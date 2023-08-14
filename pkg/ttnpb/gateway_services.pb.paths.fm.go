@@ -15,13 +15,13 @@ var PullGatewayConfigurationRequestFieldPathsTopLevel = []string{
 }
 var AssertGatewayRightsRequestFieldPathsNested = []string{
 	"gateway_ids",
-	"required_rights",
-	"required_rights.rights",
+	"required",
+	"required.rights",
 }
 
 var AssertGatewayRightsRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
-	"required_rights",
+	"required",
 }
 var AssertGatewayRightsResponseFieldPathsNested = []string{
 	"gateway_ids",

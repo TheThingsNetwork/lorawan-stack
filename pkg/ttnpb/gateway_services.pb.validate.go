@@ -177,19 +177,19 @@ func (m *AssertGatewayRightsRequest) ValidateFields(paths ...string) error {
 
 			}
 
-		case "required_rights":
+		case "required":
 
-			if m.GetRequiredRights() == nil {
+			if m.GetRequired() == nil {
 				return AssertGatewayRightsRequestValidationError{
-					field:  "required_rights",
+					field:  "required",
 					reason: "value is required",
 				}
 			}
 
-			if v, ok := interface{}(m.GetRequiredRights()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetRequired()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return AssertGatewayRightsRequestValidationError{
-						field:  "required_rights",
+						field:  "required",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

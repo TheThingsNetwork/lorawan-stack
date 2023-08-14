@@ -170,7 +170,7 @@ message AssertGatewayRightsRequest {
     (validate.rules).repeated.min_items = 1,
     (validate.rules).repeated.max_items = 20
   ];
-  Rights required_rights = 2 [(validate.rules).message.required = true];
+  Rights required = 2 [(validate.rules).message.required = true];
 }
 
 message AssertGatewayRightsResponse {
@@ -179,7 +179,7 @@ message AssertGatewayRightsResponse {
 }
 
 service GatewayBatchAccess {
-  // Assert that the caller has the required rights on all the requested gateways.
+  // Assert that the caller has the requested rights on all the requested gateways.
   // The check is successful if there are no errors.
   rpc AssertRights(AssertGatewayRightsRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {get: "/gateways/rights/batch"};

@@ -5840,6 +5840,15 @@
       "file": "gateway_access.go"
     }
   },
+  "error:pkg/identityserver:insufficient_rights": {
+    "translations": {
+      "en": "insufficient rights"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
+    }
+  },
   "error:pkg/identityserver:invalid_authorization": {
     "translations": {
       "en": "invalid authorization"
@@ -5930,6 +5939,15 @@
       "file": "notification_registry.go"
     }
   },
+  "error:pkg/identityserver:no_required_gateway_rights": {
+    "translations": {
+      "en": "no required gateway rights in request"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
+    }
+  },
   "error:pkg/identityserver:no_validation_needed": {
     "translations": {
       "en": "no validation needed for this contact info"
@@ -5937,6 +5955,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "contact_info_registry.go"
+    }
+  },
+  "error:pkg/identityserver:non_gateway_rights": {
+    "translations": {
+      "en": "non-gateway rights `{rights}` in request"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
     }
   },
   "error:pkg/identityserver:oauth_client_rejected": {
@@ -6081,6 +6108,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "registry_search.go"
+    }
+  },
+  "error:pkg/identityserver:some_gateways_not_found": {
+    "translations": {
+      "en": "some gateways not found"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
     }
   },
   "error:pkg/identityserver:temporary_password_expired": {

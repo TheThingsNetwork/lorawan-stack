@@ -96,10 +96,10 @@ func (x *AssertGatewayRightsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 		}
 		s.WriteArrayEnd()
 	}
-	if x.RequiredRights != nil || s.HasField("required_rights") {
+	if x.Required != nil || s.HasField("required") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("required_rights")
-		x.RequiredRights.MarshalProtoJSON(s.WithField("required_rights"))
+		s.WriteObjectField("required")
+		x.Required.MarshalProtoJSON(s.WithField("required"))
 	}
 	s.WriteObjectEnd()
 }
@@ -136,13 +136,13 @@ func (x *AssertGatewayRightsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 				}
 				x.GatewayIds = append(x.GatewayIds, v)
 			})
-		case "required_rights", "requiredRights":
+		case "required":
 			if s.ReadNil() {
-				x.RequiredRights = nil
+				x.Required = nil
 				return
 			}
-			x.RequiredRights = &Rights{}
-			x.RequiredRights.UnmarshalProtoJSON(s.WithField("required_rights", true))
+			x.Required = &Rights{}
+			x.Required.UnmarshalProtoJSON(s.WithField("required", true))
 		}
 	})
 }

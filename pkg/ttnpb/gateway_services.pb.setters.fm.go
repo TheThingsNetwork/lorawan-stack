@@ -61,29 +61,29 @@ func (dst *AssertGatewayRightsRequest) SetFields(src *AssertGatewayRightsRequest
 			} else {
 				dst.GatewayIds = nil
 			}
-		case "required_rights":
+		case "required":
 			if len(subs) > 0 {
 				var newDst, newSrc *Rights
-				if (src == nil || src.RequiredRights == nil) && dst.RequiredRights == nil {
+				if (src == nil || src.Required == nil) && dst.Required == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.RequiredRights
+					newSrc = src.Required
 				}
-				if dst.RequiredRights != nil {
-					newDst = dst.RequiredRights
+				if dst.Required != nil {
+					newDst = dst.Required
 				} else {
 					newDst = &Rights{}
-					dst.RequiredRights = newDst
+					dst.Required = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.RequiredRights = src.RequiredRights
+					dst.Required = src.Required
 				} else {
-					dst.RequiredRights = nil
+					dst.Required = nil
 				}
 			}
 

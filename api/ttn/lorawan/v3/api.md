@@ -5008,14 +5008,14 @@ Identifies an end device model with version information.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
-| `required_rights` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
+| `required` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
-| `required_rights` | <p>`message.required`: `true`</p> |
+| `required` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.AssertGatewayRightsResponse">Message `AssertGatewayRightsResponse`</a>
 
@@ -5072,7 +5072,7 @@ API keys and collaborators of gateways.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `AssertRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Assert that the caller has the required rights on all the requested gateways. The check is successful if there are no errors. |
+| `AssertRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Assert that the caller has the requested rights on all the requested gateways. The check is successful if there are no errors. |
 
 #### HTTP bindings
 

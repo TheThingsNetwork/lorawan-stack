@@ -465,3 +465,407 @@ func TestGatewayAccessClusterAuth(t *testing.T) {
 		}
 	}, withPrivateTestDatabase(p))
 }
+
+func TestGatewayBatchAccess(t *testing.T) {
+	p := &storetest.Population{}
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	admin := p.NewUser()
+	admin.Admin = true
+	adminKey, _ := p.NewAPIKey(admin.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	adminCreds := rpcCreds(adminKey)
+
+	usr1 := p.NewUser()
+	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	usr1Creds := rpcCreds(usr1Key)
+
+	gtw := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+	gtw.StatusPublic = true
+	gtw.LocationPublic = true
+	gtwKey, _ := p.NewAPIKey(gtw.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	gtwCreds := rpcCreds(gtwKey)
+
+	gtw1 := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+
+	limitedKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+		ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
+		ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
+	)
+	limitedCreds := rpcCreds(limitedKey)
+
+	collaboratorWithLimitedRights := p.NewUser()
+	p.NewMembership(
+		collaboratorWithLimitedRights.GetOrganizationOrUserIdentifiers(),
+		gtw1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ,
+		ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+	)
+	collaboratorKey, _ := p.NewAPIKey(
+		collaboratorWithLimitedRights.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_ALL,
+	)
+	collaboratorCreds := rpcCreds(collaboratorKey)
+
+	usr2 := p.NewUser()
+	p.NewMembership(
+		usr2.GetOrganizationOrUserIdentifiers(),
+		gtw.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+		ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ,
+	)
+
+	gtw2 := p.NewGateway(usr2.GetOrganizationOrUserIdentifiers())
+
+	randomUser := p.NewUser()
+	randomUserKey, _ := p.NewAPIKey(randomUser.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	randomUserCreds := rpcCreds(randomUserKey)
+
+	statsUser := p.NewUser()
+	statsUserKey, _ := p.NewAPIKey(statsUser.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	statsUserCreds := rpcCreds(statsUserKey)
+
+	locUser := p.NewUser()
+	locUserKey, _ := p.NewAPIKey(locUser.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	locUserCreds := rpcCreds(locUserKey)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+
+		reg := ttnpb.NewGatewayBatchAccessClient(cc)
+
+		for _, tc := range []struct {
+			Name           string
+			Credentials    grpc.CallOption
+			Request        *ttnpb.AssertGatewayRightsRequest
+			ErrorAssertion func(error) bool
+		}{
+			{
+				Name:           "Empty request",
+				Credentials:    usr1Creds,
+				Request:        &ttnpb.AssertGatewayRightsRequest{},
+				ErrorAssertion: errors.IsInvalidArgument,
+			},
+			{
+				Name:        "No rights requested",
+				Credentials: usr1Creds,
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{},
+					},
+				},
+				ErrorAssertion: errors.IsInvalidArgument,
+			},
+			{
+				Name:        "No gateway rights",
+				Credentials: usr1Creds,
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_APPLICATION_ALL,
+						},
+					},
+				},
+				ErrorAssertion: errors.IsInvalidArgument,
+			},
+			{
+				Name:        "Extra rights requested",
+				Credentials: usr1Creds,
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_APPLICATION_ALL,
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				ErrorAssertion: errors.IsInvalidArgument,
+			},
+			{
+				Name:        "Not user or organization",
+				Credentials: gtwCreds,
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Limited rights",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				Credentials:    limitedCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Random user",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				Credentials:    randomUserCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "One gateway not found",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+						{
+							GatewayId: "unknown",
+						},
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				Credentials:    usr1Creds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "One gateway not found for admin",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+						{
+							GatewayId: "unknown",
+						},
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				Credentials:    adminCreds,
+				ErrorAssertion: errors.IsNotFound,
+			},
+			{
+				Name: "No rights for one gateway",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+						gtw2.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				Credentials:    usr1Creds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Collaborator with limited rights",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS,
+						},
+					},
+				},
+				Credentials:    collaboratorCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Limited rights for admin",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS,
+						},
+					},
+				},
+				Credentials:    adminCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Read Stats Failure",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+						},
+					},
+				},
+				Credentials:    statsUserCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Read Location Failure",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw2.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+						},
+					},
+				},
+				Credentials:    locUserCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Collaborator with insufficient rights for one gateway",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+							ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ,
+						},
+					},
+				},
+				Credentials:    collaboratorCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Collaborator with excessive rights requested",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+							ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ,
+							ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS,
+						},
+					},
+				},
+				Credentials:    collaboratorCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Read Stats",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+						},
+					},
+				},
+				Credentials: statsUserCreds,
+			},
+			{
+				Name: "Read Location",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+						},
+					},
+				},
+				Credentials: locUserCreds,
+			},
+			{
+				Name: "Valid collaborator",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+							ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ,
+						},
+					},
+				},
+				Credentials: collaboratorCreds,
+			},
+			{
+				Name: "Valid request",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw.GetIds(),
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS,
+							ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE,
+							ttnpb.Right_RIGHT_GATEWAY_WRITE_SECRETS,
+						},
+					},
+				},
+				Credentials: usr1Creds,
+			},
+		} {
+			tc := tc
+			t.Run(tc.Name, func(t *testing.T) {
+				_, err := reg.AssertRights(ctx, tc.Request, tc.Credentials)
+				if err != nil {
+					if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
+						t.Fatalf("Unexpected error: %v", err)
+					}
+				} else if tc.ErrorAssertion != nil {
+					t.Fatalf("Expected error")
+				}
+			})
+		}
+	}, withPrivateTestDatabase(p))
+}

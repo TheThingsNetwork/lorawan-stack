@@ -214,9 +214,15 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs *ttnpb.UserIde
 	return entity.Union(universal), nil
 }
 
-var errInsufficientRights = errors.DefinePermissionDenied(
-	"inufficient_rights",
-	"inufficient rights",
+var (
+	errInsufficientRights = errors.DefinePermissionDenied(
+		"insufficient_rights",
+		"insufficient rights",
+	)
+	errSomeGatewaysNotFound = errors.DefineNotFound(
+		"some_gateways_not_found",
+		"some gateways not found",
+	)
 )
 
 func (is *IdentityServer) assertGatewayRights(
@@ -252,6 +258,10 @@ func (is *IdentityServer) assertGatewayRights(
 			return err
 		}
 		if len(gtws) != len(gtwIDs) {
+			if is.IsAdmin(ctx) {
+				// Return the cause only to the admin.
+				return errSomeGatewaysNotFound.New()
+			}
 			// Some gateways were not found.
 			return errInsufficientRights.New()
 		}
@@ -287,7 +297,7 @@ func (is *IdentityServer) assertGatewayRights(
 		membershipChains, err := st.FindAccountMembershipChains(
 			ctx,
 			ouID,
-			gtwIDs[0].EntityType(),
+			"gateway",
 			entityIDs...,
 		)
 		if err != nil {
@@ -299,8 +309,13 @@ func (is *IdentityServer) assertGatewayRights(
 		}
 
 		for _, chain := range membershipChains {
-			// Check if each chain has the required rights on the particular gateway (entity).
-			if len(requiredGatewayRights.Intersect(chain.GetRights()).GetRights()) == 0 {
+			// Make sure that there are no extra rights requested.
+			otherRights := requiredGatewayRights.Sub(
+				requiredGatewayRights.Intersect(
+					chain.GetRights(),
+				),
+			)
+			if len(otherRights.GetRights()) > 0 {
 				return errInsufficientRights.New()
 			}
 		}

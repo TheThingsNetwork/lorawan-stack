@@ -924,7 +924,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GatewayBatchAccessClient interface {
-	// Assert that the caller has the required rights on all the requested gateways.
+	// Assert that the caller has the requested rights on all the requested gateways.
 	// The check is successful if there are no errors.
 	AssertRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -950,7 +950,7 @@ func (c *gatewayBatchAccessClient) AssertRights(ctx context.Context, in *AssertG
 // All implementations must embed UnimplementedGatewayBatchAccessServer
 // for forward compatibility
 type GatewayBatchAccessServer interface {
-	// Assert that the caller has the required rights on all the requested gateways.
+	// Assert that the caller has the requested rights on all the requested gateways.
 	// The check is successful if there are no errors.
 	AssertRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGatewayBatchAccessServer()
