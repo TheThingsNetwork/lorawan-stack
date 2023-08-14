@@ -20,6 +20,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 func allPotentialRights(eIDs *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) *ttnpb.Rights {
@@ -247,11 +248,6 @@ func (is *IdentityServer) assertGatewayRights(
 		return errInsufficientRights.New()
 	}
 
-	entityIDs := make([]string, 0, len(gtwIDs))
-	for _, gtwID := range gtwIDs {
-		entityIDs = append(entityIDs, gtwID.GetEntityIdentifiers().IDString())
-	}
-
 	return is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		gtws, err := st.FindGateways(ctx, gtwIDs, []string{"ids", "status_public", "location_public"})
 		if err != nil {
@@ -262,38 +258,50 @@ func (is *IdentityServer) assertGatewayRights(
 				// Return the cause only to the admin.
 				return errSomeGatewaysNotFound.New()
 			}
-			// Some gateways were not found.
 			return errInsufficientRights.New()
 		}
 
-		if len(requiredGatewayRights.Sub(
+		// Filter out the public gateways from membership checks,
+		// when only public fields are requested.
+		publicGatewayIds := make(map[string]struct{}, len(gtws))
+		bothStatsAndLocation := len(requiredGatewayRights.Sub(
 			ttnpb.RightsFrom(
+				ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
 				ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
 			),
-		).GetRights()) == 0 {
-			// Only the public status is requested. Check that all the gateways in the batch allow this.
-			for _, gtw := range gtws {
-				if !gtw.StatusPublic {
-					return errInsufficientRights.New()
-				}
-			}
-			return nil
-		}
-
-		if len(requiredGatewayRights.Sub(
+		).GetRights()) == 0
+		onlyPublicLocation := len(requiredGatewayRights.Sub(
 			ttnpb.RightsFrom(
 				ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
 			),
-		).GetRights()) == 0 {
-			// Only public location is requested. Check that all the gateways in the batch allow this.
+		).GetRights()) == 0
+		onlyPublicStats := len(requiredGatewayRights.Sub(
+			ttnpb.RightsFrom(
+				ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+			),
+		).GetRights()) == 0
+		if onlyPublicStats || bothStatsAndLocation {
 			for _, gtw := range gtws {
-				if !gtw.LocationPublic {
-					return errInsufficientRights.New()
+				if gtw.StatusPublic {
+					publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
 				}
 			}
-			return nil
+		}
+		if onlyPublicLocation || bothStatsAndLocation {
+			for _, gtw := range gtws {
+				if gtw.LocationPublic {
+					publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+				}
+			}
 		}
 
+		entityIDs := make([]string, 0, len(gtwIDs))
+		for _, gtwID := range gtwIDs {
+			if _, ok := publicGatewayIds[unique.ID(ctx, gtwID)]; ok {
+				continue
+			}
+			entityIDs = append(entityIDs, gtwID.GetEntityIdentifiers().IDString())
+		}
 		membershipChains, err := st.FindAccountMembershipChains(
 			ctx,
 			ouID,
@@ -303,11 +311,10 @@ func (is *IdentityServer) assertGatewayRights(
 		if err != nil {
 			return err
 		}
-		if len(membershipChains) != len(gtwIDs) {
+		if len(membershipChains) != len(entityIDs) {
 			// Some memberships were not found.
 			return errInsufficientRights.New()
 		}
-
 		for _, chain := range membershipChains {
 			// Make sure that there are no extra rights requested.
 			otherRights := requiredGatewayRights.Sub(
