@@ -72,7 +72,7 @@ func makeWindowDurationFunc(d time.Duration) windowDurationFunc {
 	return func(ctx context.Context) time.Duration { return d }
 }
 
-// netIDFunc is a function, which is used by the Network Server to determine it's NetID.
+// netIDFunc is a function, which is used by the Network Server to determine its NetID.
 type netIDFunc func(ctx context.Context) types.NetID
 
 // makeNetIDFunc returns a netIDFunc, which always returns netID.
@@ -82,7 +82,7 @@ func makeNetIDFunc(netID types.NetID) netIDFunc {
 	}
 }
 
-// nsIDFunc is a function, which is used by the Network Server to determine it's NSID.
+// nsIDFunc is a function, which is used by the Network Server to determine its NSID.
 type nsIDFunc func(ctx context.Context) *types.EUI64
 
 // makeNSIDFunc returns a nsIDFunc, which always returns nsID.
