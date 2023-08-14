@@ -384,9 +384,10 @@ type GsClient interface {
 	// This is not persisted between reconnects.
 	GetGatewayConnectionStats(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*GatewayConnectionStats, error)
 	// Get statistics about gateway connections to the Gateway Server of a batch of gateways.
-	// This is not persisted between reconnects.
-	// Gateways that are not connected or are part of a different cluster are ignored.
-	// It is up to the client to make sure that the gateways are in the requested cluster.
+	// - Statistics are not persisted between reconnects.
+	// - Gateways that are not connected or are part of a different cluster are ignored.
+	// - The client should the gateways are in the requested cluster.
+	// - The client should have the right to get the gateway connection stats on all requested gateways.
 	BatchGetGatewayConnectionStats(ctx context.Context, in *BatchGetGatewayConnectionStatsRequest, opts ...grpc.CallOption) (*BatchGetGatewayConnectionStatsResponse, error)
 }
 
@@ -424,9 +425,10 @@ type GsServer interface {
 	// This is not persisted between reconnects.
 	GetGatewayConnectionStats(context.Context, *GatewayIdentifiers) (*GatewayConnectionStats, error)
 	// Get statistics about gateway connections to the Gateway Server of a batch of gateways.
-	// This is not persisted between reconnects.
-	// Gateways that are not connected or are part of a different cluster are ignored.
-	// It is up to the client to make sure that the gateways are in the requested cluster.
+	// - Statistics are not persisted between reconnects.
+	// - Gateways that are not connected or are part of a different cluster are ignored.
+	// - The client should the gateways are in the requested cluster.
+	// - The client should have the right to get the gateway connection stats on all requested gateways.
 	BatchGetGatewayConnectionStats(context.Context, *BatchGetGatewayConnectionStatsRequest) (*BatchGetGatewayConnectionStatsResponse, error)
 	mustEmbedUnimplementedGsServer()
 }
