@@ -383,29 +383,28 @@ func (c *TTJS) BatchUnclaim(
 		if err != nil {
 			return errUnclaimDevices.WithCause(err)
 		}
-
 		if errMsg.Message != "" {
 			return errBadRequest.WithAttributes("message", errMsg.Message)
 		}
 
 		var resp EndDevicesErrors
 		err = json.Unmarshal(respBody, &resp)
-		if err == nil {
-			e := claimerrors.DeviceErrors{
-				Errors: make(map[types.EUI64]errors.ErrorDetails, len(resp)),
-			}
-			for euiText, r := range resp {
-				var eui types.EUI64
-				err := eui.UnmarshalText([]byte(euiText))
-				if err != nil {
-					logger.WithError(err).WithField("eui", euiText).Warn("Failed to decode EUI")
-					continue
-				}
-				e.Errors[eui] = errUnclaimDevice.WithAttributes("message", r.Message)
-			}
-			return e
+		if err != nil {
+			return errUnclaimDevices.WithCause(err)
 		}
-		return errUnclaimDevices.WithCause(err)
+		ret := claimerrors.DeviceErrors{
+			Errors: make(map[types.EUI64]errors.ErrorDetails, len(resp)),
+		}
+		for euiText, r := range resp {
+			var eui types.EUI64
+			err := eui.UnmarshalText([]byte(euiText))
+			if err != nil {
+				logger.WithError(err).WithField("eui", euiText).Warn("Failed to decode EUI")
+				continue
+			}
+			ret.Errors[eui] = errUnclaimDevice.WithAttributes("message", r.Message)
+		}
+		return ret
 	case http.StatusUnauthorized:
 		return errUnauthenticated.New()
 	default:

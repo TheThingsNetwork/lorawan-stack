@@ -41,7 +41,10 @@ var (
 		"claiming_not_supported",
 		"claiming not supported for JoinEUI `{eui}`",
 	)
-	errNoDevicesFound = errors.DefineInvalidArgument("no_devices_found", "no devices in batch found")
+	errNoDevicesFound = errors.DefineInvalidArgument(
+		"no_devices_found",
+		"no devices in batch found in the device registry",
+	)
 )
 
 // endDeviceClaimingServer is the front facing entity for gRPC requests.

@@ -3745,7 +3745,7 @@
   },
   "error:pkg/deviceclaimingserver:no_devices_found": {
     "translations": {
-      "en": "no devices in batch found"
+      "en": "no devices in batch found in the device registry"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",

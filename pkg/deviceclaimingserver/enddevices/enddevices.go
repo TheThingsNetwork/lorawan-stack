@@ -46,7 +46,7 @@ type EndDeviceClaimer interface {
 
 	// BatchUnclaim releases the claim on a batch of end devices.
 	// All devices in a batch must have the same Join EUI.
-	// Callers should first try to unmarshal returned error to BatchError.
+	// Callers should first try to unmarshal returned error to DeviceError using errors.As().
 	BatchUnclaim(
 		ctx context.Context,
 		ids []*ttnpb.EndDeviceIdentifiers,
