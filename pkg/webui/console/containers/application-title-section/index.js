@@ -68,7 +68,7 @@ const ApplicationTitleSection = ({ appId }) => {
   )
   const devicesTotalCount = useSelector(state => selectApplicationDeviceCount(state, appId))
   const application = useSelector(state => selectApplicationById(state, appId))
-  const lastSeen = useSelector(selectApplicationDerivedLastSeen)
+  const lastSeen = useSelector(state => selectApplicationDerivedLastSeen(state, appId))
   const mayViewCollaborators = useSelector(state =>
     checkFromState(mayViewOrEditApplicationCollaborators, state),
   )
