@@ -41,11 +41,7 @@ import {
   getAccessTokensList,
 } from '@account/store/actions/authorizations'
 
-import {
-  selectTokens,
-  selectTokensTotalCount,
-  selectTokensFetching,
-} from '@account/store/selectors/authorizations'
+import { selectTokens, selectTokensTotalCount } from '@account/store/selectors/authorizations'
 import { selectUserId } from '@account/store/selectors/user'
 
 const m = defineMessages({
@@ -169,11 +165,9 @@ const TokensTable = () => {
   const baseDataSelector = createSelector(
     selectTokens,
     selectTokensTotalCount,
-    selectTokensFetching,
-    (tokens, totalCount, fetching) => ({
+    (tokens, totalCount) => ({
       tokens,
       totalCount,
-      fetching,
       mayAdd: false,
       mayLink: false,
     }),

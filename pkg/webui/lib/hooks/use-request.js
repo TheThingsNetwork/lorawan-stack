@@ -24,23 +24,24 @@ const useRequest = requestAction => {
   const [result, setResult] = useState()
 
   useEffect(() => {
-    const promise =
-      requestAction instanceof Array
-        ? Promise.all(requestAction.map(req => dispatch(attachPromise(req))))
-        : typeof requestAction === 'function'
-        ? requestAction(dispatch)
-        : dispatch(attachPromise(requestAction))
+    if (requestAction) {
+      const promise =
+        requestAction instanceof Array
+          ? Promise.all(requestAction.map(req => dispatch(attachPromise(req))))
+          : typeof requestAction === 'function'
+          ? requestAction(dispatch)
+          : dispatch(attachPromise(requestAction))
 
-    promise
-      .then(() => {
-        setResult(result)
-        setFetching(false)
-      })
-      .catch(error => {
-        setError(error)
-        setFetching(false)
-      })
-
+      promise
+        .then(() => {
+          setResult(result)
+          setFetching(false)
+        })
+        .catch(error => {
+          setError(error)
+          setFetching(false)
+        })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

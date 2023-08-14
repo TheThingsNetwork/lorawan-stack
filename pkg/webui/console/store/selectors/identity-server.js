@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
-import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
-
-import { GET_IS_CONFIGURATION_BASE } from '@console/store/actions/identity-server'
-
 const selectIsStore = state => state.is
 
 export const selectIsConfiguration = state => selectIsStore(state).configuration
-export const selectIsConfigurationFetching = createFetchingSelector(GET_IS_CONFIGURATION_BASE)
-export const selectIsConfigurationError = createErrorSelector(GET_IS_CONFIGURATION_BASE)
 
 export const selectUserRegistration = state => selectIsConfiguration(state).user_registration || {}
 export const selectPasswordRequirements = state =>

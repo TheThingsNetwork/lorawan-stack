@@ -36,11 +36,7 @@ import { checkFromState, mayPerformAllClientActions } from '@account/lib/feature
 import { deleteClient, restoreClient, getClientsList } from '@account/store/actions/clients'
 
 import { selectUserIsAdmin } from '@account/store/selectors/user'
-import {
-  selectOAuthClients,
-  selectOAuthClientsTotalCount,
-  selectOAuthClientsFetching,
-} from '@account/store/selectors/clients'
+import { selectOAuthClients, selectOAuthClientsTotalCount } from '@account/store/selectors/clients'
 
 const m = defineMessages({
   ownedTabTitle: 'Owned OAuth clients',
@@ -182,11 +178,10 @@ const ClientsTable = () => {
   }, [tab, handlePurge, handleRestore, formatMessage])
 
   const baseDataSelector = createSelector(
-    [selectOAuthClients, selectOAuthClientsTotalCount, selectOAuthClientsFetching, mayAddSelector],
-    (clients, totalCount, fetching, mayAdd) => ({
+    [selectOAuthClients, selectOAuthClientsTotalCount, mayAddSelector],
+    (clients, totalCount, mayAdd) => ({
       clients,
       totalCount,
-      fetching,
       mayAdd,
     }),
   )

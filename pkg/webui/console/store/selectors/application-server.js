@@ -14,16 +14,9 @@
 
 import { get } from 'lodash'
 
-import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
-import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
-
-import { GET_AS_CONFIGURATION_BASE } from '@console/store/actions/application-server'
-
 const selectAsStore = state => state.as
 
 export const selectAsConfiguration = state => selectAsStore(state).configuration
-export const selectAsConfigurationFetching = createFetchingSelector(GET_AS_CONFIGURATION_BASE)
-export const selectAsConfigurationError = createErrorSelector(GET_AS_CONFIGURATION_BASE)
 
 export const selectPubSubProviders = state =>
   get(selectAsConfiguration(state), 'pubsub.providers') || {}

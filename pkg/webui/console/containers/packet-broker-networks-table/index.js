@@ -30,7 +30,6 @@ import { getPacketBrokerNetworksList } from '@console/store/actions/packet-broke
 import {
   selectPacketBrokerNetworks,
   selectPacketBrokerNetworksTotalCount,
-  selectPacketBrokerNetworksFetching,
   selectPacketBrokerForwarderPolicyById,
   selectPacketBrokerHomeNetworkPolicyById,
   selectPacketBrokerOwnCombinedId,
@@ -108,7 +107,6 @@ const PacketBrokerNetworksTable = () => {
       selectPacketBrokerForwarderPolicyById,
       selectPacketBrokerHomeNetworkPolicyById,
       selectPacketBrokerNetworksTotalCount,
-      selectPacketBrokerNetworksFetching,
     ],
     (
       ownCombinedId,
@@ -117,7 +115,6 @@ const PacketBrokerNetworksTable = () => {
       forwarderPolicy,
       homeNetworkPolicy,
       totalCount,
-      fetching,
     ) => {
       const decoratedNetworks = []
       for (const network of networks) {
@@ -140,7 +137,6 @@ const PacketBrokerNetworksTable = () => {
       return {
         networks: decoratedNetworks,
         totalCount,
-        fetching,
         mayAdd: false,
       }
     },

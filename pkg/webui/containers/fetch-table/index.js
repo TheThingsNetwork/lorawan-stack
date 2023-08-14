@@ -33,6 +33,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import getByPath from '@ttn-lw/lib/get-by-path'
 import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
 import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
+import useRequest from '@ttn-lw/lib/hooks/use-request'
 
 import style from './fetch-table.styl'
 
@@ -83,7 +84,6 @@ const FetchTable = props => {
 
   const dispatch = useDispatch()
   const defaultTab = tabs.length > 0 ? tabs[0].name : undefined
-
   const [page, setPage] = useQueryState('page', 1, parseInt)
   const [tab, setTab] = useQueryState('tab', defaultTab)
   const [order, setOrder] = useQueryState('order', defaultOrder)
@@ -98,15 +98,14 @@ const FetchTable = props => {
 
   const [initialFetch, setInitialFetch] = useState(true)
   const base = useSelector(state => baseDataSelector(state, props))
-  const [error, setError] = useState(base.error)
   const items = base[props.entity] || []
   const totalCount = base.totalCount || 0
-  const fetching = base.fetching
-  const fetchingSearch = base.fetchingSearch
   const mayAdd = 'mayAdd' in base ? base.mayAdd : true
   const mayLink = 'mayLink' in base ? base.mayLink : true
 
   const filters = { query: debouncedQuery, tab, order, page }
+  const [fetching, fetchingError] = useRequest(getItemsAction(filters))
+  const [error, setError] = useState(fetchingError)
   let orderDirection, orderBy
   // Parse order string.
   if (typeof order === 'string') {
@@ -257,7 +256,6 @@ const FetchTable = props => {
               data-test-id="search-input"
               value={query}
               icon="search"
-              loading={fetchingSearch}
               onChange={onQueryChange}
               placeholder={searchPlaceholderMessage}
               className={style.searchBar}

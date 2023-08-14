@@ -48,7 +48,6 @@ import {
 import { selectUserIsAdmin } from '@console/store/selectors/logout'
 import {
   selectApplicationsTotalCount,
-  selectApplicationsFetching,
   selectApplicationsWithDeviceCounts,
 } from '@console/store/selectors/applications'
 
@@ -244,12 +243,10 @@ const ApplicationsTable = props => {
   const baseDataSelector = createSelector(
     selectDecoratedApplications,
     selectApplicationsTotalCount,
-    selectApplicationsFetching,
     state => checkFromState(mayCreateApplications, state),
-    (applications, totalCount, fetching, mayAdd) => ({
+    (applications, totalCount, mayAdd) => ({
       applications,
       totalCount,
-      fetching,
       mayAdd,
     }),
   )

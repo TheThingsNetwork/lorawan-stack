@@ -26,8 +26,6 @@ import CollaboratorsTable from '@console/containers/collaborators-table'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
   selectCollaborators,
-  selectCollaboratorsError,
-  selectCollaboratorsFetching,
   selectCollaboratorsTotalCount,
 } from '@ttn-lw/lib/store/selectors/collaborators'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
@@ -39,14 +37,10 @@ const GatewayCollaboratorsList = () => {
     [
       state => selectCollaborators(state, gtwId),
       state => selectCollaboratorsTotalCount(state, gtwId),
-      selectCollaboratorsFetching,
-      selectCollaboratorsError,
     ],
-    (collaborators, totalCount, fetching, error) => ({
+    (collaborators, totalCount) => ({
       collaborators,
       totalCount,
-      fetching,
-      error,
     }),
   )
 

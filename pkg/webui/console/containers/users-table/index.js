@@ -48,10 +48,8 @@ import { selectUserId } from '@console/store/selectors/logout'
 import {
   selectUsers,
   selectUsersTotalCount,
-  selectUsersFetching,
   selectUserInvitations,
   selectUserInvitationsTotalCount,
-  selectUserInvitationsFetching,
 } from '@console/store/selectors/users'
 
 import style from './users-table.styl'
@@ -316,11 +314,9 @@ const UsersTable = props => {
   const invitationsBaseDataSelector = createSelector(
     selectUserInvitations,
     selectUserInvitationsTotalCount,
-    selectUserInvitationsFetching,
-    (invitations, totalCount, fetching) => ({
+    (invitations, totalCount) => ({
       invitations,
       totalCount,
-      fetching,
       mayAdd: mayInvite,
       mayLink: false,
     }),
@@ -328,11 +324,9 @@ const UsersTable = props => {
   const usersBaseDataSelector = createSelector(
     selectUsers,
     selectUsersTotalCount,
-    selectUsersFetching,
-    (users, totalCount, fetching) => ({
+    (users, totalCount) => ({
       users,
       totalCount,
-      fetching,
       mayAdd: mayManageUsers,
     }),
   )
