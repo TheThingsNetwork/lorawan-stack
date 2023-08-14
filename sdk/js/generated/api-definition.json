@@ -3188,8 +3188,8 @@
     }
   },
   "GatewayBatchAccess": {
-    "AssertGatewayRights": {
-      "file": "lorawan-stack/api/gateway_services.proto",
+    "AssertRights": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
       "http": [
         {
           "method": "get",

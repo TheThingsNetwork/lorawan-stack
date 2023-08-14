@@ -23,12 +23,3 @@ var AssertGatewayRightsRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
 	"required",
 }
-var AssertGatewayRightsResponseFieldPathsNested = []string{
-	"gateway_ids",
-	"has_required_rights",
-}
-
-var AssertGatewayRightsResponseFieldPathsTopLevel = []string{
-	"gateway_ids",
-	"has_required_rights",
-}

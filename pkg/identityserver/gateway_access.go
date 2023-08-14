@@ -414,7 +414,7 @@ var (
 	)
 	errNonGatewayRights = errors.DefineInvalidArgument(
 		"non_gateway_rights",
-		"non-gateway rights `{rights}` in request",
+		"non-gateway rights in request",
 	)
 )
 
@@ -427,13 +427,8 @@ func (gba *gatewayBatchAccess) AssertRights(ctx context.Context, req *ttnpb.Asse
 	}
 
 	// Check that the request is checking only gateway rights.
-	gatewayRights := ttnpb.AllGatewayRights.Intersect(ttnpb.RightsFrom(required.GetRights()...))
-	if len(gatewayRights.GetRights()) == 0 {
-		return nil, errNoRequiredGatewayRights.New()
-	}
-	otherRights := required.Sub(gatewayRights)
-	if len(otherRights.GetRights()) > 0 {
-		return nil, errNonGatewayRights.WithAttributes("rights", otherRights.GetRights())
+	if !ttnpb.AllGatewayRights.IncludesAll(required.GetRights()...) {
+		return nil, errNonGatewayRights.New()
 	}
 
 	err := gba.assertGatewayRights(ctx, req.GatewayIds, required)

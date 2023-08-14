@@ -5959,7 +5959,7 @@
   },
   "error:pkg/identityserver:non_gateway_rights": {
     "translations": {
-      "en": "non-gateway rights `{rights}` in request"
+      "en": "non-gateway rights in request"
     },
     "description": {
       "package": "pkg/identityserver",

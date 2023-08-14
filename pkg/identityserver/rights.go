@@ -226,7 +226,7 @@ var (
 	)
 )
 
-func (is *IdentityServer) assertGatewayRights(
+func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 	ctx context.Context,
 	gtwIDs []*ttnpb.GatewayIdentifiers,
 	requiredGatewayRights *ttnpb.Rights,
@@ -244,7 +244,7 @@ func (is *IdentityServer) assertGatewayRights(
 
 	// Check that the caller has the requested rights.
 	authInfoRights := ttnpb.RightsFrom(authInfo.GetRights()...)
-	if len(requiredGatewayRights.Intersect(authInfoRights).GetRights()) == 0 {
+	if !authInfoRights.IncludesAll(requiredGatewayRights.GetRights()...) {
 		return errInsufficientRights.New()
 	}
 
@@ -256,6 +256,7 @@ func (is *IdentityServer) assertGatewayRights(
 		if len(gtws) != len(gtwIDs) {
 			if is.IsAdmin(ctx) {
 				// Return the cause only to the admin.
+				// This follows the same logic as in ListRights.
 				return errSomeGatewaysNotFound.New()
 			}
 			return errInsufficientRights.New()

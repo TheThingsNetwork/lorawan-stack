@@ -795,7 +795,37 @@ func TestGatewayBatchAccess(t *testing.T) {
 				ErrorAssertion: errors.IsPermissionDenied,
 			},
 			{
-				Name: "Read Stats",
+				Name: "Not allowed to read private stats",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+						},
+					},
+				},
+				Credentials:    statsUserCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Not allowed to read private location",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw1.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+						},
+					},
+				},
+				Credentials:    locUserCreds,
+				ErrorAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name: "Read Public Stats",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
 						gtw.GetIds(),
@@ -809,7 +839,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Credentials: statsUserCreds,
 			},
 			{
-				Name: "Read Location",
+				Name: "Read Public Location",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
 						gtw.GetIds(),

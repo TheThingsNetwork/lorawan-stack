@@ -331,7 +331,6 @@
   - [Service `GatewayConfigurationService`](#ttn.lorawan.v3.GatewayConfigurationService)
 - [File `ttn/lorawan/v3/gateway_services.proto`](#ttn/lorawan/v3/gateway_services.proto)
   - [Message `AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest)
-  - [Message `AssertGatewayRightsResponse`](#ttn.lorawan.v3.AssertGatewayRightsResponse)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
   - [Service `GatewayBatchAccess`](#ttn.lorawan.v3.GatewayBatchAccess)
@@ -5016,19 +5015,6 @@ Identifies an end device model with version information.
 | ----- | ----------- |
 | `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
 | `required` | <p>`message.required`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.AssertGatewayRightsResponse">Message `AssertGatewayRightsResponse`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
-| `has_required_rights` | [`bool`](#bool) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `gateway_ids` | <p>`repeated.max_items`: `20`</p> |
 
 ### <a name="ttn.lorawan.v3.PullGatewayConfigurationRequest">Message `PullGatewayConfigurationRequest`</a>
 

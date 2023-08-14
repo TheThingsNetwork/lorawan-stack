@@ -173,11 +173,6 @@ message AssertGatewayRightsRequest {
   Rights required = 2 [(validate.rules).message.required = true];
 }
 
-message AssertGatewayRightsResponse {
-  repeated GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated.max_items = 20];
-  bool has_required_rights = 2;
-}
-
 service GatewayBatchAccess {
   // Assert that the caller has the requested rights on all the requested gateways.
   // The check is successful if there are no errors.

@@ -22602,50 +22602,6 @@
           ]
         },
         {
-          "name": "AssertGatewayRightsResponse",
-          "longName": "AssertGatewayRightsResponse",
-          "fullName": "ttn.lorawan.v3.AssertGatewayRightsResponse",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "gateway_ids",
-              "description": "",
-              "label": "repeated",
-              "type": "GatewayIdentifiers",
-              "longType": "GatewayIdentifiers",
-              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "repeated.max_items",
-                    "value": 20
-                  }
-                ]
-              }
-            },
-            {
-              "name": "has_required_rights",
-              "description": "",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
           "name": "PullGatewayConfigurationRequest",
           "longName": "PullGatewayConfigurationRequest",
           "fullName": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
