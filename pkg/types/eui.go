@@ -61,7 +61,7 @@ func GetEUI64(b []byte) (*EUI64, error) {
 }
 
 // MustEUI64 returns a typed EUI64 from the bytes.
-// It returns nil if the bytes are empty.
+// It returns nil if b is nil.
 // It panics if unmarshaling results in an error.
 func MustEUI64(b []byte) *EUI64 {
 	t, err := GetEUI64(b)
@@ -201,7 +201,7 @@ func GetEUI64Prefix(b []byte) (*EUI64Prefix, error) {
 }
 
 // MustEUI64Prefix returns a typed EUI64Prefix from the bytes.
-// It returns nil if the bytes are empty.
+// It returns nil if b is nil.
 // It panics if unmarshaling results in an error.
 func MustEUI64Prefix(b []byte) *EUI64Prefix {
 	t, err := GetEUI64Prefix(b)

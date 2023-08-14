@@ -626,6 +626,15 @@ func (dst *NetworkIdentifiers) SetFields(src *NetworkIdentifiers, paths ...strin
 			} else {
 				dst.NetId = nil
 			}
+		case "ns_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ns_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NsId = src.NsId
+			} else {
+				dst.NsId = nil
+			}
 		case "tenant_id":
 			if len(subs) > 0 {
 				return fmt.Errorf("'tenant_id' has no subfields, but %s were specified", subs)

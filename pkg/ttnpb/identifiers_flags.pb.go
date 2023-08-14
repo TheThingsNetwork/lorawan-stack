@@ -440,6 +440,7 @@ func (m *EndDeviceVersionIdentifiers) SetFromFlags(flags *pflag.FlagSet, prefix 
 // AddSelectFlagsForNetworkIdentifiers adds flags to select fields in NetworkIdentifiers.
 func AddSelectFlagsForNetworkIdentifiers(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("net-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("net-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("ns-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("ns-id", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("tenant-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("tenant-id", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cluster-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cluster-id", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cluster-address", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cluster-address", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -452,6 +453,11 @@ func PathsFromSelectFlagsForNetworkIdentifiers(flags *pflag.FlagSet, prefix stri
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("ns_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("ns_id", prefix))
 	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("tenant_id", prefix)); err != nil {
 		return nil, err

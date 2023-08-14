@@ -100,7 +100,7 @@ func TestInteropServer(t *testing.T) {
 			t.FailNow()
 		}
 		a.So(ans.HNetID, should.Equal, interop.NetID(test.DefaultNetID))
-		a.So(ans.HNSID, should.BeNil) // TODO: Return HNSID (https://github.com/TheThingsNetwork/lorawan-stack/issues/4741).
+		a.So(ans.HNSID, should.Resemble, (*interop.EUI64)(&test.DefaultNSID))
 
 		// Test an unknown device
 		_, err = srv.HomeNSRequest(ctx, &interop.HomeNSReq{

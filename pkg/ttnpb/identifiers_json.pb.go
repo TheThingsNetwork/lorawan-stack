@@ -289,6 +289,11 @@ func (x *NetworkIdentifiers) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("net_id")
 		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
+	if len(x.NsId) > 0 || s.HasField("ns_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ns_id")
+		types.MarshalHEXBytes(s.WithField("ns_id"), x.NsId)
+	}
 	if x.TenantId != "" || s.HasField("tenant_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("tenant_id")
@@ -329,6 +334,9 @@ func (x *NetworkIdentifiers) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "net_id", "netId":
 			s.AddField("net_id")
 			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
+		case "ns_id", "nsId":
+			s.AddField("ns_id")
+			x.NsId = types.Unmarshal8Bytes(s.WithField("ns_id", false))
 		case "tenant_id", "tenantId":
 			s.AddField("tenant_id")
 			x.TenantId = s.ReadString()

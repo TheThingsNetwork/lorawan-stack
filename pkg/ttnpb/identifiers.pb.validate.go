@@ -1203,6 +1203,19 @@ func (m *NetworkIdentifiers) ValidateFields(paths ...string) error {
 
 			}
 
+		case "ns_id":
+
+			if len(m.GetNsId()) > 0 {
+
+				if len(m.GetNsId()) != 8 {
+					return NetworkIdentifiersValidationError{
+						field:  "ns_id",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "tenant_id":
 
 			if utf8.RuneCountInString(m.GetTenantId()) > 36 {

@@ -23730,6 +23730,26 @@
               }
             },
             {
+              "name": "ns_id",
+              "description": "LoRaWAN NSID (EUI-64) that uniquely identifies the Network Server instance.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
+            },
+            {
               "name": "tenant_id",
               "description": "Optional tenant identifier for multi-tenant deployments.",
               "label": "",

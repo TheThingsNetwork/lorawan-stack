@@ -114,6 +114,7 @@ var NetworkIdentifiersFieldPathsNested = []string{
 	"cluster_address",
 	"cluster_id",
 	"net_id",
+	"ns_id",
 	"tenant_address",
 	"tenant_id",
 }
@@ -122,6 +123,7 @@ var NetworkIdentifiersFieldPathsTopLevel = []string{
 	"cluster_address",
 	"cluster_id",
 	"net_id",
+	"ns_id",
 	"tenant_address",
 	"tenant_id",
 }
