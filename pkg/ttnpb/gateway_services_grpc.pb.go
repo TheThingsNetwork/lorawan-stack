@@ -1009,3 +1009,101 @@ var GatewayBatchAccess_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "ttn/lorawan/v3/gateway_services.proto",
 }
+
+const (
+	GatewayBatchRegistry_Delete_FullMethodName = "/ttn.lorawan.v3.GatewayBatchRegistry/Delete"
+)
+
+// GatewayBatchRegistryClient is the client API for GatewayBatchRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type GatewayBatchRegistryClient interface {
+	// Delete a batch of gateways.
+	// This operation is atomic; either all gateways are deleted or none.
+	// Gateways not found are skipped and no error is returned.
+	// The caller must have delete rights on all gateways.
+	Delete(ctx context.Context, in *BatchDeleteGatewaysRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type gatewayBatchRegistryClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewGatewayBatchRegistryClient(cc grpc.ClientConnInterface) GatewayBatchRegistryClient {
+	return &gatewayBatchRegistryClient{cc}
+}
+
+func (c *gatewayBatchRegistryClient) Delete(ctx context.Context, in *BatchDeleteGatewaysRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GatewayBatchRegistry_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GatewayBatchRegistryServer is the server API for GatewayBatchRegistry service.
+// All implementations must embed UnimplementedGatewayBatchRegistryServer
+// for forward compatibility
+type GatewayBatchRegistryServer interface {
+	// Delete a batch of gateways.
+	// This operation is atomic; either all gateways are deleted or none.
+	// Gateways not found are skipped and no error is returned.
+	// The caller must have delete rights on all gateways.
+	Delete(context.Context, *BatchDeleteGatewaysRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedGatewayBatchRegistryServer()
+}
+
+// UnimplementedGatewayBatchRegistryServer must be embedded to have forward compatible implementations.
+type UnimplementedGatewayBatchRegistryServer struct {
+}
+
+func (UnimplementedGatewayBatchRegistryServer) Delete(context.Context, *BatchDeleteGatewaysRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedGatewayBatchRegistryServer) mustEmbedUnimplementedGatewayBatchRegistryServer() {}
+
+// UnsafeGatewayBatchRegistryServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GatewayBatchRegistryServer will
+// result in compilation errors.
+type UnsafeGatewayBatchRegistryServer interface {
+	mustEmbedUnimplementedGatewayBatchRegistryServer()
+}
+
+func RegisterGatewayBatchRegistryServer(s grpc.ServiceRegistrar, srv GatewayBatchRegistryServer) {
+	s.RegisterService(&GatewayBatchRegistry_ServiceDesc, srv)
+}
+
+func _GatewayBatchRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchDeleteGatewaysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayBatchRegistryServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayBatchRegistry_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayBatchRegistryServer).Delete(ctx, req.(*BatchDeleteGatewaysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GatewayBatchRegistry_ServiceDesc is the grpc.ServiceDesc for GatewayBatchRegistry service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var GatewayBatchRegistry_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.GatewayBatchRegistry",
+	HandlerType: (*GatewayBatchRegistryServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Delete",
+			Handler:    _GatewayBatchRegistry_Delete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/gateway_services.proto",
+}

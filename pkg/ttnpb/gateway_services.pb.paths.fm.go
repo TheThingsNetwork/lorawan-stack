@@ -23,3 +23,10 @@ var AssertGatewayRightsRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
 	"required",
 }
+var BatchDeleteGatewaysRequestFieldPathsNested = []string{
+	"gateway_ids",
+}
+
+var BatchDeleteGatewaysRequestFieldPathsTopLevel = []string{
+	"gateway_ids",
+}
