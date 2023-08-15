@@ -5056,6 +5056,10 @@ API keys and collaborators of gateways.
 
 ### <a name="ttn.lorawan.v3.GatewayBatchAccess">Service `GatewayBatchAccess`</a>
 
+The GatewayBatchAccess service, exposed by the Identity Server, is used to
+check the rights of the caller on multiple gateways at once.
+EXPERIMENTAL: This service is subject to change.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `AssertRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Assert that the caller has the requested rights on all the requested gateways. The check is successful if there are no errors. |

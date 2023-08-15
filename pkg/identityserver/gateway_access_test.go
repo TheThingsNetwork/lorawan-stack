@@ -481,13 +481,13 @@ func TestGatewayBatchAccess(t *testing.T) {
 	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	usr1Creds := rpcCreds(usr1Key)
 
-	gtw := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
-	gtw.StatusPublic = true
-	gtw.LocationPublic = true
-	gtwKey, _ := p.NewAPIKey(gtw.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
-	gtwCreds := rpcCreds(gtwKey)
-
 	gtw1 := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+	gtw1.StatusPublic = true
+	gtw1.LocationPublic = true
+	gtw1Key, _ := p.NewAPIKey(gtw1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	gtw1Creds := rpcCreds(gtw1Key)
+
+	gtw2 := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
 
 	limitedKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(),
 		ttnpb.Right_RIGHT_GATEWAY_INFO,
@@ -499,7 +499,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 	collaboratorWithLimitedRights := p.NewUser()
 	p.NewMembership(
 		collaboratorWithLimitedRights.GetOrganizationOrUserIdentifiers(),
-		gtw1.GetEntityIdentifiers(),
+		gtw2.GetEntityIdentifiers(),
 		ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ,
 		ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
 	)
@@ -512,12 +512,12 @@ func TestGatewayBatchAccess(t *testing.T) {
 	usr2 := p.NewUser()
 	p.NewMembership(
 		usr2.GetOrganizationOrUserIdentifiers(),
-		gtw.GetEntityIdentifiers(),
+		gtw1.GetEntityIdentifiers(),
 		ttnpb.Right_RIGHT_GATEWAY_INFO,
 		ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ,
 	)
 
-	gtw2 := p.NewGateway(usr2.GetOrganizationOrUserIdentifiers())
+	gtw3 := p.NewGateway(usr2.GetOrganizationOrUserIdentifiers())
 
 	randomUser := p.NewUser()
 	randomUserKey, _ := p.NewAPIKey(randomUser.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
@@ -553,8 +553,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Credentials: usr1Creds,
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{},
@@ -567,8 +567,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Credentials: usr1Creds,
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -583,8 +583,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Credentials: usr1Creds,
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -597,11 +597,11 @@ func TestGatewayBatchAccess(t *testing.T) {
 			},
 			{
 				Name:        "Not user or organization",
-				Credentials: gtwCreds,
+				Credentials: gtw1Creds,
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -615,8 +615,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Limited rights",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -631,8 +631,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Random user",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -647,8 +647,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "One gateway not found",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 						{
 							GatewayId: "unknown",
 						},
@@ -666,8 +666,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "One gateway not found for admin",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 						{
 							GatewayId: "unknown",
 						},
@@ -685,9 +685,9 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "No rights for one gateway",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
 						gtw2.GetIds(),
+						gtw3.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -702,7 +702,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Collaborator with limited rights",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
+						gtw1.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -717,7 +717,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Limited rights for admin",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
+						gtw1.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -726,14 +726,14 @@ func TestGatewayBatchAccess(t *testing.T) {
 					},
 				},
 				Credentials:    adminCreds,
-				ErrorAssertion: errors.IsPermissionDenied,
+				ErrorAssertion: errors.IsNotFound,
 			},
 			{
 				Name: "Read Stats Failure",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -748,8 +748,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Read Location Failure",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
-						gtw2.GetIds(),
+						gtw1.GetIds(),
+						gtw3.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -764,8 +764,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Collaborator with insufficient rights for one gateway",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -781,7 +781,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Collaborator with excessive rights requested",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -798,7 +798,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Not allowed to read private stats",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -813,7 +813,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Not allowed to read private location",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -828,7 +828,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Read Public Stats",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
+						gtw1.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -842,7 +842,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Read Public Location",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
+						gtw1.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -856,7 +856,7 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Valid collaborator",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{
@@ -871,8 +871,8 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Name: "Valid request",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
-						gtw.GetIds(),
 						gtw1.GetIds(),
+						gtw2.GetIds(),
 					},
 					Required: &ttnpb.Rights{
 						Rights: []ttnpb.Right{

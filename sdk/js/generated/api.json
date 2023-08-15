@@ -22838,7 +22838,7 @@
           "name": "GatewayBatchAccess",
           "longName": "GatewayBatchAccess",
           "fullName": "ttn.lorawan.v3.GatewayBatchAccess",
-          "description": "",
+          "description": "The GatewayBatchAccess service, exposed by the Identity Server, is used to\ncheck the rights of the caller on multiple gateways at once.\nEXPERIMENTAL: This service is subject to change.",
           "methods": [
             {
               "name": "AssertRights",

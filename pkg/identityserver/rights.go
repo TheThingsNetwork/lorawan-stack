@@ -220,6 +220,10 @@ var (
 		"insufficient_rights",
 		"insufficient rights",
 	)
+	errNeitherUserNorOrganization = errors.DefinePermissionDenied(
+		"neither_user_nor_organization",
+		"caller is neither a user nor an organization",
+	)
 	errSomeGatewaysNotFound = errors.DefineNotFound(
 		"some_gateways_not_found",
 		"some gateways not found",
@@ -239,7 +243,7 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 	// If the caller is not an organization or user, there's nothing more to do.
 	ouID := authInfo.GetOrganizationOrUserIdentifiers()
 	if ouID == nil {
-		return errInsufficientRights.New()
+		return errNeitherUserNorOrganization.New()
 	}
 
 	// Check that the caller has the requested rights.
@@ -278,7 +282,7 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		).GetRights()) == 0
 		onlyPublicStats := len(requiredGatewayRights.Sub(
 			ttnpb.RightsFrom(
-				ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+				ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
 			),
 		).GetRights()) == 0
 		if onlyPublicStats || bothStatsAndLocation {
@@ -306,7 +310,7 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		membershipChains, err := st.FindAccountMembershipChains(
 			ctx,
 			ouID,
-			"gateway",
+			store.EntityGateway,
 			entityIDs...,
 		)
 		if err != nil {
@@ -314,6 +318,9 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		}
 		if len(membershipChains) != len(entityIDs) {
 			// Some memberships were not found.
+			if is.IsAdmin(ctx) {
+				return errSomeGatewaysNotFound.New()
+			}
 			return errInsufficientRights.New()
 		}
 		for _, chain := range membershipChains {

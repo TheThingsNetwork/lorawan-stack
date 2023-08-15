@@ -5804,6 +5804,15 @@
       "file": "application_registry.go"
     }
   },
+  "error:pkg/identityserver:empty_request": {
+    "translations": {
+      "en": "empty request"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
+    }
+  },
   "error:pkg/identityserver:end_device_euis_taken": {
     "translations": {
       "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
@@ -5894,6 +5903,15 @@
       "file": "user_access.go"
     }
   },
+  "error:pkg/identityserver:neither_user_nor_organization": {
+    "translations": {
+      "en": "caller is neither a user nor an organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
+    }
+  },
   "error:pkg/identityserver:nested_organizations": {
     "translations": {
       "en": "organizations can not be nested"
@@ -5937,15 +5955,6 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "notification_registry.go"
-    }
-  },
-  "error:pkg/identityserver:no_required_gateway_rights": {
-    "translations": {
-      "en": "no required gateway rights in request"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "gateway_access.go"
     }
   },
   "error:pkg/identityserver:no_validation_needed": {
