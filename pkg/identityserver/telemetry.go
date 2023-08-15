@@ -37,6 +37,9 @@ func (is *IdentityServer) initializeTelemetryTasks(ctx context.Context) error {
 	if tq == nil || !tmCfg.Enable {
 		return nil
 	}
+	logger.
+		WithField("documentation_url", "https://www.thethingsindustries.com/docs/reference/telemetry/identity_server").
+		Info("Identity Server telemetry is enabled. Check the documentation for more information on what is collected and how to disable it") // nolint:lll
 
 	hostname, err := os.Hostname()
 	if err != nil {

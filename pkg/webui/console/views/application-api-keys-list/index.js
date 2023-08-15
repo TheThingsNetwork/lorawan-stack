@@ -25,12 +25,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
-import {
-  selectApiKeys,
-  selectApiKeysTotalCount,
-  selectApiKeysFetching,
-  selectApiKeysError,
-} from '@console/store/selectors/api-keys'
+import { selectApiKeys, selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
 const ApplicationApiKeysList = () => {
   const { appId } = useParams()
@@ -41,12 +36,10 @@ const ApplicationApiKeysList = () => {
   )
 
   const baseDataSelectors = createSelector(
-    [selectApiKeys, selectApiKeysTotalCount, selectApiKeysFetching, selectApiKeysError],
-    (keys, totalCount, fetching, error) => ({
+    [selectApiKeys, selectApiKeysTotalCount],
+    (keys, totalCount) => ({
       keys,
       totalCount,
-      fetching,
-      error,
     }),
   )
 

@@ -21,7 +21,6 @@ import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
 import { GET_APP_LINK_BASE } from '@console/store/actions/link'
 import {
-  GET_APPS_LIST_BASE,
   GET_APPS_RIGHTS_LIST_BASE,
   GET_APP_BASE,
   GET_APP_DEV_COUNT_BASE,
@@ -66,14 +65,10 @@ export const selectApplicationDevEUICount = state =>
 // Applications.
 const selectAppsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectAppsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
-const selectAppsFetching = createFetchingSelector(GET_APPS_LIST_BASE)
-const selectAppsError = createErrorSelector(GET_APPS_LIST_BASE)
 
 export const selectApplications = state =>
   selectAppsIds(state).map(id => selectApplicationById(state, id))
 export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
-export const selectApplicationsFetching = state => selectAppsFetching(state)
-export const selectApplicationsError = state => selectAppsError(state)
 export const selectApplicationsWithDeviceCounts = state =>
   selectApplications(state).map(app => ({
     ...app,
@@ -93,12 +88,10 @@ export const selectApplicationEventsFilter = createEventsFilterSelector(ENTITY)
 export const selectApplicationRights = createRightsSelector(ENTITY)
 export const selectApplicationPseudoRights = createPseudoRightsSelector(ENTITY)
 export const selectApplicationRightsError = createErrorSelector(GET_APPS_RIGHTS_LIST_BASE)
-export const selectApplicationRightsFetching = createFetchingSelector(GET_APPS_RIGHTS_LIST_BASE)
 
 // Link.
 const selectLinkStore = state => state.link
 export const selectApplicationLink = state => selectLinkStore(state).link
-export const selectApplicationLinkFetching = createFetchingSelector(GET_APP_LINK_BASE)
 export const selectApplicationLinkError = createErrorSelector(GET_APP_LINK_BASE)
 export const selectApplicationLinkFormatters = state => {
   const link = selectApplicationLink(state) || {}

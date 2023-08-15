@@ -20,8 +20,6 @@ import {
 } from '@ttn-lw/lib/store/selectors/pagination'
 
 import {
-  GET_GTW_BASE,
-  GET_GTWS_LIST_BASE,
   UPDATE_GTW_STATS_BASE,
   GET_GTWS_RIGHTS_LIST_BASE,
   START_GTW_STATS_BASE,
@@ -50,19 +48,12 @@ export const selectSelectedGatewayId = state => selectGatewayStore(state).select
 export const selectSelectedGateway = state =>
   selectGatewayById(state, selectSelectedGatewayId(state))
 
-export const selectGatewayFetching = createFetchingSelector(GET_GTW_BASE)
-export const selectGatewayError = createErrorSelector(GET_GTW_BASE)
-
 // Gateways.
 const selectGtwsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectGtwsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
-const selectGtwsFetching = createFetchingSelector(GET_GTWS_LIST_BASE)
-const selectGtwsError = createErrorSelector(GET_GTWS_LIST_BASE)
 
 export const selectGateways = state => selectGtwsIds(state).map(id => selectGatewayById(state, id))
 export const selectGatewaysTotalCount = state => selectGtwsTotalCount(state)
-export const selectGatewaysFetching = state => selectGtwsFetching(state)
-export const selectGatewaysError = state => selectGtwsError(state)
 
 // Events.
 export const selectGatewayEvents = createEventsSelector(ENTITY)

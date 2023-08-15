@@ -42,7 +42,6 @@ import {
 import { selectUserIsAdmin } from '@console/store/selectors/logout'
 import {
   selectOrganizationsTotalCount,
-  selectOrganizationsFetching,
   selectOrganizationsWithCollaboratorCount,
 } from '@console/store/selectors/organizations'
 
@@ -191,12 +190,10 @@ const OrganizationsTable = () => {
   const baseDataSelector = createSelector(
     selectOrganizationsWithCollaboratorCount,
     selectOrganizationsTotalCount,
-    selectOrganizationsFetching,
     mayAddSelector,
-    (organizations, totalCount, fetching, mayAdd) => ({
+    (organizations, totalCount, mayAdd) => ({
       organizations,
       totalCount,
-      fetching,
       mayAdd,
     }),
   )

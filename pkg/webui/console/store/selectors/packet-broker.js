@@ -20,11 +20,7 @@ import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 import { combinePacketBrokerIds } from '@ttn-lw/lib/selectors/id'
 
-import {
-  GET_PACKET_BROKER_INFO_BASE,
-  GET_PACKET_BROKER_NETWORKS_LIST_BASE,
-  GET_PACKET_BROKER_NETWORK_BASE,
-} from '@console/store/actions/packet-broker'
+import { GET_PACKET_BROKER_INFO_BASE } from '@console/store/actions/packet-broker'
 
 const ENTITY = 'packetBrokerNetworks'
 
@@ -54,19 +50,14 @@ export const selectPacketBrokerNetworkEntitiesStore = state =>
   selectPacketBrokerStore(state).networks.entities
 export const selectPacketBrokerNetworkById = (state, combinedId) =>
   selectPacketBrokerNetworkEntitiesStore(state)[combinedId]
-export const selectPacketBrokerNetworkError = createErrorSelector(GET_PACKET_BROKER_NETWORK_BASE)
 
 // Networks.
 const selectPBNetworksIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectPBNetworksTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
-const selectPBNetworksFetching = createFetchingSelector(GET_PACKET_BROKER_NETWORKS_LIST_BASE)
-const selectPBNetworksError = createErrorSelector(GET_PACKET_BROKER_NETWORKS_LIST_BASE)
 
 export const selectPacketBrokerNetworks = state =>
   selectPBNetworksIds(state).map(netId => selectPacketBrokerNetworkById(state, netId))
 export const selectPacketBrokerNetworksTotalCount = state => selectPBNetworksTotalCount(state)
-export const selectPacketBrokerNetworksFetching = state => selectPBNetworksFetching(state)
-export const selectPacketBrokerNetworksError = state => selectPBNetworksError(state)
 
 // Policies.
 export const selectPacketBrokerPoliciesStore = state => selectPacketBrokerStore(state).policies

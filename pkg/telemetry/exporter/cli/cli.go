@@ -26,7 +26,7 @@ import (
 	"path"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter/models"
@@ -106,7 +106,7 @@ func getCLIState() (*cliStateTelemetry, bool, error) {
 			return nil, false, err
 		}
 
-		cliState.UID = uuid.NewV4().String()
+		cliState.UID = uuid.NewString()
 		cliState.LastSent = time.Now()
 		return cliState, true, nil
 	}
