@@ -73,15 +73,27 @@ func makeWindowDurationFunc(d time.Duration) windowDurationFunc {
 }
 
 // newDevAddrFunc is a function, which is used by Network Server to derive new DevAddrs.
-type newDevAddrFunc func(ctx context.Context, dev *ttnpb.EndDevice) types.DevAddr
+type newDevAddrFunc func(ctx context.Context) types.DevAddr
 
 // makeNewDevAddrFunc returns a newDevAddrFunc, which derives DevAddrs using specified prefixes.
 func makeNewDevAddrFunc(ps ...types.DevAddrPrefix) newDevAddrFunc {
-	return func(ctx context.Context, dev *ttnpb.EndDevice) types.DevAddr {
+	weights := make([]int64, len(ps))
+	totalWeight := int64(0)
+	for i, p := range ps {
+		weights[i] = int64(1 << (32 - p.Length))
+		totalWeight += weights[i]
+	}
+	return func(ctx context.Context) types.DevAddr {
 		var devAddr types.DevAddr
-		rand.Read(devAddr[:])
-		p := ps[random.Int63n(int64(len(ps)))]
-		return devAddr.WithPrefix(p)
+		_, _ = rand.Read(devAddr[:])
+		r := random.Int63n(totalWeight)
+		for i, weight := range weights {
+			r -= weight
+			if r < 0 {
+				return devAddr.WithPrefix(ps[i])
+			}
+		}
+		panic("unreachable")
 	}
 }
 

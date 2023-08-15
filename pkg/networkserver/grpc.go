@@ -29,7 +29,7 @@ import (
 // GenerateDevAddr returns a device address assignment in the device address
 // range of the network server.
 func (ns *NetworkServer) GenerateDevAddr(ctx context.Context, req *emptypb.Empty) (*ttnpb.GenerateDevAddrResponse, error) {
-	devAddr := ns.newDevAddr(ctx, nil)
+	devAddr := ns.newDevAddr(ctx)
 	return &ttnpb.GenerateDevAddrResponse{DevAddr: devAddr.Bytes()}, nil
 }
 
