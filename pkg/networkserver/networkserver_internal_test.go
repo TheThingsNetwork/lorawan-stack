@@ -27,6 +27,8 @@ import (
 )
 
 func TestNewDevAddr(t *testing.T) {
+	t.Parallel()
+
 	test.RunSubtest(t, test.SubtestConfig{
 		Name:     "From NetID",
 		Parallel: true,
@@ -101,20 +103,22 @@ func TestNewDevAddr(t *testing.T) {
 			)
 			defer stop()
 
-			seen := map[types.DevAddrPrefix]int{}
-			for i := 0; i < 100000; i++ {
+			seen, total := map[types.DevAddrPrefix]float64{}, float64(0)
+			for i := 0; i < 10000; i++ {
 				devAddr := ns.newDevAddr(ctx)
 				for _, p := range ps {
 					if devAddr.HasPrefix(p) {
 						seen[p]++
+						total++
 						break
 					}
 				}
 			}
 
-			a.So(seen[ps[0]], should.BeGreaterThan, 0)
-			a.So(seen[ps[1]], should.BeGreaterThan, 0)
-			a.So(seen[ps[2]], should.BeGreaterThan, 0)
+			totalAddresses := (65536.0 + 256.0 + 16777216.0)
+			a.So(seen[ps[0]]/total, should.AlmostEqual, 65536.0/totalAddresses, 1e-2)
+			a.So(seen[ps[1]]/total, should.AlmostEqual, 256.0/totalAddresses, 1e-2)
+			a.So(seen[ps[2]]/total, should.AlmostEqual, 16777216.0/totalAddresses, 1e-2)
 		},
 	})
 }
@@ -226,7 +230,7 @@ func TestMakeNewDevAddrFunc(t *testing.T) {
 			a, ctx := test.New(t)
 			newF := makeNewDevAddrFunc(tc.Prefixes...)
 			weights, total := make([]int, len(tc.Prefixes)), 0
-			for i := 0; i < 100000; i++ {
+			for i := 0; i < 10000; i++ {
 				devAddr := newF(ctx)
 				found := false
 				for j, prefix := range tc.Prefixes {
