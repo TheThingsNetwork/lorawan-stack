@@ -196,8 +196,7 @@ message BatchDeleteGatewaysRequest {
 service GatewayBatchRegistry {
   // Delete a batch of gateways.
   // This operation is atomic; either all gateways are deleted or none.
-  // Gateways not found are skipped and no error is returned.
-  // The caller must have delete rights on all gateways.
+  // The caller must have delete rights on all requested gateways.
   rpc Delete(BatchDeleteGatewaysRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/gateways/batch"};
   }

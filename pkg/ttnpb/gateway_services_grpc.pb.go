@@ -1020,8 +1020,7 @@ const (
 type GatewayBatchRegistryClient interface {
 	// Delete a batch of gateways.
 	// This operation is atomic; either all gateways are deleted or none.
-	// Gateways not found are skipped and no error is returned.
-	// The caller must have delete rights on all gateways.
+	// The caller must have delete rights on all requested gateways.
 	Delete(ctx context.Context, in *BatchDeleteGatewaysRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -1048,8 +1047,7 @@ func (c *gatewayBatchRegistryClient) Delete(ctx context.Context, in *BatchDelete
 type GatewayBatchRegistryServer interface {
 	// Delete a batch of gateways.
 	// This operation is atomic; either all gateways are deleted or none.
-	// Gateways not found are skipped and no error is returned.
-	// The caller must have delete rights on all gateways.
+	// The caller must have delete rights on all requested gateways.
 	Delete(context.Context, *BatchDeleteGatewaysRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGatewayBatchRegistryServer()
 }

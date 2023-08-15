@@ -5092,7 +5092,7 @@ gateway registrations in batches.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Delete` | [`BatchDeleteGatewaysRequest`](#ttn.lorawan.v3.BatchDeleteGatewaysRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a batch of gateways. This operation is atomic; either all gateways are deleted or none. Gateways not found are skipped and no error is returned. The caller must have delete rights on all gateways. |
+| `Delete` | [`BatchDeleteGatewaysRequest`](#ttn.lorawan.v3.BatchDeleteGatewaysRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a batch of gateways. This operation is atomic; either all gateways are deleted or none. The caller must have delete rights on all requested gateways. |
 
 #### HTTP bindings
 

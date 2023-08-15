@@ -8451,7 +8451,7 @@
     },
     "/gateways/batch": {
       "delete": {
-        "summary": "Delete a batch of gateways.\nThis operation is atomic; either all gateways are deleted or none.\nGateways not found are skipped and no error is returned.\nThe caller must have delete rights on all gateways.",
+        "summary": "Delete a batch of gateways.\nThis operation is atomic; either all gateways are deleted or none.\nThe caller must have delete rights on all requested gateways.",
         "operationId": "GatewayBatchRegistry_Delete",
         "responses": {
           "200": {
