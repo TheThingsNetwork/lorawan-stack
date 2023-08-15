@@ -27,11 +27,7 @@ import { natsUrl as natsUrlRegexp } from '@console/lib/regexp'
 
 import { getPubsubsList } from '@console/store/actions/pubsubs'
 
-import {
-  selectPubsubs,
-  selectPubsubsTotalCount,
-  selectPubsubsFetching,
-} from '@console/store/selectors/pubsubs'
+import { selectPubsubs, selectPubsubsTotalCount } from '@console/store/selectors/pubsubs'
 
 const m = defineMessages({
   format: 'Format',
@@ -92,11 +88,10 @@ const PubsubsTable = () => {
   const getItemsAction = useCallback(() => getPubsubsList(appId), [appId])
 
   const baseDataSelector = createSelector(
-    [selectPubsubs, selectPubsubsTotalCount, selectPubsubsFetching],
-    (pubsubs, totalCount, fetching) => ({
+    [selectPubsubs, selectPubsubsTotalCount],
+    (pubsubs, totalCount) => ({
       pubsubs,
       totalCount,
-      fetching,
     }),
   )
 

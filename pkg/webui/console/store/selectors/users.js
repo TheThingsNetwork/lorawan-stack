@@ -19,12 +19,7 @@ import {
   createPaginationTotalCountSelectorByEntity,
 } from '@ttn-lw/lib/store/selectors/pagination'
 
-import {
-  GET_USERS_LIST_BASE,
-  GET_USER_BASE,
-  GET_USER_RIGHTS_LIST_BASE,
-  GET_USER_INVITATIONS_BASE,
-} from '@console/store/actions/users'
+import { GET_USER_BASE, GET_USER_RIGHTS_LIST_BASE } from '@console/store/actions/users'
 
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
 
@@ -43,13 +38,9 @@ export const selectUserError = createErrorSelector(GET_USER_BASE)
 // Users.
 const selectUsrsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectUsrsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
-const selectUsrsFetching = createFetchingSelector(GET_USERS_LIST_BASE)
-const selectUsrsError = createErrorSelector(GET_USERS_LIST_BASE)
 
 export const selectUsers = state => selectUsrsIds(state).map(id => selectUserById(state, id))
 export const selectUsersTotalCount = state => selectUsrsTotalCount(state)
-export const selectUsersFetching = state => selectUsrsFetching(state)
-export const selectUsersError = state => selectUsrsError(state)
 
 // Rights.
 export const selectUserRights = createRightsSelector(ENTITY)
@@ -60,5 +51,3 @@ export const selectUserRightsFetching = createFetchingSelector(GET_USER_RIGHTS_L
 // Invitations.
 export const selectUserInvitations = state => selectUserStore(state).invitations
 export const selectUserInvitationsTotalCount = state => selectUserStore(state).invitationsTotalCount
-export const selectUserInvitationsFetching = createFetchingSelector(GET_USER_INVITATIONS_BASE)
-export const selectUserInvitationsError = createErrorSelector(GET_USER_INVITATIONS_BASE)

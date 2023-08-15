@@ -20,11 +20,7 @@ import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
-import {
-  GET_ORGS_LIST_BASE,
-  GET_ORG_BASE,
-  GET_ORGS_RIGHTS_LIST_BASE,
-} from '@console/store/actions/organizations'
+import { GET_ORGS_LIST_BASE, GET_ORGS_RIGHTS_LIST_BASE } from '@console/store/actions/organizations'
 
 import {
   createEventsSelector,
@@ -47,8 +43,6 @@ export const selectSelectedOrganizationId = state =>
   selectOrganizationStore(state).selectedOrganization
 export const selectSelectedOrganization = state =>
   selectOrganizationById(state, selectSelectedOrganizationId(state))
-export const selectOrganizationFetching = createFetchingSelector(GET_ORG_BASE)
-export const selectOrganizationError = createErrorSelector(GET_ORG_BASE)
 export const selectOrganizationCollaboratorCounts = state =>
   selectOrganizationStore(state).collaboratorCounts
 export const selectOrganizationCollaboratorCount = (state, id) =>

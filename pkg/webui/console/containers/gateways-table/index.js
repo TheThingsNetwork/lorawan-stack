@@ -37,11 +37,7 @@ import { checkFromState, mayCreateGateways } from '@console/lib/feature-checks'
 import { getGatewaysList, restoreGateway, deleteGateway } from '@console/store/actions/gateways'
 
 import { selectUserIsAdmin } from '@console/store/selectors/logout'
-import {
-  selectGateways,
-  selectGatewaysTotalCount,
-  selectGatewaysFetching,
-} from '@console/store/selectors/gateways'
+import { selectGateways, selectGatewaysTotalCount } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
   ownedTabTitle: 'Owned gateways',
@@ -216,12 +212,10 @@ const GatewaysTable = () => {
   const baseDataSelector = createSelector(
     selectGateways,
     selectGatewaysTotalCount,
-    selectGatewaysFetching,
     mayAddSelector,
-    (gateways, totalCount, fetching, mayAdd) => ({
+    (gateways, totalCount, mayAdd) => ({
       gateways,
       totalCount,
-      fetching,
       mayAdd,
     }),
   )

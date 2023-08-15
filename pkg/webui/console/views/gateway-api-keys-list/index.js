@@ -25,11 +25,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
-import {
-  selectApiKeys,
-  selectApiKeysTotalCount,
-  selectApiKeysFetching,
-} from '@console/store/selectors/api-keys'
+import { selectApiKeys, selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
 const GatewayApiKeysList = () => {
   const { gtwId } = useParams()
@@ -44,13 +40,11 @@ const GatewayApiKeysList = () => {
       // These are the input selectors
       state => selectApiKeys(state, gtwId),
       state => selectApiKeysTotalCount(state, gtwId),
-      selectApiKeysFetching,
     ],
     // This is the result function
-    (keys, totalCount, fetching) => ({
+    (keys, totalCount) => ({
       keys,
       totalCount,
-      fetching,
     }),
   )
 

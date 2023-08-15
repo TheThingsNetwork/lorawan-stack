@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -360,7 +361,13 @@ func registerDropDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, 
 	}
 }
 
-func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, err error) {
+func (as *ApplicationServer) registerDropDownlinks(
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	items []*ttnpb.ApplicationDownlink,
+	receivedAt *timestamppb.Timestamp,
+	err error,
+) {
 	var (
 		errorDetails   errors.ErrorDetails
 		pbErrorDetails *ttnpb.ErrorDetails
@@ -372,6 +379,7 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids *ttn
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   ids,
 			CorrelationIds: item.CorrelationIds,
+			ReceivedAt:     receivedAt,
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
 				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 					Downlink: item,
@@ -386,12 +394,16 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids *ttn
 }
 
 func (as *ApplicationServer) registerForwardDownlinks(
-	ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, decrypted, encrypted []*ttnpb.ApplicationDownlink,
+	ctx context.Context,
+	ids *ttnpb.EndDeviceIdentifiers,
+	decrypted, encrypted []*ttnpb.ApplicationDownlink,
+	receivedAt *timestamppb.Timestamp,
 ) {
 	for _, item := range decrypted {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   ids,
 			CorrelationIds: item.CorrelationIds,
+			ReceivedAt:     receivedAt,
 			Up: &ttnpb.ApplicationUp_DownlinkQueued{
 				DownlinkQueued: item,
 			},

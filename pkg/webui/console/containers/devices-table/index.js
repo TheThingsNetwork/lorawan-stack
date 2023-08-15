@@ -49,7 +49,6 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import { selectDeviceTemplateFormats } from '@console/store/selectors/device-template-formats'
 import {
   selectDevicesTotalCount,
-  selectDevicesFetching,
   isOtherClusterDevice,
   selectDevicesWithLastSeen,
 } from '@console/store/selectors/devices'
@@ -173,11 +172,9 @@ const DevicesTableInner = () => {
   const baseDataSelector = createSelector(
     selectDecoratedDevices,
     selectDevicesTotalCount,
-    selectDevicesFetching,
-    (devices, totalCount, fetching) => ({
+    (devices, totalCount) => ({
       devices,
       totalCount,
-      fetching,
       mayAdd: mayCreateDevices,
     }),
   )

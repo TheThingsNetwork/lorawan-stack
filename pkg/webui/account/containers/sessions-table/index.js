@@ -31,11 +31,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { getUserSessionsList, deleteUserSession } from '@account/store/actions/sessions'
 
 import { selectUserId, selectSessionId } from '@account/store/selectors/user'
-import {
-  selectUserSessions,
-  selectUserSessionsTotalCount,
-  selectUserSessionsFetching,
-} from '@account/store/selectors/sessions'
+import { selectUserSessions, selectUserSessionsTotalCount } from '@account/store/selectors/sessions'
 
 const m = defineMessages({
   deleteSessionSuccess: 'Session removed successfully',
@@ -76,8 +72,8 @@ const UserSessionsTable = () => {
   )
 
   const baseDataSelector = createSelector(
-    [selectUserSessions, selectUserSessionsTotalCount, selectUserSessionsFetching],
-    (sessions, totalCount, fetching) => {
+    [selectUserSessions, selectUserSessionsTotalCount],
+    (sessions, totalCount) => {
       const decoratedSessions = []
 
       if (sessions) {
@@ -95,7 +91,6 @@ const UserSessionsTable = () => {
       return {
         sessions: decoratedSessions,
         totalCount,
-        fetching,
         mayAdd: false,
         mayLink: false,
       }

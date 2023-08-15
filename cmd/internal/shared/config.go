@@ -158,13 +158,11 @@ var DefaultTracingConfig = tracing.Config{
 
 // DefaultTelemetryConfig  is the default config for telemetry.
 var DefaultTelemetryConfig = telemetry.Config{
-	// TODO: After (https://github.com/TheThingsNetwork/lorawan-stack/issues/6081) is no longer blocked.
-	// Enable the telemetry and define the target.
-	Enable:       false,
-	Target:       "",
+	Enable:       true,
+	Target:       "https://telemetry.thethingsstack.io/collect",
 	NumConsumers: 1,
 	EntityCountTelemetry: telemetry.EntityCountTelemetry{
-		Enable:   false,
+		Enable:   true,
 		Interval: 24 * time.Hour,
 	},
 }

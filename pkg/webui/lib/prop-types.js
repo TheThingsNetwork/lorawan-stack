@@ -88,6 +88,16 @@ PropTypes.eventFilter = PropTypes.shape({
 })
 PropTypes.eventFilters = PropTypes.arrayOf(PropTypes.eventFilter)
 
+PropTypes.location = PropTypes.shape({
+  hash: PropTypes.string,
+  key: PropTypes.string,
+  pathname: PropTypes.string.isRequired,
+  search: PropTypes.string,
+  state: PropTypes.shape({
+    info: PropTypes.message,
+  }),
+})
+
 PropTypes.gateway = PropTypes.shape({
   antennas: PropTypes.arrayOf(
     PropTypes.shape({
@@ -257,16 +267,6 @@ PropTypes.organization = PropTypes.shape({
 PropTypes.match = PropTypes.shape({
   path: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-})
-
-PropTypes.location = PropTypes.shape({
-  hash: PropTypes.string,
-  key: PropTypes.string,
-  pathname: PropTypes.string.isRequired,
-  search: PropTypes.string,
-  state: PropTypes.shape({
-    info: PropTypes.message,
-  }),
 })
 
 PropTypes.marker = PropTypes.shape({

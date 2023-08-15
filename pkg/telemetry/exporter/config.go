@@ -32,10 +32,9 @@ type EntityCountTelemetry struct {
 
 // Config contains information regarding the telemetry collection.
 type Config struct {
-	Enable bool `name:"enable" description:"Enables telemetry collection"`
-	// UIDElements is a list of elements that will be used to generate the UID.
-	UIDElements          []string             `name:"-"`
+	Enable               bool                 `name:"enable" description:"Enables telemetry collection"`
 	Target               string               `name:"target" description:"Target to which the information will be sent to"`                                 // nolint:lll
+	UIDElements          []string             `name:"uid-elements" description:"Elements that will be used to generate the UID"`                            // nolint:lll
 	NumConsumers         uint64               `name:"num-consumers" description:"Number of consumers that will be used to monitor telemetry related tasks"` // nolint:lll
 	EntityCountTelemetry EntityCountTelemetry `name:"entity-count-telemetry"`
 }
