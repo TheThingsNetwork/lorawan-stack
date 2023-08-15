@@ -285,17 +285,26 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 				ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
 			),
 		).GetRights()) == 0
-		if onlyPublicStats || bothStatsAndLocation {
+
+		if bothStatsAndLocation {
 			for _, gtw := range gtws {
-				if gtw.StatusPublic {
+				if gtw.StatusPublic && gtw.LocationPublic {
 					publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
 				}
 			}
-		}
-		if onlyPublicLocation || bothStatsAndLocation {
-			for _, gtw := range gtws {
-				if gtw.LocationPublic {
-					publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+		} else {
+			if onlyPublicStats {
+				for _, gtw := range gtws {
+					if gtw.StatusPublic {
+						publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+					}
+				}
+			}
+			if onlyPublicLocation {
+				for _, gtw := range gtws {
+					if gtw.LocationPublic {
+						publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+					}
 				}
 			}
 		}
