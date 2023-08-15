@@ -45,7 +45,11 @@ func NewIS(c Cluster) *IS {
 }
 
 // AssertGatewayBatchRights implements EntityRegistry.
-func (is IS) AssertGatewayBatchRights(ctx context.Context, ids []*ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
+func (is IS) AssertGatewayBatchRights(
+	ctx context.Context,
+	ids []*ttnpb.GatewayIdentifiers,
+	required ...ttnpb.Right,
+) error {
 	ctx, err := getAuthenticatedContext(ctx)
 	if err != nil {
 		return err

@@ -318,12 +318,7 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		}
 		for _, chain := range membershipChains {
 			// Make sure that there are no extra rights requested.
-			otherRights := requiredGatewayRights.Sub(
-				requiredGatewayRights.Intersect(
-					chain.GetRights(),
-				),
-			)
-			if len(otherRights.GetRights()) > 0 {
+			if !chain.GetRights().IncludesAll(requiredGatewayRights.GetRights()...) {
 				return errInsufficientRights.New()
 			}
 		}

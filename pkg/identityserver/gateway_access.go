@@ -419,7 +419,10 @@ var (
 )
 
 // AssertRights implements ttnpb.GatewayBatchAccessServer.
-func (gba *gatewayBatchAccess) AssertRights(ctx context.Context, req *ttnpb.AssertGatewayRightsRequest) (*emptypb.Empty, error) {
+func (gba *gatewayBatchAccess) AssertRights(
+	ctx context.Context,
+	req *ttnpb.AssertGatewayRightsRequest,
+) (*emptypb.Empty, error) {
 	// Sanitize request.
 	required := req.Required.Unique()
 	if len(required.GetRights()) == 0 {

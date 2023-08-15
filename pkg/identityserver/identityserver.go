@@ -271,7 +271,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterEndDeviceRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterGatewayRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterGatewayAccessHandler(is.Context(), s, conn)
-	ttnpb.RegisterGatewayBatchAccessHandler(is.Context(), s, conn)
+	ttnpb.RegisterGatewayBatchAccessHandler(is.Context(), s, conn) // nolint:errcheck
 	ttnpb.RegisterOrganizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterOrganizationAccessHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserRegistryHandler(is.Context(), s, conn)
@@ -292,7 +292,7 @@ func (is *IdentityServer) RegisterInterop(srv *interop.Server) {
 }
 
 // Roles returns the roles that the Identity Server fulfills.
-func (_ *IdentityServer) Roles() []ttnpb.ClusterRole {
+func (*IdentityServer) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_ACCESS, ttnpb.ClusterRole_ENTITY_REGISTRY}
 }
 

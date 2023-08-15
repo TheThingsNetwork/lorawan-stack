@@ -23390,7 +23390,7 @@
             },
             {
               "name": "BatchGetGatewayConnectionStats",
-              "description": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\n- Statistics are not persisted between reconnects.\n- Gateways that are not connected or are part of a different cluster are ignored.\n- The client should the gateways are in the requested cluster.\n- The client should have the right to get the gateway connection stats on all requested gateways.",
+              "description": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\n- Statistics are not persisted between reconnects.\n- Gateways that are not connected or are part of a different cluster are ignored.\n- The client should ensure that the requested gateways are in the requested cluster.\n- The client should have the right to get the gateway connection stats on all requested gateways.",
               "requestType": "BatchGetGatewayConnectionStatsRequest",
               "requestLongType": "BatchGetGatewayConnectionStatsRequest",
               "requestFullType": "ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest",

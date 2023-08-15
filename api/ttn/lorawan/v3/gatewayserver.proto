@@ -114,7 +114,7 @@ service Gs {
   // Get statistics about gateway connections to the Gateway Server of a batch of gateways.
   // - Statistics are not persisted between reconnects.
   // - Gateways that are not connected or are part of a different cluster are ignored.
-  // - The client should the gateways are in the requested cluster.
+  // - The client should ensure that the requested gateways are in the requested cluster.
   // - The client should have the right to get the gateway connection stats on all requested gateways.
   rpc BatchGetGatewayConnectionStats(BatchGetGatewayConnectionStatsRequest) returns (BatchGetGatewayConnectionStatsResponse) {
     option (google.api.http) = {
