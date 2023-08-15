@@ -143,3 +143,10 @@ var EndDeviceIdentifiersListFieldPathsNested = []string{
 var EndDeviceIdentifiersListFieldPathsTopLevel = []string{
 	"end_device_ids",
 }
+var GatewayIdentifiersListFieldPathsNested = []string{
+	"gateway_ids",
+}
+
+var GatewayIdentifiersListFieldPathsTopLevel = []string{
+	"gateway_ids",
+}

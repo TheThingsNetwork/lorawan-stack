@@ -828,6 +828,41 @@ func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdent
 	return nil
 }
 
+func (s *gatewayStore) BatchDeleteGateways(
+	ctx context.Context,
+	ids []*ttnpb.GatewayIdentifiers,
+) ([]*ttnpb.GatewayIdentifiers, error) {
+	ctx, span := tracer.StartFromContext(ctx, "BatchDeleteGateways", trace.WithAttributes(
+		attribute.Int("count", len(ids)),
+	))
+	defer span.End()
+
+	deleted := make([]*ttnpb.GatewayIdentifiers, 0, len(ids))
+	for _, id := range ids {
+		model, err := s.getGatewayModelBy(
+			ctx,
+			s.selectWithID(ctx, id.GetGatewayId()),
+			store.FieldMask{"ids"},
+		)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				continue
+			}
+			return nil, storeutil.WrapDriverError(err)
+		}
+
+		_, err = s.DB.NewDelete().
+			Model(model).
+			WherePK().
+			Exec(ctx)
+		if err != nil {
+			return nil, storeutil.WrapDriverError(err)
+		}
+		deleted = append(deleted, id)
+	}
+	return deleted, nil
+}
+
 func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
 	ctx, span := tracer.StartFromContext(ctx, "RestoreGateway", trace.WithAttributes(
 		attribute.String("gateway_id", id.GetGatewayId()),

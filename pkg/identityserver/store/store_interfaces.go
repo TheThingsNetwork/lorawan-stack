@@ -113,6 +113,10 @@ type GatewayStore interface {
 	DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error
 	RestoreGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error
 	PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error
+	BatchDeleteGateways(
+		ctx context.Context,
+		ids []*ttnpb.GatewayIdentifiers,
+	) ([]*ttnpb.GatewayIdentifiers, error)
 }
 
 // OrganizationStore interface for storing Organizations.

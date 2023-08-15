@@ -24061,6 +24061,30 @@
           ]
         },
         {
+          "name": "GatewayIdentifiersList",
+          "longName": "GatewayIdentifiersList",
+          "fullName": "ttn.lorawan.v3.GatewayIdentifiersList",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "LoRaAllianceProfileIdentifiers",
           "longName": "LoRaAllianceProfileIdentifiers",
           "fullName": "ttn.lorawan.v3.LoRaAllianceProfileIdentifiers",
