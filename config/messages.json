@@ -1502,15 +1502,6 @@
       "file": "end_devices.go"
     }
   },
-  "error:cmd/ttn-lw-cli/commands:invalid_device_registration": {
-    "translations": {
-      "en": "devices with Join EUI `{join_eui}` are neither claimed on an external Join Server nor registered in the cluster"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "end_devices.go"
-    }
-  },
   "error:cmd/ttn-lw-cli/commands:invalid_gateway_eui": {
     "translations": {
       "en": "invalid gateway EUI"
