@@ -2111,7 +2111,7 @@ func TestBatchGetStatus(t *testing.T) {
 				defer statsRedisClient.Close()
 				registry := &gsredis.GatewayConnectionStatsRegistry{
 					Redis:   statsRedisClient,
-					LockTTL: 5 * test.Delay,
+					LockTTL: timeout,
 				}
 				if err := registry.Init(ctx); err != nil {
 					t.Fatalf("Failed to setup stats registry :%v", err)
@@ -2258,6 +2258,7 @@ func TestBatchGetStatus(t *testing.T) {
 
 			// Disconnect second gateway.
 			gtwConnCancel()
+			time.Sleep(timeout) // Wait for connection to be closed.
 
 			cfg, err := gs.GetConfig(ctx)
 			if !a.So(err, should.BeNil) {
