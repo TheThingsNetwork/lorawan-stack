@@ -163,13 +163,13 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
 func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) {
-	const noPongReceived int64 = -1
 	var (
 		id           = mux.Vars(r)["id"]
 		auth         = r.Header.Get("Authorization")
 		ctx          = r.Context()
 		eps          = s.formatter.Endpoints()
-		missedPongs  = noPongReceived
+		missingPongs = int64(0)
+		pongCount    = int64(0)
 		pongCh       = make(chan []byte, 1)
 		downstreamCh = make(chan []byte, 1)
 	)
@@ -288,6 +288,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	defer pingTicker.Stop()
 
 	ws.SetPingHandler(func(data string) error {
+		logger.Debug("Received client ping")
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -298,7 +299,20 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 
 	// Not all gateways support pongs to the server's pings.
 	ws.SetPongHandler(func(data string) error {
-		atomic.StoreInt64(&missedPongs, 0)
+		logger.Debug("Received client pong")
+		if atomic.AddInt64(&pongCount, 1) == 1 {
+			// The first pong does not have an associated missing pong.
+			return nil
+		}
+		for n := atomic.LoadInt64(&missingPongs); ; n = atomic.LoadInt64(&missingPongs) {
+			if n == 0 {
+				logger.Warn("Unsolicited client pong")
+				return nil
+			}
+			if atomic.CompareAndSwapInt64(&missingPongs, n, n-1) {
+				break
+			}
+		}
 		return nil
 	})
 
@@ -321,23 +335,24 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 			case <-conn.Context().Done():
 				return
 			case <-pingTicker.C:
+				if atomic.LoadInt64(&pongCount) > 0 {
+					if atomic.AddInt64(&missingPongs, 1) == int64(s.cfg.MissedPongThreshold) {
+						err := errMissedTooManyPongs.New()
+						logger.WithError(err).Warn("Disconnect gateway")
+						return err
+					}
+				}
 				if err := ws.WriteControl(websocket.PingMessage, nil, time.Time{}); err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					return err
 				}
-				if atomic.LoadInt64(&missedPongs) == noPongReceived {
-					continue
-				}
-				if atomic.AddInt64(&missedPongs, 1) == int64(s.cfg.MissedPongThreshold) {
-					err := errMissedTooManyPongs.New()
-					logger.WithError(err).Warn("Disconnect gateway")
-					return err
-				}
+				logger.Debug("Server ping sent")
 			case data := <-pongCh:
 				if err := ws.WriteControl(websocket.PongMessage, data, time.Time{}); err != nil {
 					logger.WithError(err).Warn("Failed to send pong")
 					return err
 				}
+				logger.Debug("Server pong sent")
 			case <-timeSyncTickerC:
 				// TODO: Use GPS timestamp from a overlapping frames.
 				// https://github.com/TheThingsNetwork/lorawan-stack/issues/4852
