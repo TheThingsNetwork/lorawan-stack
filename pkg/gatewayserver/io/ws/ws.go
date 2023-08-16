@@ -321,7 +321,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 			case <-conn.Context().Done():
 				return
 			case <-pingTicker.C:
-				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
+				if err := ws.WriteControl(websocket.PingMessage, nil, time.Time{}); err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					return err
 				}
@@ -334,7 +334,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 					return err
 				}
 			case data := <-pongCh:
-				if err := ws.WriteMessage(websocket.PongMessage, data); err != nil {
+				if err := ws.WriteControl(websocket.PongMessage, data, time.Time{}); err != nil {
 					logger.WithError(err).Warn("Failed to send pong")
 					return err
 				}
