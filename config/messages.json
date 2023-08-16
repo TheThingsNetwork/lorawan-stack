@@ -3700,7 +3700,7 @@
   },
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unclaim_device": {
     "translations": {
-      "en": "could not unclaim device with EUI `{dev_eui}`"
+      "en": "unclaim device with EUI `{dev_eui}`"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
@@ -3709,7 +3709,7 @@
   },
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unclaim_devices": {
     "translations": {
-      "en": "could not unclaim devices"
+      "en": "unclaim devices"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
