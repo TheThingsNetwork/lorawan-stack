@@ -17,6 +17,9 @@ package healthcheck_test
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -83,7 +86,7 @@ func getHealthCheckerWithPassingCheck(t *testing.T) healthcheck.HealthChecker {
 	return hc
 }
 
-func getHealthCheckerWithFailngCheck(t *testing.T) healthcheck.HealthChecker {
+func getHealthCheckerWithFailingCheck(t *testing.T) healthcheck.HealthChecker {
 	t.Helper()
 	a := assertions.New(t)
 	hc := getDefaultHealthChecker(t)
@@ -126,7 +129,7 @@ func getHealthCheckerWithPassingHTTPCheck(t *testing.T) healthcheck.HealthChecke
 	t.Helper()
 	a := assertions.New(t)
 	hc := getDefaultHealthChecker(t)
-	err := hc.AddHTTPCheck("test-http-check", "http://localhost:3324")
+	err := hc.AddHTTPCheck("test-http-check", "http://example.com")
 	a.So(err, should.BeNil)
 	return hc
 }
@@ -140,87 +143,99 @@ func getHealthCheckerWithFailingHTTPCheck(t *testing.T) healthcheck.HealthChecke
 	return hc
 }
 
-func getServerWithHandler(t *testing.T, hc healthcheck.HealthChecker, addr string) http.Server {
+func getServerWithHandler(t *testing.T, hc healthcheck.HealthChecker) (net.Listener, http.Server) {
 	t.Helper()
 	r := mux.NewRouter()
 	r.Handle("/healthz", hc.GetHandler())
-	return http.Server{
-		Addr:              addr,
+	ln, err := net.Listen("tcp", ":0") // nolint:gosec
+	if err != nil {
+		t.Fatal("listen failed", err)
+	}
+	return ln, http.Server{
 		Handler:           r,
 		ReadHeaderTimeout: time.Second,
 	}
 }
 
-// nolint:gosec
-func assertGetStatusCode(a *assertions.Assertion, requestURL string, code int) {
-	resp, err := http.Get(requestURL)
-	a.So(err, should.BeNil)
+func assertGetStatusCode(t *testing.T, a *assertions.Assertion, ln net.Listener, code int) {
+	t.Helper()
+	resp, err := http.Get(fmt.Sprintf("http://%v/healthz", ln.Addr()))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer resp.Body.Close()
+	defer io.Copy(io.Discard, resp.Body) // nolint:errcheck
 	a.So(resp.StatusCode, should.Equal, code)
-	resp.Body.Close()
 }
 
 func TestHealthCheckerWithPassingCheck(t *testing.T) {
 	t.Parallel()
 	a, _ := test.New(t)
 	hc := getHealthCheckerWithPassingCheck(t)
-	srv := getServerWithHandler(t, hc, ":3320")
+	ln, srv := getServerWithHandler(t, hc)
+	defer ln.Close()
 	go func() {
-		_ = srv.ListenAndServe()
+		_ = srv.Serve(ln)
 	}()
-	assertGetStatusCode(a, "http://localhost:3320/healthz", 200)
+	assertGetStatusCode(t, a, ln, 200)
 }
 
 func TestHealthCheckerWithFailingCheck(t *testing.T) {
 	t.Parallel()
 	a, _ := test.New(t)
-	hc := getHealthCheckerWithFailngCheck(t)
-	srv := getServerWithHandler(t, hc, ":3321")
+	hc := getHealthCheckerWithFailingCheck(t)
+	ln, srv := getServerWithHandler(t, hc)
+	defer ln.Close()
 	go func() {
-		_ = srv.ListenAndServe()
+		_ = srv.Serve(ln)
 	}()
-	assertGetStatusCode(a, "http://localhost:3321/healthz", 503)
+	assertGetStatusCode(t, a, ln, 503)
 }
 
 func TestHealthCheckerWithPassingPgCheck(t *testing.T) {
 	t.Parallel()
 	a, _ := test.New(t)
 	hc := getHealthCheckerWithPassingPgCheck(t)
-	srv := getServerWithHandler(t, hc, ":3322")
+	ln, srv := getServerWithHandler(t, hc)
+	defer ln.Close()
 	go func() {
-		_ = srv.ListenAndServe()
+		_ = srv.Serve(ln)
 	}()
-	assertGetStatusCode(a, "http://localhost:3322/healthz", 200)
+	assertGetStatusCode(t, a, ln, 200)
 }
 
 func TestHealthCheckerWithFailingPgCheck(t *testing.T) {
 	t.Parallel()
 	a, _ := test.New(t)
 	hc := getHealthCheckerWithFailingPgCheck(t)
-	srv := getServerWithHandler(t, hc, ":3323")
+	ln, srv := getServerWithHandler(t, hc)
+	defer ln.Close()
 	go func() {
-		_ = srv.ListenAndServe()
+		_ = srv.Serve(ln)
 	}()
-	assertGetStatusCode(a, "http://localhost:3323/healthz", 503)
+	assertGetStatusCode(t, a, ln, 503)
 }
 
 func TestHealthCheckerWithPassingHTTPCheck(t *testing.T) {
 	t.Parallel()
 	a, _ := test.New(t)
 	hc := getHealthCheckerWithPassingHTTPCheck(t)
-	srv := getServerWithHandler(t, hc, ":3324")
+	ln, srv := getServerWithHandler(t, hc)
+	defer ln.Close()
 	go func() {
-		_ = srv.ListenAndServe()
+		_ = srv.Serve(ln)
 	}()
-	assertGetStatusCode(a, "http://localhost:3324/healthz", 200)
+	assertGetStatusCode(t, a, ln, 200)
 }
 
 func TestHealthCheckerWithFailingHTTPCheck(t *testing.T) {
 	t.Parallel()
 	a, _ := test.New(t)
 	hc := getHealthCheckerWithFailingHTTPCheck(t)
-	srv := getServerWithHandler(t, hc, ":3325")
+	ln, srv := getServerWithHandler(t, hc)
+	defer ln.Close()
 	go func() {
-		_ = srv.ListenAndServe()
+		_ = srv.Serve(ln)
 	}()
-	assertGetStatusCode(a, "http://localhost:3325/healthz", 503)
+	assertGetStatusCode(t, a, ln, 503)
 }
