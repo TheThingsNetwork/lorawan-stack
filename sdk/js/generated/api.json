@@ -10373,6 +10373,142 @@
           ]
         },
         {
+          "name": "BatchUnclaimEndDevicesRequest",
+          "longName": "BatchUnclaimEndDevicesRequest",
+          "fullName": "ttn.lorawan.v3.BatchUnclaimEndDevicesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "device_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "repeated.items.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BatchUnclaimEndDevicesResponse",
+          "longName": "BatchUnclaimEndDevicesResponse",
+          "fullName": "ttn.lorawan.v3.BatchUnclaimEndDevicesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "failed",
+              "description": "End devices that could not be unclaimed.\nThe key is the device ID.",
+              "label": "repeated",
+              "type": "FailedEntry",
+              "longType": "BatchUnclaimEndDevicesResponse.FailedEntry",
+              "fullType": "ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.FailedEntry",
+              "ismap": true,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "FailedEntry",
+          "longName": "BatchUnclaimEndDevicesResponse.FailedEntry",
+          "fullName": "ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.FailedEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "ErrorDetails",
+              "longType": "ErrorDetails",
+              "fullType": "ttn.lorawan.v3.ErrorDetails",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "CUPSRedirection",
           "longName": "CUPSRedirection",
           "fullName": "ttn.lorawan.v3.CUPSRedirection",
@@ -11159,9 +11295,118 @@
               "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "GetInfoByJoinEUIsRequest",
+          "longName": "GetInfoByJoinEUIsRequest",
+          "fullName": "ttn.lorawan.v3.GetInfoByJoinEUIsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "requests",
+              "description": "",
+              "label": "repeated",
+              "type": "GetInfoByJoinEUIRequest",
+              "longType": "GetInfoByJoinEUIRequest",
+              "fullType": "ttn.lorawan.v3.GetInfoByJoinEUIRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GetInfoByJoinEUIsResponse",
+          "longName": "GetInfoByJoinEUIsResponse",
+          "fullName": "ttn.lorawan.v3.GetInfoByJoinEUIsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "infos",
+              "description": "",
+              "label": "repeated",
+              "type": "GetInfoByJoinEUIResponse",
+              "longType": "GetInfoByJoinEUIResponse",
+              "fullType": "ttn.lorawan.v3.GetInfoByJoinEUIResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
+        {
+          "name": "EndDeviceBatchClaimingServer",
+          "longName": "EndDeviceBatchClaimingServer",
+          "fullName": "ttn.lorawan.v3.EndDeviceBatchClaimingServer",
+          "description": "",
+          "methods": [
+            {
+              "name": "Unclaim",
+              "description": "Unclaims multiple end devices on an external Join Server.\nAll devices must have the same application ID.\nCheck the response for devices that could not be unclaimed.",
+              "requestType": "BatchUnclaimEndDevicesRequest",
+              "requestLongType": "BatchUnclaimEndDevicesRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchUnclaimEndDevicesRequest",
+              "requestStreaming": false,
+              "responseType": "BatchUnclaimEndDevicesResponse",
+              "responseLongType": "BatchUnclaimEndDevicesResponse",
+              "responseFullType": "ttn.lorawan.v3.BatchUnclaimEndDevicesResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/edcs/claim/{application_ids.application_id}/devices/batch"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetInfoByJoinEUIs",
+              "description": "Return whether claiming is supported for each Join EUI in a given list.",
+              "requestType": "GetInfoByJoinEUIsRequest",
+              "requestLongType": "GetInfoByJoinEUIsRequest",
+              "requestFullType": "ttn.lorawan.v3.GetInfoByJoinEUIsRequest",
+              "requestStreaming": false,
+              "responseType": "GetInfoByJoinEUIsResponse",
+              "responseLongType": "GetInfoByJoinEUIsResponse",
+              "responseFullType": "ttn.lorawan.v3.GetInfoByJoinEUIsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/edcs/claim/info/batch",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
         {
           "name": "EndDeviceClaimingServer",
           "longName": "EndDeviceClaimingServer",
@@ -11193,7 +11438,7 @@
             },
             {
               "name": "Unclaim",
-              "description": "Unclaims the end device on a Join Server.",
+              "description": "Unclaims the end device on a Join Server.\nEUIs provided in the request are ignored and the end device is looked up by the given identifiers.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
@@ -11238,7 +11483,7 @@
             },
             {
               "name": "GetClaimStatus",
-              "description": "Gets the claim status of an end device.",
+              "description": "Gets the claim status of an end device.\nEUIs provided in the request are ignored and the end device is looked up by the given identifiers.",
               "requestType": "EndDeviceIdentifiers",
               "requestLongType": "EndDeviceIdentifiers",
               "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",

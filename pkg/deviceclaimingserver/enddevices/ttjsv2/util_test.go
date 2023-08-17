@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -51,6 +52,7 @@ type mockTTJS struct {
 func (srv *mockTTJS) Start(ctx context.Context) error {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/v2/devices/{devEUI}/claim", srv.handleClaim)
+	r.HandleFunc("/api/v2/devices/{devEUIs}/claims", srv.handleBatchClaims)
 	s := http.Server{
 		Handler:           r,
 		ReadTimeout:       60 * time.Second,
@@ -183,5 +185,80 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 		// Update
 		srv.provisonedDevices[reqDevEUI] = dev
 		w.WriteHeader(http.StatusCreated)
+	}
+}
+
+func (srv *mockTTJS) handleBatchClaims(w http.ResponseWriter, r *http.Request) { // nolint:gocyclo
+	var (
+		found bool
+		asID  string
+	)
+	for registeredASID, data := range srv.clients {
+		if len(r.TLS.PeerCertificates) > 0 && r.TLS.PeerCertificates[0].Equal(data.cert) {
+			found = true
+			asID = registeredASID
+			break
+		}
+	}
+	if !found {
+		writeResponse(w, http.StatusUnauthorized, "Invalid API Key")
+		return
+	}
+
+	raw := mux.Vars(r)["devEUIs"]
+	reqDevEUIs := strings.Split(raw, ",")
+	if len(reqDevEUIs) == 0 {
+		writeResponse(w, http.StatusNoContent, "No device EUIs in request")
+		return
+	}
+
+	devEUIs := make([]types.EUI64, len(reqDevEUIs))
+	for i, devEUIVal := range reqDevEUIs {
+		err := devEUIs[i].UnmarshalText([]byte(devEUIVal))
+		if err != nil {
+			writeResponse(w, http.StatusBadRequest, "Invalid device EUI")
+			return
+		}
+	}
+
+	switch r.Method {
+	case http.MethodDelete:
+		retErrs := make(map[string]ttjsv2.ErrorResponse)
+		for _, devEUI := range devEUIs {
+			// Check if the device exists and is claimed.
+			dev, ok := srv.provisonedDevices[devEUI]
+			if !ok {
+				retErrs[devEUI.String()] = ttjsv2.ErrorResponse{
+					Message: "Device not provisioned",
+				}
+				continue
+			}
+			if dev.asID == "" {
+				retErrs[devEUI.String()] = ttjsv2.ErrorResponse{
+					Message: "Device not claimed",
+				}
+				continue
+			}
+			if dev.asID != asID {
+				retErrs[devEUI.String()] = ttjsv2.ErrorResponse{
+					Message: "Client not allowed to unclaim",
+				}
+				continue
+			}
+			dev.asID = ""
+			dev.locked = false
+			srv.provisonedDevices[devEUI] = dev
+		}
+		if len(retErrs) > 0 {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			if err := json.NewEncoder(w).Encode(retErrs); err != nil {
+				panic(err)
+			}
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	default:
+		writeResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
 }

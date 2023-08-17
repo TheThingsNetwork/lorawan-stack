@@ -31,16 +31,18 @@ type authKeyToRights map[string][]ttnpb.Right
 // MockDefinition contains the structure that is returned by the New(ctx) method of the package, might be used to
 // specify IS mock in test cases definitons.
 type MockDefinition struct {
-	applicationRegistry *mockISApplicationRegistry
-	gatewayRegistry     *mockISGatewayRegistry
-	endDeviceRegistry   *mockISEndDeviceRegistry
-	entityAccess        *mockEntityAccess
+	applicationRegistry    *mockISApplicationRegistry
+	gatewayRegistry        *mockISGatewayRegistry
+	endDeviceRegistry      *mockISEndDeviceRegistry
+	endDeviceBatchRegistry *isEndDeviceBatchRegistry
+	entityAccess           *mockEntityAccess
 }
 
 type closeMock func()
 
 // New returns a identityserver mock along side its address and closing function.
 func New(ctx context.Context) (*MockDefinition, string, closeMock) {
+	endDeviceRegistry := &mockISEndDeviceRegistry{}
 	is := &MockDefinition{
 		applicationRegistry: &mockISApplicationRegistry{
 			applications:      make(map[string]*ttnpb.Application),
@@ -52,8 +54,11 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 			gatewayAuths:  make(map[string][]string),
 			gatewayRights: make(map[string]authKeyToRights),
 		},
-		endDeviceRegistry: &mockISEndDeviceRegistry{},
-		entityAccess:      &mockEntityAccess{},
+		endDeviceRegistry: endDeviceRegistry,
+		endDeviceBatchRegistry: &isEndDeviceBatchRegistry{
+			reg: endDeviceRegistry,
+		},
+		entityAccess: &mockEntityAccess{},
 	}
 
 	srv := rpcserver.New(ctx)
@@ -65,6 +70,8 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 	ttnpb.RegisterGatewayAccessServer(srv.Server, is.gatewayRegistry)
 
 	ttnpb.RegisterEndDeviceRegistryServer(srv.Server, is.endDeviceRegistry)
+
+	ttnpb.RegisterEndDeviceBatchRegistryServer(srv.Server, is.endDeviceBatchRegistry)
 
 	ttnpb.RegisterEntityAccessServer(srv.Server, is.entityAccess)
 
@@ -97,4 +104,8 @@ func (m *MockDefinition) GatewayRegistry() *mockISGatewayRegistry {
 // EntityAccess returns the methods related to the access entity.
 func (m *MockDefinition) EntityAccess() *mockEntityAccess {
 	return m.entityAccess
+}
+
+func (m *MockDefinition) EndDeviceBatchRegistry() *isEndDeviceBatchRegistry { //nolint:revive
+	return m.endDeviceBatchRegistry
 }

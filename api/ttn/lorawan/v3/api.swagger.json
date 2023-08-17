@@ -54,6 +54,9 @@
       "name": "EndDeviceClaimingServer"
     },
     {
+      "name": "EndDeviceBatchClaimingServer"
+    },
+    {
       "name": "GatewayClaimingServer"
     },
     {
@@ -8025,9 +8028,83 @@
         ]
       }
     },
+    "/edcs/claim/info/batch": {
+      "post": {
+        "summary": "Return whether claiming is supported for each Join EUI in a given list.",
+        "operationId": "EndDeviceBatchClaimingServer_GetInfoByJoinEUIs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetInfoByJoinEUIsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3GetInfoByJoinEUIsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceBatchClaimingServer"
+        ]
+      }
+    },
+    "/edcs/claim/{application_ids.application_id}/devices/batch": {
+      "delete": {
+        "summary": "Unclaims multiple end devices on an external Join Server.\nAll devices must have the same application ID.\nCheck the response for devices that could not be unclaimed.",
+        "operationId": "EndDeviceBatchClaimingServer_Unclaim",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3BatchUnclaimEndDevicesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_ids",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "EndDeviceBatchClaimingServer"
+        ]
+      }
+    },
     "/edcs/claim/{application_ids.application_id}/devices/{device_id}": {
       "get": {
-        "summary": "Gets the claim status of an end device.",
+        "summary": "Gets the claim status of an end device.\nEUIs provided in the request are ignored and the end device is looked up by the given identifiers.",
         "operationId": "EndDeviceClaimingServer_GetClaimStatus",
         "responses": {
           "200": {
@@ -8086,7 +8163,7 @@
         ]
       },
       "delete": {
-        "summary": "Unclaims the end device on a Join Server.",
+        "summary": "Unclaims the end device on a Join Server.\nEUIs provided in the request are ignored and the end device is looked up by the given identifiers.",
         "operationId": "EndDeviceClaimingServer_Unclaim",
         "responses": {
           "200": {
@@ -20321,6 +20398,21 @@
         }
       }
     },
+    "v3BatchUnclaimEndDevicesResponse": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "failed": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v3ErrorDetails"
+          },
+          "description": "End devices that could not be unclaimed.\nThe key is the device ID."
+        }
+      }
+    },
     "v3CFList": {
       "type": "object",
       "properties": {
@@ -22322,6 +22414,30 @@
         "supports_claiming": {
           "type": "boolean",
           "description": "If set, this Join EUI is available for claiming on one of the configured Join Servers."
+        }
+      }
+    },
+    "v3GetInfoByJoinEUIsRequest": {
+      "type": "object",
+      "properties": {
+        "requests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3GetInfoByJoinEUIRequest"
+          }
+        }
+      }
+    },
+    "v3GetInfoByJoinEUIsResponse": {
+      "type": "object",
+      "properties": {
+        "infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3GetInfoByJoinEUIResponse"
+          }
         }
       }
     },

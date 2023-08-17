@@ -24,6 +24,7 @@ import (
 	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	claimerrors "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
@@ -109,6 +110,8 @@ var (
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
 	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
 	errUnauthenticated      = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
+	errUnclaimDevice        = errors.Define("unclaim_device", "unclaim device with EUI `{dev_eui}`", "message")
+	errUnclaimDevices       = errors.Define("unclaim_devices", "unclaim devices")
 )
 
 // Claim implements EndDeviceClaimer.
@@ -319,6 +322,93 @@ func (c *TTJS) GetClaimStatus(
 		return nil, errUnauthenticated.New()
 	default:
 		return nil, errors.FromHTTPStatusCode(resp.StatusCode)
+	}
+}
+
+// BatchUnclaim implements EndDeviceClaimer.
+func (c *TTJS) BatchUnclaim(
+	ctx context.Context,
+	ids []*ttnpb.EndDeviceIdentifiers,
+) error {
+	if len(ids) == 0 {
+		return errBadRequest.WithAttributes("message", "no devices in request")
+	}
+	var euis string
+	joinEUI := types.MustEUI64(ids[0].JoinEui).OrZero()
+	for _, ids := range ids {
+		devEUI := types.MustEUI64(ids.DevEui).OrZero()
+		if euis != "" {
+			euis += ","
+		}
+		euis += devEUI.String()
+	}
+
+	reqURL := fmt.Sprintf("%s/api/v2/devices/%s/claims", c.config.URL, euis)
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"join_eui", joinEUI,
+		"url", reqURL,
+	))
+
+	logger.Debug("Unclaim end devices")
+	request, err := http.NewRequestWithContext(ctx, http.MethodDelete, reqURL, nil)
+	if err != nil {
+		return err
+	}
+
+	client, err := c.httpClient(ctx)
+	if err != nil {
+		return err
+	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if isSuccess(resp.StatusCode) {
+		return nil
+	}
+
+	switch resp.StatusCode {
+	case http.StatusBadRequest:
+		var errMsg struct {
+			Message string `json:"message"`
+		}
+		err = json.Unmarshal(respBody, &errMsg)
+		if err != nil {
+			return errUnclaimDevices.WithCause(err)
+		}
+		if errMsg.Message != "" {
+			return errBadRequest.WithAttributes("message", errMsg.Message)
+		}
+
+		var resp EndDevicesErrors
+		err = json.Unmarshal(respBody, &resp)
+		if err != nil {
+			return errUnclaimDevices.WithCause(err)
+		}
+		ret := claimerrors.DeviceErrors{
+			Errors: make(map[types.EUI64]errors.ErrorDetails, len(resp)),
+		}
+		for euiText, r := range resp {
+			var eui types.EUI64
+			err := eui.UnmarshalText([]byte(euiText))
+			if err != nil {
+				logger.WithError(err).WithField("eui", euiText).Warn("Failed to decode EUI")
+				continue
+			}
+			ret.Errors[eui] = errUnclaimDevice.WithAttributes("message", r.Message)
+		}
+		return ret
+	case http.StatusUnauthorized:
+		return errUnauthenticated.New()
+	default:
+		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
 }
 

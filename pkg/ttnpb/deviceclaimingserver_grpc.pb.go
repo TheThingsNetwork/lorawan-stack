@@ -49,10 +49,12 @@ type EndDeviceClaimingServerClient interface {
 	// Claims the end device on a Join Server by claim authentication code or QR code.
 	Claim(ctx context.Context, in *ClaimEndDeviceRequest, opts ...grpc.CallOption) (*EndDeviceIdentifiers, error)
 	// Unclaims the end device on a Join Server.
+	// EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
 	Unclaim(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Return whether claiming is available for a given JoinEUI.
 	GetInfoByJoinEUI(ctx context.Context, in *GetInfoByJoinEUIRequest, opts ...grpc.CallOption) (*GetInfoByJoinEUIResponse, error)
 	// Gets the claim status of an end device.
+	// EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
 	GetClaimStatus(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*GetClaimStatusResponse, error)
 	// Authorize the End Device Claiming Server to claim devices registered in the given application. The application
 	// identifiers are the source application, where the devices are registered before they are claimed.
@@ -137,10 +139,12 @@ type EndDeviceClaimingServerServer interface {
 	// Claims the end device on a Join Server by claim authentication code or QR code.
 	Claim(context.Context, *ClaimEndDeviceRequest) (*EndDeviceIdentifiers, error)
 	// Unclaims the end device on a Join Server.
+	// EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
 	Unclaim(context.Context, *EndDeviceIdentifiers) (*emptypb.Empty, error)
 	// Return whether claiming is available for a given JoinEUI.
 	GetInfoByJoinEUI(context.Context, *GetInfoByJoinEUIRequest) (*GetInfoByJoinEUIResponse, error)
 	// Gets the claim status of an end device.
+	// EUIs provided in the request are ignored and the end device is looked up by the given identifiers.
 	GetClaimStatus(context.Context, *EndDeviceIdentifiers) (*GetClaimStatusResponse, error)
 	// Authorize the End Device Claiming Server to claim devices registered in the given application. The application
 	// identifiers are the source application, where the devices are registered before they are claimed.
@@ -331,6 +335,142 @@ var EndDeviceClaimingServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UnauthorizeApplication",
 			Handler:    _EndDeviceClaimingServer_UnauthorizeApplication_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/deviceclaimingserver.proto",
+}
+
+const (
+	EndDeviceBatchClaimingServer_Unclaim_FullMethodName           = "/ttn.lorawan.v3.EndDeviceBatchClaimingServer/Unclaim"
+	EndDeviceBatchClaimingServer_GetInfoByJoinEUIs_FullMethodName = "/ttn.lorawan.v3.EndDeviceBatchClaimingServer/GetInfoByJoinEUIs"
+)
+
+// EndDeviceBatchClaimingServerClient is the client API for EndDeviceBatchClaimingServer service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type EndDeviceBatchClaimingServerClient interface {
+	// Unclaims multiple end devices on an external Join Server.
+	// All devices must have the same application ID.
+	// Check the response for devices that could not be unclaimed.
+	Unclaim(ctx context.Context, in *BatchUnclaimEndDevicesRequest, opts ...grpc.CallOption) (*BatchUnclaimEndDevicesResponse, error)
+	// Return whether claiming is supported for each Join EUI in a given list.
+	GetInfoByJoinEUIs(ctx context.Context, in *GetInfoByJoinEUIsRequest, opts ...grpc.CallOption) (*GetInfoByJoinEUIsResponse, error)
+}
+
+type endDeviceBatchClaimingServerClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewEndDeviceBatchClaimingServerClient(cc grpc.ClientConnInterface) EndDeviceBatchClaimingServerClient {
+	return &endDeviceBatchClaimingServerClient{cc}
+}
+
+func (c *endDeviceBatchClaimingServerClient) Unclaim(ctx context.Context, in *BatchUnclaimEndDevicesRequest, opts ...grpc.CallOption) (*BatchUnclaimEndDevicesResponse, error) {
+	out := new(BatchUnclaimEndDevicesResponse)
+	err := c.cc.Invoke(ctx, EndDeviceBatchClaimingServer_Unclaim_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *endDeviceBatchClaimingServerClient) GetInfoByJoinEUIs(ctx context.Context, in *GetInfoByJoinEUIsRequest, opts ...grpc.CallOption) (*GetInfoByJoinEUIsResponse, error) {
+	out := new(GetInfoByJoinEUIsResponse)
+	err := c.cc.Invoke(ctx, EndDeviceBatchClaimingServer_GetInfoByJoinEUIs_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// EndDeviceBatchClaimingServerServer is the server API for EndDeviceBatchClaimingServer service.
+// All implementations must embed UnimplementedEndDeviceBatchClaimingServerServer
+// for forward compatibility
+type EndDeviceBatchClaimingServerServer interface {
+	// Unclaims multiple end devices on an external Join Server.
+	// All devices must have the same application ID.
+	// Check the response for devices that could not be unclaimed.
+	Unclaim(context.Context, *BatchUnclaimEndDevicesRequest) (*BatchUnclaimEndDevicesResponse, error)
+	// Return whether claiming is supported for each Join EUI in a given list.
+	GetInfoByJoinEUIs(context.Context, *GetInfoByJoinEUIsRequest) (*GetInfoByJoinEUIsResponse, error)
+	mustEmbedUnimplementedEndDeviceBatchClaimingServerServer()
+}
+
+// UnimplementedEndDeviceBatchClaimingServerServer must be embedded to have forward compatible implementations.
+type UnimplementedEndDeviceBatchClaimingServerServer struct {
+}
+
+func (UnimplementedEndDeviceBatchClaimingServerServer) Unclaim(context.Context, *BatchUnclaimEndDevicesRequest) (*BatchUnclaimEndDevicesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Unclaim not implemented")
+}
+func (UnimplementedEndDeviceBatchClaimingServerServer) GetInfoByJoinEUIs(context.Context, *GetInfoByJoinEUIsRequest) (*GetInfoByJoinEUIsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInfoByJoinEUIs not implemented")
+}
+func (UnimplementedEndDeviceBatchClaimingServerServer) mustEmbedUnimplementedEndDeviceBatchClaimingServerServer() {
+}
+
+// UnsafeEndDeviceBatchClaimingServerServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to EndDeviceBatchClaimingServerServer will
+// result in compilation errors.
+type UnsafeEndDeviceBatchClaimingServerServer interface {
+	mustEmbedUnimplementedEndDeviceBatchClaimingServerServer()
+}
+
+func RegisterEndDeviceBatchClaimingServerServer(s grpc.ServiceRegistrar, srv EndDeviceBatchClaimingServerServer) {
+	s.RegisterService(&EndDeviceBatchClaimingServer_ServiceDesc, srv)
+}
+
+func _EndDeviceBatchClaimingServer_Unclaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchUnclaimEndDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EndDeviceBatchClaimingServerServer).Unclaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EndDeviceBatchClaimingServer_Unclaim_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EndDeviceBatchClaimingServerServer).Unclaim(ctx, req.(*BatchUnclaimEndDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EndDeviceBatchClaimingServer_GetInfoByJoinEUIs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInfoByJoinEUIsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EndDeviceBatchClaimingServerServer).GetInfoByJoinEUIs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EndDeviceBatchClaimingServer_GetInfoByJoinEUIs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EndDeviceBatchClaimingServerServer).GetInfoByJoinEUIs(ctx, req.(*GetInfoByJoinEUIsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// EndDeviceBatchClaimingServer_ServiceDesc is the grpc.ServiceDesc for EndDeviceBatchClaimingServer service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var EndDeviceBatchClaimingServer_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.EndDeviceBatchClaimingServer",
+	HandlerType: (*EndDeviceBatchClaimingServerServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Unclaim",
+			Handler:    _EndDeviceBatchClaimingServer_Unclaim_Handler,
+		},
+		{
+			MethodName: "GetInfoByJoinEUIs",
+			Handler:    _EndDeviceBatchClaimingServer_GetInfoByJoinEUIs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
