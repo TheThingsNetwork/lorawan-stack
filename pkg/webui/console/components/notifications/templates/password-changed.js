@@ -28,6 +28,30 @@ const m = defineMessages({
   closing: 'If this was not done by you, please contact your administrators as soon as possible.',
 })
 
+const PasswordChangedPreview = ({ notificationData }) => {
+  const { entity_ids } = notificationData
+
+  return (
+    <Message
+      content={m.body}
+      values={{
+        entityId: entity_ids.user_ids.user_id,
+        code: msg => msg,
+      }}
+    />
+  )
+}
+
+PasswordChangedPreview.propTypes = {
+  notificationData: PropTypes.shape({
+    entity_ids: PropTypes.shape({
+      user_ids: PropTypes.shape({
+        user_id: PropTypes.string.isRequired,
+      }),
+    }).isRequired,
+  }).isRequired,
+}
+
 const PasswordChangedTitle = ({ notificationData }) => {
   const { entity_ids } = notificationData
 
@@ -78,5 +102,6 @@ PasswordChanged.propTypes = {
 }
 
 PasswordChanged.Title = PasswordChangedTitle
+PasswordChanged.Preview = PasswordChangedPreview
 
 export default PasswordChanged
