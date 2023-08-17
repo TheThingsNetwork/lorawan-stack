@@ -25,6 +25,8 @@ import Pagination from '@ttn-lw/components/pagination'
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
+import Notification from '@console/components/notifications'
+
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -71,7 +73,7 @@ const NotificationsContainer = ({ setPage, page }) => {
 
   useEffect(() => {
     fetchItems()
-  }, [dispatch, userId, page, fetchItems])
+  }, [page, fetchItems])
 
   const onPageChange = useCallback(
     page => {
@@ -147,7 +149,10 @@ const NotificationsContainer = ({ setPage, page }) => {
                     className={classNames('mr-cs-xs', style.unseenMark)}
                   />
                 )}
-                <Message content={notification.notification_type} />
+                <Notification.Title
+                  data={notification}
+                  notificationType={notification.notification_type}
+                />
               </Button>
             )
           })}
@@ -168,7 +173,10 @@ const NotificationsContainer = ({ setPage, page }) => {
         {selectedNotification && !archiving && (
           <>
             <Row justify="between" className={classNames(style.notificationHeader, 'm-0')}>
-              <Message component="strong" content={'Title'} />
+              <Notification.Title
+                data={selectedNotification}
+                notificationType={selectedNotification.notification_type}
+              />
               <div>
                 <DateTime value={selectedNotification.created_at} />
                 <Button
@@ -180,22 +188,11 @@ const NotificationsContainer = ({ setPage, page }) => {
               </div>
             </Row>
             <div style={{ padding: '20px' }}>
-              Dear {userId}, <br />A new API key has been created for your{' '}
-              {Object.keys(selectedNotification.entity_ids)[0].replace('_ids', '')}"
-              {selectedNotification.entity_ids.application_ids.application_id}". <br />
-              API Key ID: {selectedNotification.data.id}
-              <br />
-              API Key Name: {selectedNotification.data.name}
-              <br />
-              Rights:
-              <br />
-              {selectedNotification.data.rights.map((right, index) => (
-                <div key={index}>
-                  - {right}
-                  <br />
-                </div>
-              ))}
-              You can go to ... to view and edit this API key in the Console.
+              <Notification.Content
+                reciever={userId}
+                data={selectedNotification}
+                notificationType={selectedNotification.notification_type}
+              />
             </div>
           </>
         )}

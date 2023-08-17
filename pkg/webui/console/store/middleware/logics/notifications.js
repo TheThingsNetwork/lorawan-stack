@@ -29,7 +29,7 @@ const getNotificationsLogic = createRequestLogic({
     const { page, limit } = params
     clearInterval()
     const result = await tts.Notifications.getAllNotifications(parentType, parentId, page, limit)
-    let totalCount
+    let totalCount = result.totalCount
     setInterval(async () => {
       const newResult = await tts.Notifications.getAllNotifications(parentType, parentId, 1, limit)
       if (newResult.totalCount > totalCount) {
