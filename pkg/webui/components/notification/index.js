@@ -61,7 +61,7 @@ const Notification = ({
         <Icon className={style.icon} icon={icon} large={!small} />
         <div className={style.content}>
           {title && <Message className={style.title} content={title} component="h4" />}
-          <div>
+          <div className={style.message}>
             <Message content={content} values={messageValues} firstToUpper />
             {children}
           </div>

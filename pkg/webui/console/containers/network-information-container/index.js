@@ -23,7 +23,7 @@ import RegistryTotals from './registry-totals'
 const m = defineMessages({
   openSourceInfo:
     'You are currently using The Things Stack Open Source. More features can be unlocked by using The Things Stack Cloud.',
-  plansButton: 'Get started with The things Stack Cloud',
+  plansButton: 'Get started with The Things Stack Cloud',
 })
 
 const NetworkInformationContainer = () => (
@@ -39,7 +39,6 @@ const NetworkInformationContainer = () => (
           message={m.plansButton}
           target="_blank"
           external
-          className="mt-cs-s"
         />
       }
       className="mt-cs-l"
