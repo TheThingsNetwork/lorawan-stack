@@ -19,12 +19,9 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestErrors(t *testing.T) {
-	a, _ := test.New(t)
 	t.Parallel()
 
 	eui1 := types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
@@ -36,6 +33,12 @@ func TestErrors(t *testing.T) {
 			eui2: errors.DefineAlreadyExists("already_exists", "already exists"),
 		},
 	}
-	exp := `Errors per Device EUI: 42FFFFFFFFFFFFFF: error:pkg/deviceclaimingserver/enddevices/errors:not_found (not found), 43FFFFFFFFFFFFFF: error:pkg/deviceclaimingserver/enddevices/errors:already_exists (already exists)` // nolint:lll
-	a.So(errs.Error(), should.Equal, exp)
+	// Maps in golang are not ordered, so we need to check for both possible outputs.
+	exp := `Errors per Device EUI: 42FFFFFFFFFFFFFF: error:pkg/deviceclaimingserver/enddevices/errors:not_found (not found), 43FFFFFFFFFFFFFF: error:pkg/deviceclaimingserver/enddevices/errors:already_exists (already exists)`  // nolint:lll
+	exp2 := `Errors per Device EUI: 43FFFFFFFFFFFFFF: error:pkg/deviceclaimingserver/enddevices/errors:already_exists (already exists), 42FFFFFFFFFFFFFF: error:pkg/deviceclaimingserver/enddevices/errors:not_found (not found)` // nolint:lll
+
+	ret := errs.Error()
+	if ret != exp && ret != exp2 {
+		t.Errorf("Expected error to be %s or %s, got %s", exp, exp2, errs.Error())
+	}
 }
