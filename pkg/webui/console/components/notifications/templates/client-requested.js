@@ -30,6 +30,8 @@ const m = defineMessages({
   body: '{senderType} <code>{id}</code> just registered a new OAuth client under {collaboratorType} <code>{collaboratorId}</code> on your network.{lineBreak}Since {senderTypeMiddle} <code>{id}</code> is not an admin, you need to approve this client before it can be used.',
   clientId: '<b>Client ID:</b> <code>{clientId}</code>',
   link: 'You can approve (or reject) the OAuth client <Link>here</Link>.',
+  preview:
+    '{senderType} {id} just registered a new OAuth client under {collaboratorType} {collaboratorId} on your network. Since {senderTypeMiddle} {id} is not an admin, you need to approve this client before it can be used. Client ID: {clientId}',
 })
 
 const accountUrl = selectAccountUrl()
@@ -50,6 +52,42 @@ const getId = entity => {
   }
 
   return entity.user_id
+}
+
+const ClientRequestedPreview = ({ notificationData }) => {
+  const { data, sender_ids } = notificationData
+  const client = 'create_client_request' in data ? data.create_client_request.client : data.client
+  const collaborator =
+    'create_client_request' in data ? data.create_client_request.collaborator : data.collaborator
+
+  return (
+    <Message
+      content={m.preview}
+      values={{
+        senderType: capitalizeMessage(getType(sender_ids)),
+        senderTypeMiddle: getType(sender_ids),
+        id: getId(sender_ids),
+        collaboratorType: getType(collaborator),
+        collaboratorId: getId(collaborator),
+        lineBreak: <br />,
+        clientId: client.ids.client_id,
+      }}
+    />
+  )
+}
+
+ClientRequestedPreview.propTypes = {
+  notificationData: PropTypes.shape({
+    data: PropTypes.shape({
+      create_client_request: PropTypes.shape({
+        client: PropTypes.shape({}),
+        collaborator: PropTypes.shape({}),
+      }),
+      client: PropTypes.shape({}),
+      collaborator: PropTypes.shape({}),
+    }).isRequired,
+    sender_ids: PropTypes.shape({}).isRequired,
+  }).isRequired,
 }
 
 const ClientRequestedTitle = () => <Message content={m.title} />
@@ -148,5 +186,6 @@ ClientRequested.propTypes = {
 }
 
 ClientRequested.Title = ClientRequestedTitle
+ClientRequested.Preview = ClientRequestedPreview
 
 export default ClientRequested

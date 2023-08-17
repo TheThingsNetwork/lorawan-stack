@@ -16,7 +16,7 @@ import React, { useMemo } from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { getNotificationContent, getNotificationTitle } from './utils'
+import { getNotificationContent, getNotificationPreview, getNotificationTitle } from './utils'
 
 const NotificationContent = ({ reciever, notificationType, data }) => {
   const NotificationContent = useMemo(
@@ -47,7 +47,22 @@ NotificationTitle.propTypes = {
   notificationType: PropTypes.string.isRequired,
 }
 
+const NotificationPreview = ({ notificationType, data }) => {
+  const NotificationPreview = useMemo(
+    () => getNotificationPreview(notificationType),
+    [notificationType],
+  )
+
+  return <NotificationPreview notificationData={data} />
+}
+
+NotificationPreview.propTypes = {
+  data: PropTypes.object.isRequired,
+  notificationType: PropTypes.string.isRequired,
+}
+
 Notification.Content = NotificationContent
 Notification.Title = NotificationTitle
+Notification.Preview = NotificationPreview
 
 export default Notification

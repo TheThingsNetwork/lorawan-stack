@@ -24,18 +24,18 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { getEntity } from '../utils'
 
 const m = defineMessages({
-  title: 'A new API key has just been created for your {entityType}',
+  title: 'An API key of your {entityType} on your network has been changed',
   greeting: 'Dear {receiverName},',
-  body: 'A new API key has just been created for your {entityType} <code>{id}</code> on your network.',
+  body: 'An API key of your {entityType} <code>{id}</code> on your network has been changed.',
   apikey: '<b>API Key ID:</b> <code>{apiKeyId}</code>',
   rights: 'Rights:',
   right: '<code>{right}</code>',
   closing: 'You can view and edit this API key <Link>here</Link>.',
   preview:
-    'A new API key has just been created for your {entityType} {id} on your network. API Key ID: {apiKeyId}',
+    'An API key of your {entityType} "{id}" on your network has been changed. API Key ID: {apiKeyId}',
 })
 
-const ApiKeyCreatedPreview = ({ notificationData }) => {
+const ApiKeyChangedPreview = ({ notificationData }) => {
   const { entity_ids, data } = notificationData
   const { id } = data
 
@@ -52,7 +52,7 @@ const ApiKeyCreatedPreview = ({ notificationData }) => {
   )
 }
 
-ApiKeyCreatedPreview.propTypes = {
+ApiKeyChangedPreview.propTypes = {
   notificationData: PropTypes.shape({
     data: PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -61,7 +61,7 @@ ApiKeyCreatedPreview.propTypes = {
   }).isRequired,
 }
 
-const ApiKeyCreatedTitle = ({ notificationData }) => {
+const ApiKeyChangedTitle = ({ notificationData }) => {
   const { entity_ids } = notificationData
   return (
     <Message
@@ -73,13 +73,13 @@ const ApiKeyCreatedTitle = ({ notificationData }) => {
   )
 }
 
-ApiKeyCreatedTitle.propTypes = {
+ApiKeyChangedTitle.propTypes = {
   notificationData: PropTypes.shape({
     entity_ids: PropTypes.shape({}).isRequired,
   }).isRequired,
 }
 
-const ApiKeyCreated = ({ reciever, notificationData }) => {
+const ApiKeyChanged = ({ reciever, notificationData }) => {
   const { entity_ids, data } = notificationData
   const { id, rights } = data
 
@@ -142,7 +142,7 @@ const ApiKeyCreated = ({ reciever, notificationData }) => {
   )
 }
 
-ApiKeyCreated.propTypes = {
+ApiKeyChanged.propTypes = {
   notificationData: PropTypes.shape({
     data: PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -153,7 +153,7 @@ ApiKeyCreated.propTypes = {
   reciever: PropTypes.string.isRequired,
 }
 
-ApiKeyCreated.Title = ApiKeyCreatedTitle
-ApiKeyCreated.Preview = ApiKeyCreatedPreview
+ApiKeyChanged.Title = ApiKeyChangedTitle
+ApiKeyChanged.Preview = ApiKeyChangedPreview
 
-export default ApiKeyCreated
+export default ApiKeyChanged
