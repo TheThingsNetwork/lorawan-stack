@@ -1785,7 +1785,7 @@ func TestPingPong(t *testing.T) {
 			defer cancel()
 
 			web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), Config{
-				WSPingInterval:       (1 << 5) * test.Delay,
+				WSPingInterval:       (1 << 4) * test.Delay,
 				AllowUnauthenticated: true,
 				UseTrafficTLSAddress: false,
 				MissedPongThreshold:  2,
@@ -1830,7 +1830,7 @@ func TestPingPong(t *testing.T) {
 			}()
 
 			// Wait for connection to setup
-			time.After(1 << 8 * test.Delay)
+			time.After(timeout)
 
 			select {
 			case <-ctx.Done():

@@ -336,7 +336,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 				return
 			case <-pingTicker.C:
 				if atomic.LoadInt64(&pongCount) > 0 {
-					if atomic.AddInt64(&missingPongs, 1) == int64(s.cfg.MissedPongThreshold) {
+					if atomic.AddInt64(&missingPongs, 1)-1 == int64(s.cfg.MissedPongThreshold) {
 						err := errMissedTooManyPongs.New()
 						logger.WithError(err).Warn("Disconnect gateway")
 						return err
