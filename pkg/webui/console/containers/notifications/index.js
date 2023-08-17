@@ -37,7 +37,7 @@ import {
   selectNotifications,
   selectTotalNotificationsCount,
   selectTotalUnseenCount,
-  selectUnseenNotifications,
+  selectUnseenIds,
 } from '@console/store/selectors/notifications'
 
 import style from './notifications.styl'
@@ -53,8 +53,7 @@ const NotificationsContainer = ({ setPage, page }) => {
   const notifications = useSelector(selectNotifications)
   const totalNotifications = useSelector(selectTotalNotificationsCount)
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
-  const unseenNotifications = useSelector(selectUnseenNotifications)
-  const unseenIds = Object.keys(unseenNotifications)
+  const unseenIds = useSelector(selectUnseenIds)
   const dispatch = useDispatch()
   const [archiving, setArchiving] = useState(false)
   const [selectedNotification, setSelectedNotification] = useState(undefined)
@@ -83,14 +82,14 @@ const NotificationsContainer = ({ setPage, page }) => {
   )
 
   const handleClick = useCallback(
-    async (e, id) => {
+    async (e, not) => {
       setArchiving(false)
-      setSelectedNotification(notifications.find(notification => notification.id === id))
+      setSelectedNotification(notifications.find(notification => notification.id === not.id))
       await dispatch(
-        attachPromise(updateNotificationStatus(userId, [id], 'NOTIFICATION_STATUS_SEEN')),
+        attachPromise(updateNotificationStatus(userId, [not.id], 'NOTIFICATION_STATUS_SEEN')),
       )
       setTimeout(async () => await fetchItems(), 300)
-      if (unseenCount > 0) {
+      if (unseenCount > 0 && !('status' in not)) {
         setUnseenCount(unseenCount => (unseenCount === 1 ? 0 : unseenCount - 1))
       }
     },
@@ -134,11 +133,18 @@ const NotificationsContainer = ({ setPage, page }) => {
             const classes = classNames(style.notificationPreview, 'm-0', 'p-0', {
               [style.selected]: selectedNotification?.id === notification.id,
             })
+            const titleClasses = classNames(style.notificationPreviewContentTitle, {
+              [style.selected]: selectedNotification?.id === notification.id,
+            })
+            const previewClasses = classNames(style.notificationPreviewContent, {
+              [style.selected]: selectedNotification?.id === notification.id,
+            })
+
             return (
               <Button
                 key={notification.id}
                 onClick={handleClick}
-                value={notification.id}
+                value={notification}
                 className={classes}
               >
                 {(!('status' in notification) ||
@@ -149,10 +155,31 @@ const NotificationsContainer = ({ setPage, page }) => {
                     className={classNames('mr-cs-xs', style.unseenMark)}
                   />
                 )}
-                <Notification.Title
-                  data={notification}
-                  notificationType={notification.notification_type}
-                />
+                <div className={titleClasses}>
+                  <div>
+                    <Notification.Title
+                      data={notification}
+                      notificationType={notification.notification_type}
+                    />
+                  </div>
+                  <div>
+                    <DateTime.Relative
+                      relativeTimeStyle="short"
+                      showAbsoluteAfter="3"
+                      dateTimeProps={{
+                        time: false,
+                        dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
+                      }}
+                      value={notification.created_at}
+                    />
+                  </div>
+                </div>
+                <div className={previewClasses}>
+                  <Notification.Preview
+                    data={notification}
+                    notificationType={notification.notification_type}
+                  />
+                </div>
               </Button>
             )
           })}
@@ -178,7 +205,10 @@ const NotificationsContainer = ({ setPage, page }) => {
                 notificationType={selectedNotification.notification_type}
               />
               <div>
-                <DateTime value={selectedNotification.created_at} />
+                <DateTime
+                  value={selectedNotification.created_at}
+                  dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
+                />
                 <Button
                   onClick={handleArchive}
                   message="Archive"

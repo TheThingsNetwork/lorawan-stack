@@ -45,13 +45,37 @@
   border-bottom: 1px solid #E4E4E4 !important
   border-radius: 0 !important
   box-shadow: none !important
-  min-height: 5rem
+  min-height: 8rem
   padding: $cs.xl !important
   justify-content: start !important
+  flex-direction: column !important
+  align-items: start !important
 
   &.selected
     background-color: $c-active-blue !important
-    color: white !important
+
+  &-content
+    width: 100%
+    color: $tc-subtle-gray
+    overflow: hidden
+    display: -webkit-box
+    -webkit-box-orient: vertical
+    -webkit-line-clamp: 2 /* start showing ellipsis when 2nd line is reached */
+    white-space: pre-wrap
+
+    &.selected
+      color: white !important
+
+    &-title
+      color: $tc-black
+      font-weight: 600
+      font-size: 1.05rem
+      display: flex
+      justify-content: space-between
+      width: 100%
+
+      &.selected
+        color: white !important
 
 .notification-content
   background-color: white
