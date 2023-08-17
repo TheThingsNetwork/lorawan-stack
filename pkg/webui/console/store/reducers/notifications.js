@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_NOTIFICATIONS_SUCCESS } from '@console/store/actions/notifications'
+import {
+  GET_NOTIFICATIONS_SUCCESS,
+  GET_UNSEEN_NOTIFICATIONS_SUCCESS,
+} from '@console/store/actions/notifications'
 
 const defaultState = {
-  notifications: {
-    seen: {},
-    unseen: {},
-    archived: {},
-  },
+  notifications: {},
+  unseenTotalCount: undefined,
+  unseenIds: [],
   totalCount: undefined,
 }
 
@@ -35,6 +36,12 @@ const notifications = (state = defaultState, { type, payload }) => {
           }, {}),
         },
         totalCount: payload.totalCount,
+      }
+    case GET_UNSEEN_NOTIFICATIONS_SUCCESS:
+      return {
+        ...state,
+        unseenTotalCount: payload.totalCount,
+        unseenIds: payload.notifications.map(not => not.id),
       }
     default:
       return state
