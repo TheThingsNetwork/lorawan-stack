@@ -18,18 +18,6 @@ export const selectNotificationsStore = state => state.notifications
 export const selectNotifications = createSelector([selectNotificationsStore], store =>
   Object.values(store.notifications),
 )
-export const selectUnseenNotifications = createSelector([selectNotifications], store => {
-  const asArray = Object.entries(store)
-  const filtered = asArray.filter(
-    ([key, value]) => !('status' in value) || value.status === 'NOTIFICATION_STATUS_UNSEEN',
-  )
-  const asObject = Object.fromEntries(filtered)
-
-  return asObject
-})
-
 export const selectTotalNotificationsCount = state => selectNotificationsStore(state).totalCount
-export const selectTotalUnseenCount = createSelector(
-  [selectUnseenNotifications],
-  store => Object.values(store).length,
-)
+export const selectTotalUnseenCount = state => selectNotificationsStore(state).unseenTotalCount
+export const selectUnseenIds = state => selectNotificationsStore(state).unseenIds

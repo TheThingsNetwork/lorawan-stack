@@ -30,6 +30,22 @@ export const [
   { request: getNotifications, success: getNotificationsSuccess, failure: getNotificationsFailure },
 ] = createPaginationByParentRequestActions(SHARED_NAME)
 
+export const GET_UNSEEN_NOTIFICATIONS_BASE = 'GET_UNSEEN_NOTIFICATIONS'
+export const [
+  {
+    request: GET_UNSEEN_NOTIFICATIONS,
+    success: GET_UNSEEN_NOTIFICATIONS_SUCCESS,
+    failure: GET_UNSEEN_NOTIFICATIONS_FAILURE,
+  },
+  {
+    request: getUnseenNotifications,
+    success: getUnseenNotificationsSuccess,
+    failure: getUnseenNotificationsFailure,
+  },
+] = createRequestActions(GET_UNSEEN_NOTIFICATIONS_BASE, id => ({
+  id,
+}))
+
 export const UPDATE_NOTIFICATION_STATUS_BASE = 'UPDATE_NOTIFICATION_STATUS'
 export const [
   {

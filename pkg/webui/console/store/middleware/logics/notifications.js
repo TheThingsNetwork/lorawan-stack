@@ -42,6 +42,17 @@ const getNotificationsLogic = createRequestLogic({
   },
 })
 
+const getUnseenNotificationsLogic = createRequestLogic({
+  type: notifications.GET_UNSEEN_NOTIFICATIONS,
+  process: async ({ action }) => {
+    const {
+      payload: { id },
+    } = action
+
+    return await tts.Notifications.getAllNotifications(id, ['NOTIFICATION_STATUS_UNSEEN'])
+  },
+})
+
 const updateNotificationStatusLogic = createRequestLogic({
   type: notifications.UPDATE_NOTIFICATION_STATUS,
   process: async ({ action }) => {
@@ -53,4 +64,4 @@ const updateNotificationStatusLogic = createRequestLogic({
   },
 })
 
-export default [getNotificationsLogic, updateNotificationStatusLogic]
+export default [getNotificationsLogic, getUnseenNotificationsLogic, updateNotificationStatusLogic]
