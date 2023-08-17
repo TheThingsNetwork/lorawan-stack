@@ -30,7 +30,35 @@ const m = defineMessages({
   userName: '<b>Name:</b> {userName}',
   userDescription: '<b>Description:</b> {userDescription}',
   userEmail: '<b>Email Address:</b> {userPrimaryEmailAddress}',
+  preview:
+    'A new user just registered on your network. Since user registration requires admin approval, you need to approve this user before they can login. User ID: {userId}',
 })
+
+const UserRequestedPreview = ({ notificationData }) => {
+  const { user } = notificationData.data
+
+  return (
+    <Message
+      content={m.preview}
+      values={{
+        lineBreak: <br />,
+        userId: user.ids.user_id,
+      }}
+    />
+  )
+}
+
+UserRequestedPreview.propTypes = {
+  notificationData: PropTypes.shape({
+    data: PropTypes.shape({
+      user: PropTypes.shape({
+        ids: PropTypes.shape({
+          user_id: PropTypes.string,
+        }),
+      }),
+    }).isRequired,
+  }).isRequired,
+}
 
 const UserRequestedTitle = () => <Message content={m.title} />
 
@@ -115,5 +143,6 @@ UserRequested.propTypes = {
 }
 
 UserRequested.Title = UserRequestedTitle
+UserRequested.Preview = UserRequestedPreview
 
 export default UserRequested

@@ -24,11 +24,13 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { getEntity } from '../utils'
 
 const m = defineMessages({
-  title: 'A collaborator of your {entityType} "{entityIds}" has been added or updated.',
+  title: 'A collaborator of your {entityType} has been added or updated',
   greeting: 'Dear {recieverName},',
   body: 'A collaborator of your {entityType} <code>{entityId}</code> on your network has been added or updated.',
   collaborator: '<b>Collaborator:</b> {collaboratorType} <code>{collaboratorId}</code>',
   link: 'You can view and edit this collaborator <Link>here</Link>.',
+  preview:
+    'A collaborator of your {entityType} {entityId} on your network has been added or updated. Collaborator: {collaboratorType} {collaboratorId}',
 })
 
 const getType = entity => {
@@ -49,6 +51,33 @@ const getId = entity => {
   return entity.user_id
 }
 
+const CollaboratorChangedPreview = ({ notificationData }) => {
+  const { data, entity_ids } = notificationData
+  const { ids } = data
+
+  return (
+    <Message
+      content={m.preview}
+      values={{
+        entityType: getEntity(entity_ids),
+        entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
+        collaboratorType: getType(ids),
+        collaboratorId: getId(ids),
+        lineBreak: <br />,
+      }}
+    />
+  )
+}
+
+CollaboratorChangedPreview.propTypes = {
+  notificationData: PropTypes.shape({
+    data: PropTypes.shape({
+      ids: PropTypes.shape({}).isRequired,
+    }).isRequired,
+    entity_ids: PropTypes.shape({}).isRequired,
+  }).isRequired,
+}
+
 const CollaboratorChangedTitle = ({ notificationData }) => {
   const { entity_ids } = notificationData
 
@@ -57,7 +86,6 @@ const CollaboratorChangedTitle = ({ notificationData }) => {
       content={m.title}
       values={{
         entityType: getEntity(entity_ids),
-        entityIds: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
       }}
     />
   )
@@ -141,5 +169,6 @@ CollaboratorChanged.propTypes = {
 }
 
 CollaboratorChanged.Title = CollaboratorChangedTitle
+CollaboratorChanged.Preview = CollaboratorChangedPreview
 
 export default CollaboratorChanged

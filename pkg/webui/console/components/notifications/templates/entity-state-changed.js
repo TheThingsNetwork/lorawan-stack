@@ -23,13 +23,39 @@ import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 import { getEntity } from '../utils'
 
 const m = defineMessages({
-  title: 'The state of your {entityType} "{entityIds}" has been changed.',
+  title: 'The state of your {entityType} has been changed.',
   greeting: 'Dear {recieverName},',
   body: 'The state of the {entityType} <code>{entityId}</code> on your network has been changed to "{state}".',
   link: 'You can view this <Link>here</Link>.',
 })
 
-const EntityStateChangedtTitle = ({ notificationData }) => {
+const EntityStateChangedtPreview = ({ notificationData }) => {
+  const { data, entity_ids } = notificationData
+  const { formatMessage } = useIntl()
+
+  return (
+    <Message
+      content={m.body}
+      values={{
+        entityType: getEntity(entity_ids),
+        entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
+        state: capitalizeMessage(formatMessage({ id: `enum:${data.state}` })),
+        code: msg => msg,
+      }}
+    />
+  )
+}
+
+EntityStateChangedtPreview.propTypes = {
+  notificationData: PropTypes.shape({
+    data: PropTypes.shape({
+      state: PropTypes.string.isRequired,
+    }).isRequired,
+    entity_ids: PropTypes.shape({}).isRequired,
+  }).isRequired,
+}
+
+const EntityStateChangedTitle = ({ notificationData }) => {
   const { entity_ids } = notificationData
 
   return (
@@ -37,13 +63,12 @@ const EntityStateChangedtTitle = ({ notificationData }) => {
       content={m.title}
       values={{
         entityType: getEntity(entity_ids),
-        entityIds: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
       }}
     />
   )
 }
 
-EntityStateChangedtTitle.propTypes = {
+EntityStateChangedTitle.propTypes = {
   notificationData: PropTypes.shape({
     entity_ids: PropTypes.shape({}).isRequired,
   }).isRequired,
@@ -84,6 +109,7 @@ EntityStateChanged.propTypes = {
   reciever: PropTypes.string.isRequired,
 }
 
-EntityStateChanged.Title = EntityStateChangedtTitle
+EntityStateChanged.Title = EntityStateChangedTitle
+EntityStateChanged.Preview = EntityStateChangedtPreview
 
 export default EntityStateChanged

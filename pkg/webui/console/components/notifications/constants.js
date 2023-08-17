@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import ApiKeyCreated from './templates/api-key-created'
+import ApiKeyChanged from './templates/api-key-changed'
 import ClientRequested from './templates/client-requested'
 import CollaboratorChanged from './templates/collaborator-changed'
 import EntityStateChanged from './templates/entity-state-changed'
@@ -21,6 +22,7 @@ import UserRequested from './templates/user-requested'
 
 export const notificationContentMap = {
   api_key_created: ApiKeyCreated,
+  api_key_changed: ApiKeyChanged,
   client_requested: ClientRequested,
   collaborator_changed: CollaboratorChanged,
   entity_state_changed: EntityStateChanged,
@@ -30,9 +32,20 @@ export const notificationContentMap = {
 
 export const notificationTitleMap = {
   api_key_created: ApiKeyCreated.Title,
+  api_key_changed: ApiKeyChanged.Title,
   client_requested: ClientRequested.Title,
   collaborator_changed: CollaboratorChanged.Title,
   entity_state_changed: EntityStateChanged.Title,
   password_changed: PasswordChanged.Title,
   user_requested: UserRequested.Title,
+}
+
+export const notificationPreviewMap = {
+  api_key_created: ApiKeyCreated.Preview,
+  api_key_changed: ApiKeyChanged.Preview,
+  client_requested: ClientRequested.Preview,
+  collaborator_changed: CollaboratorChanged.Preview,
+  entity_state_changed: EntityStateChanged.Preview,
+  password_changed: PasswordChanged.Preview,
+  user_requested: UserRequested.Preview,
 }
