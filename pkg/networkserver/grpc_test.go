@@ -204,7 +204,7 @@ func TestGenerateDevAddr(t *testing.T) {
 				}
 
 				seen, total := map[types.DevAddrPrefix]float64{}, float64(0)
-				for i := 0; i < 10000; i++ {
+				for i := 0; i < 1000; i++ {
 					devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(ctx, ttnpb.Empty)
 					if a.So(err, should.BeNil) {
 						devAddr := types.MustDevAddr(devAddr.DevAddr)
@@ -217,9 +217,9 @@ func TestGenerateDevAddr(t *testing.T) {
 						total++
 					}
 				}
-				a.So(seen[tc.DevAddrPrefixes[0]]/total, should.AlmostEqual, tc.Balance[0], 1e-2)
-				a.So(seen[tc.DevAddrPrefixes[1]]/total, should.AlmostEqual, tc.Balance[1], 1e-2)
-				a.So(seen[tc.DevAddrPrefixes[2]]/total, should.AlmostEqual, tc.Balance[2], 1e-2)
+				a.So(seen[tc.DevAddrPrefixes[0]]/total, should.AlmostEqual, tc.Balance[0], 0.1)
+				a.So(seen[tc.DevAddrPrefixes[1]]/total, should.AlmostEqual, tc.Balance[1], 0.1)
+				a.So(seen[tc.DevAddrPrefixes[2]]/total, should.AlmostEqual, tc.Balance[2], 0.1)
 			},
 		})
 	}

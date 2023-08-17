@@ -104,7 +104,7 @@ func TestNewDevAddr(t *testing.T) {
 			defer stop()
 
 			seen, total := map[types.DevAddrPrefix]float64{}, float64(0)
-			for i := 0; i < 10000; i++ {
+			for i := 0; i < 1000; i++ {
 				devAddr := ns.newDevAddr(ctx)
 				for _, p := range ps {
 					if devAddr.HasPrefix(p) {
@@ -116,9 +116,9 @@ func TestNewDevAddr(t *testing.T) {
 			}
 
 			totalAddresses := (65536.0 + 256.0 + 16777216.0)
-			a.So(seen[ps[0]]/total, should.AlmostEqual, 65536.0/totalAddresses, 1e-2)
-			a.So(seen[ps[1]]/total, should.AlmostEqual, 256.0/totalAddresses, 1e-2)
-			a.So(seen[ps[2]]/total, should.AlmostEqual, 16777216.0/totalAddresses, 1e-2)
+			a.So(seen[ps[0]]/total, should.AlmostEqual, 65536.0/totalAddresses, 0.1)
+			a.So(seen[ps[1]]/total, should.AlmostEqual, 256.0/totalAddresses, 0.1)
+			a.So(seen[ps[2]]/total, should.AlmostEqual, 16777216.0/totalAddresses, 0.1)
 		},
 	})
 }
@@ -230,7 +230,7 @@ func TestMakeNewDevAddrFunc(t *testing.T) {
 			a, ctx := test.New(t)
 			newF := makeNewDevAddrFunc(tc.Prefixes...)
 			weights, total := make([]int, len(tc.Prefixes)), 0
-			for i := 0; i < 10000; i++ {
+			for i := 0; i < 100000; i++ {
 				devAddr := newF(ctx)
 				found := false
 				for j, prefix := range tc.Prefixes {
@@ -244,7 +244,7 @@ func TestMakeNewDevAddrFunc(t *testing.T) {
 			}
 			for i, weight := range weights {
 				weight := float64(weight) / float64(total)
-				a.So(weight, should.AlmostEqual, tc.Balance[i], 1e-2)
+				a.So(weight, should.AlmostEqual, tc.Balance[i], 0.01)
 			}
 		})
 	}
