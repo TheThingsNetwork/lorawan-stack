@@ -79,7 +79,7 @@ const Device = () => {
     : 'messaging'
 
   useBreadcrumbs(
-    'device.single',
+    'apps.single.devices.single',
     <Breadcrumb path={`/applications/${appId}/devices/${devId}`} content={name || devId} />,
   )
 

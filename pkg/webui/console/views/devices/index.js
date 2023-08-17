@@ -40,7 +40,7 @@ const Devices = () => {
   const appId = useSelector(selectSelectedApplicationId)
 
   useBreadcrumbs(
-    'devices',
+    'apps.single.devices',
     <Breadcrumb path={`/applications/${appId}/devices`} content={sharedMessages.devices} />,
   )
 

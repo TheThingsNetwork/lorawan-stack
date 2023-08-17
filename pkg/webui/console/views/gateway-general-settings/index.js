@@ -182,7 +182,7 @@ const GatewaySettings = () => {
   )
 
   useBreadcrumbs(
-    'gateways.single.general-settings',
+    'gtws.single.general-settings',
     <Breadcrumb
       path={`/gateways/${gtwId}/general-settings`}
       content={sharedMessages.generalSettings}
