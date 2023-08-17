@@ -45,6 +45,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const pingIntervalJitter = 0.1
+
 var (
 	errGatewayID          = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway ID `{id}`")
 	errNoAuthProvided     = errors.DefineUnauthenticated("no_auth_provided", "no auth provided `{uid}`")
@@ -163,13 +165,13 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
 func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) {
-	const noPongReceived int64 = -1
 	var (
 		id           = mux.Vars(r)["id"]
 		auth         = r.Header.Get("Authorization")
 		ctx          = r.Context()
 		eps          = s.formatter.Endpoints()
-		missedPongs  = noPongReceived
+		missingPongs = int64(0)
+		pongCount    = int64(0)
 		pongCh       = make(chan []byte, 1)
 		downstreamCh = make(chan []byte, 1)
 	)
@@ -284,10 +286,16 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		return err
 	}
 	defer ws.Close()
-	pingTicker := time.NewTicker(random.Jitter(s.cfg.WSPingInterval, 0.1))
-	defer pingTicker.Stop()
+
+	var pingTickerC <-chan time.Time
+	if s.cfg.MissedPongThreshold > 0 && random.CanJitter(s.cfg.WSPingInterval, pingIntervalJitter) {
+		pingTicker := time.NewTicker(random.Jitter(s.cfg.WSPingInterval, pingIntervalJitter))
+		pingTickerC = pingTicker.C
+		defer pingTicker.Stop()
+	}
 
 	ws.SetPingHandler(func(data string) error {
+		logger.Debug("Received client ping")
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -298,7 +306,17 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 
 	// Not all gateways support pongs to the server's pings.
 	ws.SetPongHandler(func(data string) error {
-		atomic.StoreInt64(&missedPongs, 0)
+		logger.Debug("Received client pong")
+		for n := atomic.LoadInt64(&missingPongs); ; n = atomic.LoadInt64(&missingPongs) {
+			if n == 0 {
+				logger.Warn("Unsolicited client pong")
+				return nil
+			}
+			if atomic.CompareAndSwapInt64(&missingPongs, n, n-1) {
+				break
+			}
+		}
+		atomic.AddInt64(&pongCount, 1)
 		return nil
 	})
 
@@ -320,24 +338,24 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 			select {
 			case <-conn.Context().Done():
 				return
-			case <-pingTicker.C:
-				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
+			case <-pingTickerC:
+				if atomic.AddInt64(&missingPongs, 1) > int64(s.cfg.MissedPongThreshold) &&
+					atomic.LoadInt64(&pongCount) > 0 {
+					err := errMissedTooManyPongs.New()
+					logger.WithError(err).Warn("Gateway missed too many pings")
+					return err
+				}
+				if err := ws.WriteControl(websocket.PingMessage, nil, time.Time{}); err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					return err
 				}
-				if atomic.LoadInt64(&missedPongs) == noPongReceived {
-					continue
-				}
-				if atomic.AddInt64(&missedPongs, 1) == int64(s.cfg.MissedPongThreshold) {
-					err := errMissedTooManyPongs.New()
-					logger.WithError(err).Warn("Disconnect gateway")
-					return err
-				}
+				logger.Debug("Server ping sent")
 			case data := <-pongCh:
-				if err := ws.WriteMessage(websocket.PongMessage, data); err != nil {
+				if err := ws.WriteControl(websocket.PongMessage, data, time.Time{}); err != nil {
 					logger.WithError(err).Warn("Failed to send pong")
 					return err
 				}
+				logger.Debug("Server pong sent")
 			case <-timeSyncTickerC:
 				// TODO: Use GPS timestamp from a overlapping frames.
 				// https://github.com/TheThingsNetwork/lorawan-stack/issues/4852

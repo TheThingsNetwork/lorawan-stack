@@ -56,7 +56,6 @@ var (
 	serverAddress          = "127.0.0.1:0"
 	registeredGatewayUID   = "eui-0101010101010101"
 	registeredGatewayID    = &ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayUID}
-	registeredGateway      = &ttnpb.Gateway{Ids: registeredGatewayID, FrequencyPlanId: "EU_863_870"}
 	registeredGatewayToken = "secrettoken"
 
 	discoveryEndPoint      = "/router-info"
@@ -67,7 +66,6 @@ var (
 	timeout             = (1 << 7) * test.Delay
 	trafficTestWaitTime = (1 << 7) * test.Delay
 	defaultConfig       = Config{
-		WSPingInterval:       (1 << 3) * test.Delay,
 		AllowUnauthenticated: true,
 		UseTrafficTLSAddress: false,
 	}
@@ -132,11 +130,7 @@ func TestClientTokenAuth(t *testing.T) {
 			t.FailNow()
 		}
 		defer lis.Close()
-		go func() error {
-			return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				web.ServeHTTP(w, r)
-			}))
-		}()
+		go http.Serve(lis, web) // nolint:errcheck,gosec
 		servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 		for _, tc := range []struct {
@@ -167,7 +161,7 @@ func TestClientTokenAuth(t *testing.T) {
 					if err == nil {
 						return false
 					}
-					return err == websocket.ErrBadHandshake
+					return errors.Is(err, websocket.ErrBadHandshake)
 				},
 			},
 			{
@@ -177,7 +171,7 @@ func TestClientTokenAuth(t *testing.T) {
 					if ttc.AllowUnauthenticated && err == nil {
 						return true
 					}
-					return err == websocket.ErrBadHandshake
+					return errors.Is(err, websocket.ErrBadHandshake)
 				},
 			},
 			{
@@ -188,7 +182,7 @@ func TestClientTokenAuth(t *testing.T) {
 					if err == nil {
 						return false
 					}
-					return err == websocket.ErrBadHandshake
+					return errors.Is(err, websocket.ErrBadHandshake)
 				},
 			},
 		} {
@@ -256,11 +250,7 @@ func TestDiscover(t *testing.T) {
 		t.FailNow()
 	}
 	defer lis.Close()
-	go func() error {
-		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			web.ServeHTTP(w, r)
-		}))
-	}()
+	go http.Serve(lis, web) // nolint:errcheck,gosec
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	// Invalid Endpoints
@@ -334,7 +324,7 @@ func TestDiscover(t *testing.T) {
 				_, data, err := conn.ReadMessage()
 				if err != nil {
 					close(resCh)
-					if err == websocket.ErrBadHandshake {
+					if errors.Is(err, websocket.ErrBadHandshake) {
 						return
 					}
 					readErr = err
@@ -450,7 +440,7 @@ func TestDiscover(t *testing.T) {
 				_, data, err := conn.ReadMessage()
 				if err != nil {
 					close(resCh)
-					if err == websocket.ErrBadHandshake {
+					if errors.Is(err, websocket.ErrBadHandshake) {
 						return
 					}
 					readErr = err
@@ -528,11 +518,7 @@ func TestVersion(t *testing.T) {
 		t.FailNow()
 	}
 	defer lis.Close()
-	go func() error {
-		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			web.ServeHTTP(w, r)
-		}))
-	}()
+	go http.Serve(lis, web) // nolint:errcheck,gosec
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	conn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
@@ -803,11 +789,7 @@ func TestTraffic(t *testing.T) {
 		t.FailNow()
 	}
 	defer lis.Close()
-	go func() error {
-		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			web.ServeHTTP(w, r)
-		}))
-	}()
+	go http.Serve(lis, web) // nolint:errcheck,gosec
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	wsConn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
@@ -1397,11 +1379,7 @@ func TestRTT(t *testing.T) {
 		t.FailNow()
 	}
 	defer lis.Close()
-	go func() error {
-		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			web.ServeHTTP(w, r)
-		}))
-	}()
+	go http.Serve(lis, web) // nolint:errcheck,gosec
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	wsConn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
@@ -1718,77 +1696,6 @@ func TestPingPong(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c, is)
 
-	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	lis, err := net.Listen("tcp", serverAddress)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer lis.Close()
-	go func() error {
-		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			web.ServeHTTP(w, r)
-		}))
-	}()
-	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
-
-	conn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
-	if !a.So(err, should.BeNil) {
-		t.Fatalf("Connection failed: %v", err)
-	}
-	defer conn.Close()
-
-	pingCh := make(chan []byte)
-	pongCh := make(chan []byte)
-
-	// Read server ping
-	go func() {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			// The ping/pong handlers are called only after ReadMessage() receives a ping/pong message.
-			// The data read here is irrelevant.
-			_, _, err := conn.ReadMessage()
-			if err != nil {
-				return
-			}
-		}
-	}()
-
-	conn.SetPingHandler(func(data string) error {
-		pingCh <- []byte{}
-		return nil
-	})
-
-	conn.SetPongHandler(func(data string) error {
-		pongCh <- []byte{}
-		return nil
-	})
-
-	select {
-	case <-pingCh:
-		t.Log("Received server ping")
-		break
-	case <-time.After(timeout):
-		t.Fatalf("Server ping timeout")
-	}
-
-	// Client Ping, Server Pong
-	if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-		t.Fatalf("Failed to ping server: %v", err)
-	}
-	select {
-	case <-pongCh:
-		t.Log("Received server pong")
-		break
-	case <-time.After(timeout):
-		t.Fatalf("Server pong timeout")
-	}
-	conn.Close() // The test below start a new connection per test. So this can be closed.
-
 	// Test disconnection via ping pong
 	for _, tc := range []struct {
 		Name         string
@@ -1808,11 +1715,14 @@ func TestPingPong(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
+			ctx, cancel := context.WithCancel(ctx)
+			defer cancel()
+
 			web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), Config{
-				WSPingInterval:       (1 << 5) * test.Delay,
+				WSPingInterval:       (1 << 4) * test.Delay,
+				MissedPongThreshold:  2,
 				AllowUnauthenticated: true,
 				UseTrafficTLSAddress: false,
-				MissedPongThreshold:  2,
 			})
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
@@ -1822,11 +1732,7 @@ func TestPingPong(t *testing.T) {
 				t.FailNow()
 			}
 			defer lis.Close()
-			go func() error {
-				return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					web.ServeHTTP(w, r)
-				}))
-			}()
+			go http.Serve(lis, web) // nolint:errcheck,gosec
 			servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 			conn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
 			if !a.So(err, should.BeNil) {
@@ -1858,7 +1764,7 @@ func TestPingPong(t *testing.T) {
 			}()
 
 			// Wait for connection to setup
-			time.After(1 << 8 * test.Delay)
+			time.After(timeout)
 
 			select {
 			case <-ctx.Done():
@@ -1881,7 +1787,6 @@ func TestPingPong(t *testing.T) {
 				t.Fatalf("Unexpected error :%v", err)
 			case err := <-handler.ErrCh():
 				t.Fatal(err)
-				break
 			}
 		})
 	}
