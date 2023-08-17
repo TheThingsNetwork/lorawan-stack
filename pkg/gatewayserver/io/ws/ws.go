@@ -45,6 +45,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const pingIntervalJitter = 0.1
+
 var (
 	errGatewayID          = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway ID `{id}`")
 	errNoAuthProvided     = errors.DefineUnauthenticated("no_auth_provided", "no auth provided `{uid}`")
@@ -284,8 +286,13 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		return err
 	}
 	defer ws.Close()
-	pingTicker := time.NewTicker(random.Jitter(s.cfg.WSPingInterval, 0.1))
-	defer pingTicker.Stop()
+
+	var pingTickerC <-chan time.Time
+	if s.cfg.MissedPongThreshold > 0 && random.CanJitter(s.cfg.WSPingInterval, pingIntervalJitter) {
+		pingTicker := time.NewTicker(random.Jitter(s.cfg.WSPingInterval, pingIntervalJitter))
+		pingTickerC = pingTicker.C
+		defer pingTicker.Stop()
+	}
 
 	ws.SetPingHandler(func(data string) error {
 		logger.Debug("Received client ping")
@@ -300,10 +307,6 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	// Not all gateways support pongs to the server's pings.
 	ws.SetPongHandler(func(data string) error {
 		logger.Debug("Received client pong")
-		if atomic.AddInt64(&pongCount, 1) == 1 {
-			// The first pong does not have an associated missing pong.
-			return nil
-		}
 		for n := atomic.LoadInt64(&missingPongs); ; n = atomic.LoadInt64(&missingPongs) {
 			if n == 0 {
 				logger.Warn("Unsolicited client pong")
@@ -313,6 +316,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 				break
 			}
 		}
+		atomic.AddInt64(&pongCount, 1)
 		return nil
 	})
 
@@ -334,13 +338,12 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 			select {
 			case <-conn.Context().Done():
 				return
-			case <-pingTicker.C:
-				if atomic.LoadInt64(&pongCount) > 0 {
-					if atomic.AddInt64(&missingPongs, 1)-1 == int64(s.cfg.MissedPongThreshold) {
-						err := errMissedTooManyPongs.New()
-						logger.WithError(err).Warn("Disconnect gateway")
-						return err
-					}
+			case <-pingTickerC:
+				if atomic.AddInt64(&missingPongs, 1) > int64(s.cfg.MissedPongThreshold) &&
+					atomic.LoadInt64(&pongCount) > 0 {
+					err := errMissedTooManyPongs.New()
+					logger.WithError(err).Warn("Gateway missed too many pings")
+					return err
 				}
 				if err := ws.WriteControl(websocket.PingMessage, nil, time.Time{}); err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")

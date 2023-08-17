@@ -129,6 +129,7 @@ func TestGatewayServer(t *testing.T) {
 						Listen: ":1887",
 						Config: ws.Config{
 							WSPingInterval:       wsPingInterval,
+							MissedPongThreshold:  2,
 							AllowUnauthenticated: true,
 						},
 					},

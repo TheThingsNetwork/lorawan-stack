@@ -66,7 +66,6 @@ var (
 	timeout             = (1 << 7) * test.Delay
 	trafficTestWaitTime = (1 << 7) * test.Delay
 	defaultConfig       = Config{
-		WSPingInterval:       (1 << 3) * test.Delay,
 		AllowUnauthenticated: true,
 		UseTrafficTLSAddress: false,
 	}
@@ -1697,71 +1696,6 @@ func TestPingPong(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c, is)
 
-	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	lis, err := net.Listen("tcp", serverAddress)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer lis.Close()
-	go http.Serve(lis, web) // nolint:errcheck,gosec
-	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
-
-	conn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
-	if !a.So(err, should.BeNil) {
-		t.Fatalf("Connection failed: %v", err)
-	}
-	defer conn.Close()
-
-	pingCh := make(chan []byte)
-	pongCh := make(chan []byte)
-
-	// Read server ping
-	go func() {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			// The ping/pong handlers are called only after ReadMessage() receives a ping/pong message.
-			// The data read here is irrelevant.
-			_, _, err := conn.ReadMessage()
-			if err != nil {
-				return
-			}
-		}
-	}()
-
-	conn.SetPingHandler(func(data string) error {
-		pingCh <- []byte{}
-		return nil
-	})
-
-	conn.SetPongHandler(func(data string) error {
-		pongCh <- []byte{}
-		return nil
-	})
-
-	select {
-	case <-pingCh:
-		t.Log("Received server ping")
-	case <-time.After(timeout):
-		t.Fatalf("Server ping timeout")
-	}
-
-	// Client Ping, Server Pong
-	if err := conn.WriteControl(websocket.PingMessage, nil, time.Time{}); err != nil {
-		t.Fatalf("Failed to ping server: %v", err)
-	}
-	select {
-	case <-pongCh:
-		t.Log("Received server pong")
-	case <-time.After(timeout):
-		t.Fatalf("Server pong timeout")
-	}
-	conn.Close() // The test below start a new connection per test. So this can be closed.
-
 	// Test disconnection via ping pong
 	for _, tc := range []struct {
 		Name         string
@@ -1786,9 +1720,9 @@ func TestPingPong(t *testing.T) {
 
 			web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), Config{
 				WSPingInterval:       (1 << 4) * test.Delay,
+				MissedPongThreshold:  2,
 				AllowUnauthenticated: true,
 				UseTrafficTLSAddress: false,
-				MissedPongThreshold:  2,
 			})
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
