@@ -67,7 +67,10 @@ const consoleAppLogic = createRequestLogic({
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))
         dispatch(
-          getNotifications(userId, ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']),
+          getNotifications(userId, ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN'], {
+            limit: 6,
+            page: 1,
+          }),
         )
       } catch (error) {
         dispatch(user.getUserMeFailure(error))
