@@ -736,7 +736,10 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) batchDeleteGateways(ctx context.Context, req *ttnpb.BatchDeleteGatewaysRequest) (*emptypb.Empty, error) {
+func (is *IdentityServer) batchDeleteGateways(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteGatewaysRequest,
+) (*emptypb.Empty, error) {
 	if err := is.assertGatewayRights(
 		ctx,
 		req.GatewayIds,
@@ -834,6 +837,9 @@ type gatewayBatchRegistry struct {
 }
 
 // Delete implements ttnpb.GatewayBatchRegistryServer.
-func (gr *gatewayBatchRegistry) Delete(ctx context.Context, req *ttnpb.BatchDeleteGatewaysRequest) (*emptypb.Empty, error) {
+func (gr *gatewayBatchRegistry) Delete(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteGatewaysRequest,
+) (*emptypb.Empty, error) {
 	return gr.batchDeleteGateways(ctx, req)
 }

@@ -560,7 +560,6 @@ func (st *StoreTest) TestGatewayBatchOperations(t *T) { // nolint:gocyclo
 	for _, ctx := range []context.Context{
 		ctx,
 	} {
-
 		gtw1, err := s.CreateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{
 				GatewayId: "gtw1",
