@@ -269,9 +269,6 @@ func TestApplicationServer(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			HTTP: config.HTTP{
-				Listen: ":8099",
-			},
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 				JoinServer:     jsAddr,
@@ -833,19 +830,16 @@ func TestApplicationServer(t *testing.T) {
 							chs.downErr <- err
 							continue
 						}
-						url := fmt.Sprintf("http://127.0.0.1:8099/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/%s",
+						url := fmt.Sprintf("/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/%s",
 							data.EndDeviceIds.ApplicationIds.ApplicationId, registeredApplicationWebhookID.WebhookId, data.EndDeviceIds.DeviceId, action,
 						)
-						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
-						if err != nil {
-							chs.downErr <- err
-							continue
-						}
+						req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
 						req.Header.Set("Content-Type", "application/json")
 						req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", key))
-						res, err := http.DefaultClient.Do(req)
-						if err == nil && (res.StatusCode < 200 || res.StatusCode > 299) {
-							err = errors.FromHTTPStatusCode(res.StatusCode)
+						res := httptest.NewRecorder()
+						c.ServeHTTP(res, req)
+						if res.Code < 200 || res.Code > 299 {
+							err = errors.FromHTTPStatusCode(res.Code)
 						}
 						chs.downErr <- err
 					}
@@ -2911,9 +2905,6 @@ func TestLocationFromPayload(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
-			HTTP: config.HTTP{
-				Listen: ":8100",
-			},
 		},
 	})
 	config := &applicationserver.Config{
@@ -3098,9 +3089,6 @@ func TestUplinkNormalized(t *testing.T) {
 			},
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
-			},
-			HTTP: config.HTTP{
-				Listen: ":8100",
 			},
 		},
 	})
