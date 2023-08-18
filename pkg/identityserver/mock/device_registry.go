@@ -64,3 +64,32 @@ func (m *mockISEndDeviceRegistry) Update(
 	m.Add(ctx, dev)
 	return dev, nil
 }
+
+type isEndDeviceBatchRegistry struct {
+	ttnpb.UnimplementedEndDeviceBatchRegistryServer
+	reg *mockISEndDeviceRegistry
+}
+
+// Get implements ttnpb.EndDeviceBatchRegistryServer.
+func (m *isEndDeviceBatchRegistry) Get(
+	ctx context.Context,
+	req *ttnpb.BatchGetEndDevicesRequest,
+) (*ttnpb.EndDevices, error) {
+	devs := make([]*ttnpb.EndDevice, 0, len(req.DeviceIds))
+	for _, id := range req.DeviceIds {
+		dev, err := m.reg.load(unique.ID(ctx, &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: req.ApplicationIds,
+			DeviceId:       id,
+		}))
+		if err != nil {
+			if errors.IsNotFound(err) {
+				continue
+			}
+			return nil, err
+		}
+		devs = append(devs, dev)
+	}
+	return &ttnpb.EndDevices{
+		EndDevices: devs,
+	}, nil
+}

@@ -18,6 +18,8 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
+	claimerrors "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -26,14 +28,22 @@ import (
 )
 
 var (
-	errParseQRCode          = errors.Define("parse_qr_code", "parse QR code failed")
-	errQRCodeData           = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
-	errNoJoinEUI            = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
-	errNoEUI                = errors.DefineInvalidArgument("no_eui", "DevEUI/JoinEUI not set for device")
+	errParseQRCode = errors.Define("parse_qr_code", "parse QR code failed")
+	errQRCodeData  = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
+	errNoJoinEUI   = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
+	errNoEUIs      = errors.DefineFailedPrecondition(
+		"no_euis",
+		"DevEUI/JoinEUI not set for device",
+	)
+	errDeviceNotFound       = errors.DefineNotFound("device_not_found", "device not found")
 	errMethodUnavailable    = errors.DefineUnimplemented("method_unavailable", "method unavailable")
 	errClaimingNotSupported = errors.DefineAborted(
 		"claiming_not_supported",
 		"claiming not supported for JoinEUI `{eui}`",
+	)
+	errNoDevicesFound = errors.DefineInvalidArgument(
+		"no_devices_found",
+		"no devices in batch found in the device registry",
 	)
 )
 
@@ -118,21 +128,29 @@ func (edcs *endDeviceClaimingServer) Unclaim(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*emptypb.Empty, error) {
-	if in.DevEui == nil || in.JoinEui == nil {
-		return nil, errNoEUI.New()
-	}
-	if err := rights.RequireApplication(ctx, in.GetApplicationIds(),
+	devs, err := edcs.DCS.getEndDevices(
+		ctx,
+		in.GetApplicationIds(),
+		[]string{in.GetDeviceId()},
 		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
-	); err != nil {
+	)
+	if err != nil {
 		return nil, err
 	}
+	if len(devs.EndDevices) != 1 {
+		return nil, errDeviceNotFound.New()
+	}
+	ids := devs.EndDevices[0].GetIds()
+	if ids.JoinEui == nil || ids.DevEui == nil {
+		return nil, errNoEUIs.WithAttributes("ids", ids)
+	}
 
-	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
+	joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
 	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
-	if err := claimer.Unclaim(ctx, in); err != nil {
+	if err := claimer.Unclaim(ctx, ids); err != nil {
 		return nil, err
 	}
 	return ttnpb.Empty, nil
@@ -156,18 +174,152 @@ func (edcs *endDeviceClaimingServer) GetClaimStatus(
 	ctx context.Context,
 	in *ttnpb.EndDeviceIdentifiers,
 ) (*ttnpb.GetClaimStatusResponse, error) {
-	if in.DevEui == nil || in.JoinEui == nil {
-		return nil, errNoEUI.New()
-	}
-	if err := rights.RequireApplication(ctx, in.GetApplicationIds(),
-		ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
-	); err != nil {
+	devs, err := edcs.DCS.getEndDevices(
+		ctx,
+		in.GetApplicationIds(),
+		[]string{in.GetDeviceId()},
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	)
+	if err != nil {
 		return nil, err
 	}
-	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
+	if len(devs.EndDevices) != 1 {
+		return nil, errDeviceNotFound.New()
+	}
+	ids := devs.EndDevices[0].GetIds()
+	if ids.JoinEui == nil || ids.DevEui == nil {
+		return nil, errNoEUIs.WithAttributes("ids", ids)
+	}
+	joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
 	claimer := edcs.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
-	return claimer.GetClaimStatus(ctx, in)
+	return claimer.GetClaimStatus(ctx, ids)
+}
+
+func (dcs *DeviceClaimingServer) getEndDevices(
+	ctx context.Context,
+	appID *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+	requiredRights ...ttnpb.Right,
+) (*ttnpb.EndDevices, error) {
+	if err := rights.RequireApplication(
+		ctx,
+		appID,
+		requiredRights...,
+	); err != nil {
+		return nil, err
+	}
+	conn, err := dcs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	if err != nil {
+		return nil, err
+	}
+	client, err := ttnpb.NewEndDeviceBatchRegistryClient(conn), nil
+	if err != nil {
+		return nil, err
+	}
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, dcs.AllowInsecureForCredentials())
+	if err != nil {
+		return nil, err
+	}
+	return client.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+		ApplicationIds: appID,
+		DeviceIds:      deviceIDs,
+		FieldMask:      ttnpb.FieldMask("ids"),
+	}, callOpt)
+}
+
+// endDeviceBatchClaimingServer is the front facing entity for gRPC requests.
+type endDeviceBatchClaimingServer struct {
+	ttnpb.UnimplementedEndDeviceBatchClaimingServerServer
+
+	DCS *DeviceClaimingServer
+}
+
+// GetInfoByJoinEUI implements EndDeviceClaimingServer.
+func (srv *endDeviceBatchClaimingServer) GetInfoByJoinEUIs(
+	ctx context.Context,
+	in *ttnpb.GetInfoByJoinEUIsRequest,
+) (*ttnpb.GetInfoByJoinEUIsResponse, error) {
+	ret := &ttnpb.GetInfoByJoinEUIsResponse{
+		Infos: make([]*ttnpb.GetInfoByJoinEUIResponse, 0, len(in.Requests)),
+	}
+	for _, req := range in.Requests {
+		joinEUI := types.MustEUI64(req.JoinEui).OrZero()
+		claimer := srv.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
+		ret.Infos = append(ret.Infos, &ttnpb.GetInfoByJoinEUIResponse{
+			JoinEui:          joinEUI.Bytes(),
+			SupportsClaiming: claimer != nil,
+		})
+	}
+	return ret, nil
+}
+
+// Unclaim implements EndDeviceBatchClaimingServer.
+func (srv *endDeviceBatchClaimingServer) Unclaim(
+	ctx context.Context,
+	in *ttnpb.BatchUnclaimEndDevicesRequest,
+) (*ttnpb.BatchUnclaimEndDevicesResponse, error) {
+	ret := &ttnpb.BatchUnclaimEndDevicesResponse{
+		ApplicationIds: in.GetApplicationIds(),
+		Failed:         make(map[string]*ttnpb.ErrorDetails),
+	}
+	devs, err := srv.DCS.getEndDevices(
+		ctx,
+		in.GetApplicationIds(),
+		in.GetDeviceIds(),
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(devs.EndDevices) == 0 {
+		return nil, errNoDevicesFound.New()
+	}
+
+	// End Devices within an application can have different JoinEUIs.
+	// We group them by the JoinEUI and claim them in batches.
+	// We also keep track of EUIs to device IDs to report errors (if any).
+	devEUIToDeviceID := make(map[types.EUI64]string)
+	claimers := make(map[enddevices.EndDeviceClaimer][]*ttnpb.EndDeviceIdentifiers)
+	for _, dev := range devs.EndDevices {
+		ids := dev.GetIds()
+		if ids.JoinEui == nil || ids.DevEui == nil {
+			ret.Failed[ids.DeviceId] = ttnpb.ErrorDetailsToProto(
+				errNoEUIs.New(),
+			)
+			continue
+		}
+		joinEUI := types.MustEUI64(ids.JoinEui).OrZero()
+		claimer := srv.DCS.endDeviceClaimingUpstream.JoinEUIClaimer(ctx, joinEUI)
+		if claimer == nil {
+			ret.Failed[ids.DeviceId] = ttnpb.ErrorDetailsToProto(
+				errClaimingNotSupported.WithAttributes("eui", joinEUI),
+			)
+			continue
+		}
+		devIDs := claimers[claimer]
+		if devIDs == nil {
+			devIDs = make([]*ttnpb.EndDeviceIdentifiers, 0)
+		}
+		devIDs = append(devIDs, ids)
+		claimers[claimer] = devIDs
+		devEUIToDeviceID[types.EUI64(ids.DevEui)] = ids.DeviceId
+	}
+
+	// Claim in batches of Join EUIs (claimers).
+	for claimer, devIDs := range claimers {
+		err := claimer.BatchUnclaim(ctx, devIDs)
+		if err != nil {
+			var errs claimerrors.DeviceErrors
+			if !errors.As(err, &errs) {
+				return nil, err
+			}
+			for eui, err := range errs.Errors {
+				ret.Failed[devEUIToDeviceID[eui]] = ttnpb.ErrorDetailsToProto(err)
+			}
+		}
+	}
+	return ret, nil
 }

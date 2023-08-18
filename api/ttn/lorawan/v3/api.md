@@ -167,6 +167,9 @@
 - [File `ttn/lorawan/v3/deviceclaimingserver.proto`](#ttn/lorawan/v3/deviceclaimingserver.proto)
   - [Message `AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest)
   - [Message `AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest)
+  - [Message `BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest)
+  - [Message `BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse)
+  - [Message `BatchUnclaimEndDevicesResponse.FailedEntry`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.FailedEntry)
   - [Message `CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection)
   - [Message `CUPSRedirection.ClientTLS`](#ttn.lorawan.v3.CUPSRedirection.ClientTLS)
   - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
@@ -179,6 +182,9 @@
   - [Message `GetInfoByGatewayEUIResponse`](#ttn.lorawan.v3.GetInfoByGatewayEUIResponse)
   - [Message `GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest)
   - [Message `GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse)
+  - [Message `GetInfoByJoinEUIsRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIsRequest)
+  - [Message `GetInfoByJoinEUIsResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIsResponse)
+  - [Service `EndDeviceBatchClaimingServer`](#ttn.lorawan.v3.EndDeviceBatchClaimingServer)
   - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
   - [Service `GatewayClaimingServer`](#ttn.lorawan.v3.GatewayClaimingServer)
 - [File `ttn/lorawan/v3/devicerepository.proto`](#ttn/lorawan/v3/devicerepository.proto)
@@ -2718,6 +2724,34 @@ in a future version of The Things Stack.
 | `gateway_ids` | <p>`message.required`: `true`</p> |
 | `api_key` | <p>`string.min_len`: `1`</p> |
 
+### <a name="ttn.lorawan.v3.BatchUnclaimEndDevicesRequest">Message `BatchUnclaimEndDevicesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `device_ids` | [`string`](#string) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `device_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p><p>`repeated.items.string.max_len`: `36`</p><p>`repeated.items.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.BatchUnclaimEndDevicesResponse">Message `BatchUnclaimEndDevicesResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `failed` | [`BatchUnclaimEndDevicesResponse.FailedEntry`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.FailedEntry) | repeated | End devices that could not be unclaimed. The key is the device ID. |
+
+### <a name="ttn.lorawan.v3.BatchUnclaimEndDevicesResponse.FailedEntry">Message `BatchUnclaimEndDevicesResponse.FailedEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) |  |  |
+
 ### <a name="ttn.lorawan.v3.CUPSRedirection">Message `CUPSRedirection`</a>
 
 | Field | Type | Label | Description |
@@ -2893,6 +2927,38 @@ in a future version of The Things Stack.
 | ----- | ----------- |
 | `join_eui` | <p>`bytes.len`: `8`</p> |
 
+### <a name="ttn.lorawan.v3.GetInfoByJoinEUIsRequest">Message `GetInfoByJoinEUIsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `requests` | [`GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `requests` | <p>`repeated.max_items`: `20`</p> |
+
+### <a name="ttn.lorawan.v3.GetInfoByJoinEUIsResponse">Message `GetInfoByJoinEUIsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `infos` | [`GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse) | repeated |  |
+
+### <a name="ttn.lorawan.v3.EndDeviceBatchClaimingServer">Service `EndDeviceBatchClaimingServer`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Unclaim` | [`BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest) | [`BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse) | Unclaims multiple end devices on an external Join Server. All devices must have the same application ID. Check the response for devices that could not be unclaimed. |
+| `GetInfoByJoinEUIs` | [`GetInfoByJoinEUIsRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIsRequest) | [`GetInfoByJoinEUIsResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIsResponse) | Return whether claiming is supported for each Join EUI in a given list. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Unclaim` | `DELETE` | `/api/v3/edcs/claim/{application_ids.application_id}/devices/batch` |  |
+| `GetInfoByJoinEUIs` | `POST` | `/api/v3/edcs/claim/info/batch` | `*` |
+
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 
 The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
@@ -2901,9 +2967,9 @@ and allows clients to claim end devices.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Claim` | [`ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Claims the end device on a Join Server by claim authentication code or QR code. |
-| `Unclaim` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unclaims the end device on a Join Server. |
+| `Unclaim` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unclaims the end device on a Join Server. EUIs provided in the request are ignored and the end device is looked up by the given identifiers. |
 | `GetInfoByJoinEUI` | [`GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest) | [`GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse) | Return whether claiming is available for a given JoinEUI. |
-| `GetClaimStatus` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`GetClaimStatusResponse`](#ttn.lorawan.v3.GetClaimStatusResponse) | Gets the claim status of an end device. |
+| `GetClaimStatus` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`GetClaimStatusResponse`](#ttn.lorawan.v3.GetClaimStatusResponse) | Gets the claim status of an end device. EUIs provided in the request are ignored and the end device is looked up by the given identifiers. |
 | `AuthorizeApplication` | [`AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Authorize the End Device Claiming Server to claim devices registered in the given application. The application identifiers are the source application, where the devices are registered before they are claimed. The API key is used to access the application, find the device, verify the claim request and delete the end device from the source application. DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed in a future version of The Things Stack. |
 | `UnauthorizeApplication` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unauthorize the End Device Claiming Server to claim devices in the given application. This reverts the authorization given with rpc AuthorizeApplication. DEPRECATED: Device claiming that transfers devices between applications is no longer supported and will be removed in a future version of The Things Stack. |
 

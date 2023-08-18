@@ -1126,6 +1126,9 @@ var (
 	endDevicesBatchDeleteCommand = &cobra.Command{
 		Use:   "batch-delete [application-id] [device-ids]",
 		Short: "Delete a batch of end devices within the same application (EXPERIMENTAL).",
+		Long: `Delete a batch of end devices within the same application (EXPERIMENTAL).
+Devices are also unclaimed from an external Join Server if applicable.
+Devices not found in the Identity Server are skipped and no error is returned.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkComponentsEnabled(); err != nil {
 				return err
@@ -1173,7 +1176,12 @@ var (
 			if err != nil {
 				return err
 			}
-			del := make([]string, 0)
+			var (
+				del     = make([]string, 0)              // Common devices to delete from IS/AS/NS.
+				js      = make([]string, 0)              // Devices to delete from JS.
+				unclaim = make(map[types.EUI64][]string) // Devices to unclaim from DCS.
+			)
+
 			devices, err := ttnpb.NewEndDeviceBatchRegistryClient(is).Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
 				ApplicationIds: appID,
 				DeviceIds:      deviceIDs,
@@ -1187,24 +1195,90 @@ var (
 			if err != nil {
 				return err
 			}
+
+			// Separate devices that need to be deleted from the cluster Join Server
+			// and the ones that need to be unclaimed from the DCS.
 			for _, dev := range devices.GetEndDevices() {
-				// Check if the device is in the configured cluster.
-				nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(dev, config)
-				if nsMismatch || asMismatch || jsMismatch {
+				nsMismatch, asMismatch, _ := compareServerAddressesEndDevice(dev, config)
+				if nsMismatch || asMismatch {
 					return errAddressMismatchEndDevice.New()
 				}
 				del = append(del, dev.GetIds().GetDeviceId())
+
+				if dev.JoinServerAddress == "" && dev.GetIds().GetJoinEui() != nil {
+					key := types.MustEUI64(dev.GetIds().GetJoinEui()).OrZero()
+					unclaim[key] = append(unclaim[key], dev.GetIds().GetDeviceId())
+				} else {
+					// Check for JS mismatches only for devices registered in the cluster Join Server.
+					_, _, jsMismatch := compareServerAddressesEndDevice(dev, config)
+					if jsMismatch {
+						return errAddressMismatchEndDevice.New()
+					}
+					js = append(js, dev.GetIds().GetDeviceId())
+				}
 			}
 
-			// Batch Delete from JS.
-			if len(del) > 0 {
-				js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
+			dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			dcsBatchClient := ttnpb.NewEndDeviceBatchClaimingServerClient(dcs)
+
+			// Unclaim devices.
+			if len(unclaim) > 0 {
+				infoByJoinEUIs := make([]*ttnpb.GetInfoByJoinEUIRequest, 0, len(unclaim))
+				for joinEUI := range unclaim {
+					infoByJoinEUIs = append(infoByJoinEUIs, &ttnpb.GetInfoByJoinEUIRequest{
+						JoinEui: joinEUI.Bytes(),
+					})
+				}
+				claimInfosResp, err := dcsBatchClient.GetInfoByJoinEUIs(
+					ctx,
+					&ttnpb.GetInfoByJoinEUIsRequest{
+						Requests: infoByJoinEUIs,
+					},
+				)
 				if err != nil {
 					return err
 				}
-				_, err = ttnpb.NewJsEndDeviceBatchRegistryClient(js).Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
+				for _, claimInfo := range claimInfosResp.Infos {
+					if !claimInfo.SupportsClaiming {
+						// These devices cannot be claimed but they also are not registered in the cluster Join Server.
+						// We assume that these devices are in the cluster Join Server with invalid registration information.
+						// We attempt to delete them from the cluster Join Server.
+						key := types.MustEUI64(claimInfo.JoinEui).OrZero()
+						js = append(js, unclaim[key]...)
+						delete(unclaim, key)
+					}
+				}
+				// Batch Unclaim using DCS.
+				var unclaimBatch []string
+				for _, devs := range unclaim {
+					unclaimBatch = append(unclaimBatch, devs...)
+				}
+				if len(unclaim) > 0 {
+					ret, err := dcsBatchClient.Unclaim(ctx, &ttnpb.BatchUnclaimEndDevicesRequest{
+						ApplicationIds: appID,
+						DeviceIds:      unclaimBatch,
+					})
+					if err != nil {
+						return err
+					}
+					if len(ret.Failed) != 0 {
+						logger.Warnf("Could not unclaim %d devices: %v", len(ret.Failed), ret.Failed)
+					}
+				}
+			}
+
+			// Batch Delete from JS.
+			if len(js) > 0 {
+				jsConn, err := api.Dial(ctx, config.JoinServerGRPCAddress)
+				if err != nil {
+					return err
+				}
+				_, err = ttnpb.NewJsEndDeviceBatchRegistryClient(jsConn).Delete(ctx, &ttnpb.BatchDeleteEndDevicesRequest{
 					ApplicationIds: appID,
-					DeviceIds:      del,
+					DeviceIds:      js,
 				})
 				if err != nil {
 					return err

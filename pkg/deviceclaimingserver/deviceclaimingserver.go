@@ -38,8 +38,9 @@ type DeviceClaimingServer struct {
 	gatewayClaimingServerUpstream ttnpb.GatewayClaimingServerServer
 
 	grpc struct {
-		endDeviceClaimingServer *endDeviceClaimingServer
-		gatewayClaimingServer   *gatewayClaimingServer
+		endDeviceClaimingServer      *endDeviceClaimingServer
+		endDeviceBatchClaimingServer *endDeviceBatchClaimingServer
+		gatewayClaimingServer        *gatewayClaimingServer
 	}
 }
 
@@ -64,6 +65,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 		dcs.endDeviceClaimingUpstream = upstream
 	}
 	dcs.grpc.endDeviceClaimingServer = &endDeviceClaimingServer{
+		DCS: dcs,
+	}
+
+	dcs.grpc.endDeviceBatchClaimingServer = &endDeviceBatchClaimingServer{
 		DCS: dcs,
 	}
 
@@ -99,6 +104,7 @@ func (*DeviceClaimingServer) Roles() []ttnpb.ClusterRole {
 // RegisterServices registers services provided by dcs at s.
 func (dcs *DeviceClaimingServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterEndDeviceClaimingServerServer(s, dcs.grpc.endDeviceClaimingServer)
+	ttnpb.RegisterEndDeviceBatchClaimingServerServer(s, dcs.grpc.endDeviceBatchClaimingServer)
 	ttnpb.RegisterGatewayClaimingServerServer(s, dcs.grpc.gatewayClaimingServer)
 }
 
@@ -107,5 +113,6 @@ func (dcs *DeviceClaimingServer) RegisterServices(s *grpc.Server) {
 //nolint:errcheck
 func (dcs *DeviceClaimingServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterEndDeviceClaimingServerHandler(dcs.Context(), s, conn)
+	ttnpb.RegisterEndDeviceBatchClaimingServerHandler(dcs.Context(), s, conn)
 	ttnpb.RegisterGatewayClaimingServerHandler(dcs.Context(), s, conn)
 }

@@ -497,6 +497,211 @@ var _ interface {
 	ErrorName() string
 } = GetInfoByJoinEUIResponseValidationError{}
 
+// ValidateFields checks the field values on GetInfoByJoinEUIsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetInfoByJoinEUIsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetInfoByJoinEUIsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "requests":
+
+			if len(m.GetRequests()) > 20 {
+				return GetInfoByJoinEUIsRequestValidationError{
+					field:  "requests",
+					reason: "value must contain no more than 20 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetRequests() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return GetInfoByJoinEUIsRequestValidationError{
+							field:  fmt.Sprintf("requests[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return GetInfoByJoinEUIsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetInfoByJoinEUIsRequestValidationError is the validation error returned by
+// GetInfoByJoinEUIsRequest.ValidateFields if the designated constraints
+// aren't met.
+type GetInfoByJoinEUIsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetInfoByJoinEUIsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetInfoByJoinEUIsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetInfoByJoinEUIsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetInfoByJoinEUIsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetInfoByJoinEUIsRequestValidationError) ErrorName() string {
+	return "GetInfoByJoinEUIsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetInfoByJoinEUIsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetInfoByJoinEUIsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetInfoByJoinEUIsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetInfoByJoinEUIsRequestValidationError{}
+
+// ValidateFields checks the field values on GetInfoByJoinEUIsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetInfoByJoinEUIsResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetInfoByJoinEUIsResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "infos":
+
+			for idx, item := range m.GetInfos() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return GetInfoByJoinEUIsResponseValidationError{
+							field:  fmt.Sprintf("infos[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return GetInfoByJoinEUIsResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetInfoByJoinEUIsResponseValidationError is the validation error returned by
+// GetInfoByJoinEUIsResponse.ValidateFields if the designated constraints
+// aren't met.
+type GetInfoByJoinEUIsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetInfoByJoinEUIsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetInfoByJoinEUIsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetInfoByJoinEUIsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetInfoByJoinEUIsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetInfoByJoinEUIsResponseValidationError) ErrorName() string {
+	return "GetInfoByJoinEUIsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetInfoByJoinEUIsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetInfoByJoinEUIsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetInfoByJoinEUIsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetInfoByJoinEUIsResponseValidationError{}
+
 // ValidateFields checks the field values on GetClaimStatusResponse with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -634,6 +839,250 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetClaimStatusResponseValidationError{}
+
+// ValidateFields checks the field values on BatchUnclaimEndDevicesRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *BatchUnclaimEndDevicesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BatchUnclaimEndDevicesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if m.GetApplicationIds() == nil {
+				return BatchUnclaimEndDevicesRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BatchUnclaimEndDevicesRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "device_ids":
+
+			if l := len(m.GetDeviceIds()); l < 1 || l > 20 {
+				return BatchUnclaimEndDevicesRequestValidationError{
+					field:  "device_ids",
+					reason: "value must contain between 1 and 20 items, inclusive",
+				}
+			}
+
+			for idx, item := range m.GetDeviceIds() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 36 {
+					return BatchUnclaimEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("device_ids[%v]", idx),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_BatchUnclaimEndDevicesRequest_DeviceIds_Pattern.MatchString(item) {
+					return BatchUnclaimEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("device_ids[%v]", idx),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		default:
+			return BatchUnclaimEndDevicesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BatchUnclaimEndDevicesRequestValidationError is the validation error
+// returned by BatchUnclaimEndDevicesRequest.ValidateFields if the designated
+// constraints aren't met.
+type BatchUnclaimEndDevicesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BatchUnclaimEndDevicesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BatchUnclaimEndDevicesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BatchUnclaimEndDevicesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BatchUnclaimEndDevicesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BatchUnclaimEndDevicesRequestValidationError) ErrorName() string {
+	return "BatchUnclaimEndDevicesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BatchUnclaimEndDevicesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBatchUnclaimEndDevicesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BatchUnclaimEndDevicesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BatchUnclaimEndDevicesRequestValidationError{}
+
+var _BatchUnclaimEndDevicesRequest_DeviceIds_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+// ValidateFields checks the field values on BatchUnclaimEndDevicesResponse
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *BatchUnclaimEndDevicesResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BatchUnclaimEndDevicesResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BatchUnclaimEndDevicesResponseValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "failed":
+
+			for key, val := range m.GetFailed() {
+				_ = val
+
+				// no validation rules for Failed[key]
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return BatchUnclaimEndDevicesResponseValidationError{
+							field:  fmt.Sprintf("failed[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return BatchUnclaimEndDevicesResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BatchUnclaimEndDevicesResponseValidationError is the validation error
+// returned by BatchUnclaimEndDevicesResponse.ValidateFields if the designated
+// constraints aren't met.
+type BatchUnclaimEndDevicesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BatchUnclaimEndDevicesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BatchUnclaimEndDevicesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BatchUnclaimEndDevicesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BatchUnclaimEndDevicesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BatchUnclaimEndDevicesResponseValidationError) ErrorName() string {
+	return "BatchUnclaimEndDevicesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BatchUnclaimEndDevicesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBatchUnclaimEndDevicesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BatchUnclaimEndDevicesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BatchUnclaimEndDevicesResponseValidationError{}
 
 // ValidateFields checks the field values on CUPSRedirection with the rules
 // defined in the proto definition for this message. If any rules are

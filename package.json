@@ -32,7 +32,6 @@
     "babel-plugin-react-intl-auto": "^3.3.0",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^11.0.0",
-    "css-hot-loader": "^1.4.4",
     "css-loader": "^6.8.1",
     "cypress": "12.16.0",
     "cypress-browser-permissions": "^1.1.0",

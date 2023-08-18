@@ -40,7 +40,7 @@ const GatewayData = () => {
   const { gtwId } = useParams()
 
   useBreadcrumbs(
-    'gateways.single.data',
+    'gtws.single.data',
     <Breadcrumb path={`/gateways/${gtwId}/data`} content={sharedMessages.liveData} />,
   )
 

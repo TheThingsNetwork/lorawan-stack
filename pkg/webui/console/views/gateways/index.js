@@ -32,7 +32,7 @@ import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 import { mayViewGateways } from '@console/lib/feature-checks'
 
 const Gateways = () => {
-  useBreadcrumbs('gateways', <Breadcrumb path="/gateways" content={sharedMessages.gateways} />)
+  useBreadcrumbs('gtws', <Breadcrumb path="/gateways" content={sharedMessages.gateways} />)
   return (
     <Require featureCheck={mayViewGateways} otherwise={{ redirect: '/' }}>
       <Routes>

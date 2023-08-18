@@ -38,7 +38,7 @@ const GatewayApiKeys = () => {
   const { gtwId } = useParams()
 
   useBreadcrumbs(
-    'gateways.single.api-keys',
+    'gtws.single.api-keys',
     <Breadcrumb path={`/gateways/${gtwId}/api-keys`} content={sharedMessages.apiKeys} />,
   )
 
