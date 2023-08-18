@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -94,11 +95,11 @@ func TestTaskWrappers(t *testing.T) {
 	})
 }
 
-// TestConcurentTaskSet adds two distinct tasks within the task queue in order to test the all of its operations.
+// TestConcurrentTaskSet adds two distinct tasks within the task queue in order to test the all of its operations.
 //
 // Involves in creating the dispatch loop, adding tasks, registering callback, popping tasks and validating the amount
 // of times the callback have been called.
-func TestConcurentTaskSet(t *testing.T) {
+func TestConcurrentTaskSet(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
@@ -123,16 +124,16 @@ func TestConcurentTaskSet(t *testing.T) {
 	a.So(tq.Add(ctx, "test_task_1", time.Now().Add(callbackDelay), false), should.BeNil)
 	a.So(tq.Add(ctx, "test_task_2", time.Now().Add(callbackDelay), false), should.BeNil)
 
-	cntA := 0
-	cntB := 0
+	cntA := int64(0)
+	cntB := int64(0)
 
 	// Register callbacks.
 	tq.RegisterCallback("test_task_1", func(ctx context.Context) (time.Time, error) {
-		cntA++
+		atomic.AddInt64(&cntA, 1)
 		return time.Now().Add(callbackDelay), nil
 	})
 	tq.RegisterCallback("test_task_2", func(ctx context.Context) (time.Time, error) {
-		cntB++
+		atomic.AddInt64(&cntB, 1)
 		return time.Now().Add(callbackDelay), nil
 	})
 
@@ -186,7 +187,7 @@ func TestConcurentTaskSet(t *testing.T) {
 		// Considering the delay within interacting with redis, it is still expected to have at least 5 calls to each
 		// callback.
 		//
-		a.So(cntA, should.BeGreaterThanOrEqualTo, 5)
-		a.So(cntB, should.BeGreaterThanOrEqualTo, 5)
+		a.So(atomic.LoadInt64(&cntA), should.BeGreaterThanOrEqualTo, 5)
+		a.So(atomic.LoadInt64(&cntB), should.BeGreaterThanOrEqualTo, 5)
 	}
 }
