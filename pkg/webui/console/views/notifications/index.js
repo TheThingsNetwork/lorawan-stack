@@ -25,7 +25,7 @@ import style from '@console/views/app/app.styl'
 
 import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
 
-import { getNotifications, getUnseenNotifications } from '@console/store/actions/notifications'
+import { getUnseenNotifications } from '@console/store/actions/notifications'
 
 import { selectUserId } from '@console/store/selectors/logout'
 
@@ -34,15 +34,7 @@ const NotificationsView = () => {
   const [page, setPage] = useQueryState('page', 1, parseInt)
 
   return (
-    <RequireRequest
-      requestAction={[
-        getNotifications(userId, ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN'], {
-          limit: 6,
-          page,
-        }),
-        getUnseenNotifications(userId),
-      ]}
-    >
+    <RequireRequest requestAction={getUnseenNotifications(userId)}>
       <WithRootClass className={style.stageBg} id="stage">
         <Container>
           <NotificationsContainer setPage={setPage} page={page} />
