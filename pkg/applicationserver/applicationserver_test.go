@@ -266,7 +266,7 @@ func TestApplicationServer(t *testing.T) {
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
-				Listen:                      ":9184",
+				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
 			HTTP: config.HTTP{
@@ -2905,7 +2905,7 @@ func TestLocationFromPayload(t *testing.T) {
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
-				Listen:                      ":9189",
+				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
 			Cluster: cluster.Config{
@@ -3093,7 +3093,7 @@ func TestUplinkNormalized(t *testing.T) {
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
-				Listen:                      ":9189",
+				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
 			Cluster: cluster.Config{
