@@ -61,6 +61,14 @@ type mockISGatewayRegistry struct {
 	mu sync.Mutex
 }
 
+func newGatewayRegistry() *mockISGatewayRegistry {
+	return &mockISGatewayRegistry{
+		gateways:      make(map[string]*ttnpb.Gateway),
+		gatewayAuths:  make(map[string][]string),
+		gatewayRights: make(map[string]authKeyToRights),
+	}
+}
+
 func (is *mockISGatewayRegistry) SetRegisteredGateway(gtwIDs *ttnpb.GatewayIdentifiers) {
 	is.mu.Lock()
 	defer is.mu.Unlock()
