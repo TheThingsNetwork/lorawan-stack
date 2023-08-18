@@ -20,6 +20,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 func allPotentialRights(eIDs *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) *ttnpb.Rights {
@@ -212,4 +213,131 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs *ttnpb.UserIde
 		return nil, err
 	}
 	return entity.Union(universal), nil
+}
+
+var (
+	errInsufficientRights = errors.DefinePermissionDenied(
+		"insufficient_rights",
+		"insufficient rights",
+	)
+	errNeitherUserNorOrganization = errors.DefinePermissionDenied(
+		"neither_user_nor_organization",
+		"caller is neither a user nor an organization",
+	)
+	errSomeGatewaysNotFound = errors.DefineNotFound(
+		"some_gateways_not_found",
+		"some gateways not found",
+	)
+)
+
+func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
+	ctx context.Context,
+	gtwIDs []*ttnpb.GatewayIdentifiers,
+	requiredGatewayRights *ttnpb.Rights,
+) error {
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	// If the caller is not an organization or user, there's nothing more to do.
+	ouID := authInfo.GetOrganizationOrUserIdentifiers()
+	if ouID == nil {
+		return errNeitherUserNorOrganization.New()
+	}
+
+	// Check that the caller has the requested rights.
+	authInfoRights := ttnpb.RightsFrom(authInfo.GetRights()...)
+	if !authInfoRights.IncludesAll(requiredGatewayRights.GetRights()...) {
+		return errInsufficientRights.New()
+	}
+
+	return is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		gtws, err := st.FindGateways(ctx, gtwIDs, []string{"ids", "status_public", "location_public"})
+		if err != nil {
+			return err
+		}
+		if len(gtws) != len(gtwIDs) {
+			if is.IsAdmin(ctx) {
+				// Return the cause only to the admin.
+				// This follows the same logic as in ListRights.
+				return errSomeGatewaysNotFound.New()
+			}
+			return errInsufficientRights.New()
+		}
+
+		// Filter out the public gateways from membership checks,
+		// when only public fields are requested.
+		publicGatewayIds := make(map[string]struct{}, len(gtws))
+		bothStatsAndLocation := len(requiredGatewayRights.Sub(
+			ttnpb.RightsFrom(
+				ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+				ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+			),
+		).GetRights()) == 0
+		onlyPublicLocation := len(requiredGatewayRights.Sub(
+			ttnpb.RightsFrom(
+				ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+			),
+		).GetRights()) == 0
+		onlyPublicStats := len(requiredGatewayRights.Sub(
+			ttnpb.RightsFrom(
+				ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+			),
+		).GetRights()) == 0
+
+		if bothStatsAndLocation {
+			for _, gtw := range gtws {
+				if gtw.StatusPublic && gtw.LocationPublic {
+					publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+				}
+			}
+		} else {
+			if onlyPublicStats {
+				for _, gtw := range gtws {
+					if gtw.StatusPublic {
+						publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+					}
+				}
+			}
+			if onlyPublicLocation {
+				for _, gtw := range gtws {
+					if gtw.LocationPublic {
+						publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+					}
+				}
+			}
+		}
+
+		entityIDs := make([]string, 0, len(gtwIDs))
+		for _, gtwID := range gtwIDs {
+			if _, ok := publicGatewayIds[unique.ID(ctx, gtwID)]; ok {
+				continue
+			}
+			entityIDs = append(entityIDs, gtwID.GetEntityIdentifiers().IDString())
+		}
+		membershipChains, err := st.FindAccountMembershipChains(
+			ctx,
+			ouID,
+			store.EntityGateway,
+			entityIDs...,
+		)
+		if err != nil {
+			return err
+		}
+		if len(membershipChains) != len(entityIDs) {
+			// Some memberships were not found.
+			if is.IsAdmin(ctx) {
+				return errSomeGatewaysNotFound.New()
+			}
+			return errInsufficientRights.New()
+		}
+		for _, chain := range membershipChains {
+			// Make sure that there are no extra rights requested.
+			if !chain.GetRights().IncludesAll(requiredGatewayRights.GetRights()...) {
+				return errInsufficientRights.New()
+			}
+		}
+		return nil
+	})
 }

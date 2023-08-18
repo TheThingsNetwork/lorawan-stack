@@ -3187,6 +3187,18 @@
       ]
     }
   },
+  "GatewayBatchAccess": {
+    "AssertRights": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gateways/rights/batch",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "GatewayConfigurator": {
     "PullConfiguration": {
       "file": "ttn/lorawan/v3/gateway_services.proto",

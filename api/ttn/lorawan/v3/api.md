@@ -330,8 +330,10 @@
   - [Message `GetGatewayConfigurationResponse`](#ttn.lorawan.v3.GetGatewayConfigurationResponse)
   - [Service `GatewayConfigurationService`](#ttn.lorawan.v3.GatewayConfigurationService)
 - [File `ttn/lorawan/v3/gateway_services.proto`](#ttn/lorawan/v3/gateway_services.proto)
+  - [Message `AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
+  - [Service `GatewayBatchAccess`](#ttn.lorawan.v3.GatewayBatchAccess)
   - [Service `GatewayConfigurator`](#ttn.lorawan.v3.GatewayConfigurator)
   - [Service `GatewayRegistry`](#ttn.lorawan.v3.GatewayRegistry)
 - [File `ttn/lorawan/v3/gatewayserver.proto`](#ttn/lorawan/v3/gatewayserver.proto)
@@ -5000,6 +5002,20 @@ Identifies an end device model with version information.
 
 ## <a name="ttn/lorawan/v3/gateway_services.proto">File `ttn/lorawan/v3/gateway_services.proto`</a>
 
+### <a name="ttn.lorawan.v3.AssertGatewayRightsRequest">Message `AssertGatewayRightsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+| `required` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
+| `required` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.PullGatewayConfigurationRequest">Message `PullGatewayConfigurationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -5009,7 +5025,7 @@ Identifies an end device model with version information.
 
 ### <a name="ttn.lorawan.v3.GatewayAccess">Service `GatewayAccess`</a>
 
-The GatewayAcces service, exposed by the Identity Server, is used to manage
+The GatewayAccess service, exposed by the Identity Server, is used to manage
 API keys and collaborators of gateways.
 
 | Method Name | Request Type | Response Type | Description |
@@ -5037,6 +5053,22 @@ API keys and collaborators of gateways.
 | `GetCollaborator` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` |  |
+
+### <a name="ttn.lorawan.v3.GatewayBatchAccess">Service `GatewayBatchAccess`</a>
+
+The GatewayBatchAccess service, exposed by the Identity Server, is used to
+check the rights of the caller on multiple gateways at once.
+EXPERIMENTAL: This service is subject to change.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `AssertRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Assert that the caller has the requested rights on all the requested gateways. The check is successful if there are no errors. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `AssertRights` | `GET` | `/api/v3/gateways/rights/batch` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 
@@ -5147,7 +5179,7 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetGatewayConnectionStats` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) | Get statistics about the current gateway connection to the Gateway Server. This is not persisted between reconnects. |
-| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. This is not persisted between reconnects. Gateways that are not connected or are part of a different cluster are ignored. It is up to the client to make sure that the gateways are in the requested cluster. |
+| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. - Statistics are not persisted between reconnects. - Gateways that are not connected or are part of a different cluster are ignored. - The client should ensure that the requested gateways are in the requested cluster. - The client should have the right to get the gateway connection stats on all requested gateways. |
 
 #### HTTP bindings
 

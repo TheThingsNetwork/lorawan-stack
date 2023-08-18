@@ -197,6 +197,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 			"/ttn.lorawan.v3.EndDeviceBatchRegistry",
 			"/ttn.lorawan.v3.GatewayRegistry",
 			"/ttn.lorawan.v3.GatewayAccess",
+			"/ttn.lorawan.v3.GatewayBatchAccess",
 			"/ttn.lorawan.v3.OrganizationRegistry",
 			"/ttn.lorawan.v3.OrganizationAccess",
 			"/ttn.lorawan.v3.UserRegistry",
@@ -244,6 +245,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterEndDeviceRegistryServer(s, &endDeviceRegistry{IdentityServer: is})
 	ttnpb.RegisterGatewayRegistryServer(s, &gatewayRegistry{IdentityServer: is})
 	ttnpb.RegisterGatewayAccessServer(s, &gatewayAccess{IdentityServer: is})
+	ttnpb.RegisterGatewayBatchAccessServer(s, &gatewayBatchAccess{IdentityServer: is})
 	ttnpb.RegisterOrganizationRegistryServer(s, &organizationRegistry{IdentityServer: is})
 	ttnpb.RegisterOrganizationAccessServer(s, &organizationAccess{IdentityServer: is})
 	ttnpb.RegisterUserRegistryServer(s, &userRegistry{IdentityServer: is})
@@ -269,6 +271,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterEndDeviceRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterGatewayRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterGatewayAccessHandler(is.Context(), s, conn)
+	ttnpb.RegisterGatewayBatchAccessHandler(is.Context(), s, conn) // nolint:errcheck
 	ttnpb.RegisterOrganizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterOrganizationAccessHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserRegistryHandler(is.Context(), s, conn)
@@ -289,7 +292,7 @@ func (is *IdentityServer) RegisterInterop(srv *interop.Server) {
 }
 
 // Roles returns the roles that the Identity Server fulfills.
-func (is *IdentityServer) Roles() []ttnpb.ClusterRole {
+func (*IdentityServer) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_ACCESS, ttnpb.ClusterRole_ENTITY_REGISTRY}
 }
 
@@ -297,6 +300,7 @@ var softDeleteFieldMask = []string{"deleted_at"}
 
 var errRestoreWindowExpired = errors.DefineFailedPrecondition("restore_window_expired", "this entity can no longer be restored")
 
+// Close closes the Identity Server database connections and the underlying component.
 func (is *IdentityServer) Close() {
 	is.db.Close()
 	is.Component.Close()

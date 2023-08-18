@@ -20,7 +20,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
-	"golang.org/x/sync/errgroup"
 )
 
 // GetGatewayConnectionStats returns statistics about a gateway connection.
@@ -60,22 +59,16 @@ func applyGatewayConnectionStatsFieldMask(
 	return dst, dst.SetFields(src, paths...)
 }
 
-// BatchGetGatewayConnectionStats gets statistics about gateway connections to the Gateway Server
-// of a batch of gateways.
-// This RPC skips unconnected gateways.
-// FieldMask paths can be used directly since they are sanitized by the middleware.
+// BatchGetGatewayConnectionStats implements Gs.
 func (gs *GatewayServer) BatchGetGatewayConnectionStats(
 	ctx context.Context,
 	req *ttnpb.BatchGetGatewayConnectionStatsRequest,
 ) (*ttnpb.BatchGetGatewayConnectionStatsResponse, error) {
-	wg, wgCtx := errgroup.WithContext(ctx)
-	for _, ids := range req.GatewayIds {
-		ids := ids
-		wg.Go(func() error {
-			return gs.entityRegistry.AssertGatewayRights(wgCtx, ids, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ)
-		})
-	}
-	if err := wg.Wait(); err != nil {
+	if err := gs.entityRegistry.AssertGatewayBatchRights(
+		ctx,
+		req.GatewayIds,
+		ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+	); err != nil {
 		return nil, err
 	}
 

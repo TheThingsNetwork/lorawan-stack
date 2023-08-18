@@ -915,3 +915,97 @@ var GatewayConfigurator_ServiceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "ttn/lorawan/v3/gateway_services.proto",
 }
+
+const (
+	GatewayBatchAccess_AssertRights_FullMethodName = "/ttn.lorawan.v3.GatewayBatchAccess/AssertRights"
+)
+
+// GatewayBatchAccessClient is the client API for GatewayBatchAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type GatewayBatchAccessClient interface {
+	// Assert that the caller has the requested rights on all the requested gateways.
+	// The check is successful if there are no errors.
+	AssertRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type gatewayBatchAccessClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewGatewayBatchAccessClient(cc grpc.ClientConnInterface) GatewayBatchAccessClient {
+	return &gatewayBatchAccessClient{cc}
+}
+
+func (c *gatewayBatchAccessClient) AssertRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GatewayBatchAccess_AssertRights_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GatewayBatchAccessServer is the server API for GatewayBatchAccess service.
+// All implementations must embed UnimplementedGatewayBatchAccessServer
+// for forward compatibility
+type GatewayBatchAccessServer interface {
+	// Assert that the caller has the requested rights on all the requested gateways.
+	// The check is successful if there are no errors.
+	AssertRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedGatewayBatchAccessServer()
+}
+
+// UnimplementedGatewayBatchAccessServer must be embedded to have forward compatible implementations.
+type UnimplementedGatewayBatchAccessServer struct {
+}
+
+func (UnimplementedGatewayBatchAccessServer) AssertRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssertRights not implemented")
+}
+func (UnimplementedGatewayBatchAccessServer) mustEmbedUnimplementedGatewayBatchAccessServer() {}
+
+// UnsafeGatewayBatchAccessServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GatewayBatchAccessServer will
+// result in compilation errors.
+type UnsafeGatewayBatchAccessServer interface {
+	mustEmbedUnimplementedGatewayBatchAccessServer()
+}
+
+func RegisterGatewayBatchAccessServer(s grpc.ServiceRegistrar, srv GatewayBatchAccessServer) {
+	s.RegisterService(&GatewayBatchAccess_ServiceDesc, srv)
+}
+
+func _GatewayBatchAccess_AssertRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssertGatewayRightsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayBatchAccessServer).AssertRights(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayBatchAccess_AssertRights_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayBatchAccessServer).AssertRights(ctx, req.(*AssertGatewayRightsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GatewayBatchAccess_ServiceDesc is the grpc.ServiceDesc for GatewayBatchAccess service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var GatewayBatchAccess_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.GatewayBatchAccess",
+	HandlerType: (*GatewayBatchAccessServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AssertRights",
+			Handler:    _GatewayBatchAccess_AssertRights_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/gateway_services.proto",
+}

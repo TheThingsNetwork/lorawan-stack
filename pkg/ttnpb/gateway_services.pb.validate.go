@@ -137,3 +137,128 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PullGatewayConfigurationRequestValidationError{}
+
+// ValidateFields checks the field values on AssertGatewayRightsRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *AssertGatewayRightsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = AssertGatewayRightsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if l := len(m.GetGatewayIds()); l < 1 || l > 20 {
+				return AssertGatewayRightsRequestValidationError{
+					field:  "gateway_ids",
+					reason: "value must contain between 1 and 20 items, inclusive",
+				}
+			}
+
+			for idx, item := range m.GetGatewayIds() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return AssertGatewayRightsRequestValidationError{
+							field:  fmt.Sprintf("gateway_ids[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "required":
+
+			if m.GetRequired() == nil {
+				return AssertGatewayRightsRequestValidationError{
+					field:  "required",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetRequired()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AssertGatewayRightsRequestValidationError{
+						field:  "required",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return AssertGatewayRightsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// AssertGatewayRightsRequestValidationError is the validation error returned
+// by AssertGatewayRightsRequest.ValidateFields if the designated constraints
+// aren't met.
+type AssertGatewayRightsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AssertGatewayRightsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AssertGatewayRightsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AssertGatewayRightsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AssertGatewayRightsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AssertGatewayRightsRequestValidationError) ErrorName() string {
+	return "AssertGatewayRightsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AssertGatewayRightsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAssertGatewayRightsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AssertGatewayRightsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AssertGatewayRightsRequestValidationError{}
