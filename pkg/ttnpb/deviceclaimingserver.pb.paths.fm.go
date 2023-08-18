@@ -45,6 +45,20 @@ var GetInfoByJoinEUIResponseFieldPathsTopLevel = []string{
 	"join_eui",
 	"supports_claiming",
 }
+var GetInfoByJoinEUIsRequestFieldPathsNested = []string{
+	"requests",
+}
+
+var GetInfoByJoinEUIsRequestFieldPathsTopLevel = []string{
+	"requests",
+}
+var GetInfoByJoinEUIsResponseFieldPathsNested = []string{
+	"infos",
+}
+
+var GetInfoByJoinEUIsResponseFieldPathsTopLevel = []string{
+	"infos",
+}
 var GetClaimStatusResponseFieldPathsNested = []string{
 	"end_device_ids",
 	"end_device_ids.application_ids",
@@ -65,6 +79,26 @@ var GetClaimStatusResponseFieldPathsTopLevel = []string{
 	"home_net_id",
 	"home_ns_id",
 	"vendor_specific",
+}
+var BatchUnclaimEndDevicesRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"device_ids",
+}
+
+var BatchUnclaimEndDevicesRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"device_ids",
+}
+var BatchUnclaimEndDevicesResponseFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"failed",
+}
+
+var BatchUnclaimEndDevicesResponseFieldPathsTopLevel = []string{
+	"application_ids",
+	"failed",
 }
 var CUPSRedirectionFieldPathsNested = []string{
 	"current_gateway_key",

@@ -30,10 +30,10 @@ import { getPacketBrokerNetworksList } from '@console/store/actions/packet-broke
 import {
   selectPacketBrokerNetworks,
   selectPacketBrokerNetworksTotalCount,
-  selectPacketBrokerForwarderPolicyById,
-  selectPacketBrokerHomeNetworkPolicyById,
   selectPacketBrokerOwnCombinedId,
   selectHomeNetworkDefaultRoutingPolicy,
+  selectPacketBrokerHomeNetworkPoliciesStore,
+  selectPacketBrokerForwarderPoliciesStore,
 } from '@console/store/selectors/packet-broker'
 
 const m = defineMessages({
@@ -104,17 +104,17 @@ const PacketBrokerNetworksTable = () => {
       selectPacketBrokerOwnCombinedId,
       selectPacketBrokerNetworks,
       selectHomeNetworkDefaultRoutingPolicy,
-      selectPacketBrokerForwarderPolicyById,
-      selectPacketBrokerHomeNetworkPolicyById,
       selectPacketBrokerNetworksTotalCount,
+      selectPacketBrokerHomeNetworkPoliciesStore,
+      selectPacketBrokerForwarderPoliciesStore,
     ],
     (
       ownCombinedId,
       networks,
       defaultHomeNetworkRoutingPolicy,
-      forwarderPolicy,
-      homeNetworkPolicy,
       totalCount,
+      homeNetworkPolicies,
+      forwarderPolicies,
     ) => {
       const decoratedNetworks = []
       for (const network of networks) {
@@ -122,6 +122,9 @@ const PacketBrokerNetworksTable = () => {
         if (combinedId === ownCombinedId) {
           continue
         }
+
+        const homeNetworkPolicy = homeNetworkPolicies[combinedId]
+        const forwarderPolicy = forwarderPolicies[combinedId]
 
         const decoratedNetwork = { ...network }
         decoratedNetwork._forwarderPolicy = forwarderPolicy || {

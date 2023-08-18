@@ -43,6 +43,14 @@ type EndDeviceClaimer interface {
 	GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error)
 	// Unclaim releases the claim on an End Device.
 	Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (err error)
+
+	// BatchUnclaim releases the claim on a batch of end devices.
+	// All devices in a batch must have the same Join EUI.
+	// Callers should first try to unmarshal returned error to DeviceError using errors.As().
+	BatchUnclaim(
+		ctx context.Context,
+		ids []*ttnpb.EndDeviceIdentifiers,
+	) error
 }
 
 // Component abstracts the underlying *component.Component.

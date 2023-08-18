@@ -1248,10 +1248,10 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"device_channel_index", chIdx,
 	)
 
-	devAddr := ns.newDevAddr(ctx, matched)
+	devAddr := ns.newDevAddr(ctx)
 	const maxDevAddrGenerationRetries = 5
 	for i := 0; i < maxDevAddrGenerationRetries && matched.Session != nil && devAddr.Equal(types.MustDevAddr(matched.Session.DevAddr).OrZero()); i++ {
-		devAddr = ns.newDevAddr(ctx, matched)
+		devAddr = ns.newDevAddr(ctx)
 	}
 	ctx = log.NewContextWithField(ctx, "dev_addr", devAddr)
 	if matched.Session != nil && devAddr.Equal(types.MustDevAddr(matched.Session.DevAddr).OrZero()) {

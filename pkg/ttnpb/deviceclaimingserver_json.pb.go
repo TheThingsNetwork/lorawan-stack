@@ -246,6 +246,132 @@ func (x *GetInfoByJoinEUIResponse) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the GetInfoByJoinEUIsRequest message to JSON.
+func (x *GetInfoByJoinEUIsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Requests) > 0 || s.HasField("requests") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("requests")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Requests {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("requests"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetInfoByJoinEUIsRequest to JSON.
+func (x *GetInfoByJoinEUIsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetInfoByJoinEUIsRequest message from JSON.
+func (x *GetInfoByJoinEUIsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "requests":
+			s.AddField("requests")
+			if s.ReadNil() {
+				x.Requests = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Requests = append(x.Requests, nil)
+					return
+				}
+				v := &GetInfoByJoinEUIRequest{}
+				v.UnmarshalProtoJSON(s.WithField("requests", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Requests = append(x.Requests, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetInfoByJoinEUIsRequest from JSON.
+func (x *GetInfoByJoinEUIsRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetInfoByJoinEUIsResponse message to JSON.
+func (x *GetInfoByJoinEUIsResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Infos) > 0 || s.HasField("infos") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("infos")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Infos {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("infos"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetInfoByJoinEUIsResponse to JSON.
+func (x *GetInfoByJoinEUIsResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetInfoByJoinEUIsResponse message from JSON.
+func (x *GetInfoByJoinEUIsResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "infos":
+			s.AddField("infos")
+			if s.ReadNil() {
+				x.Infos = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Infos = append(x.Infos, nil)
+					return
+				}
+				v := &GetInfoByJoinEUIResponse{}
+				v.UnmarshalProtoJSON(s.WithField("infos", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Infos = append(x.Infos, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetInfoByJoinEUIsResponse from JSON.
+func (x *GetInfoByJoinEUIsResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the GetClaimStatusResponse message to JSON.
 func (x *GetClaimStatusResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {

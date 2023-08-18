@@ -121,9 +121,7 @@ func withServer(t *testing.T, wsConfig ws.Config, rateLimitConf config.RateLimit
 		t.FailNow()
 	}
 	defer lis.Close()
-	go func() error {
-		return http.Serve(lis, web)
-	}()
+	go http.Serve(lis, web) // nolint:errcheck,gosec
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	f(t, is, servAddr)
@@ -157,7 +155,7 @@ func (h *PingPongHandler) HandlePing(data string) error {
 	}
 	h.wsConnMu.Lock()
 	defer h.wsConnMu.Unlock()
-	if err := h.wsConn.WriteMessage(websocket.PongMessage, nil); err != nil {
+	if err := h.wsConn.WriteControl(websocket.PongMessage, []byte(data), time.Time{}); err != nil {
 		h.errCh <- err
 	}
 	h.numberOfPongs--

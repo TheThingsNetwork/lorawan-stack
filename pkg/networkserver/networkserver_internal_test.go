@@ -27,6 +27,8 @@ import (
 )
 
 func TestNewDevAddr(t *testing.T) {
+	t.Parallel()
+
 	test.RunSubtest(t, test.SubtestConfig{
 		Name:     "From NetID",
 		Parallel: true,
@@ -53,7 +55,7 @@ func TestNewDevAddr(t *testing.T) {
 			)
 			defer stop()
 
-			a.So(ns.newDevAddr(ctx, nil).HasPrefix(types.DevAddrPrefix{
+			a.So(ns.newDevAddr(ctx).HasPrefix(types.DevAddrPrefix{
 				DevAddr: types.DevAddr{0x26, 0, 0, 0},
 				Length:  7,
 			}), should.BeTrue)
@@ -101,20 +103,149 @@ func TestNewDevAddr(t *testing.T) {
 			)
 			defer stop()
 
-			seen := map[types.DevAddrPrefix]int{}
-			for i := 0; i < 100; i++ {
-				devAddr := ns.newDevAddr(ctx, nil)
+			seen, total := map[types.DevAddrPrefix]float64{}, float64(0)
+			for i := 0; i < 1000; i++ {
+				devAddr := ns.newDevAddr(ctx)
 				for _, p := range ps {
 					if devAddr.HasPrefix(p) {
 						seen[p]++
+						total++
 						break
 					}
 				}
 			}
 
-			a.So(seen[ps[0]], should.BeGreaterThan, 0)
-			a.So(seen[ps[1]], should.BeGreaterThan, 0)
-			a.So(seen[ps[2]], should.BeGreaterThan, 0)
+			totalAddresses := (65536.0 + 256.0 + 16777216.0)
+			a.So(seen[ps[0]]/total, should.AlmostEqual, 65536.0/totalAddresses, 0.1)
+			a.So(seen[ps[1]]/total, should.AlmostEqual, 256.0/totalAddresses, 0.1)
+			a.So(seen[ps[2]]/total, should.AlmostEqual, 16777216.0/totalAddresses, 0.1)
 		},
 	})
+}
+
+func TestMakeNewDevAddrFunc(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name     string
+		Prefixes []types.DevAddrPrefix
+		Balance  []float64
+	}{
+		{
+			Name: "single /32",
+			Prefixes: []types.DevAddrPrefix{
+				{
+					DevAddr: types.MinDevAddr,
+					Length:  32,
+				},
+			},
+			Balance: []float64{
+				1.0,
+			},
+		},
+		{
+			Name: "two /32",
+			Prefixes: []types.DevAddrPrefix{
+				{
+					DevAddr: types.MinDevAddr,
+					Length:  32,
+				},
+				{
+					DevAddr: types.MaxDevAddr,
+					Length:  32,
+				},
+			},
+			Balance: []float64{
+				1.0 / 2.0,
+				1.0 / 2.0,
+			},
+		},
+		{
+			Name: "three /32",
+			Prefixes: []types.DevAddrPrefix{
+				{
+					DevAddr: types.MinDevAddr,
+					Length:  32,
+				},
+				{
+					DevAddr: types.DevAddr{0x01, 0x00, 0x00, 0x00},
+					Length:  32,
+				},
+				{
+					DevAddr: types.MaxDevAddr,
+					Length:  32,
+				},
+			},
+			Balance: []float64{
+				1.0 / 3.0,
+				1.0 / 3.0,
+				1.0 / 3.0,
+			},
+		},
+		{
+			Name: "one /24 and one /28",
+			Prefixes: []types.DevAddrPrefix{
+				{
+					DevAddr: types.MinDevAddr,
+					Length:  24,
+				},
+				{
+					DevAddr: types.MaxDevAddr,
+					Length:  28,
+				},
+			},
+			// There are 2^4=16 more /24 addresses than /28 addresses.
+			Balance: []float64{
+				1.0 - (1.0 / 16.0),
+				1.0 / 16.0,
+			},
+		},
+		{
+			Name: "one /24 and two /28",
+			Prefixes: []types.DevAddrPrefix{
+				{
+					DevAddr: types.MinDevAddr,
+					Length:  24,
+				},
+				{
+					DevAddr: types.DevAddr{0x01, 0x00, 0x00, 0x00},
+					Length:  24,
+				},
+				{
+					DevAddr: types.MaxDevAddr,
+					Length:  28,
+				},
+			},
+			// There are 256 /24 possible addresses, and 16 /28 possible addresses.
+			Balance: []float64{
+				1.0 - 256.0/(256.0+256.0+16.0) - 16.0/(256.0+256.0+16.0),
+				1.0 - 256.0/(256.0+256.0+16.0) - 16.0/(256.0+256.0+16.0),
+				16.0 / (256.0 + 256.0 + 16.0),
+			},
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			a, ctx := test.New(t)
+			newF := makeNewDevAddrFunc(tc.Prefixes...)
+			weights, total := make([]int, len(tc.Prefixes)), 0
+			for i := 0; i < 100000; i++ {
+				devAddr := newF(ctx)
+				found := false
+				for j, prefix := range tc.Prefixes {
+					if prefix.Matches(devAddr) {
+						found = true
+						weights[j]++
+						total++
+					}
+				}
+				a.So(found, should.BeTrue)
+			}
+			for i, weight := range weights {
+				weight := float64(weight) / float64(total)
+				a.So(weight, should.AlmostEqual, tc.Balance[i], 0.01)
+			}
+		})
+	}
 }

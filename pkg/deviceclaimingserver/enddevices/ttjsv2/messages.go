@@ -43,6 +43,9 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
+// EndDevicesErrors is a map of end device identifiers to error responses.
+type EndDevicesErrors map[string]ErrorResponse
+
 func boolValue(b bool) *bool {
 	return &b
 }

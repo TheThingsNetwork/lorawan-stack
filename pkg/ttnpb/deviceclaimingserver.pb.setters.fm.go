@@ -223,6 +223,46 @@ func (dst *GetInfoByJoinEUIResponse) SetFields(src *GetInfoByJoinEUIResponse, pa
 	return nil
 }
 
+func (dst *GetInfoByJoinEUIsRequest) SetFields(src *GetInfoByJoinEUIsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "requests":
+			if len(subs) > 0 {
+				return fmt.Errorf("'requests' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Requests = src.Requests
+			} else {
+				dst.Requests = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetInfoByJoinEUIsResponse) SetFields(src *GetInfoByJoinEUIsResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "infos":
+			if len(subs) > 0 {
+				return fmt.Errorf("'infos' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Infos = src.Infos
+			} else {
+				dst.Infos = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *GetClaimStatusResponse) SetFields(src *GetClaimStatusResponse, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -293,6 +333,96 @@ func (dst *GetClaimStatusResponse) SetFields(src *GetClaimStatusResponse, paths 
 				} else {
 					dst.VendorSpecific = nil
 				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchUnclaimEndDevicesRequest) SetFields(src *BatchUnclaimEndDevicesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIds = src.ApplicationIds
+				} else {
+					dst.ApplicationIds = nil
+				}
+			}
+		case "device_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceIds = src.DeviceIds
+			} else {
+				dst.DeviceIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchUnclaimEndDevicesResponse) SetFields(src *BatchUnclaimEndDevicesResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIds = src.ApplicationIds
+				} else {
+					dst.ApplicationIds = nil
+				}
+			}
+		case "failed":
+			if len(subs) > 0 {
+				return fmt.Errorf("'failed' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Failed = src.Failed
+			} else {
+				dst.Failed = nil
 			}
 
 		default:

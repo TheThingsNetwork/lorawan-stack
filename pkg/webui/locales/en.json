@@ -647,7 +647,7 @@
   "console.containers.move-away-modal.move-away-modal.modalTitle": "Confirm navigation",
   "console.containers.move-away-modal.move-away-modal.modalMessage": "Are you sure you want to leave this page? Your current changes have not been saved yet.",
   "console.containers.network-information-container.index.openSourceInfo": "You are currently using The Things Stack Open Source. More features can be unlocked by using The Things Stack Cloud.",
-  "console.containers.network-information-container.index.plansButton": "Get started with The things Stack Cloud",
+  "console.containers.network-information-container.index.plansButton": "Get started with The Things Stack Cloud",
   "console.containers.network-information-container.registry-totals.applicationsUsed": "Total applications",
   "console.containers.network-information-container.registry-totals.gatewaysUsed": "Total gateways",
   "console.containers.network-information-container.registry-totals.registeredUsers": "Registered users",
