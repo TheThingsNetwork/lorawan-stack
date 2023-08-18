@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { notificationContentMap, notificationTitleMap, notificationPreviewMap } from './constants'
+import notificationMap from './constants'
 
-export const getNotificationContent = notificationType => notificationContentMap[notificationType]
-
-export const getNotificationTitle = notificationType => notificationTitleMap[notificationType]
-
-export const getNotificationPreview = notificationType => notificationPreviewMap[notificationType]
+export const getNotification = notificationType => notificationMap[notificationType]
 
 export const getEntity = entityIds => {
   const entity = Object.keys(entityIds)[0].split('_')[0]
