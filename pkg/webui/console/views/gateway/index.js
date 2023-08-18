@@ -108,10 +108,7 @@ const GatewayInner = () => {
 
   const gatewayName = gateway?.name || gtwId
 
-  useBreadcrumbs(
-    'gateways.single',
-    <Breadcrumb path={`/gateways/${gtwId}`} content={gatewayName} />,
-  )
+  useBreadcrumbs('gtws.single', <Breadcrumb path={`/gateways/${gtwId}`} content={gatewayName} />)
 
   return (
     <>
