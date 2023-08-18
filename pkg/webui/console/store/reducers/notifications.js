@@ -19,8 +19,8 @@ import {
 
 const defaultState = {
   notifications: {},
-  unseenTotalCount: undefined,
   unseenIds: [],
+  unseenTotalCount: undefined,
   totalCount: undefined,
 }
 
@@ -40,8 +40,8 @@ const notifications = (state = defaultState, { type, payload }) => {
     case GET_UNSEEN_NOTIFICATIONS_SUCCESS:
       return {
         ...state,
-        unseenTotalCount: payload.totalCount,
         unseenIds: payload.notifications.map(not => not.id),
+        unseenTotalCount: payload.totalCount,
       }
     default:
       return state

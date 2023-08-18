@@ -16,13 +16,10 @@ import React, { useMemo } from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { getNotificationContent, getNotificationPreview, getNotificationTitle } from './utils'
+import { getNotification } from './utils'
 
 const NotificationContent = ({ reciever, notificationType, data }) => {
-  const NotificationContent = useMemo(
-    () => getNotificationContent(notificationType),
-    [notificationType],
-  )
+  const NotificationContent = useMemo(() => getNotification(notificationType), [notificationType])
 
   return <NotificationContent notificationData={data} reciever={reciever} />
 }
@@ -34,12 +31,9 @@ NotificationContent.propTypes = {
 }
 
 const NotificationTitle = ({ notificationType, data }) => {
-  const NotificationTitle = useMemo(
-    () => getNotificationTitle(notificationType),
-    [notificationType],
-  )
+  const Notification = useMemo(() => getNotification(notificationType), [notificationType])
 
-  return <NotificationTitle notificationData={data} />
+  return <Notification.Title notificationData={data} />
 }
 
 NotificationTitle.propTypes = {
@@ -48,12 +42,9 @@ NotificationTitle.propTypes = {
 }
 
 const NotificationPreview = ({ notificationType, data }) => {
-  const NotificationPreview = useMemo(
-    () => getNotificationPreview(notificationType),
-    [notificationType],
-  )
+  const Notification = useMemo(() => getNotification(notificationType), [notificationType])
 
-  return <NotificationPreview notificationData={data} />
+  return <Notification.Preview notificationData={data} />
 }
 
 NotificationPreview.propTypes = {

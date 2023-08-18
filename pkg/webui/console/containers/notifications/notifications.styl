@@ -24,35 +24,65 @@
   background-color: white
   padding: 0 !important
 
-.notification-items
-  display: flex
-  flex-direction: column
-
 .notification-header
   border-bottom: 1px solid #E4E4E4
   align-items: center
-  padding: $cs.s
+  padding: $cs.s 0
+
+  .notification-icon
+    color: $c-active-blue
+    top: 5px
+
+  .notification-date
+    font-size: 1.1rem
+    vertical-align: super
+    padding-right: $cs.xs
+    padding-left: 2.26rem
 
 .total-notifications
   border-radius: 45%
   background-color: $c-active-blue
   color: white
-  padding: $cs.xxs $cs.s
+  padding: 0 $cs.m
+  margin-left: $cs.xxs
+  line-height: 1.8
+  position: relative
+  top: 3px
+  height: 80%
 
 .notification-preview
+  width: 100%
   position: relative
   border: none !important
   border-bottom: 1px solid #E4E4E4 !important
   border-radius: 0 !important
   box-shadow: none !important
-  min-height: 8rem
-  padding: $cs.xl !important
+  min-height: 7rem
+  padding: $cs.l !important
   justify-content: start !important
   flex-direction: column !important
   align-items: start !important
 
   &.selected
     background-color: $c-active-blue !important
+
+  &-title
+    color: $tc-black
+    font-weight: 600
+    font-size: 1.05rem
+    display: flex
+    justify-content: space-between
+    width: 100%
+
+    &.selected
+      color: white
+
+      .notification-time
+        color: white
+
+    .notification-time
+      font-weight: normal
+      color: $tc-deep-gray
 
   &-content
     width: 100%
@@ -64,18 +94,10 @@
     white-space: pre-wrap
 
     &.selected
-      color: white !important
+      color: white
 
-    &-title
-      color: $tc-black
-      font-weight: 600
-      font-size: 1.05rem
-      display: flex
-      justify-content: space-between
-      width: 100%
-
-      &.selected
-        color: white !important
+  &.selected
+    color: white
 
 .notification-content
   background-color: white
@@ -85,9 +107,3 @@
   position: absolute
   top: 26px
   left: 6px
-
-.notification-footer
-  flex-direction: column !important
-  justify-content: center !important
-  align-items: center !important
-  padding-bottom: $cs.xxl

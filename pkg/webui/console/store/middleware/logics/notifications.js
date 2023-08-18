@@ -27,16 +27,7 @@ const getNotificationsLogic = createRequestLogic({
       payload: { parentType, parentId, params },
     } = action
     const { page, limit } = params
-    clearInterval()
     const result = await tts.Notifications.getAllNotifications(parentType, parentId, page, limit)
-    let totalCount = result.totalCount
-    setInterval(async () => {
-      const newResult = await tts.Notifications.getAllNotifications(parentType, parentId, 1, limit)
-      if (newResult.totalCount > totalCount) {
-        toast({ message: 'You have new notifications', type: toast.types.INFO })
-      }
-      totalCount = newResult.totalCount
-    }, [300000]) // 5 minutes
 
     return { notifications: result.notifications, totalCount: result.totalCount }
   },
@@ -48,8 +39,19 @@ const getUnseenNotificationsLogic = createRequestLogic({
     const {
       payload: { id },
     } = action
-
-    return await tts.Notifications.getAllNotifications(id, ['NOTIFICATION_STATUS_UNSEEN'])
+    clearInterval()
+    const result = await tts.Notifications.getAllNotifications(id, ['NOTIFICATION_STATUS_UNSEEN'])
+    let totalCount = result.totalCount
+    setInterval(async () => {
+      const newResult = await tts.Notifications.getAllNotifications(id, [
+        'NOTIFICATION_STATUS_UNSEEN',
+      ])
+      if (newResult.totalCount > totalCount) {
+        toast({ message: 'You have new notifications', type: toast.types.INFO })
+      }
+      totalCount = newResult.totalCount
+    }, [300000]) // 5 minutes
+    return { notifications: result.notifications, totalCount: result.totalCount }
   },
 })
 

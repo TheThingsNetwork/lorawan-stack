@@ -21,7 +21,7 @@ import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 
 import * as user from '@console/store/actions/logout'
-import { getNotifications } from '@console/store/actions/notifications'
+import { getUnseenNotifications } from '@console/store/actions/notifications'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
@@ -66,12 +66,7 @@ const consoleAppLogic = createRequestLogic({
         ])
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))
-        dispatch(
-          getNotifications(userId, ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN'], {
-            limit: 6,
-            page: 1,
-          }),
-        )
+        dispatch(getUnseenNotifications(userId))
       } catch (error) {
         dispatch(user.getUserMeFailure(error))
       }
