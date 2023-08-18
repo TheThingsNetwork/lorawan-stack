@@ -446,8 +446,8 @@ func generateChMask72Generic(currentChs, desiredChs []bool, atomic bool) ([]ChMa
 		// We also sort the masks descending on the number of enabled channels in order to ensure
 		// that intermediary states through which the end device goes while parsing the masks
 		// are valid (i.e. the total number of enabled channels is always greater than 0).
-		slices.SortFunc(pairs, func(a, b ChMaskCntlPair) bool {
-			return trueCount(a.Mask[:]...) >= trueCount(b.Mask[:]...)
+		slices.SortFunc(pairs, func(a, b ChMaskCntlPair) int {
+			return trueCount(b.Mask[:]...) - trueCount(a.Mask[:]...)
 		})
 		return pairs, nil
 
