@@ -43,7 +43,7 @@ const NotificationListItem = ({ notification, selectedNotification, handleClick 
         <Status pulse={false} status="good" className={classNames('mr-cs-xs', style.unseenMark)} />
       )}
       <div className={titleClasses}>
-        <div style={{ width: '80%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div className={style.notificationPreviewTitleText}>
           <Notification.Title
             data={notification}
             notificationType={notification.notification_type}
@@ -52,7 +52,7 @@ const NotificationListItem = ({ notification, selectedNotification, handleClick 
         <div>
           <DateTime.Relative
             relativeTimeStyle="short"
-            showAbsoluteAfter={3}
+            showAbsoluteAfter={2}
             dateTimeProps={{
               time: false,
               dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },

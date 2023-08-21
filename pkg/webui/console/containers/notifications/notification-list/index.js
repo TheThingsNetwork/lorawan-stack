@@ -16,6 +16,7 @@ import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
 import classNames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -41,11 +42,18 @@ import style from '../notifications.styl'
 
 import NotificationListItem from './list-item'
 
+const m = defineMessages({
+  notifications: 'Notifications',
+  archived: 'Archived notifications',
+  markAllAsRead: 'Mark all as read',
+})
+
 const NotificationList = ({
   setSelectedNotification,
   selectedNotification,
-  setArchiving,
+  setShowContent,
   fetchItems,
+  isArchive,
 }) => {
   const userId = useSelector(selectUserId)
   const notifications = useSelector(selectNotifications)
@@ -55,17 +63,27 @@ const NotificationList = ({
 
   const handleClick = useCallback(
     async (e, not) => {
-      setArchiving(false)
+      setShowContent(true)
       setSelectedNotification(notifications.find(notification => notification.id === not.id))
-      await dispatch(
-        attachPromise(updateNotificationStatus(userId, [not.id], 'NOTIFICATION_STATUS_SEEN')),
-      )
-      setTimeout(async () => {
-        await fetchItems()
-        await dispatch(attachPromise(getUnseenNotifications(userId)))
-      }, 300)
+      if (!isArchive) {
+        await dispatch(
+          attachPromise(updateNotificationStatus(userId, [not.id], 'NOTIFICATION_STATUS_SEEN')),
+        )
+        setTimeout(async () => {
+          await fetchItems()
+          await dispatch(attachPromise(getUnseenNotifications(userId)))
+        }, 300)
+      }
     },
-    [notifications, dispatch, userId, fetchItems, setArchiving, setSelectedNotification],
+    [
+      notifications,
+      dispatch,
+      userId,
+      fetchItems,
+      setShowContent,
+      setSelectedNotification,
+      isArchive,
+    ],
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
@@ -78,22 +96,33 @@ const NotificationList = ({
     }, 300)
   }, [dispatch, userId, unseenIds, fetchItems])
 
+  const classes = classNames(style.notificationHeaderIcon, 'm-0', {
+    [style.notifications]: !isArchive,
+    [style.archived]: isArchive,
+  })
+
   return (
     <>
       <Row justify="between" className={classNames(style.notificationHeader, 'm-0')}>
         <Col className="pl-cs-s pr-cs-s d-flex">
-          <Icon icon="notifications" textPaddedRight nudgeDown className={style.notificationIcon} />
-          <Message component="h3" content={'Notifications'} className="m-0" />
-          {Boolean(totalUnseenCount) && (
+          <Icon icon={isArchive ? 'archive' : 'notifications'} nudgeDown className={classes} />
+          <Message
+            component="h3"
+            content={isArchive ? m.archived : m.notifications}
+            className="m-0"
+          />
+          {Boolean(totalUnseenCount) && !isArchive && (
             <span className={style.totalNotifications}>{totalUnseenCount}</span>
           )}
         </Col>
-        <Button
-          icon="visibility"
-          onClick={handleMarkAllAsSeen}
-          message="Mark all as read"
-          className="mr-cs-s"
-        />
+        {!isArchive && (
+          <Button
+            icon="visibility"
+            onClick={handleMarkAllAsSeen}
+            message={m.markAllAsRead}
+            className="mr-cs-s"
+          />
+        )}
       </Row>
       {notifications.map(notification => (
         <Row direction="column" key={notification.id} className="m-0 p-0">
@@ -110,11 +139,12 @@ const NotificationList = ({
 
 NotificationList.propTypes = {
   fetchItems: PropTypes.func.isRequired,
+  isArchive: PropTypes.bool.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string,
   }),
-  setArchiving: PropTypes.func.isRequired,
   setSelectedNotification: PropTypes.func.isRequired,
+  setShowContent: PropTypes.func.isRequired,
 }
 
 NotificationList.defaultProps = {

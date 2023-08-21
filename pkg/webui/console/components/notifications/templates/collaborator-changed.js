@@ -26,11 +26,11 @@ import { getEntity } from '../utils'
 const m = defineMessages({
   title: 'A collaborator of your {entityType} has been added or updated',
   greeting: 'Dear {recieverName},',
-  body: 'A collaborator of your {entityType} <code>{entityId}</code> on your network has been added or updated.',
+  body: 'A collaborator of your {entityType} <code>{entityId}</code> on your local network has been added or updated.',
   collaborator: '<b>Collaborator:</b> {collaboratorType} <code>{collaboratorId}</code>',
   link: 'You can view and edit this collaborator <Link>here</Link>.',
   preview:
-    'A collaborator of your {entityType} {entityId} on your network has been added or updated. Collaborator: {collaboratorType} {collaboratorId}',
+    'A collaborator of your {entityType} {entityId} on your local network has been added or updated. Collaborator: {collaboratorType} {collaboratorId}',
 })
 
 const getType = entity => {

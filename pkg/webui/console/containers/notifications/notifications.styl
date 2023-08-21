@@ -24,31 +24,44 @@
   background-color: white
   padding: 0 !important
 
+  &-change-button
+    color: $c-active-blue !important
+
 .notification-header
   border-bottom: 1px solid #E4E4E4
   align-items: center
   padding: $cs.s 0
 
-  .notification-icon
-    color: $c-active-blue
-    top: 5px
-
-  .notification-date
-    font-size: 1.1rem
-    vertical-align: super
+  &-icon
+    top: 5px !important
     padding-right: $cs.xs
-    padding-left: 2.26rem
 
-.total-notifications
-  border-radius: 45%
-  background-color: $c-active-blue
-  color: white
-  padding: 0 $cs.m
-  margin-left: $cs.xxs
-  line-height: 1.8
-  position: relative
-  top: 3px
-  height: 80%
+    &.notifications
+      color: $c-active-blue
+
+    &.archived
+      color: $c-warning
+
+  &-date
+    font-size: 1.1rem
+    padding-right: $cs.xs
+    padding-left: 0
+    padding-top: 0.2rem
+
+  .total-notifications
+    border-radius: 45%
+    background-color: $c-active-blue
+    color: white
+    padding: 0 0.8rem
+    margin-left: $cs.xs
+    line-height: 1.6
+    position: relative
+    top: 5px
+    height: 70%
+
+  &-action
+    display: flex
+    justify-content: end
 
 .notification-preview
   width: 100%
@@ -84,6 +97,11 @@
       font-weight: normal
       color: $tc-deep-gray
 
+    &-text
+      width: 80%
+      overflow: hidden
+      text-overflow: ellipsis
+
   &-content
     width: 100%
     color: $tc-subtle-gray
@@ -99,11 +117,11 @@
   &.selected
     color: white
 
+  .unseen-mark
+    position: absolute
+    top: 21px
+    left: 2px
+
 .notification-content
   background-color: white
   border-radius: 0 $br.m $br.m 0
-
-.unseen-mark
-  position: absolute
-  top: 26px
-  left: 6px
