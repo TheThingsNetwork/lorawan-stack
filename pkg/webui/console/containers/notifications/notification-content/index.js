@@ -16,6 +16,7 @@ import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
 import classNames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import Button from '@ttn-lw/components/button'
 
@@ -32,25 +33,30 @@ import { selectUserId } from '@console/store/selectors/logout'
 
 import style from '../notifications.styl'
 
-const NotificationContent = ({ selectedNotification, setArchiving, fetchItems }) => {
+const m = defineMessages({
+  archive: 'Archive',
+  unarchive: 'Unarchive',
+})
+
+const NotificationContent = ({ isArchive, selectedNotification, setShowContent, fetchItems }) => {
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
 
   const handleArchive = useCallback(
     async (e, id) => {
-      setArchiving(true)
-      await dispatch(
-        attachPromise(updateNotificationStatus(userId, [id], 'NOTIFICATION_STATUS_ARCHIVED')),
-      )
-      setTimeout(async () => await fetchItems(), 300)
+      setShowContent(false)
+      const updateFilter = isArchive ? 'NOTIFICATION_STATUS_SEEN' : 'NOTIFICATION_STATUS_ARCHIVED'
+      const fetchFilter = isArchive ? ['NOTIFICATION_STATUS_ARCHIVED'] : undefined
+      await dispatch(attachPromise(updateNotificationStatus(userId, [id], updateFilter)))
+      setTimeout(async () => await fetchItems(fetchFilter), 300)
     },
-    [dispatch, userId, fetchItems, setArchiving],
+    [dispatch, userId, fetchItems, setShowContent, isArchive],
   )
 
   return (
     <>
       <Row justify="between" className={classNames(style.notificationHeader, 'm-0')}>
-        <Col md={7.5}>
+        <Col md={8} className="pr-0">
           <h3 className="m-0">
             <Notification.Title
               data={selectedNotification}
@@ -58,7 +64,7 @@ const NotificationContent = ({ selectedNotification, setArchiving, fetchItems })
             />
           </h3>
         </Col>
-        <Col md={4.5}>
+        <Col md={4} className={classNames(style.notificationHeaderAction, 'pl-0', 'pr-cs-xxs')}>
           <DateTime
             value={selectedNotification.created_at}
             dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
@@ -67,11 +73,11 @@ const NotificationContent = ({ selectedNotification, setArchiving, fetchItems })
               minute: 'numeric',
               hourCycle: 'h23',
             }}
-            className={style.notificationDate}
+            className={style.notificationHeaderDate}
           />
           <Button
             onClick={handleArchive}
-            message="Archive"
+            message={isArchive ? m.unarchive : m.archive}
             icon="archive"
             value={selectedNotification.id}
             textPaddedRight
@@ -93,13 +99,14 @@ const NotificationContent = ({ selectedNotification, setArchiving, fetchItems })
 
 NotificationContent.propTypes = {
   fetchItems: PropTypes.func.isRequired,
+  isArchive: PropTypes.bool.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string.isRequired,
     created_at: PropTypes.string.isRequired,
     notification_type: PropTypes.string.isRequired,
     status: PropTypes.string,
   }).isRequired,
-  setArchiving: PropTypes.func.isRequired,
+  setShowContent: PropTypes.func.isRequired,
 }
 
 export default NotificationContent

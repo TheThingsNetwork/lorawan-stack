@@ -25,7 +25,7 @@ import { getEntity } from '../utils'
 const m = defineMessages({
   title: 'The state of your {entityType} has been changed.',
   greeting: 'Dear {recieverName},',
-  body: 'The state of the {entityType} <code>{entityId}</code> on your network has been changed to "{state}".',
+  body: 'The state of the {entityType} <code>{entityId}</code> on your local network has been changed to "{state}".',
   link: 'You can view this <Link>here</Link>.',
 })
 

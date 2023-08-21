@@ -16,13 +16,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
 import classNames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import Pagination from '@ttn-lw/components/pagination'
-
-import Message from '@ttn-lw/lib/components/message'
+import Button from '@ttn-lw/components/button'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
 
 import { getNotifications } from '@console/store/actions/notifications'
 
@@ -34,8 +35,12 @@ import NotificationContent from './notification-content'
 
 import style from './notifications.styl'
 
-const pageSize = 6
+const m = defineMessages({
+  seeArchived: 'See archived messages',
+  seeAll: 'See all messages',
+})
 
+const pageSize = 6
 const DEFAULT_PAGE = 1
 
 const pageValidator = page => (!Boolean(page) || page < 0 ? DEFAULT_PAGE : page)
@@ -44,12 +49,16 @@ const NotificationsContainer = ({ setPage, page }) => {
   const userId = useSelector(selectUserId)
   const totalNotifications = useSelector(selectTotalNotificationsCount)
   const dispatch = useDispatch()
-  const [archiving, setArchiving] = useState(false)
+  const [showContent, setShowContent] = useState(false)
   const [selectedNotification, setSelectedNotification] = useState(undefined)
+  const [isNotifications, setIsNotifications] = useQueryState('isNotifications', 'true')
 
   const fetchItems = useCallback(
     async filter => {
-      const filters = filter ?? ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']
+      const filters =
+        isNotifications === 'false'
+          ? ['NOTIFICATION_STATUS_ARCHIVED']
+          : filter ?? ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']
       await dispatch(
         attachPromise(
           getNotifications(userId, filters, {
@@ -59,7 +68,7 @@ const NotificationsContainer = ({ setPage, page }) => {
         ),
       )
     },
-    [dispatch, userId, page],
+    [dispatch, userId, page, isNotifications],
   )
 
   useEffect(() => {
@@ -73,16 +82,23 @@ const NotificationsContainer = ({ setPage, page }) => {
     [setPage],
   )
 
+  const handleShowArchived = useCallback(async () => {
+    setPage(DEFAULT_PAGE)
+    setShowContent(false)
+    setIsNotifications(isNotifications === 'false' ? 'true' : 'false')
+  }, [setIsNotifications, isNotifications, setPage])
+
   return (
     <Row className={classNames(style.notificationsContainer, 'm-0')}>
       <Col md={4.5} className={classNames(style.notificationList, 'mt-cs-l', 'mb-cs-l')}>
         <NotificationList
           setSelectedNotification={setSelectedNotification}
           selectedNotification={selectedNotification}
-          setArchiving={setArchiving}
+          setShowContent={setShowContent}
+          isArchive={isNotifications === 'false'}
           fetchItems={fetchItems}
         />
-        <Row direction="column" align="center">
+        <Row direction="column" align="center" className="mt-cs-xxl">
           <Pagination
             pageCount={Math.ceil(totalNotifications / pageSize) || 1}
             onPageChange={onPageChange}
@@ -90,15 +106,21 @@ const NotificationsContainer = ({ setPage, page }) => {
             pageRangeDisplayed={2}
             forcePage={page}
           />
-          <Message content="See archived messages" />
+          <Button
+            onClick={handleShowArchived}
+            naked
+            message={isNotifications === 'true' ? m.seeArchived : m.seeAll}
+            className={style.notificationListChangeButton}
+          />
         </Row>
       </Col>
       <Col md={7.5} className={classNames(style.notificationContent, 'mt-cs-l', 'mb-cs-l', 'p-0')}>
-        {selectedNotification && !archiving && (
+        {selectedNotification && showContent && (
           <NotificationContent
             selectedNotification={selectedNotification}
-            setArchiving={setArchiving}
+            setShowContent={setShowContent}
             fetchItems={fetchItems}
+            isArchive={isNotifications === 'false'}
           />
         )}
       </Col>

@@ -25,9 +25,9 @@ const NotificationContent = ({ reciever, notificationType, data }) => {
 }
 
 NotificationContent.propTypes = {
-  data: PropTypes.object.isRequired,
+  data: PropTypes.shape({}).isRequired,
   notificationType: PropTypes.string.isRequired,
-  reciever: PropTypes.object.isRequired,
+  reciever: PropTypes.string.isRequired,
 }
 
 const NotificationTitle = ({ notificationType, data }) => {
@@ -37,7 +37,7 @@ const NotificationTitle = ({ notificationType, data }) => {
 }
 
 NotificationTitle.propTypes = {
-  data: PropTypes.object.isRequired,
+  data: PropTypes.shape({}).isRequired,
   notificationType: PropTypes.string.isRequired,
 }
 
@@ -48,7 +48,7 @@ const NotificationPreview = ({ notificationType, data }) => {
 }
 
 NotificationPreview.propTypes = {
-  data: PropTypes.object.isRequired,
+  data: PropTypes.shape({}).isRequired,
   notificationType: PropTypes.string.isRequired,
 }
 
