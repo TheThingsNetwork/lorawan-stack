@@ -246,7 +246,7 @@ const commonPropTypes = {
   /** The html `type` prop passed to the <button /> element. */
   type: PropTypes.string,
   /** The html `value` prop passed to the <button /> element. */
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
   /** The html `autofocus` prop passed to the <button /> element. */
   autoFocus: PropTypes.bool,
   /** A message to be evaluated and passed to the <button /> element. */
