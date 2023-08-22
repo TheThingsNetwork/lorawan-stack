@@ -38,9 +38,17 @@ const m = defineMessages({
   unarchive: 'Unarchive',
 })
 
-const NotificationContent = ({ isArchive, selectedNotification, setShowContent, fetchItems }) => {
+const NotificationContent = ({
+  isArchive,
+  selectedNotification,
+  setShowContent,
+  fetchItems,
+  setShowListColumn,
+  showListColumn,
+}) => {
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
+  const isMobile = window.innerWidth < 768
 
   const handleArchive = useCallback(
     async (e, id) => {
@@ -53,28 +61,51 @@ const NotificationContent = ({ isArchive, selectedNotification, setShowContent, 
     [dispatch, userId, fetchItems, setShowContent, isArchive],
   )
 
+  const handleBack = useCallback(() => {
+    setShowListColumn(isMobile)
+  }, [setShowListColumn, isMobile])
+
   return (
     <>
       <Row justify="between" className={classNames(style.notificationHeader, 'm-0')}>
-        <Col md={8} className="pr-0">
-          <h3 className="m-0">
-            <Notification.Title
-              data={selectedNotification}
-              notificationType={selectedNotification.notification_type}
-            />
-          </h3>
+        <Col md={8} className={classNames(style.notificationHeaderTitle, 'pr-0', 'd-flex')}>
+          {isMobile && (
+            <Button icon="arrow_back_ios" naked onClick={handleBack} className={style.backButton} />
+          )}
+          <div>
+            <h3 className="m-0">
+              <Notification.Title
+                data={selectedNotification}
+                notificationType={selectedNotification.notification_type}
+              />
+            </h3>
+            {!showListColumn && (
+              <DateTime
+                value={selectedNotification.created_at}
+                dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
+                timeFormatOptions={{
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  hourCycle: 'h23',
+                }}
+                className={style.notificationHeaderDate}
+              />
+            )}
+          </div>
         </Col>
         <Col md={4} className={classNames(style.notificationHeaderAction, 'pl-0', 'pr-cs-xxs')}>
-          <DateTime
-            value={selectedNotification.created_at}
-            dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
-            timeFormatOptions={{
-              hour: 'numeric',
-              minute: 'numeric',
-              hourCycle: 'h23',
-            }}
-            className={style.notificationHeaderDate}
-          />
+          {showListColumn && (
+            <DateTime
+              value={selectedNotification.created_at}
+              dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
+              timeFormatOptions={{
+                hour: 'numeric',
+                minute: 'numeric',
+                hourCycle: 'h23',
+              }}
+              className={style.notificationHeaderDate}
+            />
+          )}
           <Button
             onClick={handleArchive}
             message={isArchive ? m.unarchive : m.archive}
@@ -84,7 +115,7 @@ const NotificationContent = ({ isArchive, selectedNotification, setShowContent, 
           />
         </Col>
       </Row>
-      <Row direction="column" className="m-0">
+      <Row className="m-0">
         <Col>
           <Notification.Content
             reciever={userId}
@@ -107,6 +138,8 @@ NotificationContent.propTypes = {
     status: PropTypes.string,
   }).isRequired,
   setShowContent: PropTypes.func.isRequired,
+  setShowListColumn: PropTypes.func.isRequired,
+  showListColumn: PropTypes.bool.isRequired,
 }
 
 export default NotificationContent
