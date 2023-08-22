@@ -54,15 +54,18 @@ const NotificationList = ({
   setShowContent,
   fetchItems,
   isArchive,
+  setShowListColumn,
 }) => {
   const userId = useSelector(selectUserId)
   const notifications = useSelector(selectNotifications)
   const unseenIds = useSelector(selectUnseenIds)
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const dispatch = useDispatch()
+  const isMobile = window.innerWidth < 768
 
   const handleClick = useCallback(
     async (e, not) => {
+      setShowListColumn(!isMobile)
       setShowContent(true)
       setSelectedNotification(notifications.find(notification => notification.id === not.id))
       if (!isArchive) {
@@ -83,6 +86,8 @@ const NotificationList = ({
       setShowContent,
       setSelectedNotification,
       isArchive,
+      setShowListColumn,
+      isMobile,
     ],
   )
 
@@ -145,6 +150,7 @@ NotificationList.propTypes = {
   }),
   setSelectedNotification: PropTypes.func.isRequired,
   setShowContent: PropTypes.func.isRequired,
+  setShowListColumn: PropTypes.func.isRequired,
 }
 
 NotificationList.defaultProps = {
