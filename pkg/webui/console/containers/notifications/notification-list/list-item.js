@@ -27,14 +27,15 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from '../notifications.styl'
 
 const NotificationListItem = ({ notification, selectedNotification, handleClick }) => {
+  const isMobile = window.innerWidth < 768
   const classes = classNames(style.notificationPreview, 'm-0', {
-    [style.selected]: selectedNotification?.id === notification.id,
+    [style.selected]: selectedNotification?.id === notification.id && !isMobile,
   })
   const titleClasses = classNames(style.notificationPreviewTitle, {
-    [style.selected]: selectedNotification?.id === notification.id,
+    [style.selected]: selectedNotification?.id === notification.id && !isMobile,
   })
   const previewClasses = classNames(style.notificationPreviewContent, {
-    [style.selected]: selectedNotification?.id === notification.id,
+    [style.selected]: selectedNotification?.id === notification.id && !isMobile,
   })
 
   return (

@@ -51,7 +51,9 @@ const NotificationsContainer = ({ setPage, page }) => {
   const dispatch = useDispatch()
   const [showContent, setShowContent] = useState(false)
   const [selectedNotification, setSelectedNotification] = useState(undefined)
+  const [showListColumn, setShowListColumn] = useState(true)
   const [isNotifications, setIsNotifications] = useQueryState('isNotifications', 'true')
+  const isMobile = window.innerWidth < 768
 
   const fetchItems = useCallback(
     async filter => {
@@ -88,42 +90,54 @@ const NotificationsContainer = ({ setPage, page }) => {
     setIsNotifications(isNotifications === 'false' ? 'true' : 'false')
   }, [setIsNotifications, isNotifications, setPage])
 
+  const showContentContainer = isMobile ? !showListColumn : true
+
   return (
     <Row className={classNames(style.notificationsContainer, 'm-0')}>
-      <Col md={4.5} className={classNames(style.notificationList, 'mt-cs-l', 'mb-cs-l')}>
-        <NotificationList
-          setSelectedNotification={setSelectedNotification}
-          selectedNotification={selectedNotification}
-          setShowContent={setShowContent}
-          isArchive={isNotifications === 'false'}
-          fetchItems={fetchItems}
-        />
-        <Row direction="column" align="center" className="mt-cs-xxl">
-          <Pagination
-            pageCount={Math.ceil(totalNotifications / pageSize) || 1}
-            onPageChange={onPageChange}
-            disableInitialCallback
-            pageRangeDisplayed={2}
-            forcePage={page}
-          />
-          <Button
-            onClick={handleShowArchived}
-            naked
-            message={isNotifications === 'true' ? m.seeArchived : m.seeAll}
-            className={style.notificationListChangeButton}
-          />
-        </Row>
-      </Col>
-      <Col md={7.5} className={classNames(style.notificationContent, 'mt-cs-l', 'mb-cs-l', 'p-0')}>
-        {selectedNotification && showContent && (
-          <NotificationContent
+      {showListColumn && (
+        <Col md={4.5} className={classNames(style.notificationList, 'mt-cs-l', 'mb-cs-l')}>
+          <NotificationList
+            setSelectedNotification={setSelectedNotification}
             selectedNotification={selectedNotification}
             setShowContent={setShowContent}
-            fetchItems={fetchItems}
             isArchive={isNotifications === 'false'}
+            fetchItems={fetchItems}
+            setShowListColumn={setShowListColumn}
           />
-        )}
-      </Col>
+          <Row direction="column" align="center" className="mt-cs-xxl">
+            <Pagination
+              pageCount={Math.ceil(totalNotifications / pageSize) || 1}
+              onPageChange={onPageChange}
+              disableInitialCallback
+              pageRangeDisplayed={2}
+              forcePage={page}
+            />
+            <Button
+              onClick={handleShowArchived}
+              naked
+              message={isNotifications === 'true' ? m.seeArchived : m.seeAll}
+              className={style.notificationListChangeButton}
+            />
+          </Row>
+        </Col>
+      )}
+      {showContentContainer && (
+        <Col
+          md={7.5}
+          className={classNames(style.notificationContent, 'mt-cs-l', 'mb-cs-l', 'p-0')}
+        >
+          {selectedNotification && showContent && (
+            <NotificationContent
+              selectedNotification={selectedNotification}
+              setShowContent={setShowContent}
+              fetchItems={fetchItems}
+              isArchive={isNotifications === 'false'}
+              setShowListColumn={setShowListColumn}
+              showListColumn={showListColumn}
+            />
+          )}
+        </Col>
+      )}
     </Row>
   )
 }

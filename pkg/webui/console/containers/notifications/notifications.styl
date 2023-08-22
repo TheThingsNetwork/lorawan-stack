@@ -15,6 +15,8 @@
 .notifications-container
   border-radius: $br.s
   min-height: 85vh
+  +media-query($bp.s)
+    min-height: 100%
 
 .notification-list
   display: flex
@@ -24,6 +26,10 @@
   background-color: white
   padding: 0 !important
 
+  +media-query($bp.s)
+    margin-top: 0 !important
+    margin-bottom: 0 !important
+
   &-change-button
     color: $c-active-blue !important
 
@@ -31,6 +37,9 @@
   border-bottom: 1px solid #E4E4E4
   align-items: center
   padding: $cs.s 0
+
+  +media-query($bp.s)
+    display: flex
 
   &-icon
     top: 5px !important
@@ -62,6 +71,19 @@
   &-action
     display: flex
     justify-content: end
+    align-items: center
+    +media-query($bp.s)
+      max-width: fit-content !important
+
+  &-title
+    +media-query($bp.s)
+      max-width: 70% !important
+
+  .back-button
+    height: 100%
+
+    .icon
+      font-size: 3rem
 
 .notification-preview
   width: 100%
@@ -125,3 +147,7 @@
 .notification-content
   background-color: white
   border-radius: 0 $br.m $br.m 0
+
+  +media-query($bp.s)
+    height: 88vh
+    margin: 0 !important
