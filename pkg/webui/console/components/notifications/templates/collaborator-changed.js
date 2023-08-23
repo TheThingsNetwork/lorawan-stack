@@ -25,7 +25,7 @@ import { getEntity } from '../utils'
 
 const m = defineMessages({
   title: 'A collaborator of your {entityType} has been added or updated',
-  greeting: 'Dear {recieverName},',
+  greeting: 'Dear {receiverName},',
   body: 'A collaborator of your {entityType} <code>{entityId}</code> on your network has been added or updated.',
   collaborator: '<b>Collaborator:</b> {collaboratorType} <code>{collaboratorId}</code>',
   link: 'You can view and edit this collaborator <Link>here</Link>.',
@@ -97,13 +97,13 @@ CollaboratorChangedTitle.propTypes = {
   }).isRequired,
 }
 
-const CollaboratorChanged = ({ reciever, notificationData }) => {
+const CollaboratorChanged = ({ receiver, notificationData }) => {
   const { data, entity_ids } = notificationData
   const { ids } = data
 
   return (
     <>
-      <Message content={m.greeting} values={{ recieverName: reciever }} component="p" />
+      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
       <Message
         content={m.body}
         values={{
@@ -165,7 +165,7 @@ CollaboratorChanged.propTypes = {
       }),
     }).isRequired,
   }).isRequired,
-  reciever: PropTypes.string.isRequired,
+  receiver: PropTypes.string.isRequired,
 }
 
 CollaboratorChanged.Title = CollaboratorChangedTitle

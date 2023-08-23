@@ -79,13 +79,13 @@ ApiKeyCreatedTitle.propTypes = {
   }).isRequired,
 }
 
-const ApiKeyCreated = ({ reciever, notificationData }) => {
+const ApiKeyCreated = ({ receiver, notificationData }) => {
   const { entity_ids, data } = notificationData
   const { id, rights } = data
 
   return (
     <>
-      <Message content={m.greeting} values={{ receiverName: reciever }} component="p" />
+      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
       <Message
         content={m.body}
         values={{
@@ -150,7 +150,7 @@ ApiKeyCreated.propTypes = {
     }).isRequired,
     entity_ids: PropTypes.shape({}).isRequired,
   }).isRequired,
-  reciever: PropTypes.string.isRequired,
+  receiver: PropTypes.string.isRequired,
 }
 
 ApiKeyCreated.Title = ApiKeyCreatedTitle
