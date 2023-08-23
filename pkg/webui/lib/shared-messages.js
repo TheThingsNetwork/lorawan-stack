@@ -308,6 +308,7 @@ export default defineMessages({
   normalizedPayloadWind: 'Wind',
   notAvailable: 'n/a',
   notLinked: 'Not linked',
+  notifications: 'Notifications',
   notSet: 'Not set',
   nsAddress: 'Network Server address',
   nsEmptyDefault: 'Leave empty to link to the Network Server in the same cluster',
