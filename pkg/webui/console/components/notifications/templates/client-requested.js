@@ -26,7 +26,7 @@ import selectAccountUrl from '@console/lib/selectors/app-config'
 
 const m = defineMessages({
   title: 'Your review is required for a newly registered OAuth client',
-  greeting: 'Dear {recieverName},',
+  greeting: 'Dear {receiverName},',
   body: '{senderType} <code>{id}</code> just registered a new OAuth client under {collaboratorType} <code>{collaboratorId}</code> on your network.{lineBreak}Since {senderTypeMiddle} <code>{id}</code> is not an admin, you need to approve this client before it can be used.',
   clientId: '<b>Client ID:</b> <code>{clientId}</code>',
   link: 'You can approve (or reject) the OAuth client <Link>here</Link>.',
@@ -92,7 +92,7 @@ ClientRequestedPreview.propTypes = {
 
 const ClientRequestedTitle = () => <Message content={m.title} />
 
-const ClientRequested = ({ reciever, notificationData }) => {
+const ClientRequested = ({ receiver, notificationData }) => {
   const { data, sender_ids } = notificationData
   const client = 'create_client_request' in data ? data.create_client_request.client : data.client
   const collaborator =
@@ -100,7 +100,7 @@ const ClientRequested = ({ reciever, notificationData }) => {
 
   return (
     <>
-      <Message content={m.greeting} values={{ recieverName: reciever }} component="p" />
+      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
       <Message
         content={m.body}
         values={{
@@ -182,7 +182,7 @@ ClientRequested.propTypes = {
       user_id: PropTypes.string,
     }),
   }).isRequired,
-  reciever: PropTypes.string.isRequired,
+  receiver: PropTypes.string.isRequired,
 }
 
 ClientRequested.Title = ClientRequestedTitle

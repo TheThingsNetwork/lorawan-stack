@@ -18,16 +18,16 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getNotification } from './utils'
 
-const NotificationContent = ({ reciever, notificationType, data }) => {
+const NotificationContent = ({ receiver, notificationType, data }) => {
   const NotificationContent = useMemo(() => getNotification(notificationType), [notificationType])
 
-  return <NotificationContent notificationData={data} reciever={reciever} />
+  return <NotificationContent notificationData={data} receiver={receiver} />
 }
 
 NotificationContent.propTypes = {
   data: PropTypes.shape({}).isRequired,
   notificationType: PropTypes.string.isRequired,
-  reciever: PropTypes.string.isRequired,
+  receiver: PropTypes.string.isRequired,
 }
 
 const NotificationTitle = ({ notificationType, data }) => {
