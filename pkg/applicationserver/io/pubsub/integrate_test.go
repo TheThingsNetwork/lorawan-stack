@@ -93,7 +93,7 @@ func TestIntegrate(t *testing.T) {
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
-				Listen:                      ":9185",
+				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
 			Cluster: cluster.Config{

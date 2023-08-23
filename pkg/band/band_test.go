@@ -1148,14 +1148,6 @@ func TestGenerateChMask(t *testing.T) {
 					},
 				},
 				{
-					Cntl: 4,
-					Mask: [16]bool{
-						false, false, false, false, false, false, false, false,
-						false, false, false, false, false, false, false, false,
-					},
-				},
-				{
-					Cntl: 3,
 					Mask: [16]bool{
 						false, false, false, false, false, false, false, false,
 						false, false, false, false, false, false, false, false,
@@ -1169,6 +1161,14 @@ func TestGenerateChMask(t *testing.T) {
 					},
 				},
 				{
+					Cntl: 3,
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Cntl: 4,
 					Mask: [16]bool{
 						false, false, false, false, false, false, false, false,
 						false, false, false, false, false, false, false, false,
@@ -1221,7 +1221,6 @@ func TestGenerateChMask(t *testing.T) {
 					},
 				},
 				{
-					Cntl: 3,
 					Mask: [16]bool{
 						false, false, false, false, false, false, false, false,
 						false, false, false, false, false, false, false, false,
@@ -1235,6 +1234,7 @@ func TestGenerateChMask(t *testing.T) {
 					},
 				},
 				{
+					Cntl: 3,
 					Mask: [16]bool{
 						false, false, false, false, false, false, false, false,
 						false, false, false, false, false, false, false, false,
