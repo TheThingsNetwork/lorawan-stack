@@ -118,7 +118,7 @@ const NotificationContent = ({
       <Row className="m-0">
         <Col>
           <Notification.Content
-            reciever={userId}
+            receiver={userId}
             data={selectedNotification}
             notificationType={selectedNotification.notification_type}
           />

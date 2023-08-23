@@ -24,7 +24,7 @@ import { getEntity } from '../utils'
 
 const m = defineMessages({
   title: 'The state of your {entityType} has been changed.',
-  greeting: 'Dear {recieverName},',
+  greeting: 'Dear {receiverName},',
   body: 'The state of the {entityType} <code>{entityId}</code> on your network has been changed to "{state}".',
   link: 'You can view this <Link>here</Link>.',
 })
@@ -74,13 +74,13 @@ EntityStateChangedTitle.propTypes = {
   }).isRequired,
 }
 
-const EntityStateChanged = ({ reciever, notificationData }) => {
+const EntityStateChanged = ({ receiver, notificationData }) => {
   const { data, entity_ids } = notificationData
   const { formatMessage } = useIntl()
 
   return (
     <>
-      <Message content={m.greeting} values={{ recieverName: reciever }} component="p" />
+      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
       <Message
         content={m.body}
         values={{
@@ -106,7 +106,7 @@ EntityStateChanged.propTypes = {
       }),
     }).isRequired,
   }).isRequired,
-  reciever: PropTypes.string.isRequired,
+  receiver: PropTypes.string.isRequired,
 }
 
 EntityStateChanged.Title = EntityStateChangedTitle

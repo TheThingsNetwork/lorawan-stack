@@ -23,7 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   title: 'Your review is required for a newly registered user',
-  greeting: 'Dear {recieverName},',
+  greeting: 'Dear {receiverName},',
   body: 'A new user just registered on your network.{lineBreak}Since user registration requires admin approval, you need to approve this user before they can login.',
   closing: 'You can review this user <Link>here</Link>.',
   userId: '<b>User ID:</b> <code>{userId}</code>',
@@ -62,12 +62,12 @@ UserRequestedPreview.propTypes = {
 
 const UserRequestedTitle = () => <Message content={m.title} />
 
-const UserRequested = ({ reciever, notificationData }) => {
+const UserRequested = ({ receiver, notificationData }) => {
   const { user } = notificationData.data
 
   return (
     <>
-      <Message content={m.greeting} values={{ recieverName: reciever }} component="p" />
+      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
       <Message
         content={m.body}
         values={{
@@ -139,7 +139,7 @@ UserRequested.propTypes = {
       }).isRequired,
     }).isRequired,
   }).isRequired,
-  reciever: PropTypes.string.isRequired,
+  receiver: PropTypes.string.isRequired,
 }
 
 UserRequested.Title = UserRequestedTitle
