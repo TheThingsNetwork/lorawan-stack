@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { defineMessage } from 'react-intl'
+
 import tts from '@console/api/tts'
 
 import toast from '@ttn-lw/components/toast'
@@ -19,6 +21,10 @@ import toast from '@ttn-lw/components/toast'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as notifications from '@console/store/actions/notifications'
+
+const m = defineMessage({
+  newNotifications: 'You have new notifications',
+})
 
 const getNotificationsLogic = createRequestLogic({
   type: notifications.GET_NOTIFICATIONS,
@@ -47,7 +53,7 @@ const getUnseenNotificationsLogic = createRequestLogic({
         'NOTIFICATION_STATUS_UNSEEN',
       ])
       if (newResult.totalCount > totalCount) {
-        toast({ message: 'You have new notifications', type: toast.types.INFO })
+        toast({ message: m.newNotifications, type: toast.types.INFO })
       }
       totalCount = newResult.totalCount
     }, [300000]) // 5 minutes
