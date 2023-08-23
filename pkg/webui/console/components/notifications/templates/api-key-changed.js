@@ -24,15 +24,15 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { getEntity } from '../utils'
 
 const m = defineMessages({
-  title: 'An API key of your {entityType} on your local network has been changed',
+  title: 'An API key of your {entityType} on your network has been changed',
   greeting: 'Dear {receiverName},',
-  body: 'An API key of your {entityType} <code>{id}</code> on your local network has been changed.',
+  body: 'An API key of your {entityType} <code>{id}</code> on your network has been changed.',
   apikey: '<b>API Key ID:</b> <code>{apiKeyId}</code>',
   rights: 'Rights:',
   right: '<code>{right}</code>',
   closing: 'You can view and edit this API key <Link>here</Link>.',
   preview:
-    'An API key of your {entityType} "{id}" on your local network has been changed. API Key ID: {apiKeyId}',
+    'An API key of your {entityType} "{id}" on your network has been changed. API Key ID: {apiKeyId}',
 })
 
 const ApiKeyChangedPreview = ({ notificationData }) => {

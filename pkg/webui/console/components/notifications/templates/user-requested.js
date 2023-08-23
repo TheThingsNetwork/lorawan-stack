@@ -24,14 +24,14 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 const m = defineMessages({
   title: 'Your review is required for a newly registered user',
   greeting: 'Dear {recieverName},',
-  body: 'A new user just registered on your local network.{lineBreak}Since user registration requires admin approval, you need to approve this user before they can login.',
+  body: 'A new user just registered on your network.{lineBreak}Since user registration requires admin approval, you need to approve this user before they can login.',
   closing: 'You can review this user <Link>here</Link>.',
   userId: '<b>User ID:</b> <code>{userId}</code>',
   userName: '<b>Name:</b> {userName}',
   userDescription: '<b>Description:</b> {userDescription}',
   userEmail: '<b>Email Address:</b> {userPrimaryEmailAddress}',
   preview:
-    'A new user just registered on your local network. Since user registration requires admin approval, you need to approve this user before they can login. User ID: {userId}',
+    'A new user just registered on your network. Since user registration requires admin approval, you need to approve this user before they can login. User ID: {userId}',
 })
 
 const UserRequestedPreview = ({ notificationData }) => {

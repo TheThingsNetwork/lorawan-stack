@@ -27,11 +27,11 @@ import selectAccountUrl from '@console/lib/selectors/app-config'
 const m = defineMessages({
   title: 'Your review is required for a newly registered OAuth client',
   greeting: 'Dear {recieverName},',
-  body: '{senderType} <code>{id}</code> just registered a new OAuth client under {collaboratorType} <code>{collaboratorId}</code> on your local network.{lineBreak}Since {senderTypeMiddle} <code>{id}</code> is not an admin, you need to approve this client before it can be used.',
+  body: '{senderType} <code>{id}</code> just registered a new OAuth client under {collaboratorType} <code>{collaboratorId}</code> on your network.{lineBreak}Since {senderTypeMiddle} <code>{id}</code> is not an admin, you need to approve this client before it can be used.',
   clientId: '<b>Client ID:</b> <code>{clientId}</code>',
   link: 'You can approve (or reject) the OAuth client <Link>here</Link>.',
   preview:
-    '{senderType} {id} just registered a new OAuth client under {collaboratorType} {collaboratorId} on your local network. Since {senderTypeMiddle} {id} is not an admin, you need to approve this client before it can be used. Client ID: {clientId}',
+    '{senderType} {id} just registered a new OAuth client under {collaboratorType} {collaboratorId} on your network. Since {senderTypeMiddle} {id} is not an admin, you need to approve this client before it can be used. Client ID: {clientId}',
 })
 
 const accountUrl = selectAccountUrl()

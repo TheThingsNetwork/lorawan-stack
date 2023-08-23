@@ -40,7 +40,7 @@ const m = defineMessages({
   seeAll: 'See all messages',
 })
 
-const pageSize = 6
+const pageSize = 5
 const DEFAULT_PAGE = 1
 
 const pageValidator = page => (!Boolean(page) || page < 0 ? DEFAULT_PAGE : page)
@@ -54,6 +54,7 @@ const NotificationsContainer = ({ setPage, page }) => {
   const [showListColumn, setShowListColumn] = useState(true)
   const [isNotifications, setIsNotifications] = useQueryState('isNotifications', 'true')
   const isMobile = window.innerWidth < 768
+  const showContentContainer = isMobile ? !showListColumn : true
 
   const fetchItems = useCallback(
     async filter => {
@@ -89,8 +90,6 @@ const NotificationsContainer = ({ setPage, page }) => {
     setShowContent(false)
     setIsNotifications(isNotifications === 'false' ? 'true' : 'false')
   }, [setIsNotifications, isNotifications, setPage])
-
-  const showContentContainer = isMobile ? !showListColumn : true
 
   return (
     <Row className={classNames(style.notificationsContainer, 'm-0')}>
