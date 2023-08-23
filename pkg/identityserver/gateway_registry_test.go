@@ -27,6 +27,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const noOfGateways = 3
+
 func TestGatewaysPermissionDenied(t *testing.T) {
 	p := &storetest.Population{}
 	usr1 := p.NewUser()
@@ -339,5 +341,95 @@ func TestGatewaysPagination(t *testing.T) {
 		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Gateways, should.BeEmpty)
 		}
+	}, withPrivateTestDatabase(p))
+}
+
+func TestGatewayBatchOperations(t *testing.T) {
+	t.Parallel()
+	a, ctx := test.New(t)
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	usr2 := p.NewUser()
+	gtwIDs := make([]*ttnpb.GatewayIdentifiers, 0, noOfGateways)
+	for i := 0; i < noOfGateways; i++ {
+		gtw := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+		gtw.Attributes = map[string]string{
+			"foo": "bar",
+		}
+		gtw.UpdateLocationFromStatus = true
+		gtwIDs = append(gtwIDs, gtw.GetIds())
+	}
+	limitedKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_USER_GATEWAYS_LIST)
+	limitedCreds := rpcCreds(limitedKey)
+
+	fullKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_GATEWAY_ALL)
+	fullCreds := rpcCreds(fullKey)
+
+	usr2Key, _ := p.NewAPIKey(usr2.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	usr2Creds := rpcCreds(usr2Key)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewGatewayBatchRegistryClient(cc)
+		readReg := ttnpb.NewGatewayRegistryClient(cc)
+
+		// Read after create.
+		gtws, err := readReg.List(ctx, &ttnpb.ListGatewaysRequest{
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+		}, limitedCreds)
+		a.So(err, should.BeNil)
+		a.So(len(gtws.Gateways), should.Equal, noOfGateways)
+
+		// ClusterAuth.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteGatewaysRequest{
+			GatewayIds: gtwIDs,
+		}, is.WithClusterAuth())
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// Insufficient rights.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteGatewaysRequest{
+			GatewayIds: gtwIDs,
+		}, limitedCreds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// User without rights on gateways.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteGatewaysRequest{
+			GatewayIds: gtwIDs,
+		}, usr2Creds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// Unknown gateway ID.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteGatewaysRequest{
+			GatewayIds: []*ttnpb.GatewayIdentifiers{
+				{
+					GatewayId: "unknown",
+				},
+			},
+		}, fullCreds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// One unknown in batch.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteGatewaysRequest{
+			GatewayIds: []*ttnpb.GatewayIdentifiers{
+				{
+					GatewayId: "unknown",
+				},
+				gtwIDs[0],
+				gtwIDs[1],
+			},
+		}, fullCreds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// Valid Batch.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteGatewaysRequest{
+			GatewayIds: gtwIDs,
+		}, fullCreds)
+		a.So(err, should.BeNil)
+
+		// Read after delete.
+		gtws, err = readReg.List(ctx, &ttnpb.ListGatewaysRequest{
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+		}, limitedCreds)
+		a.So(err, should.BeNil)
+		a.So(len(gtws.Gateways), should.Equal, 0)
 	}, withPrivateTestDatabase(p))
 }

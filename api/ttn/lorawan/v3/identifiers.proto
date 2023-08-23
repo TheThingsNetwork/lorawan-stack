@@ -293,3 +293,7 @@ message LoRaAllianceProfileIdentifiers {
 message EndDeviceIdentifiersList {
   repeated EndDeviceIdentifiers end_device_ids = 1;
 }
+
+message GatewayIdentifiersList {
+  repeated GatewayIdentifiers gateway_ids = 1;
+}

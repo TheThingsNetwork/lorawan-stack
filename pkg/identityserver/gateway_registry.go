@@ -62,6 +62,14 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtBatchDeleteGateways = events.Define(
+		"gateway.batch.delete", "batch delete gateways",
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
+		events.WithDataType(&ttnpb.GatewayIdentifiersList{}),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
+	)
 )
 
 var (
@@ -728,6 +736,46 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) batchDeleteGateways(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteGatewaysRequest,
+) (*emptypb.Empty, error) {
+	if err := is.assertGatewayRights(
+		ctx,
+		req.GatewayIds,
+		&ttnpb.Rights{
+			Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_DELETE},
+		},
+	); err != nil {
+		return nil, err
+	}
+	var (
+		err     error
+		deleted = make([]*ttnpb.GatewayIdentifiers, 0)
+	)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		deleted, err = st.BatchDeleteGateways(ctx, req.GatewayIds)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(deleted) != 0 {
+		events.Publish(
+			evtBatchDeleteGateways.New(
+				ctx,
+				events.WithData(
+					&ttnpb.GatewayIdentifiersList{GatewayIds: deleted},
+				),
+			),
+		)
+	}
+	return ttnpb.Empty, nil
+}
+
 func validateClaimAuthenticationCode(authCode *ttnpb.GatewayClaimAuthenticationCode) error {
 	if authCode.Secret == nil {
 		return errClaimAuthenticationCode.New()
@@ -780,4 +828,18 @@ func (gr *gatewayRegistry) Restore(ctx context.Context, req *ttnpb.GatewayIdenti
 
 func (gr *gatewayRegistry) Purge(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	return gr.purgeGateway(ctx, req)
+}
+
+type gatewayBatchRegistry struct {
+	ttnpb.UnimplementedGatewayBatchRegistryServer
+
+	*IdentityServer
+}
+
+// Delete implements ttnpb.GatewayBatchRegistryServer.
+func (gr *gatewayBatchRegistry) Delete(
+	ctx context.Context,
+	req *ttnpb.BatchDeleteGatewaysRequest,
+) (*emptypb.Empty, error) {
+	return gr.batchDeleteGateways(ctx, req)
 }

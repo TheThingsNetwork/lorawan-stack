@@ -197,6 +197,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 			"/ttn.lorawan.v3.EndDeviceBatchRegistry",
 			"/ttn.lorawan.v3.GatewayRegistry",
 			"/ttn.lorawan.v3.GatewayAccess",
+			"/ttn.lorawan.v3.GatewayBatchRegistry",
 			"/ttn.lorawan.v3.GatewayBatchAccess",
 			"/ttn.lorawan.v3.OrganizationRegistry",
 			"/ttn.lorawan.v3.OrganizationAccess",
@@ -245,6 +246,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterEndDeviceRegistryServer(s, &endDeviceRegistry{IdentityServer: is})
 	ttnpb.RegisterGatewayRegistryServer(s, &gatewayRegistry{IdentityServer: is})
 	ttnpb.RegisterGatewayAccessServer(s, &gatewayAccess{IdentityServer: is})
+	ttnpb.RegisterGatewayBatchRegistryServer(s, &gatewayBatchRegistry{IdentityServer: is})
 	ttnpb.RegisterGatewayBatchAccessServer(s, &gatewayBatchAccess{IdentityServer: is})
 	ttnpb.RegisterOrganizationRegistryServer(s, &organizationRegistry{IdentityServer: is})
 	ttnpb.RegisterOrganizationAccessServer(s, &organizationAccess{IdentityServer: is})
@@ -271,7 +273,8 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterEndDeviceRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterGatewayRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterGatewayAccessHandler(is.Context(), s, conn)
-	ttnpb.RegisterGatewayBatchAccessHandler(is.Context(), s, conn) // nolint:errcheck
+	ttnpb.RegisterGatewayBatchRegistryHandler(is.Context(), s, conn) // nolint:errcheck
+	ttnpb.RegisterGatewayBatchAccessHandler(is.Context(), s, conn)   // nolint:errcheck
 	ttnpb.RegisterOrganizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterOrganizationAccessHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserRegistryHandler(is.Context(), s, conn)

@@ -183,3 +183,21 @@ service GatewayBatchAccess {
     option (google.api.http) = {get: "/gateways/rights/batch"};
   }
 }
+
+message BatchDeleteGatewaysRequest {
+  repeated ttn.lorawan.v3.GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated = {
+    min_items: 1,
+    max_items: 20,
+  }];
+}
+
+// The GatewayBatchRegistry service, exposed by the Identity Server, is used to manage
+// gateway registrations in batches.
+service GatewayBatchRegistry {
+  // Delete a batch of gateways.
+  // This operation is atomic; either all gateways are deleted or none.
+  // The caller must have delete rights on all requested gateways.
+  rpc Delete(BatchDeleteGatewaysRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/gateways/batch"};
+  }
+}

@@ -331,9 +331,11 @@
   - [Service `GatewayConfigurationService`](#ttn.lorawan.v3.GatewayConfigurationService)
 - [File `ttn/lorawan/v3/gateway_services.proto`](#ttn/lorawan/v3/gateway_services.proto)
   - [Message `AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest)
+  - [Message `BatchDeleteGatewaysRequest`](#ttn.lorawan.v3.BatchDeleteGatewaysRequest)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
   - [Service `GatewayBatchAccess`](#ttn.lorawan.v3.GatewayBatchAccess)
+  - [Service `GatewayBatchRegistry`](#ttn.lorawan.v3.GatewayBatchRegistry)
   - [Service `GatewayConfigurator`](#ttn.lorawan.v3.GatewayConfigurator)
   - [Service `GatewayRegistry`](#ttn.lorawan.v3.GatewayRegistry)
 - [File `ttn/lorawan/v3/gatewayserver.proto`](#ttn/lorawan/v3/gatewayserver.proto)
@@ -355,6 +357,7 @@
   - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
+  - [Message `GatewayIdentifiersList`](#ttn.lorawan.v3.GatewayIdentifiersList)
   - [Message `LoRaAllianceProfileIdentifiers`](#ttn.lorawan.v3.LoRaAllianceProfileIdentifiers)
   - [Message `NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers)
   - [Message `OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers)
@@ -5016,6 +5019,18 @@ Identifies an end device model with version information.
 | `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
 | `required` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.BatchDeleteGatewaysRequest">Message `BatchDeleteGatewaysRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
+
 ### <a name="ttn.lorawan.v3.PullGatewayConfigurationRequest">Message `PullGatewayConfigurationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -5069,6 +5084,21 @@ EXPERIMENTAL: This service is subject to change.
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `AssertRights` | `GET` | `/api/v3/gateways/rights/batch` |  |
+
+### <a name="ttn.lorawan.v3.GatewayBatchRegistry">Service `GatewayBatchRegistry`</a>
+
+The GatewayBatchRegistry service, exposed by the Identity Server, is used to manage
+gateway registrations in batches.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Delete` | [`BatchDeleteGatewaysRequest`](#ttn.lorawan.v3.BatchDeleteGatewaysRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a batch of gateways. This operation is atomic; either all gateways are deleted or none. The caller must have delete rights on all requested gateways. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Delete` | `DELETE` | `/api/v3/gateways/batch` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 
@@ -5314,6 +5344,12 @@ EntityIdentifiers contains one of the possible entity identifiers.
 | ----- | ----------- |
 | `gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `eui` | <p>`bytes.len`: `8`</p> |
+
+### <a name="ttn.lorawan.v3.GatewayIdentifiersList">Message `GatewayIdentifiersList`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.LoRaAllianceProfileIdentifiers">Message `LoRaAllianceProfileIdentifiers`</a>
 

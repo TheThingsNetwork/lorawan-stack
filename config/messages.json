@@ -9764,6 +9764,15 @@
       "file": "gateway_access.go"
     }
   },
+  "event:gateway.batch.delete": {
+    "translations": {
+      "en": "batch delete gateways"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
+    }
+  },
   "event:gateway.collaborator.delete": {
     "translations": {
       "en": "delete gateway collaborator"

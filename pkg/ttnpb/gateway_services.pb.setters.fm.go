@@ -93,3 +93,23 @@ func (dst *AssertGatewayRightsRequest) SetFields(src *AssertGatewayRightsRequest
 	}
 	return nil
 }
+
+func (dst *BatchDeleteGatewaysRequest) SetFields(src *BatchDeleteGatewaysRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayIds = src.GatewayIds
+			} else {
+				dst.GatewayIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

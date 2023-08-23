@@ -733,7 +733,7 @@ func (st *StoreTest) TestEndDeviceCAC(t *T) { //nolint:revive
 	})
 }
 
-// TestEndDeviceBatchOperations tests the EndDeviceBatchStore implementation.
+// TestEndDeviceBatchOperations tests end device batch operations.
 func (st *StoreTest) TestEndDeviceBatchOperations(t *T) { // nolint:gocyclo
 	a, ctx := test.New(t)
 
@@ -806,13 +806,12 @@ func (st *StoreTest) TestEndDeviceBatchOperations(t *T) { // nolint:gocyclo
 
 		// Batch Delete
 		for _, tc := range []struct { // nolint:paralleltest
-			Name            string
-			Context         context.Context
-			BatchDeleteFunc func(context.Context, []*ttnpb.EndDeviceIdentifiers) ([]*ttnpb.EndDeviceIdentifiers, error)
-			ApplicationIDs  *ttnpb.ApplicationIdentifiers
-			DeviceIDs       []string
-			Response        []*ttnpb.EndDeviceIdentifiers
-			ErrorAssertion  func(*T, error) bool
+			Name           string
+			Context        context.Context
+			ApplicationIDs *ttnpb.ApplicationIdentifiers
+			DeviceIDs      []string
+			Response       []*ttnpb.EndDeviceIdentifiers
+			ErrorAssertion func(*T, error) bool
 		}{
 			{
 				Name:           "Not Found",

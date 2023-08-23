@@ -22602,6 +22602,42 @@
           ]
         },
         {
+          "name": "BatchDeleteGatewaysRequest",
+          "longName": "BatchDeleteGatewaysRequest",
+          "fullName": "ttn.lorawan.v3.BatchDeleteGatewaysRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "PullGatewayConfigurationRequest",
           "longName": "PullGatewayConfigurationRequest",
           "fullName": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
@@ -22857,6 +22893,36 @@
                     {
                       "method": "GET",
                       "pattern": "/gateways/rights/batch"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GatewayBatchRegistry",
+          "longName": "GatewayBatchRegistry",
+          "fullName": "ttn.lorawan.v3.GatewayBatchRegistry",
+          "description": "The GatewayBatchRegistry service, exposed by the Identity Server, is used to manage\ngateway registrations in batches.",
+          "methods": [
+            {
+              "name": "Delete",
+              "description": "Delete a batch of gateways.\nThis operation is atomic; either all gateways are deleted or none.\nThe caller must have delete rights on all requested gateways.",
+              "requestType": "BatchDeleteGatewaysRequest",
+              "requestLongType": "BatchDeleteGatewaysRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchDeleteGatewaysRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/batch"
                     }
                   ]
                 }
@@ -23991,6 +24057,30 @@
                   }
                 ]
               }
+            }
+          ]
+        },
+        {
+          "name": "GatewayIdentifiersList",
+          "longName": "GatewayIdentifiersList",
+          "fullName": "ttn.lorawan.v3.GatewayIdentifiersList",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

@@ -90,6 +90,9 @@
       "name": "GatewayBatchAccess"
     },
     {
+      "name": "GatewayBatchRegistry"
+    },
+    {
       "name": "GtwGs"
     },
     {
@@ -8443,6 +8446,30 @@
         ],
         "tags": [
           "GatewayRegistry"
+        ]
+      }
+    },
+    "/gateways/batch": {
+      "delete": {
+        "summary": "Delete a batch of gateways.\nThis operation is atomic; either all gateways are deleted or none.\nThe caller must have delete rights on all requested gateways.",
+        "operationId": "GatewayBatchRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "GatewayBatchRegistry"
         ]
       }
     },
