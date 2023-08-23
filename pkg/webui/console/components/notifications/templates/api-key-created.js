@@ -26,13 +26,13 @@ import { getEntity } from '../utils'
 const m = defineMessages({
   title: 'A new API key has just been created for your {entityType}',
   greeting: 'Dear {receiverName},',
-  body: 'A new API key has just been created for your {entityType} <code>{id}</code> on your local network.',
+  body: 'A new API key has just been created for your {entityType} <code>{id}</code> on your network.',
   apikey: '<b>API Key ID:</b> <code>{apiKeyId}</code>',
   rights: 'Rights:',
   right: '<code>{right}</code>',
   closing: 'You can view and edit this API key <Link>here</Link>.',
   preview:
-    'A new API key has just been created for your {entityType} {id} on your local network. API Key ID: {apiKeyId}',
+    'A new API key has just been created for your {entityType} {id} on your network. API Key ID: {apiKeyId}',
 })
 
 const ApiKeyCreatedPreview = ({ notificationData }) => {

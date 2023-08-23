@@ -70,8 +70,8 @@ describe('Notifications', () => {
   })
 
   it('succeeds marking all notifications as read', () => {
-    cy.findByText(/1/).should('be.visible')
+    cy.findByTestId('total-unseen-notifications').should('be.visible')
     cy.findByRole('button', { name: /Mark all as read/ }).click()
-    cy.findByText(/1/).should('not.exist')
+    cy.findByTestId('total-unseen-notifications').should('not.exist')
   })
 })
