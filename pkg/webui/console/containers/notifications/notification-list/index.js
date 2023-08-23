@@ -25,6 +25,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   getUnseenNotifications,
@@ -43,7 +44,6 @@ import style from '../notifications.styl'
 import NotificationListItem from './list-item'
 
 const m = defineMessages({
-  notifications: 'Notifications',
   archived: 'Archived notifications',
   markAllAsRead: 'Mark all as read',
 })
@@ -113,11 +113,13 @@ const NotificationList = ({
           <Icon icon={isArchive ? 'archive' : 'notifications'} nudgeDown className={classes} />
           <Message
             component="h3"
-            content={isArchive ? m.archived : m.notifications}
+            content={isArchive ? m.archived : sharedMessages.notifications}
             className="m-0"
           />
           {Boolean(totalUnseenCount) && !isArchive && (
-            <span className={style.totalNotifications}>{totalUnseenCount}</span>
+            <span className={style.totalNotifications} data-test-id="total-unseen-notifications">
+              {totalUnseenCount}
+            </span>
           )}
         </Col>
         {!isArchive && (
