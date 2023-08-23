@@ -152,6 +152,69 @@
       "file": "i18n.go"
     }
   },
+  "enum:CID_RELAY_CONF": {
+    "translations": {
+      "en": "relay configuration"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_CONFIGURE_FWD_LIMIT": {
+    "translations": {
+      "en": "manage uplink forwarding limits"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_CTRL_UPLINK_LIST": {
+    "translations": {
+      "en": "manage uplink forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_END_DEVICE_CONF": {
+    "translations": {
+      "en": "end device relay configuration"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_FILTER_LIST": {
+    "translations": {
+      "en": "manage join request forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_NOTIFY_NEW_END_DEVICE": {
+    "translations": {
+      "en": "new end device under relay"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_UPDATE_UPLINK_LIST": {
+    "translations": {
+      "en": "update uplink forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:CID_RESET": {
     "translations": {
       "en": "reset"

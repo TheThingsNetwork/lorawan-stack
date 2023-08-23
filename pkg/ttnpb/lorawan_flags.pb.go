@@ -907,6 +907,414 @@ func (m *TxSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []
 	return paths, nil
 }
 
+// AddSelectFlagsForRelaySecondChannel adds flags to select fields in RelaySecondChannel.
+func AddSelectFlagsForRelaySecondChannel(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("ack-offset", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("ack-offset", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-index", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("frequency", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelaySecondChannel message from select flags.
+func PathsFromSelectFlagsForRelaySecondChannel(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("ack_offset", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("ack_offset", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_index", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("frequency", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("frequency", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRelaySecondChannel adds flags to select fields in RelaySecondChannel.
+func AddSetFlagsForRelaySecondChannel(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("ack-offset", prefix), flagsplugin.EnumValueDesc(RelaySecondChAckOffset_value), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("data-rate-index", prefix), flagsplugin.EnumValueDesc(DataRateIndex_value, DataRateIndex_customvalue), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint64Flag(flagsplugin.Prefix("frequency", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RelaySecondChannel message from flags.
+func (m *RelaySecondChannel) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("ack_offset", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RelaySecondChAckOffset_value)
+		if err != nil {
+			return nil, err
+		}
+		m.AckOffset = RelaySecondChAckOffset(enumValue)
+		paths = append(paths, flagsplugin.Prefix("ack_offset", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("data_rate_index", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, DataRateIndex_value, DataRateIndex_customvalue)
+		if err != nil {
+			return nil, err
+		}
+		m.DataRateIndex = DataRateIndex(enumValue)
+		paths = append(paths, flagsplugin.Prefix("data_rate_index", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint64(flags, flagsplugin.Prefix("frequency", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Frequency = val
+		paths = append(paths, flagsplugin.Prefix("frequency", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRelayUplinkForwardLimits adds flags to select fields in RelayUplinkForwardLimits.
+func AddSelectFlagsForRelayUplinkForwardLimits(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("bucket-size", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("bucket-size", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("reload-rate", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("reload-rate", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelayUplinkForwardLimits message from select flags.
+func PathsFromSelectFlagsForRelayUplinkForwardLimits(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("bucket_size", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("bucket_size", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("reload_rate", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("reload_rate", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRelayUplinkForwardLimits adds flags to select fields in RelayUplinkForwardLimits.
+func AddSetFlagsForRelayUplinkForwardLimits(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("bucket-size", prefix), flagsplugin.EnumValueDesc(RelayLimitBucketSize_value), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("reload-rate", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RelayUplinkForwardLimits message from flags.
+func (m *RelayUplinkForwardLimits) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("bucket_size", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RelayLimitBucketSize_value)
+		if err != nil {
+			return nil, err
+		}
+		m.BucketSize = RelayLimitBucketSize(enumValue)
+		paths = append(paths, flagsplugin.Prefix("bucket_size", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("reload_rate", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ReloadRate = val
+		paths = append(paths, flagsplugin.Prefix("reload_rate", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRelayForwardLimits adds flags to select fields in RelayForwardLimits.
+func AddSelectFlagsForRelayForwardLimits(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("bucket-size", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("bucket-size", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("reload-rate", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("reload-rate", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelayForwardLimits message from select flags.
+func PathsFromSelectFlagsForRelayForwardLimits(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("bucket_size", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("bucket_size", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("reload_rate", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("reload_rate", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRelayForwardLimits adds flags to select fields in RelayForwardLimits.
+func AddSetFlagsForRelayForwardLimits(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("bucket-size", prefix), flagsplugin.EnumValueDesc(RelayLimitBucketSize_value), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("reload-rate", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RelayForwardLimits message from flags.
+func (m *RelayForwardLimits) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("bucket_size", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RelayLimitBucketSize_value)
+		if err != nil {
+			return nil, err
+		}
+		m.BucketSize = RelayLimitBucketSize(enumValue)
+		paths = append(paths, flagsplugin.Prefix("bucket_size", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("reload_rate", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ReloadRate = val
+		paths = append(paths, flagsplugin.Prefix("reload_rate", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRelayEndDeviceAlwaysMode adds flags to select fields in RelayEndDeviceAlwaysMode.
+func AddSelectFlagsForRelayEndDeviceAlwaysMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelayEndDeviceAlwaysMode message from select flags.
+func PathsFromSelectFlagsForRelayEndDeviceAlwaysMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSetFlagsForRelayEndDeviceAlwaysMode adds flags to select fields in RelayEndDeviceAlwaysMode.
+func AddSetFlagsForRelayEndDeviceAlwaysMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SetFromFlags sets the RelayEndDeviceAlwaysMode message from flags.
+func (m *RelayEndDeviceAlwaysMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSelectFlagsForRelayEndDeviceDynamicMode adds flags to select fields in RelayEndDeviceDynamicMode.
+func AddSelectFlagsForRelayEndDeviceDynamicMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("smart-enable-level", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("smart-enable-level", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelayEndDeviceDynamicMode message from select flags.
+func PathsFromSelectFlagsForRelayEndDeviceDynamicMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("smart_enable_level", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("smart_enable_level", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRelayEndDeviceDynamicMode adds flags to select fields in RelayEndDeviceDynamicMode.
+func AddSetFlagsForRelayEndDeviceDynamicMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("smart-enable-level", prefix), flagsplugin.EnumValueDesc(RelaySmartEnableLevel_value), flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RelayEndDeviceDynamicMode message from flags.
+func (m *RelayEndDeviceDynamicMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("smart_enable_level", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RelaySmartEnableLevel_value)
+		if err != nil {
+			return nil, err
+		}
+		m.SmartEnableLevel = RelaySmartEnableLevel(enumValue)
+		paths = append(paths, flagsplugin.Prefix("smart_enable_level", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRelayEndDeviceControlledMode adds flags to select fields in RelayEndDeviceControlledMode.
+func AddSelectFlagsForRelayEndDeviceControlledMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelayEndDeviceControlledMode message from select flags.
+func PathsFromSelectFlagsForRelayEndDeviceControlledMode(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSetFlagsForRelayEndDeviceControlledMode adds flags to select fields in RelayEndDeviceControlledMode.
+func AddSetFlagsForRelayEndDeviceControlledMode(flags *pflag.FlagSet, prefix string, hidden bool) {
+}
+
+// SetFromFlags sets the RelayEndDeviceControlledMode message from flags.
+func (m *RelayEndDeviceControlledMode) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	return paths, nil
+}
+
+// AddSelectFlagsForMACCommand_RelayUpdateUplinkListReq adds flags to select fields in MACCommand_RelayUpdateUplinkListReq.
+func AddSelectFlagsForMACCommand_RelayUpdateUplinkListReq(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rule-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rule-index", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("forward-limits", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("forward-limits", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayUplinkForwardLimits(flags, flagsplugin.Prefix("forward-limits", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-addr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-addr", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("w-f-cnt", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("w-f-cnt", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("root-wor-s-key", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("root-wor-s-key", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("device-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("device-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("session-key-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("session-key-id", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forMACCommand_RelayUpdateUplinkListReq message from select flags.
+func PathsFromSelectFlagsForMACCommand_RelayUpdateUplinkListReq(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rule_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rule_index", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("forward_limits", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("forward_limits", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayUplinkForwardLimits(flags, flagsplugin.Prefix("forward_limits", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("w_f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("w_f_cnt", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("root_wor_s_key", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("root_wor_s_key", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("device_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("device_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("session_key_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("session_key_id", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForMACCommand_RelayUpdateUplinkListReq adds flags to select fields in MACCommand_RelayUpdateUplinkListReq.
+func AddSetFlagsForMACCommand_RelayUpdateUplinkListReq(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("rule-index", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForRelayUplinkForwardLimits(flags, flagsplugin.Prefix("forward-limits", prefix), hidden)
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("w-f-cnt", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New16BytesFlag(flagsplugin.Prefix("root-wor-s-key", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("device-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("session-key-id", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the MACCommand_RelayUpdateUplinkListReq message from flags.
+func (m *MACCommand_RelayUpdateUplinkListReq) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("rule_index", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.RuleIndex = val
+		paths = append(paths, flagsplugin.Prefix("rule_index", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("forward_limits", prefix)); changed {
+		if m.ForwardLimits == nil {
+			m.ForwardLimits = &RelayUplinkForwardLimits{}
+		}
+		if setPaths, err := m.ForwardLimits.SetFromFlags(flags, flagsplugin.Prefix("forward_limits", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevAddr = val
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("w_f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.WFCnt = val
+		paths = append(paths, flagsplugin.Prefix("w_f_cnt", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("root_wor_s_key", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.RootWorSKey = val
+		paths = append(paths, flagsplugin.Prefix("root_wor_s_key", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("device_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DeviceId = val
+		paths = append(paths, flagsplugin.Prefix("device_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("session_key_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.SessionKeyId = val
+		paths = append(paths, flagsplugin.Prefix("session_key_id", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForMACCommand_RelayNotifyNewEndDeviceReq adds flags to select fields in MACCommand_RelayNotifyNewEndDeviceReq.
+func AddSelectFlagsForMACCommand_RelayNotifyNewEndDeviceReq(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dev-addr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dev-addr", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("snr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("snr", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rssi", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rssi", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forMACCommand_RelayNotifyNewEndDeviceReq message from select flags.
+func PathsFromSelectFlagsForMACCommand_RelayNotifyNewEndDeviceReq(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("snr", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("snr", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rssi", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rssi", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForMACCommand_RelayNotifyNewEndDeviceReq adds flags to select fields in MACCommand_RelayNotifyNewEndDeviceReq.
+func AddSetFlagsForMACCommand_RelayNotifyNewEndDeviceReq(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewInt32Flag(flagsplugin.Prefix("snr", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewInt32Flag(flagsplugin.Prefix("rssi", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the MACCommand_RelayNotifyNewEndDeviceReq message from flags.
+func (m *MACCommand_RelayNotifyNewEndDeviceReq) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DevAddr = val
+		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
+	}
+	if val, changed, err := flagsplugin.GetInt32(flags, flagsplugin.Prefix("snr", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Snr = val
+		paths = append(paths, flagsplugin.Prefix("snr", prefix))
+	}
+	if val, changed, err := flagsplugin.GetInt32(flags, flagsplugin.Prefix("rssi", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Rssi = val
+		paths = append(paths, flagsplugin.Prefix("rssi", prefix))
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForFrequencyValue adds flags to select fields in FrequencyValue.
 func AddSelectFlagsForFrequencyValue(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("value", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("value", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -1245,6 +1653,147 @@ func (m *DeviceEIRPValue) SetFromFlags(flags *pflag.FlagSet, prefix string) (pat
 		}
 		m.Value = DeviceEIRP(enumValue)
 		paths = append(paths, flagsplugin.Prefix("value", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRelayForwardUplinkReq adds flags to select fields in RelayForwardUplinkReq.
+func AddSelectFlagsForRelayForwardUplinkReq(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForDataRate(flags, flagsplugin.Prefix("data-rate", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("snr", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("snr", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rssi", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rssi", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("wor-channel", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("wor-channel", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("frequency", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("raw-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("raw-payload", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelayForwardUplinkReq message from select flags.
+func PathsFromSelectFlagsForRelayForwardUplinkReq(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForDataRate(flags, flagsplugin.Prefix("data_rate", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("snr", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("snr", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("rssi", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("rssi", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("wor_channel", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("wor_channel", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("frequency", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("frequency", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("raw_payload", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("raw_payload", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRelayForwardUplinkReq adds flags to select fields in RelayForwardUplinkReq.
+func AddSetFlagsForRelayForwardUplinkReq(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForDataRate(flags, flagsplugin.Prefix("data-rate", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewInt32Flag(flagsplugin.Prefix("snr", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewInt32Flag(flagsplugin.Prefix("rssi", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("wor-channel", prefix), flagsplugin.EnumValueDesc(RelayWORChannel_value), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint64Flag(flagsplugin.Prefix("frequency", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("raw-payload", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RelayForwardUplinkReq message from flags.
+func (m *RelayForwardUplinkReq) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate", prefix)); changed {
+		if m.DataRate == nil {
+			m.DataRate = &DataRate{}
+		}
+		if setPaths, err := m.DataRate.SetFromFlags(flags, flagsplugin.Prefix("data_rate", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetInt32(flags, flagsplugin.Prefix("snr", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Snr = val
+		paths = append(paths, flagsplugin.Prefix("snr", prefix))
+	}
+	if val, changed, err := flagsplugin.GetInt32(flags, flagsplugin.Prefix("rssi", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Rssi = val
+		paths = append(paths, flagsplugin.Prefix("rssi", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("wor_channel", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RelayWORChannel_value)
+		if err != nil {
+			return nil, err
+		}
+		m.WorChannel = RelayWORChannel(enumValue)
+		paths = append(paths, flagsplugin.Prefix("wor_channel", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint64(flags, flagsplugin.Prefix("frequency", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Frequency = val
+		paths = append(paths, flagsplugin.Prefix("frequency", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("raw_payload", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.RawPayload = val
+		paths = append(paths, flagsplugin.Prefix("raw_payload", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRelayForwardDownlinkReq adds flags to select fields in RelayForwardDownlinkReq.
+func AddSelectFlagsForRelayForwardDownlinkReq(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("raw-payload", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("raw-payload", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelayForwardDownlinkReq message from select flags.
+func PathsFromSelectFlagsForRelayForwardDownlinkReq(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("raw_payload", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("raw_payload", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRelayForwardDownlinkReq adds flags to select fields in RelayForwardDownlinkReq.
+func AddSetFlagsForRelayForwardDownlinkReq(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("raw-payload", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RelayForwardDownlinkReq message from flags.
+func (m *RelayForwardDownlinkReq) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("raw_payload", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.RawPayload = val
+		paths = append(paths, flagsplugin.Prefix("raw_payload", prefix))
 	}
 	return paths, nil
 }

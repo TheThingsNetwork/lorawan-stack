@@ -377,6 +377,46 @@ var TxRequestFieldPathsTopLevel = []string{
 	"rx2_data_rate",
 	"rx2_frequency",
 }
+var RelaySecondChannelFieldPathsNested = []string{
+	"ack_offset",
+	"data_rate_index",
+	"frequency",
+}
+
+var RelaySecondChannelFieldPathsTopLevel = []string{
+	"ack_offset",
+	"data_rate_index",
+	"frequency",
+}
+var RelayUplinkForwardLimitsFieldPathsNested = []string{
+	"bucket_size",
+	"reload_rate",
+}
+
+var RelayUplinkForwardLimitsFieldPathsTopLevel = []string{
+	"bucket_size",
+	"reload_rate",
+}
+var RelayForwardLimitsFieldPathsNested = []string{
+	"bucket_size",
+	"reload_rate",
+}
+
+var RelayForwardLimitsFieldPathsTopLevel = []string{
+	"bucket_size",
+	"reload_rate",
+}
+var RelayEndDeviceAlwaysModeFieldPathsNested []string
+var RelayEndDeviceAlwaysModeFieldPathsTopLevel []string
+var RelayEndDeviceDynamicModeFieldPathsNested = []string{
+	"smart_enable_level",
+}
+
+var RelayEndDeviceDynamicModeFieldPathsTopLevel = []string{
+	"smart_enable_level",
+}
+var RelayEndDeviceControlledModeFieldPathsNested []string
+var RelayEndDeviceControlledModeFieldPathsTopLevel []string
 var MACCommandFieldPathsNested = []string{
 	"cid",
 	"payload",
@@ -451,6 +491,75 @@ var MACCommandFieldPathsNested = []string{
 	"payload.rekey_conf.minor_version",
 	"payload.rekey_ind",
 	"payload.rekey_ind.minor_version",
+	"payload.relay_conf_ans",
+	"payload.relay_conf_ans.cad_periodicity_ack",
+	"payload.relay_conf_ans.default_channel_index_ack",
+	"payload.relay_conf_ans.second_channel_ack_offset_ack",
+	"payload.relay_conf_ans.second_channel_data_rate_index_ack",
+	"payload.relay_conf_ans.second_channel_frequency_ack",
+	"payload.relay_conf_ans.second_channel_index_ack",
+	"payload.relay_conf_req",
+	"payload.relay_conf_req.configuration",
+	"payload.relay_conf_req.configuration.cad_periodicity",
+	"payload.relay_conf_req.configuration.default_channel_index",
+	"payload.relay_conf_req.configuration.second_channel",
+	"payload.relay_conf_req.configuration.second_channel.ack_offset",
+	"payload.relay_conf_req.configuration.second_channel.data_rate_index",
+	"payload.relay_conf_req.configuration.second_channel.frequency",
+	"payload.relay_configure_fwd_limit_ans",
+	"payload.relay_configure_fwd_limit_req",
+	"payload.relay_configure_fwd_limit_req.global_uplink_limits",
+	"payload.relay_configure_fwd_limit_req.global_uplink_limits.bucket_size",
+	"payload.relay_configure_fwd_limit_req.global_uplink_limits.reload_rate",
+	"payload.relay_configure_fwd_limit_req.join_request_limits",
+	"payload.relay_configure_fwd_limit_req.join_request_limits.bucket_size",
+	"payload.relay_configure_fwd_limit_req.join_request_limits.reload_rate",
+	"payload.relay_configure_fwd_limit_req.notify_limits",
+	"payload.relay_configure_fwd_limit_req.notify_limits.bucket_size",
+	"payload.relay_configure_fwd_limit_req.notify_limits.reload_rate",
+	"payload.relay_configure_fwd_limit_req.overall_limits",
+	"payload.relay_configure_fwd_limit_req.overall_limits.bucket_size",
+	"payload.relay_configure_fwd_limit_req.overall_limits.reload_rate",
+	"payload.relay_configure_fwd_limit_req.reset_limit_counter",
+	"payload.relay_ctrl_uplink_list_ans",
+	"payload.relay_ctrl_uplink_list_ans.rule_index_ack",
+	"payload.relay_ctrl_uplink_list_ans.w_f_cnt",
+	"payload.relay_ctrl_uplink_list_req",
+	"payload.relay_ctrl_uplink_list_req.action",
+	"payload.relay_ctrl_uplink_list_req.rule_index",
+	"payload.relay_end_device_conf_ans",
+	"payload.relay_end_device_conf_ans.backoff_ack",
+	"payload.relay_end_device_conf_ans.second_channel_data_rate_index_ack",
+	"payload.relay_end_device_conf_ans.second_channel_frequency_ack",
+	"payload.relay_end_device_conf_ans.second_channel_index_ack",
+	"payload.relay_end_device_conf_req",
+	"payload.relay_end_device_conf_req.configuration",
+	"payload.relay_end_device_conf_req.configuration.backoff",
+	"payload.relay_end_device_conf_req.configuration.mode",
+	"payload.relay_end_device_conf_req.configuration.mode.always",
+	"payload.relay_end_device_conf_req.configuration.mode.dynamic",
+	"payload.relay_end_device_conf_req.configuration.mode.dynamic.smart_enable_level",
+	"payload.relay_end_device_conf_req.configuration.mode.end_device_controlled",
+	"payload.relay_end_device_conf_req.configuration.second_channel",
+	"payload.relay_end_device_conf_req.configuration.second_channel.ack_offset",
+	"payload.relay_end_device_conf_req.configuration.second_channel.data_rate_index",
+	"payload.relay_end_device_conf_req.configuration.second_channel.frequency",
+	"payload.relay_end_device_conf_req.configuration.serving_device_id",
+	"payload.relay_notify_new_end_device_req",
+	"payload.relay_notify_new_end_device_req.dev_addr",
+	"payload.relay_notify_new_end_device_req.rssi",
+	"payload.relay_notify_new_end_device_req.snr",
+	"payload.relay_update_uplink_list_ans",
+	"payload.relay_update_uplink_list_req",
+	"payload.relay_update_uplink_list_req.dev_addr",
+	"payload.relay_update_uplink_list_req.device_id",
+	"payload.relay_update_uplink_list_req.forward_limits",
+	"payload.relay_update_uplink_list_req.forward_limits.bucket_size",
+	"payload.relay_update_uplink_list_req.forward_limits.reload_rate",
+	"payload.relay_update_uplink_list_req.root_wor_s_key",
+	"payload.relay_update_uplink_list_req.rule_index",
+	"payload.relay_update_uplink_list_req.session_key_id",
+	"payload.relay_update_uplink_list_req.w_f_cnt",
 	"payload.reset_conf",
 	"payload.reset_conf.minor_version",
 	"payload.reset_ind",
@@ -551,6 +660,58 @@ var DeviceEIRPValueFieldPathsNested = []string{
 
 var DeviceEIRPValueFieldPathsTopLevel = []string{
 	"value",
+}
+var RelayForwardUplinkReqFieldPathsNested = []string{
+	"data_rate",
+	"data_rate.modulation",
+	"data_rate.modulation.fsk",
+	"data_rate.modulation.fsk.bit_rate",
+	"data_rate.modulation.lora",
+	"data_rate.modulation.lora.bandwidth",
+	"data_rate.modulation.lora.coding_rate",
+	"data_rate.modulation.lora.spreading_factor",
+	"data_rate.modulation.lrfhss",
+	"data_rate.modulation.lrfhss.coding_rate",
+	"data_rate.modulation.lrfhss.modulation_type",
+	"data_rate.modulation.lrfhss.operating_channel_width",
+	"frequency",
+	"raw_payload",
+	"rssi",
+	"snr",
+	"wor_channel",
+}
+
+var RelayForwardUplinkReqFieldPathsTopLevel = []string{
+	"data_rate",
+	"frequency",
+	"raw_payload",
+	"rssi",
+	"snr",
+	"wor_channel",
+}
+var RelayForwardDownlinkReqFieldPathsNested = []string{
+	"raw_payload",
+}
+
+var RelayForwardDownlinkReqFieldPathsTopLevel = []string{
+	"raw_payload",
+}
+var RelayUplinkTokenFieldPathsNested = []string{
+	"full_f_cnt",
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.dev_addr",
+	"ids.dev_eui",
+	"ids.device_id",
+	"ids.join_eui",
+	"session_key_id",
+}
+
+var RelayUplinkTokenFieldPathsTopLevel = []string{
+	"full_f_cnt",
+	"ids",
+	"session_key_id",
 }
 var TxSettings_DownlinkFieldPathsNested = []string{
 	"antenna_index",
@@ -828,4 +989,176 @@ var MACCommand_DeviceModeConfFieldPathsNested = []string{
 
 var MACCommand_DeviceModeConfFieldPathsTopLevel = []string{
 	"class",
+}
+var MACCommand_RelayConfReqFieldPathsNested = []string{
+	"configuration",
+	"configuration.cad_periodicity",
+	"configuration.default_channel_index",
+	"configuration.second_channel",
+	"configuration.second_channel.ack_offset",
+	"configuration.second_channel.data_rate_index",
+	"configuration.second_channel.frequency",
+}
+
+var MACCommand_RelayConfReqFieldPathsTopLevel = []string{
+	"configuration",
+}
+var MACCommand_RelayConfAnsFieldPathsNested = []string{
+	"cad_periodicity_ack",
+	"default_channel_index_ack",
+	"second_channel_ack_offset_ack",
+	"second_channel_data_rate_index_ack",
+	"second_channel_frequency_ack",
+	"second_channel_index_ack",
+}
+
+var MACCommand_RelayConfAnsFieldPathsTopLevel = []string{
+	"cad_periodicity_ack",
+	"default_channel_index_ack",
+	"second_channel_ack_offset_ack",
+	"second_channel_data_rate_index_ack",
+	"second_channel_frequency_ack",
+	"second_channel_index_ack",
+}
+var MACCommand_RelayEndDeviceConfReqFieldPathsNested = []string{
+	"configuration",
+	"configuration.backoff",
+	"configuration.mode",
+	"configuration.mode.always",
+	"configuration.mode.dynamic",
+	"configuration.mode.dynamic.smart_enable_level",
+	"configuration.mode.end_device_controlled",
+	"configuration.second_channel",
+	"configuration.second_channel.ack_offset",
+	"configuration.second_channel.data_rate_index",
+	"configuration.second_channel.frequency",
+	"configuration.serving_device_id",
+}
+
+var MACCommand_RelayEndDeviceConfReqFieldPathsTopLevel = []string{
+	"configuration",
+}
+var MACCommand_RelayEndDeviceConfAnsFieldPathsNested = []string{
+	"backoff_ack",
+	"second_channel_data_rate_index_ack",
+	"second_channel_frequency_ack",
+	"second_channel_index_ack",
+}
+
+var MACCommand_RelayEndDeviceConfAnsFieldPathsTopLevel = []string{
+	"backoff_ack",
+	"second_channel_data_rate_index_ack",
+	"second_channel_frequency_ack",
+	"second_channel_index_ack",
+}
+var MACCommand_RelayUpdateUplinkListReqFieldPathsNested = []string{
+	"dev_addr",
+	"device_id",
+	"forward_limits",
+	"forward_limits.bucket_size",
+	"forward_limits.reload_rate",
+	"root_wor_s_key",
+	"rule_index",
+	"session_key_id",
+	"w_f_cnt",
+}
+
+var MACCommand_RelayUpdateUplinkListReqFieldPathsTopLevel = []string{
+	"dev_addr",
+	"device_id",
+	"forward_limits",
+	"root_wor_s_key",
+	"rule_index",
+	"session_key_id",
+	"w_f_cnt",
+}
+var MACCommand_RelayUpdateUplinkListAnsFieldPathsNested []string
+var MACCommand_RelayUpdateUplinkListAnsFieldPathsTopLevel []string
+var MACCommand_RelayCtrlUplinkListReqFieldPathsNested = []string{
+	"action",
+	"rule_index",
+}
+
+var MACCommand_RelayCtrlUplinkListReqFieldPathsTopLevel = []string{
+	"action",
+	"rule_index",
+}
+var MACCommand_RelayCtrlUplinkListAnsFieldPathsNested = []string{
+	"rule_index_ack",
+	"w_f_cnt",
+}
+
+var MACCommand_RelayCtrlUplinkListAnsFieldPathsTopLevel = []string{
+	"rule_index_ack",
+	"w_f_cnt",
+}
+var MACCommand_RelayConfigureFwdLimitReqFieldPathsNested = []string{
+	"global_uplink_limits",
+	"global_uplink_limits.bucket_size",
+	"global_uplink_limits.reload_rate",
+	"join_request_limits",
+	"join_request_limits.bucket_size",
+	"join_request_limits.reload_rate",
+	"notify_limits",
+	"notify_limits.bucket_size",
+	"notify_limits.reload_rate",
+	"overall_limits",
+	"overall_limits.bucket_size",
+	"overall_limits.reload_rate",
+	"reset_limit_counter",
+}
+
+var MACCommand_RelayConfigureFwdLimitReqFieldPathsTopLevel = []string{
+	"global_uplink_limits",
+	"join_request_limits",
+	"notify_limits",
+	"overall_limits",
+	"reset_limit_counter",
+}
+var MACCommand_RelayConfigureFwdLimitAnsFieldPathsNested []string
+var MACCommand_RelayConfigureFwdLimitAnsFieldPathsTopLevel []string
+var MACCommand_RelayNotifyNewEndDeviceReqFieldPathsNested = []string{
+	"dev_addr",
+	"rssi",
+	"snr",
+}
+
+var MACCommand_RelayNotifyNewEndDeviceReqFieldPathsTopLevel = []string{
+	"dev_addr",
+	"rssi",
+	"snr",
+}
+var MACCommand_RelayConfReq_ConfigurationFieldPathsNested = []string{
+	"cad_periodicity",
+	"default_channel_index",
+	"second_channel",
+	"second_channel.ack_offset",
+	"second_channel.data_rate_index",
+	"second_channel.frequency",
+}
+
+var MACCommand_RelayConfReq_ConfigurationFieldPathsTopLevel = []string{
+	"cad_periodicity",
+	"default_channel_index",
+	"second_channel",
+}
+var MACCommand_RelayEndDeviceConfReq_ConfigurationFieldPathsNested = []string{
+	"backoff",
+	"mode",
+	"mode.always",
+	"mode.dynamic",
+	"mode.dynamic.smart_enable_level",
+	"mode.end_device_controlled",
+	"second_channel",
+	"second_channel.ack_offset",
+	"second_channel.data_rate_index",
+	"second_channel.frequency",
+	"serving_device_id",
+}
+
+var MACCommand_RelayEndDeviceConfReq_ConfigurationFieldPathsTopLevel = []string{
+	"backoff",
+	"mode",
+	"second_channel",
+	"serving_device_id",
 }

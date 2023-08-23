@@ -472,6 +472,19 @@
   - [Message `MACCommand.RejoinParamSetupReq`](#ttn.lorawan.v3.MACCommand.RejoinParamSetupReq)
   - [Message `MACCommand.RekeyConf`](#ttn.lorawan.v3.MACCommand.RekeyConf)
   - [Message `MACCommand.RekeyInd`](#ttn.lorawan.v3.MACCommand.RekeyInd)
+  - [Message `MACCommand.RelayConfAns`](#ttn.lorawan.v3.MACCommand.RelayConfAns)
+  - [Message `MACCommand.RelayConfReq`](#ttn.lorawan.v3.MACCommand.RelayConfReq)
+  - [Message `MACCommand.RelayConfReq.Configuration`](#ttn.lorawan.v3.MACCommand.RelayConfReq.Configuration)
+  - [Message `MACCommand.RelayConfigureFwdLimitAns`](#ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitAns)
+  - [Message `MACCommand.RelayConfigureFwdLimitReq`](#ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitReq)
+  - [Message `MACCommand.RelayCtrlUplinkListAns`](#ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListAns)
+  - [Message `MACCommand.RelayCtrlUplinkListReq`](#ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListReq)
+  - [Message `MACCommand.RelayEndDeviceConfAns`](#ttn.lorawan.v3.MACCommand.RelayEndDeviceConfAns)
+  - [Message `MACCommand.RelayEndDeviceConfReq`](#ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq)
+  - [Message `MACCommand.RelayEndDeviceConfReq.Configuration`](#ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq.Configuration)
+  - [Message `MACCommand.RelayNotifyNewEndDeviceReq`](#ttn.lorawan.v3.MACCommand.RelayNotifyNewEndDeviceReq)
+  - [Message `MACCommand.RelayUpdateUplinkListAns`](#ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListAns)
+  - [Message `MACCommand.RelayUpdateUplinkListReq`](#ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListReq)
   - [Message `MACCommand.ResetConf`](#ttn.lorawan.v3.MACCommand.ResetConf)
   - [Message `MACCommand.ResetInd`](#ttn.lorawan.v3.MACCommand.ResetInd)
   - [Message `MACCommand.RxParamSetupAns`](#ttn.lorawan.v3.MACCommand.RxParamSetupAns)
@@ -484,6 +497,15 @@
   - [Message `Message`](#ttn.lorawan.v3.Message)
   - [Message `PingSlotPeriodValue`](#ttn.lorawan.v3.PingSlotPeriodValue)
   - [Message `RejoinRequestPayload`](#ttn.lorawan.v3.RejoinRequestPayload)
+  - [Message `RelayEndDeviceAlwaysMode`](#ttn.lorawan.v3.RelayEndDeviceAlwaysMode)
+  - [Message `RelayEndDeviceControlledMode`](#ttn.lorawan.v3.RelayEndDeviceControlledMode)
+  - [Message `RelayEndDeviceDynamicMode`](#ttn.lorawan.v3.RelayEndDeviceDynamicMode)
+  - [Message `RelayForwardDownlinkReq`](#ttn.lorawan.v3.RelayForwardDownlinkReq)
+  - [Message `RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits)
+  - [Message `RelayForwardUplinkReq`](#ttn.lorawan.v3.RelayForwardUplinkReq)
+  - [Message `RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel)
+  - [Message `RelayUplinkForwardLimits`](#ttn.lorawan.v3.RelayUplinkForwardLimits)
+  - [Message `RelayUplinkToken`](#ttn.lorawan.v3.RelayUplinkToken)
   - [Message `RxDelayValue`](#ttn.lorawan.v3.RxDelayValue)
   - [Message `TxRequest`](#ttn.lorawan.v3.TxRequest)
   - [Message `TxSettings`](#ttn.lorawan.v3.TxSettings)
@@ -510,6 +532,13 @@
   - [Enum `RejoinPeriodExponent`](#ttn.lorawan.v3.RejoinPeriodExponent)
   - [Enum `RejoinRequestType`](#ttn.lorawan.v3.RejoinRequestType)
   - [Enum `RejoinTimeExponent`](#ttn.lorawan.v3.RejoinTimeExponent)
+  - [Enum `RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity)
+  - [Enum `RelayCtrlUplinkListAction`](#ttn.lorawan.v3.RelayCtrlUplinkListAction)
+  - [Enum `RelayLimitBucketSize`](#ttn.lorawan.v3.RelayLimitBucketSize)
+  - [Enum `RelayResetLimitCounter`](#ttn.lorawan.v3.RelayResetLimitCounter)
+  - [Enum `RelaySecondChAckOffset`](#ttn.lorawan.v3.RelaySecondChAckOffset)
+  - [Enum `RelaySmartEnableLevel`](#ttn.lorawan.v3.RelaySmartEnableLevel)
+  - [Enum `RelayWORChannel`](#ttn.lorawan.v3.RelayWORChannel)
   - [Enum `RxDelay`](#ttn.lorawan.v3.RxDelay)
   - [Enum `TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority)
 - [File `ttn/lorawan/v3/messages.proto`](#ttn/lorawan/v3/messages.proto)
@@ -6461,6 +6490,17 @@ Only the components for which the keys were meant, will have the key-encryption-
 | `beacon_freq_ans` | [`MACCommand.BeaconFreqAns`](#ttn.lorawan.v3.MACCommand.BeaconFreqAns) |  |  |
 | `device_mode_ind` | [`MACCommand.DeviceModeInd`](#ttn.lorawan.v3.MACCommand.DeviceModeInd) |  |  |
 | `device_mode_conf` | [`MACCommand.DeviceModeConf`](#ttn.lorawan.v3.MACCommand.DeviceModeConf) |  |  |
+| `relay_conf_req` | [`MACCommand.RelayConfReq`](#ttn.lorawan.v3.MACCommand.RelayConfReq) |  |  |
+| `relay_conf_ans` | [`MACCommand.RelayConfAns`](#ttn.lorawan.v3.MACCommand.RelayConfAns) |  |  |
+| `relay_end_device_conf_req` | [`MACCommand.RelayEndDeviceConfReq`](#ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq) |  |  |
+| `relay_end_device_conf_ans` | [`MACCommand.RelayEndDeviceConfAns`](#ttn.lorawan.v3.MACCommand.RelayEndDeviceConfAns) |  |  |
+| `relay_update_uplink_list_req` | [`MACCommand.RelayUpdateUplinkListReq`](#ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListReq) |  |  |
+| `relay_update_uplink_list_ans` | [`MACCommand.RelayUpdateUplinkListAns`](#ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListAns) |  |  |
+| `relay_ctrl_uplink_list_req` | [`MACCommand.RelayCtrlUplinkListReq`](#ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListReq) |  |  |
+| `relay_ctrl_uplink_list_ans` | [`MACCommand.RelayCtrlUplinkListAns`](#ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListAns) |  |  |
+| `relay_configure_fwd_limit_req` | [`MACCommand.RelayConfigureFwdLimitReq`](#ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitReq) |  |  |
+| `relay_configure_fwd_limit_ans` | [`MACCommand.RelayConfigureFwdLimitAns`](#ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitAns) |  |  |
+| `relay_notify_new_end_device_req` | [`MACCommand.RelayNotifyNewEndDeviceReq`](#ttn.lorawan.v3.MACCommand.RelayNotifyNewEndDeviceReq) |  |  |
 
 #### Field Rules
 
@@ -6759,6 +6799,142 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ----------- |
 | `minor_version` | <p>`enum.defined_only`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.MACCommand.RelayConfAns">Message `MACCommand.RelayConfAns`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `second_channel_frequency_ack` | [`bool`](#bool) |  |  |
+| `second_channel_ack_offset_ack` | [`bool`](#bool) |  |  |
+| `second_channel_data_rate_index_ack` | [`bool`](#bool) |  |  |
+| `second_channel_index_ack` | [`bool`](#bool) |  |  |
+| `default_channel_index_ack` | [`bool`](#bool) |  |  |
+| `cad_periodicity_ack` | [`bool`](#bool) |  |  |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayConfReq">Message `MACCommand.RelayConfReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `configuration` | [`MACCommand.RelayConfReq.Configuration`](#ttn.lorawan.v3.MACCommand.RelayConfReq.Configuration) |  |  |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayConfReq.Configuration">Message `MACCommand.RelayConfReq.Configuration`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  |  |
+| `default_channel_index` | [`uint32`](#uint32) |  |  |
+| `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `default_channel_index` | <p>`uint32.lte`: `255`</p> |
+| `cad_periodicity` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitAns">Message `MACCommand.RelayConfigureFwdLimitAns`</a>
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitReq">Message `MACCommand.RelayConfigureFwdLimitReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reset_limit_counter` | [`RelayResetLimitCounter`](#ttn.lorawan.v3.RelayResetLimitCounter) |  |  |
+| `join_request_limits` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  |  |
+| `notify_limits` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  |  |
+| `global_uplink_limits` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  |  |
+| `overall_limits` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  |  |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListAns">Message `MACCommand.RelayCtrlUplinkListAns`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rule_index_ack` | [`bool`](#bool) |  |  |
+| `w_f_cnt` | [`uint32`](#uint32) |  |  |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListReq">Message `MACCommand.RelayCtrlUplinkListReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rule_index` | [`uint32`](#uint32) |  |  |
+| `action` | [`RelayCtrlUplinkListAction`](#ttn.lorawan.v3.RelayCtrlUplinkListAction) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `rule_index` | <p>`uint32.lte`: `15`</p> |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayEndDeviceConfAns">Message `MACCommand.RelayEndDeviceConfAns`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `second_channel_frequency_ack` | [`bool`](#bool) |  |  |
+| `second_channel_data_rate_index_ack` | [`bool`](#bool) |  |  |
+| `second_channel_index_ack` | [`bool`](#bool) |  |  |
+| `backoff_ack` | [`bool`](#bool) |  |  |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq">Message `MACCommand.RelayEndDeviceConfReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `configuration` | [`MACCommand.RelayEndDeviceConfReq.Configuration`](#ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq.Configuration) |  |  |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq.Configuration">Message `MACCommand.RelayEndDeviceConfReq.Configuration`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `always` | [`RelayEndDeviceAlwaysMode`](#ttn.lorawan.v3.RelayEndDeviceAlwaysMode) |  |  |
+| `dynamic` | [`RelayEndDeviceDynamicMode`](#ttn.lorawan.v3.RelayEndDeviceDynamicMode) |  |  |
+| `end_device_controlled` | [`RelayEndDeviceControlledMode`](#ttn.lorawan.v3.RelayEndDeviceControlledMode) |  |  |
+| `backoff` | [`uint32`](#uint32) |  |  |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  |  |
+| `serving_device_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `backoff` | <p>`uint32.lte`: `63`</p> |
+| `serving_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayNotifyNewEndDeviceReq">Message `MACCommand.RelayNotifyNewEndDeviceReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_addr` | [`bytes`](#bytes) |  |  |
+| `snr` | [`int32`](#int32) |  |  |
+| `rssi` | [`int32`](#int32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
+| `snr` | <p>`int32.lte`: `11`</p><p>`int32.gte`: `-20`</p> |
+| `rssi` | <p>`int32.lte`: `-15`</p><p>`int32.gte`: `-142`</p> |
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListAns">Message `MACCommand.RelayUpdateUplinkListAns`</a>
+
+### <a name="ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListReq">Message `MACCommand.RelayUpdateUplinkListReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rule_index` | [`uint32`](#uint32) |  |  |
+| `forward_limits` | [`RelayUplinkForwardLimits`](#ttn.lorawan.v3.RelayUplinkForwardLimits) |  |  |
+| `dev_addr` | [`bytes`](#bytes) |  |  |
+| `w_f_cnt` | [`uint32`](#uint32) |  |  |
+| `root_wor_s_key` | [`bytes`](#bytes) |  |  |
+| `device_id` | [`string`](#string) |  |  |
+| `session_key_id` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `rule_index` | <p>`uint32.lte`: `15`</p> |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
+| `root_wor_s_key` | <p>`bytes.len`: `16`</p> |
+| `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
 ### <a name="ttn.lorawan.v3.MACCommand.ResetConf">Message `MACCommand.ResetConf`</a>
 
 | Field | Type | Label | Description |
@@ -6920,6 +7096,107 @@ Message represents a LoRaWAN message
 | `net_id` | <p>`bytes.len`: `3`</p> |
 | `join_eui` | <p>`bytes.len`: `8`</p> |
 | `dev_eui` | <p>`bytes.len`: `8`</p> |
+
+### <a name="ttn.lorawan.v3.RelayEndDeviceAlwaysMode">Message `RelayEndDeviceAlwaysMode`</a>
+
+### <a name="ttn.lorawan.v3.RelayEndDeviceControlledMode">Message `RelayEndDeviceControlledMode`</a>
+
+### <a name="ttn.lorawan.v3.RelayEndDeviceDynamicMode">Message `RelayEndDeviceDynamicMode`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `smart_enable_level` | [`RelaySmartEnableLevel`](#ttn.lorawan.v3.RelaySmartEnableLevel) |  | The number of consecutive uplinks without a valid downlink before the end device attempts to use the relay mode to transmit messages. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `smart_enable_level` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.RelayForwardDownlinkReq">Message `RelayForwardDownlinkReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `raw_payload` | [`bytes`](#bytes) |  |  |
+
+### <a name="ttn.lorawan.v3.RelayForwardLimits">Message `RelayForwardLimits`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `bucket_size` | [`RelayLimitBucketSize`](#ttn.lorawan.v3.RelayLimitBucketSize) |  | The multiplier used to compute the total bucket size for the limits. The multiplier is multiplied by the reload rate in order to compute the total bucket size. |
+| `reload_rate` | [`uint32`](#uint32) |  | The number of tokens which are replenished in the bucket every hour. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `bucket_size` | <p>`enum.defined_only`: `true`</p> |
+| `reload_rate` | <p>`uint32.lte`: `126`</p> |
+
+### <a name="ttn.lorawan.v3.RelayForwardUplinkReq">Message `RelayForwardUplinkReq`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  |  |
+| `snr` | [`int32`](#int32) |  |  |
+| `rssi` | [`int32`](#int32) |  |  |
+| `wor_channel` | [`RelayWORChannel`](#ttn.lorawan.v3.RelayWORChannel) |  |  |
+| `frequency` | [`uint64`](#uint64) |  | Uplink channel frequency (Hz). |
+| `raw_payload` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `data_rate` | <p>`message.required`: `true`</p> |
+| `snr` | <p>`int32.lte`: `11`</p><p>`int32.gte`: `-20`</p> |
+| `rssi` | <p>`int32.lte`: `-15`</p><p>`int32.gte`: `-142`</p> |
+| `wor_channel` | <p>`enum.defined_only`: `true`</p> |
+| `frequency` | <p>`uint64.gte`: `100000`</p> |
+
+### <a name="ttn.lorawan.v3.RelaySecondChannel">Message `RelaySecondChannel`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ack_offset` | [`RelaySecondChAckOffset`](#ttn.lorawan.v3.RelaySecondChAckOffset) |  | The frequency (Hz) offset used for the WOR acknowledgement. |
+| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | The data rate index used by the WOR and WOR acknowledgement. |
+| `frequency` | [`uint64`](#uint64) |  | The frequency (Hz) used by the wake on radio message. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ack_offset` | <p>`enum.defined_only`: `true`</p> |
+| `data_rate_index` | <p>`enum.defined_only`: `true`</p> |
+| `frequency` | <p>`uint64.gte`: `100000`</p> |
+
+### <a name="ttn.lorawan.v3.RelayUplinkForwardLimits">Message `RelayUplinkForwardLimits`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `bucket_size` | [`RelayLimitBucketSize`](#ttn.lorawan.v3.RelayLimitBucketSize) |  | The multiplier used to compute the total bucket size for the limits. The multiplier is multiplied by the reload rate in order to compute the total bucket size. |
+| `reload_rate` | [`uint32`](#uint32) |  | The number of tokens which are replenished in the bucket every hour. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `bucket_size` | <p>`enum.defined_only`: `true`</p> |
+| `reload_rate` | <p>`uint32.lte`: `62`</p> |
+
+### <a name="ttn.lorawan.v3.RelayUplinkToken">Message `RelayUplinkToken`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `session_key_id` | [`bytes`](#bytes) |  |  |
+| `full_f_cnt` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.RxDelayValue">Message `RxDelayValue`</a>
 
@@ -7190,6 +7467,13 @@ Transmission settings for downlink.
 | `CID_BEACON_TIMING` | 18 | Deprecated |
 | `CID_BEACON_FREQ` | 19 |  |
 | `CID_DEVICE_MODE` | 32 |  |
+| `CID_RELAY_CONF` | 64 |  |
+| `CID_RELAY_END_DEVICE_CONF` | 65 |  |
+| `CID_RELAY_FILTER_LIST` | 66 |  |
+| `CID_RELAY_UPDATE_UPLINK_LIST` | 67 |  |
+| `CID_RELAY_CTRL_UPLINK_LIST` | 68 |  |
+| `CID_RELAY_CONFIGURE_FWD_LIMIT` | 69 |  |
+| `CID_RELAY_NOTIFY_NEW_END_DEVICE` | 70 |  |
 
 ### <a name="ttn.lorawan.v3.MACVersion">Enum `MACVersion`</a>
 
@@ -7343,6 +7627,69 @@ Transmission settings for downlink.
 | `REJOIN_TIME_13` | 13 | Every ~3.2 months. |
 | `REJOIN_TIME_14` | 14 | Every ~6.4 months. |
 | `REJOIN_TIME_15` | 15 | Every ~1.1 year. |
+
+### <a name="ttn.lorawan.v3.RelayCADPeriodicity">Enum `RelayCADPeriodicity`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `RELAY_CAD_PERIODICITY_1_SECOND` | 0 |  |
+| `RELAY_CAD_PERIODICITY_500_MILLISECONDS` | 1 |  |
+| `RELAY_CAD_PERIODICITY_250_MILLISECONDS` | 2 |  |
+| `RELAY_CAD_PERIODICITY_100_MILLISECONDS` | 3 |  |
+| `RELAY_CAD_PERIODICITY_50_MILLISECONDS` | 4 |  |
+| `RELAY_CAD_PERIODICITY_20_MILLISECONDS` | 5 | sic |
+
+### <a name="ttn.lorawan.v3.RelayCtrlUplinkListAction">Enum `RelayCtrlUplinkListAction`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `RELAY_CTRL_UPLINK_LIST_ACTION_READ_W_F_CNT` | 0 |  |
+| `RELAY_CTRL_UPLINK_LIST_ACTION_REMOVE_TRUSTED_END_DEVICE` | 1 |  |
+
+### <a name="ttn.lorawan.v3.RelayLimitBucketSize">Enum `RelayLimitBucketSize`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `RELAY_LIMIT_BUCKET_SIZE_1` | 0 |  |
+| `RELAY_LIMIT_BUCKET_SIZE_2` | 1 |  |
+| `RELAY_LIMIT_BUCKET_SIZE_4` | 2 |  |
+| `RELAY_LIMIT_BUCKET_SIZE_12` | 3 | sic |
+
+### <a name="ttn.lorawan.v3.RelayResetLimitCounter">Enum `RelayResetLimitCounter`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `RELAY_RESET_LIMIT_COUNTER_ZERO` | 0 |  |
+| `RELAY_RESET_LIMIT_COUNTER_RELOAD_RATE` | 1 |  |
+| `RELAY_RESET_LIMIT_COUNTER_MAX_VALUE` | 2 |  |
+| `RELAY_RESET_LIMIT_COUNTER_NO_RESET` | 3 |  |
+
+### <a name="ttn.lorawan.v3.RelaySecondChAckOffset">Enum `RelaySecondChAckOffset`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `RELAY_SECOND_CH_ACK_OFFSET_0` | 0 | 0 kHz |
+| `RELAY_SECOND_CH_ACK_OFFSET_200` | 1 | 200 kHz |
+| `RELAY_SECOND_CH_ACK_OFFSET_400` | 2 | 400 kHz |
+| `RELAY_SECOND_CH_ACK_OFFSET_800` | 3 | 800 kHz |
+| `RELAY_SECOND_CH_ACK_OFFSET_1600` | 4 | 1.6 MHz |
+| `RELAY_SECOND_CH_ACK_OFFSET_3200` | 5 | 3.2 MHz |
+
+### <a name="ttn.lorawan.v3.RelaySmartEnableLevel">Enum `RelaySmartEnableLevel`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `RELAY_SMART_ENABLE_LEVEL_8` | 0 |  |
+| `RELAY_SMART_ENABLE_LEVEL_16` | 1 |  |
+| `RELAY_SMART_ENABLE_LEVEL_32` | 2 |  |
+| `RELAY_SMART_ENABLE_LEVEL_64` | 3 |  |
+
+### <a name="ttn.lorawan.v3.RelayWORChannel">Enum `RelayWORChannel`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `RELAY_WOR_CHANNEL_DEFAULT` | 0 |  |
+| `RELAY_WOR_CHANNEL_SECONDARY` | 1 |  |
 
 ### <a name="ttn.lorawan.v3.RxDelay">Enum `RxDelay`</a>
 

@@ -720,6 +720,161 @@ enum MACCommandIdentifier {
   CID_BEACON_TIMING = 18; // Deprecated
   CID_BEACON_FREQ = 19;
   CID_DEVICE_MODE = 32;
+
+  CID_RELAY_CONF = 64;
+  CID_RELAY_END_DEVICE_CONF = 65;
+  CID_RELAY_FILTER_LIST = 66;
+  CID_RELAY_UPDATE_UPLINK_LIST = 67;
+  CID_RELAY_CTRL_UPLINK_LIST = 68;
+  CID_RELAY_CONFIGURE_FWD_LIMIT = 69;
+  CID_RELAY_NOTIFY_NEW_END_DEVICE = 70;
+}
+
+enum RelayCADPeriodicity {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "RELAY_CAD_PERIODICITY"
+  };
+
+  RELAY_CAD_PERIODICITY_1_SECOND = 0;
+  RELAY_CAD_PERIODICITY_500_MILLISECONDS = 1;
+  RELAY_CAD_PERIODICITY_250_MILLISECONDS = 2;
+  RELAY_CAD_PERIODICITY_100_MILLISECONDS = 3;
+  RELAY_CAD_PERIODICITY_50_MILLISECONDS = 4;
+  RELAY_CAD_PERIODICITY_20_MILLISECONDS = 5; // sic
+}
+
+enum RelaySecondChAckOffset {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "RELAY_SECOND_CH_ACK_OFFSET"
+  };
+
+  RELAY_SECOND_CH_ACK_OFFSET_0 = 0; // 0 kHz
+  RELAY_SECOND_CH_ACK_OFFSET_200 = 1; // 200 kHz
+  RELAY_SECOND_CH_ACK_OFFSET_400 = 2; // 400 kHz
+  RELAY_SECOND_CH_ACK_OFFSET_800 = 3; // 800 kHz
+  RELAY_SECOND_CH_ACK_OFFSET_1600 = 4; // 1.6 MHz
+  RELAY_SECOND_CH_ACK_OFFSET_3200 = 5; // 3.2 MHz
+}
+
+enum RelayLimitBucketSize {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "RELAY_LIMIT_BUCKET_SIZE"
+  };
+
+  RELAY_LIMIT_BUCKET_SIZE_1 = 0;
+  RELAY_LIMIT_BUCKET_SIZE_2 = 1;
+  RELAY_LIMIT_BUCKET_SIZE_4 = 2;
+  RELAY_LIMIT_BUCKET_SIZE_12 = 3; // sic
+}
+
+enum RelaySmartEnableLevel {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "RELAY_SMART_ENABLE_LEVEL"
+  };
+
+  RELAY_SMART_ENABLE_LEVEL_8 = 0;
+  RELAY_SMART_ENABLE_LEVEL_16 = 1;
+  RELAY_SMART_ENABLE_LEVEL_32 = 2;
+  RELAY_SMART_ENABLE_LEVEL_64 = 3;
+}
+
+enum RelayWORChannel {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "RELAY_WOR_CHANNEL"
+  };
+
+  RELAY_WOR_CHANNEL_DEFAULT = 0;
+  RELAY_WOR_CHANNEL_SECONDARY = 1;
+}
+
+enum RelayResetLimitCounter {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "RELAY_RESET_LIMIT_COUNTER"
+  };
+
+  RELAY_RESET_LIMIT_COUNTER_ZERO = 0;
+  RELAY_RESET_LIMIT_COUNTER_RELOAD_RATE = 1;
+  RELAY_RESET_LIMIT_COUNTER_MAX_VALUE = 2;
+  RELAY_RESET_LIMIT_COUNTER_NO_RESET = 3;
+}
+
+enum RelayCtrlUplinkListAction {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "RELAY_CTRL_UPLINK_LIST_ACTION"
+  };
+
+  RELAY_CTRL_UPLINK_LIST_ACTION_READ_W_F_CNT = 0;
+  RELAY_CTRL_UPLINK_LIST_ACTION_REMOVE_TRUSTED_END_DEVICE = 1;
+}
+
+message RelaySecondChannel {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  // The frequency (Hz) offset used for the WOR acknowledgement.
+  RelaySecondChAckOffset ack_offset = 1 [(validate.rules).enum.defined_only = true];
+  // The data rate index used by the WOR and WOR acknowledgement.
+  DataRateIndex data_rate_index = 2 [(validate.rules).enum.defined_only = true];
+  // The frequency (Hz) used by the wake on radio message.
+  uint64 frequency = 3 [(validate.rules).uint64.gte = 100000];
+}
+
+message RelayUplinkForwardLimits {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  // The multiplier used to compute the total bucket size for the limits.
+  // The multiplier is multiplied by the reload rate in order to compute the total bucket size.
+  RelayLimitBucketSize bucket_size = 1 [(validate.rules).enum.defined_only = true];
+  // The number of tokens which are replenished in the bucket every hour.
+  uint32 reload_rate = 2 [(validate.rules).uint32.lte = 62];
+}
+
+message RelayForwardLimits {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  // The multiplier used to compute the total bucket size for the limits.
+  // The multiplier is multiplied by the reload rate in order to compute the total bucket size.
+  RelayLimitBucketSize bucket_size = 1 [(validate.rules).enum.defined_only = true];
+  // The number of tokens which are replenished in the bucket every hour.
+  uint32 reload_rate = 2 [(validate.rules).uint32.lte = 126];
+}
+
+message RelayEndDeviceAlwaysMode {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+}
+message RelayEndDeviceDynamicMode {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  // The number of consecutive uplinks without a valid downlink before the end device attempts
+  // to use the relay mode to transmit messages.
+  RelaySmartEnableLevel smart_enable_level = 1 [(validate.rules).enum.defined_only = true];
+}
+message RelayEndDeviceControlledMode {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
 }
 
 message MACCommand {
@@ -760,7 +915,24 @@ message MACCommand {
     BeaconFreqAns beacon_freq_ans = 30;
     DeviceModeInd device_mode_ind = 31;
     DeviceModeConf device_mode_conf = 32;
+
+    RelayConfReq relay_conf_req = 33;
+    RelayConfAns relay_conf_ans = 34;
+    RelayEndDeviceConfReq relay_end_device_conf_req = 35;
+    RelayEndDeviceConfAns relay_end_device_conf_ans = 36;
+    RelayUpdateUplinkListReq relay_update_uplink_list_req = 39;
+    RelayUpdateUplinkListAns relay_update_uplink_list_ans = 40;
+    RelayCtrlUplinkListReq relay_ctrl_uplink_list_req = 41;
+    RelayCtrlUplinkListAns relay_ctrl_uplink_list_ans = 42;
+    RelayConfigureFwdLimitReq relay_configure_fwd_limit_req = 43;
+    RelayConfigureFwdLimitAns relay_configure_fwd_limit_ans = 44;
+    RelayNotifyNewEndDeviceReq relay_notify_new_end_device_req = 45;
   }
+
+  reserved 37;
+  reserved "relay_filter_list_req";
+  reserved 38;
+  reserved "relay_filter_list_ans";
 
   message ResetInd {
     Minor minor_version = 1 [(validate.rules).enum = {
@@ -911,6 +1083,145 @@ message MACCommand {
   }
   message DeviceModeConf {
     Class class = 1 [(validate.rules).enum.defined_only = true];
+  }
+
+  message RelayConfReq {
+    message Configuration {
+      RelaySecondChannel second_channel = 1;
+      uint32 default_channel_index = 2 [(validate.rules).uint32.lte = 255];
+      RelayCADPeriodicity cad_periodicity = 3 [(validate.rules).enum.defined_only = true];
+    }
+    Configuration configuration = 1;
+  }
+  message RelayConfAns {
+    bool second_channel_frequency_ack = 1;
+    bool second_channel_ack_offset_ack = 2;
+    bool second_channel_data_rate_index_ack = 3;
+    bool second_channel_index_ack = 4;
+    bool default_channel_index_ack = 5;
+    bool cad_periodicity_ack = 6;
+  }
+  message RelayEndDeviceConfReq {
+    message Configuration {
+      oneof mode {
+        option (validate.required) = true;
+
+        RelayEndDeviceAlwaysMode always = 1;
+        RelayEndDeviceDynamicMode dynamic = 2;
+        RelayEndDeviceControlledMode end_device_controlled = 3;
+      }
+      uint32 backoff = 4 [(validate.rules).uint32.lte = 63];
+      RelaySecondChannel second_channel = 5;
+
+      string serving_device_id = 6 [(validate.rules).string = {
+        pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
+        max_len: 36
+      }];
+    }
+    Configuration configuration = 1;
+  }
+  message RelayEndDeviceConfAns {
+    bool second_channel_frequency_ack = 1;
+    reserved 2; // second_channel_ack_offset_ack does not exist in the relay specification.
+    reserved "second_channel_ack_offset_ack";
+    bool second_channel_data_rate_index_ack = 3;
+    bool second_channel_index_ack = 4;
+    bool backoff_ack = 5;
+  }
+  message RelayUpdateUplinkListReq {
+    uint32 rule_index = 1 [(validate.rules).uint32.lte = 15];
+    RelayUplinkForwardLimits forward_limits = 2;
+    bytes dev_addr = 3 [
+      (validate.rules).bytes = {
+        len: 4,
+        ignore_empty: true
+      },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+      },
+      (thethings.flags.field) = {
+        set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New4BytesFlag",
+        set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+      },
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        type: STRING,
+        format: "string",
+        example: "\"2600ABCD\""
+      }
+    ];
+    uint32 w_f_cnt = 4;
+    bytes root_wor_s_key = 5 [
+      (validate.rules).bytes = {
+        len: 16,
+        ignore_empty: true
+      },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal16Bytes"
+      },
+      (thethings.flags.field) = {
+        set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New16BytesFlag",
+        set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+      },
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        type: STRING,
+        format: "string",
+        example: "\"0123456789ABCDEF0123456789ABCDEF\""
+      }
+    ];
+
+    string device_id = 6 [(validate.rules).string = {
+      pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
+      max_len: 36
+    }];
+    bytes session_key_id = 7;
+  }
+  message RelayUpdateUplinkListAns {}
+  message RelayCtrlUplinkListReq {
+    uint32 rule_index = 1 [(validate.rules).uint32.lte = 15];
+    RelayCtrlUplinkListAction action = 2;
+  }
+  message RelayCtrlUplinkListAns {
+    bool rule_index_ack = 1;
+    uint32 w_f_cnt = 2;
+  }
+  message RelayConfigureFwdLimitReq {
+    RelayResetLimitCounter reset_limit_counter = 1;
+    RelayForwardLimits join_request_limits = 2;
+    RelayForwardLimits notify_limits = 3;
+    RelayForwardLimits global_uplink_limits = 4;
+    RelayForwardLimits overall_limits = 5;
+  }
+  message RelayConfigureFwdLimitAns {}
+  message RelayNotifyNewEndDeviceReq {
+    bytes dev_addr = 1 [
+      (validate.rules).bytes = {
+        len: 4,
+        ignore_empty: true
+      },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal4Bytes"
+      },
+      (thethings.flags.field) = {
+        set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New4BytesFlag",
+        set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+      },
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        type: STRING,
+        format: "string",
+        example: "\"2600ABCD\""
+      }
+    ];
+    int32 snr = 2 [(validate.rules).int32 = {
+      lte: 11,
+      gte: -20
+    }];
+    int32 rssi = 3 [(validate.rules).int32 = {
+      lte: -15,
+      gte: -142
+    }];
   }
 }
 
@@ -1239,4 +1550,39 @@ message DeviceEIRPValue {
   };
   option (thethings.json.message) = {wrapper: true};
   DeviceEIRP value = 1 [(validate.rules).enum.defined_only = true];
+}
+
+message RelayForwardUplinkReq {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  DataRate data_rate = 1 [(validate.rules).message.required = true];
+  int32 snr = 2 [(validate.rules).int32 = {
+    lte: 11,
+    gte: -20
+  }];
+  int32 rssi = 3 [(validate.rules).int32 = {
+    lte: -15,
+    gte: -142
+  }];
+  RelayWORChannel wor_channel = 4 [(validate.rules).enum.defined_only = true];
+  uint64 frequency = 5 [(validate.rules).uint64.gte = 100000]; // Uplink channel frequency (Hz).
+  bytes raw_payload = 6;
+}
+
+message RelayForwardDownlinkReq {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  bytes raw_payload = 1;
+}
+
+message RelayUplinkToken {
+  EndDeviceIdentifiers ids = 1 [(validate.rules).message.required = true];
+  bytes session_key_id = 2;
+  uint32 full_f_cnt = 3;
 }

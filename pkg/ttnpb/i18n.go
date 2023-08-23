@@ -87,6 +87,14 @@ func init() {
 	defineEnum(MACCommandIdentifier_CID_BEACON_FREQ, "beacon frequency")
 	defineEnum(MACCommandIdentifier_CID_DEVICE_MODE, "device mode")
 
+	defineEnum(MACCommandIdentifier_CID_RELAY_END_DEVICE_CONF, "end device relay configuration")
+	defineEnum(MACCommandIdentifier_CID_RELAY_UPDATE_UPLINK_LIST, "update uplink forwarding rules")
+	defineEnum(MACCommandIdentifier_CID_RELAY_CONF, "relay configuration")
+	defineEnum(MACCommandIdentifier_CID_RELAY_CTRL_UPLINK_LIST, "manage uplink forwarding rules")
+	defineEnum(MACCommandIdentifier_CID_RELAY_NOTIFY_NEW_END_DEVICE, "new end device under relay")
+	defineEnum(MACCommandIdentifier_CID_RELAY_FILTER_LIST, "manage join request forwarding rules")
+	defineEnum(MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT, "manage uplink forwarding limits")
+
 	defineEnum(LocationSource_SOURCE_UNKNOWN, "unknown location source")
 	defineEnum(LocationSource_SOURCE_GPS, "determined by GPS")
 	defineEnum(LocationSource_SOURCE_REGISTRY, "set in and updated from a registry")

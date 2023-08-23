@@ -1482,6 +1482,139 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 	return nil
 }
 
+func (dst *RelaySecondChannel) SetFields(src *RelaySecondChannel, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ack_offset":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ack_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AckOffset = src.AckOffset
+			} else {
+				dst.AckOffset = 0
+			}
+		case "data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndex = src.DataRateIndex
+			} else {
+				dst.DataRateIndex = 0
+			}
+		case "frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RelayUplinkForwardLimits) SetFields(src *RelayUplinkForwardLimits, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "bucket_size":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bucket_size' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BucketSize = src.BucketSize
+			} else {
+				dst.BucketSize = 0
+			}
+		case "reload_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'reload_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ReloadRate = src.ReloadRate
+			} else {
+				var zero uint32
+				dst.ReloadRate = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RelayForwardLimits) SetFields(src *RelayForwardLimits, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "bucket_size":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bucket_size' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BucketSize = src.BucketSize
+			} else {
+				dst.BucketSize = 0
+			}
+		case "reload_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'reload_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ReloadRate = src.ReloadRate
+			} else {
+				var zero uint32
+				dst.ReloadRate = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RelayEndDeviceAlwaysMode) SetFields(src *RelayEndDeviceAlwaysMode, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message RelayEndDeviceAlwaysMode has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+func (dst *RelayEndDeviceDynamicMode) SetFields(src *RelayEndDeviceDynamicMode, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "smart_enable_level":
+			if len(subs) > 0 {
+				return fmt.Errorf("'smart_enable_level' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SmartEnableLevel = src.SmartEnableLevel
+			} else {
+				dst.SmartEnableLevel = 0
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RelayEndDeviceControlledMode) SetFields(src *RelayEndDeviceControlledMode, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message RelayEndDeviceControlledMode has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
 func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -2610,6 +2743,402 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 							dst.Payload = nil
 						}
 					}
+				case "relay_conf_req":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayConfReq_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_conf_req', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayConfReq_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_conf_req', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayConfReq
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayConfReq_).RelayConfReq
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayConfReq_).RelayConfReq
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayConfReq{}
+							dst.Payload = &MACCommand_RelayConfReq_{RelayConfReq: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_conf_ans":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayConfAns_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_conf_ans', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayConfAns_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_conf_ans', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayConfAns
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayConfAns_).RelayConfAns
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayConfAns_).RelayConfAns
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayConfAns{}
+							dst.Payload = &MACCommand_RelayConfAns_{RelayConfAns: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_end_device_conf_req":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayEndDeviceConfReq_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_end_device_conf_req', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayEndDeviceConfReq_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_end_device_conf_req', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayEndDeviceConfReq
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayEndDeviceConfReq_).RelayEndDeviceConfReq
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayEndDeviceConfReq_).RelayEndDeviceConfReq
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayEndDeviceConfReq{}
+							dst.Payload = &MACCommand_RelayEndDeviceConfReq_{RelayEndDeviceConfReq: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_end_device_conf_ans":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayEndDeviceConfAns_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_end_device_conf_ans', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayEndDeviceConfAns_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_end_device_conf_ans', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayEndDeviceConfAns
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayEndDeviceConfAns_).RelayEndDeviceConfAns
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayEndDeviceConfAns_).RelayEndDeviceConfAns
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayEndDeviceConfAns{}
+							dst.Payload = &MACCommand_RelayEndDeviceConfAns_{RelayEndDeviceConfAns: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_update_uplink_list_req":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayUpdateUplinkListReq_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_update_uplink_list_req', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayUpdateUplinkListReq_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_update_uplink_list_req', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayUpdateUplinkListReq
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayUpdateUplinkListReq_).RelayUpdateUplinkListReq
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayUpdateUplinkListReq_).RelayUpdateUplinkListReq
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayUpdateUplinkListReq{}
+							dst.Payload = &MACCommand_RelayUpdateUplinkListReq_{RelayUpdateUplinkListReq: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_update_uplink_list_ans":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayUpdateUplinkListAns_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_update_uplink_list_ans', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayUpdateUplinkListAns_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_update_uplink_list_ans', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayUpdateUplinkListAns
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayUpdateUplinkListAns_).RelayUpdateUplinkListAns
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayUpdateUplinkListAns_).RelayUpdateUplinkListAns
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayUpdateUplinkListAns{}
+							dst.Payload = &MACCommand_RelayUpdateUplinkListAns_{RelayUpdateUplinkListAns: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_ctrl_uplink_list_req":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayCtrlUplinkListReq_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_ctrl_uplink_list_req', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayCtrlUplinkListReq_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_ctrl_uplink_list_req', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayCtrlUplinkListReq
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayCtrlUplinkListReq_).RelayCtrlUplinkListReq
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayCtrlUplinkListReq_).RelayCtrlUplinkListReq
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayCtrlUplinkListReq{}
+							dst.Payload = &MACCommand_RelayCtrlUplinkListReq_{RelayCtrlUplinkListReq: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_ctrl_uplink_list_ans":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayCtrlUplinkListAns_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_ctrl_uplink_list_ans', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayCtrlUplinkListAns_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_ctrl_uplink_list_ans', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayCtrlUplinkListAns
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayCtrlUplinkListAns_).RelayCtrlUplinkListAns
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayCtrlUplinkListAns_).RelayCtrlUplinkListAns
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayCtrlUplinkListAns{}
+							dst.Payload = &MACCommand_RelayCtrlUplinkListAns_{RelayCtrlUplinkListAns: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_configure_fwd_limit_req":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayConfigureFwdLimitReq_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_configure_fwd_limit_req', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayConfigureFwdLimitReq_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_configure_fwd_limit_req', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayConfigureFwdLimitReq
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayConfigureFwdLimitReq_).RelayConfigureFwdLimitReq
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayConfigureFwdLimitReq_).RelayConfigureFwdLimitReq
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayConfigureFwdLimitReq{}
+							dst.Payload = &MACCommand_RelayConfigureFwdLimitReq_{RelayConfigureFwdLimitReq: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_configure_fwd_limit_ans":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayConfigureFwdLimitAns_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_configure_fwd_limit_ans', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayConfigureFwdLimitAns_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_configure_fwd_limit_ans', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayConfigureFwdLimitAns
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayConfigureFwdLimitAns_).RelayConfigureFwdLimitAns
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayConfigureFwdLimitAns_).RelayConfigureFwdLimitAns
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayConfigureFwdLimitAns{}
+							dst.Payload = &MACCommand_RelayConfigureFwdLimitAns_{RelayConfigureFwdLimitAns: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
+				case "relay_notify_new_end_device_req":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Payload.(*MACCommand_RelayNotifyNewEndDeviceReq_)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Payload == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'relay_notify_new_end_device_req', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Payload.(*MACCommand_RelayNotifyNewEndDeviceReq_)
+					if dstValid := dstTypeOk || dst.Payload == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'relay_notify_new_end_device_req', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *MACCommand_RelayNotifyNewEndDeviceReq
+						if srcTypeOk {
+							newSrc = src.Payload.(*MACCommand_RelayNotifyNewEndDeviceReq_).RelayNotifyNewEndDeviceReq
+						}
+						if dstTypeOk {
+							newDst = dst.Payload.(*MACCommand_RelayNotifyNewEndDeviceReq_).RelayNotifyNewEndDeviceReq
+						} else if srcTypeOk {
+							newDst = &MACCommand_RelayNotifyNewEndDeviceReq{}
+							dst.Payload = &MACCommand_RelayNotifyNewEndDeviceReq_{RelayNotifyNewEndDeviceReq: newDst}
+						} else {
+							dst.Payload = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Payload = src.Payload
+						} else {
+							dst.Payload = nil
+						}
+					}
 
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
@@ -2836,6 +3365,165 @@ func (dst *DeviceEIRPValue) SetFields(src *DeviceEIRPValue, paths ...string) err
 				dst.Value = src.Value
 			} else {
 				dst.Value = 0
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RelayForwardUplinkReq) SetFields(src *RelayForwardUplinkReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "data_rate":
+			if len(subs) > 0 {
+				var newDst, newSrc *DataRate
+				if (src == nil || src.DataRate == nil) && dst.DataRate == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate
+				}
+				if dst.DataRate != nil {
+					newDst = dst.DataRate
+				} else {
+					newDst = &DataRate{}
+					dst.DataRate = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate = src.DataRate
+				} else {
+					dst.DataRate = nil
+				}
+			}
+		case "snr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'snr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Snr = src.Snr
+			} else {
+				var zero int32
+				dst.Snr = zero
+			}
+		case "rssi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rssi = src.Rssi
+			} else {
+				var zero int32
+				dst.Rssi = zero
+			}
+		case "wor_channel":
+			if len(subs) > 0 {
+				return fmt.Errorf("'wor_channel' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WorChannel = src.WorChannel
+			} else {
+				dst.WorChannel = 0
+			}
+		case "frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
+		case "raw_payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'raw_payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RawPayload = src.RawPayload
+			} else {
+				dst.RawPayload = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RelayForwardDownlinkReq) SetFields(src *RelayForwardDownlinkReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "raw_payload":
+			if len(subs) > 0 {
+				return fmt.Errorf("'raw_payload' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RawPayload = src.RawPayload
+			} else {
+				dst.RawPayload = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RelayUplinkToken) SetFields(src *RelayUplinkToken, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.Ids = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Ids = src.Ids
+				} else {
+					dst.Ids = nil
+				}
+			}
+		case "session_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionKeyId = src.SessionKeyId
+			} else {
+				dst.SessionKeyId = nil
+			}
+		case "full_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'full_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FullFCnt = src.FullFCnt
+			} else {
+				var zero uint32
+				dst.FullFCnt = zero
 			}
 
 		default:
@@ -3762,6 +4450,768 @@ func (dst *MACCommand_DeviceModeConf) SetFields(src *MACCommand_DeviceModeConf, 
 				dst.Class = src.Class
 			} else {
 				dst.Class = 0
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayConfReq) SetFields(src *MACCommand_RelayConfReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "configuration":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACCommand_RelayConfReq_Configuration
+				if (src == nil || src.Configuration == nil) && dst.Configuration == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Configuration
+				}
+				if dst.Configuration != nil {
+					newDst = dst.Configuration
+				} else {
+					newDst = &MACCommand_RelayConfReq_Configuration{}
+					dst.Configuration = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Configuration = src.Configuration
+				} else {
+					dst.Configuration = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayConfAns) SetFields(src *MACCommand_RelayConfAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "second_channel_frequency_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'second_channel_frequency_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SecondChannelFrequencyAck = src.SecondChannelFrequencyAck
+			} else {
+				var zero bool
+				dst.SecondChannelFrequencyAck = zero
+			}
+		case "second_channel_ack_offset_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'second_channel_ack_offset_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SecondChannelAckOffsetAck = src.SecondChannelAckOffsetAck
+			} else {
+				var zero bool
+				dst.SecondChannelAckOffsetAck = zero
+			}
+		case "second_channel_data_rate_index_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'second_channel_data_rate_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SecondChannelDataRateIndexAck = src.SecondChannelDataRateIndexAck
+			} else {
+				var zero bool
+				dst.SecondChannelDataRateIndexAck = zero
+			}
+		case "second_channel_index_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'second_channel_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SecondChannelIndexAck = src.SecondChannelIndexAck
+			} else {
+				var zero bool
+				dst.SecondChannelIndexAck = zero
+			}
+		case "default_channel_index_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'default_channel_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DefaultChannelIndexAck = src.DefaultChannelIndexAck
+			} else {
+				var zero bool
+				dst.DefaultChannelIndexAck = zero
+			}
+		case "cad_periodicity_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cad_periodicity_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CadPeriodicityAck = src.CadPeriodicityAck
+			} else {
+				var zero bool
+				dst.CadPeriodicityAck = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayEndDeviceConfReq) SetFields(src *MACCommand_RelayEndDeviceConfReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "configuration":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACCommand_RelayEndDeviceConfReq_Configuration
+				if (src == nil || src.Configuration == nil) && dst.Configuration == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Configuration
+				}
+				if dst.Configuration != nil {
+					newDst = dst.Configuration
+				} else {
+					newDst = &MACCommand_RelayEndDeviceConfReq_Configuration{}
+					dst.Configuration = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Configuration = src.Configuration
+				} else {
+					dst.Configuration = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayEndDeviceConfAns) SetFields(src *MACCommand_RelayEndDeviceConfAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "second_channel_frequency_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'second_channel_frequency_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SecondChannelFrequencyAck = src.SecondChannelFrequencyAck
+			} else {
+				var zero bool
+				dst.SecondChannelFrequencyAck = zero
+			}
+		case "second_channel_data_rate_index_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'second_channel_data_rate_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SecondChannelDataRateIndexAck = src.SecondChannelDataRateIndexAck
+			} else {
+				var zero bool
+				dst.SecondChannelDataRateIndexAck = zero
+			}
+		case "second_channel_index_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'second_channel_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SecondChannelIndexAck = src.SecondChannelIndexAck
+			} else {
+				var zero bool
+				dst.SecondChannelIndexAck = zero
+			}
+		case "backoff_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'backoff_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BackoffAck = src.BackoffAck
+			} else {
+				var zero bool
+				dst.BackoffAck = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayUpdateUplinkListReq) SetFields(src *MACCommand_RelayUpdateUplinkListReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "rule_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rule_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RuleIndex = src.RuleIndex
+			} else {
+				var zero uint32
+				dst.RuleIndex = zero
+			}
+		case "forward_limits":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayUplinkForwardLimits
+				if (src == nil || src.ForwardLimits == nil) && dst.ForwardLimits == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ForwardLimits
+				}
+				if dst.ForwardLimits != nil {
+					newDst = dst.ForwardLimits
+				} else {
+					newDst = &RelayUplinkForwardLimits{}
+					dst.ForwardLimits = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ForwardLimits = src.ForwardLimits
+				} else {
+					dst.ForwardLimits = nil
+				}
+			}
+		case "dev_addr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				dst.DevAddr = nil
+			}
+		case "w_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'w_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WFCnt = src.WFCnt
+			} else {
+				var zero uint32
+				dst.WFCnt = zero
+			}
+		case "root_wor_s_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'root_wor_s_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RootWorSKey = src.RootWorSKey
+			} else {
+				dst.RootWorSKey = nil
+			}
+		case "device_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceId = src.DeviceId
+			} else {
+				var zero string
+				dst.DeviceId = zero
+			}
+		case "session_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionKeyId = src.SessionKeyId
+			} else {
+				dst.SessionKeyId = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayUpdateUplinkListAns) SetFields(src *MACCommand_RelayUpdateUplinkListAns, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message MACCommand_RelayUpdateUplinkListAns has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayCtrlUplinkListReq) SetFields(src *MACCommand_RelayCtrlUplinkListReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "rule_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rule_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RuleIndex = src.RuleIndex
+			} else {
+				var zero uint32
+				dst.RuleIndex = zero
+			}
+		case "action":
+			if len(subs) > 0 {
+				return fmt.Errorf("'action' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Action = src.Action
+			} else {
+				dst.Action = 0
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayCtrlUplinkListAns) SetFields(src *MACCommand_RelayCtrlUplinkListAns, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "rule_index_ack":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rule_index_ack' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RuleIndexAck = src.RuleIndexAck
+			} else {
+				var zero bool
+				dst.RuleIndexAck = zero
+			}
+		case "w_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'w_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WFCnt = src.WFCnt
+			} else {
+				var zero uint32
+				dst.WFCnt = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayConfigureFwdLimitReq) SetFields(src *MACCommand_RelayConfigureFwdLimitReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "reset_limit_counter":
+			if len(subs) > 0 {
+				return fmt.Errorf("'reset_limit_counter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ResetLimitCounter = src.ResetLimitCounter
+			} else {
+				dst.ResetLimitCounter = 0
+			}
+		case "join_request_limits":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayForwardLimits
+				if (src == nil || src.JoinRequestLimits == nil) && dst.JoinRequestLimits == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.JoinRequestLimits
+				}
+				if dst.JoinRequestLimits != nil {
+					newDst = dst.JoinRequestLimits
+				} else {
+					newDst = &RelayForwardLimits{}
+					dst.JoinRequestLimits = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.JoinRequestLimits = src.JoinRequestLimits
+				} else {
+					dst.JoinRequestLimits = nil
+				}
+			}
+		case "notify_limits":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayForwardLimits
+				if (src == nil || src.NotifyLimits == nil) && dst.NotifyLimits == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NotifyLimits
+				}
+				if dst.NotifyLimits != nil {
+					newDst = dst.NotifyLimits
+				} else {
+					newDst = &RelayForwardLimits{}
+					dst.NotifyLimits = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NotifyLimits = src.NotifyLimits
+				} else {
+					dst.NotifyLimits = nil
+				}
+			}
+		case "global_uplink_limits":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayForwardLimits
+				if (src == nil || src.GlobalUplinkLimits == nil) && dst.GlobalUplinkLimits == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.GlobalUplinkLimits
+				}
+				if dst.GlobalUplinkLimits != nil {
+					newDst = dst.GlobalUplinkLimits
+				} else {
+					newDst = &RelayForwardLimits{}
+					dst.GlobalUplinkLimits = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GlobalUplinkLimits = src.GlobalUplinkLimits
+				} else {
+					dst.GlobalUplinkLimits = nil
+				}
+			}
+		case "overall_limits":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayForwardLimits
+				if (src == nil || src.OverallLimits == nil) && dst.OverallLimits == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.OverallLimits
+				}
+				if dst.OverallLimits != nil {
+					newDst = dst.OverallLimits
+				} else {
+					newDst = &RelayForwardLimits{}
+					dst.OverallLimits = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OverallLimits = src.OverallLimits
+				} else {
+					dst.OverallLimits = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayConfigureFwdLimitAns) SetFields(src *MACCommand_RelayConfigureFwdLimitAns, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message MACCommand_RelayConfigureFwdLimitAns has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayNotifyNewEndDeviceReq) SetFields(src *MACCommand_RelayNotifyNewEndDeviceReq, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "dev_addr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				dst.DevAddr = nil
+			}
+		case "snr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'snr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Snr = src.Snr
+			} else {
+				var zero int32
+				dst.Snr = zero
+			}
+		case "rssi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rssi = src.Rssi
+			} else {
+				var zero int32
+				dst.Rssi = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayConfReq_Configuration) SetFields(src *MACCommand_RelayConfReq_Configuration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "second_channel":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelaySecondChannel
+				if (src == nil || src.SecondChannel == nil) && dst.SecondChannel == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.SecondChannel
+				}
+				if dst.SecondChannel != nil {
+					newDst = dst.SecondChannel
+				} else {
+					newDst = &RelaySecondChannel{}
+					dst.SecondChannel = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.SecondChannel = src.SecondChannel
+				} else {
+					dst.SecondChannel = nil
+				}
+			}
+		case "default_channel_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'default_channel_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DefaultChannelIndex = src.DefaultChannelIndex
+			} else {
+				var zero uint32
+				dst.DefaultChannelIndex = zero
+			}
+		case "cad_periodicity":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cad_periodicity' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CadPeriodicity = src.CadPeriodicity
+			} else {
+				dst.CadPeriodicity = 0
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACCommand_RelayEndDeviceConfReq_Configuration) SetFields(src *MACCommand_RelayEndDeviceConfReq_Configuration, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "backoff":
+			if len(subs) > 0 {
+				return fmt.Errorf("'backoff' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Backoff = src.Backoff
+			} else {
+				var zero uint32
+				dst.Backoff = zero
+			}
+		case "second_channel":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelaySecondChannel
+				if (src == nil || src.SecondChannel == nil) && dst.SecondChannel == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.SecondChannel
+				}
+				if dst.SecondChannel != nil {
+					newDst = dst.SecondChannel
+				} else {
+					newDst = &RelaySecondChannel{}
+					dst.SecondChannel = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.SecondChannel = src.SecondChannel
+				} else {
+					dst.SecondChannel = nil
+				}
+			}
+		case "serving_device_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'serving_device_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ServingDeviceId = src.ServingDeviceId
+			} else {
+				var zero string
+				dst.ServingDeviceId = zero
+			}
+
+		case "mode":
+			if len(subs) == 0 && src == nil {
+				dst.Mode = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Mode = src.Mode
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "always":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_Always)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'always', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_Always)
+					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'always', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *RelayEndDeviceAlwaysMode
+						if srcTypeOk {
+							newSrc = src.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_Always).Always
+						}
+						if dstTypeOk {
+							newDst = dst.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_Always).Always
+						} else if srcTypeOk {
+							newDst = &RelayEndDeviceAlwaysMode{}
+							dst.Mode = &MACCommand_RelayEndDeviceConfReq_Configuration_Always{Always: newDst}
+						} else {
+							dst.Mode = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Mode = src.Mode
+						} else {
+							dst.Mode = nil
+						}
+					}
+				case "dynamic":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'dynamic', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic)
+					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'dynamic', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *RelayEndDeviceDynamicMode
+						if srcTypeOk {
+							newSrc = src.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic).Dynamic
+						}
+						if dstTypeOk {
+							newDst = dst.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic).Dynamic
+						} else if srcTypeOk {
+							newDst = &RelayEndDeviceDynamicMode{}
+							dst.Mode = &MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic{Dynamic: newDst}
+						} else {
+							dst.Mode = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Mode = src.Mode
+						} else {
+							dst.Mode = nil
+						}
+					}
+				case "end_device_controlled":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Mode == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'end_device_controlled', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled)
+					if dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'end_device_controlled', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *RelayEndDeviceControlledMode
+						if srcTypeOk {
+							newSrc = src.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled).EndDeviceControlled
+						}
+						if dstTypeOk {
+							newDst = dst.Mode.(*MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled).EndDeviceControlled
+						} else if srcTypeOk {
+							newDst = &RelayEndDeviceControlledMode{}
+							dst.Mode = &MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled{EndDeviceControlled: newDst}
+						} else {
+							dst.Mode = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Mode = src.Mode
+						} else {
+							dst.Mode = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
 			}
 
 		default:
