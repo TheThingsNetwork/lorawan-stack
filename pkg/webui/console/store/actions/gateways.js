@@ -78,6 +78,10 @@ export const [
   (id, patch, selector) => ({ selector }),
 )
 
+export const UPDATE_GTW_LOCATION_BASE = 'UPDATE_GTW_LOCATION_BASE'
+export const [{ success: UPDATE_GTW_LOCATION_SUCCESS }, { success: updateGatewayLocationSuccess }] =
+  createRequestActions(UPDATE_GTW_LOCATION_BASE)
+
 export const DELETE_GTW_BASE = createPaginationDeleteBaseActionType(SHARED_NAME)
 export const [
   { request: DELETE_GTW, success: DELETE_GTW_SUCCESS, failure: DELETE_GTW_FAILURE },

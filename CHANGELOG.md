@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Locations retrieved from gateway status messages are now be displayed in the gateway map in the Console, even when they are not received through a secure connection.
+
 ### Changed
 
 ### Deprecated
