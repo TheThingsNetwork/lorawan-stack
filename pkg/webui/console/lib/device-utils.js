@@ -53,6 +53,7 @@ export const RP002_V1_0_0 = { value: 'RP002_V1_0_0', label: 'RP002 Regional Para
 export const RP002_V1_0_1 = { value: 'RP002_V1_0_1', label: 'RP002 Regional Parameters 1.0.1' }
 export const RP002_V1_0_2 = { value: 'RP002_V1_0_2', label: 'RP002 Regional Parameters 1.0.2' }
 export const RP002_V1_0_3 = { value: 'RP002_V1_0_3', label: 'RP002 Regional Parameters 1.0.3' }
+export const RP002_V1_0_4 = { value: 'RP002_V1_0_4', label: 'RP002 Regional Parameters 1.0.4' }
 
 export const LORAWAN_PHY_VERSIONS = Object.freeze([
   PHY_V1_0,
@@ -66,6 +67,7 @@ export const LORAWAN_PHY_VERSIONS = Object.freeze([
   RP002_V1_0_1,
   RP002_V1_0_2,
   RP002_V1_0_3,
+  RP002_V1_0_4,
 ])
 
 export const LORAWAN_VERSION_PAIRS = {
@@ -73,8 +75,16 @@ export const LORAWAN_VERSION_PAIRS = {
   101: [PHY_V1_0_1],
   102: [PHY_V1_0_2_REV_A, PHY_V1_0_2_REV_B],
   103: [PHY_V1_0_3_REV_A],
-  104: [RP002_V1_0_0, RP002_V1_0_1, RP002_V1_0_2, RP002_V1_0_3],
-  110: [PHY_V1_1_REV_A, PHY_V1_1_REV_B, RP002_V1_0_0, RP002_V1_0_1, RP002_V1_0_2, RP002_V1_0_3],
+  104: [RP002_V1_0_0, RP002_V1_0_1, RP002_V1_0_2, RP002_V1_0_3, RP002_V1_0_4],
+  110: [
+    PHY_V1_1_REV_A,
+    PHY_V1_1_REV_B,
+    RP002_V1_0_0,
+    RP002_V1_0_1,
+    RP002_V1_0_2,
+    RP002_V1_0_3,
+    RP002_V1_0_4,
+  ],
   0: LORAWAN_PHY_VERSIONS,
 }
 
@@ -192,7 +202,7 @@ export const hasSelectedDeviceRepositoryOther = version =>
   version && Object.values(version).some(value => isOtherOption(value))
 
 /*
-  `hardware_version` is not required when registering an end device in the device repository, so for 
+  `hardware_version` is not required when registering an end device in the device repository, so for
   certain end device models it can be missing. When this is the case, we still want to allow the users
   to select such models because `firmware_version` (that might depend on hw version) and `band_id`
   are required. `SELECT_UNKNOWN_HW_OPTION` option represents such end devices.
