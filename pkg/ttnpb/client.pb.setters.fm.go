@@ -683,3 +683,64 @@ func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorReq
 	}
 	return nil
 }
+
+func (dst *DeleteClientCollaboratorRequest) SetFields(src *DeleteClientCollaboratorRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "client_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ClientIdentifiers
+				if (src == nil || src.ClientIds == nil) && dst.ClientIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ClientIds
+				}
+				if dst.ClientIds != nil {
+					newDst = dst.ClientIds
+				} else {
+					newDst = &ClientIdentifiers{}
+					dst.ClientIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClientIds = src.ClientIds
+				} else {
+					dst.ClientIds = nil
+				}
+			}
+		case "collaborator_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.CollaboratorIds == nil) && dst.CollaboratorIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.CollaboratorIds
+				}
+				if dst.CollaboratorIds != nil {
+					newDst = dst.CollaboratorIds
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.CollaboratorIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.CollaboratorIds = src.CollaboratorIds
+				} else {
+					dst.CollaboratorIds = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

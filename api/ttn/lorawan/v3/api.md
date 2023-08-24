@@ -124,6 +124,7 @@
   - [Message `Client.AttributesEntry`](#ttn.lorawan.v3.Client.AttributesEntry)
   - [Message `Clients`](#ttn.lorawan.v3.Clients)
   - [Message `CreateClientRequest`](#ttn.lorawan.v3.CreateClientRequest)
+  - [Message `DeleteClientCollaboratorRequest`](#ttn.lorawan.v3.DeleteClientCollaboratorRequest)
   - [Message `GetClientCollaboratorRequest`](#ttn.lorawan.v3.GetClientCollaboratorRequest)
   - [Message `GetClientRequest`](#ttn.lorawan.v3.GetClientRequest)
   - [Message `ListClientCollaboratorsRequest`](#ttn.lorawan.v3.ListClientCollaboratorsRequest)
@@ -2261,6 +2262,20 @@ An OAuth client on the network.
 | `client` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteClientCollaboratorRequest">Message `DeleteClientCollaboratorRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `client_ids` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
+| `collaborator_ids` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `client_ids` | <p>`message.required`: `true`</p> |
+| `collaborator_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetClientCollaboratorRequest">Message `GetClientCollaboratorRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2373,6 +2388,7 @@ collaborators of OAuth clients.
 | `GetCollaborator` | [`GetClientCollaboratorRequest`](#ttn.lorawan.v3.GetClientCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the client. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
 | `SetCollaborator` | [`SetClientCollaboratorRequest`](#ttn.lorawan.v3.SetClientCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the OAuth client. This method can also be used to delete the collaborator, by giving them no rights. The caller is required to have all assigned or/and removed rights. |
 | `ListCollaborators` | [`ListClientCollaboratorsRequest`](#ttn.lorawan.v3.ListClientCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) | List the collaborators on this OAuth client. |
+| `DeleteCollaborator` | [`DeleteClientCollaboratorRequest`](#ttn.lorawan.v3.DeleteClientCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteCollaborator removes a collaborator from a client. |
 
 #### HTTP bindings
 
@@ -2384,6 +2400,9 @@ collaborators of OAuth clients.
 | `GetCollaborator` | `GET` | `/api/v3/clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/clients/{client_ids.client_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3/clients/{client_ids.client_id}/collaborators` |  |
+| `DeleteCollaborator` | `` | `/api/v3` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/clients/{client_ids.client_id}/collaborators/user/{collaborator_ids.user_ids.user_id}` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/clients/{client_ids.client_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}` |  |
 
 ### <a name="ttn.lorawan.v3.ClientRegistry">Service `ClientRegistry`</a>
 

@@ -822,6 +822,61 @@ func (x *SetClientCollaboratorRequest) GetCollaborator() *Collaborator {
 	return nil
 }
 
+type DeleteClientCollaboratorRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ClientIds       *ClientIdentifiers             `protobuf:"bytes,1,opt,name=client_ids,json=clientIds,proto3" json:"client_ids,omitempty"`
+	CollaboratorIds *OrganizationOrUserIdentifiers `protobuf:"bytes,2,opt,name=collaborator_ids,json=collaboratorIds,proto3" json:"collaborator_ids,omitempty"`
+}
+
+func (x *DeleteClientCollaboratorRequest) Reset() {
+	*x = DeleteClientCollaboratorRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ttn_lorawan_v3_client_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteClientCollaboratorRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteClientCollaboratorRequest) ProtoMessage() {}
+
+func (x *DeleteClientCollaboratorRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ttn_lorawan_v3_client_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteClientCollaboratorRequest.ProtoReflect.Descriptor instead.
+func (*DeleteClientCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return file_ttn_lorawan_v3_client_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *DeleteClientCollaboratorRequest) GetClientIds() *ClientIdentifiers {
+	if x != nil {
+		return x.ClientIds
+	}
+	return nil
+}
+
+func (x *DeleteClientCollaboratorRequest) GetCollaboratorIds() *OrganizationOrUserIdentifiers {
+	if x != nil {
+		return x.CollaboratorIds
+	}
+	return nil
+}
+
 var File_ttn_lorawan_v3_client_proto protoreflect.FileDescriptor
 
 var file_ttn_lorawan_v3_client_proto_rawDesc = []byte{
@@ -1020,17 +1075,30 @@ var file_ttn_lorawan_v3_client_proto_rawDesc = []byte{
 	0x1c, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33,
 	0x2e, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x42, 0x08, 0xfa,
 	0x42, 0x05, 0x8a, 0x01, 0x02, 0x10, 0x01, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f,
-	0x72, 0x61, 0x74, 0x6f, 0x72, 0x2a, 0x65, 0x0a, 0x09, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x54, 0x79,
-	0x70, 0x65, 0x12, 0x1c, 0x0a, 0x18, 0x47, 0x52, 0x41, 0x4e, 0x54, 0x5f, 0x41, 0x55, 0x54, 0x48,
-	0x4f, 0x52, 0x49, 0x5a, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x43, 0x4f, 0x44, 0x45, 0x10, 0x00,
-	0x12, 0x12, 0x0a, 0x0e, 0x47, 0x52, 0x41, 0x4e, 0x54, 0x5f, 0x50, 0x41, 0x53, 0x53, 0x57, 0x4f,
-	0x52, 0x44, 0x10, 0x01, 0x12, 0x17, 0x0a, 0x13, 0x47, 0x52, 0x41, 0x4e, 0x54, 0x5f, 0x52, 0x45,
-	0x46, 0x52, 0x45, 0x53, 0x48, 0x5f, 0x54, 0x4f, 0x4b, 0x45, 0x4e, 0x10, 0x02, 0x1a, 0x0d, 0xea,
-	0xaa, 0x19, 0x09, 0x18, 0x01, 0x2a, 0x05, 0x47, 0x52, 0x41, 0x4e, 0x54, 0x42, 0x31, 0x5a, 0x2f,
-	0x67, 0x6f, 0x2e, 0x74, 0x68, 0x65, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x6e, 0x65, 0x74,
-	0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2d, 0x73, 0x74, 0x61,
-	0x63, 0x6b, 0x2f, 0x76, 0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x74, 0x74, 0x6e, 0x70, 0x62, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0xd1, 0x01, 0x0a, 0x1f, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
+	0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74,
+	0x6f, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x4a, 0x0a, 0x0a, 0x63, 0x6c, 0x69,
+	0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e,
+	0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x43,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73,
+	0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02, 0x10, 0x01, 0x52, 0x09, 0x63, 0x6c, 0x69, 0x65,
+	0x6e, 0x74, 0x49, 0x64, 0x73, 0x12, 0x62, 0x0a, 0x10, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f,
+	0x72, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x2d, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33,
+	0x2e, 0x4f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x4f, 0x72, 0x55,
+	0x73, 0x65, 0x72, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73, 0x42, 0x08,
+	0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02, 0x10, 0x01, 0x52, 0x0f, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62,
+	0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x49, 0x64, 0x73, 0x2a, 0x65, 0x0a, 0x09, 0x47, 0x72, 0x61,
+	0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1c, 0x0a, 0x18, 0x47, 0x52, 0x41, 0x4e, 0x54, 0x5f,
+	0x41, 0x55, 0x54, 0x48, 0x4f, 0x52, 0x49, 0x5a, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x43, 0x4f,
+	0x44, 0x45, 0x10, 0x00, 0x12, 0x12, 0x0a, 0x0e, 0x47, 0x52, 0x41, 0x4e, 0x54, 0x5f, 0x50, 0x41,
+	0x53, 0x53, 0x57, 0x4f, 0x52, 0x44, 0x10, 0x01, 0x12, 0x17, 0x0a, 0x13, 0x47, 0x52, 0x41, 0x4e,
+	0x54, 0x5f, 0x52, 0x45, 0x46, 0x52, 0x45, 0x53, 0x48, 0x5f, 0x54, 0x4f, 0x4b, 0x45, 0x4e, 0x10,
+	0x02, 0x1a, 0x0d, 0xea, 0xaa, 0x19, 0x09, 0x18, 0x01, 0x2a, 0x05, 0x47, 0x52, 0x41, 0x4e, 0x54,
+	0x42, 0x31, 0x5a, 0x2f, 0x67, 0x6f, 0x2e, 0x74, 0x68, 0x65, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x73,
+	0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e,
+	0x2d, 0x73, 0x74, 0x61, 0x63, 0x6b, 0x2f, 0x76, 0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x74, 0x74,
+	0x6e, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1046,59 +1114,62 @@ func file_ttn_lorawan_v3_client_proto_rawDescGZIP() []byte {
 }
 
 var file_ttn_lorawan_v3_client_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_ttn_lorawan_v3_client_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_ttn_lorawan_v3_client_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_ttn_lorawan_v3_client_proto_goTypes = []interface{}{
-	(GrantType)(0),                         // 0: ttn.lorawan.v3.GrantType
-	(*Client)(nil),                         // 1: ttn.lorawan.v3.Client
-	(*Clients)(nil),                        // 2: ttn.lorawan.v3.Clients
-	(*GetClientRequest)(nil),               // 3: ttn.lorawan.v3.GetClientRequest
-	(*ListClientsRequest)(nil),             // 4: ttn.lorawan.v3.ListClientsRequest
-	(*CreateClientRequest)(nil),            // 5: ttn.lorawan.v3.CreateClientRequest
-	(*UpdateClientRequest)(nil),            // 6: ttn.lorawan.v3.UpdateClientRequest
-	(*ListClientCollaboratorsRequest)(nil), // 7: ttn.lorawan.v3.ListClientCollaboratorsRequest
-	(*GetClientCollaboratorRequest)(nil),   // 8: ttn.lorawan.v3.GetClientCollaboratorRequest
-	(*SetClientCollaboratorRequest)(nil),   // 9: ttn.lorawan.v3.SetClientCollaboratorRequest
-	nil,                                    // 10: ttn.lorawan.v3.Client.AttributesEntry
-	(*ClientIdentifiers)(nil),              // 11: ttn.lorawan.v3.ClientIdentifiers
-	(*timestamppb.Timestamp)(nil),          // 12: google.protobuf.Timestamp
-	(*ContactInfo)(nil),                    // 13: ttn.lorawan.v3.ContactInfo
-	(*OrganizationOrUserIdentifiers)(nil),  // 14: ttn.lorawan.v3.OrganizationOrUserIdentifiers
-	(State)(0),                             // 15: ttn.lorawan.v3.State
-	(Right)(0),                             // 16: ttn.lorawan.v3.Right
-	(*fieldmaskpb.FieldMask)(nil),          // 17: google.protobuf.FieldMask
-	(*Collaborator)(nil),                   // 18: ttn.lorawan.v3.Collaborator
+	(GrantType)(0),                          // 0: ttn.lorawan.v3.GrantType
+	(*Client)(nil),                          // 1: ttn.lorawan.v3.Client
+	(*Clients)(nil),                         // 2: ttn.lorawan.v3.Clients
+	(*GetClientRequest)(nil),                // 3: ttn.lorawan.v3.GetClientRequest
+	(*ListClientsRequest)(nil),              // 4: ttn.lorawan.v3.ListClientsRequest
+	(*CreateClientRequest)(nil),             // 5: ttn.lorawan.v3.CreateClientRequest
+	(*UpdateClientRequest)(nil),             // 6: ttn.lorawan.v3.UpdateClientRequest
+	(*ListClientCollaboratorsRequest)(nil),  // 7: ttn.lorawan.v3.ListClientCollaboratorsRequest
+	(*GetClientCollaboratorRequest)(nil),    // 8: ttn.lorawan.v3.GetClientCollaboratorRequest
+	(*SetClientCollaboratorRequest)(nil),    // 9: ttn.lorawan.v3.SetClientCollaboratorRequest
+	(*DeleteClientCollaboratorRequest)(nil), // 10: ttn.lorawan.v3.DeleteClientCollaboratorRequest
+	nil,                                     // 11: ttn.lorawan.v3.Client.AttributesEntry
+	(*ClientIdentifiers)(nil),               // 12: ttn.lorawan.v3.ClientIdentifiers
+	(*timestamppb.Timestamp)(nil),           // 13: google.protobuf.Timestamp
+	(*ContactInfo)(nil),                     // 14: ttn.lorawan.v3.ContactInfo
+	(*OrganizationOrUserIdentifiers)(nil),   // 15: ttn.lorawan.v3.OrganizationOrUserIdentifiers
+	(State)(0),                              // 16: ttn.lorawan.v3.State
+	(Right)(0),                              // 17: ttn.lorawan.v3.Right
+	(*fieldmaskpb.FieldMask)(nil),           // 18: google.protobuf.FieldMask
+	(*Collaborator)(nil),                    // 19: ttn.lorawan.v3.Collaborator
 }
 var file_ttn_lorawan_v3_client_proto_depIdxs = []int32{
-	11, // 0: ttn.lorawan.v3.Client.ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
-	12, // 1: ttn.lorawan.v3.Client.created_at:type_name -> google.protobuf.Timestamp
-	12, // 2: ttn.lorawan.v3.Client.updated_at:type_name -> google.protobuf.Timestamp
-	12, // 3: ttn.lorawan.v3.Client.deleted_at:type_name -> google.protobuf.Timestamp
-	10, // 4: ttn.lorawan.v3.Client.attributes:type_name -> ttn.lorawan.v3.Client.AttributesEntry
-	13, // 5: ttn.lorawan.v3.Client.contact_info:type_name -> ttn.lorawan.v3.ContactInfo
-	14, // 6: ttn.lorawan.v3.Client.administrative_contact:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
-	14, // 7: ttn.lorawan.v3.Client.technical_contact:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
-	15, // 8: ttn.lorawan.v3.Client.state:type_name -> ttn.lorawan.v3.State
+	12, // 0: ttn.lorawan.v3.Client.ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
+	13, // 1: ttn.lorawan.v3.Client.created_at:type_name -> google.protobuf.Timestamp
+	13, // 2: ttn.lorawan.v3.Client.updated_at:type_name -> google.protobuf.Timestamp
+	13, // 3: ttn.lorawan.v3.Client.deleted_at:type_name -> google.protobuf.Timestamp
+	11, // 4: ttn.lorawan.v3.Client.attributes:type_name -> ttn.lorawan.v3.Client.AttributesEntry
+	14, // 5: ttn.lorawan.v3.Client.contact_info:type_name -> ttn.lorawan.v3.ContactInfo
+	15, // 6: ttn.lorawan.v3.Client.administrative_contact:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
+	15, // 7: ttn.lorawan.v3.Client.technical_contact:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
+	16, // 8: ttn.lorawan.v3.Client.state:type_name -> ttn.lorawan.v3.State
 	0,  // 9: ttn.lorawan.v3.Client.grants:type_name -> ttn.lorawan.v3.GrantType
-	16, // 10: ttn.lorawan.v3.Client.rights:type_name -> ttn.lorawan.v3.Right
+	17, // 10: ttn.lorawan.v3.Client.rights:type_name -> ttn.lorawan.v3.Right
 	1,  // 11: ttn.lorawan.v3.Clients.clients:type_name -> ttn.lorawan.v3.Client
-	11, // 12: ttn.lorawan.v3.GetClientRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
-	17, // 13: ttn.lorawan.v3.GetClientRequest.field_mask:type_name -> google.protobuf.FieldMask
-	14, // 14: ttn.lorawan.v3.ListClientsRequest.collaborator:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
-	17, // 15: ttn.lorawan.v3.ListClientsRequest.field_mask:type_name -> google.protobuf.FieldMask
+	12, // 12: ttn.lorawan.v3.GetClientRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
+	18, // 13: ttn.lorawan.v3.GetClientRequest.field_mask:type_name -> google.protobuf.FieldMask
+	15, // 14: ttn.lorawan.v3.ListClientsRequest.collaborator:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
+	18, // 15: ttn.lorawan.v3.ListClientsRequest.field_mask:type_name -> google.protobuf.FieldMask
 	1,  // 16: ttn.lorawan.v3.CreateClientRequest.client:type_name -> ttn.lorawan.v3.Client
-	14, // 17: ttn.lorawan.v3.CreateClientRequest.collaborator:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
+	15, // 17: ttn.lorawan.v3.CreateClientRequest.collaborator:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
 	1,  // 18: ttn.lorawan.v3.UpdateClientRequest.client:type_name -> ttn.lorawan.v3.Client
-	17, // 19: ttn.lorawan.v3.UpdateClientRequest.field_mask:type_name -> google.protobuf.FieldMask
-	11, // 20: ttn.lorawan.v3.ListClientCollaboratorsRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
-	11, // 21: ttn.lorawan.v3.GetClientCollaboratorRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
-	14, // 22: ttn.lorawan.v3.GetClientCollaboratorRequest.collaborator:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
-	11, // 23: ttn.lorawan.v3.SetClientCollaboratorRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
-	18, // 24: ttn.lorawan.v3.SetClientCollaboratorRequest.collaborator:type_name -> ttn.lorawan.v3.Collaborator
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	18, // 19: ttn.lorawan.v3.UpdateClientRequest.field_mask:type_name -> google.protobuf.FieldMask
+	12, // 20: ttn.lorawan.v3.ListClientCollaboratorsRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
+	12, // 21: ttn.lorawan.v3.GetClientCollaboratorRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
+	15, // 22: ttn.lorawan.v3.GetClientCollaboratorRequest.collaborator:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
+	12, // 23: ttn.lorawan.v3.SetClientCollaboratorRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
+	19, // 24: ttn.lorawan.v3.SetClientCollaboratorRequest.collaborator:type_name -> ttn.lorawan.v3.Collaborator
+	12, // 25: ttn.lorawan.v3.DeleteClientCollaboratorRequest.client_ids:type_name -> ttn.lorawan.v3.ClientIdentifiers
+	15, // 26: ttn.lorawan.v3.DeleteClientCollaboratorRequest.collaborator_ids:type_name -> ttn.lorawan.v3.OrganizationOrUserIdentifiers
+	27, // [27:27] is the sub-list for method output_type
+	27, // [27:27] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_ttn_lorawan_v3_client_proto_init() }
@@ -1219,6 +1290,18 @@ func file_ttn_lorawan_v3_client_proto_init() {
 				return nil
 			}
 		}
+		file_ttn_lorawan_v3_client_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteClientCollaboratorRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1226,7 +1309,7 @@ func file_ttn_lorawan_v3_client_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_ttn_lorawan_v3_client_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

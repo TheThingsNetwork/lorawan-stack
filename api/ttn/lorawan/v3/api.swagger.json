@@ -6048,6 +6048,59 @@
         ]
       }
     },
+    "/clients/{client_ids.client_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from a client.",
+        "operationId": "ClientAccess_DeleteCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientAccess"
+        ]
+      }
+    },
     "/clients/{client_ids.client_id}/collaborators/search": {
       "get": {
         "summary": "Search for accounts that match the conditions specified in the request.",
@@ -6115,6 +6168,59 @@
         ],
         "tags": [
           "EntityRegistrySearch"
+        ]
+      }
+    },
+    "/clients/{client_ids.client_id}/collaborators/user/{collaborator_ids.user_ids.user_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from a client.",
+        "operationId": "ClientAccess_DeleteCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientAccess"
         ]
       }
     },

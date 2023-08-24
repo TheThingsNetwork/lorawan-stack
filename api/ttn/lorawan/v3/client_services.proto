@@ -118,4 +118,12 @@ service ClientAccess {
   rpc ListCollaborators(ListClientCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {get: "/clients/{client_ids.client_id}/collaborators"};
   }
+
+  // DeleteCollaborator removes a collaborator from a client.
+  rpc DeleteCollaborator(DeleteClientCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      additional_bindings {delete: "/clients/{client_ids.client_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"}
+      additional_bindings {delete: "/clients/{client_ids.client_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}"}
+    };
+  }
 }
