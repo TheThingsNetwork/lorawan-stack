@@ -20,6 +20,7 @@ import (
 	"fmt"
 	stdio "io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -498,7 +499,6 @@ func TestWebhooks(t *testing.T) {
 			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
 			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE)
-		httpAddress := "0.0.0.0:8098"
 		conf := &component.Config{
 			ServiceBase: config.ServiceBase{
 				GRPC: config.GRPC{
@@ -507,9 +507,6 @@ func TestWebhooks(t *testing.T) {
 				},
 				Cluster: cluster.Config{
 					IdentityServer: isAddr,
-				},
-				HTTP: config.HTTP{
-					Listen: httpAddress,
 				},
 			},
 		}
@@ -555,21 +552,16 @@ func TestWebhooks(t *testing.T) {
 			} {
 				t.Run(tc.Name, func(t *testing.T) {
 					a := assertions.New(t)
-					url := fmt.Sprintf("http://%s/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/replace",
-						httpAddress, tc.ID.ApplicationId, registeredWebhookID, registeredDeviceID.DeviceId,
+					url := fmt.Sprintf("/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/replace",
+						tc.ID.ApplicationId, registeredWebhookID, registeredDeviceID.DeviceId,
 					)
 					body := bytes.NewReader([]byte(`{"downlinks":[]}`))
-					req, err := http.NewRequest(http.MethodPost, url, body)
-					if !a.So(err, should.BeNil) {
-						t.FailNow()
-					}
+					req := httptest.NewRequest(http.MethodPost, url, body)
 					req.Header.Set("Content-Type", "application/json")
 					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
-					res, err := http.DefaultClient.Do(req)
-					if !a.So(err, should.BeNil) {
-						t.FailNow()
-					}
-					a.So(res.StatusCode, should.Equal, tc.ExpectCode)
+					res := httptest.NewRecorder()
+					c.ServeHTTP(res, req)
+					a.So(res.Code, should.Equal, tc.ExpectCode)
 					downlinks, err := io.DownlinkQueueList(ctx, registeredDeviceID)
 					if !a.So(err, should.BeNil) {
 						t.FailNow()

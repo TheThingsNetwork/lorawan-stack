@@ -46,7 +46,6 @@ import (
 	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/mock"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
@@ -87,7 +86,7 @@ func TestGatewayServer(t *testing.T) {
 				c := componenttest.NewComponent(t, &component.Config{
 					ServiceBase: config.ServiceBase{
 						GRPC: config.GRPC{
-							Listen:                      ":9187",
+							Listen:                      ":0",
 							AllowInsecureForCredentials: true,
 						},
 						Cluster: cluster.Config{
@@ -225,18 +224,13 @@ func TestGatewayServer(t *testing.T) {
 						return ids.GatewayId == registeredGatewayID && key == registeredGatewayKey
 					},
 					Link: func(ctx context.Context, t *testing.T, ids *ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-						conn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
-						if err != nil {
-							return err
-						}
-						defer conn.Close()
 						md := rpcmetadata.MD{
 							ID:            ids.GatewayId,
 							AuthType:      "Bearer",
 							AuthValue:     key,
 							AllowInsecure: true,
 						}
-						client := ttnpb.NewGtwGsClient(conn)
+						client := ttnpb.NewGtwGsClient(gs.LoopbackConn())
 						_, err = client.GetConcentratorConfig(ctx, ttnpb.Empty, grpc.PerRPCCredentials(md))
 						if err != nil {
 							return err
@@ -749,16 +743,11 @@ func TestGatewayServer(t *testing.T) {
 					}
 					// Setup a stats client with independent context to query whether the gateway is connected and statistics on
 					// upstream and downstream.
-					statsConn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
-					if !a.So(err, should.BeNil) {
-						t.FailNow()
-					}
-					defer statsConn.Close()
 					statsCtx := metadata.AppendToOutgoingContext(test.Context(),
 						"id", ids.GatewayId,
 						"authorization", fmt.Sprintf("Bearer %v", registeredGatewayKey),
 					)
-					statsClient := ttnpb.NewGsClient(statsConn)
+					statsClient := ttnpb.NewGsClient(gs.LoopbackConn())
 
 					// The gateway should not be connected before testing traffic.
 					t.Run("NotConnected", func(t *testing.T) {
@@ -1842,18 +1831,13 @@ func TestGatewayServer(t *testing.T) {
 					Eui:       registeredGatewayEUI.Bytes(),
 				}
 
-				conn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-				defer conn.Close()
 				md := rpcmetadata.MD{
 					ID:            ids.GatewayId,
 					AuthType:      "Bearer",
 					AuthValue:     registeredGatewayKey,
 					AllowInsecure: true,
 				}
-				_, err = ttnpb.NewGtwGsClient(conn).LinkGateway(ctx, grpc.PerRPCCredentials(md))
+				_, err = ttnpb.NewGtwGsClient(gs.LoopbackConn()).LinkGateway(ctx, grpc.PerRPCCredentials(md))
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
@@ -1884,7 +1868,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
-				Listen:                      ":9187",
+				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
 			Cluster: cluster.Config{
@@ -2028,16 +2012,11 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	// Test Disconnection on delete.
 	// Setup a stats client with independent context to query whether the gateway is connected and statistics on
 	// upstream and downstream.
-	statsConn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer statsConn.Close()
 	statsCtx := metadata.AppendToOutgoingContext(test.Context(),
 		"id", ids.GatewayId,
 		"authorization", fmt.Sprintf("Bearer %v", registeredGatewayKey),
 	)
-	statsClient := ttnpb.NewGsClient(statsConn)
+	statsClient := ttnpb.NewGsClient(gs.LoopbackConn())
 
 	stat, err := statsClient.GetGatewayConnectionStats(statsCtx, gtwIDs)
 	a.So(err, should.BeNil)
@@ -2080,7 +2059,7 @@ func TestBatchGetStatus(t *testing.T) { // nolint:paralleltest
 			c := componenttest.NewComponent(t, &component.Config{
 				ServiceBase: config.ServiceBase{
 					GRPC: config.GRPC{
-						Listen:                      ":9187",
+						Listen:                      ":0",
 						AllowInsecureForCredentials: true,
 					},
 					Cluster: cluster.Config{
@@ -2188,13 +2167,7 @@ func TestBatchGetStatus(t *testing.T) { // nolint:paralleltest
 				GatewayId: "eui-aaee000000000001",
 			}
 
-			statsConn, err := grpc.Dial(":9187",
-				append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			defer statsConn.Close()
-			statsClient := ttnpb.NewGsClient(statsConn)
+			statsClient := ttnpb.NewGsClient(gs.LoopbackConn())
 			statsCtx := metadata.AppendToOutgoingContext(test.Context(),
 				"id", gtwIDs1.GatewayId,
 				"authorization", fmt.Sprintf("Bearer %v", registeredGatewayKey),
