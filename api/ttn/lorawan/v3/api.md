@@ -574,6 +574,7 @@
 - [File `ttn/lorawan/v3/organization.proto`](#ttn/lorawan/v3/organization.proto)
   - [Message `CreateOrganizationAPIKeyRequest`](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest)
   - [Message `CreateOrganizationRequest`](#ttn.lorawan.v3.CreateOrganizationRequest)
+  - [Message `DeleteOrganizationCollaboratorRequest`](#ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest)
   - [Message `GetOrganizationAPIKeyRequest`](#ttn.lorawan.v3.GetOrganizationAPIKeyRequest)
   - [Message `GetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.GetOrganizationCollaboratorRequest)
   - [Message `GetOrganizationRequest`](#ttn.lorawan.v3.GetOrganizationRequest)
@@ -8245,6 +8246,20 @@ is used to manage OAuth client authorizations for users.
 | `organization` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest">Message `DeleteOrganizationCollaboratorRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| `collaborator_ids` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `organization_ids` | <p>`message.required`: `true`</p> |
+| `collaborator_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetOrganizationAPIKeyRequest">Message `GetOrganizationAPIKeyRequest`</a>
 
 | Field | Type | Label | Description |
@@ -8434,6 +8449,7 @@ API keys and collaborators of organizations.
 | `GetCollaborator` | [`GetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.GetOrganizationCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the organization. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
 | `SetCollaborator` | [`SetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the organization. Organization collaborators can get access to the organization itself, as well as any application, gateway and OAuth client this organization is a collaborator of. This method can also be used to delete the collaborator, by giving them no rights. The caller is required to have all assigned or/and removed rights. |
 | `ListCollaborators` | [`ListOrganizationCollaboratorsRequest`](#ttn.lorawan.v3.ListOrganizationCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) | List the collaborators on this organization. |
+| `DeleteCollaborator` | [`DeleteOrganizationCollaboratorRequest`](#ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteCollaborator removes a collaborator from an organization. |
 
 #### HTTP bindings
 
@@ -8448,6 +8464,7 @@ API keys and collaborators of organizations.
 | `GetCollaborator` | `GET` | `/api/v3/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/organizations/{organization_ids.organization_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3/organizations/{organization_ids.organization_id}/collaborators` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}` |  |
 
 ### <a name="ttn.lorawan.v3.OrganizationRegistry">Service `OrganizationRegistry`</a>
 

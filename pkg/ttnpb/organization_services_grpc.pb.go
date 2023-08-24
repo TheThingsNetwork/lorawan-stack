@@ -384,14 +384,15 @@ var OrganizationRegistry_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	OrganizationAccess_ListRights_FullMethodName        = "/ttn.lorawan.v3.OrganizationAccess/ListRights"
-	OrganizationAccess_CreateAPIKey_FullMethodName      = "/ttn.lorawan.v3.OrganizationAccess/CreateAPIKey"
-	OrganizationAccess_ListAPIKeys_FullMethodName       = "/ttn.lorawan.v3.OrganizationAccess/ListAPIKeys"
-	OrganizationAccess_GetAPIKey_FullMethodName         = "/ttn.lorawan.v3.OrganizationAccess/GetAPIKey"
-	OrganizationAccess_UpdateAPIKey_FullMethodName      = "/ttn.lorawan.v3.OrganizationAccess/UpdateAPIKey"
-	OrganizationAccess_GetCollaborator_FullMethodName   = "/ttn.lorawan.v3.OrganizationAccess/GetCollaborator"
-	OrganizationAccess_SetCollaborator_FullMethodName   = "/ttn.lorawan.v3.OrganizationAccess/SetCollaborator"
-	OrganizationAccess_ListCollaborators_FullMethodName = "/ttn.lorawan.v3.OrganizationAccess/ListCollaborators"
+	OrganizationAccess_ListRights_FullMethodName         = "/ttn.lorawan.v3.OrganizationAccess/ListRights"
+	OrganizationAccess_CreateAPIKey_FullMethodName       = "/ttn.lorawan.v3.OrganizationAccess/CreateAPIKey"
+	OrganizationAccess_ListAPIKeys_FullMethodName        = "/ttn.lorawan.v3.OrganizationAccess/ListAPIKeys"
+	OrganizationAccess_GetAPIKey_FullMethodName          = "/ttn.lorawan.v3.OrganizationAccess/GetAPIKey"
+	OrganizationAccess_UpdateAPIKey_FullMethodName       = "/ttn.lorawan.v3.OrganizationAccess/UpdateAPIKey"
+	OrganizationAccess_GetCollaborator_FullMethodName    = "/ttn.lorawan.v3.OrganizationAccess/GetCollaborator"
+	OrganizationAccess_SetCollaborator_FullMethodName    = "/ttn.lorawan.v3.OrganizationAccess/SetCollaborator"
+	OrganizationAccess_ListCollaborators_FullMethodName  = "/ttn.lorawan.v3.OrganizationAccess/ListCollaborators"
+	OrganizationAccess_DeleteCollaborator_FullMethodName = "/ttn.lorawan.v3.OrganizationAccess/DeleteCollaborator"
 )
 
 // OrganizationAccessClient is the client API for OrganizationAccess service.
@@ -423,6 +424,8 @@ type OrganizationAccessClient interface {
 	SetCollaborator(ctx context.Context, in *SetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// List the collaborators on this organization.
 	ListCollaborators(ctx context.Context, in *ListOrganizationCollaboratorsRequest, opts ...grpc.CallOption) (*Collaborators, error)
+	// DeleteCollaborator removes a collaborator from an organization.
+	DeleteCollaborator(ctx context.Context, in *DeleteOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type organizationAccessClient struct {
@@ -505,6 +508,15 @@ func (c *organizationAccessClient) ListCollaborators(ctx context.Context, in *Li
 	return out, nil
 }
 
+func (c *organizationAccessClient) DeleteCollaborator(ctx context.Context, in *DeleteOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, OrganizationAccess_DeleteCollaborator_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrganizationAccessServer is the server API for OrganizationAccess service.
 // All implementations must embed UnimplementedOrganizationAccessServer
 // for forward compatibility
@@ -534,6 +546,8 @@ type OrganizationAccessServer interface {
 	SetCollaborator(context.Context, *SetOrganizationCollaboratorRequest) (*emptypb.Empty, error)
 	// List the collaborators on this organization.
 	ListCollaborators(context.Context, *ListOrganizationCollaboratorsRequest) (*Collaborators, error)
+	// DeleteCollaborator removes a collaborator from an organization.
+	DeleteCollaborator(context.Context, *DeleteOrganizationCollaboratorRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedOrganizationAccessServer()
 }
 
@@ -564,6 +578,9 @@ func (UnimplementedOrganizationAccessServer) SetCollaborator(context.Context, *S
 }
 func (UnimplementedOrganizationAccessServer) ListCollaborators(context.Context, *ListOrganizationCollaboratorsRequest) (*Collaborators, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCollaborators not implemented")
+}
+func (UnimplementedOrganizationAccessServer) DeleteCollaborator(context.Context, *DeleteOrganizationCollaboratorRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollaborator not implemented")
 }
 func (UnimplementedOrganizationAccessServer) mustEmbedUnimplementedOrganizationAccessServer() {}
 
@@ -722,6 +739,24 @@ func _OrganizationAccess_ListCollaborators_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrganizationAccess_DeleteCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteOrganizationCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrganizationAccessServer).DeleteCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrganizationAccess_DeleteCollaborator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrganizationAccessServer).DeleteCollaborator(ctx, req.(*DeleteOrganizationCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrganizationAccess_ServiceDesc is the grpc.ServiceDesc for OrganizationAccess service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -760,6 +795,10 @@ var OrganizationAccess_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCollaborators",
 			Handler:    _OrganizationAccess_ListCollaborators_Handler,
+		},
+		{
+			MethodName: "DeleteCollaborator",
+			Handler:    _OrganizationAccess_DeleteCollaborator_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

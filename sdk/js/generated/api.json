@@ -37610,6 +37610,58 @@
           ]
         },
         {
+          "name": "DeleteOrganizationCollaboratorRequest",
+          "longName": "DeleteOrganizationCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetOrganizationAPIKeyRequest",
           "longName": "GetOrganizationAPIKeyRequest",
           "fullName": "ttn.lorawan.v3.GetOrganizationAPIKeyRequest",
@@ -37685,7 +37737,7 @@
             },
             {
               "name": "collaborator",
-              "description": "NOTE: It is currently not possible to have organizations collaborating on\nother organizations.",
+              "description": "NOTE: It is currently not possible to have organizations collaborating on other organizations.",
               "label": "",
               "type": "OrganizationOrUserIdentifiers",
               "longType": "OrganizationOrUserIdentifiers",
@@ -38645,6 +38697,28 @@
                     {
                       "method": "GET",
                       "pattern": "/organizations/{organization_ids.organization_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteCollaborator",
+              "description": "DeleteCollaborator removes a collaborator from an organization.",
+              "requestType": "DeleteOrganizationCollaboratorRequest",
+              "requestLongType": "DeleteOrganizationCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"
                     }
                   ]
                 }

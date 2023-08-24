@@ -13327,6 +13327,53 @@
         ]
       }
     },
+    "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from an organization.",
+        "operationId": "OrganizationAccess_DeleteCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrganizationAccess"
+        ]
+      }
+    },
     "/organizations/{organization_id}": {
       "delete": {
         "summary": "Delete the organization. This may not release the organization ID for reuse.",

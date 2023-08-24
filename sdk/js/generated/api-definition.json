@@ -5251,6 +5251,19 @@
           ]
         }
       ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/organization_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "organization_ids.organization_id",
+            "collaborator_ids.user_ids.user_id"
+          ]
+        }
+      ]
     }
   },
   "OrganizationRegistry": {
