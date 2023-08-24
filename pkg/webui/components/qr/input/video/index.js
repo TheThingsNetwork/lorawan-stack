@@ -47,7 +47,7 @@ const Video = props => {
         cameras.length > 1
           ? ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1
             ? { facingMode: { exact: 'environment' } }
-            : { deviceId: cameras[1].deviceId }
+            : { deviceId: cameras[cameras.length - 1].deviceId }
           : { facingMode: 'environment' }
 
       try {
