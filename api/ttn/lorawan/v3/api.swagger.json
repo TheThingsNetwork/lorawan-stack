@@ -9293,6 +9293,67 @@
         ]
       }
     },
+    "/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from a gateway.",
+        "operationId": "GatewayAccess_DeleteCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      }
+    },
     "/gateways/{gateway_ids.gateway_id}/collaborators/search": {
       "get": {
         "summary": "Search for accounts that match the conditions specified in the request.",
@@ -9360,6 +9421,67 @@
         ],
         "tags": [
           "EntityRegistrySearch"
+        ]
+      }
+    },
+    "/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from a gateway.",
+        "operationId": "GatewayAccess_DeleteCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
         ]
       }
     },

@@ -20221,6 +20221,58 @@
           ]
         },
         {
+          "name": "DeleteGatewayCollaboratorRequest",
+          "longName": "DeleteGatewayCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.DeleteGatewayCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Gateway",
           "longName": "Gateway",
           "fullName": "ttn.lorawan.v3.Gateway",
@@ -22937,6 +22989,36 @@
                     {
                       "method": "GET",
                       "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteCollaborator",
+              "description": "DeleteCollaborator removes a collaborator from a gateway.",
+              "requestType": "DeleteGatewayCollaboratorRequest",
+              "requestLongType": "DeleteGatewayCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteGatewayCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "",
+                      "pattern": ""
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}"
                     }
                   ]
                 }

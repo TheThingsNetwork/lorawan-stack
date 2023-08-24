@@ -3208,6 +3208,32 @@
           ]
         }
       ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "collaborator_ids.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "collaborator_ids.organization_ids.organization_id"
+          ]
+        }
+      ]
     }
   },
   "GatewayConfigurator": {

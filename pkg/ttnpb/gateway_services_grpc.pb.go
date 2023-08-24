@@ -425,14 +425,15 @@ var GatewayRegistry_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	GatewayAccess_ListRights_FullMethodName        = "/ttn.lorawan.v3.GatewayAccess/ListRights"
-	GatewayAccess_CreateAPIKey_FullMethodName      = "/ttn.lorawan.v3.GatewayAccess/CreateAPIKey"
-	GatewayAccess_ListAPIKeys_FullMethodName       = "/ttn.lorawan.v3.GatewayAccess/ListAPIKeys"
-	GatewayAccess_GetAPIKey_FullMethodName         = "/ttn.lorawan.v3.GatewayAccess/GetAPIKey"
-	GatewayAccess_UpdateAPIKey_FullMethodName      = "/ttn.lorawan.v3.GatewayAccess/UpdateAPIKey"
-	GatewayAccess_GetCollaborator_FullMethodName   = "/ttn.lorawan.v3.GatewayAccess/GetCollaborator"
-	GatewayAccess_SetCollaborator_FullMethodName   = "/ttn.lorawan.v3.GatewayAccess/SetCollaborator"
-	GatewayAccess_ListCollaborators_FullMethodName = "/ttn.lorawan.v3.GatewayAccess/ListCollaborators"
+	GatewayAccess_ListRights_FullMethodName         = "/ttn.lorawan.v3.GatewayAccess/ListRights"
+	GatewayAccess_CreateAPIKey_FullMethodName       = "/ttn.lorawan.v3.GatewayAccess/CreateAPIKey"
+	GatewayAccess_ListAPIKeys_FullMethodName        = "/ttn.lorawan.v3.GatewayAccess/ListAPIKeys"
+	GatewayAccess_GetAPIKey_FullMethodName          = "/ttn.lorawan.v3.GatewayAccess/GetAPIKey"
+	GatewayAccess_UpdateAPIKey_FullMethodName       = "/ttn.lorawan.v3.GatewayAccess/UpdateAPIKey"
+	GatewayAccess_GetCollaborator_FullMethodName    = "/ttn.lorawan.v3.GatewayAccess/GetCollaborator"
+	GatewayAccess_SetCollaborator_FullMethodName    = "/ttn.lorawan.v3.GatewayAccess/SetCollaborator"
+	GatewayAccess_ListCollaborators_FullMethodName  = "/ttn.lorawan.v3.GatewayAccess/ListCollaborators"
+	GatewayAccess_DeleteCollaborator_FullMethodName = "/ttn.lorawan.v3.GatewayAccess/DeleteCollaborator"
 )
 
 // GatewayAccessClient is the client API for GatewayAccess service.
@@ -460,6 +461,8 @@ type GatewayAccessClient interface {
 	SetCollaborator(ctx context.Context, in *SetGatewayCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// List the collaborators on this gateway.
 	ListCollaborators(ctx context.Context, in *ListGatewayCollaboratorsRequest, opts ...grpc.CallOption) (*Collaborators, error)
+	// DeleteCollaborator removes a collaborator from a gateway.
+	DeleteCollaborator(ctx context.Context, in *DeleteGatewayCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type gatewayAccessClient struct {
@@ -542,6 +545,15 @@ func (c *gatewayAccessClient) ListCollaborators(ctx context.Context, in *ListGat
 	return out, nil
 }
 
+func (c *gatewayAccessClient) DeleteCollaborator(ctx context.Context, in *DeleteGatewayCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GatewayAccess_DeleteCollaborator_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GatewayAccessServer is the server API for GatewayAccess service.
 // All implementations must embed UnimplementedGatewayAccessServer
 // for forward compatibility
@@ -567,6 +579,8 @@ type GatewayAccessServer interface {
 	SetCollaborator(context.Context, *SetGatewayCollaboratorRequest) (*emptypb.Empty, error)
 	// List the collaborators on this gateway.
 	ListCollaborators(context.Context, *ListGatewayCollaboratorsRequest) (*Collaborators, error)
+	// DeleteCollaborator removes a collaborator from a gateway.
+	DeleteCollaborator(context.Context, *DeleteGatewayCollaboratorRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGatewayAccessServer()
 }
 
@@ -597,6 +611,9 @@ func (UnimplementedGatewayAccessServer) SetCollaborator(context.Context, *SetGat
 }
 func (UnimplementedGatewayAccessServer) ListCollaborators(context.Context, *ListGatewayCollaboratorsRequest) (*Collaborators, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCollaborators not implemented")
+}
+func (UnimplementedGatewayAccessServer) DeleteCollaborator(context.Context, *DeleteGatewayCollaboratorRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollaborator not implemented")
 }
 func (UnimplementedGatewayAccessServer) mustEmbedUnimplementedGatewayAccessServer() {}
 
@@ -755,6 +772,24 @@ func _GatewayAccess_ListCollaborators_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GatewayAccess_DeleteCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteGatewayCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayAccessServer).DeleteCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayAccess_DeleteCollaborator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayAccessServer).DeleteCollaborator(ctx, req.(*DeleteGatewayCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GatewayAccess_ServiceDesc is the grpc.ServiceDesc for GatewayAccess service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -793,6 +828,10 @@ var GatewayAccess_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCollaborators",
 			Handler:    _GatewayAccess_ListCollaborators_Handler,
+		},
+		{
+			MethodName: "DeleteCollaborator",
+			Handler:    _GatewayAccess_DeleteCollaborator_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
