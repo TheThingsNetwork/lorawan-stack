@@ -443,17 +443,7 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				ImplementsCFList: true,
 				CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
-				ReceiveDelay1: 1 * time.Second,
-				ReceiveDelay2: 2 * time.Second,
-
-				JoinAcceptDelay1: 3 * time.Second,
-				JoinAcceptDelay2: 4 * time.Second,
-				MaxFCntGap:       5,
-
-				SupportsDynamicADR:   true,
-				ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
-				MinRetransmitTimeout: 1 * time.Second,
-				MaxRetransmitTimeout: 2 * time.Second,
+				SupportsDynamicADR: true,
 
 				TxOffset:            []float32{1.0, 2.0},
 				MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
@@ -469,6 +459,17 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				BootDwellTime: DwellTime{
 					Uplinks:   BoolPtr(true),
 					Downlinks: BoolPtr(true),
+				},
+
+				SharedParameters: SharedParameters{
+					ReceiveDelay1:        1 * time.Second,
+					ReceiveDelay2:        2 * time.Second,
+					JoinAcceptDelay1:     3 * time.Second,
+					JoinAcceptDelay2:     4 * time.Second,
+					MaxFCntGap:           5,
+					ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
+					MinRetransmitTimeout: 1 * time.Second,
+					MaxRetransmitTimeout: 2 * time.Second,
 				},
 			},
 			Expected: &ttnpb.BandDescription{
@@ -586,17 +587,7 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				ImplementsCFList: true,
 				CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
-				ReceiveDelay1: 1 * time.Second,
-				ReceiveDelay2: 2 * time.Second,
-
-				JoinAcceptDelay1: 3 * time.Second,
-				JoinAcceptDelay2: 4 * time.Second,
-				MaxFCntGap:       5,
-
-				SupportsDynamicADR:   true,
-				ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
-				MinRetransmitTimeout: 1 * time.Second,
-				MaxRetransmitTimeout: 2 * time.Second,
+				SupportsDynamicADR: true,
 
 				TxOffset:            []float32{1.0, 2.0},
 				MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
@@ -610,6 +601,17 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				},
 
 				BootDwellTime: DwellTime{},
+
+				SharedParameters: SharedParameters{
+					ReceiveDelay1:        1 * time.Second,
+					ReceiveDelay2:        2 * time.Second,
+					JoinAcceptDelay1:     3 * time.Second,
+					JoinAcceptDelay2:     4 * time.Second,
+					MaxFCntGap:           5,
+					ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
+					MinRetransmitTimeout: 1 * time.Second,
+					MaxRetransmitTimeout: 2 * time.Second,
+				},
 			},
 			Expected: &ttnpb.BandDescription{
 				Id: "Nullable band",

@@ -20,7 +20,6 @@ import (
 	"os"
 	"path"
 	"testing"
-	"time"
 
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -101,18 +100,7 @@ type serializableBand struct {
 	ImplementsCFList bool
 	CFListType       ttnpb.CFListType
 
-	ReceiveDelay1 time.Duration
-	ReceiveDelay2 time.Duration
-
-	JoinAcceptDelay1 time.Duration
-	JoinAcceptDelay2 time.Duration
-	MaxFCntGap       uint
-
-	SupportsDynamicADR   bool
-	ADRAckLimit          ttnpb.ADRAckLimitExponent
-	ADRAckDelay          ttnpb.ADRAckDelayExponent
-	MinRetransmitTimeout time.Duration
-	MaxRetransmitTimeout time.Duration
+	SupportsDynamicADR bool
 
 	TxOffset            []float32
 	MaxADRDataRateIndex ttnpb.DataRateIndex
@@ -127,6 +115,8 @@ type serializableBand struct {
 	DefaultRx2Parameters band.Rx2Parameters
 
 	BootDwellTime band.DwellTime
+
+	SharedParameters band.SharedParameters
 }
 
 func makeRx1Channel(f func(uint8) (uint8, error)) map[uint8]uint8 {
@@ -188,18 +178,7 @@ func makeBand(b band.Band) serializableBand {
 		ImplementsCFList: b.ImplementsCFList,
 		CFListType:       b.CFListType,
 
-		ReceiveDelay1: b.ReceiveDelay1,
-		ReceiveDelay2: b.ReceiveDelay2,
-
-		JoinAcceptDelay1: b.JoinAcceptDelay1,
-		JoinAcceptDelay2: b.JoinAcceptDelay2,
-		MaxFCntGap:       b.MaxFCntGap,
-
-		SupportsDynamicADR:   b.SupportsDynamicADR,
-		ADRAckLimit:          b.ADRAckLimit,
-		ADRAckDelay:          b.ADRAckDelay,
-		MinRetransmitTimeout: b.MinRetransmitTimeout,
-		MaxRetransmitTimeout: b.MaxRetransmitTimeout,
+		SupportsDynamicADR: b.SupportsDynamicADR,
 
 		TxOffset:            b.TxOffset,
 		MaxADRDataRateIndex: b.MaxADRDataRateIndex,
@@ -217,6 +196,8 @@ func makeBand(b band.Band) serializableBand {
 		DefaultRx2Parameters: b.DefaultRx2Parameters,
 
 		BootDwellTime: b.BootDwellTime,
+
+		SharedParameters: b.SharedParameters,
 	}
 }
 
@@ -260,8 +241,12 @@ func TestBandDefinitions(t *testing.T) {
 }
 
 func TestLatest(t *testing.T) {
+	t.Parallel()
+
 	for name := range band.All {
+		name := name
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			if _, ok := band.LatestVersion[name]; !ok {
 				t.Fatal("Band not found in the latest version map")
 			}
@@ -269,7 +254,9 @@ func TestLatest(t *testing.T) {
 	}
 
 	for name := range band.LatestVersion {
+		name := name
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			if _, ok := band.All[name]; !ok {
 				t.Fatal("Band not found in the all map")
 			}
