@@ -7078,6 +7078,7 @@ Transmission settings for downlink.
 | `RP002_V1_0_1` | 9 |  |
 | `RP002_V1_0_2` | 10 |  |
 | `RP002_V1_0_3` | 11 |  |
+| `RP002_V1_0_4` | 12 |  |
 
 ### <a name="ttn.lorawan.v3.PingSlotPeriod">Enum `PingSlotPeriod`</a>
 
