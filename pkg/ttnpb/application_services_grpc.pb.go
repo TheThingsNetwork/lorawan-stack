@@ -429,14 +429,15 @@ var ApplicationRegistry_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	ApplicationAccess_ListRights_FullMethodName        = "/ttn.lorawan.v3.ApplicationAccess/ListRights"
-	ApplicationAccess_CreateAPIKey_FullMethodName      = "/ttn.lorawan.v3.ApplicationAccess/CreateAPIKey"
-	ApplicationAccess_ListAPIKeys_FullMethodName       = "/ttn.lorawan.v3.ApplicationAccess/ListAPIKeys"
-	ApplicationAccess_GetAPIKey_FullMethodName         = "/ttn.lorawan.v3.ApplicationAccess/GetAPIKey"
-	ApplicationAccess_UpdateAPIKey_FullMethodName      = "/ttn.lorawan.v3.ApplicationAccess/UpdateAPIKey"
-	ApplicationAccess_GetCollaborator_FullMethodName   = "/ttn.lorawan.v3.ApplicationAccess/GetCollaborator"
-	ApplicationAccess_SetCollaborator_FullMethodName   = "/ttn.lorawan.v3.ApplicationAccess/SetCollaborator"
-	ApplicationAccess_ListCollaborators_FullMethodName = "/ttn.lorawan.v3.ApplicationAccess/ListCollaborators"
+	ApplicationAccess_ListRights_FullMethodName         = "/ttn.lorawan.v3.ApplicationAccess/ListRights"
+	ApplicationAccess_CreateAPIKey_FullMethodName       = "/ttn.lorawan.v3.ApplicationAccess/CreateAPIKey"
+	ApplicationAccess_ListAPIKeys_FullMethodName        = "/ttn.lorawan.v3.ApplicationAccess/ListAPIKeys"
+	ApplicationAccess_GetAPIKey_FullMethodName          = "/ttn.lorawan.v3.ApplicationAccess/GetAPIKey"
+	ApplicationAccess_UpdateAPIKey_FullMethodName       = "/ttn.lorawan.v3.ApplicationAccess/UpdateAPIKey"
+	ApplicationAccess_GetCollaborator_FullMethodName    = "/ttn.lorawan.v3.ApplicationAccess/GetCollaborator"
+	ApplicationAccess_SetCollaborator_FullMethodName    = "/ttn.lorawan.v3.ApplicationAccess/SetCollaborator"
+	ApplicationAccess_ListCollaborators_FullMethodName  = "/ttn.lorawan.v3.ApplicationAccess/ListCollaborators"
+	ApplicationAccess_DeleteCollaborator_FullMethodName = "/ttn.lorawan.v3.ApplicationAccess/DeleteCollaborator"
 )
 
 // ApplicationAccessClient is the client API for ApplicationAccess service.
@@ -464,6 +465,8 @@ type ApplicationAccessClient interface {
 	SetCollaborator(ctx context.Context, in *SetApplicationCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// List the collaborators on this application.
 	ListCollaborators(ctx context.Context, in *ListApplicationCollaboratorsRequest, opts ...grpc.CallOption) (*Collaborators, error)
+	// DeleteCollaborator removes a collaborator from an application.
+	DeleteCollaborator(ctx context.Context, in *DeleteApplicationCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type applicationAccessClient struct {
@@ -546,6 +549,15 @@ func (c *applicationAccessClient) ListCollaborators(ctx context.Context, in *Lis
 	return out, nil
 }
 
+func (c *applicationAccessClient) DeleteCollaborator(ctx context.Context, in *DeleteApplicationCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ApplicationAccess_DeleteCollaborator_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationAccessServer is the server API for ApplicationAccess service.
 // All implementations must embed UnimplementedApplicationAccessServer
 // for forward compatibility
@@ -571,6 +583,8 @@ type ApplicationAccessServer interface {
 	SetCollaborator(context.Context, *SetApplicationCollaboratorRequest) (*emptypb.Empty, error)
 	// List the collaborators on this application.
 	ListCollaborators(context.Context, *ListApplicationCollaboratorsRequest) (*Collaborators, error)
+	// DeleteCollaborator removes a collaborator from an application.
+	DeleteCollaborator(context.Context, *DeleteApplicationCollaboratorRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedApplicationAccessServer()
 }
 
@@ -601,6 +615,9 @@ func (UnimplementedApplicationAccessServer) SetCollaborator(context.Context, *Se
 }
 func (UnimplementedApplicationAccessServer) ListCollaborators(context.Context, *ListApplicationCollaboratorsRequest) (*Collaborators, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCollaborators not implemented")
+}
+func (UnimplementedApplicationAccessServer) DeleteCollaborator(context.Context, *DeleteApplicationCollaboratorRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollaborator not implemented")
 }
 func (UnimplementedApplicationAccessServer) mustEmbedUnimplementedApplicationAccessServer() {}
 
@@ -759,6 +776,24 @@ func _ApplicationAccess_ListCollaborators_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationAccess_DeleteCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteApplicationCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationAccessServer).DeleteCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ApplicationAccess_DeleteCollaborator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationAccessServer).DeleteCollaborator(ctx, req.(*DeleteApplicationCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ApplicationAccess_ServiceDesc is the grpc.ServiceDesc for ApplicationAccess service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -797,6 +832,10 @@ var ApplicationAccess_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCollaborators",
 			Handler:    _ApplicationAccess_ListCollaborators_Handler,
+		},
+		{
+			MethodName: "DeleteCollaborator",
+			Handler:    _ApplicationAccess_DeleteCollaborator_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
