@@ -144,6 +144,8 @@
   - [Message `BandDescription.Channel`](#ttn.lorawan.v3.BandDescription.Channel)
   - [Message `BandDescription.DataRatesEntry`](#ttn.lorawan.v3.BandDescription.DataRatesEntry)
   - [Message `BandDescription.DwellTime`](#ttn.lorawan.v3.BandDescription.DwellTime)
+  - [Message `BandDescription.RelayParameters`](#ttn.lorawan.v3.BandDescription.RelayParameters)
+  - [Message `BandDescription.RelayParameters.RelayWORChannel`](#ttn.lorawan.v3.BandDescription.RelayParameters.RelayWORChannel)
   - [Message `BandDescription.Rx2Parameters`](#ttn.lorawan.v3.BandDescription.Rx2Parameters)
   - [Message `BandDescription.SubBandParameters`](#ttn.lorawan.v3.BandDescription.SubBandParameters)
   - [Message `FrequencyPlanDescription`](#ttn.lorawan.v3.FrequencyPlanDescription)
@@ -2466,6 +2468,7 @@ PeerInfo
 | `default_max_eirp` | [`float`](#float) |  |  |
 | `default_rx2_parameters` | [`BandDescription.Rx2Parameters`](#ttn.lorawan.v3.BandDescription.Rx2Parameters) |  |  |
 | `boot_dwell_time` | [`BandDescription.DwellTime`](#ttn.lorawan.v3.BandDescription.DwellTime) |  |  |
+| `relay` | [`BandDescription.RelayParameters`](#ttn.lorawan.v3.BandDescription.RelayParameters) |  |  |
 
 ### <a name="ttn.lorawan.v3.BandDescription.BandDataRate">Message `BandDescription.BandDataRate`</a>
 
@@ -2502,6 +2505,20 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `uplinks` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
 | `downlinks` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.RelayParameters">Message `BandDescription.RelayParameters`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `wor_channels` | [`BandDescription.RelayParameters.RelayWORChannel`](#ttn.lorawan.v3.BandDescription.RelayParameters.RelayWORChannel) | repeated |  |
+
+### <a name="ttn.lorawan.v3.BandDescription.RelayParameters.RelayWORChannel">Message `BandDescription.RelayParameters.RelayWORChannel`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `frequency` | [`uint64`](#uint64) |  |  |
+| `ack_frequency` | [`uint64`](#uint64) |  |  |
+| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
 
 ### <a name="ttn.lorawan.v3.BandDescription.Rx2Parameters">Message `BandDescription.Rx2Parameters`</a>
 

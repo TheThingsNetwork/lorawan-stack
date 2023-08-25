@@ -17244,6 +17244,18 @@
         }
       }
     },
+    "BandDescriptionRelayParameters": {
+      "type": "object",
+      "properties": {
+        "wor_channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/RelayParametersRelayWORChannel"
+          }
+        }
+      }
+    },
     "BandDescriptionRx2Parameters": {
       "type": "object",
       "properties": {
@@ -18418,6 +18430,22 @@
       ],
       "default": "ENABLED",
       "description": " - ENABLED: No restrictions are in place.\n - WARNING: Warnings are being emitted that the provider will be deprecated in the future.\n - DISABLED: New integrations cannot be set up, and old ones do not start."
+    },
+    "RelayParametersRelayWORChannel": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "ack_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        }
+      }
     },
     "TxAcknowledgmentResult": {
       "type": "string",
@@ -20356,6 +20384,9 @@
         },
         "boot_dwell_time": {
           "$ref": "#/definitions/BandDescriptionDwellTime"
+        },
+        "relay": {
+          "$ref": "#/definitions/BandDescriptionRelayParameters"
         }
       }
     },

@@ -15,7 +15,6 @@
 package band_test
 
 import (
-	"context"
 	"sort"
 	"testing"
 	"time"
@@ -24,6 +23,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -31,8 +31,7 @@ import (
 
 func TestGetPhyVersions(t *testing.T) {
 	t.Parallel()
-	a := assertions.New(t)
-	ctx := context.Background()
+	a, ctx := test.New(t)
 
 	for _, tc := range []struct {
 		Name           string
@@ -408,7 +407,7 @@ func TestGetPhyVersions(t *testing.T) {
 	}
 }
 
-func TestBand_convertToBandDescription(t *testing.T) {
+func TestBandConvertToBandDescription(t *testing.T) {
 	t.Parallel()
 	a := assertions.New(t)
 
@@ -479,6 +478,21 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				BootDwellTime: DwellTime{
 					Uplinks:   BoolPtr(true),
 					Downlinks: BoolPtr(true),
+				},
+
+				Relay: RelayParameters{
+					WORChannels: []RelayWORChannel{
+						{
+							Frequency:     1,
+							ACKFrequency:  2,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+						},
+						{
+							Frequency:     3,
+							ACKFrequency:  4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+						},
+					},
 				},
 
 				SharedParameters: SharedParameters{
@@ -562,6 +576,21 @@ func TestBand_convertToBandDescription(t *testing.T) {
 					Uplinks:   &wrapperspb.BoolValue{Value: true},
 					Downlinks: &wrapperspb.BoolValue{Value: true},
 				},
+
+				Relay: &ttnpb.BandDescription_RelayParameters{
+					WorChannels: []*ttnpb.BandDescription_RelayParameters_RelayWORChannel{
+						{
+							Frequency:     1,
+							AckFrequency:  2,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+						},
+						{
+							Frequency:     3,
+							AckFrequency:  4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+						},
+					},
+				},
 			},
 		},
 		{
@@ -621,6 +650,21 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				},
 
 				BootDwellTime: DwellTime{},
+
+				Relay: RelayParameters{
+					WORChannels: []RelayWORChannel{
+						{
+							Frequency:     1,
+							ACKFrequency:  2,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+						},
+						{
+							Frequency:     3,
+							ACKFrequency:  4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+						},
+					},
+				},
 
 				SharedParameters: SharedParameters{
 					ReceiveDelay1:        1 * time.Second,
@@ -700,6 +744,21 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				},
 
 				BootDwellTime: &ttnpb.BandDescription_DwellTime{},
+
+				Relay: &ttnpb.BandDescription_RelayParameters{
+					WorChannels: []*ttnpb.BandDescription_RelayParameters_RelayWORChannel{
+						{
+							Frequency:     1,
+							AckFrequency:  2,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+						},
+						{
+							Frequency:     3,
+							AckFrequency:  4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+						},
+					},
+				},
 			},
 		},
 	} {
@@ -739,8 +798,7 @@ func convertBands(input map[string]map[ttnpb.PHYVersion]Band) map[string]*ttnpb.
 
 func TestListBands(t *testing.T) {
 	t.Parallel()
-	a := assertions.New(t)
-	ctx := context.Background()
+	a, ctx := test.New(t)
 
 	for _, tc := range []struct {
 		Name           string

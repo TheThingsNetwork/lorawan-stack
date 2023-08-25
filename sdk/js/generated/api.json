@@ -9195,6 +9195,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "relay",
+              "description": "",
+              "label": "",
+              "type": "RelayParameters",
+              "longType": "BandDescription.RelayParameters",
+              "fullType": "ttn.lorawan.v3.BandDescription.RelayParameters",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -9383,6 +9395,78 @@
               "type": "BoolValue",
               "longType": "google.protobuf.BoolValue",
               "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayParameters",
+          "longName": "BandDescription.RelayParameters",
+          "fullName": "ttn.lorawan.v3.BandDescription.RelayParameters",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "wor_channels",
+              "description": "",
+              "label": "repeated",
+              "type": "RelayWORChannel",
+              "longType": "BandDescription.RelayParameters.RelayWORChannel",
+              "fullType": "ttn.lorawan.v3.BandDescription.RelayParameters.RelayWORChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayWORChannel",
+          "longName": "BandDescription.RelayParameters.RelayWORChannel",
+          "fullName": "ttn.lorawan.v3.BandDescription.RelayParameters.RelayWORChannel",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "ack_frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_index",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
