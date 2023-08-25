@@ -114,5 +114,7 @@ var US_902_928_RP2_V1_0_4 = Band{
 		Downlinks: boolPtr(false),
 	},
 
+	Relay: us902928RelayParameters,
+
 	SharedParameters: universalSharedParameters,
 }

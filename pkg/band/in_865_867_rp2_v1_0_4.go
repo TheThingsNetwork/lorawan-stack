@@ -98,5 +98,7 @@ var IN_865_867_RP2_V1_0_4 = Band{
 	},
 	PingSlotFrequencies: in865867BeaconFrequencies,
 
+	Relay: in865867RelayParameters,
+
 	SharedParameters: universalSharedParameters,
 }

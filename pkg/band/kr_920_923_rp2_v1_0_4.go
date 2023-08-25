@@ -87,5 +87,7 @@ var KR_920_923_RP2_V1_0_4 = Band{
 	},
 	PingSlotFrequencies: kr920923BeaconFrequencies,
 
+	Relay: kr920923RelayParameters,
+
 	SharedParameters: universalSharedParameters,
 }

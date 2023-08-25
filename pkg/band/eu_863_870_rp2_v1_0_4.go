@@ -131,5 +131,7 @@ var EU_863_870_RP2_V1_0_4 = Band{
 	},
 	PingSlotFrequencies: eu863870BeaconFrequencies,
 
+	Relay: eu863870RelayParameters,
+
 	SharedParameters: universalSharedParameters,
 }

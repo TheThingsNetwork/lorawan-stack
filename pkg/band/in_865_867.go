@@ -38,4 +38,19 @@ var (
 			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 	}
+
+	in865867RelayParameters = RelayParameters{
+		WORChannels: []RelayWORChannel{
+			{
+				Frequency:     866000000,
+				ACKFrequency:  866200000,
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+			},
+			{
+				Frequency:     866700000,
+				ACKFrequency:  866900000,
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+			},
+		},
+	}
 )

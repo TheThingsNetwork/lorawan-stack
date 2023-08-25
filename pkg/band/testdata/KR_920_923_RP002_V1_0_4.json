@@ -493,7 +493,18 @@
     "Downlinks": null
   },
   "Relay": {
-    "WORChannels": null
+    "WORChannels": [
+      {
+        "Frequency": 922700000,
+        "ACKFrequency": 922900000,
+        "DataRateIndex": 3
+      },
+      {
+        "Frequency": 923100000,
+        "ACKFrequency": 923100000,
+        "DataRateIndex": 3
+      }
+    ]
   },
   "SharedParameters": {
     "ReceiveDelay1": 1000000000,

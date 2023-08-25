@@ -90,5 +90,7 @@ var CN_470_510_26_A_RP2_v1_0_4 = Band{
 	ImplementsCFList: true,
 	CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
+	Relay: cn470510RelayParameters,
+
 	SharedParameters: universalSharedParameters,
 }

@@ -61,4 +61,19 @@ var (
 		{10, 9, 8, 8},
 		{11, 10, 9, 8},
 	}
+
+	us902928RelayParameters = RelayParameters{
+		WORChannels: []RelayWORChannel{
+			{
+				Frequency:     916700000,
+				ACKFrequency:  918300000,
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
+			},
+			{
+				Frequency:     919900000,
+				ACKFrequency:  921500000,
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
+			},
+		},
+	}
 )
