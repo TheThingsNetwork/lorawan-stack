@@ -116,6 +116,8 @@ type serializableBand struct {
 
 	BootDwellTime band.DwellTime
 
+	Relay band.RelayParameters
+
 	SharedParameters band.SharedParameters
 }
 
@@ -196,6 +198,8 @@ func makeBand(b band.Band) serializableBand {
 		DefaultRx2Parameters: b.DefaultRx2Parameters,
 
 		BootDwellTime: b.BootDwellTime,
+
+		Relay: b.Relay,
 
 		SharedParameters: b.SharedParameters,
 	}

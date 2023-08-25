@@ -73,7 +73,7 @@ type Band struct {
 	// then channel with index i should be enabled, otherwise it should be disabled.
 	// Meaning of currentChs is as follows: for i in range 0..len(currentChs) if currentChs[i] == true,
 	// then channel with index i is enabled, otherwise it is disabled.
-	// In case desiredChs equals currentChs, GenerateChMasks returns a singleton, which repesents a noop.
+	// In case desiredChs equals currentChs, GenerateChMasks returns a singleton, which represents a noop.
 	GenerateChMasks func(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error)
 	// ParseChMask computes the channels that have to be masked given ChMask mask and ChMaskCntl cntl.
 	ParseChMask func(mask [16]bool, cntl uint8) (map[uint8]bool, error)
@@ -83,6 +83,9 @@ type Band struct {
 
 	// BootDwellTime contains the dwell time values expected for a device on boot.
 	BootDwellTime DwellTime
+
+	// Relay contains the relay settings.
+	Relay RelayParameters
 
 	SharedParameters
 }

@@ -987,6 +987,9 @@
     "Uplinks": true,
     "Downlinks": false
   },
+  "Relay": {
+    "WORChannels": null
+  },
   "SharedParameters": {
     "ReceiveDelay1": 1000000000,
     "ReceiveDelay2": 2000000000,
