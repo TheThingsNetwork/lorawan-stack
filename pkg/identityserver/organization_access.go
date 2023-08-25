@@ -65,7 +65,9 @@ var (
 	)
 )
 
-func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
+func (*IdentityServer) listOrganizationRights(
+	ctx context.Context, ids *ttnpb.OrganizationIdentifiers,
+) (*ttnpb.Rights, error) {
 	orgRights, err := rights.ListOrganization(ctx, ids)
 	if err != nil {
 		return nil, err
