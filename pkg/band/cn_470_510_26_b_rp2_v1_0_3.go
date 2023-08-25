@@ -82,7 +82,9 @@ var CN_470_510_26_B_RP2_v1_0_3 = Band{
 	Beacon: Beacon{
 		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 		CodingRate:    Cr4_5,
+		Frequencies:   cn47051026BBeaconFrequencies,
 	},
+	PingSlotFrequencies: cn47051026BBeaconFrequencies,
 
 	FreqMultiplier:   100,
 	ImplementsCFList: true,
