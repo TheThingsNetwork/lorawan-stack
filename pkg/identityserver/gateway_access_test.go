@@ -448,26 +448,17 @@ func TestGatewayCollaborators(t *testing.T) { // nolint:gocyclo
 				}, opts...)
 				a.So(err, should.BeNil)
 				a.So(empty, should.Resemble, ttnpb.Empty)
+
+				// Verifies that it has been deleted.
+				got, err := reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
+					GatewayIds:   gtw1.GetIds(),
+					Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
 			})
-
-			got, err = reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
-				GatewayIds:   gtw1.GetIds(),
-				Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsNotFound(err), should.BeTrue)
-			}
-			a.So(got, should.BeNil)
-
-			// Verifies that it has been deleted.
-			got, err := reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
-				GatewayIds:   gtw1.GetIds(),
-				Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsNotFound(err), should.BeTrue)
-			}
-			a.So(got, should.BeNil)
 		}
 
 		// Try removing the only collaborator with _ALL rights.
