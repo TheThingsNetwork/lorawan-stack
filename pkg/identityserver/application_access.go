@@ -206,6 +206,7 @@ func (is *IdentityServer) updateApplicationAPIKey(
 		}
 
 		if len(req.ApiKey.Rights) == 0 && ttnpb.HasAnyField(req.GetFieldMask().GetPaths(), "rights") {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteAPIKey(ctx, req.ApplicationIds.GetEntityIdentifiers(), req.ApiKey)
 		}
 
@@ -233,6 +234,25 @@ func (is *IdentityServer) updateApplicationAPIKey(
 	})
 
 	return key, nil
+}
+
+func (is *IdentityServer) deleteApplicationAPIKey(
+	ctx context.Context, req *ttnpb.DeleteApplicationAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	// Require that caller has rights to manage API keys.
+	err := rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS)
+	if err != nil {
+		return nil, err
+	}
+
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		return st.DeleteAPIKey(ctx, req.ApplicationIds.GetEntityIdentifiers(), &ttnpb.APIKey{Id: req.KeyId})
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtDeleteApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.GetApplicationIds(), nil))
+	return ttnpb.Empty, nil
 }
 
 func (is *IdentityServer) getApplicationCollaborator(
@@ -489,6 +509,12 @@ func (aa *applicationAccess) UpdateAPIKey(
 	ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest,
 ) (*ttnpb.APIKey, error) {
 	return aa.updateApplicationAPIKey(ctx, req)
+}
+
+func (aa *applicationAccess) DeleteAPIKey(
+	ctx context.Context, req *ttnpb.DeleteApplicationAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	return aa.deleteApplicationAPIKey(ctx, req)
 }
 
 func (aa *applicationAccess) GetCollaborator(
