@@ -494,6 +494,50 @@
           ]
         },
         {
+          "name": "DeleteApplicationAPIKeyRequest",
+          "longName": "DeleteApplicationAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.DeleteApplicationAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "DeleteApplicationCollaboratorRequest",
           "longName": "DeleteApplicationCollaboratorRequest",
           "fullName": "ttn.lorawan.v3.DeleteApplicationCollaboratorRequest",
@@ -1297,6 +1341,28 @@
                       "method": "PUT",
                       "pattern": "/applications/{application_ids.application_id}/api-keys/{api_key.id}",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteAPIKey",
+              "description": "Delete a single API key of this application.",
+              "requestType": "DeleteApplicationAPIKeyRequest",
+              "requestLongType": "DeleteApplicationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteApplicationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/applications/{application_ids.application_id}/api-keys/{key_id}"
                     }
                   ]
                 }

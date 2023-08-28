@@ -662,6 +662,42 @@
         "tags": [
           "ApplicationAccess"
         ]
+      },
+      "delete": {
+        "summary": "Delete a single API key of this application.",
+        "operationId": "ApplicationAccess_DeleteAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
       }
     },
     "/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
