@@ -104,7 +104,6 @@ const ByteInput = ({
 
   const onChangeCallback = useCallback(
     evt => {
-      const { value: oldValue, unbounded } = rest
       const data = evt?.nativeEvent?.data
 
       // Due to the way that react-text-mask works, it is not possible to
@@ -113,7 +112,7 @@ const ByteInput = ({
       // if it targets the space character, since the deleted space would
       // be re-added right away. Hence, unbounded inputs need to remove
       // the space paddings manually.
-      let value = unbounded ? evt.target.value : clean(evt.target.value)
+      let newValue = unbounded ? evt.target.value : clean(evt.target.value)
 
       // Make sure values entered at the end of the input (with placeholders)
       // are added as expected. `selectionStart` cannot be used due to
@@ -122,19 +121,19 @@ const ByteInput = ({
         evt.target.value.endsWith(PLACEHOLDER_CHAR) &&
         data &&
         hex.test(data) &&
-        oldValue === value
+        value === newValue
       ) {
-        value += data
+        newValue += data
       }
 
       onChange({
         target: {
           name: evt.target.name,
-          value,
+          value: newValue,
         },
       })
     },
-    [onChange, rest],
+    [onChange, value, unbounded],
   )
 
   const onBlurCallback = useCallback(

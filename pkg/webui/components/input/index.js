@@ -56,7 +56,6 @@ const Input = React.forwardRef((props, ref) => {
     inputWidth,
     label,
     loading,
-    max,
     onBlur,
     onChange,
     onEnter,
@@ -78,9 +77,8 @@ const Input = React.forwardRef((props, ref) => {
   const intl = useIntl()
 
   const computeByteInputWidth = useCallback(() => {
-    const { showPerChar, max } = rest
     const isSafari = isSafariUserAgent()
-
+    const { max } = props
     const maxValue = showPerChar ? Math.ceil(max / 2) : max
     const multiplier = isSafari ? 2.1 : 1.8
 
@@ -96,7 +94,7 @@ const Input = React.forwardRef((props, ref) => {
     }
 
     return `${width}rem`
-  }, [rest, sensitive])
+  }, [sensitive, showPerChar, props])
 
   const handleHideToggleClick = useCallback(() => {
     setHidden(prevHidden => !prevHidden)
@@ -163,7 +161,7 @@ const Input = React.forwardRef((props, ref) => {
   let inputStyle
   if (type === 'byte') {
     Component = ByteInput
-    if (!inputWidthValue && max) {
+    if (!inputWidthValue && props.max) {
       inputStyle = { maxWidth: computeByteInputWidth() }
     }
   } else if (type === 'textarea') {
