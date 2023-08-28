@@ -300,6 +300,7 @@
 - [File `ttn/lorawan/v3/gateway.proto`](#ttn/lorawan/v3/gateway.proto)
   - [Message `CreateGatewayAPIKeyRequest`](#ttn.lorawan.v3.CreateGatewayAPIKeyRequest)
   - [Message `CreateGatewayRequest`](#ttn.lorawan.v3.CreateGatewayRequest)
+  - [Message `DeleteGatewayAPIKeyRequest`](#ttn.lorawan.v3.DeleteGatewayAPIKeyRequest)
   - [Message `DeleteGatewayCollaboratorRequest`](#ttn.lorawan.v3.DeleteGatewayCollaboratorRequest)
   - [Message `Gateway`](#ttn.lorawan.v3.Gateway)
   - [Message `Gateway.AttributesEntry`](#ttn.lorawan.v3.Gateway.AttributesEntry)
@@ -4617,6 +4618,19 @@ The Events service serves events from the cluster.
 | `gateway` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteGatewayAPIKeyRequest">Message `DeleteGatewayAPIKeyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `key_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.DeleteGatewayCollaboratorRequest">Message `DeleteGatewayCollaboratorRequest`</a>
 
 | Field | Type | Label | Description |
@@ -5108,6 +5122,7 @@ API keys and collaborators of gateways.
 | `ListAPIKeys` | [`ListGatewayAPIKeysRequest`](#ttn.lorawan.v3.ListGatewayAPIKeysRequest) | [`APIKeys`](#ttn.lorawan.v3.APIKeys) | List the API keys for this gateway. |
 | `GetAPIKey` | [`GetGatewayAPIKeyRequest`](#ttn.lorawan.v3.GetGatewayAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Get a single API key of this gateway. |
 | `UpdateAPIKey` | [`UpdateGatewayAPIKeyRequest`](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an API key of the gateway. This method can also be used to delete the API key, by giving it no rights. The caller is required to have all assigned or/and removed rights. |
+| `DeleteAPIKey` | [`DeleteGatewayAPIKeyRequest`](#ttn.lorawan.v3.DeleteGatewayAPIKeyRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a single API key of this gateway. |
 | `GetCollaborator` | [`GetGatewayCollaboratorRequest`](#ttn.lorawan.v3.GetGatewayCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the gateway. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
 | `SetCollaborator` | [`SetGatewayCollaboratorRequest`](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the gateway. This method can also be used to delete the collaborator, by giving them no rights. The caller is required to have all assigned or/and removed rights. |
 | `ListCollaborators` | [`ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) | List the collaborators on this gateway. |
@@ -5122,6 +5137,7 @@ API keys and collaborators of gateways.
 | `ListAPIKeys` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/api-keys` |  |
 | `GetAPIKey` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}` |  |
 | `UpdateAPIKey` | `PUT` | `/api/v3/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}` | `*` |
+| `DeleteAPIKey` | `DELETE` | `/api/v3/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}` |  |
 | `GetCollaborator` | `` | `/api/v3` |  |
 | `GetCollaborator` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}` |  |
 | `GetCollaborator` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}` |  |

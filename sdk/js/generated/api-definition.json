@@ -3197,6 +3197,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "GetCollaborator": {
       "file": "ttn/lorawan/v3/gateway_services.proto",
       "http": [

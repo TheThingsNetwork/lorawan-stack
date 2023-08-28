@@ -20369,6 +20369,50 @@
           ]
         },
         {
+          "name": "DeleteGatewayAPIKeyRequest",
+          "longName": "DeleteGatewayAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.DeleteGatewayAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "DeleteGatewayCollaboratorRequest",
           "longName": "DeleteGatewayCollaboratorRequest",
           "fullName": "ttn.lorawan.v3.DeleteGatewayCollaboratorRequest",
@@ -23062,6 +23106,28 @@
                       "method": "PUT",
                       "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteAPIKey",
+              "description": "Delete a single API key of this gateway.",
+              "requestType": "DeleteGatewayAPIKeyRequest",
+              "requestLongType": "DeleteGatewayAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteGatewayAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}"
                     }
                   ]
                 }
