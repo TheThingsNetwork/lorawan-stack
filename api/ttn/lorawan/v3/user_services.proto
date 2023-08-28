@@ -129,6 +129,11 @@ service UserAccess {
     };
   }
 
+  // Delete a single API key of this user.
+  rpc DeleteAPIKey(DeleteUserAPIKeyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/users/{user_ids.user_id}/api-keys/{key_id}"};
+  }
+
   // Create a login token that can be used for a one-time login as a user.
   rpc CreateLoginToken(CreateLoginTokenRequest) returns (CreateLoginTokenResponse) {
     option (google.api.http) = {post: "/users/{user_ids.user_id}/login-tokens"};

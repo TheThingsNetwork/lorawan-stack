@@ -6162,6 +6162,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/user_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/api-keys/{key_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "CreateLoginToken": {
       "file": "ttn/lorawan/v3/user_services.proto",
       "http": [

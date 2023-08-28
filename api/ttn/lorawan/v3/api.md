@@ -678,6 +678,7 @@
   - [Message `CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest)
   - [Message `CreateUserRequest`](#ttn.lorawan.v3.CreateUserRequest)
   - [Message `DeleteInvitationRequest`](#ttn.lorawan.v3.DeleteInvitationRequest)
+  - [Message `DeleteUserAPIKeyRequest`](#ttn.lorawan.v3.DeleteUserAPIKeyRequest)
   - [Message `GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest)
   - [Message `GetUserRequest`](#ttn.lorawan.v3.GetUserRequest)
   - [Message `Invitation`](#ttn.lorawan.v3.Invitation)
@@ -9668,6 +9669,19 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | ----- | ----------- |
 | `email` | <p>`string.email`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteUserAPIKeyRequest">Message `DeleteUserAPIKeyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `key_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetUserAPIKeyRequest">Message `GetUserAPIKeyRequest`</a>
 
 | Field | Type | Label | Description |
@@ -9963,6 +9977,7 @@ API keys of users.
 | `ListAPIKeys` | [`ListUserAPIKeysRequest`](#ttn.lorawan.v3.ListUserAPIKeysRequest) | [`APIKeys`](#ttn.lorawan.v3.APIKeys) | List the API keys for this user. |
 | `GetAPIKey` | [`GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Get a single API key of this user. |
 | `UpdateAPIKey` | [`UpdateUserAPIKeyRequest`](#ttn.lorawan.v3.UpdateUserAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an API key of the user. This method can also be used to delete the API key, by giving it no rights. The caller is required to have all assigned or/and removed rights. |
+| `DeleteAPIKey` | [`DeleteUserAPIKeyRequest`](#ttn.lorawan.v3.DeleteUserAPIKeyRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a single API key of this user. |
 | `CreateLoginToken` | [`CreateLoginTokenRequest`](#ttn.lorawan.v3.CreateLoginTokenRequest) | [`CreateLoginTokenResponse`](#ttn.lorawan.v3.CreateLoginTokenResponse) | Create a login token that can be used for a one-time login as a user. |
 
 #### HTTP bindings
@@ -9974,6 +9989,7 @@ API keys of users.
 | `ListAPIKeys` | `GET` | `/api/v3/users/{user_ids.user_id}/api-keys` |  |
 | `GetAPIKey` | `GET` | `/api/v3/users/{user_ids.user_id}/api-keys/{key_id}` |  |
 | `UpdateAPIKey` | `PUT` | `/api/v3/users/{user_ids.user_id}/api-keys/{api_key.id}` | `*` |
+| `DeleteAPIKey` | `DELETE` | `/api/v3/users/{user_ids.user_id}/api-keys/{key_id}` |  |
 | `CreateLoginToken` | `POST` | `/api/v3/users/{user_ids.user_id}/login-tokens` |  |
 
 ### <a name="ttn.lorawan.v3.UserInvitationRegistry">Service `UserInvitationRegistry`</a>
