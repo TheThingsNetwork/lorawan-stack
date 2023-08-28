@@ -5235,6 +5235,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/organization_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{key_id}",
+          "parameters": [
+            "organization_ids.organization_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "GetCollaborator": {
       "file": "ttn/lorawan/v3/organization_services.proto",
       "http": [

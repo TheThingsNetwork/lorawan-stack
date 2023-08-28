@@ -575,6 +575,7 @@
 - [File `ttn/lorawan/v3/organization.proto`](#ttn/lorawan/v3/organization.proto)
   - [Message `CreateOrganizationAPIKeyRequest`](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest)
   - [Message `CreateOrganizationRequest`](#ttn.lorawan.v3.CreateOrganizationRequest)
+  - [Message `DeleteOrganizationAPIKeyRequest`](#ttn.lorawan.v3.DeleteOrganizationAPIKeyRequest)
   - [Message `DeleteOrganizationCollaboratorRequest`](#ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest)
   - [Message `GetOrganizationAPIKeyRequest`](#ttn.lorawan.v3.GetOrganizationAPIKeyRequest)
   - [Message `GetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.GetOrganizationCollaboratorRequest)
@@ -8266,6 +8267,19 @@ is used to manage OAuth client authorizations for users.
 | `organization` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteOrganizationAPIKeyRequest">Message `DeleteOrganizationAPIKeyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| `key_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `organization_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest">Message `DeleteOrganizationCollaboratorRequest`</a>
 
 | Field | Type | Label | Description |
@@ -8466,6 +8480,7 @@ API keys and collaborators of organizations.
 | `ListAPIKeys` | [`ListOrganizationAPIKeysRequest`](#ttn.lorawan.v3.ListOrganizationAPIKeysRequest) | [`APIKeys`](#ttn.lorawan.v3.APIKeys) | List the API keys for this organization. |
 | `GetAPIKey` | [`GetOrganizationAPIKeyRequest`](#ttn.lorawan.v3.GetOrganizationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Get a single API key of this organization. |
 | `UpdateAPIKey` | [`UpdateOrganizationAPIKeyRequest`](#ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an API key of the organization. This method can also be used to delete the API key, by giving it no rights. The caller is required to have all assigned or/and removed rights. |
+| `DeleteAPIKey` | [`DeleteOrganizationAPIKeyRequest`](#ttn.lorawan.v3.DeleteOrganizationAPIKeyRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a single API key of this organization. |
 | `GetCollaborator` | [`GetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.GetOrganizationCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the organization. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
 | `SetCollaborator` | [`SetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the organization. Organization collaborators can get access to the organization itself, as well as any application, gateway and OAuth client this organization is a collaborator of. This method can also be used to delete the collaborator, by giving them no rights. The caller is required to have all assigned or/and removed rights. |
 | `ListCollaborators` | [`ListOrganizationCollaboratorsRequest`](#ttn.lorawan.v3.ListOrganizationCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) | List the collaborators on this organization. |
@@ -8480,6 +8495,7 @@ API keys and collaborators of organizations.
 | `ListAPIKeys` | `GET` | `/api/v3/organizations/{organization_ids.organization_id}/api-keys` |  |
 | `GetAPIKey` | `GET` | `/api/v3/organizations/{organization_ids.organization_id}/api-keys/{key_id}` |  |
 | `UpdateAPIKey` | `PUT` | `/api/v3/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}` | `*` |
+| `DeleteAPIKey` | `DELETE` | `/api/v3/organizations/{organization_ids.organization_id}/api-keys/{key_id}` |  |
 | `GetCollaborator` | `` | `/api/v3` |  |
 | `GetCollaborator` | `GET` | `/api/v3/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/organizations/{organization_ids.organization_id}/collaborators` | `*` |

@@ -206,6 +206,11 @@ message UpdateOrganizationAPIKeyRequest {
   google.protobuf.FieldMask field_mask = 3;
 }
 
+message DeleteOrganizationAPIKeyRequest {
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
+  string key_id = 2;
+}
+
 message ListOrganizationCollaboratorsRequest {
   OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.

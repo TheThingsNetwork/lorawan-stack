@@ -207,6 +207,16 @@ var UpdateOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"organization_ids",
 }
+var DeleteOrganizationAPIKeyRequestFieldPathsNested = []string{
+	"key_id",
+	"organization_ids",
+	"organization_ids.organization_id",
+}
+
+var DeleteOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
+	"key_id",
+	"organization_ids",
+}
 var ListOrganizationCollaboratorsRequestFieldPathsNested = []string{
 	"limit",
 	"order",

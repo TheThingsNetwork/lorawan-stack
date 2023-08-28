@@ -37692,6 +37692,50 @@
           ]
         },
         {
+          "name": "DeleteOrganizationAPIKeyRequest",
+          "longName": "DeleteOrganizationAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.DeleteOrganizationAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "DeleteOrganizationCollaboratorRequest",
           "longName": "DeleteOrganizationCollaboratorRequest",
           "fullName": "ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest",
@@ -38708,6 +38752,28 @@
                       "method": "PUT",
                       "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteAPIKey",
+              "description": "Delete a single API key of this organization.",
+              "requestType": "DeleteOrganizationAPIKeyRequest",
+              "requestLongType": "DeleteOrganizationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteOrganizationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{key_id}"
                     }
                   ]
                 }
