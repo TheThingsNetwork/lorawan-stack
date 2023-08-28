@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { injectIntl, defineMessages } from 'react-intl'
+import React, { useCallback, useImperativeHandle, useRef, useState } from 'react'
+import { defineMessages, useIntl } from 'react-intl'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
 
 import Icon from '@ttn-lw/components/icon'
 import Spinner from '@ttn-lw/components/spinner'
@@ -39,101 +38,47 @@ const m = defineMessages({
   hideValue: 'Hide value',
 })
 
-class Input extends React.Component {
-  static propTypes = {
-    action: PropTypes.shape({
-      ...Button.propTypes,
-    }),
-    actionDisable: PropTypes.bool,
-    append: PropTypes.node,
-    autoComplete: PropTypes.oneOf([
-      'current-password',
-      'email',
-      'name',
-      'new-password',
-      'off',
-      'on',
-      'url',
-      'username',
-    ]),
-    children: PropTypes.node,
-    className: PropTypes.string,
-    code: PropTypes.bool,
-    component: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    disabled: PropTypes.bool,
-    error: PropTypes.bool,
-    forwardedRef: PropTypes.shape({ current: PropTypes.shape({}) }),
-    icon: PropTypes.string,
-    inputRef: PropTypes.shape({ current: PropTypes.shape({}) }),
-    inputWidth: PropTypes.inputWidth,
-    intl: PropTypes.shape({
-      formatMessage: PropTypes.func,
-    }).isRequired,
-    label: PropTypes.string,
-    loading: PropTypes.bool,
-    max: PropTypes.number,
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
-    onEnter: PropTypes.func,
-    onFocus: PropTypes.func,
-    placeholder: PropTypes.message,
-    readOnly: PropTypes.bool,
-    sensitive: PropTypes.bool,
-    showPerChar: PropTypes.bool,
-    title: PropTypes.message,
-    type: PropTypes.string,
-    valid: PropTypes.bool,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    warning: PropTypes.bool,
-  }
+const Input = React.forwardRef((props, ref) => {
+  const {
+    action,
+    actionDisable,
+    append,
+    autoComplete,
+    children,
+    className,
+    code,
+    component,
+    disabled,
+    error,
+    forwardedRef,
+    icon,
+    inputRef,
+    inputWidth,
+    label,
+    loading,
+    max,
+    onBlur,
+    onChange,
+    onEnter,
+    onFocus,
+    placeholder,
+    readOnly,
+    sensitive,
+    showPerChar,
+    title,
+    type,
+    valid,
+    value,
+    warning,
+    ...rest
+  } = props
+  const [focus, setFocus] = useState(false)
+  const [hidden, setHidden] = useState(sensitive)
+  const input = useRef(null)
+  const intl = useIntl()
 
-  static defaultProps = {
-    action: undefined,
-    actionDisable: false,
-    append: null,
-    autoComplete: 'off',
-    children: undefined,
-    className: undefined,
-    code: false,
-    component: 'input',
-    disabled: false,
-    error: false,
-    /** Default `inputWidth` value is set programmatically based on input type. */
-    inputWidth: undefined,
-    icon: undefined,
-    label: undefined,
-    loading: false,
-    max: undefined,
-    onFocus: () => null,
-    onBlur: () => null,
-    onChange: () => null,
-    onEnter: () => null,
-    placeholder: undefined,
-    readOnly: false,
-    sensitive: false,
-    showPerChar: false,
-    title: undefined,
-    type: 'text',
-    valid: false,
-    value: '',
-    warning: false,
-    inputRef: null,
-    forwardedRef: null,
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      focus: false,
-      hidden: props.sensitive,
-    }
-  }
-
-  input = React.createRef(null)
-
-  _computeByteInputWidth() {
-    const { showPerChar, max, sensitive } = this.props
+  const computeByteInputWidth = useCallback(() => {
+    const { showPerChar, max } = rest
     const isSafari = isSafariUserAgent()
 
     const maxValue = showPerChar ? Math.ceil(max / 2) : max
@@ -151,193 +96,162 @@ class Input extends React.Component {
     }
 
     return `${width}rem`
-  }
+  }, [rest, sensitive])
 
-  @bind
-  handleHideToggleClick() {
-    this.setState(({ hidden }) => ({ hidden: !hidden }))
-  }
+  const handleHideToggleClick = useCallback(() => {
+    setHidden(prevHidden => !prevHidden)
+  }, [])
 
-  focus() {
-    if (this.input.current) {
-      this.input.current.focus()
+  const focusInput = useCallback(() => {
+    if (input.current) {
+      input.current.focus()
     }
 
-    this.setState({ focus: true })
-  }
+    setFocus(true)
+  }, [])
 
-  blur() {
-    if (this.input.current) {
-      this.input.current.blur()
+  const blurInput = useCallback(() => {
+    if (input.current) {
+      input.current.blur()
     }
 
-    this.setState({ focus: false })
-  }
+    setFocus(false)
+  }, [])
 
-  render() {
-    const {
-      action,
-      actionDisable,
-      append,
-      autoComplete,
-      children,
-      className,
-      code,
-      component,
-      disabled,
-      error,
-      forwardedRef,
-      icon,
-      inputRef,
-      inputWidth,
-      intl,
-      label,
-      loading,
-      onBlur,
-      onChange,
-      onEnter,
-      onFocus,
-      placeholder,
-      readOnly,
-      sensitive,
-      showPerChar,
-      title,
-      type,
-      valid,
-      value,
-      warning,
-      ...rest
-    } = this.props
+  // Expose the 'focus' and 'blur' methods to the parent component
+  useImperativeHandle(ref, () => ({
+    focus: focusInput,
+    blur: blurInput,
+  }))
 
-    const { focus, hidden } = this.state
-    const inputWidthValue = inputWidth || (type === 'byte' ? undefined : 'm')
+  const onFocusCallback = useCallback(
+    evt => {
+      setFocus(true)
+      onFocus(evt)
+    },
+    [onFocus],
+  )
 
-    let Component = component
-    let inputStyle
-    if (type === 'byte') {
-      Component = ByteInput
-      const { max } = this.props
-      if (!inputWidthValue && max) {
-        inputStyle = { maxWidth: this._computeByteInputWidth() }
+  const onBlurCallback = useCallback(
+    evt => {
+      setFocus(false)
+      onBlur(evt)
+    },
+    [onBlur],
+  )
+
+  const onChangeCallback = useCallback(
+    evt => {
+      const { value } = evt.target
+      onChange(value)
+    },
+    [onChange],
+  )
+
+  const onKeyDownCallback = useCallback(
+    evt => {
+      if (evt.key === 'Enter') {
+        onEnter(evt.target.value)
       }
-    } else if (type === 'textarea') {
-      Component = 'textarea'
+    },
+    [onEnter],
+  )
+
+  const inputWidthValue = inputWidth || (type === 'byte' ? undefined : 'm')
+
+  let Component = component
+  let inputStyle
+  if (type === 'byte') {
+    Component = ByteInput
+    if (!inputWidthValue && max) {
+      inputStyle = { maxWidth: computeByteInputWidth() }
     }
+  } else if (type === 'textarea') {
+    Component = 'textarea'
+  }
 
-    let inputPlaceholder = placeholder
-    if (typeof placeholder === 'object') {
-      inputPlaceholder = intl.formatMessage(placeholder, placeholder.values)
-    }
+  let inputPlaceholder = placeholder
+  if (typeof placeholder === 'object') {
+    inputPlaceholder = intl.formatMessage(placeholder, placeholder.values)
+  }
 
-    let inputTitle = title
-    if (typeof title === 'object') {
-      inputTitle = intl.formatMessage(title, title.values)
-    }
+  let inputTitle = title
+  if (typeof title === 'object') {
+    inputTitle = intl.formatMessage(title, title.values)
+  }
 
-    const v = valid && (Component.validate ? Component.validate(value, this.props) : true)
-    const hasAction = Boolean(action)
+  const v = valid && (Component.validate ? Component.validate(value, props) : true)
+  const hasAction = Boolean(action)
 
-    const inputCls = classnames(style.inputBox, {
-      [style[`input-width-${inputWidthValue}`]]: inputWidthValue,
-      [style.focus]: focus,
-      [style.error]: error,
-      [style.readOnly]: readOnly,
-      [style.warn]: !error && warning,
-      [style.disabled]: disabled,
-      [style.code]: code,
-      [style.actionable]: hasAction,
-      [style.textarea]: type === 'textarea',
-    })
-    const inputElemCls = classnames(style.input, { [style.hidden]: hidden })
+  const inputCls = classnames(style.inputBox, {
+    [style[`input-width-${inputWidthValue}`]]: inputWidthValue,
+    [style.focus]: focus,
+    [style.error]: error,
+    [style.readOnly]: readOnly,
+    [style.warn]: !error && warning,
+    [style.disabled]: disabled,
+    [style.code]: code,
+    [style.actionable]: hasAction,
+    [style.textarea]: type === 'textarea',
+  })
+  const inputElemCls = classnames(style.input, { [style.hidden]: hidden })
 
-    const passedProps = {
-      ...rest,
-      ...(type === 'byte' ? { showPerChar } : {}),
-      ref: inputRef ? combineRefs([this.input, inputRef]) : this.input,
-    }
+  const passedProps = {
+    ...rest,
+    ...(type === 'byte' ? { showPerChar } : {}),
+    ref: inputRef ? combineRefs([input, inputRef]) : input,
+  }
 
-    return (
-      <div className={classnames(className, style.container)}>
-        <div className={inputCls} style={inputStyle}>
-          {icon && <Icon className={style.icon} icon={icon} />}
-          <Component
-            key="i"
-            className={inputElemCls}
-            type={type}
-            value={value}
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-            onChange={this.onChange}
-            onKeyDown={this.onKeyDown}
-            placeholder={inputPlaceholder}
-            disabled={disabled}
-            readOnly={readOnly}
-            title={inputTitle}
-            autoComplete={autoComplete}
-            {...passedProps}
-          />
-          {v && <Valid show={v} />}
-          {loading && <Spinner className={style.spinner} small />}
-          {sensitive && value.length !== 0 && (
-            <Tooltip
-              delay={[1250, 200]}
-              hideOnClick={false}
-              content={<Message content={hidden ? m.showValue : m.hideValue} />}
-              trigger="mouseenter"
-              small
-            >
-              <Button
-                icon={hidden ? 'visibility' : 'visibility_off'}
-                className={style.hideToggle}
-                onClick={this.handleHideToggleClick}
-                naked
-                type="button"
-              />
-            </Tooltip>
-          )}
-          {append && <div className={style.append}>{append}</div>}
-        </div>
-        {hasAction && (
-          <div className={style.actions}>
-            <Button className={style.button} {...action} disabled={disabled || actionDisable} />
-          </div>
+  return (
+    <div className={classnames(className, style.container)}>
+      <div className={inputCls} style={inputStyle}>
+        {icon && <Icon className={style.icon} icon={icon} />}
+        <Component
+          key="i"
+          className={inputElemCls}
+          type={type}
+          value={value}
+          onFocus={onFocusCallback}
+          onBlur={onBlurCallback}
+          onChange={onChangeCallback}
+          onKeyDown={onKeyDownCallback}
+          placeholder={inputPlaceholder}
+          disabled={disabled}
+          readOnly={readOnly}
+          title={inputTitle}
+          autoComplete={autoComplete}
+          {...passedProps}
+        />
+        {v && <Valid show={v} />}
+        {loading && <Spinner className={style.spinner} small />}
+        {sensitive && value.length !== 0 && (
+          <Tooltip
+            delay={[1250, 200]}
+            hideOnClick={false}
+            content={<Message content={hidden ? m.showValue : m.hideValue} />}
+            trigger="mouseenter"
+            small
+          >
+            <Button
+              icon={hidden ? 'visibility' : 'visibility_off'}
+              className={style.hideToggle}
+              onClick={handleHideToggleClick}
+              naked
+              type="button"
+            />
+          </Tooltip>
         )}
-        {children}
+        {append && <div className={style.append}>{append}</div>}
       </div>
-    )
-  }
-
-  @bind
-  onFocus(evt) {
-    const { onFocus } = this.props
-
-    this.setState({ focus: true })
-    onFocus(evt)
-  }
-
-  @bind
-  onBlur(evt) {
-    const { onBlur } = this.props
-
-    this.setState({ focus: false })
-    onBlur(evt)
-  }
-
-  @bind
-  onChange(evt) {
-    const { onChange } = this.props
-    const { value } = evt.target
-
-    onChange(value)
-  }
-
-  @bind
-  onKeyDown(evt) {
-    if (evt.key === 'Enter') {
-      this.props.onEnter(evt.target.value)
-    }
-  }
-}
+      {hasAction && (
+        <div className={style.actions}>
+          <Button className={style.button} {...action} disabled={disabled || actionDisable} />
+        </div>
+      )}
+      {children}
+    </div>
+  )
+})
 
 const Valid = props => {
   const classname = classnames(style.valid, {
@@ -359,7 +273,88 @@ Valid.defaultProps = {
   show: false,
 }
 
+Input.propTypes = {
+  action: PropTypes.shape({
+    ...Button.propTypes,
+  }),
+  actionDisable: PropTypes.bool,
+  append: PropTypes.node,
+  autoComplete: PropTypes.oneOf([
+    'current-password',
+    'email',
+    'name',
+    'new-password',
+    'off',
+    'on',
+    'url',
+    'username',
+  ]),
+  children: PropTypes.node,
+  className: PropTypes.string,
+  code: PropTypes.bool,
+  component: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  disabled: PropTypes.bool,
+  error: PropTypes.bool,
+  forwardedRef: PropTypes.shape({ current: PropTypes.shape({}) }),
+  icon: PropTypes.string,
+  inputRef: PropTypes.shape({ current: PropTypes.shape({}) }),
+  inputWidth: PropTypes.inputWidth,
+  intl: PropTypes.shape({
+    formatMessage: PropTypes.func,
+  }).isRequired,
+  label: PropTypes.string,
+  loading: PropTypes.bool,
+  max: PropTypes.number,
+  onBlur: PropTypes.func,
+  onChange: PropTypes.func,
+  onEnter: PropTypes.func,
+  onFocus: PropTypes.func,
+  placeholder: PropTypes.message,
+  readOnly: PropTypes.bool,
+  sensitive: PropTypes.bool,
+  showPerChar: PropTypes.bool,
+  title: PropTypes.message,
+  type: PropTypes.string,
+  valid: PropTypes.bool,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  warning: PropTypes.bool,
+}
+
+Input.defaultProps = {
+  action: undefined,
+  actionDisable: false,
+  append: null,
+  autoComplete: 'off',
+  children: undefined,
+  className: undefined,
+  code: false,
+  component: 'input',
+  disabled: false,
+  error: false,
+  /** Default `inputWidth` value is set programmatically based on input type. */
+  inputWidth: undefined,
+  icon: undefined,
+  label: undefined,
+  loading: false,
+  max: undefined,
+  onFocus: () => null,
+  onBlur: () => null,
+  onChange: () => null,
+  onEnter: () => null,
+  placeholder: undefined,
+  readOnly: false,
+  sensitive: false,
+  showPerChar: false,
+  title: undefined,
+  type: 'text',
+  valid: false,
+  value: '',
+  warning: false,
+  inputRef: null,
+  forwardedRef: null,
+}
+
 Input.Toggled = Toggled
 Input.Generate = Generate
 
-export default injectIntl(Input, { forwardRef: true })
+export default Input
