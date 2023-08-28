@@ -1180,7 +1180,7 @@
   },
   "error:cmd/internal/shared:initialize_application_server": {
     "translations": {
-      "en": "could not initialize Application Server"
+      "en": "initialize Application Server"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1189,7 +1189,7 @@
   },
   "error:cmd/internal/shared:initialize_base_component": {
     "translations": {
-      "en": "could not initialize base component"
+      "en": "initialize base component"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1198,7 +1198,7 @@
   },
   "error:cmd/internal/shared:initialize_console": {
     "translations": {
-      "en": "could not initialize Console"
+      "en": "initialize Console"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1207,7 +1207,7 @@
   },
   "error:cmd/internal/shared:initialize_device_claiming_server": {
     "translations": {
-      "en": "could not initialize Device Claiming Server"
+      "en": "initialize Device Claiming Server"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1216,7 +1216,7 @@
   },
   "error:cmd/internal/shared:initialize_device_repository": {
     "translations": {
-      "en": "could not initialize Device Repository"
+      "en": "initialize Device Repository"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1225,7 +1225,7 @@
   },
   "error:cmd/internal/shared:initialize_device_template_converter": {
     "translations": {
-      "en": "could not initialize Device Template Converter"
+      "en": "initialize Device Template Converter"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1234,7 +1234,7 @@
   },
   "error:cmd/internal/shared:initialize_gateway_configuration_server": {
     "translations": {
-      "en": "could not initialize Gateway Configuration Server"
+      "en": "initialize Gateway Configuration Server"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1243,7 +1243,7 @@
   },
   "error:cmd/internal/shared:initialize_gateway_server": {
     "translations": {
-      "en": "could not initialize Gateway Server"
+      "en": "initialize Gateway Server"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1252,7 +1252,7 @@
   },
   "error:cmd/internal/shared:initialize_identity_server": {
     "translations": {
-      "en": "could not initialize Identity Server"
+      "en": "initialize Identity Server"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1261,7 +1261,7 @@
   },
   "error:cmd/internal/shared:initialize_join_server": {
     "translations": {
-      "en": "could not initialize Join Server"
+      "en": "initialize Join Server"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1270,7 +1270,7 @@
   },
   "error:cmd/internal/shared:initialize_logger": {
     "translations": {
-      "en": "could not initialize logger"
+      "en": "initialize logger"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1279,7 +1279,7 @@
   },
   "error:cmd/internal/shared:initialize_network_server": {
     "translations": {
-      "en": "could not initialize Network Server"
+      "en": "initialize Network Server"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1288,7 +1288,7 @@
   },
   "error:cmd/internal/shared:initialize_packet_broker_agent": {
     "translations": {
-      "en": "could not initialize Packet Broker Agent"
+      "en": "initialize Packet Broker Agent"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1297,7 +1297,7 @@
   },
   "error:cmd/internal/shared:initialize_qr_code_generator": {
     "translations": {
-      "en": "could not initialize QR Code Generator"
+      "en": "initialize QR Code Generator"
     },
     "description": {
       "package": "cmd/internal/shared",
@@ -1387,7 +1387,7 @@
   },
   "error:cmd/ttn-lw-cli/commands:end_device_claim": {
     "translations": {
-      "en": "could not claim end device"
+      "en": "claim end device"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
@@ -1396,7 +1396,7 @@
   },
   "error:cmd/ttn-lw-cli/commands:end_device_claim_info": {
     "translations": {
-      "en": "could not get end device claim info from DCS"
+      "en": "get end device claim info from DCS"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
@@ -1450,7 +1450,7 @@
   },
   "error:cmd/ttn-lw-cli/commands:fail_write": {
     "translations": {
-      "en": "failed to write `{file}`"
+      "en": "write `{file}`"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
@@ -1972,7 +1972,7 @@
   },
   "error:pkg/account/session:auth_cookie": {
     "translations": {
-      "en": "could not get auth cookie"
+      "en": "get auth cookie"
     },
     "description": {
       "package": "pkg/account/session",
@@ -2089,7 +2089,7 @@
   },
   "error:pkg/applicationserver/io/grpc:connect": {
     "translations": {
-      "en": "failed to connect application `{application_uid}`"
+      "en": "connect application `{application_uid}`"
     },
     "description": {
       "package": "pkg/applicationserver/io/grpc",
@@ -2125,7 +2125,7 @@
   },
   "error:pkg/applicationserver/io/packages/alcsync/v1:command_creation_failed": {
     "translations": {
-      "en": "failed to create command"
+      "en": "create command"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
@@ -2134,7 +2134,7 @@
   },
   "error:pkg/applicationserver/io/packages/alcsync/v1:downlink_creation_failed": {
     "translations": {
-      "en": "failed to create downlink"
+      "en": "create downlink"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
@@ -2179,7 +2179,7 @@
   },
   "error:pkg/applicationserver/io/packages/alcsync/v1:pkg_data_merge": {
     "translations": {
-      "en": "failed to merge package data"
+      "en": "merge package data"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/alcsync/v1",
@@ -2620,7 +2620,7 @@
   },
   "error:pkg/applicationserver/io/web:parse_file": {
     "translations": {
-      "en": "could not parse file"
+      "en": "parse file"
     },
     "description": {
       "package": "pkg/applicationserver/io/web",
@@ -2746,7 +2746,7 @@
   },
   "error:pkg/applicationserver:app_s_key": {
     "translations": {
-      "en": "failed to get AppSKey"
+      "en": "get AppSKey"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -2845,7 +2845,7 @@
   },
   "error:pkg/applicationserver:listen_frontend": {
     "translations": {
-      "en": "failed to start frontend listener `{protocol}` on address `{address}`"
+      "en": "start frontend listener `{protocol}` on address `{address}`"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -2917,7 +2917,7 @@
   },
   "error:pkg/applicationserver:rebuild": {
     "translations": {
-      "en": "could not rebuild device session; check device address"
+      "en": "rebuild device session; check device address"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -2998,7 +2998,7 @@
   },
   "error:pkg/auth/pbkdf2:pbkdf2_iterations": {
     "translations": {
-      "en": "could not determine number of iterations from `{iterations}`"
+      "en": "determine number of iterations from `{iterations}`"
     },
     "description": {
       "package": "pkg/auth/pbkdf2",
@@ -3007,7 +3007,7 @@
   },
   "error:pkg/auth/pbkdf2:pbkdf2_key_length": {
     "translations": {
-      "en": "could not determine key length"
+      "en": "determine key length"
     },
     "description": {
       "package": "pkg/auth/pbkdf2",
@@ -3295,7 +3295,7 @@
   },
   "error:pkg/basicstation/cups:server_trust": {
     "translations": {
-      "en": "failed to fetch server trust for address `{address}`"
+      "en": "fetch server trust for address `{address}`"
     },
     "description": {
       "package": "pkg/basicstation/cups",
@@ -3385,7 +3385,7 @@
   },
   "error:pkg/component:listen_endpoint": {
     "translations": {
-      "en": "could not listen on `{endpoint}` address"
+      "en": "listen on `{endpoint}` address"
     },
     "description": {
       "package": "pkg/component",
@@ -3394,7 +3394,7 @@
   },
   "error:pkg/component:listener": {
     "translations": {
-      "en": "could not create `{protocol}` listener"
+      "en": "create `{protocol}` listener"
     },
     "description": {
       "package": "pkg/component",
@@ -3754,7 +3754,7 @@
   },
   "error:pkg/deviceclaimingserver:no_join_eui": {
     "translations": {
-      "en": "failed to extract JoinEUI from request"
+      "en": "extract JoinEUI from request"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",
@@ -4033,7 +4033,7 @@
   },
   "error:pkg/encoding/lorawan:decode": {
     "translations": {
-      "en": "could not decode `{lorawan_field}`"
+      "en": "decode `{lorawan_field}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -4042,7 +4042,7 @@
   },
   "error:pkg/encoding/lorawan:decoding_mac_command": {
     "translations": {
-      "en": "could not decode MAC command with CID `{cid}`"
+      "en": "decode MAC command with CID `{cid}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -4051,7 +4051,7 @@
   },
   "error:pkg/encoding/lorawan:encode": {
     "translations": {
-      "en": "could not encode `{lorawan_field}`"
+      "en": "encode `{lorawan_field}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -4087,7 +4087,7 @@
   },
   "error:pkg/encoding/lorawan:encoding_mac_command": {
     "translations": {
-      "en": "could not encode MAC command with CID `{cid}`"
+      "en": "encode MAC command with CID `{cid}`"
     },
     "description": {
       "package": "pkg/encoding/lorawan",
@@ -4429,7 +4429,7 @@
   },
   "error:pkg/fetch:fetch_file": {
     "translations": {
-      "en": "could not fetch file `{filename}`"
+      "en": "fetch file `{filename}`"
     },
     "description": {
       "package": "pkg/fetch",
@@ -4456,7 +4456,7 @@
   },
   "error:pkg/fetch:read_file": {
     "translations": {
-      "en": "could not read file `{filename}`"
+      "en": "read file `{filename}`"
     },
     "description": {
       "package": "pkg/fetch",
@@ -4555,7 +4555,7 @@
   },
   "error:pkg/frequencyplans:parse_file": {
     "translations": {
-      "en": "could not parse file"
+      "en": "parse file"
     },
     "description": {
       "package": "pkg/frequencyplans",
@@ -4564,7 +4564,7 @@
   },
   "error:pkg/frequencyplans:read": {
     "translations": {
-      "en": "could not read frequency plan `{id}`"
+      "en": "read frequency plan `{id}`"
     },
     "description": {
       "package": "pkg/frequencyplans",
@@ -4573,7 +4573,7 @@
   },
   "error:pkg/frequencyplans:read_base": {
     "translations": {
-      "en": "could not read the base `{base_id}` of frequency plan `{id}`"
+      "en": "read the base `{base_id}` of frequency plan `{id}`"
     },
     "description": {
       "package": "pkg/frequencyplans",
@@ -4582,7 +4582,7 @@
   },
   "error:pkg/frequencyplans:read_list": {
     "translations": {
-      "en": "could not read the list of frequency plans"
+      "en": "read the list of frequency plans"
     },
     "description": {
       "package": "pkg/frequencyplans",
@@ -4627,7 +4627,7 @@
   },
   "error:pkg/gatewayserver/io/grpc:connect": {
     "translations": {
-      "en": "failed to connect gateway `{gateway_uid}`"
+      "en": "connect gateway `{gateway_uid}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io/grpc",
@@ -4717,7 +4717,7 @@
   },
   "error:pkg/gatewayserver/io/udp:downlink_claim": {
     "translations": {
-      "en": "failed to claim downlink"
+      "en": "claim downlink"
     },
     "description": {
       "package": "pkg/gatewayserver/io/udp",
@@ -5014,7 +5014,7 @@
   },
   "error:pkg/gatewayserver/io:tx_schedule": {
     "translations": {
-      "en": "failed to schedule"
+      "en": "schedule"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
@@ -5176,7 +5176,7 @@
   },
   "error:pkg/gatewayserver:host_handle": {
     "translations": {
-      "en": "host `{host}` failed to handle message"
+      "en": "host `{host}` handle message"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5194,7 +5194,7 @@
   },
   "error:pkg/gatewayserver:listen_frontend": {
     "translations": {
-      "en": "failed to start frontend listener `{protocol}` on address `{address}`"
+      "en": "start frontend listener `{protocol}` on address `{address}`"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5248,7 +5248,7 @@
   },
   "error:pkg/gatewayserver:schedule": {
     "translations": {
-      "en": "failed to schedule"
+      "en": "schedule"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5257,7 +5257,7 @@
   },
   "error:pkg/gatewayserver:schedule_path": {
     "translations": {
-      "en": "failed to schedule on path `{gateway_uid}`"
+      "en": "schedule on path `{gateway_uid}`"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5284,7 +5284,7 @@
   },
   "error:pkg/gatewayserver:upstream": {
     "translations": {
-      "en": "failed to setup upstream `{name}`"
+      "en": "setup upstream `{name}`"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -6274,7 +6274,7 @@
   },
   "error:pkg/interop:generate_session_key_id": {
     "translations": {
-      "en": "failed to generate session key ID"
+      "en": "generate session key ID"
     },
     "description": {
       "package": "pkg/interop",
@@ -6571,7 +6571,7 @@
   },
   "error:pkg/joinserver:application_activation_settings": {
     "translations": {
-      "en": "failed to get application activation settings"
+      "en": "get application activation settings"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6589,7 +6589,7 @@
   },
   "error:pkg/joinserver:compute_mic": {
     "translations": {
-      "en": "failed to compute MIC"
+      "en": "compute MIC"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6598,7 +6598,7 @@
   },
   "error:pkg/joinserver:decode_payload": {
     "translations": {
-      "en": "failed to decode payload"
+      "en": "decode payload"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6607,7 +6607,7 @@
   },
   "error:pkg/joinserver:derive_app_s_key": {
     "translations": {
-      "en": "failed to derive application session key"
+      "en": "derive application session key"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6616,7 +6616,7 @@
   },
   "error:pkg/joinserver:derive_nwk_s_keys": {
     "translations": {
-      "en": "failed to derive network session keys"
+      "en": "derive network session keys"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6661,7 +6661,7 @@
   },
   "error:pkg/joinserver:encode_payload": {
     "translations": {
-      "en": "failed to encode payload"
+      "en": "encode payload"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6670,7 +6670,7 @@
   },
   "error:pkg/joinserver:encrypt_payload": {
     "translations": {
-      "en": "failed to encrypt JoinAccept"
+      "en": "encrypt JoinAccept"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6697,7 +6697,7 @@
   },
   "error:pkg/joinserver:generate_session_key_id": {
     "translations": {
-      "en": "failed to generate session key ID"
+      "en": "generate session key ID"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6940,7 +6940,7 @@
   },
   "error:pkg/joinserver:unwrap_key": {
     "translations": {
-      "en": "failed to unwrap key"
+      "en": "unwrap key"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6949,7 +6949,7 @@
   },
   "error:pkg/joinserver:wrap_key": {
     "translations": {
-      "en": "failed to wrap key with KEK label `{label}`"
+      "en": "wrap key with KEK label `{label}`"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -7093,7 +7093,7 @@
   },
   "error:pkg/networkserver/internal:channel_data_rate_range": {
     "translations": {
-      "en": "could not generate channel datarate range"
+      "en": "generate channel datarate range"
     },
     "description": {
       "package": "pkg/networkserver/internal",
@@ -7102,7 +7102,7 @@
   },
   "error:pkg/networkserver/internal:channel_mask": {
     "translations": {
-      "en": "could not generate channel mask"
+      "en": "generate channel mask"
     },
     "description": {
       "package": "pkg/networkserver/internal",
@@ -7147,7 +7147,7 @@
   },
   "error:pkg/networkserver/internal:network_downlink_slot": {
     "translations": {
-      "en": "could not generate network initiated downlink slot"
+      "en": "generate network initiated downlink slot"
     },
     "description": {
       "package": "pkg/networkserver/internal",
@@ -7381,7 +7381,7 @@
   },
   "error:pkg/networkserver:compute_mic": {
     "translations": {
-      "en": "failed to compute MIC"
+      "en": "compute MIC"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -7444,7 +7444,7 @@
   },
   "error:pkg/networkserver:decode_payload": {
     "translations": {
-      "en": "failed to decode payload"
+      "en": "decode payload"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -7525,7 +7525,7 @@
   },
   "error:pkg/networkserver:encode_mac": {
     "translations": {
-      "en": "failed to encode MAC commands"
+      "en": "encode MAC commands"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -7534,7 +7534,7 @@
   },
   "error:pkg/networkserver:encode_payload": {
     "translations": {
-      "en": "failed to encode payload"
+      "en": "encode payload"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -7543,7 +7543,7 @@
   },
   "error:pkg/networkserver:encrypt_mac": {
     "translations": {
-      "en": "failed to encrypt MAC commands"
+      "en": "encrypt MAC commands"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -8362,7 +8362,7 @@
   },
   "error:pkg/redis:decode": {
     "translations": {
-      "en": "failed to decode value"
+      "en": "decode value"
     },
     "description": {
       "package": "pkg/redis",
@@ -8371,7 +8371,7 @@
   },
   "error:pkg/redis:encode": {
     "translations": {
-      "en": "failed to encode value"
+      "en": "encode value"
     },
     "description": {
       "package": "pkg/redis",
@@ -8641,7 +8641,7 @@
   },
   "error:pkg/ttnpb/udp:eui": {
     "translations": {
-      "en": "failed to parse EUI"
+      "en": "parse EUI"
     },
     "description": {
       "package": "pkg/ttnpb/udp",
@@ -8677,7 +8677,7 @@
   },
   "error:pkg/ttnpb/udp:payload": {
     "translations": {
-      "en": "failed to parse binary payload"
+      "en": "parse binary payload"
     },
     "description": {
       "package": "pkg/ttnpb/udp",
@@ -8686,7 +8686,7 @@
   },
   "error:pkg/ttnpb/udp:timestamp": {
     "translations": {
-      "en": "failed to parse timestamp"
+      "en": "parse timestamp"
     },
     "description": {
       "package": "pkg/ttnpb/udp",
@@ -8749,7 +8749,7 @@
   },
   "error:pkg/ttnpb:parse": {
     "translations": {
-      "en": "could not parse `{value}` into `{field}`"
+      "en": "parse `{value}` into `{field}`"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -9793,7 +9793,7 @@
   },
   "event:gs.down.schedule.fail": {
     "translations": {
-      "en": "failed to schedule downlink for transmission by gateway"
+      "en": "schedule downlink for transmission by gateway"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -10063,7 +10063,7 @@
   },
   "event:ns.down.data.schedule.fail": {
     "translations": {
-      "en": "failed to schedule data downlink for transmission on Gateway Server"
+      "en": "schedule data downlink for transmission on Gateway Server"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -10090,7 +10090,7 @@
   },
   "event:ns.down.join.schedule.fail": {
     "translations": {
-      "en": "failed to schedule join-accept for transmission on Gateway Server"
+      "en": "schedule join-accept for transmission on Gateway Server"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -10108,7 +10108,7 @@
   },
   "event:ns.down.rx.parameters.fail": {
     "translations": {
-      "en": "failed to compute RX parameters"
+      "en": "compute RX parameters"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -10117,7 +10117,7 @@
   },
   "event:ns.down.transmission.fail": {
     "translations": {
-      "en": "failed to transmit downlink"
+      "en": "transmit downlink"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -10216,7 +10216,7 @@
   },
   "event:ns.mac.command.parse.fail": {
     "translations": {
-      "en": "failed to parse MAC command"
+      "en": "parse MAC command"
     },
     "description": {
       "package": "pkg/networkserver/mac",
@@ -10225,7 +10225,7 @@
   },
   "event:ns.mac.command.process.fail": {
     "translations": {
-      "en": "failed to process MAC command"
+      "en": "process MAC command"
     },
     "description": {
       "package": "pkg/networkserver/mac",

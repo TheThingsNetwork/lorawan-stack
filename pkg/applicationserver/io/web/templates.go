@@ -127,7 +127,7 @@ type queryResult struct {
 
 var (
 	errFetchFailed = errors.Define("fetch", "fetching failed")
-	errParseFile   = errors.DefineCorruption("parse_file", "could not parse file")
+	errParseFile   = errors.DefineCorruption("parse_file", "parse file")
 )
 
 func (ts *templateStore) allTemplateIDs() (ids []string, err error) {

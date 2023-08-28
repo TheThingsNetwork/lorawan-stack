@@ -224,7 +224,7 @@ func wrapKeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, k
 }
 
 var (
-	errGetApplicationActivationSettings = errors.Define("application_activation_settings", "failed to get application activation settings")
+	errGetApplicationActivationSettings = errors.Define("application_activation_settings", "get application activation settings")
 	errNoKEK                            = errors.DefineNotFound("kek", "KEK not found")
 )
 
