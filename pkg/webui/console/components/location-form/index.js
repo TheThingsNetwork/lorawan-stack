@@ -83,6 +83,12 @@ const hasLocationSet = location =>
 
 const defaultLocation = [38.43745529233546, -5.089416503906251]
 
+const emptyLocation = {
+  latitude: undefined,
+  longitude: undefined,
+  altitude: undefined,
+}
+
 class LocationForm extends Component {
   static propTypes = {
     additionalMarkers: PropTypes.markers,
@@ -108,11 +114,7 @@ class LocationForm extends Component {
     additionalMarkers: [],
     children: null,
     disabledInfo: undefined,
-    initialValues: {
-      latitude: undefined,
-      longitude: undefined,
-      altitude: undefined,
-    },
+    initialValues: emptyLocation,
     validationSchema,
     updatesDisabled: false,
     noLocationSetInfo: m.noLocationSetInfo,
@@ -240,7 +242,7 @@ class LocationForm extends Component {
 
     try {
       await onDelete(deleteAll)
-      this.form.current.resetForm()
+      this.form.current.resetForm({ values: emptyLocation })
       this.setState({ latitude: undefined, longitude: undefined })
       toast({
         title: entityId,
@@ -276,7 +278,6 @@ class LocationForm extends Component {
     return (
       <React.Fragment>
         <Form
-          enableReinitialize
           error={error}
           validateOnChange
           initialValues={initialValues}
