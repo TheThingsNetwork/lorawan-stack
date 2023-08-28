@@ -39,6 +39,7 @@ class Gateways {
         get: 'gateway_ids.gateway_id',
         list: 'gateway_ids.gateway_id',
         set: 'gateway_ids.gateway_id',
+        delete: 'gateway_ids.gateway_id',
       },
     })
     autoBind(this)
