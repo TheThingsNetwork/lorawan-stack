@@ -32,6 +32,7 @@ class Gateways {
         list: 'gateway_ids.gateway_id',
         create: 'gateway_ids.gateway_id',
         update: 'gateway_ids.gateway_id',
+        delete: 'gateway_ids.gateway_id',
       },
     })
     this.Collaborators = new Collaborators(api.GatewayAccess, {
