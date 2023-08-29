@@ -50,16 +50,6 @@ var EU_433_TS1_V1_0 = Band{
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 
-	ReceiveDelay1:        defaultReceiveDelay1,
-	ReceiveDelay2:        defaultReceiveDelay2,
-	JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-	JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-	MaxFCntGap:           defaultMaxFCntGap,
-	ADRAckLimit:          defaultADRAckLimit,
-	ADRAckDelay:          defaultADRAckDelay,
-	MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-	MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 	DefaultMaxEIRP: 12.15,
 	TxOffset: []float32{
 		0,
@@ -96,4 +86,6 @@ var EU_433_TS1_V1_0 = Band{
 		Frequencies:   eu433BeaconFrequencies,
 	},
 	PingSlotFrequencies: eu433BeaconFrequencies,
+
+	SharedParameters: universalSharedParameters,
 }

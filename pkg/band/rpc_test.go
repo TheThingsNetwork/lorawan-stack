@@ -15,7 +15,6 @@
 package band_test
 
 import (
-	"context"
 	"sort"
 	"testing"
 	"time"
@@ -24,6 +23,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -31,8 +31,7 @@ import (
 
 func TestGetPhyVersions(t *testing.T) {
 	t.Parallel()
-	a := assertions.New(t)
-	ctx := context.Background()
+	a, ctx := test.New(t)
 
 	for _, tc := range []struct {
 		Name           string
@@ -55,6 +54,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_863_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -79,6 +79,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AU_915_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -102,6 +103,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -123,6 +125,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -137,6 +140,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923_2",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -145,6 +149,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923_3",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -153,12 +158,14 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923_4",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 						},
 					},
 					{
 						BandId: "AU_915_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -185,6 +192,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510_20_A",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -194,6 +202,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510_20_B",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -203,6 +212,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510_26_A",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -212,6 +222,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510_26_B",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -237,6 +248,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_433",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -253,6 +265,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_863_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -269,6 +282,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "IN_865_867",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -282,6 +296,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "ISM_2400",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -298,6 +313,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "KR_920_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -312,6 +328,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "MA_869_870_DRAFT",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -328,6 +345,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "RU_864_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -340,6 +358,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "US_902_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_4,
 							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
@@ -388,7 +407,7 @@ func TestGetPhyVersions(t *testing.T) {
 	}
 }
 
-func TestBand_convertToBandDescription(t *testing.T) {
+func TestBandConvertToBandDescription(t *testing.T) {
 	t.Parallel()
 	a := assertions.New(t)
 
@@ -443,17 +462,7 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				ImplementsCFList: true,
 				CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
-				ReceiveDelay1: 1 * time.Second,
-				ReceiveDelay2: 2 * time.Second,
-
-				JoinAcceptDelay1: 3 * time.Second,
-				JoinAcceptDelay2: 4 * time.Second,
-				MaxFCntGap:       5,
-
-				SupportsDynamicADR:   true,
-				ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
-				MinRetransmitTimeout: 1 * time.Second,
-				MaxRetransmitTimeout: 2 * time.Second,
+				SupportsDynamicADR: true,
 
 				TxOffset:            []float32{1.0, 2.0},
 				MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
@@ -469,6 +478,32 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				BootDwellTime: DwellTime{
 					Uplinks:   BoolPtr(true),
 					Downlinks: BoolPtr(true),
+				},
+
+				Relay: RelayParameters{
+					WORChannels: []RelayWORChannel{
+						{
+							Frequency:     1,
+							ACKFrequency:  2,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+						},
+						{
+							Frequency:     3,
+							ACKFrequency:  4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+						},
+					},
+				},
+
+				SharedParameters: SharedParameters{
+					ReceiveDelay1:        1 * time.Second,
+					ReceiveDelay2:        2 * time.Second,
+					JoinAcceptDelay1:     3 * time.Second,
+					JoinAcceptDelay2:     4 * time.Second,
+					MaxFCntGap:           5,
+					ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
+					MinRetransmitTimeout: 1 * time.Second,
+					MaxRetransmitTimeout: 2 * time.Second,
 				},
 			},
 			Expected: &ttnpb.BandDescription{
@@ -541,6 +576,21 @@ func TestBand_convertToBandDescription(t *testing.T) {
 					Uplinks:   &wrapperspb.BoolValue{Value: true},
 					Downlinks: &wrapperspb.BoolValue{Value: true},
 				},
+
+				Relay: &ttnpb.BandDescription_RelayParameters{
+					WorChannels: []*ttnpb.BandDescription_RelayParameters_RelayWORChannel{
+						{
+							Frequency:     1,
+							AckFrequency:  2,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+						},
+						{
+							Frequency:     3,
+							AckFrequency:  4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+						},
+					},
+				},
 			},
 		},
 		{
@@ -586,17 +636,7 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				ImplementsCFList: true,
 				CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
-				ReceiveDelay1: 1 * time.Second,
-				ReceiveDelay2: 2 * time.Second,
-
-				JoinAcceptDelay1: 3 * time.Second,
-				JoinAcceptDelay2: 4 * time.Second,
-				MaxFCntGap:       5,
-
-				SupportsDynamicADR:   true,
-				ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
-				MinRetransmitTimeout: 1 * time.Second,
-				MaxRetransmitTimeout: 2 * time.Second,
+				SupportsDynamicADR: true,
 
 				TxOffset:            []float32{1.0, 2.0},
 				MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
@@ -610,6 +650,32 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				},
 
 				BootDwellTime: DwellTime{},
+
+				Relay: RelayParameters{
+					WORChannels: []RelayWORChannel{
+						{
+							Frequency:     1,
+							ACKFrequency:  2,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+						},
+						{
+							Frequency:     3,
+							ACKFrequency:  4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+						},
+					},
+				},
+
+				SharedParameters: SharedParameters{
+					ReceiveDelay1:        1 * time.Second,
+					ReceiveDelay2:        2 * time.Second,
+					JoinAcceptDelay1:     3 * time.Second,
+					JoinAcceptDelay2:     4 * time.Second,
+					MaxFCntGap:           5,
+					ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
+					MinRetransmitTimeout: 1 * time.Second,
+					MaxRetransmitTimeout: 2 * time.Second,
+				},
 			},
 			Expected: &ttnpb.BandDescription{
 				Id: "Nullable band",
@@ -678,6 +744,21 @@ func TestBand_convertToBandDescription(t *testing.T) {
 				},
 
 				BootDwellTime: &ttnpb.BandDescription_DwellTime{},
+
+				Relay: &ttnpb.BandDescription_RelayParameters{
+					WorChannels: []*ttnpb.BandDescription_RelayParameters_RelayWORChannel{
+						{
+							Frequency:     1,
+							AckFrequency:  2,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+						},
+						{
+							Frequency:     3,
+							AckFrequency:  4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+						},
+					},
+				},
 			},
 		},
 	} {
@@ -717,8 +798,7 @@ func convertBands(input map[string]map[ttnpb.PHYVersion]Band) map[string]*ttnpb.
 
 func TestListBands(t *testing.T) {
 	t.Parallel()
-	a := assertions.New(t)
-	ctx := context.Background()
+	a, ctx := test.New(t)
 
 	for _, tc := range []struct {
 		Name           string

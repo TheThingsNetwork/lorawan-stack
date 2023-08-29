@@ -22,6 +22,8 @@ const (
 )
 
 var (
+	cn47051026ABeaconFrequencies = []uint64{494900000}
+
 	cn47051026AUplinkChannels = func(minDataRateIndex ttnpb.DataRateIndex) []Channel {
 		uplinkChannels := make([]Channel, 0, 48)
 		// 26 MHz Type A

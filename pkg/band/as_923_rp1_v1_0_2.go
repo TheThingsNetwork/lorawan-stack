@@ -51,16 +51,6 @@ var AS_923_RP1_v1_0_2 = Band{
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 
-	ReceiveDelay1:        defaultReceiveDelay1,
-	ReceiveDelay2:        defaultReceiveDelay2,
-	JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-	JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-	MaxFCntGap:           defaultMaxFCntGap,
-	ADRAckLimit:          defaultADRAckLimit,
-	ADRAckDelay:          defaultADRAckDelay,
-	MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-	MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 	DefaultMaxEIRP: 14,
 	TxOffset: []float32{
 		0,
@@ -112,4 +102,6 @@ var AS_923_RP1_v1_0_2 = Band{
 	PingSlotFrequencies: as923BeaconFrequencies(as923Group1Offset),
 
 	TxParamSetupReqSupport: true,
+
+	SharedParameters: universalSharedParameters,
 }

@@ -47,16 +47,6 @@ var ISM_2400_Universal = Band{
 	},
 	StrictCodingRate: true,
 
-	ReceiveDelay1:        defaultReceiveDelay1,
-	ReceiveDelay2:        defaultReceiveDelay2,
-	JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-	JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-	MaxFCntGap:           defaultMaxFCntGap,
-	ADRAckLimit:          defaultADRAckLimit,
-	ADRAckDelay:          defaultADRAckDelay,
-	MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-	MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 	DefaultMaxEIRP: 10,
 	TxOffset: []float32{
 		0,
@@ -95,4 +85,6 @@ var ISM_2400_Universal = Band{
 		Frequencies:   ism2400BeaconFrequencies,
 	},
 	PingSlotFrequencies: ism2400BeaconFrequencies,
+
+	SharedParameters: universalSharedParameters,
 }

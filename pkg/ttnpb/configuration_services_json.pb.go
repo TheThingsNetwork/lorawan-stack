@@ -358,6 +358,127 @@ func (x *BandDescription_Rx2Parameters) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the BandDescription_RelayParameters_RelayWORChannel message to JSON.
+func (x *BandDescription_RelayParameters_RelayWORChannel) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Frequency != 0 || s.HasField("frequency") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("frequency")
+		s.WriteUint64(x.Frequency)
+	}
+	if x.AckFrequency != 0 || s.HasField("ack_frequency") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ack_frequency")
+		s.WriteUint64(x.AckFrequency)
+	}
+	if x.DataRateIndex != 0 || s.HasField("data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("data_rate_index")
+		x.DataRateIndex.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BandDescription_RelayParameters_RelayWORChannel to JSON.
+func (x *BandDescription_RelayParameters_RelayWORChannel) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BandDescription_RelayParameters_RelayWORChannel message from JSON.
+func (x *BandDescription_RelayParameters_RelayWORChannel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "frequency":
+			s.AddField("frequency")
+			x.Frequency = s.ReadUint64()
+		case "ack_frequency", "ackFrequency":
+			s.AddField("ack_frequency")
+			x.AckFrequency = s.ReadUint64()
+		case "data_rate_index", "dataRateIndex":
+			s.AddField("data_rate_index")
+			x.DataRateIndex.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BandDescription_RelayParameters_RelayWORChannel from JSON.
+func (x *BandDescription_RelayParameters_RelayWORChannel) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BandDescription_RelayParameters message to JSON.
+func (x *BandDescription_RelayParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.WorChannels) > 0 || s.HasField("wor_channels") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("wor_channels")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.WorChannels {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("wor_channels"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BandDescription_RelayParameters to JSON.
+func (x *BandDescription_RelayParameters) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BandDescription_RelayParameters message from JSON.
+func (x *BandDescription_RelayParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "wor_channels", "worChannels":
+			s.AddField("wor_channels")
+			if s.ReadNil() {
+				x.WorChannels = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.WorChannels = append(x.WorChannels, nil)
+					return
+				}
+				v := &BandDescription_RelayParameters_RelayWORChannel{}
+				v.UnmarshalProtoJSON(s.WithField("wor_channels", false))
+				if s.Err() != nil {
+					return
+				}
+				x.WorChannels = append(x.WorChannels, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BandDescription_RelayParameters from JSON.
+func (x *BandDescription_RelayParameters) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the BandDescription message to JSON.
 func (x *BandDescription) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -552,6 +673,11 @@ func (x *BandDescription) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("boot_dwell_time")
 		// NOTE: BandDescription_DwellTime does not seem to implement MarshalProtoJSON.
 		golang.MarshalMessage(s, x.BootDwellTime)
+	}
+	if x.Relay != nil || s.HasField("relay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("relay")
+		x.Relay.MarshalProtoJSON(s.WithField("relay"))
 	}
 	s.WriteObjectEnd()
 }
@@ -771,6 +897,13 @@ func (x *BandDescription) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v BandDescription_DwellTime
 			golang.UnmarshalMessage(s, &v)
 			x.BootDwellTime = &v
+		case "relay":
+			if s.ReadNil() {
+				x.Relay = nil
+				return
+			}
+			x.Relay = &BandDescription_RelayParameters{}
+			x.Relay.UnmarshalProtoJSON(s.WithField("relay", true))
 		}
 	})
 }

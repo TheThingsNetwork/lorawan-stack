@@ -50,16 +50,6 @@ var CN_779_787_RP1_V1_0_3_RevA = Band{
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 
-	ReceiveDelay1:        defaultReceiveDelay1,
-	ReceiveDelay2:        defaultReceiveDelay2,
-	JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-	JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-	MaxFCntGap:           defaultMaxFCntGap,
-	ADRAckLimit:          defaultADRAckLimit,
-	ADRAckDelay:          defaultADRAckDelay,
-	MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-	MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 	DefaultMaxEIRP: 12.15,
 	TxOffset: []float32{
 		0,
@@ -96,4 +86,6 @@ var CN_779_787_RP1_V1_0_3_RevA = Band{
 		Frequencies:   cn779787BeaconFrequencies,
 	},
 	PingSlotFrequencies: cn779787BeaconFrequencies,
+
+	SharedParameters: universalSharedParameters,
 }

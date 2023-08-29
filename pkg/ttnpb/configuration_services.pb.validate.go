@@ -797,6 +797,18 @@ func (m *BandDescription) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "relay":
+
+			if v, ok := interface{}(m.GetRelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "relay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return BandDescriptionValidationError{
 				field:  name,
@@ -1596,6 +1608,199 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = BandDescription_DwellTimeValidationError{}
+
+// ValidateFields checks the field values on BandDescription_RelayParameters
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *BandDescription_RelayParameters) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescription_RelayParametersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "wor_channels":
+
+			for idx, item := range m.GetWorChannels() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return BandDescription_RelayParametersValidationError{
+							field:  fmt.Sprintf("wor_channels[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return BandDescription_RelayParametersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescription_RelayParametersValidationError is the validation error
+// returned by BandDescription_RelayParameters.ValidateFields if the
+// designated constraints aren't met.
+type BandDescription_RelayParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescription_RelayParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BandDescription_RelayParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BandDescription_RelayParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescription_RelayParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescription_RelayParametersValidationError) ErrorName() string {
+	return "BandDescription_RelayParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BandDescription_RelayParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription_RelayParameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescription_RelayParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescription_RelayParametersValidationError{}
+
+// ValidateFields checks the field values on
+// BandDescription_RelayParameters_RelayWORChannel with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *BandDescription_RelayParameters_RelayWORChannel) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BandDescription_RelayParameters_RelayWORChannelFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "frequency":
+			// no validation rules for Frequency
+		case "ack_frequency":
+			// no validation rules for AckFrequency
+		case "data_rate_index":
+			// no validation rules for DataRateIndex
+		default:
+			return BandDescription_RelayParameters_RelayWORChannelValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BandDescription_RelayParameters_RelayWORChannelValidationError is the
+// validation error returned by
+// BandDescription_RelayParameters_RelayWORChannel.ValidateFields if the
+// designated constraints aren't met.
+type BandDescription_RelayParameters_RelayWORChannelValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BandDescription_RelayParameters_RelayWORChannelValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e BandDescription_RelayParameters_RelayWORChannelValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e BandDescription_RelayParameters_RelayWORChannelValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BandDescription_RelayParameters_RelayWORChannelValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BandDescription_RelayParameters_RelayWORChannelValidationError) ErrorName() string {
+	return "BandDescription_RelayParameters_RelayWORChannelValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BandDescription_RelayParameters_RelayWORChannelValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBandDescription_RelayParameters_RelayWORChannel.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BandDescription_RelayParameters_RelayWORChannelValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BandDescription_RelayParameters_RelayWORChannelValidationError{}
 
 // ValidateFields checks the field values on
 // ListBandsResponse_VersionedBandDescription with the rules defined in the
