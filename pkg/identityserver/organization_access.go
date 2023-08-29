@@ -332,6 +332,7 @@ func (is *IdentityServer) setOrganizationCollaborator( //nolint:gocyclo
 		}
 
 		if len(req.Collaborator.Rights) == 0 {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteMember(ctx, req.GetCollaborator().GetIds(), req.GetOrganizationIds().GetEntityIdentifiers())
 		}
 

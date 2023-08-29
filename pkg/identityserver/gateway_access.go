@@ -316,6 +316,7 @@ func (is *IdentityServer) setGatewayCollaborator(
 		}
 
 		if len(req.GetCollaborator().GetRights()) == 0 {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteMember(ctx, req.GetCollaborator().GetIds(), req.GetGatewayIds().GetEntityIdentifiers())
 		}
 
