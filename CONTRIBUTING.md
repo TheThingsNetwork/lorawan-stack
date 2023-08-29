@@ -123,12 +123,7 @@ Some key points:
 
 ## <a name="security-issues"></a>Security Issues
 
-We do our utmost best to build secure systems, but we're human too, so we sometimes make mistakes. If you find any vulnerability in our systems, please contact us directly. We can be reached on Slack, by email and a number of other communication platforms.
-
-- Johan Stokking - [keybase.io/johanstokking](https://keybase.io/johanstokking) `EE80D01EB2BE7EC8`
-- Hylke Visser - [keybase.io/htdvisser](https://keybase.io/htdvisser) `A115FF80DC8A2270`
-
-Our email addresses follow the pattern `<firstname>@thethingsnetwork.org`.
+We do our utmost best to build secure systems, but we're human too, so we sometimes make mistakes. If you find any vulnerability in our systems, please report it via our [responsible disclosure process](https://www.thethingsnetwork.org/responsible-disclosure)
 
 ## Legal
 
