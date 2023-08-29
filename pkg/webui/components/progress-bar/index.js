@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
@@ -44,31 +44,14 @@ const ProgressBar = props => {
     warn,
   } = props
   const { percentage = (current / target) * 100 } = props
-
-  const [estimatedDuration, setEstimatedDuration] = useState(Infinity)
-  const [startTime, setStartTime] = useState()
+  const startTime = useMemo(() => (percentage === 0 ? Date.now() : null), [percentage])
   const [estimations, setEstimations] = useState(0)
-
-  useEffect(() => {
-    if (showEstimation) {
-      const fraction = Math.max(0, Math.min(1, percentage / 100))
-
-      if (fraction === 0) {
-        setStartTime(Date.now())
-        setEstimatedDuration(Infinity)
-        setEstimations(0)
-      } else {
-        const elapsedTime = Date.now() - startTime
-        const newEstimatedDuration = Math.max(0, elapsedTime * (100 / fraction))
-
-        if (estimations >= 3 || newEstimatedDuration === Infinity || !startTime) {
-          setEstimatedDuration(newEstimatedDuration)
-        }
-
-        setEstimations(estimations + 1)
-      }
-    }
-  }, [current, percentage, showEstimation, startTime, estimations])
+  const estimatedDuration = useMemo(() => {
+    const newElapsedTime = Date.now() - startTime
+    const newEstimatedDuration = Math.max(0, newElapsedTime * (100 / percentage))
+    setEstimations(estimations => estimations + 1)
+    return newEstimatedDuration
+  }, [percentage, startTime])
 
   const fraction = Math.max(0, Math.min(1, percentage / 100))
   const displayPercentage = (fraction || 0) * 100
@@ -116,14 +99,14 @@ const ProgressBar = props => {
       </div>
       {showStatus && (
         <div className={style.status}>
-          {percentage === undefined && !showHeader && (
+          {props.percentage === undefined && !showHeader && (
             <div>
               <Message content={m.progress} values={{ current, target }} /> (
               <Message content={m.percentage} values={{ percentage: fraction }} />)
             </div>
           )}
           {children}
-          {percentage !== undefined && (
+          {props.percentage !== undefined && (
             <Message
               component="div"
               content={m.percentage}

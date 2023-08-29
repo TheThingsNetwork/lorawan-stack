@@ -24,27 +24,29 @@ import style from './toggled.styl'
 
 import Input from '.'
 
-const Toggled = ({ valueProp, onChange, type, enabledMessage, className, children, ...rest }) => {
+const Toggled = props => {
   const handleCheckboxChange = useCallback(
     event => {
       const enabled = event.target.checked
-      const { value } = valueProp
+      const { value } = props.value
 
-      onChange({ value, enabled }, true)
+      props.onChange({ value, enabled }, true)
     },
-    [onChange, valueProp],
+    [props],
   )
 
   const handleInputChange = useCallback(
     value => {
-      const { enabled } = valueProp
+      const { enabled } = props.value
 
-      onChange({ value, enabled })
+      props.onChange({ value, enabled })
     },
-    [onChange, valueProp],
+    [props],
   )
 
-  const isEnabled = valueProp.enabled || false
+  const { value, type, enabledMessage, className, children, ...rest } = props
+
+  const isEnabled = value.enabled || false
   const checkboxId = `${rest.id}_checkbox`
 
   return (
@@ -67,7 +69,7 @@ const Toggled = ({ valueProp, onChange, type, enabledMessage, className, childre
           {...rest}
           className={style.input}
           type="text"
-          value={valueProp.value || ''}
+          value={value.value || ''}
           onChange={handleInputChange}
         />
       )}
@@ -89,7 +91,7 @@ Toggled.propTypes = {
   readOnly: PropTypes.bool,
   type: PropTypes.string,
   valid: PropTypes.bool,
-  valueProp: PropTypes.shape({
+  value: PropTypes.shape({
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     enabled: PropTypes.bool,
   }),
@@ -108,7 +110,7 @@ Toggled.defaultProps = {
   placeholder: undefined,
   readOnly: false,
   valid: false,
-  valueProp: undefined,
+  value: undefined,
   warning: false,
   type: 'text',
 }

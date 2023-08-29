@@ -297,9 +297,6 @@ Input.propTypes = {
   icon: PropTypes.string,
   inputRef: PropTypes.shape({ current: PropTypes.shape({}) }),
   inputWidth: PropTypes.inputWidth,
-  intl: PropTypes.shape({
-    formatMessage: PropTypes.func,
-  }).isRequired,
   label: PropTypes.string,
   loading: PropTypes.bool,
   max: PropTypes.number,
