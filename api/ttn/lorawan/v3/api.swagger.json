@@ -19212,6 +19212,9 @@
         },
         "packet_broker": {
           "$ref": "#/definitions/UplinkMessageRxMetadataPacketBrokerMetadata"
+        },
+        "relay": {
+          "$ref": "#/definitions/UplinkMessageRxMetadataRelayMetadata"
         }
       }
     },
@@ -19361,6 +19364,9 @@
       "description": "Transmission settings for downlink."
     },
     "UplinkMessageRxMetadataPacketBrokerMetadata": {
+      "type": "object"
+    },
+    "UplinkMessageRxMetadataRelayMetadata": {
       "type": "object"
     },
     "UserRegistrationAdminApproval": {
@@ -19677,6 +19683,27 @@
         }
       }
     },
+    "lorawanv3RelayMetadata": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string",
+          "description": "End device identifiers of the relay."
+        },
+        "wor_channel": {
+          "$ref": "#/definitions/lorawanv3RelayWORChannel",
+          "description": "Wake on radio channel."
+        }
+      }
+    },
+    "lorawanv3RelayWORChannel": {
+      "type": "string",
+      "enum": [
+        "RELAY_WOR_CHANNEL_DEFAULT",
+        "RELAY_WOR_CHANNEL_SECONDARY"
+      ],
+      "default": "RELAY_WOR_CHANNEL_DEFAULT"
+    },
     "lorawanv3RxMetadata": {
       "type": "object",
       "properties": {
@@ -19685,6 +19712,9 @@
         },
         "packet_broker": {
           "$ref": "#/definitions/lorawanv3PacketBrokerMetadata"
+        },
+        "relay": {
+          "$ref": "#/definitions/lorawanv3RelayMetadata"
         },
         "antenna_index": {
           "type": "integer",

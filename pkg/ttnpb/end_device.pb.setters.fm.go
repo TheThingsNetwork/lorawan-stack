@@ -4058,6 +4058,31 @@ func (dst *MACState_UplinkMessage_RxMetadata) SetFields(src *MACState_UplinkMess
 					dst.PacketBroker = nil
 				}
 			}
+		case "relay":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACState_UplinkMessage_RxMetadata_RelayMetadata
+				if (src == nil || src.Relay == nil) && dst.Relay == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Relay
+				}
+				if dst.Relay != nil {
+					newDst = dst.Relay
+				} else {
+					newDst = &MACState_UplinkMessage_RxMetadata_RelayMetadata{}
+					dst.Relay = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Relay = src.Relay
+				} else {
+					dst.Relay = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -4069,6 +4094,13 @@ func (dst *MACState_UplinkMessage_RxMetadata) SetFields(src *MACState_UplinkMess
 func (dst *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata) SetFields(src *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata, paths ...string) error {
 	if len(paths) != 0 {
 		return fmt.Errorf("message MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+func (dst *MACState_UplinkMessage_RxMetadata_RelayMetadata) SetFields(src *MACState_UplinkMessage_RxMetadata_RelayMetadata, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message MACState_UplinkMessage_RxMetadata_RelayMetadata has no fields, but paths %s were specified", paths)
 	}
 	return nil
 }

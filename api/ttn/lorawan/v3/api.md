@@ -273,6 +273,7 @@
   - [Message `MACState.UplinkMessage`](#ttn.lorawan.v3.MACState.UplinkMessage)
   - [Message `MACState.UplinkMessage.RxMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata)
   - [Message `MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata)
+  - [Message `MACState.UplinkMessage.RxMetadata.RelayMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata)
   - [Message `MACState.UplinkMessage.TxSettings`](#ttn.lorawan.v3.MACState.UplinkMessage.TxSettings)
   - [Message `ResetAndGetEndDeviceRequest`](#ttn.lorawan.v3.ResetAndGetEndDeviceRequest)
   - [Message `Session`](#ttn.lorawan.v3.Session)
@@ -571,6 +572,7 @@
   - [Message `Location`](#ttn.lorawan.v3.Location)
   - [Message `PacketBrokerMetadata`](#ttn.lorawan.v3.PacketBrokerMetadata)
   - [Message `PacketBrokerRouteHop`](#ttn.lorawan.v3.PacketBrokerRouteHop)
+  - [Message `RelayMetadata`](#ttn.lorawan.v3.RelayMetadata)
   - [Message `RxMetadata`](#ttn.lorawan.v3.RxMetadata)
   - [Enum `LocationSource`](#ttn.lorawan.v3.LocationSource)
 - [File `ttn/lorawan/v3/mqtt.proto`](#ttn/lorawan/v3/mqtt.proto)
@@ -4325,6 +4327,7 @@ Used for type safe recent uplink storage.
 | `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  |  |
 | `uplink_token` | [`bytes`](#bytes) |  |  |
 | `packet_broker` | [`MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata) |  |  |
+| `relay` | [`MACState.UplinkMessage.RxMetadata.RelayMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata) |  |  |
 
 #### Field Rules
 
@@ -4334,6 +4337,8 @@ Used for type safe recent uplink storage.
 | `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata">Message `MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata`</a>
+
+### <a name="ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata">Message `MACState.UplinkMessage.RxMetadata.RelayMetadata`</a>
 
 ### <a name="ttn.lorawan.v3.MACState.UplinkMessage.TxSettings">Message `MACState.UplinkMessage.TxSettings`</a>
 
@@ -8197,6 +8202,20 @@ Mapping from UDP message (other fields can be set in "advanced"):
 | `receiver_name` | [`string`](#string) |  | Receiver of the message. |
 | `receiver_agent` | [`string`](#string) |  | Receiver agent. |
 
+### <a name="ttn.lorawan.v3.RelayMetadata">Message `RelayMetadata`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `device_id` | [`string`](#string) |  | End device identifiers of the relay. |
+| `wor_channel` | [`RelayWORChannel`](#ttn.lorawan.v3.RelayWORChannel) |  | Wake on radio channel. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `wor_channel` | <p>`enum.defined_only`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.RxMetadata">Message `RxMetadata`</a>
 
 Contains metadata for a received message. Each antenna that receives
@@ -8206,6 +8225,7 @@ a message corresponds to one RxMetadata.
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `packet_broker` | [`PacketBrokerMetadata`](#ttn.lorawan.v3.PacketBrokerMetadata) |  |  |
+| `relay` | [`RelayMetadata`](#ttn.lorawan.v3.RelayMetadata) |  |  |
 | `antenna_index` | [`uint32`](#uint32) |  |  |
 | `time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp at the end of the transmission, provided by the gateway. The accuracy is undefined. |
 | `timestamp` | [`uint32`](#uint32) |  | Gateway concentrator timestamp when the Rx finished (microseconds). |

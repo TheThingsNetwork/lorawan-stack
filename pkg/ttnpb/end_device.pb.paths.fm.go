@@ -3442,6 +3442,7 @@ var MACState_UplinkMessage_RxMetadataFieldPathsNested = []string{
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
 	"packet_broker",
+	"relay",
 	"snr",
 	"uplink_token",
 }
@@ -3451,11 +3452,14 @@ var MACState_UplinkMessage_RxMetadataFieldPathsTopLevel = []string{
 	"downlink_path_constraint",
 	"gateway_ids",
 	"packet_broker",
+	"relay",
 	"snr",
 	"uplink_token",
 }
 var MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataFieldPathsNested []string
 var MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataFieldPathsTopLevel []string
+var MACState_UplinkMessage_RxMetadata_RelayMetadataFieldPathsNested []string
+var MACState_UplinkMessage_RxMetadata_RelayMetadataFieldPathsTopLevel []string
 var MACState_DownlinkMessage_MessageFieldPathsNested = []string{
 	"m_hdr",
 	"m_hdr.m_type",

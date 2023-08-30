@@ -36,6 +36,9 @@ var RxMetadataFieldPathsNested = []string{
 	"packet_broker.hops",
 	"packet_broker.message_id",
 	"received_at",
+	"relay",
+	"relay.device_id",
+	"relay.wor_channel",
 	"rssi",
 	"rssi_standard_deviation",
 	"signal_rssi",
@@ -62,6 +65,7 @@ var RxMetadataFieldPathsTopLevel = []string{
 	"location",
 	"packet_broker",
 	"received_at",
+	"relay",
 	"rssi",
 	"rssi_standard_deviation",
 	"signal_rssi",
@@ -124,4 +128,13 @@ var PacketBrokerRouteHopFieldPathsTopLevel = []string{
 	"receiver_name",
 	"sender_address",
 	"sender_name",
+}
+var RelayMetadataFieldPathsNested = []string{
+	"device_id",
+	"wor_channel",
+}
+
+var RelayMetadataFieldPathsTopLevel = []string{
+	"device_id",
+	"wor_channel",
 }

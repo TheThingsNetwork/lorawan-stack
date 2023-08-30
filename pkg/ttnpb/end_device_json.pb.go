@@ -1742,6 +1742,12 @@ func (x *MACState_UplinkMessage_RxMetadata) MarshalProtoJSON(s *jsonplugin.Marsh
 		// NOTE: MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata does not seem to implement MarshalProtoJSON.
 		golang.MarshalMessage(s, x.PacketBroker)
 	}
+	if x.Relay != nil || s.HasField("relay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("relay")
+		// NOTE: MACState_UplinkMessage_RxMetadata_RelayMetadata does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Relay)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1788,6 +1794,16 @@ func (x *MACState_UplinkMessage_RxMetadata) UnmarshalProtoJSON(s *jsonplugin.Unm
 			var v MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata
 			golang.UnmarshalMessage(s, &v)
 			x.PacketBroker = &v
+		case "relay":
+			s.AddField("relay")
+			if s.ReadNil() {
+				x.Relay = nil
+				return
+			}
+			// NOTE: MACState_UplinkMessage_RxMetadata_RelayMetadata does not seem to implement UnmarshalProtoJSON.
+			var v MACState_UplinkMessage_RxMetadata_RelayMetadata
+			golang.UnmarshalMessage(s, &v)
+			x.Relay = &v
 		}
 	})
 }
