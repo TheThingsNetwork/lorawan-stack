@@ -15,6 +15,8 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 
+import Link from '@ttn-lw/components/link'
+
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -22,9 +24,10 @@ import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 
 import { getEntity } from '../utils'
 
+import ContentTemplate from './template'
+
 const m = defineMessages({
   title: 'The state of your {entityType} has been changed.',
-  greeting: 'Dear {receiverName},',
   body: 'The state of the {entityType} <code>{entityId}</code> on your network has been changed to "{state}".',
   link: 'You can view this <Link>here</Link>.',
 })
@@ -74,25 +77,34 @@ EntityStateChangedTitle.propTypes = {
   }).isRequired,
 }
 
-const EntityStateChanged = ({ receiver, notificationData }) => {
+const EntityStateChanged = ({ notificationData }) => {
   const { data, entity_ids } = notificationData
   const { formatMessage } = useIntl()
+  const messages = {
+    body: m.body,
+    action: m.link,
+  }
+  const values = {
+    body: {
+      entityType: getEntity(entity_ids),
+      entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
+      state: capitalizeMessage(formatMessage({ id: `enum:${data.state}` })),
+      code: msg => <code>{msg}</code>,
+    },
+    action: {
+      Link: msg => (
+        <Link
+          to={`/${getEntity(entity_ids)}/${
+            entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`]
+          }`}
+        >
+          {msg}
+        </Link>
+      ),
+    },
+  }
 
-  return (
-    <>
-      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
-      <Message
-        content={m.body}
-        values={{
-          entityType: getEntity(entity_ids),
-          entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
-          state: capitalizeMessage(formatMessage({ id: `enum:${data.state}` })),
-          code: msg => <code>{msg}</code>,
-        }}
-        component="p"
-      />
-    </>
-  )
+  return <ContentTemplate messages={messages} values={values} />
 }
 
 EntityStateChanged.propTypes = {
@@ -106,7 +118,6 @@ EntityStateChanged.propTypes = {
       }),
     }).isRequired,
   }).isRequired,
-  receiver: PropTypes.string.isRequired,
 }
 
 EntityStateChanged.Title = EntityStateChangedTitle

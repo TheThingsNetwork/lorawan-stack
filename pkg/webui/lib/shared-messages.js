@@ -51,6 +51,7 @@ export default defineMessages({
   antennas: 'Antennas',
   apiKey: 'API key',
   apiKeyCounted: '{count, plural, one {API key} other {API keys}}',
+  apiKeyId: '<b>API Key ID:</b> <code>{apiKeyId}</code>',
   apiKeyNamePlaceholder: 'My new API key',
   apiKeys: 'API keys',
   appData: 'Application data',
@@ -447,6 +448,7 @@ export default defineMessages({
     'You can only set yourself as a contact. If you would like another collaborator set as contact, please contact this collaborator to self-assign as contact.',
   resume: 'Resume',
   rights: 'Rights',
+  rightsList: 'Rights:',
   rootKeys: 'Root keys',
   rx1DataRateOffset: 'Rx1 data rate offset',
   rx1Delay: 'Rx1 delay',
@@ -577,6 +579,7 @@ export default defineMessages({
   validateUrl: 'Must be a valid URL format, contain no spaces or special characters',
   value: 'value',
   webhookActivated: 'Webhook activated',
+  viewLink: 'You can view and edit this API key <Link>here</Link>.',
   webhookAlreadyExistsModalMessage:
     'A Webhook with the ID "{id}" already exists. Do you wish to replace this webhook?',
   webhookBaseUrl: 'Base URL',

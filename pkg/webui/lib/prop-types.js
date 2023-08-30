@@ -350,4 +350,45 @@ PropTypes.routingPolicy = PropTypes.shape({
 
 PropTypes.entity = PropTypes.oneOf([APPLICATION, GATEWAY, ORGANIZATION, USER, CLIENT])
 
+PropTypes.clientNotificationData = PropTypes.shape({
+  data: PropTypes.shape({
+    create_client_request: PropTypes.shape({
+      client: PropTypes.shape({
+        ids: PropTypes.shape({
+          client_id: PropTypes.string,
+        }),
+      }),
+      collaborator: PropTypes.oneOfType([
+        PropTypes.shape({
+          organization_ids: PropTypes.shape({
+            organization_id: PropTypes.string,
+          }),
+        }),
+        PropTypes.shape({
+          user_ids: PropTypes.shape({
+            user_id: PropTypes.string,
+          }),
+        }),
+      ]),
+    }),
+    client: PropTypes.shape({
+      ids: PropTypes.shape({
+        client_id: PropTypes.string,
+      }),
+    }),
+    collaborator: PropTypes.oneOfType([
+      PropTypes.shape({
+        organization_ids: PropTypes.shape({
+          organization_id: PropTypes.string,
+        }),
+      }),
+      PropTypes.shape({
+        user_ids: PropTypes.shape({
+          user_id: PropTypes.string,
+        }),
+      }),
+    ]),
+  }).isRequired,
+})
+
 export default PropTypes

@@ -64,13 +64,13 @@ const NotificationList = ({
   const isMobile = window.innerWidth < 768
 
   const handleClick = useCallback(
-    async (e, not) => {
+    async (e, id) => {
       setShowListColumn(!isMobile)
       setShowContent(true)
-      setSelectedNotification(notifications.find(notification => notification.id === not.id))
+      setSelectedNotification(notifications.find(notification => notification.id === id))
       if (!isArchive) {
         await dispatch(
-          attachPromise(updateNotificationStatus(userId, [not.id], 'NOTIFICATION_STATUS_SEEN')),
+          attachPromise(updateNotificationStatus(userId, [id], 'NOTIFICATION_STATUS_SEEN')),
         )
         setTimeout(async () => {
           await fetchItems()
