@@ -21,9 +21,10 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getEntity } from '../utils'
 
+import ContentTemplate from './template'
+
 const m = defineMessages({
   title: 'The password of your user "{entityIds}" has just been changed.',
-  greeting: 'Dear {receiverName},',
   body: 'The password of your user <code>{entityId}</code> on your network has just been changed.',
   closing: 'If this was not done by you, please contact your administrators as soon as possible.',
 })
@@ -71,23 +72,20 @@ PasswordChangedTitle.propTypes = {
   }).isRequired,
 }
 
-const PasswordChanged = ({ receiver, notificationData }) => {
+const PasswordChanged = ({ notificationData }) => {
   const { entity_ids } = notificationData
+  const messages = {
+    body: m.body,
+    action: m.closing,
+  }
+  const values = {
+    body: {
+      entityId: entity_ids.user_ids.user_id,
+      code: msg => <code>{msg}</code>,
+    },
+  }
 
-  return (
-    <>
-      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
-      <Message
-        content={m.body}
-        values={{
-          entityId: entity_ids.user_ids.user_id,
-          code: msg => <code>{msg}</code>,
-        }}
-        component="p"
-      />
-      <Message content={m.closing} component="p" />
-    </>
-  )
+  return <ContentTemplate messages={messages} values={values} />
 }
 
 PasswordChanged.propTypes = {
@@ -98,7 +96,6 @@ PasswordChanged.propTypes = {
       }),
     }).isRequired,
   }).isRequired,
-  receiver: PropTypes.string.isRequired,
 }
 
 PasswordChanged.Title = PasswordChangedTitle

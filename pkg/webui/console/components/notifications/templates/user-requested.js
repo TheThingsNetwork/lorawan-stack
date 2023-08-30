@@ -21,15 +21,13 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import ContentTemplate from './template'
+
 const m = defineMessages({
   title: 'Your review is required for a newly registered user',
-  greeting: 'Dear {receiverName},',
   body: 'A new user just registered on your network.{lineBreak}Since user registration requires admin approval, you need to approve this user before they can login.',
   closing: 'You can review this user <Link>here</Link>.',
-  userId: '<b>User ID:</b> <code>{userId}</code>',
-  userName: '<b>Name:</b> {userName}',
-  userDescription: '<b>Description:</b> {userDescription}',
-  userEmail: '<b>Email Address:</b> {userPrimaryEmailAddress}',
+  user: '<b>User ID:</b> <code>{userId}</code>{lineBreak}<b>Name:</b> {userName}{lineBreak}<b>Description:</b> {userDescription}{lineBreak}<b>Email Address:</b> {userPrimaryEmailAddress}',
   preview:
     'A new user just registered on your network. Since user registration requires admin approval, you need to approve this user before they can login. User ID: {userId}',
 })
@@ -62,68 +60,31 @@ UserRequestedPreview.propTypes = {
 
 const UserRequestedTitle = () => <Message content={m.title} />
 
-const UserRequested = ({ receiver, notificationData }) => {
+const UserRequested = ({ notificationData }) => {
   const { user } = notificationData.data
-
-  return (
-    <>
-      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
-      <Message
-        content={m.body}
-        values={{
-          lineBreak: <br />,
-        }}
-        component="p"
-      />
-      {'ids' in user && (
-        <Message
-          content={m.userId}
-          values={{
-            b: msg => <b>{msg}</b>,
-            code: msg => <code>{msg}</code>,
-            userId: user.ids.user_id,
-          }}
-          component="p"
-        />
-      )}
-      {'name' in user && (
-        <Message
-          content={m.userName}
-          values={{ b: msg => <b>{msg}</b>, code: msg => <code>{msg}</code>, userName: user.name }}
-          component="p"
-        />
-      )}
-      {'description' in user && (
-        <Message
-          content={m.userDescription}
-          values={{
-            b: msg => <b>{msg}</b>,
-            code: msg => <code>{msg}</code>,
-            userDescription: user.description,
-          }}
-          component="p"
-        />
-      )}
-      {'primary_email_address' in user && (
-        <Message
-          content={m.userEmail}
-          values={{
-            b: msg => <b>{msg}</b>,
-            code: msg => <code>{msg}</code>,
-            userPrimaryEmailAddress: user.primary_email_address,
-          }}
-          component="p"
-        />
-      )}
-      <Message
-        content={m.closing}
-        values={{
-          Link: msg => <Link to={`/admin-panel/user-management/${user.ids.user_id}`}>{msg}</Link>,
-        }}
-        component="p"
-      />
-    </>
-  )
+  const messages = {
+    body: m.body,
+    entities: m.user,
+    action: m.closing,
+  }
+  const values = {
+    body: {
+      lineBreak: <br />,
+    },
+    entities: {
+      b: msg => <b>{msg}</b>,
+      code: msg => <code>{msg}</code>,
+      userId: user.ids.user_id,
+      userName: user.name,
+      userDescription: user.description ?? '—',
+      userPrimaryEmailAddress: user.primary_email_address,
+      lineBreak: <br />,
+    },
+    action: {
+      Link: msg => <Link to={`/admin-panel/user-management/${user.ids.user_id}`}>{msg}</Link>,
+    },
+  }
+  return <ContentTemplate messages={messages} values={values} />
 }
 
 UserRequested.propTypes = {
@@ -139,7 +100,6 @@ UserRequested.propTypes = {
       }).isRequired,
     }).isRequired,
   }).isRequired,
-  receiver: PropTypes.string.isRequired,
 }
 
 UserRequested.Title = UserRequestedTitle

@@ -39,7 +39,7 @@ const NotificationListItem = ({ notification, selectedNotification, handleClick 
   })
 
   return (
-    <Button key={notification.id} onClick={handleClick} value={notification} className={classes}>
+    <Button key={notification.id} onClick={handleClick} value={notification.id} className={classes}>
       {(!('status' in notification) || notification.status === 'NOTIFICATION_STATUS_UNSEEN') && (
         <Status pulse={false} status="good" className={classNames('mr-cs-xs', style.unseenMark)} />
       )}

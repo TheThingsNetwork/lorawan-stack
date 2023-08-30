@@ -24,9 +24,10 @@ import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 
 import selectAccountUrl from '@console/lib/selectors/app-config'
 
+import ContentTemplate from './template'
+
 const m = defineMessages({
   title: 'Your review is required for a newly registered OAuth client',
-  greeting: 'Dear {receiverName},',
   body: '{senderType} <code>{id}</code> just registered a new OAuth client under {collaboratorType} <code>{collaboratorId}</code> on your network.{lineBreak}Since {senderTypeMiddle} <code>{id}</code> is not an admin, you need to approve this client before it can be used.',
   clientId: '<b>Client ID:</b> <code>{clientId}</code>',
   link: 'You can approve (or reject) the OAuth client <Link>here</Link>.',
@@ -77,112 +78,52 @@ const ClientRequestedPreview = ({ notificationData }) => {
 }
 
 ClientRequestedPreview.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      create_client_request: PropTypes.shape({
-        client: PropTypes.shape({}),
-        collaborator: PropTypes.shape({}),
-      }),
-      client: PropTypes.shape({}),
-      collaborator: PropTypes.shape({}),
-    }).isRequired,
-    sender_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.clientNotificationData.isRequired,
 }
 
 const ClientRequestedTitle = () => <Message content={m.title} />
 
-const ClientRequested = ({ receiver, notificationData }) => {
+const ClientRequested = ({ notificationData }) => {
   const { data, sender_ids } = notificationData
   const client = 'create_client_request' in data ? data.create_client_request.client : data.client
   const collaborator =
     'create_client_request' in data ? data.create_client_request.collaborator : data.collaborator
 
-  return (
-    <>
-      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
-      <Message
-        content={m.body}
-        values={{
-          senderType: capitalizeMessage(getType(sender_ids)),
-          senderTypeMiddle: getType(sender_ids),
-          id: getId(sender_ids),
-          collaboratorType: getType(collaborator),
-          collaboratorId: getId(collaborator),
-          code: msg => <code>{msg}</code>,
-          b: msg => <b>{msg}</b>,
-          lineBreak: <br />,
-        }}
-        component="p"
-      />
-      <Message
-        component="p"
-        content={m.clientId}
-        values={{
-          b: msg => <b>{msg}</b>,
-          code: msg => <code>{msg}</code>,
-          clientId: client.ids.client_id,
-        }}
-      />
-      <Message
-        content={m.link}
-        values={{
-          Link: msg => (
-            <Link.Anchor href={`${accountUrl}/oauth-clients/${client.ids.client_id}`} external>
-              {msg}
-            </Link.Anchor>
-          ),
-        }}
-      />
-    </>
-  )
+  const messages = {
+    body: m.body,
+    entities: m.clientId,
+    action: m.link,
+  }
+  const values = {
+    body: {
+      senderType: capitalizeMessage(getType(sender_ids)),
+      senderTypeMiddle: getType(sender_ids),
+      id: getId(sender_ids),
+      collaboratorType: getType(collaborator),
+      collaboratorId: getId(collaborator),
+      code: msg => <code>{msg}</code>,
+      b: msg => <b>{msg}</b>,
+      lineBreak: <br />,
+    },
+    entities: {
+      b: msg => <b>{msg}</b>,
+      code: msg => <code>{msg}</code>,
+      clientId: client.ids.client_id,
+    },
+    action: {
+      Link: msg => (
+        <Link.Anchor href={`${accountUrl}/oauth-clients/${client.ids.client_id}`} external>
+          {msg}
+        </Link.Anchor>
+      ),
+    },
+  }
+
+  return <ContentTemplate messages={messages} values={values} />
 }
 
 ClientRequested.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      create_client_request: PropTypes.shape({
-        client: PropTypes.shape({
-          ids: PropTypes.shape({
-            client_id: PropTypes.string,
-          }),
-        }),
-        collaborator: PropTypes.oneOfType([
-          PropTypes.shape({
-            organization_ids: PropTypes.shape({
-              organization_id: PropTypes.string,
-            }),
-          }),
-          PropTypes.shape({
-            user_ids: PropTypes.shape({
-              user_id: PropTypes.string,
-            }),
-          }),
-        ]),
-      }),
-      client: PropTypes.shape({
-        ids: PropTypes.shape({
-          client_id: PropTypes.string,
-        }),
-      }),
-      collaborator: PropTypes.oneOfType([
-        PropTypes.shape({
-          organization_ids: PropTypes.shape({
-            organization_id: PropTypes.string,
-          }),
-        }),
-        PropTypes.shape({
-          user_ids: PropTypes.shape({
-            user_id: PropTypes.string,
-          }),
-        }),
-      ]),
-    }).isRequired,
-    sender_ids: PropTypes.shape({
-      user_id: PropTypes.string,
-    }),
-  }).isRequired,
-  receiver: PropTypes.string.isRequired,
+  notificationData: PropTypes.clientNotificationData.isRequired,
 }
 
 ClientRequested.Title = ClientRequestedTitle

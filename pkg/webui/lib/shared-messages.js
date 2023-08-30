@@ -41,6 +41,7 @@ export default defineMessages({
   antennas: 'Antennas',
   apiKey: 'API key',
   apiKeyCounted: '{count, plural, one {API key} other {API keys}}',
+  apiKeyId: '<b>API Key ID:</b> <code>{apiKeyId}</code>',
   apiKeyNamePlaceholder: 'My new API key',
   apiKeys: 'API keys',
   appEUI: 'AppEUI',
@@ -378,6 +379,7 @@ export default defineMessages({
     'You can only set yourself as a contact. If you would like another collaborator set as contact, please contact this collaborator to self-assign as contact.',
   resume: 'Resume',
   rights: 'Rights',
+  rightsList: 'Rights:',
   rootKeys: 'Root keys',
   saveChanges: 'Save changes',
   scheduleAnyTimeDelay: 'Schedule any time delay',
@@ -486,6 +488,7 @@ export default defineMessages({
   validFrom: 'Valid from',
   validTo: 'Valid to',
   value: 'value',
+  viewLink: 'You can view and edit this API key <Link>here</Link>.',
   webhookAlreadyExistsModalMessage:
     'A Webhook with the ID "{id}" already exists. Do you wish to replace this webhook?',
   webhookBaseUrl: 'Base URL',
