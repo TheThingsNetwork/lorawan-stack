@@ -275,7 +275,12 @@
   - [Message `MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata)
   - [Message `MACState.UplinkMessage.RxMetadata.RelayMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata)
   - [Message `MACState.UplinkMessage.TxSettings`](#ttn.lorawan.v3.MACState.UplinkMessage.TxSettings)
+  - [Message `RelayParameters`](#ttn.lorawan.v3.RelayParameters)
   - [Message `ResetAndGetEndDeviceRequest`](#ttn.lorawan.v3.ResetAndGetEndDeviceRequest)
+  - [Message `ServedRelayParameters`](#ttn.lorawan.v3.ServedRelayParameters)
+  - [Message `ServingRelayParameters`](#ttn.lorawan.v3.ServingRelayParameters)
+  - [Message `ServingRelayParameters.ForwardingLimits`](#ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits)
+  - [Message `ServingRelayParameters.UplinkForwardingRule`](#ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule)
   - [Message `Session`](#ttn.lorawan.v3.Session)
   - [Message `SetEndDeviceRequest`](#ttn.lorawan.v3.SetEndDeviceRequest)
   - [Message `UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest)
@@ -4038,11 +4043,12 @@ This is used internally by the Network Server.
 | `ping_slot_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | Data rate index of the class B ping slot. This field is deprecated, use ping_slot_data_rate_index_value instead. |
 | `beacon_frequency` | [`uint64`](#uint64) |  | Frequency of the class B beacon (Hz). |
 | `channels` | [`MACParameters.Channel`](#ttn.lorawan.v3.MACParameters.Channel) | repeated | Configured uplink channels and optionally Rx1 frequency. |
-| `uplink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether uplink dwell time is set (400ms). If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it). |
-| `downlink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether downlink dwell time is set (400ms). If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it). |
+| `uplink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether uplink dwell time is set (400ms). If unset, then the value is either unknown or irrelevant(Network Server cannot modify it). |
+| `downlink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether downlink dwell time is set (400ms). If unset, then the value is either unknown or irrelevant(Network Server cannot modify it). |
 | `adr_ack_limit_exponent` | [`ADRAckLimitExponentValue`](#ttn.lorawan.v3.ADRAckLimitExponentValue) |  | ADR: number of messages to wait before setting ADRAckReq. |
 | `adr_ack_delay_exponent` | [`ADRAckDelayExponentValue`](#ttn.lorawan.v3.ADRAckDelayExponentValue) |  | ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate. |
 | `ping_slot_data_rate_index_value` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Data rate index of the class B ping slot. |
+| `relay` | [`RelayParameters`](#ttn.lorawan.v3.RelayParameters) |  | Relay parameters. |
 
 #### Field Rules
 
@@ -4119,6 +4125,8 @@ This is used internally by the Network Server.
 | `downlink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether downlink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `adr` | [`ADRSettings`](#ttn.lorawan.v3.ADRSettings) |  | Adaptive Data Rate settings. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `schedule_downlinks` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether or not downlink messages should be scheduled. This option can be used in order to disable any downlink interaction with the end device. It will affect all types of downlink messages: data and MAC downlinks, and join accepts. |
+| `relay` | [`RelayParameters`](#ttn.lorawan.v3.RelayParameters) |  | The relay parameters the end device is using. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `desired_relay` | [`RelayParameters`](#ttn.lorawan.v3.RelayParameters) |  | The relay parameters the Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 
 #### Field Rules
 
@@ -4157,6 +4165,7 @@ This is used internally by the Network Server.
 | `rejected_data_rate_ranges` | [`MACState.RejectedDataRateRangesEntry`](#ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry) | repeated | Data rate ranges rejected by the device per frequency. |
 | `last_adr_change_f_cnt_up` | [`uint32`](#uint32) |  | Frame counter of uplink, which confirmed the last ADR parameter change. |
 | `recent_mac_command_identifiers` | [`MACCommandIdentifier`](#ttn.lorawan.v3.MACCommandIdentifier) | repeated | MAC command identifiers sent by the end device in the last received uplink. The Network Server may choose to store only certain types of MAC command identifiers in the underlying implementation. |
+| `pending_relay_downlink` | [`RelayForwardDownlinkReq`](#ttn.lorawan.v3.RelayForwardDownlinkReq) |  | Pending relay downlink contents. The pending downlink will be scheduled to the relay in either Rx1 or Rx2. The pending downlink will be cleared after the scheduling attempt. |
 
 #### Field Rules
 
@@ -4352,6 +4361,16 @@ Used for type safe recent uplink storage.
 | ----- | ----------- |
 | `data_rate` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.RelayParameters">Message `RelayParameters`</a>
+
+RelayParameters represent the parameters of a relay.
+This is used internally by the Network Server.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `serving` | [`ServingRelayParameters`](#ttn.lorawan.v3.ServingRelayParameters) |  | Parameters related to a relay which is serving end devices. |
+| `served` | [`ServedRelayParameters`](#ttn.lorawan.v3.ServedRelayParameters) |  | Parameters related to an end device served by a relay. |
+
 ### <a name="ttn.lorawan.v3.ResetAndGetEndDeviceRequest">Message `ResetAndGetEndDeviceRequest`</a>
 
 | Field | Type | Label | Description |
@@ -4364,6 +4383,67 @@ Used for type safe recent uplink storage.
 | Field | Validations |
 | ----- | ----------- |
 | `end_device_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ServedRelayParameters">Message `ServedRelayParameters`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `always` | [`RelayEndDeviceAlwaysMode`](#ttn.lorawan.v3.RelayEndDeviceAlwaysMode) |  | The end device will always attempt to use the relay mode in order to send uplink messages. |
+| `dynamic` | [`RelayEndDeviceDynamicMode`](#ttn.lorawan.v3.RelayEndDeviceDynamicMode) |  | The end device will attempt to use relay mode only after a number of uplink messages have been sent without receiving a valid a downlink message. |
+| `end_device_controlled` | [`RelayEndDeviceControlledMode`](#ttn.lorawan.v3.RelayEndDeviceControlledMode) |  | The end device will control when it uses the relay mode. This is the default mode. |
+| `backoff` | [`uint32`](#uint32) |  | Number of uplinks to be sent without a wake on radio frame. |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
+| `serving_device_id` | [`string`](#string) |  | End device identifier of the serving end device. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `backoff` | <p>`uint32.lte`: `63`</p> |
+| `serving_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.ServingRelayParameters">Message `ServingRelayParameters`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
+| `default_channel_index` | [`uint32`](#uint32) |  | Index of the default wake on radio channel. |
+| `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  | Channel activity detection periodicity. |
+| `uplink_forwarding_rules` | [`ServingRelayParameters.UplinkForwardingRule`](#ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule) | repeated | Configured uplink forwarding rules. |
+| `limits` | [`ServingRelayParameters.ForwardingLimits`](#ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits) |  | Configured forwarding limits. If unset, the default value from Network Server configuration will be used. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `default_channel_index` | <p>`uint32.lte`: `255`</p> |
+| `cad_periodicity` | <p>`enum.defined_only`: `true`</p> |
+| `uplink_forwarding_rules` | <p>`repeated.max_items`: `16`</p> |
+
+### <a name="ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits">Message `ServingRelayParameters.ForwardingLimits`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reset_behavior` | [`RelayResetLimitCounter`](#ttn.lorawan.v3.RelayResetLimitCounter) |  | Reset behavior of the buckets upon limit update. |
+| `join_requests` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  | Bucket configuration for join requests. If unset, no individual limits will apply to join requests, but the relay overall limitations will apply. |
+| `notifications` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  | Bucket configuration for unknown device notifications. If unset, no individual limits will apply to unknown end device notifications, but the relay overall limitations will still apply. |
+| `uplink_messages` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  | Bucket configuration for uplink messages across all served end devices. If unset, no individual limits will apply to uplink messages across all served end devices, but the relay overall limitations will still apply. |
+| `overall` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  | Bucket configuration for all relay messages. If unset, no overall limits will apply to the relay, but individual limitations will still apply. |
+
+### <a name="ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule">Message `ServingRelayParameters.UplinkForwardingRule`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limits` | [`RelayUplinkForwardLimits`](#ttn.lorawan.v3.RelayUplinkForwardLimits) |  | Bucket configuration for the served end device. If unset, no individual limits will apply to the end device, but the relay global limitations will apply. |
+| `last_w_f_cnt` | [`uint32`](#uint32) |  | Last wake on radio frame counter used by the served end device. |
+| `device_id` | [`string`](#string) |  | End device identifier of the served end device. |
+| `session_key_id` | [`bytes`](#bytes) |  | Session key ID of the session keys used to derive the root relay session key. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.Session">Message `Session`</a>
 

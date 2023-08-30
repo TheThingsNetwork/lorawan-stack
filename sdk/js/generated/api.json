@@ -17284,7 +17284,7 @@
             },
             {
               "name": "uplink_dwell_time",
-              "description": "Whether uplink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).",
+              "description": "Whether uplink dwell time is set (400ms).\nIf unset, then the value is either unknown or irrelevant(Network Server cannot modify it).",
               "label": "",
               "type": "BoolValue",
               "longType": "BoolValue",
@@ -17296,7 +17296,7 @@
             },
             {
               "name": "downlink_dwell_time",
-              "description": "Whether downlink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).",
+              "description": "Whether downlink dwell time is set (400ms).\nIf unset, then the value is either unknown or irrelevant(Network Server cannot modify it).",
               "label": "",
               "type": "BoolValue",
               "longType": "BoolValue",
@@ -17337,6 +17337,18 @@
               "type": "DataRateIndexValue",
               "longType": "DataRateIndexValue",
               "fullType": "ttn.lorawan.v3.DataRateIndexValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay",
+              "description": "Relay parameters.",
+              "label": "",
+              "type": "RelayParameters",
+              "longType": "RelayParameters",
+              "fullType": "ttn.lorawan.v3.RelayParameters",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -17883,6 +17895,30 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "relay",
+              "description": "The relay parameters the end device is using.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "RelayParameters",
+              "longType": "RelayParameters",
+              "fullType": "ttn.lorawan.v3.RelayParameters",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "desired_relay",
+              "description": "The relay parameters the Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "RelayParameters",
+              "longType": "RelayParameters",
+              "fullType": "ttn.lorawan.v3.RelayParameters",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -18231,6 +18267,18 @@
               "type": "MACCommandIdentifier",
               "longType": "MACCommandIdentifier",
               "fullType": "ttn.lorawan.v3.MACCommandIdentifier",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pending_relay_downlink",
+              "description": "Pending relay downlink contents.\nThe pending downlink will be scheduled to the relay in either Rx1 or Rx2.\nThe pending downlink will be cleared after the scheduling attempt.",
+              "label": "",
+              "type": "RelayForwardDownlinkReq",
+              "longType": "RelayForwardDownlinkReq",
+              "fullType": "ttn.lorawan.v3.RelayForwardDownlinkReq",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -19005,6 +19053,42 @@
           ]
         },
         {
+          "name": "RelayParameters",
+          "longName": "RelayParameters",
+          "fullName": "ttn.lorawan.v3.RelayParameters",
+          "description": "RelayParameters represent the parameters of a relay.\nThis is used internally by the Network Server.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "serving",
+              "description": "Parameters related to a relay which is serving end devices.",
+              "label": "",
+              "type": "ServingRelayParameters",
+              "longType": "ServingRelayParameters",
+              "fullType": "ttn.lorawan.v3.ServingRelayParameters",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "served",
+              "description": "Parameters related to an end device served by a relay.",
+              "label": "",
+              "type": "ServedRelayParameters",
+              "longType": "ServedRelayParameters",
+              "fullType": "ttn.lorawan.v3.ServedRelayParameters",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ResetAndGetEndDeviceRequest",
           "longName": "ResetAndGetEndDeviceRequest",
           "fullName": "ttn.lorawan.v3.ResetAndGetEndDeviceRequest",
@@ -19041,6 +19125,350 @@
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
               "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ServedRelayParameters",
+          "longName": "ServedRelayParameters",
+          "fullName": "ttn.lorawan.v3.ServedRelayParameters",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "always",
+              "description": "The end device will always attempt to use the relay mode in order to send uplink messages.",
+              "label": "",
+              "type": "RelayEndDeviceAlwaysMode",
+              "longType": "RelayEndDeviceAlwaysMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceAlwaysMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "dynamic",
+              "description": "The end device will attempt to use relay mode only after a number of uplink messages have been sent without\nreceiving a valid a downlink message.",
+              "label": "",
+              "type": "RelayEndDeviceDynamicMode",
+              "longType": "RelayEndDeviceDynamicMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceDynamicMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_controlled",
+              "description": "The end device will control when it uses the relay mode. This is the default mode.",
+              "label": "",
+              "type": "RelayEndDeviceControlledMode",
+              "longType": "RelayEndDeviceControlledMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceControlledMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "backoff",
+              "description": "Number of uplinks to be sent without a wake on radio frame.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 63
+                  }
+                ]
+              }
+            },
+            {
+              "name": "second_channel",
+              "description": "Second wake on radio channel configuration.",
+              "label": "",
+              "type": "RelaySecondChannel",
+              "longType": "RelaySecondChannel",
+              "fullType": "ttn.lorawan.v3.RelaySecondChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "serving_device_id",
+              "description": "End device identifier of the serving end device.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServingRelayParameters",
+          "longName": "ServingRelayParameters",
+          "fullName": "ttn.lorawan.v3.ServingRelayParameters",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "second_channel",
+              "description": "Second wake on radio channel configuration.",
+              "label": "",
+              "type": "RelaySecondChannel",
+              "longType": "RelaySecondChannel",
+              "fullType": "ttn.lorawan.v3.RelaySecondChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "default_channel_index",
+              "description": "Index of the default wake on radio channel.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cad_periodicity",
+              "description": "Channel activity detection periodicity.",
+              "label": "",
+              "type": "RelayCADPeriodicity",
+              "longType": "RelayCADPeriodicity",
+              "fullType": "ttn.lorawan.v3.RelayCADPeriodicity",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "uplink_forwarding_rules",
+              "description": "Configured uplink forwarding rules.",
+              "label": "repeated",
+              "type": "UplinkForwardingRule",
+              "longType": "ServingRelayParameters.UplinkForwardingRule",
+              "fullType": "ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 16
+                  }
+                ]
+              }
+            },
+            {
+              "name": "limits",
+              "description": "Configured forwarding limits.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "ForwardingLimits",
+              "longType": "ServingRelayParameters.ForwardingLimits",
+              "fullType": "ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ForwardingLimits",
+          "longName": "ServingRelayParameters.ForwardingLimits",
+          "fullName": "ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "reset_behavior",
+              "description": "Reset behavior of the buckets upon limit update.",
+              "label": "",
+              "type": "RelayResetLimitCounter",
+              "longType": "RelayResetLimitCounter",
+              "fullType": "ttn.lorawan.v3.RelayResetLimitCounter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "join_requests",
+              "description": "Bucket configuration for join requests.\nIf unset, no individual limits will apply to join requests, but the relay overall limitations will apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "notifications",
+              "description": "Bucket configuration for unknown device notifications.\nIf unset, no individual limits will apply to unknown end device notifications, but the relay overall\nlimitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink_messages",
+              "description": "Bucket configuration for uplink messages across all served end devices.\nIf unset, no individual limits will apply to uplink messages across all served end devices, but the relay\noverall limitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "overall",
+              "description": "Bucket configuration for all relay messages.\nIf unset, no overall limits will apply to the relay, but individual limitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UplinkForwardingRule",
+          "longName": "ServingRelayParameters.UplinkForwardingRule",
+          "fullName": "ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "limits",
+              "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply.",
+              "label": "",
+              "type": "RelayUplinkForwardLimits",
+              "longType": "RelayUplinkForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayUplinkForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "last_w_f_cnt",
+              "description": "Last wake on radio frame counter used by the served end device.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "device_id",
+              "description": "End device identifier of the served end device.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_key_id",
+              "description": "Session key ID of the session keys used to derive the root relay session key.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
