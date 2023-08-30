@@ -7,11 +7,11 @@ with the exception that this project **does not** follow Semantic Versioning.
 
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
-## [Unreleased]
+## [3.28.0] - unreleased
 
 ### Added
 
-- Locations retrieved from gateway status messages are now be displayed in the gateway map in the Console, even when they are not received through a secure connection.
+- The Network Server ID (NSID, EUI-64) used in LoRaWAN Backend Interfaces is now included in the application uplink message network metadata as well as in the Backend Interfaces `HomeNSAns` message that Identity Server returns to clients. The NSID is configurable via `is.network.ns-id`.
 
 ### Changed
 

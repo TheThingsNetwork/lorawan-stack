@@ -99,6 +99,7 @@ func defaultTestOptions() *testOptions {
 	testOptions.isConfig.DevEUIBlock.Enabled = true
 	testOptions.isConfig.DevEUIBlock.ApplicationLimit = 3
 	testOptions.isConfig.Network.NetID = test.DefaultNetID
+	testOptions.isConfig.Network.NSID = &test.DefaultNSID
 	testOptions.isConfig.Network.TenantID = "test"
 	return testOptions
 }

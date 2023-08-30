@@ -68,6 +68,7 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 
 	ttnpb.RegisterGatewayRegistryServer(srv.Server, is.gatewayRegistry)
 	ttnpb.RegisterGatewayAccessServer(srv.Server, is.gatewayRegistry)
+	ttnpb.RegisterGatewayBatchAccessServer(srv.Server, is.gatewayRegistry)
 
 	ttnpb.RegisterEndDeviceRegistryServer(srv.Server, is.endDeviceRegistry)
 

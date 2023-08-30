@@ -289,6 +289,11 @@ func (x *NetworkIdentifiers) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("net_id")
 		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
+	if len(x.NsId) > 0 || s.HasField("ns_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ns_id")
+		types.MarshalHEXBytes(s.WithField("ns_id"), x.NsId)
+	}
 	if x.TenantId != "" || s.HasField("tenant_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("tenant_id")
@@ -329,6 +334,9 @@ func (x *NetworkIdentifiers) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "net_id", "netId":
 			s.AddField("net_id")
 			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
+		case "ns_id", "nsId":
+			s.AddField("ns_id")
+			x.NsId = types.Unmarshal8Bytes(s.WithField("ns_id", false))
 		case "tenant_id", "tenantId":
 			s.AddField("tenant_id")
 			x.TenantId = s.ReadString()
@@ -410,5 +418,68 @@ func (x *EndDeviceIdentifiersList) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSta
 
 // UnmarshalJSON unmarshals the EndDeviceIdentifiersList from JSON.
 func (x *EndDeviceIdentifiersList) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GatewayIdentifiersList message to JSON.
+func (x *GatewayIdentifiersList) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.GatewayIds) > 0 || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.GatewayIds {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("gateway_ids"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GatewayIdentifiersList to JSON.
+func (x *GatewayIdentifiersList) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GatewayIdentifiersList message from JSON.
+func (x *GatewayIdentifiersList) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			s.AddField("gateway_ids")
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.GatewayIds = append(x.GatewayIds, nil)
+					return
+				}
+				v := &GatewayIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("gateway_ids", false))
+				if s.Err() != nil {
+					return
+				}
+				x.GatewayIds = append(x.GatewayIds, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GatewayIdentifiersList from JSON.
+func (x *GatewayIdentifiersList) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
