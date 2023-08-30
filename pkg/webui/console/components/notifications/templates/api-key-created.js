@@ -19,18 +19,16 @@ import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getEntity } from '../utils'
 
+import ContentTemplate from './template'
+
 const m = defineMessages({
   title: 'A new API key has just been created for your {entityType}',
-  greeting: 'Dear {receiverName},',
   body: 'A new API key has just been created for your {entityType} <code>{id}</code> on your network.',
-  apikey: '<b>API Key ID:</b> <code>{apiKeyId}</code>',
-  rights: 'Rights:',
-  right: '<code>{right}</code>',
-  closing: 'You can view and edit this API key <Link>here</Link>.',
   preview:
     'A new API key has just been created for your {entityType} {id} on your network. API Key ID: {apiKeyId}',
 })
@@ -79,66 +77,47 @@ ApiKeyCreatedTitle.propTypes = {
   }).isRequired,
 }
 
-const ApiKeyCreated = ({ receiver, notificationData }) => {
+const ApiKeyCreated = ({ notificationData }) => {
   const { entity_ids, data } = notificationData
   const { id, rights } = data
+  const messages = {
+    body: m.body,
+    entities: sharedMessages.apiKeyId,
+    action: sharedMessages.viewLink,
+  }
 
+  const values = {
+    body: {
+      entityType: getEntity(entity_ids),
+      id: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
+      code: msg => <code>{msg}</code>,
+      b: msg => <b>{msg}</b>,
+    },
+    entities: {
+      b: msg => <b>{msg}</b>,
+      code: msg => <code>{msg}</code>,
+      apiKeyId: id,
+    },
+    action: {
+      Link: msg => (
+        <Link
+          to={`/applications/${
+            entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`]
+          }/api-keys`}
+        >
+          {msg}
+        </Link>
+      ),
+    },
+  }
   return (
-    <>
-      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
-      <Message
-        content={m.body}
-        values={{
-          entityType: getEntity(entity_ids),
-          id: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
-          code: msg => <code>{msg}</code>,
-          b: msg => <b>{msg}</b>,
-        }}
-        component="p"
-      />
-      <Message
-        component="p"
-        content={m.apikey}
-        values={{
-          b: msg => <b>{msg}</b>,
-          code: msg => <code>{msg}</code>,
-          apiKeyId: id,
-        }}
-      />
-      <p>
-        <Message component="b" content={m.rights} />
-      </p>
-      <ul>
-        {rights.map(right => (
-          <>
-            <Message
-              component="li"
-              content={m.right}
-              values={{
-                code: msg => <code>{msg}</code>,
-                lineBreak: <br />,
-                right,
-              }}
-            />
-            <Message content={{ id: `enum:${right}` }} firstToUpper />
-          </>
-        ))}
-      </ul>
-      <Message
-        content={m.closing}
-        values={{
-          Link: msg => (
-            <Link
-              to={`/applications/${
-                entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`]
-              }/api-keys`}
-            >
-              {msg}
-            </Link>
-          ),
-        }}
-      />
-    </>
+    <ContentTemplate
+      messages={messages}
+      values={values}
+      withList
+      listTitle={sharedMessages.rightsList}
+      listElement={rights}
+    />
   )
 }
 
@@ -150,7 +129,6 @@ ApiKeyCreated.propTypes = {
     }).isRequired,
     entity_ids: PropTypes.shape({}).isRequired,
   }).isRequired,
-  receiver: PropTypes.string.isRequired,
 }
 
 ApiKeyCreated.Title = ApiKeyCreatedTitle

@@ -23,9 +23,10 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getEntity } from '../utils'
 
+import ContentTemplate from './template'
+
 const m = defineMessages({
   title: 'A collaborator of your {entityType} has been added or updated',
-  greeting: 'Dear {receiverName},',
   body: 'A collaborator of your {entityType} <code>{entityId}</code> on your network has been added or updated.',
   collaborator: '<b>Collaborator:</b> {collaboratorType} <code>{collaboratorId}</code>',
   link: 'You can view and edit this collaborator <Link>here</Link>.',
@@ -97,50 +98,41 @@ CollaboratorChangedTitle.propTypes = {
   }).isRequired,
 }
 
-const CollaboratorChanged = ({ receiver, notificationData }) => {
+const CollaboratorChanged = ({ notificationData }) => {
   const { data, entity_ids } = notificationData
   const { ids } = data
-
-  return (
-    <>
-      <Message content={m.greeting} values={{ receiverName: receiver }} component="p" />
-      <Message
-        content={m.body}
-        values={{
-          entityType: getEntity(entity_ids),
-          entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
-          collaboratorType: getType(ids),
-          collaboratorId: getId(ids),
-          code: msg => <code>{msg}</code>,
-        }}
-        component="p"
-      />
-      <Message
-        component="p"
-        content={m.collaborator}
-        values={{
-          b: msg => <b>{msg}</b>,
-          code: msg => <code>{msg}</code>,
-          collaboratorType: getType(ids),
-          collaboratorId: getId(ids),
-        }}
-      />
-      <Message
-        content={m.link}
-        values={{
-          Link: msg => (
-            <Link
-              to={`/applications/${
-                entity_ids.application_ids.application_id
-              }/collaborators/user/${getId(ids)}`}
-            >
-              {msg}
-            </Link>
-          ),
-        }}
-      />
-    </>
-  )
+  const messages = {
+    body: m.body,
+    entities: m.collaborator,
+    action: m.link,
+  }
+  const values = {
+    body: {
+      entityType: getEntity(entity_ids),
+      entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
+      collaboratorType: getType(ids),
+      collaboratorId: getId(ids),
+      code: msg => <code>{msg}</code>,
+    },
+    entities: {
+      b: msg => <b>{msg}</b>,
+      code: msg => <code>{msg}</code>,
+      collaboratorType: getType(ids),
+      collaboratorId: getId(ids),
+    },
+    action: {
+      Link: msg => (
+        <Link
+          to={`/applications/${
+            entity_ids.application_ids.application_id
+          }/collaborators/user/${getId(ids)}`}
+        >
+          {msg}
+        </Link>
+      ),
+    },
+  }
+  return <ContentTemplate messages={messages} values={values} />
 }
 
 CollaboratorChanged.propTypes = {
@@ -165,7 +157,6 @@ CollaboratorChanged.propTypes = {
       }),
     }).isRequired,
   }).isRequired,
-  receiver: PropTypes.string.isRequired,
 }
 
 CollaboratorChanged.Title = CollaboratorChangedTitle
