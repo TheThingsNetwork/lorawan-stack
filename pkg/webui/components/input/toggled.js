@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -25,55 +24,57 @@ import style from './toggled.styl'
 
 import Input from '.'
 
-class Toggled extends Component {
-  @bind
-  handleCheckboxChange(event) {
-    const enabled = event.target.checked
-    const { value } = this.props.value
+const Toggled = props => {
+  const handleCheckboxChange = useCallback(
+    event => {
+      const enabled = event.target.checked
+      const { value } = props.value
 
-    this.props.onChange({ value, enabled }, true)
-  }
+      props.onChange({ value, enabled }, true)
+    },
+    [props],
+  )
 
-  @bind
-  handleInputChange(value) {
-    const { enabled } = this.props.value
+  const handleInputChange = useCallback(
+    value => {
+      const { enabled } = props.value
 
-    this.props.onChange({ value, enabled })
-  }
+      props.onChange({ value, enabled })
+    },
+    [props],
+  )
 
-  render() {
-    const { value, type, enabledMessage, className, children, ...rest } = this.props
+  const { value, type, enabledMessage, className, children, ...rest } = props
 
-    const isEnabled = value.enabled || false
-    const checkboxId = `${rest.id}_checkbox`
+  const isEnabled = value.enabled || false
+  const checkboxId = `${rest.id}_checkbox`
 
-    return (
-      <div className={classnames(className, style.container)}>
-        <div className={style.checkboxContainer}>
-          <label className={style.checkbox} htmlFor={checkboxId}>
-            <Checkbox
-              name={`${rest.name}.enable`}
-              onChange={this.handleCheckboxChange}
-              value={isEnabled}
-              id={checkboxId}
-              label={enabledMessage}
-              labelAsTitle
-            />
-          </label>
-          {children}
-        </div>
-        {isEnabled && (
-          <Input
-            {...rest}
-            className={style.input}
-            type="text"
-            value={value.value || ''}
-            onChange={this.handleInputChange}
+  return (
+    <div className={classnames(className, style.container)}>
+      <div className={style.checkboxContainer}>
+        <label className={style.checkbox} htmlFor={checkboxId}>
+          <Checkbox
+            name={`${rest.name}.enable`}
+            onChange={handleCheckboxChange}
+            value={isEnabled}
+            id={checkboxId}
+            label={enabledMessage}
+            labelAsTitle
           />
-        )}
+        </label>
+        {children}
       </div>
-    )
-  }
+      {isEnabled && (
+        <Input
+          {...rest}
+          className={style.input}
+          type="text"
+          value={value.value || ''}
+          onChange={handleInputChange}
+        />
+      )}
+    </div>
+  )
 }
 
 Toggled.propTypes = {

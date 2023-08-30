@@ -266,10 +266,20 @@ export default defineMessages({
   locationDescription:
     'When set to public, the gateway location may be visible to other users of the network',
   locationMarkerDescriptionNonUser:
-    'This location has been set automatically from incoming messages of this device',
+    'This location has been set automatically from incoming (status) messages',
   locationMarkerDescriptionUser:
     'This location has been set manually (e.g. by using the "Location"-tab)',
+  locationMarkerDescriptionUntrusted:
+    'This location was determined via an untrusted status message and may be inaccurate',
   locationSolved: 'Location solved',
+  locationSourceGps: 'GPS-based location',
+  locationSourceRegistry: 'Manually set location',
+  locationSourceIpGeolocation: 'IP-based geolocation',
+  locationSourceWifiRssi: 'Wifi RSSI geolocation',
+  locationSourceBtRssi: 'Bluetooth RSSI geolocation',
+  locationSourceLoraRssi: 'LoRa RSSI geolocation',
+  locationSourceLoraTdoa: 'LoRa TDOA geolocation',
+  locationSourceCombined: 'Combined geolocation',
   login: 'Login',
   logout: 'Logout',
   longitude: 'Longitude',
