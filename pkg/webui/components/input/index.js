@@ -69,6 +69,7 @@ const Input = React.forwardRef((props, ref) => {
     valid,
     value,
     warning,
+    max,
     ...rest
   } = props
   const [focus, setFocus] = useState(false)
@@ -78,7 +79,6 @@ const Input = React.forwardRef((props, ref) => {
 
   const computeByteInputWidth = useCallback(() => {
     const isSafari = isSafariUserAgent()
-    const { max } = props
     const maxValue = showPerChar ? Math.ceil(max / 2) : max
     const multiplier = isSafari ? 2.1 : 1.8
 
@@ -94,7 +94,7 @@ const Input = React.forwardRef((props, ref) => {
     }
 
     return `${width}rem`
-  }, [sensitive, showPerChar, props])
+  }, [sensitive, showPerChar, max])
 
   const handleHideToggleClick = useCallback(() => {
     setHidden(prevHidden => !prevHidden)
@@ -195,6 +195,7 @@ const Input = React.forwardRef((props, ref) => {
   const inputElemCls = classnames(style.input, { [style.hidden]: hidden })
 
   const passedProps = {
+    max,
     ...rest,
     ...(type === 'byte' ? { showPerChar } : {}),
     ref: inputRef ? combineRefs([input, inputRef]) : input,
