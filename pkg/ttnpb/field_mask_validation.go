@@ -1108,7 +1108,6 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		Allowed: []string{
 			"administrative_contact",
 			"antennas",
-			"contact_info",
 			"frequency_plan_ids",
 			"ids",
 			"ids.eui",
