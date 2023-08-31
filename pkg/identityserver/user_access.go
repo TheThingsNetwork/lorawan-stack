@@ -255,6 +255,9 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 		})
 		return err
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	if !(canSkipEmail && req.SkipEmail) {
 		go is.SendTemplateEmailToUserIDs(is.FromRequestContext(ctx), "login_token", func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
