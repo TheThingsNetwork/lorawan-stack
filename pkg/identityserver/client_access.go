@@ -47,7 +47,7 @@ var (
 	)
 )
 
-func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
+func (*IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
 	cliRights, err := rights.ListClient(ctx, ids)
 	if err != nil {
 		return nil, err
