@@ -55,7 +55,7 @@ jobs:
             git push origin v${{ steps.version.outputs.result }}
           fi
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-region: "${{ secrets.AWS_REGION }}"
           role-to-assume: "arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_NAME }}"

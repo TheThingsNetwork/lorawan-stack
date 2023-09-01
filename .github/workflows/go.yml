@@ -85,7 +85,7 @@ jobs:
           args: -h postgres -U root ttn_lorawan_is_store_test
       - name: Configure AWS Credentials
         if: "${{ env.AWS_REGION != '' }}"
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-region: "${{ secrets.AWS_REGION }}"
           role-to-assume: "arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_NAME }}"
