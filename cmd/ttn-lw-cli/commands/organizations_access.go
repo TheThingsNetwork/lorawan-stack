@@ -346,13 +346,9 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
+			_, err = ttnpb.NewOrganizationAccessClient(is).DeleteAPIKey(ctx, &ttnpb.DeleteOrganizationAPIKeyRequest{
 				OrganizationIds: orgID,
-				ApiKey: &ttnpb.APIKey{
-					Id:     id,
-					Rights: nil,
-				},
-				FieldMask: ttnpb.FieldMask("rights"),
+				KeyId:           id,
 			})
 			if err != nil {
 				return err

@@ -68,9 +68,10 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			order := getOrder(cmd.Flags())
-			res, err := ttnpb.NewApplicationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
-				ApplicationIds: appID, Limit: limit, Page: page, Order: order,
-			}, opt)
+			res, err := ttnpb.NewApplicationAccessClient(is).ListCollaborators(
+				ctx, &ttnpb.ListApplicationCollaboratorsRequest{
+					ApplicationIds: appID, Limit: limit, Page: page, Order: order,
+				}, opt)
 			if err != nil {
 				return err
 			}
@@ -83,7 +84,7 @@ var (
 		Use:     "get",
 		Aliases: []string{"info"},
 		Short:   "Get an application collaborator",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			appID := getApplicationID(cmd.Flags(), nil)
 			if appID == nil {
 				return errNoApplicationID.New()
@@ -112,7 +113,7 @@ var (
 		Use:     "set",
 		Aliases: []string{"update"},
 		Short:   "Set properties of an application collaborator",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			appID := getApplicationID(cmd.Flags(), nil)
 			if appID == nil {
 				return errNoApplicationID.New()
@@ -345,13 +346,9 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+			_, err = ttnpb.NewApplicationAccessClient(is).DeleteAPIKey(ctx, &ttnpb.DeleteApplicationAPIKeyRequest{
 				ApplicationIds: appID,
-				ApiKey: &ttnpb.APIKey{
-					Id:     id,
-					Rights: nil,
-				},
-				FieldMask: ttnpb.FieldMask("rights"),
+				KeyId:          id,
 			})
 			if err != nil {
 				return err

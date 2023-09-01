@@ -343,13 +343,9 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewGatewayAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+			_, err = ttnpb.NewGatewayAccessClient(is).DeleteAPIKey(ctx, &ttnpb.DeleteGatewayAPIKeyRequest{
 				GatewayIds: gtwID,
-				ApiKey: &ttnpb.APIKey{
-					Id:     id,
-					Rights: nil,
-				},
-				FieldMask: ttnpb.FieldMask("rights"),
+				KeyId:      id,
 			})
 			if err != nil {
 				return err
