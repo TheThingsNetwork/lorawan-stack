@@ -227,7 +227,7 @@ require (
 	go.uber.org/automaxprocs v1.5.3 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.25.0 // indirect
-	gocloud.dev v0.33.0 // indirect
+	gocloud.dev v0.34.0 // indirect
 	gocloud.dev/pubsub/natspubsub v0.33.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect

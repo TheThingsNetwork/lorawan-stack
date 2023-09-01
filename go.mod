@@ -96,7 +96,7 @@ require (
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0
 	go.uber.org/automaxprocs v1.5.3
 	go.uber.org/zap v1.25.0
-	gocloud.dev v0.33.0
+	gocloud.dev v0.34.0
 	gocloud.dev/pubsub/natspubsub v0.33.0
 	golang.org/x/crypto v0.12.0
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
