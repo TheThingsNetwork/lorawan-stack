@@ -77,8 +77,20 @@ class Collaborators {
     return await this.add(entityId, data)
   }
 
-  async remove(entityId, data) {
-    return await this.add(entityId, { ...data, rights: [] })
+  async remove(isUser, entityId, collaboratorId) {
+    const entityIdRoute = this._parentRoutes.delete
+    const collaboratorIdRoute = isUser
+      ? 'collaborator_ids.user_ids.user_id'
+      : 'collaborator_ids.organization_ids.organization_id'
+
+    const result = await this._api.DeleteCollaborator({
+      routeParams: {
+        [entityIdRoute]: entityId,
+        [collaboratorIdRoute]: collaboratorId,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(result)
   }
 }
 

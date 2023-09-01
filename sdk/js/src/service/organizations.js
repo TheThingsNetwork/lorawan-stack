@@ -36,6 +36,7 @@ class Organizations {
         get: 'organization_ids.organization_id',
         list: 'organization_ids.organization_id',
         set: 'organization_ids.organization_id',
+        delete: 'organization_ids.organization_id',
       },
     })
     autoBind(this)

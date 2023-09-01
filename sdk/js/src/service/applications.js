@@ -61,6 +61,7 @@ class Applications {
         get: 'application_ids.application_id',
         list: 'application_ids.application_id',
         set: 'application_ids.application_id',
+        delete: 'application_ids.application_id',
       },
     })
     this.Webhooks = new Webhooks(api.ApplicationWebhookRegistry)
