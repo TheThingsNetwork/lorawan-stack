@@ -824,8 +824,8 @@ go.uber.org/multierr v1.11.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN8
 go.uber.org/zap v1.18.1/go.mod h1:xg/QME4nWcxGxrpdeYfq7UvYrLh66cuVKdrbD1XF/NI=
 go.uber.org/zap v1.25.0 h1:4Hvk6GtkucQ790dqmj7l1eEnRdKm3k3ZUrUMS2d5+5c=
 go.uber.org/zap v1.25.0/go.mod h1:JIAUzQIH94IC4fOJQm7gMmBJP5k7wQfdcnYdPoEXJYk=
-gocloud.dev v0.33.0 h1:ET5z49jm1+eUhY5BkuGk2d7czfgGeXKd4vtg1Jcg9OQ=
-gocloud.dev v0.33.0/go.mod h1:z6W8qorjrfM09H8t1MDk8KLPj3Xi26aFBzDKAHWIgLU=
+gocloud.dev v0.34.0 h1:LzlQY+4l2cMtuNfwT2ht4+fiXwWf/NmPTnXUlLmGif4=
+gocloud.dev v0.34.0/go.mod h1:psKOachbnvY3DAOPbsFVmLIErwsbWPUG2H5i65D38vE=
 gocloud.dev/pubsub/natspubsub v0.33.0 h1:SwHh+PuDmZ3/xv1h/7VBRVlgiBI9Hw6vS7NcvJzW3Us=
 gocloud.dev/pubsub/natspubsub v0.33.0/go.mod h1:2hKJ2+CbUyuSv4pFkaU/Ay3buK5ACJMxqlfnVSXFZGs=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
