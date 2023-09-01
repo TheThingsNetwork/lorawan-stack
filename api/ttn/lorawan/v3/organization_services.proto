@@ -122,6 +122,11 @@ service OrganizationAccess {
     };
   }
 
+  // Delete a single API key of this organization.
+  rpc DeleteAPIKey(DeleteOrganizationAPIKeyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/organizations/{organization_ids.organization_id}/api-keys/{key_id}"};
+  }
+
   // Get the rights of a collaborator (member) of the organization.
   // Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
   rpc GetCollaborator(GetOrganizationCollaboratorRequest) returns (GetCollaboratorResponse) {

@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -50,7 +51,7 @@ var (
 	)
 )
 
-func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
+func (*IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
 	usrRights, err := rights.ListUser(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -58,7 +59,9 @@ func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIde
 	return usrRights.Intersect(ttnpb.AllEntityRights.Union(ttnpb.AllOrganizationRights, ttnpb.AllUserRights)), nil
 }
 
-func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+func (is *IdentityServer) createUserAPIKey(
+	ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest,
+) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
 	if err = rights.RequireUser(ctx, req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
@@ -85,15 +88,19 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
 		NotificationType: "api_key_created",
 		Data:             ttnpb.MustMarshalAny(key),
-		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
-		Email:            true,
+		Receivers: []ttnpb.NotificationReceiver{
+			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
+		},
+		Email: true,
 	})
 
 	key.Key = token
 	return key, nil
 }
 
-func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
+func (is *IdentityServer) listUserAPIKeys(
+	ctx context.Context, req *ttnpb.ListUserAPIKeysRequest,
+) (keys *ttnpb.APIKeys, err error) {
 	if err = rights.RequireUser(ctx, req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
@@ -119,7 +126,9 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 	return keys, nil
 }
 
-func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+func (is *IdentityServer) getUserAPIKey(
+	ctx context.Context, req *ttnpb.GetUserAPIKeyRequest,
+) (key *ttnpb.APIKey, err error) {
 	if err = rights.RequireUser(ctx, req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
@@ -139,7 +148,9 @@ func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserA
 	return key, nil
 }
 
-func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+func (is *IdentityServer) updateUserAPIKey(
+	ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest,
+) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
 	if err = rights.RequireUser(ctx, req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
@@ -161,16 +172,19 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
-			if err := rights.RequireUser(ctx, req.GetUserIds(), newRights.Sub(existingRights).GetRights()...); err != nil {
+			err = rights.RequireUser(ctx, req.GetUserIds(), newRights.Sub(existingRights).GetRights()...)
+			if err != nil {
 				return err
 			}
 			// Require the caller to have all removed rights.
-			if err := rights.RequireUser(ctx, req.GetUserIds(), existingRights.Sub(newRights).GetRights()...); err != nil {
+			err = rights.RequireUser(ctx, req.GetUserIds(), existingRights.Sub(newRights).GetRights()...)
+			if err != nil {
 				return err
 			}
 		}
 
 		if len(req.ApiKey.Rights) == 0 && ttnpb.HasAnyField(req.GetFieldMask().GetPaths(), "rights") {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteAPIKey(ctx, req.GetUserIds().GetEntityIdentifiers(), req.ApiKey)
 		}
 
@@ -191,21 +205,45 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
 		NotificationType: "api_key_changed",
 		Data:             ttnpb.MustMarshalAny(key),
-		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
-		Email:            true,
+		Receivers: []ttnpb.NotificationReceiver{
+			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
+		},
+		Email: true,
 	})
 
 	return key, nil
+}
+
+func (is *IdentityServer) deleteUserAPIKey(
+	ctx context.Context, req *ttnpb.DeleteUserAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	// Require that caller has rights to manage API keys.
+	err := rights.RequireUser(ctx, req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS)
+	if err != nil {
+		return ttnpb.Empty, err
+	}
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		return st.DeleteAPIKey(ctx, req.GetUserIds().GetEntityIdentifiers(), &ttnpb.APIKey{Id: req.KeyId})
+	})
+	if err != nil {
+		return ttnpb.Empty, err
+	}
+	events.Publish(evtDeleteUserAPIKey.New(ctx, events.WithIdentifiers(req.GetUserIds())))
+	return ttnpb.Empty, nil
 }
 
 const maxActiveLoginTokens = 5
 
 var (
 	errLoginTokensDisabled   = errors.DefineFailedPrecondition("login_tokens_disabled", "login tokens are disabled")
-	errLoginTokensStillValid = errors.DefineAlreadyExists("login_tokens_still_valid", "previously created login token still valid")
+	errLoginTokensStillValid = errors.DefineAlreadyExists(
+		"login_tokens_still_valid", "previously created login token still valid",
+	)
 )
 
-func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.CreateLoginTokenRequest) (*ttnpb.CreateLoginTokenResponse, error) {
+func (is *IdentityServer) createLoginToken(
+	ctx context.Context, req *ttnpb.CreateLoginTokenRequest,
+) (*ttnpb.CreateLoginTokenResponse, error) {
 	loginTokenConfig := is.configFromContext(ctx).LoginTokens
 	if !loginTokenConfig.Enabled {
 		return nil, errLoginTokensDisabled.New()
@@ -255,15 +293,21 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 		})
 		return err
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	if !(canSkipEmail && req.SkipEmail) {
-		go is.SendTemplateEmailToUserIDs(is.FromRequestContext(ctx), "login_token", func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
-			return &templates.LoginTokenData{
-				TemplateData: data,
-				LoginToken:   token,
-				TTL:          loginTokenConfig.TokenTTL,
-			}, nil
-		}, req.GetUserIds())
+	if !canSkipEmail || !req.SkipEmail {
+		go is.SendTemplateEmailToUserIDs(
+			is.FromRequestContext(ctx),
+			"login_token",
+			func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
+				return &templates.LoginTokenData{
+					TemplateData: data,
+					LoginToken:   token,
+					TTL:          loginTokenConfig.TokenTTL,
+				}, nil
+			}, req.GetUserIds())
 	}
 	if !canReturnToken {
 		token = ""
@@ -277,26 +321,44 @@ type userAccess struct {
 	*IdentityServer
 }
 
-func (ua *userAccess) ListRights(ctx context.Context, req *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
+func (ua *userAccess) ListRights(
+	ctx context.Context, req *ttnpb.UserIdentifiers,
+) (*ttnpb.Rights, error) {
 	return ua.listUserRights(ctx, req)
 }
 
-func (ua *userAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetUserAPIKeyRequest) (*ttnpb.APIKey, error) {
+func (ua *userAccess) GetAPIKey(
+	ctx context.Context, req *ttnpb.GetUserAPIKeyRequest,
+) (*ttnpb.APIKey, error) {
 	return ua.getUserAPIKey(ctx, req)
 }
 
-func (ua *userAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
+func (ua *userAccess) CreateAPIKey(
+	ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest,
+) (*ttnpb.APIKey, error) {
 	return ua.createUserAPIKey(ctx, req)
 }
 
-func (ua *userAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKeysRequest) (*ttnpb.APIKeys, error) {
+func (ua *userAccess) ListAPIKeys(
+	ctx context.Context, req *ttnpb.ListUserAPIKeysRequest,
+) (*ttnpb.APIKeys, error) {
 	return ua.listUserAPIKeys(ctx, req)
 }
 
-func (ua *userAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
+func (ua *userAccess) UpdateAPIKey(
+	ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest,
+) (*ttnpb.APIKey, error) {
 	return ua.updateUserAPIKey(ctx, req)
 }
 
-func (ua *userAccess) CreateLoginToken(ctx context.Context, req *ttnpb.CreateLoginTokenRequest) (*ttnpb.CreateLoginTokenResponse, error) {
+func (ua *userAccess) DeleteAPIKey(
+	ctx context.Context, req *ttnpb.DeleteUserAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	return ua.deleteUserAPIKey(ctx, req)
+}
+
+func (ua *userAccess) CreateLoginToken(
+	ctx context.Context, req *ttnpb.CreateLoginTokenRequest,
+) (*ttnpb.CreateLoginTokenResponse, error) {
 	return ua.createLoginToken(ctx, req)
 }

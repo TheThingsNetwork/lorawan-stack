@@ -26,7 +26,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func TestGatewayAPIKeys(t *testing.T) {
+func TestGatewayAPIKeys(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
 	admin := p.NewUser()
@@ -184,6 +184,14 @@ func TestGatewayAPIKeys(t *testing.T) {
 			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
 				a.So(updated, should.BeNil)
 			}
+
+			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteGatewayAPIKeyRequest{
+				GatewayIds: gtw1.GetIds(),
+				KeyId:      created.GetId(),
+			}, opts...)
+			if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				t.FailNow()
+			}
 		}
 
 		// API Key CRUD with different valid credentials.
@@ -229,25 +237,52 @@ func TestGatewayAPIKeys(t *testing.T) {
 				a.So(updated.Name, should.Equal, "api-key-name-updated")
 			}
 
-			deleted, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+			// TODO: Remove UpdateAPIKey test case (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
+			t.Run("Delete via update method", func(*testing.T) { // nolint:paralleltest
+				_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+					GatewayIds: gtw1.GetIds(),
+					ApiKey:     &ttnpb.APIKey{Id: created.GetId()},
+				}, opts...)
+				a.So(err, should.BeNil)
+
+				got, err = reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+					GatewayIds: gtw1.GetIds(),
+					KeyId:      created.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
+
+			// Recreates api-key of the `gtw1` Gateway.
+			created, err = reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 				GatewayIds: gtw1.GetIds(),
-				ApiKey: &ttnpb.APIKey{
-					Id: created.GetId(),
-				},
-				FieldMask: ttnpb.FieldMask("rights"),
+				Name:       "api-key-name",
+				Rights:     []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
 			}, opts...)
-			if a.So(err, should.BeNil) && a.So(deleted, should.NotBeNil) {
-				a.So(deleted.Rights, should.BeNil)
+			if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+				a.So(created.Name, should.Equal, "api-key-name")
+				a.So(created.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO})
 			}
 
-			got, err = reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
-				GatewayIds: gtw1.GetIds(),
-				KeyId:      created.GetId(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsNotFound(err), should.BeTrue)
-			}
-			a.So(got, should.BeNil)
+			t.Run("Delete via delete method", func(*testing.T) { // nolint:paralleltest
+				empty, err := reg.DeleteAPIKey(ctx, &ttnpb.DeleteGatewayAPIKeyRequest{
+					GatewayIds: gtw1.GetIds(),
+					KeyId:      created.GetId(),
+				}, opts...)
+				a.So(err, should.BeNil)
+				a.So(empty, should.Resemble, ttnpb.Empty)
+
+				got, err = reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+					GatewayIds: gtw1.GetIds(),
+					KeyId:      created.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
 		}
 	}, withPrivateTestDatabase(p))
 }

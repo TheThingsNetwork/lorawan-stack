@@ -416,6 +416,17 @@ var UpdateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"gateway_ids",
 }
+var DeleteGatewayAPIKeyRequestFieldPathsNested = []string{
+	"gateway_ids",
+	"gateway_ids.eui",
+	"gateway_ids.gateway_id",
+	"key_id",
+}
+
+var DeleteGatewayAPIKeyRequestFieldPathsTopLevel = []string{
+	"gateway_ids",
+	"key_id",
+}
 var ListGatewayCollaboratorsRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",

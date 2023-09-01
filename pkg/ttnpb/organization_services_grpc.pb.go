@@ -389,6 +389,7 @@ const (
 	OrganizationAccess_ListAPIKeys_FullMethodName        = "/ttn.lorawan.v3.OrganizationAccess/ListAPIKeys"
 	OrganizationAccess_GetAPIKey_FullMethodName          = "/ttn.lorawan.v3.OrganizationAccess/GetAPIKey"
 	OrganizationAccess_UpdateAPIKey_FullMethodName       = "/ttn.lorawan.v3.OrganizationAccess/UpdateAPIKey"
+	OrganizationAccess_DeleteAPIKey_FullMethodName       = "/ttn.lorawan.v3.OrganizationAccess/DeleteAPIKey"
 	OrganizationAccess_GetCollaborator_FullMethodName    = "/ttn.lorawan.v3.OrganizationAccess/GetCollaborator"
 	OrganizationAccess_SetCollaborator_FullMethodName    = "/ttn.lorawan.v3.OrganizationAccess/SetCollaborator"
 	OrganizationAccess_ListCollaborators_FullMethodName  = "/ttn.lorawan.v3.OrganizationAccess/ListCollaborators"
@@ -413,6 +414,8 @@ type OrganizationAccessClient interface {
 	// This method can also be used to delete the API key, by giving it no rights.
 	// The caller is required to have all assigned or/and removed rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	// Delete a single API key of this organization.
+	DeleteAPIKey(ctx context.Context, in *DeleteOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Get the rights of a collaborator (member) of the organization.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(ctx context.Context, in *GetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*GetCollaboratorResponse, error)
@@ -481,6 +484,15 @@ func (c *organizationAccessClient) UpdateAPIKey(ctx context.Context, in *UpdateO
 	return out, nil
 }
 
+func (c *organizationAccessClient) DeleteAPIKey(ctx context.Context, in *DeleteOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, OrganizationAccess_DeleteAPIKey_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *organizationAccessClient) GetCollaborator(ctx context.Context, in *GetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*GetCollaboratorResponse, error) {
 	out := new(GetCollaboratorResponse)
 	err := c.cc.Invoke(ctx, OrganizationAccess_GetCollaborator_FullMethodName, in, out, opts...)
@@ -535,6 +547,8 @@ type OrganizationAccessServer interface {
 	// This method can also be used to delete the API key, by giving it no rights.
 	// The caller is required to have all assigned or/and removed rights.
 	UpdateAPIKey(context.Context, *UpdateOrganizationAPIKeyRequest) (*APIKey, error)
+	// Delete a single API key of this organization.
+	DeleteAPIKey(context.Context, *DeleteOrganizationAPIKeyRequest) (*emptypb.Empty, error)
 	// Get the rights of a collaborator (member) of the organization.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(context.Context, *GetOrganizationCollaboratorRequest) (*GetCollaboratorResponse, error)
@@ -569,6 +583,9 @@ func (UnimplementedOrganizationAccessServer) GetAPIKey(context.Context, *GetOrga
 }
 func (UnimplementedOrganizationAccessServer) UpdateAPIKey(context.Context, *UpdateOrganizationAPIKeyRequest) (*APIKey, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAPIKey not implemented")
+}
+func (UnimplementedOrganizationAccessServer) DeleteAPIKey(context.Context, *DeleteOrganizationAPIKeyRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAPIKey not implemented")
 }
 func (UnimplementedOrganizationAccessServer) GetCollaborator(context.Context, *GetOrganizationCollaboratorRequest) (*GetCollaboratorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollaborator not implemented")
@@ -685,6 +702,24 @@ func _OrganizationAccess_UpdateAPIKey_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrganizationAccess_DeleteAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteOrganizationAPIKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrganizationAccessServer).DeleteAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrganizationAccess_DeleteAPIKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrganizationAccessServer).DeleteAPIKey(ctx, req.(*DeleteOrganizationAPIKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _OrganizationAccess_GetCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetOrganizationCollaboratorRequest)
 	if err := dec(in); err != nil {
@@ -783,6 +818,10 @@ var OrganizationAccess_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateAPIKey",
 			Handler:    _OrganizationAccess_UpdateAPIKey_Handler,
+		},
+		{
+			MethodName: "DeleteAPIKey",
+			Handler:    _OrganizationAccess_DeleteAPIKey_Handler,
 		},
 		{
 			MethodName: "GetCollaborator",

@@ -65,7 +65,7 @@ var (
 	)
 )
 
-func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
+func (*IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	gtwRights, err := rights.ListGateway(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -199,6 +199,7 @@ func (is *IdentityServer) updateGatewayAPIKey(
 		}
 
 		if len(req.ApiKey.Rights) == 0 && ttnpb.HasAnyField(req.GetFieldMask().GetPaths(), "rights") {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), req.ApiKey)
 		}
 
@@ -226,6 +227,24 @@ func (is *IdentityServer) updateGatewayAPIKey(
 	})
 
 	return key, nil
+}
+
+func (is *IdentityServer) deleteGatewayAPIKey(
+	ctx context.Context, req *ttnpb.DeleteGatewayAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	// Require that caller has rights to manage API keys.
+	if err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+		return nil, err
+	}
+
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		return st.DeleteAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), &ttnpb.APIKey{Id: req.KeyId})
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtDeleteGatewayAPIKey.New(ctx, events.WithIdentifiers(req.GetGatewayIds())))
+	return ttnpb.Empty, nil
 }
 
 func (is *IdentityServer) getGatewayCollaborator(
@@ -256,7 +275,9 @@ func (is *IdentityServer) getGatewayCollaborator(
 	return res, nil
 }
 
-var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition("gateway_needs_collaborator", "every gateway needs at least one collaborator with all rights")
+var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition(
+	"gateway_needs_collaborator", "every gateway needs at least one collaborator with all rights",
+)
 
 func (is *IdentityServer) setGatewayCollaborator(
 	ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest,
@@ -477,6 +498,12 @@ func (ga *gatewayAccess) UpdateAPIKey(
 	ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest,
 ) (*ttnpb.APIKey, error) {
 	return ga.updateGatewayAPIKey(ctx, req)
+}
+
+func (ga *gatewayAccess) DeleteAPIKey(
+	ctx context.Context, req *ttnpb.DeleteGatewayAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	return ga.deleteGatewayAPIKey(ctx, req)
 }
 
 func (ga *gatewayAccess) GetCollaborator(

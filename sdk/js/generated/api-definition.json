@@ -73,6 +73,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/application_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/applications/{application_ids.application_id}/api-keys/{key_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "GetCollaborator": {
       "file": "ttn/lorawan/v3/application_services.proto",
       "http": [
@@ -3184,6 +3197,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "GetCollaborator": {
       "file": "ttn/lorawan/v3/gateway_services.proto",
       "http": [
@@ -5235,6 +5261,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/organization_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{key_id}",
+          "parameters": [
+            "organization_ids.organization_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "GetCollaborator": {
       "file": "ttn/lorawan/v3/organization_services.proto",
       "http": [
@@ -6160,6 +6199,19 @@
         "name",
         "rights",
         "updated_at"
+      ]
+    },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/user_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/api-keys/{key_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "key_id"
+          ]
+        }
       ]
     },
     "CreateLoginToken": {

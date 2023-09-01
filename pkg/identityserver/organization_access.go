@@ -204,6 +204,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(
 		}
 
 		if len(req.ApiKey.Rights) == 0 && ttnpb.HasAnyField(req.GetFieldMask().GetPaths(), "rights") {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey)
 		}
 
@@ -233,6 +234,24 @@ func (is *IdentityServer) updateOrganizationAPIKey(
 	})
 
 	return key, nil
+}
+
+func (is *IdentityServer) deleteOrganizationAPIKey(
+	ctx context.Context, req *ttnpb.DeleteOrganizationAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	// Require that caller has rights to manage API keys.
+	err := rights.RequireOrganization(ctx, req.GetOrganizationIds(), ttnpb.Right_RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
+	if err != nil {
+		return ttnpb.Empty, err
+	}
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		return st.DeleteAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), &ttnpb.APIKey{Id: req.KeyId})
+	})
+	if err != nil {
+		return ttnpb.Empty, err
+	}
+	events.Publish(evtDeleteUserAPIKey.New(ctx, events.WithIdentifiers(req.GetOrganizationIds())))
+	return ttnpb.Empty, nil
 }
 
 func (is *IdentityServer) getOrganizationCollaborator(
@@ -492,6 +511,12 @@ func (oa *organizationAccess) UpdateAPIKey(
 	ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest,
 ) (*ttnpb.APIKey, error) {
 	return oa.updateOrganizationAPIKey(ctx, req)
+}
+
+func (oa *organizationAccess) DeleteAPIKey(
+	ctx context.Context, req *ttnpb.DeleteOrganizationAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	return oa.deleteOrganizationAPIKey(ctx, req)
 }
 
 func (oa *organizationAccess) GetCollaborator(

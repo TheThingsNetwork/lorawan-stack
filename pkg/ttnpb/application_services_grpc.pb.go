@@ -434,6 +434,7 @@ const (
 	ApplicationAccess_ListAPIKeys_FullMethodName        = "/ttn.lorawan.v3.ApplicationAccess/ListAPIKeys"
 	ApplicationAccess_GetAPIKey_FullMethodName          = "/ttn.lorawan.v3.ApplicationAccess/GetAPIKey"
 	ApplicationAccess_UpdateAPIKey_FullMethodName       = "/ttn.lorawan.v3.ApplicationAccess/UpdateAPIKey"
+	ApplicationAccess_DeleteAPIKey_FullMethodName       = "/ttn.lorawan.v3.ApplicationAccess/DeleteAPIKey"
 	ApplicationAccess_GetCollaborator_FullMethodName    = "/ttn.lorawan.v3.ApplicationAccess/GetCollaborator"
 	ApplicationAccess_SetCollaborator_FullMethodName    = "/ttn.lorawan.v3.ApplicationAccess/SetCollaborator"
 	ApplicationAccess_ListCollaborators_FullMethodName  = "/ttn.lorawan.v3.ApplicationAccess/ListCollaborators"
@@ -456,6 +457,8 @@ type ApplicationAccessClient interface {
 	// This method can also be used to delete the API key, by giving it no rights.
 	// The caller is required to have all assigned or/and removed rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	// Delete a single API key of this application.
+	DeleteAPIKey(ctx context.Context, in *DeleteApplicationAPIKeyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Get the rights of a collaborator (member) of the application.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(ctx context.Context, in *GetApplicationCollaboratorRequest, opts ...grpc.CallOption) (*GetCollaboratorResponse, error)
@@ -522,6 +525,15 @@ func (c *applicationAccessClient) UpdateAPIKey(ctx context.Context, in *UpdateAp
 	return out, nil
 }
 
+func (c *applicationAccessClient) DeleteAPIKey(ctx context.Context, in *DeleteApplicationAPIKeyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ApplicationAccess_DeleteAPIKey_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *applicationAccessClient) GetCollaborator(ctx context.Context, in *GetApplicationCollaboratorRequest, opts ...grpc.CallOption) (*GetCollaboratorResponse, error) {
 	out := new(GetCollaboratorResponse)
 	err := c.cc.Invoke(ctx, ApplicationAccess_GetCollaborator_FullMethodName, in, out, opts...)
@@ -574,6 +586,8 @@ type ApplicationAccessServer interface {
 	// This method can also be used to delete the API key, by giving it no rights.
 	// The caller is required to have all assigned or/and removed rights.
 	UpdateAPIKey(context.Context, *UpdateApplicationAPIKeyRequest) (*APIKey, error)
+	// Delete a single API key of this application.
+	DeleteAPIKey(context.Context, *DeleteApplicationAPIKeyRequest) (*emptypb.Empty, error)
 	// Get the rights of a collaborator (member) of the application.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(context.Context, *GetApplicationCollaboratorRequest) (*GetCollaboratorResponse, error)
@@ -606,6 +620,9 @@ func (UnimplementedApplicationAccessServer) GetAPIKey(context.Context, *GetAppli
 }
 func (UnimplementedApplicationAccessServer) UpdateAPIKey(context.Context, *UpdateApplicationAPIKeyRequest) (*APIKey, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAPIKey not implemented")
+}
+func (UnimplementedApplicationAccessServer) DeleteAPIKey(context.Context, *DeleteApplicationAPIKeyRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAPIKey not implemented")
 }
 func (UnimplementedApplicationAccessServer) GetCollaborator(context.Context, *GetApplicationCollaboratorRequest) (*GetCollaboratorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollaborator not implemented")
@@ -722,6 +739,24 @@ func _ApplicationAccess_UpdateAPIKey_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationAccess_DeleteAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteApplicationAPIKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationAccessServer).DeleteAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ApplicationAccess_DeleteAPIKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationAccessServer).DeleteAPIKey(ctx, req.(*DeleteApplicationAPIKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ApplicationAccess_GetCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetApplicationCollaboratorRequest)
 	if err := dec(in); err != nil {
@@ -820,6 +855,10 @@ var ApplicationAccess_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateAPIKey",
 			Handler:    _ApplicationAccess_UpdateAPIKey_Handler,
+		},
+		{
+			MethodName: "DeleteAPIKey",
+			Handler:    _ApplicationAccess_DeleteAPIKey_Handler,
 		},
 		{
 			MethodName: "GetCollaborator",
