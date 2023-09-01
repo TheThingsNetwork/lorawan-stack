@@ -59,13 +59,14 @@ func (is *IdentityServer) getClientCollaborator(
 	ctx context.Context,
 	req *ttnpb.GetClientCollaboratorRequest,
 ) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS); err != nil {
+	err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS)
+	if err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
 		Ids: req.GetCollaborator(),
 	}
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		rights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator(),
@@ -147,6 +148,7 @@ func (is *IdentityServer) setClientCollaborator(
 		}
 
 		if len(req.Collaborator.Rights) == 0 {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteMember(ctx, req.GetCollaborator().GetIds(), req.GetClientIds().GetEntityIdentifiers())
 		}
 
@@ -178,7 +180,9 @@ func (is *IdentityServer) setClientCollaborator(
 			Email: false,
 		})
 	} else {
-		events.Publish(evtDeleteClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds())))
+		events.Publish(evtDeleteClientCollaborator.New(
+			ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds()),
+		))
 	}
 	return ttnpb.Empty, nil
 }
@@ -225,13 +229,63 @@ func (is *IdentityServer) listClientCollaborators(
 	return collaborators, nil
 }
 
+func (is *IdentityServer) deleteClientCollaborator(
+	ctx context.Context, req *ttnpb.DeleteClientCollaboratorRequest,
+) (*emptypb.Empty, error) {
+	err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS)
+	if err != nil {
+		return ttnpb.Empty, err
+	}
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		removedRights, err := st.GetMember(ctx, req.GetCollaboratorIds(), req.GetClientIds().GetEntityIdentifiers())
+		if err != nil {
+			return err
+		}
+		if removedRights.Implied().IncludesAll(ttnpb.Right_RIGHT_CLIENT_ALL) {
+			memberRights, err := st.FindMembers(ctx, req.GetClientIds().GetEntityIdentifiers())
+			if err != nil {
+				return err
+			}
+			var hasOtherOwner bool
+			for _, v := range memberRights {
+				member, rights := v.Ids, v.Rights
+				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaboratorIds()) {
+					continue
+				}
+				if rights.Implied().IncludesAll(ttnpb.Right_RIGHT_CLIENT_ALL) {
+					hasOtherOwner = true
+					break
+				}
+			}
+			if !hasOtherOwner {
+				return errClientNeedsCollaborator.New()
+			}
+		}
+		return st.DeleteMember(
+			ctx,
+			req.GetCollaboratorIds(),
+			req.GetClientIds().GetEntityIdentifiers(),
+		)
+	})
+	if err != nil {
+		return ttnpb.Empty, err
+	}
+	events.Publish(evtDeleteClientCollaborator.New(
+		ctx,
+		events.WithIdentifiers(req.GetClientIds(), req.GetCollaboratorIds()),
+	))
+	return ttnpb.Empty, nil
+}
+
 type clientAccess struct {
 	ttnpb.UnimplementedClientAccessServer
 
 	*IdentityServer
 }
 
-func (ca *clientAccess) ListRights(ctx context.Context, req *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
+func (ca *clientAccess) ListRights(
+	ctx context.Context, req *ttnpb.ClientIdentifiers,
+) (*ttnpb.Rights, error) {
 	return ca.listClientRights(ctx, req)
 }
 
@@ -254,4 +308,10 @@ func (ca *clientAccess) ListCollaborators(
 	req *ttnpb.ListClientCollaboratorsRequest,
 ) (*ttnpb.Collaborators, error) {
 	return ca.listClientCollaborators(ctx, req)
+}
+
+func (ca *clientAccess) DeleteCollaborator(
+	ctx context.Context, req *ttnpb.DeleteClientCollaboratorRequest,
+) (*emptypb.Empty, error) {
+	return ca.deleteClientCollaborator(ctx, req)
 }

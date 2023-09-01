@@ -11,6 +11,7 @@
   - [Message `Applications`](#ttn.lorawan.v3.Applications)
   - [Message `CreateApplicationAPIKeyRequest`](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest)
   - [Message `CreateApplicationRequest`](#ttn.lorawan.v3.CreateApplicationRequest)
+  - [Message `DeleteApplicationCollaboratorRequest`](#ttn.lorawan.v3.DeleteApplicationCollaboratorRequest)
   - [Message `GetApplicationAPIKeyRequest`](#ttn.lorawan.v3.GetApplicationAPIKeyRequest)
   - [Message `GetApplicationCollaboratorRequest`](#ttn.lorawan.v3.GetApplicationCollaboratorRequest)
   - [Message `GetApplicationRequest`](#ttn.lorawan.v3.GetApplicationRequest)
@@ -124,6 +125,7 @@
   - [Message `Client.AttributesEntry`](#ttn.lorawan.v3.Client.AttributesEntry)
   - [Message `Clients`](#ttn.lorawan.v3.Clients)
   - [Message `CreateClientRequest`](#ttn.lorawan.v3.CreateClientRequest)
+  - [Message `DeleteClientCollaboratorRequest`](#ttn.lorawan.v3.DeleteClientCollaboratorRequest)
   - [Message `GetClientCollaboratorRequest`](#ttn.lorawan.v3.GetClientCollaboratorRequest)
   - [Message `GetClientRequest`](#ttn.lorawan.v3.GetClientRequest)
   - [Message `ListClientCollaboratorsRequest`](#ttn.lorawan.v3.ListClientCollaboratorsRequest)
@@ -297,6 +299,7 @@
 - [File `ttn/lorawan/v3/gateway.proto`](#ttn/lorawan/v3/gateway.proto)
   - [Message `CreateGatewayAPIKeyRequest`](#ttn.lorawan.v3.CreateGatewayAPIKeyRequest)
   - [Message `CreateGatewayRequest`](#ttn.lorawan.v3.CreateGatewayRequest)
+  - [Message `DeleteGatewayCollaboratorRequest`](#ttn.lorawan.v3.DeleteGatewayCollaboratorRequest)
   - [Message `Gateway`](#ttn.lorawan.v3.Gateway)
   - [Message `Gateway.AttributesEntry`](#ttn.lorawan.v3.Gateway.AttributesEntry)
   - [Message `Gateway.LRFHSS`](#ttn.lorawan.v3.Gateway.LRFHSS)
@@ -572,6 +575,7 @@
 - [File `ttn/lorawan/v3/organization.proto`](#ttn/lorawan/v3/organization.proto)
   - [Message `CreateOrganizationAPIKeyRequest`](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest)
   - [Message `CreateOrganizationRequest`](#ttn.lorawan.v3.CreateOrganizationRequest)
+  - [Message `DeleteOrganizationCollaboratorRequest`](#ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest)
   - [Message `GetOrganizationAPIKeyRequest`](#ttn.lorawan.v3.GetOrganizationAPIKeyRequest)
   - [Message `GetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.GetOrganizationCollaboratorRequest)
   - [Message `GetOrganizationRequest`](#ttn.lorawan.v3.GetOrganizationRequest)
@@ -783,6 +787,20 @@ Application is the message that defines an Application in the network.
 | `application` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteApplicationCollaboratorRequest">Message `DeleteApplicationCollaboratorRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `collaborator_ids` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `collaborator_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetApplicationAPIKeyRequest">Message `GetApplicationAPIKeyRequest`</a>
 
 | Field | Type | Label | Description |
@@ -946,6 +964,7 @@ API keys and collaborators of applications.
 | `GetCollaborator` | [`GetApplicationCollaboratorRequest`](#ttn.lorawan.v3.GetApplicationCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the application. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
 | `SetCollaborator` | [`SetApplicationCollaboratorRequest`](#ttn.lorawan.v3.SetApplicationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the application. This method can also be used to delete the collaborator, by giving them no rights. The caller is required to have all assigned or/and removed rights. |
 | `ListCollaborators` | [`ListApplicationCollaboratorsRequest`](#ttn.lorawan.v3.ListApplicationCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) | List the collaborators on this application. |
+| `DeleteCollaborator` | [`DeleteApplicationCollaboratorRequest`](#ttn.lorawan.v3.DeleteApplicationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteCollaborator removes a collaborator from an application. |
 
 #### HTTP bindings
 
@@ -961,6 +980,9 @@ API keys and collaborators of applications.
 | `GetCollaborator` | `GET` | `/api/v3/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/applications/{application_ids.application_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3/applications/{application_ids.application_id}/collaborators` |  |
+| `DeleteCollaborator` | `` | `/api/v3` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/applications/{application_ids.application_id}/collaborator/user/{collaborator_ids.user_ids.user_id}` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/applications/{application_ids.application_id}/collaborator/organization/{collaborator_ids.organization_ids.organization_id}` |  |
 
 ### <a name="ttn.lorawan.v3.ApplicationRegistry">Service `ApplicationRegistry`</a>
 
@@ -2261,6 +2283,20 @@ An OAuth client on the network.
 | `client` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteClientCollaboratorRequest">Message `DeleteClientCollaboratorRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `client_ids` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
+| `collaborator_ids` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `client_ids` | <p>`message.required`: `true`</p> |
+| `collaborator_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetClientCollaboratorRequest">Message `GetClientCollaboratorRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2373,6 +2409,7 @@ collaborators of OAuth clients.
 | `GetCollaborator` | [`GetClientCollaboratorRequest`](#ttn.lorawan.v3.GetClientCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the client. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
 | `SetCollaborator` | [`SetClientCollaboratorRequest`](#ttn.lorawan.v3.SetClientCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the OAuth client. This method can also be used to delete the collaborator, by giving them no rights. The caller is required to have all assigned or/and removed rights. |
 | `ListCollaborators` | [`ListClientCollaboratorsRequest`](#ttn.lorawan.v3.ListClientCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) | List the collaborators on this OAuth client. |
+| `DeleteCollaborator` | [`DeleteClientCollaboratorRequest`](#ttn.lorawan.v3.DeleteClientCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteCollaborator removes a collaborator from a client. |
 
 #### HTTP bindings
 
@@ -2384,6 +2421,9 @@ collaborators of OAuth clients.
 | `GetCollaborator` | `GET` | `/api/v3/clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/clients/{client_ids.client_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3/clients/{client_ids.client_id}/collaborators` |  |
+| `DeleteCollaborator` | `` | `/api/v3` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/clients/{client_ids.client_id}/collaborators/user/{collaborator_ids.user_ids.user_id}` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/clients/{client_ids.client_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}` |  |
 
 ### <a name="ttn.lorawan.v3.ClientRegistry">Service `ClientRegistry`</a>
 
@@ -4559,6 +4599,20 @@ The Events service serves events from the cluster.
 | `gateway` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteGatewayCollaboratorRequest">Message `DeleteGatewayCollaboratorRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `collaborator_ids` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
+| `collaborator_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.Gateway">Message `Gateway`</a>
 
 Gateway is the message that defines a gateway on the network.
@@ -5039,6 +5093,7 @@ API keys and collaborators of gateways.
 | `GetCollaborator` | [`GetGatewayCollaboratorRequest`](#ttn.lorawan.v3.GetGatewayCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the gateway. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
 | `SetCollaborator` | [`SetGatewayCollaboratorRequest`](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the gateway. This method can also be used to delete the collaborator, by giving them no rights. The caller is required to have all assigned or/and removed rights. |
 | `ListCollaborators` | [`ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) | List the collaborators on this gateway. |
+| `DeleteCollaborator` | [`DeleteGatewayCollaboratorRequest`](#ttn.lorawan.v3.DeleteGatewayCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteCollaborator removes a collaborator from a gateway. |
 
 #### HTTP bindings
 
@@ -5054,6 +5109,9 @@ API keys and collaborators of gateways.
 | `GetCollaborator` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` |  |
+| `DeleteCollaborator` | `` | `/api/v3` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 
@@ -8207,6 +8265,20 @@ is used to manage OAuth client authorizations for users.
 | `organization` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest">Message `DeleteOrganizationCollaboratorRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| `collaborator_ids` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `organization_ids` | <p>`message.required`: `true`</p> |
+| `collaborator_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetOrganizationAPIKeyRequest">Message `GetOrganizationAPIKeyRequest`</a>
 
 | Field | Type | Label | Description |
@@ -8396,6 +8468,7 @@ API keys and collaborators of organizations.
 | `GetCollaborator` | [`GetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.GetOrganizationCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the organization. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
 | `SetCollaborator` | [`SetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the organization. Organization collaborators can get access to the organization itself, as well as any application, gateway and OAuth client this organization is a collaborator of. This method can also be used to delete the collaborator, by giving them no rights. The caller is required to have all assigned or/and removed rights. |
 | `ListCollaborators` | [`ListOrganizationCollaboratorsRequest`](#ttn.lorawan.v3.ListOrganizationCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) | List the collaborators on this organization. |
+| `DeleteCollaborator` | [`DeleteOrganizationCollaboratorRequest`](#ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | DeleteCollaborator removes a collaborator from an organization. |
 
 #### HTTP bindings
 
@@ -8410,6 +8483,7 @@ API keys and collaborators of organizations.
 | `GetCollaborator` | `GET` | `/api/v3/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}` |  |
 | `SetCollaborator` | `PUT` | `/api/v3/organizations/{organization_ids.organization_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3/organizations/{organization_ids.organization_id}/collaborators` |  |
+| `DeleteCollaborator` | `DELETE` | `/api/v3/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}` |  |
 
 ### <a name="ttn.lorawan.v3.OrganizationRegistry">Service `OrganizationRegistry`</a>
 

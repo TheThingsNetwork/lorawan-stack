@@ -123,6 +123,32 @@
           ]
         }
       ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/application_services.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/applications/{application_ids.application_id}/collaborator/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "collaborator_ids.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/applications/{application_ids.application_id}/collaborator/organization/{collaborator_ids.organization_ids.organization_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "collaborator_ids.organization_ids.organization_id"
+          ]
+        }
+      ]
     }
   },
   "ApplicationRegistry": {
@@ -1982,6 +2008,32 @@
           ]
         }
       ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/client_services.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/clients/{client_ids.client_id}/collaborators/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "client_ids.client_id",
+            "collaborator_ids.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/clients/{client_ids.client_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}",
+          "parameters": [
+            "client_ids.client_id",
+            "collaborator_ids.organization_ids.organization_id"
+          ]
+        }
+      ]
     }
   },
   "ClientRegistry": {
@@ -3179,6 +3231,32 @@
           "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators",
           "parameters": [
             "gateway_ids.gateway_id"
+          ]
+        }
+      ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "collaborator_ids.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "collaborator_ids.organization_ids.organization_id"
           ]
         }
       ]
@@ -5196,6 +5274,19 @@
           "pattern": "/organizations/{organization_ids.organization_id}/collaborators",
           "parameters": [
             "organization_ids.organization_id"
+          ]
+        }
+      ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/organization_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "organization_ids.organization_id",
+            "collaborator_ids.user_ids.user_id"
           ]
         }
       ]

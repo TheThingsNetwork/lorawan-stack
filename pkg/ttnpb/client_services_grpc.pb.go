@@ -380,10 +380,11 @@ var ClientRegistry_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	ClientAccess_ListRights_FullMethodName        = "/ttn.lorawan.v3.ClientAccess/ListRights"
-	ClientAccess_GetCollaborator_FullMethodName   = "/ttn.lorawan.v3.ClientAccess/GetCollaborator"
-	ClientAccess_SetCollaborator_FullMethodName   = "/ttn.lorawan.v3.ClientAccess/SetCollaborator"
-	ClientAccess_ListCollaborators_FullMethodName = "/ttn.lorawan.v3.ClientAccess/ListCollaborators"
+	ClientAccess_ListRights_FullMethodName         = "/ttn.lorawan.v3.ClientAccess/ListRights"
+	ClientAccess_GetCollaborator_FullMethodName    = "/ttn.lorawan.v3.ClientAccess/GetCollaborator"
+	ClientAccess_SetCollaborator_FullMethodName    = "/ttn.lorawan.v3.ClientAccess/SetCollaborator"
+	ClientAccess_ListCollaborators_FullMethodName  = "/ttn.lorawan.v3.ClientAccess/ListCollaborators"
+	ClientAccess_DeleteCollaborator_FullMethodName = "/ttn.lorawan.v3.ClientAccess/DeleteCollaborator"
 )
 
 // ClientAccessClient is the client API for ClientAccess service.
@@ -401,6 +402,8 @@ type ClientAccessClient interface {
 	SetCollaborator(ctx context.Context, in *SetClientCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// List the collaborators on this OAuth client.
 	ListCollaborators(ctx context.Context, in *ListClientCollaboratorsRequest, opts ...grpc.CallOption) (*Collaborators, error)
+	// DeleteCollaborator removes a collaborator from a client.
+	DeleteCollaborator(ctx context.Context, in *DeleteClientCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type clientAccessClient struct {
@@ -447,6 +450,15 @@ func (c *clientAccessClient) ListCollaborators(ctx context.Context, in *ListClie
 	return out, nil
 }
 
+func (c *clientAccessClient) DeleteCollaborator(ctx context.Context, in *DeleteClientCollaboratorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ClientAccess_DeleteCollaborator_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ClientAccessServer is the server API for ClientAccess service.
 // All implementations must embed UnimplementedClientAccessServer
 // for forward compatibility
@@ -462,6 +474,8 @@ type ClientAccessServer interface {
 	SetCollaborator(context.Context, *SetClientCollaboratorRequest) (*emptypb.Empty, error)
 	// List the collaborators on this OAuth client.
 	ListCollaborators(context.Context, *ListClientCollaboratorsRequest) (*Collaborators, error)
+	// DeleteCollaborator removes a collaborator from a client.
+	DeleteCollaborator(context.Context, *DeleteClientCollaboratorRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedClientAccessServer()
 }
 
@@ -480,6 +494,9 @@ func (UnimplementedClientAccessServer) SetCollaborator(context.Context, *SetClie
 }
 func (UnimplementedClientAccessServer) ListCollaborators(context.Context, *ListClientCollaboratorsRequest) (*Collaborators, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCollaborators not implemented")
+}
+func (UnimplementedClientAccessServer) DeleteCollaborator(context.Context, *DeleteClientCollaboratorRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollaborator not implemented")
 }
 func (UnimplementedClientAccessServer) mustEmbedUnimplementedClientAccessServer() {}
 
@@ -566,6 +583,24 @@ func _ClientAccess_ListCollaborators_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClientAccess_DeleteCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteClientCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientAccessServer).DeleteCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ClientAccess_DeleteCollaborator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientAccessServer).DeleteCollaborator(ctx, req.(*DeleteClientCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ClientAccess_ServiceDesc is the grpc.ServiceDesc for ClientAccess service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -588,6 +623,10 @@ var ClientAccess_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCollaborators",
 			Handler:    _ClientAccess_ListCollaborators_Handler,
+		},
+		{
+			MethodName: "DeleteCollaborator",
+			Handler:    _ClientAccess_DeleteCollaborator_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

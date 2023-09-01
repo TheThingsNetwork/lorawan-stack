@@ -402,6 +402,11 @@ message SetGatewayCollaboratorRequest {
   Collaborator collaborator = 2 [(validate.rules).message.required = true];
 }
 
+message DeleteGatewayCollaboratorRequest {
+  GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator_ids = 2 [(validate.rules).message.required = true];
+}
+
 enum GatewayAntennaPlacement {
   option (thethings.json.enum) = {
     marshal_as_string: true,

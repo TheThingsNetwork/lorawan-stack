@@ -156,4 +156,12 @@ service ApplicationAccess {
   rpc ListCollaborators(ListApplicationCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {get: "/applications/{application_ids.application_id}/collaborators"};
   }
+
+  // DeleteCollaborator removes a collaborator from an application.
+  rpc DeleteCollaborator(DeleteApplicationCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      additional_bindings {delete: "/applications/{application_ids.application_id}/collaborator/user/{collaborator_ids.user_ids.user_id}"}
+      additional_bindings {delete: "/applications/{application_ids.application_id}/collaborator/organization/{collaborator_ids.organization_ids.organization_id}"}
+    };
+  }
 }

@@ -255,3 +255,19 @@ var SetOrganizationCollaboratorRequestFieldPathsTopLevel = []string{
 	"collaborator",
 	"organization_ids",
 }
+var DeleteOrganizationCollaboratorRequestFieldPathsNested = []string{
+	"collaborator_ids",
+	"collaborator_ids.ids",
+	"collaborator_ids.ids.organization_ids",
+	"collaborator_ids.ids.organization_ids.organization_id",
+	"collaborator_ids.ids.user_ids",
+	"collaborator_ids.ids.user_ids.email",
+	"collaborator_ids.ids.user_ids.user_id",
+	"organization_ids",
+	"organization_ids.organization_id",
+}
+
+var DeleteOrganizationCollaboratorRequestFieldPathsTopLevel = []string{
+	"collaborator_ids",
+	"organization_ids",
+}

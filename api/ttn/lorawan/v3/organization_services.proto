@@ -146,4 +146,12 @@ service OrganizationAccess {
   rpc ListCollaborators(ListOrganizationCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {get: "/organizations/{organization_ids.organization_id}/collaborators"};
   }
+
+  // DeleteCollaborator removes a collaborator from an organization.
+  rpc DeleteCollaborator(DeleteOrganizationCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      // NOTE: It is currently not possible to have organizations collaborating on other organizations.
+      delete: "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"
+    };
+  }
 }

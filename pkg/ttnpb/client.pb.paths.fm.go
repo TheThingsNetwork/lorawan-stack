@@ -234,3 +234,19 @@ var SetClientCollaboratorRequestFieldPathsTopLevel = []string{
 	"client_ids",
 	"collaborator",
 }
+var DeleteClientCollaboratorRequestFieldPathsNested = []string{
+	"client_ids",
+	"client_ids.client_id",
+	"collaborator_ids",
+	"collaborator_ids.ids",
+	"collaborator_ids.ids.organization_ids",
+	"collaborator_ids.ids.organization_ids.organization_id",
+	"collaborator_ids.ids.user_ids",
+	"collaborator_ids.ids.user_ids.email",
+	"collaborator_ids.ids.user_ids.user_id",
+}
+
+var DeleteClientCollaboratorRequestFieldPathsTopLevel = []string{
+	"client_ids",
+	"collaborator_ids",
+}

@@ -252,7 +252,7 @@ func TestGatewayAPIKeys(t *testing.T) {
 	}, withPrivateTestDatabase(p))
 }
 
-func TestGatewayCollaborators(t *testing.T) {
+func TestGatewayCollaborators(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
 	admin := p.NewUser()
@@ -327,10 +327,8 @@ func TestGatewayCollaborators(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gtw1.GetIds(),
 			Collaborator: &ttnpb.Collaborator{
-				Ids: usr2.GetOrganizationOrUserIdentifiers(),
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_GATEWAY_INFO,
-				},
+				Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
 			},
 		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
@@ -341,11 +339,8 @@ func TestGatewayCollaborators(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gtw1.GetIds(),
 			Collaborator: &ttnpb.Collaborator{
-				Ids: usr2.GetOrganizationOrUserIdentifiers(),
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
-					ttnpb.Right_RIGHT_GATEWAY_LINK,
-				},
+				Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC, ttnpb.Right_RIGHT_GATEWAY_LINK},
 			},
 		}, limitedCreds)
 		a.So(err, should.BeNil)
@@ -355,10 +350,8 @@ func TestGatewayCollaborators(t *testing.T) {
 			_, err := reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 				GatewayIds: gtw1.GetIds(),
 				Collaborator: &ttnpb.Collaborator{
-					Ids: usr2.GetOrganizationOrUserIdentifiers(),
-					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_GATEWAY_INFO,
-					},
+					Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
 				},
 			}, opts...)
 			if a.So(err, should.NotBeNil) {
@@ -387,10 +380,8 @@ func TestGatewayCollaborators(t *testing.T) {
 			_, err := reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 				GatewayIds: gtw1.GetIds(),
 				Collaborator: &ttnpb.Collaborator{
-					Ids: usr3.GetOrganizationOrUserIdentifiers(),
-					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_GATEWAY_INFO,
-					},
+					Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
 				},
 			}, opts...)
 			a.So(err, should.BeNil)
@@ -418,30 +409,62 @@ func TestGatewayCollaborators(t *testing.T) {
 				})
 			}
 
+			// TODO: Remove SetCollaborator test case (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
+			t.Run("Delete via set method", func(*testing.T) { // nolint:paralleltest
+				_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
+					GatewayIds: gtw1.GetIds(),
+					Collaborator: &ttnpb.Collaborator{
+						Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+						Rights: []ttnpb.Right{},
+					},
+				}, opts...)
+				a.So(err, should.BeNil)
+
+				// Verifies that it has been deleted.
+				got, err := reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
+					GatewayIds:   gtw1.GetIds(),
+					Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
+
+			// Recreates `usr3` collaborator of the `gtw1` gateway.
 			_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 				GatewayIds: gtw1.GetIds(),
 				Collaborator: &ttnpb.Collaborator{
-					Ids: usr3.GetOrganizationOrUserIdentifiers(),
+					Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
 				},
 			}, opts...)
 			a.So(err, should.BeNil)
 
-			got, err = reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
-				GatewayIds:   gtw1.GetIds(),
-				Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsNotFound(err), should.BeTrue)
-			}
-			a.So(got, should.BeNil)
+			t.Run("Delete via delete method", func(*testing.T) { // nolint:paralleltest
+				empty, err := reg.DeleteCollaborator(ctx, &ttnpb.DeleteGatewayCollaboratorRequest{
+					GatewayIds:      gtw1.GetIds(),
+					CollaboratorIds: usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				a.So(err, should.BeNil)
+				a.So(empty, should.Resemble, ttnpb.Empty)
+
+				// Verifies that it has been deleted.
+				got, err := reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
+					GatewayIds:   gtw1.GetIds(),
+					Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
 		}
 
 		// Try removing the only collaborator with _ALL rights.
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
-			GatewayIds: gtw1.GetIds(),
-			Collaborator: &ttnpb.Collaborator{
-				Ids: usr1.GetOrganizationOrUserIdentifiers(),
-			},
+		_, err = reg.DeleteCollaborator(ctx, &ttnpb.DeleteGatewayCollaboratorRequest{
+			GatewayIds:      gtw1.GetIds(),
+			CollaboratorIds: usr1.GetOrganizationOrUserIdentifiers(),
 		}, usr1Creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
