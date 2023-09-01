@@ -162,12 +162,9 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewGatewayAccessClient(is).SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
-				GatewayIds: gtwID,
-				Collaborator: &ttnpb.Collaborator{
-					Ids:    collaborator,
-					Rights: nil,
-				},
+			_, err = ttnpb.NewGatewayAccessClient(is).DeleteCollaborator(ctx, &ttnpb.DeleteGatewayCollaboratorRequest{
+				GatewayIds:      gtwID,
+				CollaboratorIds: collaborator,
 			})
 			if err != nil {
 				return err

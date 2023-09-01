@@ -148,7 +148,7 @@ var (
 		Use:     "delete",
 		Aliases: []string{"del", "remove", "rm"},
 		Short:   "Delete an application collaborator",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			appID := getApplicationID(cmd.Flags(), nil)
 			if appID == nil {
 				return errNoApplicationID.New()
@@ -162,13 +162,12 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewApplicationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-				ApplicationIds: appID,
-				Collaborator: &ttnpb.Collaborator{
-					Ids:    collaborator,
-					Rights: nil,
+			_, err = ttnpb.NewApplicationAccessClient(is).DeleteCollaborator(
+				ctx, &ttnpb.DeleteApplicationCollaboratorRequest{
+					ApplicationIds:  appID,
+					CollaboratorIds: collaborator,
 				},
-			})
+			)
 			if err != nil {
 				return err
 			}
