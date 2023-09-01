@@ -82,8 +82,8 @@ github.com/TheThingsIndustries/mapstructure v0.0.0-20230413130846-941bcd1deec3 h
 github.com/TheThingsIndustries/mapstructure v0.0.0-20230413130846-941bcd1deec3/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/TheThingsIndustries/mystique v0.0.0-20221125120501-80ab21781b6d h1:ZlvidrSPuNA6BWhj/K4/3UJwvckLbqAqn6PNyvurA34=
 github.com/TheThingsIndustries/mystique v0.0.0-20221125120501-80ab21781b6d/go.mod h1:HOIQ7hQsZuwP7nFlKNGoNdvMC1F/vrksjyAYCUzjhio=
-github.com/TheThingsIndustries/protoc-gen-go-flags v1.1.0 h1:hBM84P37CLkRcIzOF1hst+Mr/fR6M+l8+Yvqfv4qd2M=
-github.com/TheThingsIndustries/protoc-gen-go-flags v1.1.0/go.mod h1:KRzvId/g1naSKVCrZ6c2cNAqgO/dPYK4hvS2Z/uFyRc=
+github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0 h1:QkFMT0vLDH4jzcnsbQhVvc8FTpxyDVJvb/eXbh1N8mc=
+github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0/go.mod h1:MgevoYLHRx/KP6LZeY7uMyoQPxD+11ed4eJMN5+faD4=
 github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0 h1:FTaVxiDPoV9o6k2OFBijhQO8zWZf6uYHIAc/cRYsCSA=
 github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0/go.mod h1:6ourNr6TBk/2SB2V4In+o2eqZd/DIdiBLnoxvQ3UyWk=
 github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis h1:uashKgjy7XCNZNb00+3GheWtJXnS9DnAkYQ1X89cAIg=

@@ -13,7 +13,7 @@ require (
 	github.com/KimMachineGun/automemlimit v0.2.6
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/TheThingsIndustries/mystique v0.0.0-20221125120501-80ab21781b6d
-	github.com/TheThingsIndustries/protoc-gen-go-flags v1.1.0
+	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
 	github.com/aws/aws-sdk-go v1.44.314
