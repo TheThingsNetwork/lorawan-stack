@@ -17,14 +17,15 @@ import PropTypes from 'prop-types'
 import { defineMessages } from 'react-intl'
 
 import Spinner from '@ttn-lw/components/spinner'
+import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import style from '../../qr.styl'
-import Button from '@ttn-lw/components/button'
 
 const m = defineMessages({
   fetchingCamera: 'Waiting for camera…',
+  switchCamera: 'Switch camera',
 })
 
 const Video = props => {
@@ -33,6 +34,7 @@ const Video = props => {
   const [stream, setStream] = useState(undefined)
   const [devices, setDevices] = useState([])
   const [cameras, setCameras] = useState([])
+  const isMobile = window.innerWidth <= 768
 
   const getDevices = useCallback(async () => {
     if (!devices.length) {
@@ -46,19 +48,15 @@ const Video = props => {
       const ua = navigator.userAgent.toLowerCase()
       const cameras = devices.filter(device => device.kind === 'videoinput')
       setCameras(cameras)
-      // Try to find a camera with a label containing 'back'
       let rearCamera = cameras.find(device => device.label.toLowerCase().includes('back'))
-      // If no rear camera was found, just use the first video device
       if (!rearCamera) {
-        rearCamera = cameras[0]
+        rearCamera = cameras[1]
       }
       const videoMode =
         cameras.length > 1
           ? ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1
             ? { facingMode: { exact: 'environment' } }
-            : rearCamera
-            ? { deviceId: rearCamera.deviceId }
-            : undefined
+            : { deviceId: rearCamera.deviceId }
           : { facingMode: 'environment' }
 
       try {
@@ -90,7 +88,12 @@ const Video = props => {
       setStream(userStream)
     } else if ('deviceId' in stream) {
       const indexOfCurrentDevice = cameras.findIndex(camera => camera.deviceId === stream.deviceId)
-      const device = cameras.length === 2 ? cameras.find((_, i) => i !== indexOfCurrentDevice) : 0
+      // The first item will be taken from the beginning of the array after the last item.
+      const nextIndex = ++indexOfCurrentDevice % cameras.length
+      const device =
+        cameras.length === 2
+          ? cameras.find((_, i) => i !== indexOfCurrentDevice)
+          : cameras[nextIndex]
       const userStream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: device.deviceId },
       })
@@ -141,8 +144,8 @@ const Video = props => {
         className={style.video}
         data-test-id="webcam-feed"
       />
-      {cameras.length > 1 && (
-        <Button icon="switch_camera" message={'Switch camera'} onClick={switchStream} />
+      {cameras.length > 1 && isMobile && (
+        <Button icon="switch_camera" message={m.switchCamera} onClick={switchStream} />
       )}
     </>
   ) : (
