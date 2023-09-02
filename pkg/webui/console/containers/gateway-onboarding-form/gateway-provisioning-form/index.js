@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -21,6 +21,7 @@ import OwnersSelect from '@console/containers/owners-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
 
 import GatewayRegistrationFormSection from './gateway-registration-form-section'
 
@@ -33,9 +34,32 @@ const gatewayEuiEncoder = value => (value === '' ? undefined : value)
 const gatewayEuiDecoder = value => (value === undefined ? '' : value)
 
 const GatewayProvisioningFormSection = () => {
-  const { touched, setFieldValue, values } = useFormContext()
+  const { touched, setFieldValue, values, validateForm } = useFormContext()
   const idTouched = touched?.ids?.gateway_id
   const hasEuiId = euiIdRegexp.test(values.ids.gateway_id)
+  const [showMacAddressEnteredWarning, setShowMacAddressEntered] = useState(false)
+  const isEuiMac = useMemo(() => values.ids.eui?.length === 12, [values.ids.eui])
+  const debouncedFormValues = useDebounce(
+    values.ids,
+    3000,
+    useCallback(() => {
+      // Force validate if the eui is 12 characters long
+      if (isEuiMac) {
+        validateForm(values)
+      }
+    }, [isEuiMac, validateForm, values]),
+  )
+
+  useEffect(() => {
+    setShowMacAddressEntered(debouncedFormValues.eui?.length === 12)
+  }, [debouncedFormValues])
+
+  // Instantly hide button and warning if the user removes/adds new character
+  useEffect(() => {
+    if (!isEuiMac) {
+      setShowMacAddressEntered(false)
+    }
+  }, [isEuiMac])
 
   // Prefill the gateway ID after the EUI is entered.
   const handleEuiBlur = useCallback(
@@ -47,6 +71,12 @@ const GatewayProvisioningFormSection = () => {
     },
     [hasEuiId, idTouched, setFieldValue],
   )
+
+  const handleConvertMacToEui = useCallback(() => {
+    const euiValue = `${values.ids.eui.substring(0, 6)}FFFE${values.ids.eui.substring(6)}`
+    setFieldValue('ids.eui', euiValue)
+    setFieldValue('ids.gateway_id', `eui-${euiValue.toLowerCase()}`)
+  }, [setFieldValue, values.ids.eui])
 
   return (
     <>
@@ -64,6 +94,16 @@ const GatewayProvisioningFormSection = () => {
         encode={gatewayEuiEncoder}
         decode={gatewayEuiDecoder}
         autoFocus
+        warning={showMacAddressEnteredWarning ? sharedMessages.macAddressEnteredWarning : undefined}
+        action={
+          showMacAddressEnteredWarning
+            ? {
+                type: 'button',
+                message: sharedMessages.convertMacToEui,
+                onClick: handleConvertMacToEui,
+              }
+            : undefined
+        }
       />
       <GatewayRegistrationFormSection />
     </>
