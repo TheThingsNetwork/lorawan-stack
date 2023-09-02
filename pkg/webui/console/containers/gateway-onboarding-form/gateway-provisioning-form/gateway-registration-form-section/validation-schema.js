@@ -26,7 +26,11 @@ const validationSchema = Yup.object().shape({
       .max(36, Yup.passValues(sharedMessages.validateTooLong))
       .matches(gatewayIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
       .required(sharedMessages.validateRequired),
-    eui: Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
+    eui: Yup.string().test(
+      'length',
+      Yup.passValues(sharedMessages.validateLength)({ length: 16 }),
+      value => value && (value.length === 12 || value.length === 16),
+    ),
   }),
   name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
