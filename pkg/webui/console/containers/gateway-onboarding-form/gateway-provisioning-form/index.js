@@ -37,7 +37,7 @@ const GatewayProvisioningFormSection = () => {
   const { touched, setFieldValue, values, validateForm } = useFormContext()
   const idTouched = touched?.ids?.gateway_id
   const hasEuiId = euiIdRegexp.test(values.ids.gateway_id)
-  const [showMacAddressEnteredWarning, setShowMacAddressEntered] = useState(false)
+  const [showMacAddressEntered, setShowMacAddressEntered] = useState(false)
   const isEuiMac = useMemo(() => values.ids.eui?.length === 12, [values.ids.eui])
   const debouncedFormValues = useDebounce(
     values.ids,
@@ -94,9 +94,9 @@ const GatewayProvisioningFormSection = () => {
         encode={gatewayEuiEncoder}
         decode={gatewayEuiDecoder}
         autoFocus
-        warning={showMacAddressEnteredWarning ? sharedMessages.macAddressEnteredWarning : undefined}
+        warning={showMacAddressEntered ? sharedMessages.macAddressEnteredWarning : undefined}
         action={
-          showMacAddressEnteredWarning
+          showMacAddressEntered
             ? {
                 type: 'button',
                 message: sharedMessages.convertMacToEui,
