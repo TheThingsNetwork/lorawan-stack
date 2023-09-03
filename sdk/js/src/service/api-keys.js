@@ -59,9 +59,12 @@ class ApiKeys {
   }
 
   async deleteById(entityId, id) {
-    return this.updateById(entityId, id, {
-      rights: [],
+    const entityIdRoute = this._parentRoutes.delete
+    const result = await this._api.DeleteAPIKey({
+      routeParams: { [entityIdRoute]: entityId, key_id: id },
     })
+
+    return Marshaler.payloadSingleResponse(result)
   }
 
   async updateById(

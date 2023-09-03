@@ -52,6 +52,7 @@ class Applications {
         list: 'application_ids.application_id',
         create: 'application_ids.application_id',
         update: 'application_ids.application_id',
+        delete: 'application_ids.application_id',
       },
     })
     this.Link = new Link(api.As)
