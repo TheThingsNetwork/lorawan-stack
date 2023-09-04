@@ -50,7 +50,7 @@ const Video = props => {
       setCameras(cameras)
       let rearCamera = cameras.find(device => device.label.toLowerCase().includes('back'))
       if (!rearCamera) {
-        rearCamera = cameras[1]
+        rearCamera = cameras[1] ?? cameras[0]
       }
       const videoMode =
         cameras.length > 1
