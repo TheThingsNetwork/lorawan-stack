@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -21,7 +21,6 @@ import OwnersSelect from '@console/containers/owners-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
-import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
 
 import GatewayRegistrationFormSection from './gateway-registration-form-section'
 
@@ -34,32 +33,14 @@ const gatewayEuiEncoder = value => (value === '' ? undefined : value)
 const gatewayEuiDecoder = value => (value === undefined ? '' : value)
 
 const GatewayProvisioningFormSection = () => {
-  const { touched, setFieldValue, values, validateForm } = useFormContext()
+  const { touched, setFieldValue, values, setFieldTouched } = useFormContext()
   const idTouched = touched?.ids?.gateway_id
   const hasEuiId = euiIdRegexp.test(values.ids.gateway_id)
-  const [showMacAddressEntered, setShowMacAddressEntered] = useState(false)
   const isEuiMac = useMemo(() => values.ids.eui?.length === 12, [values.ids.eui])
-  const debouncedFormValues = useDebounce(
-    values.ids,
-    3000,
-    useCallback(() => {
-      // Force validate if the eui is 12 characters long
-      if (isEuiMac) {
-        validateForm(values)
-      }
-    }, [isEuiMac, validateForm, values]),
-  )
 
   useEffect(() => {
-    setShowMacAddressEntered(debouncedFormValues.eui?.length === 12)
-  }, [debouncedFormValues])
-
-  // Instantly hide button and warning if the user removes/adds new character
-  useEffect(() => {
-    if (!isEuiMac) {
-      setShowMacAddressEntered(false)
-    }
-  }, [isEuiMac])
+    setFieldTouched('ids.eui', isEuiMac)
+  }, [isEuiMac, setFieldTouched])
 
   // Prefill the gateway ID after the EUI is entered.
   const handleEuiBlur = useCallback(
@@ -94,9 +75,8 @@ const GatewayProvisioningFormSection = () => {
         encode={gatewayEuiEncoder}
         decode={gatewayEuiDecoder}
         autoFocus
-        warning={showMacAddressEntered ? sharedMessages.macAddressEnteredWarning : undefined}
         action={
-          showMacAddressEntered
+          isEuiMac
             ? {
                 type: 'button',
                 message: sharedMessages.convertMacToEui,
