@@ -372,6 +372,234 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			[]byte{0x20, 0x02},
 			false,
 		},
+
+		{
+			"RelayConfReqDisabled",
+			&ttnpb.MACCommand_RelayConfReq{},
+			[]byte{0x40, 0x00, 0x00, 0x00, 0x00, 0x00},
+			false,
+		},
+		{
+			"RelayConfReqNoSecondCh",
+			&ttnpb.MACCommand_RelayConfReq{
+				Configuration: &ttnpb.MACCommand_RelayConfReq_Configuration{
+					SecondChannel:       nil,
+					DefaultChannelIndex: 0x01,
+					CadPeriodicity:      ttnpb.RelayCADPeriodicity_RELAY_CAD_PERIODICITY_100_MILLISECONDS,
+				},
+			},
+			[]byte{0x40, 0x00, 0x2e, 0x00, 0x00, 0x00},
+			false,
+		},
+		{
+			"RelayConfReqSecondCh",
+			&ttnpb.MACCommand_RelayConfReq{
+				Configuration: &ttnpb.MACCommand_RelayConfReq_Configuration{
+					SecondChannel: &ttnpb.RelaySecondChannel{
+						AckOffset:     ttnpb.RelaySecondChAckOffset_RELAY_SECOND_CH_ACK_OFFSET_200,
+						Frequency:     868100000,
+						DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					},
+					DefaultChannelIndex: 0x01,
+					CadPeriodicity:      ttnpb.RelayCADPeriodicity_RELAY_CAD_PERIODICITY_100_MILLISECONDS,
+				},
+			},
+			[]byte{0x40, 0x89, 0x2e, 0x28, 0x76, 0x84},
+			false,
+		},
+		{
+			"RelayConfAns",
+			&ttnpb.MACCommand_RelayConfAns{
+				SecondChannelFrequencyAck:     true,
+				SecondChannelAckOffsetAck:     false,
+				SecondChannelDataRateIndexAck: true,
+				SecondChannelIndexAck:         false,
+				DefaultChannelIndexAck:        true,
+				CadPeriodicityAck:             true,
+			},
+			[]byte{0x40, 0x35},
+			true,
+		},
+		{
+			"EndDeviceConfReqDisabled",
+			&ttnpb.MACCommand_RelayEndDeviceConfReq{},
+			[]byte{0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			false,
+		},
+		{
+			"EndDeviceConfReqNoSecondCh",
+			&ttnpb.MACCommand_RelayEndDeviceConfReq{
+				Configuration: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration{
+					Mode: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic{
+						Dynamic: &ttnpb.RelayEndDeviceDynamicMode{
+							SmartEnableLevel: ttnpb.RelaySmartEnableLevel_RELAY_SMART_ENABLE_LEVEL_64,
+						},
+					},
+					Backoff: 48,
+				},
+			},
+			[]byte{0x41, 0x0b, 0x00, 0x60, 0x00, 0x00, 0x00},
+			false,
+		},
+		{
+			"EndDeviceConfReqSecondCh",
+			&ttnpb.MACCommand_RelayEndDeviceConfReq{
+				Configuration: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration{
+					Mode:    &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled{},
+					Backoff: 48,
+					SecondChannel: &ttnpb.RelaySecondChannel{
+						AckOffset:     ttnpb.RelaySecondChAckOffset_RELAY_SECOND_CH_ACK_OFFSET_200,
+						Frequency:     868100000,
+						DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					},
+				},
+			},
+			[]byte{0x41, 0x0c, 0x89, 0x60, 0x28, 0x76, 0x84},
+			false,
+		},
+		{
+			"EndDeviceConfAns",
+			&ttnpb.MACCommand_RelayEndDeviceConfAns{
+				SecondChannelFrequencyAck:     true,
+				SecondChannelDataRateIndexAck: true,
+				SecondChannelIndexAck:         false,
+				BackoffAck:                    true,
+			},
+			[]byte{0x41, 0x0b},
+			true,
+		},
+		{
+			"UpdateUplinkListReqNoForwardLimits",
+			&ttnpb.MACCommand_RelayUpdateUplinkListReq{
+				RuleIndex: 1,
+				DevAddr:   []byte{0x41, 0x42, 0x43, 0x44},
+				WFCnt:     0x00be00ef,
+				RootWorSKey: []byte{
+					0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+				},
+			},
+			[]byte{
+				0x43,                   // CID
+				0x01,                   // RuleIndex
+				0x3f,                   // No limits
+				0x44, 0x43, 0x42, 0x41, // DevAddr
+				0xef, 0x00, 0xbe, 0x00, // WFCnt
+				0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, // RootWorSKey
+			},
+			false,
+		},
+		{
+			"UpdateUplinkListReqForwardLimits",
+			&ttnpb.MACCommand_RelayUpdateUplinkListReq{
+				RuleIndex: 1,
+				ForwardLimits: &ttnpb.RelayUplinkForwardLimits{
+					BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
+					ReloadRate: 48,
+				},
+				DevAddr: []byte{0x41, 0x42, 0x43, 0x44},
+				WFCnt:   0x00be00ef,
+				RootWorSKey: []byte{
+					0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+				},
+			},
+			[]byte{
+				0x43,                   // CID
+				0x01,                   // RuleIndex
+				0x70,                   // BucketSize = 2, ReloadRate = 48
+				0x44, 0x43, 0x42, 0x41, // DevAddr
+				0xef, 0x00, 0xbe, 0x00, // WFCnt
+				0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, // RootWorSKey
+			},
+			false,
+		},
+		{
+			"UpdateUplinkListAns",
+			&ttnpb.MACCommand_RelayUpdateUplinkListAns{},
+			[]byte{0x43},
+			true,
+		},
+		{
+			"RelayCtrlUplinkListReqRemoveTrustedEndDevice",
+			&ttnpb.MACCommand_RelayCtrlUplinkListReq{
+				RuleIndex: 2,
+				Action:    ttnpb.RelayCtrlUplinkListAction_RELAY_CTRL_UPLINK_LIST_ACTION_REMOVE_TRUSTED_END_DEVICE,
+			},
+			[]byte{0x44, 0x12},
+			false,
+		},
+		{
+			"RelayCtrlUplinkListReqReadWFCnt",
+			&ttnpb.MACCommand_RelayCtrlUplinkListReq{
+				RuleIndex: 3,
+				Action:    ttnpb.RelayCtrlUplinkListAction_RELAY_CTRL_UPLINK_LIST_ACTION_READ_W_F_CNT,
+			},
+			[]byte{0x44, 0x03},
+			false,
+		},
+		{
+			"RelayCtrlUplinkListAnsAccept",
+			&ttnpb.MACCommand_RelayCtrlUplinkListAns{
+				RuleIndexAck: true,
+				WFCnt:        0x11223344,
+			},
+			[]byte{0x44, 0x01, 0x44, 0x33, 0x22, 0x11},
+			true,
+		},
+		{
+			"RelayCtrlUplinkListAnsReject",
+			&ttnpb.MACCommand_RelayCtrlUplinkListAns{
+				RuleIndexAck: false,
+				WFCnt:        0,
+			},
+			[]byte{0x44, 0x00, 0x00, 0x00, 0x00, 0x00},
+			true,
+		},
+		{
+			"ConfigureFwdLimitReqNoLimits",
+			&ttnpb.MACCommand_RelayConfigureFwdLimitReq{},
+			[]byte{0x45, 0xff, 0xff, 0xff, 0x0f, 0x00},
+			false,
+		},
+		{
+			"ConfigureFwdLimitReqLimits",
+			&ttnpb.MACCommand_RelayConfigureFwdLimitReq{
+				ResetLimitCounter: ttnpb.RelayResetLimitCounter_RELAY_RESET_LIMIT_COUNTER_NO_RESET,
+				JoinRequestLimits: &ttnpb.RelayForwardLimits{
+					BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_1,
+					ReloadRate: 12,
+				},
+				NotifyLimits: &ttnpb.RelayForwardLimits{
+					BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
+					ReloadRate: 23,
+				},
+				GlobalUplinkLimits: &ttnpb.RelayForwardLimits{
+					BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_4,
+					ReloadRate: 34,
+				},
+				OverallLimits: &ttnpb.RelayForwardLimits{
+					BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_12,
+					ReloadRate: 45,
+				},
+			},
+			[]byte{0x45, 0x2d, 0xd1, 0x85, 0x31, 0x1b},
+			false,
+		},
+		{
+			"ConfigureFwdLimitAns",
+			&ttnpb.MACCommand_RelayConfigureFwdLimitAns{},
+			[]byte{0x45},
+			true,
+		},
+		{
+			"NotifyNewEndDeviceReq",
+			&ttnpb.MACCommand_RelayNotifyNewEndDeviceReq{
+				DevAddr: []byte{0x41, 0x42, 0x43, 0x44},
+				Snr:     6,
+				Rssi:    -64,
+			},
+			[]byte{0x46, 0x3a, 0x06, 0x44, 0x43, 0x42, 0x41},
+			true,
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
