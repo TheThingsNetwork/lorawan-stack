@@ -21,6 +21,7 @@ import OwnersSelect from '@console/containers/owners-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
 
 import GatewayRegistrationFormSection from './gateway-registration-form-section'
 
@@ -37,10 +38,17 @@ const GatewayProvisioningFormSection = () => {
   const idTouched = touched?.ids?.gateway_id
   const hasEuiId = euiIdRegexp.test(values.ids.gateway_id)
   const isEuiMac = useMemo(() => values.ids.eui?.length === 12, [values.ids.eui])
+  const debouncedEui = useDebounce(values.ids.eui, 3000)
+  const isDebouncedEuiMac = useMemo(() => debouncedEui?.length === 12, [debouncedEui])
+  const showMacConvert = isEuiMac && isDebouncedEuiMac
 
   useEffect(() => {
-    setFieldTouched('ids.eui', isEuiMac)
-  }, [isEuiMac, setFieldTouched])
+    if (showMacConvert) {
+      setFieldTouched('ids.eui', true)
+    } else if (isDebouncedEuiMac && !isEuiMac) {
+      setFieldTouched('ids.eui', false)
+    }
+  }, [isDebouncedEuiMac, isEuiMac, setFieldTouched, showMacConvert])
 
   // Prefill the gateway ID after the EUI is entered.
   const handleEuiBlur = useCallback(
@@ -76,7 +84,7 @@ const GatewayProvisioningFormSection = () => {
         decode={gatewayEuiDecoder}
         autoFocus
         action={
-          isEuiMac
+          showMacConvert
             ? {
                 type: 'button',
                 message: sharedMessages.convertMacToEui,
