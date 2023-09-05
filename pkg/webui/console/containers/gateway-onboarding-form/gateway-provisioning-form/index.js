@@ -21,6 +21,7 @@ import OwnersSelect from '@console/containers/owners-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
 
 import GatewayRegistrationFormSection from './gateway-registration-form-section'
 
@@ -35,22 +36,42 @@ const gatewayEuiDecoder = value => (value === undefined ? '' : value)
 const GatewayProvisioningFormSection = () => {
   const { touched, setFieldValue, values, setFieldTouched } = useFormContext()
   const idTouched = touched?.ids?.gateway_id
+  const euiTouched = touched?.ids?.eui
   const hasEuiId = euiIdRegexp.test(values.ids.gateway_id)
   const isEuiMac = useMemo(() => values.ids.eui?.length === 12, [values.ids.eui])
+  const debouncedFormValues = useDebounce(
+    values.ids,
+    3000,
+    useCallback(() => {
+      if (isEuiMac) {
+        setFieldTouched('ids.eui', true)
+      }
+    }, [isEuiMac, setFieldTouched]),
+  )
+  const isDebouncedEuiMac = useMemo(
+    () => debouncedFormValues.eui?.length === 12,
+    [debouncedFormValues.eui],
+  )
 
   useEffect(() => {
-    setFieldTouched('ids.eui', isEuiMac)
+    // Hide error instantly if displayed
+    if (!isEuiMac) {
+      setFieldTouched('ids.eui', false)
+    }
   }, [isEuiMac, setFieldTouched])
 
   // Prefill the gateway ID after the EUI is entered.
   const handleEuiBlur = useCallback(
     event => {
       const val = event.target.value
+      if (val.length === 12 && !isDebouncedEuiMac) {
+        setFieldTouched('ids.eui', false)
+      }
       if (val.length === 16 && (!idTouched || hasEuiId)) {
         setFieldValue('ids.gateway_id', `eui-${val.toLowerCase()}`)
       }
     },
-    [hasEuiId, idTouched, setFieldValue],
+    [hasEuiId, idTouched, isDebouncedEuiMac, setFieldTouched, setFieldValue],
   )
 
   const handleConvertMacToEui = useCallback(() => {
@@ -76,7 +97,7 @@ const GatewayProvisioningFormSection = () => {
         decode={gatewayEuiDecoder}
         autoFocus
         action={
-          isEuiMac
+          isDebouncedEuiMac && isEuiMac && euiTouched
             ? {
                 type: 'button',
                 message: sharedMessages.convertMacToEui,
