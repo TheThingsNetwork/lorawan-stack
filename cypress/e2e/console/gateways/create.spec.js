@@ -70,7 +70,7 @@ describe('Gateway create', () => {
     const gatewayMac = generateHexValue(12)
 
     cy.findByLabelText('Gateway EUI').type(gatewayMac)
-    cy.contains('Convert MAC to EUI', { timeout: 3500 }).should('be.visible').click()
+    cy.contains('Convert MAC to EUI').should('be.visible').click()
     cy.contains('Convert MAC to EUI').should('not.exist')
 
     const gatewayEui = `${gatewayMac.substring(0, 6)}fffe${gatewayMac.substring(6)}`
