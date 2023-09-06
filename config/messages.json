@@ -10502,6 +10502,15 @@
       "file": "ping_slot_channel.go"
     }
   },
+  "event:ns.mac.ping_slot_channel.answer.reject": {
+    "translations": {
+      "en": "ping slot channel rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "ping_slot_channel.go"
+    }
+  },
   "event:ns.mac.ping_slot_channel.request": {
     "translations": {
       "en": "ping slot channel request enqueued"
