@@ -29,36 +29,31 @@ var errNotFound = errors.DefineNotFound("not_found", "not found")
 type authKeyToRights map[string][]ttnpb.Right
 
 // MockDefinition contains the structure that is returned by the New(ctx) method of the package, might be used to
-// specify IS mock in test cases definitons.
+// specify IS mock in test cases definitions.
 type MockDefinition struct {
 	applicationRegistry    *mockISApplicationRegistry
-	gatewayRegistry        *mockISGatewayRegistry
 	endDeviceRegistry      *mockISEndDeviceRegistry
 	endDeviceBatchRegistry *isEndDeviceBatchRegistry
 	entityAccess           *mockEntityAccess
+	gatewayRegistry        *mockISGatewayRegistry
+	organizationRegistry   *mockISOrganizationRegistry
+	userRegistry           *mockISUserRegistry
 }
 
 type closeMock func()
 
-// New returns a identityserver mock along side its address and closing function.
-func New(ctx context.Context) (*MockDefinition, string, closeMock) {
-	endDeviceRegistry := &mockISEndDeviceRegistry{}
+// New returns an Identity Server mock along side its address and closing function.
+func New(ctx context.Context) (*MockDefinition, string, closeMock) { // nolint:revive
+	endDeviceRegistry := newEndDeviceRegitry()
+
 	is := &MockDefinition{
-		applicationRegistry: &mockISApplicationRegistry{
-			applications:      make(map[string]*ttnpb.Application),
-			applicationAuths:  make(map[string][]string),
-			applicationRights: make(map[string]authKeyToRights),
-		},
-		gatewayRegistry: &mockISGatewayRegistry{
-			gateways:      make(map[string]*ttnpb.Gateway),
-			gatewayAuths:  make(map[string][]string),
-			gatewayRights: make(map[string]authKeyToRights),
-		},
-		endDeviceRegistry: endDeviceRegistry,
-		endDeviceBatchRegistry: &isEndDeviceBatchRegistry{
-			reg: endDeviceRegistry,
-		},
-		entityAccess: &mockEntityAccess{},
+		applicationRegistry:    newApplicationRegistry(),
+		endDeviceRegistry:      endDeviceRegistry,
+		endDeviceBatchRegistry: newEndDeviceBatchRegitry(endDeviceRegistry),
+		entityAccess:           newEntityAccess(),
+		gatewayRegistry:        newGatewayRegistry(),
+		organizationRegistry:   newOrganizationRegistry(),
+		userRegistry:           newUserRegistry(),
 	}
 
 	srv := rpcserver.New(ctx)
@@ -66,20 +61,25 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 	ttnpb.RegisterApplicationRegistryServer(srv.Server, is.applicationRegistry)
 	ttnpb.RegisterApplicationAccessServer(srv.Server, is.applicationRegistry)
 
-	ttnpb.RegisterGatewayRegistryServer(srv.Server, is.gatewayRegistry)
-	ttnpb.RegisterGatewayAccessServer(srv.Server, is.gatewayRegistry)
-
 	ttnpb.RegisterEndDeviceRegistryServer(srv.Server, is.endDeviceRegistry)
 
+	ttnpb.RegisterEntityAccessServer(srv.Server, is.entityAccess)
+
+	ttnpb.RegisterGatewayRegistryServer(srv.Server, is.gatewayRegistry)
+	ttnpb.RegisterGatewayAccessServer(srv.Server, is.gatewayRegistry)
 	ttnpb.RegisterEndDeviceBatchRegistryServer(srv.Server, is.endDeviceBatchRegistry)
 
-	ttnpb.RegisterEntityAccessServer(srv.Server, is.entityAccess)
+	ttnpb.RegisterOrganizationRegistryServer(srv.Server, is.organizationRegistry)
+	ttnpb.RegisterOrganizationAccessServer(srv.Server, is.organizationRegistry)
+
+	ttnpb.RegisterUserRegistryServer(srv.Server, is.userRegistry)
+	ttnpb.RegisterUserAccessServer(srv.Server, is.userRegistry)
 
 	lis, err := net.Listen("tcp", "")
 	if err != nil {
 		panic(err)
 	}
-	go srv.Serve(lis) //nolint:errcheck
+	go srv.Serve(lis) // nolint:errcheck
 	return is, lis.Addr().String(), func() {
 		lis.Close()
 		srv.GracefulStop()
@@ -87,25 +87,36 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 }
 
 // EndDeviceRegistry returns the methods related to the device registry.
-func (m *MockDefinition) EndDeviceRegistry() *mockISEndDeviceRegistry {
+func (m *MockDefinition) EndDeviceRegistry() *mockISEndDeviceRegistry { // nolint:revive
 	return m.endDeviceRegistry
 }
 
 // ApplicationRegistry returns the methods related to the application registry.
-func (m *MockDefinition) ApplicationRegistry() *mockISApplicationRegistry {
+func (m *MockDefinition) ApplicationRegistry() *mockISApplicationRegistry { // nolint:revive
 	return m.applicationRegistry
 }
 
 // GatewayRegistry returns the methods related to the gateway registry.
-func (m *MockDefinition) GatewayRegistry() *mockISGatewayRegistry {
+func (m *MockDefinition) GatewayRegistry() *mockISGatewayRegistry { // nolint:revive
 	return m.gatewayRegistry
 }
 
 // EntityAccess returns the methods related to the access entity.
-func (m *MockDefinition) EntityAccess() *mockEntityAccess {
+func (m *MockDefinition) EntityAccess() *mockEntityAccess { // nolint:revive
 	return m.entityAccess
 }
 
-func (m *MockDefinition) EndDeviceBatchRegistry() *isEndDeviceBatchRegistry { //nolint:revive
+// EndDeviceBatchRegistry returns the methods related to the end device batch registry.
+func (m *MockDefinition) EndDeviceBatchRegistry() *isEndDeviceBatchRegistry { // nolint:revive
 	return m.endDeviceBatchRegistry
+}
+
+// OrganizationRegistry returns the methods related to the organization registry.
+func (m *MockDefinition) OrganizationRegistry() *mockISOrganizationRegistry { // nolint:revive
+	return m.organizationRegistry
+}
+
+// UserRegistry returns the methods related to the user registry.
+func (m *MockDefinition) UserRegistry() *mockISUserRegistry { // nolint:revive
+	return m.userRegistry
 }

@@ -474,6 +474,7 @@ func (gs *GatewayServer) Connect(
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIds: ids,
 		FieldMask: ttnpb.FieldMask(
+			"administrative_contact",
 			"antennas",
 			"attributes",
 			"disable_packet_broker_forwarding",
@@ -486,6 +487,7 @@ func (gs *GatewayServer) Connect(
 			"schedule_anytime_delay",
 			"schedule_downlink_late",
 			"status_public",
+			"technical_contact",
 			"update_location_from_status",
 		),
 	})

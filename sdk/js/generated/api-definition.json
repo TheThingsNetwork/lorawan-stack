@@ -5508,16 +5508,17 @@
       "file": "ttn/lorawan/v3/packetbrokeragent.proto",
       "http": [],
       "allowedFieldMaskPaths": [
+        "administrative_contact",
         "antennas",
-        "contact_info",
         "frequency_plan_ids",
+        "ids",
         "ids.eui",
         "ids.gateway_id",
-        "ids",
         "location_public",
         "online",
         "rx_rate",
         "status_public",
+        "technical_contact",
         "tx_rate"
       ]
     }

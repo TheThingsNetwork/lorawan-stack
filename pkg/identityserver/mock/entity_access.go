@@ -28,6 +28,10 @@ type mockEntityAccess struct {
 	err              error
 }
 
+func newEntityAccess() *mockEntityAccess {
+	return &mockEntityAccess{}
+}
+
 func (ea *mockEntityAccess) AuthInfo(context.Context, *emptypb.Empty) (*ttnpb.AuthInfoResponse, error) {
 	if ea.err != nil {
 		return &ttnpb.AuthInfoResponse{}, ea.err
