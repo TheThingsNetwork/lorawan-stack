@@ -222,8 +222,13 @@ const startGatewayStatisticsLogic = createLogic({
     }
 
     dispatch(gateways.startGatewayStatisticsSuccess())
-    const stats = await tts.Gateways.getStatisticsById(id)
-    dispatch(gateways.updateGatewayStatisticsSuccess({ stats }))
+
+    try {
+      const stats = await tts.Gateways.getStatisticsById(id)
+      dispatch(gateways.updateGatewayStatisticsSuccess({ stats }))
+    } catch (error) {
+      dispatch(gateways.startGatewayStatisticsFailure(error))
+    }
 
     const interval = setInterval(() => {
       const statsRequestInProgress = selectGatewayStatisticsIsFetching(getState())
