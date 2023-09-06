@@ -298,6 +298,9 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		case mac.DeviceNeedsRelayConfReq(dev):
 			logger.Debug("Device needs RelayConfReq, choose class A downlink slot")
 			return classA, true
+		case mac.DeviceNeedsRelayEndDeviceConfReq(dev):
+			logger.Debug("Device needs RelayEndDeviceConfReq, choose class A downlink slot")
+			return classA, true
 		case mac.DeviceNeedsRelayConfigureFwdLimitReq(dev):
 			logger.Debug("Device needs RelayConfigureFwdLimitReq, choose class A downlink slot")
 			return classA, true

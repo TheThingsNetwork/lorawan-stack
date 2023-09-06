@@ -10790,6 +10790,33 @@
       "file": "relay_configure_fwd_limit.go"
     }
   },
+  "event:ns.mac.relay_end_device_conf.answer.accept": {
+    "translations": {
+      "en": "relay end device configuration accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
+  "event:ns.mac.relay_end_device_conf.answer.reject": {
+    "translations": {
+      "en": "relay end device configuration rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
+  "event:ns.mac.relay_end_device_conf.request": {
+    "translations": {
+      "en": "relay end device configuration request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
   "event:ns.mac.relay_notify_new_end_device.indication": {
     "translations": {
       "en": "relay notify new end device indication received"

@@ -274,6 +274,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				return mac.EnqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
 			},
 			mac.EnqueueRelayConfReq,
+			mac.EnqueueRelayEndDeviceConfReq,
 			mac.EnqueueRelayConfigureFwdLimitReq,
 		}
 

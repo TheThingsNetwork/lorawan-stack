@@ -66,3 +66,27 @@ func relayConfigureForwardLimitsFields(limits *ttnpb.ServingRelayParameters_Forw
 	fields = append(fields, relayForwardLimitsFields(limits.Overall, "overall")...)
 	return log.Fields(fields...)
 }
+
+func servedRelayFields(served *ttnpb.ServedRelayParameters) log.Fielder {
+	if served == nil {
+		return log.Fields()
+	}
+	fields := []any{}
+	switch {
+	case served.GetAlways() != nil:
+		fields = append(fields, "relay_mode", "always")
+	case served.GetDynamic() != nil:
+		fields = append(
+			fields,
+			"relay_mode", "dynamic",
+			"relay_smart_enable_level", served.GetDynamic().SmartEnableLevel,
+		)
+	case served.GetEndDeviceControlled() != nil:
+		fields = append(fields, "relay_mode", "end_device_controlled")
+	default:
+		panic("unreachable")
+	}
+	fields = append(fields, "relay_backoff", served.Backoff)
+	fields = append(fields, secondChFields(served.SecondChannel)...)
+	return log.Fields(fields...)
+}
