@@ -10745,6 +10745,33 @@
       "file": "rekey.go"
     }
   },
+  "event:ns.mac.relay_conf.answer.accept": {
+    "translations": {
+      "en": "relay configuration accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
+  "event:ns.mac.relay_conf.answer.reject": {
+    "translations": {
+      "en": "relay configuration rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
+  "event:ns.mac.relay_conf.request": {
+    "translations": {
+      "en": "relay configuration request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
   "event:ns.mac.reset.confirmation": {
     "translations": {
       "en": "device reset confirmation enqueued"

@@ -612,6 +612,8 @@ macLoop:
 			evs, err = mac.HandleBeaconFreqAns(ctx, dev, cmd.GetBeaconFreqAns())
 		case ttnpb.MACCommandIdentifier_CID_DEVICE_MODE:
 			evs, err = mac.HandleDeviceModeInd(ctx, dev, cmd.GetDeviceModeInd())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_CONF:
+			evs, err = mac.HandleRelayConfAns(ctx, dev, cmd.GetRelayConfAns())
 		default:
 			_, known := lorawan.DefaultMACCommands[cmd.Cid]
 			logger.WithField("known", known).Debug("Unknown MAC command received")
