@@ -305,6 +305,10 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			cmdBuf = b
 		}
 		ctx = log.NewContext(ctx, logger)
+
+		for i, req := range dev.MacState.PendingRequests {
+			dev.MacState.PendingRequests[i] = req.Sanitized()
+		}
 	}
 
 	var needsDownlink bool
