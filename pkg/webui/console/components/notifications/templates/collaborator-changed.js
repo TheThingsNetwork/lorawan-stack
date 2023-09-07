@@ -64,19 +64,13 @@ const CollaboratorChangedPreview = ({ notificationData }) => {
         entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
         collaboratorType: getType(ids),
         collaboratorId: getId(ids),
-        lineBreak: <br />,
       }}
     />
   )
 }
 
 CollaboratorChangedPreview.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      ids: PropTypes.shape({}).isRequired,
-    }).isRequired,
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const CollaboratorChangedTitle = ({ notificationData }) => {
@@ -93,9 +87,7 @@ const CollaboratorChangedTitle = ({ notificationData }) => {
 }
 
 CollaboratorChangedTitle.propTypes = {
-  notificationData: PropTypes.shape({
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const CollaboratorChanged = ({ notificationData }) => {
@@ -112,11 +104,8 @@ const CollaboratorChanged = ({ notificationData }) => {
       entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
       collaboratorType: getType(ids),
       collaboratorId: getId(ids),
-      code: msg => <code>{msg}</code>,
     },
     entities: {
-      b: msg => <b>{msg}</b>,
-      code: msg => <code>{msg}</code>,
       collaboratorType: getType(ids),
       collaboratorId: getId(ids),
     },
@@ -136,27 +125,7 @@ const CollaboratorChanged = ({ notificationData }) => {
 }
 
 CollaboratorChanged.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      ids: PropTypes.oneOfType([
-        PropTypes.shape({
-          organization_ids: PropTypes.shape({
-            organization_id: PropTypes.string.isRequired,
-          }),
-        }),
-        PropTypes.shape({
-          user_ids: PropTypes.shape({
-            user_id: PropTypes.string.isRequired,
-          }),
-        }),
-      ]).isRequired,
-    }).isRequired,
-    entity_ids: PropTypes.shape({
-      application_ids: PropTypes.shape({
-        application_id: PropTypes.string.isRequired,
-      }),
-    }).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 CollaboratorChanged.Title = CollaboratorChangedTitle

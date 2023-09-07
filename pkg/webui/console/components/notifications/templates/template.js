@@ -18,30 +18,46 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const ContentTemplate = ({ messages, values, withList, listTitle, listElement }) => (
-  <>
-    <Message content={messages.body} values={{ ...values.body }} component="p" />
-    {'entities' in messages && (
-      <Message content={messages.entities} values={{ ...values.entities }} component="p" />
-    )}
-    {withList && (
-      <>
-        <p>
-          <Message component="b" content={listTitle} />
-        </p>
-        <ul>
-          {listElement.map(el => (
-            <>
-              <Message component="li" content={el} />
-              <Message content={{ id: `enum:${el}` }} firstToUpper />
-            </>
-          ))}
-        </ul>
-      </>
-    )}
-    <Message content={messages.action} values={{ ...values.action }} />
-  </>
-)
+const ContentTemplate = ({ messages, values, withList, listTitle, listElement }) => {
+  const defaultValues = {
+    lineBreak: <br />,
+    b: msg => <b>{msg}</b>,
+    code: msg => <code>{msg}</code>,
+  }
+
+  return (
+    <>
+      <Message
+        content={messages.body}
+        values={{ ...defaultValues, ...values.body }}
+        component="p"
+      />
+      {'entities' in messages && (
+        <Message
+          content={messages.entities}
+          values={{ ...defaultValues, ...values.entities }}
+          component="p"
+        />
+      )}
+      {withList && (
+        <>
+          <p>
+            <Message component="b" content={listTitle} />
+          </p>
+          <ul>
+            {listElement.map(el => (
+              <>
+                <Message component="li" content={el} />
+                <Message content={{ id: `enum:${el}` }} firstToUpper />
+              </>
+            ))}
+          </ul>
+        </>
+      )}
+      <Message content={messages.action} values={{ ...defaultValues, ...values.action }} />
+    </>
+  )
+}
 
 ContentTemplate.propTypes = {
   listElement: PropTypes.arrayOf(PropTypes.string),

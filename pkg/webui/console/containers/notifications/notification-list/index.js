@@ -51,22 +51,17 @@ const m = defineMessages({
 const NotificationList = ({
   setSelectedNotification,
   selectedNotification,
-  setShowContent,
   fetchItems,
   isArchive,
-  setShowListColumn,
 }) => {
   const userId = useSelector(selectUserId)
   const notifications = useSelector(selectNotifications)
   const unseenIds = useSelector(selectUnseenIds)
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const dispatch = useDispatch()
-  const isMobile = window.innerWidth < 768
 
   const handleClick = useCallback(
     async (e, id) => {
-      setShowListColumn(!isMobile)
-      setShowContent(true)
       setSelectedNotification(notifications.find(notification => notification.id === id))
       if (!isArchive) {
         await dispatch(
@@ -78,17 +73,7 @@ const NotificationList = ({
         }, 300)
       }
     },
-    [
-      notifications,
-      dispatch,
-      userId,
-      fetchItems,
-      setShowContent,
-      setSelectedNotification,
-      isArchive,
-      setShowListColumn,
-      isMobile,
-    ],
+    [notifications, dispatch, userId, fetchItems, setSelectedNotification, isArchive],
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
@@ -151,8 +136,6 @@ NotificationList.propTypes = {
     id: PropTypes.string,
   }),
   setSelectedNotification: PropTypes.func.isRequired,
-  setShowContent: PropTypes.func.isRequired,
-  setShowListColumn: PropTypes.func.isRequired,
 }
 
 NotificationList.defaultProps = {
