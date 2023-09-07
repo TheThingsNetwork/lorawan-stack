@@ -5804,6 +5804,15 @@
       "file": "application_registry.go"
     }
   },
+  "error:pkg/identityserver:empty_request": {
+    "translations": {
+      "en": "empty request"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
+    }
+  },
   "error:pkg/identityserver:end_device_euis_taken": {
     "translations": {
       "en": "an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`"
@@ -5838,6 +5847,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "gateway_access.go"
+    }
+  },
+  "error:pkg/identityserver:insufficient_rights": {
+    "translations": {
+      "en": "insufficient rights"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
     }
   },
   "error:pkg/identityserver:invalid_authorization": {
@@ -5883,6 +5901,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "user_access.go"
+    }
+  },
+  "error:pkg/identityserver:neither_user_nor_organization": {
+    "translations": {
+      "en": "caller is neither a user nor an organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
     }
   },
   "error:pkg/identityserver:nested_organizations": {
@@ -5937,6 +5964,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "contact_info_registry.go"
+    }
+  },
+  "error:pkg/identityserver:non_gateway_rights": {
+    "translations": {
+      "en": "non-gateway rights in request"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
     }
   },
   "error:pkg/identityserver:oauth_client_rejected": {
@@ -6081,6 +6117,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "registry_search.go"
+    }
+  },
+  "error:pkg/identityserver:some_gateways_not_found": {
+    "translations": {
+      "en": "some gateways not found"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "rights.go"
     }
   },
   "error:pkg/identityserver:temporary_password_expired": {
@@ -9717,6 +9762,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "gateway_access.go"
+    }
+  },
+  "event:gateway.batch.delete": {
+    "translations": {
+      "en": "batch delete gateways"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
     }
   },
   "event:gateway.collaborator.delete": {

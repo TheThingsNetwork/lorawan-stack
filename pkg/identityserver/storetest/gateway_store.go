@@ -15,10 +15,12 @@
 package storetest
 
 import (
+	"context"
 	"fmt"
 	. "testing"
 	"time"
 
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -539,4 +541,145 @@ func (st *StoreTest) TestGatewayStorePagination(t *T) {
 			a.So(total, should.Equal, 7)
 		}
 	})
+}
+
+// TestGatewayBatchOperations tests gateway batch operations.
+func (st *StoreTest) TestGatewayBatchOperations(t *T) { // nolint:gocyclo
+	a, ctx := test.New(t)
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.GatewayStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement TestGatewayBatchOperations")
+	}
+	defer s.Close()
+
+	for _, ctx := range []context.Context{
+		ctx,
+	} {
+		gtw1, err := s.CreateGateway(ctx, &ttnpb.Gateway{
+			Ids: &ttnpb.GatewayIdentifiers{
+				GatewayId: "gtw1",
+			},
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		gtw2, err := s.CreateGateway(ctx, &ttnpb.Gateway{
+			Ids: &ttnpb.GatewayIdentifiers{
+				GatewayId: "gtw2",
+				Eui:       types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}.Bytes(),
+			},
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		gtw3, err := s.CreateGateway(ctx, &ttnpb.Gateway{
+			Ids: &ttnpb.GatewayIdentifiers{
+				GatewayId: "gtw3",
+				Eui:       types.EUI64{1, 2, 3, 4, 5, 6, 7, 9}.Bytes(),
+			},
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		gtws, err := s.FindGateways(
+			ctx,
+			[]*ttnpb.GatewayIdentifiers{
+				{GatewayId: "gtw1"},
+				{GatewayId: "gtw2"},
+				{GatewayId: "gtw3"},
+			},
+			[]string{"ids"})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(gtws, should.HaveLength, 3)
+		for _, gtw := range gtws {
+			switch gtw.IDString() {
+			case gtw1.IDString():
+			case gtw2.IDString():
+			case gtw3.IDString():
+			default:
+				t.Fatalf("Unexpected gateway ID: %s", gtw.IDString())
+			}
+		}
+
+		// Batch Delete
+		for _, tc := range []struct { // nolint:paralleltest
+			Name           string
+			Context        context.Context
+			Request        []*ttnpb.GatewayIdentifiers
+			Response       []*ttnpb.GatewayIdentifiers
+			ErrorAssertion func(error) bool
+		}{
+			{
+				Name:    "Invalid batch",
+				Context: ctx,
+				Request: []*ttnpb.GatewayIdentifiers{
+					{GatewayId: "unknown"},
+				},
+				Response: []*ttnpb.GatewayIdentifiers{},
+			},
+			{
+				Name:    "One not found",
+				Context: ctx,
+				Request: []*ttnpb.GatewayIdentifiers{
+					{GatewayId: "unknown"},
+					{GatewayId: "gtw3"},
+				},
+				Response: []*ttnpb.GatewayIdentifiers{
+					{GatewayId: "gtw3"},
+				},
+			},
+			{
+				Name:    "Valid batch",
+				Context: ctx,
+				Request: []*ttnpb.GatewayIdentifiers{
+					{GatewayId: "gtw1"},
+					{GatewayId: "gtw2"},
+				},
+				Response: []*ttnpb.GatewayIdentifiers{
+					{GatewayId: "gtw1"},
+					{GatewayId: "gtw2"},
+				},
+			},
+		} {
+			tc := tc
+			t.Run(tc.Name, func(t *T) {
+				a := assertions.New(t)
+				deleted, err := s.BatchDeleteGateways(tc.Context, tc.Request)
+				if err != nil {
+					if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
+						t.Fatalf("Unexpected error: %v", err)
+					}
+				} else if tc.ErrorAssertion != nil {
+					t.Fatalf("Expected error")
+				}
+				if tc.Response != nil {
+					a.So(deleted, should.Resemble, tc.Response)
+				} else {
+					a.So(deleted, should.BeNil)
+				}
+			})
+		}
+
+		// Check that the gateways are deleted.
+		gtws, err = s.FindGateways(
+			ctx,
+			[]*ttnpb.GatewayIdentifiers{
+				{GatewayId: "gtw1"},
+				{GatewayId: "gtw2"},
+				{GatewayId: "gtw3"},
+			},
+			[]string{"ids"})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(gtws, should.HaveLength, 0)
+	}
 }

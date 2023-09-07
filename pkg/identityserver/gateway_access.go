@@ -400,3 +400,44 @@ func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGate
 func (ga *gatewayAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return ga.listGatewayCollaborators(ctx, req)
 }
+
+type gatewayBatchAccess struct {
+	ttnpb.UnimplementedGatewayBatchAccessServer
+
+	*IdentityServer
+}
+
+var (
+	errEmtpyRequest = errors.DefineInvalidArgument(
+		"empty_request",
+		"empty request",
+	)
+	errNonGatewayRights = errors.DefineInvalidArgument(
+		"non_gateway_rights",
+		"non-gateway rights in request",
+	)
+)
+
+// AssertRights implements ttnpb.GatewayBatchAccessServer.
+func (gba *gatewayBatchAccess) AssertRights(
+	ctx context.Context,
+	req *ttnpb.AssertGatewayRightsRequest,
+) (*emptypb.Empty, error) {
+	// Sanitize request.
+	required := req.Required.Unique()
+	if len(required.GetRights()) == 0 {
+		return nil, errEmtpyRequest.New()
+	}
+
+	// Check that the request is checking only gateway rights.
+	if !ttnpb.AllGatewayRights.IncludesAll(required.GetRights()...) {
+		return nil, errNonGatewayRights.New()
+	}
+
+	err := gba.assertGatewayRights(ctx, req.GatewayIds, required)
+	if err != nil {
+		return nil, err
+	}
+
+	return ttnpb.Empty, nil
+}

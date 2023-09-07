@@ -22546,6 +22546,98 @@
       "extensions": [],
       "messages": [
         {
+          "name": "AssertGatewayRightsRequest",
+          "longName": "AssertGatewayRightsRequest",
+          "fullName": "ttn.lorawan.v3.AssertGatewayRightsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            },
+            {
+              "name": "required",
+              "description": "",
+              "label": "",
+              "type": "Rights",
+              "longType": "Rights",
+              "fullType": "ttn.lorawan.v3.Rights",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BatchDeleteGatewaysRequest",
+          "longName": "BatchDeleteGatewaysRequest",
+          "fullName": "ttn.lorawan.v3.BatchDeleteGatewaysRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "PullGatewayConfigurationRequest",
           "longName": "PullGatewayConfigurationRequest",
           "fullName": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
@@ -22587,7 +22679,7 @@
           "name": "GatewayAccess",
           "longName": "GatewayAccess",
           "fullName": "ttn.lorawan.v3.GatewayAccess",
-          "description": "The GatewayAcces service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of gateways.",
+          "description": "The GatewayAccess service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of gateways.",
           "methods": [
             {
               "name": "ListRights",
@@ -22771,6 +22863,66 @@
                     {
                       "method": "GET",
                       "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GatewayBatchAccess",
+          "longName": "GatewayBatchAccess",
+          "fullName": "ttn.lorawan.v3.GatewayBatchAccess",
+          "description": "The GatewayBatchAccess service, exposed by the Identity Server, is used to\ncheck the rights of the caller on multiple gateways at once.\nEXPERIMENTAL: This service is subject to change.",
+          "methods": [
+            {
+              "name": "AssertRights",
+              "description": "Assert that the caller has the requested rights on all the requested gateways.\nThe check is successful if there are no errors.",
+              "requestType": "AssertGatewayRightsRequest",
+              "requestLongType": "AssertGatewayRightsRequest",
+              "requestFullType": "ttn.lorawan.v3.AssertGatewayRightsRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/rights/batch"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GatewayBatchRegistry",
+          "longName": "GatewayBatchRegistry",
+          "fullName": "ttn.lorawan.v3.GatewayBatchRegistry",
+          "description": "The GatewayBatchRegistry service, exposed by the Identity Server, is used to manage\ngateway registrations in batches.",
+          "methods": [
+            {
+              "name": "Delete",
+              "description": "Delete a batch of gateways.\nThis operation is atomic; either all gateways are deleted or none.\nThe caller must have delete rights on all requested gateways.",
+              "requestType": "BatchDeleteGatewaysRequest",
+              "requestLongType": "BatchDeleteGatewaysRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchDeleteGatewaysRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/batch"
                     }
                   ]
                 }
@@ -23304,7 +23456,7 @@
             },
             {
               "name": "BatchGetGatewayConnectionStats",
-              "description": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.\nGateways that are not connected or are part of a different cluster are ignored.\nIt is up to the client to make sure that the gateways are in the requested cluster.",
+              "description": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\n- Statistics are not persisted between reconnects.\n- Gateways that are not connected or are part of a different cluster are ignored.\n- The client should ensure that the requested gateways are in the requested cluster.\n- The client should have the right to get the gateway connection stats on all requested gateways.",
               "requestType": "BatchGetGatewayConnectionStatsRequest",
               "requestLongType": "BatchGetGatewayConnectionStatsRequest",
               "requestFullType": "ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest",
@@ -23909,6 +24061,30 @@
           ]
         },
         {
+          "name": "GatewayIdentifiersList",
+          "longName": "GatewayIdentifiersList",
+          "fullName": "ttn.lorawan.v3.GatewayIdentifiersList",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "LoRaAllianceProfileIdentifiers",
           "longName": "LoRaAllianceProfileIdentifiers",
           "fullName": "ttn.lorawan.v3.LoRaAllianceProfileIdentifiers",
@@ -23970,6 +24146,26 @@
                   {
                     "name": "bytes.len",
                     "value": 3
+                  }
+                ]
+              }
+            },
+            {
+              "name": "ns_id",
+              "description": "LoRaWAN NSID (EUI-64) that uniquely identifies the Network Server instance.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
                   }
                 ]
               }

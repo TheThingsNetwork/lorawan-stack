@@ -250,6 +250,26 @@ message NetworkIdentifiers {
       set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
     }
   ];
+  // LoRaWAN NSID (EUI-64) that uniquely identifies the Network Server instance.
+  bytes ns_id = 6 [
+    (validate.rules).bytes = {
+      len: 8,
+      ignore_empty: true
+    },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    },
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New8BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "\"70B3D57ED000ABCD\""
+    }
+  ];
   // Optional tenant identifier for multi-tenant deployments.
   string tenant_id = 2 [(validate.rules).string = {
     pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$",
@@ -272,4 +292,8 @@ message LoRaAllianceProfileIdentifiers {
 
 message EndDeviceIdentifiersList {
   repeated EndDeviceIdentifiers end_device_ids = 1;
+}
+
+message GatewayIdentifiersList {
+  repeated GatewayIdentifiers gateway_ids = 1;
 }

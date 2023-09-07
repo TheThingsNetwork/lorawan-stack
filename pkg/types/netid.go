@@ -59,7 +59,7 @@ func GetNetID(b []byte) (*NetID, error) {
 }
 
 // MustNetID returns a typed NetID from the bytes.
-// It returns nil if the bytes are empty.
+// It returns nil if b is nil.
 // It panics if unmarshaling results in an error.
 func MustNetID(b []byte) *NetID {
 	t, err := GetNetID(b)

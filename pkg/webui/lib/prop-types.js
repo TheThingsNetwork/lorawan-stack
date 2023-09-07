@@ -72,6 +72,25 @@ PropTypes.inputWidth = PropTypes.oneOf(['xxs', 'xs', 's', 'm', 'l', 'full'])
 PropTypes.onlineStatus = PropTypes.oneOf(Object.values(ONLINE_STATUS))
 
 // Entities and entity-related prop-types.
+//
+PropTypes.entityLocation = PropTypes.shape({
+  latitude: PropTypes.number,
+  longitude: PropTypes.number,
+  altitude: PropTypes.number,
+  source: PropTypes.string,
+})
+
+PropTypes.entityLocations = PropTypes.shape({
+  user: PropTypes.entityLocation,
+  'frm-payload': PropTypes.entityLocation,
+  'lora-cloud-device-management-v1-gnss': PropTypes.entityLocation,
+  'lora-cloud-device-management-v1-wifi': PropTypes.entityLocation,
+  'lora-cloud-device-management-v1-unknown': PropTypes.entityLocation,
+  'lora-cloud-geolocation-v3-gnss': PropTypes.entityLocation,
+  'lora-cloud-geolocation-v3-rssi': PropTypes.entityLocation,
+  'lora-cloud-geolocation-v3-tdoa': PropTypes.entityLocation,
+  'lora-cloud-geolocation-v3-rssitdoacombined': PropTypes.entityLocation,
+})
 
 PropTypes.event = PropTypes.shape({
   name: PropTypes.string.isRequired,
@@ -101,7 +120,7 @@ PropTypes.location = PropTypes.shape({
 PropTypes.gateway = PropTypes.shape({
   antennas: PropTypes.arrayOf(
     PropTypes.shape({
-      location: PropTypes.location,
+      location: PropTypes.entityLocation,
     }),
   ),
   ids: PropTypes.shape({
@@ -203,25 +222,6 @@ PropTypes.env = PropTypes.shape({
       gs: PropTypes.stackComponent,
     }),
   }).isRequired,
-})
-
-PropTypes.entityLocation = PropTypes.shape({
-  latitude: PropTypes.number,
-  longitude: PropTypes.number,
-  altitude: PropTypes.number,
-  source: PropTypes.string,
-})
-
-PropTypes.entityLocations = PropTypes.shape({
-  user: PropTypes.entityLocation,
-  'frm-payload': PropTypes.entityLocation,
-  'lora-cloud-device-management-v1-gnss': PropTypes.entityLocation,
-  'lora-cloud-device-management-v1-wifi': PropTypes.entityLocation,
-  'lora-cloud-device-management-v1-unknown': PropTypes.entityLocation,
-  'lora-cloud-geolocation-v3-gnss': PropTypes.entityLocation,
-  'lora-cloud-geolocation-v3-rssi': PropTypes.entityLocation,
-  'lora-cloud-geolocation-v3-tdoa': PropTypes.entityLocation,
-  'lora-cloud-geolocation-v3-rssitdoacombined': PropTypes.entityLocation,
 })
 
 PropTypes.device = PropTypes.shape({

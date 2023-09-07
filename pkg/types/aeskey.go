@@ -59,7 +59,7 @@ func GetAES128Key(b []byte) (*AES128Key, error) {
 }
 
 // MustAES128Key returns a typed AES128Key from the bytes.
-// It returns nil if the bytes are empty.
+// It returns nil if b is nil.
 // It panics if unmarshaling results in an error.
 func MustAES128Key(b []byte) *AES128Key {
 	t, err := GetAES128Key(b)

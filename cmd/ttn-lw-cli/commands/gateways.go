@@ -417,6 +417,45 @@ var (
 			return nil
 		},
 	}
+	gatewaysBatchDeleteCommand = &cobra.Command{
+		Use:   "batch-delete [gateway-ids]",
+		Short: "Delete a batch of gateways (EXPERIMENTAL).",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var gatewayIDs []*ttnpb.GatewayIdentifiers
+			if inputDecoder != nil {
+				dec := struct {
+					GatewayIDs []string `json:"gateway_ids"`
+				}{}
+				err := inputDecoder.Decode(&dec)
+				if err != nil {
+					return err
+				}
+				for _, gtwID := range dec.GatewayIDs {
+					gatewayIDs = append(gatewayIDs, &ttnpb.GatewayIdentifiers{
+						GatewayId: gtwID,
+					})
+				}
+			} else if len(args) == 0 {
+				return errNoIDs.New()
+			} else {
+				for _, arg := range args {
+					gatewayIDs = append(gatewayIDs, &ttnpb.GatewayIdentifiers{
+						GatewayId: arg,
+					})
+				}
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewGatewayBatchRegistryClient(is).Delete(
+				ctx, &ttnpb.BatchDeleteGatewaysRequest{
+					GatewayIds: gatewayIDs,
+				},
+			)
+			return err
+		},
+	}
 	gatewaysRestoreCommand = &cobra.Command{
 		Use:   "restore [gateway-id]",
 		Short: "Restore a gateway",
@@ -606,6 +645,7 @@ func init() {
 	gatewaysPurgeCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysPurgeCommand.Flags().AddFlagSet(forceFlags())
 	gatewaysCommand.AddCommand(gatewaysPurgeCommand)
+	gatewaysCommand.AddCommand(gatewaysBatchDeleteCommand)
 	Root.AddCommand(gatewaysCommand)
 }
 
