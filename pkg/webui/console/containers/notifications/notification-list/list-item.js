@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classNames from 'classnames'
+import { useSelector } from 'react-redux'
 
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
@@ -24,9 +25,12 @@ import Notification from '@console/components/notifications'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { selectUnseenIds } from '@console/store/selectors/notifications'
+
 import style from '../notifications.styl'
 
 const NotificationListItem = ({ notification, selectedNotification, handleClick }) => {
+  const unseenIds = useSelector(selectUnseenIds)
   const classes = classNames(style.notificationPreview, 'm-0', {
     [style.notificationSelected]: selectedNotification?.id === notification.id,
   })
@@ -36,10 +40,11 @@ const NotificationListItem = ({ notification, selectedNotification, handleClick 
   const previewClasses = classNames(style.notificationPreviewContent, {
     [style.notificationSelected]: selectedNotification?.id === notification.id,
   })
+  const showUnseenStatus = unseenIds.includes(notification.id)
 
   return (
     <Button key={notification.id} onClick={handleClick} value={notification.id} className={classes}>
-      {(!('status' in notification) || notification.status === 'NOTIFICATION_STATUS_UNSEEN') && (
+      {showUnseenStatus && (
         <Status pulse={false} status="good" className={classNames('mr-cs-xs', style.unseenMark)} />
       )}
       <div className={titleClasses}>

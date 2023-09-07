@@ -65,7 +65,7 @@ const NotificationList = ({ setSelectedNotification, selectedNotification, isArc
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
-    if (!unseenIds.length) {
+    if (unseenIds.length > 0) {
       await dispatch(
         attachPromise(updateNotificationStatus(userId, unseenIds, 'NOTIFICATION_STATUS_SEEN')),
       )
