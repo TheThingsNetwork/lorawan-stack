@@ -32,7 +32,7 @@ const m = defineMessages({
   link: 'You can view this <Link>here</Link>.',
 })
 
-const EntityStateChangedtPreview = ({ notificationData }) => {
+const EntityStateChangedPreview = ({ notificationData }) => {
   const { data, entity_ids } = notificationData
   const { formatMessage } = useIntl()
 
@@ -42,20 +42,15 @@ const EntityStateChangedtPreview = ({ notificationData }) => {
       values={{
         entityType: getEntity(entity_ids),
         entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
-        state: capitalizeMessage(formatMessage({ id: `enum:${data.state}` })),
+        state: formatMessage({ id: `enum:${data.state}` }),
         code: msg => msg,
       }}
     />
   )
 }
 
-EntityStateChangedtPreview.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      state: PropTypes.string.isRequired,
-    }).isRequired,
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+EntityStateChangedPreview.propTypes = {
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const EntityStateChangedTitle = ({ notificationData }) => {
@@ -72,9 +67,7 @@ const EntityStateChangedTitle = ({ notificationData }) => {
 }
 
 EntityStateChangedTitle.propTypes = {
-  notificationData: PropTypes.shape({
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const EntityStateChanged = ({ notificationData }) => {
@@ -89,7 +82,6 @@ const EntityStateChanged = ({ notificationData }) => {
       entityType: getEntity(entity_ids),
       entityId: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
       state: capitalizeMessage(formatMessage({ id: `enum:${data.state}` })),
-      code: msg => <code>{msg}</code>,
     },
     action: {
       Link: msg => (
@@ -108,19 +100,10 @@ const EntityStateChanged = ({ notificationData }) => {
 }
 
 EntityStateChanged.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      state: PropTypes.string.isRequired,
-    }).isRequired,
-    entity_ids: PropTypes.shape({
-      user_ids: PropTypes.shape({
-        user_id: PropTypes.string.isRequired,
-      }),
-    }).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 EntityStateChanged.Title = EntityStateChangedTitle
-EntityStateChanged.Preview = EntityStateChangedtPreview
+EntityStateChanged.Preview = EntityStateChangedPreview
 
 export default EntityStateChanged

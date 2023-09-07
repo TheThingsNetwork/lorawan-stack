@@ -16,8 +16,14 @@ import notificationMap from './constants'
 
 export const getNotification = notificationType => notificationMap[notificationType]
 
-export const getEntity = entityIds => {
-  const entity = Object.keys(entityIds)[0].split('_')[0]
-
-  return entity
+const idToEntityMap = {
+  application_ids: 'application',
+  device_ids: 'end device',
+  gateway_ids: 'gateway',
+  user_ids: 'user',
+  organization_ids: 'organization',
+  client_ids: 'client',
 }
+
+export const getEntity = entity_ids =>
+  (entity_ids && idToEntityMap[Object.keys(entity_ids)[0]]) || 'entity'

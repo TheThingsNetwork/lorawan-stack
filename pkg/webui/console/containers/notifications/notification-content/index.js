@@ -40,38 +40,32 @@ const m = defineMessages({
 
 const NotificationContent = ({
   isArchive,
+  setSelectedNotification,
   selectedNotification,
-  setShowContent,
   fetchItems,
-  setShowListColumn,
-  showListColumn,
 }) => {
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
-  const isMobile = window.innerWidth < 768
 
   const handleArchive = useCallback(
     async (e, id) => {
-      setShowContent(false)
       const updateFilter = isArchive ? 'NOTIFICATION_STATUS_SEEN' : 'NOTIFICATION_STATUS_ARCHIVED'
       const fetchFilter = isArchive ? ['NOTIFICATION_STATUS_ARCHIVED'] : undefined
       await dispatch(attachPromise(updateNotificationStatus(userId, [id], updateFilter)))
       setTimeout(async () => await fetchItems(fetchFilter), 300)
     },
-    [dispatch, userId, fetchItems, setShowContent, isArchive],
+    [dispatch, userId, fetchItems, isArchive],
   )
 
   const handleBack = useCallback(() => {
-    setShowListColumn(isMobile)
-  }, [setShowListColumn, isMobile])
+    setSelectedNotification(undefined)
+  }, [setSelectedNotification])
 
   return (
     <>
       <Row justify="between" className={classNames(style.notificationHeader, 'm-0')}>
         <Col md={8} className={classNames(style.notificationHeaderTitle, 'pr-0', 'd-flex')}>
-          {isMobile && (
-            <Button icon="arrow_back_ios" naked onClick={handleBack} className={style.backButton} />
-          )}
+          <Button icon="arrow_back_ios" naked onClick={handleBack} className={style.backButton} />
           <div>
             <h3 className="m-0">
               <Notification.Title
@@ -79,22 +73,6 @@ const NotificationContent = ({
                 notificationType={selectedNotification.notification_type}
               />
             </h3>
-            {!showListColumn && (
-              <DateTime
-                value={selectedNotification.created_at}
-                dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
-                timeFormatOptions={{
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hourCycle: 'h23',
-                }}
-                className={style.notificationHeaderDate}
-              />
-            )}
-          </div>
-        </Col>
-        <Col md={4} className={classNames(style.notificationHeaderAction, 'pl-0', 'pr-cs-xxs')}>
-          {showListColumn && (
             <DateTime
               value={selectedNotification.created_at}
               dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
@@ -103,9 +81,25 @@ const NotificationContent = ({
                 minute: 'numeric',
                 hourCycle: 'h23',
               }}
-              className={style.notificationHeaderDate}
+              className={classNames(style.notificationHeaderDate, {
+                [style.notificationSelectedMobile]: Boolean(selectedNotification),
+              })}
             />
-          )}
+          </div>
+        </Col>
+        <Col md={4} className={classNames(style.notificationHeaderAction, 'pl-0', 'pr-cs-xxs')}>
+          <DateTime
+            value={selectedNotification.created_at}
+            dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
+            timeFormatOptions={{
+              hour: 'numeric',
+              minute: 'numeric',
+              hourCycle: 'h23',
+            }}
+            className={classNames(style.notificationHeaderDate, {
+              [style.notificationSelected]: Boolean(selectedNotification),
+            })}
+          />
           <Button
             onClick={handleArchive}
             message={isArchive ? m.unarchive : m.archive}
@@ -137,9 +131,7 @@ NotificationContent.propTypes = {
     notification_type: PropTypes.string.isRequired,
     status: PropTypes.string,
   }).isRequired,
-  setShowContent: PropTypes.func.isRequired,
-  setShowListColumn: PropTypes.func.isRequired,
-  showListColumn: PropTypes.bool.isRequired,
+  setSelectedNotification: PropTypes.func.isRequired,
 }
 
 export default NotificationContent

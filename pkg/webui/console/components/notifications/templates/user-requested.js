@@ -39,7 +39,6 @@ const UserRequestedPreview = ({ notificationData }) => {
     <Message
       content={m.preview}
       values={{
-        lineBreak: <br />,
         userId: user.ids.user_id,
       }}
     />
@@ -47,15 +46,7 @@ const UserRequestedPreview = ({ notificationData }) => {
 }
 
 UserRequestedPreview.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      user: PropTypes.shape({
-        ids: PropTypes.shape({
-          user_id: PropTypes.string,
-        }),
-      }),
-    }).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const UserRequestedTitle = () => <Message content={m.title} />
@@ -68,17 +59,11 @@ const UserRequested = ({ notificationData }) => {
     action: m.closing,
   }
   const values = {
-    body: {
-      lineBreak: <br />,
-    },
     entities: {
-      b: msg => <b>{msg}</b>,
-      code: msg => <code>{msg}</code>,
       userId: user.ids.user_id,
       userName: user.name,
       userDescription: user.description ?? '—',
       userPrimaryEmailAddress: user.primary_email_address,
-      lineBreak: <br />,
     },
     action: {
       Link: msg => <Link to={`/admin-panel/user-management/${user.ids.user_id}`}>{msg}</Link>,
@@ -88,18 +73,7 @@ const UserRequested = ({ notificationData }) => {
 }
 
 UserRequested.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      user: PropTypes.shape({
-        ids: PropTypes.shape({
-          user_id: PropTypes.string,
-        }),
-        name: PropTypes.string,
-        description: PropTypes.string,
-        primary_email_address: PropTypes.string,
-      }).isRequired,
-    }).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 UserRequested.Title = UserRequestedTitle
