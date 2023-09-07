@@ -44,13 +44,7 @@ const PasswordChangedPreview = ({ notificationData }) => {
 }
 
 PasswordChangedPreview.propTypes = {
-  notificationData: PropTypes.shape({
-    entity_ids: PropTypes.shape({
-      user_ids: PropTypes.shape({
-        user_id: PropTypes.string.isRequired,
-      }),
-    }).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const PasswordChangedTitle = ({ notificationData }) => {
@@ -67,9 +61,7 @@ const PasswordChangedTitle = ({ notificationData }) => {
 }
 
 PasswordChangedTitle.propTypes = {
-  notificationData: PropTypes.shape({
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const PasswordChanged = ({ notificationData }) => {
@@ -81,7 +73,6 @@ const PasswordChanged = ({ notificationData }) => {
   const values = {
     body: {
       entityId: entity_ids.user_ids.user_id,
-      code: msg => <code>{msg}</code>,
     },
   }
 
@@ -89,13 +80,7 @@ const PasswordChanged = ({ notificationData }) => {
 }
 
 PasswordChanged.propTypes = {
-  notificationData: PropTypes.shape({
-    entity_ids: PropTypes.shape({
-      user_ids: PropTypes.shape({
-        user_id: PropTypes.string.isRequired,
-      }),
-    }).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 PasswordChanged.Title = PasswordChangedTitle

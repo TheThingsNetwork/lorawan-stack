@@ -44,19 +44,13 @@ const ApiKeyChangedPreview = ({ notificationData }) => {
         entityType: getEntity(entity_ids),
         id: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
         apiKeyId: id,
-        linebreak: <br />,
       }}
     />
   )
 }
 
 ApiKeyChangedPreview.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const ApiKeyChangedTitle = ({ notificationData }) => {
@@ -72,9 +66,7 @@ const ApiKeyChangedTitle = ({ notificationData }) => {
 }
 
 ApiKeyChangedTitle.propTypes = {
-  notificationData: PropTypes.shape({
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const ApiKeyChanged = ({ notificationData }) => {
@@ -89,12 +81,8 @@ const ApiKeyChanged = ({ notificationData }) => {
     body: {
       entityType: getEntity(entity_ids),
       id: entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`],
-      code: msg => <code>{msg}</code>,
-      b: msg => <b>{msg}</b>,
     },
     entities: {
-      b: msg => <b>{msg}</b>,
-      code: msg => <code>{msg}</code>,
       apiKeyId: id,
     },
     action: {
@@ -122,13 +110,7 @@ const ApiKeyChanged = ({ notificationData }) => {
 }
 
 ApiKeyChanged.propTypes = {
-  notificationData: PropTypes.shape({
-    data: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      rights: PropTypes.arrayOf(PropTypes.string).isRequired,
-    }).isRequired,
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 ApiKeyChanged.Title = ApiKeyChangedTitle

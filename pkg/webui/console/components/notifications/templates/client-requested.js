@@ -70,7 +70,6 @@ const ClientRequestedPreview = ({ notificationData }) => {
         id: getId(sender_ids),
         collaboratorType: getType(collaborator),
         collaboratorId: getId(collaborator),
-        lineBreak: <br />,
         clientId: client.ids.client_id,
       }}
     />
@@ -78,7 +77,7 @@ const ClientRequestedPreview = ({ notificationData }) => {
 }
 
 ClientRequestedPreview.propTypes = {
-  notificationData: PropTypes.clientNotificationData.isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 const ClientRequestedTitle = () => <Message content={m.title} />
@@ -101,13 +100,8 @@ const ClientRequested = ({ notificationData }) => {
       id: getId(sender_ids),
       collaboratorType: getType(collaborator),
       collaboratorId: getId(collaborator),
-      code: msg => <code>{msg}</code>,
-      b: msg => <b>{msg}</b>,
-      lineBreak: <br />,
     },
     entities: {
-      b: msg => <b>{msg}</b>,
-      code: msg => <code>{msg}</code>,
       clientId: client.ids.client_id,
     },
     action: {
@@ -123,7 +117,7 @@ const ClientRequested = ({ notificationData }) => {
 }
 
 ClientRequested.propTypes = {
-  notificationData: PropTypes.clientNotificationData.isRequired,
+  notificationData: PropTypes.notificationData.isRequired,
 }
 
 ClientRequested.Title = ClientRequestedTitle
