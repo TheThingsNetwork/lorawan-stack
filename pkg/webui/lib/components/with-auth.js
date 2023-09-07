@@ -15,6 +15,7 @@
 import React from 'react'
 import { useLocation, Navigate, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
+import { useDispatch } from 'react-redux'
 
 import Spinner from '@ttn-lw/components/spinner'
 
@@ -22,6 +23,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 import { createFrontendError } from '@ttn-lw/lib/errors/utils'
+
+import { requestEmailValidation } from '@console/store/actions/users'
 
 import Message from './message'
 
@@ -40,14 +43,17 @@ const m = defineMessages({
   errStateSuspended:
     'Your account has been suspended by an administrator. Please contact support for further information about your account status.',
   errStateSuspendedTitle: 'Account suspended',
-  errEmailValidation: 'Your account is restricted until your email address has been validated.',
+  errEmailValidation:
+    'Your account is restricted until your email address has been validated. Please check your email inbox (including spam folder) for the validation email and follow its instructions. Alternatively, use the button below to send it again.',
   errEmailValidationTitle: 'Email validation pending',
+  resendValidationEmail: 'Resend validation email',
 })
 
 // `Auth` is a component that wraps a tree that requires the user to be authenticated.
 const Auth = ({ user, fetching, userError, errorComponent, children, rights, isAdmin }) => {
   const location = useLocation()
   const [searchParams] = useSearchParams()
+  const dispatch = useDispatch()
   if (fetching) {
     return (
       <Spinner center>
@@ -75,15 +81,19 @@ const Auth = ({ user, fetching, userError, errorComponent, children, rights, isA
   ) {
     // Provide relevant error messages if possible.
     if (user.state === 'STATE_REQUESTED') {
-      error = createFrontendError(m.errStateRequestedTitle, m.errStateRequested)
+      error = createFrontendError(m.errStateRequestedTitle, m.errStateRequested, 'USER_UNAPPROVED')
     } else if (user.state === 'STATE_REJECTED') {
-      error = createFrontendError(m.errStateRejectedTitle, m.errStateRejected)
+      error = createFrontendError(m.errStateRejectedTitle, m.errStateRejected, 'USER_REJECTED')
     } else if (user.state === 'STATE_SUSPENDED') {
-      error = createFrontendError(m.errStateSuspendedTitle, m.errStateSuspended)
+      error = createFrontendError(m.errStateSuspendedTitle, m.errStateSuspended, 'USER_SUSPENDED')
     } else if (!user.primary_email_address_validated_at) {
-      error = createFrontendError(m.errEmailValidationTitle, m.errEmailValidation)
+      error = createFrontendError(
+        m.errEmailValidationTitle,
+        m.errEmailValidation,
+        'USER_EMAIL_VALIDATION_PENDING',
+      )
     } else {
-      error = createFrontendError(m.errTooFewRightsTitle, m.errTooFewRights)
+      error = createFrontendError(m.errTooFewRightsTitle, m.errTooFewRights, 'USER_TOO_FEW_RIGHTS')
     }
   }
 
@@ -91,6 +101,19 @@ const Auth = ({ user, fetching, userError, errorComponent, children, rights, isA
     // Redirect to root to prevent side effects.
     if (!hasCallbackError && location.pathname !== '/') {
       return <Navigate to="" replace />
+    }
+
+    if (user && !user.primary_email_address_validated_at) {
+      // If the user's email address is not validated, define a rerequest action
+      const requestValidationAction = {
+        message: m.resendValidationEmail,
+        icon: 'email',
+        action: () => {
+          dispatch(requestEmailValidation(user.ids.user_id))
+        },
+      }
+      const Component = errorComponent
+      return <Component error={error} action={requestValidationAction} unexpected={false} />
     }
 
     const Component = errorComponent

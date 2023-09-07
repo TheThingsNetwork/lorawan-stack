@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { defineMessages } from 'react-intl'
+
 import tts from '@console/api/tts'
 
+import toast from '@ttn-lw/components/toast'
+
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import { getBackendErrorName } from '@ttn-lw/lib/errors/utils'
 
 import * as users from '@console/store/actions/users'
 
@@ -146,6 +151,40 @@ const deleteInviteLogic = createRequestLogic({
   },
 })
 
+const m = defineMessages({
+  errEmailValidationActionSuccess: 'Validation email sent (please also check your spam folder)',
+  errEmailValidationActionFailure: 'There was an error and the validation email could not be sent.',
+  errEmailValidationAlreadySent:
+    'A validation email has already been sent recently to your email address. Please also check your spam folder.',
+})
+
+const requestEmailValidationLogic = createRequestLogic({
+  type: users.REQUEST_EMAIL_VALIDATION,
+  process: async ({ action }) => {
+    const { userId } = action.payload
+    try {
+      const result = await tts.ContactInfo.requestValidation({ user_ids: { user_id: userId } })
+      toast({
+        type: toast.types.SUCCESS,
+        message: m.errEmailValidationActionSuccess,
+      })
+      return result
+    } catch (error) {
+      if (getBackendErrorName(error) === 'validations_already_sent') {
+        toast({
+          type: toast.types.INFO,
+          message: m.errEmailValidationAlreadySent,
+        })
+        return
+      }
+      toast({
+        type: toast.types.ERROR,
+        message: m.errEmailValidationActionFailure,
+      })
+    }
+  },
+})
+
 export default [
   getUserLogic,
   getUsersLogic,
@@ -157,4 +196,5 @@ export default [
   getUserInvitationsLogic,
   sendInviteLogic,
   deleteInviteLogic,
+  requestEmailValidationLogic,
 ]

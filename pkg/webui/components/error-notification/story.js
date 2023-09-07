@@ -13,15 +13,8 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import ErrorNotification from '.'
-
-const m = defineMessages({
-  problem: 'We got a problem here!',
-  lengthyProblem:
-    'We got a problem here! And the description is quite lengthy as well, which can sometimes be a problem.',
-})
 
 const exampleError = {
   code: 2,
