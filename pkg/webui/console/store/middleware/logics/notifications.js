@@ -67,8 +67,9 @@ const updateNotificationStatusLogic = createRequestLogic({
     const {
       payload: { id, notificationIds, newStatus },
     } = action
+    const result = await tts.Notifications.updateNotificationStatus(id, notificationIds, newStatus)
 
-    return await tts.Notifications.updateNotificationStatus(id, notificationIds, newStatus)
+    return { ...result, ids: notificationIds }
   },
 })
 

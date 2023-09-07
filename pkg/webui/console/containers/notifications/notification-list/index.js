@@ -27,10 +27,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import {
-  getUnseenNotifications,
-  updateNotificationStatus,
-} from '@console/store/actions/notifications'
+import { updateNotificationStatus } from '@console/store/actions/notifications'
 
 import {
   selectNotifications,
@@ -48,12 +45,7 @@ const m = defineMessages({
   markAllAsRead: 'Mark all as read',
 })
 
-const NotificationList = ({
-  setSelectedNotification,
-  selectedNotification,
-  fetchItems,
-  isArchive,
-}) => {
+const NotificationList = ({ setSelectedNotification, selectedNotification, isArchive }) => {
   const userId = useSelector(selectUserId)
   const notifications = useSelector(selectNotifications)
   const unseenIds = useSelector(selectUnseenIds)
@@ -63,28 +55,22 @@ const NotificationList = ({
   const handleClick = useCallback(
     async (e, id) => {
       setSelectedNotification(notifications.find(notification => notification.id === id))
-      if (!isArchive) {
+      if (!isArchive && unseenIds.includes(id)) {
         await dispatch(
           attachPromise(updateNotificationStatus(userId, [id], 'NOTIFICATION_STATUS_SEEN')),
         )
-        setTimeout(async () => {
-          await fetchItems()
-          await dispatch(attachPromise(getUnseenNotifications(userId)))
-        }, 300)
       }
     },
-    [notifications, dispatch, userId, fetchItems, setSelectedNotification, isArchive],
+    [notifications, dispatch, userId, setSelectedNotification, isArchive, unseenIds],
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
-    await dispatch(
-      attachPromise(updateNotificationStatus(userId, unseenIds, 'NOTIFICATION_STATUS_SEEN')),
-    )
-    setTimeout(async () => {
-      await fetchItems()
-      await dispatch(attachPromise(getUnseenNotifications(userId)))
-    }, 300)
-  }, [dispatch, userId, unseenIds, fetchItems])
+    if (!unseenIds.length) {
+      await dispatch(
+        attachPromise(updateNotificationStatus(userId, unseenIds, 'NOTIFICATION_STATUS_SEEN')),
+      )
+    }
+  }, [dispatch, userId, unseenIds])
 
   const classes = classNames(style.notificationHeaderIcon, 'm-0', {
     [style.notifications]: !isArchive,
@@ -130,7 +116,6 @@ const NotificationList = ({
 }
 
 NotificationList.propTypes = {
-  fetchItems: PropTypes.func.isRequired,
   isArchive: PropTypes.bool.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string,
