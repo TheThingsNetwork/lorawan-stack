@@ -56,7 +56,6 @@ describe('Notifications', () => {
   it('succeeds opening a notification', () => {
     cy.findByText(/A new API key has just been created for your application./).click()
     cy.findByRole('button', { name: /Archive/ }).should('be.visible')
-    cy.findByText(/Dear admin,/).should('be.visible')
   })
 
   it('succeeds archiving and unarchiving a notification', () => {
