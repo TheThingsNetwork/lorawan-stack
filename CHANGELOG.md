@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix gateway connection stats being stuck at `Connecting` until the first uplink is processed in the Console.
+
 ### Security
 
 ## [3.27.1] - 2023-08-29
