@@ -101,6 +101,48 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationId
 	return pb, ctx, nil
 }
 
+// BatchGetByID gets devices by appID, deviceIDs.
+func (r *DeviceRegistry) BatchGetByID(
+	ctx context.Context, appID *ttnpb.ApplicationIdentifiers, deviceIDs []string, paths []string,
+) ([]*ttnpb.EndDevice, error) {
+	defer trace.StartRegion(ctx, "batch get end device by id").End()
+
+	keys := make([]string, len(deviceIDs))
+	for i, devID := range deviceIDs {
+		ids := &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: appID,
+			DeviceId:       devID,
+		}
+		if err := ids.ValidateContext(ctx); err != nil {
+			return nil, err
+		}
+		keys[i] = r.uidKey(unique.ID(ctx, ids))
+	}
+
+	results, err := r.Redis.MGet(ctx, keys...).Result()
+	if err != nil {
+		return nil, ttnredis.ConvertError(err)
+	}
+
+	protos := make([]*ttnpb.EndDevice, len(deviceIDs))
+	for i, result := range results {
+		switch cmd := result.(type) {
+		case nil:
+		case string:
+			dev := &ttnpb.EndDevice{}
+			if err := ttnredis.UnmarshalProto(cmd, dev); err != nil {
+				return nil, err
+			}
+			dev, err = ttnpb.FilterGetEndDevice(dev, paths...)
+			if err != nil {
+				return nil, err
+			}
+			protos[i] = dev
+		}
+	}
+	return protos, nil
+}
+
 // GetByEUI gets device by joinEUI, devEUI.
 func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	defer trace.StartRegion(ctx, "get end device by eui").End()
