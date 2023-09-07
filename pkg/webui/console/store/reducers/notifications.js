@@ -15,6 +15,7 @@
 import {
   GET_NOTIFICATIONS_SUCCESS,
   GET_UNSEEN_NOTIFICATIONS_SUCCESS,
+  UPDATE_NOTIFICATION_STATUS_SUCCESS,
 } from '@console/store/actions/notifications'
 
 const defaultState = {
@@ -42,6 +43,12 @@ const notifications = (state = defaultState, { type, payload }) => {
         ...state,
         unseenIds: payload.notifications.map(not => not.id),
         unseenTotalCount: payload.totalCount,
+      }
+    case UPDATE_NOTIFICATION_STATUS_SUCCESS:
+      return {
+        ...state,
+        unseenIds: state.unseenIds.filter(id => !payload.ids.includes(id)),
+        unseenTotalCount: state.unseenTotalCount - payload.ids.length,
       }
     default:
       return state

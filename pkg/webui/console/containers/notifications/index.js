@@ -98,7 +98,6 @@ const Notifications = ({ setPage, page }) => {
           setSelectedNotification={setSelectedNotification}
           selectedNotification={selectedNotification}
           isArchive={showArchived === 'true'}
-          fetchItems={fetchItems}
         />
         <Row direction="column" align="center" className="mt-cs-xxl">
           <Pagination
