@@ -15,11 +15,24 @@
 package mac
 
 import (
+	"context"
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
+
+// RelayKeyService provides common relay related cryptographic operations.
+type RelayKeyService interface {
+	// BatchDeriveRootWorSKey derives the RootWorSKey for the provided end devices.
+	// For devices with a pending session, the derived RootWorSKey is derived rom the
+	// pending NwkSEncKey. For devices with an active session, the derived RootWorSKey
+	// is derived from the active NwkSEncKey.
+	BatchDeriveRootWorSKey(
+		ctx context.Context, appID *ttnpb.ApplicationIdentifiers, deviceIDs []string, sessionKeyIDs [][]byte,
+	) (devAddrs []*types.DevAddr, keys []*types.AES128Key, err error)
+}
 
 func secondChFields(secondCh *ttnpb.RelaySecondChannel) []any {
 	if secondCh == nil {
