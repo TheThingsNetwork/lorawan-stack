@@ -33,6 +33,10 @@
   &-change-button
     color: $c-active-blue !important
 
+  &.notification-selected
+    +media-query($bp.s)
+      display: none
+
 .notification-header
   border-bottom: 1px solid #E4E4E4
   align-items: center
@@ -57,6 +61,16 @@
     padding-left: 0
     padding-top: 0.2rem
 
+    &.notification-selected
+      display: block
+      +media-query($bp.s)
+        display: none
+
+    &.notification-selected-mobile
+      display: none
+      +media-query($bp.s)
+        display: block
+
   .total-notifications
     border-radius: 45%
     background-color: $c-active-blue
@@ -80,7 +94,10 @@
       max-width: 70% !important
 
   .back-button
+    display: none
     height: 100%
+    +media-query($bp.s)
+      display: block
 
     .icon
       font-size: 3rem
@@ -98,8 +115,10 @@
   flex-direction: column !important
   align-items: start !important
 
-  &.selected
+  &.notification-selected
     background-color: $c-active-blue !important
+    +media-query($bp.s)
+      background-color: unset !important
 
   &-title
     color: $tc-black
@@ -109,8 +128,10 @@
     justify-content: space-between
     width: 100%
 
-    &.selected
+    &.notification-selected
       color: white
+      +media-query($bp.s)
+        color: $tc-black
 
       .notification-time
         color: white
@@ -133,11 +154,15 @@
     -webkit-line-clamp: 2 /* start showing ellipsis when 2nd line is reached */
     white-space: pre-wrap
 
-    &.selected
+    &.notification-selected
       color: white
+      +media-query($bp.s)
+        color: $tc-subtle-gray
 
-  &.selected
+  &.notification-selected
     color: white
+    +media-query($bp.s)
+      color: $tc-subtle-gray
 
   .unseen-mark
     position: absolute
@@ -149,5 +174,10 @@
   border-radius: 0 $br.m $br.m 0
 
   +media-query($bp.s)
+    display: none
     height: 88vh
     margin: 0 !important
+
+  &.notification-selected
+    +media-query($bp.s)
+      display: block
