@@ -616,6 +616,8 @@ macLoop:
 			evs, err = mac.HandleRelayConfAns(ctx, dev, cmd.GetRelayConfAns())
 		case ttnpb.MACCommandIdentifier_CID_RELAY_END_DEVICE_CONF:
 			evs, err = mac.HandleRelayEndDeviceConfAns(ctx, dev, cmd.GetRelayEndDeviceConfAns())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_UPDATE_UPLINK_LIST:
+			evs, err = mac.HandleRelayUpdateUplinkListAns(ctx, dev, cmd.GetRelayUpdateUplinkListAns())
 		case ttnpb.MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT:
 			evs, err = mac.HandleRelayConfigureFwdLimitAns(ctx, dev, cmd.GetRelayConfigureFwdLimitAns())
 		case ttnpb.MACCommandIdentifier_CID_RELAY_NOTIFY_NEW_END_DEVICE:

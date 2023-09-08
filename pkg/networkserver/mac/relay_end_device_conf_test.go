@@ -57,6 +57,7 @@ func TestDeviceNeedsRelayEndDeviceConfReq(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -78,6 +79,7 @@ func TestDeviceNeedsRelayEndDeviceConfReq(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -97,6 +99,7 @@ func TestDeviceNeedsRelayEndDeviceConfReq(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -110,6 +113,7 @@ func TestDeviceNeedsRelayEndDeviceConfReq(t *testing.T) {
 											SmartEnableLevel: ttnpb.RelaySmartEnableLevel_RELAY_SMART_ENABLE_LEVEL_32,
 										},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -159,6 +163,7 @@ func TestEnqueueRelayEndDeviceConfReq(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -175,6 +180,7 @@ func TestEnqueueRelayEndDeviceConfReq(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -185,6 +191,7 @@ func TestEnqueueRelayEndDeviceConfReq(t *testing.T) {
 								Mode: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Always{
 									Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 								},
+								ServingDeviceId: "foo",
 							},
 						}).MACCommand(),
 					},
@@ -201,6 +208,7 @@ func TestEnqueueRelayEndDeviceConfReq(t *testing.T) {
 							Mode: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Always{
 								Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 							},
+							ServingDeviceId: "foo",
 						},
 					})),
 				},
@@ -218,6 +226,7 @@ func TestEnqueueRelayEndDeviceConfReq(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -234,6 +243,7 @@ func TestEnqueueRelayEndDeviceConfReq(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -294,6 +304,7 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -304,6 +315,7 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 								Mode: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Always{
 									Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 								},
+								ServingDeviceId: "foo",
 							},
 						}).MACCommand(),
 					},
@@ -319,6 +331,7 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -354,6 +367,7 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -364,6 +378,7 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 								Mode: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Always{
 									Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 								},
+								ServingDeviceId: "foo",
 							},
 						}).MACCommand(),
 					},
@@ -378,6 +393,7 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -389,6 +405,7 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},
@@ -423,6 +440,7 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 									Mode: &ttnpb.ServedRelayParameters_Always{
 										Always: &ttnpb.RelayEndDeviceAlwaysMode{},
 									},
+									ServingDeviceId: "foo",
 								},
 							},
 						},

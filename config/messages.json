@@ -10826,6 +10826,24 @@
       "file": "relay_notify_new_end_device.go"
     }
   },
+  "event:ns.mac.relay_update_uplink_list.answer": {
+    "translations": {
+      "en": "relay update uplink list answer received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_update_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_update_uplink_list.request": {
+    "translations": {
+      "en": "relay update uplink list request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_update_uplink_list.go"
+    }
+  },
   "event:ns.mac.reset.confirmation": {
     "translations": {
       "en": "device reset confirmation enqueued"

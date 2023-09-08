@@ -103,3 +103,19 @@ func servedRelayFields(served *ttnpb.ServedRelayParameters) log.Fielder {
 	fields = append(fields, secondChFields(served.SecondChannel)...)
 	return log.Fields(fields...)
 }
+
+func relayUpdateUplinkListReqFields(req *ttnpb.MACCommand_RelayUpdateUplinkListReq) log.Fielder {
+	fields := []any{
+		"relay_rule_index", req.RuleIndex,
+		"relay_served_dev_addr", types.MustDevAddr(req.DevAddr),
+		"relay_served_w_f_cnt", req.WFCnt,
+		"relay_served_session_key_id", req.SessionKeyId,
+	}
+	if limits := req.ForwardLimits; limits != nil {
+		fields = append(fields,
+			"relay_served_bucket_size", limits.BucketSize,
+			"relay_served_reload_rate", limits.ReloadRate,
+		)
+	}
+	return log.Fields(fields...)
+}
