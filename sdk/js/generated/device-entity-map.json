@@ -726,6 +726,176 @@
         "ns"
       ]
     },
+    "desired_relay": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "mode": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "served": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "backoff": [
+            "ns",
+            "ns"
+          ],
+          "mode": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "always": [
+              "ns",
+              "ns"
+            ],
+            "dynamic": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "smart_enable_level": [
+                "ns",
+                "ns"
+              ]
+            },
+            "end_device_controlled": [
+              "ns",
+              "ns"
+            ]
+          },
+          "second_channel": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "ack_offset": [
+              "ns",
+              "ns"
+            ],
+            "data_rate_index": [
+              "ns",
+              "ns"
+            ],
+            "frequency": [
+              "ns",
+              "ns"
+            ]
+          },
+          "serving_device_id": [
+            "ns",
+            "ns"
+          ]
+        },
+        "serving": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "cad_periodicity": [
+            "ns",
+            "ns"
+          ],
+          "default_channel_index": [
+            "ns",
+            "ns"
+          ],
+          "limits": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "join_requests": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "bucket_size": [
+                "ns",
+                "ns"
+              ],
+              "reload_rate": [
+                "ns",
+                "ns"
+              ]
+            },
+            "notifications": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "bucket_size": [
+                "ns",
+                "ns"
+              ],
+              "reload_rate": [
+                "ns",
+                "ns"
+              ]
+            },
+            "overall": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "bucket_size": [
+                "ns",
+                "ns"
+              ],
+              "reload_rate": [
+                "ns",
+                "ns"
+              ]
+            },
+            "reset_behavior": [
+              "ns",
+              "ns"
+            ],
+            "uplink_messages": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "bucket_size": [
+                "ns",
+                "ns"
+              ],
+              "reload_rate": [
+                "ns",
+                "ns"
+              ]
+            }
+          },
+          "second_channel": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "ack_offset": [
+              "ns",
+              "ns"
+            ],
+            "data_rate_index": [
+              "ns",
+              "ns"
+            ],
+            "frequency": [
+              "ns",
+              "ns"
+            ]
+          },
+          "uplink_forwarding_rules": [
+            "ns",
+            "ns"
+          ]
+        }
+      }
+    },
     "desired_rx1_data_rate_offset": {
       "_root": [
         "ns",
@@ -809,6 +979,176 @@
         "ns",
         "ns"
       ]
+    },
+    "relay": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "mode": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "served": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "backoff": [
+            "ns",
+            "ns"
+          ],
+          "mode": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "always": [
+              "ns",
+              "ns"
+            ],
+            "dynamic": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "smart_enable_level": [
+                "ns",
+                "ns"
+              ]
+            },
+            "end_device_controlled": [
+              "ns",
+              "ns"
+            ]
+          },
+          "second_channel": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "ack_offset": [
+              "ns",
+              "ns"
+            ],
+            "data_rate_index": [
+              "ns",
+              "ns"
+            ],
+            "frequency": [
+              "ns",
+              "ns"
+            ]
+          },
+          "serving_device_id": [
+            "ns",
+            "ns"
+          ]
+        },
+        "serving": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "cad_periodicity": [
+            "ns",
+            "ns"
+          ],
+          "default_channel_index": [
+            "ns",
+            "ns"
+          ],
+          "limits": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "join_requests": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "bucket_size": [
+                "ns",
+                "ns"
+              ],
+              "reload_rate": [
+                "ns",
+                "ns"
+              ]
+            },
+            "notifications": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "bucket_size": [
+                "ns",
+                "ns"
+              ],
+              "reload_rate": [
+                "ns",
+                "ns"
+              ]
+            },
+            "overall": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "bucket_size": [
+                "ns",
+                "ns"
+              ],
+              "reload_rate": [
+                "ns",
+                "ns"
+              ]
+            },
+            "reset_behavior": [
+              "ns",
+              "ns"
+            ],
+            "uplink_messages": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "bucket_size": [
+                "ns",
+                "ns"
+              ],
+              "reload_rate": [
+                "ns",
+                "ns"
+              ]
+            }
+          },
+          "second_channel": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "ack_offset": [
+              "ns",
+              "ns"
+            ],
+            "data_rate_index": [
+              "ns",
+              "ns"
+            ],
+            "frequency": [
+              "ns",
+              "ns"
+            ]
+          },
+          "uplink_forwarding_rules": [
+            "ns",
+            "ns"
+          ]
+        }
+      }
     },
     "resets_f_cnt": {
       "_root": [
@@ -1009,6 +1349,176 @@
         "ns",
         "ns"
       ],
+      "relay": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "mode": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "served": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "backoff": [
+              "ns",
+              "ns"
+            ],
+            "mode": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "always": [
+                "ns",
+                "ns"
+              ],
+              "dynamic": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "smart_enable_level": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "end_device_controlled": [
+                "ns",
+                "ns"
+              ]
+            },
+            "second_channel": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "ack_offset": [
+                "ns",
+                "ns"
+              ],
+              "data_rate_index": [
+                "ns",
+                "ns"
+              ],
+              "frequency": [
+                "ns",
+                "ns"
+              ]
+            },
+            "serving_device_id": [
+              "ns",
+              "ns"
+            ]
+          },
+          "serving": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "cad_periodicity": [
+              "ns",
+              "ns"
+            ],
+            "default_channel_index": [
+              "ns",
+              "ns"
+            ],
+            "limits": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "join_requests": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "notifications": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "overall": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "reset_behavior": [
+                "ns",
+                "ns"
+              ],
+              "uplink_messages": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              }
+            },
+            "second_channel": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "ack_offset": [
+                "ns",
+                "ns"
+              ],
+              "data_rate_index": [
+                "ns",
+                "ns"
+              ],
+              "frequency": [
+                "ns",
+                "ns"
+              ]
+            },
+            "uplink_forwarding_rules": [
+              "ns",
+              "ns"
+            ]
+          }
+        }
+      },
       "rx1_data_rate_offset": [
         "ns",
         "ns"
@@ -1121,6 +1631,176 @@
         "ns",
         "ns"
       ],
+      "relay": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "mode": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "served": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "backoff": [
+              "ns",
+              "ns"
+            ],
+            "mode": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "always": [
+                "ns",
+                "ns"
+              ],
+              "dynamic": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "smart_enable_level": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "end_device_controlled": [
+                "ns",
+                "ns"
+              ]
+            },
+            "second_channel": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "ack_offset": [
+                "ns",
+                "ns"
+              ],
+              "data_rate_index": [
+                "ns",
+                "ns"
+              ],
+              "frequency": [
+                "ns",
+                "ns"
+              ]
+            },
+            "serving_device_id": [
+              "ns",
+              "ns"
+            ]
+          },
+          "serving": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "cad_periodicity": [
+              "ns",
+              "ns"
+            ],
+            "default_channel_index": [
+              "ns",
+              "ns"
+            ],
+            "limits": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "join_requests": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "notifications": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "overall": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "reset_behavior": [
+                "ns",
+                "ns"
+              ],
+              "uplink_messages": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              }
+            },
+            "second_channel": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "ack_offset": [
+                "ns",
+                "ns"
+              ],
+              "data_rate_index": [
+                "ns",
+                "ns"
+              ],
+              "frequency": [
+                "ns",
+                "ns"
+              ]
+            },
+            "uplink_forwarding_rules": [
+              "ns",
+              "ns"
+            ]
+          }
+        }
+      },
       "rx1_data_rate_offset": [
         "ns",
         "ns"
@@ -1220,6 +1900,16 @@
         "ns"
       ],
       "session_key_id": [
+        "ns",
+        "ns"
+      ]
+    },
+    "pending_relay_downlink": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "raw_payload": [
         "ns",
         "ns"
       ]
@@ -1377,6 +2067,176 @@
         "ns",
         "ns"
       ],
+      "relay": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "mode": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "served": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "backoff": [
+              "ns",
+              "ns"
+            ],
+            "mode": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "always": [
+                "ns",
+                "ns"
+              ],
+              "dynamic": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "smart_enable_level": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "end_device_controlled": [
+                "ns",
+                "ns"
+              ]
+            },
+            "second_channel": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "ack_offset": [
+                "ns",
+                "ns"
+              ],
+              "data_rate_index": [
+                "ns",
+                "ns"
+              ],
+              "frequency": [
+                "ns",
+                "ns"
+              ]
+            },
+            "serving_device_id": [
+              "ns",
+              "ns"
+            ]
+          },
+          "serving": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "cad_periodicity": [
+              "ns",
+              "ns"
+            ],
+            "default_channel_index": [
+              "ns",
+              "ns"
+            ],
+            "limits": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "join_requests": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "notifications": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "overall": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "reset_behavior": [
+                "ns",
+                "ns"
+              ],
+              "uplink_messages": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              }
+            },
+            "second_channel": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "ack_offset": [
+                "ns",
+                "ns"
+              ],
+              "data_rate_index": [
+                "ns",
+                "ns"
+              ],
+              "frequency": [
+                "ns",
+                "ns"
+              ]
+            },
+            "uplink_forwarding_rules": [
+              "ns",
+              "ns"
+            ]
+          }
+        }
+      },
       "rx1_data_rate_offset": [
         "ns",
         "ns"
@@ -1489,6 +2349,176 @@
         "ns",
         "ns"
       ],
+      "relay": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "mode": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "served": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "backoff": [
+              "ns",
+              "ns"
+            ],
+            "mode": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "always": [
+                "ns",
+                "ns"
+              ],
+              "dynamic": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "smart_enable_level": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "end_device_controlled": [
+                "ns",
+                "ns"
+              ]
+            },
+            "second_channel": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "ack_offset": [
+                "ns",
+                "ns"
+              ],
+              "data_rate_index": [
+                "ns",
+                "ns"
+              ],
+              "frequency": [
+                "ns",
+                "ns"
+              ]
+            },
+            "serving_device_id": [
+              "ns",
+              "ns"
+            ]
+          },
+          "serving": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "cad_periodicity": [
+              "ns",
+              "ns"
+            ],
+            "default_channel_index": [
+              "ns",
+              "ns"
+            ],
+            "limits": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "join_requests": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "notifications": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "overall": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              },
+              "reset_behavior": [
+                "ns",
+                "ns"
+              ],
+              "uplink_messages": {
+                "_root": [
+                  "ns",
+                  "ns"
+                ],
+                "bucket_size": [
+                  "ns",
+                  "ns"
+                ],
+                "reload_rate": [
+                  "ns",
+                  "ns"
+                ]
+              }
+            },
+            "second_channel": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "ack_offset": [
+                "ns",
+                "ns"
+              ],
+              "data_rate_index": [
+                "ns",
+                "ns"
+              ],
+              "frequency": [
+                "ns",
+                "ns"
+              ]
+            },
+            "uplink_forwarding_rules": [
+              "ns",
+              "ns"
+            ]
+          }
+        }
+      },
       "rx1_data_rate_offset": [
         "ns",
         "ns"
