@@ -713,6 +713,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults *ttnpb.M
 		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
 		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
 		PingSlotDataRateIndexValue: DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaults),
+		Relay:                      DeviceDefaultRelayParameters(dev, defaults),
 	}
 	desired := current
 	if !dev.Multicast {
@@ -735,6 +736,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults *ttnpb.M
 			AdrAckLimitExponent:        DeviceDesiredADRAckLimitExponent(dev, phy, defaults),
 			AdrAckDelayExponent:        DeviceDesiredADRAckDelayExponent(dev, phy, defaults),
 			PingSlotDataRateIndexValue: DeviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaults),
+			Relay:                      DeviceDesiredRelayParameters(dev, defaults),
 		}
 	}
 	// TODO: Support rejoins. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)

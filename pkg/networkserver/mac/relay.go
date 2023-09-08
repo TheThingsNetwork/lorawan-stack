@@ -119,3 +119,27 @@ func relayUpdateUplinkListReqFields(req *ttnpb.MACCommand_RelayUpdateUplinkListR
 	}
 	return log.Fields(fields...)
 }
+
+// DeviceDefaultRelayParameters returns the default relay parameters for the given device.
+func DeviceDefaultRelayParameters(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) *ttnpb.RelayParameters {
+	switch {
+	case dev.GetMacSettings().GetRelay() != nil:
+		return dev.MacSettings.Relay
+	case defaults.Relay != nil:
+		return defaults.Relay
+	default:
+		return nil
+	}
+}
+
+// DeviceDesiredRelayParameters returns the desired relay parameters for the given device.
+func DeviceDesiredRelayParameters(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) *ttnpb.RelayParameters {
+	switch {
+	case dev.GetMacSettings().GetDesiredRelay() != nil:
+		return dev.MacSettings.DesiredRelay
+	case defaults.DesiredRelay != nil:
+		return defaults.DesiredRelay
+	default:
+		return DeviceDefaultRelayParameters(dev, defaults)
+	}
+}
