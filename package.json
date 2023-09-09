@@ -52,7 +52,7 @@
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.3",
     "jest": "^29.6.4",
-    "jest-environment-jsdom": "^29.5.0",
+    "jest-environment-jsdom": "^29.6.4",
     "js-yaml": "^4.0.0",
     "json": "^11.0.0",
     "messageformat-parser": "^4.1.3",
