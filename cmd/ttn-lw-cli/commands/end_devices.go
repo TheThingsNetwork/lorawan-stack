@@ -174,11 +174,11 @@ var (
 	)
 	errEndDeviceClaimInfo = errors.DefineFailedPrecondition(
 		"end_device_claim_info",
-		"could not get end device claim info from DCS",
+		"get end device claim info from DCS",
 	)
 	errEndDeviceClaim = errors.DefineFailedPrecondition(
 		"end_device_claim",
-		"could not claim end device",
+		"claim end device",
 	)
 	errEndDeviceClaimGeneratedEUI = errors.DefineInvalidArgument(
 		"claim_generated_eui",

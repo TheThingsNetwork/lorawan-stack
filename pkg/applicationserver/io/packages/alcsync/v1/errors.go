@@ -28,12 +28,12 @@ var (
 	errIgnoreDownlink = errors.DefineUnavailable("downlink_unavailable", "downlink unavailable")
 
 	errCommandCreationFailed = errors.Define(
-		"command_creation_failed", "failed to create command", "command_id", "command_payload", "remaining_payload",
+		"command_creation_failed", "create command", "command_id", "command_payload", "remaining_payload",
 	)
-	errDownlinkCreationFailed = errors.Define("downlink_creation_failed", "failed to create downlink")
+	errDownlinkCreationFailed = errors.Define("downlink_creation_failed", "create downlink")
 
 	errInvalidFieldType = errors.DefineCorruption("invalid_field_type", "field `{field}` has the wrong type `{type}`")
-	errPkgDataMerge     = errors.DefineCorruption("pkg_data_merge", "failed to merge package data")
+	errPkgDataMerge     = errors.DefineCorruption("pkg_data_merge", "merge package data")
 
 	errInsufficientLength = errors.DefineInvalidArgument(
 		"insufficient_length", "command payload has insufficient length", "expected_length", "actual_length",

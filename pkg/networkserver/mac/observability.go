@@ -103,7 +103,7 @@ var (
 	EvtClassCSwitch = defineClassSwitchEvent('c')()
 
 	EvtParseMACCommandFail = events.Define(
-		"ns.mac.command.parse.fail", "failed to parse MAC command",
+		"ns.mac.command.parse.fail", "parse MAC command",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 		events.WithPropagateToParent(),
@@ -114,7 +114,7 @@ var (
 		events.WithDataType(&ttnpb.MACCommand{}),
 	)
 	EvtProcessMACCommandFail = events.Define(
-		"ns.mac.command.process.fail", "failed to process MAC command",
+		"ns.mac.command.process.fail", "process MAC command",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 		events.WithPropagateToParent(),

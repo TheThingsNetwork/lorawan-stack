@@ -104,10 +104,10 @@ func (gs *GatewayServer) Context() context.Context {
 var (
 	errListenFrontend = errors.DefineFailedPrecondition(
 		"listen_frontend",
-		"failed to start frontend listener `{protocol}` on address `{address}`",
+		"start frontend listener `{protocol}` on address `{address}`",
 	)
 	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
-	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
+	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "setup upstream `{name}`")
 	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}` is invalid")
 
 	modelAttribute    = "model"
@@ -474,6 +474,7 @@ func (gs *GatewayServer) Connect(
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIds: ids,
 		FieldMask: ttnpb.FieldMask(
+			"administrative_contact",
 			"antennas",
 			"attributes",
 			"disable_packet_broker_forwarding",
@@ -486,6 +487,7 @@ func (gs *GatewayServer) Connect(
 			"schedule_anytime_delay",
 			"schedule_downlink_late",
 			"status_public",
+			"technical_contact",
 			"update_location_from_status",
 		),
 	})
@@ -737,7 +739,7 @@ func (gs *GatewayServer) startHandleVersionUpdatesTask(conn connectionEntry) {
 	})
 }
 
-var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")
+var errHostHandle = errors.Define("host_handle", "host `{host}` handle message")
 
 type upstreamHost struct {
 	name          string

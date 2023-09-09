@@ -241,6 +241,17 @@ var UpdateUserAPIKeyRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"user_ids",
 }
+var DeleteUserAPIKeyRequestFieldPathsNested = []string{
+	"key_id",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var DeleteUserAPIKeyRequestFieldPathsTopLevel = []string{
+	"key_id",
+	"user_ids",
+}
 var InvitationFieldPathsNested = []string{
 	"accepted_at",
 	"accepted_by",

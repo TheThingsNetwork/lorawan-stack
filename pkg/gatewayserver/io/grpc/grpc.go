@@ -82,7 +82,7 @@ func (*impl) Protocol() string                          { return "grpc" }
 func (*impl) SupportsDownlinkClaim() bool               { return false }
 func (*impl) DutyCycleStyle() scheduling.DutyCycleStyle { return scheduling.DefaultDutyCycleStyle }
 
-var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_uid}`")
+var errConnect = errors.Define("connect", "connect gateway `{gateway_uid}`")
 
 // LinkGateway links the gateway to the Gateway Server.
 func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {

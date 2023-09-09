@@ -41,6 +41,7 @@ import {
   RP002_V1_0_1,
   RP002_V1_0_2,
   RP002_V1_0_3,
+  RP002_V1_0_4,
   LORAWAN_VERSIONS,
   parseLorawanMacVersion,
 } from '@console/lib/device-utils'
@@ -57,6 +58,7 @@ const phyVersionsMap = {
   [RP002_V1_0_1.value]: [MAC_V1_1, MAC_V1_0_4],
   [RP002_V1_0_2.value]: [MAC_V1_1, MAC_V1_0_4],
   [RP002_V1_0_3.value]: [MAC_V1_1, MAC_V1_0_4],
+  [RP002_V1_0_4.value]: [MAC_V1_1, MAC_V1_0_4],
 }
 const m = defineMessages({
   phyVersionError: 'Failed to fetch regional parameters versions',

@@ -82,12 +82,12 @@ var errInvalidPBKDF2 = errors.DefineInternal( // internal because hash is in DB.
 
 var errIterations = errors.DefineInternal(
 	"pbkdf2_iterations",
-	"could not determine number of iterations from `{iterations}`",
+	"determine number of iterations from `{iterations}`",
 )
 
 var errKeyLength = errors.DefineInternal(
 	"pbkdf2_key_length",
-	"could not determine key length",
+	"determine key length",
 )
 
 // Validate validates a plaintext password against a hashed one.

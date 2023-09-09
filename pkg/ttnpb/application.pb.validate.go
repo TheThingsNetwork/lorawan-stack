@@ -1509,6 +1509,109 @@ var _ interface {
 	ErrorName() string
 } = UpdateApplicationAPIKeyRequestValidationError{}
 
+// ValidateFields checks the field values on DeleteApplicationAPIKeyRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *DeleteApplicationAPIKeyRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DeleteApplicationAPIKeyRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if m.GetApplicationIds() == nil {
+				return DeleteApplicationAPIKeyRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteApplicationAPIKeyRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "key_id":
+			// no validation rules for KeyId
+		default:
+			return DeleteApplicationAPIKeyRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DeleteApplicationAPIKeyRequestValidationError is the validation error
+// returned by DeleteApplicationAPIKeyRequest.ValidateFields if the designated
+// constraints aren't met.
+type DeleteApplicationAPIKeyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteApplicationAPIKeyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteApplicationAPIKeyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteApplicationAPIKeyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteApplicationAPIKeyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteApplicationAPIKeyRequestValidationError) ErrorName() string {
+	return "DeleteApplicationAPIKeyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteApplicationAPIKeyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteApplicationAPIKeyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteApplicationAPIKeyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteApplicationAPIKeyRequestValidationError{}
+
 // ValidateFields checks the field values on
 // ListApplicationCollaboratorsRequest with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.
@@ -1877,3 +1980,123 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SetApplicationCollaboratorRequestValidationError{}
+
+// ValidateFields checks the field values on
+// DeleteApplicationCollaboratorRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *DeleteApplicationCollaboratorRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DeleteApplicationCollaboratorRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if m.GetApplicationIds() == nil {
+				return DeleteApplicationCollaboratorRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteApplicationCollaboratorRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator_ids":
+
+			if m.GetCollaboratorIds() == nil {
+				return DeleteApplicationCollaboratorRequestValidationError{
+					field:  "collaborator_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaboratorIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteApplicationCollaboratorRequestValidationError{
+						field:  "collaborator_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return DeleteApplicationCollaboratorRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DeleteApplicationCollaboratorRequestValidationError is the validation error
+// returned by DeleteApplicationCollaboratorRequest.ValidateFields if the
+// designated constraints aren't met.
+type DeleteApplicationCollaboratorRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteApplicationCollaboratorRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteApplicationCollaboratorRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteApplicationCollaboratorRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteApplicationCollaboratorRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteApplicationCollaboratorRequestValidationError) ErrorName() string {
+	return "DeleteApplicationCollaboratorRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteApplicationCollaboratorRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteApplicationCollaboratorRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteApplicationCollaboratorRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteApplicationCollaboratorRequestValidationError{}

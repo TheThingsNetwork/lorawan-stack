@@ -26,7 +26,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func TestUserAPIKeys(t *testing.T) {
+func TestUserAPIKeys(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
 	admin := p.NewUser()
@@ -179,6 +179,14 @@ func TestUserAPIKeys(t *testing.T) {
 			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
 				a.So(updated, should.BeNil)
 			}
+
+			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteUserAPIKeyRequest{
+				UserIds: usr1.GetIds(),
+				KeyId:   usr1Key.GetId(),
+			}, opts...)
+			if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				t.FailNow()
+			}
 		}
 
 		// API Key CRUD with different valid credentials.
@@ -224,25 +232,52 @@ func TestUserAPIKeys(t *testing.T) {
 				a.So(updated.Name, should.Equal, "api-key-name-updated")
 			}
 
-			deleted, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
+			// TODO: Remove UpdateAPIKey test case (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
+			t.Run("Delete via update method", func(*testing.T) { // nolint:paralleltest
+				_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
+					UserIds: usr1.GetIds(),
+					ApiKey:  &ttnpb.APIKey{Id: created.GetId()},
+				}, opts...)
+				a.So(err, should.BeNil)
+
+				got, err = reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+					UserIds: usr1.GetIds(),
+					KeyId:   created.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
+
+			// Recreates api-key of the `usr1` User.
+			created, err = reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
 				UserIds: usr1.GetIds(),
-				ApiKey: &ttnpb.APIKey{
-					Id: created.GetId(),
-				},
-				FieldMask: ttnpb.FieldMask("rights"),
+				Name:    "api-key-name",
+				Rights:  []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
 			}, opts...)
-			if a.So(err, should.BeNil) && a.So(deleted, should.NotBeNil) {
-				a.So(deleted.Rights, should.BeNil)
+			if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+				a.So(created.Name, should.Equal, "api-key-name")
+				a.So(created.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO})
 			}
 
-			got, err = reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
-				UserIds: usr1.GetIds(),
-				KeyId:   created.GetId(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsNotFound(err), should.BeTrue)
-			}
-			a.So(got, should.BeNil)
+			t.Run("Delete via delete method", func(*testing.T) { // nolint:paralleltest
+				empty, err := reg.DeleteAPIKey(ctx, &ttnpb.DeleteUserAPIKeyRequest{
+					UserIds: usr1.GetIds(),
+					KeyId:   created.GetId(),
+				}, opts...)
+				a.So(err, should.BeNil)
+				a.So(empty, should.Resemble, ttnpb.Empty)
+
+				got, err = reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+					UserIds: usr1.GetIds(),
+					KeyId:   created.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
 		}
 	}, withPrivateTestDatabase(p))
 }

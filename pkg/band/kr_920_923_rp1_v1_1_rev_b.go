@@ -47,16 +47,6 @@ var KR_920_923_RP1_V1_1_Rev_B = Band{
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 
-	ReceiveDelay1:        defaultReceiveDelay1,
-	ReceiveDelay2:        defaultReceiveDelay2,
-	JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-	JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-	MaxFCntGap:           defaultMaxFCntGap,
-	ADRAckLimit:          defaultADRAckLimit,
-	ADRAckDelay:          defaultADRAckDelay,
-	MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-	MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 	DefaultMaxEIRP: 14,
 	TxOffset: []float32{
 		0,
@@ -95,4 +85,6 @@ var KR_920_923_RP1_V1_1_Rev_B = Band{
 		Frequencies:   kr920923BeaconFrequencies,
 	},
 	PingSlotFrequencies: kr920923BeaconFrequencies,
+
+	SharedParameters: universalSharedParameters,
 }

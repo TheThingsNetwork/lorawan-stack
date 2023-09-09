@@ -152,16 +152,7 @@
   "FreqMultiplier": 100,
   "ImplementsCFList": true,
   "CFListType": "FREQUENCIES",
-  "ReceiveDelay1": 1000000000,
-  "ReceiveDelay2": 2000000000,
-  "JoinAcceptDelay1": 5000000000,
-  "JoinAcceptDelay2": 6000000000,
-  "MaxFCntGap": 16384,
   "SupportsDynamicADR": true,
-  "ADRAckLimit": "ADR_ACK_LIMIT_64",
-  "ADRAckDelay": "ADR_ACK_DELAY_32",
-  "MinRetransmitTimeout": 1000000000,
-  "MaxRetransmitTimeout": 3000000000,
   "TxOffset": [
     0,
     -2,
@@ -698,5 +689,19 @@
   "BootDwellTime": {
     "Uplinks": true,
     "Downlinks": false
+  },
+  "Relay": {
+    "WORChannels": null
+  },
+  "SharedParameters": {
+    "ReceiveDelay1": 1000000000,
+    "ReceiveDelay2": 2000000000,
+    "JoinAcceptDelay1": 5000000000,
+    "JoinAcceptDelay2": 6000000000,
+    "MaxFCntGap": 16384,
+    "ADRAckLimit": "ADR_ACK_LIMIT_64",
+    "ADRAckDelay": "ADR_ACK_DELAY_32",
+    "MinRetransmitTimeout": 1000000000,
+    "MaxRetransmitTimeout": 3000000000
   }
 }

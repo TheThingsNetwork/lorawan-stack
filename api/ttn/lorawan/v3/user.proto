@@ -265,6 +265,11 @@ message UpdateUserAPIKeyRequest {
   google.protobuf.FieldMask field_mask = 3;
 }
 
+message DeleteUserAPIKeyRequest {
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
+  string key_id = 2;
+}
+
 message Invitation {
   string email = 1 [(validate.rules).string.email = true];
   string token = 2;

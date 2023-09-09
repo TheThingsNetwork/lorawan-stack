@@ -373,6 +373,11 @@ message UpdateGatewayAPIKeyRequest {
   google.protobuf.FieldMask field_mask = 3;
 }
 
+message DeleteGatewayAPIKeyRequest {
+  GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
+  string key_id = 2;
+}
+
 message ListGatewayCollaboratorsRequest {
   GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
@@ -400,6 +405,11 @@ message GetGatewayCollaboratorRequest {
 message SetGatewayCollaboratorRequest {
   GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
   Collaborator collaborator = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteGatewayCollaboratorRequest {
+  GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator_ids = 2 [(validate.rules).message.required = true];
 }
 
 enum GatewayAntennaPlacement {

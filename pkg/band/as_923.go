@@ -87,4 +87,16 @@ var (
 			},
 		}
 	}
+
+	as923RelayParameters = func(offset as923GroupOffset) RelayParameters {
+		return RelayParameters{
+			WORChannels: []RelayWORChannel{
+				{
+					Frequency:     uint64(923600000 + offset),
+					ACKFrequency:  uint64(923800000 + offset),
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+				},
+			},
+		}
+	}
 )

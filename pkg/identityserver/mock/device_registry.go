@@ -30,6 +30,10 @@ type mockISEndDeviceRegistry struct {
 	endDevices sync.Map
 }
 
+func newEndDeviceRegitry() *mockISEndDeviceRegistry {
+	return &mockISEndDeviceRegistry{}
+}
+
 func (m *mockISEndDeviceRegistry) Add(ctx context.Context, dev *ttnpb.EndDevice) {
 	m.endDevices.Store(unique.ID(ctx, dev.Ids), dev)
 }
@@ -68,6 +72,10 @@ func (m *mockISEndDeviceRegistry) Update(
 type isEndDeviceBatchRegistry struct {
 	ttnpb.UnimplementedEndDeviceBatchRegistryServer
 	reg *mockISEndDeviceRegistry
+}
+
+func newEndDeviceBatchRegitry(devReg *mockISEndDeviceRegistry) *isEndDeviceBatchRegistry {
+	return &isEndDeviceBatchRegistry{reg: devReg}
 }
 
 // Get implements ttnpb.EndDeviceBatchRegistryServer.

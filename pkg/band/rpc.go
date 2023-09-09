@@ -147,6 +147,7 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 			Frequency:     b.DefaultRx2Parameters.Frequency,
 		},
 		BootDwellTime: &ttnpb.BandDescription_DwellTime{},
+		Relay:         &ttnpb.BandDescription_RelayParameters{},
 	}
 
 	for _, channel := range b.UplinkChannels {
@@ -192,6 +193,16 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 		bandDescription.BootDwellTime.Downlinks = &wrapperspb.BoolValue{
 			Value: *b.BootDwellTime.Downlinks,
 		}
+	}
+
+	for _, ch := range b.Relay.WORChannels {
+		bandDescription.Relay.WorChannels = append(
+			bandDescription.Relay.WorChannels, &ttnpb.BandDescription_RelayParameters_RelayWORChannel{
+				Frequency:     ch.Frequency,
+				AckFrequency:  ch.ACKFrequency,
+				DataRateIndex: ch.DataRateIndex,
+			},
+		)
 	}
 
 	return bandDescription

@@ -73,11 +73,12 @@ export default tts => {
   const deleteCollaboratorLogic = createRequestLogic({
     type: collaborators.DELETE_COLLABORATOR,
     process: async ({ action }) => {
-      const { parentType, parentId } = action.payload
-
-      const result = await tts.Clients.Collaborators.update(parentType, parentId)
-
-      return result
+      const { parentType, parentId, collaboratorId, isUser } = action.payload
+      return await tts[entitySdkServiceMap[parentType]].Collaborators.remove(
+        isUser,
+        parentId,
+        collaboratorId,
+      )
     },
   })
 

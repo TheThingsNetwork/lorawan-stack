@@ -143,7 +143,7 @@ var (
 	errFieldHasMax        = errors.DefineInvalidArgument("field_with_max", "`{field}` should be lower or equal to `{max}`", valueKey)
 	errFieldBound         = errors.DefineInvalidArgument("field_bound", "`{field}` should be between `{min}` and `{max}`", valueKey)
 	errMissingIdentifiers = errors.DefineInvalidArgument("missing_identifiers", "missing identifiers")
-	errParse              = errors.DefineInvalidArgument("parse", "could not parse `{value}` into `{field}`", valueKey)
+	errParse              = errors.DefineInvalidArgument("parse", "parse `{value}` into `{field}`", valueKey)
 
 	errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{field}`")
 )

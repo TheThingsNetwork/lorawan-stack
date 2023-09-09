@@ -463,7 +463,7 @@ var (
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
 	errDataRateRxWindow = errors.DefineInvalidArgument("data_rate_rx_window", "invalid data rate in Rx window `{window}`")
 	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate `{data_rate}`")
-	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
+	errTxSchedule       = errors.DefineAborted("tx_schedule", "schedule")
 )
 
 // getDownlinkPath returns the downlink path.

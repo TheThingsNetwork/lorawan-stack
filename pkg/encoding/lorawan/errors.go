@@ -19,8 +19,8 @@ import (
 )
 
 var (
-	errDecode                       = errors.Define("decode", "could not decode `{lorawan_field}`")
-	errEncode                       = errors.Define("encode", "could not encode `{lorawan_field}`")
+	errDecode                       = errors.Define("decode", "decode `{lorawan_field}`")
+	errEncode                       = errors.Define("encode", "encode `{lorawan_field}`")
 	errEncodedFieldLengthBound      = errors.DefineInvalidArgument("encoded_field_length_bound", "`{lorawan_field}` encoded length `{value}` should between `{min}` and `{max}`", valueKey)
 	errEncodedFieldLengthEqual      = errors.DefineInvalidArgument("encoded_field_length_equal", "`{lorawan_field}` encoded length `{value}` should be `{expected}`", valueKey)
 	errEncodedFieldLengthTwoChoices = errors.DefineInvalidArgument("encoded_field_length_multiple_choices", "`{lorawan_field}` encoded length `{value}` should be equal to `{expected_1}` or `{expected_2}`", valueKey)

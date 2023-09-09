@@ -35,6 +35,14 @@ type mockISApplicationRegistry struct {
 	mu sync.Mutex
 }
 
+func newApplicationRegistry() *mockISApplicationRegistry {
+	return &mockISApplicationRegistry{
+		applications:      make(map[string]*ttnpb.Application),
+		applicationAuths:  make(map[string][]string),
+		applicationRights: make(map[string]authKeyToRights),
+	}
+}
+
 func (is *mockISApplicationRegistry) Add(
 	ctx context.Context,
 	ids *ttnpb.ApplicationIdentifiers,

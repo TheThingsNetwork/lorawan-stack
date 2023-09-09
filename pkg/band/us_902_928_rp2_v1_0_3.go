@@ -63,16 +63,6 @@ var US_902_928_RP2_V1_0_3 = Band{
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 	StrictCodingRate:    true,
 
-	ReceiveDelay1:        defaultReceiveDelay1,
-	ReceiveDelay2:        defaultReceiveDelay2,
-	JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-	JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-	MaxFCntGap:           defaultMaxFCntGap,
-	ADRAckLimit:          defaultADRAckLimit,
-	ADRAckDelay:          defaultADRAckDelay,
-	MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-	MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 	DefaultMaxEIRP: 30,
 	TxOffset: []float32{
 		0,
@@ -123,4 +113,6 @@ var US_902_928_RP2_V1_0_3 = Band{
 		Uplinks:   boolPtr(true),
 		Downlinks: boolPtr(false),
 	},
+
+	SharedParameters: universalSharedParameters,
 }

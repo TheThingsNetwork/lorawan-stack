@@ -238,7 +238,6 @@ const startGatewayStatisticsLogic = createLogic({
 const updateGatewayStatisticsLogic = createRequestLogic({
   type: gateways.UPDATE_GTW_STATS,
   throttle: 1000,
-  latest: true,
   process: async ({ action }) => {
     const { id } = action.payload
 

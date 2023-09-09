@@ -29,7 +29,15 @@ afterEach(function () {
   // Enable fail-early, if set.:
   if (this.currentTest.state === 'failed' && Cypress.env('FAIL_FAST')) {
     cy.log('Skipping rest of run due to test failure (fail fast)')
-    const file = this.currentTest.invocationDetails.relativeFile
+    const file = this.currentTest?.invocationDetails?.relativeFile
+    // Sometimes `invocationDetails` is not set, see:
+    // https://github.com/cypress-io/cypress/issues/3090#issuecomment-1068059581
+    // In that case, we should just skip the fail fast logic and run the
+    // remaining tests as usual.
+    if (!file) {
+      cy.log('Skipping fail fast logic due to missing `invocationDetails`')
+      return
+    }
     // The file will be relative to the `./config` directory, so we need to
     // remove the `../` prefix.
     const relativeFile = file.replace(/^\.\.\//, '')

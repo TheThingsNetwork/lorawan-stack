@@ -60,7 +60,7 @@ func (s *Session) authCookie() *cookie.Cookie {
 	}
 }
 
-var errAuthCookie = errors.DefineUnauthenticated("auth_cookie", "could not get auth cookie")
+var errAuthCookie = errors.DefineUnauthenticated("auth_cookie", "get auth cookie")
 
 func (s *Session) getAuthCookie(w http.ResponseWriter, r *http.Request) (cookie auth.CookieShape, err error) {
 	ok, err := s.authCookie().Get(w, r, &cookie)

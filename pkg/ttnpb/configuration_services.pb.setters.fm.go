@@ -470,6 +470,31 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 					dst.BootDwellTime = nil
 				}
 			}
+		case "relay":
+			if len(subs) > 0 {
+				var newDst, newSrc *BandDescription_RelayParameters
+				if (src == nil || src.Relay == nil) && dst.Relay == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Relay
+				}
+				if dst.Relay != nil {
+					newDst = dst.Relay
+				} else {
+					newDst = &BandDescription_RelayParameters{}
+					dst.Relay = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Relay = src.Relay
+				} else {
+					dst.Relay = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -743,6 +768,66 @@ func (dst *BandDescription_DwellTime) SetFields(src *BandDescription_DwellTime, 
 				dst.Downlinks = src.Downlinks
 			} else {
 				dst.Downlinks = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BandDescription_RelayParameters) SetFields(src *BandDescription_RelayParameters, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "wor_channels":
+			if len(subs) > 0 {
+				return fmt.Errorf("'wor_channels' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WorChannels = src.WorChannels
+			} else {
+				dst.WorChannels = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BandDescription_RelayParameters_RelayWORChannel) SetFields(src *BandDescription_RelayParameters_RelayWORChannel, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Frequency = src.Frequency
+			} else {
+				var zero uint64
+				dst.Frequency = zero
+			}
+		case "ack_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ack_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AckFrequency = src.AckFrequency
+			} else {
+				var zero uint64
+				dst.AckFrequency = zero
+			}
+		case "data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndex = src.DataRateIndex
+			} else {
+				dst.DataRateIndex = 0
 			}
 
 		default:

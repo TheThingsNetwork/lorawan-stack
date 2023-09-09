@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	errListenEndpoint = errors.Define("listen_endpoint", "could not listen on `{endpoint}` address")
-	errListener       = errors.Define("listener", "could not create `{protocol}` listener")
+	errListenEndpoint = errors.Define("listen_endpoint", "listen on `{endpoint}` address")
+	errListener       = errors.Define("listener", "create `{protocol}` listener")
 )
 
 // Listener that accepts multiple protocols on the same port

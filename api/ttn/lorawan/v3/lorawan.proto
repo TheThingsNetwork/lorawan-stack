@@ -176,6 +176,7 @@ enum PHYVersion {
   RP002_V1_0_1 = 9;
   RP002_V1_0_2 = 10;
   RP002_V1_0_3 = 11;
+  RP002_V1_0_4 = 12;
 }
 
 enum DataRateIndex {
