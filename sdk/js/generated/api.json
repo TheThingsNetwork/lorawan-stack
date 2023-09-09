@@ -494,6 +494,102 @@
           ]
         },
         {
+          "name": "DeleteApplicationAPIKeyRequest",
+          "longName": "DeleteApplicationAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.DeleteApplicationAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DeleteApplicationCollaboratorRequest",
+          "longName": "DeleteApplicationCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.DeleteApplicationCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetApplicationAPIKeyRequest",
           "longName": "GetApplicationAPIKeyRequest",
           "fullName": "ttn.lorawan.v3.GetApplicationAPIKeyRequest",
@@ -1251,6 +1347,28 @@
               }
             },
             {
+              "name": "DeleteAPIKey",
+              "description": "Delete a single API key of this application.",
+              "requestType": "DeleteApplicationAPIKeyRequest",
+              "requestLongType": "DeleteApplicationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteApplicationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/applications/{application_ids.application_id}/api-keys/{key_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "GetCollaborator",
               "description": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
               "requestType": "GetApplicationCollaboratorRequest",
@@ -1320,6 +1438,36 @@
                     {
                       "method": "GET",
                       "pattern": "/applications/{application_ids.application_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteCollaborator",
+              "description": "DeleteCollaborator removes a collaborator from an application.",
+              "requestType": "DeleteApplicationCollaboratorRequest",
+              "requestLongType": "DeleteApplicationCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteApplicationCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "",
+                      "pattern": ""
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/applications/{application_ids.application_id}/collaborator/user/{collaborator_ids.user_ids.user_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/applications/{application_ids.application_id}/collaborator/organization/{collaborator_ids.organization_ids.organization_id}"
                     }
                   ]
                 }
@@ -8053,6 +8201,58 @@
           ]
         },
         {
+          "name": "DeleteClientCollaboratorRequest",
+          "longName": "DeleteClientCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.DeleteClientCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "client_ids",
+              "description": "",
+              "label": "",
+              "type": "ClientIdentifiers",
+              "longType": "ClientIdentifiers",
+              "fullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetClientCollaboratorRequest",
           "longName": "GetClientCollaboratorRequest",
           "fullName": "ttn.lorawan.v3.GetClientCollaboratorRequest",
@@ -8555,6 +8755,36 @@
                     {
                       "method": "GET",
                       "pattern": "/clients/{client_ids.client_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteCollaborator",
+              "description": "DeleteCollaborator removes a collaborator from a client.",
+              "requestType": "DeleteClientCollaboratorRequest",
+              "requestLongType": "DeleteClientCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteClientCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "",
+                      "pattern": ""
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/clients/{client_ids.client_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/clients/{client_ids.client_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}"
                     }
                   ]
                 }
@@ -9195,6 +9425,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "relay",
+              "description": "",
+              "label": "",
+              "type": "RelayParameters",
+              "longType": "BandDescription.RelayParameters",
+              "fullType": "ttn.lorawan.v3.BandDescription.RelayParameters",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -9383,6 +9625,78 @@
               "type": "BoolValue",
               "longType": "google.protobuf.BoolValue",
               "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayParameters",
+          "longName": "BandDescription.RelayParameters",
+          "fullName": "ttn.lorawan.v3.BandDescription.RelayParameters",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "wor_channels",
+              "description": "",
+              "label": "repeated",
+              "type": "RelayWORChannel",
+              "longType": "BandDescription.RelayParameters.RelayWORChannel",
+              "fullType": "ttn.lorawan.v3.BandDescription.RelayParameters.RelayWORChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayWORChannel",
+          "longName": "BandDescription.RelayParameters.RelayWORChannel",
+          "fullName": "ttn.lorawan.v3.BandDescription.RelayParameters.RelayWORChannel",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "ack_frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_index",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -20055,6 +20369,102 @@
           ]
         },
         {
+          "name": "DeleteGatewayAPIKeyRequest",
+          "longName": "DeleteGatewayAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.DeleteGatewayAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DeleteGatewayCollaboratorRequest",
+          "longName": "DeleteGatewayCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.DeleteGatewayCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Gateway",
           "longName": "Gateway",
           "fullName": "ttn.lorawan.v3.Gateway",
@@ -22794,6 +23204,28 @@
               }
             },
             {
+              "name": "DeleteAPIKey",
+              "description": "Delete a single API key of this gateway.",
+              "requestType": "DeleteGatewayAPIKeyRequest",
+              "requestLongType": "DeleteGatewayAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteGatewayAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "GetCollaborator",
               "description": "Get the rights of a collaborator (member) of the gateway.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
               "requestType": "GetGatewayCollaboratorRequest",
@@ -22863,6 +23295,36 @@
                     {
                       "method": "GET",
                       "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteCollaborator",
+              "description": "DeleteCollaborator removes a collaborator from a gateway.",
+              "requestType": "DeleteGatewayCollaboratorRequest",
+              "requestLongType": "DeleteGatewayCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteGatewayCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "",
+                      "pattern": ""
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}"
                     }
                   ]
                 }
@@ -28274,6 +28736,11 @@
             {
               "name": "RP002_V1_0_3",
               "number": "11",
+              "description": ""
+            },
+            {
+              "name": "RP002_V1_0_4",
+              "number": "12",
               "description": ""
             }
           ]
@@ -37553,6 +38020,102 @@
           ]
         },
         {
+          "name": "DeleteOrganizationAPIKeyRequest",
+          "longName": "DeleteOrganizationAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.DeleteOrganizationAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DeleteOrganizationCollaboratorRequest",
+          "longName": "DeleteOrganizationCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetOrganizationAPIKeyRequest",
           "longName": "GetOrganizationAPIKeyRequest",
           "fullName": "ttn.lorawan.v3.GetOrganizationAPIKeyRequest",
@@ -37628,7 +38191,7 @@
             },
             {
               "name": "collaborator",
-              "description": "NOTE: It is currently not possible to have organizations collaborating on\nother organizations.",
+              "description": "NOTE: It is currently not possible to have organizations collaborating on other organizations.",
               "label": "",
               "type": "OrganizationOrUserIdentifiers",
               "longType": "OrganizationOrUserIdentifiers",
@@ -38523,6 +39086,28 @@
               }
             },
             {
+              "name": "DeleteAPIKey",
+              "description": "Delete a single API key of this organization.",
+              "requestType": "DeleteOrganizationAPIKeyRequest",
+              "requestLongType": "DeleteOrganizationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteOrganizationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{key_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "GetCollaborator",
               "description": "Get the rights of a collaborator (member) of the organization.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
               "requestType": "GetOrganizationCollaboratorRequest",
@@ -38588,6 +39173,28 @@
                     {
                       "method": "GET",
                       "pattern": "/organizations/{organization_ids.organization_id}/collaborators"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteCollaborator",
+              "description": "DeleteCollaborator removes a collaborator from an organization.",
+              "requestType": "DeleteOrganizationCollaboratorRequest",
+              "requestLongType": "DeleteOrganizationCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteOrganizationCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"
                     }
                   ]
                 }
@@ -45082,6 +45689,50 @@
           ]
         },
         {
+          "name": "DeleteUserAPIKeyRequest",
+          "longName": "DeleteUserAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.DeleteUserAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetUserAPIKeyRequest",
           "longName": "GetUserAPIKeyRequest",
           "fullName": "ttn.lorawan.v3.GetUserAPIKeyRequest",
@@ -46650,6 +47301,28 @@
                       "method": "PUT",
                       "pattern": "/users/{user_ids.user_id}/api-keys/{api_key.id}",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteAPIKey",
+              "description": "Delete a single API key of this user.",
+              "requestType": "DeleteUserAPIKeyRequest",
+              "requestLongType": "DeleteUserAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteUserAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_ids.user_id}/api-keys/{key_id}"
                     }
                   ]
                 }

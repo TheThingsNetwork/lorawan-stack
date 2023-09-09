@@ -30,7 +30,7 @@ import (
 var (
 	errParseQRCode = errors.Define("parse_qr_code", "parse QR code failed")
 	errQRCodeData  = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
-	errNoJoinEUI   = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
+	errNoJoinEUI   = errors.DefineInvalidArgument("no_join_eui", "extract JoinEUI from request")
 	errNoEUIs      = errors.DefineFailedPrecondition(
 		"no_euis",
 		"DevEUI/JoinEUI not set for device",

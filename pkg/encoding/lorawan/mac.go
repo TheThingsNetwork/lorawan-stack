@@ -907,7 +907,7 @@ var DefaultMACCommands = MACCommandSpec{
 }
 
 var (
-	errDecodingMACCommand = errors.DefineInvalidArgument("decoding_mac_command", "could not decode MAC command with CID `{cid}`")
+	errDecodingMACCommand = errors.DefineInvalidArgument("decoding_mac_command", "decode MAC command with CID `{cid}`")
 	errNoUnmarshaler      = errors.DefineNotFound("no_unmarshaler", "no unmarshaler available for MAC command with CID `{cid}`")
 )
 
@@ -972,7 +972,7 @@ func (spec MACCommandSpec) ReadDownlink(phy band.Band, r io.Reader, cmd *ttnpb.M
 }
 
 var (
-	errEncodingMACCommand = errors.DefineInvalidArgument("encoding_mac_command", "could not encode MAC command with CID `{cid}`")
+	errEncodingMACCommand = errors.DefineInvalidArgument("encoding_mac_command", "encode MAC command with CID `{cid}`")
 	errUnknownMACCommand  = errors.DefineInvalidArgument("unknown_mac_command", "unknown MAC command CID `{cid}`")
 	errMACCommandUplink   = errors.DefineInvalidArgument("mac_command_uplink", "invalid uplink MAC command CID `{cid}`")
 	errMACCommandDownlink = errors.DefineInvalidArgument("mac_command_downlink", "invalid downlink MAC command CID `{cid}`")

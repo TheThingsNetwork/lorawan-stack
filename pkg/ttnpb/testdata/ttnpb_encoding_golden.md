@@ -250,6 +250,7 @@ Binary | ttnpb.PHYVersion | RP002_V1_0_0 | [8]
 Binary | ttnpb.PHYVersion | RP002_V1_0_1 | [9]
 Binary | ttnpb.PHYVersion | RP002_V1_0_2 | [10]
 Binary | ttnpb.PHYVersion | RP002_V1_0_3 | [11]
+Binary | ttnpb.PHYVersion | RP002_V1_0_4 | [12]
 Binary | ttnpb.PingSlotPeriod | PING_EVERY_128S | [7]
 Binary | ttnpb.PingSlotPeriod | PING_EVERY_16S | [4]
 Binary | ttnpb.PingSlotPeriod | PING_EVERY_1S | [0]
@@ -618,6 +619,7 @@ JSON | ttnpb.PHYVersion | RP002_V1_0_0 | "RP002_V1_0_0"
 JSON | ttnpb.PHYVersion | RP002_V1_0_1 | "RP002_V1_0_1"
 JSON | ttnpb.PHYVersion | RP002_V1_0_2 | "RP002_V1_0_2"
 JSON | ttnpb.PHYVersion | RP002_V1_0_3 | "RP002_V1_0_3"
+JSON | ttnpb.PHYVersion | RP002_V1_0_4 | "RP002_V1_0_4"
 JSON | ttnpb.PingSlotPeriod | PING_EVERY_128S | "PING_EVERY_128S"
 JSON | ttnpb.PingSlotPeriod | PING_EVERY_16S | "PING_EVERY_16S"
 JSON | ttnpb.PingSlotPeriod | PING_EVERY_1S | "PING_EVERY_1S"
@@ -1059,6 +1061,7 @@ ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_0 | "RP002_V1_0_0"
 ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_1 | "RP002_V1_0_1"
 ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_2 | "RP002_V1_0_2"
 ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_3 | "RP002_V1_0_3"
+ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_4 | "RP002_V1_0_4"
 ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_128S | "PING_EVERY_128S"
 ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_16S | "PING_EVERY_16S"
 ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_1S | "PING_EVERY_1S"
@@ -1500,6 +1503,7 @@ Text | ttnpb.PHYVersion | RP002_V1_0_0 | RP002_V1_0_0
 Text | ttnpb.PHYVersion | RP002_V1_0_1 | RP002_V1_0_1
 Text | ttnpb.PHYVersion | RP002_V1_0_2 | RP002_V1_0_2
 Text | ttnpb.PHYVersion | RP002_V1_0_3 | RP002_V1_0_3
+Text | ttnpb.PHYVersion | RP002_V1_0_4 | RP002_V1_0_4
 Text | ttnpb.PingSlotPeriod | PING_EVERY_128S | PING_EVERY_128S
 Text | ttnpb.PingSlotPeriod | PING_EVERY_16S | PING_EVERY_16S
 Text | ttnpb.PingSlotPeriod | PING_EVERY_1S | PING_EVERY_1S

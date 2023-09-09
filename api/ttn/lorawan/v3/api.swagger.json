@@ -668,6 +668,42 @@
         "tags": [
           "ApplicationAccess"
         ]
+      },
+      "delete": {
+        "summary": "Delete a single API key of this application.",
+        "operationId": "ApplicationAccess_DeleteAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
       }
     },
     "/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
@@ -722,6 +758,59 @@
         ]
       }
     },
+    "/applications/{application_ids.application_id}/collaborator/organization/{collaborator_ids.organization_ids.organization_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from an application.",
+        "operationId": "ApplicationAccess_DeleteCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
+      }
+    },
     "/applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
         "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
@@ -763,6 +852,59 @@
           },
           {
             "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
+      }
+    },
+    "/applications/{application_ids.application_id}/collaborator/user/{collaborator_ids.user_ids.user_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from an application.",
+        "operationId": "ApplicationAccess_DeleteCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
             "description": "Secondary identifier, which can only be used in specific requests.",
             "in": "query",
             "required": false,
@@ -6054,6 +6196,59 @@
         ]
       }
     },
+    "/clients/{client_ids.client_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from a client.",
+        "operationId": "ClientAccess_DeleteCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientAccess"
+        ]
+      }
+    },
     "/clients/{client_ids.client_id}/collaborators/search": {
       "get": {
         "summary": "Search for accounts that match the conditions specified in the request.",
@@ -6121,6 +6316,59 @@
         ],
         "tags": [
           "EntityRegistrySearch"
+        ]
+      }
+    },
+    "/clients/{client_ids.client_id}/collaborators/user/{collaborator_ids.user_ids.user_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from a client.",
+        "operationId": "ClientAccess_DeleteCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientAccess"
         ]
       }
     },
@@ -6302,7 +6550,8 @@
               "RP002_V1_0_0",
               "RP002_V1_0_1",
               "RP002_V1_0_2",
-              "RP002_V1_0_3"
+              "RP002_V1_0_3",
+              "RP002_V1_0_4"
             ],
             "default": "PHY_UNKNOWN"
           }
@@ -6362,7 +6611,8 @@
               "RP002_V1_0_0",
               "RP002_V1_0_1",
               "RP002_V1_0_2",
-              "RP002_V1_0_3"
+              "RP002_V1_0_3",
+              "RP002_V1_0_4"
             ],
             "default": "PHY_UNKNOWN"
           }
@@ -6422,7 +6672,8 @@
               "RP002_V1_0_0",
               "RP002_V1_0_1",
               "RP002_V1_0_2",
-              "RP002_V1_0_3"
+              "RP002_V1_0_3",
+              "RP002_V1_0_4"
             ]
           }
         ],
@@ -9079,6 +9330,50 @@
         "tags": [
           "GatewayAccess"
         ]
+      },
+      "delete": {
+        "summary": "Delete a single API key of this gateway.",
+        "operationId": "GatewayAccess_DeleteAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
       }
     },
     "/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
@@ -9317,6 +9612,67 @@
         ]
       }
     },
+    "/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from a gateway.",
+        "operationId": "GatewayAccess_DeleteCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      }
+    },
     "/gateways/{gateway_ids.gateway_id}/collaborators/search": {
       "get": {
         "summary": "Search for accounts that match the conditions specified in the request.",
@@ -9384,6 +9740,67 @@
         ],
         "tags": [
           "EntityRegistrySearch"
+        ]
+      }
+    },
+    "/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from a gateway.",
+        "operationId": "GatewayAccess_DeleteCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "collaborator_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
         ]
       }
     },
@@ -12057,7 +12474,8 @@
               "RP002_V1_0_0",
               "RP002_V1_0_1",
               "RP002_V1_0_2",
-              "RP002_V1_0_3"
+              "RP002_V1_0_3",
+              "RP002_V1_0_4"
             ]
           }
         ],
@@ -13008,6 +13426,43 @@
         "tags": [
           "OrganizationAccess"
         ]
+      },
+      "delete": {
+        "summary": "Delete a single API key of this organization.",
+        "operationId": "OrganizationAccess_DeleteAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrganizationAccess"
+        ]
       }
     },
     "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}": {
@@ -13225,6 +13680,53 @@
         ],
         "tags": [
           "EntityRegistrySearch"
+        ]
+      }
+    },
+    "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}": {
+      "delete": {
+        "summary": "DeleteCollaborator removes a collaborator from an organization.",
+        "operationId": "OrganizationAccess_DeleteCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrganizationAccess"
         ]
       }
     },
@@ -16408,6 +16910,50 @@
         "tags": [
           "UserAccess"
         ]
+      },
+      "delete": {
+        "summary": "Delete a single API key of this user.",
+        "operationId": "UserAccess_DeleteAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserAccess"
+        ]
       }
     },
     "/users/{user_ids.user_id}/authorizations": {
@@ -17370,6 +17916,18 @@
         },
         "downlinks": {
           "type": "boolean"
+        }
+      }
+    },
+    "BandDescriptionRelayParameters": {
+      "type": "object",
+      "properties": {
+        "wor_channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/RelayParametersRelayWORChannel"
+          }
         }
       }
     },
@@ -18547,6 +19105,22 @@
       ],
       "default": "ENABLED",
       "description": " - ENABLED: No restrictions are in place.\n - WARNING: Warnings are being emitted that the provider will be deprecated in the future.\n - DISABLED: New integrations cannot be set up, and old ones do not start."
+    },
+    "RelayParametersRelayWORChannel": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "ack_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        }
+      }
     },
     "TxAcknowledgmentResult": {
       "type": "string",
@@ -20485,6 +21059,9 @@
         },
         "boot_dwell_time": {
           "$ref": "#/definitions/BandDescriptionDwellTime"
+        },
+        "relay": {
+          "$ref": "#/definitions/BandDescriptionRelayParameters"
         }
       }
     },
@@ -24042,7 +24619,8 @@
         "RP002_V1_0_0",
         "RP002_V1_0_1",
         "RP002_V1_0_2",
-        "RP002_V1_0_3"
+        "RP002_V1_0_3",
+        "RP002_V1_0_4"
       ],
       "default": "PHY_UNKNOWN"
     },

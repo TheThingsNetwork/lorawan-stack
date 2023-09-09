@@ -27,6 +27,7 @@ class Clients {
         get: 'client_ids.client_id',
         list: 'client_ids.client_id',
         set: 'client_ids.client_id',
+        delete: 'client_ids.client_id',
       },
     })
 

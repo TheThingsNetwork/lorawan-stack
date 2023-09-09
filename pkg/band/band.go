@@ -16,7 +16,6 @@ package band
 
 import (
 	"math"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -42,37 +41,20 @@ type Band struct {
 	SubBands []SubBandParameters
 
 	DataRates map[ttnpb.DataRateIndex]DataRate
-	// StricCodingRate depicts if the coding rate has been defined in the specifications for this band.
+	// StrictCodingRate depicts if the coding rate has been defined in the specifications for this band.
 	StrictCodingRate bool
 
 	FreqMultiplier   uint64
 	ImplementsCFList bool
 	CFListType       ttnpb.CFListType
 
-	// ReceiveDelay1 is the default Rx1 window timing in seconds.
-	ReceiveDelay1 time.Duration
-	// ReceiveDelay2 is the default Rx2 window timing in seconds (ReceiveDelay1 + 1s).
-	ReceiveDelay2 time.Duration
-
-	// ReceiveDelay1 is the default join-accept window timing in seconds.
-	JoinAcceptDelay1 time.Duration
-	// ReceiveDelay2 is the join-accept window timing in seconds.
-	JoinAcceptDelay2 time.Duration
-	// MaxFCntGap
-	MaxFCntGap uint
-
 	// SupportsDynamicADR determines whether the Adaptive Data Rate algorithm is supported.
 	SupportsDynamicADR bool
-	// ADRAckLimit
-	ADRAckLimit ttnpb.ADRAckLimitExponent
-	// ADRAckDelay
-	ADRAckDelay          ttnpb.ADRAckDelayExponent
-	MinRetransmitTimeout time.Duration
-	MaxRetransmitTimeout time.Duration
 
 	// TxOffset in dB: Tx power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset.
 	TxOffset []float32
-	// MaxADRDataRateIndex represents the maximum non-RFU DataRateIndex suitable for ADR, which can be used according to the band's spec.
+	// MaxADRDataRateIndex represents the maximum non-RFU DataRateIndex suitable for ADR, which can be used according
+	// to the band's spec.
 	MaxADRDataRateIndex ttnpb.DataRateIndex
 
 	TxParamSetupReqSupport bool
@@ -91,7 +73,7 @@ type Band struct {
 	// then channel with index i should be enabled, otherwise it should be disabled.
 	// Meaning of currentChs is as follows: for i in range 0..len(currentChs) if currentChs[i] == true,
 	// then channel with index i is enabled, otherwise it is disabled.
-	// In case desiredChs equals currentChs, GenerateChMasks returns a singleton, which repesents a noop.
+	// In case desiredChs equals currentChs, GenerateChMasks returns a singleton, which represents a noop.
 	GenerateChMasks func(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error)
 	// ParseChMask computes the channels that have to be masked given ChMask mask and ChMaskCntl cntl.
 	ParseChMask func(mask [16]bool, cntl uint8) (map[uint8]bool, error)
@@ -101,12 +83,11 @@ type Band struct {
 
 	// BootDwellTime contains the dwell time values expected for a device on boot.
 	BootDwellTime DwellTime
-}
 
-// DwellTime contains the band dwell time settings.
-type DwellTime struct {
-	Uplinks   *bool
-	Downlinks *bool
+	// Relay contains the relay settings.
+	Relay RelayParameters
+
+	SharedParameters
 }
 
 // MaxTxPowerIndex returns the maximum TxPower index for the band.

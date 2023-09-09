@@ -49,16 +49,6 @@ var IN_865_867_RP1_V1_0_2_Rev_B = Band{
 	},
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 
-	ReceiveDelay1:        defaultReceiveDelay1,
-	ReceiveDelay2:        defaultReceiveDelay2,
-	JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-	JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-	MaxFCntGap:           defaultMaxFCntGap,
-	ADRAckLimit:          defaultADRAckLimit,
-	ADRAckDelay:          defaultADRAckDelay,
-	MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-	MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 	DefaultMaxEIRP: 30,
 	TxOffset: []float32{
 		0,
@@ -106,4 +96,6 @@ var IN_865_867_RP1_V1_0_2_Rev_B = Band{
 		Frequencies:   in865867BeaconFrequencies,
 	},
 	PingSlotFrequencies: in865867BeaconFrequencies,
+
+	SharedParameters: universalSharedParameters,
 }

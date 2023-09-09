@@ -82,6 +82,8 @@ var BandDescriptionFieldPathsNested = []string{
 	"ping_slot_frequencies",
 	"receive_delay_1",
 	"receive_delay_2",
+	"relay",
+	"relay.wor_channels",
 	"sub_bands",
 	"supports_dynamic_adr",
 	"tx_offset",
@@ -112,6 +114,7 @@ var BandDescriptionFieldPathsTopLevel = []string{
 	"ping_slot_frequencies",
 	"receive_delay_1",
 	"receive_delay_2",
+	"relay",
 	"sub_bands",
 	"supports_dynamic_adr",
 	"tx_offset",
@@ -204,6 +207,24 @@ var BandDescription_DwellTimeFieldPathsNested = []string{
 var BandDescription_DwellTimeFieldPathsTopLevel = []string{
 	"downlinks",
 	"uplinks",
+}
+var BandDescription_RelayParametersFieldPathsNested = []string{
+	"wor_channels",
+}
+
+var BandDescription_RelayParametersFieldPathsTopLevel = []string{
+	"wor_channels",
+}
+var BandDescription_RelayParameters_RelayWORChannelFieldPathsNested = []string{
+	"ack_frequency",
+	"data_rate_index",
+	"frequency",
+}
+
+var BandDescription_RelayParameters_RelayWORChannelFieldPathsTopLevel = []string{
+	"ack_frequency",
+	"data_rate_index",
+	"frequency",
 }
 var ListBandsResponse_VersionedBandDescriptionFieldPathsNested = []string{
 	"band",

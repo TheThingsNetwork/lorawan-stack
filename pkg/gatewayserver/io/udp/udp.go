@@ -357,7 +357,7 @@ func (s *srv) handleUp(ctx context.Context, st *state, packet encoding.Packet) e
 }
 
 var (
-	errClaimDownlinkFailed = errors.DefineUnavailable("downlink_claim", "failed to claim downlink")
+	errClaimDownlinkFailed = errors.DefineUnavailable("downlink_claim", "claim downlink")
 	errDownlinkPathExpired = errors.DefineAborted("downlink_path_expired", "downlink path expired")
 )
 

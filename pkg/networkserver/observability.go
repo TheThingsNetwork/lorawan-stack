@@ -67,7 +67,7 @@ var (
 		events.WithDataType(&ttnpb.ScheduleDownlinkResponse{}),
 	)
 	evtScheduleDataDownlinkFail = events.Define(
-		"ns.down.data.schedule.fail", "failed to schedule data downlink for transmission on Gateway Server",
+		"ns.down.data.schedule.fail", "schedule data downlink for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 		events.WithPropagateToParent(),
@@ -138,7 +138,7 @@ var (
 		events.WithDataType(&ttnpb.ScheduleDownlinkResponse{}),
 	)
 	evtScheduleJoinAcceptFail = events.Define(
-		"ns.down.join.schedule.fail", "failed to schedule join-accept for transmission on Gateway Server",
+		"ns.down.join.schedule.fail", "schedule join-accept for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 		events.WithPropagateToParent(),
@@ -149,13 +149,13 @@ var (
 		events.WithDataType(&ttnpb.DownlinkMessage{}),
 	)
 	evtTransmissionFail = events.Define(
-		"ns.down.transmission.fail", "failed to transmit downlink",
+		"ns.down.transmission.fail", "transmit downlink",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 		events.WithPropagateToParent(),
 	)
 	evtRXParametersFail = events.Define(
-		"ns.down.rx.parameters.fail", "failed to compute RX parameters",
+		"ns.down.rx.parameters.fail", "compute RX parameters",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 		events.WithPropagateToParent(),

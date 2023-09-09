@@ -29,6 +29,7 @@ class Organizations {
         list: 'organization_ids.organization_id',
         create: 'organization_ids.organization_id',
         update: 'organization_ids.organization_id',
+        delete: 'organization_ids.organization_id',
       },
     })
     this.Collaborators = new Collaborators(api.OrganizationAccess, {
@@ -36,6 +37,7 @@ class Organizations {
         get: 'organization_ids.organization_id',
         list: 'organization_ids.organization_id',
         set: 'organization_ids.organization_id',
+        delete: 'organization_ids.organization_id',
       },
     })
     autoBind(this)

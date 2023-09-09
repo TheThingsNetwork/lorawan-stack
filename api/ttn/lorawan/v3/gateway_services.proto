@@ -131,6 +131,11 @@ service GatewayAccess {
     };
   }
 
+  // Delete a single API key of this gateway.
+  rpc DeleteAPIKey(DeleteGatewayAPIKeyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}"};
+  }
+
   // Get the rights of a collaborator (member) of the gateway.
   // Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
   rpc GetCollaborator(GetGatewayCollaboratorRequest) returns (GetCollaboratorResponse) {
@@ -153,6 +158,14 @@ service GatewayAccess {
   // List the collaborators on this gateway.
   rpc ListCollaborators(ListGatewayCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {get: "/gateways/{gateway_ids.gateway_id}/collaborators"};
+  }
+
+  // DeleteCollaborator removes a collaborator from a gateway.
+  rpc DeleteCollaborator(DeleteGatewayCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      additional_bindings {delete: "/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"}
+      additional_bindings {delete: "/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}"}
+    };
   }
 }
 

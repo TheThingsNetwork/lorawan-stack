@@ -207,6 +207,16 @@ var UpdateOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"organization_ids",
 }
+var DeleteOrganizationAPIKeyRequestFieldPathsNested = []string{
+	"key_id",
+	"organization_ids",
+	"organization_ids.organization_id",
+}
+
+var DeleteOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
+	"key_id",
+	"organization_ids",
+}
 var ListOrganizationCollaboratorsRequestFieldPathsNested = []string{
 	"limit",
 	"order",
@@ -253,5 +263,21 @@ var SetOrganizationCollaboratorRequestFieldPathsNested = []string{
 
 var SetOrganizationCollaboratorRequestFieldPathsTopLevel = []string{
 	"collaborator",
+	"organization_ids",
+}
+var DeleteOrganizationCollaboratorRequestFieldPathsNested = []string{
+	"collaborator_ids",
+	"collaborator_ids.ids",
+	"collaborator_ids.ids.organization_ids",
+	"collaborator_ids.ids.organization_ids.organization_id",
+	"collaborator_ids.ids.user_ids",
+	"collaborator_ids.ids.user_ids.email",
+	"collaborator_ids.ids.user_ids.user_id",
+	"organization_ids",
+	"organization_ids.organization_id",
+}
+
+var DeleteOrganizationCollaboratorRequestFieldPathsTopLevel = []string{
+	"collaborator_ids",
 	"organization_ids",
 }

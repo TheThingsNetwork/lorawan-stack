@@ -65,7 +65,9 @@ export default (parts, base = {}, minimum = [['ids'], ['created_at'], ['updated_
             }
 
             if (this.isLeaf) {
-              // TODO: Remove this once https://github.com/TheThingsNetwork/lorawan-stack/issues/4766 is resolved.
+              // TODO: Instead of ignoring empty time values, the merge order should be improved
+              // as described in the following issue comment:
+              // https://github.com/TheThingsNetwork/lorawan-stack/issues/4766#issuecomment-952691708
               if (this.key.endsWith('_at') && e === '0001-01-01T00:00:00Z') {
                 return
               }

@@ -26,7 +26,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func TestOrganizationAPIKeys(t *testing.T) {
+func TestOrganizationAPIKeys(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
 	admin := p.NewUser()
@@ -184,6 +184,14 @@ func TestOrganizationAPIKeys(t *testing.T) {
 			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
 				a.So(updated, should.BeNil)
 			}
+
+			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteOrganizationAPIKeyRequest{
+				OrganizationIds: org1.GetIds(),
+				KeyId:           created.GetId(),
+			}, opts...)
+			if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				t.FailNow()
+			}
 		}
 
 		// API Key CRUD with different valid credentials.
@@ -229,30 +237,57 @@ func TestOrganizationAPIKeys(t *testing.T) {
 				a.So(updated.Name, should.Equal, "api-key-name-updated")
 			}
 
-			deleted, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
+			// TODO: Remove UpdateAPIKey test case (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
+			t.Run("Delete via update method", func(*testing.T) { // nolint:paralleltest
+				_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
+					OrganizationIds: org1.GetIds(),
+					ApiKey:          &ttnpb.APIKey{Id: created.GetId()},
+				}, opts...)
+				a.So(err, should.BeNil)
+
+				got, err = reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
+					OrganizationIds: org1.GetIds(),
+					KeyId:           created.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
+
+			// Recreates api-key of the `org1` Organization.
+			created, err = reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
 				OrganizationIds: org1.GetIds(),
-				ApiKey: &ttnpb.APIKey{
-					Id: created.GetId(),
-				},
-				FieldMask: ttnpb.FieldMask("rights"),
+				Name:            "api-key-name",
+				Rights:          []ttnpb.Right{ttnpb.Right_RIGHT_ORGANIZATION_INFO},
 			}, opts...)
-			if a.So(err, should.BeNil) && a.So(deleted, should.NotBeNil) {
-				a.So(deleted.Rights, should.BeNil)
+			if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+				a.So(created.Name, should.Equal, "api-key-name")
+				a.So(created.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_ORGANIZATION_INFO})
 			}
 
-			got, err = reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
-				OrganizationIds: org1.GetIds(),
-				KeyId:           created.GetId(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsNotFound(err), should.BeTrue)
-			}
-			a.So(got, should.BeNil)
+			t.Run("Delete via delete method", func(*testing.T) { // nolint:paralleltest
+				empty, err := reg.DeleteAPIKey(ctx, &ttnpb.DeleteOrganizationAPIKeyRequest{
+					OrganizationIds: org1.GetIds(),
+					KeyId:           created.GetId(),
+				}, opts...)
+				a.So(err, should.BeNil)
+				a.So(empty, should.Resemble, ttnpb.Empty)
+
+				got, err = reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
+					OrganizationIds: org1.GetIds(),
+					KeyId:           created.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
 		}
 	}, withPrivateTestDatabase(p))
 }
 
-func TestOrganizationCollaborators(t *testing.T) {
+func TestOrganizationCollaborators(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
 	admin := p.NewUser()
@@ -327,10 +362,8 @@ func TestOrganizationCollaborators(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: org1.GetIds(),
 			Collaborator: &ttnpb.Collaborator{
-				Ids: usr2.GetOrganizationOrUserIdentifiers(),
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_ORGANIZATION_INFO,
-				},
+				Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_ORGANIZATION_INFO},
 			},
 		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
@@ -387,10 +420,8 @@ func TestOrganizationCollaborators(t *testing.T) {
 			_, err := reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 				OrganizationIds: org1.GetIds(),
 				Collaborator: &ttnpb.Collaborator{
-					Ids: usr3.GetOrganizationOrUserIdentifiers(),
-					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_ORGANIZATION_INFO,
-					},
+					Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_ORGANIZATION_INFO},
 				},
 			}, opts...)
 			a.So(err, should.BeNil)
@@ -418,30 +449,62 @@ func TestOrganizationCollaborators(t *testing.T) {
 				})
 			}
 
+			// TODO: Remove SetCollaborator test case (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
+			t.Run("Delete via set method", func(*testing.T) { // nolint:paralleltest
+				_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
+					OrganizationIds: org1.GetIds(),
+					Collaborator: &ttnpb.Collaborator{
+						Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+						Rights: []ttnpb.Right{},
+					},
+				}, opts...)
+				a.So(err, should.BeNil)
+
+				// Verifies that it has been deleted.
+				got, err = reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
+					OrganizationIds: org1.GetIds(),
+					Collaborator:    usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
+
+			// Recreates `usr3` collaborator of the `org1` Organization.
 			_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 				OrganizationIds: org1.GetIds(),
 				Collaborator: &ttnpb.Collaborator{
-					Ids: usr3.GetOrganizationOrUserIdentifiers(),
+					Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_ORGANIZATION_INFO},
 				},
 			}, opts...)
 			a.So(err, should.BeNil)
 
-			got, err = reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
-				OrganizationIds: org1.GetIds(),
-				Collaborator:    usr3.GetOrganizationOrUserIdentifiers(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsNotFound(err), should.BeTrue)
-			}
-			a.So(got, should.BeNil)
+			t.Run("Delete via delete method", func(*testing.T) { // nolint:paralleltest
+				empty, err := reg.DeleteCollaborator(ctx, &ttnpb.DeleteOrganizationCollaboratorRequest{
+					OrganizationIds: org1.GetIds(),
+					CollaboratorIds: usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				a.So(err, should.BeNil)
+				a.So(empty, should.Resemble, ttnpb.Empty)
+
+				// Verifies that it has been deleted.
+				got, err = reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
+					OrganizationIds: org1.GetIds(),
+					Collaborator:    usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
 		}
 
 		// Try removing the only collaborator with _ALL rights.
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
+		_, err = reg.DeleteCollaborator(ctx, &ttnpb.DeleteOrganizationCollaboratorRequest{
 			OrganizationIds: org1.GetIds(),
-			Collaborator: &ttnpb.Collaborator{
-				Ids: usr1.GetOrganizationOrUserIdentifiers(),
-			},
+			CollaboratorIds: usr1.GetOrganizationOrUserIdentifiers(),
 		}, usr1Creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsFailedPrecondition(err), should.BeTrue)

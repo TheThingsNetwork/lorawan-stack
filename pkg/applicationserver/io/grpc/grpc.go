@@ -115,7 +115,7 @@ func New(server io.Server, opts ...Option) ttnpb.AppAsServer {
 	return i
 }
 
-var errConnect = errors.Define("connect", "failed to connect application `{application_uid}`")
+var errConnect = errors.Define("connect", "connect application `{application_uid}`")
 
 func (s *impl) Subscribe(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_SubscribeServer) error {
 	ctx := log.NewContextWithField(stream.Context(), "namespace", "applicationserver/io/grpc")

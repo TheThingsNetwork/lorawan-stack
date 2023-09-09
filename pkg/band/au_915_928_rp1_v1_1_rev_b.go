@@ -57,16 +57,6 @@ var AU_915_928_RP1_v1_1_RevB = Band{
 	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 	StrictCodingRate:    true,
 
-	ReceiveDelay1:        defaultReceiveDelay1,
-	ReceiveDelay2:        defaultReceiveDelay2,
-	JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-	JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-	MaxFCntGap:           defaultMaxFCntGap,
-	ADRAckLimit:          defaultADRAckLimit,
-	ADRAckDelay:          defaultADRAckDelay,
-	MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-	MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 	DefaultMaxEIRP: 30,
 	TxOffset: []float32{
 		0,
@@ -119,4 +109,6 @@ var AU_915_928_RP1_v1_1_RevB = Band{
 		Uplinks:   boolPtr(true),
 		Downlinks: boolPtr(false),
 	},
+
+	SharedParameters: universalSharedParameters,
 }

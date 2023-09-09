@@ -65,7 +65,7 @@ var (
 	)
 )
 
-func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
+func (*IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	gtwRights, err := rights.ListGateway(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,9 @@ func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.Gate
 	return gtwRights.Intersect(ttnpb.AllGatewayRights), nil
 }
 
-func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+func (is *IdentityServer) createGatewayAPIKey(
+	ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest,
+) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
 	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
@@ -100,15 +102,19 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 		EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
 		NotificationType: "api_key_created",
 		Data:             ttnpb.MustMarshalAny(key),
-		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
-		Email:            true,
+		Receivers: []ttnpb.NotificationReceiver{
+			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
+		},
+		Email: true,
 	})
 
 	key.Key = token
 	return key, nil
 }
 
-func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
+func (is *IdentityServer) listGatewayAPIKeys(
+	ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest,
+) (keys *ttnpb.APIKeys, err error) {
 	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
@@ -134,7 +140,9 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 	return keys, nil
 }
 
-func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+func (is *IdentityServer) getGatewayAPIKey(
+	ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest,
+) (key *ttnpb.APIKey, err error) {
 	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
@@ -154,7 +162,9 @@ func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGa
 	return key, nil
 }
 
-func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+func (is *IdentityServer) updateGatewayAPIKey(
+	ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest,
+) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
 	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
@@ -177,16 +187,19 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
-			if err := rights.RequireGateway(ctx, req.GetGatewayIds(), newRights.Sub(existingRights).GetRights()...); err != nil {
+			err = rights.RequireGateway(ctx, req.GetGatewayIds(), newRights.Sub(existingRights).GetRights()...)
+			if err != nil {
 				return err
 			}
 			// Require the caller to have all removed rights.
-			if err := rights.RequireGateway(ctx, req.GetGatewayIds(), existingRights.Sub(newRights).GetRights()...); err != nil {
+			err = rights.RequireGateway(ctx, req.GetGatewayIds(), existingRights.Sub(newRights).GetRights()...)
+			if err != nil {
 				return err
 			}
 		}
 
 		if len(req.ApiKey.Rights) == 0 && ttnpb.HasAnyField(req.GetFieldMask().GetPaths(), "rights") {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), req.ApiKey)
 		}
 
@@ -207,21 +220,44 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 		EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
 		NotificationType: "api_key_changed",
 		Data:             ttnpb.MustMarshalAny(key),
-		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
-		Email:            true,
+		Receivers: []ttnpb.NotificationReceiver{
+			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
+		},
+		Email: true,
 	})
 
 	return key, nil
 }
 
-func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+func (is *IdentityServer) deleteGatewayAPIKey(
+	ctx context.Context, req *ttnpb.DeleteGatewayAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	// Require that caller has rights to manage API keys.
+	if err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+		return nil, err
+	}
+
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		return st.DeleteAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), &ttnpb.APIKey{Id: req.KeyId})
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtDeleteGatewayAPIKey.New(ctx, events.WithIdentifiers(req.GetGatewayIds())))
+	return ttnpb.Empty, nil
+}
+
+func (is *IdentityServer) getGatewayCollaborator(
+	ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest,
+) (*ttnpb.GetCollaboratorResponse, error) {
+	err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+	if err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
 		Ids: req.GetCollaborator(),
 	}
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		rights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator(),
@@ -239,13 +275,16 @@ func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb
 	return res, nil
 }
 
-var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition("gateway_needs_collaborator", "every gateway needs at least one collaborator with all rights")
+var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition(
+	"gateway_needs_collaborator", "every gateway needs at least one collaborator with all rights",
+)
 
 func (is *IdentityServer) setGatewayCollaborator(
 	ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest,
 ) (_ *emptypb.Empty, err error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+	if err != nil {
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -298,6 +337,7 @@ func (is *IdentityServer) setGatewayCollaborator(
 		}
 
 		if len(req.GetCollaborator().GetRights()) == 0 {
+			// TODO: Remove delete capability (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
 			return st.DeleteMember(ctx, req.GetCollaborator().GetIds(), req.GetGatewayIds().GetEntityIdentifiers())
 		}
 
@@ -312,25 +352,37 @@ func (is *IdentityServer) setGatewayCollaborator(
 		return nil, err
 	}
 	if len(req.GetCollaborator().GetRights()) > 0 {
-		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds()), events.WithData(req.GetCollaborator())))
+		events.Publish(evtUpdateGatewayCollaborator.New(
+			ctx,
+			events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds()),
+			events.WithData(req.GetCollaborator()),
+		))
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
 			NotificationType: "collaborator_changed",
 			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
-			Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
-			Email:            false,
+			Receivers: []ttnpb.NotificationReceiver{
+				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
+			},
+			Email: false,
 		})
 	} else {
-		events.Publish(evtDeleteGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds())))
+		events.Publish(evtDeleteGatewayCollaborator.New(
+			ctx,
+			events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds()),
+		))
 	}
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest) (collaborators *ttnpb.Collaborators, err error) {
+func (is *IdentityServer) listGatewayCollaborators(
+	ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest,
+) (collaborators *ttnpb.Collaborators, err error) {
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+	if err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 
@@ -363,42 +415,119 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 	return collaborators, nil
 }
 
+func (is *IdentityServer) deleteGatewayCollaborator(
+	ctx context.Context, req *ttnpb.DeleteGatewayCollaboratorRequest,
+) (*emptypb.Empty, error) {
+	err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+	if err != nil {
+		return ttnpb.Empty, err
+	}
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		removedRights, err := st.GetMember(ctx, req.GetCollaboratorIds(), req.GetGatewayIds().GetEntityIdentifiers())
+		if err != nil {
+			return err
+		}
+		if removedRights.Implied().IncludesAll(ttnpb.Right_RIGHT_GATEWAY_ALL) {
+			memberRights, err := st.FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
+			if err != nil {
+				return err
+			}
+			var hasOtherOwner bool
+			for _, v := range memberRights {
+				member, rights := v.Ids, v.Rights
+				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaboratorIds()) {
+					continue
+				}
+				if rights.Implied().IncludesAll(ttnpb.Right_RIGHT_GATEWAY_ALL) {
+					hasOtherOwner = true
+					break
+				}
+			}
+			if !hasOtherOwner {
+				return errGatewayNeedsCollaborator.New()
+			}
+		}
+
+		return st.DeleteMember(
+			ctx,
+			req.GetCollaboratorIds(),
+			req.GetGatewayIds().GetEntityIdentifiers(),
+		)
+	})
+	if err != nil {
+		return ttnpb.Empty, err
+	}
+	events.Publish(evtDeleteGatewayCollaborator.New(
+		ctx,
+		events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaboratorIds()),
+	))
+	return ttnpb.Empty, nil
+}
+
 type gatewayAccess struct {
 	ttnpb.UnimplementedGatewayAccessServer
 
 	*IdentityServer
 }
 
-func (ga *gatewayAccess) ListRights(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
+func (ga *gatewayAccess) ListRights(
+	ctx context.Context, req *ttnpb.GatewayIdentifiers,
+) (*ttnpb.Rights, error) {
 	return ga.listGatewayRights(ctx, req)
 }
 
-func (ga *gatewayAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
+func (ga *gatewayAccess) CreateAPIKey(
+	ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest,
+) (*ttnpb.APIKey, error) {
 	return ga.createGatewayAPIKey(ctx, req)
 }
 
-func (ga *gatewayAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (*ttnpb.APIKeys, error) {
+func (ga *gatewayAccess) ListAPIKeys(
+	ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest,
+) (*ttnpb.APIKeys, error) {
 	return ga.listGatewayAPIKeys(ctx, req)
 }
 
-func (ga *gatewayAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
+func (ga *gatewayAccess) GetAPIKey(
+	ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest,
+) (*ttnpb.APIKey, error) {
 	return ga.getGatewayAPIKey(ctx, req)
 }
 
-func (ga *gatewayAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
+func (ga *gatewayAccess) UpdateAPIKey(
+	ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest,
+) (*ttnpb.APIKey, error) {
 	return ga.updateGatewayAPIKey(ctx, req)
 }
 
-func (ga *gatewayAccess) GetCollaborator(ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
+func (ga *gatewayAccess) DeleteAPIKey(
+	ctx context.Context, req *ttnpb.DeleteGatewayAPIKeyRequest,
+) (*emptypb.Empty, error) {
+	return ga.deleteGatewayAPIKey(ctx, req)
+}
+
+func (ga *gatewayAccess) GetCollaborator(
+	ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest,
+) (*ttnpb.GetCollaboratorResponse, error) {
 	return ga.getGatewayCollaborator(ctx, req)
 }
 
-func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*emptypb.Empty, error) {
+func (ga *gatewayAccess) SetCollaborator(
+	ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest,
+) (*emptypb.Empty, error) {
 	return ga.setGatewayCollaborator(ctx, req)
 }
 
-func (ga *gatewayAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest) (*ttnpb.Collaborators, error) {
+func (ga *gatewayAccess) ListCollaborators(
+	ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest,
+) (*ttnpb.Collaborators, error) {
 	return ga.listGatewayCollaborators(ctx, req)
+}
+
+func (ga *gatewayAccess) DeleteCollaborator(
+	ctx context.Context, req *ttnpb.DeleteGatewayCollaboratorRequest,
+) (*emptypb.Empty, error) {
+	return ga.deleteGatewayCollaborator(ctx, req)
 }
 
 type gatewayBatchAccess struct {

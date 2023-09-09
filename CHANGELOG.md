@@ -23,7 +23,17 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.27.1] - unreleased
+## [3.27.2] - unreleased
+
+### Added
+
+- Locations retrieved from gateway status messages are now be displayed in the gateway map in the Console, even when they are not received through a secure connection.
+
+### Fixed
+
+- Fix gateway connection stats being stuck at `Connecting` until the first uplink is processed in the Console.
+
+## [3.27.1] - 2023-08-29
 
 ### Added
 
@@ -2665,7 +2675,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.1...v3.27
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.2...v3.27
+[3.27.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.1...v3.27.2
 [3.27.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.0...v3.27.1
 [3.27.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.2...v3.27.0
 [3.26.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.1...v3.26.2

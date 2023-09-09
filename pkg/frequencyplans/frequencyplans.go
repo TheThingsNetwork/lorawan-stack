@@ -537,7 +537,7 @@ func (d FrequencyPlanDescription) content(f fetch.Interface) ([]byte, error) {
 	return content, nil
 }
 
-var errParseFile = errors.DefineCorruption("parse_file", "could not parse file")
+var errParseFile = errors.DefineCorruption("parse_file", "parse file")
 
 func (d FrequencyPlanDescription) proto(f fetch.Interface) (FrequencyPlan, error) {
 	fp := FrequencyPlan{}
@@ -640,9 +640,9 @@ func (s *Store) descriptions() (frequencyPlanList, error) {
 
 var (
 	errNotConfigured = errors.Define("not_configured", "frequency plans not configured")
-	errRead          = errors.Define("read", "could not read frequency plan `{id}`")
-	errReadBase      = errors.Define("read_base", "could not read the base `{base_id}` of frequency plan `{id}`")
-	errReadList      = errors.Define("read_list", "could not read the list of frequency plans")
+	errRead          = errors.Define("read", "read frequency plan `{id}`")
+	errReadBase      = errors.Define("read_base", "read the base `{base_id}` of frequency plan `{id}`")
+	errReadList      = errors.Define("read_list", "read the list of frequency plans")
 	errNotFound      = errors.DefineNotFound("not_found", "frequency plan `{id}` not found")
 	errInvalid       = errors.DefineCorruption("invalid", "invalid frequency plan")
 )

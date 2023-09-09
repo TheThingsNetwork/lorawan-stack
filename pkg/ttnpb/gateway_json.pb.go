@@ -1206,6 +1206,60 @@ func (x *UpdateGatewayAPIKeyRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the DeleteGatewayAPIKeyRequest message to JSON.
+func (x *DeleteGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.KeyId != "" || s.HasField("key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("key_id")
+		s.WriteString(x.KeyId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DeleteGatewayAPIKeyRequest to JSON.
+func (x *DeleteGatewayAPIKeyRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the DeleteGatewayAPIKeyRequest message from JSON.
+func (x *DeleteGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "key_id", "keyId":
+			s.AddField("key_id")
+			x.KeyId = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the DeleteGatewayAPIKeyRequest from JSON.
+func (x *DeleteGatewayAPIKeyRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the ListGatewayCollaboratorsRequest message to JSON.
 func (x *ListGatewayCollaboratorsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -1393,6 +1447,68 @@ func (x *SetGatewayCollaboratorRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarsh
 
 // UnmarshalJSON unmarshals the SetGatewayCollaboratorRequest from JSON.
 func (x *SetGatewayCollaboratorRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the DeleteGatewayCollaboratorRequest message to JSON.
+func (x *DeleteGatewayCollaboratorRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_ids")
+		x.GatewayIds.MarshalProtoJSON(s.WithField("gateway_ids"))
+	}
+	if x.CollaboratorIds != nil || s.HasField("collaborator_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator_ids")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.CollaboratorIds)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DeleteGatewayCollaboratorRequest to JSON.
+func (x *DeleteGatewayCollaboratorRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the DeleteGatewayCollaboratorRequest message from JSON.
+func (x *DeleteGatewayCollaboratorRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway_ids", "gatewayIds":
+			if s.ReadNil() {
+				x.GatewayIds = nil
+				return
+			}
+			x.GatewayIds = &GatewayIdentifiers{}
+			x.GatewayIds.UnmarshalProtoJSON(s.WithField("gateway_ids", true))
+		case "collaborator_ids", "collaboratorIds":
+			s.AddField("collaborator_ids")
+			if s.ReadNil() {
+				x.CollaboratorIds = nil
+				return
+			}
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.CollaboratorIds = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the DeleteGatewayCollaboratorRequest from JSON.
+func (x *DeleteGatewayCollaboratorRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 

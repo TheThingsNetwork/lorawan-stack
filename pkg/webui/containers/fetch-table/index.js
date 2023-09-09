@@ -33,7 +33,6 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import getByPath from '@ttn-lw/lib/get-by-path'
 import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
 import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
-import useRequest from '@ttn-lw/lib/hooks/use-request'
 
 import style from './fetch-table.styl'
 
@@ -103,9 +102,9 @@ const FetchTable = props => {
   const mayAdd = 'mayAdd' in base ? base.mayAdd : true
   const mayLink = 'mayLink' in base ? base.mayLink : true
 
-  const filters = { query: debouncedQuery, tab, order, page }
-  const [fetching, fetchingError] = useRequest(getItemsAction(filters))
-  const [error, setError] = useState(fetchingError)
+  const filters = { query: debouncedQuery, tab, order, page, limit: pageSize }
+  const [fetching, setFetching] = useState(true)
+  const [error, setError] = useState(undefined)
   let orderDirection, orderBy
   // Parse order string.
   if (typeof order === 'string') {
@@ -123,8 +122,8 @@ const FetchTable = props => {
   // Fetch items initially or whenever the filters change.
   useEffect(() => {
     const fetchItems = async () => {
+      setFetching(true)
       const f = { query: debouncedQuery || '', page, limit: pageSize }
-
       // Validate tab.
       if (tabs.find(t => t.name === tab)) {
         f.tab = tab
@@ -144,15 +143,16 @@ const FetchTable = props => {
       try {
         if (f.query && searchItemsAction) {
           await dispatch(attachPromise(searchItemsAction(f)))
+          setFetching(false)
         }
-
         await dispatch(attachPromise(getItemsAction(f)))
-
+        setFetching(false)
         if (initialFetch) {
           setInitialFetch(false)
         }
       } catch (error) {
         setError(error)
+        setFetching(false)
       }
     }
     fetchItems()

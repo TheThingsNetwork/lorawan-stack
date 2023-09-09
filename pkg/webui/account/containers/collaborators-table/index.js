@@ -61,18 +61,11 @@ const CollaboratorsTable = props => {
 
   const deleteCollaborator = React.useCallback(
     async ids => {
-      const collaboratorType = 'user_ids' in ids ? 'user' : 'organization'
-      const collaborator_ids = {
-        [`${collaboratorType}_ids`]: {
-          [`${collaboratorType}_id`]: getCollaboratorId({ ids }),
-        },
-      }
-      const updatedCollaborator = {
-        ids: collaborator_ids,
-      }
+      const isUser = 'user_ids' in ids
+      const collaboratorID = getCollaboratorId({ ids })
 
       try {
-        await handleDeleteCollaborator(updatedCollaborator)
+        await handleDeleteCollaborator(collaboratorID, isUser)
         toast({
           message: sharedMessages.collaboratorDeleteSuccess,
           type: toast.types.SUCCESS,
@@ -227,7 +220,7 @@ export default connect(
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    handleDeleteCollaborator: patch =>
-      dispatchProps.handleDeleteCollaborator(stateProps.clientId, patch),
+    handleDeleteCollaborator: (collaboratorID, isUsr) =>
+      dispatchProps.handleDeleteCollaborator('client', stateProps.clientId, collaboratorID, isUsr),
   }),
 )(CollaboratorsTable)

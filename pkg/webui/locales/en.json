@@ -190,6 +190,7 @@
   "components.qr.input.capture.index.uploadImage": "Upload a Photo",
   "components.qr.input.capture.index.qrCodeNotFound": "QR code not found",
   "components.qr.input.video.index.fetchingCamera": "Waiting for camera…",
+  "components.qr.input.video.index.switchCamera": "Switch camera",
   "components.qr.require-permission.permissionDeniedError": "Permission Denied: Please allow access to your camera or upload a photo",
   "components.qr.require-permission.fetchingPermission": "Please set camera permissions",
   "components.qr.require-permission.uploadImage": "Upload an image",

@@ -147,7 +147,7 @@ var (
 		Use:     "delete",
 		Aliases: []string{"del", "remove", "rm"},
 		Short:   "Delete a client collaborator",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			cliID := getClientID(cmd.Flags(), nil)
 			if cliID == nil {
 				return errNoClientID.New()
@@ -161,12 +161,9 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewClientAccessClient(is).SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
-				ClientIds: cliID,
-				Collaborator: &ttnpb.Collaborator{
-					Ids:    collaborator,
-					Rights: nil,
-				},
+			_, err = ttnpb.NewClientAccessClient(is).DeleteCollaborator(ctx, &ttnpb.DeleteClientCollaboratorRequest{
+				ClientIds:       cliID,
+				CollaboratorIds: collaborator,
 			})
 			if err != nil {
 				return err

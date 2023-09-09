@@ -90,8 +90,6 @@ const CollaboratorForm = props => {
     removeCollaborator,
   } = useCollaboratorData(entity, entityId, collaboratorId, tts)
 
-  const collaboratorType = isCollaboratorUser ? 'user' : 'organization'
-
   const [submitError, setSubmitError] = useState(undefined)
   const navigate = useNavigate()
   const error = submitError || passedError
@@ -127,18 +125,10 @@ const CollaboratorForm = props => {
     [navigate, update, updateCollaborator],
   )
   const handleDelete = useCallback(async () => {
-    const collaborator_ids = {
-      [`${collaboratorType}_ids`]: {
-        [`${collaboratorType}_id`]: collaboratorId,
-      },
-    }
-    const updatedCollaborator = {
-      ids: collaborator_ids,
-    }
     setSubmitError(undefined)
 
     try {
-      await removeCollaborator(updatedCollaborator)
+      await removeCollaborator(isCollaboratorUser, collaboratorId)
       toast({
         message: sharedMessages.collaboratorDeleteSuccess,
         type: toast.types.SUCCESS,
@@ -147,7 +137,7 @@ const CollaboratorForm = props => {
     } catch (error) {
       setSubmitError(error)
     }
-  }, [collaboratorId, collaboratorType, navigate, removeCollaborator])
+  }, [collaboratorId, isCollaboratorUser, navigate, removeCollaborator])
 
   const initialValues = React.useMemo(() => {
     if (!collaborator) {
