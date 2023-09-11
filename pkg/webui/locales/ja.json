@@ -2719,6 +2719,8 @@
   "event:ns.up.join.interop.success": "相互接続ジョインサーバへのジョイン要求成功",
   "event:ns.up.join.process": "ジョイン要求処理に成功",
   "event:ns.up.join.receive": "ジョイン要求を受信",
+  "event:ns.up.relay.drop": "",
+  "event:ns.up.relay.process": "",
   "event:oauth.authorize": "OAuthクラアントを認証",
   "event:oauth.session.terminated": "ユーザセッションを終了",
   "event:oauth.token.deleted": "アクセストークンを削除",

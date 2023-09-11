@@ -32,6 +32,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/relayspec"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/toa"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -1105,7 +1107,25 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 	if !matched.IsRetransmission {
 		var frmPayload []byte
-		if pld.FPort != 0 {
+		switch pld.FPort {
+		case 0:
+		case relayspec.FPort:
+			relayUp, relayEvents, err := handleRelayForwardingProtocol(
+				ctx, matched.Device, matched.FullFCnt, matched.phy, up, ns.KeyService(),
+			)
+			queuedEvents = append(queuedEvents, relayEvents...)
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Failed to handle relay forwarding protocol")
+			} else {
+				ns.StartTask(&task.Config{
+					Context: ns.FromRequestContext(ctx),
+					ID:      "loopback_relay_uplink",
+					Func:    relayLoopbackFunc(ns.LoopbackConn(), relayUp, ns.WithClusterAuth()),
+					Restart: task.RestartNever,
+					Backoff: task.DefaultBackoffConfig,
+				})
+			}
+		default:
 			frmPayload = pld.FrmPayload
 		}
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
