@@ -169,7 +169,7 @@ func (s *gsPbaServer) UpdateGateway( // nolint: gocyclo
 		// Only replaces the administrative contact if the contact is validated and no error happens.
 		adminUsr, err := s.fetchUserFromContact(
 			ctx, req.Gateway.GetAdministrativeContact(),
-			func(o *ttnpb.Organization) *ttnpb.OrganizationOrUserIdentifiers { return o.GetAdministrativeContact() },
+			(*ttnpb.Organization).GetAdministrativeContact,
 		)
 		if err == nil && adminUsr.PrimaryEmailAddressValidatedAt != nil {
 			adminContact = &packetbroker.ContactInfo{Name: adminUsr.Ids.UserId, Email: adminUsr.PrimaryEmailAddress}
@@ -185,7 +185,7 @@ func (s *gsPbaServer) UpdateGateway( // nolint: gocyclo
 		// Only replaces the technical contact if the contact is validated and no error happens.
 		techUsr, err := s.fetchUserFromContact(
 			ctx, req.Gateway.GetTechnicalContact(),
-			func(o *ttnpb.Organization) *ttnpb.OrganizationOrUserIdentifiers { return o.GetTechnicalContact() },
+			(*ttnpb.Organization).GetTechnicalContact,
 		)
 		if err == nil && techUsr.PrimaryEmailAddressValidatedAt != nil {
 			techContact = &packetbroker.ContactInfo{Name: techUsr.Ids.UserId, Email: techUsr.PrimaryEmailAddress}
@@ -249,12 +249,14 @@ func (s *gsPbaServer) UpdateGateway( // nolint: gocyclo
 	return res, nil
 }
 
+var errContactNotFound = errors.DefineNotFound("contact_not_found", "contact not found")
+
 func (s *gsPbaServer) fetchUserFromContact(
-	ctx context.Context, contact *ttnpb.OrganizationOrUserIdentifiers,
-	selectOrgContact func(*ttnpb.Organization) *ttnpb.OrganizationOrUserIdentifiers,
+	ctx context.Context,
+	contact *ttnpb.OrganizationOrUserIdentifiers,
+	selector func(*ttnpb.Organization) *ttnpb.OrganizationOrUserIdentifiers,
 ) (*ttnpb.User, error) {
 	usrID := contact.GetUserIds()
-
 	// If the contact is an organization, get its contact before fetching the user information.
 	if orgID := contact.GetOrganizationIds(); orgID != nil {
 		org, err := s.entityRegistry.GetOrganization(ctx, &ttnpb.GetOrganizationRequest{
@@ -264,9 +266,11 @@ func (s *gsPbaServer) fetchUserFromContact(
 		if err != nil {
 			return nil, err
 		}
-		usrID = selectOrgContact(org).GetUserIds()
+		usrID = selector(org).GetUserIds()
 	}
-
+	if usrID == nil {
+		return nil, errContactNotFound.New()
+	}
 	return s.entityRegistry.GetUser(ctx, &ttnpb.GetUserRequest{
 		UserIds:   usrID,
 		FieldMask: ttnpb.FieldMask("ids", "primary_email_address", "primary_email_address_validated_at"),
