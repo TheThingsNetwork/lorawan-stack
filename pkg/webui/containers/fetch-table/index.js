@@ -147,9 +147,7 @@ const FetchTable = props => {
         }
         await dispatch(attachPromise(getItemsAction(f)))
         setFetching(false)
-        if (initialFetch) {
-          setInitialFetch(false)
-        }
+        setInitialFetch(false)
       } catch (error) {
         setError(error)
         setFetching(false)
@@ -162,7 +160,6 @@ const FetchTable = props => {
     defaultTab,
     dispatch,
     getItemsAction,
-    initialFetch,
     order,
     page,
     pageSize,
