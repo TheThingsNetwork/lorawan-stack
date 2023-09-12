@@ -180,7 +180,6 @@ func TestDialContext(t *testing.T) {
 					return "test", tc.LookupResult, nil
 				},
 			}
-			resolver.UnregisterForTesting("ttn-v3-gs")
 			resolver.Register(discover.NewBuilder("ttn-v3-gs", discover.WithDNS(dns)))
 
 			clientTLSConfig := &tls.Config{
