@@ -734,8 +734,8 @@ github.com/tinylib/msgp v1.1.0/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDW
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc h1:9lRDQMhESg+zvGYmW5DyG0UqvY96Bu5QYsTLvCHdrgo=
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc/go.mod h1:bciPuU6GHm1iF1pBvUfxfsH0Wmnc2VbpgvbI9ZWuIRs=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
-github.com/uptrace/bun v1.1.14 h1:S5vvNnjEynJ0CvnrBOD7MIRW7q/WbtvFXrdfy0lddAM=
-github.com/uptrace/bun v1.1.14/go.mod h1:RHk6DrIisO62dv10pUOJCz5MphXThuOTpVNYEYv7NI8=
+github.com/uptrace/bun v1.1.15 h1:uxLNIo1VN8pkJ8rykwPBd9qYg4NDTvjHIintnwoQ3QY=
+github.com/uptrace/bun v1.1.15/go.mod h1:7HnsMRRvpLFUcquJxp22JO8PsWKpFQO/gNXqqsuGWg8=
 github.com/uptrace/bun/dialect/pgdialect v1.1.14 h1:b7+V1KDJPQSFYgkG/6YLXCl2uvwEY3kf/GSM7hTHRDY=
 github.com/uptrace/bun/dialect/pgdialect v1.1.14/go.mod h1:v6YiaXmnKQ2FlhRD2c0ZfKd+QXH09pYn4H8ojaavkKk=
 github.com/uptrace/bun/driver/pgdriver v1.1.14 h1:V2Etm7mLGS3mhx8ddxZcUnwZLX02Jmq9JTlo0sNVDhA=

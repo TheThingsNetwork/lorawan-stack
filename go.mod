@@ -74,7 +74,7 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/throttled/throttled v2.2.5+incompatible
 	github.com/throttled/throttled/v2 v2.0.0-00010101000000-000000000000
-	github.com/uptrace/bun v1.1.14
+	github.com/uptrace/bun v1.1.15
 	github.com/uptrace/bun/dialect/pgdialect v1.1.14
 	github.com/uptrace/bun/driver/pgdriver v1.1.14
 	github.com/vmihailenco/msgpack/v5 v5.3.5
