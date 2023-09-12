@@ -793,8 +793,8 @@ go.packetbroker.org/api/iam v1.6.0 h1:Qkq+fVZxihQPxhxwW2l+AFqRbMgTemuuPjrZ9vySzX
 go.packetbroker.org/api/iam v1.6.0/go.mod h1:JnrI9j4j90XftftRALhaDlr+5oKcjkD/jnTqauXafRk=
 go.packetbroker.org/api/iam/v2 v2.7.13 h1:uVNOGFAUttLcvYcC+ZrOXOPEZYkV47gxMyLm9viv+vo=
 go.packetbroker.org/api/iam/v2 v2.7.13/go.mod h1:HPBEl7oTtmxSq762h9WW3zyGMvZXnoNQIopczUV7gEE=
-go.packetbroker.org/api/mapping/v2 v2.1.29 h1:yacJWttIF03KovuxemA/sn2WYnLc6cp7Mi/QnUAzvgU=
-go.packetbroker.org/api/mapping/v2 v2.1.29/go.mod h1:2p+8pc3zKZgOcosqiQrI6VDTvDDp6qrv3UObm1cOuMQ=
+go.packetbroker.org/api/mapping/v2 v2.1.32 h1:SeJ4oc+BYAUzUpZWkGJg9YtKZy/D1IDss9O2dX/NW54=
+go.packetbroker.org/api/mapping/v2 v2.1.32/go.mod h1:I2qf9dWkMAH+uRY8Q/5gGxv68wLJBRRt48niAlOQ1NY=
 go.packetbroker.org/api/routing v1.8.23 h1:fCPGt6zYKZ+/RW60nVnxe+yn4gck0Hcr6VAgU0PD+4U=
 go.packetbroker.org/api/routing v1.8.23/go.mod h1:NmFAo4VGGGEYIHKdD0Tmk03f5e81NSYu8QApAF7vONs=
 go.packetbroker.org/api/v3 v3.15.2 h1:CqBWwsqU3q7URTcwZEa+cJ+Stpc97ZVIXTMZlUJiFHM=
