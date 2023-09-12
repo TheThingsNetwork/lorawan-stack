@@ -172,7 +172,7 @@ jobs:
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run previously failed test first
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         if: steps.get-failed-spec.outputs.failed-test != ''
         with:
           config-file: config/cypress.config.js
@@ -183,7 +183,7 @@ jobs:
           group: previously-failed-${{ needs.determine-if-required.outputs.hash }}
           spec: ${{ steps.get-failed-spec.outputs.failed-test }}
       - name: Run frontend end-to-end tests
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           config-file: config/cypress.config.js
           config: baseUrl=https://localhost:8885
@@ -252,7 +252,7 @@ jobs:
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run end-to-end smoke tests (Firefox)
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           config-file: config/cypress.config.js
           config: baseUrl=https://localhost:8885
