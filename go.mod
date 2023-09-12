@@ -16,18 +16,18 @@ require (
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
-	github.com/aws/aws-sdk-go v1.44.314
+	github.com/aws/aws-sdk-go v1.45.7
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.14
 	github.com/bluele/gcache v0.0.2
 	github.com/disintegration/imaging v1.6.2
-	github.com/dop251/goja v0.0.0-20230122160437-8f6e415ca41e
+	github.com/dop251/goja v0.0.0-20230828202809-3dbe69dd2b8e
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eclipse/paho.mqtt.golang v1.4.4-0.20230810210351-7b759f1d9ddf
-	github.com/emersion/go-smtp v0.17.0
+	github.com/emersion/go-smtp v0.18.1
 	github.com/envoyproxy/protoc-gen-validate v1.0.2
 	github.com/felixge/httpsnoop v1.0.3
-	github.com/getsentry/sentry-go v0.23.0
+	github.com/getsentry/sentry-go v0.24.0
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.1
@@ -49,14 +49,14 @@ require (
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/jaytaylor/html2text v0.0.0-20211105163654-bc68cce691ba
+	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056
 	github.com/json-iterator/go v1.1.12
 	github.com/jtacoma/uritemplates v1.0.0
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/nats-server/v2 v2.9.20
+	github.com/nats-io/nats-server/v2 v2.9.22
 	github.com/nats-io/nats.go v1.28.0
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/openshift/osin v1.0.2-0.20220317075346-0f4d38c6e53f
@@ -65,7 +65,7 @@ require (
 	github.com/prometheus/client_golang v1.16.0
 	github.com/redis/go-redis/v9 v9.1.0
 	github.com/satori/go.uuid v1.2.0
-	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
+	github.com/sendgrid/sendgrid-go v3.13.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/smarty/assertions v1.15.1
 	github.com/spf13/cast v1.5.1
@@ -73,21 +73,21 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.16.0
 	github.com/throttled/throttled v2.2.5+incompatible
-	github.com/throttled/throttled/v2 v2.0.0-00010101000000-000000000000
+	github.com/throttled/throttled/v2 v2.12.0
 	github.com/uptrace/bun v1.1.15
 	github.com/uptrace/bun/dialect/pgdialect v1.1.15
 	github.com/uptrace/bun/driver/pgdriver v1.1.15
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.43.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.42.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.43.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.43.0
 	go.opentelemetry.io/otel v1.17.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.17.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.17.0
 	go.opentelemetry.io/otel/sdk v1.17.0
 	go.opentelemetry.io/otel/trace v1.17.0
-	go.packetbroker.org/api/iam v1.6.0
+	go.packetbroker.org/api/iam v1.7.0
 	go.packetbroker.org/api/iam/v2 v2.7.13
 	go.packetbroker.org/api/mapping/v2 v2.1.32
 	go.packetbroker.org/api/routing v1.8.23
@@ -97,15 +97,15 @@ require (
 	go.uber.org/automaxprocs v1.5.3
 	go.uber.org/zap v1.25.0
 	gocloud.dev v0.34.0
-	gocloud.dev/pubsub/natspubsub v0.33.0
+	gocloud.dev/pubsub/natspubsub v0.34.0
 	golang.org/x/crypto v0.13.0
-	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
+	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 	golang.org/x/net v0.15.0
 	golang.org/x/oauth2 v0.12.0
 	golang.org/x/sync v0.3.0
-	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5
-	google.golang.org/genproto/googleapis/api v0.0.0-20230822172742-b8732ec3820d
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d
+	google.golang.org/genproto v0.0.0-20230911183012-2d3300fd4832
+	google.golang.org/genproto/googleapis/api v0.0.0-20230911183012-2d3300fd4832
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230911183012-2d3300fd4832
 	google.golang.org/grpc v1.58.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/mail.v2 v2.3.1
@@ -185,6 +185,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
+	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
 	github.com/google/s2a-go v0.1.4 // indirect
 	github.com/google/wire v0.5.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.5 // indirect
@@ -216,7 +217,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	github.com/nats-io/jwt/v2 v2.4.1 // indirect
+	github.com/nats-io/jwt/v2 v2.5.0 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
