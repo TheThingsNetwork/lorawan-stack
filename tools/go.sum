@@ -806,8 +806,8 @@ go.opentelemetry.io/proto/otlp v1.0.0 h1:T0TX0tmXU8a3CbNXzEKGeU5mIVOdf0oykP+u2lI
 go.opentelemetry.io/proto/otlp v1.0.0/go.mod h1:Sy6pihPLfYHkr3NkUbEhGHFhINUSI/v80hjKIs5JXpM=
 go.packetbroker.org/api/iam v1.6.0 h1:Qkq+fVZxihQPxhxwW2l+AFqRbMgTemuuPjrZ9vySzXk=
 go.packetbroker.org/api/iam v1.6.0/go.mod h1:JnrI9j4j90XftftRALhaDlr+5oKcjkD/jnTqauXafRk=
-go.packetbroker.org/api/iam/v2 v2.7.12 h1:Yh0Yqx6RC83sT4fvcsxvoLkJOaVTvwKzQ5mWAWoCKXY=
-go.packetbroker.org/api/iam/v2 v2.7.12/go.mod h1:yKbHrWedgjOs8LcZjk5aAF06LcJKjmcAAgIhoDbprsY=
+go.packetbroker.org/api/iam/v2 v2.7.13 h1:uVNOGFAUttLcvYcC+ZrOXOPEZYkV47gxMyLm9viv+vo=
+go.packetbroker.org/api/iam/v2 v2.7.13/go.mod h1:HPBEl7oTtmxSq762h9WW3zyGMvZXnoNQIopczUV7gEE=
 go.packetbroker.org/api/mapping/v2 v2.1.29 h1:yacJWttIF03KovuxemA/sn2WYnLc6cp7Mi/QnUAzvgU=
 go.packetbroker.org/api/mapping/v2 v2.1.29/go.mod h1:2p+8pc3zKZgOcosqiQrI6VDTvDDp6qrv3UObm1cOuMQ=
 go.packetbroker.org/api/routing v1.8.20 h1:nIbVrj3D//Y4lRcH2KazeVOyapUtaLY50T5GGapnRXI=
