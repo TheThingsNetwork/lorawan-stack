@@ -793,12 +793,12 @@ go.packetbroker.org/api/iam v1.6.0 h1:Qkq+fVZxihQPxhxwW2l+AFqRbMgTemuuPjrZ9vySzX
 go.packetbroker.org/api/iam v1.6.0/go.mod h1:JnrI9j4j90XftftRALhaDlr+5oKcjkD/jnTqauXafRk=
 go.packetbroker.org/api/iam/v2 v2.7.12 h1:Yh0Yqx6RC83sT4fvcsxvoLkJOaVTvwKzQ5mWAWoCKXY=
 go.packetbroker.org/api/iam/v2 v2.7.12/go.mod h1:yKbHrWedgjOs8LcZjk5aAF06LcJKjmcAAgIhoDbprsY=
-go.packetbroker.org/api/mapping/v2 v2.1.29 h1:yacJWttIF03KovuxemA/sn2WYnLc6cp7Mi/QnUAzvgU=
-go.packetbroker.org/api/mapping/v2 v2.1.29/go.mod h1:2p+8pc3zKZgOcosqiQrI6VDTvDDp6qrv3UObm1cOuMQ=
+go.packetbroker.org/api/mapping/v2 v2.1.32 h1:SeJ4oc+BYAUzUpZWkGJg9YtKZy/D1IDss9O2dX/NW54=
+go.packetbroker.org/api/mapping/v2 v2.1.32/go.mod h1:I2qf9dWkMAH+uRY8Q/5gGxv68wLJBRRt48niAlOQ1NY=
 go.packetbroker.org/api/routing v1.8.20 h1:nIbVrj3D//Y4lRcH2KazeVOyapUtaLY50T5GGapnRXI=
 go.packetbroker.org/api/routing v1.8.20/go.mod h1:cDGUBlDBV0canSuzfNwWU/onEIXq4EwsdZqbnT/FZy0=
-go.packetbroker.org/api/v3 v3.15.1 h1:/uv8BxRZJbKg8ROhFVFtu7e6nX3506+/rVb58bfZg1k=
-go.packetbroker.org/api/v3 v3.15.1/go.mod h1:6bVbdWAYLnvZ5kgXxA7GBQvZTN7vxI0DoF1Di1NoAT4=
+go.packetbroker.org/api/v3 v3.15.2 h1:CqBWwsqU3q7URTcwZEa+cJ+Stpc97ZVIXTMZlUJiFHM=
+go.packetbroker.org/api/v3 v3.15.2/go.mod h1:6bVbdWAYLnvZ5kgXxA7GBQvZTN7vxI0DoF1Di1NoAT4=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e h1:TWGQ3lh7gI2W5hnb6qPdpoAa0d7s/XPwvgf2VVCMJaY=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e/go.mod h1:/smENFuESiJCyWRsHRLBjbZGMN889BORQXIPP6NlpZE=
 go.thethings.network/lorawan-stack-legacy/v2 v2.1.0 h1:xP1fElQiH8/6GWXg6JG8UqRD0uluhmicIRS4e/BzcAw=
