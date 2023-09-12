@@ -10,7 +10,7 @@ replace github.com/mitchellh/mapstructure => github.com/TheThingsIndustries/maps
 
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2
-	github.com/KimMachineGun/automemlimit v0.2.6
+	github.com/KimMachineGun/automemlimit v0.3.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/TheThingsIndustries/mystique v0.0.0-20221125120501-80ab21781b6d
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
@@ -63,7 +63,7 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
-	github.com/redis/go-redis/v9 v9.0.5
+	github.com/redis/go-redis/v9 v9.1.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
@@ -79,12 +79,12 @@ require (
 	github.com/uptrace/bun/driver/pgdriver v1.1.14
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.opencensus.io v0.24.0
-	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.42.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.43.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.42.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.0
 	go.opentelemetry.io/otel v1.17.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.17.0
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.16.0
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.17.0
 	go.opentelemetry.io/otel/sdk v1.17.0
 	go.opentelemetry.io/otel/trace v1.17.0
 	go.packetbroker.org/api/iam v1.6.0
@@ -98,10 +98,10 @@ require (
 	go.uber.org/zap v1.25.0
 	gocloud.dev v0.34.0
 	gocloud.dev/pubsub/natspubsub v0.33.0
-	golang.org/x/crypto v0.12.0
+	golang.org/x/crypto v0.13.0
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
-	golang.org/x/net v0.14.0
-	golang.org/x/oauth2 v0.10.0
+	golang.org/x/net v0.15.0
+	golang.org/x/oauth2 v0.12.0
 	golang.org/x/sync v0.3.0
 	google.golang.org/genproto v0.0.0-20230731193218-e0aa005b6bdf
 	google.golang.org/genproto/googleapis/api v0.0.0-20230731193218-e0aa005b6bdf
@@ -250,9 +250,9 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/image v0.5.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/term v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/term v0.12.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.134.0 // indirect
