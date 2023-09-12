@@ -88,10 +88,10 @@ require (
 	go.opentelemetry.io/otel/sdk v1.17.0
 	go.opentelemetry.io/otel/trace v1.17.0
 	go.packetbroker.org/api/iam v1.6.0
-	go.packetbroker.org/api/iam/v2 v2.7.10
+	go.packetbroker.org/api/iam/v2 v2.7.12
 	go.packetbroker.org/api/mapping/v2 v2.1.29
 	go.packetbroker.org/api/routing v1.8.20
-	go.packetbroker.org/api/v3 v3.13.0
+	go.packetbroker.org/api/v3 v3.15.1
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0
 	go.uber.org/automaxprocs v1.5.3
