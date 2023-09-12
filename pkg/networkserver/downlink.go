@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/relayspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -703,6 +704,9 @@ func downlinkPathsFromMetadata(
 		switch {
 		case md.PacketBroker != nil:
 			path.GatewayIdentifiers = packetbroker.GatewayIdentifiers
+			tail = append(tail, path)
+		case md.Relay != nil:
+			path.GatewayIdentifiers = relayspec.GatewayIdentifiers
 			tail = append(tail, path)
 		default:
 			path.GatewayIdentifiers = md.GatewayIds

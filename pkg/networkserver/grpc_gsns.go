@@ -765,9 +765,14 @@ func toMACStateRxMetadata(mds []*ttnpb.RxMetadata) []*ttnpb.MACState_UplinkMessa
 		if md.PacketBroker != nil {
 			pbMD = &ttnpb.MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata{}
 		}
+		var relayMD *ttnpb.MACState_UplinkMessage_RxMetadata_RelayMetadata
+		if md.Relay != nil {
+			relayMD = &ttnpb.MACState_UplinkMessage_RxMetadata_RelayMetadata{}
+		}
 		recentMDs = append(recentMDs, &ttnpb.MACState_UplinkMessage_RxMetadata{
 			GatewayIds:             md.GatewayIds,
 			PacketBroker:           pbMD,
+			Relay:                  relayMD,
 			ChannelRssi:            md.ChannelRssi,
 			Snr:                    md.Snr,
 			DownlinkPathConstraint: md.DownlinkPathConstraint,
