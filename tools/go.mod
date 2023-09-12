@@ -221,7 +221,7 @@ require (
 	go.packetbroker.org/api/iam/v2 v2.7.12 // indirect
 	go.packetbroker.org/api/mapping/v2 v2.1.29 // indirect
 	go.packetbroker.org/api/routing v1.8.20 // indirect
-	go.packetbroker.org/api/v3 v3.15.1 // indirect
+	go.packetbroker.org/api/v3 v3.15.2 // indirect
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e // indirect
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0 // indirect
 	go.uber.org/automaxprocs v1.5.3 // indirect
