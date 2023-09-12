@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Maximize build space
-        uses: easimon/maximize-build-space@v7
+        uses: easimon/maximize-build-space@v8
         with:
           root-reserve-mb: 20480
           swap-size-mb: 4096
