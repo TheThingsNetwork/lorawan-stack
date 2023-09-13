@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/relayspec"
@@ -32,7 +33,20 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+)
+
+var (
+	errRelaySchedule            = errors.DefineAborted("relay_schedule", "relay schedule")
+	errRelayInvalidUplinkToken  = errors.DefineInvalidArgument("relay_uplink_token", "invalid relay uplink token")
+	errRelayNoSession           = errors.DefineNotFound("relay_session", "relay session not found")
+	errRelayNoSessionKeyID      = errors.DefineNotFound("relay_session_key_id", "relay session key ID not found")
+	errRelayNoRecentUplinks     = errors.DefineNotFound("relay_recent_uplinks", "recent uplinks not found")
+	errRelayRXWindowUnavailable = errors.DefineUnavailable("relay_rx_windows_available", "no RX windows available")
+	errRelayMTYpe               = errors.DefineInvalidArgument("relay_m_type", "invalid MType")
+	errRelayFullFCnt            = errors.DefineInvalidArgument("relay_full_f_cnt", "invalid full FCnt")
+	errRelayNotServing          = errors.DefineUnavailable("relay_serving", "relay not serving")
 )
 
 type relayKeyService struct {
@@ -284,4 +298,149 @@ func (ns *NetworkServer) deliverRelaySessionKeys(ctx context.Context, dev *ttnpb
 		}
 	}
 	return nil
+}
+
+func parseRelayUplinkToken(b []byte) (*ttnpb.RelayUplinkToken, error) {
+	token := &ttnpb.RelayUplinkToken{}
+	if err := proto.Unmarshal(b, token); err != nil {
+		return nil, err
+	}
+	if err := token.ValidateFields(); err != nil {
+		return nil, err
+	}
+	return token, nil
+}
+
+func (ns *NetworkServer) relayPatchServingDevice(
+	ctx context.Context,
+	appID *ttnpb.ApplicationIdentifiers,
+	devID string,
+	gets []string,
+	f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+) error {
+	fullGets := ttnpb.AddFields(gets, deviceDownlinkFullPaths[:]...)
+	filteredF := func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		dev, err := ttnpb.FilterGetEndDevice(dev, gets...)
+		if err != nil {
+			return nil, nil, err
+		}
+		dev, sets, err := f(ctx, dev)
+		if err != nil {
+			return nil, nil, err
+		}
+		if dev == nil {
+			panic("nil device returned")
+		}
+		return dev, sets, nil
+	}
+	dev, ctx, err := ns.devices.SetByID(ctx, appID, devID, fullGets, filteredF)
+	if err != nil {
+		return err
+	}
+	return ns.updateDataDownlinkTask(ctx, dev, time.Time{})
+}
+
+type relayDownlinkTarget struct {
+	servedEndDeviceIDs *ttnpb.EndDeviceIdentifiers
+	servedSessionKeyID []byte
+
+	patchServingDevice func(
+		ctx context.Context,
+		appID *ttnpb.ApplicationIdentifiers,
+		devID string,
+		paths []string,
+		f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+	) error
+}
+
+var _ downlinkTarget = (*relayDownlinkTarget)(nil)
+
+// Equal implements downlinkTarget.
+func (*relayDownlinkTarget) Equal(downlinkTarget) bool {
+	return false
+}
+
+// Schedule implements downlinkTarget.
+func (r *relayDownlinkTarget) Schedule(
+	ctx context.Context, down *ttnpb.DownlinkMessage, _ ...grpc.CallOption,
+) (*ttnpb.ScheduleDownlinkResponse, error) {
+	request := down.GetRequest()
+	if request == nil {
+		panic("downlink without request")
+	}
+	if len(request.DownlinkPaths) != 1 {
+		panic("invalid downlink paths length")
+	}
+	path := request.DownlinkPaths[0].GetUplinkToken()
+	if len(path) == 0 {
+		panic("invalid downlink path")
+	}
+	token, err := parseRelayUplinkToken(path)
+	if err != nil {
+		return nil, err
+	}
+	if !proto.Equal(token.Ids.ApplicationIds, r.servedEndDeviceIDs.ApplicationIds) {
+		return nil, errRelaySchedule.WithCause(errRelayInvalidUplinkToken)
+	}
+	f := func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		session, macState := dev.GetSession(), dev.GetMacState()
+		if session == nil || macState == nil {
+			log.FromContext(ctx).Debug("Nil session or MAC state")
+			return dev, nil, errRelaySchedule.WithCause(errRelayNoSession)
+		}
+		if !bytes.Equal(session.Keys.SessionKeyId, token.SessionKeyId) {
+			log.FromContext(ctx).Debug("Invalid session key ID")
+			return dev, nil, errRelaySchedule.WithCause(errRelayNoSessionKeyID)
+		}
+		if len(macState.RecentUplinks) == 0 {
+			log.FromContext(ctx).Debug("No recent uplinks")
+			return dev, nil, errRelaySchedule.WithCause(errRelayNoRecentUplinks)
+		}
+		if !macState.RxWindowsAvailable {
+			log.FromContext(ctx).Debug("No RX windows available")
+			return dev, nil, errRelaySchedule.WithCause(errRelayRXWindowUnavailable)
+		}
+		lastPayload := internal.LastUplink(macState.RecentUplinks...).Payload
+		if mType := lastPayload.MHdr.MType; mType != ttnpb.MType_UNCONFIRMED_UP && mType != ttnpb.MType_CONFIRMED_UP {
+			log.FromContext(ctx).Debug("Invalid MType")
+			return dev, nil, errRelaySchedule.WithCause(errRelayMTYpe)
+		}
+		if lastPayload.GetMacPayload().FullFCnt != token.FullFCnt {
+			log.FromContext(ctx).Debug("Invalid full FCnt")
+			return dev, nil, errRelaySchedule.WithCause(errRelayFullFCnt)
+		}
+		if macState.CurrentParameters.Relay.GetServing() == nil {
+			log.FromContext(ctx).Debug("Not serving relay")
+			return dev, nil, errRelaySchedule.WithCause(errRelayNotServing)
+		}
+		log.FromContext(ctx).Debug("Relay downlink enqueued")
+		macState.PendingRelayDownlink = &ttnpb.RelayForwardDownlinkReq{
+			RawPayload: down.RawPayload,
+		}
+		return dev, []string{"mac_state.pending_relay_downlink.raw_payload"}, nil
+	}
+	if err := r.patchServingDevice(
+		ctx,
+		token.Ids.ApplicationIds,
+		token.Ids.DeviceId,
+		[]string{
+			"mac_state.current_parameters.relay.mode.serving",
+			"mac_state.recent_uplinks",
+			"mac_state.rx_windows_available",
+			"session.keys.session_key_id",
+		},
+		f,
+	); err != nil {
+		return nil, err
+	}
+	return &ttnpb.ScheduleDownlinkResponse{
+		Delay: durationpb.New(peeringScheduleDelay),
+		DownlinkPath: &ttnpb.DownlinkPath{
+			Path: &ttnpb.DownlinkPath_Fixed{
+				Fixed: &ttnpb.GatewayAntennaIdentifiers{
+					GatewayIds: relayspec.GatewayIdentifiers,
+				},
+			},
+		},
+	}, nil
 }

@@ -205,9 +205,10 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	maxDownPayloadLen := maxDownLen
 
 	var (
-		fPending bool
-		genState generateDownlinkState
-		cmdBuf   []byte
+		fPending     bool
+		genState     generateDownlinkState
+		cmdBuf       []byte
+		relayPayload []byte
 	)
 	if class == ttnpb.Class_CLASS_A {
 		spec := lorawan.DefaultMACCommands
@@ -238,6 +239,18 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		}
 		dev.MacState.QueuedResponses = nil
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
+
+		if relayDownlink := dev.MacState.PendingRelayDownlink; relayDownlink != nil {
+			// NOTE: We attempt to enqueue the pending relay downlink if the already
+			// enqueued MAC command responses fit into FOpts and the relay payload
+			// is smaller than the remaining space.
+			queuedResponsesLen := maxDownPayloadLen - maxDownLen
+			relayPayloadLen := uint16(len(relayDownlink.RawPayload))
+			if queuedResponsesLen <= fOptsCapacity && relayPayloadLen <= maxDownLen {
+				relayPayload = relayDownlink.RawPayload
+				maxDownLen = fOptsCapacity - queuedResponsesLen
+			}
+		}
 
 		enqueuers := []func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState{
 			mac.EnqueueDutyCycleReq,
@@ -358,7 +371,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	ctx = log.NewContext(ctx, logger)
 
 	cmdsInFOpts := len(cmdBuf) <= fOptsCapacity
-	if cmdsInFOpts {
+	if cmdsInFOpts && len(relayPayload) == 0 {
 		appDowns := dev.Session.QueuedApplicationDownlinks[:0:0]
 	outer:
 		for i, down := range dev.Session.QueuedApplicationDownlinks {
@@ -476,7 +489,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			mType = ttnpb.MType_CONFIRMED_DOWN
 		}
 
-	case len(cmdBuf) > 0, needsDownlink:
+	case len(cmdBuf) > 0, len(relayPayload) > 0, needsDownlink:
 		pld.FullFCnt = func() uint32 {
 			for i := len(dev.MacState.RecentDownlinks) - 1; i >= 0; i-- {
 				down := dev.MacState.RecentDownlinks[i]
@@ -506,6 +519,25 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			}
 			return 0
 		}()
+		if len(relayPayload) > 0 {
+			logger.Debug("Add relay downlink to buffer")
+			if dev.GetSession().GetKeys().GetNwkSEncKey() == nil {
+				return nil, genState, errUnknownNwkSEncKey.New()
+			}
+			key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.NwkSEncKey, ns.KeyService())
+			if err != nil {
+				logger.WithField("kek_label", dev.Session.Keys.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
+				return nil, genState, err
+			}
+			encPayload, err := crypto.EncryptDownlink(
+				key, types.MustDevAddr(dev.Session.DevAddr).OrZero(), pld.FullFCnt, relayPayload,
+			)
+			if err != nil {
+				return nil, genState, errEncryptMAC.WithCause(err)
+			}
+			pld.FPort = relayspec.FPort
+			pld.FrmPayload = encPayload
+		}
 
 	default:
 		return nil, genState, errNoDownlink.New()
@@ -905,6 +937,12 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(
 					continue
 				}
 				target = &packetBrokerDownlinkTarget{peer: peer}
+			case proto.Equal(path.GatewayIdentifiers, relayspec.GatewayIdentifiers):
+				target = &relayDownlinkTarget{
+					servedEndDeviceIDs: req.EndDeviceIdentifiers,
+					servedSessionKeyID: req.SessionKeyID,
+					patchServingDevice: ns.relayPatchServingDevice,
+				}
 			default:
 				logger := logger.WithFields(log.Fields(
 					"target", "gateway_server",
@@ -1412,10 +1450,12 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	ctx = events.ContextWithCorrelationID(ctx, slot.Uplink.CorrelationIds...)
 	if !dev.MacState.RxWindowsAvailable {
 		log.FromContext(ctx).Error("RX windows not available, skip class A downlink slot")
+		dev.MacState.PendingRelayDownlink = nil
 		dev.MacState.QueuedResponses = nil
 		dev.MacState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
 			SetPaths: []string{
+				"mac_state.pending_relay_downlink",
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			},
@@ -1446,10 +1486,12 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	)
 	queuedEvents = append(queuedEvents, rxParametersEvents...)
 	if err != nil {
+		dev.MacState.PendingRelayDownlink = nil
 		dev.MacState.QueuedResponses = nil
 		dev.MacState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
 			SetPaths: []string{
+				"mac_state.pending_relay_downlink",
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			},
@@ -1462,10 +1504,12 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		attemptRX2 = rxParameters.attemptRX2
 	)
 	if !attemptRX1 && !attemptRX2 {
+		dev.MacState.PendingRelayDownlink = nil
 		dev.MacState.QueuedResponses = nil
 		dev.MacState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
 			SetPaths: []string{
+				"mac_state.pending_relay_downlink",
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			},
@@ -1510,11 +1554,13 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		attemptRX2 = len(genDown.RawPayload) <= int(rxParameters.rx2MaxMACPayloadSize)+5
 		if !attemptRX1 && !attemptRX2 {
 			log.FromContext(ctx).Error("Generated downlink payload size does not fit neither RX1, nor RX2, skip class A downlink slot")
+			dev.MacState.PendingRelayDownlink = nil
 			dev.MacState.QueuedResponses = nil
 			dev.MacState.RxWindowsAvailable = false
 			return downlinkAttemptResult{
 				DownlinkTaskUpdateStrategy: nextDownlinkTask,
 				SetPaths: ttnpb.AddFields(sets,
+					"mac_state.pending_relay_downlink",
 					"mac_state.queued_responses",
 					"mac_state.rx_windows_available",
 				),
@@ -1568,10 +1614,12 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		if genState.ApplicationDownlink != nil {
 			dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 		}
+		dev.MacState.PendingRelayDownlink = nil
 		dev.MacState.QueuedResponses = nil
 		dev.MacState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
 			SetPaths: ttnpb.AddFields(sets,
+				"mac_state.pending_relay_downlink",
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
@@ -1586,11 +1634,13 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		dev.Session.QueuedApplicationDownlinks = dev.Session.QueuedApplicationDownlinks[:0:0]
 	}
 	recordDataDownlink(dev, genState, genDown.NeedsMACAnswer, down, ns.defaultMACSettings)
+	dev.MacState.PendingRelayDownlink = nil
 	return downlinkAttemptResult{
 		SetPaths: ttnpb.AddFields(sets,
 			"mac_state.last_confirmed_downlink_at",
 			"mac_state.last_downlink_at",
 			"mac_state.pending_application_downlink",
+			"mac_state.pending_relay_downlink",
 			"mac_state.pending_requests",
 			"mac_state.queued_responses",
 			"mac_state.recent_downlinks",
@@ -1993,6 +2043,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						&scheduleRequest{
 							TxRequest:            req,
 							EndDeviceIdentifiers: dev.Ids,
+							SessionKeyID:         dev.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
 							RawPayload:           dev.PendingMacState.QueuedJoinAccept.Payload,
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{

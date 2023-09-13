@@ -7865,6 +7865,87 @@
       "file": "grpc_gsns.go"
     }
   },
+  "error:pkg/networkserver:relay_full_f_cnt": {
+    "translations": {
+      "en": "invalid full FCnt"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_m_type": {
+    "translations": {
+      "en": "invalid MType"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_recent_uplinks": {
+    "translations": {
+      "en": "recent uplinks not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_rx_windows_available": {
+    "translations": {
+      "en": "no RX windows available"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_schedule": {
+    "translations": {
+      "en": "relay schedule"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_serving": {
+    "translations": {
+      "en": "relay not serving"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_session": {
+    "translations": {
+      "en": "relay session not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_session_key_id": {
+    "translations": {
+      "en": "relay session key ID not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_uplink_token": {
+    "translations": {
+      "en": "invalid relay uplink token"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
   "error:pkg/networkserver:schedule": {
     "translations": {
       "en": "all downlink scheduling attempts failed"

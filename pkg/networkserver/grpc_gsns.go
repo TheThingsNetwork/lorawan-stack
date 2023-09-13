@@ -660,6 +660,7 @@ macLoop:
 		// TODO: Notify AS of session recovery(https://github.com/TheThingsNetwork/lorawan-stack/issues/594)
 	}
 	dev.MacState.PendingJoinRequest = nil
+	dev.MacState.PendingRelayDownlink = nil
 	dev.PendingMacState = nil
 	dev.PendingSession = nil
 
