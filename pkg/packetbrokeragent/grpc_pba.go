@@ -16,6 +16,7 @@ package packetbrokeragent
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	iampb "go.packetbroker.org/api/iam"
@@ -25,6 +26,7 @@ import (
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -106,6 +108,19 @@ func (s *pbaServer) GetInfo(ctx context.Context, _ *emptypb.Empty) (*ttnpb.Packe
 	return res, nil
 }
 
+func addAuthorityWarning(ctx context.Context, authority string) {
+	var name string
+	switch authority {
+	case "ttnr": // The Things Network Registry is the authority used by The Things Industries.
+		name = "The Things Industries"
+	default:
+		name = "an external authority"
+	}
+	warning.Add(ctx, fmt.Sprintf(
+		"The Packet Broker tenant is managed by %s: not all settings can be updated through The Things Stack.", name,
+	))
+}
+
 var (
 	errNetwork      = errors.DefineFailedPrecondition("network", "not supported for network")
 	errRegistration = errors.Define("registration", "get registration information")
@@ -120,16 +135,19 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 		return nil, errNetwork.New()
 	}
 
-	_, err := iampb.NewTenantRegistryClient(s.iamConn).GetTenant(ctx, &iampb.TenantRequest{
+	res, err := iampb.NewTenantRegistryClient(s.iamConn).GetTenant(ctx, &iampb.TenantRequest{
 		NetId:    s.netID.MarshalNumber(),
 		TenantId: tenantID,
 	})
-	var create bool
+	var create,
+		managedByAuthority bool
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			return nil, err
 		}
 		create = true
+	} else if managedByAuthority = res.Tenant.Authority != ""; managedByAuthority {
+		addAuthorityWarning(ctx, res.Tenant.Authority)
 	}
 
 	registration, err := s.registrationInfoExtractor(ctx, s.homeNetworkClusterID, s.clusterIDBuilder)
@@ -141,7 +159,8 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 	adminContact, technicalContact := toPBContactInfo(registration.ContactInfo)
 
 	if create {
-		_, err = iampb.NewTenantRegistryClient(s.iamConn).CreateTenant(ctx, &iampb.CreateTenantRequest{
+		var res *iampb.CreateTenantResponse
+		res, err = iampb.NewTenantRegistryClient(s.iamConn).CreateTenant(ctx, &iampb.CreateTenantRequest{
 			Tenant: &packetbroker.Tenant{
 				NetId:                 s.netID.MarshalNumber(),
 				TenantId:              tenantID,
@@ -152,31 +171,32 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 				Listed:                listed,
 			},
 		})
+		if err == nil && res.Tenant.Authority != "" {
+			addAuthorityWarning(ctx, res.Tenant.Authority)
+		}
 	} else {
 		req := &iampb.UpdateTenantRequest{
 			NetId:    s.netID.MarshalNumber(),
 			TenantId: tenantID,
-			Name: &wrapperspb.StringValue{
-				Value: registration.Name,
-			},
-			AdministrativeContact: &packetbroker.ContactInfoValue{
-				Value: adminContact,
-			},
-			TechnicalContact: &packetbroker.ContactInfoValue{
-				Value: technicalContact,
-			},
-			Listed: &wrapperspb.BoolValue{
-				Value: listed,
-			},
+			Listed:   wrapperspb.Bool(listed),
 		}
-		// Managing DevAddr blocks is only available if Packet Broker Agent is configured with NetID level authorization,
-		// and if the registration is a tenant within that NetID.
-		if id, err := s.authenticator.AuthInfo(ctx); err == nil && id.TenantId == "" {
-			req.DevAddrBlocks = &iampb.DevAddrBlocksValue{
-				Value: devAddrBlocks,
+		// If the Packet Broker tenant is not managed by an authority, other fields can be updated.
+		if !managedByAuthority {
+			req.Name = wrapperspb.String(registration.Name)
+			req.AdministrativeContact = &packetbroker.ContactInfoValue{
+				Value: adminContact,
+			}
+			req.TechnicalContact = &packetbroker.ContactInfoValue{
+				Value: technicalContact,
+			}
+			// Managing DevAddr blocks is only available if Packet Broker Agent is configured with NetID level authorization,
+			// and if the registration is a tenant within that NetID.
+			if id, err := s.authenticator.AuthInfo(ctx); err == nil && id.TenantId == "" {
+				req.DevAddrBlocks = &iampb.DevAddrBlocksValue{
+					Value: devAddrBlocks,
+				}
 			}
 		}
-
 		_, err = iampb.NewTenantRegistryClient(s.iamConn).UpdateTenant(ctx, req)
 	}
 
