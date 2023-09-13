@@ -10772,6 +10772,24 @@
       "file": "relay_conf.go"
     }
   },
+  "event:ns.mac.relay_configure_fwd_limit.answer": {
+    "translations": {
+      "en": "relay configure forward limit answer received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_configure_fwd_limit.go"
+    }
+  },
+  "event:ns.mac.relay_configure_fwd_limit.request": {
+    "translations": {
+      "en": "relay configure forward limit request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_configure_fwd_limit.go"
+    }
+  },
   "event:ns.mac.reset.confirmation": {
     "translations": {
       "en": "device reset confirmation enqueued"

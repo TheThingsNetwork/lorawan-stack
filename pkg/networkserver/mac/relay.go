@@ -15,6 +15,8 @@
 package mac
 
 import (
+	"fmt"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -41,4 +43,26 @@ func servingRelayFields(serving *ttnpb.ServingRelayParameters) log.Fielder {
 			"relay_cad_periodicity", serving.CadPeriodicity,
 		)...,
 	)
+}
+
+func relayForwardLimitsFields(limits *ttnpb.RelayForwardLimits, prefix string) []any {
+	if limits == nil {
+		return nil
+	}
+	return []any{
+		fmt.Sprintf("relay_%v_limit_bucket_size", prefix), limits.BucketSize,
+		fmt.Sprintf("relay_%v_limit_reload_rate", prefix), limits.ReloadRate,
+	}
+}
+
+func relayConfigureForwardLimitsFields(limits *ttnpb.ServingRelayParameters_ForwardingLimits) log.Fielder {
+	if limits == nil {
+		return log.Fields()
+	}
+	fields := []any{"relay_limit_reset_behavior", limits.ResetBehavior}
+	fields = append(fields, relayForwardLimitsFields(limits.JoinRequests, "join_requests")...)
+	fields = append(fields, relayForwardLimitsFields(limits.Notifications, "notifications")...)
+	fields = append(fields, relayForwardLimitsFields(limits.UplinkMessages, "uplink_messages")...)
+	fields = append(fields, relayForwardLimitsFields(limits.Overall, "overall")...)
+	return log.Fields(fields...)
 }

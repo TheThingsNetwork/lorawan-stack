@@ -614,6 +614,8 @@ macLoop:
 			evs, err = mac.HandleDeviceModeInd(ctx, dev, cmd.GetDeviceModeInd())
 		case ttnpb.MACCommandIdentifier_CID_RELAY_CONF:
 			evs, err = mac.HandleRelayConfAns(ctx, dev, cmd.GetRelayConfAns())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT:
+			evs, err = mac.HandleRelayConfigureFwdLimitAns(ctx, dev, cmd.GetRelayConfigureFwdLimitAns())
 		default:
 			_, known := lorawan.DefaultMACCommands[cmd.Cid]
 			logger.WithField("known", known).Debug("Unknown MAC command received")
