@@ -117,6 +117,7 @@ export default defineMessages({
   connectionIssues: 'Connection issues',
   contactInformation: 'Contact information',
   contactFieldPlaceholder: 'Type or choose a collaborator',
+  convertMacToEui: 'Convert MAC to EUI',
   copiedToClipboard: 'Copied to clipboard!',
   copyToClipboard: 'Copy to clipboard',
   createApiKey: 'Create API key',
@@ -476,6 +477,8 @@ export default defineMessages({
   validateLatitude: 'Latitude must be a whole or decimal number between -90 and 90',
   validateLength: '{field} must be exactly {length} characters long',
   validateLongitude: 'Longitude must be a whole or decimal number between -180 and 180',
+  validateMacAddressEntered:
+    '{field}s are 8 bytes. If you have entered a MAC address instead, use the button to convert it.',
   validateMqttPassword: '{field} must be empty or have at least 2 characters',
   validateMqttUrl:
     'MQTT URLs must have the format "mqtt[s]://[username][:password]@host.domain[:port]"',
