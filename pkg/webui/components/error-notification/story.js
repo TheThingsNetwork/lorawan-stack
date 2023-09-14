@@ -17,12 +17,6 @@ import { defineMessages } from 'react-intl'
 
 import ErrorNotification from '.'
 
-const m = defineMessages({
-  problem: 'We got a problem here!',
-  lengthyProblem:
-    'We got a problem here! And the description is quite lengthy as well, which can sometimes be a problem.',
-})
-
 const exampleError = {
   code: 2,
   message:
@@ -63,9 +57,13 @@ export default {
 
 export const Error = () => (
   <div>
-    <ErrorNotification title="example message title" content={m.problem} />
+    <ErrorNotification title="example message title" content="We've got a problem here!" />
     <ErrorNotification content={m.problem} />
-    <ErrorNotification title={m.lengthyProblem} content={exampleError} small />
+    <ErrorNotification
+      title="We got a problem here! And the description is quite lengthy as well, which can sometimes be a problem."
+      content={exampleError}
+      small
+    />
     <ErrorNotification content={exampleError} small />
     <ErrorNotification title="example of error with markup" content={testErrorWithMarkup} />
   </div>
