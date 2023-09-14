@@ -8045,6 +8045,15 @@
       "file": "agent.go"
     }
   },
+  "error:pkg/packetbrokeragent:contact_not_found": {
+    "translations": {
+      "en": "contact not found"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_gspba.go"
+    }
+  },
   "error:pkg/packetbrokeragent:decode_payload": {
     "translations": {
       "en": "decode LoRaWAN payload"
