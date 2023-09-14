@@ -261,6 +261,7 @@ func (js Js) BackendTranslations() error {
 		"--backend-messages", "config/messages.json",
 		"--locales", "pkg/webui/locales/.backend",
 		"--backend-only",
+		"--supported-locales", "en",
 	)
 }
 
