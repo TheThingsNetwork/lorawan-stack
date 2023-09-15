@@ -2727,6 +2727,7 @@ PeerInfo
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 #### Field Rules
 
