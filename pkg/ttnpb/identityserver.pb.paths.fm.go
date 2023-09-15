@@ -90,6 +90,7 @@ var IsConfigurationFieldPathsNested = []string{
 	"user_registration.admin_approval.required",
 	"user_registration.contact_info_validation",
 	"user_registration.contact_info_validation.required",
+	"user_registration.contact_info_validation.token_ttl",
 	"user_registration.enabled",
 	"user_registration.invitation",
 	"user_registration.invitation.required",
@@ -134,6 +135,7 @@ var GetIsConfigurationResponseFieldPathsNested = []string{
 	"configuration.user_registration.admin_approval.required",
 	"configuration.user_registration.contact_info_validation",
 	"configuration.user_registration.contact_info_validation.required",
+	"configuration.user_registration.contact_info_validation.token_ttl",
 	"configuration.user_registration.enabled",
 	"configuration.user_registration.invitation",
 	"configuration.user_registration.invitation.required",
@@ -206,6 +208,7 @@ var IsConfiguration_UserRegistrationFieldPathsNested = []string{
 	"admin_approval.required",
 	"contact_info_validation",
 	"contact_info_validation.required",
+	"contact_info_validation.token_ttl",
 	"enabled",
 	"invitation",
 	"invitation.required",
@@ -286,10 +289,12 @@ var IsConfiguration_UserRegistration_InvitationFieldPathsTopLevel = []string{
 }
 var IsConfiguration_UserRegistration_ContactInfoValidationFieldPathsNested = []string{
 	"required",
+	"token_ttl",
 }
 
 var IsConfiguration_UserRegistration_ContactInfoValidationFieldPathsTopLevel = []string{
 	"required",
+	"token_ttl",
 }
 var IsConfiguration_UserRegistration_AdminApprovalFieldPathsNested = []string{
 	"required",

@@ -1626,6 +1626,18 @@ func (m *IsConfiguration_UserRegistration_ContactInfoValidation) ValidateFields(
 				}
 			}
 
+		case "token_ttl":
+
+			if v, ok := interface{}(m.GetTokenTtl()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_ContactInfoValidationValidationError{
+						field:  "token_ttl",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return IsConfiguration_UserRegistration_ContactInfoValidationValidationError{
 				field:  name,

@@ -5637,6 +5637,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `required` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `token_ttl` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
 
 ### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation">Message `IsConfiguration.UserRegistration.Invitation`</a>
 

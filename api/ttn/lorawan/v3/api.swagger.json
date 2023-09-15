@@ -18501,6 +18501,9 @@
       "properties": {
         "required": {
           "type": "boolean"
+        },
+        "token_ttl": {
+          "type": "string"
         }
       }
     },

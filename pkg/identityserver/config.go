@@ -183,6 +183,7 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 			},
 			ContactInfoValidation: &ttnpb.IsConfiguration_UserRegistration_ContactInfoValidation{
 				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.ContactInfoValidation.Required},
+				TokenTtl: durationpb.New(c.UserRegistration.ContactInfoValidation.TokenTTL),
 			},
 			AdminApproval: &ttnpb.IsConfiguration_UserRegistration_AdminApproval{
 				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.AdminApproval.Required},
