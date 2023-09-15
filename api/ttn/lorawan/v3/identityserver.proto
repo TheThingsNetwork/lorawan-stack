@@ -71,6 +71,8 @@ message IsConfiguration {
     message ContactInfoValidation {
       google.protobuf.BoolValue required = 1;
       google.protobuf.Duration token_ttl = 2;
+      // The minimum interval between validation emails.
+      google.protobuf.Duration retry_interval = 3;
     }
     ContactInfoValidation contact_info_validation = 2;
 

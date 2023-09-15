@@ -43,8 +43,9 @@ type Config struct {
 			TokenTTL time.Duration `name:"token-ttl" description:"TTL of user invitation tokens"`
 		} `name:"invitation"`
 		ContactInfoValidation struct {
-			Required bool          `name:"required" description:"Require contact info validation for new users"`
-			TokenTTL time.Duration `name:"token-ttl" description:"TTL of contact info validation tokens"`
+			Required      bool          `name:"required" description:"Require contact info validation for new users"`
+			TokenTTL      time.Duration `name:"token-ttl" description:"TTL of contact info validation tokens"`
+			RetryInterval time.Duration `name:"retry-interval" description:"Minimum interval for resending contact info validation emails"` // nolint:lll
 		} `name:"contact-info-validation"`
 		AdminApproval struct {
 			Required bool `name:"required" description:"Require admin approval for new users"`
@@ -182,8 +183,9 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 				TokenTtl: durationpb.New(c.UserRegistration.Invitation.TokenTTL),
 			},
 			ContactInfoValidation: &ttnpb.IsConfiguration_UserRegistration_ContactInfoValidation{
-				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.ContactInfoValidation.Required},
-				TokenTtl: durationpb.New(c.UserRegistration.ContactInfoValidation.TokenTTL),
+				Required:      &wrapperspb.BoolValue{Value: c.UserRegistration.ContactInfoValidation.Required},
+				TokenTtl:      durationpb.New(c.UserRegistration.ContactInfoValidation.TokenTTL),
+				RetryInterval: durationpb.New(c.UserRegistration.ContactInfoValidation.RetryInterval),
 			},
 			AdminApproval: &ttnpb.IsConfiguration_UserRegistration_AdminApproval{
 				Required: &wrapperspb.BoolValue{Value: c.UserRegistration.AdminApproval.Required},

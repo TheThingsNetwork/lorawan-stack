@@ -1638,6 +1638,18 @@ func (m *IsConfiguration_UserRegistration_ContactInfoValidation) ValidateFields(
 				}
 			}
 
+		case "retry_interval":
+
+			if v, ok := interface{}(m.GetRetryInterval()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserRegistration_ContactInfoValidationValidationError{
+						field:  "retry_interval",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return IsConfiguration_UserRegistration_ContactInfoValidationValidationError{
 				field:  name,

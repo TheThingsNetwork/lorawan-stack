@@ -877,6 +877,15 @@ func (dst *IsConfiguration_UserRegistration_ContactInfoValidation) SetFields(src
 			} else {
 				dst.TokenTtl = nil
 			}
+		case "retry_interval":
+			if len(subs) > 0 {
+				return fmt.Errorf("'retry_interval' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RetryInterval = src.RetryInterval
+			} else {
+				dst.RetryInterval = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

@@ -5638,6 +5638,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `required` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
 | `token_ttl` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `retry_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The minimum interval between validation emails. |
 
 ### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation">Message `IsConfiguration.UserRegistration.Invitation`</a>
 

@@ -18504,6 +18504,10 @@
         },
         "token_ttl": {
           "type": "string"
+        },
+        "retry_interval": {
+          "type": "string",
+          "description": "The minimum interval between validation emails."
         }
       }
     },
