@@ -759,10 +759,26 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					)
 				}
 				if stored.PendingSession != nil {
-					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(types.MustDevAddr(stored.PendingSession.DevAddr).OrZero())), uid)
+					devAddr := types.MustDevAddr(stored.PendingSession.DevAddr).OrZero()
+					removeAddrMapping(
+						ctx,
+						p,
+						PendingAddrKey(r.addrKey(
+							devAddr,
+						)),
+						uid,
+					)
 				}
 				if stored.Session != nil {
-					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(types.MustDevAddr(stored.Session.DevAddr).OrZero())), uid)
+					devAddr := types.MustDevAddr(stored.Session.DevAddr).OrZero()
+					removeAddrMapping(
+						ctx,
+						p,
+						CurrentAddrKey(r.addrKey(
+							devAddr,
+						)),
+						uid,
+					)
 				}
 				return nil
 			}
@@ -850,21 +866,44 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 						!proto.Equal(updated.PendingSession.Keys.FNwkSIntKey, storedPendingSession.Keys.FNwkSIntKey)
 				}()
 				if removeStored {
-					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(types.MustDevAddr(storedPendingSession.DevAddr).OrZero())), uid)
+					devAddr := types.MustDevAddr(storedPendingSession.DevAddr).OrZero()
+					removeAddrMapping(
+						ctx,
+						p,
+						PendingAddrKey(r.addrKey(
+							devAddr,
+						)),
+						uid,
+					)
 				}
 				if setAddr {
-					pendingDevAddr := types.MustDevAddr(updated.PendingSession.DevAddr).OrZero()
-					p.ZAdd(ctx, PendingAddrKey(r.addrKey(pendingDevAddr)), redis.Z{
+					devAddr := types.MustDevAddr(updated.PendingSession.DevAddr).OrZero()
+					z := redis.Z{
 						Score:  float64(time.Now().UnixNano()),
 						Member: uid,
-					})
+					}
+					p.ZAdd(
+						ctx,
+						PendingAddrKey(r.addrKey(
+							devAddr,
+						)),
+						z,
+					)
 				}
 				if setFields {
+					devAddr := types.MustDevAddr(updated.PendingSession.DevAddr).OrZero()
 					b, err := MarshalDevicePendingSession(updated)
 					if err != nil {
 						return err
 					}
-					p.HSet(ctx, FieldKey(PendingAddrKey(r.addrKey(types.MustDevAddr(updated.PendingSession.DevAddr).OrZero()))), uid, b)
+					p.HSet(
+						ctx,
+						FieldKey(PendingAddrKey(r.addrKey(
+							devAddr,
+						))),
+						uid,
+						b,
+					)
 				}
 			}
 
@@ -890,21 +929,44 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 						!proto.Equal(updated.MacSettings.GetSupports_32BitFCnt(), storedMACSettings.GetSupports_32BitFCnt())
 				}()
 				if removeStored {
-					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(types.MustDevAddr(storedSession.DevAddr).OrZero())), uid)
+					devAddr := types.MustDevAddr(storedSession.DevAddr).OrZero()
+					removeAddrMapping(
+						ctx,
+						p,
+						CurrentAddrKey(r.addrKey(
+							devAddr,
+						)),
+						uid,
+					)
 				}
 				if setAddr {
 					devAddr := types.MustDevAddr(updated.Session.DevAddr).OrZero()
-					p.ZAdd(ctx, CurrentAddrKey(r.addrKey(devAddr)), redis.Z{
+					z := redis.Z{
 						Score:  float64(updated.Session.LastFCntUp & 0xffff),
 						Member: uid,
-					})
+					}
+					p.ZAdd(
+						ctx,
+						CurrentAddrKey(r.addrKey(
+							devAddr,
+						)),
+						z,
+					)
 				}
 				if setFields {
+					devAddr := types.MustDevAddr(updated.Session.DevAddr).OrZero()
 					b, err := MarshalDeviceCurrentSession(updated)
 					if err != nil {
 						return err
 					}
-					p.HSet(ctx, FieldKey(CurrentAddrKey(r.addrKey(types.MustDevAddr(updated.Session.DevAddr).OrZero()))), uid, b)
+					p.HSet(
+						ctx,
+						FieldKey(CurrentAddrKey(r.addrKey(
+							devAddr,
+						))),
+						uid,
+						b,
+					)
 				}
 			}
 
@@ -1009,16 +1071,18 @@ func (r *DeviceRegistry) BatchDelete(
 					))
 				}
 				if dev.PendingSession != nil {
+					devAddr := types.MustDevAddr(dev.PendingSession.DevAddr).OrZero()
 					addrMapping[uid] = []string{
 						PendingAddrKey(r.addrKey(
-							types.MustDevAddr(dev.PendingSession.DevAddr).OrZero(),
+							devAddr,
 						)),
 					}
 				}
 				if dev.Session != nil {
+					devAddr := types.MustDevAddr(dev.Session.DevAddr).OrZero()
 					addrMapping[uid] = append(addrMapping[uid], []string{
 						CurrentAddrKey(r.addrKey(
-							types.MustDevAddr(dev.Session.DevAddr).OrZero(),
+							devAddr,
 						)),
 					}...)
 				}
