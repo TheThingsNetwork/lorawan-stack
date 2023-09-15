@@ -390,6 +390,7 @@ func validationToPB(m *ContactInfoValidation) *ttnpb.ContactInfoValidation {
 		Token:     m.Token,
 		CreatedAt: ttnpb.ProtoTime(&m.CreatedAt),
 		ExpiresAt: ttnpb.ProtoTime(m.ExpiresAt),
+		UpdatedAt: ttnpb.ProtoTime(&m.UpdatedAt),
 		ContactInfo: []*ttnpb.ContactInfo{{
 			ContactMethod: ttnpb.ContactMethod(m.ContactMethod),
 			Value:         m.Value,
@@ -555,5 +556,36 @@ func (s *contactInfoStore) ExpireValidation(ctx context.Context, pb *ttnpb.Conta
 	if err != nil {
 		return storeutil.WrapDriverError(err)
 	}
+	return nil
+}
+
+func (s *contactInfoStore) RefreshValidation(ctx context.Context, pb *ttnpb.ContactInfoValidation) error {
+	ctx, span := tracer.StartFromContext(ctx, "RefreshValidation", trace.WithAttributes(
+		attribute.String("entity_type", pb.GetEntity().EntityType()),
+		attribute.String("entity_id", pb.GetEntity().IDString()),
+	))
+	defer span.End()
+
+	model, err := s.getContactInfoValidationModelBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.
+			Where("reference = ? AND token = ?", pb.Id, pb.Token).
+			// Done in order to avoid concurrent updates from happening in the same validation.
+			Where("updated_at <= ?", pb.UpdatedAt.AsTime())
+	})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrValidationTokenNotFound.WithAttributes("validation_id", pb.Id)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewUpdate().
+		Model(model).
+		WherePK().
+		Exec(ctx)
+	if err != nil {
+		return storeutil.WrapDriverError(err)
+	}
+
 	return nil
 }
