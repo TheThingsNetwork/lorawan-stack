@@ -346,6 +346,8 @@ type ContactInfoStore interface {
 	CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
 	GetValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
 	ExpireValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
+	// RefreshValidation sets the updated_at field of a validation, should be called before resending to the receiver.
+	RefreshValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 }
 
 // EUIStore interface for assigning DevEUI blocks and addresses.
