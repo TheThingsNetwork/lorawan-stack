@@ -37,13 +37,6 @@ type EntityIdentifiers interface {
 	GetEntityIdentifiers() *ttnpb.EntityIdentifiers
 }
 
-func getEntityIdentifiers(eIDs EntityIdentifiers) *ttnpb.EntityIdentifiers {
-	if eIDs == nil {
-		return nil
-	}
-	return eIDs.GetEntityIdentifiers()
-}
-
 // Cluster interface that is implemented by all different clustering implementations.
 type Cluster interface {
 	// Join the cluster.
@@ -330,23 +323,9 @@ func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer,
 	return matches, nil
 }
 
-// overridePeerRole may change the peer role depending on the identifiers.
-func overridePeerRole(ctx context.Context, role ttnpb.ClusterRole, ids *ttnpb.EntityIdentifiers) ttnpb.ClusterRole {
-	switch role {
-	case ttnpb.ClusterRole_GATEWAY_SERVER:
-		if ids := ids.GetGatewayIds(); ids != nil && ids.GetGatewayId() == PacketBrokerGatewayID.GatewayId {
-			return ttnpb.ClusterRole_PACKET_BROKER_AGENT
-		}
-	default:
-	}
-	return role
-}
-
 var errPeerUnavailable = errors.DefineUnavailable("peer_unavailable", "{cluster_role} cluster peer unavailable")
 
-func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, eIDs EntityIdentifiers) (Peer, error) {
-	ids := getEntityIdentifiers(eIDs)
-	role = overridePeerRole(ctx, role, ids)
+func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, _ EntityIdentifiers) (Peer, error) {
 	matches, err := c.GetPeers(ctx, role)
 	if err != nil {
 		return nil, err

@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	pkgpacketbroker "go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	. "go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -789,7 +790,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIds:   cluster.PacketBrokerGatewayID,
+							GatewayIds:   pkgpacketbroker.GatewayIdentifiers,
 							AntennaIndex: 0,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
@@ -819,7 +820,7 @@ func TestHomeNetwork(t *testing.T) {
 							})),
 						},
 						{
-							GatewayIds:   cluster.PacketBrokerGatewayID,
+							GatewayIds:   pkgpacketbroker.GatewayIdentifiers,
 							AntennaIndex: 1,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
@@ -932,7 +933,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIds: cluster.PacketBrokerGatewayID,
+							GatewayIds: pkgpacketbroker.GatewayIdentifiers,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
 								ForwarderNetId:      types.NetID{0x0, 0x0, 0x42}.Bytes(),

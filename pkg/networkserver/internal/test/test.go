@@ -23,13 +23,13 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	nstime "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/toa"
@@ -161,7 +161,7 @@ var (
 	}
 	PacketBrokerRxMetadata = [...]*ttnpb.RxMetadata{
 		{
-			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
+			GatewayIds:  packetbroker.GatewayIdentifiers,
 			Snr:         4.2,
 			ChannelRssi: -14.2,
 			UplinkToken: []byte("token-pb-1"),
@@ -172,7 +172,7 @@ var (
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
-			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
+			GatewayIds:  packetbroker.GatewayIdentifiers,
 			Snr:         1.8,
 			ChannelRssi: -21.8,
 			UplinkToken: []byte("token-pb-2"),

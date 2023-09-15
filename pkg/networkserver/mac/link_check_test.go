@@ -20,10 +20,10 @@ import (
 
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -301,7 +301,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 						Snr: 25,
 					},
 					{
-						GatewayIds: cluster.PacketBrokerGatewayID,
+						GatewayIds: packetbroker.GatewayIdentifiers,
 						PacketBroker: &ttnpb.PacketBrokerMetadata{
 							ForwarderNetId:     types.NetID{0x0, 0x0, 0x42}.Bytes(),
 							ForwarderTenantId:  "test",

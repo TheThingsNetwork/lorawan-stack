@@ -23,12 +23,12 @@ import (
 
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	pkgpacketbroker "go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -525,7 +525,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		if md := gtwMd.GetPlainLocalization().GetTerrestrial(); md != nil {
 			for _, ant := range md.Antennas {
 				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIds:             cluster.PacketBrokerGatewayID,
+					GatewayIds:             pkgpacketbroker.GatewayIdentifiers,
 					PacketBroker:           pbMD,
 					AntennaIndex:           ant.Index,
 					Time:                   receiveTime,
@@ -554,7 +554,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 				}
 				if md == nil {
 					md = &ttnpb.RxMetadata{
-						GatewayIds:             cluster.PacketBrokerGatewayID,
+						GatewayIds:             pkgpacketbroker.GatewayIdentifiers,
 						PacketBroker:           pbMD,
 						AntennaIndex:           ant.Index,
 						Time:                   receiveTime,
