@@ -84,9 +84,9 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 }
 
 // GetNetID returns the NetID of the Network Server.
-func (ns *NetworkServer) GetNetID(_ context.Context, _ *emptypb.Empty) (*ttnpb.GetNetIDResponse, error) {
+func (ns *NetworkServer) GetNetID(ctx context.Context, _ *emptypb.Empty) (*ttnpb.GetNetIDResponse, error) {
 	return &ttnpb.GetNetIDResponse{
-		NetId: ns.netID[:],
+		NetId: ns.netID(ctx).Bytes(),
 	}, nil
 }
 

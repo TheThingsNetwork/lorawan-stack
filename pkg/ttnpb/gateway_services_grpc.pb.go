@@ -993,3 +993,193 @@ var GatewayConfigurator_ServiceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "ttn/lorawan/v3/gateway_services.proto",
 }
+
+const (
+	GatewayBatchAccess_AssertRights_FullMethodName = "/ttn.lorawan.v3.GatewayBatchAccess/AssertRights"
+)
+
+// GatewayBatchAccessClient is the client API for GatewayBatchAccess service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type GatewayBatchAccessClient interface {
+	// Assert that the caller has the requested rights on all the requested gateways.
+	// The check is successful if there are no errors.
+	AssertRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type gatewayBatchAccessClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewGatewayBatchAccessClient(cc grpc.ClientConnInterface) GatewayBatchAccessClient {
+	return &gatewayBatchAccessClient{cc}
+}
+
+func (c *gatewayBatchAccessClient) AssertRights(ctx context.Context, in *AssertGatewayRightsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GatewayBatchAccess_AssertRights_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GatewayBatchAccessServer is the server API for GatewayBatchAccess service.
+// All implementations must embed UnimplementedGatewayBatchAccessServer
+// for forward compatibility
+type GatewayBatchAccessServer interface {
+	// Assert that the caller has the requested rights on all the requested gateways.
+	// The check is successful if there are no errors.
+	AssertRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedGatewayBatchAccessServer()
+}
+
+// UnimplementedGatewayBatchAccessServer must be embedded to have forward compatible implementations.
+type UnimplementedGatewayBatchAccessServer struct {
+}
+
+func (UnimplementedGatewayBatchAccessServer) AssertRights(context.Context, *AssertGatewayRightsRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssertRights not implemented")
+}
+func (UnimplementedGatewayBatchAccessServer) mustEmbedUnimplementedGatewayBatchAccessServer() {}
+
+// UnsafeGatewayBatchAccessServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GatewayBatchAccessServer will
+// result in compilation errors.
+type UnsafeGatewayBatchAccessServer interface {
+	mustEmbedUnimplementedGatewayBatchAccessServer()
+}
+
+func RegisterGatewayBatchAccessServer(s grpc.ServiceRegistrar, srv GatewayBatchAccessServer) {
+	s.RegisterService(&GatewayBatchAccess_ServiceDesc, srv)
+}
+
+func _GatewayBatchAccess_AssertRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssertGatewayRightsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayBatchAccessServer).AssertRights(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayBatchAccess_AssertRights_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayBatchAccessServer).AssertRights(ctx, req.(*AssertGatewayRightsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GatewayBatchAccess_ServiceDesc is the grpc.ServiceDesc for GatewayBatchAccess service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var GatewayBatchAccess_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.GatewayBatchAccess",
+	HandlerType: (*GatewayBatchAccessServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AssertRights",
+			Handler:    _GatewayBatchAccess_AssertRights_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/gateway_services.proto",
+}
+
+const (
+	GatewayBatchRegistry_Delete_FullMethodName = "/ttn.lorawan.v3.GatewayBatchRegistry/Delete"
+)
+
+// GatewayBatchRegistryClient is the client API for GatewayBatchRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type GatewayBatchRegistryClient interface {
+	// Delete a batch of gateways.
+	// This operation is atomic; either all gateways are deleted or none.
+	// The caller must have delete rights on all requested gateways.
+	Delete(ctx context.Context, in *BatchDeleteGatewaysRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type gatewayBatchRegistryClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewGatewayBatchRegistryClient(cc grpc.ClientConnInterface) GatewayBatchRegistryClient {
+	return &gatewayBatchRegistryClient{cc}
+}
+
+func (c *gatewayBatchRegistryClient) Delete(ctx context.Context, in *BatchDeleteGatewaysRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GatewayBatchRegistry_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GatewayBatchRegistryServer is the server API for GatewayBatchRegistry service.
+// All implementations must embed UnimplementedGatewayBatchRegistryServer
+// for forward compatibility
+type GatewayBatchRegistryServer interface {
+	// Delete a batch of gateways.
+	// This operation is atomic; either all gateways are deleted or none.
+	// The caller must have delete rights on all requested gateways.
+	Delete(context.Context, *BatchDeleteGatewaysRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedGatewayBatchRegistryServer()
+}
+
+// UnimplementedGatewayBatchRegistryServer must be embedded to have forward compatible implementations.
+type UnimplementedGatewayBatchRegistryServer struct {
+}
+
+func (UnimplementedGatewayBatchRegistryServer) Delete(context.Context, *BatchDeleteGatewaysRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedGatewayBatchRegistryServer) mustEmbedUnimplementedGatewayBatchRegistryServer() {}
+
+// UnsafeGatewayBatchRegistryServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GatewayBatchRegistryServer will
+// result in compilation errors.
+type UnsafeGatewayBatchRegistryServer interface {
+	mustEmbedUnimplementedGatewayBatchRegistryServer()
+}
+
+func RegisterGatewayBatchRegistryServer(s grpc.ServiceRegistrar, srv GatewayBatchRegistryServer) {
+	s.RegisterService(&GatewayBatchRegistry_ServiceDesc, srv)
+}
+
+func _GatewayBatchRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchDeleteGatewaysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayBatchRegistryServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayBatchRegistry_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayBatchRegistryServer).Delete(ctx, req.(*BatchDeleteGatewaysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GatewayBatchRegistry_ServiceDesc is the grpc.ServiceDesc for GatewayBatchRegistry service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var GatewayBatchRegistry_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.GatewayBatchRegistry",
+	HandlerType: (*GatewayBatchRegistryServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Delete",
+			Handler:    _GatewayBatchRegistry_Delete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/gateway_services.proto",
+}

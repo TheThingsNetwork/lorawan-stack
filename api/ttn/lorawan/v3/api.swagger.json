@@ -87,6 +87,12 @@
       "name": "GatewayConfigurator"
     },
     {
+      "name": "GatewayBatchAccess"
+    },
+    {
+      "name": "GatewayBatchRegistry"
+    },
+    {
       "name": "GtwGs"
     },
     {
@@ -8694,6 +8700,133 @@
         ]
       }
     },
+    "/gateways/batch": {
+      "delete": {
+        "summary": "Delete a batch of gateways.\nThis operation is atomic; either all gateways are deleted or none.\nThe caller must have delete rights on all requested gateways.",
+        "operationId": "GatewayBatchRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "GatewayBatchRegistry"
+        ]
+      }
+    },
+    "/gateways/rights/batch": {
+      "get": {
+        "summary": "Assert that the caller has the requested rights on all the requested gateways.\nThe check is successful if there are no errors.",
+        "operationId": "GatewayBatchAccess_AssertRights",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "required.rights",
+            "description": " - RIGHT_USER_INFO: The right to view user information.\n - RIGHT_USER_SETTINGS_BASIC: The right to edit basic user settings.\n - RIGHT_USER_SETTINGS_API_KEYS: The right to view and edit user API keys.\n - RIGHT_USER_DELETE: The right to delete user account.\n - RIGHT_USER_AUTHORIZED_CLIENTS: The right to view and edit authorized OAuth clients of the user.\n - RIGHT_USER_APPLICATIONS_LIST: The right to list applications the user is a collaborator of.\n - RIGHT_USER_APPLICATIONS_CREATE: The right to create an application under the user account.\n - RIGHT_USER_GATEWAYS_LIST: The right to list gateways the user is a collaborator of.\n - RIGHT_USER_GATEWAYS_CREATE: The right to create a gateway under the account of the user.\n - RIGHT_USER_CLIENTS_LIST: The right to list OAuth clients the user is a collaborator of.\n - RIGHT_USER_CLIENTS_CREATE: The right to create an OAuth client under the account of the user.\n - RIGHT_USER_ORGANIZATIONS_LIST: The right to list organizations the user is a member of.\n - RIGHT_USER_ORGANIZATIONS_CREATE: The right to create an organization under the user account.\n - RIGHT_USER_NOTIFICATIONS_READ: The right to read notifications sent to the user.\n - RIGHT_USER_ALL: The pseudo-right for all (current and future) user rights.\n - RIGHT_APPLICATION_INFO: The right to view application information.\n - RIGHT_APPLICATION_SETTINGS_BASIC: The right to edit basic application settings.\n - RIGHT_APPLICATION_SETTINGS_API_KEYS: The right to view and edit application API keys.\n - RIGHT_APPLICATION_SETTINGS_COLLABORATORS: The right to view and edit application collaborators.\n - RIGHT_APPLICATION_SETTINGS_PACKAGES: The right to view and edit application packages and associations.\n - RIGHT_APPLICATION_DELETE: The right to delete application.\n - RIGHT_APPLICATION_DEVICES_READ: The right to view devices in application.\n - RIGHT_APPLICATION_DEVICES_WRITE: The right to create devices in application.\n - RIGHT_APPLICATION_DEVICES_READ_KEYS: The right to view device keys in application.\nNote that keys may not be stored in a way that supports viewing them.\n - RIGHT_APPLICATION_DEVICES_WRITE_KEYS: The right to edit device keys in application.\n - RIGHT_APPLICATION_TRAFFIC_READ: The right to read application traffic (uplink and downlink).\n - RIGHT_APPLICATION_TRAFFIC_UP_WRITE: The right to write uplink application traffic.\n - RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE: The right to write downlink application traffic.\n - RIGHT_APPLICATION_LINK: The right to link as Application to a Network Server for traffic exchange,\ni.e. read uplink and write downlink (API keys only).\nThis right is typically only given to an Application Server.\nThis right implies RIGHT_APPLICATION_INFO, RIGHT_APPLICATION_TRAFFIC_READ,\nand RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE.\n - RIGHT_APPLICATION_ALL: The pseudo-right for all (current and future) application rights.\n - RIGHT_CLIENT_ALL: The pseudo-right for all (current and future) OAuth client rights.\n - RIGHT_CLIENT_INFO: The right to read client information.\n - RIGHT_CLIENT_SETTINGS_BASIC: The right to edit basic client settings.\n - RIGHT_CLIENT_SETTINGS_COLLABORATORS: The right to view and edit client collaborators.\n - RIGHT_CLIENT_DELETE: The right to delete a client.\n - RIGHT_GATEWAY_INFO: The right to view gateway information.\n - RIGHT_GATEWAY_SETTINGS_BASIC: The right to edit basic gateway settings.\n - RIGHT_GATEWAY_SETTINGS_API_KEYS: The right to view and edit gateway API keys.\n - RIGHT_GATEWAY_SETTINGS_COLLABORATORS: The right to view and edit gateway collaborators.\n - RIGHT_GATEWAY_DELETE: The right to delete gateway.\n - RIGHT_GATEWAY_TRAFFIC_READ: The right to read gateway traffic.\n - RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE: The right to write downlink gateway traffic.\n - RIGHT_GATEWAY_LINK: The right to link as Gateway to a Gateway Server for traffic exchange,\ni.e. write uplink and read downlink (API keys only)\nThis right is typically only given to a gateway.\nThis right implies RIGHT_GATEWAY_INFO.\n - RIGHT_GATEWAY_STATUS_READ: The right to view gateway status.\n - RIGHT_GATEWAY_LOCATION_READ: The right to view view gateway location.\n - RIGHT_GATEWAY_WRITE_SECRETS: The right to store secrets associated with this gateway.\n - RIGHT_GATEWAY_READ_SECRETS: The right to retrieve secrets associated with this gateway.\n - RIGHT_GATEWAY_ALL: The pseudo-right for all (current and future) gateway rights.\n - RIGHT_ORGANIZATION_INFO: The right to view organization information.\n - RIGHT_ORGANIZATION_SETTINGS_BASIC: The right to edit basic organization settings.\n - RIGHT_ORGANIZATION_SETTINGS_API_KEYS: The right to view and edit organization API keys.\n - RIGHT_ORGANIZATION_SETTINGS_MEMBERS: The right to view and edit organization members.\n - RIGHT_ORGANIZATION_DELETE: The right to delete organization.\n - RIGHT_ORGANIZATION_APPLICATIONS_LIST: The right to list the applications the organization is a collaborator of.\n - RIGHT_ORGANIZATION_APPLICATIONS_CREATE: The right to create an application under the organization.\n - RIGHT_ORGANIZATION_GATEWAYS_LIST: The right to list the gateways the organization is a collaborator of.\n - RIGHT_ORGANIZATION_GATEWAYS_CREATE: The right to create a gateway under the organization.\n - RIGHT_ORGANIZATION_CLIENTS_LIST: The right to list the OAuth clients the organization is a collaborator of.\n - RIGHT_ORGANIZATION_CLIENTS_CREATE: The right to create an OAuth client under the organization.\n - RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR: The right to add the organization as a collaborator on an existing entity.\n - RIGHT_ORGANIZATION_ALL: The pseudo-right for all (current and future) organization rights.\n - RIGHT_SEND_INVITES: The right to send invites to new users.\nNote that this is not prefixed with \"USER_\"; it is not a right on the user entity.\n - RIGHT_ALL: The pseudo-right for all (current and future) possible rights.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "right_invalid",
+                "RIGHT_USER_INFO",
+                "RIGHT_USER_SETTINGS_BASIC",
+                "RIGHT_USER_SETTINGS_API_KEYS",
+                "RIGHT_USER_DELETE",
+                "RIGHT_USER_AUTHORIZED_CLIENTS",
+                "RIGHT_USER_APPLICATIONS_LIST",
+                "RIGHT_USER_APPLICATIONS_CREATE",
+                "RIGHT_USER_GATEWAYS_LIST",
+                "RIGHT_USER_GATEWAYS_CREATE",
+                "RIGHT_USER_CLIENTS_LIST",
+                "RIGHT_USER_CLIENTS_CREATE",
+                "RIGHT_USER_ORGANIZATIONS_LIST",
+                "RIGHT_USER_ORGANIZATIONS_CREATE",
+                "RIGHT_USER_NOTIFICATIONS_READ",
+                "RIGHT_USER_ALL",
+                "RIGHT_APPLICATION_INFO",
+                "RIGHT_APPLICATION_SETTINGS_BASIC",
+                "RIGHT_APPLICATION_SETTINGS_API_KEYS",
+                "RIGHT_APPLICATION_SETTINGS_COLLABORATORS",
+                "RIGHT_APPLICATION_SETTINGS_PACKAGES",
+                "RIGHT_APPLICATION_DELETE",
+                "RIGHT_APPLICATION_DEVICES_READ",
+                "RIGHT_APPLICATION_DEVICES_WRITE",
+                "RIGHT_APPLICATION_DEVICES_READ_KEYS",
+                "RIGHT_APPLICATION_DEVICES_WRITE_KEYS",
+                "RIGHT_APPLICATION_TRAFFIC_READ",
+                "RIGHT_APPLICATION_TRAFFIC_UP_WRITE",
+                "RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE",
+                "RIGHT_APPLICATION_LINK",
+                "RIGHT_APPLICATION_ALL",
+                "RIGHT_CLIENT_ALL",
+                "RIGHT_CLIENT_INFO",
+                "RIGHT_CLIENT_SETTINGS_BASIC",
+                "RIGHT_CLIENT_SETTINGS_COLLABORATORS",
+                "RIGHT_CLIENT_DELETE",
+                "RIGHT_GATEWAY_INFO",
+                "RIGHT_GATEWAY_SETTINGS_BASIC",
+                "RIGHT_GATEWAY_SETTINGS_API_KEYS",
+                "RIGHT_GATEWAY_SETTINGS_COLLABORATORS",
+                "RIGHT_GATEWAY_DELETE",
+                "RIGHT_GATEWAY_TRAFFIC_READ",
+                "RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE",
+                "RIGHT_GATEWAY_LINK",
+                "RIGHT_GATEWAY_STATUS_READ",
+                "RIGHT_GATEWAY_LOCATION_READ",
+                "RIGHT_GATEWAY_WRITE_SECRETS",
+                "RIGHT_GATEWAY_READ_SECRETS",
+                "RIGHT_GATEWAY_ALL",
+                "RIGHT_ORGANIZATION_INFO",
+                "RIGHT_ORGANIZATION_SETTINGS_BASIC",
+                "RIGHT_ORGANIZATION_SETTINGS_API_KEYS",
+                "RIGHT_ORGANIZATION_SETTINGS_MEMBERS",
+                "RIGHT_ORGANIZATION_DELETE",
+                "RIGHT_ORGANIZATION_APPLICATIONS_LIST",
+                "RIGHT_ORGANIZATION_APPLICATIONS_CREATE",
+                "RIGHT_ORGANIZATION_GATEWAYS_LIST",
+                "RIGHT_ORGANIZATION_GATEWAYS_CREATE",
+                "RIGHT_ORGANIZATION_CLIENTS_LIST",
+                "RIGHT_ORGANIZATION_CLIENTS_CREATE",
+                "RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR",
+                "RIGHT_ORGANIZATION_ALL",
+                "RIGHT_SEND_INVITES",
+                "RIGHT_ALL"
+              ]
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "GatewayBatchAccess"
+        ]
+      }
+    },
     "/gateways/{gateway.ids.gateway_id}": {
       "put": {
         "summary": "Update the gateway, changing the fields specified by the field mask to the provided values.",
@@ -10107,7 +10240,7 @@
     },
     "/gs/gateways/connection/stats": {
       "post": {
-        "summary": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\nThis is not persisted between reconnects.\nGateways that are not connected or are part of a different cluster are ignored.\nIt is up to the client to make sure that the gateways are in the requested cluster.",
+        "summary": "Get statistics about gateway connections to the Gateway Server of a batch of gateways.\n- Statistics are not persisted between reconnects.\n- Gateways that are not connected or are part of a different cluster are ignored.\n- The client should ensure that the requested gateways are in the requested cluster.\n- The client should have the right to get the gateway connection stats on all requested gateways.",
         "operationId": "Gs_BatchGetGatewayConnectionStats",
         "responses": {
           "200": {
@@ -24180,6 +24313,12 @@
           "format": "string",
           "example": "000013",
           "description": "LoRa Alliance NetID."
+        },
+        "ns_id": {
+          "type": "string",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
+          "description": "LoRaWAN NSID (EUI-64) that uniquely identifies the Network Server instance."
         },
         "tenant_id": {
           "type": "string",

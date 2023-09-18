@@ -54,7 +54,7 @@ func (s *session) Mail(from string, opts *smtp.MailOptions) error {
 	return nil
 }
 
-func (s *session) Rcpt(to string) error {
+func (s *session) Rcpt(to string, _ *smtp.RcptOptions) error {
 	s.msg.Recipients = append(s.msg.Recipients, to)
 	return nil
 }

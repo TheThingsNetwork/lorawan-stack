@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Maximize build space
-        uses: easimon/maximize-build-space@v7
+        uses: easimon/maximize-build-space@v8
         with:
           root-reserve-mb: 20480
           swap-size-mb: 4096
@@ -34,7 +34,7 @@ jobs:
           export VERSION=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+.\d+')
           echo "result=$VERSION" >> $GITHUB_OUTPUT
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: true
@@ -55,24 +55,24 @@ jobs:
             git push origin v${{ steps.version.outputs.result }}
           fi
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: "${{ secrets.AWS_REGION }}"
           role-to-assume: "arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_NAME }}"
           role-session-name: "${{ secrets.AWS_ROLE_NAME }}-${{ github.job }}-${{ github.run_id }}"
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Install Buf
         uses: bufbuild/buf-setup-action@v1
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_PASSWORD }}"
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: "${{ secrets.GHCR_USERNAME }}"
@@ -117,7 +117,7 @@ jobs:
           printf '%s' '${{ secrets.SIGNATURE_PASSPHRASE }}' >/tmp/gpg_passphrase
           cat /tmp/gpg_passphrase | gpg --passphrase-fd 0 --no-tty --batch --import gpg_signing_key
       - name: Run Goreleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: "v1.18.2"
           args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m

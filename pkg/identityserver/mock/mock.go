@@ -58,16 +58,17 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) { // nolint:r
 
 	srv := rpcserver.New(ctx)
 
+	ttnpb.RegisterEntityAccessServer(srv.Server, is.entityAccess)
+
 	ttnpb.RegisterApplicationRegistryServer(srv.Server, is.applicationRegistry)
 	ttnpb.RegisterApplicationAccessServer(srv.Server, is.applicationRegistry)
 
 	ttnpb.RegisterEndDeviceRegistryServer(srv.Server, is.endDeviceRegistry)
-
-	ttnpb.RegisterEntityAccessServer(srv.Server, is.entityAccess)
+	ttnpb.RegisterEndDeviceBatchRegistryServer(srv.Server, is.endDeviceBatchRegistry)
 
 	ttnpb.RegisterGatewayRegistryServer(srv.Server, is.gatewayRegistry)
 	ttnpb.RegisterGatewayAccessServer(srv.Server, is.gatewayRegistry)
-	ttnpb.RegisterEndDeviceBatchRegistryServer(srv.Server, is.endDeviceBatchRegistry)
+	ttnpb.RegisterGatewayBatchAccessServer(srv.Server, is.gatewayRegistry)
 
 	ttnpb.RegisterOrganizationRegistryServer(srv.Server, is.organizationRegistry)
 	ttnpb.RegisterOrganizationAccessServer(srv.Server, is.organizationRegistry)

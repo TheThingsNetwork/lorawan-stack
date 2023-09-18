@@ -45,6 +45,8 @@ type GatewayConnectionStatsRegistry interface {
 type EntityRegistry interface {
 	// AssertGatewayRights checks whether the gateway authentication (provied in the context) contains the required rights.
 	AssertGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error
+	// AssertGatewayBatchRights checks whether the caller has the requested rights on all the requested gateways.
+	AssertGatewayBatchRights(ctx context.Context, ids []*ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error
 	// Get the identifiers of the gateway that has the given EUI registered.
 	GetIdentifiersForEUI(ctx context.Context, in *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error)
 	// Get the gateway with the given identifiers, selecting the fields specified.

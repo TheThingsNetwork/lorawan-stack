@@ -72,6 +72,26 @@ func makeWindowDurationFunc(d time.Duration) windowDurationFunc {
 	return func(ctx context.Context) time.Duration { return d }
 }
 
+// netIDFunc is a function, which is used by the Network Server to determine its NetID.
+type netIDFunc func(ctx context.Context) types.NetID
+
+// makeNetIDFunc returns a netIDFunc, which always returns netID.
+func makeNetIDFunc(netID types.NetID) netIDFunc {
+	return func(ctx context.Context) types.NetID {
+		return netID
+	}
+}
+
+// nsIDFunc is a function, which is used by the Network Server to determine its NSID.
+type nsIDFunc func(ctx context.Context) *types.EUI64
+
+// makeNSIDFunc returns a nsIDFunc, which always returns nsID.
+func makeNSIDFunc(nsID *types.EUI64) nsIDFunc {
+	return func(ctx context.Context) *types.EUI64 {
+		return nsID
+	}
+}
+
 // newDevAddrFunc is a function, which is used by Network Server to derive new DevAddrs.
 type newDevAddrFunc func(ctx context.Context) types.DevAddr
 
@@ -141,7 +161,8 @@ type NetworkServer struct {
 	devices      DeviceRegistry
 	batchDevices *nsEndDeviceBatchRegistry
 
-	netID           types.NetID
+	netID           netIDFunc
+	nsID            nsIDFunc
 	clusterID       string
 	newDevAddr      newDevAddrFunc
 	devAddrPrefixes devAddrPrefixesFunc
@@ -158,7 +179,6 @@ type NetworkServer struct {
 	defaultMACSettings *ttnpb.MACSettings
 
 	interopClient InteropClient
-	interopNSID   *types.EUI64
 
 	uplinkDeduplicator UplinkDeduplicator
 
@@ -257,7 +277,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	ns := &NetworkServer{
 		Component:                c,
 		ctx:                      ctx,
-		netID:                    conf.NetID,
+		netID:                    makeNetIDFunc(conf.NetID),
+		nsID:                     makeNSIDFunc(conf.Interop.ID),
 		clusterID:                conf.ClusterID,
 		newDevAddr:               makeNewDevAddrFunc(devAddrPrefixes...),
 		devAddrPrefixes:          makeDevAddrPrefixesFunc(devAddrPrefixes...),
@@ -270,7 +291,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		downlinkPriorities:       downlinkPriorities,
 		defaultMACSettings:       defaultMACSettings,
 		interopClient:            interopCl,
-		interopNSID:              conf.Interop.ID,
 		uplinkDeduplicator:       conf.UplinkDeduplicator,
 		deviceKEKLabel:           conf.DeviceKEKLabel,
 		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,

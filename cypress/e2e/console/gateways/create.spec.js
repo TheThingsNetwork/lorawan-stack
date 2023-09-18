@@ -66,6 +66,17 @@ describe('Gateway create', () => {
     cy.findByTestId('error-notification').should('not.exist')
   })
 
+  it('succeeds converting MAC to EUI', () => {
+    const gatewayMac = generateHexValue(12)
+
+    cy.findByLabelText('Gateway EUI').type(gatewayMac)
+    cy.contains('Convert MAC to EUI', { timeout: 3500 }).should('be.visible').click()
+    cy.contains('Convert MAC to EUI').should('not.exist')
+
+    const gatewayEui = `${gatewayMac.substring(0, 6)}fffe${gatewayMac.substring(6)}`
+    cy.findByLabelText('Gateway ID').should('have.value', `eui-${gatewayEui}`)
+  })
+
   it('succeeds showing modal when generating API keys for CUPS and LNS', () => {
     const gateway = {
       frequency_plan: 'EU_863_870',

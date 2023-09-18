@@ -17,9 +17,11 @@ package mockis
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -52,6 +54,7 @@ func DefaultGateway(ids *ttnpb.GatewayIdentifiers, locationPublic, updateLocatio
 type mockISGatewayRegistry struct {
 	ttnpb.UnimplementedGatewayRegistryServer
 	ttnpb.UnimplementedGatewayAccessServer
+	ttnpb.UnimplementedGatewayBatchAccessServer
 	gateways      map[string]*ttnpb.Gateway
 	gatewayAuths  map[string][]string
 	gatewayRights map[string]authKeyToRights
@@ -171,6 +174,49 @@ func (is *mockISGatewayRegistry) ListRights(
 		}
 	}
 	return res, err
+}
+
+// AssertRights implements GatewayBatchAccess.
+func (is *mockISGatewayRegistry) AssertRights(
+	ctx context.Context,
+	req *ttnpb.AssertGatewayRightsRequest,
+) (*emptypb.Empty, error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
+	md := rpcmetadata.FromIncomingContext(ctx)
+	if md.AuthType == "" {
+		return nil, errNoGatewayRights.New()
+	}
+	if strings.ToLower(md.AuthType) != "bearer" {
+		return nil, errNoGatewayRights.New()
+	}
+
+	for _, ids := range req.GatewayIds {
+		uid := unique.ID(ctx, ids)
+		auths, ok := is.gatewayAuths[uid]
+		if !ok {
+			return nil, errNoGatewayRights.New()
+		}
+		for _, a := range auths {
+			if a != fmt.Sprintf("Bearer %s", md.AuthValue) {
+				return nil, errNoGatewayRights.New()
+			}
+			authKeyToRights := is.gatewayRights[uid]
+			if authKeyToRights == nil {
+				return nil, errNoGatewayRights.New()
+			}
+			r, ok := authKeyToRights[a]
+			if !ok {
+				return nil, errNoGatewayRights.New()
+			}
+			rights := &ttnpb.Rights{Rights: r}
+			if len(rights.Intersect(req.Required).GetRights()) == 0 {
+				return nil, errNoGatewayRights.New()
+			}
+		}
+	}
+	return ttnpb.Empty, nil
 }
 
 func (is *mockISGatewayRegistry) GetIdentifiersForEUI(

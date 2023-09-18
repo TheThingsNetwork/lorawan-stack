@@ -22,6 +22,7 @@ import "google/protobuf/field_mask.proto";
 import "ttn/lorawan/v3/gateway.proto";
 import "ttn/lorawan/v3/identifiers.proto";
 import "ttn/lorawan/v3/rights.proto";
+import "validate/validate.proto";
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
@@ -94,7 +95,7 @@ service GatewayRegistry {
   }
 }
 
-// The GatewayAcces service, exposed by the Identity Server, is used to manage
+// The GatewayAccess service, exposed by the Identity Server, is used to manage
 // API keys and collaborators of gateways.
 service GatewayAccess {
   // List the rights the caller has on this gateway.
@@ -175,4 +176,41 @@ message PullGatewayConfigurationRequest {
 
 service GatewayConfigurator {
   rpc PullConfiguration(PullGatewayConfigurationRequest) returns (stream Gateway);
+}
+
+message AssertGatewayRightsRequest {
+  repeated GatewayIdentifiers gateway_ids = 1 [
+    (validate.rules).repeated.min_items = 1,
+    (validate.rules).repeated.max_items = 20
+  ];
+  Rights required = 2 [(validate.rules).message.required = true];
+}
+
+// The GatewayBatchAccess service, exposed by the Identity Server, is used to
+// check the rights of the caller on multiple gateways at once.
+// EXPERIMENTAL: This service is subject to change.
+service GatewayBatchAccess {
+  // Assert that the caller has the requested rights on all the requested gateways.
+  // The check is successful if there are no errors.
+  rpc AssertRights(AssertGatewayRightsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {get: "/gateways/rights/batch"};
+  }
+}
+
+message BatchDeleteGatewaysRequest {
+  repeated ttn.lorawan.v3.GatewayIdentifiers gateway_ids = 1 [(validate.rules).repeated = {
+    min_items: 1,
+    max_items: 20,
+  }];
+}
+
+// The GatewayBatchRegistry service, exposed by the Identity Server, is used to manage
+// gateway registrations in batches.
+service GatewayBatchRegistry {
+  // Delete a batch of gateways.
+  // This operation is atomic; either all gateways are deleted or none.
+  // The caller must have delete rights on all requested gateways.
+  rpc Delete(BatchDeleteGatewaysRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/gateways/batch"};
+  }
 }

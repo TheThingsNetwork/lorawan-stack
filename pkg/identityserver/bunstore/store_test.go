@@ -99,6 +99,7 @@ func TestGatewayStore(t *testing.T) {
 	st := storetest.New(t, newTestStore)
 	st.TestGatewayStoreCRUD(t)
 	st.TestGatewayStorePagination(t)
+	st.TestGatewayBatchOperations(t)
 }
 
 func TestOrganizationStore(t *testing.T) {

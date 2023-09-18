@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback, useEffect, useState } from 'react'
 import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -36,72 +35,62 @@ const findCheckedRadio = children => {
   return value
 }
 
-class RadioGroup extends React.Component {
-  constructor(props) {
-    super(props)
-
-    let value
+const RadioGroup = props => {
+  const { className, name, disabled, horizontal, onChange, children } = props
+  const [value, setValue] = useState(() => {
     if ('value' in props) {
-      value = props.value
+      return props.value
     } else if ('initialValue' in props) {
-      value = props.initialValue
-    } else {
-      value = findCheckedRadio(props.children)
+      return props.initialValue
     }
 
-    this.state = { value }
-  }
+    return findCheckedRadio(children)
+  })
 
-  static getDerivedStateFromProps(props, state) {
+  useEffect(() => {
     if ('value' in props) {
-      return { value: props.value }
+      setValue(props.value)
+    } else {
+      const foundValue = findCheckedRadio(children)
+      if (foundValue && foundValue !== value) {
+        setValue(foundValue)
+      }
     }
+  }, [props, children, value])
 
-    const value = findCheckedRadio(props.children)
-    if (value && value !== state.value) {
-      return { value }
-    }
+  const handleRadioChange = useCallback(
+    event => {
+      const { target } = event
 
-    return null
+      // Retain boolean type if the value was initially provided as boolean.
+      const value = typeof props.value === 'boolean' ? target.value === 'true' : target.value
+
+      if (!('value' in props)) {
+        setValue(value)
+      }
+
+      onChange(value)
+    },
+    [onChange, props],
+  )
+
+  const ctx = {
+    className: style.groupRadio,
+    onChange: handleRadioChange,
+    disabled,
+    value,
+    name,
   }
 
-  @bind
-  handleRadioChange(event) {
-    const { onChange } = this.props
-    const { target } = event
+  const cls = classnames(className, style.group, {
+    [style.horizontal]: horizontal,
+  })
 
-    // Retain boolean type if the value was initially provided as boolean.
-    const value = typeof this.props.value === 'boolean' ? target.value === 'true' : target.value
-
-    if (!('value' in this.props)) {
-      this.setState({ value })
-    }
-
-    onChange(value)
-  }
-
-  render() {
-    const { className, name, disabled, horizontal, children } = this.props
-    const { value } = this.state
-
-    const ctx = {
-      className: style.groupRadio,
-      onChange: this.handleRadioChange,
-      disabled,
-      value,
-      name,
-    }
-
-    const cls = classnames(className, style.group, {
-      [style.horizontal]: horizontal,
-    })
-
-    return (
-      <div className={cls}>
-        <RadioGroupContext.Provider value={ctx}>{children}</RadioGroupContext.Provider>
-      </div>
-    )
-  }
+  return (
+    <div className={cls}>
+      <RadioGroupContext.Provider value={ctx}>{children}</RadioGroupContext.Provider>
+    </div>
+  )
 }
 
 RadioGroup.propTypes = {

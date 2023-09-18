@@ -61,7 +61,8 @@ func newIS(c Cluster) *IS {
 
 // GetUser calls the Entity Registry with cluster auth and returns an user.
 func (is IS) GetUser(ctx context.Context, req *ttnpb.GetUserRequest) (*ttnpb.User, error) {
-	v, err := is.cache.Get(unique.ID(ctx, req))
+	uid := unique.ID(ctx, req)
+	v, err := is.cache.Get(uid)
 	if err != nil && !errors.Is(err, gcache.KeyNotFoundError) {
 		return nil, err
 	}
@@ -82,7 +83,7 @@ func (is IS) GetUser(ctx context.Context, req *ttnpb.GetUserRequest) (*ttnpb.Use
 
 	// Caches error in order to avoid calls in succession, time to live is significantly lower when an error occurs.
 	item := &cacheItem[*ttnpb.User]{entity: usr, err: err}
-	if err := is.cache.SetWithExpire(unique.ID(ctx, item.entity), item, expire); err != nil {
+	if err := is.cache.SetWithExpire(uid, item, expire); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to cache user")
 	}
 	return item.entity, item.err
@@ -90,7 +91,8 @@ func (is IS) GetUser(ctx context.Context, req *ttnpb.GetUserRequest) (*ttnpb.Use
 
 // GetOrganization calls the Entity Registry with cluster auth and returns an organization.
 func (is IS) GetOrganization(ctx context.Context, req *ttnpb.GetOrganizationRequest) (*ttnpb.Organization, error) {
-	v, err := is.cache.Get(unique.ID(ctx, req))
+	uid := unique.ID(ctx, req)
+	v, err := is.cache.Get(uid)
 	if err != nil && !errors.Is(err, gcache.KeyNotFoundError) {
 		return nil, err
 	}
@@ -111,7 +113,7 @@ func (is IS) GetOrganization(ctx context.Context, req *ttnpb.GetOrganizationRequ
 
 	// Caches error in order to avoid calls in succession, time to live is significantly lower when an error occurs.
 	item := &cacheItem[*ttnpb.Organization]{entity: org, err: err}
-	if err := is.cache.SetWithExpire(unique.ID(ctx, item.entity), item, expire); err != nil {
+	if err := is.cache.SetWithExpire(uid, item, expire); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to cache organization")
 	}
 	return item.entity, item.err

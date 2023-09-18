@@ -842,7 +842,7 @@ func (ns *NetworkServer) filterMetadata(ctx context.Context, up *ttnpb.UplinkMes
 	mds := make([]*ttnpb.RxMetadata, 0, len(up.RxMetadata))
 	for _, md := range up.RxMetadata {
 		if pbMD := md.GetPacketBroker(); pbMD != nil {
-			if types.MustNetID(pbMD.ForwarderNetId).OrZero().Equal(ns.netID) &&
+			if types.MustNetID(pbMD.ForwarderNetId).OrZero().Equal(ns.netID(ctx)) &&
 				pbMD.ForwarderClusterId == ns.clusterID {
 				continue
 			}
@@ -1147,7 +1147,7 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids *ttnpb.EndDevi
 	}
 	if ns.interopClient != nil {
 		queuedEvents = append(queuedEvents, evtInteropJoinAttempt.NewWithIdentifiersAndData(ctx, ids, req))
-		resp, err := ns.interopClient.HandleJoinRequest(ctx, ns.netID, ns.interopNSID, req)
+		resp, err := ns.interopClient.HandleJoinRequest(ctx, ns.netID(ctx), ns.nsID(ctx), req)
 		if err == nil {
 			logger.Debug("Join-request accepted by interop Join Server")
 			queuedEvents = append(queuedEvents, evtInteropJoinSuccess.NewWithIdentifiersAndData(ctx, ids, joinResponseWithoutKeys(resp)))
@@ -1288,7 +1288,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		CfList:             cfList,
 		CorrelationIds:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr.Bytes(),
-		NetId:              ns.netID.Bytes(),
+		NetId:              ns.netID(ctx).Bytes(),
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
 		SelectedMacVersion: matched.LorawanVersion, // Assume NS version is always higher than the version of the device
@@ -1327,7 +1327,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		Keys:           keys,
 		Payload:        resp.RawPayload,
 		DevAddr:        devAddr.Bytes(),
-		NetId:          ns.netID.Bytes(),
+		NetId:          ns.netID(ctx).Bytes(),
 		Request: &ttnpb.MACState_JoinRequest{
 			RxDelay:          macState.DesiredParameters.Rx1Delay,
 			CfList:           cfList,

@@ -95,6 +95,7 @@ var (
 	DefaultSNwkSIntKeyWrapped = DefaultSNwkSIntKeyEnvelopeWrapped.EncryptedKey
 
 	DefaultNetID   = Must(types.NewNetID(2, []byte{0x00, 0x42, 0xff}))
+	DefaultNSID    = types.EUI64{0x00, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	DefaultDevAddr = Must(types.NewDevAddr(DefaultNetID, []byte{0x00, 0x02, 0xff, 0xff}))
 
 	DefaultLegacyAppSKey = crypto.DeriveLegacyAppSKey(DefaultNwkKey, DefaultJoinNonce, DefaultNetID, DefaultDevNonce)

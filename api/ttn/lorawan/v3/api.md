@@ -337,8 +337,12 @@
   - [Message `GetGatewayConfigurationResponse`](#ttn.lorawan.v3.GetGatewayConfigurationResponse)
   - [Service `GatewayConfigurationService`](#ttn.lorawan.v3.GatewayConfigurationService)
 - [File `ttn/lorawan/v3/gateway_services.proto`](#ttn/lorawan/v3/gateway_services.proto)
+  - [Message `AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest)
+  - [Message `BatchDeleteGatewaysRequest`](#ttn.lorawan.v3.BatchDeleteGatewaysRequest)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
+  - [Service `GatewayBatchAccess`](#ttn.lorawan.v3.GatewayBatchAccess)
+  - [Service `GatewayBatchRegistry`](#ttn.lorawan.v3.GatewayBatchRegistry)
   - [Service `GatewayConfigurator`](#ttn.lorawan.v3.GatewayConfigurator)
   - [Service `GatewayRegistry`](#ttn.lorawan.v3.GatewayRegistry)
 - [File `ttn/lorawan/v3/gatewayserver.proto`](#ttn/lorawan/v3/gatewayserver.proto)
@@ -360,6 +364,7 @@
   - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
+  - [Message `GatewayIdentifiersList`](#ttn.lorawan.v3.GatewayIdentifiersList)
   - [Message `LoRaAllianceProfileIdentifiers`](#ttn.lorawan.v3.LoRaAllianceProfileIdentifiers)
   - [Message `NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers)
   - [Message `OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers)
@@ -5103,6 +5108,32 @@ Identifies an end device model with version information.
 
 ## <a name="ttn/lorawan/v3/gateway_services.proto">File `ttn/lorawan/v3/gateway_services.proto`</a>
 
+### <a name="ttn.lorawan.v3.AssertGatewayRightsRequest">Message `AssertGatewayRightsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+| `required` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
+| `required` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.BatchDeleteGatewaysRequest">Message `BatchDeleteGatewaysRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
+
 ### <a name="ttn.lorawan.v3.PullGatewayConfigurationRequest">Message `PullGatewayConfigurationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -5112,7 +5143,7 @@ Identifies an end device model with version information.
 
 ### <a name="ttn.lorawan.v3.GatewayAccess">Service `GatewayAccess`</a>
 
-The GatewayAcces service, exposed by the Identity Server, is used to manage
+The GatewayAccess service, exposed by the Identity Server, is used to manage
 API keys and collaborators of gateways.
 
 | Method Name | Request Type | Response Type | Description |
@@ -5146,6 +5177,37 @@ API keys and collaborators of gateways.
 | `DeleteCollaborator` | `` | `/api/v3` |  |
 | `DeleteCollaborator` | `DELETE` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}` |  |
 | `DeleteCollaborator` | `DELETE` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}` |  |
+
+### <a name="ttn.lorawan.v3.GatewayBatchAccess">Service `GatewayBatchAccess`</a>
+
+The GatewayBatchAccess service, exposed by the Identity Server, is used to
+check the rights of the caller on multiple gateways at once.
+EXPERIMENTAL: This service is subject to change.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `AssertRights` | [`AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Assert that the caller has the requested rights on all the requested gateways. The check is successful if there are no errors. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `AssertRights` | `GET` | `/api/v3/gateways/rights/batch` |  |
+
+### <a name="ttn.lorawan.v3.GatewayBatchRegistry">Service `GatewayBatchRegistry`</a>
+
+The GatewayBatchRegistry service, exposed by the Identity Server, is used to manage
+gateway registrations in batches.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Delete` | [`BatchDeleteGatewaysRequest`](#ttn.lorawan.v3.BatchDeleteGatewaysRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a batch of gateways. This operation is atomic; either all gateways are deleted or none. The caller must have delete rights on all requested gateways. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Delete` | `DELETE` | `/api/v3/gateways/batch` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 
@@ -5256,7 +5318,7 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetGatewayConnectionStats` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats) | Get statistics about the current gateway connection to the Gateway Server. This is not persisted between reconnects. |
-| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. This is not persisted between reconnects. Gateways that are not connected or are part of a different cluster are ignored. It is up to the client to make sure that the gateways are in the requested cluster. |
+| `BatchGetGatewayConnectionStats` | [`BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest) | [`BatchGetGatewayConnectionStatsResponse`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsResponse) | Get statistics about gateway connections to the Gateway Server of a batch of gateways. - Statistics are not persisted between reconnects. - Gateways that are not connected or are part of a different cluster are ignored. - The client should ensure that the requested gateways are in the requested cluster. - The client should have the right to get the gateway connection stats on all requested gateways. |
 
 #### HTTP bindings
 
@@ -5392,6 +5454,12 @@ EntityIdentifiers contains one of the possible entity identifiers.
 | `gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `eui` | <p>`bytes.len`: `8`</p> |
 
+### <a name="ttn.lorawan.v3.GatewayIdentifiersList">Message `GatewayIdentifiersList`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.LoRaAllianceProfileIdentifiers">Message `LoRaAllianceProfileIdentifiers`</a>
 
 | Field | Type | Label | Description |
@@ -5406,6 +5474,7 @@ Identifies a Network Server.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `net_id` | [`bytes`](#bytes) |  | LoRa Alliance NetID. |
+| `ns_id` | [`bytes`](#bytes) |  | LoRaWAN NSID (EUI-64) that uniquely identifies the Network Server instance. |
 | `tenant_id` | [`string`](#string) |  | Optional tenant identifier for multi-tenant deployments. |
 | `cluster_id` | [`string`](#string) |  | Cluster identifier of the Network Server. |
 | `cluster_address` | [`string`](#string) |  | Cluster address of the Network Server. |
@@ -5416,6 +5485,7 @@ Identifies a Network Server.
 | Field | Validations |
 | ----- | ----------- |
 | `net_id` | <p>`bytes.len`: `3`</p> |
+| `ns_id` | <p>`bytes.len`: `8`</p> |
 | `tenant_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 | `cluster_id` | <p>`string.max_len`: `64`</p> |
 | `cluster_address` | <p>`string.max_len`: `256`</p> |

@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
       - name: Build Mage
@@ -85,7 +85,7 @@ jobs:
           args: -h postgres -U root ttn_lorawan_is_store_test
       - name: Configure AWS Credentials
         if: "${{ env.AWS_REGION != '' }}"
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: "${{ secrets.AWS_REGION }}"
           role-to-assume: "arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_NAME }}"
@@ -93,7 +93,7 @@ jobs:
         env:
           AWS_REGION: "${{ secrets.AWS_REGION }}"
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
       - name: Build Mage

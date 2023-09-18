@@ -65,7 +65,7 @@ func GetDevAddr(b []byte) (*DevAddr, error) {
 }
 
 // MustDevAddr returns a typed DevAddr from the bytes.
-// It returns nil if the bytes are empty.
+// It returns nil if b is nil.
 // It panics if unmarshaling results in an error.
 func MustDevAddr(b []byte) *DevAddr {
 	t, err := GetDevAddr(b)
@@ -353,7 +353,7 @@ func GetDevAddrPrefix(b []byte) (*DevAddrPrefix, error) {
 }
 
 // MustDevAddrPrefix returns a typed DevAddrPrefix from the bytes.
-// It returns nil if the bytes are empty.
+// It returns nil if b is nil.
 // It panics if unmarshaling results in an error.
 func MustDevAddrPrefix(b []byte) *DevAddrPrefix {
 	t, err := GetDevAddrPrefix(b)

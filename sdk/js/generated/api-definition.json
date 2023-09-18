@@ -882,6 +882,7 @@
         "up.uplink_message.network_ids.cluster_address",
         "up.uplink_message.network_ids.cluster_id",
         "up.uplink_message.network_ids.net_id",
+        "up.uplink_message.network_ids.ns_id",
         "up.uplink_message.network_ids.tenant_address",
         "up.uplink_message.network_ids.tenant_id",
         "up.uplink_message.normalized_payload",
@@ -928,6 +929,7 @@
         "up.uplink_normalized.network_ids.cluster_address",
         "up.uplink_normalized.network_ids.cluster_id",
         "up.uplink_normalized.network_ids.net_id",
+        "up.uplink_normalized.network_ids.ns_id",
         "up.uplink_normalized.network_ids.tenant_address",
         "up.uplink_normalized.network_ids.tenant_id",
         "up.uplink_normalized.normalized_payload",
@@ -980,6 +982,7 @@
         "up.uplink_message.network_ids.cluster_address",
         "up.uplink_message.network_ids.cluster_id",
         "up.uplink_message.network_ids.net_id",
+        "up.uplink_message.network_ids.ns_id",
         "up.uplink_message.network_ids.tenant_address",
         "up.uplink_message.network_ids.tenant_id",
         "up.uplink_message.normalized_payload",
@@ -3284,6 +3287,30 @@
             "gateway_ids.gateway_id",
             "collaborator_ids.organization_ids.organization_id"
           ]
+        }
+      ]
+    }
+  },
+  "GatewayBatchAccess": {
+    "AssertRights": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gateways/rights/batch",
+          "parameters": []
+        }
+      ]
+    }
+  },
+  "GatewayBatchRegistry": {
+    "Delete": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/gateways/batch",
+          "parameters": []
         }
       ]
     }
