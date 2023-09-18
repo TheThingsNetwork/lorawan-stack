@@ -11,7 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Locations retrieved from gateway status messages are now be displayed in the gateway map in the Console, even when they are not received through a secure connection.
 - The Network Server ID (NSID, EUI-64) used in LoRaWAN Backend Interfaces is now included in the application uplink message network metadata as well as in the Backend Interfaces `HomeNSAns` message that Identity Server returns to clients. The NSID is configurable via `is.network.ns-id`.
+- It is now possible to trigger a resending of the email validation email from within the Console. The new action is part of the error screen that users see when they log into the Console without having their contact info validated yet (and the network requires validation before usage).
 
 ### Changed
 

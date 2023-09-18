@@ -107,3 +107,7 @@ export const [
   { request: DELETE_INVITE, success: DELETE_INVITE_SUCCESS, failure: DELETE_INVITE_FAILURE },
   { request: deleteInvite, success: deleteInviteSuccess, failure: deleteInviteFailure },
 ] = createRequestActions(DELETE_INVITE_BASE, email => ({ email }))
+
+export const REQUEST_EMAIL_VALIDATION_BASE = 'REQUEST_EMAIL_VALIDATION'
+export const [{ request: REQUEST_EMAIL_VALIDATION }, { request: requestEmailValidation }] =
+  createRequestActions(REQUEST_EMAIL_VALIDATION_BASE, userId => ({ userId }))

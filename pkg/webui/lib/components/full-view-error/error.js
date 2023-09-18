@@ -61,11 +61,11 @@ const lastRefreshAttemptCacheKey = 'last-refresh-attempt'
 // Mind any rendering that is dependant on context, since the errors
 // can be rendered before such context is injected. Use the `safe`
 // prop to conditionally render any context-dependant nodes.
-const FullViewError = ({ error, header, onlineStatus, safe }) => (
+const FullViewError = ({ error, header, onlineStatus, safe, action, unexpected }) => (
   <div className={style.wrapper}>
     {Boolean(header) && header}
     <div className={style.flexWrapper}>
-      <FullViewErrorInner error={error} safe={safe} />
+      <FullViewErrorInner error={error} safe={safe} action={action} unexpected={unexpected} />
     </div>
     <Footer
       onlineStatus={onlineStatus}
@@ -76,11 +76,12 @@ const FullViewError = ({ error, header, onlineStatus, safe }) => (
   </div>
 )
 
-const FullViewErrorInner = ({ error, safe }) => {
+const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
   const isUnknown = isUnknownError(error)
   const isNotFound = isNotFoundError(error)
   const isFrontend = isFrontendError(error)
   const isBackend = isBackendError(error)
+  const hasAction = Boolean(action)
   const isErrorObject = error instanceof Error
   const isOAuthCallback = /oauth.*\/callback$/.test(window.location.pathname)
 
@@ -175,7 +176,7 @@ const FullViewErrorInner = ({ error, safe }) => {
             </h1>
             <div className={style.fullViewErrorSub}>
               <Message component="span" content={errorMessage} />
-              {!isNotFound && (
+              {!isNotFound && unexpected && (
                 <>
                   {' '}
                   <Message
@@ -203,6 +204,16 @@ const FullViewErrorInner = ({ error, safe }) => {
                   <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
                   <Message content={sharedMessages.backToLogin} />
                 </a>
+              )}
+              {hasAction && (
+                <button
+                  type="button"
+                  className={classnames(buttonClasses, buttonStyle.primary)}
+                  onClick={action.action}
+                >
+                  <Icon icon={action.icon} textPaddedRight nudgeDown />
+                  <Message content={action.message} />
+                </button>
               )}
               {hasSupportLink && !isNotFound && (
                 <>
@@ -289,25 +300,41 @@ const FullViewErrorInner = ({ error, safe }) => {
 }
 
 FullViewErrorInner.propTypes = {
+  action: PropTypes.shape({
+    action: PropTypes.func.isRequired,
+    icon: PropTypes.string.isRequired,
+    message: PropTypes.message.isRequired,
+  }),
   error: PropTypes.error.isRequired,
   safe: PropTypes.bool,
+  unexpected: PropTypes.bool,
 }
 
 FullViewErrorInner.defaultProps = {
+  action: undefined,
   safe: false,
+  unexpected: true,
 }
 
 FullViewError.propTypes = {
+  action: PropTypes.shape({
+    action: PropTypes.func.isRequired,
+    icon: PropTypes.string.isRequired,
+    message: PropTypes.message.isRequired,
+  }),
   error: PropTypes.error.isRequired,
   header: PropTypes.node,
   onlineStatus: PropTypes.onlineStatus,
   safe: PropTypes.bool,
+  unexpected: PropTypes.bool,
 }
 
 FullViewError.defaultProps = {
+  action: undefined,
   header: undefined,
   onlineStatus: undefined,
   safe: false,
+  unexpected: true,
 }
 
 export { FullViewError, FullViewErrorInner }

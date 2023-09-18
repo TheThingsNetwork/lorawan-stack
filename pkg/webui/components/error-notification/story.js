@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import ErrorNotification from '.'
 
