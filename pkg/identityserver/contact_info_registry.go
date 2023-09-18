@@ -38,7 +38,8 @@ var (
 		"no_validation_needed", "no validation needed for this contact info",
 	)
 	errValidationsAlreadySent = errors.DefineAlreadyExists(
-		"validations_already_sent", "validations for this contact info already sent",
+		"validations_already_sent",
+		"validations for this contact info already sent, wait `{retry_interval}` before retrying",
 	)
 )
 
@@ -212,7 +213,7 @@ func (is *IdentityServer) requestContactInfoValidation(
 		validation.Token = "" // Unset tokens after sending emails
 	}
 	if len(pendingContactInfo) == 0 {
-		return nil, errValidationsAlreadySent.New()
+		return nil, errValidationsAlreadySent.WithAttributes("retry_interval", retryInterval)
 	}
 
 	return &ttnpb.ContactInfoValidation{
