@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -348,6 +349,10 @@ type ContactInfoStore interface {
 	ExpireValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 	// RefreshValidation sets the updated_at field of a validation, should be called before resending to the receiver.
 	RefreshValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
+	// ListRefreshableValidations returns all not used validations for a given entity.
+	ListRefreshableValidations(
+		ctx context.Context, entityID *ttnpb.EntityIdentifiers, refreshInterval time.Duration,
+	) ([]*ttnpb.ContactInfoValidation, error)
 }
 
 // EUIStore interface for assigning DevEUI blocks and addresses.
