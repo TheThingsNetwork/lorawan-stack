@@ -33,12 +33,14 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/lora"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -688,9 +690,11 @@ func downlinkPathsFromMetadata(
 				},
 			},
 		}
-		if md.PacketBroker != nil {
+		switch {
+		case md.PacketBroker != nil:
+			path.GatewayIdentifiers = packetbroker.GatewayIdentifiers
 			tail = append(tail, path)
-		} else {
+		default:
 			path.GatewayIdentifiers = md.GatewayIds
 			switch md.DownlinkPathConstraint {
 			case ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE:
@@ -844,7 +848,7 @@ func (t *packetBrokerDownlinkTarget) Schedule(
 		DownlinkPath: &ttnpb.DownlinkPath{
 			Path: &ttnpb.DownlinkPath_Fixed{
 				Fixed: &ttnpb.GatewayAntennaIdentifiers{
-					GatewayIds: cluster.PacketBrokerGatewayID,
+					GatewayIds: packetbroker.GatewayIdentifiers,
 				},
 			},
 		},
@@ -878,7 +882,16 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(
 		attempts := groupedAttempts[groupIdx]
 		for _, path := range paths {
 			var target downlinkTarget
-			if path.GatewayIdentifiers != nil {
+			switch {
+			case proto.Equal(path.GatewayIdentifiers, packetbroker.GatewayIdentifiers):
+				logger := logger.WithField("target", "packet_broker_agent")
+				peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, nil)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to get Packet Broker Agent peer")
+					continue
+				}
+				target = &packetBrokerDownlinkTarget{peer: peer}
+			default:
 				logger := logger.WithFields(log.Fields(
 					"target", "gateway_server",
 					"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
@@ -889,14 +902,6 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(
 					continue
 				}
 				target = &gatewayServerDownlinkTarget{peer: peer}
-			} else {
-				logger := logger.WithField("target", "packet_broker_agent")
-				peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, nil)
-				if err != nil {
-					logger.WithError(err).Warn("Failed to get Packet Broker Agent peer")
-					continue
-				}
-				target = &packetBrokerDownlinkTarget{peer: peer}
 			}
 
 			var a *attempt

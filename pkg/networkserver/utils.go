@@ -435,3 +435,24 @@ func (ns *NetworkServer) networkIdentifiers(ctx context.Context) *ttnpb.NetworkI
 	}
 	return networkIDs
 }
+
+var (
+	deviceDownlinkBasePaths = [...]string{
+		"mac_state",
+		"multicast",
+		"pending_mac_state",
+		"pending_session",
+		"session",
+	}
+	deviceDownlinkFullPaths = [...]string{
+		"frequency_plan_id",
+		"last_dev_status_received_at",
+		"lorawan_phy_version",
+		"mac_settings",
+		"mac_state",
+		"multicast",
+		"pending_mac_state",
+		"pending_session",
+		"session",
+	}
+)

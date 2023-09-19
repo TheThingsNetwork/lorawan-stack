@@ -27,7 +27,11 @@ var (
 		"ping_slot_channel", "ping slot channel",
 		events.WithDataType(&ttnpb.MACCommand_PingSlotChannelReq{}),
 	)()
-	EvtReceivePingSlotChannelAnswer = defineReceiveMACAcceptEvent(
+	EvtReceivePingSlotChannelAccept = defineReceiveMACAcceptEvent(
+		"ping_slot_channel", "ping slot channel",
+		events.WithDataType(&ttnpb.MACCommand_PingSlotChannelAns{}),
+	)()
+	EvtReceivePingSlotChannelReject = defineReceiveMACRejectEvent(
 		"ping_slot_channel", "ping slot channel",
 		events.WithDataType(&ttnpb.MACCommand_PingSlotChannelAns{}),
 	)()
@@ -94,15 +98,21 @@ func HandlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *tt
 		ttnpb.MACCommandIdentifier_CID_PING_SLOT_CHANNEL,
 		false,
 		func(cmd *ttnpb.MACCommand) error {
+			if !pld.DataRateIndexAck || !pld.FrequencyAck {
+				return nil
+			}
 			req := cmd.GetPingSlotChannelReq()
-
 			dev.MacState.CurrentParameters.PingSlotFrequency = req.Frequency
 			dev.MacState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: req.DataRateIndex}
 			return nil
 		},
 		dev.MacState.PendingRequests...,
 	)
+	ev := EvtReceivePingSlotChannelAccept
+	if !pld.DataRateIndexAck || !pld.FrequencyAck {
+		ev = EvtReceivePingSlotChannelReject
+	}
 	return events.Builders{
-		EvtReceivePingSlotChannelAnswer.With(events.WithData(pld)),
+		ev.With(events.WithData(pld)),
 	}, err
 }

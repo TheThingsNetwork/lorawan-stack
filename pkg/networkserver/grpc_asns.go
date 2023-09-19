@@ -285,20 +285,9 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, req.EndDeviceIds))
 
-	gets := []string{
-		"mac_state",
-		"multicast",
-		"pending_mac_state",
-		"pending_session",
-		"session",
-	}
+	gets := deviceDownlinkBasePaths[:]
 	if len(req.Downlinks) > 0 {
-		gets = append(gets,
-			"frequency_plan_id",
-			"last_dev_status_received_at",
-			"lorawan_phy_version",
-			"mac_settings",
-		)
+		gets = deviceDownlinkFullPaths[:]
 	}
 
 	log.FromContext(ctx).WithField("downlink_count", len(req.Downlinks)).Debug("Replace downlink queue")
@@ -361,18 +350,8 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, req.EndDeviceIds))
 
 	log.FromContext(ctx).WithField("downlink_count", len(req.Downlinks)).Debug("Push application downlink to queue")
-	dev, ctx, err := ns.devices.SetByID(ctx, req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId,
-		[]string{
-			"frequency_plan_id",
-			"last_dev_status_received_at",
-			"lorawan_phy_version",
-			"mac_settings",
-			"mac_state",
-			"multicast",
-			"pending_mac_state",
-			"pending_session",
-			"session",
-		},
+	dev, ctx, err := ns.devices.SetByID(
+		ctx, req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, deviceDownlinkFullPaths[:],
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.New()
