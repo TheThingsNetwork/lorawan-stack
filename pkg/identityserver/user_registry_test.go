@@ -251,6 +251,16 @@ func TestUsersCRUD(t *testing.T) {
 
 	usr1 := p.NewUser()
 	usr1.Password = "OldPassword"
+	usr1.PrimaryEmailAddress = "user-1@email.com"
+	validatedAtTime := time.Now().Truncate(time.Millisecond)
+	usr1.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTime(&validatedAtTime)
+	// NOTE: Remove this when the deprecated field is removed.
+	// (https://github.com/TheThingsIndustries/lorawan-stack/issues/3830)
+	usr1.ContactInfo = append(usr1.ContactInfo, &ttnpb.ContactInfo{ // nolint:staticcheck
+		ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+		Value:         usr1.PrimaryEmailAddress,
+		ValidatedAt:   usr1.PrimaryEmailAddressValidatedAt,
+	})
 
 	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	creds := rpcCreds(key)
@@ -345,11 +355,41 @@ func TestUsersCRUD(t *testing.T) {
 			})
 
 			t.Run("PrimaryEmailAddress", func(t *testing.T) { // nolint:paralleltest
-				a, ctx := test.New(t)
+				t.Run("admin update", func(t *testing.T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					got, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
+						User: &ttnpb.User{
+							Ids:                 usr1.GetIds(),
+							PrimaryEmailAddress: "new-user-email@email.com",
+						},
+						FieldMask: ttnpb.FieldMask("primary_email_address"),
+					}, adminUsrCreds)
+					if a.So(err, should.BeNil) {
+						a.So(got.PrimaryEmailAddress, should.Equal, "new-user-email@email.com")
+						a.So(got.PrimaryEmailAddressValidatedAt, should.NotBeNil)
+						a.So(got.ContactInfo, should.HaveLength, 1)                              // nolint:staticcheck
+						a.So(got.ContactInfo[0].Value, should.Equal, "new-user-email@email.com") // nolint:staticcheck
+						a.So(got.ContactInfo[0].ValidatedAt, should.NotBeNil)                    // nolint:staticcheck
+					}
+				})
 
-				// admin operations
-
-				// non admin operations
+				t.Run("non admin update", func(t *testing.T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					got, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
+						User: &ttnpb.User{
+							Ids:                 usr1.GetIds(),
+							PrimaryEmailAddress: "second-new-user-email@email.com",
+						},
+						FieldMask: ttnpb.FieldMask("primary_email_address"),
+					}, creds)
+					if a.So(err, should.BeNil) {
+						a.So(got.PrimaryEmailAddress, should.Equal, "second-new-user-email@email.com")
+						a.So(got.PrimaryEmailAddressValidatedAt, should.BeNil)
+						a.So(got.ContactInfo, should.HaveLength, 1)                                     // nolint:staticcheck,lll
+						a.So(got.ContactInfo[0].Value, should.Equal, "second-new-user-email@email.com") // nolint:staticcheck,lll
+						a.So(got.ContactInfo[0].ValidatedAt, should.BeNil)                              // nolint:staticcheck,lll
+					}
+				})
 			})
 		})
 
