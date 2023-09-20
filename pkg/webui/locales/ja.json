@@ -2690,6 +2690,7 @@
   "event:ns.mac.relay_conf.request": "",
   "event:ns.mac.relay_configure_fwd_limit.answer": "",
   "event:ns.mac.relay_configure_fwd_limit.request": "",
+  "event:ns.mac.relay_notify_new_end_device.indication": "",
   "event:ns.mac.reset.confirmation": "デバイスリセット確認がエンキューされました",
   "event:ns.mac.reset.indication": "デバイスリセット指示を受信",
   "event:ns.mac.rx_param_setup.answer.accept": "受信パラメータ設定許可を受信",

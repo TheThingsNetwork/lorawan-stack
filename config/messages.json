@@ -10790,6 +10790,15 @@
       "file": "relay_configure_fwd_limit.go"
     }
   },
+  "event:ns.mac.relay_notify_new_end_device.indication": {
+    "translations": {
+      "en": "relay notify new end device indication received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_notify_new_end_device.go"
+    }
+  },
   "event:ns.mac.reset.confirmation": {
     "translations": {
       "en": "device reset confirmation enqueued"
