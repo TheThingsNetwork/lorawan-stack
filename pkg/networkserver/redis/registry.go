@@ -131,16 +131,6 @@ type UplinkMatchPendingSession struct {
 	LoRaWANVersion ttnpb.MACVersion
 }
 
-type UplinkMatchResult struct {
-	FNwkSIntKey       *ttnpb.KeyEnvelope
-	ResetsFCnt        *ttnpb.BoolValue
-	Supports32BitFCnt *ttnpb.BoolValue
-	UID               string
-	LoRaWANVersion    ttnpb.MACVersion
-	LastFCnt          uint32
-	IsPending         bool
-}
-
 func encodeStruct(enc *msgpack.Encoder, fs ...func(enc *msgpack.Encoder) error) error {
 	if err := enc.EncodeMapLen(len(fs)); err != nil {
 		return err
@@ -351,109 +341,6 @@ func (v *UplinkMatchPendingSession) DecodeMsgpack(dec *msgpack.Decoder) error {
 	return nil
 }
 
-// EncodeMsgpack implements msgpack.CustomEncoder interface.
-func (v UplinkMatchResult) EncodeMsgpack(enc *msgpack.Encoder) error {
-	fs := []func(enc *msgpack.Encoder) error{
-		makeEncodeFNwkSIntField(v.FNwkSIntKey),
-		makeEncodeLoRaWANVersionField(v.LoRaWANVersion),
-		func(enc *msgpack.Encoder) error {
-			if err := enc.EncodeString("uid"); err != nil {
-				return err
-			}
-			return enc.EncodeString(v.UID)
-		},
-	}
-	if v.LastFCnt > 0 {
-		fs = append(fs, makeEncodeLastFCntField(v.LastFCnt))
-	}
-	if v.IsPending {
-		fs = append(fs, func(enc *msgpack.Encoder) error {
-			if err := enc.EncodeString("is_pending"); err != nil {
-				return err
-			}
-			return enc.EncodeBool(v.IsPending)
-		})
-	}
-	if v.ResetsFCnt != nil {
-		fs = append(fs, makeEncodeResetsFCntField(v.ResetsFCnt))
-	}
-	if v.Supports32BitFCnt != nil {
-		fs = append(fs, makeEncodeSupports32BitFCntField(v.Supports32BitFCnt))
-	}
-	return encodeStruct(enc, fs...)
-}
-
-// DecodeMsgpack implements msgpack.CustomDecoder interface.
-func (v *UplinkMatchResult) DecodeMsgpack(dec *msgpack.Decoder) error {
-	n, err := dec.DecodeMapLen()
-	if err != nil {
-		return err
-	}
-	if n > 7 {
-		return errInvalidFieldCount.WithAttributes("count", n)
-	}
-	for i := 0; i < n; i++ {
-		s, err := dec.DecodeString()
-		if err != nil {
-			return err
-		}
-		switch s {
-		case "f_nwk_s_int_key":
-			fv := &ttnpb.KeyEnvelope{}
-			if err := fv.DecodeMsgpack(dec); err != nil {
-				return err
-			}
-			v.FNwkSIntKey = fv
-
-		case "lorawan_version":
-			var fv ttnpb.MACVersion
-			if err := fv.DecodeMsgpack(dec); err != nil {
-				return err
-			}
-			v.LoRaWANVersion = fv
-
-		case "resets_f_cnt":
-			fv, err := decodeBoolValue(dec)
-			if err != nil {
-				return err
-			}
-			v.ResetsFCnt = fv
-
-		case "supports_32_bit_f_cnt":
-			fv, err := decodeBoolValue(dec)
-			if err != nil {
-				return err
-			}
-			v.Supports32BitFCnt = fv
-
-		case "last_f_cnt":
-			fv, err := dec.DecodeUint32()
-			if err != nil {
-				return err
-			}
-			v.LastFCnt = fv
-
-		case "uid":
-			fv, err := dec.DecodeString()
-			if err != nil {
-				return err
-			}
-			v.UID = fv
-
-		case "is_pending":
-			fv, err := dec.DecodeBool()
-			if err != nil {
-				return err
-			}
-			v.IsPending = fv
-
-		default:
-			return errInvalidField.WithAttributes("field", s)
-		}
-	}
-	return nil
-}
-
 func CurrentAddrKey(addrKey string) string {
 	return ttnredis.Key(addrKey, "current")
 }
@@ -465,8 +352,6 @@ func PendingAddrKey(addrKey string) string {
 func FieldKey(addrKey string) string {
 	return ttnredis.Key(addrKey, "fields")
 }
-
-const noUplinkMatchMarker = '-'
 
 var (
 	errNoUplinkMatch = errors.DefineNotFound("no_uplink_match", "no device matches uplink")
@@ -653,13 +538,6 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	}
 
 	return errNoUplinkMatch.New()
-}
-
-func equalEUI64(x, y *types.EUI64) bool {
-	if x == nil || y == nil {
-		return x == y
-	}
-	return x.Equal(*y)
 }
 
 func removeAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string) (*redis.IntCmd, *redis.IntCmd) {
