@@ -78,9 +78,6 @@ func TestMsgpackCompatibility(t *testing.T) {
 	makeLastFCntExpr := func(v uint32) string {
 		return makeNumericExpr("last_f_cnt", v)
 	}
-	makeUIDExpr := func(v string) string {
-		return makeStringExpr("uid", v)
-	}
 
 	defaultfNwkSIntKeyWrappedExpr := makeFNwkSIntWrappedKeyExpr(test.DefaultFNwkSIntKeyEnvelopeWrapped)
 	defaultfNwkSIntKeyUnwrappedExpr := makeFNwkSIntUnwrappedKeyExpr(test.DefaultFNwkSIntKey)
@@ -193,123 +190,6 @@ func TestMsgpackCompatibility(t *testing.T) {
 				makeResetsFCntExpr(true),
 				makeSupports32BitFCntExpr(false),
 				makeLastFCntExpr(42),
-			),
-		},
-
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
-				LoRaWANVersion: test.DefaultMACVersion,
-				UID:            "test-uid",
-			},
-			LuaExpr: makeExprWithDefaults(
-				makeUIDExpr("test-uid"),
-			),
-		},
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelope,
-				LoRaWANVersion: test.DefaultMACVersion,
-				UID:            "test-uid",
-			},
-			LuaExpr: makeExpr(
-				defaultfNwkSIntKeyUnwrappedExpr,
-				defaultLoRaWANVersionExpr,
-				makeUIDExpr("test-uid"),
-			),
-		},
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
-				LoRaWANVersion:    test.DefaultMACVersion,
-				Supports32BitFCnt: &ttnpb.BoolValue{Value: false},
-				UID:               "test-uid",
-			},
-			LuaExpr: makeExprWithDefaults(
-				makeUIDExpr("test-uid"),
-				makeSupports32BitFCntExpr(false),
-			),
-		},
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
-				LoRaWANVersion:    test.DefaultMACVersion,
-				Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
-				UID:               "test-uid",
-			},
-			LuaExpr: makeExprWithDefaults(
-				makeUIDExpr("test-uid"),
-				makeSupports32BitFCntExpr(true),
-			),
-		},
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
-				LoRaWANVersion: test.DefaultMACVersion,
-				UID:            "test-uid",
-				ResetsFCnt:     &ttnpb.BoolValue{Value: true},
-			},
-			LuaExpr: makeExprWithDefaults(
-				makeUIDExpr("test-uid"),
-				makeResetsFCntExpr(true),
-			),
-		},
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
-				LoRaWANVersion: test.DefaultMACVersion,
-				UID:            "test-uid",
-				ResetsFCnt:     &ttnpb.BoolValue{Value: false},
-			},
-			LuaExpr: makeExprWithDefaults(
-				makeUIDExpr("test-uid"),
-				makeResetsFCntExpr(false),
-			),
-		},
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:    test.DefaultFNwkSIntKeyEnvelopeWrapped,
-				LoRaWANVersion: test.DefaultMACVersion,
-				UID:            "test-uid",
-				LastFCnt:       42,
-			},
-			LuaExpr: makeExprWithDefaults(
-				makeUIDExpr("test-uid"),
-				makeLastFCntExpr(42),
-			),
-		},
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
-				LoRaWANVersion:    test.DefaultMACVersion,
-				UID:               "test-uid",
-				ResetsFCnt:        &ttnpb.BoolValue{Value: true},
-				Supports32BitFCnt: &ttnpb.BoolValue{Value: false},
-				LastFCnt:          42,
-			},
-			LuaExpr: makeExprWithDefaults(
-				makeUIDExpr("test-uid"),
-				makeResetsFCntExpr(true),
-				makeSupports32BitFCntExpr(false),
-				makeLastFCntExpr(42),
-			),
-		},
-		{
-			Value: UplinkMatchResult{
-				FNwkSIntKey:       test.DefaultFNwkSIntKeyEnvelopeWrapped,
-				LoRaWANVersion:    test.DefaultMACVersion,
-				UID:               "test-uid",
-				ResetsFCnt:        &ttnpb.BoolValue{Value: true},
-				Supports32BitFCnt: &ttnpb.BoolValue{Value: false},
-				LastFCnt:          42,
-				IsPending:         true,
-			},
-			LuaExpr: makeExprWithDefaults(
-				makeUIDExpr("test-uid"),
-				makeResetsFCntExpr(true),
-				makeSupports32BitFCntExpr(false),
-				makeLastFCntExpr(42),
-				`x.is_pending`,
 			),
 		},
 	} {
