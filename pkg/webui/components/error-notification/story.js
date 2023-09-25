@@ -57,7 +57,7 @@ export default {
 export const Error = () => (
   <div>
     <ErrorNotification title="example message title" content="We've got a problem here!" />
-    <ErrorNotification content={m.problem} />
+    <ErrorNotification content="We've got a problem here" />
     <ErrorNotification
       title="We got a problem here! And the description is quite lengthy as well, which can sometimes be a problem."
       content={exampleError}
