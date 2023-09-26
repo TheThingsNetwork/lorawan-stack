@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux'
 
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
+import Spinner from '@ttn-lw/components/spinner'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 
@@ -29,16 +30,17 @@ import { selectUnseenIds } from '@console/store/selectors/notifications'
 
 import style from '../notifications.styl'
 
-const NotificationListItem = ({ notification, selectedNotification, handleClick }) => {
+export const NotificationListItem = ({ notification, selectedNotification, handleClick }) => {
   const unseenIds = useSelector(selectUnseenIds)
+  const showSelected = selectedNotification?.id === notification.id
   const classes = classNames(style.notificationPreview, 'm-0', {
-    [style.notificationSelected]: selectedNotification?.id === notification.id,
+    [style.notificationSelected]: showSelected,
   })
   const titleClasses = classNames(style.notificationPreviewTitle, {
-    [style.notificationSelected]: selectedNotification?.id === notification.id,
+    [style.notificationSelected]: showSelected,
   })
   const previewClasses = classNames(style.notificationPreviewContent, {
-    [style.notificationSelected]: selectedNotification?.id === notification.id,
+    [style.notificationSelected]: showSelected,
   })
   const showUnseenStatus = unseenIds.includes(notification.id)
 
@@ -80,9 +82,9 @@ const NotificationListItem = ({ notification, selectedNotification, handleClick 
 NotificationListItem.propTypes = {
   handleClick: PropTypes.func.isRequired,
   notification: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    created_at: PropTypes.string.isRequired,
-    notification_type: PropTypes.string.isRequired,
+    id: PropTypes.string,
+    created_at: PropTypes.string,
+    notification_type: PropTypes.string,
     status: PropTypes.string,
   }).isRequired,
   selectedNotification: PropTypes.shape({
@@ -94,4 +96,15 @@ NotificationListItem.defaultProps = {
   selectedNotification: undefined,
 }
 
-export default NotificationListItem
+export const NotificationListSpinner = () => {
+  const classes = classNames(style.notificationPreview, 'm-0')
+  const titleClasses = classNames(style.notificationPreviewTitle)
+
+  return (
+    <div className={classes}>
+      <div className={titleClasses}>
+        <Spinner faded small center />
+      </div>
+    </div>
+  )
+}
