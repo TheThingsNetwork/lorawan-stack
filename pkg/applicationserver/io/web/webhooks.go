@@ -29,7 +29,6 @@ import (
 	"github.com/jtacoma/uritemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -39,6 +38,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 const (
@@ -57,41 +57,41 @@ type HTTPClientSink struct {
 	*http.Client
 }
 
-var errRequest = errors.DefineUnavailable("request", "request")
+var errRequest = errors.DefineUnavailable("request", "request", "webhook_id", "url", "status_code")
 
-func createRequestErrorDetails(req *http.Request, res *http.Response) []proto.Message {
+func requestErrorDetails(req *http.Request, res *http.Response) ([]any, []proto.Message) {
 	ctx := req.Context()
-	m := map[string]any{
-		"webhook_id": webhookIDFromContext(ctx).WebhookId,
-		"url":        req.URL.String(),
-	}
+	attributes, details := []any{
+		"webhook_id", webhookIDFromContext(ctx).WebhookId,
+		"url", req.URL.String(),
+	}, []proto.Message{}
 	if res != nil {
-		body, _ := stdio.ReadAll(stdio.LimitReader(res.Body, maxResponseSize))
-		m["status_code"] = res.StatusCode
-		if utf8.Valid(body) {
-			m["body"] = string(body)
+		attributes = append(attributes, "status_code", res.StatusCode)
+		if body, _ := stdio.ReadAll(stdio.LimitReader(res.Body, maxResponseSize)); utf8.Valid(body) {
+			details = append(details, &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"body": structpb.NewStringValue(string(body)),
+				},
+			})
 		}
 	}
-	detail, err := goproto.Struct(m)
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Failed to marshal request error details")
-		return nil
-	}
-	return []proto.Message{detail}
+	return attributes, details
 }
 
 // Process uses the HTTP client to perform the request.
 func (s *HTTPClientSink) Process(req *http.Request) error {
 	res, err := s.Do(req)
 	if err != nil {
-		return errRequest.WithCause(err).WithDetails(createRequestErrorDetails(req, res)...)
+		attributes, details := requestErrorDetails(req, res)
+		return errRequest.WithAttributes(attributes...).WithDetails(details...).WithCause(err)
 	}
 	defer res.Body.Close()
 	defer stdio.Copy(stdio.Discard, res.Body) //nolint:errcheck
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return nil
 	}
-	return errRequest.WithDetails(createRequestErrorDetails(req, res)...)
+	attributes, details := requestErrorDetails(req, res)
+	return errRequest.WithAttributes(attributes...).WithDetails(details...)
 }
 
 // pooledSink is a Sink with worker pool.
@@ -271,20 +271,20 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 		hook := hooks[i]
 		ctx := withWebhookID(ctx, hook.Ids)
 		ctx = WithCachedHealthStatus(ctx, hook.HealthStatus)
-		logger := log.FromContext(ctx).WithField("hook", hook.Ids.WebhookId)
+		ctx = log.NewContextWithField(ctx, "hook", hook.Ids.WebhookId)
 		f := func(ctx context.Context) error {
 			req, err := w.newRequest(ctx, msg, hook)
 			if err != nil {
-				logger.WithError(err).Warn("Failed to create request")
+				log.FromContext(ctx).WithError(err).Warn("Failed to create request")
 				return err
 			}
 			if req == nil {
 				return nil
 			}
-			logger.WithField("url", req.URL).Debug("Process message")
+			log.FromContext(ctx).WithField("url", req.URL).Debug("Process message")
 			if err := w.target.Process(req); err != nil {
 				registerWebhookFailed(ctx, err)
-				logger.WithError(err).Warn("Failed to process message")
+				log.FromContext(ctx).WithError(err).Warn("Failed to process message")
 				return err
 			}
 			return nil
