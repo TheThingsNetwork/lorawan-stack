@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Col, Row } from 'react-grid-system'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
+import { FixedSizeList as List } from 'react-window'
+import InfiniteLoader from 'react-window-infinite-loader'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -29,39 +31,46 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { updateNotificationStatus } from '@console/store/actions/notifications'
 
-import {
-  selectNotifications,
-  selectTotalUnseenCount,
-  selectUnseenIds,
-} from '@console/store/selectors/notifications'
+import { selectTotalUnseenCount, selectUnseenIds } from '@console/store/selectors/notifications'
 import { selectUserId } from '@console/store/selectors/logout'
 
-import style from '../notifications.styl'
+import styles from '../notifications.styl'
 
-import NotificationListItem from './list-item'
+import { NotificationListItem, NotificationListSpinner } from './list-item'
 
 const m = defineMessages({
   archived: 'Archived notifications',
   markAllAsRead: 'Mark all as read',
 })
 
-const NotificationList = ({ setSelectedNotification, selectedNotification, isArchive }) => {
+const NotificationList = ({
+  items,
+  hasNextPage,
+  loadNextPage,
+  setSelectedNotification,
+  selectedNotification,
+  isArchive,
+}) => {
   const userId = useSelector(selectUserId)
-  const notifications = useSelector(selectNotifications)
   const unseenIds = useSelector(selectUnseenIds)
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const dispatch = useDispatch()
+  const isItemLoaded = useCallback(
+    index => !hasNextPage || index < items.length,
+    [hasNextPage, items],
+  )
+  const itemCount = hasNextPage ? items.length + 1 : items.length
 
   const handleClick = useCallback(
     async (e, id) => {
-      setSelectedNotification(notifications.find(notification => notification.id === id))
+      setSelectedNotification(items.find(notification => notification.id === id))
       if (!isArchive && unseenIds.includes(id)) {
         await dispatch(
           attachPromise(updateNotificationStatus(userId, [id], 'NOTIFICATION_STATUS_SEEN')),
         )
       }
     },
-    [notifications, dispatch, userId, setSelectedNotification, isArchive, unseenIds],
+    [items, dispatch, userId, setSelectedNotification, isArchive, unseenIds],
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
@@ -72,14 +81,34 @@ const NotificationList = ({ setSelectedNotification, selectedNotification, isArc
     }
   }, [dispatch, userId, unseenIds])
 
-  const classes = classNames(style.notificationHeaderIcon, 'm-0', {
-    [style.notifications]: !isArchive,
-    [style.archived]: isArchive,
+  const classes = classNames(styles.notificationHeaderIcon, 'm-0', {
+    [styles.notifications]: !isArchive,
+    [styles.archived]: isArchive,
   })
+
+  const Item = ({ index, style }) =>
+    isItemLoaded(index) ? (
+      <div style={style}>
+        <NotificationListItem
+          notification={items[index]}
+          selectedNotification={selectedNotification}
+          handleClick={handleClick}
+        />
+      </div>
+    ) : (
+      <div style={style}>
+        <NotificationListSpinner />
+      </div>
+    )
+
+  Item.propTypes = {
+    index: PropTypes.number.isRequired,
+    style: PropTypes.shape({}).isRequired,
+  }
 
   return (
     <>
-      <Row justify="between" className={classNames(style.notificationHeader, 'm-0')}>
+      <Row justify="between" className={classNames(styles.notificationHeader, 'm-0')}>
         <Col className="pl-cs-s pr-cs-s d-flex">
           <Icon icon={isArchive ? 'archive' : 'notifications'} nudgeDown className={classes} />
           <Message
@@ -88,7 +117,7 @@ const NotificationList = ({ setSelectedNotification, selectedNotification, isArc
             className="m-0"
           />
           {Boolean(totalUnseenCount) && !isArchive && (
-            <span className={style.totalNotifications} data-test-id="total-unseen-notifications">
+            <span className={styles.totalNotifications} data-test-id="total-unseen-notifications">
               {totalUnseenCount}
             </span>
           )}
@@ -102,21 +131,33 @@ const NotificationList = ({ setSelectedNotification, selectedNotification, isArc
           />
         )}
       </Row>
-      {notifications.map(notification => (
-        <Row direction="column" key={notification.id} className="m-0 p-0">
-          <NotificationListItem
-            notification={notification}
-            selectedNotification={selectedNotification}
-            handleClick={handleClick}
-          />
-        </Row>
-      ))}
+      <InfiniteLoader
+        loadMoreItems={loadNextPage}
+        isItemLoaded={isItemLoaded}
+        itemCount={itemCount}
+      >
+        {({ onItemsRendered, ref }) => (
+          <List
+            height={500}
+            itemSize={112}
+            width={416}
+            ref={ref}
+            itemCount={itemCount}
+            onItemsRendered={onItemsRendered}
+          >
+            {Item}
+          </List>
+        )}
+      </InfiniteLoader>
     </>
   )
 }
 
 NotificationList.propTypes = {
+  hasNextPage: PropTypes.bool.isRequired,
   isArchive: PropTypes.bool.isRequired,
+  items: PropTypes.array.isRequired,
+  loadNextPage: PropTypes.func.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string,
   }),

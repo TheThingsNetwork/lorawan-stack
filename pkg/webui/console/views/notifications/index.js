@@ -23,8 +23,6 @@ import NotificationsContainer from '@console/containers/notifications'
 
 import style from '@console/views/app/app.styl'
 
-import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
-
 import { getUnseenNotifications } from '@console/store/actions/notifications'
 
 import { selectUserId } from '@console/store/selectors/logout'
@@ -33,13 +31,12 @@ import styles from './notifications.styl'
 
 const NotificationsView = () => {
   const userId = useSelector(selectUserId)
-  const [page, setPage] = useQueryState('page', 1, parseInt)
 
   return (
     <RequireRequest requestAction={getUnseenNotifications(userId)}>
       <WithRootClass className={style.stageBg} id="stage">
         <Container className={styles.mobileContainer}>
-          <NotificationsContainer setPage={setPage} page={page} />
+          <NotificationsContainer />
         </Container>
       </WithRootClass>
     </RequireRequest>
