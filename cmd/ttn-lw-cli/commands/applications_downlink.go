@@ -36,17 +36,17 @@ var (
 			if err != nil {
 				return err
 			}
-			var downlink ttnpb.ApplicationDownlink
-			paths, err := downlink.SetFromFlags(cmd.Flags(), "")
+			downlink := &ttnpb.ApplicationDownlink{}
+			_, err = downlink.SetFromFlags(cmd.Flags(), "")
 			if err != nil {
 				return err
 			}
-			antennas, err := GetGatewayAntennaIdentifiers(cmd.Flags(), "class-b-c")
+			gateways, err := GetClassBCGatewayIdentifiers(cmd.Flags(), "class-b-c")
 			if err != nil {
 				return err
 			}
-			if len(antennas) > 0 {
-				paths = append(paths, "class-b-c.gateways")
+			if len(gateways) > 0 {
+				downlink.ClassBC.Gateways = gateways
 			}
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -54,7 +54,7 @@ var (
 			}
 			_, err = ttnpb.NewAppAsClient(as).DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: devID,
-				Downlinks:    []*ttnpb.ApplicationDownlink{&downlink},
+				Downlinks:    []*ttnpb.ApplicationDownlink{downlink},
 			})
 			if err != nil {
 				return err
@@ -71,18 +71,17 @@ var (
 			if err != nil {
 				return err
 			}
-
-			var downlink ttnpb.ApplicationDownlink
-			paths, err := downlink.SetFromFlags(cmd.Flags(), "")
+			downlink := &ttnpb.ApplicationDownlink{}
+			_, err = downlink.SetFromFlags(cmd.Flags(), "")
 			if err != nil {
 				return err
 			}
-			antennas, err := GetGatewayAntennaIdentifiers(cmd.Flags(), "class-b-c")
+			gateways, err := GetClassBCGatewayIdentifiers(cmd.Flags(), "class-b-c")
 			if err != nil {
 				return err
 			}
-			if len(antennas) > 0 {
-				paths = append(paths, "class-b-c.gateways")
+			if len(gateways) > 0 {
+				downlink.ClassBC.Gateways = gateways
 			}
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -90,7 +89,7 @@ var (
 			}
 			_, err = ttnpb.NewAppAsClient(as).DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: devID,
-				Downlinks:    []*ttnpb.ApplicationDownlink{&downlink},
+				Downlinks:    []*ttnpb.ApplicationDownlink{downlink},
 			})
 			if err != nil {
 				return err

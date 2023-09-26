@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -348,18 +349,39 @@ func AddGatewayAntennaIdentifierFlags(flagSet *pflag.FlagSet, prefix string) {
 	flagSet.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("gateways", prefix), ""))
 }
 
-// GetGatewayAntennaIdentifiers gets a string slice value from a flag and returns a slice of gateway antenna identifiers.
-func GetGatewayAntennaIdentifiers(flagSet *pflag.FlagSet, prefix string) (antennas []*ttnpb.GatewayAntennaIdentifiers, err error) {
-	antennaStrings, changed, err := flagsplugin.GetStringSlice(flagSet, flagsplugin.Prefix("gateways", prefix))
+var errInvalidClassBCGatewayIdentifiers = errors.DefineInvalidArgument("class_b_c_gateway_identifiers", "invalid class B/C gateway identifiers")
+
+// GetClassBCGatewayIdentifiers gets a string slice value from a flag and returns a slice of class B/C gateway identifiers.
+func GetClassBCGatewayIdentifiers(flagSet *pflag.FlagSet, prefix string) (identifiers []*ttnpb.ClassBCGatewayIdentifiers, err error) {
+	identifiersStrings, changed, err := flagsplugin.GetStringSlice(flagSet, flagsplugin.Prefix("gateways", prefix))
 	if err != nil || !changed {
 		return nil, err
 	}
-	for _, id := range antennaStrings {
-		antennas = append(antennas, &ttnpb.GatewayAntennaIdentifiers{
+	for _, idStr := range identifiersStrings {
+		parts := strings.Split(idStr, ":")
+		ids := &ttnpb.ClassBCGatewayIdentifiers{
 			GatewayIds: &ttnpb.GatewayIdentifiers{
-				GatewayId: id,
+				GatewayId: parts[0],
 			},
-		})
+		}
+		if len(parts) > 1 {
+			antennaIdx, err := strconv.ParseUint(parts[1], 10, 32)
+			if err != nil {
+				return nil, err
+			}
+			ids.AntennaIndex = uint32(antennaIdx)
+		}
+		if len(parts) > 2 {
+			groupIdx, err := strconv.ParseUint(parts[2], 10, 32)
+			if err != nil {
+				return nil, err
+			}
+			ids.GroupIndex = uint32(groupIdx)
+		}
+		if len(parts) > 3 {
+			return nil, errInvalidClassBCGatewayIdentifiers.New()
+		}
+		identifiers = append(identifiers, ids)
 	}
-	return antennas, nil
+	return identifiers, nil
 }
