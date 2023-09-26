@@ -110,7 +110,7 @@ func (as *ApplicationServer) Context() context.Context {
 
 var (
 	errListenFrontend = errors.DefineFailedPrecondition(
-		"listen_frontend", "failed to start frontend listener `{protocol}` on address `{address}`",
+		"listen_frontend", "start frontend listener `{protocol}` on address `{address}`",
 	)
 	errMaxRetriesReached = errors.DefineAborted(
 		"max_retries_reached", "maximum number of retries ({max_retries}) reached",
@@ -496,7 +496,7 @@ var (
 		"no_device_session", "no device session; check device activation",
 	)
 	errRebuild = errors.DefineAborted(
-		"rebuild", "could not rebuild device session; check device address",
+		"rebuild", "rebuild device session; check device address",
 	)
 	errZeroAttemptCounts = errors.DefineFailedPrecondition(
 		"zero_attempt_counts", "the default and maximum number of retries cannot be zero",
@@ -929,7 +929,7 @@ func (as *ApplicationServer) handleSimulatedUp(ctx context.Context, up *ttnpb.Ap
 	}
 }
 
-var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
+var errFetchAppSKey = errors.Define("app_s_key", "get AppSKey")
 
 // handleJoinAccept handles a join-accept message.
 // If the application or device is not configured to skip application crypto, the InvalidatedDownlinks and the AppSKey

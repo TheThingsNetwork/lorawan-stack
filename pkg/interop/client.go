@@ -217,7 +217,7 @@ var (
 	errMissingNSID          = errors.DefineFailedPrecondition("missing_ns_id", "missing NSID")
 	errNSIDNotSupported     = errors.DefineFailedPrecondition("ns_id_not_supported", "NSID not supported")
 	errNoJoinRequestPayload = errors.DefineInvalidArgument("no_join_request_payload", "no join-request payload")
-	errGenerateSessionKeyID = errors.Define("generate_session_key_id", "failed to generate session key ID")
+	errGenerateSessionKeyID = errors.Define("generate_session_key_id", "generate session key ID")
 
 	generatedSessionKeyIDPrefix = []byte("ttn-lw-interop-generated:")
 )

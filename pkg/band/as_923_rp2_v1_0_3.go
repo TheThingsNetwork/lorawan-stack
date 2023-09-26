@@ -56,16 +56,6 @@ var as923RP2103Band = func(id string, offset as923GroupOffset) Band {
 		MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 		StrictCodingRate:    true,
 
-		ReceiveDelay1:        defaultReceiveDelay1,
-		ReceiveDelay2:        defaultReceiveDelay2,
-		JoinAcceptDelay1:     defaultJoinAcceptDelay1,
-		JoinAcceptDelay2:     defaultJoinAcceptDelay2,
-		MaxFCntGap:           defaultMaxFCntGap,
-		ADRAckLimit:          defaultADRAckLimit,
-		ADRAckDelay:          defaultADRAckDelay,
-		MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
-		MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
-
 		DefaultMaxEIRP: 16,
 		TxOffset: []float32{
 			0,
@@ -119,5 +109,7 @@ var as923RP2103Band = func(id string, offset as923GroupOffset) Band {
 		PingSlotFrequencies: as923BeaconFrequencies(offset),
 
 		TxParamSetupReqSupport: true,
+
+		SharedParameters: universalSharedParameters,
 	}
 }

@@ -28,6 +28,7 @@ class Users {
         list: 'user_ids.user_id',
         create: 'user_ids.user_id',
         update: 'user_ids.user_id',
+        delete: 'user_ids.user_id',
       },
     })
 

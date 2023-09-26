@@ -11,7 +11,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Locations retrieved from gateway status messages are now be displayed in the gateway map in the Console, even when they are not received through a secure connection.
 - The Network Server ID (NSID, EUI-64) used in LoRaWAN Backend Interfaces is now included in the application uplink message network metadata as well as in the Backend Interfaces `HomeNSAns` message that Identity Server returns to clients. The NSID is configurable via `is.network.ns-id`.
+- It is now possible to trigger a resending of the email validation email from within the Console. The new action is part of the error screen that users see when they log into the Console without having their contact info validated yet (and the network requires validation before usage).
+- Updated Japanese translations for the Console and backend.
 - Add support for reading notifications in the Console.
 
 ### Changed
@@ -24,7 +27,17 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.27.1] - unreleased
+## [3.27.2] - 2023-09-14
+
+### Added
+
+- Locations retrieved from gateway status messages are now be displayed in the gateway map in the Console, even when they are not received through a secure connection.
+
+### Fixed
+
+- Fix gateway connection stats being stuck at `Connecting` until the first uplink is processed in the Console.
+
+## [3.27.1] - 2023-08-29
 
 ### Added
 
@@ -2666,7 +2679,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.1...v3.27
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.2...v3.27
+[3.27.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.1...v3.27.2
 [3.27.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.0...v3.27.1
 [3.27.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.2...v3.27.0
 [3.26.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.1...v3.26.2

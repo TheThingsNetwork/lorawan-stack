@@ -26,7 +26,17 @@ const validationSchema = Yup.object().shape({
       .max(36, Yup.passValues(sharedMessages.validateTooLong))
       .matches(gatewayIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
       .required(sharedMessages.validateRequired),
-    eui: Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
+    eui: Yup.string()
+      .test(
+        'has 16 or 12 characters',
+        Yup.passValues(sharedMessages.validateLength)({ length: 16 }),
+        value => value && (value.length === 12 || value.length === 16),
+      )
+      .test(
+        "doesn't have 12 characters",
+        Yup.passValues(sharedMessages.validateMacAddressEntered),
+        value => value && value.length !== 12,
+      ),
   }),
   name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))

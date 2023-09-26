@@ -92,24 +92,6 @@ func (v *ADRSettings_StaticMode) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
-func (v *ADRSettings_Static) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "static":
-		return v.Static == nil
-	case "static.data_rate_index":
-		return v.Static.FieldIsZero("data_rate_index")
-	case "static.tx_power_index":
-		return v.Static.FieldIsZero("tx_power_index")
-	case "static.nb_trans":
-		return v.Static.FieldIsZero("nb_trans")
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
 func (v *ADRSettings_DynamicMode_ChannelSteeringSettings) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
@@ -157,56 +139,6 @@ func (v *ADRSettings_DynamicMode) FieldIsZero(p string) bool {
 		return v.MinNbTrans == nil
 	case "max_nb_trans":
 		return v.MaxNbTrans == nil
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *ADRSettings_Dynamic) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "dynamic":
-		return v.Dynamic == nil
-	case "dynamic.channel_steering":
-		return v.Dynamic.FieldIsZero("channel_steering")
-	case "dynamic.channel_steering.mode":
-		return v.Dynamic.FieldIsZero("channel_steering.mode")
-	case "dynamic.channel_steering.mode.disabled":
-		return v.Dynamic.FieldIsZero("channel_steering.mode.disabled")
-	case "dynamic.channel_steering.mode.lora_narrow":
-		return v.Dynamic.FieldIsZero("channel_steering.mode.lora_narrow")
-	case "dynamic.margin":
-		return v.Dynamic.FieldIsZero("margin")
-	case "dynamic.min_data_rate_index":
-		return v.Dynamic.FieldIsZero("min_data_rate_index")
-	case "dynamic.min_data_rate_index.value":
-		return v.Dynamic.FieldIsZero("min_data_rate_index.value")
-	case "dynamic.max_data_rate_index":
-		return v.Dynamic.FieldIsZero("max_data_rate_index")
-	case "dynamic.max_data_rate_index.value":
-		return v.Dynamic.FieldIsZero("max_data_rate_index.value")
-	case "dynamic.min_tx_power_index":
-		return v.Dynamic.FieldIsZero("min_tx_power_index")
-	case "dynamic.max_tx_power_index":
-		return v.Dynamic.FieldIsZero("max_tx_power_index")
-	case "dynamic.min_nb_trans":
-		return v.Dynamic.FieldIsZero("min_nb_trans")
-	case "dynamic.max_nb_trans":
-		return v.Dynamic.FieldIsZero("max_nb_trans")
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *ADRSettings_Disabled) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "disabled":
-		return v.Disabled == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }

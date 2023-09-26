@@ -145,7 +145,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				DataRateIndexAck: true,
 			},
 			Events: events.Builders{
-				EvtReceivePingSlotChannelAnswer.With(events.WithData(&ttnpb.MACCommand_PingSlotChannelAns{
+				EvtReceivePingSlotChannelAccept.With(events.WithData(&ttnpb.MACCommand_PingSlotChannelAns{
 					FrequencyAck:     true,
 					DataRateIndexAck: true,
 				})),
@@ -181,9 +181,53 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				DataRateIndexAck: true,
 			},
 			Events: events.Builders{
-				EvtReceivePingSlotChannelAnswer.With(events.WithData(&ttnpb.MACCommand_PingSlotChannelAns{
+				EvtReceivePingSlotChannelAccept.With(events.WithData(&ttnpb.MACCommand_PingSlotChannelAns{
 					FrequencyAck:     true,
 					DataRateIndexAck: true,
+				})),
+			},
+		},
+		{
+			Name: "frequency ack only",
+			Device: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_PingSlotChannelReq{
+							Frequency:     44,
+							DataRateIndex: 45,
+						}).MACCommand(),
+					},
+					CurrentParameters: &ttnpb.MACParameters{
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: 43},
+						PingSlotFrequency:          42,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: 44},
+						PingSlotFrequency:          45,
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MacState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+					CurrentParameters: &ttnpb.MACParameters{
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: 43},
+						PingSlotFrequency:          42,
+					},
+					DesiredParameters: &ttnpb.MACParameters{
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: 44},
+						PingSlotFrequency:          45,
+					},
+				},
+			},
+			Payload: &ttnpb.MACCommand_PingSlotChannelAns{
+				FrequencyAck:     true,
+				DataRateIndexAck: false,
+			},
+			Events: events.Builders{
+				EvtReceivePingSlotChannelReject.With(events.WithData(&ttnpb.MACCommand_PingSlotChannelAns{
+					FrequencyAck:     true,
+					DataRateIndexAck: false,
 				})),
 			},
 		},

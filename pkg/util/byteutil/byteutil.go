@@ -18,6 +18,20 @@ package byteutil
 // MaxUint24 is the maximum value representable 3-octet uint.
 const MaxUint24 = 1<<24 - 1
 
+// ParseUint16 parses uint16 from b assuming little endian binary encoding.
+func ParseUint16(b []byte) uint16 {
+	switch len(b) {
+	case 0:
+		return 0
+	case 1:
+		_ = b[0]
+		return uint16(b[0])
+	default:
+		_ = b[1]
+		return uint16(b[0]) | uint16(b[1])<<8
+	}
+}
+
 // ParseUint32 parses uint32 from b assuming little endian binary encoding.
 func ParseUint32(b []byte) uint32 {
 	switch len(b) {

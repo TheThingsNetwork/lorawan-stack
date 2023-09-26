@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+package band
 
-import log from '@ttn-lw/lib/log'
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
-export const WizardContext = React.createContext()
+// RelayWORChannel encapsulates a relay channel.
+type RelayWORChannel struct {
+	Frequency     uint64
+	ACKFrequency  uint64
+	DataRateIndex ttnpb.DataRateIndex
+}
 
-export const useWizardContext = () => {
-  const wizardCtx = React.useContext(WizardContext)
-
-  if (!wizardCtx) {
-    log(`Wizard context provider is not found in the react tree`)
-  }
-
-  return wizardCtx
+// RelayParameters contains relay parameters.
+type RelayParameters struct {
+	WORChannels []RelayWORChannel
 }

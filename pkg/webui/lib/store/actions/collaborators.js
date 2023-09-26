@@ -64,9 +64,11 @@ export const [
   },
 ] = createRequestActions(
   DELETE_COLLABORATOR_BASE,
-  (parentType, parentId) => ({
+  (parentType, parentId, collaboratorId, isUser) => ({
     parentType,
     parentId,
+    collaboratorId,
+    isUser,
   }),
-  (parentType, parentId, selector) => ({ selector }),
+  (parentType, parentId, collaboratorId, isUser, selector) => ({ selector }),
 )

@@ -254,6 +254,11 @@ message UpdateApplicationAPIKeyRequest {
   google.protobuf.FieldMask field_mask = 3;
 }
 
+message DeleteApplicationAPIKeyRequest {
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  string key_id = 2;
+}
+
 message ListApplicationCollaboratorsRequest {
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
@@ -281,4 +286,9 @@ message GetApplicationCollaboratorRequest {
 message SetApplicationCollaboratorRequest {
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   Collaborator collaborator = 2 [(validate.rules).message.required = true];
+}
+
+message DeleteApplicationCollaboratorRequest {
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator_ids = 2 [(validate.rules).message.required = true];
 }

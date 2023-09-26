@@ -27,6 +27,8 @@ import (
 )
 
 func TestSMTP(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
 	lis, err := net.Listen("tcp", "localhost:0")
@@ -40,7 +42,7 @@ func TestSMTP(t *testing.T) {
 	}
 	server := smtp.NewServer(bkd)
 
-	go server.Serve(lis)
+	go server.Serve(lis) // nolint:errcheck
 
 	smtpAddress := lis.Addr().String()
 
@@ -59,7 +61,7 @@ func TestSMTP(t *testing.T) {
 	)
 	a.So(err, should.BeNil)
 
-	email := &email.Message{
+	mail := &email.Message{
 		TemplateName:     "test",
 		RecipientName:    "John Doe",
 		RecipientAddress: "john.doe@example.com",
@@ -68,17 +70,17 @@ func TestSMTP(t *testing.T) {
 		TextBody:         "****************\r\nTesting SMTP\r\n****************\r\n\r\nWe are testing SMTP",
 	}
 
-	err = smtp.Send(email)
+	err = smtp.Send(mail)
 	a.So(err, should.BeNil)
 
 	received := <-bkd.messages
 
 	a.So(received.Sender, should.Equal, "unit@test.local")
-	a.So(received.Recipients, should.Contain, email.RecipientAddress)
+	a.So(received.Recipients, should.Contain, mail.RecipientAddress)
 
 	dataString := string(received.Data)
 
-	a.So(dataString, should.ContainSubstring, email.Subject)
-	a.So(dataString, should.ContainSubstring, email.HTMLBody)
-	a.So(dataString, should.ContainSubstring, email.TextBody)
+	a.So(dataString, should.ContainSubstring, mail.Subject)
+	a.So(dataString, should.ContainSubstring, mail.HTMLBody)
+	a.So(dataString, should.ContainSubstring, mail.TextBody)
 }

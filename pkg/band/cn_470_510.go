@@ -60,4 +60,19 @@ var (
 		}
 		return freqs
 	}()
+
+	cn470510RelayParameters = RelayParameters{
+		WORChannels: []RelayWORChannel{
+			{
+				Frequency:     472100000,
+				ACKFrequency:  485300000,
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+			},
+			{
+				Frequency:     494900000,
+				ACKFrequency:  505500000,
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+			},
+		},
+	}
 )

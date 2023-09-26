@@ -148,7 +148,7 @@ var (
 		Use:     "delete",
 		Aliases: []string{"del", "remove", "rm"},
 		Short:   "Delete an organization collaborator",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			orgID := getOrganizationID(cmd.Flags(), nil)
 			if orgID == nil {
 				return errNoOrganizationID.New()
@@ -162,13 +162,12 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewOrganizationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
-				OrganizationIds: orgID,
-				Collaborator: &ttnpb.Collaborator{
-					Ids:    collaborator,
-					Rights: nil,
+			_, err = ttnpb.NewOrganizationAccessClient(is).DeleteCollaborator(
+				ctx, &ttnpb.DeleteOrganizationCollaboratorRequest{
+					OrganizationIds: orgID,
+					CollaboratorIds: collaborator,
 				},
-			})
+			)
 			if err != nil {
 				return err
 			}
@@ -347,13 +346,9 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
+			_, err = ttnpb.NewOrganizationAccessClient(is).DeleteAPIKey(ctx, &ttnpb.DeleteOrganizationAPIKeyRequest{
 				OrganizationIds: orgID,
-				ApiKey: &ttnpb.APIKey{
-					Id:     id,
-					Rights: nil,
-				},
-				FieldMask: ttnpb.FieldMask("rights"),
+				KeyId:           id,
 			})
 			if err != nil {
 				return err

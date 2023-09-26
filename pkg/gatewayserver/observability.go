@@ -86,7 +86,7 @@ var (
 		events.WithDataType(&ttnpb.DownlinkMessage{}),
 	)
 	evtScheduleDownFail = events.Define(
-		"gs.down.schedule.fail", "failed to schedule downlink for transmission by gateway",
+		"gs.down.schedule.fail", "schedule downlink for transmission by gateway",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)

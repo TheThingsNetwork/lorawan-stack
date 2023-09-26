@@ -32,6 +32,7 @@ class Gateways {
         list: 'gateway_ids.gateway_id',
         create: 'gateway_ids.gateway_id',
         update: 'gateway_ids.gateway_id',
+        delete: 'gateway_ids.gateway_id',
       },
     })
     this.Collaborators = new Collaborators(api.GatewayAccess, {
@@ -39,6 +40,7 @@ class Gateways {
         get: 'gateway_ids.gateway_id',
         list: 'gateway_ids.gateway_id',
         set: 'gateway_ids.gateway_id',
+        delete: 'gateway_ids.gateway_id',
       },
     })
     autoBind(this)

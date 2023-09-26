@@ -30,7 +30,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	pkgpacketbroker "go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	. "go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -41,6 +43,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gopkg.in/square/go-jose.v2"
@@ -75,12 +78,61 @@ func TestForwarder(t *testing.T) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+
+	a := assertions.New(t)
+
+	// Elements for the valid test cases.
+	userFoo := &ttnpb.UserIdentifiers{UserId: "userfoo"}
+	userBar := &ttnpb.UserIdentifiers{UserId: "userbar"}
+	orgID := &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"}
+	_, err := is.UserRegistry().Create(ctx, &ttnpb.CreateUserRequest{
+		User: &ttnpb.User{
+			Ids:                            userFoo,
+			PrimaryEmailAddress:            "usr-foo@example.com",
+			PrimaryEmailAddressValidatedAt: timestamppb.New(time.Now()),
+		},
+	})
+	a.So(err, should.BeNil)
+	_, err = is.UserRegistry().Create(ctx, &ttnpb.CreateUserRequest{
+		User: &ttnpb.User{
+			Ids:                            userBar,
+			PrimaryEmailAddress:            "usr-bar@example.com",
+			PrimaryEmailAddressValidatedAt: timestamppb.New(time.Now()),
+		},
+	})
+	a.So(err, should.BeNil)
+	_, err = is.OrganizationRegistry().Create(ctx, &ttnpb.CreateOrganizationRequest{
+		Organization: &ttnpb.Organization{
+			Ids:                   orgID,
+			AdministrativeContact: userFoo.GetOrganizationOrUserIdentifiers(),
+			TechnicalContact:      userBar.GetOrganizationOrUserIdentifiers(),
+		},
+	})
+	a.So(err, should.BeNil)
+
+	// Elements for the non valid test cases.
+	userEmailNotValidated := &ttnpb.UserIdentifiers{UserId: "usr-email-not-validated"}
+	orgEmailNotValidated := &ttnpb.OrganizationIdentifiers{OrganizationId: "org-email-not-validated"}
+	_, err = is.UserRegistry().Create(ctx, &ttnpb.CreateUserRequest{User: &ttnpb.User{Ids: userEmailNotValidated}})
+	a.So(err, should.BeNil)
+	_, err = is.OrganizationRegistry().Create(ctx, &ttnpb.CreateOrganizationRequest{
+		Organization: &ttnpb.Organization{
+			Ids:                   orgEmailNotValidated,
+			AdministrativeContact: userEmailNotValidated.GetOrganizationOrUserIdentifiers(),
+			TechnicalContact:      userEmailNotValidated.GetOrganizationOrUserIdentifiers(),
+		},
+	})
+	a.So(err, should.BeNil)
+
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			FrequencyPlans: config.FrequencyPlansConfig{
 				ConfigSource: "static",
 				Static:       test.StaticFrequencyPlans,
 			},
+			Cluster: cluster.Config{IdentityServer: isAddr},
 		},
 	})
 
@@ -120,6 +172,7 @@ func TestForwarder(t *testing.T) {
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_GATEWAY_SERVER)
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_PACKET_BROKER_AGENT)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	receivedAt := time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC)
 
@@ -461,62 +514,131 @@ func TestForwarder(t *testing.T) {
 			return ttnpb.Empty, nil
 		}
 
-		res, err := gs.UpdateGateway(ctx, &ttnpb.UpdatePacketBrokerGatewayRequest{
-			Gateway: &ttnpb.PacketBrokerGateway{
-				Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
-					GatewayId: "foo-gateway",
-					Eui:       types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
-				},
-				ContactInfo: []*ttnpb.ContactInfo{
-					{
-						ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
-						ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
-						Value:         "admin@example.com",
-					},
-					{
-						ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
-						ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
-						Value:         "tech@example.com",
-					},
-				},
-				FrequencyPlanIds: []string{"EU_863_870"},
-				Antennas: []*ttnpb.GatewayAntenna{
-					{
-						Location: &ttnpb.Location{
-							Latitude:  4.85464,
-							Longitude: 52.34562,
-							Altitude:  16,
-							Accuracy:  10,
-							Source:    ttnpb.LocationSource_SOURCE_REGISTRY,
-						},
-					},
-				},
-				StatusPublic:   true,
-				LocationPublic: true,
-				Online:         true,
-			},
-			FieldMask: ttnpb.FieldMask(
-				"antennas",
-				"contact_info",
-				"frequency_plan_ids",
-				"ids",
-				"location_public",
-				"online",
-				"status_public",
-			),
-		})
-		a.So(err, should.BeNil)
-		a.So(res.OnlineTtl.AsDuration(), should.NotBeZeroValue)
+		for _, tc := range []struct {
+			name               string
+			fieldMask          *fieldmaskpb.FieldMask
+			setGatewayContacts func(*ttnpb.PacketBrokerGateway)
+			validateResponse   func(*mappingpb.UpdateGatewayRequest)
+		}{
+			{
+				name: "No Admin|tech ContactInfo present",
+				fieldMask: ttnpb.FieldMask(
+					"antennas",
+					"frequency_plan_ids",
+					"ids",
+					"location_public",
+					"online",
+					"status_public",
+				),
 
-		select {
-		case update := <-updateCh:
-			a.So(update.AdministrativeContact.GetValue().GetEmail(), should.Equal, "admin@example.com")
-			a.So(update.TechnicalContact.GetValue().GetEmail(), should.Equal, "tech@example.com")
-			a.So(update.FrequencyPlan.GetLoraMultiSfChannels(), should.HaveLength, 8)
-			a.So(update.Online.GetValue(), should.BeTrue)
-			a.So(update.GatewayLocation.GetLocation().GetTerrestrial().GetAntennaCount().GetValue(), should.Equal, 1)
-		case <-time.After(timeout):
-			t.Fatal("Expected gateway update timeout")
+				setGatewayContacts: func(*ttnpb.PacketBrokerGateway) {},
+				validateResponse: func(up *mappingpb.UpdateGatewayRequest) {
+					a.So(up.AdministrativeContact.GetValue().GetEmail(), should.BeEmpty)
+					a.So(up.TechnicalContact.GetValue().GetEmail(), should.BeEmpty)
+					a.So(up.FrequencyPlan.GetLoraMultiSfChannels(), should.HaveLength, 8)
+					a.So(up.Online.GetValue(), should.BeTrue)
+					a.So(up.GatewayLocation.GetLocation().GetTerrestrial().GetAntennaCount().GetValue(), should.Equal, 1)
+				},
+			},
+			{
+				name: "Valid Admin|tech ContactInfo present",
+				fieldMask: ttnpb.FieldMask(
+					"administrative_contact",
+					"antennas",
+					"frequency_plan_ids",
+					"ids",
+					"location_public",
+					"online",
+					"status_public",
+					"technical_contact",
+				),
+				setGatewayContacts: func(gtw *ttnpb.PacketBrokerGateway) {
+					gtw.AdministrativeContact = userFoo.GetOrganizationOrUserIdentifiers()
+					gtw.TechnicalContact = orgID.GetOrganizationOrUserIdentifiers()
+				},
+				validateResponse: func(up *mappingpb.UpdateGatewayRequest) {
+					a.So(up.AdministrativeContact.GetValue().GetName(), should.Equal, userFoo.UserId)
+					a.So(up.AdministrativeContact.GetValue().GetEmail(), should.Equal, "usr-foo@example.com")
+					a.So(up.TechnicalContact.GetValue().GetName(), should.Equal, userBar.UserId)
+					a.So(up.TechnicalContact.GetValue().GetEmail(), should.Equal, "usr-bar@example.com")
+					a.So(up.FrequencyPlan.GetLoraMultiSfChannels(), should.HaveLength, 8)
+					a.So(up.Online.GetValue(), should.BeTrue)
+					a.So(up.GatewayLocation.GetLocation().GetTerrestrial().GetAntennaCount().GetValue(), should.Equal, 1)
+				},
+			},
+			{
+				name: "Email not validated in Admin|tech ContactInfo",
+				fieldMask: ttnpb.FieldMask(
+					"administrative_contact",
+					"antennas",
+					"frequency_plan_ids",
+					"ids",
+					"location_public",
+					"online",
+					"status_public",
+					"technical_contact",
+				),
+				setGatewayContacts: func(gtw *ttnpb.PacketBrokerGateway) {
+					gtw.AdministrativeContact = orgEmailNotValidated.GetOrganizationOrUserIdentifiers()
+					gtw.TechnicalContact = orgEmailNotValidated.GetOrganizationOrUserIdentifiers()
+				},
+				validateResponse: func(up *mappingpb.UpdateGatewayRequest) {
+					a.So(up.AdministrativeContact.GetValue().GetEmail(), should.BeEmpty)
+					a.So(up.TechnicalContact.GetValue().GetEmail(), should.BeEmpty)
+					a.So(up.FrequencyPlan.GetLoraMultiSfChannels(), should.HaveLength, 8)
+					a.So(up.Online.GetValue(), should.BeTrue)
+					a.So(up.GatewayLocation.GetLocation().GetTerrestrial().GetAntennaCount().GetValue(), should.Equal, 1)
+				},
+			},
+		} {
+			tc := tc
+			t.Run(tc.name, func(t *testing.T) { // nolint:paralleltest
+				//  If validateUpdate or setRequestContacts are not set, the tests will panic.
+				if tc.validateResponse == nil {
+					t.Fatal("Test has to contain a validateUpdate function")
+				}
+				if tc.setGatewayContacts == nil {
+					t.Fatal("Test has to contain a setRequestContacts function")
+				}
+
+				req := &ttnpb.UpdatePacketBrokerGatewayRequest{
+					Gateway: &ttnpb.PacketBrokerGateway{
+						Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
+							GatewayId: "foo-gateway",
+							Eui:       types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}.Bytes(),
+						},
+						FrequencyPlanIds: []string{"EU_863_870"},
+						Antennas: []*ttnpb.GatewayAntenna{
+							{
+								Location: &ttnpb.Location{
+									Latitude:  4.85464,
+									Longitude: 52.34562,
+									Altitude:  16,
+									Accuracy:  10,
+									Source:    ttnpb.LocationSource_SOURCE_REGISTRY,
+								},
+							},
+						},
+						StatusPublic:   true,
+						LocationPublic: true,
+						Online:         true,
+					},
+					FieldMask: tc.fieldMask,
+				}
+
+				tc.setGatewayContacts(req.Gateway)
+
+				res, err := gs.UpdateGateway(ctx, req)
+				a.So(err, should.BeNil)
+				a.So(res.OnlineTtl.AsDuration(), should.NotBeZeroValue)
+
+				select {
+				case update := <-updateCh:
+					tc.validateResponse(update)
+				case <-time.After(timeout):
+					t.Fatal("Expected gateway update timeout")
+				}
+			})
 		}
 	})
 }
@@ -668,7 +790,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIds:   cluster.PacketBrokerGatewayID,
+							GatewayIds:   pkgpacketbroker.GatewayIdentifiers,
 							AntennaIndex: 0,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
@@ -698,7 +820,7 @@ func TestHomeNetwork(t *testing.T) {
 							})),
 						},
 						{
-							GatewayIds:   cluster.PacketBrokerGatewayID,
+							GatewayIds:   pkgpacketbroker.GatewayIdentifiers,
 							AntennaIndex: 1,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
@@ -811,7 +933,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIds: cluster.PacketBrokerGatewayID,
+							GatewayIds: pkgpacketbroker.GatewayIdentifiers,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
 								ForwarderNetId:      types.NetID{0x0, 0x0, 0x42}.Bytes(),

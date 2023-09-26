@@ -218,13 +218,9 @@ var (
 			if err != nil {
 				return err
 			}
-			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
+			_, err = ttnpb.NewUserAccessClient(is).DeleteAPIKey(ctx, &ttnpb.DeleteUserAPIKeyRequest{
 				UserIds: usrID,
-				ApiKey: &ttnpb.APIKey{
-					Id:     id,
-					Rights: nil,
-				},
-				FieldMask: ttnpb.FieldMask("rights"),
+				KeyId:   id,
 			})
 			if err != nil {
 				return err

@@ -38,7 +38,7 @@ const configFileName = ".ttn-lw-cli.yml"
 var (
 	errNoHost          = errors.DefineInvalidArgument("no_host", "no host set")
 	errFileExists      = errors.DefineAlreadyExists("file_exists", "`{file}` exists")
-	errFailWrite       = errors.DefinePermissionDenied("fail_write", "failed to write `{file}`")
+	errFailWrite       = errors.DefinePermissionDenied("fail_write", "write `{file}`")
 	errInvalidHostname = errors.DefineInvalidArgument("invalid_hostname", "`{hostname}` is not a valid hostname")
 	errMissingTenantID = errors.DefineInvalidArgument("missing_tenant_id", "missing tenant ID in hostname")
 

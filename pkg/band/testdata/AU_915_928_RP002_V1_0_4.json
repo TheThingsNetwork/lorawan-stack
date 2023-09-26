@@ -1,0 +1,1038 @@
+{
+  "ID": "AU_915_928",
+  "Beacon": {
+    "DataRateIndex": 8,
+    "CodingRate": "4/5",
+    "Frequencies": [
+      923300000,
+      923900000,
+      924500000,
+      925100000,
+      925700000,
+      926300000,
+      926900000,
+      927500000
+    ]
+  },
+  "PingSlotFrequencies": [
+    923300000,
+    923900000,
+    924500000,
+    925100000,
+    925700000,
+    926300000,
+    926900000,
+    927500000
+  ],
+  "MaxUplinkChannels": 72,
+  "UplinkChannels": [
+    {
+      "Frequency": 915200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 915400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 915600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 915800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 916000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 916200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 916400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 916600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 916800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 917000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 917200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 917400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 917600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 917800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 918000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 918200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 918400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 918600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 918800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 919000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 919200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 919400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 919600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 919800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 920000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 920200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 920400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 920600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 920800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 921000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 921200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 921400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 921600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 921800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 922000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 922200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 922400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 922600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 922800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 923000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 923200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 923400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 923600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 923800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 924000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 924200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 924400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 924600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 924800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 925000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 925200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 925400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 925600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 925800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 926000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 926200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 926400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 926600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 926800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 927000000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 927200000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 927400000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 927600000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 927800000,
+      "MinDataRate": 0,
+      "MaxDataRate": 5
+    },
+    {
+      "Frequency": 915900000,
+      "MinDataRate": 6,
+      "MaxDataRate": 7
+    },
+    {
+      "Frequency": 917500000,
+      "MinDataRate": 6,
+      "MaxDataRate": 7
+    },
+    {
+      "Frequency": 919100000,
+      "MinDataRate": 6,
+      "MaxDataRate": 7
+    },
+    {
+      "Frequency": 920700000,
+      "MinDataRate": 6,
+      "MaxDataRate": 7
+    },
+    {
+      "Frequency": 922300000,
+      "MinDataRate": 6,
+      "MaxDataRate": 7
+    },
+    {
+      "Frequency": 923900000,
+      "MinDataRate": 6,
+      "MaxDataRate": 7
+    },
+    {
+      "Frequency": 925500000,
+      "MinDataRate": 6,
+      "MaxDataRate": 7
+    },
+    {
+      "Frequency": 927100000,
+      "MinDataRate": 6,
+      "MaxDataRate": 7
+    }
+  ],
+  "MaxDownlinkChannels": 8,
+  "DownlinkChannels": [
+    {
+      "Frequency": 923300000,
+      "MinDataRate": 8,
+      "MaxDataRate": 13
+    },
+    {
+      "Frequency": 923900000,
+      "MinDataRate": 8,
+      "MaxDataRate": 13
+    },
+    {
+      "Frequency": 924500000,
+      "MinDataRate": 8,
+      "MaxDataRate": 13
+    },
+    {
+      "Frequency": 925100000,
+      "MinDataRate": 8,
+      "MaxDataRate": 13
+    },
+    {
+      "Frequency": 925700000,
+      "MinDataRate": 8,
+      "MaxDataRate": 13
+    },
+    {
+      "Frequency": 926300000,
+      "MinDataRate": 8,
+      "MaxDataRate": 13
+    },
+    {
+      "Frequency": 926900000,
+      "MinDataRate": 8,
+      "MaxDataRate": 13
+    },
+    {
+      "Frequency": 927500000,
+      "MinDataRate": 8,
+      "MaxDataRate": 13
+    }
+  ],
+  "SubBands": [
+    {
+      "MinFrequency": 915000000,
+      "MaxFrequency": 928000000,
+      "DutyCycle": 1,
+      "MaxEIRP": 30
+    }
+  ],
+  "DataRates": {
+    "0": {
+      "MaxMACPayloadSize": {
+        "false": 59,
+        "true": 0
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 125000,
+          "spreading_factor": 12,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "1": {
+      "MaxMACPayloadSize": {
+        "false": 59,
+        "true": 0
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 125000,
+          "spreading_factor": 11,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "10": {
+      "MaxMACPayloadSize": {
+        "false": 250,
+        "true": 250
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 500000,
+          "spreading_factor": 10,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "11": {
+      "MaxMACPayloadSize": {
+        "false": 250,
+        "true": 250
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 500000,
+          "spreading_factor": 9,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "12": {
+      "MaxMACPayloadSize": {
+        "false": 250,
+        "true": 250
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 500000,
+          "spreading_factor": 8,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "13": {
+      "MaxMACPayloadSize": {
+        "false": 250,
+        "true": 250
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 500000,
+          "spreading_factor": 7,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "2": {
+      "MaxMACPayloadSize": {
+        "false": 59,
+        "true": 19
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 125000,
+          "spreading_factor": 10,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "3": {
+      "MaxMACPayloadSize": {
+        "false": 123,
+        "true": 61
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 125000,
+          "spreading_factor": 9,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "4": {
+      "MaxMACPayloadSize": {
+        "false": 250,
+        "true": 133
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 125000,
+          "spreading_factor": 8,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "5": {
+      "MaxMACPayloadSize": {
+        "false": 250,
+        "true": 250
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 125000,
+          "spreading_factor": 7,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "6": {
+      "MaxMACPayloadSize": {
+        "false": 250,
+        "true": 250
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 500000,
+          "spreading_factor": 8,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "7": {
+      "MaxMACPayloadSize": {
+        "false": 58,
+        "true": 58
+      },
+      "Rate": {
+        "lrfhss": {
+          "operating_channel_width": 1523000,
+          "coding_rate": "1/3"
+        }
+      }
+    },
+    "8": {
+      "MaxMACPayloadSize": {
+        "false": 61,
+        "true": 61
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 500000,
+          "spreading_factor": 12,
+          "coding_rate": "4/5"
+        }
+      }
+    },
+    "9": {
+      "MaxMACPayloadSize": {
+        "false": 137,
+        "true": 137
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 500000,
+          "spreading_factor": 11,
+          "coding_rate": "4/5"
+        }
+      }
+    }
+  },
+  "StrictCodingRate": true,
+  "FreqMultiplier": 100,
+  "ImplementsCFList": true,
+  "CFListType": "CHANNEL_MASKS",
+  "SupportsDynamicADR": true,
+  "TxOffset": [
+    0,
+    -2,
+    -4,
+    -6,
+    -8,
+    -10,
+    -12,
+    -14,
+    -16,
+    -18,
+    -20,
+    -22,
+    -24,
+    -26,
+    -28
+  ],
+  "MaxADRDataRateIndex": 5,
+  "TxParamSetupReqSupport": true,
+  "DefaultMaxEIRP": 30,
+  "Rx1Channel": {
+    "0": 0,
+    "1": 1,
+    "10": 2,
+    "100": 4,
+    "101": 5,
+    "102": 6,
+    "103": 7,
+    "104": 0,
+    "105": 1,
+    "106": 2,
+    "107": 3,
+    "108": 4,
+    "109": 5,
+    "11": 3,
+    "110": 6,
+    "111": 7,
+    "112": 0,
+    "113": 1,
+    "114": 2,
+    "115": 3,
+    "116": 4,
+    "117": 5,
+    "118": 6,
+    "119": 7,
+    "12": 4,
+    "120": 0,
+    "121": 1,
+    "122": 2,
+    "123": 3,
+    "124": 4,
+    "125": 5,
+    "126": 6,
+    "127": 7,
+    "128": 0,
+    "129": 1,
+    "13": 5,
+    "130": 2,
+    "131": 3,
+    "132": 4,
+    "133": 5,
+    "134": 6,
+    "135": 7,
+    "136": 0,
+    "137": 1,
+    "138": 2,
+    "139": 3,
+    "14": 6,
+    "140": 4,
+    "141": 5,
+    "142": 6,
+    "143": 7,
+    "144": 0,
+    "145": 1,
+    "146": 2,
+    "147": 3,
+    "148": 4,
+    "149": 5,
+    "15": 7,
+    "150": 6,
+    "151": 7,
+    "152": 0,
+    "153": 1,
+    "154": 2,
+    "155": 3,
+    "156": 4,
+    "157": 5,
+    "158": 6,
+    "159": 7,
+    "16": 0,
+    "160": 0,
+    "161": 1,
+    "162": 2,
+    "163": 3,
+    "164": 4,
+    "165": 5,
+    "166": 6,
+    "167": 7,
+    "168": 0,
+    "169": 1,
+    "17": 1,
+    "170": 2,
+    "171": 3,
+    "172": 4,
+    "173": 5,
+    "174": 6,
+    "175": 7,
+    "176": 0,
+    "177": 1,
+    "178": 2,
+    "179": 3,
+    "18": 2,
+    "180": 4,
+    "181": 5,
+    "182": 6,
+    "183": 7,
+    "184": 0,
+    "185": 1,
+    "186": 2,
+    "187": 3,
+    "188": 4,
+    "189": 5,
+    "19": 3,
+    "190": 6,
+    "191": 7,
+    "192": 0,
+    "193": 1,
+    "194": 2,
+    "195": 3,
+    "196": 4,
+    "197": 5,
+    "198": 6,
+    "199": 7,
+    "2": 2,
+    "20": 4,
+    "200": 0,
+    "201": 1,
+    "202": 2,
+    "203": 3,
+    "204": 4,
+    "205": 5,
+    "206": 6,
+    "207": 7,
+    "208": 0,
+    "209": 1,
+    "21": 5,
+    "210": 2,
+    "211": 3,
+    "212": 4,
+    "213": 5,
+    "214": 6,
+    "215": 7,
+    "216": 0,
+    "217": 1,
+    "218": 2,
+    "219": 3,
+    "22": 6,
+    "220": 4,
+    "221": 5,
+    "222": 6,
+    "223": 7,
+    "224": 0,
+    "225": 1,
+    "226": 2,
+    "227": 3,
+    "228": 4,
+    "229": 5,
+    "23": 7,
+    "230": 6,
+    "231": 7,
+    "232": 0,
+    "233": 1,
+    "234": 2,
+    "235": 3,
+    "236": 4,
+    "237": 5,
+    "238": 6,
+    "239": 7,
+    "24": 0,
+    "240": 0,
+    "241": 1,
+    "242": 2,
+    "243": 3,
+    "244": 4,
+    "245": 5,
+    "246": 6,
+    "247": 7,
+    "248": 0,
+    "249": 1,
+    "25": 1,
+    "250": 2,
+    "251": 3,
+    "252": 4,
+    "253": 5,
+    "254": 6,
+    "255": 7,
+    "26": 2,
+    "27": 3,
+    "28": 4,
+    "29": 5,
+    "3": 3,
+    "30": 6,
+    "31": 7,
+    "32": 0,
+    "33": 1,
+    "34": 2,
+    "35": 3,
+    "36": 4,
+    "37": 5,
+    "38": 6,
+    "39": 7,
+    "4": 4,
+    "40": 0,
+    "41": 1,
+    "42": 2,
+    "43": 3,
+    "44": 4,
+    "45": 5,
+    "46": 6,
+    "47": 7,
+    "48": 0,
+    "49": 1,
+    "5": 5,
+    "50": 2,
+    "51": 3,
+    "52": 4,
+    "53": 5,
+    "54": 6,
+    "55": 7,
+    "56": 0,
+    "57": 1,
+    "58": 2,
+    "59": 3,
+    "6": 6,
+    "60": 4,
+    "61": 5,
+    "62": 6,
+    "63": 7,
+    "64": 0,
+    "65": 1,
+    "66": 2,
+    "67": 3,
+    "68": 4,
+    "69": 5,
+    "7": 7,
+    "70": 6,
+    "71": 7,
+    "72": 0,
+    "73": 1,
+    "74": 2,
+    "75": 3,
+    "76": 4,
+    "77": 5,
+    "78": 6,
+    "79": 7,
+    "8": 0,
+    "80": 0,
+    "81": 1,
+    "82": 2,
+    "83": 3,
+    "84": 4,
+    "85": 5,
+    "86": 6,
+    "87": 7,
+    "88": 0,
+    "89": 1,
+    "9": 1,
+    "90": 2,
+    "91": 3,
+    "92": 4,
+    "93": 5,
+    "94": 6,
+    "95": 7,
+    "96": 0,
+    "97": 1,
+    "98": 2,
+    "99": 3
+  },
+  "Rx1DataRate": {
+    "0_0_false": 8,
+    "0_0_true": 8,
+    "0_1_false": 8,
+    "0_1_true": 8,
+    "0_2_false": 8,
+    "0_2_true": 8,
+    "0_3_false": 8,
+    "0_3_true": 8,
+    "0_4_false": 8,
+    "0_4_true": 8,
+    "0_5_false": 8,
+    "0_5_true": 8,
+    "1_0_false": 9,
+    "1_0_true": 9,
+    "1_1_false": 8,
+    "1_1_true": 8,
+    "1_2_false": 8,
+    "1_2_true": 8,
+    "1_3_false": 8,
+    "1_3_true": 8,
+    "1_4_false": 8,
+    "1_4_true": 8,
+    "1_5_false": 8,
+    "1_5_true": 8,
+    "2_0_false": 10,
+    "2_0_true": 10,
+    "2_1_false": 9,
+    "2_1_true": 9,
+    "2_2_false": 8,
+    "2_2_true": 8,
+    "2_3_false": 8,
+    "2_3_true": 8,
+    "2_4_false": 8,
+    "2_4_true": 8,
+    "2_5_false": 8,
+    "2_5_true": 8,
+    "3_0_false": 11,
+    "3_0_true": 11,
+    "3_1_false": 10,
+    "3_1_true": 10,
+    "3_2_false": 9,
+    "3_2_true": 9,
+    "3_3_false": 8,
+    "3_3_true": 8,
+    "3_4_false": 8,
+    "3_4_true": 8,
+    "3_5_false": 8,
+    "3_5_true": 8,
+    "4_0_false": 12,
+    "4_0_true": 12,
+    "4_1_false": 11,
+    "4_1_true": 11,
+    "4_2_false": 10,
+    "4_2_true": 10,
+    "4_3_false": 9,
+    "4_3_true": 9,
+    "4_4_false": 8,
+    "4_4_true": 8,
+    "4_5_false": 8,
+    "4_5_true": 8,
+    "5_0_false": 13,
+    "5_0_true": 13,
+    "5_1_false": 12,
+    "5_1_true": 12,
+    "5_2_false": 11,
+    "5_2_true": 11,
+    "5_3_false": 10,
+    "5_3_true": 10,
+    "5_4_false": 9,
+    "5_4_true": 9,
+    "5_5_false": 8,
+    "5_5_true": 8,
+    "6_0_false": 13,
+    "6_0_true": 13,
+    "6_1_false": 13,
+    "6_1_true": 13,
+    "6_2_false": 12,
+    "6_2_true": 12,
+    "6_3_false": 11,
+    "6_3_true": 11,
+    "6_4_false": 10,
+    "6_4_true": 10,
+    "6_5_false": 9,
+    "6_5_true": 9,
+    "7_0_false": 9,
+    "7_0_true": 9,
+    "7_1_false": 8,
+    "7_1_true": 8,
+    "7_2_false": 8,
+    "7_2_true": 8,
+    "7_3_false": 8,
+    "7_3_true": 8,
+    "7_4_false": 8,
+    "7_4_true": 8,
+    "7_5_false": 8,
+    "7_5_true": 8
+  },
+  "DefaultRx2Parameters": {
+    "DataRateIndex": 8,
+    "Frequency": 923300000
+  },
+  "BootDwellTime": {
+    "Uplinks": true,
+    "Downlinks": false
+  },
+  "Relay": {
+    "WORChannels": [
+      {
+        "Frequency": 916700000,
+        "ACKFrequency": 918300000,
+        "DataRateIndex": 10
+      },
+      {
+        "Frequency": 919900000,
+        "ACKFrequency": 921500000,
+        "DataRateIndex": 10
+      }
+    ]
+  },
+  "SharedParameters": {
+    "ReceiveDelay1": 1000000000,
+    "ReceiveDelay2": 2000000000,
+    "JoinAcceptDelay1": 5000000000,
+    "JoinAcceptDelay2": 6000000000,
+    "MaxFCntGap": 16384,
+    "ADRAckLimit": "ADR_ACK_LIMIT_64",
+    "ADRAckDelay": "ADR_ACK_DELAY_32",
+    "MinRetransmitTimeout": 1000000000,
+    "MaxRetransmitTimeout": 3000000000
+  }
+}

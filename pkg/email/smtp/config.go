@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package smtp implements SMTP as email provider.
 package smtp
 
 import (
 	"crypto/tls"
-	"net"
-	"net/smtp"
 )
 
 // Config for the SMTP email provider.
@@ -27,12 +26,4 @@ type Config struct {
 	Password    string `name:"password" description:"Password to authenticate with"`
 	Connections int    `name:"connections" description:"Maximum number of connections to the SMTP server"`
 	TLSConfig   *tls.Config
-}
-
-func (c Config) auth() smtp.Auth {
-	if c.Username == "" && c.Password == "" {
-		return nil
-	}
-	host, _, _ := net.SplitHostPort(c.Address)
-	return smtp.PlainAuth("", c.Username, c.Password, host)
 }

@@ -45,10 +45,10 @@ const flatten = function (s) {
 }
 
 const localesDir = argv.locales || env.LOCALES_DIR || 'pkg/webui/locales'
-const support = flatten(argv.support || env.SUPPORT_LOCALES || 'en')
+const support = flatten(argv.support || env.SUPPORT_LOCALES || 'en,ja')
 const backendOnly = ('backend-only' in argv && argv['backend-only'] !== false) || false
 const messagesDir = !backendOnly && (argv.messages || env.MESSAGES || '.cache/messages')
-const backendMessages = argv.backendMessages || env.MESSAGES_BACKEND
+const backendMessages = argv.backendMessages || env.MESSAGES_BACKEND || 'config/messages.json'
 const defaultLocale = argv.default || env.DEFAULT_LOCALE || 'en'
 const exportForTranslation = argv['export-for-interpreters'] || env.EXPORT_FOR_INTERPRETERS || false
 const verbose = ('verbose' in argv && argv.verbose !== 'false') || false
@@ -256,13 +256,27 @@ const get = function (object, ...pth) {
  * Write locales to their corresponding file in the localesDir (specified by --locales).
  *
  * @param {object} locales - The locales to write.
+ * @param backendIds
  * @returns {Promise<undefined>} - A promise that resolves when all locales have been written.
  */
-const writeLocales = async function (locales) {
+const writeLocales = async function (locales, backendIds) {
   return Promise.all(
     Object.keys(locales).map(async function (key) {
       const locale = locales[key]
-      const content = JSON.stringify(locale, null, 2).concat('\n')
+      let cleaned = locale
+      if (key === defaultLocale && !backendOnly) {
+        // Remove backend keys from the default locale
+        cleaned = Object.keys(locale).reduce(function (acc, next) {
+          if (!backendIds.includes(next)) {
+            return {
+              ...acc,
+              [next]: locale[next],
+            }
+          }
+          return acc
+        }, {})
+      }
+      const content = JSON.stringify(cleaned, null, 2).concat('\n')
       await mkdirp(localesDir)
       await write(`${localesDir}/${key}.json`, content)
     }),
@@ -282,6 +296,7 @@ const writeInterpreterFile = async function (locales, targetLanguage) {
 
   const locale = locales[targetLanguage]
   const content = Object.keys(locale)
+    .filter(id => !locale[id])
     .map(function (id) {
       const message = locale[id] || ''
       // Add proper escapes
@@ -310,6 +325,8 @@ const main = async function () {
     }
   }
 
+  const backendIds = Object.keys(backend)
+
   // Walk through messages via id
   for (const id of Object.keys(messages)) {
     const message = messages[id]
@@ -332,7 +349,7 @@ const main = async function () {
     }
   }
 
-  await writeLocales(updated)
+  await writeLocales(updated, backendIds)
 
   if (exportForTranslation) {
     const supportWithoutDefault = support.filter(s => s !== defaultLocale)

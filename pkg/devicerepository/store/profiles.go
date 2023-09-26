@@ -36,6 +36,8 @@ var regionalParametersToPB = map[string]ttnpb.PHYVersion{
 	"RP002-1.0.0":      ttnpb.PHYVersion_RP002_V1_0_0,
 	"RP002-1.0.1":      ttnpb.PHYVersion_RP002_V1_0_1,
 	"RP002-1.0.2":      ttnpb.PHYVersion_RP002_V1_0_2,
+	"RP002-1.0.3":      ttnpb.PHYVersion_RP002_V1_0_3,
+	"RP002-1.0.4":      ttnpb.PHYVersion_RP002_V1_0_4,
 }
 
 // EndDeviceProfile is the profile of a LoRaWAN end device as defined in the LoRaWAN backend interfaces.

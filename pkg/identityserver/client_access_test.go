@@ -26,7 +26,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func TestClientCollaborators(t *testing.T) {
+func TestClientCollaborators(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
 	admin := p.NewUser()
@@ -39,6 +39,11 @@ func TestClientCollaborators(t *testing.T) {
 	usr1Creds := rpcCreds(usr1Key)
 
 	cli1 := p.NewClient(usr1.GetOrganizationOrUserIdentifiers())
+	cliKey, _ := p.NewAPIKey(cli1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+		ttnpb.Right_RIGHT_GATEWAY_LINK,
+	)
+	cliCreds := rpcCreds(cliKey)
 
 	usr2 := p.NewUser()
 	p.NewMembership(
@@ -98,33 +103,54 @@ func TestClientCollaborators(t *testing.T) {
 			a.So(list, should.BeNil)
 		}
 
-		// Collaborator CRUD with different valid credentials.
-		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}} {
+		// Collaborator CRUD with different invalid credentials.
+		for _, opts := range [][]grpc.CallOption{nil, {cliCreds}} {
 			_, err := reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 				ClientIds: cli1.GetIds(),
 				Collaborator: &ttnpb.Collaborator{
-					Ids: usr3.GetOrganizationOrUserIdentifiers(),
-					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
-					},
+					Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
+				},
+			}, opts...)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			got, err := reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
+				ClientIds:    cli1.GetIds(),
+				Collaborator: usr2.GetOrganizationOrUserIdentifiers(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(got, should.BeNil)
+			}
+		}
+
+		// Collaborator CRUD with different valid credentials.
+		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}} {
+			// Adds `usr3` as a collaborator of `cli1` client.
+			_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
+				ClientIds: cli1.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS},
 				},
 			}, opts...)
 			a.So(err, should.BeNil)
 
-			list, err := reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
+			// Lists collaborators of the `cli1` client.
+			list, err = reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
 				ClientIds: cli1.GetIds(),
 			}, opts...)
 			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Collaborators, should.HaveLength, 3) {
 				for _, k := range list.Collaborators {
 					if unique.ID(ctx, k.GetIds()) == unique.ID(ctx, usr3.GetIds()) {
-						a.So(k.Rights, should.Resemble, []ttnpb.Right{
-							ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
-						})
+						a.So(k.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS})
 					}
 				}
 			}
 
-			got, err := reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
+			// Gets `usr3` collaborator of the `cli1` client.
+			got, err = reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
 				ClientIds:    cli1.GetIds(),
 				Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
 			}, opts...)
@@ -134,39 +160,69 @@ func TestClientCollaborators(t *testing.T) {
 				})
 			}
 
+			// TODO: Remove SetCollaborator test case (https://github.com/TheThingsNetwork/lorawan-stack/issues/6488).
+			t.Run("Delete via set method", func(*testing.T) { // nolint:paralleltest
+				_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
+					ClientIds: cli1.GetIds(),
+					Collaborator: &ttnpb.Collaborator{
+						Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+						Rights: []ttnpb.Right{},
+					},
+				}, opts...)
+				a.So(err, should.BeNil)
+
+				// Verifies that it has been deleted.
+				got, err = reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
+					ClientIds:    cli1.GetIds(),
+					Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
+
+			// Recreates `usr3` collaborator of the `cli1` client.
 			_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 				ClientIds: cli1.GetIds(),
 				Collaborator: &ttnpb.Collaborator{
-					Ids: usr3.GetOrganizationOrUserIdentifiers(),
+					Ids:    usr3.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS},
 				},
 			}, opts...)
 			a.So(err, should.BeNil)
 
-			got, err = reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
-				ClientIds:    cli1.GetIds(),
-				Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsNotFound(err), should.BeTrue)
-			}
-			a.So(got, should.BeNil)
+			t.Run("Delete via delete method", func(*testing.T) { // nolint:paralleltest
+				empty, err := reg.DeleteCollaborator(ctx, &ttnpb.DeleteClientCollaboratorRequest{
+					ClientIds:       cli1.GetIds(),
+					CollaboratorIds: usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				a.So(err, should.BeNil)
+				a.So(empty, should.Resemble, ttnpb.Empty)
+
+				// Verifies that it has been deleted.
+				got, err = reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
+					ClientIds:    cli1.GetIds(),
+					Collaborator: usr3.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+				a.So(got, should.BeNil)
+			})
 		}
 
 		// Remove the other collaborator with _ALL rights.
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
-			ClientIds: cli1.GetIds(),
-			Collaborator: &ttnpb.Collaborator{
-				Ids: usr2.GetOrganizationOrUserIdentifiers(),
-			},
+		_, err = reg.DeleteCollaborator(ctx, &ttnpb.DeleteClientCollaboratorRequest{
+			ClientIds:       cli1.GetIds(),
+			CollaboratorIds: usr2.GetOrganizationOrUserIdentifiers(),
 		}, usr1Creds)
 		a.So(err, should.BeNil)
 
 		// Try removing the only collaborator with _ALL rights.
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
-			ClientIds: cli1.GetIds(),
-			Collaborator: &ttnpb.Collaborator{
-				Ids: usr1.GetOrganizationOrUserIdentifiers(),
-			},
+		_, err = reg.DeleteCollaborator(ctx, &ttnpb.DeleteClientCollaboratorRequest{
+			ClientIds:       cli1.GetIds(),
+			CollaboratorIds: usr1.GetOrganizationOrUserIdentifiers(),
 		}, usr1Creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsFailedPrecondition(err), should.BeTrue)

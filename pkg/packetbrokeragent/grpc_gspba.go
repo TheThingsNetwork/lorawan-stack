@@ -63,6 +63,7 @@ type gsPbaServer struct {
 	frequencyPlansStore GetFrequencyPlansStore
 	upstreamCh          chan *uplinkMessage
 	mapperConn          *grpc.ClientConn
+	entityRegistry      EntityRegistry
 }
 
 // PublishUplink is called by the Gateway Server when an uplink message arrives and needs to get forwarded to Packet Broker.
@@ -100,12 +101,17 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 }
 
 var (
-	errNoGatewayID          = errors.DefineFailedPrecondition("no_gateway_id", "no gateway identifier provided or included in configuration")
 	errPacketBrokerInternal = errors.DefineAborted("packet_broker_internal", "internal Packet Broker error")
+	errNoGatewayID          = errors.DefineFailedPrecondition(
+		"no_gateway_id", "no gateway identifier provided or included in configuration",
+	)
 )
 
 // UpdateGateway is called by Gateway Server to update a gateway.
-func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacketBrokerGatewayRequest) (*ttnpb.UpdatePacketBrokerGatewayResponse, error) {
+func (s *gsPbaServer) UpdateGateway( // nolint: gocyclo
+	ctx context.Context, req *ttnpb.UpdatePacketBrokerGatewayRequest,
+) (*ttnpb.UpdatePacketBrokerGatewayResponse, error) {
+	logger := log.FromContext(ctx)
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -157,14 +163,45 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-		adminContact, techContact := toPBContactInfo(req.Gateway.GetContactInfo())
-		updateReq.AdministrativeContact = &packetbroker.ContactInfoValue{
-			Value: adminContact,
+	var adminContact, techContact *packetbroker.ContactInfo
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "administrative_contact") {
+		// Only replaces the administrative contact if the contact is validated and no error happens.
+		adminUsr, err := s.fetchUserFromContact(
+			ctx, req.Gateway.GetAdministrativeContact(),
+			(*ttnpb.Organization).GetAdministrativeContact,
+		)
+		if err == nil && adminUsr.PrimaryEmailAddressValidatedAt != nil {
+			adminContact = &packetbroker.ContactInfo{Name: adminUsr.Ids.UserId, Email: adminUsr.PrimaryEmailAddress}
+		} else if !errors.IsNotFound(err) {
+			logger.
+				WithField("gateway_id", req.Gateway.Ids).
+				WithError(err).
+				Warn("Failed to fetch administrative contact")
 		}
-		updateReq.TechnicalContact = &packetbroker.ContactInfoValue{
-			Value: techContact,
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "technical_contact") {
+		// Only replaces the technical contact if the contact is validated and no error happens.
+		techUsr, err := s.fetchUserFromContact(
+			ctx, req.Gateway.GetTechnicalContact(),
+			(*ttnpb.Organization).GetTechnicalContact,
+		)
+		if err == nil && techUsr.PrimaryEmailAddressValidatedAt != nil {
+			techContact = &packetbroker.ContactInfo{Name: techUsr.Ids.UserId, Email: techUsr.PrimaryEmailAddress}
+		} else if !errors.IsNotFound(err) {
+			logger.
+				WithField("gateway_id", req.Gateway.Ids).
+				WithError(err).
+				Warn("Failed to fetch technical contact")
 		}
+	}
+
+	if adminContact != nil {
+		updateReq.AdministrativeContact = &packetbroker.ContactInfoValue{Value: adminContact}
+	}
+	if techContact != nil {
+		updateReq.TechnicalContact = &packetbroker.ContactInfoValue{Value: techContact}
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
@@ -210,4 +247,38 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		res.OnlineTtl = durationpb.New(s.config.GatewayOnlineTTL)
 	}
 	return res, nil
+}
+
+var errContactNotFound = errors.DefineNotFound("contact_not_found", "contact not found")
+
+func (s *gsPbaServer) fetchUserFromContact(
+	ctx context.Context,
+	contact *ttnpb.OrganizationOrUserIdentifiers,
+	selector func(*ttnpb.Organization) *ttnpb.OrganizationOrUserIdentifiers,
+) (*ttnpb.User, error) {
+	usrID := contact.GetUserIds()
+	// If the contact is an organization, get its contact before fetching the user information.
+	if orgID := contact.GetOrganizationIds(); orgID != nil {
+		org, err := s.entityRegistry.GetOrganization(ctx, &ttnpb.GetOrganizationRequest{
+			OrganizationIds: orgID,
+			FieldMask:       ttnpb.FieldMask("administrative_contact", "technical_contact"),
+		})
+		if err != nil {
+			return nil, err
+		}
+		usrID = selector(org).GetUserIds()
+	}
+	if usrID == nil {
+		return nil, errContactNotFound.New()
+	}
+	return s.entityRegistry.GetUser(ctx, &ttnpb.GetUserRequest{
+		UserIds:   usrID,
+		FieldMask: ttnpb.FieldMask("ids", "primary_email_address", "primary_email_address_validated_at"),
+	})
+}
+
+// EntityRegistry abstracts the Identity server user/organization functions.
+type EntityRegistry interface {
+	GetUser(ctx context.Context, req *ttnpb.GetUserRequest) (*ttnpb.User, error)
+	GetOrganization(ctx context.Context, req *ttnpb.GetOrganizationRequest) (*ttnpb.Organization, error)
 }

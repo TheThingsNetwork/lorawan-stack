@@ -122,6 +122,11 @@ service OrganizationAccess {
     };
   }
 
+  // Delete a single API key of this organization.
+  rpc DeleteAPIKey(DeleteOrganizationAPIKeyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/organizations/{organization_ids.organization_id}/api-keys/{key_id}"};
+  }
+
   // Get the rights of a collaborator (member) of the organization.
   // Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
   rpc GetCollaborator(GetOrganizationCollaboratorRequest) returns (GetCollaboratorResponse) {
@@ -145,5 +150,13 @@ service OrganizationAccess {
   // List the collaborators on this organization.
   rpc ListCollaborators(ListOrganizationCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {get: "/organizations/{organization_ids.organization_id}/collaborators"};
+  }
+
+  // DeleteCollaborator removes a collaborator from an organization.
+  rpc DeleteCollaborator(DeleteOrganizationCollaboratorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      // NOTE: It is currently not possible to have organizations collaborating on other organizations.
+      delete: "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}"
+    };
   }
 }

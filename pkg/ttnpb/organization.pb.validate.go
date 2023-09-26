@@ -1381,6 +1381,109 @@ var _ interface {
 	ErrorName() string
 } = UpdateOrganizationAPIKeyRequestValidationError{}
 
+// ValidateFields checks the field values on DeleteOrganizationAPIKeyRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *DeleteOrganizationAPIKeyRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DeleteOrganizationAPIKeyRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "organization_ids":
+
+			if m.GetOrganizationIds() == nil {
+				return DeleteOrganizationAPIKeyRequestValidationError{
+					field:  "organization_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetOrganizationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteOrganizationAPIKeyRequestValidationError{
+						field:  "organization_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "key_id":
+			// no validation rules for KeyId
+		default:
+			return DeleteOrganizationAPIKeyRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DeleteOrganizationAPIKeyRequestValidationError is the validation error
+// returned by DeleteOrganizationAPIKeyRequest.ValidateFields if the
+// designated constraints aren't met.
+type DeleteOrganizationAPIKeyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteOrganizationAPIKeyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteOrganizationAPIKeyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteOrganizationAPIKeyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteOrganizationAPIKeyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteOrganizationAPIKeyRequestValidationError) ErrorName() string {
+	return "DeleteOrganizationAPIKeyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteOrganizationAPIKeyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteOrganizationAPIKeyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteOrganizationAPIKeyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteOrganizationAPIKeyRequestValidationError{}
+
 // ValidateFields checks the field values on
 // ListOrganizationCollaboratorsRequest with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.
@@ -1749,3 +1852,123 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SetOrganizationCollaboratorRequestValidationError{}
+
+// ValidateFields checks the field values on
+// DeleteOrganizationCollaboratorRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *DeleteOrganizationCollaboratorRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DeleteOrganizationCollaboratorRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "organization_ids":
+
+			if m.GetOrganizationIds() == nil {
+				return DeleteOrganizationCollaboratorRequestValidationError{
+					field:  "organization_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetOrganizationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteOrganizationCollaboratorRequestValidationError{
+						field:  "organization_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator_ids":
+
+			if m.GetCollaboratorIds() == nil {
+				return DeleteOrganizationCollaboratorRequestValidationError{
+					field:  "collaborator_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaboratorIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteOrganizationCollaboratorRequestValidationError{
+						field:  "collaborator_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return DeleteOrganizationCollaboratorRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DeleteOrganizationCollaboratorRequestValidationError is the validation error
+// returned by DeleteOrganizationCollaboratorRequest.ValidateFields if the
+// designated constraints aren't met.
+type DeleteOrganizationCollaboratorRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteOrganizationCollaboratorRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteOrganizationCollaboratorRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteOrganizationCollaboratorRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteOrganizationCollaboratorRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteOrganizationCollaboratorRequestValidationError) ErrorName() string {
+	return "DeleteOrganizationCollaboratorRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteOrganizationCollaboratorRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteOrganizationCollaboratorRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteOrganizationCollaboratorRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteOrganizationCollaboratorRequestValidationError{}

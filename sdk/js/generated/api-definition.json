@@ -73,6 +73,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/application_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/applications/{application_ids.application_id}/api-keys/{key_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "GetCollaborator": {
       "file": "ttn/lorawan/v3/application_services.proto",
       "http": [
@@ -120,6 +133,32 @@
           "pattern": "/applications/{application_ids.application_id}/collaborators",
           "parameters": [
             "application_ids.application_id"
+          ]
+        }
+      ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/application_services.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/applications/{application_ids.application_id}/collaborator/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "collaborator_ids.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/applications/{application_ids.application_id}/collaborator/organization/{collaborator_ids.organization_ids.organization_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "collaborator_ids.organization_ids.organization_id"
           ]
         }
       ]
@@ -1985,6 +2024,32 @@
           ]
         }
       ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/client_services.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/clients/{client_ids.client_id}/collaborators/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "client_ids.client_id",
+            "collaborator_ids.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/clients/{client_ids.client_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}",
+          "parameters": [
+            "client_ids.client_id",
+            "collaborator_ids.organization_ids.organization_id"
+          ]
+        }
+      ]
     }
   },
   "ClientRegistry": {
@@ -3135,6 +3200,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "GetCollaborator": {
       "file": "ttn/lorawan/v3/gateway_services.proto",
       "http": [
@@ -3182,6 +3260,32 @@
           "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators",
           "parameters": [
             "gateway_ids.gateway_id"
+          ]
+        }
+      ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/gateway_services.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "collaborator_ids.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators/organization/{collaborator_ids.organization_ids.organization_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "collaborator_ids.organization_ids.organization_id"
           ]
         }
       ]
@@ -5184,6 +5288,19 @@
         "updated_at"
       ]
     },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/organization_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{key_id}",
+          "parameters": [
+            "organization_ids.organization_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "GetCollaborator": {
       "file": "ttn/lorawan/v3/organization_services.proto",
       "http": [
@@ -5223,6 +5340,19 @@
           "pattern": "/organizations/{organization_ids.organization_id}/collaborators",
           "parameters": [
             "organization_ids.organization_id"
+          ]
+        }
+      ]
+    },
+    "DeleteCollaborator": {
+      "file": "ttn/lorawan/v3/organization_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/organizations/{organization_ids.organization_id}/collaborators/user/{collaborator_ids.user_ids.user_id}",
+          "parameters": [
+            "organization_ids.organization_id",
+            "collaborator_ids.user_ids.user_id"
           ]
         }
       ]
@@ -5405,16 +5535,17 @@
       "file": "ttn/lorawan/v3/packetbrokeragent.proto",
       "http": [],
       "allowedFieldMaskPaths": [
+        "administrative_contact",
         "antennas",
-        "contact_info",
         "frequency_plan_ids",
+        "ids",
         "ids.eui",
         "ids.gateway_id",
-        "ids",
         "location_public",
         "online",
         "rx_rate",
         "status_public",
+        "technical_contact",
         "tx_rate"
       ]
     }
@@ -6096,6 +6227,19 @@
         "name",
         "rights",
         "updated_at"
+      ]
+    },
+    "DeleteAPIKey": {
+      "file": "ttn/lorawan/v3/user_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/api-keys/{key_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "key_id"
+          ]
+        }
       ]
     },
     "CreateLoginToken": {
