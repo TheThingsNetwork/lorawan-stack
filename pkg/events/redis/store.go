@@ -42,6 +42,7 @@ type PubSubStore struct {
 	*PubSub
 
 	taskStarter task.Starter
+	publisher   events.Publisher
 
 	historyTTL                time.Duration
 	entityHistoryCount        int
@@ -452,8 +453,13 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 	return evts, nil
 }
 
-// Publish an event to Redis.
+// Publish implements events.Publisher.
 func (ps *PubSubStore) Publish(evs ...events.Event) {
+	ps.publisher.Publish(evs...)
+}
+
+// publish an event to Redis.
+func (ps *PubSubStore) publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
 	tx := ps.client.TxPipeline()

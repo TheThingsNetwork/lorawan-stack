@@ -18,6 +18,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -27,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/batch"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
@@ -36,7 +38,9 @@ import (
 )
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(ctx context.Context, component workerpool.Component, conf config.RedisEvents) events.PubSub {
+func NewPubSub(
+	ctx context.Context, component workerpool.Component, conf config.RedisEvents, batchConf config.BatchEvents,
+) events.PubSub {
 	ttnRedisClient := ttnredis.New(&conf.Config)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "events/redis",
@@ -105,6 +109,20 @@ func NewPubSub(ctx context.Context, component workerpool.Component, conf config.
 	}
 	if pss.streamPartitionSize == 0 {
 		pss.streamPartitionSize = 64
+	}
+
+	pss.publisher = events.PublishFunc(pss.publish)
+	if batchConf.Enable {
+		size, delay := batchConf.Size, batchConf.Delay
+		if size == 0 {
+			size = 64
+		}
+		if delay == 0 {
+			delay = 32 * time.Millisecond
+		}
+		// NOTE: Event publication in the Redis store implementation is CPU-bound due to the marshaling,
+		// so we use the number of CPUs as the number of workers.
+		pss.publisher = batch.NewPublisher(ctx, pss.publisher, component, size, delay, runtime.GOMAXPROCS(-1))
 	}
 
 	return pss
