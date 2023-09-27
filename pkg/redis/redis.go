@@ -696,13 +696,17 @@ func (q *TaskQueue) Pop(ctx context.Context, consumerID string, r redis.Cmdable,
 	return popTask(ctx, r, q.Group, consumerID, f, q.Key, q.StreamBlockLimit)
 }
 
-var deduplicateProtosScript = redis.NewScript(`local exp = ARGV[1]
+var deduplicateProtosScript = redis.NewScript(`local exp = table.remove(ARGV, 1)
+local limit = tonumber(table.remove(ARGV, 1))
 local ok = redis.call('set', KEYS[1], '', 'px', exp, 'nx')
-if #ARGV > 1 then
-	table.remove(ARGV, 1)
+
+if #ARGV > 0 then
 	redis.call('rpush', KEYS[2], unpack(ARGV))
 	local ttl = redis.call('pttl', KEYS[1])
 	redis.call('pexpire', KEYS[2], ttl)
+	if limit > 0 then
+		redis.call('ltrim', KEYS[2], -limit, -1)
+	end
 end
 if ok then
 	return 1
@@ -728,12 +732,19 @@ func milliseconds(d time.Duration) int64 {
 	return ms
 }
 
-// DeduplicateProtos deduplicates protos using key k. It stores a lock at LockKey(k) and the list of collected protos at ListKey(k).
+// DeduplicateProtos deduplicates protos using key k. It stores a lock at LockKey(k)
+// and the list of collected protos at ListKey(k).
+// If the number of protos exceeds limit, the messages are trimmed from the start of the list.
 func DeduplicateProtos(
-	ctx context.Context, r redis.Scripter, k string, window time.Duration, msgs ...proto.Message,
+	ctx context.Context, r redis.Scripter, k string, window time.Duration, limit int, msgs ...proto.Message,
 ) (bool, error) {
-	args := make([]any, 0, 1+len(msgs))
+	args := make([]any, 0, 2+len(msgs))
 	args = append(args, milliseconds(window))
+	args = append(args, limit)
+	if n := len(msgs) - limit; n > 0 {
+		msgs = msgs[n:]
+	}
+
 	for _, msg := range msgs {
 		s, err := MarshalProto(msg)
 		if err != nil {

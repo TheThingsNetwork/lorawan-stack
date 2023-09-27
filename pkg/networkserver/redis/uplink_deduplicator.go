@@ -52,7 +52,9 @@ func uplinkHash(ctx context.Context, up *ttnpb.UplinkMessage, round uint64) (str
 }
 
 // DeduplicateUplink deduplicates up for window. Since highest precision allowed by Redis is milliseconds, window is truncated to milliseconds.
-func (d *UplinkDeduplicator) DeduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, round uint64) (bool, error) {
+func (d *UplinkDeduplicator) DeduplicateUplink(
+	ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, limit int, round uint64,
+) (bool, error) {
 	h, err := uplinkHash(ctx, up, round)
 	if err != nil {
 		return false, err
@@ -61,7 +63,7 @@ func (d *UplinkDeduplicator) DeduplicateUplink(ctx context.Context, up *ttnpb.Up
 	for _, md := range up.RxMetadata {
 		msgs = append(msgs, md)
 	}
-	return ttnredis.DeduplicateProtos(ctx, d.Redis, d.Redis.Key(h), window, msgs...)
+	return ttnredis.DeduplicateProtos(ctx, d.Redis, d.Redis.Key(h), window, limit, msgs...)
 }
 
 // AccumulatedMetadata returns accumulated metadata for up.
