@@ -62,7 +62,6 @@ describe('Notifications', () => {
     cy.findByText(/A new API key has just been created for your application./).click()
     cy.findByRole('button', { name: /Archive/ }).click()
     cy.findByText(/See archived messages/).click()
-    cy.findByText(/A new API key has just been created for your application./).click()
     cy.findByRole('button', { name: /Unarchive/ }).click()
     cy.findByText(/See all messages/).click()
     cy.findByText(/A new API key has just been created for your application./).should('be.visible')
