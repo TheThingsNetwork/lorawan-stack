@@ -1349,6 +1349,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:class_b_c_gateway_identifiers": {
+    "translations": {
+      "en": "invalid class B/C gateway identifiers"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:conflicting_paths": {
     "translations": {
       "en": "conflicting set and unset field mask paths"
