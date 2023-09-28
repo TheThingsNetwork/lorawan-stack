@@ -97,7 +97,7 @@ const OrganizationUpdateForm = ({ onDeleteSuccess }) => {
   const handleDelete = useCallback(
     async shouldPurge => {
       try {
-        await dispatch(attachPromise(deleteOrganization(orgId, { purge: shouldPurge })))
+        await dispatch(attachPromise(deleteOrganization(orgId, { purge: shouldPurge || false })))
         toast({
           title: orgId,
           message: m.deleteSuccess,

@@ -169,7 +169,7 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
       setError(undefined)
 
       try {
-        await dispatch(attachPromise(deleteApplication(appId, shouldPurge)))
+        await dispatch(attachPromise(deleteApplication(appId, { purge: shouldPurge || false })))
         toast({
           title: appId,
           message: m.deleteSuccess,

@@ -112,7 +112,7 @@ const ClientAdd = props => {
       setError(undefined)
 
       try {
-        await dispatch(attachPromise(deleteClient(clientId, shouldPurge)))
+        await dispatch(attachPromise(deleteClient(clientId, { purge: shouldPurge || false })))
         navigate('/oauth-clients')
         toast({
           title: clientId,
