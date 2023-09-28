@@ -104,7 +104,7 @@ const GatewayGeneralSettingsInner = () => {
   const handleDelete = useCallback(
     async shouldPurge => {
       try {
-        await dispatch(attachPromise(deleteGateway(gtwId, shouldPurge || false)))
+        await dispatch(attachPromise(deleteGateway(gtwId, { purge: shouldPurge || false })))
         navigate('/gateways')
         toast({
           title: gtwId,
