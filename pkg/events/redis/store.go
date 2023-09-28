@@ -19,6 +19,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"hash/fnv"
+	"math/rand"
 	"strconv"
 	"strings"
 	"sync"
@@ -33,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"golang.org/x/exp/slices"
 )
 
 const ttlJitter = 0.01
@@ -257,6 +259,8 @@ func streamPartitionSize(states []*streamState, partitionSize int) int {
 }
 
 func partitionStreamStates(states []*streamState, partitionSize int) [][]*streamState {
+	states = slices.Clone(states)
+	rand.Shuffle(len(states), func(i, j int) { states[i], states[j] = states[j], states[i] })
 	partitionedStates := make([][]*streamState, 0, len(states)/partitionSize+1)
 	for len(states) > 0 {
 		n := streamPartitionSize(states, partitionSize)
