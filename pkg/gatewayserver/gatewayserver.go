@@ -465,7 +465,6 @@ func (gs *GatewayServer) Connect(
 		"gateway_ip_address", addr.Ip,
 	))
 	ctx = log.NewContext(ctx, logger)
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
 	var isAuthenticated bool
 	if _, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()); err == nil {
@@ -742,15 +741,13 @@ func (gs *GatewayServer) startHandleVersionUpdatesTask(conn connectionEntry) {
 var errHostHandle = errors.Define("host_handle", "host `{host}` handle message")
 
 type upstreamHost struct {
-	name          string
-	handler       upstream.Handler
-	pool          workerpool.WorkerPool[any]
-	gtw           *ttnpb.Gateway
-	correlationID string
+	name    string
+	handler upstream.Handler
+	pool    workerpool.WorkerPool[any]
+	gtw     *ttnpb.Gateway
 }
 
 func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
-	ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
 	logger := log.FromContext(ctx)
 	gtw := host.gtw
 	// Each concurrent upstream host will receive the message and edit it in order
@@ -866,10 +863,9 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			continue
 		}
 		host := &upstreamHost{
-			name:          name,
-			handler:       handler,
-			gtw:           gtw,
-			correlationID: fmt.Sprintf("gs:up:host:%s", events.NewCorrelationID()),
+			name:    name,
+			handler: handler,
+			gtw:     gtw,
 		}
 		wp := workerpool.NewWorkerPool(workerpool.Config[any]{
 			Component:  gs,
