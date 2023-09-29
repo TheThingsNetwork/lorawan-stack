@@ -442,7 +442,6 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 		return err
 	}
 	defer conn.Close()
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:up:%s", events.NewCorrelationID()))
 
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Forwarder")
@@ -514,7 +513,6 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 		return err
 	}
 	defer conn.Close()
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:down:%s", events.NewCorrelationID()))
 
 	client := routingpb.NewForwarderDataClient(conn)
 
@@ -801,7 +799,6 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		return err
 	}
 	defer conn.Close()
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:up:%s", events.NewCorrelationID()))
 
 	filters := a.getSubscriptionFilters()
 	for i, f := range filters {
@@ -1078,7 +1075,6 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 		return err
 	}
 	defer conn.Close()
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:down:%s", events.NewCorrelationID()))
 
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Home Network")
