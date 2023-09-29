@@ -58,14 +58,15 @@ type Sentry struct {
 
 // GRPC represents gRPC listener configuration.
 type GRPC struct {
-	AllowInsecureForCredentials bool `name:"allow-insecure-for-credentials" description:"Allow transmission of credentials over insecure transport"` //nolint:lll
+	AllowInsecureForCredentials bool `name:"allow-insecure-for-credentials" description:"Allow transmission of credentials over insecure transport"` // nolint:lll
 
 	Listen    string `name:"listen" description:"Address for the TCP gRPC server to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the TLS gRPC server to listen on"`
 
 	TrustedProxies []string `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
 
-	LogIgnoreMethods []string `name:"log-ignore-methods" description:"List of paths for which successful requests will not be logged"` //nolint:lll
+	LogIgnoreMethods            []string `name:"log-ignore-methods" description:"List of methods for which requests will not be logged"`                         // nolint:lll
+	CorrelationIDsIgnoreMethods []string `name:"correlation-ids-ignore-methods" description:"List of methods for which no RPC correlation IDs will be injected"` // nolint:lll
 }
 
 // Cookie represents cookie configuration.
