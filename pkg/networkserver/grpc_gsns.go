@@ -1404,10 +1404,8 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		return nil, err
 	}
 
-	ctx = events.ContextWithCorrelationID(ctx, append(
-		up.CorrelationIds,
-		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),
-	)...)
+	ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
+	ctx = appendUplinkCorrelationID(ctx)
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	registerUplinkLatency(ctx, up)
@@ -1487,9 +1485,8 @@ func (ns *NetworkServer) ReportTxAcknowledgment(
 	}
 
 	ack := txAck.GetTxAck()
-	ctx = events.ContextWithCorrelationID(
-		ctx, append(ack.CorrelationIds, fmt.Sprintf("ns:tx_ack:%s", events.NewCorrelationID()))...,
-	)
+	ctx = events.ContextWithCorrelationID(ctx, ack.CorrelationIds...)
+	ctx = appendTxAckCorrelationID(ctx)
 
 	down, err := ns.scheduledDownlinkMatcher.Match(ctx, ack)
 	if err != nil {

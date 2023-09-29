@@ -54,6 +54,11 @@ const (
 	publishMessageTimeout = 3 * time.Second
 )
 
+var (
+	appendUplinkCorrelationID   = events.RegisterCorrelationIDPrefix("uplink", "pba:uplink")
+	appendDownlinkCorrelationID = events.RegisterCorrelationIDPrefix("downlink", "pba:downlink")
+)
+
 // TenantContextFiller fills the parent context based on the tenant ID.
 type TenantContextFiller func(parent context.Context, tenantID string) (context.Context, error)
 
@@ -622,7 +627,7 @@ func (a *Agent) handleDownlink(
 		if down.Message == nil {
 			return
 		}
-		ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:downlink:%s", down.Id))
+		ctx = appendDownlinkCorrelationID(ctx, down.Id)
 		var homeNetworkNetID types.NetID
 		homeNetworkNetID.UnmarshalNumber(down.HomeNetworkNetId)
 		ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -945,7 +950,7 @@ func (a *Agent) handleUplink(
 		if up.Message == nil {
 			return
 		}
-		ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:uplink:%s", up.Id))
+		ctx = appendDownlinkCorrelationID(ctx, up.Id)
 		var forwarderNetID types.NetID
 		forwarderNetID.UnmarshalNumber(up.ForwarderNetId)
 		ctx = log.NewContextWithFields(ctx, log.Fields(

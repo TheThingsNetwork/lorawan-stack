@@ -28,6 +28,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
+var (
+	appendUplinkCorrelationID   = events.RegisterCorrelationIDPrefix("uplink", "ns:uplink")
+	appendDownlinkCorrelationID = events.RegisterCorrelationIDPrefix("downlink", "ns:downlink")
+	appendTxAckCorrelationID    = events.RegisterCorrelationIDPrefix("tx_ack", "ns:tx_ack")
+)
+
 // nsScheduleWindow returns minimum time.Duration between downlink being added to the queue and it being sent to GS for transmission.
 func nsScheduleWindow() time.Duration {
 	// TODO: Observe this value at runtime https://github.com/TheThingsNetwork/lorawan-stack/issues/1552.

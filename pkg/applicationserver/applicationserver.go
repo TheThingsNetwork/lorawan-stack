@@ -62,6 +62,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+var (
+	appendUpCorrelationID       = events.RegisterCorrelationIDPrefix("uplink", "as:up")
+	appendDownlinkCorrelationID = events.RegisterCorrelationIDPrefix("downlink", "as:downlink")
+)
+
 // ApplicationServer implements the Application Server component.
 //
 // The Application Server exposes the As, AppAs and AsEndDeviceRegistry services.
@@ -429,7 +434,8 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 	defer trace.StartRegion(ctx, "process up").End()
 
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIds))
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
+	ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
+	ctx = appendUpCorrelationID(ctx)
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
 
@@ -708,7 +714,7 @@ func (as *ApplicationServer) initAndValidateConfirmationRetriesConfig(item *ttnp
 }
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*emptypb.Empty, error)) error {
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
+	ctx = appendDownlinkCorrelationID(ctx)
 	link, err := as.getLink(ctx, ids.ApplicationIds, []string{
 		"default_formatters",
 		"skip_payload_crypto",
