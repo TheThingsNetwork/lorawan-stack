@@ -714,7 +714,9 @@ func (as *ApplicationServer) initAndValidateConfirmationRetriesConfig(item *ttnp
 }
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*emptypb.Empty, error)) error {
-	ctx = appendDownlinkCorrelationID(ctx)
+	if len(items) <= 1 {
+		ctx = appendDownlinkCorrelationID(ctx)
+	}
 	link, err := as.getLink(ctx, ids.ApplicationIds, []string{
 		"default_formatters",
 		"skip_payload_crypto",
@@ -728,6 +730,9 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 	}
 	for _, item := range items {
 		ctx := events.ContextWithCorrelationID(ctx, item.CorrelationIds...)
+		if len(items) > 1 {
+			ctx = appendDownlinkCorrelationID(ctx)
+		}
 		item.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	}
 	now := timestamppb.Now()
