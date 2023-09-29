@@ -383,7 +383,6 @@ func (*ApplicationServer) Roles() []ttnpb.ClusterRole {
 // Subscription for traffic and control. If the cluster parameter is true, the subscription receives all of the
 // traffic of the application. Otherwise, only traffic that was processed locally is sent.
 func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers, cluster bool) (*io.Subscription, error) {
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:conn:%s", events.NewCorrelationID()))
 	if ids != nil {
 		uid := unique.ID(ctx, ids)
 		ctx = log.NewContextWithField(ctx, "application_uid", uid)
