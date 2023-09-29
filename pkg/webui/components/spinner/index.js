@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useEffect, useState } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -21,101 +20,80 @@ import from from '@ttn-lw/lib/from'
 
 import style from './spinner.styl'
 
-const id = () => `grad-${Math.round(Math.random() * 10000)}`
+const id = `grad-${Math.round(Math.random() * 10000)}`
 
-export default class Spinner extends React.PureComponent {
-  static propTypes = {
-    after: PropTypes.number,
-    center: PropTypes.bool,
-    children: PropTypes.node,
-    className: PropTypes.string,
-    faded: PropTypes.bool,
-    inline: PropTypes.bool,
-    micro: PropTypes.bool,
-    small: PropTypes.bool,
-  }
+const Spinner = ({
+  after,
+  center,
+  children,
+  className,
+  faded = false,
+  micro = false,
+  small,
+  inline = false,
+}) => {
+  const [visible, setVisible] = useState(false)
+  const visibilityTimeout = setTimeout(() => setVisible(true), after)
 
-  static defaultProps = {
-    after: 350,
-    center: false,
-    children: undefined,
-    className: undefined,
-    faded: false,
-    inline: false,
-    micro: false,
-    small: false,
-  }
+  useEffect(
+    () => () => {
+      clearTimeout(visibilityTimeout)
+    },
+    [visibilityTimeout],
+  )
 
-  constructor(props) {
-    super(props)
-
-    this.state = { visible: false }
-    this.id = id()
-  }
-
-  componentDidMount() {
-    this.timer = setTimeout(this.show, this.props.after)
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.timer)
-  }
-
-  @bind
-  show() {
-    this.setState({
-      visible: true,
-    })
-  }
-
-  render() {
-    const {
-      className,
+  const classname = classnames(
+    style.box,
+    className,
+    ...from(style, {
       center,
       small,
-      micro = false,
-      faded = false,
-      children,
-      inline = false,
-    } = this.props
+      micro,
+      faded,
+      visible,
+      inline,
+    }),
+  )
 
-    const { visible = false } = this.state
-
-    const classname = classnames(
-      style.box,
-      className,
-      ...from(style, {
-        center,
-        small,
-        micro,
-        faded,
-        visible,
-        inline,
-      }),
-    )
-
-    return (
-      <div className={classname}>
-        <svg className={style.spinner} viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id={this.id}>
-              <stop offset="0%" className={style.stop} />
-              <stop offset="100%" className={style.stop} stopColor="white" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <g transform="translate(50, 50)">
-            <circle
-              cx="0"
-              cy="0"
-              r={micro ? 35 : 40}
-              className={style.bar}
-              stroke={`url(#${this.id})`}
-            />
-          </g>
-          <circle cx="50" cy="50" r={micro ? 35 : 40} className={style.circle} />
-        </svg>
-        <div className={style.message}>{children}</div>
-      </div>
-    )
-  }
+  return (
+    <div className={classname}>
+      <svg className={style.spinner} viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id={id}>
+            <stop offset="0%" className={style.stop} />
+            <stop offset="100%" className={style.stop} stopColor="white" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <g transform="translate(50, 50)">
+          <circle cx="0" cy="0" r={micro ? 35 : 40} className={style.bar} stroke={`url(#${id})`} />
+        </g>
+        <circle cx="50" cy="50" r={micro ? 35 : 40} className={style.circle} />
+      </svg>
+      <div className={style.message}>{children}</div>
+    </div>
+  )
 }
+
+Spinner.propTypes = {
+  after: PropTypes.number,
+  center: PropTypes.bool,
+  children: PropTypes.node,
+  className: PropTypes.string,
+  faded: PropTypes.bool,
+  inline: PropTypes.bool,
+  micro: PropTypes.bool,
+  small: PropTypes.bool,
+}
+
+Spinner.defaultProps = {
+  after: 350,
+  center: false,
+  children: undefined,
+  className: undefined,
+  faded: false,
+  inline: false,
+  micro: false,
+  small: false,
+}
+
+export default Spinner
