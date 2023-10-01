@@ -40,14 +40,11 @@ type ApplicationUplinkQueue interface {
 	// Implementations must ensure that Add returns fast.
 	Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error
 
-	// Dispatch dispatches the tasks in the queue.
-	Dispatch(ctx context.Context, consumerID string) error
-
-	// PopApplication calls f on the most recent application uplink task in the schedule, for which timestamp is in range [0, time.Now()],
-	// if such is available, otherwise it blocks until it is.
+	// Pop groups up to limit most recent application uplinks in the queue
+	// by their application ID and calls f on each group.
 	// Context passed to f must be derived from ctx.
 	// Implementations must respect ctx.Done() value on best-effort basis.
-	Pop(ctx context.Context, consumerID string, f func(context.Context, *ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueDrainFunc) (time.Time, error)) error
+	Pop(ctx context.Context, consumerID string, limit int, f func(context.Context, []*ttnpb.ApplicationUp) error) error
 }
 
 func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnpb.ApplicationJoinAccept {
@@ -99,29 +96,20 @@ func (ns *NetworkServer) createProcessApplicationUplinkTask(consumerID string) f
 }
 
 func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context, consumerID string) error {
-	return ns.applicationUplinks.Pop(ctx, consumerID, func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
-		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
-			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
-		}
-
-		cl := ttnpb.NewNsAsClient(conn)
-		var sendErr bool
-		if err := drain(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
-			err := ns.sendApplicationUplinks(ctx, cl, ups...)
+	return ns.applicationUplinks.Pop(ctx, consumerID, applicationUplinkLimit,
+		func(ctx context.Context, ups []*ttnpb.ApplicationUp) error {
+			conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
 			if err != nil {
-				sendErr = true
+				log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
+				return err
 			}
-			return err
-		}); err != nil {
-			if !sendErr {
-				log.FromContext(ctx).WithError(err).Error("Failed to drain application uplinks")
+			cl := ttnpb.NewNsAsClient(conn)
+			if err := ns.sendApplicationUplinks(ctx, cl, ups...); err != nil {
+				log.FromContext(ctx).WithError(err).Error("Failed to send application uplinks")
+				return err
 			}
-			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
-		}
-		return time.Time{}, nil
-	})
+			return nil
+		})
 }
 
 func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, error) {

@@ -349,8 +349,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	for id, dispatcher := range map[string]interface {
 		Dispatch(context.Context, string) error
 	}{
-		downlinkDispatchTaskName:          ns.downlinkTasks,
-		applicationUplinkDispatchTaskName: ns.applicationUplinks,
+		downlinkDispatchTaskName: ns.downlinkTasks,
 	} {
 		dispatcher := dispatcher
 		ns.RegisterTask(&task.Config{
