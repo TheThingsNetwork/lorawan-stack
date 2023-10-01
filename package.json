@@ -40,7 +40,7 @@
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-ttn": "git+https://github.com/TheThingsNetwork/eslint-config-ttn.git#v1.4.0",
-    "eslint-import-resolver-webpack": "^0.13.0",
+    "eslint-import-resolver-webpack": "^0.13.7",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-cypress": "^2.13.3",
     "eslint-plugin-import": "^2.27.5",
