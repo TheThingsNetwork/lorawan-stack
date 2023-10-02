@@ -19,6 +19,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"hash/fnv"
+	"math/rand"
 	"strconv"
 	"strings"
 	"sync"
@@ -33,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"golang.org/x/exp/slices"
 )
 
 const ttlJitter = 0.01
@@ -71,7 +73,7 @@ func (ps *PubSubStore) eventStream(ctx context.Context, ids *ttnpb.EntityIdentif
 }
 
 func (ps *PubSubStore) storeEvent(
-	ctx context.Context, tx redis.Cmdable, evt events.Event, correlationIDKeys map[string]struct{},
+	ctx context.Context, tx redis.Cmdable, evt events.Event, correlationIDKeys map[string][]any,
 ) error {
 	b, err := encodeEventData(evt)
 	if err != nil {
@@ -81,8 +83,7 @@ func (ps *PubSubStore) storeEvent(
 	tx.Set(ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ttl)
 	for _, cid := range evt.CorrelationIds() {
 		key := ps.eventIndexKey(evt.Context(), cid)
-		tx.LPush(ctx, key, evt.UniqueID())
-		correlationIDKeys[key] = struct{}{}
+		correlationIDKeys[key] = append(correlationIDKeys[key], evt.UniqueID())
 	}
 	return nil
 }
@@ -258,6 +259,8 @@ func streamPartitionSize(states []*streamState, partitionSize int) int {
 }
 
 func partitionStreamStates(states []*streamState, partitionSize int) [][]*streamState {
+	states = slices.Clone(states)
+	rand.Shuffle(len(states), func(i, j int) { states[i], states[j] = states[j], states[i] })
 	partitionedStates := make([][]*streamState, 0, len(states)/partitionSize+1)
 	for len(states) > 0 {
 		n := streamPartitionSize(states, partitionSize)
@@ -459,7 +462,7 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 	tx := ps.client.TxPipeline()
 
 	eventStreams := make(map[string]struct{}, len(evs))
-	correlationIDKeys := make(map[string]struct{}, len(evs))
+	correlationIDKeys := make(map[string][]any, len(evs))
 	for _, evt := range evs {
 		if err := ps.storeEvent(ps.ctx, tx, evt, correlationIDKeys); err != nil {
 			logger.WithError(err).Warn("Failed to store event")
@@ -509,7 +512,8 @@ func (ps *PubSubStore) Publish(evs ...events.Event) {
 	}
 
 	historyTTL := random.Jitter(ps.historyTTL, ttlJitter)
-	for correlationIDKey := range correlationIDKeys {
+	for correlationIDKey, eventIDs := range correlationIDKeys {
+		tx.LPush(ps.ctx, correlationIDKey, eventIDs...)
 		tx.LTrim(ps.ctx, correlationIDKey, 0, int64(ps.correlationIDHistoryCount))
 		tx.PExpire(ps.ctx, correlationIDKey, historyTTL)
 	}
