@@ -79,7 +79,7 @@ require (
 	github.com/uptrace/bun/driver/pgdriver v1.1.16
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.opencensus.io v0.24.0
-	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.43.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.45.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.45.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.43.0
 	go.opentelemetry.io/otel v1.19.0
