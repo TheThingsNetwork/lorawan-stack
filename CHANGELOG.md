@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Providing fixed downlink paths to the `ttn-lw-cli devices downlink {push|replace}` commands using the `-class-b-c.gateways` parameter. The gateways IDs are comma separated, and the antenna index `i` can be provided by suffixing the ID with `:i` (i.e. `my-gateway:0` for antenna index 0). The group index `j` can be provided by suffixing the ID with `:j` (i.e. `my-gateway:0:1` for antenna index 0 and group index 1). The antenna index is mandatory if a group index is to be provided, but optional otherwise.
 - Gateway registration without gateway EUI not working.
+- Listing deleted entities is now fixed for both admin and standard users, which previously returned an `account_not_found` error.
 
 ### Security
 
