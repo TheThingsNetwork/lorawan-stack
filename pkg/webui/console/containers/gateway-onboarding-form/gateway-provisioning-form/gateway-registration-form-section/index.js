@@ -16,8 +16,6 @@ import React from 'react'
 import { useFormikContext } from 'formik'
 import { defineMessages } from 'react-intl'
 
-import frequencyPlans from '@console/constants/frequency-plans'
-
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -25,11 +23,10 @@ import Link from '@ttn-lw/components/link'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import KeyValueMap from '@ttn-lw/components/key-value-map'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import { GsFrequencyPlansSelect as FrequencyPlansSelect } from '@console/containers/freq-plans-select'
+import GsFrequencyPlansSelect from '@console/containers/freq-plans-select/gs-frequency-plan-select'
 
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -44,7 +41,6 @@ const m = defineMessages({
     'Choose this option eg. if your gateway is powered by {loraBasicStationURL}',
   generateAPIKeyCups: 'Generate API key for CUPS',
   generateAPIKeyLNS: 'Generate API key for LNS',
-  selectFrequencyPlan: 'Select a frequency plan',
 })
 
 const PacketBrokerURL = (
@@ -97,27 +93,7 @@ const GatewayRegistrationFormSections = () => {
         component={Input}
         tooltipId={tooltipIds.GATEWAY_NAME}
       />
-      {gsEnabled && (
-        <Form.Field
-          name="frequency_plan_ids"
-          title={sharedMessages.frequencyPlan}
-          tooltipId={tooltipIds.FREQUENCY_PLAN}
-          warning={
-            values.frequency_plan_id === frequencyPlans.EMPTY_FREQ_PLAN
-              ? sharedMessages.frequencyPlanWarning
-              : undefined
-          }
-          valuePlaceholder={m.selectFrequencyPlan}
-          addMessage={'Add frequency plan'}
-          removeMessage={'Remove'}
-          icon="remove"
-          component={KeyValueMap}
-          indexAsKey
-          inputElement={FrequencyPlansSelect}
-          className="w-60"
-          required
-        />
-      )}
+      {gsEnabled && <GsFrequencyPlansSelect />}
       <Form.Field
         name="require_authenticated_connection"
         component={Checkbox}

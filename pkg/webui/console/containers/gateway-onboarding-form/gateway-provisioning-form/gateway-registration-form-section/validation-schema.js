@@ -22,7 +22,7 @@ import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 const gsEnabled = selectGsConfig().enabled
 
 const m = defineMessages({
-  validateEmpty: 'There must be at least one selected frequency plan ID.',
+  validateEntry: 'There must be at least one selected frequency plan ID.',
 })
 
 const hasAtLeastOneEntry = frequencyPlanIds =>
@@ -56,8 +56,8 @@ const validationSchema = Yup.object().shape({
   frequency_plan_ids: gsEnabled
     ? Yup.array()
         .of(Yup.string().max(64, Yup.passValues(sharedMessages.validateTooLong)))
-        .test('has no empty entry', m.validateEmpty, hasAtLeastOneEntry)
         .max(8, Yup.passValues(sharedMessages.attributesValidateTooMany))
+        .test('has at least one entry', m.validateEntry, hasAtLeastOneEntry)
     : Yup.array(),
 })
 

@@ -37,7 +37,7 @@ export default ({
   additionalOptions = [],
 }) => {
   const FetchSelect = props => {
-    const { warning, onChange, index, ...rest } = props
+    const { warning, onChange, ...rest } = props
     const options = [...optionsFormatter(useSelector(optionsSelector)), ...additionalOptions]
     const error = useSelector(errorSelector)
     const fetching = useSelector(fetchingSelector)
@@ -50,14 +50,9 @@ export default ({
     const handleChange = useCallback(
       value => {
         const selectedOption = options.find(option => option.value === value)
-        if (index !== undefined) {
-          onChange(index, selectedOption)
-          return
-        }
-
         onChange(selectedOption)
       },
-      [onChange, options, index],
+      [onChange, options],
     )
 
     return (
@@ -88,11 +83,11 @@ export default ({
   }
 
   FetchSelect.defaultProps = {
-    description: defaultDescription ?? undefined,
+    description: defaultDescription,
     menuPlacement: 'auto',
     onChange: () => null,
     options: [],
-    title: defaultTitle ?? undefined,
+    title: defaultTitle,
     warning: undefined,
     defaultWarning,
   }
