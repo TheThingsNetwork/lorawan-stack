@@ -34,6 +34,7 @@ const Video = props => {
   const [stream, setStream] = useState(undefined)
   const [devices, setDevices] = useState([])
   const [cameras, setCameras] = useState([])
+  const [videoMode, setVideoMode] = useState({})
   const isMobile = window.innerWidth <= 768
 
   const getDevices = useCallback(async () => {
@@ -59,6 +60,7 @@ const Video = props => {
             : { deviceId: rearCamera.deviceId }
           : { facingMode: 'environment' }
 
+      setVideoMode(videoMode)
       try {
         const userStream = await navigator.mediaDevices.getUserMedia({
           video: videoMode ? { ...videoMode } : { facingMode: 'environment' },
@@ -76,30 +78,28 @@ const Video = props => {
   }, [devices, setCapture, setError, stream])
 
   const switchStream = useCallback(async () => {
-    if (stream === { facingMode: 'environment' }) {
+    if (videoMode.facingMode === 'environment') {
       const userStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user' },
       })
       setStream(userStream)
-    } else if (stream === { facingMode: 'user' }) {
+    } else if (videoMode.facingMode === 'user') {
       const userStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment' },
       })
       setStream(userStream)
-    } else if ('deviceId' in stream) {
-      const indexOfCurrentDevice = cameras.findIndex(camera => camera.deviceId === stream.deviceId)
+    } else if ('deviceId' in videoMode) {
+      let indexOfCurrentDevice = cameras.findIndex(camera => camera.deviceId === videoMode.deviceId)
       // The first item will be taken from the beginning of the array after the last item.
       const nextIndex = ++indexOfCurrentDevice % cameras.length
-      const device =
-        cameras.length === 2
-          ? cameras.find((_, i) => i !== indexOfCurrentDevice)
-          : cameras[nextIndex]
+      const device = cameras[nextIndex]
+      setVideoMode({ deviceId: device.deviceId })
       const userStream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: device.deviceId },
       })
       setStream(userStream)
     }
-  }, [cameras, stream])
+  }, [cameras, videoMode])
 
   useEffect(() => {
     getDevices()
