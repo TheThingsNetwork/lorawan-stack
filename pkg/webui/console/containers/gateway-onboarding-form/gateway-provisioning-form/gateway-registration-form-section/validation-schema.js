@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { defineMessages } from 'react-intl'
+
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as gatewayIdRegexp } from '@ttn-lw/lib/regexp'
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 
 const gsEnabled = selectGsConfig().enabled
+
+const m = defineMessages({
+  validateEmpty: 'There must be at least one selected frequency plan ID.',
+})
+
+const hasAtLeastOneEntry = frequencyPlanIds =>
+  frequencyPlanIds.length > 0 && frequencyPlanIds.some(entry => entry !== '' && entry !== undefined)
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
@@ -44,11 +53,12 @@ const validationSchema = Yup.object().shape({
   require_authenticated_connection: Yup.boolean(),
   location_public: Yup.boolean(),
   status_public: Yup.boolean(),
-  frequency_plan_id: gsEnabled
-    ? Yup.string()
-        .max(64, Yup.passValues(sharedMessages.validateTooLong))
-        .required(sharedMessages.validateRequired)
-    : Yup.string(),
+  frequency_plan_ids: gsEnabled
+    ? Yup.array()
+        .of(Yup.string().max(64, Yup.passValues(sharedMessages.validateTooLong)))
+        .test('has no empty entry', m.validateEmpty, hasAtLeastOneEntry)
+        .max(8, Yup.passValues(sharedMessages.attributesValidateTooMany))
+    : Yup.array(),
 })
 
 export default validationSchema
