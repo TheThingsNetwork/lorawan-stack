@@ -113,16 +113,16 @@ func NewPubSub(
 
 	pss.publisher = events.PublishFunc(pss.publish)
 	if batchConf.Enable {
-		size, delay := batchConf.Size, batchConf.Delay
-		if size == 0 {
-			size = 64
+		targetSize, delay := batchConf.TargetSize, batchConf.Delay
+		if targetSize == 0 {
+			targetSize = 64
 		}
 		if delay == 0 {
 			delay = 32 * time.Millisecond
 		}
 		// NOTE: Event publication in the Redis store implementation is CPU-bound due to the marshaling,
 		// so we use the number of CPUs as the number of workers.
-		pss.publisher = batch.NewPublisher(ctx, pss.publisher, component, size, delay, runtime.GOMAXPROCS(-1))
+		pss.publisher = batch.NewPublisher(ctx, pss.publisher, component, targetSize, delay, runtime.GOMAXPROCS(-1))
 	}
 
 	return pss

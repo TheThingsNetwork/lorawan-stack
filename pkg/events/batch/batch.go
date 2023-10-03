@@ -24,31 +24,36 @@ import (
 )
 
 type batchPublisher struct {
-	ctx       context.Context
-	publisher events.Publisher
-	size      int
-	delay     time.Duration
-	input     chan []events.Event
-	output    chan []events.Event
+	ctx        context.Context
+	publisher  events.Publisher
+	targetSize int
+	delay      time.Duration
+	input      chan []events.Event
+	output     chan []events.Event
 }
 
 func (bp *batchPublisher) process(ctx context.Context) error {
-	batch, lastFlushAt := make([]events.Event, 0, bp.size), time.Now()
+	batch, lastFlushAt := make([]events.Event, 0, bp.targetSize), time.Now()
 	t := time.NewTimer(bp.delay)
 	defer t.Stop()
-	publish := func(min int, evs ...events.Event) bool {
+	publish := func(lowerBound int, evs ...events.Event) bool {
 		batch = append(batch, evs...)
-		if n := len(batch); n >= min {
+		flushed := false
+		for n := len(batch); n >= lowerBound; n = len(batch) {
+			toFlush := n
+			if upperBound := 2 * lowerBound; n > upperBound {
+				toFlush = upperBound
+			}
 			select {
 			case <-bp.ctx.Done():
 			case <-ctx.Done():
-			case bp.output <- batch:
-				registerBatchFlush(time.Since(lastFlushAt), n)
-				batch, lastFlushAt = make([]events.Event, 0, bp.size), time.Now()
-				return true
+			case bp.output <- batch[:toFlush]:
+				registerBatchFlush(time.Since(lastFlushAt), toFlush)
+				batch, lastFlushAt = batch[toFlush:], time.Now()
+				flushed = true
 			}
 		}
-		return false
+		return flushed
 	}
 	for {
 		select {
@@ -57,7 +62,7 @@ func (bp *batchPublisher) process(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case evs := <-bp.input:
-			if publish(bp.size, evs...) {
+			if publish(bp.targetSize, evs...) {
 				if !t.Stop() {
 					<-t.C
 				}
@@ -96,15 +101,20 @@ var _ events.Publisher = (*batchPublisher)(nil)
 
 // NewPublisher returns a new batch publisher.
 func NewPublisher(
-	ctx context.Context, publisher events.Publisher, ts task.Starter, size int, delay time.Duration, concurrency int,
+	ctx context.Context,
+	publisher events.Publisher,
+	ts task.Starter,
+	targetSize int,
+	delay time.Duration,
+	concurrency int,
 ) events.Publisher {
 	bp := &batchPublisher{
-		ctx:       ctx,
-		publisher: publisher,
-		size:      size,
-		delay:     delay,
-		input:     make(chan []events.Event, 1),
-		output:    make(chan []events.Event, concurrency),
+		ctx:        ctx,
+		publisher:  publisher,
+		targetSize: targetSize,
+		delay:      delay,
+		input:      make(chan []events.Event, 1),
+		output:     make(chan []events.Event, concurrency),
 	}
 	for name, t := range map[string]struct {
 		f func(context.Context) error
