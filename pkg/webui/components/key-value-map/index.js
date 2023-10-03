@@ -54,11 +54,7 @@ const KeyValueMap = ({
             return val
           }
 
-          return indexAsKey
-            ? 'value' in newValues.value
-              ? newValues.value.value
-              : newValues.value
-            : { ...val, ...newValues }
+          return indexAsKey ? newValues.value : { ...val, ...newValues }
         }),
       )
     },
