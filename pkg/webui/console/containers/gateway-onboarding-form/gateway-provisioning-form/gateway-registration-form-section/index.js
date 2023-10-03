@@ -25,6 +25,7 @@ import Link from '@ttn-lw/components/link'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import KeyValueMap from '@ttn-lw/components/key-value-map'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -43,6 +44,7 @@ const m = defineMessages({
     'Choose this option eg. if your gateway is powered by {loraBasicStationURL}',
   generateAPIKeyCups: 'Generate API key for CUPS',
   generateAPIKeyLNS: 'Generate API key for LNS',
+  selectFrequencyPlan: 'Select a frequency plan',
 })
 
 const PacketBrokerURL = (
@@ -67,7 +69,7 @@ const initialValues = {
   },
   status_public: true,
   location_public: true,
-  frequency_plan_id: '',
+  frequency_plan_ids: [''],
   name: '',
   require_authenticated_connection: false,
   gateway_server_address: gsEnabled ? new URL(gsBaseURL).hostname : '',
@@ -96,15 +98,23 @@ const GatewayRegistrationFormSections = () => {
         tooltipId={tooltipIds.GATEWAY_NAME}
       />
       {gsEnabled && (
-        <FrequencyPlansSelect
-          name="frequency_plan_id"
-          menuPlacement="top"
+        <Form.Field
+          name="frequency_plan_ids"
+          title={sharedMessages.frequencyPlan}
           tooltipId={tooltipIds.FREQUENCY_PLAN}
           warning={
             values.frequency_plan_id === frequencyPlans.EMPTY_FREQ_PLAN
               ? sharedMessages.frequencyPlanWarning
               : undefined
           }
+          valuePlaceholder={m.selectFrequencyPlan}
+          addMessage={'Add frequency plan'}
+          removeMessage={'Remove'}
+          icon="remove"
+          component={KeyValueMap}
+          indexAsKey
+          inputElement={FrequencyPlansSelect}
+          className="w-60"
           required
         />
       )}

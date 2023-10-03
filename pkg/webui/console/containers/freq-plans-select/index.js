@@ -40,7 +40,7 @@ export const CreateFrequencyPlansSelect = (source, options = {}) =>
     fetchingSelector: selectFrequencyPlansFetching,
     errorSelector: selectFrequencyPlansError,
     defaultWarning: m.warning,
-    defaultTitle: m.title,
+    defaultTitle: source === 'ns' ? m.title : undefined,
     optionsFormatter: formatOptions,
     additionalOptions: source === 'gs' ? [{ value: 'no-frequency-plan', label: m.none }] : [],
     ...options,
