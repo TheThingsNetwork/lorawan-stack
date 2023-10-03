@@ -31,6 +31,8 @@ const m = defineMessages({
 
 const KeyValueMap = ({
   addMessage,
+  removeMessage,
+  icon,
   additionalInputProps,
   className,
   disabled,
@@ -52,7 +54,11 @@ const KeyValueMap = ({
             return val
           }
 
-          return indexAsKey ? newValues.value : { ...val, ...newValues }
+          return indexAsKey
+            ? 'value' in newValues.value
+              ? newValues.value.value
+              : newValues.value
+            : { ...val, ...newValues }
         }),
       )
     },
@@ -91,6 +97,8 @@ const KeyValueMap = ({
               readOnly={isReadOnly(value)}
               inputElement={inputElement}
               additionalInputProps={additionalInputProps}
+              removeMessage={removeMessage}
+              icon={icon}
             />
           ))}
       </div>
@@ -113,6 +121,7 @@ KeyValueMap.propTypes = {
   additionalInputProps: PropTypes.shape({}),
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  icon: PropTypes.string,
   indexAsKey: PropTypes.bool,
   inputElement: PropTypes.elementType,
   isReadOnly: PropTypes.func,
@@ -120,6 +129,7 @@ KeyValueMap.propTypes = {
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
+  removeMessage: PropTypes.message,
   value: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.shape({
@@ -144,6 +154,8 @@ KeyValueMap.defaultProps = {
   disabled: false,
   isReadOnly: () => null,
   inputElement: Input,
+  removeMessage: undefined,
+  icon: undefined,
 }
 
 export default KeyValueMap

@@ -39,6 +39,8 @@ const Entry = ({
   valuePlaceholder,
   keyPlaceholder,
   additionalInputProps,
+  removeMessage,
+  icon,
 }) => {
   const _getKeyInputName = useMemo(() => `${name}[${index}].key`, [index, name])
 
@@ -115,10 +117,11 @@ const Entry = ({
       <Button
         type="button"
         onClick={handleRemoveButtonClicked}
-        icon="delete"
+        icon={icon ?? 'delete'}
         title={m.deleteEntry}
+        message={removeMessage}
         disabled={readOnly}
-        danger
+        danger={!Boolean(removeMessage)}
       />
     </div>
   )
@@ -126,6 +129,7 @@ const Entry = ({
 
 Entry.propTypes = {
   additionalInputProps: PropTypes.shape({}).isRequired,
+  icon: PropTypes.string,
   index: PropTypes.number.isRequired,
   indexAsKey: PropTypes.bool.isRequired,
   inputElement: PropTypes.elementType.isRequired,
@@ -135,6 +139,7 @@ Entry.propTypes = {
   onChange: PropTypes.func.isRequired,
   onRemoveButtonClick: PropTypes.func.isRequired,
   readOnly: PropTypes.bool,
+  removeMessage: PropTypes.message,
   value: PropTypes.oneOfType([
     PropTypes.shape({
       key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -148,6 +153,8 @@ Entry.propTypes = {
 Entry.defaultProps = {
   value: undefined,
   readOnly: false,
+  removeMessage: undefined,
+  icon: undefined,
 }
 
 export default Entry
