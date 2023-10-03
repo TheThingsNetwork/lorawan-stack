@@ -18,6 +18,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Users can now request a new email for the account validation from time to time instead of once per validation, the interval between email requests is determined by `is.user-registration.contact-info-validation.retry-interval` and by default it is an hour.
+
 ### Deprecated
 
 ### Removed

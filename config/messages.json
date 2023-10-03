@@ -6238,7 +6238,7 @@
   },
   "error:pkg/identityserver:validations_already_sent": {
     "translations": {
-      "en": "validations for this contact info already sent"
+      "en": "validations for this contact info already sent, wait `{retry_interval}` before retrying"
     },
     "description": {
       "package": "pkg/identityserver",

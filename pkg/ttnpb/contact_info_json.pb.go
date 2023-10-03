@@ -244,6 +244,15 @@ func (x *ContactInfoValidation) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			golang.MarshalTimestamp(s, x.ExpiresAt)
 		}
 	}
+	if x.UpdatedAt != nil || s.HasField("updated_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("updated_at")
+		if x.UpdatedAt == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalTimestamp(s, x.UpdatedAt)
+		}
+	}
 	s.WriteObjectEnd()
 }
 
@@ -314,6 +323,17 @@ func (x *ContactInfoValidation) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 				return
 			}
 			x.ExpiresAt = v
+		case "updated_at", "updatedAt":
+			s.AddField("updated_at")
+			if s.ReadNil() {
+				x.UpdatedAt = nil
+				return
+			}
+			v := golang.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.UpdatedAt = v
 		}
 	})
 }

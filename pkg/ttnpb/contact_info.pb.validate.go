@@ -238,6 +238,18 @@ func (m *ContactInfoValidation) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "updated_at":
+
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ContactInfoValidationValidationError{
+						field:  "updated_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ContactInfoValidationValidationError{
 				field:  name,

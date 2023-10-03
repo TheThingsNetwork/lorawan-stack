@@ -22,7 +22,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
-	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -40,7 +39,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 	s, ok := st.PrepareDB(t).(interface {
 		Store
 
-		is.ContactInfoStore
+		store.ContactInfoStore
 	})
 	defer st.DestroyDB(t, false)
 	if !ok {
@@ -55,7 +54,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 		org1.GetEntityIdentifiers(),
 		usr1.GetEntityIdentifiers(),
 	} {
-		t.Run(ids.EntityType(), func(t *T) {
+		t.Run(ids.EntityType(), func(t *T) { // nolint:paralleltest
 			start := time.Now().Truncate(time.Second)
 			info := &ttnpb.ContactInfo{
 				ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
@@ -66,7 +65,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 			if ids.EntityType() == "user" && ids.IDString() == usr1.IDString() {
 				info.Value = usr1.PrimaryEmailAddress
 			}
-			t.Run("SetContactInfo", func(t *T) {
+			t.Run("SetContactInfo", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				created, err := s.SetContactInfo(ctx, ids, []*ttnpb.ContactInfo{
 					info,
@@ -76,7 +75,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("GetContactInfo", func(t *T) {
+			t.Run("GetContactInfo", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				got, err := s.GetContactInfo(ctx, ids)
 				if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 1) {
@@ -86,7 +85,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 
 			validationID := fmt.Sprintf("%s_%s_validation", ids.EntityType(), ids.IDString())
 
-			t.Run("CreateValidation_Expired", func(t *T) {
+			t.Run("CreateValidation_Expired", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				_, err := s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:          validationID,
@@ -100,7 +99,10 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("CreateValidation", func(t *T) {
+			// Used for a refresh interval test.
+			var createAt time.Time
+
+			t.Run("CreateValidation", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				created, err := s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:          validationID,
@@ -117,9 +119,10 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					a.So(*ttnpb.StdTime(created.ExpiresAt), should.Equal, start.Add(5*time.Minute))
 					a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 				}
+				createAt = created.CreatedAt.AsTime()
 			})
 
-			t.Run("CreateValidation_AfterCreate", func(t *T) {
+			t.Run("CreateValidation_AfterCreate", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				_, err := s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:          validationID,
@@ -133,7 +136,38 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("FetchExpiredValidation", func(t *T) {
+			t.Run("ListRefreshableValidations", func(t *T) { // nolint:paralleltest
+				t.Run("valid refresh interval", func(t *T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					// Any validation from now
+					validations, err := s.ListRefreshableValidations(ctx, ids, 0)
+					if a.So(err, should.BeNil) && a.So(validations, should.NotBeNil) {
+						a.So(validations, should.HaveLength, 1)
+						v := validations[0]
+						a.So(v.Id, should.Equal, validationID)
+						a.So(v.Token, should.Equal, "TOKEN")
+						a.So(v.Entity, should.Resemble, ids)
+						a.So(v.ContactInfo, should.Resemble, []*ttnpb.ContactInfo{{
+							ContactMethod: info.ContactMethod,
+							Value:         info.Value,
+						}})
+						a.So(*ttnpb.StdTime(v.ExpiresAt), should.Equal, start.Add(5*time.Minute))
+						a.So(*ttnpb.StdTime(v.CreatedAt), should.HappenWithin, 5*time.Second, start)
+						a.So(*ttnpb.StdTime(v.UpdatedAt), should.HappenWithin, 5*time.Second, start)
+					}
+				})
+
+				t.Run("invalid refresh interval", func(t *T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					invalidRefreshInterval := 2 * time.Since(createAt)
+					validations, err := s.ListRefreshableValidations(ctx, ids, invalidRefreshInterval)
+					if !a.So(err, should.BeNil) || !a.So(validations, should.HaveLength, 0) {
+						t.Fail()
+					}
+				})
+			})
+
+			t.Run("FetchExpiredValidation", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
@@ -144,14 +178,54 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("Validate", func(t *T) {
+			t.Run("RefreshValidation", func(t *T) { // nolint:paralleltest
+				t.Run("Valid", func(t *T) {
+					a, ctx := test.New(t)
+
+					validation := &ttnpb.ContactInfoValidation{
+						Id:          validationID,
+						Token:       "TOKEN",
+						Entity:      ids,
+						ContactInfo: []*ttnpb.ContactInfo{info},
+					}
+
+					original, err := s.GetValidation(ctx, validation)
+					if !a.So(err, should.BeNil) || !a.So(original.GetUpdatedAt(), should.NotBeNil) {
+						t.FailNow()
+					}
+
+					err = s.RefreshValidation(ctx, original)
+					a.So(err, should.BeNil)
+
+					// Get validation again and check if updated_at has changed.
+					after, err := s.GetValidation(ctx, validation)
+					if !a.So(err, should.BeNil) || !a.So(after.GetUpdatedAt(), should.NotBeNil) {
+						t.FailNow()
+					}
+					a.So(original.UpdatedAt.AsTime().Before(after.UpdatedAt.AsTime()), should.BeTrue)
+
+					// Retry refresh with original validation, as updated_at should have changed it should not refresh.
+					err = s.RefreshValidation(ctx, original)
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				})
+				t.Run("Invalid", func(t *T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					err := s.RefreshValidation(ctx, &ttnpb.ContactInfoValidation{
+						Id:    validationID,
+						Token: "INVALID_TOKEN",
+					})
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				})
+			})
+
+			t.Run("Validate", func(t *T) { // nolint:paralleltest
 				validation := &ttnpb.ContactInfoValidation{
 					Id:          validationID,
 					Token:       "TOKEN",
 					Entity:      ids,
 					ContactInfo: []*ttnpb.ContactInfo{info},
 				}
-				t.Run("GetValidation", func(t *T) {
+				t.Run("GetValidation", func(t *T) { // nolint:paralleltest
 					// This test is meant to impact `validation` and must run before any other test within `Validate`.
 					a, ctx := test.New(t)
 					var err error
@@ -162,8 +236,8 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					a.So(len(validation.ContactInfo), should.Equal, 1)
 				})
 
-				t.Run("ValidateContactInfo", func(t *T) {
-					t.Run("ContactInfoDoesNotExist", func(t *T) {
+				t.Run("ValidateContactInfo", func(t *T) { // nolint:paralleltest
+					t.Run("ContactInfoDoesNotExist", func(t *T) { // nolint:paralleltest
 						a, ctx := test.New(t)
 						v := &ttnpb.ContactInfoValidation{
 							Id:          validationID,
@@ -175,7 +249,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 						a.So(errors.IsNotFound(err), should.BeTrue)
 					})
 
-					t.Run("NoContactInfo", func(t *T) {
+					t.Run("NoContactInfo", func(t *T) { // nolint:paralleltest
 						a, ctx := test.New(t)
 						v := &ttnpb.ContactInfoValidation{
 							Id:          validationID,
@@ -187,7 +261,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 						a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 					})
 
-					t.Run("Valid", func(t *T) {
+					t.Run("Valid", func(t *T) { // nolint:paralleltest
 						a, ctx := test.New(t)
 						err := s.ValidateContactInfo(ctx, validation)
 						a.So(err, should.BeNil)
@@ -198,13 +272,13 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 						}
 					})
 				})
-				t.Run("ExpireValidation", func(t *T) {
+				t.Run("ExpireValidation", func(t *T) { // nolint:paralleltest
 					a, ctx := test.New(t)
 					err := s.ExpireValidation(ctx, validation)
 					a.So(err, should.BeNil)
 				})
 			})
-			t.Run("FetchUsedValidation_AfterValidate", func(t *T) {
+			t.Run("FetchUsedValidation_AfterValidate", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
@@ -214,7 +288,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 					a.So(errors.IsFailedPrecondition(err), should.BeTrue)
 				}
 			})
-			t.Run("FetchNonExistentValidation", func(t *T) {
+			t.Run("FetchNonExistentValidation", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				_, err := s.GetValidation(ctx, &ttnpb.ContactInfoValidation{
 					Id:    validationID,
@@ -225,7 +299,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("GetContactInfo_AfterValidate", func(t *T) {
+			t.Run("GetContactInfo_AfterValidate", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				got, err := s.GetContactInfo(ctx, ids)
 				if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 1) {
@@ -234,7 +308,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 			})
 
 			if ids.EntityType() == "user" && ids.IDString() == usr1.IDString() {
-				t.Run("GetUser_AfterValidate", func(t *T) {
+				t.Run("GetUser_AfterValidate", func(t *T) { // nolint:paralleltest
 					a, ctx := test.New(t)
 					got, err := s.(store.UserStore).GetUser(ctx, usr1.GetIds(), fieldMask("primary_email_address_validated_at"))
 					if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
@@ -258,7 +332,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				ValidatedAt:   timestamppb.New(start.Add(time.Minute)),
 			}
 
-			t.Run("UpdateContactInfo", func(t *T) {
+			t.Run("UpdateContactInfo", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				updated, err := s.SetContactInfo(ctx, ids, []*ttnpb.ContactInfo{
 					updatedInfo,
@@ -271,7 +345,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("GetContactInfo_AfterUpdate", func(t *T) {
+			t.Run("GetContactInfo_AfterUpdate", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				got, err := s.GetContactInfo(ctx, ids)
 				if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 2) {
@@ -281,7 +355,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 				}
 			})
 
-			t.Run("DeleteEntityContactInfo", func(t *T) {
+			t.Run("DeleteEntityContactInfo", func(t *T) { // nolint:paralleltest
 				a, ctx := test.New(t)
 				err := s.DeleteEntityContactInfo(ctx, ids)
 				a.So(err, should.BeNil)
