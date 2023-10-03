@@ -1135,6 +1135,12 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		Set:     true,
 	},
 
+	// Gateway Configuration:
+	"/ttn.lorawan.v3.GatewayConfigurator/PullConfiguration": {
+		All:     GatewayFieldPathsNested,
+		Allowed: GatewayFieldPathsNested,
+	},
+
 	// Organizations:
 	"/ttn.lorawan.v3.OrganizationRegistry/Get": {
 		All:     OrganizationFieldPathsNested,
