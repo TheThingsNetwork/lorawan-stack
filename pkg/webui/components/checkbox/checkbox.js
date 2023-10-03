@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useState, useEffect, useContext, useCallback } from 'react'
 import classnames from 'classnames'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -25,166 +24,140 @@ import { CheckboxGroupContext } from './group'
 
 import style from './checkbox.styl'
 
-class Checkbox extends React.PureComponent {
-  static contextType = CheckboxGroupContext
+const Checkbox = props => {
+  const {
+    autoFocus,
+    checked: propChecked,
+    children,
+    className,
+    disabled,
+    id,
+    indeterminate,
+    label,
+    labelAsTitle,
+    name,
+    onBlur,
+    onChange,
+    onFocus,
+    readOnly,
+    value,
+    ...rest
+  } = props
+  const hasValue = 'value' in props
+  const context = useContext(CheckboxGroupContext)
+  const composedValue = value && context ? value[name] : value
+  const [checked, setChecked] = useState(composedValue)
 
-  static propTypes = {
-    autoFocus: PropTypes.bool,
-    checked: PropTypes.bool,
-    children: PropTypes.node,
-    className: PropTypes.string,
-    disabled: PropTypes.bool,
-    id: PropTypes.string,
-    indeterminate: PropTypes.bool,
-    label: PropTypes.message,
-    labelAsTitle: PropTypes.bool,
-    name: PropTypes.string.isRequired,
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
-    onFocus: PropTypes.func,
-    readOnly: PropTypes.bool,
-    value: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
-  }
-
-  static defaultProps = {
-    checked: false,
-    children: null,
-    className: undefined,
-    label: sharedMessages.enabled,
-    labelAsTitle: false,
-    disabled: false,
-    id: undefined,
-    readOnly: false,
-    autoFocus: false,
-    onChange: () => null,
-    onBlur: () => null,
-    onFocus: () => null,
-    indeterminate: false,
-    value: false,
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.input = React.createRef()
-    let value
-    if ('value' in props && this.context) {
-      value = props.value[name]
-    } else {
-      value = false
-    }
-
-    this.state = {
-      checked: value,
-    }
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    const { value } = props
-
-    if ('value' in props && value !== state.checked) {
-      return { checked: value }
+  useEffect(() => {
+    if (hasValue && value !== checked) {
+      setChecked(value)
     }
 
     return null
+  }, [value, hasValue, checked])
+
+  const handleChange = useCallback(
+    event => {
+      const { checked } = event.target
+
+      if (hasValue && !context) {
+        setChecked(checked)
+      }
+
+      if (context) {
+        const { onChange: groupOnChange } = context
+        groupOnChange(event)
+      }
+
+      onChange(event)
+    },
+    [context, onChange, hasValue],
+  )
+
+  const inputRef = React.useRef()
+
+  const checkboxProps = {}
+  let groupCls
+
+  if (context) {
+    checkboxProps.onBlur = context.onBlur
+    checkboxProps.onFocus = context.onFocus
+    checkboxProps.disabled = disabled || context.disabled
+    checkboxProps.checked = context.getValue(name)
+    groupCls = context.className
+  } else {
+    checkboxProps.onBlur = onBlur
+    checkboxProps.onFocus = onFocus
+    checkboxProps.disabled = disabled
+    checkboxProps.checked = checked
   }
+  checkboxProps.value = checkboxProps.checked
 
-  @bind
-  handleChange(event) {
-    const { onChange } = this.props
-    const { checked } = event.target
+  const cls = classnames(className, style.wrapper, groupCls, {
+    [style.disabled]: checkboxProps.disabled,
+    [style.indeterminate]: indeterminate,
+  })
 
-    if (!('value' in this.props) && !this.context) {
-      this.setState({ checked })
-    }
+  const labelCls = classnames(style.label, {
+    [style.labelAsTitle]: labelAsTitle,
+  })
 
-    if (this.context) {
-      const { onChange: groupOnChange } = this.context
-      groupOnChange(event)
-    }
+  return (
+    <label className={cls}>
+      <span className={style.checkbox}>
+        <input
+          type="checkbox"
+          ref={inputRef}
+          name={name}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
+          onChange={handleChange}
+          id={id}
+          aria-describedby={rest['aria-describedby']}
+          aria-invalid={rest['aria-invalid']}
+          {...checkboxProps}
+        />
+        <span className={style.checkmark} />
+      </span>
+      {label && <Message className={labelCls} content={label} />}
+      {children}
+    </label>
+  )
+}
 
-    onChange(event)
-  }
+Checkbox.propTypes = {
+  autoFocus: PropTypes.bool,
+  checked: PropTypes.bool,
+  children: PropTypes.node,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  id: PropTypes.string,
+  indeterminate: PropTypes.bool,
+  label: PropTypes.message,
+  labelAsTitle: PropTypes.bool,
+  name: PropTypes.string.isRequired,
+  onBlur: PropTypes.func,
+  onChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  readOnly: PropTypes.bool,
+  value: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
+}
 
-  @bind
-  focus() {
-    if (this.input && this.input.current) {
-      this.input.current.focus()
-    }
-  }
-
-  @bind
-  blur() {
-    if (this.input && this.input.current) {
-      this.input.current.blur()
-    }
-  }
-
-  render() {
-    const {
-      className,
-      name,
-      label,
-      disabled,
-      readOnly,
-      autoFocus,
-      onBlur,
-      onFocus,
-      indeterminate,
-      id,
-      children,
-      labelAsTitle,
-      ...rest
-    } = this.props
-    const { checked } = this.state
-
-    const checkboxProps = {}
-    let groupCls
-    if (this.context) {
-      checkboxProps.onBlur = this.context.onBlur
-      checkboxProps.onFocus = this.context.onFocus
-      checkboxProps.disabled = disabled || this.context.disabled
-      checkboxProps.checked = this.context.getValue(name)
-      groupCls = this.context.className
-    } else {
-      checkboxProps.onBlur = onBlur
-      checkboxProps.onFocus = onFocus
-      checkboxProps.disabled = disabled
-      checkboxProps.checked = checked
-    }
-    checkboxProps.value = checkboxProps.checked
-
-    const cls = classnames(className, style.wrapper, groupCls, {
-      [style.disabled]: checkboxProps.disabled,
-      [style.indeterminate]: indeterminate,
-    })
-
-    const labelCls = classnames(style.label, {
-      [style.labelAsTitle]: labelAsTitle,
-    })
-
-    return (
-      <label className={cls}>
-        <span className={style.checkbox}>
-          <input
-            type="checkbox"
-            ref={this.input}
-            name={name}
-            readOnly={readOnly}
-            autoFocus={autoFocus}
-            onChange={this.handleChange}
-            id={id}
-            aria-describedby={rest['aria-describedby']}
-            aria-invalid={rest['aria-invalid']}
-            {...checkboxProps}
-          />
-          <span className={style.checkmark} />
-        </span>
-        {label && <Message className={labelCls} content={label} />}
-        {children}
-      </label>
-    )
-  }
+Checkbox.defaultProps = {
+  checked: false,
+  children: null,
+  className: undefined,
+  label: sharedMessages.enabled,
+  labelAsTitle: false,
+  disabled: false,
+  id: undefined,
+  readOnly: false,
+  autoFocus: false,
+  onChange: () => null,
+  onBlur: () => null,
+  onFocus: () => null,
+  indeterminate: false,
+  value: false,
 }
 
 export default Checkbox

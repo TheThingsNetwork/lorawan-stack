@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
 
 import { selectApplicationRights } from '@console/store/selectors/applications'
@@ -235,12 +237,18 @@ export const mayConfigurePacketBroker = mayPerformAdminActions
 
 // Composite feature checks.
 export const mayViewApplications = {
-  rightsSelector: state => [...selectUserRights(state), ...selectOrganizationRights(state)],
+  rightsSelector: createSelector([selectUserRights, selectOrganizationRights], (user, org) => [
+    ...user,
+    ...org,
+  ]),
   check: rights =>
     mayViewApplicationsOfUser.check(rights) || mayViewApplicationsOfOrganization.check(rights),
 }
 export const mayViewGateways = {
-  rightsSelector: state => [...selectUserRights(state), ...selectOrganizationRights(state)],
+  rightsSelector: createSelector([selectUserRights, selectOrganizationRights], (user, org) => [
+    ...user,
+    ...org,
+  ]),
   check: rights =>
     mayViewApplicationsOfUser.check(rights) || mayViewApplicationsOfOrganization.check(rights),
 }
