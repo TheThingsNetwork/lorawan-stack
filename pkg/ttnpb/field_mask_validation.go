@@ -1190,7 +1190,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 	// Storage Integration:
 	"/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp": {
 		All:     ApplicationUpFieldPathsNested,
-		Allowed: applicationUpFieldMaskPaths(),
+		Allowed: ApplicationUpFieldPathsNested,
 	},
 
 	// Device Repository:
@@ -1236,22 +1236,4 @@ nextField:
 		out = append(out, field)
 	}
 	return out
-}
-
-func applicationUpFieldMaskPaths() []string {
-	paths := ApplicationUpFieldPathsNested
-	paths = append(paths, FieldsWithPrefix("up.uplink_message", ApplicationUplinkFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.join_accept", ApplicationJoinAcceptFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.downlink_ack", ApplicationDownlinkFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.downlink_nack", ApplicationDownlinkFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.downlink_sent", ApplicationDownlinkFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.downlink_failed", ApplicationDownlinkFailedFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.downlink_queued", ApplicationDownlinkFieldPathsNested...)...)
-	paths = append(
-		paths,
-		FieldsWithPrefix("up.downlink_queue_invalidated", ApplicationInvalidatedDownlinksFieldPathsNested...)...,
-	)
-	paths = append(paths, FieldsWithPrefix("up.location_solved", ApplicationLocationFieldPathsNested...)...)
-	paths = append(paths, FieldsWithPrefix("up.service_data", ApplicationServiceDataFieldPathsNested...)...)
-	return paths
 }
