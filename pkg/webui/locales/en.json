@@ -610,6 +610,8 @@
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.shareGatewayInfoDescription": "Choose this option eg. if your gateway is powered by {loraBasicStationURL}",
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.generateAPIKeyCups": "Generate API key for CUPS",
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.generateAPIKeyLNS": "Generate API key for LNS",
+  "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.selectFrequencyPlan": "Select a frequency plan",
+  "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.validation-schema.validateEmpty": "There must be at least one selected frequency plan ID.",
   "console.containers.gateways-table.index.ownedTabTitle": "Owned gateways",
   "console.containers.gateways-table.index.restoreSuccess": "Gateway restored",
   "console.containers.gateways-table.index.restoreFail": "There was an error and the gateway could not be restored",

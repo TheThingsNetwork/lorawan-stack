@@ -610,6 +610,8 @@
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.shareGatewayInfoDescription": "ゲートウェイが{loraBasicStationURL}で駆動している場合など、このオプションを選択します",
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.generateAPIKeyCups": "CUPS用APIキー生成",
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.generateAPIKeyLNS": "LNS用APIキー生成",
+  "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.selectFrequencyPlan": "",
+  "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.validation-schema.validateEmpty": "",
   "console.containers.gateways-table.index.ownedTabTitle": "所有するゲートウェイ",
   "console.containers.gateways-table.index.restoreSuccess": "ゲートウェイが復旧",
   "console.containers.gateways-table.index.restoreFail": "エラーが発生し、ゲートウェイを復元することができませんでした",
