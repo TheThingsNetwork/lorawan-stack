@@ -39,7 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	gsio "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
@@ -1547,7 +1547,7 @@ func TestGatewayServer(t *testing.T) {
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
-														UplinkToken: io.MustUplinkToken(
+														UplinkToken: gsio.MustUplinkToken(
 															&ttnpb.GatewayAntennaIdentifiers{
 																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
@@ -1588,7 +1588,7 @@ func TestGatewayServer(t *testing.T) {
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
-														UplinkToken: io.MustUplinkToken(
+														UplinkToken: gsio.MustUplinkToken(
 															&ttnpb.GatewayAntennaIdentifiers{
 																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
@@ -1628,7 +1628,7 @@ func TestGatewayServer(t *testing.T) {
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
-														UplinkToken: io.MustUplinkToken(
+														UplinkToken: gsio.MustUplinkToken(
 															&ttnpb.GatewayAntennaIdentifiers{
 																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
