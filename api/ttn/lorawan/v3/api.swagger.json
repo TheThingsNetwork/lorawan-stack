@@ -4544,7 +4544,7 @@
                 },
                 "simulated": {
                   "type": "boolean",
-                  "description": "Signals if the message is coming from the Network Server or is simulated."
+                  "description": "Signals if the message is coming from the Network Server or is simulated.\nThe Application Server automatically sets this field, and callers must not manually set it."
                 }
               },
               "description": "Application uplink message."
@@ -20453,7 +20453,7 @@
         },
         "simulated": {
           "type": "boolean",
-          "description": "Signals if the message is coming from the Network Server or is simulated."
+          "description": "Signals if the message is coming from the Network Server or is simulated.\nThe Application Server automatically sets this field, and callers must not manually set it."
         }
       },
       "description": "Application uplink message."
