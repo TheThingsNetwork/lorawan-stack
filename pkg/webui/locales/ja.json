@@ -587,7 +587,6 @@
   "console.containers.device-title-section.device-title-section.lastSeenAvailableTooltip": "ネットワークがこのエンドデバイスの最後のアクティビティを登録してから経過した時間です。これは、送信されたアップリンク、確認されたダウンリンク、または（再）参加要求から判断されます。{lineBreak}最後のアクティビティは{lastActivityInfo}で受信します",
   "console.containers.device-title-section.device-title-section.noActivityTooltip": "ネットワークは、このエンドデバイスからのアクティビティをまだ登録していません。これは、エンドデバイスがまだメッセージを送信していないか、EUIや周波数の不一致など、ネットワークで処理できないメッセージしか送信していないことを意味する可能性があります",
   "console.containers.devices-table.index.otherClusterTooltip": "このエンドデバイスは、別のクラスタ（`{host}`）に登録されています。このデバイスにアクセスするには、このエンドデバイスが登録されているクラスタのコンソールを使用します",
-  "console.containers.freq-plans-select.utils.title": "",
   "console.containers.freq-plans-select.utils.warning": "",
   "console.containers.freq-plans-select.utils.none": "",
   "console.containers.freq-plans-select.utils.selectFrequencyPlan": "",
