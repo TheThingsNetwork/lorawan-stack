@@ -38,7 +38,7 @@ describe('Gateway create', () => {
     cy.findByLabelText('Gateway EUI').should('be.visible')
     cy.findByLabelText('Gateway ID').should('be.visible')
     cy.findByLabelText('Gateway name').should('be.visible')
-    cy.findByLabelText('Frequency plan').should('be.visible')
+    cy.findByTestId('key-value-map').should('be.visible')
     cy.findByLabelText(/Require authenticated connection/).should('exist')
     cy.findByLabelText(/Share status within network/).should('exist')
     cy.findByLabelText(/Share location within network/).should('exist')
@@ -54,7 +54,11 @@ describe('Gateway create', () => {
     cy.findByLabelText('Gateway EUI').blur()
     cy.findByLabelText('Gateway ID').should('have.value', `eui-${gateway.eui}`)
     cy.findByLabelText('Gateway name').type('Test Gateway')
-    cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
+    cy.findByText('Frequency plan')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption(gateway.frequency_plan)
     cy.findByRole('button', { name: 'Register gateway' }).click()
 
     cy.location('pathname').should(
@@ -87,7 +91,11 @@ describe('Gateway create', () => {
     cy.findByLabelText('Gateway EUI').blur()
     cy.findByLabelText('Gateway ID').should('have.value', `eui-${gateway.eui}`)
     cy.findByLabelText('Gateway name').type('Test Gateway')
-    cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
+    cy.findByText('Frequency plan')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption(gateway.frequency_plan)
     cy.findByLabelText(/Require authenticated connection/).check()
     cy.findByLabelText(/Generate API key for CUPS/).check()
     cy.findByLabelText(/Generate API key for LNS/).check()
@@ -121,7 +129,11 @@ describe('Gateway create', () => {
     }
 
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
-    cy.findByLabelText('Frequency plan').selectOption('no-frequency-plan')
+    cy.findByText('Frequency plan')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption('no-frequency-plan')
     cy.findByText(/Without choosing a frequency plan/)
     cy.findByRole('button', { name: 'Register gateway' }).click()
 
@@ -149,7 +161,7 @@ describe('Gateway create', () => {
 
       cy.findByLabelText('Gateway EUI').type(gateway.eui)
 
-      cy.findByLabelText('Frequency plan').should('not.exist')
+      cy.findByTestId('key-value-map').should('not.exist')
       cy.findByRole('button', { name: 'Register gateway' }).click()
 
       cy.location('pathname').should(
