@@ -16,7 +16,6 @@ import { defineMessages } from 'react-intl'
 
 export const formatOptions = plans => plans.map(plan => ({ value: plan.id, label: plan.name }))
 export const m = defineMessages({
-  title: 'Frequency plan',
   warning: 'Frequency plans unavailable',
   none: 'Do not set a frequency plan',
   selectFrequencyPlan: 'Select a frequency plan...',
