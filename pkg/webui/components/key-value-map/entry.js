@@ -43,6 +43,7 @@ const Entry = ({
   removeMessage,
   icon,
   withOptionsUpdate,
+  atLeastOneEntry,
 }) => {
   const [currentValue, setCurrentValue] = useState(value)
   const [newOptions, setNewOptions] = useState(undefined)
@@ -134,15 +135,17 @@ const Entry = ({
         options={options ? newOptions ?? options : undefined}
         {...additionalInputPropsRest}
       />
-      <Button
-        type="button"
-        onClick={handleRemoveButtonClicked}
-        icon={icon ?? 'delete'}
-        title={m.deleteEntry}
-        message={removeMessage}
-        disabled={readOnly}
-        danger={!Boolean(removeMessage)}
-      />
+      {atLeastOneEntry && index !== 0 && (
+        <Button
+          type="button"
+          onClick={handleRemoveButtonClicked}
+          icon={icon ?? 'delete'}
+          title={m.deleteEntry}
+          message={removeMessage}
+          disabled={readOnly}
+          danger={!Boolean(removeMessage)}
+        />
+      )}
     </div>
   )
 }
@@ -151,6 +154,7 @@ Entry.propTypes = {
   additionalInputProps: PropTypes.shape({
     options: PropTypes.array,
   }).isRequired,
+  atLeastOneEntry: PropTypes.bool,
   fieldValue: PropTypes.any,
   icon: PropTypes.string,
   index: PropTypes.number.isRequired,
@@ -181,6 +185,7 @@ Entry.defaultProps = {
   icon: undefined,
   withOptionsUpdate: false,
   fieldValue: undefined,
+  atLeastOneEntry: false,
 }
 
 export default Entry

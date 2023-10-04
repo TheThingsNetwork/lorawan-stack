@@ -64,6 +64,7 @@ const GatewayFrequencyPlansSelect = () => {
       icon="remove"
       additionalInputProps={{ options: freqPlanOptions }}
       withOptionsUpdate
+      atLeastOneEntry
       required
     />
   )

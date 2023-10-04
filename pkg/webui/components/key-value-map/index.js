@@ -46,6 +46,7 @@ const KeyValueMap = ({
   value,
   valuePlaceholder,
   withOptionsUpdate,
+  atLeastOneEntry,
 }) => {
   const handleEntryChange = useCallback(
     (index, newValues) => {
@@ -98,6 +99,7 @@ const KeyValueMap = ({
               removeMessage={removeMessage}
               icon={icon}
               withOptionsUpdate={withOptionsUpdate}
+              atLeastOneEntry={atLeastOneEntry}
             />
           ))}
       </div>
@@ -118,6 +120,7 @@ const KeyValueMap = ({
 KeyValueMap.propTypes = {
   addMessage: PropTypes.message,
   additionalInputProps: PropTypes.shape({}),
+  atLeastOneEntry: PropTypes.bool,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   icon: PropTypes.string,
@@ -157,6 +160,7 @@ KeyValueMap.defaultProps = {
   removeMessage: undefined,
   icon: undefined,
   withOptionsUpdate: false,
+  atLeastOneEntry: false,
 }
 
 export default KeyValueMap
