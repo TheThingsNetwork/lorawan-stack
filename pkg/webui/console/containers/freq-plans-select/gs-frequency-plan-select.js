@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import frequencyPlans from '@console/constants/frequency-plans'
@@ -30,9 +30,15 @@ import { selectGsFrequencyPlans } from '@console/store/selectors/configuration'
 
 import { formatOptions, m } from './utils'
 
+const isEmptyFrequencyPlan = value => value?.includes(frequencyPlans.EMPTY_FREQ_PLAN)
+
 const GatewayFrequencyPlansSelect = () => {
   const { values } = useFormContext()
+  const { frequency_plan_ids } = values
   const dispatch = useDispatch()
+  const [showFrequencyPlanWarning, setShowFrequencyPlanWarning] = React.useState(
+    isEmptyFrequencyPlan(frequency_plan_ids) || !frequency_plan_ids,
+  )
 
   useEffect(() => {
     dispatch(getGsFrequencyPlans())
@@ -43,25 +49,25 @@ const GatewayFrequencyPlansSelect = () => {
     { value: 'no-frequency-plan', label: m.none },
   ]
 
+  const onFrequencyPlanChange = useCallback(freqPlan => {
+    setShowFrequencyPlanWarning(isEmptyFrequencyPlan(freqPlan))
+  }, [])
+
   return (
     <Form.Field
-      className="w-60"
       name="frequency_plan_ids"
       title={sharedMessages.frequencyPlan}
       description={m.frequencyPlanDescription}
       valuePlaceholder={m.selectFrequencyPlan}
       tooltipId={tooltipIds.FREQUENCY_PLAN}
-      warning={
-        values.frequency_plan_ids.includes(frequencyPlans.EMPTY_FREQ_PLAN)
-          ? sharedMessages.frequencyPlanWarning
-          : undefined
-      }
+      warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
       component={KeyValueMap}
       inputElement={Select}
       indexAsKey
       addMessage={m.addFrequencyPlan}
       removeMessage={m.removeFrequencyPlan}
       icon="remove"
+      onChange={onFrequencyPlanChange}
       additionalInputProps={{ options: freqPlanOptions }}
       withOptionsUpdate
       atLeastOneEntry

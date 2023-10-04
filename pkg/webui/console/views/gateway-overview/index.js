@@ -22,7 +22,6 @@ import tts from '@console/api/tts'
 
 import Button from '@ttn-lw/components/button'
 import DataSheet from '@ttn-lw/components/data-sheet'
-import Tag from '@ttn-lw/components/tag'
 import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -62,7 +61,7 @@ const GatewayOverview = () => {
   const { gtwId } = useParams()
   const mayViewGatewayConf = useSelector(state => checkFromState(mayViewGatewayConfJson, state))
   const gateway = useSelector(selectSelectedGateway)
-  const { ids, description, created_at, updated_at, frequency_plan_id, gateway_server_address } =
+  const { ids, description, created_at, updated_at, frequency_plan_ids, gateway_server_address } =
     gateway
 
   const handleGlobalConfDownload = useCallback(async () => {
@@ -122,7 +121,10 @@ const GatewayOverview = () => {
     items: [
       {
         key: sharedMessages.frequencyPlan,
-        value: frequency_plan_id ? <Tag content={frequency_plan_id} /> : undefined,
+        value:
+          frequency_plan_ids.length !== 0 ? (
+            <Message content={frequency_plan_ids.join(' , ')} />
+          ) : undefined,
       },
     ],
   }
@@ -130,16 +132,17 @@ const GatewayOverview = () => {
   if (mayViewGatewayConf) {
     lorawanInfo.items.push({
       key: m.globalConf,
-      value: Boolean(frequency_plan_id) ? (
-        <Button
-          type="button"
-          icon="get_app"
-          onClick={handleGlobalConfDownload}
-          message={m.downloadGlobalConf}
-        />
-      ) : (
-        <Message content={m.globalConfUnavailable} className={style.notAvailable} />
-      ),
+      value:
+        frequency_plan_ids.length !== 0 ? (
+          <Button
+            type="button"
+            icon="get_app"
+            onClick={handleGlobalConfDownload}
+            message={m.downloadGlobalConf}
+          />
+        ) : (
+          <Message content={m.globalConfUnavailable} className={style.notAvailable} />
+        ),
     })
   }
 
