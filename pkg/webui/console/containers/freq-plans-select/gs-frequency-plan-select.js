@@ -52,7 +52,7 @@ const GatewayFrequencyPlansSelect = () => {
       valuePlaceholder={m.selectFrequencyPlan}
       tooltipId={tooltipIds.FREQUENCY_PLAN}
       warning={
-        values.frequency_plan_id === frequencyPlans.EMPTY_FREQ_PLAN
+        values.frequency_plan_ids.includes(frequencyPlans.EMPTY_FREQ_PLAN)
           ? sharedMessages.frequencyPlanWarning
           : undefined
       }
