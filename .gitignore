@@ -93,6 +93,7 @@ node_modules/
 /stories
 /pkg/webui/locales/.backend
 /data/lorawan-devices-index
+/events.json
 
 # Development tooling
 /tools/bin/mage
