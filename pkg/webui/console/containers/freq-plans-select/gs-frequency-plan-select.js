@@ -45,24 +45,25 @@ const GatewayFrequencyPlansSelect = () => {
 
   return (
     <Form.Field
+      className="w-60"
       name="frequency_plan_ids"
       title={sharedMessages.frequencyPlan}
       description={m.frequencyPlanDescription}
       valuePlaceholder={m.selectFrequencyPlan}
-      component={KeyValueMap}
       tooltipId={tooltipIds.FREQUENCY_PLAN}
-      additionalInputProps={{ options: freqPlanOptions }}
-      inputElement={Select}
       warning={
         values.frequency_plan_id === frequencyPlans.EMPTY_FREQ_PLAN
           ? sharedMessages.frequencyPlanWarning
           : undefined
       }
+      component={KeyValueMap}
+      inputElement={Select}
+      indexAsKey
       addMessage={m.addFrequencyPlan}
       removeMessage={m.removeFrequencyPlan}
       icon="remove"
-      indexAsKey
-      className="w-60"
+      additionalInputProps={{ options: freqPlanOptions }}
+      withOptionsUpdate
       required
     />
   )

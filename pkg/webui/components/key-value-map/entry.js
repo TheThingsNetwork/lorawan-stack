@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
@@ -30,6 +30,7 @@ const Entry = ({
   readOnly,
   name,
   value,
+  fieldValue,
   index,
   onRemoveButtonClick,
   onChange,
@@ -41,7 +42,11 @@ const Entry = ({
   additionalInputProps,
   removeMessage,
   icon,
+  withOptionsUpdate,
 }) => {
+  const [currentValue, setCurrentValue] = useState(value)
+  const [newOptions, setNewOptions] = useState(undefined)
+  const { options, ...additionalInputPropsRest } = additionalInputProps
   const _getKeyInputName = useMemo(() => `${name}[${index}].key`, [index, name])
 
   const _getValueInputName = useMemo(() => `${name}[${index}].value`, [index, name])
@@ -62,6 +67,7 @@ const Entry = ({
 
   const handleValueChanged = useCallback(
     newValue => {
+      setCurrentValue(newValue)
       onChange(index, { value: newValue })
     },
     [index, onChange],
@@ -83,6 +89,18 @@ const Entry = ({
     },
     [onBlur, name, value, _getKeyInputName, _getValueInputName],
   )
+
+  const handleFocus = useCallback(() => {
+    if (withOptionsUpdate && options) {
+      let newOptions
+      if (currentValue) {
+        newOptions = options.filter(v => !fieldValue.includes(v.value) || v.value === currentValue)
+      } else {
+        newOptions = options.filter(v => !fieldValue.includes(v.value))
+      }
+      setNewOptions(newOptions)
+    }
+  }, [currentValue, options, withOptionsUpdate, fieldValue])
 
   return (
     <div className={style.entriesRow}>
@@ -109,10 +127,12 @@ const Entry = ({
         type="text"
         onChange={handleValueChanged}
         onBlur={handleBlur}
+        onFocus={handleFocus}
         value={indexAsKey ? value : value.value}
         readOnly={readOnly}
         code
-        {...additionalInputProps}
+        options={options ? newOptions ?? options : undefined}
+        {...additionalInputPropsRest}
       />
       <Button
         type="button"
@@ -128,7 +148,10 @@ const Entry = ({
 }
 
 Entry.propTypes = {
-  additionalInputProps: PropTypes.shape({}).isRequired,
+  additionalInputProps: PropTypes.shape({
+    options: PropTypes.array,
+  }).isRequired,
+  fieldValue: PropTypes.any,
   icon: PropTypes.string,
   index: PropTypes.number.isRequired,
   indexAsKey: PropTypes.bool.isRequired,
@@ -148,6 +171,7 @@ Entry.propTypes = {
     PropTypes.string,
   ]),
   valuePlaceholder: PropTypes.message.isRequired,
+  withOptionsUpdate: PropTypes.bool,
 }
 
 Entry.defaultProps = {
@@ -155,6 +179,8 @@ Entry.defaultProps = {
   readOnly: false,
   removeMessage: undefined,
   icon: undefined,
+  withOptionsUpdate: false,
+  fieldValue: undefined,
 }
 
 export default Entry

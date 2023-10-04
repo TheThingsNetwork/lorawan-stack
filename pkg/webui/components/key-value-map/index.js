@@ -45,6 +45,7 @@ const KeyValueMap = ({
   onChange,
   value,
   valuePlaceholder,
+  withOptionsUpdate,
 }) => {
   const handleEntryChange = useCallback(
     (index, newValues) => {
@@ -78,11 +79,12 @@ const KeyValueMap = ({
     <div data-test-id={'key-value-map'} className={classnames(className, style.container)}>
       <div>
         {value &&
-          value.map((value, index) => (
+          value.map((individualValue, index) => (
             <Entry
               key={`${name}[${index}]`}
               name={name}
-              value={value}
+              value={individualValue}
+              fieldValue={value}
               keyPlaceholder={keyPlaceholder}
               valuePlaceholder={valuePlaceholder}
               index={index}
@@ -95,6 +97,7 @@ const KeyValueMap = ({
               additionalInputProps={additionalInputProps}
               removeMessage={removeMessage}
               icon={icon}
+              withOptionsUpdate={withOptionsUpdate}
             />
           ))}
       </div>
@@ -136,6 +139,7 @@ KeyValueMap.propTypes = {
     ]),
   ),
   valuePlaceholder: PropTypes.message.isRequired,
+  withOptionsUpdate: PropTypes.bool,
 }
 
 KeyValueMap.defaultProps = {
@@ -152,6 +156,7 @@ KeyValueMap.defaultProps = {
   inputElement: Input,
   removeMessage: undefined,
   icon: undefined,
+  withOptionsUpdate: false,
 }
 
 export default KeyValueMap
