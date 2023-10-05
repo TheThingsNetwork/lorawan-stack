@@ -984,7 +984,7 @@ func TestHomeNetwork(t *testing.T) {
 				case <-time.After(timeout):
 					t.Fatal("Expected uplink message from Forwarder")
 				}
-				a.So(nsMsg.CorrelationIds, should.HaveLength, 2)
+				a.So(nsMsg.CorrelationIds, should.HaveLength, 1)
 				a.So(*ttnpb.StdTime(nsMsg.ReceivedAt), should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
 
 				expected := ttnpb.Clone(tc.UplinkMessage)
