@@ -146,11 +146,19 @@ type RedisEvents struct {
 	} `name:"publish"`
 }
 
+// BatchEvents represents the configuration for batch event publication.
+type BatchEvents struct {
+	Enable     bool          `name:"enable" description:"Enable events batching (EXPERIMENTAL)"`
+	TargetSize int           `name:"target-size" description:"The minimum number of items in a batch. A batch may contain at most twice the target size items (EXPERIMENTAL)"` // nolint:lll
+	Delay      time.Duration `name:"delay" description:"For how long to delay event submission in order to build a batch (EXPERIMENTAL)"`                                      // nolint:lll
+}
+
 // Events represents configuration for the events system.
 type Events struct {
 	Backend string      `name:"backend" description:"Backend to use for events (internal, redis, cloud)"`
 	Redis   RedisEvents `name:"redis"`
 	Cloud   CloudEvents `name:"cloud"`
+	Batch   BatchEvents `name:"batch"`
 }
 
 // Rights represents the configuration to apply when fetching entity rights.

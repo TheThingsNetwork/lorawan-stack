@@ -67,6 +67,8 @@ func Example() {
 
 	redisPubSub := redis.NewPubSub(context.TODO(), mockComponent{taskStarter}, config.RedisEvents{
 		// Config here...
+	}, config.BatchEvents{
+		// Batch config here...
 	})
 
 	// Replace the default pubsub so that we will now publish to Redis.
@@ -82,10 +84,11 @@ func TestRedisPubSub(t *testing.T) { //nolint:paralleltest
 	test.RunTest(t, test.TestConfig{
 		Timeout: timeout,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
-			config := config.RedisEvents{
+			conf := config.RedisEvents{
 				Config: redisConfig,
 			}
-			pubsub := redis.NewPubSub(ctx, mockComponent{taskStarter}, config)
+			batchConfig := config.BatchEvents{}
+			pubsub := redis.NewPubSub(ctx, mockComponent{taskStarter}, conf, batchConfig)
 			defer pubsub.(*redis.PubSub).Close(ctx)
 
 			time.Sleep(timeout / 10)
@@ -102,11 +105,12 @@ func TestRedisPubSubStore(t *testing.T) { //nolint:paralleltest
 	test.RunTest(t, test.TestConfig{
 		Timeout: timeout,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
-			config := config.RedisEvents{
+			conf := config.RedisEvents{
 				Config: redisConfig,
 			}
-			config.Store.Enable = true
-			pubsub := redis.NewPubSub(ctx, mockComponent{taskStarter}, config)
+			conf.Store.Enable = true
+			batchConf := config.BatchEvents{Enable: true}
+			pubsub := redis.NewPubSub(ctx, mockComponent{taskStarter}, conf, batchConf)
 			defer pubsub.(*redis.PubSubStore).Close(ctx)
 
 			time.Sleep(timeout / 10)

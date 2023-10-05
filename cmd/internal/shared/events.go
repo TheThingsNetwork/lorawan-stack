@@ -41,7 +41,7 @@ func InitializeEvents(ctx context.Context, component Component, conf config.Serv
 		events.SetDefaultPubSub(basic.NewPubSub())
 		return nil
 	case "redis":
-		events.SetDefaultPubSub(redis.NewPubSub(ctx, component, conf.Events.Redis))
+		events.SetDefaultPubSub(redis.NewPubSub(ctx, component, conf.Events.Redis, conf.Events.Batch))
 		return nil
 	case "cloud":
 		ps, err := cloud.NewPubSub(ctx, component, conf.Events.Cloud.PublishURL, conf.Events.Cloud.SubscribeURL)
