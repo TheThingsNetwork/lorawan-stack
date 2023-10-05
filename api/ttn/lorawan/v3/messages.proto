@@ -532,6 +532,7 @@ message ApplicationUp {
   }
 
   // Signals if the message is coming from the Network Server or is simulated.
+  // The Application Server automatically sets this field, and callers must not manually set it.
   bool simulated = 14;
 
   // next: 17

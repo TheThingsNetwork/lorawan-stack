@@ -251,6 +251,16 @@ func TestUsersCRUD(t *testing.T) {
 
 	usr1 := p.NewUser()
 	usr1.Password = "OldPassword"
+	usr1.PrimaryEmailAddress = "user-1@email.com"
+	validatedAtTime := time.Now().Truncate(time.Millisecond)
+	usr1.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTime(&validatedAtTime)
+	// NOTE: Remove this when the deprecated field is removed.
+	// (https://github.com/TheThingsIndustries/lorawan-stack/issues/3830)
+	usr1.ContactInfo = append(usr1.ContactInfo, &ttnpb.ContactInfo{ // nolint:staticcheck
+		ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+		Value:         usr1.PrimaryEmailAddress,
+		ValidatedAt:   usr1.PrimaryEmailAddressValidatedAt,
+	})
 
 	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	creds := rpcCreds(key)
@@ -258,137 +268,204 @@ func TestUsersCRUD(t *testing.T) {
 	keyWithoutRights, _ := p.NewAPIKey(usr1.GetEntityIdentifiers())
 	credsWithoutRights := rpcCreds(keyWithoutRights)
 
-	a, ctx := test.New(t)
-
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserRegistryClient(cc)
 
-		got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   usr1.GetIds(),
-			FieldMask: ttnpb.FieldMask("name", "admin", "created_at", "updated_at"),
-		}, creds)
-		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-			a.So(got.Name, should.Equal, usr1.Name)
-			a.So(got.Admin, should.Equal, usr1.Admin)
-			a.So(got.CreatedAt, should.Resemble, usr1.CreatedAt)
-		}
+		t.Run("Get", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
 
-		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   usr1.GetIds(),
-			FieldMask: ttnpb.FieldMask("ids"),
-		}, credsWithoutRights)
-		a.So(err, should.BeNil)
+			got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+				UserIds:   usr1.GetIds(),
+				FieldMask: ttnpb.FieldMask("name", "admin", "created_at", "updated_at"),
+			}, creds)
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				a.So(got.Name, should.Equal, usr1.Name)
+				a.So(got.Admin, should.Equal, usr1.Admin)
+				a.So(got.CreatedAt, should.Resemble, usr1.CreatedAt)
+			}
 
-		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   usr1.GetIds(),
-			FieldMask: ttnpb.FieldMask("attributes"),
-		}, credsWithoutRights)
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+				UserIds:   usr1.GetIds(),
+				FieldMask: ttnpb.FieldMask("ids"),
+			}, credsWithoutRights)
+			if a.So(err, should.BeNil) {
+				a.So(got.GetIds(), should.Resemble, usr1.GetIds())
+			}
 
-		updated, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
-			User: &ttnpb.User{
-				Ids:  usr1.GetIds(),
-				Name: "Updated Name",
-			},
-			FieldMask: ttnpb.FieldMask("name"),
-		}, creds)
-		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
-			a.So(updated.Name, should.Equal, "Updated Name")
-		}
+			got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+				UserIds:   usr1.GetIds(),
+				FieldMask: ttnpb.FieldMask("attributes"),
+			}, credsWithoutRights)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				a.So(got, should.BeNil)
+			}
+		})
 
-		updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
-			User: &ttnpb.User{
-				Ids:              usr1.GetIds(),
-				State:            ttnpb.State_STATE_FLAGGED,
-				StateDescription: "something is wrong",
-			},
-			FieldMask: ttnpb.FieldMask("state", "state_description"),
-		}, adminUsrCreds)
-		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
-			a.So(updated.State, should.Equal, ttnpb.State_STATE_FLAGGED)
-			a.So(updated.StateDescription, should.Equal, "something is wrong")
-		}
+		t.Run("Update", func(t *testing.T) { // nolint:paralleltest
+			t.Run("Simple change", func(t *testing.T) { // nolint:paralleltest
+				a, ctx := test.New(t)
+				updated, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
+					User: &ttnpb.User{
+						Ids:  usr1.GetIds(),
+						Name: "Updated Name",
+					},
+					FieldMask: ttnpb.FieldMask("name"),
+				}, creds)
+				if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+					a.So(updated.Name, should.Equal, "Updated Name")
+				}
+			})
 
-		updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
-			User: &ttnpb.User{
-				Ids:   usr1.GetIds(),
-				State: ttnpb.State_STATE_APPROVED,
-			},
-			FieldMask: ttnpb.FieldMask("state"),
-		}, adminUsrCreds)
-		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
-			a.So(updated.State, should.Equal, ttnpb.State_STATE_APPROVED)
-		}
+			t.Run("Change state", func(t *testing.T) { // nolint:paralleltest
+				a, ctx := test.New(t)
 
-		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   usr1.GetIds(),
-			FieldMask: ttnpb.FieldMask("state", "state_description"),
-		}, creds)
-		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-			a.So(got.State, should.Equal, ttnpb.State_STATE_APPROVED)
-			a.So(got.StateDescription, should.Equal, "")
-		}
+				updated, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
+					User: &ttnpb.User{
+						Ids:              usr1.GetIds(),
+						State:            ttnpb.State_STATE_FLAGGED,
+						StateDescription: "something is wrong",
+					},
+					FieldMask: ttnpb.FieldMask("state", "state_description"),
+				}, adminUsrCreds)
+				if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+					a.So(updated.State, should.Equal, ttnpb.State_STATE_FLAGGED)
+					a.So(updated.StateDescription, should.Equal, "something is wrong")
+				}
 
-		passwordUpdateTime := time.Now().Truncate(time.Millisecond)
+				updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
+					User: &ttnpb.User{
+						Ids:   usr1.GetIds(),
+						State: ttnpb.State_STATE_APPROVED,
+					},
+					FieldMask: ttnpb.FieldMask("state"),
+				}, adminUsrCreds)
+				if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+					a.So(updated.State, should.Equal, ttnpb.State_STATE_APPROVED)
+				}
 
-		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-			UserIds: usr1.GetIds(),
-			Old:     "OldPassword",
-			New:     "NewPassword", // Meets minimum length requirement of 10 characters.
-		}, creds)
-		a.So(err, should.BeNil)
+				got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+					UserIds:   usr1.GetIds(),
+					FieldMask: ttnpb.FieldMask("state", "state_description"),
+				}, creds)
+				if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+					a.So(got.State, should.Equal, ttnpb.State_STATE_APPROVED)
+					a.So(got.StateDescription, should.Equal, "")
+				}
+			})
 
-		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   usr1.GetIds(),
-			FieldMask: ttnpb.FieldMask("password_updated_at"),
-		}, creds)
-		if a.So(err, should.BeNil) && a.So(afterUpdate, should.NotBeNil) {
-			a.So(afterUpdate.PasswordUpdatedAt, should.NotBeNil)
-			a.So(*ttnpb.StdTime(afterUpdate.PasswordUpdatedAt), should.HappenAfter, passwordUpdateTime)
-		}
+			t.Run("PrimaryEmailAddress", func(t *testing.T) { // nolint:paralleltest
+				t.Run("admin update", func(t *testing.T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					got, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
+						User: &ttnpb.User{
+							Ids:                 usr1.GetIds(),
+							PrimaryEmailAddress: "new-user-email@email.com",
+						},
+						FieldMask: ttnpb.FieldMask("primary_email_address"),
+					}, adminUsrCreds)
+					if a.So(err, should.BeNil) {
+						a.So(got.PrimaryEmailAddress, should.Equal, "new-user-email@email.com")
+						a.So(got.PrimaryEmailAddressValidatedAt, should.NotBeNil)
+						a.So(got.ContactInfo, should.HaveLength, 1)                              // nolint:staticcheck
+						a.So(got.ContactInfo[0].Value, should.Equal, "new-user-email@email.com") // nolint:staticcheck
+						a.So(got.ContactInfo[0].ValidatedAt, should.NotBeNil)                    // nolint:staticcheck
+					}
+				})
 
-		_, err = reg.Delete(ctx, usr1.GetIds(), creds)
-		a.So(err, should.BeNil)
+				t.Run("non admin update", func(t *testing.T) { // nolint:paralleltest
+					a, ctx := test.New(t)
+					got, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
+						User: &ttnpb.User{
+							Ids:                 usr1.GetIds(),
+							PrimaryEmailAddress: "second-new-user-email@email.com",
+						},
+						FieldMask: ttnpb.FieldMask("primary_email_address"),
+					}, creds)
+					if a.So(err, should.BeNil) {
+						a.So(got.PrimaryEmailAddress, should.Equal, "second-new-user-email@email.com")
+						a.So(got.PrimaryEmailAddressValidatedAt, should.BeNil)
+						a.So(got.ContactInfo, should.HaveLength, 1)                                     // nolint:staticcheck,lll
+						a.So(got.ContactInfo[0].Value, should.Equal, "second-new-user-email@email.com") // nolint:staticcheck,lll
+						a.So(got.ContactInfo[0].ValidatedAt, should.BeNil)                              // nolint:staticcheck,lll
+					}
+				})
+			})
+		})
 
-		_, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   usr1.GetIds(),
-			FieldMask: ttnpb.FieldMask("name"),
-		}, creds)
-		if a.So(err, should.NotBeNil) {
-			// NOTE: For other entities, this would be a NotFound, but in this case
-			// the user's credentials become invalid when the user is deleted.
-			a.So(errors.IsUnauthenticated(err), should.BeTrue)
-		}
+		t.Run("Update Password", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
+			passwordUpdateTime := time.Now().Truncate(time.Millisecond)
 
-		_, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   usr1.GetIds(),
-			FieldMask: ttnpb.FieldMask("name"),
-		}, adminUsrCreds)
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsNotFound(err), should.BeTrue)
-		}
+			_, err := reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
+				UserIds: usr1.GetIds(),
+				Old:     "OldPassword",
+				New:     "NewPassword", // Meets minimum length requirement of 10 characters.
+			}, creds)
+			a.So(err, should.BeNil)
 
-		_, err = reg.Purge(ctx, usr1.GetIds(), creds)
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+				UserIds:   usr1.GetIds(),
+				FieldMask: ttnpb.FieldMask("password_updated_at"),
+			}, creds)
+			if a.So(err, should.BeNil) && a.So(afterUpdate, should.NotBeNil) {
+				a.So(afterUpdate.PasswordUpdatedAt, should.NotBeNil)
+				a.So(*ttnpb.StdTime(afterUpdate.PasswordUpdatedAt), should.HappenAfter, passwordUpdateTime)
+			}
+		})
 
-		_, err = reg.Purge(ctx, usr1.GetIds(), adminUsrCreds)
-		a.So(err, should.BeNil)
+		t.Run("Delete", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
 
-		// Admin restrictions, cannot remove the only admin in tenant store.
-		_, err = reg.Delete(ctx, adminUsr.GetIds(), adminUsrCreds)
-		a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+			_, err := reg.Delete(ctx, usr1.GetIds(), creds)
+			a.So(err, should.BeNil)
 
-		_, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
-			User: &ttnpb.User{
-				Ids:   adminUsr.GetIds(),
-				Admin: false,
-			},
-			FieldMask: ttnpb.FieldMask("admin"),
-		}, adminUsrCreds)
-		a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+			_, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+				UserIds:   usr1.GetIds(),
+				FieldMask: ttnpb.FieldMask("name"),
+			}, creds)
+			if a.So(err, should.NotBeNil) {
+				// NOTE: For other entities, this would be a NotFound, but in this case
+				// the user's credentials become invalid when the user is deleted.
+				a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			}
+
+			_, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+				UserIds:   usr1.GetIds(),
+				FieldMask: ttnpb.FieldMask("name"),
+			}, adminUsrCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
+		})
+
+		t.Run("Purge", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
+
+			_, err := reg.Purge(ctx, usr1.GetIds(), creds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Purge(ctx, usr1.GetIds(), adminUsrCreds)
+			a.So(err, should.BeNil)
+		})
+
+		t.Run("Last Admin Cases", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
+
+			// Admin restrictions, cannot remove the only admin in tenant store.
+			_, err := reg.Delete(ctx, adminUsr.GetIds(), adminUsrCreds)
+			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+
+			_, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
+				User: &ttnpb.User{
+					Ids:   adminUsr.GetIds(),
+					Admin: false,
+				},
+				FieldMask: ttnpb.FieldMask("admin"),
+			}, adminUsrCreds)
+			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+		})
 	}, withPrivateTestDatabase(p))
 }

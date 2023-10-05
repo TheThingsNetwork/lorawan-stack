@@ -19,35 +19,31 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './list.styl'
 
-class SideNavigationList extends React.Component {
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    className: PropTypes.string,
-    /** The depth of the current list starting at 0 for the root list. */
-    depth: PropTypes.number,
-    /**
-     * A flag specifying whether the side navigation list is expanded or not.
-     * Applicable to nested lists.
-     */
-    isExpanded: PropTypes.bool,
-  }
+const SideNavigationList = ({ children, className, depth, isExpanded }) => {
+  const isRoot = depth === 0
+  const listClassNames = classnames(className, style.list, {
+    [style.listNested]: !isRoot,
+    [style.listExpanded]: isExpanded,
+  })
+  return <ul className={listClassNames}>{children}</ul>
+}
 
-  static defaultProps = {
-    className: undefined,
-    depth: 0,
-    isExpanded: false,
-  }
+SideNavigationList.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  /** The depth of the current list starting at 0 for the root list. */
+  depth: PropTypes.number,
+  /**
+   * A flag specifying whether the side navigation list is expanded or not.
+   * Applicable to nested lists.
+   */
+  isExpanded: PropTypes.bool,
+}
 
-  render() {
-    const { children, className, isExpanded, depth } = this.props
-
-    const isRoot = depth === 0
-    const listClassNames = classnames(className, style.list, {
-      [style.listNested]: !isRoot,
-      [style.listExpanded]: isExpanded,
-    })
-    return <ul className={listClassNames}>{children}</ul>
-  }
+SideNavigationList.defaultProps = {
+  className: undefined,
+  depth: 0,
+  isExpanded: false,
 }
 
 export default SideNavigationList

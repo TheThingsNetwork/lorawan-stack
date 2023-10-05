@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -210,12 +211,24 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.Application
 	}, nil
 }
 
-var errPayloadCryptoSkipped = errors.DefineFailedPrecondition("payload_crypto_skipped", "payload crypto skipped")
+var (
+	errPayloadCryptoSkipped = errors.DefineFailedPrecondition("payload_crypto_skipped", "payload crypto skipped")
+	errSimulated            = errors.DefineInvalidArgument("simulated", "simulated traffic cannot be simulated again")
+)
 
 func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*emptypb.Empty, error) {
-	if err := rights.RequireApplication(ctx, up.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_UP_WRITE); err != nil {
+	if up.Simulated {
+		// Traffic already marked as simulated is discarded, in order to avoid traffic loops created by injecting
+		// simulated traffic which is then piped into the simulate uplink endpoint itself.
+		return nil, errSimulated.New()
+	}
+	if err := rights.RequireApplication(
+		ctx, up.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_UP_WRITE,
+	); err != nil {
 		return nil, err
 	}
+	ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
+	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	skip, err := s.skipPayloadCrypto(ctx, up.EndDeviceIds)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to determine if the payload crypto should be skipped")

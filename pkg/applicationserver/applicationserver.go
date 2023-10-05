@@ -62,6 +62,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+var (
+	appendUpCorrelationID       = events.RegisterCorrelationIDPrefix("uplink", "as:up")
+	appendDownlinkCorrelationID = events.RegisterCorrelationIDPrefix("downlink", "as:downlink")
+)
+
 // ApplicationServer implements the Application Server component.
 //
 // The Application Server exposes the As, AppAs and AsEndDeviceRegistry services.
@@ -383,7 +388,6 @@ func (*ApplicationServer) Roles() []ttnpb.ClusterRole {
 // Subscription for traffic and control. If the cluster parameter is true, the subscription receives all of the
 // traffic of the application. Otherwise, only traffic that was processed locally is sent.
 func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers, cluster bool) (*io.Subscription, error) {
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:conn:%s", events.NewCorrelationID()))
 	if ids != nil {
 		uid := unique.ID(ctx, ids)
 		ctx = log.NewContextWithField(ctx, "application_uid", uid)
@@ -430,7 +434,8 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 	defer trace.StartRegion(ctx, "process up").End()
 
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIds))
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
+	ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
+	ctx = appendUpCorrelationID(ctx)
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
 
@@ -709,7 +714,9 @@ func (as *ApplicationServer) initAndValidateConfirmationRetriesConfig(item *ttnp
 }
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*emptypb.Empty, error)) error {
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
+	if len(items) <= 1 {
+		ctx = appendDownlinkCorrelationID(ctx)
+	}
 	link, err := as.getLink(ctx, ids.ApplicationIds, []string{
 		"default_formatters",
 		"skip_payload_crypto",
@@ -723,6 +730,9 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 	}
 	for _, item := range items {
 		ctx := events.ContextWithCorrelationID(ctx, item.CorrelationIds...)
+		if len(items) > 1 {
+			ctx = appendDownlinkCorrelationID(ctx)
+		}
 		item.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	}
 	now := timestamppb.Now()

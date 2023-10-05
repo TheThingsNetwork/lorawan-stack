@@ -16,7 +16,6 @@ package packetbrokeragent
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	mappingpb "go.packetbroker.org/api/mapping/v2"
@@ -72,10 +71,8 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 		return nil, err
 	}
 
-	ctx = events.ContextWithCorrelationID(ctx, append(
-		up.Message.CorrelationIds,
-		fmt.Sprintf("pba:uplink:%s", events.NewCorrelationID()),
-	)...)
+	ctx = events.ContextWithCorrelationID(ctx, up.Message.CorrelationIds...)
+	ctx = appendUplinkCorrelationID(ctx)
 	up.Message.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	msg, err := toPBUplink(ctx, up, s.config)

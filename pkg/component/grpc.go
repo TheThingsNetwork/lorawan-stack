@@ -41,6 +41,7 @@ func (c *Component) initGRPC() {
 		rpcserver.WithContextFiller(c.FillContext),
 		rpcserver.WithTrustedProxies(c.config.GRPC.TrustedProxies...),
 		rpcserver.WithLogIgnoreMethods(c.config.GRPC.LogIgnoreMethods),
+		rpcserver.WithCorrelationIDsIgnoreMethods(c.config.GRPC.CorrelationIDsIgnoreMethods),
 		rpcserver.WithRateLimiter(c.RateLimiter()),
 	)
 }

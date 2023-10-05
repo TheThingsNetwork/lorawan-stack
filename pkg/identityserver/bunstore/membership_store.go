@@ -105,7 +105,7 @@ func (s *membershipStore) selectWithUUIDsInMemberships(
 		}
 	}
 
-	account, err := s.getAccountModel(ctx, accountID.EntityType(), accountID.IDString())
+	account, err := s.getAccountModel(store.WithSoftDeleted(ctx, false), accountID.EntityType(), accountID.IDString())
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (s *membershipStore) selectWithUUIDsInMemberships(
 func (s *membershipStore) CountMemberships(
 	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string,
 ) (uint64, error) {
-	account, err := s.getAccountModel(ctx, accountID.EntityType(), accountID.IDString())
+	account, err := s.getAccountModel(store.WithSoftDeleted(ctx, false), accountID.EntityType(), accountID.IDString())
 	if err != nil {
 		return 0, err
 	}
@@ -227,7 +227,7 @@ func (s *membershipStore) FindAccountMembershipChains(
 	))
 	defer span.End()
 
-	account, err := s.getAccountModel(ctx, accountID.EntityType(), accountID.IDString())
+	account, err := s.getAccountModel(store.WithSoftDeleted(ctx, false), accountID.EntityType(), accountID.IDString())
 	if err != nil {
 		return nil, err
 	}

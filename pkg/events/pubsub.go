@@ -48,3 +48,9 @@ type Subscription interface {
 	// Notify notifies the subscription of a new matching event.
 	Notify(Event)
 }
+
+// PublishFunc is a function which implements Publisher.
+type PublishFunc func(...Event)
+
+// Publish implements events.Publisher.
+func (f PublishFunc) Publish(evs ...Event) { f(evs...) }

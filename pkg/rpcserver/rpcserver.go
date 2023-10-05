@@ -60,13 +60,14 @@ func init() {
 }
 
 type options struct {
-	contextFillers     []fillcontext.Filler
-	streamInterceptors []grpc.StreamServerInterceptor
-	unaryInterceptors  []grpc.UnaryServerInterceptor
-	serverOptions      []grpc.ServerOption
-	trustedProxies     []string
-	logIgnoreMethods   []string
-	limiter            ratelimit.Interface
+	contextFillers              []fillcontext.Filler
+	streamInterceptors          []grpc.StreamServerInterceptor
+	unaryInterceptors           []grpc.UnaryServerInterceptor
+	serverOptions               []grpc.ServerOption
+	trustedProxies              []string
+	logIgnoreMethods            []string
+	correlationIDsIgnoreMethods []string
+	limiter                     ratelimit.Interface
 }
 
 // Option for the gRPC server
@@ -111,6 +112,13 @@ func WithTrustedProxies(cidrs ...string) Option {
 func WithLogIgnoreMethods(methods []string) Option {
 	return func(o *options) {
 		o.logIgnoreMethods = methods
+	}
+}
+
+// WithCorrelationIDsIgnoreMethods sets a list of methods for which no correlation IDs are injected.
+func WithCorrelationIDsIgnoreMethods(methods []string) Option {
+	return func(o *options) {
+		o.correlationIDsIgnoreMethods = methods
 	}
 }
 
@@ -160,7 +168,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcmiddleware.RequestIDStreamServerInterceptor(),
 		proxyHeaders.StreamServerInterceptor(),
 		otelgrpc.StreamServerInterceptor(otelgrpc.WithTracerProvider(tracing.FromContext(ctx))),
-		events.StreamServerInterceptor,
+		events.StreamServerInterceptor(options.correlationIDsIgnoreMethods),
 		rpclog.StreamServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
 		metrics.StreamServerInterceptor,
 		errors.StreamServerInterceptor(),
@@ -178,7 +186,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcmiddleware.RequestIDUnaryServerInterceptor(),
 		proxyHeaders.UnaryServerInterceptor(),
 		otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(tracing.FromContext(ctx))),
-		events.UnaryServerInterceptor,
+		events.UnaryServerInterceptor(options.correlationIDsIgnoreMethods),
 		rpclog.UnaryServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
 		metrics.UnaryServerInterceptor,
 		errors.UnaryServerInterceptor(),

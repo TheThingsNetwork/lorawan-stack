@@ -62,6 +62,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+var (
+	appendUplinkCorrelationID = events.RegisterCorrelationIDPrefix("uplink", "gs:uplink")
+	appendTxAckCorrelationID  = events.RegisterCorrelationIDPrefix("tx_ack", "gs:tx_ack")
+)
+
 // GatewayServer implements the Gateway Server component.
 //
 // The Gateway Server exposes the Gs, GtwGs and NsGs services and MQTT and UDP frontends for gateways.
@@ -465,7 +470,6 @@ func (gs *GatewayServer) Connect(
 		"gateway_ip_address", addr.Ip,
 	))
 	ctx = log.NewContext(ctx, logger)
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
 	var isAuthenticated bool
 	if _, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()); err == nil {
@@ -742,15 +746,13 @@ func (gs *GatewayServer) startHandleVersionUpdatesTask(conn connectionEntry) {
 var errHostHandle = errors.Define("host_handle", "host `{host}` handle message")
 
 type upstreamHost struct {
-	name          string
-	handler       upstream.Handler
-	pool          workerpool.WorkerPool[any]
-	gtw           *ttnpb.Gateway
-	correlationID string
+	name    string
+	handler upstream.Handler
+	pool    workerpool.WorkerPool[any]
+	gtw     *ttnpb.Gateway
 }
 
 func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
-	ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
 	logger := log.FromContext(ctx)
 	gtw := host.gtw
 	// Each concurrent upstream host will receive the message and edit it in order
@@ -866,10 +868,9 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			continue
 		}
 		host := &upstreamHost{
-			name:          name,
-			handler:       handler,
-			gtw:           gtw,
-			correlationID: fmt.Sprintf("gs:up:host:%s", events.NewCorrelationID()),
+			name:    name,
+			handler: handler,
+			gtw:     gtw,
 		}
 		wp := workerpool.NewWorkerPool(workerpool.Config[any]{
 			Component:  gs,
@@ -894,10 +895,8 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 		case <-ctx.Done():
 			return
 		case msg := <-conn.Up():
-			correlationIDs := make([]string, 0, len(msg.Message.CorrelationIds)+1)
-			correlationIDs = append(correlationIDs, msg.Message.CorrelationIds...)
-			correlationIDs = append(correlationIDs, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-			ctx = events.ContextWithCorrelationID(ctx, correlationIDs...)
+			ctx = events.ContextWithCorrelationID(ctx, msg.Message.CorrelationIds...)
+			ctx = appendUplinkCorrelationID(ctx)
 			msg.Message.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 			if msg.Message.Payload == nil {
 				msg.Message.Payload = &ttnpb.Message{}
@@ -920,11 +919,11 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			val = msg
 			registerReceiveStatus(ctx, gtw, msg, protocol)
 		case msg := <-conn.TxAck():
-			correlationIDs := make([]string, 0, len(msg.CorrelationIds)+len(msg.DownlinkMessage.GetCorrelationIds())+1)
+			correlationIDs := make([]string, 0, len(msg.CorrelationIds)+len(msg.DownlinkMessage.GetCorrelationIds()))
 			correlationIDs = append(correlationIDs, msg.CorrelationIds...)
 			correlationIDs = append(correlationIDs, msg.DownlinkMessage.GetCorrelationIds()...)
-			correlationIDs = append(correlationIDs, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
 			ctx = events.ContextWithCorrelationID(ctx, correlationIDs...)
+			ctx = appendTxAckCorrelationID(ctx)
 			msg.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 			if d := msg.DownlinkMessage; d != nil {
 				d.CorrelationIds = events.CorrelationIDsFromContext(ctx)

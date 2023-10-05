@@ -1587,6 +1587,7 @@ type ApplicationUp struct {
 	//	*ApplicationUp_ServiceData
 	Up isApplicationUp_Up `protobuf_oneof:"up"`
 	// Signals if the message is coming from the Network Server or is simulated.
+	// The Application Server automatically sets this field, and callers must not manually set it.
 	Simulated bool `protobuf:"varint,14,opt,name=simulated,proto3" json:"simulated,omitempty"`
 }
 

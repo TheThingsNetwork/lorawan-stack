@@ -44,6 +44,7 @@ var ContactInfoValidationFieldPathsNested = []string{
 	"expires_at",
 	"id",
 	"token",
+	"updated_at",
 }
 
 var ContactInfoValidationFieldPathsTopLevel = []string{
@@ -53,4 +54,5 @@ var ContactInfoValidationFieldPathsTopLevel = []string{
 	"expires_at",
 	"id",
 	"token",
+	"updated_at",
 }

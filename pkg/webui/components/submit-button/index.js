@@ -18,40 +18,34 @@ import Button from '@ttn-lw/components/button'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-class SubmitButton extends React.PureComponent {
-  static propTypes = {
-    disabled: PropTypes.bool,
-    icon: PropTypes.string,
-    isSubmitting: PropTypes.bool.isRequired,
-    isValidating: PropTypes.bool.isRequired,
-    message: PropTypes.message,
-  }
+const SubmitButton = ({ disabled, icon, isSubmitting, isValidating, message, ...rest }) => {
+  const buttonLoading = isSubmitting || isValidating
 
-  static defaultProps = {
-    message: undefined,
-  }
+  return (
+    <Button
+      primary
+      {...rest}
+      type="submit"
+      icon={icon}
+      message={message}
+      disabled={disabled}
+      busy={buttonLoading}
+    />
+  )
+}
 
-  static defaultProps = {
-    disabled: false,
-    icon: undefined,
-  }
-  render() {
-    const { message, icon, disabled, isSubmitting, isValidating, ...rest } = this.props
+SubmitButton.propTypes = {
+  disabled: PropTypes.bool,
+  icon: PropTypes.string,
+  isSubmitting: PropTypes.bool.isRequired,
+  isValidating: PropTypes.bool.isRequired,
+  message: PropTypes.message,
+}
 
-    const buttonLoading = isSubmitting || isValidating
-
-    return (
-      <Button
-        primary
-        {...rest}
-        type="submit"
-        icon={icon}
-        message={message}
-        disabled={disabled}
-        busy={buttonLoading}
-      />
-    )
-  }
+SubmitButton.defaultProps = {
+  disabled: false,
+  icon: undefined,
+  message: undefined,
 }
 
 export default SubmitButton

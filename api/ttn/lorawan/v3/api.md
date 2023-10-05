@@ -2727,6 +2727,7 @@ PeerInfo
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 #### Field Rules
 
@@ -5637,6 +5638,8 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `required` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+| `token_ttl` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `retry_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The minimum interval between validation emails. |
 
 ### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration.Invitation">Message `IsConfiguration.UserRegistration.Invitation`</a>
 
@@ -7515,7 +7518,7 @@ Application uplink message.
 | `downlink_queue_invalidated` | [`ApplicationInvalidatedDownlinks`](#ttn.lorawan.v3.ApplicationInvalidatedDownlinks) |  |  |
 | `location_solved` | [`ApplicationLocation`](#ttn.lorawan.v3.ApplicationLocation) |  |  |
 | `service_data` | [`ApplicationServiceData`](#ttn.lorawan.v3.ApplicationServiceData) |  |  |
-| `simulated` | [`bool`](#bool) |  | Signals if the message is coming from the Network Server or is simulated. |
+| `simulated` | [`bool`](#bool) |  | Signals if the message is coming from the Network Server or is simulated. The Application Server automatically sets this field, and callers must not manually set it. |
 
 #### Field Rules
 

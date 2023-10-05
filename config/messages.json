@@ -2123,6 +2123,15 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/applicationserver/io/grpc:simulated": {
+    "translations": {
+      "en": "simulated traffic cannot be simulated again"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/applicationserver/io/mqtt:not_authorized": {
     "translations": {
       "en": "not authorized"
@@ -6238,7 +6247,7 @@
   },
   "error:pkg/identityserver:validations_already_sent": {
     "translations": {
-      "en": "validations for this contact info already sent"
+      "en": "validations for this contact info already sent, wait `{retry_interval}` before retrying"
     },
     "description": {
       "package": "pkg/identityserver",

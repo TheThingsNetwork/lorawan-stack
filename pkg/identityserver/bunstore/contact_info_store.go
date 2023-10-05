@@ -390,6 +390,7 @@ func validationToPB(m *ContactInfoValidation) *ttnpb.ContactInfoValidation {
 		Token:     m.Token,
 		CreatedAt: ttnpb.ProtoTime(&m.CreatedAt),
 		ExpiresAt: ttnpb.ProtoTime(m.ExpiresAt),
+		UpdatedAt: ttnpb.ProtoTime(&m.UpdatedAt),
 		ContactInfo: []*ttnpb.ContactInfo{{
 			ContactMethod: ttnpb.ContactMethod(m.ContactMethod),
 			Value:         m.Value,
@@ -422,6 +423,32 @@ func (s *contactInfoStore) getContactInfoValidationModelBy(
 		return nil, storeutil.WrapDriverError(err)
 	}
 	return model, nil
+}
+
+func (s *contactInfoStore) listValidationsBy(
+	ctx context.Context,
+	by func(*bun.SelectQuery) *bun.SelectQuery,
+) ([]*ttnpb.ContactInfoValidation, error) {
+	models := []*ContactInfoValidation{}
+	selectQuery := newSelectModels(ctx, s.DB, &models).Apply(by)
+
+	// Scan the results.
+	err := selectQuery.Scan(ctx)
+	if err != nil {
+		return nil, storeutil.WrapDriverError(err)
+	}
+
+	// Convert the results to protobuf.
+	pbs := make([]*ttnpb.ContactInfoValidation, len(models))
+	for i, model := range models {
+		friendlyID, err := s.getEntityID(ctx, model.EntityType, model.EntityID)
+		if err != nil {
+			return nil, err
+		}
+		model.EntityID = friendlyID
+		pbs[i] = validationToPB(model)
+	}
+	return pbs, nil
 }
 
 func (s *contactInfoStore) CreateValidation(
@@ -534,6 +561,31 @@ func (s *contactInfoStore) GetValidation(
 	return validationToPB(model), nil
 }
 
+func (s *contactInfoStore) ListRefreshableValidations(
+	ctx context.Context, pb *ttnpb.EntityIdentifiers, refreshInterval time.Duration,
+) ([]*ttnpb.ContactInfoValidation, error) {
+	ctx, span := tracer.StartFromContext(ctx, "ListRefreshableValidations", trace.WithAttributes(
+		attribute.String("entity_type", pb.EntityType()),
+		attribute.String("entity_id", pb.IDString()),
+		attribute.String("refresh_interval", refreshInterval.String()),
+	))
+	defer span.End()
+
+	entityType, entityUUID, err := s.getEntity(ctx, pb)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.listValidationsBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.
+			Where("?TableAlias.entity_id = ?", entityUUID).
+			Where("?TableAlias.entity_type = ?", entityType).
+			Where("?TableAlias.used IS NULL OR ?TableAlias.used = false").
+			Where("?TableAlias.expires_at IS NULL OR ?TableAlias.expires_at > NOW()").
+			Where("?TableAlias.updated_at <= (NOW() - interval ?)", refreshInterval.String())
+	})
+}
+
 func (s *contactInfoStore) ExpireValidation(ctx context.Context, pb *ttnpb.ContactInfoValidation) error {
 	ctx, span := tracer.StartFromContext(ctx, "ExpireValidation", trace.WithAttributes(
 		attribute.String("entity_type", pb.GetEntity().EntityType()),
@@ -555,5 +607,36 @@ func (s *contactInfoStore) ExpireValidation(ctx context.Context, pb *ttnpb.Conta
 	if err != nil {
 		return storeutil.WrapDriverError(err)
 	}
+	return nil
+}
+
+func (s *contactInfoStore) RefreshValidation(ctx context.Context, pb *ttnpb.ContactInfoValidation) error {
+	ctx, span := tracer.StartFromContext(ctx, "RefreshValidation", trace.WithAttributes(
+		attribute.String("entity_type", pb.GetEntity().EntityType()),
+		attribute.String("entity_id", pb.GetEntity().IDString()),
+	))
+	defer span.End()
+
+	model, err := s.getContactInfoValidationModelBy(ctx, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.
+			Where("reference = ? AND token = ?", pb.Id, pb.Token).
+			// Done in order to avoid concurrent updates from happening in the same validation.
+			Where("updated_at <= ?", pb.UpdatedAt.AsTime())
+	})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return store.ErrValidationTokenNotFound.WithAttributes("validation_id", pb.Id)
+		}
+		return err
+	}
+
+	_, err = s.DB.NewUpdate().
+		Model(model).
+		WherePK().
+		Exec(ctx)
+	if err != nil {
+		return storeutil.WrapDriverError(err)
+	}
+
 	return nil
 }

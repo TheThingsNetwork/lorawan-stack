@@ -953,7 +953,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(
 	default:
 		panic(fmt.Sprintf("attempt to schedule downlink with invalid MType '%s'", req.Payload.MHdr.MType))
 	}
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()))
+	ctx = appendDownlinkCorrelationID(ctx)
 	var (
 		errs                    = make([]error, 0, totalAttempts)
 		eventIDOpt              = events.WithIdentifiers(req.EndDeviceIdentifiers)

@@ -4544,7 +4544,7 @@
                 },
                 "simulated": {
                   "type": "boolean",
-                  "description": "Signals if the message is coming from the Network Server or is simulated."
+                  "description": "Signals if the message is coming from the Network Server or is simulated.\nThe Application Server automatically sets this field, and callers must not manually set it."
                 }
               },
               "description": "Application uplink message."
@@ -18501,6 +18501,13 @@
       "properties": {
         "required": {
           "type": "boolean"
+        },
+        "token_ttl": {
+          "type": "string"
+        },
+        "retry_interval": {
+          "type": "string",
+          "description": "The minimum interval between validation emails."
         }
       }
     },
@@ -19244,6 +19251,10 @@
           "format": "date-time"
         },
         "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
           "type": "string",
           "format": "date-time"
         }
@@ -20442,7 +20453,7 @@
         },
         "simulated": {
           "type": "boolean",
-          "description": "Signals if the message is coming from the Network Server or is simulated."
+          "description": "Signals if the message is coming from the Network Server or is simulated.\nThe Application Server automatically sets this field, and callers must not manually set it."
         }
       },
       "description": "Application uplink message."
