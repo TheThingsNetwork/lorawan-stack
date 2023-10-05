@@ -1819,6 +1819,7 @@
   "error:pkg/applicationserver/io/grpc:connect": "アプリケーション `{application_uid}`への接続が失敗",
   "error:pkg/applicationserver/io/grpc:no_configuration_provider": "MQTTコンフィグレーションプロバイダを利用できません",
   "error:pkg/applicationserver/io/grpc:payload_crypto_skipped": "ペイロード暗号化がスキップされました",
+  "error:pkg/applicationserver/io/grpc:simulated": "",
   "error:pkg/applicationserver/io/mqtt:not_authorized": "認証されていません",
   "error:pkg/applicationserver/io/packages/alcsync/v1:command_creation_failed": "コマンドの作成に失敗しました",
   "error:pkg/applicationserver/io/packages/alcsync/v1:downlink_creation_failed": "ダウンリンクの作成に失敗しました",
