@@ -404,6 +404,49 @@ var ListForwarderRoutingPoliciesRequestFieldPathsTopLevel = []string{
 	"limit",
 	"page",
 }
+var PacketBrokerAgentUplinkTokenFieldPathsNested = []string{
+	"forwarder_cluster_id",
+	"forwarder_net_id",
+	"forwarder_tenant_id",
+}
+
+var PacketBrokerAgentUplinkTokenFieldPathsTopLevel = []string{
+	"forwarder_cluster_id",
+	"forwarder_net_id",
+	"forwarder_tenant_id",
+}
+var PacketBrokerAgentGatewayUplinkTokenFieldPathsNested = []string{
+	"gateway_uid",
+	"token",
+}
+
+var PacketBrokerAgentGatewayUplinkTokenFieldPathsTopLevel = []string{
+	"gateway_uid",
+	"token",
+}
+var PacketBrokerAgentCompoundUplinkTokenFieldPathsNested = []string{
+	"agent",
+	"agent.forwarder_cluster_id",
+	"agent.forwarder_net_id",
+	"agent.forwarder_tenant_id",
+	"forwarder",
+	"gateway",
+}
+
+var PacketBrokerAgentCompoundUplinkTokenFieldPathsTopLevel = []string{
+	"agent",
+	"forwarder",
+	"gateway",
+}
+var PacketBrokerAgentEncryptedPayloadFieldPathsNested = []string{
+	"ciphertext",
+	"nonce",
+}
+
+var PacketBrokerAgentEncryptedPayloadFieldPathsTopLevel = []string{
+	"ciphertext",
+	"nonce",
+}
 var PacketBrokerGateway_GatewayIdentifiersFieldPathsNested = []string{
 	"eui",
 	"gateway_id",

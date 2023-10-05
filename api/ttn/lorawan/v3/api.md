@@ -604,6 +604,10 @@
   - [Message `ListHomeNetworkRoutingPoliciesRequest`](#ttn.lorawan.v3.ListHomeNetworkRoutingPoliciesRequest)
   - [Message `ListPacketBrokerHomeNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerHomeNetworksRequest)
   - [Message `ListPacketBrokerNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerNetworksRequest)
+  - [Message `PacketBrokerAgentCompoundUplinkToken`](#ttn.lorawan.v3.PacketBrokerAgentCompoundUplinkToken)
+  - [Message `PacketBrokerAgentEncryptedPayload`](#ttn.lorawan.v3.PacketBrokerAgentEncryptedPayload)
+  - [Message `PacketBrokerAgentGatewayUplinkToken`](#ttn.lorawan.v3.PacketBrokerAgentGatewayUplinkToken)
+  - [Message `PacketBrokerAgentUplinkToken`](#ttn.lorawan.v3.PacketBrokerAgentUplinkToken)
   - [Message `PacketBrokerDefaultGatewayVisibility`](#ttn.lorawan.v3.PacketBrokerDefaultGatewayVisibility)
   - [Message `PacketBrokerDefaultRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy)
   - [Message `PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock)
@@ -8692,6 +8696,36 @@ organization registrations.
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 | `tenant_id_contains` | <p>`string.max_len`: `100`</p> |
 | `name_contains` | <p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.PacketBrokerAgentCompoundUplinkToken">Message `PacketBrokerAgentCompoundUplinkToken`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway` | [`bytes`](#bytes) |  |  |
+| `forwarder` | [`bytes`](#bytes) |  |  |
+| `agent` | [`PacketBrokerAgentUplinkToken`](#ttn.lorawan.v3.PacketBrokerAgentUplinkToken) |  |  |
+
+### <a name="ttn.lorawan.v3.PacketBrokerAgentEncryptedPayload">Message `PacketBrokerAgentEncryptedPayload`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ciphertext` | [`bytes`](#bytes) |  |  |
+| `nonce` | [`bytes`](#bytes) |  |  |
+
+### <a name="ttn.lorawan.v3.PacketBrokerAgentGatewayUplinkToken">Message `PacketBrokerAgentGatewayUplinkToken`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_uid` | [`string`](#string) |  |  |
+| `token` | [`bytes`](#bytes) |  |  |
+
+### <a name="ttn.lorawan.v3.PacketBrokerAgentUplinkToken">Message `PacketBrokerAgentUplinkToken`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `forwarder_net_id` | [`bytes`](#bytes) |  |  |
+| `forwarder_tenant_id` | [`string`](#string) |  |  |
+| `forwarder_cluster_id` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerDefaultGatewayVisibility">Message `PacketBrokerDefaultGatewayVisibility`</a>
 

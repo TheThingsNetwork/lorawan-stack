@@ -465,3 +465,25 @@ service Pba {
     option (google.api.http) = {get: "/pba/forwarders/policies"};
   }
 }
+
+message PacketBrokerAgentUplinkToken {
+  bytes forwarder_net_id = 1;
+  string forwarder_tenant_id = 2;
+  string forwarder_cluster_id = 3;
+}
+
+message PacketBrokerAgentGatewayUplinkToken {
+  string gateway_uid = 1;
+  bytes token = 2;
+}
+
+message PacketBrokerAgentCompoundUplinkToken {
+  bytes gateway = 1;
+  bytes forwarder = 2;
+  PacketBrokerAgentUplinkToken agent = 3;
+}
+
+message PacketBrokerAgentEncryptedPayload {
+  bytes ciphertext = 1;
+  bytes nonce = 2;
+}
