@@ -135,23 +135,25 @@ const Video = props => {
     }
   }, [devices, handleVideoFrame, stream, videoRef])
 
-  return devices.length && stream ? (
+  return (
     <>
-      <video
-        autoPlay
-        playsInline
-        ref={videoRef}
-        className={style.video}
-        data-test-id="webcam-feed"
-      />
       {cameras.length > 1 && isMobile && (
         <Button icon="switch_camera" message={m.switchCamera} onClick={switchStream} />
       )}
+      {devices.length && stream ? (
+        <video
+          autoPlay
+          playsInline
+          ref={videoRef}
+          className={style.video}
+          data-test-id="webcam-feed"
+        />
+      ) : (
+        <Spinner center>
+          <Message className={style.msg} content={m.fetchingCamera} />
+        </Spinner>
+      )}
     </>
-  ) : (
-    <Spinner center>
-      <Message className={style.msg} content={m.fetchingCamera} />
-    </Spinner>
   )
 }
 
