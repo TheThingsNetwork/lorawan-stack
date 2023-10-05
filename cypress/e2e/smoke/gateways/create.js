@@ -44,7 +44,7 @@ const gatewayCreate = defineSmokeTest('succeeds creating gateway', () => {
     .parents('div[data-test-id="form-field"]')
     .find('input')
     .first()
-    .selectOption(gateway.frequency_plan)
+    .selectOption(gateway.frequency_plan_id)
   cy.findByRole('button', { name: 'Register gateway' }).click()
 
   cy.location('pathname').should(
