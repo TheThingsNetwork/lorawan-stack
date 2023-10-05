@@ -20,14 +20,13 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import WithRootClass from '@ttn-lw/lib/components/with-root-class'
-
 import ApplicationEvents from '@console/containers/application-events'
 
 import Require from '@console/lib/components/require'
 
 import style from '@console/views/app/app.styl'
 
+import useRootClass from '@ttn-lw/lib/hooks/use-root-class'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
@@ -39,6 +38,8 @@ const m = defineMessages({
 const ApplicationData = () => {
   const { appId } = useParams()
 
+  useRootClass(style.stageFlex, 'stage')
+
   useBreadcrumbs(
     'apps.single.data',
     <Breadcrumb path={`/applications/${appId}/data`} content={sharedMessages.liveData} />,
@@ -49,10 +50,8 @@ const ApplicationData = () => {
       featureCheck={mayViewApplicationEvents}
       otherwise={{ redirect: `/applications/${appId}` }}
     >
-      <WithRootClass className={style.stageFlex} id="stage">
-        <PageTitle hideHeading title={m.appData} />
-        <ApplicationEvents appId={appId} />
-      </WithRootClass>
+      <PageTitle hideHeading title={m.appData} />
+      <ApplicationEvents appId={appId} />
     </Require>
   )
 }

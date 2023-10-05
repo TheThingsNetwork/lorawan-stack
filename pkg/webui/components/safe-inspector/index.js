@@ -177,7 +177,7 @@ const SafeInspector = ({
     }
 
     return () => {
-      clearTimeout(_timer)
+      clearTimeout(_timer.current)
     }
   }, [_timer, checkTruncateState, disableResize])
 
@@ -191,8 +191,8 @@ const SafeInspector = ({
 
   if (isBytes) {
     let chunks = chunkArray(data.toUpperCase().split(''), 2)
-    if (chunks.length > truncateAfter) {
-      truncated = true
+    if (chunks.length > truncateAfter && !truncated) {
+      setTruncated(true)
       chunks = chunks.slice(0, truncateAfter)
     }
     if (!byteStyle) {
