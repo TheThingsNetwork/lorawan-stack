@@ -14,6 +14,8 @@
 
 import CreateFetchSelect from '@console/containers/fetch-select'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import { getGsFrequencyPlans, getNsFrequencyPlans } from '@console/store/actions/configuration'
 
 import {
@@ -32,7 +34,7 @@ export const CreateFrequencyPlansSelect = (source, options = {}) =>
     fetchingSelector: selectFrequencyPlansFetching,
     errorSelector: selectFrequencyPlansError,
     defaultWarning: m.warning,
-    defaultTitle: m.title,
+    defaultTitle: sharedMessages.frequencyPlan,
     optionsFormatter: formatOptions,
     additionalOptions: source === 'gs' ? [{ value: 'no-frequency-plan', label: m.none }] : [],
     ...options,
