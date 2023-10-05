@@ -48,9 +48,9 @@ func TestContactInfoValidation(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewContactInfoRegistryClient(cc)
 
-		retryInterval := test.Delay << 3
+		retryInterval := test.Delay << 5
 		is.config.UserRegistration.ContactInfoValidation.Required = true
-		is.config.UserRegistration.ContactInfoValidation.TokenTTL = test.Delay << 5
+		is.config.UserRegistration.ContactInfoValidation.TokenTTL = retryInterval * 2
 		is.config.UserRegistration.ContactInfoValidation.RetryInterval = retryInterval
 
 		t.Run("Request Validation", func(t *testing.T) { // nolint:paralleltest
