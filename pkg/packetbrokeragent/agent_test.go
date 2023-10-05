@@ -17,7 +17,10 @@ package packetbrokeragent_test
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"io"
 	"strconv"
 	"testing"
 	"time"
@@ -41,12 +44,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-	"gopkg.in/square/go-jose.v2"
 )
 
 var (
@@ -143,10 +146,8 @@ func TestForwarder(t *testing.T) {
 
 	gs := test.Must(mock.NewGatewayServer(c))
 	tokenKey := bytes.Repeat([]byte{0x42}, 16)
-	tokenEncrypter := test.Must(jose.NewEncrypter(jose.A128GCM, jose.Recipient{
-		Algorithm: jose.A128GCMKW,
-		Key:       tokenKey,
-	}, nil)).(jose.Encrypter)
+	blockCipher := test.Must(aes.NewCipher(tokenKey))
+	aead := test.Must(cipher.NewGCM(blockCipher))
 	test.Must(New(c, &Config{
 		IAMAddress:          iamAddr.String(),
 		ControlPlaneAddress: cpAddr.String(),
@@ -161,7 +162,7 @@ func TestForwarder(t *testing.T) {
 				Limit: 1,
 			},
 			TokenKey:          tokenKey,
-			TokenEncrypter:    tokenEncrypter,
+			TokenAEAD:         aead,
 			IncludeGatewayEUI: true,
 			IncludeGatewayID:  true,
 			HashGatewayID:     true,
@@ -421,12 +422,16 @@ func TestForwarder(t *testing.T) {
 	t.Run("Downlink", func(t *testing.T) {
 		a := assertions.New(t)
 
-		token := test.Must(json.Marshal(GatewayUplinkToken{
-			GatewayUID: unique.ID(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}),
+		plainToken := test.Must(proto.Marshal(&ttnpb.PacketBrokerAgentGatewayUplinkToken{
+			GatewayUid: unique.ID(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}),
 			Token:      []byte{0x1, 0x2, 0x3, 0x4},
 		}))
-		tokenObj := test.Must(tokenEncrypter.Encrypt(token))
-		tokenCompact := test.Must(tokenObj.CompactSerialize())
+		tokenNonce := make([]byte, aead.NonceSize())
+		test.Must(io.ReadFull(rand.Reader, tokenNonce))
+		token := test.Must(proto.Marshal(&ttnpb.PacketBrokerAgentEncryptedPayload{
+			Ciphertext: aead.Seal(nil, tokenNonce, plainToken, nil),
+			Nonce:      tokenNonce,
+		}))
 
 		dp.ForwarderDown <- &packetbroker.RoutedDownlinkMessage{
 			ForwarderNetId:      0x000013,
@@ -449,7 +454,7 @@ func TestForwarder(t *testing.T) {
 					DataRate:  packetbroker.NewLoRaDataRate(12, 125000, ""),
 				},
 				Rx1Delay:           durationpb.New(5 * time.Second),
-				GatewayUplinkToken: []byte(tokenCompact),
+				GatewayUplinkToken: token,
 			},
 		}
 
@@ -813,10 +818,10 @@ func TestHomeNetwork(t *testing.T) {
 								Longitude: 4.8,
 								Altitude:  2,
 							},
-							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
-								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
-								ForwarderTenantID:  "foo-tenant",
-								ForwarderClusterID: "test",
+							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &ttnpb.PacketBrokerAgentUplinkToken{
+								ForwarderNetId:     []byte{0x0, 0x0, 0x42},
+								ForwarderTenantId:  "foo-tenant",
+								ForwarderClusterId: "test",
 							})),
 						},
 						{
@@ -839,10 +844,10 @@ func TestHomeNetwork(t *testing.T) {
 							Rssi:            -43,
 							Snr:             10.6,
 							FrequencyOffset: 1,
-							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
-								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
-								ForwarderTenantID:  "foo-tenant",
-								ForwarderClusterID: "test",
+							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &ttnpb.PacketBrokerAgentUplinkToken{
+								ForwarderNetId:     []byte{0x0, 0x0, 0x42},
+								ForwarderTenantId:  "foo-tenant",
+								ForwarderClusterId: "test",
 							})),
 						},
 					},
@@ -950,10 +955,10 @@ func TestHomeNetwork(t *testing.T) {
 							ChannelRssi: 4.2,
 							Rssi:        4.2,
 							Snr:         -5.5,
-							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
-								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
-								ForwarderTenantID:  "foo-tenant",
-								ForwarderClusterID: "test",
+							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &ttnpb.PacketBrokerAgentUplinkToken{
+								ForwarderNetId:     []byte{0x0, 0x0, 0x42},
+								ForwarderTenantId:  "foo-tenant",
+								ForwarderClusterId: "test",
 							})),
 						},
 					},
@@ -1019,10 +1024,10 @@ func TestHomeNetwork(t *testing.T) {
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
-								UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
-									ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
-									ForwarderTenantID:  "foo-tenant",
-									ForwarderClusterID: "test",
+								UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &ttnpb.PacketBrokerAgentUplinkToken{
+									ForwarderNetId:     []byte{0x0, 0x0, 0x42},
+									ForwarderTenantId:  "foo-tenant",
+									ForwarderClusterId: "test",
 								})),
 							},
 						},
