@@ -26,6 +26,12 @@ const CheckboxGroup = props => {
   const hasValue = 'value' in rest
   const [value, setValue] = React.useState(hasValue ? rest.value : rest.initialValue || {})
 
+  React.useEffect(() => {
+    if ('value' in rest) {
+      setValue(rest.value || {})
+    }
+  }, [rest.value, rest])
+
   const handleCheckboxChange = useCallback(
     async event => {
       const { target } = event

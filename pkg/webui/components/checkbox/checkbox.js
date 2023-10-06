@@ -60,7 +60,7 @@ const Checkbox = props => {
     event => {
       const { checked } = event.target
 
-      if (hasValue && !context) {
+      if (!hasValue && !context) {
         setChecked(checked)
       }
 
