@@ -504,6 +504,9 @@ func TestBandConvertToBandDescription(t *testing.T) {
 					ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
 					MinRetransmitTimeout: 1 * time.Second,
 					MaxRetransmitTimeout: 2 * time.Second,
+
+					RelayForwardDelay: 3 * time.Second,
+					RelayReceiveDelay: 4 * time.Second,
 				},
 			},
 			Expected: &ttnpb.BandDescription{
@@ -591,6 +594,8 @@ func TestBandConvertToBandDescription(t *testing.T) {
 						},
 					},
 				},
+				RelayForwardDelay: durationpb.New(3 * time.Second),
+				RelayReceiveDelay: durationpb.New(4 * time.Second),
 			},
 		},
 		{
@@ -675,6 +680,9 @@ func TestBandConvertToBandDescription(t *testing.T) {
 					ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1,
 					MinRetransmitTimeout: 1 * time.Second,
 					MaxRetransmitTimeout: 2 * time.Second,
+
+					RelayForwardDelay: 3 * time.Second,
+					RelayReceiveDelay: 4 * time.Second,
 				},
 			},
 			Expected: &ttnpb.BandDescription{
@@ -759,6 +767,8 @@ func TestBandConvertToBandDescription(t *testing.T) {
 						},
 					},
 				},
+				RelayForwardDelay: durationpb.New(3 * time.Second),
+				RelayReceiveDelay: durationpb.New(4 * time.Second),
 			},
 		},
 	} {
