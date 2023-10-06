@@ -400,6 +400,24 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 			} else {
 				dst.MaxAdrDataRateIndex = 0
 			}
+		case "relay_forward_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'relay_forward_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RelayForwardDelay = src.RelayForwardDelay
+			} else {
+				dst.RelayForwardDelay = nil
+			}
+		case "relay_receive_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'relay_receive_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RelayReceiveDelay = src.RelayReceiveDelay
+			} else {
+				dst.RelayReceiveDelay = nil
+			}
 		case "tx_param_setup_req_support":
 			if len(subs) > 0 {
 				return fmt.Errorf("'tx_param_setup_req_support' has no subfields, but %s were specified", subs)

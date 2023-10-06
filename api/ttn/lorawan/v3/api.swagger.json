@@ -21058,6 +21058,12 @@
         "max_adr_data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex"
         },
+        "relay_forward_delay": {
+          "type": "string"
+        },
+        "relay_receive_delay": {
+          "type": "string"
+        },
         "tx_param_setup_req_support": {
           "type": "boolean"
         },

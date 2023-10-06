@@ -653,6 +653,24 @@ func (x *BandDescription) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("max_adr_data_rate_index")
 		x.MaxAdrDataRateIndex.MarshalProtoJSON(s)
 	}
+	if x.RelayForwardDelay != nil || s.HasField("relay_forward_delay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("relay_forward_delay")
+		if x.RelayForwardDelay == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalDuration(s, x.RelayForwardDelay)
+		}
+	}
+	if x.RelayReceiveDelay != nil || s.HasField("relay_receive_delay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("relay_receive_delay")
+		if x.RelayReceiveDelay == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalDuration(s, x.RelayReceiveDelay)
+		}
+	}
 	if x.TxParamSetupReqSupport || s.HasField("tx_param_setup_req_support") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("tx_param_setup_req_support")
@@ -874,6 +892,28 @@ func (x *BandDescription) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "max_adr_data_rate_index", "maxAdrDataRateIndex":
 			s.AddField("max_adr_data_rate_index")
 			x.MaxAdrDataRateIndex.UnmarshalProtoJSON(s)
+		case "relay_forward_delay", "relayForwardDelay":
+			s.AddField("relay_forward_delay")
+			if s.ReadNil() {
+				x.RelayForwardDelay = nil
+				return
+			}
+			v := golang.UnmarshalDuration(s)
+			if s.Err() != nil {
+				return
+			}
+			x.RelayForwardDelay = v
+		case "relay_receive_delay", "relayReceiveDelay":
+			s.AddField("relay_receive_delay")
+			if s.ReadNil() {
+				x.RelayReceiveDelay = nil
+				return
+			}
+			v := golang.UnmarshalDuration(s)
+			if s.Err() != nil {
+				return
+			}
+			x.RelayReceiveDelay = v
 		case "tx_param_setup_req_support", "txParamSetupReqSupport":
 			s.AddField("tx_param_setup_req_support")
 			x.TxParamSetupReqSupport = s.ReadBool()

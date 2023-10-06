@@ -135,6 +135,8 @@ message BandDescription {
   google.protobuf.Duration max_retransmit_timeout = 21;
   repeated float tx_offset = 22;
   DataRateIndex max_adr_data_rate_index = 23;
+  google.protobuf.Duration relay_forward_delay = 34;
+  google.protobuf.Duration relay_receive_delay = 35;
 
   bool tx_param_setup_req_support = 24;
   float default_max_eirp = 25;
