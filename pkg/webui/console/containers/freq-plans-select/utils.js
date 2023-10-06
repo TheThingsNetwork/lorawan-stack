@@ -20,7 +20,6 @@ export const m = defineMessages({
   none: 'Do not set a frequency plan',
   selectFrequencyPlan: 'Select a frequency plan...',
   addFrequencyPlan: 'Add frequency plan',
-  removeFrequencyPlan: 'Remove',
   frequencyPlanDescription:
     'Note: most gateways use a single frequency plan. Some 16 and 64 channel gateways however allow setting multiple.',
 })
