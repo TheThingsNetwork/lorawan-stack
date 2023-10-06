@@ -16,41 +16,42 @@ package packetbrokeragent
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
+	"encoding/base64"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
-	"gopkg.in/square/go-jose.v2"
 )
 
-type (
-	GatewayUplinkToken gatewayUplinkToken
-	AgentUplinkToken   agentUplinkToken
-)
-
-func WrapUplinkTokens(gateway, forwarder []byte, agent *AgentUplinkToken) ([]byte, error) {
-	return wrapUplinkTokens(gateway, forwarder, (*agentUplinkToken)(agent))
+func WrapUplinkTokens(gateway, forwarder []byte, agent *ttnpb.PacketBrokerAgentUplinkToken) ([]byte, error) {
+	return wrapUplinkTokens(gateway, forwarder, agent)
 }
 
 func TestWrapGatewayUplinkToken(t *testing.T) {
 	a, ctx := test.New(t)
 	key := bytes.Repeat([]byte{0x42}, 16)
-	encrypter, err := jose.NewEncrypter(jose.A128GCM, jose.Recipient{Algorithm: jose.A128GCMKW, Key: key}, nil)
+	blockCipher, err := aes.NewCipher(key)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	aead, err := cipher.NewGCM(blockCipher)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
 	wrappedToken, err := wrapGatewayUplinkToken(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"},
-		[]byte{0x1, 0x2, 0x3}, encrypter,
+		[]byte{0x1, 0x2, 0x3}, aead,
 	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	t.Logf("Wrapped token: %q", string(wrappedToken))
+	t.Logf("Wrapped token: %q", base64.RawStdEncoding.EncodeToString(wrappedToken))
 
-	uid, gtwToken, err := unwrapGatewayUplinkToken(wrappedToken, key)
+	uid, gtwToken, err := unwrapGatewayUplinkToken(wrappedToken, aead, nil)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

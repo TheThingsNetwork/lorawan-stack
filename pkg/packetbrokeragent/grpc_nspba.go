@@ -54,9 +54,9 @@ func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkM
 	}
 
 	ctxMsg := &downlinkMessage{
-		Context:          s.contextDecoupler.FromRequestContext(ctx),
-		agentUplinkToken: token,
-		DownlinkMessage:  msg,
+		Context:                      s.contextDecoupler.FromRequestContext(ctx),
+		PacketBrokerAgentUplinkToken: token,
+		DownlinkMessage:              msg,
 	}
 	select {
 	case <-ctx.Done():

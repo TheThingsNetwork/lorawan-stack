@@ -2628,6 +2628,364 @@ var _ interface {
 	ErrorName() string
 } = ListForwarderRoutingPoliciesRequestValidationError{}
 
+// ValidateFields checks the field values on PacketBrokerAgentUplinkToken with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *PacketBrokerAgentUplinkToken) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerAgentUplinkTokenFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "forwarder_net_id":
+			// no validation rules for ForwarderNetId
+		case "forwarder_tenant_id":
+			// no validation rules for ForwarderTenantId
+		case "forwarder_cluster_id":
+			// no validation rules for ForwarderClusterId
+		default:
+			return PacketBrokerAgentUplinkTokenValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerAgentUplinkTokenValidationError is the validation error returned
+// by PacketBrokerAgentUplinkToken.ValidateFields if the designated
+// constraints aren't met.
+type PacketBrokerAgentUplinkTokenValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerAgentUplinkTokenValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerAgentUplinkTokenValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerAgentUplinkTokenValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerAgentUplinkTokenValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerAgentUplinkTokenValidationError) ErrorName() string {
+	return "PacketBrokerAgentUplinkTokenValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerAgentUplinkTokenValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerAgentUplinkToken.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerAgentUplinkTokenValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerAgentUplinkTokenValidationError{}
+
+// ValidateFields checks the field values on
+// PacketBrokerAgentGatewayUplinkToken with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *PacketBrokerAgentGatewayUplinkToken) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerAgentGatewayUplinkTokenFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_uid":
+			// no validation rules for GatewayUid
+		case "token":
+			// no validation rules for Token
+		default:
+			return PacketBrokerAgentGatewayUplinkTokenValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerAgentGatewayUplinkTokenValidationError is the validation error
+// returned by PacketBrokerAgentGatewayUplinkToken.ValidateFields if the
+// designated constraints aren't met.
+type PacketBrokerAgentGatewayUplinkTokenValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerAgentGatewayUplinkTokenValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerAgentGatewayUplinkTokenValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerAgentGatewayUplinkTokenValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerAgentGatewayUplinkTokenValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerAgentGatewayUplinkTokenValidationError) ErrorName() string {
+	return "PacketBrokerAgentGatewayUplinkTokenValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerAgentGatewayUplinkTokenValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerAgentGatewayUplinkToken.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerAgentGatewayUplinkTokenValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerAgentGatewayUplinkTokenValidationError{}
+
+// ValidateFields checks the field values on
+// PacketBrokerAgentCompoundUplinkToken with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *PacketBrokerAgentCompoundUplinkToken) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerAgentCompoundUplinkTokenFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway":
+			// no validation rules for Gateway
+		case "forwarder":
+			// no validation rules for Forwarder
+		case "agent":
+
+			if v, ok := interface{}(m.GetAgent()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerAgentCompoundUplinkTokenValidationError{
+						field:  "agent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return PacketBrokerAgentCompoundUplinkTokenValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerAgentCompoundUplinkTokenValidationError is the validation error
+// returned by PacketBrokerAgentCompoundUplinkToken.ValidateFields if the
+// designated constraints aren't met.
+type PacketBrokerAgentCompoundUplinkTokenValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerAgentCompoundUplinkTokenValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerAgentCompoundUplinkTokenValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerAgentCompoundUplinkTokenValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerAgentCompoundUplinkTokenValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerAgentCompoundUplinkTokenValidationError) ErrorName() string {
+	return "PacketBrokerAgentCompoundUplinkTokenValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerAgentCompoundUplinkTokenValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerAgentCompoundUplinkToken.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerAgentCompoundUplinkTokenValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerAgentCompoundUplinkTokenValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerAgentEncryptedPayload
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *PacketBrokerAgentEncryptedPayload) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerAgentEncryptedPayloadFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "ciphertext":
+			// no validation rules for Ciphertext
+		case "nonce":
+			// no validation rules for Nonce
+		default:
+			return PacketBrokerAgentEncryptedPayloadValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerAgentEncryptedPayloadValidationError is the validation error
+// returned by PacketBrokerAgentEncryptedPayload.ValidateFields if the
+// designated constraints aren't met.
+type PacketBrokerAgentEncryptedPayloadValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerAgentEncryptedPayloadValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerAgentEncryptedPayloadValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerAgentEncryptedPayloadValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerAgentEncryptedPayloadValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerAgentEncryptedPayloadValidationError) ErrorName() string {
+	return "PacketBrokerAgentEncryptedPayloadValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerAgentEncryptedPayloadValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerAgentEncryptedPayload.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerAgentEncryptedPayloadValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerAgentEncryptedPayloadValidationError{}
+
 // ValidateFields checks the field values on
 // PacketBrokerGateway_GatewayIdentifiers with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.

@@ -17,6 +17,8 @@ package packetbrokeragent
 
 import (
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
 	"encoding/hex"
 	"fmt"
 	"sync"
@@ -90,7 +92,7 @@ type uplinkMessage struct {
 
 type downlinkMessage struct {
 	context.Context
-	*agentUplinkToken
+	*ttnpb.PacketBrokerAgentUplinkToken
 	*packetbroker.DownlinkMessage
 }
 
@@ -270,22 +272,30 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			logger.WithField("token_key", hex.EncodeToString(a.forwarderConfig.TokenKey)).Warn("No token key configured, generated a random one")
 		}
 		var (
-			enc jose.ContentEncryption
-			alg jose.KeyAlgorithm
+			legacyEncryption   jose.ContentEncryption
+			legacyKeyAlgorithm jose.KeyAlgorithm
 		)
 		switch l := len(a.forwarderConfig.TokenKey); l {
 		case 16:
-			enc, alg = jose.A128GCM, jose.A128GCMKW
+			legacyEncryption, legacyKeyAlgorithm = jose.A128GCM, jose.A128GCMKW
 		case 32:
-			enc, alg = jose.A256GCM, jose.A256GCMKW
+			legacyEncryption, legacyKeyAlgorithm = jose.A256GCM, jose.A256GCMKW
 		default:
 			return nil, errTokenKey.WithAttributes("length", l).New()
 		}
 		var err error
-		a.forwarderConfig.TokenEncrypter, err = jose.NewEncrypter(enc, jose.Recipient{
-			Algorithm: alg,
+		a.forwarderConfig.LegacyTokenEncrypter, err = jose.NewEncrypter(legacyEncryption, jose.Recipient{
+			Algorithm: legacyKeyAlgorithm,
 			Key:       a.forwarderConfig.TokenKey,
 		}, nil)
+		if err != nil {
+			return nil, errTokenKey.WithCause(err)
+		}
+		blockCipher, err := aes.NewCipher(a.forwarderConfig.TokenKey)
+		if err != nil {
+			return nil, errTokenKey.WithCause(err)
+		}
+		a.forwarderConfig.TokenAEAD, err = cipher.NewGCM(blockCipher)
 		if err != nil {
 			return nil, errTokenKey.WithCause(err)
 		}
@@ -1109,11 +1119,12 @@ func (a *Agent) homeNetworkPublisher(conn *grpc.ClientConn) workerpool.Handler[*
 	client := routingpb.NewHomeNetworkDataClient(conn)
 	h := func(ctx context.Context, down *downlinkMessage) {
 		tenantID := a.tenantIDExtractor(down.Context)
-		msg, token := down.DownlinkMessage, down.agentUplinkToken
+		msg, token := down.DownlinkMessage, down.PacketBrokerAgentUplinkToken
+		forwarderNetID := types.MustNetID(token.ForwarderNetId)
 		ctx = log.NewContextWithFields(ctx, log.Fields(
-			"forwarder_net_id", token.ForwarderNetID,
-			"forwarder_tenant_id", token.ForwarderTenantID,
-			"forwarder_cluster_id", token.ForwarderClusterID,
+			"forwarder_net_id", forwarderNetID,
+			"forwarder_tenant_id", token.ForwarderTenantId,
+			"forwarder_cluster_id", token.ForwarderClusterId,
 			"home_network_tenant_id", tenantID,
 		))
 		logger := log.FromContext(ctx)
@@ -1121,9 +1132,9 @@ func (a *Agent) homeNetworkPublisher(conn *grpc.ClientConn) workerpool.Handler[*
 			HomeNetworkNetId:     a.netID.MarshalNumber(),
 			HomeNetworkTenantId:  tenantID,
 			HomeNetworkClusterId: a.homeNetworkClusterID,
-			ForwarderNetId:       token.ForwarderNetID.MarshalNumber(),
-			ForwarderTenantId:    token.ForwarderTenantID,
-			ForwarderClusterId:   token.ForwarderClusterID,
+			ForwarderNetId:       forwarderNetID.MarshalNumber(),
+			ForwarderTenantId:    token.ForwarderTenantId,
+			ForwarderClusterId:   token.ForwarderClusterId,
 			Message:              msg,
 		}
 		ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
@@ -1135,7 +1146,7 @@ func (a *Agent) homeNetworkPublisher(conn *grpc.ClientConn) workerpool.Handler[*
 			logger.WithField("message_id", res.Id).Debug("Published downlink message")
 			pbaMetrics.downlinkForwarded.WithLabelValues(ctx,
 				a.netID.String(), tenantID, a.homeNetworkClusterID,
-				token.ForwarderNetID.String(), token.ForwarderTenantID, token.ForwarderClusterID,
+				forwarderNetID.String(), token.ForwarderTenantId, token.ForwarderClusterId,
 			).Inc()
 		}
 	}
