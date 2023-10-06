@@ -591,7 +591,6 @@
   "console.containers.freq-plans-select.utils.none": "",
   "console.containers.freq-plans-select.utils.selectFrequencyPlan": "",
   "console.containers.freq-plans-select.utils.addFrequencyPlan": "",
-  "console.containers.freq-plans-select.utils.removeFrequencyPlan": "",
   "console.containers.freq-plans-select.utils.frequencyPlanDescription": "",
   "console.containers.gateway-connection.gateway-connection.lastSeenAvailableTooltip": "ネットワークがこのゲートウェイの最後のアクティビティを登録してから経過した時間です。これは、このゲートウェイの受信したアップリンク、または送信したステータスメッセージから決定されます",
   "console.containers.gateway-connection.gateway-connection.disconnectedTooltip": "ゲートウェイは現在、ゲートウェイサーバーとの TCP 接続を確立していません。まれに）UDPベースのゲートウェイの場合、これはゲートウェイが過去30秒以内にpull/pushデータ要求を開始しなかったことを意味することもあります",
