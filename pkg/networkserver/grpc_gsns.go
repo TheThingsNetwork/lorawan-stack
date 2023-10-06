@@ -790,10 +790,17 @@ func appendRecentUplink(
 	up *ttnpb.UplinkMessage,
 	window int,
 ) []*ttnpb.MACState_UplinkMessage {
+	ups := toMACStateUplinkMessages(up)
 	if n := len(recent); n > 0 {
 		recent[n-1].CorrelationIds = nil
+		if len(downlinkPathsFromRecentUplinks(ups...)) > 0 {
+			for _, md := range recent[n-1].RxMetadata {
+				md.UplinkToken = nil
+				md.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER
+			}
+		}
 	}
-	recent = append(recent, toMACStateUplinkMessages(up)...)
+	recent = append(recent, ups...)
 	if extra := len(recent) - window; extra > 0 {
 		recent = recent[extra:]
 	}
