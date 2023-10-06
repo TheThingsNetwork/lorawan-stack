@@ -1463,6 +1463,7 @@
   "lib.shared-messages.registerEndDevice": "エンドデバイスの登録",
   "lib.shared-messages.registerGateway": "ゲートウェイの登録",
   "lib.shared-messages.replaceWebhook": "webhookの交換",
+  "lib.shared-messages.remove": "",
   "lib.shared-messages.removeCollaborator": "コラボレーターの削除",
   "lib.shared-messages.removeCollaboratorSelf": "自分をコラボレーターとして外す",
   "lib.shared-messages.removeCollaboratorLast": "最後のコラボレーターを削除できません",

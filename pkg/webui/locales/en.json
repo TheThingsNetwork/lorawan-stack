@@ -1463,6 +1463,7 @@
   "lib.shared-messages.registerEndDevice": "Register end device",
   "lib.shared-messages.registerGateway": "Register gateway",
   "lib.shared-messages.replaceWebhook": "Replace webhook",
+  "lib.shared-messages.remove": "Remove",
   "lib.shared-messages.removeCollaborator": "Remove collaborator",
   "lib.shared-messages.removeCollaboratorSelf": "Remove yourself as collaborator",
   "lib.shared-messages.removeCollaboratorLast": "Cannot remove last collaborator",
