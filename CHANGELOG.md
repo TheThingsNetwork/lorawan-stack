@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
 - Users can now request a new email for the account validation from time to time instead of once per validation, the interval between email requests is determined by `is.user-registration.contact-info-validation.retry-interval` and by default it is an hour.
 - Traffic related correlation IDs have been simplified. Previously one correlation ID per component was added as traffic passed through different stack components. Now a singular correlation ID relating to the entry point of the message will be added (such as `gs:uplink:xxx` for uplinks, or `as:downlink:xxx` for downlinks), and subsequent components will no longer add any extra correlation IDs (such as `ns:uplink:xxx` or `as:up:xxx`). The uplink entry points are `pba` and `gs`, while the downlink entry points are `pba`, `ns` and `as`.
 - Packet Broker Agent uplink tokens are now serialized in a more efficient manner.
+- The Network Server now stores only the most recent uplinks tokens.
 
 ### Deprecated
 
