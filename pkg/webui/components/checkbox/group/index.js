@@ -22,15 +22,25 @@ import style from './group.styl'
 export const CheckboxGroupContext = React.createContext()
 
 const CheckboxGroup = props => {
-  const { children, className, horizontal, onChange, disabled, onFocus, onBlur, ...rest } = props
-  const hasValue = 'value' in rest
-  const [value, setValue] = React.useState(hasValue ? rest.value : rest.initialValue || {})
+  const {
+    children,
+    className,
+    horizontal,
+    onChange,
+    disabled,
+    onFocus,
+    onBlur,
+    value: valueProp,
+    ...rest
+  } = props
+  const hasValue = Boolean(valueProp)
+  const [value, setValue] = React.useState(hasValue ? valueProp : rest.initialValue || {})
 
   React.useEffect(() => {
-    if ('value' in rest) {
-      setValue(rest.value || {})
+    if (valueProp) {
+      setValue(valueProp || {})
     }
-  }, [rest.value, rest])
+  }, [valueProp])
 
   const handleCheckboxChange = useCallback(
     async event => {
