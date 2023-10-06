@@ -20,7 +20,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"gopkg.in/square/go-jose.v2"
 )
 
 // Config configures Packet Broker clients.
@@ -75,15 +74,14 @@ type OAuth2Config struct {
 
 // ForwarderConfig defines configuration of the Forwarder role.
 type ForwarderConfig struct {
-	Enable               bool             `name:"enable" description:"Enable Forwarder role"`
-	WorkerPool           WorkerPoolConfig `name:"worker-pool" description:"Workers pool configuration"`
-	TokenKey             []byte           `name:"token-key" description:"AES 128 or 256-bit key for encrypting tokens"`
-	LegacyTokenEncrypter jose.Encrypter   `name:"-"`
-	TokenAEAD            cipher.AEAD      `name:"-"`
-	IncludeGatewayEUI    bool             `name:"include-gateway-eui" description:"Include the gateway EUI in forwarded metadata"`          // nolint:lll
-	IncludeGatewayID     bool             `name:"include-gateway-id" description:"Include the gateway ID in forwarded metadata"`            // nolint:lll
-	HashGatewayID        bool             `name:"hash-gateway-id" description:"Hash the gateway ID (if forwarded in the metadata)"`         // nolint:lll
-	GatewayOnlineTTL     time.Duration    `name:"gateway-online-ttl" description:"Time-to-live of online status reported to Packet Broker"` // nolint:lll
+	Enable            bool             `name:"enable" description:"Enable Forwarder role"`
+	WorkerPool        WorkerPoolConfig `name:"worker-pool" description:"Workers pool configuration"`
+	TokenKey          []byte           `name:"token-key" description:"AES 128 or 256-bit key for encrypting tokens"`
+	TokenAEAD         cipher.AEAD      `name:"-"`
+	IncludeGatewayEUI bool             `name:"include-gateway-eui" description:"Include the gateway EUI in forwarded metadata"`          // nolint:lll
+	IncludeGatewayID  bool             `name:"include-gateway-id" description:"Include the gateway ID in forwarded metadata"`            // nolint:lll
+	HashGatewayID     bool             `name:"hash-gateway-id" description:"Hash the gateway ID (if forwarded in the metadata)"`         // nolint:lll
+	GatewayOnlineTTL  time.Duration    `name:"gateway-online-ttl" description:"Time-to-live of online status reported to Packet Broker"` // nolint:lll
 }
 
 // HomeNetworkConfig defines the configuration of the Home Network role.
