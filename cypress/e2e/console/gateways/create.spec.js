@@ -146,6 +146,33 @@ describe('Gateway create', () => {
     cy.findByTestId('error-notification').should('not.exist')
   })
 
+  it('succeeds adding gateway with multiple frequency plans', () => {
+    const gateway = {
+      frequency_plan: 'EU_863_870',
+      eui: generateHexValue(16),
+    }
+
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByText('Frequency plan')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption(gateway.frequency_plan)
+    cy.findByRole('button', { name: /Add frequency plan/ }).click()
+    cy.findByText('Frequency plan').parent().parent().find('input').eq(2).selectOption('US_902_928')
+    cy.findByRole('button', { name: 'Register gateway' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
+    )
+    cy.findByRole('heading', { name: `eui-${gateway.eui}` })
+    cy.findByText('Frequency plan')
+    cy.findByText('EU_863_870 , US_902_928_FSB_1').should('be.visible')
+    cy.findByTestId('error-notification').should('not.exist')
+  })
+
   describe('Gateway Server disabled', () => {
     beforeEach(() => {
       cy.augmentStackConfig(disableGatewayServer)
