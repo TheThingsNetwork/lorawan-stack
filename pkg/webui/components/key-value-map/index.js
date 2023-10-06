@@ -32,7 +32,6 @@ const m = defineMessages({
 const KeyValueMap = ({
   addMessage,
   removeMessage,
-  icon,
   additionalInputProps,
   className,
   disabled,
@@ -45,7 +44,7 @@ const KeyValueMap = ({
   onChange,
   value,
   valuePlaceholder,
-  withOptionsUpdate,
+  distinctOptions,
   atLeastOneEntry,
 }) => {
   const handleEntryChange = useCallback(
@@ -97,8 +96,7 @@ const KeyValueMap = ({
               inputElement={inputElement}
               additionalInputProps={additionalInputProps}
               removeMessage={removeMessage}
-              icon={icon}
-              withOptionsUpdate={withOptionsUpdate}
+              distinctOptions={distinctOptions}
               atLeastOneEntry={atLeastOneEntry}
             />
           ))}
@@ -123,7 +121,7 @@ KeyValueMap.propTypes = {
   atLeastOneEntry: PropTypes.bool,
   className: PropTypes.string,
   disabled: PropTypes.bool,
-  icon: PropTypes.string,
+  distinctOptions: PropTypes.bool,
   indexAsKey: PropTypes.bool,
   inputElement: PropTypes.elementType,
   isReadOnly: PropTypes.func,
@@ -142,7 +140,6 @@ KeyValueMap.propTypes = {
     ]),
   ),
   valuePlaceholder: PropTypes.message.isRequired,
-  withOptionsUpdate: PropTypes.bool,
 }
 
 KeyValueMap.defaultProps = {
@@ -158,8 +155,7 @@ KeyValueMap.defaultProps = {
   isReadOnly: () => null,
   inputElement: Input,
   removeMessage: undefined,
-  icon: undefined,
-  withOptionsUpdate: false,
+  distinctOptions: false,
   atLeastOneEntry: false,
 }
 

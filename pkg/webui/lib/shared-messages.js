@@ -372,6 +372,7 @@ export default defineMessages({
   registerEndDevice: 'Register end device',
   registerGateway: 'Register gateway',
   replaceWebhook: 'Replace webhook',
+  remove: 'Remove',
   removeCollaborator: 'Remove collaborator',
   removeCollaboratorSelf: 'Remove yourself as collaborator',
   removeCollaboratorLast: 'Cannot remove last collaborator',

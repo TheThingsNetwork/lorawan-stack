@@ -18,6 +18,7 @@ import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './key-value-map.styl'
@@ -41,8 +42,7 @@ const Entry = ({
   keyPlaceholder,
   additionalInputProps,
   removeMessage,
-  icon,
-  withOptionsUpdate,
+  distinctOptions,
   atLeastOneEntry,
 }) => {
   const [currentValue, setCurrentValue] = useState(value)
@@ -52,7 +52,7 @@ const Entry = ({
 
   const _getValueInputName = useMemo(() => `${name}[${index}].value`, [index, name])
 
-  const handleRemoveButtonClicked = useCallback(
+  const handleRemoveButtonClick = useCallback(
     event => {
       onRemoveButtonClick(index, event)
     },
@@ -91,17 +91,17 @@ const Entry = ({
     [onBlur, name, value, _getKeyInputName, _getValueInputName],
   )
 
-  const handleFocus = useCallback(() => {
-    if (withOptionsUpdate && options) {
-      let newOptions
-      if (currentValue) {
-        newOptions = options.filter(v => !fieldValue.includes(v.value) || v.value === currentValue)
-      } else {
-        newOptions = options.filter(v => !fieldValue.includes(v.value))
-      }
-      setNewOptions(newOptions)
+  const handleOptionComposition = useCallback(() => {
+    let newOptions
+    if (currentValue) {
+      newOptions = options.filter(v => !fieldValue.includes(v.value) || v.value === currentValue)
+    } else {
+      newOptions = options.filter(v => !fieldValue.includes(v.value))
     }
-  }, [currentValue, options, withOptionsUpdate, fieldValue])
+    setNewOptions(newOptions)
+  }, [currentValue, options, fieldValue])
+
+  const showRemoveButton = atLeastOneEntry ? index !== 0 : true
 
   return (
     <div className={style.entriesRow}>
@@ -128,18 +128,18 @@ const Entry = ({
         type="text"
         onChange={handleValueChanged}
         onBlur={handleBlur}
-        onFocus={handleFocus}
+        onFocus={distinctOptions && options ? handleOptionComposition : undefined}
         value={indexAsKey ? value : value.value}
         readOnly={readOnly}
         code
         options={options ? newOptions ?? options : undefined}
         {...additionalInputPropsRest}
       />
-      {atLeastOneEntry && index !== 0 && (
+      {showRemoveButton && (
         <Button
           type="button"
-          onClick={handleRemoveButtonClicked}
-          icon={icon ?? 'delete'}
+          onClick={handleRemoveButtonClick}
+          icon="delete"
           title={m.deleteEntry}
           message={removeMessage}
           disabled={readOnly}
@@ -155,8 +155,8 @@ Entry.propTypes = {
     options: PropTypes.array,
   }).isRequired,
   atLeastOneEntry: PropTypes.bool,
+  distinctOptions: PropTypes.bool,
   fieldValue: PropTypes.any,
-  icon: PropTypes.string,
   index: PropTypes.number.isRequired,
   indexAsKey: PropTypes.bool.isRequired,
   inputElement: PropTypes.elementType.isRequired,
@@ -175,15 +175,13 @@ Entry.propTypes = {
     PropTypes.string,
   ]),
   valuePlaceholder: PropTypes.message.isRequired,
-  withOptionsUpdate: PropTypes.bool,
 }
 
 Entry.defaultProps = {
   value: undefined,
   readOnly: false,
-  removeMessage: undefined,
-  icon: undefined,
-  withOptionsUpdate: false,
+  removeMessage: sharedMessages.remove,
+  distinctOptions: false,
   fieldValue: undefined,
   atLeastOneEntry: false,
 }

@@ -65,11 +65,9 @@ const GatewayFrequencyPlansSelect = () => {
       inputElement={Select}
       indexAsKey
       addMessage={m.addFrequencyPlan}
-      removeMessage={m.removeFrequencyPlan}
-      icon="remove"
       onChange={onFrequencyPlanChange}
       additionalInputProps={{ options: freqPlanOptions }}
-      withOptionsUpdate
+      distinctOptions
       atLeastOneEntry
       required
     />
