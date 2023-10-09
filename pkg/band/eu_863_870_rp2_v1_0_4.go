@@ -133,5 +133,5 @@ var EU_863_870_RP2_V1_0_4 = Band{
 
 	Relay: eu863870RelayParameters,
 
-	SharedParameters: universalSharedParameters,
+	SharedParameters: relayAwareSharedParameters,
 }

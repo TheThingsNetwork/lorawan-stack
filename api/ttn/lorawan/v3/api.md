@@ -2532,6 +2532,8 @@ PeerInfo
 | `max_retransmit_timeout` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
 | `tx_offset` | [`float`](#float) | repeated |  |
 | `max_adr_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
+| `relay_forward_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `relay_receive_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
 | `tx_param_setup_req_support` | [`bool`](#bool) |  |  |
 | `default_max_eirp` | [`float`](#float) |  |  |
 | `default_rx2_parameters` | [`BandDescription.Rx2Parameters`](#ttn.lorawan.v3.BandDescription.Rx2Parameters) |  |  |

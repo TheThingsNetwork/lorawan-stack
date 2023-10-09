@@ -86,5 +86,5 @@ var ISM_2400_Universal = Band{
 	},
 	PingSlotFrequencies: ism2400BeaconFrequencies,
 
-	SharedParameters: universalSharedParameters,
+	SharedParameters: relayAwareSharedParameters,
 }
