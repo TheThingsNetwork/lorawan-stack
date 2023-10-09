@@ -51,7 +51,7 @@ func TestWrapGatewayUplinkToken(t *testing.T) {
 	}
 	t.Logf("Wrapped token: %q", base64.RawStdEncoding.EncodeToString(wrappedToken))
 
-	uid, gtwToken, err := unwrapGatewayUplinkToken(wrappedToken, aead, nil)
+	uid, gtwToken, err := unwrapGatewayUplinkToken(wrappedToken, aead)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

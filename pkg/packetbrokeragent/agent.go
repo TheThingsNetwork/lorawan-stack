@@ -45,7 +45,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
-	"gopkg.in/square/go-jose.v2"
 )
 
 const (
@@ -271,25 +270,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			a.forwarderConfig.TokenKey = random.Bytes(16)
 			logger.WithField("token_key", hex.EncodeToString(a.forwarderConfig.TokenKey)).Warn("No token key configured, generated a random one")
 		}
-		var (
-			legacyEncryption   jose.ContentEncryption
-			legacyKeyAlgorithm jose.KeyAlgorithm
-		)
 		switch l := len(a.forwarderConfig.TokenKey); l {
-		case 16:
-			legacyEncryption, legacyKeyAlgorithm = jose.A128GCM, jose.A128GCMKW
-		case 32:
-			legacyEncryption, legacyKeyAlgorithm = jose.A256GCM, jose.A256GCMKW
+		case 16, 32:
 		default:
 			return nil, errTokenKey.WithAttributes("length", l).New()
-		}
-		var err error
-		a.forwarderConfig.LegacyTokenEncrypter, err = jose.NewEncrypter(legacyEncryption, jose.Recipient{
-			Algorithm: legacyKeyAlgorithm,
-			Key:       a.forwarderConfig.TokenKey,
-		}, nil)
-		if err != nil {
-			return nil, errTokenKey.WithCause(err)
 		}
 		blockCipher, err := aes.NewCipher(a.forwarderConfig.TokenKey)
 		if err != nil {
