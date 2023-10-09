@@ -428,8 +428,9 @@ func TestForwarder(t *testing.T) {
 		}))
 		tokenNonce := make([]byte, aead.NonceSize())
 		test.Must(io.ReadFull(rand.Reader, tokenNonce))
+		forwarderData := []byte("000013:foo-tenant:test")
 		token := test.Must(proto.Marshal(&ttnpb.PacketBrokerAgentEncryptedPayload{
-			Ciphertext: aead.Seal(nil, tokenNonce, plainToken, nil),
+			Ciphertext: aead.Seal(nil, tokenNonce, plainToken, forwarderData),
 			Nonce:      tokenNonce,
 		}))
 
