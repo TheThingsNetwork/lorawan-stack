@@ -46,21 +46,28 @@ func (reg *healthStatusRegistry) Get(r *http.Request) (*ttnpb.ApplicationWebhook
 }
 
 // Set implements HealthStatusRegistry.
-func (reg *healthStatusRegistry) Set(r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error)) error {
+func (reg *healthStatusRegistry) Set(
+	r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
+) error {
 	ctx := r.Context()
 	ids := webhookIDFromContext(ctx)
-	_, err := reg.registry.Set(ctx, ids, []string{"health_status"}, func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
-		if wh == nil {
-			// The webhook has been deleted during execution.
-			return nil, nil, nil
-		}
-		new, err := f(wh.HealthStatus)
-		if err != nil {
-			return nil, nil, err
-		}
-		wh.HealthStatus = new
-		return wh, []string{"health_status"}, nil
-	})
+	_, err := reg.registry.Set(
+		ctx,
+		ids,
+		[]string{"health_status"},
+		func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+			if wh == nil {
+				// The webhook has been deleted during execution.
+				return nil, nil, nil
+			}
+			updated, err := f(wh.HealthStatus)
+			if err != nil {
+				return nil, nil, err
+			}
+			wh.HealthStatus = updated
+			return wh, []string{"health_status"}, nil
+		},
+	)
 	return err
 }
 
@@ -91,7 +98,9 @@ func (reg *cachedHealthStatusRegistry) Get(r *http.Request) (*ttnpb.ApplicationW
 }
 
 // Set implements HealthStatusRegistry.
-func (reg *cachedHealthStatusRegistry) Set(r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error)) error {
+func (reg *cachedHealthStatusRegistry) Set(
+	r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
+) error {
 	return reg.registry.Set(r, f)
 }
 
@@ -111,65 +120,85 @@ type healthCheckSink struct {
 // Process runs the health checks and sends the request to the underlying sink
 // if they pass.
 func (hcs *healthCheckSink) Process(r *http.Request) error {
-	healthy, err := hcs.preRunCheck(r)
+	lastKnownState, err := hcs.preRunCheck(r)
 	if err != nil {
 		return err
 	}
-	return hcs.executeAndRecord(r, healthy)
+	return hcs.executeAndRecord(r, lastKnownState)
 }
+
+type healthState int
+
+const (
+	healthStateUnknown healthState = iota
+	healthStateHealthy
+	healthStateMonitorSkipRecord
+	healthStateMonitorRecord
+	healthStateUnhealthy
+)
 
 var errWebhookDisabled = errors.DefineAborted("webhook_disabled", "webhook disabled")
 
 // preRunCheck verifies if the webhook should be executed.
-func (hcs *healthCheckSink) preRunCheck(r *http.Request) (bool, error) {
+func (hcs *healthCheckSink) preRunCheck(r *http.Request) (healthState, error) {
 	h, err := hcs.registry.Get(r)
 	if err != nil {
-		return false, err
+		return healthStateUnknown, err
 	}
 
 	switch {
-	case h == nil:
+	case h == nil, h.Status == nil:
+		return healthStateUnknown, nil
 
 	case h.GetHealthy() != nil:
-		return true, nil
+		return healthStateHealthy, nil
 
 	case h.GetUnhealthy() != nil:
 		h := h.GetUnhealthy()
-		lastFailedAttemptAt := ttnpb.StdTime(h.LastFailedAttemptAt)
-		nextAttemptAt := lastFailedAttemptAt.Add(hcs.unhealthyRetryInterval)
-		now := time.Now()
+		monitorOnly := hcs.unhealthyAttemptsThreshold <= 0 || hcs.unhealthyRetryInterval <= 0
+		nextAttemptAt := ttnpb.StdTime(h.LastFailedAttemptAt).Add(hcs.unhealthyRetryInterval)
+		retryIntervalPassed := time.Now().After(nextAttemptAt)
 		switch {
-		case hcs.unhealthyAttemptsThreshold <= 0:
+		case monitorOnly:
 			// The system only monitors the health status, but does not block execution.
+			if retryIntervalPassed {
+				return healthStateMonitorRecord, nil
+			}
+			return healthStateMonitorSkipRecord, nil
 
 		case h.FailedAttempts < uint64(hcs.unhealthyAttemptsThreshold):
 			// The webhook is unhealthy but it has not failed enough times to be disabled yet.
 			// This comparison is racing, as we may allow multiple webhooks at a time to execute
 			// under the assumption that we are still under the threshold. However, serializing the
 			// execution of unhealthy webhooks is considered costly, so we allow the race to occur.
+			return healthStateUnhealthy, nil
 
-		case h.FailedAttempts >= uint64(hcs.unhealthyAttemptsThreshold) && now.After(nextAttemptAt):
+		case h.FailedAttempts >= uint64(hcs.unhealthyAttemptsThreshold) && retryIntervalPassed:
 			// The webhook is above the threshold, but the cooldown period has elapsed.
+			return healthStateUnhealthy, nil
 
 		default:
 			// The webhook is above the threshold, and the cooldown period has not passed yet.
-			return false, errWebhookDisabled.New()
+			return healthStateUnhealthy, errWebhookDisabled.New()
 		}
 
 	default:
 		panic("unreachable")
 	}
-
-	return false, nil
 }
 
 // executeAndRecord runs the provided request using the underlying sink and records the health status.
-func (hcs *healthCheckSink) executeAndRecord(r *http.Request, healthy bool) error {
+func (hcs *healthCheckSink) executeAndRecord(r *http.Request, lastKnownState healthState) error {
 	sinkErr := hcs.sink.Process(r)
 
-	// Fast path: the health status is available, the request did not error, and the webhook is healthy.
-	if sinkErr == nil && healthy {
+	// Fast path 1: the health status is available, the request did not error, and the webhook is healthy.
+	if sinkErr == nil && lastKnownState == healthStateHealthy {
 		return nil
+	}
+
+	// Fast path 2: the health status is available, the request did error, and the webhook is unhealthy.
+	if sinkErr != nil && lastKnownState == healthStateMonitorSkipRecord {
+		return sinkErr
 	}
 
 	// Slow path: the request did error, or the webhook is unhealthy.
@@ -205,7 +234,9 @@ func (hcs *healthCheckSink) executeAndRecord(r *http.Request, healthy bool) erro
 
 // NewHealthCheckSink creates a Sink that records the health status of the webhooks and stops them from executing if
 // too many fail in a specified interval of time.
-func NewHealthCheckSink(sink Sink, registry HealthStatusRegistry, unhealthyAttemptsThreshold int, unhealthyRetryInterval time.Duration) Sink {
+func NewHealthCheckSink(
+	sink Sink, registry HealthStatusRegistry, unhealthyAttemptsThreshold int, unhealthyRetryInterval time.Duration,
+) Sink {
 	return &healthCheckSink{
 		sink:                       sink,
 		registry:                   registry,
