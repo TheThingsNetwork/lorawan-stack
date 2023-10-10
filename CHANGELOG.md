@@ -23,6 +23,9 @@ For details about compatibility between different releases, see the **Commitment
 - Traffic related correlation IDs have been simplified. Previously one correlation ID per component was added as traffic passed through different stack components. Now a singular correlation ID relating to the entry point of the message will be added (such as `gs:uplink:xxx` for uplinks, or `as:downlink:xxx` for downlinks), and subsequent components will no longer add any extra correlation IDs (such as `ns:uplink:xxx` or `as:up:xxx`). The uplink entry points are `pba` and `gs`, while the downlink entry points are `pba`, `ns` and `as`.
 - Packet Broker Agent uplink tokens are now serialized in a more efficient manner.
 - The Network Server now stores only the most recent uplinks tokens.
+- The Application Server webhook health system now records failures only every retry interval while in monitor mode, as opposed to recording every failure.
+  - Monitor mode in this context refers to situations in which either `--as.webhooks.unhealthy-attempts-threshold` or `--as.webhooks.unhealthy-retry-interval` are less or equal to zero. In such situations, the Application Server will record failures but will not stop the execution of the webhooks.
+  - Using a retry interval of zero and a non zero attempts threshold restores the previous behavior.
 
 ### Deprecated
 
