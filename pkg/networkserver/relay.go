@@ -24,6 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/relayspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -221,4 +223,65 @@ func relayLoopbackFunc(
 			return err
 		}
 	}
+}
+
+func relayUpdateRules(
+	deviceID string, sessionKeyID []byte, rules []*ttnpb.ServingRelayParameters_UplinkForwardingRule,
+) bool {
+	for _, rule := range rules {
+		if rule.DeviceId != deviceID || bytes.Equal(rule.SessionKeyId, sessionKeyID) {
+			continue
+		}
+		rule.LastWFCnt = 0
+		rule.SessionKeyId = sessionKeyID
+		return true
+	}
+	return false
+}
+
+var relayDeliverSessionKeysPaths = ttnpb.AddFields(
+	deviceDownlinkFullPaths[:],
+	"mac_settings.desired_relay.mode.serving.uplink_forwarding_rules",
+	"mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules",
+	"pending_mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules",
+)
+
+func (ns *NetworkServer) deliverRelaySessionKeys(ctx context.Context, dev *ttnpb.EndDevice, sessionKeyID []byte) error {
+	for _, served := range []*ttnpb.ServedRelayParameters{
+		dev.MacSettings.GetRelay().GetServed(),
+		dev.MacSettings.GetDesiredRelay().GetServed(),
+	} {
+		if served == nil {
+			continue
+		}
+		serving, ctx, err := ns.devices.SetByID(
+			ctx,
+			dev.Ids.ApplicationIds,
+			served.ServingDeviceId,
+			relayDeliverSessionKeysPaths,
+			func(ctx context.Context, serving *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+				if serving == nil {
+					return nil, nil, nil
+				}
+				var paths []string
+				for path, rules := range map[string][]*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+					"mac_settings.desired_relay.mode.serving.uplink_forwarding_rules":                 serving.MacSettings.GetDesiredRelay().GetServing().GetUplinkForwardingRules(),                     // nolint:lll
+					"mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules":         serving.MacState.GetDesiredParameters().GetRelay().GetServing().GetUplinkForwardingRules(),        // nolint:lll
+					"pending_mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules": serving.PendingMacState.GetDesiredParameters().GetRelay().GetServing().GetUplinkForwardingRules(), // nolint:lll
+				} {
+					if relayUpdateRules(dev.Ids.DeviceId, sessionKeyID, rules) {
+						paths = ttnpb.AddFields(paths, path)
+					}
+				}
+				return serving, paths, nil
+			},
+		)
+		if err != nil {
+			return err
+		}
+		if err := ns.updateDataDownlinkTask(ctx, serving, time.Time{}); err != nil {
+			log.FromContext(ctx).WithError(err).Error("Failed to update downlink task queue after session key delivery")
+		}
+	}
+	return nil
 }

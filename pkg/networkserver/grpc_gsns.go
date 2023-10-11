@@ -1386,6 +1386,10 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	macState.RxWindowsAvailable = true
 	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIds...)
 
+	if err := ns.deliverRelaySessionKeys(ctx, matched, keys.SessionKeyId); err != nil {
+		return err
+	}
+
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil
 	up = ttnpb.Clone(up)
