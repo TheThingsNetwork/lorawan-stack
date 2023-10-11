@@ -2370,6 +2370,7 @@
   "error:pkg/messageprocessors/devicerepository:no_version_identifiers": "デバイスのバージョン識別子がありません",
   "error:pkg/messageprocessors/javascript:input": "無効な入力",
   "error:pkg/messageprocessors/javascript:output": "無効な出力",
+  "error:pkg/messageprocessors/javascript:output_encoding": "",
   "error:pkg/messageprocessors/javascript:output_errors": "{errors}",
   "error:pkg/messageprocessors/normalizedpayload:field_exclusive_maximum": "`{path}`は`{maximum}`未満であるべきです",
   "error:pkg/messageprocessors/normalizedpayload:field_exclusive_minimum": "`{path}`は`{minimum}`より大きいべきです",

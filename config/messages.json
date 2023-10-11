@@ -7082,6 +7082,15 @@
       "file": "javascript.go"
     }
   },
+  "error:pkg/messageprocessors/javascript:output_encoding": {
+    "translations": {
+      "en": "{errors}"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/javascript",
+      "file": "javascript.go"
+    }
+  },
   "error:pkg/messageprocessors/javascript:output_errors": {
     "translations": {
       "en": "{errors}"
