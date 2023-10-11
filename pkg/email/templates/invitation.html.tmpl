@@ -3,7 +3,7 @@ Invitation
 {{- end -}}
 
 {{- define "preview" -}}
-You have been invited {{- with .SenderIds }} by user {{ .IDString }} {{ end -}} to join {{ .Network.Name }}.
+You have been invited to join {{ .Network.Name }}.
 {{- end -}}
 
 {{- define "body" -}}
@@ -11,7 +11,7 @@ You have been invited {{- with .SenderIds }} by user {{ .IDString }} {{ end -}} 
 Hello,
 </p>
 <p>
-You have been invited {{- with .SenderIds }} by user <code>{{ .IDString }}</code> {{ end -}} to join <b>{{ .Network.Name }}</b>.
+You have been invited to join <b>{{ .Network.Name }}</b>.
 </p>
 <p>
 You can now visit <a href="{{ .Network.IdentityServerURL }}/register?invitation_token={{ .InvitationToken }}">this link</a> to register your user account.

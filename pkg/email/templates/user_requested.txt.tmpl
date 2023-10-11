@@ -1,11 +1,6 @@
 Dear {{ .ReceiverName }},
 
-A new user just registered on {{ .Network.Name }}.
+A new user with with ID {{ .User.Ids.IDString }} just registered on {{ .Network.Name }}.
 Since user registration requires admin approval, you need to approve this user before they can login.
-
-User ID: {{ .User.Ids.IDString }}
-Name: {{ with .User.Name }}{{ . }}{{ else }}(none){{ end }}
-Description: {{ with .User.Description }}{{ . }}{{ else }}(none){{ end }}
-Email Address: {{ with .User.PrimaryEmailAddress }}{{ . }}{{ else }}(none){{ end }}
 
 You can go to {{ .ConsoleURL }} to review this user in the Console.
