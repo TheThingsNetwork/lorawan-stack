@@ -960,7 +960,7 @@ func (a *Agent) handleUplink(
 		if up.Message == nil {
 			return
 		}
-		ctx = appendDownlinkCorrelationID(ctx, up.Id)
+		ctx = appendUplinkCorrelationID(ctx, up.Id)
 		var forwarderNetID types.NetID
 		forwarderNetID.UnmarshalNumber(up.ForwarderNetId)
 		ctx = log.NewContextWithFields(ctx, log.Fields(
