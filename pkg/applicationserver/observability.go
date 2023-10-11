@@ -178,14 +178,6 @@ var asMetrics = &messageMetrics{
 		},
 		[]string{"error"},
 	),
-	uplinkPayloadValueViolations: metrics.NewContextualCounterVec(
-		prometheus.CounterOpts{
-			Subsystem: subsystem,
-			Name:      "uplink_payload_value_violations_total",
-			Help:      "Total number of uplink payload value violations",
-		},
-		[]string{"payload_formatter", "value_context", "value_type"},
-	),
 	nsAsUplinkLatency: metrics.NewContextualHistogramVec(
 		prometheus.HistogramOpts{
 			Subsystem: "ns_as",
@@ -228,14 +220,6 @@ var asMetrics = &messageMetrics{
 		},
 		[]string{"error"},
 	),
-	downlinkPayloadValueViolations: metrics.NewContextualCounterVec(
-		prometheus.CounterOpts{
-			Subsystem: subsystem,
-			Name:      "downlink_payload_value_violations_total",
-			Help:      "Total number of downlink payload value violations when decoding downlink messages",
-		},
-		[]string{"payload_formatter", "value_context", "value_type"},
-	),
 }
 
 func init() {
@@ -243,42 +227,36 @@ func init() {
 }
 
 type messageMetrics struct {
-	uplinkReceived                 *metrics.ContextualCounterVec
-	uplinkForwarded                *metrics.ContextualCounterVec
-	uplinkDropped                  *metrics.ContextualCounterVec
-	uplinkPayloadValueViolations   *metrics.ContextualCounterVec
-	nsAsUplinkLatency              *metrics.ContextualHistogramVec
-	gtwAsUplinkLatency             *metrics.ContextualHistogramVec
-	downlinkReceived               *metrics.ContextualCounterVec
-	downlinkForwarded              *metrics.ContextualCounterVec
-	downlinkDropped                *metrics.ContextualCounterVec
-	downlinkPayloadValueViolations *metrics.ContextualCounterVec
+	uplinkReceived     *metrics.ContextualCounterVec
+	uplinkForwarded    *metrics.ContextualCounterVec
+	uplinkDropped      *metrics.ContextualCounterVec
+	nsAsUplinkLatency  *metrics.ContextualHistogramVec
+	gtwAsUplinkLatency *metrics.ContextualHistogramVec
+	downlinkReceived   *metrics.ContextualCounterVec
+	downlinkForwarded  *metrics.ContextualCounterVec
+	downlinkDropped    *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkReceived.Describe(ch)
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
-	m.uplinkPayloadValueViolations.Describe(ch)
 	m.nsAsUplinkLatency.Describe(ch)
 	m.gtwAsUplinkLatency.Describe(ch)
 	m.downlinkReceived.Describe(ch)
 	m.downlinkForwarded.Describe(ch)
 	m.downlinkDropped.Describe(ch)
-	m.downlinkPayloadValueViolations.Describe(ch)
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkReceived.Collect(ch)
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
-	m.uplinkPayloadValueViolations.Collect(ch)
 	m.nsAsUplinkLatency.Collect(ch)
 	m.gtwAsUplinkLatency.Collect(ch)
 	m.downlinkReceived.Collect(ch)
 	m.downlinkForwarded.Collect(ch)
 	m.downlinkDropped.Collect(ch)
-	m.downlinkPayloadValueViolations.Collect(ch)
 }
 
 func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
