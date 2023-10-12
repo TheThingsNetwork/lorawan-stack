@@ -15,7 +15,7 @@ require (
 	github.com/TheThingsIndustries/mystique v0.0.0-20221125120501-80ab21781b6d
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0
-	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
+	github.com/TheThingsNetwork/go-cayenne-lib v1.2.0
 	github.com/aws/aws-sdk-go v1.45.19
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.14

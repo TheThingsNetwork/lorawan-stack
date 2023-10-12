@@ -88,8 +88,8 @@ github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0 h1:FTaVxiDPoV9o6k2OFBij
 github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0/go.mod h1:6ourNr6TBk/2SB2V4In+o2eqZd/DIdiBLnoxvQ3UyWk=
 github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis h1:uashKgjy7XCNZNb00+3GheWtJXnS9DnAkYQ1X89cAIg=
 github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis/go.mod h1:XC/YhKcHsxRy8shbYICwf+oWeYTCC2kpL5/clSJbt+U=
-github.com/TheThingsNetwork/go-cayenne-lib v1.1.0 h1:uw+WnTMSSwTo58/ob3ktWNBiCY2psIof8p3lKdxreAE=
-github.com/TheThingsNetwork/go-cayenne-lib v1.1.0/go.mod h1:HTTus7UIBhXKvLIeNGybbG1o7wr4zwwVbbUXwFqrtp0=
+github.com/TheThingsNetwork/go-cayenne-lib v1.2.0 h1:yW4x7mNk2vyNTUYNRhda9oV8caLePMNR7Z5QbaG5Ifs=
+github.com/TheThingsNetwork/go-cayenne-lib v1.2.0/go.mod h1:HTTus7UIBhXKvLIeNGybbG1o7wr4zwwVbbUXwFqrtp0=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
