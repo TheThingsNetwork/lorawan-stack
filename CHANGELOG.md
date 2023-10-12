@@ -37,6 +37,7 @@ For details about compatibility between different releases, see the **Commitment
 - Gateway registration without gateway EUI not working.
 - Listing deleted entities is now fixed for both admin and standard users, which previously returned an `account_not_found` error.
 - Update to an user's `PrimaryEmailAddress` via a non admin now invalidates the `PrimaryEmailAddressValidatedAt` as it was intended.
+- Negative number support in Cayenne LPP.
 
 ### Security
 
