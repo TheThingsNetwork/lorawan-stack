@@ -7550,6 +7550,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver/redis:relay_served": {
+    "translations": {
+      "en": "`{served}` is already served by `{serving}`"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/networkserver:abp_join_request": {
     "translations": {
       "en": "received a join-request from ABP device"

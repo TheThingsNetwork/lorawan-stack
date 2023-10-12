@@ -2330,6 +2330,7 @@
   "error:pkg/networkserver/redis:missing_uid": "",
   "error:pkg/networkserver/redis:no_uplink_match": "デバイスがアップリンクと一致しません",
   "error:pkg/networkserver/redis:read_only_field": "読み取り専用フィールド `{field}`",
+  "error:pkg/networkserver/redis:relay_served": "",
   "error:pkg/networkserver:abp_join_request": "ABPデバイスからジョインリクエストを受信しました",
   "error:pkg/networkserver:absolute_time": "アプリケーションダウンリンクに無効なアブソリュートタイムが設定されています",
   "error:pkg/networkserver:application_downlink_too_long": "アプリケーションダウンリンク長 `{length}` が最大値 '{max}' を超えています",
