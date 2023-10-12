@@ -75,7 +75,8 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 	ctx = appendUplinkCorrelationID(ctx)
 	up.Message.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
-	msg, err := toPBUplink(ctx, up, s.config)
+	forwarderData := forwarderAdditionalData(s.netID.MarshalNumber(), s.tenantIDExtractor(ctx), s.clusterID)
+	msg, err := toPBUplink(ctx, up, forwarderData, s.config)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to convert outgoing uplink message")
 		return nil, err

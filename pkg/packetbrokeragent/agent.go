@@ -691,7 +691,8 @@ func (a *Agent) handleDownlinkMessage(
 		}
 	}
 
-	uid, msg, err := fromPBDownlink(ctx, down.Message, receivedAt, a.forwarderConfig)
+	forwarderData := forwarderAdditionalData(down.ForwarderNetId, down.ForwarderTenantId, down.ForwarderClusterId)
+	uid, msg, err := fromPBDownlink(ctx, down.Message, forwarderData, receivedAt, a.forwarderConfig)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to convert incoming downlink message")
 		return err
