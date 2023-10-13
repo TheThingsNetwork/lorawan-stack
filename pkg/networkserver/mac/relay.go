@@ -120,6 +120,13 @@ func relayUpdateUplinkListReqFields(req *ttnpb.MACCommand_RelayUpdateUplinkListR
 	return log.Fields(fields...)
 }
 
+func relayCtrlUplinkListReqFields(req *ttnpb.MACCommand_RelayCtrlUplinkListReq) log.Fielder {
+	return log.Fields(
+		"relay_rule_index", req.RuleIndex,
+		"relay_ctrl_action", req.Action,
+	)
+}
+
 // DeviceDefaultRelayParameters returns the default relay parameters for the given device.
 func DeviceDefaultRelayParameters(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) *ttnpb.RelayParameters {
 	switch {

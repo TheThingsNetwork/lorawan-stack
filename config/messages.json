@@ -10880,6 +10880,33 @@
       "file": "relay_configure_fwd_limit.go"
     }
   },
+  "event:ns.mac.relay_ctrl_uplink_list.answer.accept": {
+    "translations": {
+      "en": "relay control uplink list accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_ctrl_uplink_list.answer.reject": {
+    "translations": {
+      "en": "relay control uplink list rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_ctrl_uplink_list.request": {
+    "translations": {
+      "en": "relay control uplink list request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
   "event:ns.mac.relay_end_device_conf.answer.accept": {
     "translations": {
       "en": "relay end device configuration accept received"
