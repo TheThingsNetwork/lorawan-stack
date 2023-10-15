@@ -114,18 +114,18 @@ func receiveEvent(v any) (events.Event, string) {
 	case <-chan events.Event:
 		select {
 		case <-time.After(eventTimeout):
-			return nil, fmt.Sprintf("Timed out while waiting for event to arrive")
+			return nil, "Timed out while waiting for event to arrive"
 		case ev := <-ch:
 			return ev, success
 		}
 	case <-chan test.EventPubSubPublishRequest:
 		select {
 		case <-time.After(eventTimeout):
-			return nil, fmt.Sprintf("Timed out while waiting for event publish request to arrive")
+			return nil, "Timed out while waiting for event publish request to arrive"
 		case req := <-ch:
 			select {
 			case <-time.After(eventTimeout):
-				return nil, fmt.Sprintf("Timed out while waiting for event publish response to be processed")
+				return nil, "Timed out while waiting for event publish response to be processed"
 			case req.Response <- struct{}{}:
 			}
 			return req.Event, success
