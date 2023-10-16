@@ -22,12 +22,15 @@ import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
 
 import Link from '@ttn-lw/components/link'
 import PageTitle from '@ttn-lw/components/page-title'
-import Icon from '@ttn-lw/components/icon'
 import Switch from '@ttn-lw/components/switch'
 import Tabs from '@ttn-lw/components/tabs'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
-import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
+import Radio from '@ttn-lw/components/radio-button'
+import Form from '@ttn-lw/components/form'
+import toast from '@ttn-lw/components/toast'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -35,15 +38,18 @@ import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import SubViewErrorComponent from '@console/views/sub-view-error'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import Yup from '@ttn-lw/lib/yup'
 
-import { isNotEnabledError } from '@console/lib/packet-broker/utils'
+import { isNotEnabledError, isValidPolicy } from '@console/lib/packet-broker/utils'
 
 import {
   registerPacketBroker,
   deregisterPacketBroker,
   getHomeNetworkDefaultRoutingPolicy,
-  getHomeNetworkDefaultGatewayVisibility,
+  setHomeNetworkDefaultRoutingPolicy,
+  deleteHomeNetworkDefaultRoutingPolicy,
 } from '@console/store/actions/packet-broker'
 
 import {
@@ -51,16 +57,23 @@ import {
   selectRegisterEnabled,
   selectEnabled,
   selectListed,
-  selectInfo,
   selectInfoError,
+  selectHomeNetworkDefaultRoutingPolicy,
 } from '@console/store/selectors/packet-broker'
 
 import DefaultRoutingPolicyView from './default-routing-policy'
 import NetworkRoutingPoliciesView from './network-routing-policies'
-import DefaultGatewayVisibilityView from './default-gateway-visibility'
 import m from './messages'
 
 import style from './admin-packet-broker.styl'
+
+const validationSchema = Yup.object({
+  _use_default_policy: Yup.bool(),
+  policy: Yup.object({
+    uplink: Yup.object({}),
+    downlink: Yup.object({}),
+  }).when('_use_default_policy', { is: 'default', then: schema => schema.strip() }),
+})
 
 const PacketBroker = () => {
   const [activeTab, setActiveTab] = useState('default-routing-policy')
@@ -70,7 +83,6 @@ const PacketBroker = () => {
   const enabled = useSelector(selectEnabled)
   const [unlistModalVisible, setUnlistModalVisible] = useState(false)
   const listed = useSelector(selectListed)
-  const info = useSelector(selectInfo)
   const infoError = useSelector(selectInfoError)
   const dispatch = useDispatch()
   const showError = Boolean(infoError) && !isNotEnabledError(infoError)
@@ -113,11 +125,11 @@ const PacketBroker = () => {
 
   const tabs = [
     { title: m.defaultRoutingPolicy, link: '/admin-panel/packet-broker', name: 'default' },
-    {
+    /*     {
       title: m.defaultGatewayVisibility,
       link: '/admin-panel/packet-broker/default-gateway-visibility',
       name: 'default-gateway-visibility',
-    },
+    }, */
     {
       title: sharedMessages.networks,
       link: '/admin-panel/packet-broker/networks',
@@ -126,7 +138,43 @@ const PacketBroker = () => {
     },
   ]
 
-  const boldMessage = { b: msg => <b>{msg}</b> }
+  const defaultRoutingPolicy = useSelector(selectHomeNetworkDefaultRoutingPolicy)
+  const initialValues = {
+    _use_default_policy: isValidPolicy(defaultRoutingPolicy),
+    _routing_configuration: 'default',
+  }
+  initialValues.policy = initialValues._use_default_policy
+    ? defaultRoutingPolicy
+    : { uplink: {}, downlink: {} }
+  const [rountingConfig, setRoutingConfig] = useState(initialValues._routing_configuration)
+  const [formError, setFormError] = useState(undefined)
+  const handleDefaultRoutingPolicySubmit = useCallback(
+    async values => {
+      const vals = validationSchema.cast(values)
+      const { _use_default_policy, policy } = vals
+      try {
+        if (_use_default_policy) {
+          await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
+        } else {
+          await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
+        }
+        toast({
+          message: m.defaultRoutingPolicySet,
+          type: toast.types.SUCCESS,
+        })
+      } catch (error) {
+        setFormError(error)
+      }
+    },
+    [dispatch, setFormError],
+  )
+
+  const handleRoutingConfigChange = useCallback(
+    value => {
+      setRoutingConfig(value)
+    },
+    [setRoutingConfig],
+  )
 
   return (
     <Container>
@@ -138,29 +186,23 @@ const PacketBroker = () => {
             <img className={style.logo} src={PacketBrokerLogo} alt="Packet Broker" />
           </div>
           <div>
-            <Message
-              component="h4"
-              content={sharedMessages.furtherResources}
-              className={style.furtherResources}
-            />
+            <Message component="h4" content={m.learnMore} className={style.furtherResources} />
             <Link.DocLink path="/reference/packet-broker/" secondary>
-              Packet Broker documentation
+              Packet Broker
             </Link.DocLink>
             {' | '}
             <Link.Anchor href="https://www.packetbroker.net" external secondary>
               <Message content={m.packetBrokerWebsite} />
             </Link.Anchor>
-            {' | '}
-            <Link.Anchor href="https://status.packetbroker.net" external secondary>
-              <Message content={m.packetBrokerStatusPage} />
-            </Link.Anchor>
           </div>
           <hr className={style.hRule} />
-          <Message content={m.registrationStatus} component="h3" />
-          {!enabled && <Notification warning small content={m.packetBrokerDisabledDesc} />}
+          <Message content={m.whyNetworkPeeringTitle} component="h3" />
+          <Message content={m.whyNetworkPeeringText} className={style.info} component="p" />
+          <Message content={m.enbaling} className={style.info} />
+          <Message content={m.registrationStatus} component="h3" className="mt-cs-xxl" />
           {showError && <ErrorNotification small content={infoError} />}
           {enabled && (
-            <Row gutterWidth={48}>
+            <Row gutterWidth={48} className="mb-cs-xl">
               <Col md={4}>
                 {registerEnabled && (
                   <label
@@ -176,48 +218,6 @@ const PacketBroker = () => {
                       disabled={!enabled}
                     />
                   </label>
-                )}
-                {registered && (
-                  <div className={style.featureInfo}>
-                    {info.forwarder_enabled ? (
-                      <span data-test-id="feature-info-forwarder-enabled">
-                        <Icon icon="check" className="c-active" textPaddedRight />
-                        <Message
-                          content={m.forwarderEnabled}
-                          values={boldMessage}
-                          component="span"
-                        />
-                      </span>
-                    ) : (
-                      <span data-test-id="feature-info-forwarder-disabled">
-                        <Icon icon="close" className="c-error" textPaddedRight />
-                        <Message
-                          content={m.forwarderDisabled}
-                          values={boldMessage}
-                          component="span"
-                        />
-                      </span>
-                    )}
-                    {info.home_network_enabled ? (
-                      <span data-test-id="feature-info-home-network-enabled">
-                        <Icon icon="check" className="c-active" textPaddedRight />
-                        <Message
-                          content={m.homeNetworkEnabled}
-                          values={boldMessage}
-                          component="span"
-                        />
-                      </span>
-                    ) : (
-                      <span data-test-id="feature-info-forwarder-disabled">
-                        <Icon icon="close" className="c-error" textPaddedRight />
-                        <Message
-                          content={m.homeNetworkDisabled}
-                          values={boldMessage}
-                          component="span"
-                        />
-                      </span>
-                    )}
-                  </div>
                 )}
               </Col>
               <Col md={8} className={style.switchInfo}>
@@ -251,7 +251,6 @@ const PacketBroker = () => {
         {registered && (
           <>
             <Col md={12}>
-              <Message content={m.networkVisibility} component="h3" className={style.subTitle} />
               <Row gutterWidth={48}>
                 <Col md={4}>
                   <label className={style.toggleContainer}>
@@ -281,27 +280,53 @@ const PacketBroker = () => {
                   component="span"
                 />
               </PortalledModal>
-              <hr className={style.hRule} />
             </Col>
             <Col md={12} style={{ position: 'relative' }}>
-              <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
+              <Message
+                content={'Routing configuration'}
+                component="h3"
+                className={style.subTitle}
+              />
               <RequireRequest
-                requestAction={[
-                  getHomeNetworkDefaultRoutingPolicy(),
-                  getHomeNetworkDefaultGatewayVisibility(),
-                ]}
+                requestAction={getHomeNetworkDefaultRoutingPolicy()}
                 errorRenderFunction={SubViewErrorComponent}
                 spinnerProps={{ inline: true, center: true, className: 'mt-ls-s' }}
               >
-                <Routes>
-                  <Route index Component={DefaultRoutingPolicyView} />
-                  <Route
-                    path="default-gateway-visibility"
-                    Component={DefaultGatewayVisibilityView}
-                  />
-                  <Route path="networks/*" Component={NetworkRoutingPoliciesView} />
-                  <Route path="*" component={GenericNotFound} />
-                </Routes>
+                <Form
+                  onSubmit={handleDefaultRoutingPolicySubmit}
+                  initialValues={initialValues}
+                  error={formError}
+                >
+                  <Form.Field
+                    component={Radio.Group}
+                    className="mb-cs-xl"
+                    name="_routing_configuration"
+                    onChange={handleRoutingConfigChange}
+                  >
+                    <Radio
+                      label="Forward traffic to all networks registered in Packet Broker"
+                      value="default"
+                    />
+                    <Radio
+                      label="Forward traffic to The Things Stack Sandbox (community network) only"
+                      value="ttn"
+                    />
+                    <Radio label="Use custom routing policies" value="custom" />
+                  </Form.Field>
+                  {rountingConfig === 'custom' && (
+                    <>
+                      <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
+                      <Routes>
+                        <Route index Component={DefaultRoutingPolicyView} />
+                        <Route path="networks/*" Component={NetworkRoutingPoliciesView} />
+                        <Route path="*" component={GenericNotFound} />
+                      </Routes>
+                    </>
+                  )}
+                  <SubmitBar align="end">
+                    <Form.Submit component={SubmitButton} message={'Save routing configuration'} />
+                  </SubmitBar>
+                </Form>
               </RequireRequest>
             </Col>
           </>

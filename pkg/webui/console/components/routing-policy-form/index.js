@@ -16,10 +16,8 @@ import React, { useState, useCallback } from 'react'
 import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import Form from '@ttn-lw/components/form'
+import Form, { useFormContext } from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
-import SubmitBar from '@ttn-lw/components/submit-bar'
-import SubmitButton from '@ttn-lw/components/submit-button'
 import Radio from '@ttn-lw/components/radio-button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -28,7 +26,6 @@ import RoutingPolicy from '@console/components/routing-policy'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import Yup from '@ttn-lw/lib/yup'
 
 import { isValidPolicy } from '@console/lib/packet-broker/utils'
 import policyMessages from '@console/lib/packet-broker/messages'
@@ -36,19 +33,10 @@ import policyMessages from '@console/lib/packet-broker/messages'
 import style from './routing-policy-form.styl'
 
 const m = defineMessages({
-  saveDefaultPolicy: 'Save default policy',
   useDefaultPolicy: 'Use default routing policy for this network',
   useSpecificPolicy: 'Use network specific routing policy',
   doNotUseADefaultPolicy: 'Do not use a default routing policy for this network',
   doNotUseAPolicy: 'Do not use a routing policy for this network',
-})
-
-const validationSchema = Yup.object({
-  _use_default_policy: Yup.bool(),
-  policy: Yup.object({
-    uplink: Yup.object({}),
-    downlink: Yup.object({}),
-  }).when('_use_default_policy', { is: 'default', then: schema => schema.strip() }),
 })
 
 const policySourceEncode = val => val === 'default'
@@ -56,16 +44,9 @@ const policySourceDecode = val => (val ? 'default' : 'specific')
 const useDefaultEncode = val => val === 'default'
 const useDefaultDecode = val => (val ? 'default' : 'no-default')
 
-const RoutingPolicyForm = ({
-  onSubmit,
-  initialValues,
-  error,
-  defaultPolicy,
-  networkLevel,
-  submitMessage,
-}) => {
-  const handleSubmit = useCallback(values => onSubmit(validationSchema.cast(values)), [onSubmit])
-  const [useDefault, setUseDefault] = useState(initialValues._use_default_policy || false)
+const RoutingPolicyForm = ({ defaultPolicy, networkLevel }) => {
+  const { values } = useFormContext()
+  const [useDefault, setUseDefault] = useState(values._use_default_policy || false)
   const handlePolicySourceChange = useCallback(setUseDefault, [setUseDefault])
   const hasDefaultPolicy = isValidPolicy(defaultPolicy)
 
@@ -73,12 +54,7 @@ const RoutingPolicyForm = ({
   const showPolicyCheckboxes = (useDefault && !networkLevel) || (!useDefault && networkLevel)
 
   return (
-    <Form
-      onSubmit={handleSubmit}
-      initialValues={initialValues}
-      error={error}
-      validationSchema={validationSchema}
-    >
+    <>
       <Row>
         <Col md={12}>
           {networkLevel ? (
@@ -182,30 +158,22 @@ const RoutingPolicyForm = ({
           </>
         )}
       </Row>
-      <SubmitBar>
-        <Form.Submit component={SubmitButton} message={submitMessage} />
-      </SubmitBar>
-    </Form>
+    </>
   )
 }
 
 RoutingPolicyForm.propTypes = {
   defaultPolicy: PropTypes.routingPolicy,
-  error: PropTypes.error,
   initialValues: PropTypes.shape({
     _use_default_policy: PropTypes.bool,
     policy: PropTypes.shape({}),
   }),
   networkLevel: PropTypes.bool,
-  onSubmit: PropTypes.func.isRequired,
-  submitMessage: PropTypes.message,
 }
 
 RoutingPolicyForm.defaultProps = {
-  error: undefined,
   networkLevel: false,
   defaultPolicy: undefined,
-  submitMessage: m.saveDefaultPolicy,
   initialValues: {
     _use_default_policy: false,
     policy: {
