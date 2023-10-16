@@ -146,7 +146,7 @@ const Video = props => {
 
   return (
     <>
-      {!(devices.length <= 1) && (
+      {cameras.length > 1 && (
         <Button icon="switch_camera" message={m.switchCamera} onClick={switchStream} />
       )}
       {devices.length && stream ? (
