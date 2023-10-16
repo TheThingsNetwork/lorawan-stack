@@ -35,7 +35,6 @@ const Video = props => {
   const [devices, setDevices] = useState([])
   const [cameras, setCameras] = useState([])
   const [videoMode, setVideoMode] = useState({})
-  const isMobile = window.innerWidth <= 768
 
   const getDevices = useCallback(async () => {
     if (!devices.length) {
@@ -78,7 +77,17 @@ const Video = props => {
   }, [devices, setCapture, setError, stream])
 
   const switchStream = useCallback(async () => {
-    if (videoMode.facingMode === 'environment') {
+    const ua = navigator.userAgent.toLowerCase()
+    if (ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1) {
+      const userStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: {
+            exact: videoMode.facingMode.exact === 'environment' ? 'user' : 'environment',
+          },
+        },
+      })
+      setStream(userStream)
+    } else if (videoMode.facingMode === 'environment') {
       const userStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user' },
       })
@@ -137,7 +146,7 @@ const Video = props => {
 
   return (
     <>
-      {cameras.length > 1 && isMobile && (
+      {!(devices.length <= 1) && (
         <Button icon="switch_camera" message={m.switchCamera} onClick={switchStream} />
       )}
       {devices.length && stream ? (
