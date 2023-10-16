@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -24,19 +23,20 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 import NetworkInformationContainer from '@console/containers/network-information-container'
 import DeploymentComponentStatus from '@console/containers/deployment-component-status'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import { getApplicationsList } from '@console/store/actions/applications'
 import { getGatewaysList } from '@console/store/actions/gateways'
 import { getUsersList } from '@console/store/actions/users'
 import { getOrganizationsList } from '@console/store/actions/organizations'
 
-const m = defineMessages({
-  title: 'Network information',
-})
-
 const NetworkInformation = () => {
   useBreadcrumbs(
     'admin-panel.network-information',
-    <Breadcrumb path={`/admin-panel/network-information`} content={m.title} />,
+    <Breadcrumb
+      path={`/admin-panel/network-information`}
+      content={sharedMessages.networkInformation}
+    />,
   )
 
   const requestActions = [
@@ -49,7 +49,7 @@ const NetworkInformation = () => {
   return (
     <>
       <RequireRequest requestAction={requestActions}>
-        <PageTitle title={m.title} className="panel-title mb-0" />
+        <PageTitle title={sharedMessages.networkInformation} className="panel-title mb-0" />
         <NetworkInformationContainer />
         <DeploymentComponentStatus />
       </RequireRequest>

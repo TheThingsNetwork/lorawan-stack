@@ -37,7 +37,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
   loginToken: 'Login Token',
-  loginFailed: 'Login failed',
 })
 
 const appRoot = selectApplicationRootPath()
@@ -97,7 +96,7 @@ const TokenLogin = () => {
         onSubmit={handleSubmit}
         initialValues={initialValues}
         error={error}
-        errorTitle={m.loginFailed}
+        errorTitle={sharedMessages.loginFailed}
         validationSchema={validationSchema}
         horizontal={false}
       >

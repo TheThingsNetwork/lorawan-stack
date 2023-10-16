@@ -30,6 +30,8 @@ import UserManagement from '@console/views/admin-user-management'
 import PacketBrokerRouter from '@console/views/admin-packet-broker'
 import NetworkInformation from '@console/views/admin-panel-network-information'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   checkFromState,
   mayConfigurePacketBroker,
@@ -39,7 +41,6 @@ import {
 
 const m = defineMessages({
   adminPanel: 'Admin panel',
-  networkInformation: 'Network information',
   userManagement: 'User management',
   globalNetworkSettings: 'Global network settings',
   peeringSettings: 'Peering settings',
@@ -56,7 +57,7 @@ const AdminPanel = () => {
       <IntlHelmet title={m.adminPanel} />
       <PanelView>
         <PanelView.Item
-          title={m.networkInformation}
+          title={sharedMessages.networkInformation}
           icon="view_compact"
           path="network-information"
           Component={NetworkInformation}

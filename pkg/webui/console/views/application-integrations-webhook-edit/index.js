@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
@@ -39,13 +38,6 @@ import {
   selectWebhookHasUnhealthyConfig,
 } from '@console/store/selectors/application-server'
 
-const m = defineMessages({
-  editWebhook: 'Edit webhook',
-  updateSuccess: 'Webhook updated',
-  deleteSuccess: 'Webhook deleted',
-  reactivateSuccess: 'Webhook activated',
-})
-
 const ApplicationWebhookEditInner = () => {
   const { appId, webhookId } = useParams()
   const healthStatusEnabled = useSelector(selectWebhooksHealthStatusEnabled)
@@ -64,7 +56,11 @@ const ApplicationWebhookEditInner = () => {
 
   return (
     <Container>
-      <PageTitle title={m.editWebhook} className="mb-0" hideHeading={Boolean(webhookTemplate)} />
+      <PageTitle
+        title={sharedMessages.editWebhook}
+        className="mb-0"
+        hideHeading={Boolean(webhookTemplate)}
+      />
       <Row>
         <Col lg={8} md={12}>
           <WebhookEdit

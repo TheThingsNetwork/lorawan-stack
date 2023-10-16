@@ -53,7 +53,6 @@ const m = defineMessages({
   formatInfo: 'Format information',
   selectAFile: 'Please select a template file',
   fileInfoPlaceholder: 'Please select a template format',
-  claiming: 'Claiming',
   setClaimAuthCode: 'Set claim authentication code',
   targetedComponents: 'Targeted components',
   advancedSectionTitle: 'Advanced end device claiming settings',
@@ -143,7 +142,7 @@ const DeviceBulkCreateFormInner = props => {
           <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
             <Form.Field
               disabled={!jsEnabled}
-              title={m.claiming}
+              title={sharedMessages.claiming}
               label={m.setClaimAuthCode}
               component={Checkbox}
               name="set_claim_auth_code"

@@ -28,7 +28,6 @@ import style from './qr.styl'
 const m = defineMessages({
   permissionDeniedError: 'Permission Denied: Please allow access to your camera or upload a photo',
   fetchingPermission: 'Please set camera permissions',
-  uploadImage: 'Upload an image',
 })
 
 const RequirePermission = props => {

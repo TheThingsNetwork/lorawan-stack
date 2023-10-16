@@ -271,14 +271,14 @@ export default class PubsubForm extends Component {
         )}
         <Form.Field
           name="mqtt.server_url"
-          title={m.serverUrl}
+          title={sharedMessages.serverUrl}
           placeholder={m.mqttServerUrlPlaceholder}
           component={Input}
           required
         />
         <Form.Field
           name="mqtt.client_id"
-          title={m.clientId}
+          title={sharedMessages.clientId}
           placeholder={m.mqttClientIdPlaceholder}
           component={Input}
           required

@@ -45,8 +45,6 @@ export default defineMessages({
   defaultRoutingPolicySet: 'Default routing policy set',
   routingPolicySet: 'Routing policy set',
   defaultRoutingPolicy: 'Default routing policy',
-  networks: 'Networks',
-  networkInformation: 'Network information',
   devAddressBlock: 'Device address block',
   devAddressBlocks: 'Device address blocks',
   lastPolicyChange: 'Last policy change',

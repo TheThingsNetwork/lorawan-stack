@@ -21,7 +21,6 @@ export default defineMessages({
   clientDescDescription:
     'The description is displayed to the user when authorizing the client. Use it to explain the purpose of your client.',
   createClient: 'Create OAuth client',
-  deleteTitle: 'Are you sure you want to delete this account?',
   deleteWarning:
     'This will <strong>PERMANENTLY DELETE THIS OAUTH CLIENT</strong> and <strong>LOCK THE OAUTH ID</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.',
   purgeWarning:
@@ -41,9 +40,7 @@ export default defineMessages({
     'If set, the authorization page will visually indicate endorsement to improve trust',
   grants: 'Grant types',
   grantsDesc: 'OAuth flows that can be used for the client to get a token',
-  grantAuthorizationLabel: 'Authorization code',
   grantRefreshTokenLabel: 'Refresh token',
-  grantPasswordLabel: 'Password',
   deleteClient: 'Delete OAuth client',
   urlsPlaceholder: 'https://example.com/oauth/callback',
   rightsWarning:

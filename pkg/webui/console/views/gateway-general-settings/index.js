@@ -145,7 +145,7 @@ const GatewayGeneralSettingsInner = () => {
             />
           </Collapse>
           <Collapse
-            title={m.lorawanTitle}
+            title={sharedMessages.lorawanOptions}
             description={m.lorawanDescription}
             disabled={false}
             initialCollapsed

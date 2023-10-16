@@ -39,7 +39,6 @@ const m = defineMessages({
   bytes: 'Bytes',
   replace: 'Replace downlink queue',
   push: 'Push to downlink queue (append)',
-  confirmedDownlink: 'Confirmed downlink',
   scheduleDownlink: 'Schedule downlink',
   downlinkSuccess: 'Downlink scheduled',
   bytesPayloadDescription: 'The desired payload bytes of the downlink message',
@@ -183,7 +182,11 @@ const DownlinkForm = ({ appId, devId, device, downlinkQueue, skipPayloadCrypto }
             maxLines={14}
           />
         )}
-        <Form.Field label={m.confirmedDownlink} name="confirmed" component={Checkbox} />
+        <Form.Field
+          label={sharedMessages.confirmedDownlink}
+          name="confirmed"
+          component={Checkbox}
+        />
         <SubmitBar>
           <Form.Submit component={SubmitButton} message={m.scheduleDownlink} />
         </SubmitBar>
