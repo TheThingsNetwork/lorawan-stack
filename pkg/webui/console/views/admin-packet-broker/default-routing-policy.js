@@ -17,7 +17,7 @@ import { Col } from 'react-grid-system'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import RoutingPolicyForm from '@console/components/routing-policy-form'
+import DefaultRoutingPolicyForm from '@console/components/default-routing-policy-form'
 
 import m from './messages'
 
@@ -30,7 +30,7 @@ const DefaultRoutingPolicyView = () => (
       component="p"
       className={style.routingPolicyInformation}
     />
-    <RoutingPolicyForm />
+    <DefaultRoutingPolicyForm />
   </Col>
 )
 
