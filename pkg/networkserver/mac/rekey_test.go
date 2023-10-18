@@ -28,6 +28,7 @@ import (
 )
 
 func TestHandleRekeyInd(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
@@ -48,8 +49,9 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue/original",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin: true,
-				Ids:          &ttnpb.EndDeviceIdentifiers{},
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
+				SupportsJoin:   true,
+				Ids:            &ttnpb.EndDeviceIdentifiers{},
 				PendingSession: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
@@ -62,7 +64,8 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin: true,
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
+				SupportsJoin:   true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
@@ -95,7 +98,8 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue/retransmission/non-matching pending session",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin: true,
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
+				SupportsJoin:   true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
@@ -116,7 +120,8 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin: true,
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
+				SupportsJoin:   true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
@@ -149,7 +154,8 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue/retransmission/no pending session",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin: true,
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
+				SupportsJoin:   true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
@@ -161,7 +167,8 @@ func TestHandleRekeyInd(t *testing.T) {
 				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin: true,
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
+				SupportsJoin:   true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
@@ -194,8 +201,9 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				SupportsJoin: true,
-				Ids:          &ttnpb.EndDeviceIdentifiers{},
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
+				SupportsJoin:   true,
+				Ids:            &ttnpb.EndDeviceIdentifiers{},
 				PendingSession: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
@@ -212,7 +220,8 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SupportsJoin: true,
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
+				SupportsJoin:   true,
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: test.DefaultDevAddr.Bytes(),
 				},

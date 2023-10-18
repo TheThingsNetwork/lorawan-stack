@@ -1396,7 +1396,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	return nil
 }
 
-var errRejoinRequest = errors.DefineUnimplemented("rejoin_request", "rejoin-request handling is not implemented")
+var errRejoinRequest = errors.DefineUnavailable("rejoin_request", "rejoin-request handling is not implemented")
 
 func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) error {
 	defer trace.StartRegion(ctx, "handle rejoin request").End()
