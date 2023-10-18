@@ -178,10 +178,6 @@ func (q *ApplicationUplinkQueue) Pop(
 	}
 
 	remainingCount := limit - len(msgs)
-	if remainingCount <= 0 {
-		remainingCount = 0
-	}
-
 	streams, err := q.redis.XReadGroup(ctx, &redis.XReadGroupArgs{
 		Group:    q.groupID,
 		Consumer: consumerID,
