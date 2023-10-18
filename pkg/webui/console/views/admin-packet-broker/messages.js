@@ -23,9 +23,9 @@ export default defineMessages({
   whyNetworkPeeringText:
     'Since LoRaWAN uses shared spectrum, gateways receive messages from devices registered on other LoRaWAN networks. Instead of discarding this traffic, these messages can be forwarded via Packet Broker to the home network of these devices. This extends coverage of networks and allows devices to use higher data rates that reduce channel utilization and increase battery life. No sensitive data is exposed as LoRaWAN is end-to-end encrypted and integrity protected.',
   enbaling:
-    'Enable forwarding via the options below or define custom routing policies. In the Networks tab below, you can see which other networks are forwarding data to this network.',
-  registrationStatus: 'Setup',
-  registerNetwork: 'Enable Packet Broker',
+    'Enable forwarding via the options below or define custom routing policies. In the Networks tab below (visible by selecting the option "Use custom routing policies"), you can see which other networks are forwarding data to this network.',
+  setup: 'Setup',
+  enablePacketBroker: 'Enable Packet Broker',
   packetBrokerRegistrationDesc:
     'Enabling will allow other networks to send traffic to you as well as you forwarding traffic to them, based on the exact routing policy.',
   network: 'Network: {network}',

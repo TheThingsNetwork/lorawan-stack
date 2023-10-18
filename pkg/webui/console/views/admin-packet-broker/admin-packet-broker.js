@@ -17,6 +17,7 @@ import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
 import { Routes, Route } from 'react-router-dom'
 import classnames from 'classnames'
+import { isEqual } from 'lodash'
 
 import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
 
@@ -50,6 +51,10 @@ import {
   getHomeNetworkDefaultRoutingPolicy,
   setHomeNetworkDefaultRoutingPolicy,
   deleteHomeNetworkDefaultRoutingPolicy,
+  setHomeNetworkRoutingPolicy,
+  getHomeNetworkRoutingPolicies,
+  deleteAllHomeNetworkRoutingPolicies,
+  getPacketBrokerNetworksList,
 } from '@console/store/actions/packet-broker'
 
 import {
@@ -59,6 +64,8 @@ import {
   selectListed,
   selectInfoError,
   selectHomeNetworkDefaultRoutingPolicy,
+  selectPacketBrokerHomeNetworkPoliciesStore,
+  selectPacketBrokerNetworks,
 } from '@console/store/selectors/packet-broker'
 
 import DefaultRoutingPolicyView from './default-routing-policy'
@@ -68,12 +75,36 @@ import m from './messages'
 import style from './admin-packet-broker.styl'
 
 const validationSchema = Yup.object({
+  _routing_configuration: Yup.string().oneOf(['all_networks', 'ttn', 'custom']),
   _use_default_policy: Yup.bool(),
   policy: Yup.object({
     uplink: Yup.object({}),
     downlink: Yup.object({}),
   }).when('_use_default_policy', { is: 'default', then: schema => schema.strip() }),
 })
+
+const peerWithEveryNetworkPolicy = {
+  uplink: {
+    join_request: true,
+    mac_data: true,
+    application_data: true,
+    signal_quality: true,
+    localization: true,
+  },
+  downlink: {
+    join_accept: true,
+    mac_data: true,
+    application_data: true,
+  },
+}
+
+const TTN_NET_ID = '19'
+const peerWithEveryNetwork = policy =>
+  isEqual(policy.uplink, peerWithEveryNetworkPolicy.uplink) &&
+  isEqual(policy.downlink, peerWithEveryNetworkPolicy.downlink)
+
+const onlyTtn = policies =>
+  Object.keys(policies).length === 1 && Object.keys(policies).includes(TTN_NET_ID)
 
 const PacketBroker = () => {
   const [activeTab, setActiveTab] = useState('default-routing-policy')
@@ -125,11 +156,6 @@ const PacketBroker = () => {
 
   const tabs = [
     { title: m.defaultRoutingPolicy, link: '/admin-panel/packet-broker', name: 'default' },
-    /*     {
-      title: m.defaultGatewayVisibility,
-      link: '/admin-panel/packet-broker/default-gateway-visibility',
-      name: 'default-gateway-visibility',
-    }, */
     {
       title: sharedMessages.networks,
       link: '/admin-panel/packet-broker/networks',
@@ -139,25 +165,46 @@ const PacketBroker = () => {
   ]
 
   const defaultRoutingPolicy = useSelector(selectHomeNetworkDefaultRoutingPolicy)
+  const routingPolicies = useSelector(selectPacketBrokerHomeNetworkPoliciesStore)
+  const networkList = useSelector(selectPacketBrokerNetworks)
   const initialValues = {
     _use_default_policy: isValidPolicy(defaultRoutingPolicy),
-    _routing_configuration: 'default',
+    _routing_configuration:
+      peerWithEveryNetwork(defaultRoutingPolicy) && isValidPolicy(defaultRoutingPolicy)
+        ? 'all_networks'
+        : onlyTtn(routingPolicies) && !isValidPolicy(defaultRoutingPolicy)
+        ? 'ttn'
+        : 'custom',
   }
   initialValues.policy = initialValues._use_default_policy
     ? defaultRoutingPolicy
     : { uplink: {}, downlink: {} }
-  const [rountingConfig, setRoutingConfig] = useState(initialValues._routing_configuration)
+
+  const [routingConfig, setRoutingConfig] = useState(undefined)
   const [formError, setFormError] = useState(undefined)
+
   const handleDefaultRoutingPolicySubmit = useCallback(
     async values => {
       const vals = validationSchema.cast(values)
-      const { _use_default_policy, policy } = vals
+      const { _routing_configuration, _use_default_policy, policy } = vals
+
       try {
-        if (_use_default_policy) {
+        if (_routing_configuration === 'ttn') {
+          const ids = networkList.map(network =>
+            'tenant_id' in network.id
+              ? `${network.id.net_id}/${network.id.tenant_id}`
+              : network.id.net_id,
+          )
+
+          await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
+          await dispatch(attachPromise(deleteAllHomeNetworkRoutingPolicies(ids)))
+          await dispatch(attachPromise(setHomeNetworkRoutingPolicy(TTN_NET_ID, policy)))
+        } else if (_use_default_policy || _routing_configuration === 'all_networks') {
           await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
         } else {
           await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
         }
+
         toast({
           message: m.defaultRoutingPolicySet,
           type: toast.types.SUCCESS,
@@ -166,7 +213,7 @@ const PacketBroker = () => {
         setFormError(error)
       }
     },
-    [dispatch, setFormError],
+    [dispatch, setFormError, networkList],
   )
 
   const handleRoutingConfigChange = useCallback(
@@ -175,6 +222,38 @@ const PacketBroker = () => {
     },
     [setRoutingConfig],
   )
+
+  const handleSetPolicies = useCallback(({ setValues }, { value }) => {
+    if (value !== 'custom') {
+      return setValues(values => ({
+        ...values,
+        _routing_configuration: value,
+        policy: {
+          uplink: {
+            join_request: true,
+            mac_data: true,
+            application_data: true,
+            signal_quality: true,
+            localization: true,
+          },
+          downlink: {
+            join_accept: true,
+            mac_data: true,
+            application_data: true,
+          },
+        },
+      }))
+    }
+
+    return setValues(values => ({
+      ...values,
+      _routing_configuration: value,
+    }))
+  }, [])
+
+  const showPolicyCheckboxes = routingConfig
+    ? routingConfig === 'custom'
+    : initialValues._routing_configuration === 'custom'
 
   return (
     <Container>
@@ -199,7 +278,7 @@ const PacketBroker = () => {
           <Message content={m.whyNetworkPeeringTitle} component="h3" />
           <Message content={m.whyNetworkPeeringText} className={style.info} component="p" />
           <Message content={m.enbaling} className={style.info} />
-          <Message content={m.registrationStatus} component="h3" className="mt-cs-xxl" />
+          <Message content={m.setup} component="h3" className="mt-cs-xxl" />
           {showError && <ErrorNotification small content={infoError} />}
           {enabled && (
             <Row gutterWidth={48} className="mb-cs-xl">
@@ -210,7 +289,7 @@ const PacketBroker = () => {
                       [style.disabled]: !enabled || !registerEnabled,
                     })}
                   >
-                    <Message content={m.registerNetwork} component="span" />
+                    <Message content={m.enablePacketBroker} component="span" />
                     <Switch
                       onChange={handleRegisterChange}
                       checked={registered}
@@ -288,7 +367,11 @@ const PacketBroker = () => {
                 className={style.subTitle}
               />
               <RequireRequest
-                requestAction={getHomeNetworkDefaultRoutingPolicy()}
+                requestAction={[
+                  getHomeNetworkDefaultRoutingPolicy(),
+                  getHomeNetworkRoutingPolicies(),
+                  getPacketBrokerNetworksList(),
+                ]}
                 errorRenderFunction={SubViewErrorComponent}
                 spinnerProps={{ inline: true, center: true, className: 'mt-ls-s' }}
               >
@@ -302,10 +385,11 @@ const PacketBroker = () => {
                     className="mb-cs-xl"
                     name="_routing_configuration"
                     onChange={handleRoutingConfigChange}
+                    valueSetter={handleSetPolicies}
                   >
                     <Radio
                       label="Forward traffic to all networks registered in Packet Broker"
-                      value="default"
+                      value="all_networks"
                     />
                     <Radio
                       label="Forward traffic to The Things Stack Sandbox (community network) only"
@@ -313,7 +397,7 @@ const PacketBroker = () => {
                     />
                     <Radio label="Use custom routing policies" value="custom" />
                   </Form.Field>
-                  {rountingConfig === 'custom' && (
+                  {showPolicyCheckboxes && (
                     <>
                       <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
                       <Routes>
