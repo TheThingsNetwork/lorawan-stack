@@ -158,6 +158,36 @@ func applicationUpFrom(values map[string]any) (*ttnpb.ApplicationUp, error) {
 	return up, nil
 }
 
+func addToBatch(
+	ctx context.Context,
+	m map[string]*contextualUplinkBatch,
+	confirmID string,
+	uid string,
+	up *ttnpb.ApplicationUp,
+) error {
+	ctx, err := unique.WithContext(ctx, uid)
+	if err != nil {
+		return errInvalidUID.WithCause(err)
+	}
+	ids, err := unique.ToDeviceID(uid)
+	if err != nil {
+		return errInvalidUID.WithCause(err)
+	}
+	key := unique.ID(ctx, ids.ApplicationIds)
+	batch, ok := m[key]
+	if !ok {
+		batch = &contextualUplinkBatch{
+			ctx:        ctx,
+			confirmIDs: make([]string, 0),
+			uplinks:    make([]*ttnpb.ApplicationUp, 0),
+		}
+		m[key] = batch
+	}
+	batch.uplinks = append(batch.uplinks, up)
+	batch.confirmIDs = append(batch.confirmIDs, confirmID)
+	return nil
+}
+
 // Pop implements ApplicationUplinkQueue interface.
 func (q *ApplicationUplinkQueue) Pop(
 	ctx context.Context, consumerID string, limit int,
