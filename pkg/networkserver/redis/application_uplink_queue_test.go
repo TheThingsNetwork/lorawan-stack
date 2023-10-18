@@ -19,7 +19,9 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+	"time"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
@@ -40,13 +42,15 @@ var (
 	maxLen           = int64(100)
 	groupID          = "ns-test"
 	minIdle          = (1 << 8) * test.Delay
-	streamBlockLimit = (1 << 5) * test.Delay
+	streamBlockLimit = (1 << 6) * test.Delay
 
 	appCount       = 5
 	devCountPerApp = 3
 )
 
-func setupRedusApplicationUplinkQueue(t *testing.T, cl *ttnredis.Client) (*nsredis.ApplicationUplinkQueue, func()) {
+func setupRedusApplicationUplinkQueue(
+	t *testing.T, cl *ttnredis.Client, minIdle, streamBlockLimit time.Duration,
+) (*nsredis.ApplicationUplinkQueue, func()) {
 	t.Helper()
 
 	_, ctx := test.New(t)
@@ -60,14 +64,14 @@ func setupRedusApplicationUplinkQueue(t *testing.T, cl *ttnredis.Client) (*nsred
 	}
 }
 
-func TestApplicationUplinkQueueInitCreatesConsumerGroup(t *testing.T) {
+func TestApplicationUplinkQueueInit(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "init")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl)
+	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -84,14 +88,14 @@ func TestApplicationUplinkQueueInitCreatesConsumerGroup(t *testing.T) {
 	a.So(groups[0].Consumers, should.Equal, 0)
 }
 
-func TestApplicationUplinkQueueCloseRemovesAllConsumers(t *testing.T) {
+func TestApplicationUplinkQueueClose(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "close")...)
 	t.Cleanup(redisCloseFn)
 
-	q, _ := setupRedusApplicationUplinkQueue(t, cl)
+	q, _ := setupRedusApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
 		t.FailNow()
@@ -192,7 +196,7 @@ func TestApplicationUplinkQueueAdd(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "add")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl)
+	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -242,7 +246,7 @@ func TestApplicationUplinkQueuePopAll(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "pop_all")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl)
+	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -312,7 +316,7 @@ func TestApplicationUplinkQueuePopErr(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "pop_err")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl)
+	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -383,4 +387,71 @@ func TestApplicationUplinkQueuePopErr(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(actual, should.HaveLength, len(expected))    // All uplinks should have been processed
 	assertStreamUplinkCount(t, cl, expectedFailCount) // Only failed uplinks should remain in the stream
+}
+
+func TestApplicationUplinkQueueClaiming(t *testing.T) {
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "claiming")...)
+	t.Cleanup(redisCloseFn)
+
+	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl, 0, streamBlockLimit)
+	t.Cleanup(qCloseFn)
+
+	if !a.So(q.Init(ctx), should.BeNil) {
+		t.FailNow()
+	}
+
+	expected := generateRandomUplinks(t, appCount, devCountPerApp)
+	totalCount := len(expected)
+	subsetCount := totalCount / 2
+	subset, rest := expected[:subsetCount], expected[subsetCount:]
+
+	if err := q.Add(ctx, subset...); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	consumerID1 := fmt.Sprintf("test-consumer-%d", 1)
+	err := q.Pop(ctx, consumerID1, totalCount, func(ctx context.Context, ups []*ttnpb.ApplicationUp) error {
+		return fmt.Errorf("consumer error")
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	streamID := cl.Key("uplinks")
+	pending, err := cl.XPendingExt(ctx, &redis.XPendingExtArgs{
+		Stream: streamID,
+		Group:  groupID,
+		Start:  "-",
+		End:    "+",
+		Count:  int64(totalCount),
+	}).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(len(pending), should.Equal, subsetCount)
+
+	if err := q.Add(ctx, rest...); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	actual := make([]*ttnpb.ApplicationUp, 0, len(expected))
+	invokeCount := 0
+	consumerID2 := fmt.Sprintf("test-consumer-%d", 2)
+	err = q.Pop(ctx, consumerID2, 100, func(ctx context.Context, ups []*ttnpb.ApplicationUp) error {
+		assertAllEqualAppIDs(t, ups)
+		invokeCount++
+		actual = append(actual, ups...)
+		return nil
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	a.So(err, should.BeNil)
+	a.So(invokeCount, should.Equal, appCount)
+	a.So(actual, should.HaveLength, len(expected))
+	assertStreamUplinkCount(t, cl, 0)
 }
