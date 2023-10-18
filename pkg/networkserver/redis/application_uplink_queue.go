@@ -201,13 +201,11 @@ func (q *ApplicationUplinkQueue) Pop(
 	for _, msg := range msgs {
 		uid, err := uidStrFrom(msg.Values)
 		if err != nil {
-			log.FromContext(ctx).Warn("Malformed uplink UID. Skipping message.")
-			continue
+			return err
 		}
 		up, err := applicationUpFrom(msg.Values)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Malformed uplink payload. Skipping message.")
-			continue
+			return err
 		}
 		if err := addToBatch(ctx, batches, msg.ID, uid, up); err != nil {
 			return err
