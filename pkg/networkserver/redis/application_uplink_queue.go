@@ -188,6 +188,41 @@ func addToBatch(
 	return nil
 }
 
+func (q *ApplicationUplinkQueue) processMessages(
+	ctx context.Context,
+	msgs []redis.XMessage,
+	f func(context.Context, []*ttnpb.ApplicationUp) error,
+) error {
+	batches := map[string]*contextualUplinkBatch{}
+	for _, msg := range msgs {
+		uid, err := uidStrFrom(msg.Values)
+		if err != nil {
+			return err
+		}
+		up, err := applicationUpFrom(msg.Values)
+		if err != nil {
+			return err
+		}
+		if err := addToBatch(ctx, batches, msg.ID, uid, up); err != nil {
+			return err
+		}
+	}
+	pipeliner := q.redis.Pipeline()
+	for _, batch := range batches {
+		if err := f(batch.ctx, batch.uplinks); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to process uplink batch")
+			continue // Do not confirm messages that failed to process.
+		}
+
+		pipeliner.XAck(ctx, q.streamID, q.groupID, batch.confirmIDs...)
+		pipeliner.XDel(ctx, q.streamID, batch.confirmIDs...)
+	}
+	if _, err := pipeliner.Exec(ctx); err != nil {
+		return ttnredis.ConvertError(err)
+	}
+	return nil
+}
+
 // Pop implements ApplicationUplinkQueue interface.
 func (q *ApplicationUplinkQueue) Pop(
 	ctx context.Context, consumerID string, limit int,
@@ -218,37 +253,9 @@ func (q *ApplicationUplinkQueue) Pop(
 	if err != nil && !errors.Is(err, redis.Nil) {
 		return ttnredis.ConvertError(err)
 	}
-	batches := map[string]*contextualUplinkBatch{}
 	if len(streams) > 0 {
 		stream := streams[0]
 		msgs = append(msgs, stream.Messages...)
 	}
-
-	for _, msg := range msgs {
-		uid, err := uidStrFrom(msg.Values)
-		if err != nil {
-			return err
-		}
-		up, err := applicationUpFrom(msg.Values)
-		if err != nil {
-			return err
-		}
-		if err := addToBatch(ctx, batches, msg.ID, uid, up); err != nil {
-			return err
-		}
-	}
-	pipeliner := q.redis.Pipeline()
-	for _, batch := range batches {
-		if err := f(batch.ctx, batch.uplinks); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to process uplink batch")
-			continue // Do not confirm messages that failed to process.
-		}
-
-		pipeliner.XAck(ctx, q.streamID, q.groupID, batch.confirmIDs...)
-		pipeliner.XDel(ctx, q.streamID, batch.confirmIDs...)
-	}
-	if _, err := pipeliner.Exec(ctx); err != nil {
-		return ttnredis.ConvertError(err)
-	}
-	return nil
+	return q.processMessages(ctx, msgs, f)
 }
