@@ -64,7 +64,7 @@ func TestApplicationUplinkQueueInitCreatesConsumerGroup(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
-	cl, redisCloseFn := test.NewRedis(ctx, redisNamespace[:]...)
+	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "init")...)
 	t.Cleanup(redisCloseFn)
 
 	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl)
@@ -88,7 +88,7 @@ func TestApplicationUplinkQueueCloseRemovesAllConsumers(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
-	cl, redisCloseFn := test.NewRedis(ctx, redisNamespace[:]...)
+	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "close")...)
 	t.Cleanup(redisCloseFn)
 
 	q, _ := setupRedusApplicationUplinkQueue(t, cl)
@@ -189,7 +189,7 @@ func TestApplicationUplinkQueueAdd(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
-	cl, redisCloseFn := test.NewRedis(ctx, redisNamespace[:]...)
+	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "add")...)
 	t.Cleanup(redisCloseFn)
 
 	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl)
@@ -239,7 +239,7 @@ func TestApplicationUplinkQueuePopAll(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
-	cl, redisCloseFn := test.NewRedis(ctx, redisNamespace[:]...)
+	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "pop_all")...)
 	t.Cleanup(redisCloseFn)
 
 	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl)
@@ -309,7 +309,7 @@ func TestApplicationUplinkQueuePopErr(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 
-	cl, redisCloseFn := test.NewRedis(ctx, redisNamespace[:]...)
+	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "pop_err")...)
 	t.Cleanup(redisCloseFn)
 
 	q, qCloseFn := setupRedusApplicationUplinkQueue(t, cl)
