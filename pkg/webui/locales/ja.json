@@ -685,6 +685,7 @@
   "console.views.admin-packet-broker.messages.whyNetworkPeeringText": "",
   "console.views.admin-packet-broker.messages.enbaling": "",
   "console.views.admin-packet-broker.messages.setup": "",
+  "console.views.admin-packet-broker.messages.packetBrokerDisabledDesc": "",
   "console.views.admin-packet-broker.messages.enablePacketBroker": "",
   "console.views.admin-packet-broker.messages.packetBrokerRegistrationDesc": "ご自宅のネットワークから、またはご自宅のネットワークへのピアリングを可能にするには、ご自宅のネットワークを登録する必要があります。これにより、お客様のネットワークがPacket Brokerに認識され、お客様のネットワークのピアリング動作を設定することができます",
   "console.views.admin-packet-broker.messages.network": "ネットワーク: {network}",
