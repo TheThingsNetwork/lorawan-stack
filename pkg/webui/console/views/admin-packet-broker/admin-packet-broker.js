@@ -55,7 +55,6 @@ import {
   setHomeNetworkRoutingPolicy,
   getHomeNetworkRoutingPolicies,
   deleteAllHomeNetworkRoutingPolicies,
-  getPacketBrokerNetworksList,
 } from '@console/store/actions/packet-broker'
 
 import {
@@ -66,7 +65,6 @@ import {
   selectInfoError,
   selectHomeNetworkDefaultRoutingPolicy,
   selectPacketBrokerHomeNetworkPoliciesStore,
-  selectPacketBrokerNetworks,
 } from '@console/store/selectors/packet-broker'
 
 import DefaultRoutingPolicyView from './default-routing-policy'
@@ -182,7 +180,6 @@ const PacketBroker = () => {
 
   const defaultRoutingPolicy = useSelector(selectHomeNetworkDefaultRoutingPolicy)
   const routingPolicies = useSelector(selectPacketBrokerHomeNetworkPoliciesStore)
-  const networkList = useSelector(selectPacketBrokerNetworks)
   const initialValues = {
     _routing_configuration:
       peerWithEveryNetwork(defaultRoutingPolicy) && isValidPolicy(defaultRoutingPolicy)
@@ -206,11 +203,7 @@ const PacketBroker = () => {
 
       try {
         if (_routing_configuration === 'ttn') {
-          const ids = networkList.map(network =>
-            'tenant_id' in network.id
-              ? `${network.id.net_id}/${network.id.tenant_id}`
-              : network.id.net_id,
-          )
+          const ids = Object.keys(routingPolicies)
 
           await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
           await dispatch(attachPromise(deleteAllHomeNetworkRoutingPolicies(ids)))
@@ -227,7 +220,7 @@ const PacketBroker = () => {
         setFormError(error)
       }
     },
-    [dispatch, setFormError, networkList],
+    [dispatch, setFormError, routingPolicies],
   )
 
   const handleRoutingConfigChange = useCallback(
@@ -373,7 +366,6 @@ const PacketBroker = () => {
                 requestAction={[
                   getHomeNetworkDefaultRoutingPolicy(),
                   getHomeNetworkRoutingPolicies(),
-                  getPacketBrokerNetworksList(),
                 ]}
                 errorRenderFunction={SubViewErrorComponent}
                 spinnerProps={{ inline: true, center: true, className: 'mt-ls-s' }}
