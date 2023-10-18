@@ -84,7 +84,7 @@ const validationSchema = Yup.object({
   }).when('_use_default_policy', { is: 'default', then: schema => schema.strip() }),
 })
 
-const peerWithEveryNetworkPolicy = {
+const fullyPermissiveNetworkPolicy = {
   uplink: {
     join_request: true,
     mac_data: true,
@@ -99,10 +99,25 @@ const peerWithEveryNetworkPolicy = {
   },
 }
 
+const fullyRestrictiveNetworkPolicy = {
+  uplink: {
+    join_request: false,
+    mac_data: false,
+    application_data: false,
+    signal_quality: false,
+    localization: false,
+  },
+  downlink: {
+    join_accept: false,
+    mac_data: false,
+    application_data: false,
+  },
+}
+
 const TTN_NET_ID = '19'
 const peerWithEveryNetwork = policy =>
-  isEqual(policy.uplink, peerWithEveryNetworkPolicy.uplink) &&
-  isEqual(policy.downlink, peerWithEveryNetworkPolicy.downlink)
+  isEqual(policy.uplink, fullyPermissiveNetworkPolicy.uplink) &&
+  isEqual(policy.downlink, fullyPermissiveNetworkPolicy.downlink)
 
 const onlyTtn = policies =>
   Object.keys(policies).length === 1 && Object.keys(policies).includes(TTN_NET_ID)
@@ -169,7 +184,6 @@ const PacketBroker = () => {
   const routingPolicies = useSelector(selectPacketBrokerHomeNetworkPoliciesStore)
   const networkList = useSelector(selectPacketBrokerNetworks)
   const initialValues = {
-    _use_default_policy: isValidPolicy(defaultRoutingPolicy),
     _routing_configuration:
       peerWithEveryNetwork(defaultRoutingPolicy) && isValidPolicy(defaultRoutingPolicy)
         ? 'all_networks'
@@ -177,9 +191,10 @@ const PacketBroker = () => {
         ? 'ttn'
         : 'custom',
   }
-  initialValues.policy = initialValues._use_default_policy
-    ? defaultRoutingPolicy
-    : { uplink: {}, downlink: {} }
+  initialValues.policy =
+    isValidPolicy(defaultRoutingPolicy) && !peerWithEveryNetwork(defaultRoutingPolicy)
+      ? defaultRoutingPolicy
+      : { uplink: {}, downlink: {} }
 
   const [routingConfig, setRoutingConfig] = useState(undefined)
   const [formError, setFormError] = useState(undefined)
@@ -187,7 +202,7 @@ const PacketBroker = () => {
   const handleDefaultRoutingPolicySubmit = useCallback(
     async values => {
       const vals = validationSchema.cast(values)
-      const { _routing_configuration, _use_default_policy, policy } = vals
+      const { _routing_configuration, policy } = vals
 
       try {
         if (_routing_configuration === 'ttn') {
@@ -200,10 +215,8 @@ const PacketBroker = () => {
           await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
           await dispatch(attachPromise(deleteAllHomeNetworkRoutingPolicies(ids)))
           await dispatch(attachPromise(setHomeNetworkRoutingPolicy(TTN_NET_ID, policy)))
-        } else if (_use_default_policy || _routing_configuration === 'all_networks') {
-          await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
         } else {
-          await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
+          await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
         }
 
         toast({
@@ -229,26 +242,14 @@ const PacketBroker = () => {
       return setValues(values => ({
         ...values,
         _routing_configuration: value,
-        policy: {
-          uplink: {
-            join_request: true,
-            mac_data: true,
-            application_data: true,
-            signal_quality: true,
-            localization: true,
-          },
-          downlink: {
-            join_accept: true,
-            mac_data: true,
-            application_data: true,
-          },
-        },
+        policy: fullyPermissiveNetworkPolicy,
       }))
     }
 
     return setValues(values => ({
       ...values,
       _routing_configuration: value,
+      policy: fullyRestrictiveNetworkPolicy,
     }))
   }, [])
 
