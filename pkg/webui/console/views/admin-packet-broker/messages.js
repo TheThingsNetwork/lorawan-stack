@@ -25,6 +25,8 @@ export default defineMessages({
   enbaling:
     'Enable forwarding via the options below or define custom routing policies. In the Networks tab below (visible by selecting the option "Use custom routing policies"), you can see which other networks are forwarding data to this network.',
   setup: 'Setup',
+  packetBrokerDisabledDesc:
+    'The Things Stack is not set up to use Packet Broker. Please refer to the documentation link above for instructions on how to set up The Things Stack for peering with Packet Broker.',
   enablePacketBroker: 'Enable Packet Broker',
   packetBrokerRegistrationDesc:
     'Enabling will allow other networks to send traffic to you as well as you forwarding traffic to them, based on the exact routing policy.',
@@ -39,7 +41,7 @@ export default defineMessages({
     'This will hide your network. Other network administrators will not be able to see your network to configure routing policies.',
   routingPolicyInformation:
     'You can use the checkboxes below to control the default forwarding behavior of your network. You can additionally set up individual per-network routing policies via the Networks tab.',
-  defaultRoutingPolicySet: 'Default routing policy set',
+  defaultRoutingPolicySet: 'Default routing configuration set',
   routingPolicySet: 'Routing policy set',
   defaultRoutingPolicy: 'Default routing policy',
   devAddressBlock: 'Device address block',

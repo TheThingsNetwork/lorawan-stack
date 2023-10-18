@@ -32,6 +32,7 @@ import Form from '@ttn-lw/components/form'
 import toast from '@ttn-lw/components/toast'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -279,6 +280,7 @@ const PacketBroker = () => {
           <Message content={m.whyNetworkPeeringText} className={style.info} component="p" />
           <Message content={m.enbaling} className={style.info} />
           <Message content={m.setup} component="h3" className="mt-cs-xxl" />
+          {!enabled && <Notification warning small content={m.packetBrokerDisabledDesc} />}
           {showError && <ErrorNotification small content={infoError} />}
           {enabled && (
             <Row gutterWidth={48} className="mb-cs-xl">

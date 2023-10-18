@@ -46,6 +46,7 @@ describe('Packet Broker networks', () => {
       fixture: 'console/packet-broker/policies-home-network.json',
     })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/networks`)
+    cy.findByLabelText('Use custom routing policies').check()
 
     const { networks } = this.networks
     const networksFiltered = networks.filter(
