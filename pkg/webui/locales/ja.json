@@ -191,8 +191,6 @@
   "console.components.application-general-settings-form.index.useAlcsync": "LoRaアプリケーションレイヤー・クロックシンクロパッケージの使用",
   "console.components.application-general-settings-form.index.adminContactDescription": "このアプリケーションの管理者の連絡先情報。通常、アプリケーションに関する管理上の問い合わせ先を示すために使用されます。",
   "console.components.application-general-settings-form.index.techContactDescription": "このアプリケーションの技術的な連絡先情報。通常、アプリケーションに関する技術/セキュリティの質問の連絡先を示すために使用されます。",
-  "console.components.default-routing-policy-form.index.useDefaultPolicy": "",
-  "console.components.default-routing-policy-form.index.doNotUseADefaultPolicy": "",
   "console.components.device-import-form.index.file": "ファイル",
   "console.components.device-import-form.index.formatInfo": "フォーマット情報",
   "console.components.device-import-form.index.selectAFile": "テンプレートファイルを選択してください",

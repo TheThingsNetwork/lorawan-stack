@@ -191,8 +191,6 @@
   "console.components.application-general-settings-form.index.useAlcsync": "Use Application Layer Clock Synchronization",
   "console.components.application-general-settings-form.index.adminContactDescription": "Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.",
   "console.components.application-general-settings-form.index.techContactDescription": "Technical contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.",
-  "console.components.default-routing-policy-form.index.useDefaultPolicy": "Use default routing policy for this network",
-  "console.components.default-routing-policy-form.index.doNotUseADefaultPolicy": "Do not use a default routing policy for this network",
   "console.components.device-import-form.index.file": "File",
   "console.components.device-import-form.index.formatInfo": "Format information",
   "console.components.device-import-form.index.selectAFile": "Please select a template file",
