@@ -34,7 +34,7 @@ const Video = props => {
   const [stream, setStream] = useState(undefined)
   const [devices, setDevices] = useState([])
   const [cameras, setCameras] = useState([])
-  const isMobile = window.innerWidth <= 768
+  const [videoMode, setVideoMode] = useState({})
 
   const getDevices = useCallback(async () => {
     if (!devices.length) {
@@ -59,6 +59,7 @@ const Video = props => {
             : { deviceId: rearCamera.deviceId }
           : { facingMode: 'environment' }
 
+      setVideoMode(videoMode)
       try {
         const userStream = await navigator.mediaDevices.getUserMedia({
           video: videoMode ? { ...videoMode } : { facingMode: 'environment' },
@@ -76,30 +77,38 @@ const Video = props => {
   }, [devices, setCapture, setError, stream])
 
   const switchStream = useCallback(async () => {
-    if (stream === { facingMode: 'environment' }) {
+    const ua = navigator.userAgent.toLowerCase()
+    if (ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1) {
+      const userStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: {
+            exact: videoMode.facingMode.exact === 'environment' ? 'user' : 'environment',
+          },
+        },
+      })
+      setStream(userStream)
+    } else if (videoMode.facingMode === 'environment') {
       const userStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user' },
       })
       setStream(userStream)
-    } else if (stream === { facingMode: 'user' }) {
+    } else if (videoMode.facingMode === 'user') {
       const userStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment' },
       })
       setStream(userStream)
-    } else if ('deviceId' in stream) {
-      const indexOfCurrentDevice = cameras.findIndex(camera => camera.deviceId === stream.deviceId)
+    } else if ('deviceId' in videoMode) {
+      let indexOfCurrentDevice = cameras.findIndex(camera => camera.deviceId === videoMode.deviceId)
       // The first item will be taken from the beginning of the array after the last item.
       const nextIndex = ++indexOfCurrentDevice % cameras.length
-      const device =
-        cameras.length === 2
-          ? cameras.find((_, i) => i !== indexOfCurrentDevice)
-          : cameras[nextIndex]
+      const device = cameras[nextIndex]
+      setVideoMode({ deviceId: device.deviceId })
       const userStream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: device.deviceId },
       })
       setStream(userStream)
     }
-  }, [cameras, stream])
+  }, [cameras, videoMode])
 
   useEffect(() => {
     getDevices()
@@ -135,23 +144,25 @@ const Video = props => {
     }
   }, [devices, handleVideoFrame, stream, videoRef])
 
-  return devices.length && stream ? (
+  return (
     <>
-      <video
-        autoPlay
-        playsInline
-        ref={videoRef}
-        className={style.video}
-        data-test-id="webcam-feed"
-      />
-      {cameras.length > 1 && isMobile && (
+      {cameras.length > 1 && (
         <Button icon="switch_camera" message={m.switchCamera} onClick={switchStream} />
       )}
+      {devices.length && stream ? (
+        <video
+          autoPlay
+          playsInline
+          ref={videoRef}
+          className={style.video}
+          data-test-id="webcam-feed"
+        />
+      ) : (
+        <Spinner center>
+          <Message className={style.msg} content={m.fetchingCamera} />
+        </Spinner>
+      )}
     </>
-  ) : (
-    <Spinner center>
-      <Message className={style.msg} content={m.fetchingCamera} />
-    </Spinner>
   )
 }
 
