@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -411,6 +412,10 @@ func (ns *NetworkServer) submitApplicationUplinks(ctx context.Context, ups ...*t
 	))
 	if err := ns.uplinkSubmissionPool.Publish(ctx, ups); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to enqueue application uplinks in submission pool")
+		if nonRetryableUplinkError(err) {
+			log.FromContext(ctx).Warn("Error is non-retryable, dropping application uplinks")
+			return
+		}
 		ns.enqueueApplicationUplinks(ctx, ups...)
 		return
 	}
@@ -425,8 +430,11 @@ func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, ups []*ttnp
 	}
 	if err := ns.sendApplicationUplinks(ctx, ttnpb.NewNsAsClient(conn), ups...); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
+		if nonRetryableUplinkError(err) {
+			log.FromContext(ctx).Warn("Error is non-retryable, dropping application uplinks")
+			return
+		}
 		ns.enqueueApplicationUplinks(ctx, ups...)
-		return
 	}
 }
 
@@ -462,3 +470,13 @@ var (
 		"session",
 	}
 )
+
+func nonRetryableUplinkError(err error) bool {
+	return errors.IsFailedPrecondition(err) ||
+		errors.IsResourceExhausted(err) ||
+		errors.IsAborted(err) ||
+		errors.IsUnauthenticated(err) ||
+		errors.IsPermissionDenied(err) ||
+		errors.IsUnimplemented(err) ||
+		errors.IsInternal(err)
+}

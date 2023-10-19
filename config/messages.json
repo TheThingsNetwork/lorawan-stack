@@ -7370,6 +7370,15 @@
       "file": "application_uplink_queue.go"
     }
   },
+  "error:pkg/networkserver/redis:invalid_uid": {
+    "translations": {
+      "en": "invalid UID"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "application_uplink_queue.go"
+    }
+  },
   "error:pkg/networkserver/redis:missing_downlink_correlation_id": {
     "translations": {
       "en": "missing identifier correlation ID on downlink message"
@@ -7395,6 +7404,15 @@
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:missing_uid": {
+    "translations": {
+      "en": "missing UID"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "application_uplink_queue.go"
     }
   },
   "error:pkg/networkserver/redis:no_uplink_match": {

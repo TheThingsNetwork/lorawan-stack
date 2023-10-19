@@ -16,51 +16,62 @@ package redis
 
 import (
 	"context"
+	"sync"
 
 	"github.com/redis/go-redis/v9"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
-type ApplicationUplinkQueue struct {
-	applicationQueue *ttnredis.TaskQueue
-
-	redis   *ttnredis.Client
-	maxLen  int64
-	group   string
-	key     string
-	minIdle time.Duration
+type contextualUplinkBatch struct {
+	ctx        context.Context
+	confirmIDs []string
+	uplinks    []*ttnpb.ApplicationUp
 }
 
 const (
-	payloadKey = "payload"
+	payloadKey    = "payload"
+	payloadUIDKey = "uid"
 )
+
+var (
+	errMissingPayload = errors.DefineDataLoss("missing_payload", "missing payload")
+	errInvalidPayload = errors.DefineCorruption("invalid_payload", "invalid payload")
+	errMissingUID     = errors.DefineDataLoss("missing_uid", "missing UID")
+	errInvalidUID     = errors.DefineCorruption("invalid_uid", "invalid UID")
+)
+
+// ApplicationUplinkQueue is an implementation of ApplicationUplinkQueue.
+type ApplicationUplinkQueue struct {
+	redis            *ttnredis.Client
+	maxLen           int64
+	groupID          string
+	streamID         string
+	minIdle          time.Duration
+	streamBlockLimit time.Duration
+	consumers        sync.Map
+}
 
 // NewApplicationUplinkQueue returns new application uplink queue.
 func NewApplicationUplinkQueue(
 	cl *ttnredis.Client,
 	maxLen int64,
-	group string,
+	groupID string,
 	minIdle time.Duration,
 	streamBlockLimit time.Duration,
 ) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
-		applicationQueue: &ttnredis.TaskQueue{
-			Redis:            cl,
-			MaxLen:           maxLen,
-			Group:            group,
-			Key:              cl.Key("application"),
-			StreamBlockLimit: streamBlockLimit,
-		},
-		redis:   cl,
-		maxLen:  maxLen,
-		group:   group,
-		key:     cl.Key("application-uplink"),
-		minIdle: minIdle,
+		redis:            cl,
+		maxLen:           maxLen,
+		groupID:          groupID,
+		streamID:         cl.Key("uplinks"),
+		minIdle:          minIdle,
+		streamBlockLimit: streamBlockLimit,
+		consumers:        sync.Map{},
 	}
 }
 
@@ -68,68 +79,48 @@ func ApplicationUplinkQueueUIDGenericUplinkKey(r keyer, uid string) string {
 	return ttnredis.Key(UIDKey(r, uid), "uplinks")
 }
 
-func (q *ApplicationUplinkQueue) uidGenericUplinkKey(uid string) string {
-	return ApplicationUplinkQueueUIDGenericUplinkKey(q.redis, uid)
-}
-
-func (q *ApplicationUplinkQueue) uidInvalidationKey(uid string) string {
-	return ttnredis.Key(q.uidGenericUplinkKey(uid), "invalidation")
-}
-
-func (q *ApplicationUplinkQueue) uidJoinAcceptKey(uid string) string {
-	return ttnredis.Key(q.uidGenericUplinkKey(uid), "join-accept")
-}
-
 // Init initializes the ApplicationUplinkQueue.
 func (q *ApplicationUplinkQueue) Init(ctx context.Context) error {
-	return q.applicationQueue.Init(ctx)
+	cmd := q.redis.XGroupCreateMkStream(ctx, q.streamID, q.groupID, "0")
+	if err := cmd.Err(); err != nil && !ttnredis.IsConsumerGroupExistsErr(err) {
+		return ttnredis.ConvertError(err)
+	}
+	return nil
 }
 
-// Close closes the ApplicationUplinkQueue.
+// Close removes all consumers from the consumer group.
 func (q *ApplicationUplinkQueue) Close(ctx context.Context) error {
-	return q.applicationQueue.Close(ctx)
+	pipeline := q.redis.Pipeline()
+	q.consumers.Range(func(key, value any) bool {
+		pipeline.XGroupDelConsumer(ctx, q.streamID, q.groupID, key.(string))
+		return true
+	})
+	if _, err := pipeline.Exec(ctx); err != nil {
+		return ttnredis.ConvertError(err)
+	}
+	return nil
 }
 
+// Add implements ApplicationUplinkQueue interface.
 func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error {
 	if len(ups) == 0 {
 		return nil
 	}
 	_, err := q.redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-		now := time.Now()
-		taskMap := map[string]time.Time{}
 		for _, up := range ups {
-			uid := unique.ID(ctx, up.EndDeviceIds.ApplicationIds)
-
 			s, err := ttnredis.MarshalProto(up)
 			if err != nil {
 				return err
 			}
-
-			var uidStreamID string
-			switch up.Up.(type) {
-			case *ttnpb.ApplicationUp_JoinAccept:
-				uidStreamID = q.uidJoinAcceptKey(uid)
-			case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
-				uidStreamID = q.uidInvalidationKey(uid)
-			default:
-				uidStreamID = q.uidGenericUplinkKey(uid)
-			}
 			p.XAdd(ctx, &redis.XAddArgs{
-				Stream: uidStreamID,
+				Stream: q.streamID,
 				MaxLen: q.maxLen,
 				Approx: true,
 				Values: map[string]any{
-					payloadKey: s,
+					payloadUIDKey: unique.ID(ctx, up.EndDeviceIds),
+					payloadKey:    s,
 				},
 			})
-			if _, ok := taskMap[uid]; !ok {
-				taskMap[uid] = now
-			}
-		}
-		for uid, t := range taskMap {
-			if err := q.applicationQueue.Add(ctx, p, uid, t, false); err != nil {
-				return err
-			}
 		}
 		return nil
 	})
@@ -139,83 +130,132 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 	return nil
 }
 
-var (
-	errInvalidPayload = errors.DefineCorruption("invalid_payload", "invalid payload")
-	errMissingPayload = errors.DefineDataLoss("missing_payload", "missing payload")
-)
-
-func (q *ApplicationUplinkQueue) Dispatch(ctx context.Context, consumerID string) error {
-	return q.applicationQueue.Dispatch(ctx, consumerID, nil)
+func uidStrFrom(values map[string]any) (string, error) {
+	uidValue, ok := values[payloadUIDKey]
+	if !ok {
+		return "", errMissingUID.New()
+	}
+	uid, ok := uidValue.(string)
+	if !ok {
+		return "", errInvalidUID.New()
+	}
+	return uid, nil
 }
 
-func (q *ApplicationUplinkQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, *ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
-	return q.applicationQueue.Pop(ctx, consumerID, nil, func(p redis.Pipeliner, uid string, _ time.Time) error {
-		appID, err := unique.ToApplicationID(uid)
+func applicationUpFrom(values map[string]any) (*ttnpb.ApplicationUp, error) {
+	payloadValue, ok := values[payloadKey]
+	if !ok {
+		return nil, errMissingPayload.New()
+	}
+	payload, ok := payloadValue.(string)
+	if !ok {
+		return nil, errInvalidPayload.New()
+	}
+	up := &ttnpb.ApplicationUp{}
+	if err := ttnredis.UnmarshalProto(payload, up); err != nil {
+		return nil, errInvalidPayload.WithCause(err)
+	}
+	return up, nil
+}
+
+func addToBatch(
+	ctx context.Context,
+	m map[string]*contextualUplinkBatch,
+	confirmID string,
+	uid string,
+	up *ttnpb.ApplicationUp,
+) error {
+	ctx, err := unique.WithContext(ctx, uid)
+	if err != nil {
+		return errInvalidUID.WithCause(err)
+	}
+	ids, err := unique.ToDeviceID(uid)
+	if err != nil {
+		return errInvalidUID.WithCause(err)
+	}
+	key := unique.ID(ctx, ids.ApplicationIds)
+	batch, ok := m[key]
+	if !ok {
+		batch = &contextualUplinkBatch{
+			ctx:        ctx,
+			confirmIDs: make([]string, 0),
+			uplinks:    make([]*ttnpb.ApplicationUp, 0),
+		}
+		m[key] = batch
+	}
+	batch.uplinks = append(batch.uplinks, up)
+	batch.confirmIDs = append(batch.confirmIDs, confirmID)
+	return nil
+}
+
+func (q *ApplicationUplinkQueue) processMessages(
+	ctx context.Context,
+	msgs []redis.XMessage,
+	f func(context.Context, []*ttnpb.ApplicationUp) error,
+) error {
+	batches := map[string]*contextualUplinkBatch{}
+	for _, msg := range msgs {
+		uid, err := uidStrFrom(msg.Values)
 		if err != nil {
 			return err
 		}
-		ctx, err := unique.WithContext(ctx, uid)
+		up, err := applicationUpFrom(msg.Values)
 		if err != nil {
 			return err
 		}
-		joinAcceptUpStream := q.uidJoinAcceptKey(uid)
-		invalidationUpStream := q.uidInvalidationKey(uid)
-		genericUpStream := q.uidGenericUplinkKey(uid)
-
-		streams := [...]string{
-			joinAcceptUpStream,
-			invalidationUpStream,
-			genericUpStream,
-		}
-
-		cmds, err := q.redis.Pipelined(ctx, func(pp redis.Pipeliner) error {
-			for _, stream := range streams {
-				pp.XGroupCreateMkStream(ctx, stream, q.group, "0")
-			}
-			return nil
-		})
-		if err != nil && !ttnredis.IsConsumerGroupExistsErr(err) {
-			return ttnredis.ConvertError(err)
-		}
-		var initErr error
-		for i, cmd := range cmds {
-			if err := cmd.Err(); err != nil && !ttnredis.IsConsumerGroupExistsErr(err) {
-				initErr = err
-				continue
-			}
-			p.XGroupDelConsumer(ctx, streams[i], q.group, consumerID)
-		}
-		if initErr != nil {
-			return ttnredis.ConvertError(initErr)
-		}
-
-		t, err := f(ctx, appID, func(limit int, g func(...*ttnpb.ApplicationUp) error) error {
-			ups := make([]*ttnpb.ApplicationUp, 0, limit)
-
-			processMessages := func(stream string, msgs ...redis.XMessage) error {
-				ups = ups[:0]
-				for _, msg := range msgs {
-					v, ok := msg.Values[payloadKey]
-					if !ok {
-						return errMissingPayload.New()
-					}
-					s, ok := v.(string)
-					if !ok {
-						return errInvalidPayload.New()
-					}
-					up := &ttnpb.ApplicationUp{}
-					if err = ttnredis.UnmarshalProto(s, up); err != nil {
-						return err
-					}
-					ups = append(ups, up)
-				}
-				return g(ups...)
-			}
-			return ttnredis.RangeStreams(ctx, q.redis, q.group, consumerID, int64(limit), q.minIdle, processMessages, streams[:]...)
-		})
-		if err != nil || t.IsZero() {
+		if err := addToBatch(ctx, batches, msg.ID, uid, up); err != nil {
 			return err
 		}
-		return q.applicationQueue.Add(ctx, p, uid, t, true)
-	})
+	}
+	pipeliner := q.redis.Pipeline()
+	for _, batch := range batches {
+		if err := f(batch.ctx, batch.uplinks); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to process uplink batch")
+			continue // Do not confirm messages that failed to process.
+		}
+
+		pipeliner.XAck(ctx, q.streamID, q.groupID, batch.confirmIDs...)
+		pipeliner.XDel(ctx, q.streamID, batch.confirmIDs...)
+	}
+	if _, err := pipeliner.Exec(ctx); err != nil {
+		return ttnredis.ConvertError(err)
+	}
+	return nil
+}
+
+// Pop implements ApplicationUplinkQueue interface.
+func (q *ApplicationUplinkQueue) Pop(
+	ctx context.Context, consumerID string, limit int,
+	f func(context.Context, []*ttnpb.ApplicationUp) error,
+) error {
+	q.consumers.Store(consumerID, struct{}{})
+
+	msgs, _, err := q.redis.XAutoClaim(ctx, &redis.XAutoClaimArgs{
+		Group:    q.groupID,
+		Consumer: consumerID,
+		Stream:   q.streamID,
+		Start:    "-",
+		MinIdle:  q.minIdle,
+		Count:    int64(limit),
+	}).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return ttnredis.ConvertError(err)
+	}
+
+	remainingCount := limit - len(msgs)
+	streams, err := q.redis.XReadGroup(ctx, &redis.XReadGroupArgs{
+		Group:    q.groupID,
+		Consumer: consumerID,
+		Streams:  []string{q.streamID, ">"},
+		Count:    int64(remainingCount),
+		Block:    q.streamBlockLimit,
+	}).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return ttnredis.ConvertError(err)
+	}
+	if len(streams) > 0 {
+		stream := streams[0]
+		msgs = append(msgs, stream.Messages...)
+	}
+	return q.processMessages(ctx, msgs, f)
 }
