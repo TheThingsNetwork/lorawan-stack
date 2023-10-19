@@ -2682,7 +2682,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	var evt events.Event
-	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.Ids.ApplicationIds, st.Device.Ids.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
+	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.Ids.ApplicationIds, st.Device.Ids.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel, st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
+		if nonZeroFields := ttnpb.NonZeroFields(stored, st.GetFields()...); len(nonZeroFields) > 0 {
+			newStored := &ttnpb.EndDevice{}
+			if err := newStored.SetFields(stored, nonZeroFields...); err != nil {
+				return err
+			}
+			stored = newStored
+		}
 		if hasSession {
 			macVersion := stored.GetMacState().GetLorawanVersion()
 			if stored.GetMacState() == nil && !st.HasSetField("mac_state") {
