@@ -31,6 +31,7 @@ const m = defineMessages({
 
 const KeyValueMap = ({
   addMessage,
+  removeMessage,
   additionalInputProps,
   className,
   disabled,
@@ -43,6 +44,8 @@ const KeyValueMap = ({
   onChange,
   value,
   valuePlaceholder,
+  distinctOptions,
+  atLeastOneEntry,
 }) => {
   const handleEntryChange = useCallback(
     (index, newValues) => {
@@ -76,11 +79,12 @@ const KeyValueMap = ({
     <div data-test-id={'key-value-map'} className={classnames(className, style.container)}>
       <div>
         {value &&
-          value.map((value, index) => (
+          value.map((individualValue, index) => (
             <Entry
               key={`${name}[${index}]`}
               name={name}
-              value={value}
+              value={individualValue}
+              fieldValue={value}
               keyPlaceholder={keyPlaceholder}
               valuePlaceholder={valuePlaceholder}
               index={index}
@@ -88,9 +92,12 @@ const KeyValueMap = ({
               onChange={handleEntryChange}
               onBlur={onBlur}
               indexAsKey={indexAsKey}
-              readOnly={isReadOnly(value)}
+              readOnly={isReadOnly(individualValue)}
               inputElement={inputElement}
               additionalInputProps={additionalInputProps}
+              removeMessage={removeMessage}
+              distinctOptions={distinctOptions}
+              atLeastOneEntry={atLeastOneEntry}
             />
           ))}
       </div>
@@ -111,8 +118,10 @@ const KeyValueMap = ({
 KeyValueMap.propTypes = {
   addMessage: PropTypes.message,
   additionalInputProps: PropTypes.shape({}),
+  atLeastOneEntry: PropTypes.bool,
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  distinctOptions: PropTypes.bool,
   indexAsKey: PropTypes.bool,
   inputElement: PropTypes.elementType,
   isReadOnly: PropTypes.func,
@@ -120,6 +129,7 @@ KeyValueMap.propTypes = {
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
+  removeMessage: PropTypes.message,
   value: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.shape({
@@ -144,6 +154,9 @@ KeyValueMap.defaultProps = {
   disabled: false,
   isReadOnly: () => null,
   inputElement: Input,
+  removeMessage: undefined,
+  distinctOptions: false,
+  atLeastOneEntry: false,
 }
 
 export default KeyValueMap
