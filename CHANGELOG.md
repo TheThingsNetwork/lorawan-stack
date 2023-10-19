@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
 - Updated Japanese translations for the Console and backend.
 - `--grpc.correlation-ids-ignore-methods` configuration option, which allows certain gRPC methods to be skipped from the correlation ID middleware which adds a correlation ID with the name of the gRPC method. Methods bear the format used by `--grpc.log-ignore-methods`, such as `/ttn.lorawan.v3.GsNs/HandleUplink`.
 - Support for setting multiple frequency plans for gateways from the Console.
+- The `ns-db purge` command to purge unused data from the Network Server database.
 
 ### Changed
 
