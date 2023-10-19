@@ -8,6 +8,7 @@ package ttnpb
 
 import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
+	golang "github.com/TheThingsIndustries/protoc-gen-go-flags/golang"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 )
@@ -509,6 +510,36 @@ func PathsFromSelectFlagsForLoRaDataRate(flags *pflag.FlagSet, prefix string) (p
 	return paths, nil
 }
 
+// AddSetFlagsForLoRaDataRate adds flags to select fields in LoRaDataRate.
+func AddSetFlagsForLoRaDataRate(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("bandwidth", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("spreading-factor", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("coding-rate", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the LoRaDataRate message from flags.
+func (m *LoRaDataRate) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("bandwidth", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Bandwidth = val
+		paths = append(paths, flagsplugin.Prefix("bandwidth", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("spreading_factor", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.SpreadingFactor = val
+		paths = append(paths, flagsplugin.Prefix("spreading_factor", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("coding_rate", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.CodingRate = val
+		paths = append(paths, flagsplugin.Prefix("coding_rate", prefix))
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForFSKDataRate adds flags to select fields in FSKDataRate.
 func AddSelectFlagsForFSKDataRate(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("bit-rate", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("bit-rate", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -519,6 +550,22 @@ func PathsFromSelectFlagsForFSKDataRate(flags *pflag.FlagSet, prefix string) (pa
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("bit_rate", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("bit_rate", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForFSKDataRate adds flags to select fields in FSKDataRate.
+func AddSetFlagsForFSKDataRate(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("bit-rate", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the FSKDataRate message from flags.
+func (m *FSKDataRate) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("bit_rate", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.BitRate = val
 		paths = append(paths, flagsplugin.Prefix("bit_rate", prefix))
 	}
 	return paths, nil
@@ -546,6 +593,36 @@ func PathsFromSelectFlagsForLRFHSSDataRate(flags *pflag.FlagSet, prefix string) 
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("coding_rate", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("coding_rate", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForLRFHSSDataRate adds flags to select fields in LRFHSSDataRate.
+func AddSetFlagsForLRFHSSDataRate(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("modulation-type", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("operating-channel-width", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("coding-rate", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the LRFHSSDataRate message from flags.
+func (m *LRFHSSDataRate) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("modulation_type", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ModulationType = val
+		paths = append(paths, flagsplugin.Prefix("modulation_type", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("operating_channel_width", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.OperatingChannelWidth = val
+		paths = append(paths, flagsplugin.Prefix("operating_channel_width", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("coding_rate", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.CodingRate = val
 		paths = append(paths, flagsplugin.Prefix("coding_rate", prefix))
 	}
 	return paths, nil
@@ -596,6 +673,54 @@ func PathsFromSelectFlagsForDataRate(flags *pflag.FlagSet, prefix string) (paths
 	return paths, nil
 }
 
+// AddSetFlagsForDataRate adds flags to select fields in DataRate.
+func AddSetFlagsForDataRate(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForLoRaDataRate(flags, flagsplugin.Prefix("modulation.lora", prefix), hidden)
+	AddSetFlagsForFSKDataRate(flags, flagsplugin.Prefix("modulation.fsk", prefix), hidden)
+	AddSetFlagsForLRFHSSDataRate(flags, flagsplugin.Prefix("modulation.lrfhss", prefix), hidden)
+}
+
+// SetFromFlags sets the DataRate message from flags.
+func (m *DataRate) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("modulation.lora", prefix)); changed {
+		ov := &DataRate_Lora{}
+		if ov.Lora == nil {
+			ov.Lora = &LoRaDataRate{}
+		}
+		if setPaths, err := ov.Lora.SetFromFlags(flags, flagsplugin.Prefix("modulation.lora", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Modulation = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("modulation.fsk", prefix)); changed {
+		ov := &DataRate_Fsk{}
+		if ov.Fsk == nil {
+			ov.Fsk = &FSKDataRate{}
+		}
+		if setPaths, err := ov.Fsk.SetFromFlags(flags, flagsplugin.Prefix("modulation.fsk", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Modulation = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("modulation.lrfhss", prefix)); changed {
+		ov := &DataRate_Lrfhss{}
+		if ov.Lrfhss == nil {
+			ov.Lrfhss = &LRFHSSDataRate{}
+		}
+		if setPaths, err := ov.Lrfhss.SetFromFlags(flags, flagsplugin.Prefix("modulation.lrfhss", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Modulation = ov
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForTxSettings_Downlink adds flags to select fields in TxSettings_Downlink.
 func AddSelectFlagsForTxSettings_Downlink(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("antenna-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("antenna-index", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -618,6 +743,36 @@ func PathsFromSelectFlagsForTxSettings_Downlink(flags *pflag.FlagSet, prefix str
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("invert_polarization", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("invert_polarization", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForTxSettings_Downlink adds flags to select fields in TxSettings_Downlink.
+func AddSetFlagsForTxSettings_Downlink(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("antenna-index", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewFloat32Flag(flagsplugin.Prefix("tx-power", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("invert-polarization", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the TxSettings_Downlink message from flags.
+func (m *TxSettings_Downlink) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("antenna_index", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.AntennaIndex = val
+		paths = append(paths, flagsplugin.Prefix("antenna_index", prefix))
+	}
+	if val, changed, err := flagsplugin.GetFloat32(flags, flagsplugin.Prefix("tx_power", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.TxPower = val
+		paths = append(paths, flagsplugin.Prefix("tx_power", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("invert_polarization", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.InvertPolarization = val
 		paths = append(paths, flagsplugin.Prefix("invert_polarization", prefix))
 	}
 	return paths, nil
@@ -681,6 +836,72 @@ func PathsFromSelectFlagsForTxSettings(flags *pflag.FlagSet, prefix string) (pat
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("concentrator_timestamp", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("concentrator_timestamp", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForTxSettings adds flags to select fields in TxSettings.
+func AddSetFlagsForTxSettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForDataRate(flags, flagsplugin.Prefix("data-rate", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewUint64Flag(flagsplugin.Prefix("frequency", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("enable-crc", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("timestamp", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("time", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForTxSettings_Downlink(flags, flagsplugin.Prefix("downlink", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewInt64Flag(flagsplugin.Prefix("concentrator-timestamp", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the TxSettings message from flags.
+func (m *TxSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate", prefix)); changed {
+		if m.DataRate == nil {
+			m.DataRate = &DataRate{}
+		}
+		if setPaths, err := m.DataRate.SetFromFlags(flags, flagsplugin.Prefix("data_rate", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetUint64(flags, flagsplugin.Prefix("frequency", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Frequency = val
+		paths = append(paths, flagsplugin.Prefix("frequency", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("enable_crc", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.EnableCrc = val
+		paths = append(paths, flagsplugin.Prefix("enable_crc", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("timestamp", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Timestamp = val
+		paths = append(paths, flagsplugin.Prefix("timestamp", prefix))
+	}
+	if val, changed, err := flagsplugin.GetTimestamp(flags, flagsplugin.Prefix("time", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Time = golang.SetTimestamp(val)
+		paths = append(paths, flagsplugin.Prefix("time", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("downlink", prefix)); changed {
+		if m.Downlink == nil {
+			m.Downlink = &TxSettings_Downlink{}
+		}
+		if setPaths, err := m.Downlink.SetFromFlags(flags, flagsplugin.Prefix("downlink", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetInt64(flags, flagsplugin.Prefix("concentrator_timestamp", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ConcentratorTimestamp = val
 		paths = append(paths, flagsplugin.Prefix("concentrator_timestamp", prefix))
 	}
 	return paths, nil
