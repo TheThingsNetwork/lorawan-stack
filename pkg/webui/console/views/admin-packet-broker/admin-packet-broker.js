@@ -75,11 +75,10 @@ import style from './admin-packet-broker.styl'
 
 const validationSchema = Yup.object({
   _routing_configuration: Yup.string().oneOf(['all_networks', 'ttn', 'custom']),
-  _use_default_policy: Yup.bool(),
   policy: Yup.object({
     uplink: Yup.object({}),
     downlink: Yup.object({}),
-  }).when('_use_default_policy', { is: 'default', then: schema => schema.strip() }),
+  }),
 })
 
 const fullyPermissiveNetworkPolicy = {
