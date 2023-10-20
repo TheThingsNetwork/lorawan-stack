@@ -48,20 +48,6 @@ const approvalStates = [
 ]
 
 const m = defineMessages({
-  adminLabel: 'Grant this user admin status',
-  adminDescription:
-    'Admin status enables overarching rights such as managing other users or modifying entities regardless of collaboration status',
-  userDescPlaceholder: 'Description for my new user',
-  userDescDescription: 'Optional user description; can also be used to save notes about the user',
-  userIdPlaceholder: 'jane-doe',
-  userNamePlaceholder: 'Jane Doe',
-  emailPlaceholder: 'mail@example.com',
-  emailAddressDescription:
-    'Primary email address used for logging in; this address is not publicly visible',
-  emailAddressValidation: 'Treat email address as validated',
-  emailAddressValidationDescription:
-    'Enable this option if you do not need this user to validate the email address',
-  deleteTitle: 'Are you sure you want to delete this account?',
   deleteWarning:
     "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong> and <strong>LOCK THE USER ID AND EMAIL FOR RE-REGISTRATION</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
   purgeWarning:
@@ -180,22 +166,22 @@ const UserDataFormEdit = () => {
             <Form.Field
               title={sharedMessages.name}
               name="name"
-              placeholder={m.userNamePlaceholder}
+              placeholder={sharedMessages.userNamePlaceholder}
               component={Input}
             />
             <Form.Field
               title={sharedMessages.description}
               name="description"
               type="textarea"
-              placeholder={m.userDescPlaceholder}
-              description={m.userDescDescription}
+              placeholder={sharedMessages.userDescription}
+              description={sharedMessages.userDescDescription}
               component={Input}
             />
             <Form.Field
               title={sharedMessages.emailAddress}
               name="primary_email_address"
-              placeholder={m.emailPlaceholder}
-              description={m.emailAddressDescription}
+              placeholder={sharedMessages.emailPlaceholder}
+              description={sharedMessages.emailAddressDescription}
               component={Input}
               required
             />
@@ -209,14 +195,14 @@ const UserDataFormEdit = () => {
             <Form.Field
               name="_validate_email"
               component={Checkbox}
-              label={m.emailAddressValidation}
-              description={m.emailAddressValidationDescription}
+              label={sharedMessages.emailAddressValidation}
+              description={sharedMessages.emailAddressValidationDescription}
             />
             <Form.Field
               name="admin"
               component={Checkbox}
-              label={m.adminLabel}
-              description={m.adminDescription}
+              label={sharedMessages.grantAdminStatus}
+              description={sharedMessages.adminDescription}
             />
             <SubmitBar>
               <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
@@ -224,7 +210,7 @@ const UserDataFormEdit = () => {
                 message={sharedMessages.userDelete}
                 entityId={initialValues?.ids?.user_id}
                 entityName={initialValues?.name}
-                title={m.deleteTitle}
+                title={sharedMessages.accountDeleteConfirmation}
                 confirmMessage={m.deleteConfirmMessage}
                 defaultMessage={m.deleteWarning}
                 purgeMessage={m.purgeWarning}

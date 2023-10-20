@@ -178,6 +178,7 @@ const CollaboratorForm = props => {
         name="collaborator"
         title={sharedMessages.collaborator}
         placeholder={m.collaboratorIdPlaceholder}
+        noOptionsMessage={sharedMessages.noMatchingCollaborators}
         required
         autoFocus={!update}
         disabled={update}

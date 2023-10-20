@@ -35,7 +35,6 @@ const m = defineMessages({
   noFileSelected: 'No file selected',
   fileProvided: 'A file has been provided',
   tooBig: 'The selected file is too large',
-  remove: 'Remove',
 })
 
 const defaultDataTransform = content => content.replace(/^.*;base64,/, '')

@@ -49,7 +49,6 @@ const m = defineMessages({
   fPortSetDescription:
     'Comma separated list of F-Port values (1-223) to be used for LoRa Cloud Modem Services',
   modemEncoding: 'LoRa Edge Reference Tracker (Modem-E) encoding',
-  setLoRaCloudToken: 'Set LoRa Cloud token',
   deleteWarning:
     'Are you sure you want to delete the LoRa Cloud Modem and Geolocation Services token? This action cannot be undone.',
   fPortSetValidationFormat:

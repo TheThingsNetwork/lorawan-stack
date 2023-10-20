@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import Button from '@ttn-lw/components/button'
 
@@ -25,10 +24,7 @@ import style from '@account/views/front/front.styl'
 import { selectApplicationSiteName, selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
-
-const m = defineMessages({
-  backToAccount: 'Back to {siteTitle}',
-})
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
@@ -51,7 +47,7 @@ const FrontNotFound = () => (
       <Button.Link
         to="/login"
         icon="keyboard_arrow_left"
-        message={{ ...m.backToAccount, values: { siteTitle } }}
+        message={{ ...sharedMessages.backTo, values: { siteTitle } }}
       />
     </div>
   </React.Fragment>

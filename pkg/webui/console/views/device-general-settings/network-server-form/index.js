@@ -173,7 +173,7 @@ const NetworkServerForm = React.memo(props => {
         if (isBackend(err) && getBackendErrorName(err) === 'no_band_version') {
           toast({
             type: toast.types.ERROR,
-            message: messages.fpNotFoundError,
+            message: sharedMessages.fpNotFoundError,
             messageValues: {
               lorawanVersion,
               freqPlan,

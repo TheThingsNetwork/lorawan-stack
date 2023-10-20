@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
@@ -31,10 +30,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 
-const m = defineMessages({
-  appData: 'Application data',
-})
-
 const ApplicationData = () => {
   const { appId } = useParams()
 
@@ -42,7 +37,7 @@ const ApplicationData = () => {
 
   useBreadcrumbs(
     'apps.single.data',
-    <Breadcrumb path={`/applications/${appId}/data`} content={sharedMessages.liveData} />,
+    <Breadcrumb path={`/applications/${appId}/data`} content={sharedMessages.appData} />,
   )
 
   return (
@@ -50,7 +45,7 @@ const ApplicationData = () => {
       featureCheck={mayViewApplicationEvents}
       otherwise={{ redirect: `/applications/${appId}` }}
     >
-      <PageTitle hideHeading title={m.appData} />
+      <PageTitle hideHeading title={sharedMessages.appData} />
       <ApplicationEvents appId={appId} />
     </Require>
   )

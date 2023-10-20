@@ -38,10 +38,6 @@ const messages = defineMessages({
     'You do not have sufficient rights to view end device keys. Only overwriting is allowed.',
   unclaimFailure: 'An error occurred and the end device could not be unclaimed and deleted',
   validateSessionKey: '{field} must have non-zero value',
-  macSettingsError:
-    'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
-  fpNotFoundError:
-    'The LoRaWAN version <code>{lorawanVersion}</code> does not support the <code>{freqPlan}</code> frequency plan. Please choose a different MAC version or frequency plan.',
   resetUsedDevNonces: 'Reset used DevNonces',
   resetUsedDevNoncesModal:
     'Are you sure you want to reset the used DevNonces of this end device?{break}{break}Resetting the used DevNonces enables replay attacks using past nonces. Do not use this option unless you have reset the end device NVRAM.',

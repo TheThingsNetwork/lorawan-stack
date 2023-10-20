@@ -57,7 +57,6 @@ const m = defineMessages({
   sessionInfo: 'Session information',
   pendingSessionInfo: 'Session information (pending)',
   latestData: 'Latest data',
-  rootKeys: 'Root keys',
   keysNotExposed: 'Keys are not exposed',
   failedAccessOtherHostDevice:
     'The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
@@ -194,7 +193,7 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
       }
     } else if (supports_join) {
       activationInfoData.items.push({
-        key: m.rootKeys,
+        key: sharedMessages.rootKeys,
         value: <Message content={sharedMessages.provisionedOnExternalJoinServer} />,
       })
     }

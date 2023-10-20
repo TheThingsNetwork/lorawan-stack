@@ -39,8 +39,6 @@ const m = defineMessages({
     'Select which information can be seen by other network participants, including {packetBrokerURL}',
   shareGatewayInfoDescription:
     'Choose this option eg. if your gateway is powered by {loraBasicStationURL}',
-  generateAPIKeyCups: 'Generate API key for CUPS',
-  generateAPIKeyLNS: 'Generate API key for LNS',
 })
 
 const PacketBrokerURL = (
@@ -111,7 +109,7 @@ const GatewayRegistrationFormSections = () => {
           <Form.Field
             name="_create_api_key_cups"
             component={Checkbox}
-            label={m.generateAPIKeyCups}
+            label={sharedMessages.generateAPIKeyCups}
             tooltipId={tooltipIds.GATEWAY_GENERATE_API_KEY_CUPS}
             className="mb-0"
             labelAsTitle
@@ -119,7 +117,7 @@ const GatewayRegistrationFormSections = () => {
           <Form.Field
             name="_create_api_key_lns"
             component={Checkbox}
-            label={m.generateAPIKeyLNS}
+            label={sharedMessages.generateAPIKeyLNS}
             className="mb-cs-xl"
             tooltipId={tooltipIds.GATEWAY_GENERATE_API_KEY_LNS}
             labelAsTitle

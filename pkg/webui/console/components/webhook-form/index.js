@@ -70,9 +70,6 @@ const m = defineMessages({
   modalWarning:
     'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone.',
   additionalHeaders: 'Additional headers',
-  headersKeyPlaceholder: 'Authorization',
-  headersValuePlaceholder: 'Bearer my-auth-token',
-  headersAdd: 'Add header entry',
   downlinkAPIKey: 'Downlink API key',
   downlinkAPIKeyDesc:
     'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
@@ -539,9 +536,9 @@ export default class WebhookForm extends Component {
           <Form.Field
             name="_headers"
             title={m.additionalHeaders}
-            keyPlaceholder={m.headersKeyPlaceholder}
-            valuePlaceholder={m.headersValuePlaceholder}
-            addMessage={m.headersAdd}
+            keyPlaceholder={sharedMessages.authorization}
+            valuePlaceholder={sharedMessages.bearerMyAuthToken}
+            addMessage={sharedMessages.addHeaderEntry}
             component={KeyValueMap}
             isReadOnly={isReadOnly}
             onChange={this.handleHeadersChange}

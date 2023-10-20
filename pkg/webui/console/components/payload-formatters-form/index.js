@@ -47,7 +47,6 @@ import TestForm from './test-form'
 import style from './payload-formatters-form.styl'
 
 const m = defineMessages({
-  grpc: 'GRPC service',
   repository: 'Use Device Repository formatters',
   customJavascipt: 'Custom Javascript formatter',
   formatterType: 'Formatter type',
@@ -80,7 +79,7 @@ const formatterOptions = [
   { label: m.appFormatter, value: TYPES.DEFAULT },
   { label: m.repository, value: TYPES.REPOSITORY },
   { label: m.customJavascipt, value: TYPES.JAVASCRIPT },
-  { label: m.grpc, value: TYPES.GRPC },
+  { label: sharedMessages.grpcService, value: TYPES.GRPC },
   { label: 'CayenneLPP', value: TYPES.CAYENNELPP },
   { label: sharedMessages.none, value: TYPES.NONE },
 ]

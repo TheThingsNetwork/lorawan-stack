@@ -36,7 +36,6 @@ import { selectUserSessions, selectUserSessionsTotalCount } from '@account/store
 const m = defineMessages({
   deleteSessionSuccess: 'Session removed successfully',
   deleteSessionError: 'There was an error and the session could not be deleted',
-  sessionsTableTitle: 'Sessions',
   removeButtonMessage: 'Remove this session',
   noExpiryDate: 'No expiry date',
   endSession: 'Logout to end this session',
@@ -183,7 +182,7 @@ const UserSessionsTable = () => {
       headers={makeHeaders}
       getItemsAction={getSessions}
       baseDataSelector={baseDataSelector}
-      tableTitle={<Message content={m.sessionsTableTitle} />}
+      tableTitle={<Message content={sharedMessages.sessions} />}
       getItemPathPrefix={getItemPathPrefix}
     />
   )

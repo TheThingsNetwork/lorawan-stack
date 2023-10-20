@@ -25,7 +25,6 @@ import { SELECT_OTHER_OPTION } from '@console/lib/device-utils'
 
 const m = defineMessages({
   title: 'End device brand',
-  warning: 'End device models unavailable',
   noOptionsMessage: 'No matching brand found',
 })
 
@@ -56,7 +55,7 @@ const BrandSelect = props => {
       title={m.title}
       component={Select}
       isLoading={fetching}
-      warning={Boolean(error) ? m.warning : undefined}
+      warning={Boolean(error) ? sharedMessages.endDeviceModelsUnavailable : undefined}
       onChange={onChange}
       noOptionsMessage={handleNoOptions}
       placeholder={sharedMessages.typeToSearch}

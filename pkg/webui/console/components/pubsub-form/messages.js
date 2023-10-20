@@ -21,9 +21,6 @@ export default defineMessages({
   modalWarning:
     'Are you sure you want to delete Pub/Sub "{pubsubId}"? Deleting a Pub/Sub cannot be undone.',
   headers: 'Headers',
-  headersKeyPlaceholder: 'Authorization',
-  headersValuePlaceholder: 'Bearer my-auth-token',
-  headersAdd: 'Add header entry',
   headersValidateRequired: 'All header entry values are required. Please remove empty entries.',
   usernamePlaceholder: 'my-username',
   passwordPlaceholder: 'my-password',
@@ -33,8 +30,6 @@ export default defineMessages({
   mqttConfig: 'MQTT configuration',
   mqttClientIdPlaceholder: 'my-client-id',
   mqttServerUrlPlaceholder: 'mqtts://example.com',
-  serverUrl: 'Server URL',
-  clientId: 'Client ID',
   subscribeQos: 'Subscribe QoS',
   publishQos: 'Publish QoS',
   tlsCa: 'Root CA certificate',
@@ -43,7 +38,6 @@ export default defineMessages({
   selectPemFile: 'Select .pem file…',
   pemFileProvided: '.pem file has been provided',
   useCredentials: 'Use credentials',
-  alreadyExistsModalTitle: 'ID already exists',
   alreadyExistsModalMessage:
     'A Pub/Sub with the ID "{id}" already exists. Do you wish to replace this Pub/Sub?',
   replacePubsub: 'Replace Pub/Sub',

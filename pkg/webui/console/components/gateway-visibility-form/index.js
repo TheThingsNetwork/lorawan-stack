@@ -23,6 +23,7 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import gatewayVisibilityMessages from '@console/lib/packet-broker/messages'
 
@@ -49,7 +50,7 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error }) => {
           <Form.Field
             name="visibility.location"
             component={Checkbox}
-            label={gatewayVisibilityMessages.gatewayLocationLabel}
+            label={sharedMessages.location}
           />
           <Form.Field
             name="visibility.antenna_placement"

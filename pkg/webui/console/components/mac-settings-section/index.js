@@ -40,32 +40,19 @@ import {
 const m = defineMessages({
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
   factoryPresetFreqDescription: 'List of factory-preset frequencies. Note: order is respected.',
-  factoryPresetFreqTitle: 'Factory preset frequencies',
-  freqAdd: 'Add Frequency',
-  frequencyPlaceholder: 'e.g. 869525000 for 869,525 MHz',
   advancedMacSettings: 'Advanced MAC settings',
-  pingSlotFrequencyTitle: 'Ping slot frequency',
   desiredPingSlotFrequencyTitle: 'Desired ping slot frequency',
   pingSlotPeriodicityDescription: 'Periodicity of the class B ping slot',
-  pingSlotPeriodicityTitle: 'Ping slot periodicity',
-  pingSlotPeriodicityValue: '{count, plural, one {every second} other {every {count} seconds}}',
   pingSlotDataRateTitle: 'Ping slot data rate index',
   desiredPingSlotDataRateTitle: 'Desired ping slot data rate',
   resetWarning: 'Resetting is insecure and makes your device susceptible for replay attacks',
-  resetsFCnt: 'Resets frame counters',
-  rx1DataRateOffsetTitle: 'Rx1 data rate offset',
   desiredRx1DataRateOffsetTitle: 'Desired Rx1 data rate offset',
-  rx1DelayTitle: 'Rx1 delay',
   desiredRx1DelayTitle: 'Desired Rx1 delay',
   rx2DataRateIndexTitle: 'Rx2 data rate index',
   desiredRx2DataRateIndexTitle: 'Desired Rx2 data rate index',
   desiredRx2FrequencyTitle: 'Desired Rx2 frequency',
-  rx2FrequencyTitle: 'Rx2 frequency',
   updateSuccess: 'The MAC settings updated',
-  beaconFrequency: 'Beacon frequency',
   desiredBeaconFrequency: 'Desired beacon frequency',
-  classBTimeout: 'Class B timeout',
-  classCTimeout: 'Class C timeout',
   maxDutyCycle: 'Maximum duty cycle',
   desiredMaxDutyCycle: 'Desired maximum duty cycle',
   adrMargin: 'ADR margin',
@@ -88,7 +75,7 @@ const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
 
   return {
     value: `PING_EVERY_${value}S`,
-    label: <Message content={m.pingSlotPeriodicityValue} values={{ count: value }} />,
+    label: <Message content={sharedMessages.secondInterval} values={{ count: value }} />,
   }
 })
 // 0...15
@@ -189,7 +176,7 @@ const MacSettingsSection = props => {
           <Form.FieldContainer horizontal>
             {!isOTAA && (
               <Form.Field
-                title={m.rx1DelayTitle}
+                title={sharedMessages.rx1Delay}
                 type="number"
                 tooltipId={tooltipIds.RX1_DELAY}
                 append={<Message content={sharedMessages.secondsAbbreviated} />}
@@ -219,7 +206,7 @@ const MacSettingsSection = props => {
           <Form.FieldContainer horizontal>
             {!isOTAA && (
               <Form.Field
-                title={m.rx1DataRateOffsetTitle}
+                title={sharedMessages.rx1DataRateOffset}
                 type="number"
                 name="mac_settings.rx1_data_rate_offset"
                 inputWidth="xxs"
@@ -290,7 +277,7 @@ const MacSettingsSection = props => {
             type="number"
             min={100000}
             step={100}
-            title={m.rx2FrequencyTitle}
+            title={sharedMessages.rx2Frequency}
             name="mac_settings.rx2_frequency"
             component={UnitInput.Hertz}
             tooltipId={tooltipIds.RX2_FREQUENCY}
@@ -336,15 +323,15 @@ const MacSettingsSection = props => {
         indexAsKey
         name="mac_settings.factory_preset_frequencies"
         component={KeyValueMap}
-        title={m.factoryPresetFreqTitle}
+        title={sharedMessages.factoryPresetFrequencies}
         description={m.factoryPresetFreqDescription}
-        addMessage={m.freqAdd}
-        valuePlaceholder={m.frequencyPlaceholder}
+        addMessage={sharedMessages.freqAdd}
+        valuePlaceholder={sharedMessages.frequencyPlaceholder}
         tooltipId={tooltipIds.FACTORY_PRESET_FREQUENCIES}
       />
       {isClassC && (
         <Form.Field
-          title={m.classCTimeout}
+          title={sharedMessages.classCTimeout}
           name="mac_settings.class_c_timeout"
           tooltipId={tooltipIds.CLASS_C_TIMEOUT}
           component={UnitInput.Duration}
@@ -356,7 +343,7 @@ const MacSettingsSection = props => {
       {(isClassB || isMulticast) && (
         <>
           <Form.Field
-            title={m.classBTimeout}
+            title={sharedMessages.classBTimeout}
             name="mac_settings.class_b_timeout"
             tooltipId={tooltipIds.CLASS_B_TIMEOUT}
             component={UnitInput.Duration}
@@ -365,7 +352,7 @@ const MacSettingsSection = props => {
             fieldWidth="xs"
           />
           <Form.Field
-            title={m.pingSlotPeriodicityTitle}
+            title={sharedMessages.pingSlotPeriodicity}
             description={m.pingSlotPeriodicityDescription}
             name="mac_settings.ping_slot_periodicity"
             component={Select}
@@ -379,8 +366,8 @@ const MacSettingsSection = props => {
               <Form.Field
                 type="number"
                 min={100000}
-                title={m.beaconFrequency}
-                placeholder={m.frequencyPlaceholder}
+                title={sharedMessages.beaconFrequency}
+                placeholder={sharedMessages.frequencyPlaceholder}
                 name="mac_settings.beacon_frequency"
                 tooltipId={tooltipIds.BEACON_FREQUENCY}
                 component={UnitInput.Hertz}
@@ -392,7 +379,7 @@ const MacSettingsSection = props => {
                 type="number"
                 min={100000}
                 title={m.desiredBeaconFrequency}
-                placeholder={m.frequencyPlaceholder}
+                placeholder={sharedMessages.frequencyPlaceholder}
                 name="mac_settings.desired_beacon_frequency"
                 tooltipId={tooltipIds.BEACON_FREQUENCY}
                 component={UnitInput.Hertz}
@@ -406,8 +393,8 @@ const MacSettingsSection = props => {
                 type="number"
                 min={100000}
                 step={100}
-                title={m.pingSlotFrequencyTitle}
-                placeholder={m.frequencyPlaceholder}
+                title={sharedMessages.pingSlotFrequency}
+                placeholder={sharedMessages.frequencyPlaceholder}
                 name="mac_settings.ping_slot_frequency"
                 tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
                 component={UnitInput.Hertz}
@@ -420,7 +407,7 @@ const MacSettingsSection = props => {
                 min={100000}
                 step={100}
                 title={m.desiredPingSlotFrequencyTitle}
-                placeholder={m.frequencyPlaceholder}
+                placeholder={sharedMessages.frequencyPlaceholder}
                 name="mac_settings.desired_ping_slot_frequency"
                 tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
                 component={UnitInput.Hertz}

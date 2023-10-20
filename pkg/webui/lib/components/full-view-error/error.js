@@ -99,7 +99,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
     errorTitle = statusCodeMessages['404']
     errorMessage = errorMessages.genericNotFound
   } else if (isOAuthCallback) {
-    errorTitle = errorMessages.loginFailed
+    errorTitle = sharedMessages.loginFailed
     errorMessage = errorMessages.loginFailedDescription
     if (isOAuthClientRefusedError(error) || error.error === 'access_denied') {
       errorMessage = errorMessages.loginFailedAbortDescription

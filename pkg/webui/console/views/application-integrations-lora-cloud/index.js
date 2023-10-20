@@ -52,7 +52,6 @@ const m = defineMessages({
   loraCloudInfoText:
     'Lora Cloud provides value added APIs that enable simple solutions for common tasks related to LoRaWAN networks and LoRa-based devices. You can setup our LoRaCloud integrations below.',
   officialLoRaCloudDocumentation: 'Official LoRa Cloud documentation',
-  setToken: 'Set LoRa Cloud token',
   dasDescription:
     'With the LoRa Cloud Modem and Geolocation Services protocol, you can manage common device functionality at the application layer for LoRaWAN-enabled devices.',
   glsDescription:
@@ -108,11 +107,11 @@ const LoRaCloud = () => {
                 </div>
                 <hr className={style.hRule} />
                 <Collapse title="Geolocation" description={m.glsDescription}>
-                  <Message component="h3" content={m.setToken} />
+                  <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
                   <LoRaCloudGLSForm />
                 </Collapse>
                 <Collapse title="Device & Application Services" description={m.dasDescription}>
-                  <Message component="h3" content={m.setToken} />
+                  <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
                   <LoRaCloudDASForm />
                 </Collapse>
               </Col>

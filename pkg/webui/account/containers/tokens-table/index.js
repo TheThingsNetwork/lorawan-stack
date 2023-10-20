@@ -45,7 +45,6 @@ import { selectTokens, selectTokensTotalCount } from '@account/store/selectors/a
 import { selectUserId } from '@account/store/selectors/user'
 
 const m = defineMessages({
-  tableTitle: 'Access tokens',
   deleteSuccess: 'Access token invalidated',
   deleteFail: 'There was an error and the access token could not be invalidated',
   deleteButton: 'Invalidate this access token',
@@ -53,7 +52,6 @@ const m = defineMessages({
   deleteAllFail: 'There was an error and the access tokens could not be invalidated',
   deleteAllButton: 'Invalidate all access tokens',
   expires: 'Expires',
-  accessTokens: 'Access tokens',
 })
 
 const TokensTable = () => {
@@ -67,7 +65,7 @@ const TokensTable = () => {
     'client-authorizations.single.access-tokens',
     <Breadcrumb
       path={`/client-authorizations/${clientId}/access-tokens`}
-      content={m.accessTokens}
+      content={sharedMessages.accessTokens}
     />,
   )
 
@@ -200,7 +198,7 @@ const TokensTable = () => {
             baseDataSelector={baseDataSelector}
             pageSize={PAGE_SIZES.SMALL}
             actionItems={deleteAllButton}
-            tableTitle={<Message content={m.tableTitle} />}
+            tableTitle={<Message content={sharedMessages.accessTokens} />}
           />
         </Col>
       </Row>

@@ -24,8 +24,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { SELECT_OTHER_OPTION } from '@console/lib/device-utils'
 
 const m = defineMessages({
-  title: 'Model',
-  warning: 'End device models unavailable',
   noOptionsMessage: 'No matching model found',
 })
 
@@ -65,10 +63,10 @@ const ModelSelect = props => {
       {...rest}
       options={options}
       name={name}
-      title={m.title}
+      title={sharedMessages.model}
       component={Select}
       isLoading={fetching}
-      warning={Boolean(error) ? m.warning : undefined}
+      warning={Boolean(error) ? sharedMessages.endDeviceModelsUnavailable : undefined}
       onChange={onChange}
       noOptionsMessage={handleNoOptions}
       placeholder={sharedMessages.typeToSearch}
