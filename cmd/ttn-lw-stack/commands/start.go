@@ -302,7 +302,6 @@ var startCommand = &cobra.Command{
 				int64(applicationUplinkQueueSize),
 				redisConsumerGroup,
 				time.Minute,
-				redis.DefaultStreamBlockLimit,
 			)
 			if err := applicationUplinkQueue.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)

@@ -36,7 +36,7 @@ func testStreamBlockLimit() time.Duration {
 func NewRedisApplicationUplinkQueue(ctx context.Context) (ApplicationUplinkQueue, func()) {
 	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "application-uplinks")...)
-	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, 0, testStreamBlockLimit())
+	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, 0)
 	if err := q.Init(ctx); err != nil {
 		tb.Fatalf("Failed to initialize Redis application uplink queue: %s", test.FormatError(err))
 	}

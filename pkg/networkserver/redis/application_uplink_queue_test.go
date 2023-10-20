@@ -38,24 +38,23 @@ var (
 	redisNamespace = [...]string{
 		"redis_test_uplink_queue",
 	}
-	readLimit        = 7
-	maxLen           = int64(100)
-	groupID          = "ns-test"
-	minIdle          = (1 << 8) * test.Delay
-	streamBlockLimit = (1 << 6) * test.Delay
+	readLimit = 7
+	maxLen    = int64(100)
+	groupID   = "ns-test"
+	minIdle   = (1 << 8) * test.Delay
 
 	appCount       = 5
 	devCountPerApp = 3
 )
 
 func setupRedisApplicationUplinkQueue(
-	t *testing.T, cl *ttnredis.Client, minIdle, streamBlockLimit time.Duration,
+	t *testing.T, cl *ttnredis.Client, minIdle time.Duration,
 ) (*nsredis.ApplicationUplinkQueue, func()) {
 	t.Helper()
 
 	_, ctx := test.New(t)
 
-	q := nsredis.NewApplicationUplinkQueue(cl, maxLen, groupID, minIdle, streamBlockLimit)
+	q := nsredis.NewApplicationUplinkQueue(cl, maxLen, groupID, minIdle)
 
 	return q, func() {
 		if err := q.Close(ctx); err != nil {
@@ -71,7 +70,7 @@ func TestApplicationUplinkQueueInit(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "init")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
+	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, minIdle)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -95,7 +94,7 @@ func TestApplicationUplinkQueueClose(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "close")...)
 	t.Cleanup(redisCloseFn)
 
-	q, _ := setupRedisApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
+	q, _ := setupRedisApplicationUplinkQueue(t, cl, minIdle)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
 		t.FailNow()
@@ -196,7 +195,7 @@ func TestApplicationUplinkQueueAdd(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "add")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
+	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, minIdle)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -246,7 +245,7 @@ func TestApplicationUplinkQueuePopAll(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "pop_all")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
+	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, minIdle)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -305,7 +304,7 @@ func TestApplicationUplinkQueuePopErr(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "pop_err")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, minIdle, streamBlockLimit)
+	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, minIdle)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -374,7 +373,7 @@ func TestApplicationUplinkQueueClaiming(t *testing.T) {
 	cl, redisCloseFn := test.NewRedis(ctx, append(redisNamespace[:], "claiming")...)
 	t.Cleanup(redisCloseFn)
 
-	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, 0, streamBlockLimit)
+	q, qCloseFn := setupRedisApplicationUplinkQueue(t, cl, 0)
 	t.Cleanup(qCloseFn)
 
 	if !a.So(q.Init(ctx), should.BeNil) {
@@ -416,11 +415,9 @@ func TestApplicationUplinkQueueClaiming(t *testing.T) {
 	}
 
 	actual := make([]*ttnpb.ApplicationUp, 0, len(expected))
-	invokeCount := 0
 	consumerID2 := fmt.Sprintf("test-consumer-%d", 2)
 	err = q.Pop(ctx, consumerID2, 100, func(ctx context.Context, ups []*ttnpb.ApplicationUp) error {
 		assertAllEqualAppIDs(t, ups)
-		invokeCount++
 		actual = append(actual, ups...)
 		return nil
 	})
@@ -429,7 +426,6 @@ func TestApplicationUplinkQueueClaiming(t *testing.T) {
 	}
 
 	a.So(err, should.BeNil)
-	a.So(invokeCount, should.Equal, appCount)
 	a.So(actual, should.HaveLength, len(expected))
 	assertStreamUplinkCount(t, cl, 0)
 }

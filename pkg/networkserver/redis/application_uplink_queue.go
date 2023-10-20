@@ -47,13 +47,12 @@ var (
 
 // ApplicationUplinkQueue is an implementation of ApplicationUplinkQueue.
 type ApplicationUplinkQueue struct {
-	redis            *ttnredis.Client
-	maxLen           int64
-	groupID          string
-	streamID         string
-	minIdle          time.Duration
-	streamBlockLimit time.Duration
-	consumers        sync.Map
+	redis     *ttnredis.Client
+	maxLen    int64
+	groupID   string
+	streamID  string
+	minIdle   time.Duration
+	consumers sync.Map
 }
 
 // NewApplicationUplinkQueue returns new application uplink queue.
@@ -62,16 +61,14 @@ func NewApplicationUplinkQueue(
 	maxLen int64,
 	groupID string,
 	minIdle time.Duration,
-	streamBlockLimit time.Duration,
 ) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
-		redis:            cl,
-		maxLen:           maxLen,
-		groupID:          groupID,
-		streamID:         cl.Key("uplinks"),
-		minIdle:          minIdle,
-		streamBlockLimit: streamBlockLimit,
-		consumers:        sync.Map{},
+		redis:     cl,
+		maxLen:    maxLen,
+		groupID:   groupID,
+		streamID:  cl.Key("uplinks"),
+		minIdle:   minIdle,
+		consumers: sync.Map{},
 	}
 }
 
@@ -188,9 +185,10 @@ func addToBatch(
 	return nil
 }
 
-func (q *ApplicationUplinkQueue) processMessages(
+func (*ApplicationUplinkQueue) processMessages(
 	ctx context.Context,
 	msgs []redis.XMessage,
+	ack func(...string) error,
 	f func(context.Context, []*ttnpb.ApplicationUp) error,
 ) error {
 	batches := map[string]*contextualUplinkBatch{}
@@ -207,20 +205,15 @@ func (q *ApplicationUplinkQueue) processMessages(
 			return err
 		}
 	}
-	pipeliner := q.redis.Pipeline()
+	processedIDs := make([]string, 0, len(msgs))
 	for _, batch := range batches {
 		if err := f(batch.ctx, batch.uplinks); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to process uplink batch")
 			continue // Do not confirm messages that failed to process.
 		}
-
-		pipeliner.XAck(ctx, q.streamID, q.groupID, batch.confirmIDs...)
-		pipeliner.XDel(ctx, q.streamID, batch.confirmIDs...)
+		processedIDs = append(processedIDs, batch.confirmIDs...)
 	}
-	if _, err := pipeliner.Exec(ctx); err != nil {
-		return ttnredis.ConvertError(err)
-	}
-	return nil
+	return ack(processedIDs...)
 }
 
 // Pop implements ApplicationUplinkQueue interface.
@@ -229,33 +222,16 @@ func (q *ApplicationUplinkQueue) Pop(
 	f func(context.Context, []*ttnpb.ApplicationUp) error,
 ) error {
 	q.consumers.Store(consumerID, struct{}{})
-
-	msgs, _, err := q.redis.XAutoClaim(ctx, &redis.XAutoClaimArgs{
-		Group:    q.groupID,
-		Consumer: consumerID,
-		Stream:   q.streamID,
-		Start:    "-",
-		MinIdle:  q.minIdle,
-		Count:    int64(limit),
-	}).Result()
-	if err != nil && !errors.Is(err, redis.Nil) {
-		return ttnredis.ConvertError(err)
-	}
-
-	remainingCount := limit - len(msgs)
-	streams, err := q.redis.XReadGroup(ctx, &redis.XReadGroupArgs{
-		Group:    q.groupID,
-		Consumer: consumerID,
-		Streams:  []string{q.streamID, ">"},
-		Count:    int64(remainingCount),
-		Block:    q.streamBlockLimit,
-	}).Result()
-	if err != nil && !errors.Is(err, redis.Nil) {
-		return ttnredis.ConvertError(err)
-	}
-	if len(streams) > 0 {
-		stream := streams[0]
-		msgs = append(msgs, stream.Messages...)
-	}
-	return q.processMessages(ctx, msgs, f)
+	return ttnredis.RangeStreams(
+		ctx,
+		q.redis,
+		q.groupID,
+		consumerID,
+		int64(limit),
+		q.minIdle,
+		func(_ string, ack func(...string) error, msgs ...redis.XMessage) error {
+			return q.processMessages(ctx, msgs, ack, f)
+		},
+		q.streamID,
+	)
 }

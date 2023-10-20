@@ -885,17 +885,23 @@ func LockedWatch(ctx context.Context, r WatchCmdable, k, id string, expiration t
 	return nil
 }
 
-// RangeStreams sequentially iterates over all non-acknowledged messages in streams calling f with at most count messages.
+// RangeStreams sequentially iterates over all non-acknowledged messages in streams calling f with at most count
+// messages. f must acknowledge the messages which have been processed.
 // RangeStreams assumes that within its lifetime it is the only consumer within group group using ID id.
 // RangeStreams iterates over all pending messages, which have been idle for at least minIdle milliseconds first.
-func RangeStreams(ctx context.Context, r redis.Cmdable, group, id string, count int64, minIdle time.Duration, f func(string, ...redis.XMessage) error, streams ...string) error {
-	var ack func(context.Context, string, ...redis.XMessage) error
-	{
-		ids := make([]string, 0, int(count))
-		ack = func(ctx context.Context, stream string, msgs ...redis.XMessage) error {
-			ids = ids[:0]
-			for _, msg := range msgs {
-				ids = append(ids, msg.ID)
+func RangeStreams(
+	ctx context.Context,
+	r redis.Cmdable,
+	group, id string,
+	count int64,
+	minIdle time.Duration,
+	f func(string, func(...string) error, ...redis.XMessage) error,
+	streams ...string,
+) error {
+	makeAck := func(stream string) func(...string) error {
+		return func(ids ...string) error {
+			if len(ids) == 0 {
+				return nil
 			}
 			_, err := r.Pipelined(ctx, func(p redis.Pipeliner) error {
 				// NOTE: Both calls below copy contents of ids internally.
@@ -903,13 +909,17 @@ func RangeStreams(ctx context.Context, r redis.Cmdable, group, id string, count 
 				p.XDel(ctx, stream, ids...)
 				return nil
 			})
-			return err
+			if err != nil {
+				return ConvertError(err)
+			}
+			return nil
 		}
 	}
 
 	for _, stream := range streams {
-		for start := "-"; ; {
-			msgs, lastID, err := r.XAutoClaim(ctx, &redis.XAutoClaimArgs{
+		for start := "-"; start != "0-0"; {
+			var err error
+			_, start, err = r.XAutoClaimJustID(ctx, &redis.XAutoClaimArgs{
 				Stream:   stream,
 				Group:    group,
 				Consumer: id,
@@ -918,38 +928,27 @@ func RangeStreams(ctx context.Context, r redis.Cmdable, group, id string, count 
 				Count:    count,
 			}).Result()
 			if err != nil {
-				return err
+				return ConvertError(err)
 			}
-			if len(msgs) == 0 {
-				break
-			}
-			if err := f(stream, msgs...); err != nil {
-				return err
-			}
-			if err := ack(ctx, stream, msgs...); err != nil {
-				return err
-			}
-			start = lastID
 		}
 	}
 
 	streamCount := len(streams)
-	streamsArg := make([]string, 2*streamCount)
-	idsArg := make([]string, 2*streamCount)
-	for i, stream := range streams {
-		j := i * 2
-		streamsArg[j], streamsArg[j+1], idsArg[j], idsArg[j+1] = stream, stream, "0", ">"
+	args := make([]string, 2*streamCount)
+	streamsArg := args[:streamCount]
+	idsArg := args[streamCount:]
+	for i := range streams {
+		streamsArg[i], idsArg[i] = streams[i], "0"
 	}
 
-	drainedOld := make(map[string]struct{}, streamCount)
-outer:
+	finishedOld, block := false, time.Duration(-1)
 	for {
 		rets, err := r.XReadGroup(ctx, &redis.XReadGroupArgs{
 			Group:    group,
 			Consumer: id,
-			Streams:  append(streamsArg, idsArg...),
+			Streams:  args,
 			Count:    count,
-			Block:    -1, // do not block
+			Block:    block,
 		}).Result()
 		if err != nil {
 			if errors.Is(err, redis.Nil) {
@@ -958,38 +957,33 @@ outer:
 			return ConvertError(err)
 		}
 
+		cont := false
 		for i, ret := range rets {
-			if idsArg[i] == "0" && len(ret.Messages) < int(count) {
-				drainedOld[ret.Stream] = struct{}{}
-			}
-			if len(ret.Messages) == 0 {
-				if i == len(rets)-1 {
-					return nil
-				}
+			n := int64(len(ret.Messages))
+			if n == 0 {
 				continue
 			}
-
-			if err := f(ret.Stream, ret.Messages...); err != nil {
+			cont = cont || n == count
+			idsArg[i] = ret.Messages[len(ret.Messages)-1].ID
+			if err := f(ret.Stream, makeAck(ret.Stream), ret.Messages...); err != nil {
 				return err
-			}
-			if err := ack(ctx, ret.Stream, ret.Messages...); err != nil {
-				return err
-			}
-			if len(ret.Messages) == int(count) {
-				continue outer
 			}
 		}
 
-		streamsArg = streamsArg[:0]
-		idsArg = idsArg[:0]
-		for _, stream := range streams {
-			_, ok := drainedOld[stream]
-			if !ok {
-				streamsArg = append(streamsArg, stream)
-				idsArg = append(idsArg, "0")
+		switch {
+		case cont:
+			// At least one stream has returned `count` messages.
+		case finishedOld:
+			// All streams have returned less than `count` messages,
+			// and we have already processed all of the old and new messages.
+			return nil
+		default: // !cont && !finishedOld
+			// All streams have returned less than `count` messages,
+			// and we have processed all of the old messages.
+			finishedOld, block = true, minIdle
+			for i := range streams {
+				idsArg[i] = ">"
 			}
-			streamsArg = append(streamsArg, stream)
-			idsArg = append(idsArg, ">")
 		}
 	}
 }
