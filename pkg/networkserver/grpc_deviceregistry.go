@@ -1266,11 +1266,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_settings.adr.mode",
 		"mac_settings.adr",
 		"mac_settings.desired_ping_slot_data_rate_index.value",
+		"mac_settings.desired_relay.mode.served.second_channel.data_rate_index",
+		"mac_settings.desired_relay.mode.serving.default_channel_index",
+		"mac_settings.desired_relay.mode.serving.second_channel.data_rate_index",
 		"mac_settings.desired_rx2_data_rate_index.value",
 		"mac_settings.downlink_dwell_time.value",
 		"mac_settings.factory_preset_frequencies",
 		"mac_settings.ping_slot_data_rate_index.value",
 		"mac_settings.ping_slot_frequency.value",
+		"mac_settings.relay.mode.served.second_channel.data_rate_index",
+		"mac_settings.relay.mode.serving.default_channel_index",
+		"mac_settings.relay.mode.serving.second_channel.data_rate_index",
 		"mac_settings.rx2_data_rate_index.value",
 		"mac_settings.uplink_dwell_time.value",
 		"mac_settings.use_adr.value",
@@ -1278,21 +1284,33 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_state.current_parameters.adr_tx_power_index",
 		"mac_state.current_parameters.channels",
 		"mac_state.current_parameters.ping_slot_data_rate_index_value.value",
+		"mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+		"mac_state.current_parameters.relay.mode.serving.default_channel_index",
+		"mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
 		"mac_state.current_parameters.rx2_data_rate_index",
 		"mac_state.desired_parameters.adr_data_rate_index",
 		"mac_state.desired_parameters.adr_tx_power_index",
 		"mac_state.desired_parameters.channels",
 		"mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
+		"mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+		"mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+		"mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
 		"mac_state.desired_parameters.rx2_data_rate_index",
 		"pending_mac_state.current_parameters.adr_data_rate_index",
 		"pending_mac_state.current_parameters.adr_tx_power_index",
 		"pending_mac_state.current_parameters.channels",
 		"pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value",
+		"pending_mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+		"pending_mac_state.current_parameters.relay.mode.serving.default_channel_index",
+		"pending_mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
 		"pending_mac_state.current_parameters.rx2_data_rate_index",
 		"pending_mac_state.desired_parameters.adr_data_rate_index",
 		"pending_mac_state.desired_parameters.adr_tx_power_index",
 		"pending_mac_state.desired_parameters.channels",
 		"pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
+		"pending_mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+		"pending_mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+		"pending_mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
 		"pending_mac_state.desired_parameters.rx2_data_rate_index",
 		"supports_class_b",
 	) {
@@ -1428,6 +1446,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 						return nil
 					}
 					_, ok := phy.DataRates[dev.MacSettings.DesiredPingSlotDataRateIndex.Value]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.desired_relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDesiredRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.DesiredRelay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.desired_relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDesiredRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.MacSettings.DesiredRelay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.desired_relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDesiredRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.DesiredRelay.GetServing().SecondChannel.DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError(field)
 					}
@@ -1603,6 +1675,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
+		if field, validate := hasSetField("mac_settings.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.MacSettings.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.Relay.GetServing().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
 		if field, validate := hasSetField("mac_state.current_parameters.rx2_data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacState() == nil {
@@ -1639,6 +1765,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
+		if field, validate := hasSetField("pending_mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetCurrentParameters().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.current_parameters.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetCurrentParameters().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.PendingMacState.CurrentParameters.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetCurrentParameters().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Relay.GetServing().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
 		if field, validate := hasSetField("pending_mac_state.current_parameters.rx2_data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetPendingMacState() == nil {
@@ -1646,6 +1826,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Rx2DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetDesiredParameters().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.PendingMacState.DesiredParameters.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.desired_parameters.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetDesiredParameters().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.PendingMacState.DesiredParameters.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetDesiredParameters().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.PendingMacState.DesiredParameters.Relay.GetServing().SecondChannel.DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError(field)
 					}
@@ -1693,6 +1927,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
+		if field, validate := hasSetField("mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetCurrentParameters().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacState.CurrentParameters.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.current_parameters.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetCurrentParameters().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.MacState.CurrentParameters.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetCurrentParameters().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacState.CurrentParameters.Relay.GetServing().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
 		if field, validate := hasSetField("mac_state.desired_parameters.ping_slot_data_rate_index_value.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacState() == nil || dev.MacState.DesiredParameters.PingSlotDataRateIndexValue == nil {
@@ -1700,6 +1988,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MacState.DesiredParameters.PingSlotDataRateIndexValue.Value]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetDesiredParameters().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacState.DesiredParameters.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.desired_parameters.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetDesiredParameters().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.MacState.DesiredParameters.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetDesiredParameters().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacState.DesiredParameters.Relay.GetServing().SecondChannel.DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError(field)
 					}
