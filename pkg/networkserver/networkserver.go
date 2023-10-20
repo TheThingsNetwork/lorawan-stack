@@ -20,7 +20,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"os"
-	"sync"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -167,7 +166,6 @@ type NetworkServer struct {
 	newDevAddr      newDevAddrFunc
 	devAddrPrefixes devAddrPrefixesFunc
 
-	applicationServers *sync.Map // string -> *applicationUpStream
 	applicationUplinks ApplicationUplinkQueue
 
 	downlinkTasks      DownlinkTaskQueue
@@ -282,7 +280,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		clusterID:                conf.ClusterID,
 		newDevAddr:               makeNewDevAddrFunc(devAddrPrefixes...),
 		devAddrPrefixes:          makeDevAddrPrefixesFunc(devAddrPrefixes...),
-		applicationServers:       &sync.Map{},
 		applicationUplinks:       conf.ApplicationUplinkQueue.Queue,
 		deduplicationWindow:      makeWindowDurationFunc(conf.DeduplicationWindow),
 		collectionWindow:         makeWindowDurationFunc(conf.DeduplicationWindow + conf.CooldownWindow),
