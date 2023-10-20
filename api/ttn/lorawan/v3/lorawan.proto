@@ -530,7 +530,7 @@ enum TxSchedulePriority {
 message LoRaDataRate {
   option (thethings.flags.message) = {
     select: true,
-    set: false
+    set: true
   };
   // Bandwidth (Hz).
   uint32 bandwidth = 1;
@@ -541,7 +541,7 @@ message LoRaDataRate {
 message FSKDataRate {
   option (thethings.flags.message) = {
     select: true,
-    set: false
+    set: true
   };
   // Bit rate (bps).
   uint32 bit_rate = 1;
@@ -550,7 +550,7 @@ message FSKDataRate {
 message LRFHSSDataRate {
   option (thethings.flags.message) = {
     select: true,
-    set: false
+    set: true
   };
   uint32 modulation_type = 1;
   // Operating Channel Width (Hz).
@@ -561,7 +561,7 @@ message LRFHSSDataRate {
 message DataRate {
   option (thethings.flags.message) = {
     select: true,
-    set: false
+    set: true
   };
   oneof modulation {
     option (validate.required) = true;
@@ -578,13 +578,13 @@ message DataRate {
 message TxSettings {
   option (thethings.flags.message) = {
     select: true,
-    set: false
+    set: true
   };
   // Transmission settings for downlink.
   message Downlink {
     option (thethings.flags.message) = {
       select: true,
-      set: false
+      set: true
     };
     // Index of the antenna on which the uplink was received and/or downlink must be sent.
     uint32 antenna_index = 1;
