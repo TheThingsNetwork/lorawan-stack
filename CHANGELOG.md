@@ -29,10 +29,6 @@ For details about compatibility between different releases, see the **Commitment
   - Monitor mode in this context refers to situations in which either `--as.webhooks.unhealthy-attempts-threshold` or `--as.webhooks.unhealthy-retry-interval` are less or equal to zero. In such situations, the Application Server will record failures but will not stop the execution of the webhooks.
   - Using a retry interval of zero and a non zero attempts threshold restores the previous behavior.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Providing fixed downlink paths to the `ttn-lw-cli devices downlink {push|replace}` commands using the `-class-b-c.gateways` parameter. The gateways IDs are comma separated, and the antenna index `i` can be provided by suffixing the ID with `:i` (i.e. `my-gateway:0` for antenna index 0). The group index `j` can be provided by suffixing the ID with `:j` (i.e. `my-gateway:0:1` for antenna index 0 and group index 1). The antenna index is mandatory if a group index is to be provided, but optional otherwise.
@@ -41,8 +37,6 @@ For details about compatibility between different releases, see the **Commitment
 - Update to an user's `PrimaryEmailAddress` via a non admin now invalidates the `PrimaryEmailAddressValidatedAt` as it was intended.
 - Negative number support in Cayenne LPP.
 - Fix panic in snapcraft CLI deployment, commands will no longer generate a panic error message when telemetry is enabled.
-
-### Security
 
 ## [3.27.2] - 2023-09-14
 
@@ -2696,7 +2690,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.2...v3.27
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.0...v3.28
+[3.28.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.2...v3.28.0
 [3.27.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.1...v3.27.2
 [3.27.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.0...v3.27.1
 [3.27.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.26.2...v3.27.0
