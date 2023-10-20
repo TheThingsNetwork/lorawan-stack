@@ -941,14 +941,14 @@ func RangeStreams(
 		streamsArg[i], idsArg[i] = streams[i], "0"
 	}
 
-	finishedOld := false
+	finishedOld, block := false, time.Duration(-1)
 	for {
 		rets, err := r.XReadGroup(ctx, &redis.XReadGroupArgs{
 			Group:    group,
 			Consumer: id,
 			Streams:  args,
 			Count:    count,
-			Block:    -1, // do not block
+			Block:    block,
 		}).Result()
 		if err != nil {
 			if errors.Is(err, redis.Nil) {
@@ -980,7 +980,7 @@ func RangeStreams(
 		default: // !cont && !finishedOld
 			// All streams have returned less than `count` messages,
 			// and we have processed all of the old messages.
-			finishedOld = true
+			finishedOld, block = true, minIdle
 			for i := range streams {
 				idsArg[i] = ">"
 			}
