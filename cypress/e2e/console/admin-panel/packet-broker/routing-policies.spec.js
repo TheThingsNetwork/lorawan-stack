@@ -59,6 +59,7 @@ describe('Packet Broker routing policies', () => {
     })
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/default', {})
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19/johan', {})
     cy.intercept('PUT', '/api/v3/pba/home-networks/policies/19', {})
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
@@ -86,7 +87,6 @@ describe('Packet Broker routing policies', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
     cy.findByLabelText('Use custom routing policies').check()
-    cy.findAllByLabelText('Use default routing policy for this network').check()
 
     // Check routing policy form checkboxes.
     cy.findByText('Uplink')
@@ -127,7 +127,23 @@ describe('Packet Broker routing policies', () => {
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
-    cy.findByLabelText('Do not use a default routing policy for this network').check()
+    // Check routing policy form checkboxes.
+    cy.findByText('Uplink')
+      .parent()
+      .within(() => {
+        cy.findByLabelText('Join request').uncheck()
+        cy.findByLabelText('MAC data').uncheck()
+        cy.findByLabelText('Application data').uncheck()
+        cy.findByLabelText('Signal quality information').uncheck()
+        cy.findByLabelText('Localization information').uncheck()
+      })
+    cy.findByText('Downlink')
+      .parent()
+      .within(() => {
+        cy.findByLabelText('Join accept').uncheck()
+        cy.findByLabelText('MAC data').uncheck()
+        cy.findByLabelText('Application data').uncheck()
+      })
     cy.findByRole('button', { name: 'Save routing configuration' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
