@@ -77,12 +77,26 @@ const GatewayGeneralSettingsInner = () => {
   const handleSubmit = useCallback(
     async values => {
       const formValues = { ...values }
-      const { attributes } = formValues
+      const { attributes, frequency_plan_ids } = formValues
       if (isEqual(gateway.attributes || {}, attributes)) {
         delete formValues.attributes
       }
       const changed = diff(gateway, formValues)
-      const update = 'attributes' in changed ? { ...changed, attributes } : changed
+      let update
+      if ('attributes' in changed) {
+        update = {
+          ...changed,
+          attributes,
+        }
+      } else if ('frequency_plan_ids' in changed) {
+        update = {
+          ...changed,
+          frequency_plan_ids,
+        }
+      } else {
+        update = changed
+      }
+
       try {
         await dispatch(updateGateway(gtwId, update))
         toast({
