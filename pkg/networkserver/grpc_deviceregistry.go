@@ -1333,18 +1333,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"frequency_plan_id",
 			"lorawan_phy_version",
 		)
-
-		hasSetFieldWithFallback := func(field, fallbackField string) (fieldToRetrieve string, validate bool) {
-			if st.HasSetField(field) {
-				return field, true
-			}
-			return fallbackField, hasPHYUpdate
-		}
 		hasSetField := func(field string) (fieldToRetrieve string, validate bool) {
-			return hasSetFieldWithFallback(field, field)
-		}
-		hasSetADRField := func(field string) (fieldToRetrieve string, validate bool) {
-			return hasSetFieldWithFallback(field, "mac_settings.adr.mode")
+			return field, st.HasSetField(field) || hasPHYUpdate
 		}
 
 		setFields := func(fields ...string) []string {
@@ -1449,7 +1439,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.max_data_rate_index.value"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.dynamic.max_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMaxDataRateIndex() == nil {
@@ -1468,7 +1458,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.min_data_rate_index.value"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.dynamic.min_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMinDataRateIndex() == nil {
@@ -1487,7 +1477,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.max_tx_power_index"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.dynamic.max_tx_power_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMaxTxPowerIndex() == nil {
@@ -1504,7 +1494,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.min_tx_power_index"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.dynamic.min_tx_power_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMinTxPowerIndex() == nil {
@@ -1544,7 +1534,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.static.data_rate_index"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.static.data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetStatic() == nil {
@@ -1562,7 +1552,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.static.tx_power_index"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.static.tx_power_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetStatic() == nil {
