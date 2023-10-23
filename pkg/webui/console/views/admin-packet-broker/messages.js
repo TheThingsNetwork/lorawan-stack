@@ -24,7 +24,6 @@ export default defineMessages({
     'Since LoRaWAN uses shared spectrum, gateways receive messages from devices registered on other LoRaWAN networks. Instead of discarding this traffic, these messages can be forwarded via Packet Broker to the home network of these devices. This extends coverage of networks and allows devices to use higher data rates that reduce channel utilization and increase battery life. No sensitive data is exposed as LoRaWAN is end-to-end encrypted and integrity protected.',
   enbaling:
     'Enable forwarding via the options below or define custom routing policies. In the Networks tab below (visible by selecting the option "Use custom routing policies"), you can see which other networks are forwarding data to this network.',
-  setup: 'Setup',
   packetBrokerDisabledDesc:
     'The Things Stack is not set up to use Packet Broker. Please refer to the documentation link above for instructions on how to set up The Things Stack for peering with Packet Broker.',
   enablePacketBroker: 'Enable Packet Broker',

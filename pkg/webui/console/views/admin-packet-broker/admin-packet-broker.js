@@ -274,7 +274,7 @@ const PacketBroker = () => {
           <Message content={m.whyNetworkPeeringTitle} component="h3" />
           <Message content={m.whyNetworkPeeringText} className={style.info} component="p" />
           <Message content={m.enbaling} className={style.info} />
-          <Message content={m.setup} component="h3" className="mt-cs-xxl" />
+          <Message content={sharedMessages.setupSubTitle} component="h3" className="mt-cs-xxl" />
           {!enabled && <Notification warning small content={m.packetBrokerDisabledDesc} />}
           {showError && <ErrorNotification small content={infoError} />}
           {enabled && (

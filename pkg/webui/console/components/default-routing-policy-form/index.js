@@ -45,7 +45,7 @@ const DefaultRoutingPolicyForm = () => (
       <Form.Field
         name="policy.uplink.application_data"
         component={Checkbox}
-        label={policyMessages.applicationData}
+        label={sharedMessages.appData}
         description={policyMessages.applicationDataDesc}
       />
       <Form.Field
@@ -66,7 +66,7 @@ const DefaultRoutingPolicyForm = () => (
       <Form.Field
         name="policy.downlink.join_accept"
         component={Checkbox}
-        label={policyMessages.joinAccept}
+        label={sharedMessages.joinAccept}
         description={policyMessages.joinAcceptDesc}
       />
       <Form.Field
@@ -78,7 +78,7 @@ const DefaultRoutingPolicyForm = () => (
       <Form.Field
         name="policy.downlink.application_data"
         component={Checkbox}
-        label={policyMessages.applicationData}
+        label={sharedMessages.appData}
         description={policyMessages.applicationDataAllowDesc}
       />
     </Col>
