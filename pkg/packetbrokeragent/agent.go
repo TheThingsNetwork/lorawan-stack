@@ -178,7 +178,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			}
 			devAddrPrefix := types.DevAddrPrefix{
 				DevAddr: devAddr,
-				Length:  uint8(conf.NetID.IDBits()),
+				Length:  uint8(32 - types.NwkAddrBits(conf.NetID)),
 			}
 			devAddrPrefixes = append(devAddrPrefixes, devAddrPrefix)
 		}
