@@ -263,7 +263,12 @@ const setPacketBrokerHomeNetworkPolicyLogic = createRequestLogic({
     const ids = extractPacketBrokerIdsFromCombinedId(id)
     await tts.PacketBrokerAgent.setHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id, policy)
 
-    return policy
+    const newPolicy = { home_network_id: { net_id: ids.net_id }, ...policy }
+    if ('tenant_id' in ids) {
+      newPolicy.home_network_id.tenant_id = ids.tenant_id
+    }
+
+    return newPolicy
   },
 })
 

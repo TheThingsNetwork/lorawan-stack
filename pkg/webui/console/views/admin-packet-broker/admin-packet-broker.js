@@ -199,14 +199,16 @@ const PacketBroker = () => {
     async values => {
       const vals = validationSchema.cast(values)
       const { _routing_configuration, policy } = vals
+      const ids = Object.keys(routingPolicies)
 
       try {
         if (_routing_configuration === 'ttn') {
-          const ids = Object.keys(routingPolicies)
-
           await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
           await dispatch(attachPromise(deleteAllHomeNetworkRoutingPolicies(ids)))
           await dispatch(attachPromise(setHomeNetworkRoutingPolicy(TTN_NET_ID, policy)))
+        } else if (_routing_configuration === 'all_networks') {
+          await dispatch(attachPromise(deleteAllHomeNetworkRoutingPolicies(ids)))
+          await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
         } else {
           await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
         }
