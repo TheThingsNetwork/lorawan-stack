@@ -35,6 +35,8 @@ describe('Packet Broker routing policies', () => {
   it('succeeds setting a "traffic to all networks" routing configuration', () => {
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
     cy.intercept('PUT', '/api/v3/pba/home-networks/policies/default', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19/johan', {})
     cy.intercept('/api/v3/pba/networks*', { fixture: 'console/packet-broker/networks.json' })
     cy.intercept('/api/v3/pba/home-networks/policies*', {
       fixture: 'console/packet-broker/policies-home-network.json',
