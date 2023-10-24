@@ -81,24 +81,17 @@ const GatewayGeneralSettingsInner = () => {
       if (isEqual(gateway.attributes || {}, attributes)) {
         delete formValues.attributes
       }
-      const changed = diff(gateway, formValues)
-      let update
-      if ('attributes' in changed) {
-        update = {
-          ...changed,
-          attributes,
-        }
-      } else if ('frequency_plan_ids' in changed) {
-        update = {
-          ...changed,
-          frequency_plan_ids,
-        }
-      } else {
-        update = changed
+      if (isEqual(gateway.frequency_plan_ids || {}, frequency_plan_ids)) {
+        delete formValues.frequency_plan_ids
       }
 
+      const changed = diff(gateway, formValues, {
+        patchArraysItems: false,
+        patchInFull: ['attributes', 'frequency_plan_ids'],
+      })
+
       try {
-        await dispatch(updateGateway(gtwId, update))
+        await dispatch(updateGateway(gtwId, changed))
         toast({
           title: gtwId,
           message: m.updateSuccess,
