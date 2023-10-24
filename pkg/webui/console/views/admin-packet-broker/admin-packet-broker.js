@@ -17,7 +17,6 @@ import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
 import { Routes, Route } from 'react-router-dom'
 import classnames from 'classnames'
-import { isEqual } from 'lodash'
 
 import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
 
@@ -27,35 +26,16 @@ import Switch from '@ttn-lw/components/switch'
 import Tabs from '@ttn-lw/components/tabs'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import ErrorNotification from '@ttn-lw/components/error-notification'
-import Radio from '@ttn-lw/components/radio-button'
-import Form from '@ttn-lw/components/form'
-import toast from '@ttn-lw/components/toast'
-import SubmitBar from '@ttn-lw/components/submit-bar'
-import SubmitButton from '@ttn-lw/components/submit-button'
 import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
-import RequireRequest from '@ttn-lw/lib/components/require-request'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
-import SubViewErrorComponent from '@console/views/sub-view-error'
-
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import Yup from '@ttn-lw/lib/yup'
 
-import { isNotEnabledError, isValidPolicy } from '@console/lib/packet-broker/utils'
+import { isNotEnabledError } from '@console/lib/packet-broker/utils'
 
-import {
-  registerPacketBroker,
-  deregisterPacketBroker,
-  getHomeNetworkDefaultRoutingPolicy,
-  setHomeNetworkDefaultRoutingPolicy,
-  deleteHomeNetworkDefaultRoutingPolicy,
-  setHomeNetworkRoutingPolicy,
-  getHomeNetworkRoutingPolicies,
-  deleteAllHomeNetworkRoutingPolicies,
-} from '@console/store/actions/packet-broker'
+import { registerPacketBroker, deregisterPacketBroker } from '@console/store/actions/packet-broker'
 
 import {
   selectRegistered,
@@ -63,61 +43,13 @@ import {
   selectEnabled,
   selectListed,
   selectInfoError,
-  selectHomeNetworkDefaultRoutingPolicy,
-  selectPacketBrokerHomeNetworkPoliciesStore,
 } from '@console/store/selectors/packet-broker'
 
-import DefaultRoutingPolicyView from './default-routing-policy'
-import NetworkRoutingPoliciesView from './network-routing-policies'
+import RoutingConfigurationView from './routing-configuration'
+import DefaultGatewayVisibilityView from './default-gateway-visibility'
 import m from './messages'
 
 import style from './admin-packet-broker.styl'
-
-const validationSchema = Yup.object({
-  _routing_configuration: Yup.string().oneOf(['all_networks', 'ttn', 'custom']),
-  policy: Yup.object({
-    uplink: Yup.object({}),
-    downlink: Yup.object({}),
-  }),
-})
-
-const fullyPermissiveNetworkPolicy = {
-  uplink: {
-    join_request: true,
-    mac_data: true,
-    application_data: true,
-    signal_quality: true,
-    localization: true,
-  },
-  downlink: {
-    join_accept: true,
-    mac_data: true,
-    application_data: true,
-  },
-}
-
-const fullyRestrictiveNetworkPolicy = {
-  uplink: {
-    join_request: false,
-    mac_data: false,
-    application_data: false,
-    signal_quality: false,
-    localization: false,
-  },
-  downlink: {
-    join_accept: false,
-    mac_data: false,
-    application_data: false,
-  },
-}
-
-const TTN_NET_ID = '19'
-const peerWithEveryNetwork = policy =>
-  isEqual(policy.uplink, fullyPermissiveNetworkPolicy.uplink) &&
-  isEqual(policy.downlink, fullyPermissiveNetworkPolicy.downlink)
-
-const onlyTtn = policies =>
-  Object.keys(policies).length === 1 && Object.keys(policies).includes(TTN_NET_ID)
 
 const PacketBroker = () => {
   const [activeTab, setActiveTab] = useState('default-routing-policy')
@@ -168,88 +100,17 @@ const PacketBroker = () => {
   )
 
   const tabs = [
-    { title: m.defaultRoutingPolicy, link: '/admin-panel/packet-broker', name: 'default' },
     {
-      title: sharedMessages.networks,
-      link: '/admin-panel/packet-broker/networks',
-      name: 'networks',
-      exact: false,
+      title: m.routingConfig,
+      link: '/admin-panel/packet-broker',
+      name: 'default',
+    },
+    {
+      title: m.defaultGatewayVisibility,
+      link: '/admin-panel/packet-broker/default-gateway-visibility',
+      name: 'default-gateway-visibility',
     },
   ]
-
-  const defaultRoutingPolicy = useSelector(selectHomeNetworkDefaultRoutingPolicy)
-  const routingPolicies = useSelector(selectPacketBrokerHomeNetworkPoliciesStore)
-  const initialValues = {
-    _routing_configuration:
-      peerWithEveryNetwork(defaultRoutingPolicy) && isValidPolicy(defaultRoutingPolicy)
-        ? 'all_networks'
-        : onlyTtn(routingPolicies) && !isValidPolicy(defaultRoutingPolicy)
-        ? 'ttn'
-        : 'custom',
-  }
-  initialValues.policy =
-    isValidPolicy(defaultRoutingPolicy) && !peerWithEveryNetwork(defaultRoutingPolicy)
-      ? defaultRoutingPolicy
-      : { uplink: {}, downlink: {} }
-
-  const [routingConfig, setRoutingConfig] = useState(undefined)
-  const [formError, setFormError] = useState(undefined)
-
-  const handleDefaultRoutingPolicySubmit = useCallback(
-    async values => {
-      const vals = validationSchema.cast(values)
-      const { _routing_configuration, policy } = vals
-      const ids = Object.keys(routingPolicies)
-
-      try {
-        if (_routing_configuration === 'ttn') {
-          await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
-          await dispatch(attachPromise(deleteAllHomeNetworkRoutingPolicies(ids)))
-          await dispatch(attachPromise(setHomeNetworkRoutingPolicy(TTN_NET_ID, policy)))
-        } else if (_routing_configuration === 'all_networks') {
-          await dispatch(attachPromise(deleteAllHomeNetworkRoutingPolicies(ids)))
-          await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
-        } else {
-          await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
-        }
-
-        toast({
-          message: m.defaultRoutingPolicySet,
-          type: toast.types.SUCCESS,
-        })
-      } catch (error) {
-        setFormError(error)
-      }
-    },
-    [dispatch, setFormError, routingPolicies],
-  )
-
-  const handleRoutingConfigChange = useCallback(
-    value => {
-      setRoutingConfig(value)
-    },
-    [setRoutingConfig],
-  )
-
-  const handleSetPolicies = useCallback(({ setValues }, { value }) => {
-    if (value !== 'custom') {
-      return setValues(values => ({
-        ...values,
-        _routing_configuration: value,
-        policy: fullyPermissiveNetworkPolicy,
-      }))
-    }
-
-    return setValues(values => ({
-      ...values,
-      _routing_configuration: value,
-      policy: fullyRestrictiveNetworkPolicy,
-    }))
-  }, [])
-
-  const showPolicyCheckboxes = routingConfig
-    ? routingConfig === 'custom'
-    : initialValues._routing_configuration === 'custom'
 
   return (
     <Container>
@@ -274,7 +135,7 @@ const PacketBroker = () => {
           <Message content={m.whyNetworkPeeringTitle} component="h3" />
           <Message content={m.whyNetworkPeeringText} className={style.info} component="p" />
           <Message content={m.enbaling} className={style.info} />
-          <Message content={sharedMessages.setupSubTitle} component="h3" className="mt-cs-xxl" />
+          <Message content={sharedMessages.setup} component="h3" className="mt-cs-xxl" />
           {!enabled && <Notification warning small content={m.packetBrokerDisabledDesc} />}
           {showError && <ErrorNotification small content={infoError} />}
           {enabled && (
@@ -357,57 +218,13 @@ const PacketBroker = () => {
                 />
               </PortalledModal>
             </Col>
-            <Col md={12} style={{ position: 'relative' }}>
-              <Message
-                content={'Routing configuration'}
-                component="h3"
-                className={style.subTitle}
-              />
-              <RequireRequest
-                requestAction={[
-                  getHomeNetworkDefaultRoutingPolicy(),
-                  getHomeNetworkRoutingPolicies(),
-                ]}
-                errorRenderFunction={SubViewErrorComponent}
-                spinnerProps={{ inline: true, center: true, className: 'mt-ls-s' }}
-              >
-                <Form
-                  onSubmit={handleDefaultRoutingPolicySubmit}
-                  initialValues={initialValues}
-                  error={formError}
-                >
-                  <Form.Field
-                    component={Radio.Group}
-                    className="mb-cs-xl"
-                    name="_routing_configuration"
-                    onChange={handleRoutingConfigChange}
-                    valueSetter={handleSetPolicies}
-                  >
-                    <Radio
-                      label="Forward traffic to all networks registered in Packet Broker"
-                      value="all_networks"
-                    />
-                    <Radio
-                      label="Forward traffic to The Things Stack Sandbox (community network) only"
-                      value="ttn"
-                    />
-                    <Radio label="Use custom routing policies" value="custom" />
-                  </Form.Field>
-                  {showPolicyCheckboxes && (
-                    <>
-                      <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
-                      <Routes>
-                        <Route index Component={DefaultRoutingPolicyView} />
-                        <Route path="networks/*" Component={NetworkRoutingPoliciesView} />
-                        <Route path="*" component={GenericNotFound} />
-                      </Routes>
-                    </>
-                  )}
-                  <SubmitBar align="end">
-                    <Form.Submit component={SubmitButton} message={'Save routing configuration'} />
-                  </SubmitBar>
-                </Form>
-              </RequireRequest>
+            <Col md={12} style={{ position: 'relative' }} className="mt-cs-xxl">
+              <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
+              <Routes>
+                <Route index path="/*" Component={RoutingConfigurationView} />
+                <Route path="default-gateway-visibility" Component={DefaultGatewayVisibilityView} />
+                <Route path="*" component={GenericNotFound} />
+              </Routes>
             </Col>
           </>
         )}

@@ -29,6 +29,7 @@ export default defineMessages({
   enablePacketBroker: 'Enable Packet Broker',
   packetBrokerRegistrationDesc:
     'Enabling will allow other networks to send traffic to you as well as you forwarding traffic to them, based on the exact routing policy.',
+  routingConfig: 'Routing configuration',
   network: 'Network: {network}',
   listNetwork: 'List my network in Packet Broker publicly',
   listNetworkDesc:

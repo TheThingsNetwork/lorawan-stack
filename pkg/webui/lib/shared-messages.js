@@ -459,7 +459,7 @@ export default defineMessages({
   sessions: 'Sessions',
   setLoRaCloudToken: 'Set LoRa Cloud token',
   settings: 'Settings',
-  setupSubTitle: 'Setup',
+  setup: 'Setup',
   shareGatewayInfo: 'Share gateway information',
   skipCryptoDescription: 'Skip decryption of uplink payloads and encryption of downlink payloads',
   skipCryptoPlaceholder: 'Encryption/decryption disabled',

@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,12 +24,10 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import policyMessages from '@console/lib/packet-broker/messages'
 
-import style from './routing-policy-form.styl'
-
 const DefaultRoutingPolicyForm = () => (
   <Row>
     <Col md={6} xs={12}>
-      <Message content={sharedMessages.uplink} component="h4" className={style.directionHeader} />
+      <Message content={sharedMessages.uplink} component="h4" className="mb-cs-xs" />
       <Form.Field
         name="policy.uplink.join_request"
         component={Checkbox}
@@ -62,7 +60,7 @@ const DefaultRoutingPolicyForm = () => (
       />
     </Col>
     <Col sm={6} xs={12}>
-      <Message content={sharedMessages.downlink} component="h4" className={style.directionHeader} />
+      <Message content={sharedMessages.downlink} component="h4" className="mb-cs-xs" />
       <Form.Field
         name="policy.downlink.join_accept"
         component={Checkbox}

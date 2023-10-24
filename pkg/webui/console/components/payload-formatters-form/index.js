@@ -418,7 +418,7 @@ const PayloadFormattersForm = ({
           >
             {() => (
               <>
-                <Form.SubTitle title={sharedMessages.setupSubTitle} />
+                <Form.SubTitle title={sharedMessages.setup} />
                 <Form.Field
                   name={FIELD_NAMES.SELECT}
                   title={m.formatterType}
