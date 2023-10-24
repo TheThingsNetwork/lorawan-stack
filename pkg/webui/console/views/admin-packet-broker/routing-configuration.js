@@ -97,7 +97,7 @@ const peerWithEveryNetwork = policy =>
   isEqual(policy.downlink, fullyPermissiveNetworkPolicy.downlink)
 
 const onlyTtn = policies =>
-  Object.keys(policies).length === 1 && Object.keys(policies).includes(TTN_NET_ID)
+  Object.keys(policies).length === 1 && Object.keys(policies).includes(`${TTN_NET_ID}/ttn`)
 
 const RoutingConfigurationView = () => {
   const dispatch = useDispatch()

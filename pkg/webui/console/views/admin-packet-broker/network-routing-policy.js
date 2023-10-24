@@ -75,7 +75,7 @@ const NetworkRoutingPolicyViewInner = () => {
   useBreadcrumbs(
     'admin-panel.packet-broker.networks.single',
     <>
-      <Breadcrumb path={'/admin-panel/packet-broker/networks'} content={m.networks} />
+      <Breadcrumb path={'/admin-panel/packet-broker/networks'} content={sharedMessages.networks} />
       <Breadcrumb
         path={`/admin-panel/packet-broker/networks/${netId}${tenantId ? `/${tenantId}` : ''}`}
         content={network.name || displayId}
@@ -120,7 +120,7 @@ const NetworkRoutingPolicyViewInner = () => {
 
   const homeNetworkData = [
     {
-      header: m.networkInformation,
+      header: sharedMessages.networkInformation,
       items: [
         {
           key: m.networkId,
