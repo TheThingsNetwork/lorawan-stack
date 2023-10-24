@@ -65,7 +65,7 @@ const RoutingPolicySheet = ({ policy }) => {
         />
         <RoutingPolicy
           enabled={uplink.mac_data}
-          message={m.macData}
+          message={sharedMessages.macData}
           positiveMessage={m.forwardsMacData}
           negativeMessage={m.doesNotForwardMacData}
         />
@@ -98,7 +98,7 @@ const RoutingPolicySheet = ({ policy }) => {
         />
         <RoutingPolicy
           enabled={downlink.mac_data}
-          message={m.macData}
+          message={sharedMessages.macData}
           positiveMessage={m.allowsMacData}
           negativeMessage={m.doesNotAllowMacData}
         />
