@@ -355,7 +355,6 @@
   "console.components.routing-policy-form.index.saveDefaultPolicy": "",
   "console.components.routing-policy-form.index.useDefaultPolicy": "このネットワークでデフォルトのルーティングポリシーを使用",
   "console.components.routing-policy-form.index.useSpecificPolicy": "ネットワーク固有のルーティングポリシーを使用",
-  "console.components.routing-policy-form.index.doNotUseADefaultPolicy": "",
   "console.components.routing-policy-form.index.doNotUseAPolicy": "このネットワークには、ルーティングポリシーを使用しないでください",
   "console.components.uplink-form.uplink-form.simulateUplink": "アップリンクのシミュレーション",
   "console.components.uplink-form.uplink-form.payloadDescription": "アップリンクメッセージの希望するペイロードバイト数",

@@ -355,7 +355,6 @@
   "console.components.routing-policy-form.index.saveDefaultPolicy": "Save default policy",
   "console.components.routing-policy-form.index.useDefaultPolicy": "Use default routing policy for this network",
   "console.components.routing-policy-form.index.useSpecificPolicy": "Use network specific routing policy",
-  "console.components.routing-policy-form.index.doNotUseADefaultPolicy": "Do not use a default routing policy for this network",
   "console.components.routing-policy-form.index.doNotUseAPolicy": "Do not use a routing policy for this network",
   "console.components.uplink-form.uplink-form.simulateUplink": "Simulate uplink",
   "console.components.uplink-form.uplink-form.payloadDescription": "The desired payload bytes of the uplink message",
