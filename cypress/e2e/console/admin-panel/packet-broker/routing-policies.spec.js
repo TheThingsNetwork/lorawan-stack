@@ -62,7 +62,7 @@ describe('Packet Broker routing policies', () => {
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/default', {})
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19/johan', {})
-    cy.intercept('PUT', '/api/v3/pba/home-networks/policies/19', {})
+    cy.intercept('PUT', '/api/v3/pba/home-networks/policies/19/ttn', {})
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
     cy.findByLabelText(
