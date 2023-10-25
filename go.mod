@@ -111,6 +111,7 @@ require (
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v2 v2.4.0
+	nhooyr.io/websocket v1.8.10
 )
 
 require (

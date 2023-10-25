@@ -257,4 +257,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.90.1 // indirect
 	mellium.im/sasl v0.3.1 // indirect
+	nhooyr.io/websocket v1.8.10 // indirect
 )
