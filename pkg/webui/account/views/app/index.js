@@ -14,7 +14,7 @@
 
 import { useSelector, useDispatch } from 'react-redux'
 import React, { useEffect } from 'react'
-import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import { Routes, Route, BrowserRouter, ScrollRestoration } from 'react-router-dom'
 import { Helmet } from 'react-helmet'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
@@ -44,6 +44,16 @@ const siteTitle = selectApplicationSiteTitle()
 const pageData = selectPageData()
 
 const errorRender = error => <FullViewError error={error} header={<Header />} />
+const getScrollRestorationKey = location => {
+  // Preserve scroll position only when necessary.
+  // E.g. we don't want to scroll to top when changing tabs of a table,
+  // but we do want to scroll to top when changing pages.
+  const { pathname, search } = location
+  const params = new URLSearchParams(search)
+  const page = params.get('page')
+
+  return `${pathname}${page ? `?page=${page}` : ''}`
+}
 
 const AccountApp = ({ history }) => {
   const user = useSelector(selectUser)
@@ -73,6 +83,7 @@ const AccountApp = ({ history }) => {
 
   return (
     <>
+      <ScrollRestoration getKey={getScrollRestorationKey} />
       <ToastContainer />
       <BrowserRouter history={history} basename="/oauth">
         <ErrorView errorRender={errorRender}>
