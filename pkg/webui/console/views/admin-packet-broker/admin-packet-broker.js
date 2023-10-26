@@ -15,7 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import classnames from 'classnames'
 
 import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
@@ -69,7 +69,7 @@ const PacketBroker = () => {
     } else {
       setDeregisterModalVisible(true)
     }
-  }, [dispatch, registered, setDeregisterModalVisible])
+  }, [dispatch, registered])
 
   const handleDeregisterModalComplete = useCallback(
     approved => {
@@ -102,8 +102,9 @@ const PacketBroker = () => {
   const tabs = [
     {
       title: m.routingConfig,
-      link: '/admin-panel/packet-broker',
+      link: '/admin-panel/packet-broker/routing-configuration',
       name: 'default',
+      exact: false,
     },
     {
       title: m.defaultGatewayVisibility,
@@ -221,8 +222,9 @@ const PacketBroker = () => {
             <Col md={12} style={{ position: 'relative' }} className="mt-cs-xxl">
               <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
               <Routes>
-                <Route index path="/*" Component={RoutingConfigurationView} />
+                <Route path="routing-configuration/*" Component={RoutingConfigurationView} />
                 <Route path="default-gateway-visibility" Component={DefaultGatewayVisibilityView} />
+                <Route path="/" element={<Navigate to="routing-configuration" />} />
                 <Route path="*" component={GenericNotFound} />
               </Routes>
             </Col>

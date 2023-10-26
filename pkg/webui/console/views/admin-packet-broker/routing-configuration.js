@@ -103,10 +103,14 @@ const RoutingConfigurationView = () => {
   const dispatch = useDispatch()
   const [activeTab, setActiveTab] = useState('default-routing-policy')
   const tabs = [
-    { title: m.defaultRoutingPolicy, link: '/admin-panel/packet-broker', name: 'default' },
+    {
+      title: m.defaultRoutingPolicy,
+      link: '/admin-panel/packet-broker/routing-configuration',
+      name: 'default',
+    },
     {
       title: sharedMessages.networks,
-      link: '/admin-panel/packet-broker/networks',
+      link: '/admin-panel/packet-broker/routing-configuration/networks',
       name: 'networks',
       exact: false,
     },

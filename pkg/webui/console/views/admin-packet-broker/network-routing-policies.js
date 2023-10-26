@@ -23,8 +23,11 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const NetworkRoutingPoliciesView = () => {
   useBreadcrumbs(
-    'admin-panel.packet-broker.networks',
-    <Breadcrumb path={'/admin-panel/packet-broker/networks'} content={sharedMessages.networks} />,
+    'admin-panel.packet-broker.routing-configuration.networks',
+    <Breadcrumb
+      path={'/admin-panel/packet-broker/routing-configuration/networks'}
+      content={sharedMessages.networks}
+    />,
   )
 
   return <PacketBrokerNetworksTable />
