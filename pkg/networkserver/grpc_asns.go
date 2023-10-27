@@ -105,7 +105,10 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context, consu
 			}
 			cl := ttnpb.NewNsAsClient(conn)
 			if err := ns.sendApplicationUplinks(ctx, cl, ups...); err != nil {
-				log.FromContext(ctx).WithError(err).Error("Failed to send application uplinks")
+				log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks")
+				if !retryableUplinkError(err) {
+					return nil
+				}
 				return err
 			}
 			return nil
