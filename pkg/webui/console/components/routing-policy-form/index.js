@@ -132,7 +132,7 @@ const RoutingPolicyForm = ({
               <Form.Field
                 name="policy.uplink.mac_data"
                 component={Checkbox}
-                label={policyMessages.macData}
+                label={sharedMessages.macData}
                 description={policyMessages.macDataDesc}
               />
               <Form.Field
@@ -169,7 +169,7 @@ const RoutingPolicyForm = ({
               <Form.Field
                 name="policy.downlink.mac_data"
                 component={Checkbox}
-                label={policyMessages.macData}
+                label={sharedMessages.macData}
                 description={policyMessages.macDataAllowDesc}
               />
               <Form.Field

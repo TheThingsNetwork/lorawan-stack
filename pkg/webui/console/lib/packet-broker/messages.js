@@ -22,7 +22,6 @@ export default defineMessages({
   joinRequestDesc: 'Forward join-request messages',
   localizationInformation: 'Localization  information',
   localizationInformationDesc: 'Forward gateway location, RSSI, SNR and fine timestamp',
-  macData: 'MAC data',
   macDataAllowDesc: 'Allow downlink messages with FPort of 0',
   macDataDesc: 'Forward uplink messages with FPort 0',
   signalQualityInformation: 'Signal quality information',
