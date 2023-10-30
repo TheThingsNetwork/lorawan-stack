@@ -265,7 +265,7 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
                   },
             }}
             onApprove={onExport}
-            message={m.macData}
+            message={sharedMessages.macData}
             type="button"
             icon="file_download"
           />
@@ -307,14 +307,14 @@ const DeviceOverview = () => {
 
         if (!('mac_state' in result)) {
           toast({
-            title: m.macData,
+            title: sharedMessages.macData,
             message: m.macStateError,
             type: toast.types.ERROR,
           })
         }
       } catch {
         toast({
-          title: m.macData,
+          title: sharedMessages.macData,
           message: m.macStateError,
           type: toast.types.ERROR,
         })
