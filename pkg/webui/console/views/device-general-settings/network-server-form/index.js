@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Link from '@ttn-lw/components/link'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -40,12 +41,15 @@ import { isBackend, getBackendErrorName } from '@ttn-lw/lib/errors/utils'
 import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import {
   parseLorawanMacVersion,
   ACTIVATION_MODES,
   generate16BytesKey,
 } from '@console/lib/device-utils'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import messages from '../messages'
 import {
@@ -229,9 +233,12 @@ const NetworkServerForm = React.memo(props => {
       ),
     [device, initialActivationMode, isClassB, isClassC, macSettings, validationContext],
   )
+
+  const dispatch = useDispatch()
+  const appId = useSelector(selectSelectedApplicationId)
   const handleMacReset = React.useCallback(async () => {
     try {
-      await onMacReset()
+      await dispatch(attachPromise(onMacReset(appId, device.ids.device_id)))
       toast({
         message: m.resetSuccess,
         type: toast.types.SUCCESS,
@@ -242,7 +249,7 @@ const NetworkServerForm = React.memo(props => {
         type: toast.types.ERROR,
       })
     }
-  }, [onMacReset])
+  }, [onMacReset, dispatch, device, appId])
 
   const handleSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
