@@ -332,6 +332,7 @@ export default defineMessages({
   lorawanInformation: 'LoRaWAN information',
   lorawanOptions: 'LoRaWAN options',
   lorawanPhyVersionDescription: 'The LoRaWAN PHY version of the end device',
+  macData: 'MAC data',
   macSettingsError:
     'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
   macVersion: 'LoRaWAN version',

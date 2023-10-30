@@ -40,21 +40,23 @@ import {
 } from '@console/lib/feature-checks'
 
 const m = defineMessages({
-  adminPanel: 'Admin panel',
   userManagement: 'User management',
   globalNetworkSettings: 'Global network settings',
   peeringSettings: 'Peering settings',
 })
 
 const AdminPanel = () => {
-  useBreadcrumbs('admin-panel', <Breadcrumb path="/admin-panel" content={m.adminPanel} />)
+  useBreadcrumbs(
+    'admin-panel',
+    <Breadcrumb path="/admin-panel" content={sharedMessages.adminPanel} />,
+  )
   const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))
   const showPacketBroker = useSelector(state => checkFromState(mayConfigurePacketBroker, state))
 
   return (
     <Require featureCheck={mayPerformAdminActions} otherwise={{ redirect: '/' }}>
       <Breadcrumbs />
-      <IntlHelmet title={m.adminPanel} />
+      <IntlHelmet title={sharedMessages.adminPanel} />
       <PanelView>
         <PanelView.Item
           title={sharedMessages.networkInformation}
