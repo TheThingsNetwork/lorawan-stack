@@ -3509,6 +3509,42 @@
       "file": "shared.go"
     }
   },
+  "error:pkg/console/internal/events/protocol:message_type": {
+    "translations": {
+      "en": "invalid message type `{type}`"
+    },
+    "description": {
+      "package": "pkg/console/internal/events/protocol",
+      "file": "protocol.go"
+    }
+  },
+  "error:pkg/console/internal/events/subscriptions:already_subscribed": {
+    "translations": {
+      "en": "already subscribed with ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/console/internal/events/subscriptions",
+      "file": "subscriptions.go"
+    }
+  },
+  "error:pkg/console/internal/events/subscriptions:no_identifiers": {
+    "translations": {
+      "en": "no identifiers"
+    },
+    "description": {
+      "package": "pkg/console/internal/events/subscriptions",
+      "file": "subscriptions.go"
+    }
+  },
+  "error:pkg/console/internal/events/subscriptions:not_subscribed": {
+    "translations": {
+      "en": "not subscribed with ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/console/internal/events/subscriptions",
+      "file": "subscriptions.go"
+    }
+  },
   "error:pkg/crypto/cryptoservices:no_app_key": {
     "translations": {
       "en": "no AppKey specified"
@@ -4382,15 +4418,6 @@
       "file": "conversion.go"
     }
   },
-  "error:pkg/events/grpc:invalid_regexp": {
-    "translations": {
-      "en": "invalid regexp"
-    },
-    "description": {
-      "package": "pkg/events/grpc",
-      "file": "grpc.go"
-    }
-  },
   "error:pkg/events/grpc:no_identifiers": {
     "translations": {
       "en": "no identifiers"
@@ -4400,27 +4427,9 @@
       "file": "grpc.go"
     }
   },
-  "error:pkg/events/grpc:no_matching_events": {
-    "translations": {
-      "en": "no matching events for regexp `{regexp}`"
-    },
-    "description": {
-      "package": "pkg/events/grpc",
-      "file": "grpc.go"
-    }
-  },
   "error:pkg/events/grpc:storage_disabled": {
     "translations": {
       "en": "events storage is not not enabled"
-    },
-    "description": {
-      "package": "pkg/events/grpc",
-      "file": "grpc.go"
-    }
-  },
-  "error:pkg/events/grpc:unknown_event_name": {
-    "translations": {
-      "en": "unknown event `{name}`"
     },
     "description": {
       "package": "pkg/events/grpc",
@@ -4443,6 +4452,33 @@
     "description": {
       "package": "pkg/events/redis",
       "file": "codec.go"
+    }
+  },
+  "error:pkg/events:invalid_regexp": {
+    "translations": {
+      "en": "invalid regexp"
+    },
+    "description": {
+      "package": "pkg/events",
+      "file": "pattern.go"
+    }
+  },
+  "error:pkg/events:no_matching_events": {
+    "translations": {
+      "en": "no matching events for regexp `{regexp}`"
+    },
+    "description": {
+      "package": "pkg/events",
+      "file": "pattern.go"
+    }
+  },
+  "error:pkg/events:unknown_event_name": {
+    "translations": {
+      "en": "unknown event `{name}`"
+    },
+    "description": {
+      "package": "pkg/events",
+      "file": "pattern.go"
     }
   },
   "error:pkg/fetch:fetch_file": {

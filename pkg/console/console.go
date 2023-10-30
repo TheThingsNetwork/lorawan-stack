@@ -23,6 +23,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
@@ -58,6 +59,7 @@ func New(c *component.Component, config Config) (*Console, error) {
 	}
 
 	c.RegisterWeb(console)
+	c.RegisterWeb(events.New(c))
 
 	return console, nil
 }

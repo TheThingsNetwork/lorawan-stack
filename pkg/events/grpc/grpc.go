@@ -19,9 +19,6 @@ package grpc
 import (
 	"context"
 	"os"
-	"regexp"
-	"sort"
-	"strings"
 	"time"
 
 	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -65,58 +62,6 @@ type EventsServer struct {
 	definedNames map[string]struct{}
 }
 
-var (
-	errInvalidRegexp    = errors.DefineInvalidArgument("invalid_regexp", "invalid regexp")
-	errNoMatchingEvents = errors.DefineInvalidArgument("no_matching_events", "no matching events for regexp `{regexp}`")
-	errUnknownEventName = errors.DefineInvalidArgument("unknown_event_name", "unknown event `{name}`")
-)
-
-func (srv *EventsServer) processNames(names ...string) ([]string, error) {
-	if len(names) == 0 {
-		return nil, nil
-	}
-	nameMap := make(map[string]struct{})
-	for _, name := range names {
-		if strings.HasPrefix(name, "/") && strings.HasSuffix(name, "/") {
-			re, err := regexp.Compile(strings.Trim(name, "/"))
-			if err != nil {
-				return nil, errInvalidRegexp.WithCause(err)
-			}
-			var found bool
-			for defined := range srv.definedNames {
-				if re.MatchString(defined) {
-					nameMap[defined] = struct{}{}
-					found = true
-				}
-			}
-			if !found {
-				return nil, errNoMatchingEvents.WithAttributes("regexp", re.String())
-			}
-		} else {
-			var found bool
-			for defined := range srv.definedNames {
-				if name == defined {
-					nameMap[name] = struct{}{}
-					found = true
-					break
-				}
-			}
-			if !found {
-				return nil, errUnknownEventName.WithAttributes("name", name)
-			}
-		}
-	}
-	if len(nameMap) == 0 {
-		return nil, nil
-	}
-	out := make([]string, 0, len(nameMap))
-	for name := range nameMap {
-		out = append(out, name)
-	}
-	sort.Strings(out)
-	return out, nil
-}
-
 var errNoIdentifiers = errors.DefineInvalidArgument("no_identifiers", "no identifiers")
 
 // Stream implements the EventsServer interface.
@@ -125,7 +70,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		return errNoIdentifiers.New()
 	}
 
-	names, err := srv.processNames(req.Names...)
+	names, err := events.NamesFromPatterns(srv.definedNames, req.Names)
 	if err != nil {
 		return err
 	}

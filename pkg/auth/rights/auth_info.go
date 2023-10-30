@@ -51,16 +51,14 @@ func AuthInfo(ctx context.Context) (authInfo *ttnpb.AuthInfoResponse, err error)
 
 var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 
-// RequireAuthentication confirms if the authentication information within a context contains any rights, if so,
+// RequireAuthenticated confirms if the authentication information within a context contains any rights, if so,
 // the request is considered to be authenticated.
-func RequireAuthentication(ctx context.Context) error {
-	log.FromContext(ctx).Debug("Authenticate request")
+func RequireAuthenticated(ctx context.Context) error {
 	authInfo, err := AuthInfo(ctx)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to validate authentication information")
 		return errUnauthenticated.WithCause(err)
 	}
-
 	if authInfo.GetAccessMethod() == nil && len(authInfo.GetUniversalRights().GetRights()) == 0 {
 		return errUnauthenticated.New()
 	}
