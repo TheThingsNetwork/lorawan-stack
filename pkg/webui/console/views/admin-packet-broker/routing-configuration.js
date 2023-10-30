@@ -76,21 +76,6 @@ const fullyPermissiveNetworkPolicy = {
   },
 }
 
-const fullyRestrictiveNetworkPolicy = {
-  uplink: {
-    join_request: false,
-    mac_data: false,
-    application_data: false,
-    signal_quality: false,
-    localization: false,
-  },
-  downlink: {
-    join_accept: false,
-    mac_data: false,
-    application_data: false,
-  },
-}
-
 const TTN_NET_ID = '19'
 const peerWithEveryNetwork = policy =>
   isEqual(policy.uplink, fullyPermissiveNetworkPolicy.uplink) &&
@@ -128,6 +113,7 @@ const RoutingConfigurationView = () => {
         : onlyTtn(routingPolicies) && !isValidPolicy(defaultRoutingPolicy)
         ? 'ttn'
         : 'custom',
+    _use_default_policy: isValidPolicy(defaultRoutingPolicy),
   }
   initialValues.policy = isValidPolicy(defaultRoutingPolicy)
     ? defaultRoutingPolicy
@@ -139,7 +125,7 @@ const RoutingConfigurationView = () => {
   const handleDefaultRoutingPolicySubmit = useCallback(
     async values => {
       const vals = validationSchema.cast(values)
-      const { _routing_configuration, policy } = vals
+      const { _routing_configuration, _use_default_policy, policy } = vals
       const ids = Object.keys(routingPolicies)
 
       try {
@@ -150,8 +136,10 @@ const RoutingConfigurationView = () => {
         } else if (_routing_configuration === 'all_networks') {
           await dispatch(attachPromise(deleteAllHomeNetworkRoutingPolicies(ids)))
           await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
-        } else {
+        } else if (_routing_configuration === 'custom' && _use_default_policy) {
           await dispatch(attachPromise(setHomeNetworkDefaultRoutingPolicy(policy)))
+        } else if (_routing_configuration === 'custom' && !_use_default_policy) {
+          await dispatch(attachPromise(deleteHomeNetworkDefaultRoutingPolicy()))
         }
 
         toast({
@@ -184,7 +172,6 @@ const RoutingConfigurationView = () => {
     return setValues(values => ({
       ...values,
       _routing_configuration: value,
-      policy: fullyRestrictiveNetworkPolicy,
     }))
   }, [])
 
