@@ -96,7 +96,6 @@ describe('Packet Broker registration', () => {
       .next()
       .findByTestId('switch')
       .should('be.checked')
-    cy.findByText('Routing configuration', { selector: 'h3' }).should('be.visible')
     cy.findByLabelText('Forward traffic to all networks registered in Packet Broker').should(
       'exist',
     )

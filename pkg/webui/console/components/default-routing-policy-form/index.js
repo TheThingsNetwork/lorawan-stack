@@ -27,7 +27,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import policyMessages from '@console/lib/packet-broker/messages'
 
 const m = defineMessages({
-  useDefaultPolicy: 'Use default routing policy for this network',
   doNotUseADefaultPolicy: 'Do not use a default routing policy for this network',
 })
 
@@ -51,7 +50,7 @@ const DefaultRoutingPolicyForm = () => {
           decode={useDefaultDecode}
         >
           <Radio label={m.doNotUseADefaultPolicy} value="no-default" />
-          <Radio label={m.useDefaultPolicy} value="default" />
+          <Radio label={sharedMessages.useDefaultPolicy} value="default" />
         </Form.Field>
       </Col>
       {useDefault && (

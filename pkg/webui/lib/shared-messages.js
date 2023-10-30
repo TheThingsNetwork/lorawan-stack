@@ -508,6 +508,7 @@ export default defineMessages({
   uplinksReceived: 'Uplinks received',
   uploadAnImage: 'Upload an image',
   used: '{currentValue}/{maxValue} used',
+  useDefaultPolicy: 'Use default routing policy for this network',
   user: 'User',
   userAdd: 'Add user',
   userDelete: 'Delete user',

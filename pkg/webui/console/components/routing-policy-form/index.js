@@ -37,7 +37,6 @@ import style from './routing-policy-form.styl'
 
 const m = defineMessages({
   saveDefaultPolicy: 'Save default policy',
-  useDefaultPolicy: 'Use default routing policy for this network',
   useSpecificPolicy: 'Use network specific routing policy',
   doNotUseAPolicy: 'Do not use a routing policy for this network',
 })
@@ -79,7 +78,7 @@ const RoutingPolicyForm = ({ onSubmit, initialValues, error, defaultPolicy, subm
             decode={policySourceDecode}
           >
             <Radio
-              label={hasDefaultPolicy ? m.useDefaultPolicy : m.doNotUseAPolicy}
+              label={hasDefaultPolicy ? sharedMessages.useDefaultPolicy : m.doNotUseAPolicy}
               value="default"
             />
             <Radio label={m.useSpecificPolicy} value="specific" />
