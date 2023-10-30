@@ -786,7 +786,7 @@
   "console.views.device-overview.index.latestData": "Latest data",
   "console.views.device-overview.index.keysNotExposed": "Keys are not exposed",
   "console.views.device-overview.index.failedAccessOtherHostDevice": "The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.",
-  "console.views.device-overview.index.macData": "Download MAC data",
+  "console.views.device-overview.index.downloadMacData": "Download MAC data",
   "console.views.device-overview.index.sensitiveDataWarning": "The MAC data can contain sensitive information such as session keys that can be used to decrypt messages. <b>Do not share this information publicly</b>.",
   "console.views.device-overview.index.noSessionWarning": "The end device is currently not connected to the network (no active session). The MAC data will hence only contain the current MAC settings.",
   "console.views.device-overview.index.macStateError": "There was an error and MAC state could not be included in the MAC data.",

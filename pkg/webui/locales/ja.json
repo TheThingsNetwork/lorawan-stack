@@ -786,7 +786,7 @@
   "console.views.device-overview.index.latestData": "最新データ",
   "console.views.device-overview.index.keysNotExposed": "キーは露出していません",
   "console.views.device-overview.index.failedAccessOtherHostDevice": "アクセスしようとしたエンドデバイスは別のクラスタに登録されているため、そのホストコンソールを使用してアクセスする必要があります",
-  "console.views.device-overview.index.macData": "",
+  "console.views.device-overview.index.downloadMacData": "",
   "console.views.device-overview.index.sensitiveDataWarning": "MACデータには、メッセージの復号化に使用できるセッションキーなどの機密情報が含まれていることがあります。この情報を一般に公開しないでください！",
   "console.views.device-overview.index.noSessionWarning": "エンドデバイスは現在ネットワークに接続されていない（アクティブセッションがない）。そのため、MACデータには、現在のMAC設定のみが含まれます",
   "console.views.device-overview.index.macStateError": "エラーが発生し、MAC状態をMACデータに含めることができませんでした",
