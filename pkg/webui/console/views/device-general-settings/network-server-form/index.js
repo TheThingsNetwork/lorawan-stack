@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import Link from '@ttn-lw/components/link'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -48,8 +48,6 @@ import {
   ACTIVATION_MODES,
   generate16BytesKey,
 } from '@console/lib/device-utils'
-
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import messages from '../messages'
 import {
@@ -235,10 +233,11 @@ const NetworkServerForm = React.memo(props => {
   )
 
   const dispatch = useDispatch()
-  const appId = useSelector(selectSelectedApplicationId)
+  const appId = device.ids.application_ids.application_id
+  const devId = device.ids.device_id
   const handleMacReset = React.useCallback(async () => {
     try {
-      await dispatch(attachPromise(onMacReset(appId, device.ids.device_id)))
+      await dispatch(attachPromise(onMacReset(appId, devId)))
       toast({
         message: m.resetSuccess,
         type: toast.types.SUCCESS,
@@ -249,7 +248,7 @@ const NetworkServerForm = React.memo(props => {
         type: toast.types.ERROR,
       })
     }
-  }, [onMacReset, dispatch, device, appId])
+  }, [onMacReset, dispatch, devId, appId])
 
   const handleSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
