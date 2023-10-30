@@ -14,7 +14,15 @@
 
 import { useSelector, useDispatch } from 'react-redux'
 import React, { useEffect } from 'react'
-import { Routes, Route, BrowserRouter, ScrollRestoration } from 'react-router-dom'
+import {
+  Routes,
+  Route,
+  BrowserRouter,
+  ScrollRestoration,
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+} from 'react-router-dom'
 import { Helmet } from 'react-helmet'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
@@ -27,7 +35,6 @@ import Header from '@account/containers/header'
 import Landing from '@account/views/landing'
 import Authorize from '@account/views/authorize'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import {
   selectApplicationSiteName,
   selectApplicationSiteTitle,
@@ -55,7 +62,23 @@ const getScrollRestorationKey = location => {
   return `${pathname}${page ? `?page=${page}` : ''}`
 }
 
-const AccountApp = ({ history }) => {
+const Layout = () => (
+  <>
+    <ScrollRestoration getKey={getScrollRestorationKey} />
+    <ToastContainer />
+    <ErrorView errorRender={errorRender}>
+      <React.Fragment>
+        <Helmet
+          titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+          defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+        />
+        <Outlet />
+      </React.Fragment>
+    </ErrorView>
+  </>
+)
+
+const AccountRoot = () => {
   const user = useSelector(selectUser)
   const dispatch = useDispatch()
 
@@ -82,29 +105,19 @@ const AccountApp = ({ history }) => {
   }
 
   return (
-    <>
-      <ScrollRestoration getKey={getScrollRestorationKey} />
-      <ToastContainer />
-      <BrowserRouter history={history} basename="/oauth">
-        <ErrorView errorRender={errorRender}>
-          <React.Fragment>
-            <Helmet
-              titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-              defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-            />
-            <Routes>
-              <Route path="/authorize/*" Component={Authorize} />
-              <Route path="*" Component={Boolean(user) ? Landing : Front} />
-            </Routes>
-          </React.Fragment>
-        </ErrorView>
-      </BrowserRouter>
-    </>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/authorize/*" Component={Authorize} />
+        <Route path="*" Component={Boolean(user) ? Landing : Front} />
+      </Route>
+    </Routes>
   )
 }
 
-AccountApp.propTypes = {
-  history: PropTypes.history.isRequired,
-}
+const router = createBrowserRouter([{ path: '*', Component: AccountRoot }], {
+  basename: '/oauth',
+})
+
+const AccountApp = () => <RouterProvider router={router} />
 
 export default AccountApp
