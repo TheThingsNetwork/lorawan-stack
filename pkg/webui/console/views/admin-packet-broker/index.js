@@ -36,7 +36,10 @@ import NetworkRoutingPolicy from './network-routing-policy'
 const PacketBrokerRouter = () => {
   useBreadcrumbs(
     'admin-panel.packet-broker',
-    <Breadcrumb path={'/admin-panel/packet-broker'} content={sharedMessages.packetBroker} />,
+    <Breadcrumb
+      path={'/admin-panel/packet-broker/routing-configuration'}
+      content={sharedMessages.packetBroker}
+    />,
   )
 
   return (
@@ -44,7 +47,7 @@ const PacketBrokerRouter = () => {
       <RequireRequest requestAction={getPacketBrokerInfo()}>
         <Routes>
           <Route
-            path="networks/:netId/:tenantId?"
+            path="routing-configuration/networks/:netId/:tenantId?"
             element={
               <ValidateRouteParam
                 check={{ tenantId: pathIdRegexp, netId: /^\d+$/ }}

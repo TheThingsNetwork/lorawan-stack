@@ -73,11 +73,16 @@ const NetworkRoutingPolicyViewInner = () => {
   const defaultRoutingPolicy = useSelector(selectHomeNetworkDefaultRoutingPolicy)
 
   useBreadcrumbs(
-    'admin-panel.packet-broker.networks.single',
+    'admin-panel.packet-broker.routing-configuration.networks.single',
     <>
-      <Breadcrumb path={'/admin-panel/packet-broker/networks'} content={m.networks} />
       <Breadcrumb
-        path={`/admin-panel/packet-broker/networks/${netId}${tenantId ? `/${tenantId}` : ''}`}
+        path={'/admin-panel/packet-broker/routing-configuration/networks'}
+        content={sharedMessages.networks}
+      />
+      <Breadcrumb
+        path={`/admin-panel/packet-broker/routing-configuration/networks/${netId}${
+          tenantId ? `/${tenantId}` : ''
+        }`}
         content={network.name || displayId}
       />
     </>,
@@ -120,7 +125,7 @@ const NetworkRoutingPolicyViewInner = () => {
 
   const homeNetworkData = [
     {
-      header: m.networkInformation,
+      header: sharedMessages.networkInformation,
       items: [
         {
           key: m.networkId,
@@ -160,7 +165,11 @@ const NetworkRoutingPolicyViewInner = () => {
       <Row>
         <Col md={12}>
           <PageTitle title={m.network} values={{ network: network.name || displayId }}>
-            <Link to="/admin-panel/packet-broker/networks" secondary className={style.backLink}>
+            <Link
+              to="/admin-panel/packet-broker/routing-configuration/networks"
+              secondary
+              className={style.backLink}
+            >
               ← <Message content={m.backToAllNetworks} />
             </Link>
           </PageTitle>
@@ -228,7 +237,10 @@ const NetworkRoutingPolicyView = () => {
   const registered = useSelector(selectRegistered)
 
   return (
-    <Require condition={registered} otherwise={{ redirect: '/admin-panel/packet-broker' }}>
+    <Require
+      condition={registered}
+      otherwise={{ redirect: '/admin-panel/packet-broker/routing-configuration' }}
+    >
       <RequireRequest
         requestAction={[
           getPacketBrokerNetwork(combinedId, { fetchPolicies: true }),

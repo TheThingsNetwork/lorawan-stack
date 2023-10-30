@@ -210,6 +210,21 @@ export const [
   },
 ] = createRequestActions(DELETE_HOME_NETWORK_ROUTING_POLICY_BASE, (id, policy) => ({ id, policy }))
 
+export const DELETE_ALL_HOME_NETWORK_ROUTING_POLICIES_BASE =
+  'DELETE_ALL_HOME_NETWORK_ROUTING_POLICIES'
+export const [
+  {
+    request: DELETE_ALL_HOME_NETWORK_ROUTING_POLICIES,
+    success: DELETE_ALL_HOME_NETWORK_ROUTING_POLICIES_SUCCESS,
+    failure: DELETE_ALL_HOME_NETWORK_ROUTING_POLICIES_FAILURE,
+  },
+  {
+    request: deleteAllHomeNetworkRoutingPolicies,
+    success: deleteAllHomeNetworkRoutingPoliciesSuccess,
+    failure: deleteAllHomeNetworkRoutingPoliciesFailure,
+  },
+] = createRequestActions(DELETE_ALL_HOME_NETWORK_ROUTING_POLICIES_BASE, ids => ({ ids }))
+
 export const GET_HOME_NETWORK_ROUTING_POLICIES_BASE = 'GET_HOME_NETWORK_ROUTING_POLICIES'
 export const [
   {

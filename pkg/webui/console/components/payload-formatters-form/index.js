@@ -56,7 +56,6 @@ const m = defineMessages({
   grpcFieldDescription: 'The address of the service to connect to',
   appFormatter: 'Use application payload formatter',
   appFormatterWarning: 'This option will affect both uplink and downlink formatter',
-  setupSubTitle: 'Setup',
   defaultFormatter:
     'Click <Link>here</Link> to modify the default payload formatter for this application. The payload formatter of this application is currently set to `{defaultFormatter}`',
   pasteRepositoryFormatter: 'Paste repository formatter',
@@ -419,7 +418,7 @@ const PayloadFormattersForm = ({
           >
             {() => (
               <>
-                <Form.SubTitle title={m.setupSubTitle} />
+                <Form.SubTitle title={sharedMessages.setup} />
                 <Form.Field
                   name={FIELD_NAMES.SELECT}
                   title={m.formatterType}

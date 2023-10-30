@@ -61,15 +61,15 @@ describe('Packet Broker registration', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
     cy.findByText('Packet Broker', { selector: 'h1' }).should('be.visible')
-    cy.findByText(/Packet Broker can be used to exchange traffic/).should('be.visible')
-    cy.findByText('Packet Broker documentation', { selector: 'a' }).should('be.visible')
+    cy.findByText(/Packet Broker is a service by The Things Industries/).should('be.visible')
+    cy.findByText('Packet Broker', { selector: 'a' }).should('be.visible')
     cy.findByText('Packet Broker website', { selector: 'a' }).should('be.visible')
-    cy.findByText('Register network', { selector: 'span' }).should('be.visible')
+    cy.findByText('Enable Packet Broker', { selector: 'span' }).should('be.visible')
     cy.findByTestId('switch')
       .should('be.visible')
       .and('not.be.checked')
       .and('not.have.attr', 'disabled')
-    cy.findByText(/To enable peering/).should('be.visible')
+    cy.findByText(/Enabling will allow/).should('be.visible')
 
     cy.findByText('Default routing policy').should('not.exist')
     cy.findByText('Networks').should('not.exist')
@@ -89,18 +89,20 @@ describe('Packet Broker registration', () => {
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
-    cy.findByText('Register network').click()
-    cy.findByText('Register network').next().findByTestId('switch').should('be.checked')
-    cy.findByText('List network publicly')
+    cy.findByText('Enable Packet Broker').click()
+    cy.findByText('Enable Packet Broker').next().findByTestId('switch').should('be.checked')
+    cy.findByText('List my network in Packet Broker publicly')
       .should('be.visible')
       .next()
       .findByTestId('switch')
       .should('be.checked')
-    cy.findByTestId('feature-info-forwarder-enabled').should('be.visible')
-    cy.findByTestId('feature-info-home-network-enabled').should('be.visible')
-    cy.findByTestId('tabs').findByText('Default routing policy').should('be.visible')
-    cy.findByTestId('tabs').findByText('Networks').should('be.visible')
-    cy.findByLabelText('Do not use a default routing policy for this network').should('be.checked')
+    cy.findByLabelText('Forward traffic to all networks registered in Packet Broker').should(
+      'exist',
+    )
+    cy.findByLabelText(
+      'Forward traffic to The Things Stack Sandbox (community network) only',
+    ).should('exist')
+    cy.findByLabelText('Use custom routing policies').should('exist')
 
     cy.findByTestId('error-notification').should('not.exist')
   })

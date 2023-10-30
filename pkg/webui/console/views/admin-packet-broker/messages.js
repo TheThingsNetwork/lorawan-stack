@@ -16,25 +16,24 @@ import { defineMessages } from 'react-intl'
 
 export default defineMessages({
   packetBrokerInfoText:
-    'Packet Broker can be used to exchange traffic (peering) with other LoRaWAN networks to share coverage and improve the overall network performance.',
+    'Packet Broker is a service by The Things Industries to facilitate peering between LoRaWAN networks. This extends network coverage and improves overall network performance and device battery lifetime.',
   packetBrokerWebsite: 'Packet Broker website',
-  registrationStatus: 'Registration status',
-  registerNetwork: 'Register network',
-  networkVisibility: 'Network visibility',
-  packetBrokerRegistrationDesc:
-    "To enable peering from or to your home network, it is necessary to register your network. This will make your network known to Packet Broker and enable you to configure your network's peering behavior.",
+  learnMore: 'Learn more',
+  whyNetworkPeeringTitle: 'Why choose network peering?',
+  whyNetworkPeeringText:
+    'Since LoRaWAN uses shared spectrum, gateways receive messages from devices registered on other LoRaWAN networks. Instead of discarding this traffic, these messages can be forwarded via Packet Broker to the home network of these devices. This extends coverage of networks and allows devices to use higher data rates that reduce channel utilization and increase battery life. No sensitive data is exposed as LoRaWAN is end-to-end encrypted and integrity protected.',
+  enbaling:
+    'Enable forwarding via the options below or define custom routing policies. In the Networks tab below (visible by selecting the option "Use custom routing policies"), you can see which other networks are forwarding data to this network.',
   packetBrokerDisabledDesc:
     'The Things Stack is not set up to use Packet Broker. Please refer to the documentation link above for instructions on how to set up The Things Stack for peering with Packet Broker.',
-  packetBrokerRegistrationDisabledDesc:
-    'The Things Stack is set up to use Packet Broker, but security settings disallow (de)registering your network here. Please contact Packet Broker to manage your registration. Refer to the documentation link above for contact information.',
+  enablePacketBroker: 'Enable Packet Broker',
+  packetBrokerRegistrationDesc:
+    'Enabling will allow other networks to send traffic to you as well as you forwarding traffic to them, based on the exact routing policy.',
+  routingConfig: 'Routing configuration',
   network: 'Network: {network}',
-  homeNetworkEnabled: 'Home network <b>enabled</b>',
-  homeNetworkDisabled: 'Home network <b>disabled</b>',
-  forwarderEnabled: 'Forwarder <b>enabled</b>',
-  forwarderDisabled: 'Forwarder <b>disabled</b>',
-  listNetwork: 'List network publicly',
+  listNetwork: 'List my network in Packet Broker publicly',
   listNetworkDesc:
-    'Listing your network allows other network administrators to see your network. This allows them to easily configure routing policies with your network.',
+    'Public listing will make it easier for other network operators to set up routing policies for your network. Hence public listing is generally recommended.',
   unlistNetwork: 'Unlist this network',
   confirmUnlist: 'Confirm unlist',
   unlistModal:
@@ -42,7 +41,7 @@ export default defineMessages({
     'This will hide your network. Other network administrators will not be able to see your network to configure routing policies.',
   routingPolicyInformation:
     'You can use the checkboxes below to control the default forwarding behavior of your network. You can additionally set up individual per-network routing policies via the Networks tab.',
-  defaultRoutingPolicySet: 'Default routing policy set',
+  defaultRoutingPolicySet: 'Default routing configuration set',
   routingPolicySet: 'Routing policy set',
   defaultRoutingPolicy: 'Default routing policy',
   devAddressBlock: 'Device address block',
