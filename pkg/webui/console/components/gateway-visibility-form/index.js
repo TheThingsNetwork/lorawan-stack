@@ -74,19 +74,19 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error }) => {
           <Form.Field
             name="visibility.contact_info"
             component={Checkbox}
-            label={gatewayVisibilityMessages.gatewayContactInfoLabel}
+            label={sharedMessages.contactInformation}
             description={gatewayVisibilityMessages.gatewayContactInfoDescription}
           />
           <Form.Field
             name="visibility.status"
             component={Checkbox}
-            label={gatewayVisibilityMessages.gatewayStatusLabel}
+            label={sharedMessages.status}
             description={gatewayVisibilityMessages.gatewayStatusDescription}
           />
           <Form.Field
             name="visibility.frequency_plan"
             component={Checkbox}
-            label={gatewayVisibilityMessages.gatewayFreqPlanLabel}
+            label={sharedMessages.frequencyPlan}
           />
           <Form.Field
             name="visibility.packet_rates"

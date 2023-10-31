@@ -1,0 +1,11 @@
+{
+  "updated_at": "2021-06-21T12:09:26.810087Z",
+  "uplink": {
+    "join_request": true,
+    "mac_data": false,
+    "application_data": true,
+    "signal_quality": false,
+    "localization": false
+  },
+  "downlink": { "join_accept": true, "mac_data": false, "application_data": true }
+}

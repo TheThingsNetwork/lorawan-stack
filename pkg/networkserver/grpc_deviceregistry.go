@@ -948,40 +948,39 @@ var (
 
 	legacyADRSettingsFields = []string{
 		"mac_settings.adr_margin",
-		"mac_settings.use_adr",
 		"mac_settings.use_adr.value",
+		"mac_settings.use_adr",
 	}
 
 	adrSettingsFields = []string{
-		"mac_settings.adr",
-		"mac_settings.adr.mode",
 		"mac_settings.adr.mode.disabled",
-		"mac_settings.adr.mode.dynamic",
-		"mac_settings.adr.mode.dynamic.channel_steering",
-		"mac_settings.adr.mode.dynamic.channel_steering.mode",
 		"mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
 		"mac_settings.adr.mode.dynamic.channel_steering.mode.lora_narrow",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode",
+		"mac_settings.adr.mode.dynamic.channel_steering",
 		"mac_settings.adr.mode.dynamic.margin",
-		"mac_settings.adr.mode.dynamic.max_data_rate_index",
 		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.max_data_rate_index",
 		"mac_settings.adr.mode.dynamic.max_nb_trans",
 		"mac_settings.adr.mode.dynamic.max_tx_power_index",
-		"mac_settings.adr.mode.dynamic.min_data_rate_index",
 		"mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.min_data_rate_index",
 		"mac_settings.adr.mode.dynamic.min_nb_trans",
 		"mac_settings.adr.mode.dynamic.min_tx_power_index",
-		"mac_settings.adr.mode.static",
+		"mac_settings.adr.mode.dynamic",
 		"mac_settings.adr.mode.static.data_rate_index",
 		"mac_settings.adr.mode.static.nb_trans",
 		"mac_settings.adr.mode.static.tx_power_index",
+		"mac_settings.adr.mode.static",
+		"mac_settings.adr.mode",
+		"mac_settings.adr",
 	}
 
 	dynamicADRSettingsFields = []string{
-		"mac_settings.adr.mode.dynamic",
-		"mac_settings.adr.mode.dynamic.channel_steering",
-		"mac_settings.adr.mode.dynamic.channel_steering.mode",
 		"mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
 		"mac_settings.adr.mode.dynamic.channel_steering.mode.lora_narrow",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode",
+		"mac_settings.adr.mode.dynamic.channel_steering",
 		"mac_settings.adr.mode.dynamic.margin",
 		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
 		"mac_settings.adr.mode.dynamic.max_nb_trans",
@@ -989,6 +988,7 @@ var (
 		"mac_settings.adr.mode.dynamic.min_data_rate_index.value",
 		"mac_settings.adr.mode.dynamic.min_nb_trans",
 		"mac_settings.adr.mode.dynamic.min_tx_power_index",
+		"mac_settings.adr.mode.dynamic",
 	}
 )
 
@@ -1244,36 +1244,36 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.HasSetField(
 		"frequency_plan_id",
 		"lorawan_phy_version",
-		"mac_settings.adr",
-		"mac_settings.adr.mode",
 		"mac_settings.adr.mode.disabled",
-		"mac_settings.adr.mode.dynamic",
-		"mac_settings.adr.mode.dynamic.channel_steering",
-		"mac_settings.adr.mode.dynamic.channel_steering.mode",
 		"mac_settings.adr.mode.dynamic.channel_steering.mode.disabled",
 		"mac_settings.adr.mode.dynamic.channel_steering.mode.lora_narrow",
+		"mac_settings.adr.mode.dynamic.channel_steering.mode",
+		"mac_settings.adr.mode.dynamic.channel_steering",
 		"mac_settings.adr.mode.dynamic.margin",
-		"mac_settings.adr.mode.dynamic.max_data_rate_index",
 		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.max_data_rate_index",
 		"mac_settings.adr.mode.dynamic.max_nb_trans",
 		"mac_settings.adr.mode.dynamic.max_tx_power_index",
-		"mac_settings.adr.mode.dynamic.min_data_rate_index",
 		"mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.min_data_rate_index",
 		"mac_settings.adr.mode.dynamic.min_nb_trans",
 		"mac_settings.adr.mode.dynamic.min_tx_power_index",
-		"mac_settings.adr.mode.static",
+		"mac_settings.adr.mode.dynamic",
 		"mac_settings.adr.mode.static.data_rate_index",
 		"mac_settings.adr.mode.static.nb_trans",
 		"mac_settings.adr.mode.static.tx_power_index",
-		"mac_settings.factory_preset_frequencies",
-		"mac_settings.ping_slot_frequency.value",
-		"mac_settings.use_adr.value",
-		"mac_settings.rx2_data_rate_index.value",
-		"mac_settings.desired_rx2_data_rate_index.value",
-		"mac_settings.ping_slot_data_rate_index.value",
+		"mac_settings.adr.mode.static",
+		"mac_settings.adr.mode",
+		"mac_settings.adr",
 		"mac_settings.desired_ping_slot_data_rate_index.value",
-		"mac_settings.uplink_dwell_time.value",
+		"mac_settings.desired_rx2_data_rate_index.value",
 		"mac_settings.downlink_dwell_time.value",
+		"mac_settings.factory_preset_frequencies",
+		"mac_settings.ping_slot_data_rate_index.value",
+		"mac_settings.ping_slot_frequency.value",
+		"mac_settings.rx2_data_rate_index.value",
+		"mac_settings.uplink_dwell_time.value",
+		"mac_settings.use_adr.value",
 		"mac_state.current_parameters.adr_data_rate_index",
 		"mac_state.current_parameters.adr_tx_power_index",
 		"mac_state.current_parameters.channels",
@@ -1333,18 +1333,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"frequency_plan_id",
 			"lorawan_phy_version",
 		)
-
-		hasSetFieldWithFallback := func(field, fallbackField string) (fieldToRetrieve string, validate bool) {
-			if st.HasSetField(field) {
-				return field, true
-			}
-			return fallbackField, hasPHYUpdate
-		}
 		hasSetField := func(field string) (fieldToRetrieve string, validate bool) {
-			return hasSetFieldWithFallback(field, field)
-		}
-		hasSetADRField := func(field string) (fieldToRetrieve string, validate bool) {
-			return hasSetFieldWithFallback(field, "mac_settings.adr.mode")
+			return field, st.HasSetField(field) || hasPHYUpdate
 		}
 
 		setFields := func(fields ...string) []string {
@@ -1449,7 +1439,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.max_data_rate_index.value"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.dynamic.max_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMaxDataRateIndex() == nil {
@@ -1468,7 +1458,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.min_data_rate_index.value"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.dynamic.min_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMinDataRateIndex() == nil {
@@ -1487,7 +1477,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.max_tx_power_index"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.dynamic.max_tx_power_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMaxTxPowerIndex() == nil {
@@ -1504,7 +1494,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.min_tx_power_index"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.dynamic.min_tx_power_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetDynamic().GetMinTxPowerIndex() == nil {
@@ -1544,7 +1534,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.static.data_rate_index"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.static.data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetStatic() == nil {
@@ -1562,7 +1552,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if field, validate := hasSetADRField("mac_settings.adr.mode.static.tx_power_index"); validate {
+		if field, validate := hasSetField("mac_settings.adr.mode.static.tx_power_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetAdr().GetStatic() == nil {
@@ -2682,7 +2672,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	var evt events.Event
-	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.Ids.ApplicationIds, st.Device.Ids.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
+	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.Ids.ApplicationIds, st.Device.Ids.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel, st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
+		if nonZeroFields := ttnpb.NonZeroFields(stored, st.GetFields()...); len(nonZeroFields) > 0 {
+			newStored := &ttnpb.EndDevice{}
+			if err := newStored.SetFields(stored, nonZeroFields...); err != nil {
+				return err
+			}
+			stored = newStored
+		}
 		if hasSession {
 			macVersion := stored.GetMacState().GetLorawanVersion()
 			if stored.GetMacState() == nil && !st.HasSetField("mac_state") {

@@ -332,6 +332,7 @@ export default defineMessages({
   lorawanInformation: 'LoRaWAN information',
   lorawanOptions: 'LoRaWAN options',
   lorawanPhyVersionDescription: 'The LoRaWAN PHY version of the end device',
+  macData: 'MAC data',
   macSettingsError:
     'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
   macVersion: 'LoRaWAN version',
@@ -459,6 +460,7 @@ export default defineMessages({
   sessions: 'Sessions',
   setLoRaCloudToken: 'Set LoRa Cloud token',
   settings: 'Settings',
+  setup: 'Setup',
   shareGatewayInfo: 'Share gateway information',
   skipCryptoDescription: 'Skip decryption of uplink payloads and encryption of downlink payloads',
   skipCryptoPlaceholder: 'Encryption/decryption disabled',
@@ -507,6 +509,7 @@ export default defineMessages({
   uplinksReceived: 'Uplinks received',
   uploadAnImage: 'Upload an image',
   used: '{currentValue}/{maxValue} used',
+  useDefaultPolicy: 'Use default routing policy for this network',
   user: 'User',
   userAdd: 'Add user',
   userDelete: 'Delete user',

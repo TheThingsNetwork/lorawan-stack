@@ -32,12 +32,63 @@ describe('Packet Broker routing policies', () => {
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
   })
 
-  it('succeeds setting a default routing policy', () => {
+  it('succeeds setting a "traffic to all networks" routing configuration', () => {
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
     cy.intercept('PUT', '/api/v3/pba/home-networks/policies/default', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19/johan', {})
+    cy.intercept('/api/v3/pba/networks*', { fixture: 'console/packet-broker/networks.json' })
+    cy.intercept('/api/v3/pba/home-networks/policies*', {
+      fixture: 'console/packet-broker/policies-home-network.json',
+    })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
-    cy.findByLabelText('Use default routing policy for this network').check()
+    cy.findByLabelText('Forward traffic to all networks registered in Packet Broker').check()
+    cy.findByRole('button', { name: 'Save routing configuration' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification')
+      .should('be.visible')
+      .findByText('Default routing configuration set')
+      .should('be.visible')
+  })
+
+  it('succeeds setting a "only ttn" routing configuration', () => {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', { statusCode: 404 })
+    cy.intercept('/api/v3/pba/networks*', { fixture: 'console/packet-broker/networks.json' })
+    cy.intercept('/api/v3/pba/home-networks/policies*', {
+      fixture: 'console/packet-broker/policies-home-network.json',
+    })
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/default', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19/johan', {})
+    cy.intercept('PUT', '/api/v3/pba/home-networks/policies/19/ttn', {})
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
+
+    cy.findByLabelText(
+      'Forward traffic to The Things Stack Sandbox (community network) only',
+    ).check()
+    cy.findByRole('button', { name: 'Save routing configuration' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification')
+      .should('be.visible')
+      .findByText('Default routing configuration set')
+      .should('be.visible')
+  })
+
+  it('succeeds setting a custom routing configuration with a default routing policy', () => {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
+      fixture: 'console/packet-broker/default-policy.json',
+    })
+    cy.intercept('PUT', '/api/v3/pba/home-networks/policies/default', {})
+    cy.intercept('/api/v3/pba/networks*', { fixture: 'console/packet-broker/networks.json' })
+    cy.intercept('/api/v3/pba/home-networks/policies*', {
+      fixture: 'console/packet-broker/policies-home-network.json',
+    })
+    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
+
+    cy.findByLabelText('Use custom routing policies').check()
 
     // Check routing policy form checkboxes.
     cy.findByText('Uplink')
@@ -56,30 +107,35 @@ describe('Packet Broker routing policies', () => {
         cy.findByLabelText('MAC data').check()
         cy.findByLabelText('Application data').check()
       })
-    cy.findByRole('button', { name: 'Save default policy' }).click()
+    cy.findByRole('button', { name: 'Save routing configuration' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('toast-notification')
       .should('be.visible')
-      .findByText('Default routing policy set')
+      .findByText('Default routing configuration set')
       .should('be.visible')
   })
 
   it('succeeds unsetting a default routing policy', () => {
+    cy.intercept('PUT', '/api/v3/pba/home-networks/policies/default', {})
+    cy.intercept('/api/v3/pba/networks*', { fixture: 'console/packet-broker/networks.json' })
+    cy.intercept('/api/v3/pba/home-networks/policies*', {
+      fixture: 'console/packet-broker/policies-home-network.json',
+    })
     cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
-      fixture: 'console/packet-broker/default-policy.json',
+      fixture: 'console/packet-broker/default-custom-policy.json',
     })
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/default', {})
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
     cy.findByLabelText('Do not use a default routing policy for this network').check()
-    cy.findByRole('button', { name: 'Save default policy' }).click()
+    cy.findByRole('button', { name: 'Save routing configuration' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('toast-notification')
       .should('be.visible')
-      .findByText('Default routing policy set')
+      .findByText('Default routing configuration set')
       .should('be.visible')
   })
 
@@ -93,7 +149,11 @@ describe('Packet Broker routing policies', () => {
     })
     cy.intercept('PUT', '/api/v3/pba/home-networks/policies/19', {})
 
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/networks/19`)
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/admin-panel/packet-broker/routing-configuration/networks/19`,
+    )
 
     // Check routing policy form checkboxes.
     cy.findByLabelText('Use network specific routing policy').check()
@@ -138,7 +198,11 @@ describe('Packet Broker routing policies', () => {
     })
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
 
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/networks/19`)
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/admin-panel/packet-broker/routing-configuration/networks/19`,
+    )
 
     cy.findByLabelText('Do not use a routing policy for this network').check()
     cy.findByRole('button', { name: 'Save routing policy' }).click()
@@ -161,7 +225,11 @@ describe('Packet Broker routing policies', () => {
     })
     cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
 
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/networks/19`)
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/admin-panel/packet-broker/routing-configuration/networks/19`,
+    )
 
     cy.findByLabelText('Use default routing policy for this network').check()
     cy.findByRole('button', { name: 'Save routing policy' }).click()

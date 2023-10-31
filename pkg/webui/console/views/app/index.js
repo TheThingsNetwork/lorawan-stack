@@ -14,7 +14,14 @@
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Route, Routes, Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom'
+import {
+  Route,
+  Routes,
+  Outlet,
+  createBrowserRouter,
+  RouterProvider,
+  ScrollRestoration,
+} from 'react-router-dom'
 import classnames from 'classnames'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
@@ -25,7 +32,6 @@ import Footer from '@ttn-lw/containers/footer'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import ErrorView from '@ttn-lw/lib/components/error-view'
-import ScrollToTop from '@ttn-lw/lib/components/scroll-to-top'
 import WithAuth from '@ttn-lw/lib/components/with-auth'
 import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
 
@@ -58,6 +64,16 @@ import {
 import style from './app.styl'
 
 const errorRender = error => <FullViewError error={error} header={<Header />} />
+const getScrollRestorationKey = location => {
+  // Preserve scroll position only when necessary.
+  // E.g. we don't want to scroll to top when changing tabs of a table,
+  // but we do want to scroll to top when changing pages.
+  const { pathname, search } = location
+  const params = new URLSearchParams(search)
+  const page = params.get('page')
+
+  return `${pathname}${page ? `?page=${page}` : ''}`
+}
 
 const Layout = () => {
   const user = useSelector(selectUser)
@@ -70,7 +86,7 @@ const Layout = () => {
 
   return (
     <>
-      <ScrollToTop />
+      <ScrollRestoration getKey={getScrollRestorationKey} />
       <ErrorView errorRender={errorRender}>
         <div className={style.app}>
           <IntlHelmet

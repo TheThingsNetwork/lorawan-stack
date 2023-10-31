@@ -37,9 +37,7 @@ import style from './routing-policy-form.styl'
 
 const m = defineMessages({
   saveDefaultPolicy: 'Save default policy',
-  useDefaultPolicy: 'Use default routing policy for this network',
   useSpecificPolicy: 'Use network specific routing policy',
-  doNotUseADefaultPolicy: 'Do not use a default routing policy for this network',
   doNotUseAPolicy: 'Do not use a routing policy for this network',
 })
 
@@ -53,25 +51,15 @@ const validationSchema = Yup.object({
 
 const policySourceEncode = val => val === 'default'
 const policySourceDecode = val => (val ? 'default' : 'specific')
-const useDefaultEncode = val => val === 'default'
-const useDefaultDecode = val => (val ? 'default' : 'no-default')
 
-const RoutingPolicyForm = ({
-  onSubmit,
-  initialValues,
-  error,
-  defaultPolicy,
-  networkLevel,
-  submitMessage,
-}) => {
+const RoutingPolicyForm = ({ onSubmit, initialValues, error, defaultPolicy, submitMessage }) => {
   const handleSubmit = useCallback(values => onSubmit(validationSchema.cast(values)), [onSubmit])
   const [useDefault, setUseDefault] = useState(initialValues._use_default_policy || false)
   const handlePolicySourceChange = useCallback(setUseDefault, [setUseDefault])
   const hasDefaultPolicy = isValidPolicy(defaultPolicy)
 
-  const showDefaultPolicySheet = networkLevel && useDefault && isValidPolicy(defaultPolicy)
-  const showPolicyCheckboxes = (useDefault && !networkLevel) || (!useDefault && networkLevel)
-
+  const showDefaultPolicySheet = useDefault && isValidPolicy(defaultPolicy)
+  const showPolicyCheckboxes = !useDefault
   return (
     <Form
       onSubmit={handleSubmit}
@@ -81,34 +69,20 @@ const RoutingPolicyForm = ({
     >
       <Row>
         <Col md={12}>
-          {networkLevel ? (
-            <Form.Field
-              component={Radio.Group}
-              className={style.policySource}
-              name="_use_default_policy"
-              onChange={handlePolicySourceChange}
-              encode={policySourceEncode}
-              decode={policySourceDecode}
-            >
-              <Radio
-                label={hasDefaultPolicy ? m.useDefaultPolicy : m.doNotUseAPolicy}
-                value="default"
-              />
-              <Radio label={m.useSpecificPolicy} value="specific" />
-            </Form.Field>
-          ) : (
-            <Form.Field
-              component={Radio.Group}
-              className={style.policySource}
-              name="_use_default_policy"
-              onChange={handlePolicySourceChange}
-              encode={useDefaultEncode}
-              decode={useDefaultDecode}
-            >
-              <Radio label={m.doNotUseADefaultPolicy} value="no-default" />
-              <Radio label={m.useDefaultPolicy} value="default" />
-            </Form.Field>
-          )}
+          <Form.Field
+            component={Radio.Group}
+            className={style.policySource}
+            name="_use_default_policy"
+            onChange={handlePolicySourceChange}
+            encode={policySourceEncode}
+            decode={policySourceDecode}
+          >
+            <Radio
+              label={hasDefaultPolicy ? sharedMessages.useDefaultPolicy : m.doNotUseAPolicy}
+              value="default"
+            />
+            <Radio label={m.useSpecificPolicy} value="specific" />
+          </Form.Field>
         </Col>
         {showDefaultPolicySheet && (
           <Col md={12}>
@@ -132,7 +106,7 @@ const RoutingPolicyForm = ({
               <Form.Field
                 name="policy.uplink.mac_data"
                 component={Checkbox}
-                label={policyMessages.macData}
+                label={sharedMessages.macData}
                 description={policyMessages.macDataDesc}
               />
               <Form.Field
@@ -169,7 +143,7 @@ const RoutingPolicyForm = ({
               <Form.Field
                 name="policy.downlink.mac_data"
                 component={Checkbox}
-                label={policyMessages.macData}
+                label={sharedMessages.macData}
                 description={policyMessages.macDataAllowDesc}
               />
               <Form.Field
@@ -196,14 +170,12 @@ RoutingPolicyForm.propTypes = {
     _use_default_policy: PropTypes.bool,
     policy: PropTypes.shape({}),
   }),
-  networkLevel: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   submitMessage: PropTypes.message,
 }
 
 RoutingPolicyForm.defaultProps = {
   error: undefined,
-  networkLevel: false,
   defaultPolicy: undefined,
   submitMessage: m.saveDefaultPolicy,
   initialValues: {

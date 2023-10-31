@@ -7,6 +7,22 @@ with the exception that this project **does not** follow Semantic Versioning.
 
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- Resolve scroll jumps when selecting different tabs of a table in the Console.
+
+### Security
+
 ## [3.28.0] - 2023-10-31
 
 ### Added

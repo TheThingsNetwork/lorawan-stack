@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { useDispatch } from 'react-redux'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -29,6 +30,7 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 
@@ -79,9 +81,12 @@ const JoinServerForm = React.memo(props => {
     [device, validationContext],
   )
 
+  const dispatch = useDispatch()
+  const appId = device.ids.application_ids.application_id
+  const devId = device.ids.device_id
   const handleUsedDevNoncesReset = React.useCallback(async () => {
     try {
-      await onUsedDevNoncesReset()
+      await dispatch(attachPromise(onUsedDevNoncesReset(appId, devId)))
       toast({
         message: messages.resetSuccess,
         type: toast.types.SUCCESS,
@@ -92,7 +97,7 @@ const JoinServerForm = React.memo(props => {
         type: toast.types.ERROR,
       })
     }
-  }, [onUsedDevNoncesReset])
+  }, [onUsedDevNoncesReset, appId, devId, dispatch])
 
   // Setup and memoize callbacks for changes to `resets_join_nonces` for displaying the field warning.
   const handleResetsJoinNoncesChange = React.useCallback(
