@@ -412,10 +412,6 @@ func (ns *NetworkServer) submitApplicationUplinks(ctx context.Context, ups ...*t
 	))
 	if err := ns.uplinkSubmissionPool.Publish(ctx, ups); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to enqueue application uplinks in submission pool")
-		if nonRetryableUplinkError(err) {
-			log.FromContext(ctx).Warn("Error is non-retryable, dropping application uplinks")
-			return
-		}
 		ns.enqueueApplicationUplinks(ctx, ups...)
 		return
 	}
@@ -430,8 +426,7 @@ func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, ups []*ttnp
 	}
 	if err := ns.sendApplicationUplinks(ctx, ttnpb.NewNsAsClient(conn), ups...); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
-		if nonRetryableUplinkError(err) {
-			log.FromContext(ctx).Warn("Error is non-retryable, dropping application uplinks")
+		if !retryableUplinkError(err) {
 			return
 		}
 		ns.enqueueApplicationUplinks(ctx, ups...)
@@ -471,12 +466,10 @@ var (
 	}
 )
 
-func nonRetryableUplinkError(err error) bool {
-	return errors.IsFailedPrecondition(err) ||
+func retryableUplinkError(err error) bool {
+	return errors.IsCanceled(err) ||
+		errors.IsDeadlineExceeded(err) ||
 		errors.IsResourceExhausted(err) ||
 		errors.IsAborted(err) ||
-		errors.IsUnauthenticated(err) ||
-		errors.IsPermissionDenied(err) ||
-		errors.IsUnimplemented(err) ||
-		errors.IsInternal(err)
+		errors.IsUnavailable(err)
 }

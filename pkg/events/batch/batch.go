@@ -41,7 +41,7 @@ func (bp *batchPublisher) process(ctx context.Context) error {
 		flushed := false
 		for n := len(batch); n >= lowerBound; n = len(batch) {
 			toFlush := n
-			if upperBound := 2 * lowerBound; n > upperBound {
+			if upperBound := 2 * bp.targetSize; n > upperBound {
 				toFlush = upperBound
 			}
 			select {
