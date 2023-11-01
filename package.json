@@ -16,7 +16,7 @@
     "@babel/plugin-transform-spread": "^7.22.5",
     "@babel/plugin-transform-strict-mode": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
-    "@babel/preset-react": "^7.22.5",
+    "@babel/preset-react": "^7.22.15",
     "@babel/register": "^7.22.5",
     "@babel/runtime-corejs2": "^7.22.5",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
