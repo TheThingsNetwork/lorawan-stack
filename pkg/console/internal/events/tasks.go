@@ -33,7 +33,9 @@ func makeMuxTask(m eventsmux.Interface, cancel func(error)) func(context.Context
 	}
 }
 
-func makeReadTask(conn *websocket.Conn, m eventsmux.Interface, cancel func(error)) func(context.Context) error {
+func makeReadTask(
+	conn *websocket.Conn, m eventsmux.Interface, rateLimit func() error, cancel func(error),
+) func(context.Context) error {
 	return func(ctx context.Context) (err error) {
 		defer func() { cancel(err) }()
 		defer func() {
@@ -48,6 +50,9 @@ func makeReadTask(conn *websocket.Conn, m eventsmux.Interface, cancel func(error
 		for {
 			var request protocol.RequestWrapper
 			if err := wsjson.Read(ctx, conn, &request); err != nil {
+				return err
+			}
+			if err := rateLimit(); err != nil {
 				return err
 			}
 			select {

@@ -78,6 +78,12 @@ func (h *eventsHandler) handleEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rateLimit, err := makeRateLimiter(ctx, h.component.RateLimiter())
+	if err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
+
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		Subprotocols:       []string{protocolV1},
 		InsecureSkipVerify: true, // CORS is not enabled for APIs.
@@ -100,7 +106,7 @@ func (h *eventsHandler) handleEvents(w http.ResponseWriter, r *http.Request) {
 	})
 	for name, f := range map[string]func(context.Context) error{
 		"console_events_mux":   makeMuxTask(m, cancel),
-		"console_events_read":  makeReadTask(conn, m, cancel),
+		"console_events_read":  makeReadTask(conn, m, rateLimit, cancel),
 		"console_events_write": makeWriteTask(conn, m, cancel),
 	} {
 		wg.Add(1)

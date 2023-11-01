@@ -1885,6 +1885,8 @@
   "error:pkg/console/internal/events/subscriptions:already_subscribed": "",
   "error:pkg/console/internal/events/subscriptions:no_identifiers": "",
   "error:pkg/console/internal/events/subscriptions:not_subscribed": "",
+  "error:pkg/console/internal/events:rate_exceeded": "",
+  "error:pkg/console/internal/events:unknown_caller": "",
   "error:pkg/crypto/cryptoservices:no_app_key": "指定されたAppKeyがありません",
   "error:pkg/crypto/cryptoservices:no_dev_eui": "指定されたDevEUIがありません",
   "error:pkg/crypto/cryptoservices:no_join_eui": "指定されたJoinEUIがありません",
