@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Resolve scroll jumps when selecting different tabs of a table in the Console.
+- `BatchGetGatewayConnectionStats` RPC rights check in certain cases.
 
 ### Security
 

@@ -252,6 +252,9 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		return errInsufficientRights.New()
 	}
 
+	// If the caller has specified the identifiers multiple times, deduplicate them.
+	gtwIDs = uniqueIdentifiers(gtwIDs)
+
 	return is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		gtws, err := st.FindGateways(ctx, gtwIDs, []string{"ids", "status_public", "location_public"})
 		if err != nil {
@@ -316,6 +319,9 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 			}
 			entityIDs = append(entityIDs, gtwID.GetEntityIdentifiers().IDString())
 		}
+		if len(entityIDs) == 0 {
+			return nil
+		}
 		membershipChains, err := st.FindAccountMembershipChains(
 			ctx,
 			ouID,
@@ -340,4 +346,17 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		}
 		return nil
 	})
+}
+
+func uniqueIdentifiers[T ttnpb.IDStringer](ids []T) []T {
+	m := make(map[string]struct{}, len(ids))
+	result := make([]T, 0, len(ids))
+	for _, id := range ids {
+		if _, ok := m[id.IDString()]; ok {
+			continue
+		}
+		m[id.IDString()] = struct{}{}
+		result = append(result, id)
+	}
+	return result
 }
