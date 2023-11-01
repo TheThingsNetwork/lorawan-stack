@@ -57,19 +57,26 @@ const (
 	// This parameter is separated from the uplink collection period since the JoinRequest may have to be
 	// served by a Join Server which is either geographically far away, or simply slow to respond.
 	joinRequestCollectionWindow = 6 * time.Second
+
+	// DeduplicationLimit is the number of metadata to deduplicate for a single transmission.
+	deduplicationLimit = 50
 )
 
 // UplinkDeduplicator represents an entity, that deduplicates uplinks and accumulates metadata.
 type UplinkDeduplicator interface {
 	// DeduplicateUplink deduplicates an uplink message for specified time.Duration, in the provided round.
 	// DeduplicateUplink returns true if the uplink is not a duplicate or false and error, if any, otherwise.
-	DeduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, round uint64) (first bool, err error)
+	DeduplicateUplink(
+		ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, limit int, round uint64,
+	) (first bool, err error)
 	// AccumulatedMetadata returns accumulated metadata for specified uplink message in the provided round and error, if any.
 	AccumulatedMetadata(ctx context.Context, up *ttnpb.UplinkMessage, round uint64) (mds []*ttnpb.RxMetadata, err error)
 }
 
-func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, round uint64) (bool, error) {
-	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, window, round)
+func (ns *NetworkServer) deduplicateUplink(
+	ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, limit int, round uint64,
+) (bool, error) {
+	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, window, limit, round)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to deduplicate uplink")
 		return false, err
@@ -887,7 +894,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"uplink_f_cnt", pld.FHdr.FCnt,
 	))
 
-	ok, err := ns.deduplicateUplink(ctx, up, ns.collectionWindow(ctx), initialDeduplicationRound)
+	ok, err := ns.deduplicateUplink(ctx, up, ns.collectionWindow(ctx), deduplicationLimit, initialDeduplicationRound)
 	if err != nil {
 		return err
 	}
@@ -1182,7 +1189,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"join_eui", types.MustEUI64(pld.JoinEui).OrZero(),
 	))
 
-	ok, err := ns.deduplicateUplink(ctx, up, joinRequestCollectionWindow, initialDeduplicationRound)
+	ok, err := ns.deduplicateUplink(ctx, up, joinRequestCollectionWindow, deduplicationLimit, initialDeduplicationRound)
 	if err != nil {
 		return err
 	}
