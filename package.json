@@ -18,7 +18,7 @@
     "@babel/preset-env": "^7.22.5",
     "@babel/preset-react": "^7.22.5",
     "@babel/register": "^7.22.5",
-    "@babel/runtime-corejs2": "^7.22.5",
+    "@babel/runtime-corejs2": "^7.23.2",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
     "@storybook/addon-actions": "^7.0.24",
     "@storybook/addon-info": "6.0.0-alpha.2",
