@@ -46,6 +46,11 @@ The authentication for the internal API is similar to other APIs available in Th
 
 Upon connecting, no authorization will take place - the endpoint only will check that the provided token is valid (i.e. exists and it is not expired).
 
+The [standard WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) [does not support custom request headers](https://github.com/whatwg/websockets/issues/16). As a result of this limitation, the backend allows the Console to provide the token as a [protocol](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket#parameters). Specifically, given a `Bearer` token `t`, the following protocols should be provided to the `WebSocket` constructor:
+
+- `ttn.lorawan.v3.console.internal.events.v1`
+- `ttn.lorawan.v3.header.authorization.bearer.t`
+
 ### Message Format
 
 Both requests and responses sent over the WebSocket connection are JSON encoded. All messages are JSON objects and are required to contain at least the following two fields:
