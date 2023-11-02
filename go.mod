@@ -27,7 +27,7 @@ require (
 	github.com/emersion/go-smtp v0.18.1
 	github.com/envoyproxy/protoc-gen-validate v1.0.2
 	github.com/felixge/httpsnoop v1.0.3
-	github.com/getsentry/sentry-go v0.24.1
+	github.com/getsentry/sentry-go v0.25.0
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.3.1
