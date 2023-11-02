@@ -90,7 +90,7 @@ require (
 	go.packetbroker.org/api/iam v1.8.1
 	go.packetbroker.org/api/iam/v2 v2.8.1
 	go.packetbroker.org/api/mapping/v2 v2.2.1
-	go.packetbroker.org/api/routing v1.8.23
+	go.packetbroker.org/api/routing v1.9.1
 	go.packetbroker.org/api/v3 v3.17.0
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0
