@@ -613,6 +613,29 @@ var (
 			"pending_mac_state.current_parameters.ping_slot_frequency",
 			"pending_mac_state.current_parameters.rejoin_count_periodicity",
 			"pending_mac_state.current_parameters.rejoin_time_periodicity",
+			"pending_mac_state.current_parameters.relay.mode.served.backoff",
+			"pending_mac_state.current_parameters.relay.mode.served.mode.always",
+			"pending_mac_state.current_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+			"pending_mac_state.current_parameters.relay.mode.served.mode.end_device_controlled",
+			"pending_mac_state.current_parameters.relay.mode.served.second_channel.ack_offset",
+			"pending_mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+			"pending_mac_state.current_parameters.relay.mode.served.second_channel.frequency",
+			"pending_mac_state.current_parameters.relay.mode.served.serving_device_id",
+			"pending_mac_state.current_parameters.relay.mode.serving.cad_periodicity",
+			"pending_mac_state.current_parameters.relay.mode.serving.default_channel_index",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.notifications.bucket_size",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.notifications.reload_rate",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.overall.bucket_size",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.overall.reload_rate",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.reset_behavior",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+			"pending_mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+			"pending_mac_state.current_parameters.relay.mode.serving.second_channel.ack_offset",
+			"pending_mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
+			"pending_mac_state.current_parameters.relay.mode.serving.second_channel.frequency",
+			"pending_mac_state.current_parameters.relay.mode.serving.uplink_forwarding_rules",
 			"pending_mac_state.current_parameters.rx1_data_rate_offset",
 			"pending_mac_state.current_parameters.rx1_delay",
 			"pending_mac_state.current_parameters.rx2_data_rate_index",
@@ -632,6 +655,29 @@ var (
 			"pending_mac_state.desired_parameters.ping_slot_frequency",
 			"pending_mac_state.desired_parameters.rejoin_count_periodicity",
 			"pending_mac_state.desired_parameters.rejoin_time_periodicity",
+			"pending_mac_state.desired_parameters.relay.mode.served.backoff",
+			"pending_mac_state.desired_parameters.relay.mode.served.mode.always",
+			"pending_mac_state.desired_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+			"pending_mac_state.desired_parameters.relay.mode.served.mode.end_device_controlled",
+			"pending_mac_state.desired_parameters.relay.mode.served.second_channel.ack_offset",
+			"pending_mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+			"pending_mac_state.desired_parameters.relay.mode.served.second_channel.frequency",
+			"pending_mac_state.desired_parameters.relay.mode.served.serving_device_id",
+			"pending_mac_state.desired_parameters.relay.mode.serving.cad_periodicity",
+			"pending_mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.notifications.bucket_size",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.notifications.reload_rate",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.overall.bucket_size",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.overall.reload_rate",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.reset_behavior",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+			"pending_mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+			"pending_mac_state.desired_parameters.relay.mode.serving.second_channel.ack_offset",
+			"pending_mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
+			"pending_mac_state.desired_parameters.relay.mode.serving.second_channel.frequency",
+			"pending_mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules",
 			"pending_mac_state.desired_parameters.rx1_data_rate_offset",
 			"pending_mac_state.desired_parameters.rx1_delay",
 			"pending_mac_state.desired_parameters.rx2_data_rate_index",
@@ -697,7 +743,99 @@ var (
 
 	ifNotZeroThenZeroFields = map[string][]string{
 		"multicast": {
+			"mac_settings.desired_relay.mode.served.backoff",
+			"mac_settings.desired_relay.mode.served.mode.always",
+			"mac_settings.desired_relay.mode.served.mode.dynamic.smart_enable_level",
+			"mac_settings.desired_relay.mode.served.mode.end_device_controlled",
+			"mac_settings.desired_relay.mode.served.second_channel.ack_offset",
+			"mac_settings.desired_relay.mode.served.second_channel.data_rate_index",
+			"mac_settings.desired_relay.mode.served.second_channel.frequency",
+			"mac_settings.desired_relay.mode.served.serving_device_id",
+			"mac_settings.desired_relay.mode.serving.cad_periodicity",
+			"mac_settings.desired_relay.mode.serving.default_channel_index",
+			"mac_settings.desired_relay.mode.serving.limits.join_requests.bucket_size",
+			"mac_settings.desired_relay.mode.serving.limits.join_requests.reload_rate",
+			"mac_settings.desired_relay.mode.serving.limits.notifications.bucket_size",
+			"mac_settings.desired_relay.mode.serving.limits.notifications.reload_rate",
+			"mac_settings.desired_relay.mode.serving.limits.overall.bucket_size",
+			"mac_settings.desired_relay.mode.serving.limits.overall.reload_rate",
+			"mac_settings.desired_relay.mode.serving.limits.reset_behavior",
+			"mac_settings.desired_relay.mode.serving.limits.uplink_messages.bucket_size",
+			"mac_settings.desired_relay.mode.serving.limits.uplink_messages.reload_rate",
+			"mac_settings.desired_relay.mode.serving.second_channel.ack_offset",
+			"mac_settings.desired_relay.mode.serving.second_channel.data_rate_index",
+			"mac_settings.desired_relay.mode.serving.second_channel.frequency",
+			"mac_settings.desired_relay.mode.serving.uplink_forwarding_rules",
+			"mac_settings.relay.mode.served.backoff",
+			"mac_settings.relay.mode.served.mode.always",
+			"mac_settings.relay.mode.served.mode.dynamic.smart_enable_level",
+			"mac_settings.relay.mode.served.mode.end_device_controlled",
+			"mac_settings.relay.mode.served.second_channel.ack_offset",
+			"mac_settings.relay.mode.served.second_channel.data_rate_index",
+			"mac_settings.relay.mode.served.second_channel.frequency",
+			"mac_settings.relay.mode.served.serving_device_id",
+			"mac_settings.relay.mode.serving.cad_periodicity",
+			"mac_settings.relay.mode.serving.default_channel_index",
+			"mac_settings.relay.mode.serving.limits.join_requests.bucket_size",
+			"mac_settings.relay.mode.serving.limits.join_requests.reload_rate",
+			"mac_settings.relay.mode.serving.limits.notifications.bucket_size",
+			"mac_settings.relay.mode.serving.limits.notifications.reload_rate",
+			"mac_settings.relay.mode.serving.limits.overall.bucket_size",
+			"mac_settings.relay.mode.serving.limits.overall.reload_rate",
+			"mac_settings.relay.mode.serving.limits.reset_behavior",
+			"mac_settings.relay.mode.serving.limits.uplink_messages.bucket_size",
+			"mac_settings.relay.mode.serving.limits.uplink_messages.reload_rate",
+			"mac_settings.relay.mode.serving.second_channel.ack_offset",
+			"mac_settings.relay.mode.serving.second_channel.data_rate_index",
+			"mac_settings.relay.mode.serving.second_channel.frequency",
+			"mac_settings.relay.mode.serving.uplink_forwarding_rules",
 			"mac_settings.schedule_downlinks.value",
+			"mac_state.current_parameters.relay.mode.served.backoff",
+			"mac_state.current_parameters.relay.mode.served.mode.always",
+			"mac_state.current_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+			"mac_state.current_parameters.relay.mode.served.mode.end_device_controlled",
+			"mac_state.current_parameters.relay.mode.served.second_channel.ack_offset",
+			"mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+			"mac_state.current_parameters.relay.mode.served.second_channel.frequency",
+			"mac_state.current_parameters.relay.mode.served.serving_device_id",
+			"mac_state.current_parameters.relay.mode.serving.cad_periodicity",
+			"mac_state.current_parameters.relay.mode.serving.default_channel_index",
+			"mac_state.current_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+			"mac_state.current_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+			"mac_state.current_parameters.relay.mode.serving.limits.notifications.bucket_size",
+			"mac_state.current_parameters.relay.mode.serving.limits.notifications.reload_rate",
+			"mac_state.current_parameters.relay.mode.serving.limits.overall.bucket_size",
+			"mac_state.current_parameters.relay.mode.serving.limits.overall.reload_rate",
+			"mac_state.current_parameters.relay.mode.serving.limits.reset_behavior",
+			"mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+			"mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+			"mac_state.current_parameters.relay.mode.serving.second_channel.ack_offset",
+			"mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
+			"mac_state.current_parameters.relay.mode.serving.second_channel.frequency",
+			"mac_state.current_parameters.relay.mode.serving.uplink_forwarding_rules",
+			"mac_state.desired_parameters.relay.mode.served.backoff",
+			"mac_state.desired_parameters.relay.mode.served.mode.always",
+			"mac_state.desired_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+			"mac_state.desired_parameters.relay.mode.served.mode.end_device_controlled",
+			"mac_state.desired_parameters.relay.mode.served.second_channel.ack_offset",
+			"mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+			"mac_state.desired_parameters.relay.mode.served.second_channel.frequency",
+			"mac_state.desired_parameters.relay.mode.served.serving_device_id",
+			"mac_state.desired_parameters.relay.mode.serving.cad_periodicity",
+			"mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+			"mac_state.desired_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+			"mac_state.desired_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+			"mac_state.desired_parameters.relay.mode.serving.limits.notifications.bucket_size",
+			"mac_state.desired_parameters.relay.mode.serving.limits.notifications.reload_rate",
+			"mac_state.desired_parameters.relay.mode.serving.limits.overall.bucket_size",
+			"mac_state.desired_parameters.relay.mode.serving.limits.overall.reload_rate",
+			"mac_state.desired_parameters.relay.mode.serving.limits.reset_behavior",
+			"mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+			"mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+			"mac_state.desired_parameters.relay.mode.serving.second_channel.ack_offset",
+			"mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
+			"mac_state.desired_parameters.relay.mode.serving.second_channel.frequency",
+			"mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules",
 			"mac_state.last_adr_change_f_cnt_up",
 			"mac_state.last_confirmed_downlink_at",
 			"mac_state.last_dev_status_f_cnt_up",
@@ -905,6 +1043,28 @@ var (
 		"mac_state.current_parameters.ping_slot_frequency",
 		"mac_state.current_parameters.rejoin_count_periodicity",
 		"mac_state.current_parameters.rejoin_time_periodicity",
+		"mac_state.current_parameters.relay.mode.served.backoff",
+		"mac_state.current_parameters.relay.mode.served.mode.always",
+		"mac_state.current_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+		"mac_state.current_parameters.relay.mode.served.mode.end_device_controlled",
+		"mac_state.current_parameters.relay.mode.served.second_channel.ack_offset",
+		"mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+		"mac_state.current_parameters.relay.mode.served.second_channel.frequency",
+		"mac_state.current_parameters.relay.mode.serving.cad_periodicity",
+		"mac_state.current_parameters.relay.mode.serving.default_channel_index",
+		"mac_state.current_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+		"mac_state.current_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+		"mac_state.current_parameters.relay.mode.serving.limits.notifications.bucket_size",
+		"mac_state.current_parameters.relay.mode.serving.limits.notifications.reload_rate",
+		"mac_state.current_parameters.relay.mode.serving.limits.overall.bucket_size",
+		"mac_state.current_parameters.relay.mode.serving.limits.overall.reload_rate",
+		"mac_state.current_parameters.relay.mode.serving.limits.reset_behavior",
+		"mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+		"mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+		"mac_state.current_parameters.relay.mode.serving.second_channel.ack_offset",
+		"mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
+		"mac_state.current_parameters.relay.mode.serving.second_channel.frequency",
+		"mac_state.current_parameters.relay.mode.serving.uplink_forwarding_rules",
 		"mac_state.current_parameters.rx1_data_rate_offset",
 		"mac_state.current_parameters.rx1_delay",
 		"mac_state.current_parameters.rx2_data_rate_index",
@@ -924,6 +1084,28 @@ var (
 		"mac_state.desired_parameters.ping_slot_frequency",
 		"mac_state.desired_parameters.rejoin_count_periodicity",
 		"mac_state.desired_parameters.rejoin_time_periodicity",
+		"mac_state.desired_parameters.relay.mode.served.backoff",
+		"mac_state.desired_parameters.relay.mode.served.mode.always",
+		"mac_state.desired_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+		"mac_state.desired_parameters.relay.mode.served.mode.end_device_controlled",
+		"mac_state.desired_parameters.relay.mode.served.second_channel.ack_offset",
+		"mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+		"mac_state.desired_parameters.relay.mode.served.second_channel.frequency",
+		"mac_state.desired_parameters.relay.mode.serving.cad_periodicity",
+		"mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+		"mac_state.desired_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+		"mac_state.desired_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+		"mac_state.desired_parameters.relay.mode.serving.limits.notifications.bucket_size",
+		"mac_state.desired_parameters.relay.mode.serving.limits.notifications.reload_rate",
+		"mac_state.desired_parameters.relay.mode.serving.limits.overall.bucket_size",
+		"mac_state.desired_parameters.relay.mode.serving.limits.overall.reload_rate",
+		"mac_state.desired_parameters.relay.mode.serving.limits.reset_behavior",
+		"mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+		"mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+		"mac_state.desired_parameters.relay.mode.serving.second_channel.ack_offset",
+		"mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
+		"mac_state.desired_parameters.relay.mode.serving.second_channel.frequency",
+		"mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules",
 		"mac_state.desired_parameters.rx1_data_rate_offset",
 		"mac_state.desired_parameters.rx1_delay",
 		"mac_state.desired_parameters.rx2_data_rate_index",
@@ -1266,11 +1448,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_settings.adr.mode",
 		"mac_settings.adr",
 		"mac_settings.desired_ping_slot_data_rate_index.value",
+		"mac_settings.desired_relay.mode.served.second_channel.data_rate_index",
+		"mac_settings.desired_relay.mode.serving.default_channel_index",
+		"mac_settings.desired_relay.mode.serving.second_channel.data_rate_index",
 		"mac_settings.desired_rx2_data_rate_index.value",
 		"mac_settings.downlink_dwell_time.value",
 		"mac_settings.factory_preset_frequencies",
 		"mac_settings.ping_slot_data_rate_index.value",
 		"mac_settings.ping_slot_frequency.value",
+		"mac_settings.relay.mode.served.second_channel.data_rate_index",
+		"mac_settings.relay.mode.serving.default_channel_index",
+		"mac_settings.relay.mode.serving.second_channel.data_rate_index",
 		"mac_settings.rx2_data_rate_index.value",
 		"mac_settings.uplink_dwell_time.value",
 		"mac_settings.use_adr.value",
@@ -1278,21 +1466,33 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_state.current_parameters.adr_tx_power_index",
 		"mac_state.current_parameters.channels",
 		"mac_state.current_parameters.ping_slot_data_rate_index_value.value",
+		"mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+		"mac_state.current_parameters.relay.mode.serving.default_channel_index",
+		"mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
 		"mac_state.current_parameters.rx2_data_rate_index",
 		"mac_state.desired_parameters.adr_data_rate_index",
 		"mac_state.desired_parameters.adr_tx_power_index",
 		"mac_state.desired_parameters.channels",
 		"mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
+		"mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+		"mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+		"mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
 		"mac_state.desired_parameters.rx2_data_rate_index",
 		"pending_mac_state.current_parameters.adr_data_rate_index",
 		"pending_mac_state.current_parameters.adr_tx_power_index",
 		"pending_mac_state.current_parameters.channels",
 		"pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value",
+		"pending_mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+		"pending_mac_state.current_parameters.relay.mode.serving.default_channel_index",
+		"pending_mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
 		"pending_mac_state.current_parameters.rx2_data_rate_index",
 		"pending_mac_state.desired_parameters.adr_data_rate_index",
 		"pending_mac_state.desired_parameters.adr_tx_power_index",
 		"pending_mac_state.desired_parameters.channels",
 		"pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
+		"pending_mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+		"pending_mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+		"pending_mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
 		"pending_mac_state.desired_parameters.rx2_data_rate_index",
 		"supports_class_b",
 	) {
@@ -1428,6 +1628,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 						return nil
 					}
 					_, ok := phy.DataRates[dev.MacSettings.DesiredPingSlotDataRateIndex.Value]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.desired_relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDesiredRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.DesiredRelay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.desired_relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDesiredRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.MacSettings.DesiredRelay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.desired_relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDesiredRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.DesiredRelay.GetServing().SecondChannel.DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError(field)
 					}
@@ -1603,6 +1857,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
+		if field, validate := hasSetField("mac_settings.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.MacSettings.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.Relay.GetServing().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
 		if field, validate := hasSetField("mac_state.current_parameters.rx2_data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacState() == nil {
@@ -1639,6 +1947,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
+		if field, validate := hasSetField("pending_mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetCurrentParameters().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.current_parameters.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetCurrentParameters().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.PendingMacState.CurrentParameters.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetCurrentParameters().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Relay.GetServing().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
 		if field, validate := hasSetField("pending_mac_state.current_parameters.rx2_data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetPendingMacState() == nil {
@@ -1646,6 +2008,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Rx2DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetDesiredParameters().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.PendingMacState.DesiredParameters.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.desired_parameters.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetDesiredParameters().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.PendingMacState.DesiredParameters.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("pending_mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetPendingMacState().GetDesiredParameters().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.PendingMacState.DesiredParameters.Relay.GetServing().SecondChannel.DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError(field)
 					}
@@ -1693,6 +2109,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
+		if field, validate := hasSetField("mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetCurrentParameters().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacState.CurrentParameters.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.current_parameters.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetCurrentParameters().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.MacState.CurrentParameters.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetCurrentParameters().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacState.CurrentParameters.Relay.GetServing().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
 		if field, validate := hasSetField("mac_state.desired_parameters.ping_slot_data_rate_index_value.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacState() == nil || dev.MacState.DesiredParameters.PingSlotDataRateIndexValue == nil {
@@ -1700,6 +2170,60 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MacState.DesiredParameters.PingSlotDataRateIndexValue.Value]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetDesiredParameters().GetRelay().GetServed().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacState.DesiredParameters.Relay.GetServed().SecondChannel.DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.desired_parameters.relay.mode.serving.default_channel_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetDesiredParameters().GetRelay().GetServing() == nil {
+						return nil
+					}
+					chIdx := dev.MacState.DesiredParameters.Relay.GetServing().DefaultChannelIndex
+					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacState().GetDesiredParameters().GetRelay().GetServing().GetSecondChannel() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacState.DesiredParameters.Relay.GetServing().SecondChannel.DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError(field)
 					}
@@ -2306,6 +2830,29 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_state.current_parameters.ping_slot_frequency",
 		"mac_state.current_parameters.rejoin_count_periodicity",
 		"mac_state.current_parameters.rejoin_time_periodicity",
+		"mac_state.current_parameters.relay.mode.served.backoff",
+		"mac_state.current_parameters.relay.mode.served.mode.always",
+		"mac_state.current_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+		"mac_state.current_parameters.relay.mode.served.mode.end_device_controlled",
+		"mac_state.current_parameters.relay.mode.served.second_channel.ack_offset",
+		"mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+		"mac_state.current_parameters.relay.mode.served.second_channel.frequency",
+		"mac_state.current_parameters.relay.mode.served.serving_device_id",
+		"mac_state.current_parameters.relay.mode.serving.cad_periodicity",
+		"mac_state.current_parameters.relay.mode.serving.default_channel_index",
+		"mac_state.current_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+		"mac_state.current_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+		"mac_state.current_parameters.relay.mode.serving.limits.notifications.bucket_size",
+		"mac_state.current_parameters.relay.mode.serving.limits.notifications.reload_rate",
+		"mac_state.current_parameters.relay.mode.serving.limits.overall.bucket_size",
+		"mac_state.current_parameters.relay.mode.serving.limits.overall.reload_rate",
+		"mac_state.current_parameters.relay.mode.serving.limits.reset_behavior",
+		"mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+		"mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+		"mac_state.current_parameters.relay.mode.serving.second_channel.ack_offset",
+		"mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
+		"mac_state.current_parameters.relay.mode.serving.second_channel.frequency",
+		"mac_state.current_parameters.relay.mode.serving.uplink_forwarding_rules",
 		"mac_state.current_parameters.rx1_data_rate_offset",
 		"mac_state.current_parameters.rx1_delay",
 		"mac_state.current_parameters.rx2_data_rate_index",
@@ -2325,6 +2872,29 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_state.desired_parameters.ping_slot_frequency",
 		"mac_state.desired_parameters.rejoin_count_periodicity",
 		"mac_state.desired_parameters.rejoin_time_periodicity",
+		"mac_state.desired_parameters.relay.mode.served.backoff",
+		"mac_state.desired_parameters.relay.mode.served.mode.always",
+		"mac_state.desired_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+		"mac_state.desired_parameters.relay.mode.served.mode.end_device_controlled",
+		"mac_state.desired_parameters.relay.mode.served.second_channel.ack_offset",
+		"mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+		"mac_state.desired_parameters.relay.mode.served.second_channel.frequency",
+		"mac_state.desired_parameters.relay.mode.served.serving_device_id",
+		"mac_state.desired_parameters.relay.mode.serving.cad_periodicity",
+		"mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+		"mac_state.desired_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+		"mac_state.desired_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+		"mac_state.desired_parameters.relay.mode.serving.limits.notifications.bucket_size",
+		"mac_state.desired_parameters.relay.mode.serving.limits.notifications.reload_rate",
+		"mac_state.desired_parameters.relay.mode.serving.limits.overall.bucket_size",
+		"mac_state.desired_parameters.relay.mode.serving.limits.overall.reload_rate",
+		"mac_state.desired_parameters.relay.mode.serving.limits.reset_behavior",
+		"mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+		"mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+		"mac_state.desired_parameters.relay.mode.serving.second_channel.ack_offset",
+		"mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
+		"mac_state.desired_parameters.relay.mode.serving.second_channel.frequency",
+		"mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules",
 		"mac_state.desired_parameters.rx1_data_rate_offset",
 		"mac_state.desired_parameters.rx1_delay",
 		"mac_state.desired_parameters.rx2_data_rate_index",
@@ -2346,6 +2916,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_state.pending_application_downlink.frm_payload",
 		"mac_state.pending_application_downlink.priority",
 		"mac_state.pending_application_downlink.session_key_id",
+		"mac_state.pending_relay_downlink.raw_payload",
+		"mac_state.pending_relay_downlink",
 		"mac_state.pending_requests",
 		"mac_state.ping_slot_periodicity.value",
 		"mac_state.queued_responses",
@@ -2520,6 +3092,29 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"pending_mac_state.current_parameters.ping_slot_frequency",
 		"pending_mac_state.current_parameters.rejoin_count_periodicity",
 		"pending_mac_state.current_parameters.rejoin_time_periodicity",
+		"pending_mac_state.current_parameters.relay.mode.served.backoff",
+		"pending_mac_state.current_parameters.relay.mode.served.mode.always",
+		"pending_mac_state.current_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+		"pending_mac_state.current_parameters.relay.mode.served.mode.end_device_controlled",
+		"pending_mac_state.current_parameters.relay.mode.served.second_channel.ack_offset",
+		"pending_mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+		"pending_mac_state.current_parameters.relay.mode.served.second_channel.frequency",
+		"pending_mac_state.current_parameters.relay.mode.served.serving_device_id",
+		"pending_mac_state.current_parameters.relay.mode.serving.cad_periodicity",
+		"pending_mac_state.current_parameters.relay.mode.serving.default_channel_index",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.notifications.bucket_size",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.notifications.reload_rate",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.overall.bucket_size",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.overall.reload_rate",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.reset_behavior",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+		"pending_mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+		"pending_mac_state.current_parameters.relay.mode.serving.second_channel.ack_offset",
+		"pending_mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
+		"pending_mac_state.current_parameters.relay.mode.serving.second_channel.frequency",
+		"pending_mac_state.current_parameters.relay.mode.serving.uplink_forwarding_rules",
 		"pending_mac_state.current_parameters.rx1_data_rate_offset",
 		"pending_mac_state.current_parameters.rx1_delay",
 		"pending_mac_state.current_parameters.rx2_data_rate_index",
@@ -2539,6 +3134,29 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"pending_mac_state.desired_parameters.ping_slot_frequency",
 		"pending_mac_state.desired_parameters.rejoin_count_periodicity",
 		"pending_mac_state.desired_parameters.rejoin_time_periodicity",
+		"pending_mac_state.desired_parameters.relay.mode.served.backoff",
+		"pending_mac_state.desired_parameters.relay.mode.served.mode.always",
+		"pending_mac_state.desired_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+		"pending_mac_state.desired_parameters.relay.mode.served.mode.end_device_controlled",
+		"pending_mac_state.desired_parameters.relay.mode.served.second_channel.ack_offset",
+		"pending_mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+		"pending_mac_state.desired_parameters.relay.mode.served.second_channel.frequency",
+		"pending_mac_state.desired_parameters.relay.mode.served.serving_device_id",
+		"pending_mac_state.desired_parameters.relay.mode.serving.cad_periodicity",
+		"pending_mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.notifications.bucket_size",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.notifications.reload_rate",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.overall.bucket_size",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.overall.reload_rate",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.reset_behavior",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+		"pending_mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+		"pending_mac_state.desired_parameters.relay.mode.serving.second_channel.ack_offset",
+		"pending_mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
+		"pending_mac_state.desired_parameters.relay.mode.serving.second_channel.frequency",
+		"pending_mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules",
 		"pending_mac_state.desired_parameters.rx1_data_rate_offset",
 		"pending_mac_state.desired_parameters.rx1_delay",
 		"pending_mac_state.desired_parameters.rx2_data_rate_index",
@@ -2622,6 +3240,29 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_state.current_parameters.ping_slot_frequency",
 			"mac_state.current_parameters.rejoin_count_periodicity",
 			"mac_state.current_parameters.rejoin_time_periodicity",
+			"mac_state.current_parameters.relay.mode.served.backoff",
+			"mac_state.current_parameters.relay.mode.served.mode.always",
+			"mac_state.current_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+			"mac_state.current_parameters.relay.mode.served.mode.end_device_controlled",
+			"mac_state.current_parameters.relay.mode.served.second_channel.ack_offset",
+			"mac_state.current_parameters.relay.mode.served.second_channel.data_rate_index",
+			"mac_state.current_parameters.relay.mode.served.second_channel.frequency",
+			"mac_state.current_parameters.relay.mode.served.serving_device_id",
+			"mac_state.current_parameters.relay.mode.serving.cad_periodicity",
+			"mac_state.current_parameters.relay.mode.serving.default_channel_index",
+			"mac_state.current_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+			"mac_state.current_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+			"mac_state.current_parameters.relay.mode.serving.limits.notifications.bucket_size",
+			"mac_state.current_parameters.relay.mode.serving.limits.notifications.reload_rate",
+			"mac_state.current_parameters.relay.mode.serving.limits.overall.bucket_size",
+			"mac_state.current_parameters.relay.mode.serving.limits.overall.reload_rate",
+			"mac_state.current_parameters.relay.mode.serving.limits.reset_behavior",
+			"mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+			"mac_state.current_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+			"mac_state.current_parameters.relay.mode.serving.second_channel.ack_offset",
+			"mac_state.current_parameters.relay.mode.serving.second_channel.data_rate_index",
+			"mac_state.current_parameters.relay.mode.serving.second_channel.frequency",
+			"mac_state.current_parameters.relay.mode.serving.uplink_forwarding_rules",
 			"mac_state.current_parameters.rx1_data_rate_offset",
 			"mac_state.current_parameters.rx1_delay",
 			"mac_state.current_parameters.rx2_data_rate_index",
@@ -2641,6 +3282,29 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_state.desired_parameters.ping_slot_frequency",
 			"mac_state.desired_parameters.rejoin_count_periodicity",
 			"mac_state.desired_parameters.rejoin_time_periodicity",
+			"mac_state.desired_parameters.relay.mode.served.backoff",
+			"mac_state.desired_parameters.relay.mode.served.mode.always",
+			"mac_state.desired_parameters.relay.mode.served.mode.dynamic.smart_enable_level",
+			"mac_state.desired_parameters.relay.mode.served.mode.end_device_controlled",
+			"mac_state.desired_parameters.relay.mode.served.second_channel.ack_offset",
+			"mac_state.desired_parameters.relay.mode.served.second_channel.data_rate_index",
+			"mac_state.desired_parameters.relay.mode.served.second_channel.frequency",
+			"mac_state.desired_parameters.relay.mode.served.serving_device_id",
+			"mac_state.desired_parameters.relay.mode.serving.cad_periodicity",
+			"mac_state.desired_parameters.relay.mode.serving.default_channel_index",
+			"mac_state.desired_parameters.relay.mode.serving.limits.join_requests.bucket_size",
+			"mac_state.desired_parameters.relay.mode.serving.limits.join_requests.reload_rate",
+			"mac_state.desired_parameters.relay.mode.serving.limits.notifications.bucket_size",
+			"mac_state.desired_parameters.relay.mode.serving.limits.notifications.reload_rate",
+			"mac_state.desired_parameters.relay.mode.serving.limits.overall.bucket_size",
+			"mac_state.desired_parameters.relay.mode.serving.limits.overall.reload_rate",
+			"mac_state.desired_parameters.relay.mode.serving.limits.reset_behavior",
+			"mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.bucket_size",
+			"mac_state.desired_parameters.relay.mode.serving.limits.uplink_messages.reload_rate",
+			"mac_state.desired_parameters.relay.mode.serving.second_channel.ack_offset",
+			"mac_state.desired_parameters.relay.mode.serving.second_channel.data_rate_index",
+			"mac_state.desired_parameters.relay.mode.serving.second_channel.frequency",
+			"mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules",
 			"mac_state.desired_parameters.rx1_data_rate_offset",
 			"mac_state.desired_parameters.rx1_delay",
 			"mac_state.desired_parameters.rx2_data_rate_index",

@@ -79,6 +79,8 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		UplinkDwellTime:              mac.DeviceUplinkDwellTime(nil, phy, ns.defaultMACSettings),
 		DownlinkDwellTime:            mac.DeviceDownlinkDwellTime(nil, phy, ns.defaultMACSettings),
 		ScheduleDownlinks:            &ttnpb.BoolValue{Value: mac.DeviceScheduleDownlinks(nil, ns.defaultMACSettings)},
+		Relay:                        mac.DeviceDefaultRelayParameters(nil, ns.defaultMACSettings),
+		DesiredRelay:                 mac.DeviceDesiredRelayParameters(nil, ns.defaultMACSettings),
 	}
 	return settings, nil
 }

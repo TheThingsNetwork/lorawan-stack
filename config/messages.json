@@ -152,6 +152,69 @@
       "file": "i18n.go"
     }
   },
+  "enum:CID_RELAY_CONF": {
+    "translations": {
+      "en": "relay configuration"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_CONFIGURE_FWD_LIMIT": {
+    "translations": {
+      "en": "manage uplink forwarding limits"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_CTRL_UPLINK_LIST": {
+    "translations": {
+      "en": "manage uplink forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_END_DEVICE_CONF": {
+    "translations": {
+      "en": "end device relay configuration"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_FILTER_LIST": {
+    "translations": {
+      "en": "manage join request forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_NOTIFY_NEW_END_DEVICE": {
+    "translations": {
+      "en": "new end device under relay"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_UPDATE_UPLINK_LIST": {
+    "translations": {
+      "en": "update uplink forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:CID_RESET": {
     "translations": {
       "en": "reset"
@@ -7487,6 +7550,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver/redis:relay_served": {
+    "translations": {
+      "en": "`{served}` is already served by `{serving}`"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/networkserver:abp_join_request": {
     "translations": {
       "en": "received a join-request from ABP device"
@@ -7800,6 +7872,87 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "grpc_gsns.go"
+    }
+  },
+  "error:pkg/networkserver:relay_full_f_cnt": {
+    "translations": {
+      "en": "invalid full FCnt"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_m_type": {
+    "translations": {
+      "en": "invalid MType"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_recent_uplinks": {
+    "translations": {
+      "en": "recent uplinks not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_rx_windows_available": {
+    "translations": {
+      "en": "no RX windows available"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_schedule": {
+    "translations": {
+      "en": "relay schedule"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_serving": {
+    "translations": {
+      "en": "relay not serving"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_session": {
+    "translations": {
+      "en": "relay session not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_session_key_id": {
+    "translations": {
+      "en": "relay session key ID not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_uplink_token": {
+    "translations": {
+      "en": "invalid relay uplink token"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
     }
   },
   "error:pkg/networkserver:schedule": {
@@ -10682,6 +10835,132 @@
       "file": "rekey.go"
     }
   },
+  "event:ns.mac.relay_conf.answer.accept": {
+    "translations": {
+      "en": "relay configuration accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
+  "event:ns.mac.relay_conf.answer.reject": {
+    "translations": {
+      "en": "relay configuration rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
+  "event:ns.mac.relay_conf.request": {
+    "translations": {
+      "en": "relay configuration request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
+  "event:ns.mac.relay_configure_fwd_limit.answer": {
+    "translations": {
+      "en": "relay configure forward limit answer received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_configure_fwd_limit.go"
+    }
+  },
+  "event:ns.mac.relay_configure_fwd_limit.request": {
+    "translations": {
+      "en": "relay configure forward limit request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_configure_fwd_limit.go"
+    }
+  },
+  "event:ns.mac.relay_ctrl_uplink_list.answer.accept": {
+    "translations": {
+      "en": "relay control uplink list accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_ctrl_uplink_list.answer.reject": {
+    "translations": {
+      "en": "relay control uplink list rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_ctrl_uplink_list.request": {
+    "translations": {
+      "en": "relay control uplink list request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_end_device_conf.answer.accept": {
+    "translations": {
+      "en": "relay end device configuration accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
+  "event:ns.mac.relay_end_device_conf.answer.reject": {
+    "translations": {
+      "en": "relay end device configuration rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
+  "event:ns.mac.relay_end_device_conf.request": {
+    "translations": {
+      "en": "relay end device configuration request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
+  "event:ns.mac.relay_notify_new_end_device.indication": {
+    "translations": {
+      "en": "relay notify new end device indication received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_notify_new_end_device.go"
+    }
+  },
+  "event:ns.mac.relay_update_uplink_list.answer": {
+    "translations": {
+      "en": "relay update uplink list answer received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_update_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_update_uplink_list.request": {
+    "translations": {
+      "en": "relay update uplink list request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_update_uplink_list.go"
+    }
+  },
   "event:ns.mac.reset.confirmation": {
     "translations": {
       "en": "device reset confirmation enqueued"
@@ -10883,6 +11162,24 @@
   "event:ns.up.join.receive": {
     "translations": {
       "en": "receive join-request"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.relay.drop": {
+    "translations": {
+      "en": "drop relay message"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.relay.process": {
+    "translations": {
+      "en": "successfully processed relay message"
     },
     "description": {
       "package": "pkg/networkserver",

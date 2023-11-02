@@ -32,6 +32,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/relayspec"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/toa"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -612,6 +614,18 @@ macLoop:
 			evs, err = mac.HandleBeaconFreqAns(ctx, dev, cmd.GetBeaconFreqAns())
 		case ttnpb.MACCommandIdentifier_CID_DEVICE_MODE:
 			evs, err = mac.HandleDeviceModeInd(ctx, dev, cmd.GetDeviceModeInd())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_CONF:
+			evs, err = mac.HandleRelayConfAns(ctx, dev, cmd.GetRelayConfAns())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_END_DEVICE_CONF:
+			evs, err = mac.HandleRelayEndDeviceConfAns(ctx, dev, cmd.GetRelayEndDeviceConfAns())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_UPDATE_UPLINK_LIST:
+			evs, err = mac.HandleRelayUpdateUplinkListAns(ctx, dev, cmd.GetRelayUpdateUplinkListAns())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_CTRL_UPLINK_LIST:
+			evs, err = mac.HandleRelayCtrlUplinkListAns(ctx, dev, cmd.GetRelayCtrlUplinkListAns())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT:
+			evs, err = mac.HandleRelayConfigureFwdLimitAns(ctx, dev, cmd.GetRelayConfigureFwdLimitAns())
+		case ttnpb.MACCommandIdentifier_CID_RELAY_NOTIFY_NEW_END_DEVICE:
+			evs, err = mac.HandleRelayNotifyNewEndDeviceReq(ctx, dev, cmd.GetRelayNotifyNewEndDeviceReq())
 		default:
 			_, known := lorawan.DefaultMACCommands[cmd.Cid]
 			logger.WithField("known", known).Debug("Unknown MAC command received")
@@ -648,6 +662,7 @@ macLoop:
 		// TODO: Notify AS of session recovery(https://github.com/TheThingsNetwork/lorawan-stack/issues/594)
 	}
 	dev.MacState.PendingJoinRequest = nil
+	dev.MacState.PendingRelayDownlink = nil
 	dev.PendingMacState = nil
 	dev.PendingSession = nil
 
@@ -753,9 +768,14 @@ func toMACStateRxMetadata(mds []*ttnpb.RxMetadata) []*ttnpb.MACState_UplinkMessa
 		if md.PacketBroker != nil {
 			pbMD = &ttnpb.MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata{}
 		}
+		var relayMD *ttnpb.MACState_UplinkMessage_RxMetadata_RelayMetadata
+		if md.Relay != nil {
+			relayMD = &ttnpb.MACState_UplinkMessage_RxMetadata_RelayMetadata{}
+		}
 		recentMDs = append(recentMDs, &ttnpb.MACState_UplinkMessage_RxMetadata{
 			GatewayIds:             md.GatewayIds,
 			PacketBroker:           pbMD,
+			Relay:                  relayMD,
 			ChannelRssi:            md.ChannelRssi,
 			Snr:                    md.Snr,
 			DownlinkPathConstraint: md.DownlinkPathConstraint,
@@ -1095,7 +1115,25 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 	if !matched.IsRetransmission {
 		var frmPayload []byte
-		if pld.FPort != 0 {
+		switch pld.FPort {
+		case 0:
+		case relayspec.FPort:
+			relayUp, relayEvents, err := handleRelayForwardingProtocol(
+				ctx, matched.Device, matched.FullFCnt, matched.phy, up, ns.KeyService(),
+			)
+			queuedEvents = append(queuedEvents, relayEvents...)
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Failed to handle relay forwarding protocol")
+			} else {
+				ns.StartTask(&task.Config{
+					Context: ns.FromRequestContext(ctx),
+					ID:      "loopback_relay_uplink",
+					Func:    relayLoopbackFunc(ns.LoopbackConn(), relayUp, ns.WithClusterAuth()),
+					Restart: task.RestartNever,
+					Backoff: task.DefaultBackoffConfig,
+				})
+			}
+		default:
 			frmPayload = pld.FrmPayload
 		}
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
@@ -1350,6 +1388,10 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	macState.RxWindowsAvailable = true
 	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIds...)
+
+	if err := ns.deliverRelaySessionKeys(ctx, matched, keys.SessionKeyId); err != nil {
+		return err
+	}
 
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil

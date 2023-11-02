@@ -57,6 +57,31 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 					dst.PacketBroker = nil
 				}
 			}
+		case "relay":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayMetadata
+				if (src == nil || src.Relay == nil) && dst.Relay == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Relay
+				}
+				if dst.Relay != nil {
+					newDst = dst.Relay
+				} else {
+					newDst = &RelayMetadata{}
+					dst.Relay = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Relay = src.Relay
+				} else {
+					dst.Relay = nil
+				}
+			}
 		case "antenna_index":
 			if len(subs) > 0 {
 				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
@@ -499,6 +524,36 @@ func (dst *PacketBrokerRouteHop) SetFields(src *PacketBrokerRouteHop, paths ...s
 			} else {
 				var zero string
 				dst.ReceiverAgent = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *RelayMetadata) SetFields(src *RelayMetadata, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "device_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceId = src.DeviceId
+			} else {
+				var zero string
+				dst.DeviceId = zero
+			}
+		case "wor_channel":
+			if len(subs) > 0 {
+				return fmt.Errorf("'wor_channel' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WorChannel = src.WorChannel
+			} else {
+				dst.WorChannel = 0
 			}
 
 		default:

@@ -17919,15 +17919,19 @@
         }
       }
     },
-    "BandDescriptionRelayParameters": {
+    "BandDescriptionRelayParametersRelayWORChannel": {
       "type": "object",
       "properties": {
-        "wor_channels": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/RelayParametersRelayWORChannel"
-          }
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "ack_frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex"
         }
       }
     },
@@ -18841,6 +18845,202 @@
         }
       }
     },
+    "MACCommandRelayConfAns": {
+      "type": "object",
+      "properties": {
+        "second_channel_frequency_ack": {
+          "type": "boolean"
+        },
+        "second_channel_ack_offset_ack": {
+          "type": "boolean"
+        },
+        "second_channel_data_rate_index_ack": {
+          "type": "boolean"
+        },
+        "second_channel_index_ack": {
+          "type": "boolean"
+        },
+        "default_channel_index_ack": {
+          "type": "boolean"
+        },
+        "cad_periodicity_ack": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MACCommandRelayConfReq": {
+      "type": "object",
+      "properties": {
+        "configuration": {
+          "$ref": "#/definitions/MACCommandRelayConfReqConfiguration"
+        }
+      }
+    },
+    "MACCommandRelayConfReqConfiguration": {
+      "type": "object",
+      "properties": {
+        "second_channel": {
+          "$ref": "#/definitions/v3RelaySecondChannel"
+        },
+        "default_channel_index": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "cad_periodicity": {
+          "$ref": "#/definitions/v3RelayCADPeriodicity"
+        }
+      }
+    },
+    "MACCommandRelayConfigureFwdLimitAns": {
+      "type": "object"
+    },
+    "MACCommandRelayConfigureFwdLimitReq": {
+      "type": "object",
+      "properties": {
+        "reset_limit_counter": {
+          "$ref": "#/definitions/v3RelayResetLimitCounter"
+        },
+        "join_request_limits": {
+          "$ref": "#/definitions/v3RelayForwardLimits"
+        },
+        "notify_limits": {
+          "$ref": "#/definitions/v3RelayForwardLimits"
+        },
+        "global_uplink_limits": {
+          "$ref": "#/definitions/v3RelayForwardLimits"
+        },
+        "overall_limits": {
+          "$ref": "#/definitions/v3RelayForwardLimits"
+        }
+      }
+    },
+    "MACCommandRelayCtrlUplinkListAns": {
+      "type": "object",
+      "properties": {
+        "rule_index_ack": {
+          "type": "boolean"
+        },
+        "w_f_cnt": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "MACCommandRelayCtrlUplinkListReq": {
+      "type": "object",
+      "properties": {
+        "rule_index": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "action": {
+          "$ref": "#/definitions/v3RelayCtrlUplinkListAction"
+        }
+      }
+    },
+    "MACCommandRelayEndDeviceConfAns": {
+      "type": "object",
+      "properties": {
+        "second_channel_frequency_ack": {
+          "type": "boolean"
+        },
+        "second_channel_data_rate_index_ack": {
+          "type": "boolean"
+        },
+        "second_channel_index_ack": {
+          "type": "boolean"
+        },
+        "backoff_ack": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MACCommandRelayEndDeviceConfReq": {
+      "type": "object",
+      "properties": {
+        "configuration": {
+          "$ref": "#/definitions/MACCommandRelayEndDeviceConfReqConfiguration"
+        }
+      }
+    },
+    "MACCommandRelayEndDeviceConfReqConfiguration": {
+      "type": "object",
+      "properties": {
+        "always": {
+          "$ref": "#/definitions/v3RelayEndDeviceAlwaysMode"
+        },
+        "dynamic": {
+          "$ref": "#/definitions/v3RelayEndDeviceDynamicMode"
+        },
+        "end_device_controlled": {
+          "$ref": "#/definitions/v3RelayEndDeviceControlledMode"
+        },
+        "backoff": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "second_channel": {
+          "$ref": "#/definitions/v3RelaySecondChannel"
+        },
+        "serving_device_id": {
+          "type": "string"
+        }
+      }
+    },
+    "MACCommandRelayNotifyNewEndDeviceReq": {
+      "type": "object",
+      "properties": {
+        "dev_addr": {
+          "type": "string",
+          "format": "string",
+          "example": "2600ABCD"
+        },
+        "snr": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rssi": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "MACCommandRelayUpdateUplinkListAns": {
+      "type": "object"
+    },
+    "MACCommandRelayUpdateUplinkListReq": {
+      "type": "object",
+      "properties": {
+        "rule_index": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "forward_limits": {
+          "$ref": "#/definitions/v3RelayUplinkForwardLimits"
+        },
+        "dev_addr": {
+          "type": "string",
+          "format": "string",
+          "example": "2600ABCD"
+        },
+        "w_f_cnt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "root_wor_s_key": {
+          "type": "string",
+          "format": "string",
+          "example": "0123456789ABCDEF0123456789ABCDEF"
+        },
+        "device_id": {
+          "type": "string"
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "MACCommandResetConf": {
       "type": "object",
       "properties": {
@@ -19000,6 +19200,9 @@
         },
         "packet_broker": {
           "$ref": "#/definitions/UplinkMessageRxMetadataPacketBrokerMetadata"
+        },
+        "relay": {
+          "$ref": "#/definitions/UplinkMessageRxMetadataRelayMetadata"
         }
       }
     },
@@ -19113,19 +19316,51 @@
       "default": "ENABLED",
       "description": " - ENABLED: No restrictions are in place.\n - WARNING: Warnings are being emitted that the provider will be deprecated in the future.\n - DISABLED: New integrations cannot be set up, and old ones do not start."
     },
-    "RelayParametersRelayWORChannel": {
+    "ServingRelayParametersForwardingLimits": {
       "type": "object",
       "properties": {
-        "frequency": {
-          "type": "string",
-          "format": "uint64"
+        "reset_behavior": {
+          "$ref": "#/definitions/v3RelayResetLimitCounter",
+          "description": "Reset behavior of the buckets upon limit update."
         },
-        "ack_frequency": {
-          "type": "string",
-          "format": "uint64"
+        "join_requests": {
+          "$ref": "#/definitions/v3RelayForwardLimits",
+          "description": "Bucket configuration for join requests.\nIf unset, no individual limits will apply to join requests, but the relay overall limitations will apply."
         },
-        "data_rate_index": {
-          "$ref": "#/definitions/v3DataRateIndex"
+        "notifications": {
+          "$ref": "#/definitions/v3RelayForwardLimits",
+          "description": "Bucket configuration for unknown device notifications.\nIf unset, no individual limits will apply to unknown end device notifications, but the relay overall\nlimitations will still apply."
+        },
+        "uplink_messages": {
+          "$ref": "#/definitions/v3RelayForwardLimits",
+          "description": "Bucket configuration for uplink messages across all served end devices.\nIf unset, no individual limits will apply to uplink messages across all served end devices, but the relay\noverall limitations will still apply."
+        },
+        "overall": {
+          "$ref": "#/definitions/v3RelayForwardLimits",
+          "description": "Bucket configuration for all relay messages.\nIf unset, no overall limits will apply to the relay, but individual limitations will still apply."
+        }
+      }
+    },
+    "ServingRelayParametersUplinkForwardingRule": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/v3RelayUplinkForwardLimits",
+          "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply."
+        },
+        "last_w_f_cnt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Last wake on radio frame counter used by the served end device."
+        },
+        "device_id": {
+          "type": "string",
+          "description": "End device identifier of the served end device."
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte",
+          "description": "Session key ID of the session keys used to derive the root relay session key."
         }
       }
     },
@@ -19165,6 +19400,9 @@
       "description": "Transmission settings for downlink."
     },
     "UplinkMessageRxMetadataPacketBrokerMetadata": {
+      "type": "object"
+    },
+    "UplinkMessageRxMetadataRelayMetadata": {
       "type": "object"
     },
     "UserRegistrationAdminApproval": {
@@ -19481,6 +19719,41 @@
         }
       }
     },
+    "lorawanv3RelayMetadata": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string",
+          "description": "End device identifiers of the relay."
+        },
+        "wor_channel": {
+          "$ref": "#/definitions/lorawanv3RelayWORChannel",
+          "description": "Wake on radio channel."
+        }
+      }
+    },
+    "lorawanv3RelayParameters": {
+      "type": "object",
+      "properties": {
+        "serving": {
+          "$ref": "#/definitions/v3ServingRelayParameters",
+          "description": "Parameters related to a relay which is serving end devices."
+        },
+        "served": {
+          "$ref": "#/definitions/v3ServedRelayParameters",
+          "description": "Parameters related to an end device served by a relay."
+        }
+      },
+      "description": "RelayParameters represent the parameters of a relay.\nThis is used internally by the Network Server."
+    },
+    "lorawanv3RelayWORChannel": {
+      "type": "string",
+      "enum": [
+        "RELAY_WOR_CHANNEL_DEFAULT",
+        "RELAY_WOR_CHANNEL_SECONDARY"
+      ],
+      "default": "RELAY_WOR_CHANNEL_DEFAULT"
+    },
     "lorawanv3RxMetadata": {
       "type": "object",
       "properties": {
@@ -19489,6 +19762,9 @@
         },
         "packet_broker": {
           "$ref": "#/definitions/lorawanv3PacketBrokerMetadata"
+        },
+        "relay": {
+          "$ref": "#/definitions/lorawanv3RelayMetadata"
         },
         "antenna_index": {
           "type": "integer",
@@ -21078,7 +21354,7 @@
           "$ref": "#/definitions/BandDescriptionDwellTime"
         },
         "relay": {
-          "$ref": "#/definitions/BandDescriptionRelayParameters"
+          "$ref": "#/definitions/v3BandDescriptionRelayParameters"
         }
       }
     },
@@ -21094,6 +21370,18 @@
         },
         "max_data_rate": {
           "$ref": "#/definitions/v3DataRateIndex"
+        }
+      }
+    },
+    "v3BandDescriptionRelayParameters": {
+      "type": "object",
+      "properties": {
+        "wor_channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/BandDescriptionRelayParametersRelayWORChannel"
+          }
         }
       }
     },
@@ -23644,6 +23932,39 @@
         },
         "device_mode_conf": {
           "$ref": "#/definitions/MACCommandDeviceModeConf"
+        },
+        "relay_conf_req": {
+          "$ref": "#/definitions/MACCommandRelayConfReq"
+        },
+        "relay_conf_ans": {
+          "$ref": "#/definitions/MACCommandRelayConfAns"
+        },
+        "relay_end_device_conf_req": {
+          "$ref": "#/definitions/MACCommandRelayEndDeviceConfReq"
+        },
+        "relay_end_device_conf_ans": {
+          "$ref": "#/definitions/MACCommandRelayEndDeviceConfAns"
+        },
+        "relay_update_uplink_list_req": {
+          "$ref": "#/definitions/MACCommandRelayUpdateUplinkListReq"
+        },
+        "relay_update_uplink_list_ans": {
+          "$ref": "#/definitions/MACCommandRelayUpdateUplinkListAns"
+        },
+        "relay_ctrl_uplink_list_req": {
+          "$ref": "#/definitions/MACCommandRelayCtrlUplinkListReq"
+        },
+        "relay_ctrl_uplink_list_ans": {
+          "$ref": "#/definitions/MACCommandRelayCtrlUplinkListAns"
+        },
+        "relay_configure_fwd_limit_req": {
+          "$ref": "#/definitions/MACCommandRelayConfigureFwdLimitReq"
+        },
+        "relay_configure_fwd_limit_ans": {
+          "$ref": "#/definitions/MACCommandRelayConfigureFwdLimitAns"
+        },
+        "relay_notify_new_end_device_req": {
+          "$ref": "#/definitions/MACCommandRelayNotifyNewEndDeviceReq"
         }
       }
     },
@@ -23670,7 +23991,14 @@
         "CID_PING_SLOT_CHANNEL",
         "CID_BEACON_TIMING",
         "CID_BEACON_FREQ",
-        "CID_DEVICE_MODE"
+        "CID_DEVICE_MODE",
+        "CID_RELAY_CONF",
+        "CID_RELAY_END_DEVICE_CONF",
+        "CID_RELAY_FILTER_LIST",
+        "CID_RELAY_UPDATE_UPLINK_LIST",
+        "CID_RELAY_CTRL_UPLINK_LIST",
+        "CID_RELAY_CONFIGURE_FWD_LIMIT",
+        "CID_RELAY_NOTIFY_NEW_END_DEVICE"
       ],
       "default": "CID_RFU_0",
       "title": "- CID_BEACON_TIMING: Deprecated"
@@ -23760,11 +24088,11 @@
         },
         "uplink_dwell_time": {
           "$ref": "#/definitions/lorawanv3BoolValue",
-          "description": "Whether uplink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it)."
+          "description": "Whether uplink dwell time is set (400ms).\nIf unset, then the value is either unknown or irrelevant(Network Server cannot modify it)."
         },
         "downlink_dwell_time": {
           "$ref": "#/definitions/lorawanv3BoolValue",
-          "description": "Whether downlink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it)."
+          "description": "Whether downlink dwell time is set (400ms).\nIf unset, then the value is either unknown or irrelevant(Network Server cannot modify it)."
         },
         "adr_ack_limit_exponent": {
           "$ref": "#/definitions/v3ADRAckLimitExponentValue",
@@ -23777,6 +24105,10 @@
         "ping_slot_data_rate_index_value": {
           "$ref": "#/definitions/v3DataRateIndexValue",
           "description": "Data rate index of the class B ping slot."
+        },
+        "relay": {
+          "$ref": "#/definitions/lorawanv3RelayParameters",
+          "description": "Relay parameters."
         }
       },
       "description": "MACParameters represent the parameters of the device's MAC layer (active or desired).\nThis is used internally by the Network Server."
@@ -23952,6 +24284,14 @@
         "schedule_downlinks": {
           "$ref": "#/definitions/lorawanv3BoolValue",
           "description": "Whether or not downlink messages should be scheduled.\nThis option can be used in order to disable any downlink interaction with the end device. It will affect all types\nof downlink messages: data and MAC downlinks, and join accepts."
+        },
+        "relay": {
+          "$ref": "#/definitions/lorawanv3RelayParameters",
+          "description": "The relay parameters the end device is using.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+        },
+        "desired_relay": {
+          "$ref": "#/definitions/lorawanv3RelayParameters",
+          "description": "The relay parameters the Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         }
       }
     },
@@ -24087,6 +24427,10 @@
             "$ref": "#/definitions/v3MACCommandIdentifier"
           },
           "description": "MAC command identifiers sent by the end device in the last received uplink.\nThe Network Server may choose to store only certain types of MAC\ncommand identifiers in the underlying implementation."
+        },
+        "pending_relay_downlink": {
+          "$ref": "#/definitions/v3RelayForwardDownlinkReq",
+          "description": "Pending relay downlink contents.\nThe pending downlink will be scheduled to the relay in either Rx1 or Rx2.\nThe pending downlink will be cleared after the scheduling attempt."
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server."
@@ -25204,6 +25548,141 @@
       "default": "REJOIN_TIME_0",
       "description": " - REJOIN_TIME_0: Every ~17.1 minutes.\n - REJOIN_TIME_1: Every ~34.1 minutes.\n - REJOIN_TIME_2: Every ~1.1 hours.\n - REJOIN_TIME_3: Every ~2.3 hours.\n - REJOIN_TIME_4: Every ~4.6 hours.\n - REJOIN_TIME_5: Every ~9.1 hours.\n - REJOIN_TIME_6: Every ~18.2 hours.\n - REJOIN_TIME_7: Every ~1.5 days.\n - REJOIN_TIME_8: Every ~3.0 days.\n - REJOIN_TIME_9: Every ~6.1 days.\n - REJOIN_TIME_10: Every ~12.1 days.\n - REJOIN_TIME_11: Every ~3.5 weeks.\n - REJOIN_TIME_12: Every ~1.6 months.\n - REJOIN_TIME_13: Every ~3.2 months.\n - REJOIN_TIME_14: Every ~6.4 months.\n - REJOIN_TIME_15: Every ~1.1 year."
     },
+    "v3RelayCADPeriodicity": {
+      "type": "string",
+      "enum": [
+        "RELAY_CAD_PERIODICITY_1_SECOND",
+        "RELAY_CAD_PERIODICITY_500_MILLISECONDS",
+        "RELAY_CAD_PERIODICITY_250_MILLISECONDS",
+        "RELAY_CAD_PERIODICITY_100_MILLISECONDS",
+        "RELAY_CAD_PERIODICITY_50_MILLISECONDS",
+        "RELAY_CAD_PERIODICITY_20_MILLISECONDS"
+      ],
+      "default": "RELAY_CAD_PERIODICITY_1_SECOND",
+      "title": "- RELAY_CAD_PERIODICITY_20_MILLISECONDS: sic"
+    },
+    "v3RelayCtrlUplinkListAction": {
+      "type": "string",
+      "enum": [
+        "RELAY_CTRL_UPLINK_LIST_ACTION_READ_W_F_CNT",
+        "RELAY_CTRL_UPLINK_LIST_ACTION_REMOVE_TRUSTED_END_DEVICE"
+      ],
+      "default": "RELAY_CTRL_UPLINK_LIST_ACTION_READ_W_F_CNT"
+    },
+    "v3RelayEndDeviceAlwaysMode": {
+      "type": "object"
+    },
+    "v3RelayEndDeviceControlledMode": {
+      "type": "object"
+    },
+    "v3RelayEndDeviceDynamicMode": {
+      "type": "object",
+      "properties": {
+        "smart_enable_level": {
+          "$ref": "#/definitions/v3RelaySmartEnableLevel",
+          "description": "The number of consecutive uplinks without a valid downlink before the end device attempts\nto use the relay mode to transmit messages."
+        }
+      }
+    },
+    "v3RelayForwardDownlinkReq": {
+      "type": "object",
+      "properties": {
+        "raw_payload": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v3RelayForwardLimits": {
+      "type": "object",
+      "properties": {
+        "bucket_size": {
+          "$ref": "#/definitions/v3RelayLimitBucketSize",
+          "description": "The multiplier used to compute the total bucket size for the limits.\nThe multiplier is multiplied by the reload rate in order to compute the total bucket size."
+        },
+        "reload_rate": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The number of tokens which are replenished in the bucket every hour."
+        }
+      }
+    },
+    "v3RelayLimitBucketSize": {
+      "type": "string",
+      "enum": [
+        "RELAY_LIMIT_BUCKET_SIZE_1",
+        "RELAY_LIMIT_BUCKET_SIZE_2",
+        "RELAY_LIMIT_BUCKET_SIZE_4",
+        "RELAY_LIMIT_BUCKET_SIZE_12"
+      ],
+      "default": "RELAY_LIMIT_BUCKET_SIZE_1",
+      "title": "- RELAY_LIMIT_BUCKET_SIZE_12: sic"
+    },
+    "v3RelayResetLimitCounter": {
+      "type": "string",
+      "enum": [
+        "RELAY_RESET_LIMIT_COUNTER_ZERO",
+        "RELAY_RESET_LIMIT_COUNTER_RELOAD_RATE",
+        "RELAY_RESET_LIMIT_COUNTER_MAX_VALUE",
+        "RELAY_RESET_LIMIT_COUNTER_NO_RESET"
+      ],
+      "default": "RELAY_RESET_LIMIT_COUNTER_ZERO"
+    },
+    "v3RelaySecondChAckOffset": {
+      "type": "string",
+      "enum": [
+        "RELAY_SECOND_CH_ACK_OFFSET_0",
+        "RELAY_SECOND_CH_ACK_OFFSET_200",
+        "RELAY_SECOND_CH_ACK_OFFSET_400",
+        "RELAY_SECOND_CH_ACK_OFFSET_800",
+        "RELAY_SECOND_CH_ACK_OFFSET_1600",
+        "RELAY_SECOND_CH_ACK_OFFSET_3200"
+      ],
+      "default": "RELAY_SECOND_CH_ACK_OFFSET_0",
+      "title": "- RELAY_SECOND_CH_ACK_OFFSET_0: 0 kHz\n - RELAY_SECOND_CH_ACK_OFFSET_200: 200 kHz\n - RELAY_SECOND_CH_ACK_OFFSET_400: 400 kHz\n - RELAY_SECOND_CH_ACK_OFFSET_800: 800 kHz\n - RELAY_SECOND_CH_ACK_OFFSET_1600: 1.6 MHz\n - RELAY_SECOND_CH_ACK_OFFSET_3200: 3.2 MHz"
+    },
+    "v3RelaySecondChannel": {
+      "type": "object",
+      "properties": {
+        "ack_offset": {
+          "$ref": "#/definitions/v3RelaySecondChAckOffset",
+          "description": "The frequency (Hz) offset used for the WOR acknowledgement."
+        },
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex",
+          "description": "The data rate index used by the WOR and WOR acknowledgement."
+        },
+        "frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The frequency (Hz) used by the wake on radio message."
+        }
+      }
+    },
+    "v3RelaySmartEnableLevel": {
+      "type": "string",
+      "enum": [
+        "RELAY_SMART_ENABLE_LEVEL_8",
+        "RELAY_SMART_ENABLE_LEVEL_16",
+        "RELAY_SMART_ENABLE_LEVEL_32",
+        "RELAY_SMART_ENABLE_LEVEL_64"
+      ],
+      "default": "RELAY_SMART_ENABLE_LEVEL_8"
+    },
+    "v3RelayUplinkForwardLimits": {
+      "type": "object",
+      "properties": {
+        "bucket_size": {
+          "$ref": "#/definitions/v3RelayLimitBucketSize",
+          "description": "The multiplier used to compute the total bucket size for the limits.\nThe multiplier is multiplied by the reload rate in order to compute the total bucket size."
+        },
+        "reload_rate": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The number of tokens which are replenished in the bucket every hour."
+        }
+      }
+    },
     "v3Right": {
       "type": "string",
       "enum": [
@@ -25387,6 +25866,66 @@
       "properties": {
         "email": {
           "type": "string"
+        }
+      }
+    },
+    "v3ServedRelayParameters": {
+      "type": "object",
+      "properties": {
+        "always": {
+          "$ref": "#/definitions/v3RelayEndDeviceAlwaysMode",
+          "description": "The end device will always attempt to use the relay mode in order to send uplink messages."
+        },
+        "dynamic": {
+          "$ref": "#/definitions/v3RelayEndDeviceDynamicMode",
+          "description": "The end device will attempt to use relay mode only after a number of uplink messages have been sent without\nreceiving a valid a downlink message."
+        },
+        "end_device_controlled": {
+          "$ref": "#/definitions/v3RelayEndDeviceControlledMode",
+          "description": "The end device will control when it uses the relay mode. This is the default mode."
+        },
+        "backoff": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of uplinks to be sent without a wake on radio frame."
+        },
+        "second_channel": {
+          "$ref": "#/definitions/v3RelaySecondChannel",
+          "description": "Second wake on radio channel configuration."
+        },
+        "serving_device_id": {
+          "type": "string",
+          "description": "End device identifier of the serving end device."
+        }
+      }
+    },
+    "v3ServingRelayParameters": {
+      "type": "object",
+      "properties": {
+        "second_channel": {
+          "$ref": "#/definitions/v3RelaySecondChannel",
+          "description": "Second wake on radio channel configuration."
+        },
+        "default_channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the default wake on radio channel."
+        },
+        "cad_periodicity": {
+          "$ref": "#/definitions/v3RelayCADPeriodicity",
+          "description": "Channel activity detection periodicity."
+        },
+        "uplink_forwarding_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ServingRelayParametersUplinkForwardingRule"
+          },
+          "description": "Configured uplink forwarding rules."
+        },
+        "limits": {
+          "$ref": "#/definitions/ServingRelayParametersForwardingLimits",
+          "description": "Configured forwarding limits.\nIf unset, the default value from Network Server configuration will be used."
         }
       }
     },

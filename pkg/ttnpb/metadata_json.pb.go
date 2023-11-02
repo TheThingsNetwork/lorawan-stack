@@ -84,6 +84,11 @@ func (x *RxMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("packet_broker")
 		x.PacketBroker.MarshalProtoJSON(s.WithField("packet_broker"))
 	}
+	if x.Relay != nil || s.HasField("relay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("relay")
+		x.Relay.MarshalProtoJSON(s.WithField("relay"))
+	}
 	if x.AntennaIndex != 0 || s.HasField("antenna_index") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("antenna_index")
@@ -240,6 +245,13 @@ func (x *RxMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.PacketBroker = &PacketBrokerMetadata{}
 			x.PacketBroker.UnmarshalProtoJSON(s.WithField("packet_broker", true))
+		case "relay":
+			if s.ReadNil() {
+				x.Relay = nil
+				return
+			}
+			x.Relay = &RelayMetadata{}
+			x.Relay.UnmarshalProtoJSON(s.WithField("relay", true))
 		case "antenna_index", "antennaIndex":
 			s.AddField("antenna_index")
 			x.AntennaIndex = s.ReadUint32()
@@ -569,5 +581,55 @@ func (x *PacketBrokerMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 
 // UnmarshalJSON unmarshals the PacketBrokerMetadata from JSON.
 func (x *PacketBrokerMetadata) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayMetadata message to JSON.
+func (x *RelayMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.DeviceId != "" || s.HasField("device_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("device_id")
+		s.WriteString(x.DeviceId)
+	}
+	if x.WorChannel != 0 || s.HasField("wor_channel") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("wor_channel")
+		x.WorChannel.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayMetadata to JSON.
+func (x *RelayMetadata) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayMetadata message from JSON.
+func (x *RelayMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "device_id", "deviceId":
+			s.AddField("device_id")
+			x.DeviceId = s.ReadString()
+		case "wor_channel", "worChannel":
+			s.AddField("wor_channel")
+			x.WorChannel.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayMetadata from JSON.
+func (x *RelayMetadata) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

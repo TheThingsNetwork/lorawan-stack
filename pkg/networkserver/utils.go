@@ -256,6 +256,9 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		case mac.ContainsStickyMACCommand(dev.MacState.RecentMacCommandIdentifiers...):
 			logger.Debug("Sticky MAC response received, choose class A downlink slot")
 			return classA, true
+		case dev.MacState.PendingRelayDownlink != nil:
+			logger.Debug("Pending relay downlink, choose class A downlink slot")
+			return classA, true
 		case mac.DeviceNeedsADRParamSetupReq(dev, phy):
 			logger.Debug("Device needs ADRParamSetupReq, choose class A downlink slot")
 			return classA, true
@@ -294,6 +297,21 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 			return classA, true
 		case mac.DeviceNeedsTxParamSetupReq(dev, phy):
 			logger.Debug("Device needs TxParamSetupReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayConfReq(dev):
+			logger.Debug("Device needs RelayConfReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayEndDeviceConfReq(dev):
+			logger.Debug("Device needs RelayEndDeviceConfReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayUpdateUplinkListReq(dev):
+			logger.Debug("Device needs RelayUpdateUplinkListReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayCtrlUplinkListReq(dev):
+			logger.Debug("Device needs RelayCtrlUplinkListReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayConfigureFwdLimitReq(dev):
+			logger.Debug("Device needs RelayConfigureFwdLimitReq, choose class A downlink slot")
 			return classA, true
 		}
 	}

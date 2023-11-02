@@ -558,27 +558,34 @@ func (x MACCommandIdentifier) MarshalJSON() ([]byte, error) {
 
 // MACCommandIdentifier_customvalue contains custom string values that extend MACCommandIdentifier_value.
 var MACCommandIdentifier_customvalue = map[string]int32{
-	"RFU_0":              0,
-	"RESET":              1,
-	"LINK_CHECK":         2,
-	"LINK_ADR":           3,
-	"DUTY_CYCLE":         4,
-	"RX_PARAM_SETUP":     5,
-	"DEV_STATUS":         6,
-	"NEW_CHANNEL":        7,
-	"RX_TIMING_SETUP":    8,
-	"TX_PARAM_SETUP":     9,
-	"DL_CHANNEL":         10,
-	"REKEY":              11,
-	"ADR_PARAM_SETUP":    12,
-	"DEVICE_TIME":        13,
-	"FORCE_REJOIN":       14,
-	"REJOIN_PARAM_SETUP": 15,
-	"PING_SLOT_INFO":     16,
-	"PING_SLOT_CHANNEL":  17,
-	"BEACON_TIMING":      18,
-	"BEACON_FREQ":        19,
-	"DEVICE_MODE":        32,
+	"RFU_0":                       0,
+	"RESET":                       1,
+	"LINK_CHECK":                  2,
+	"LINK_ADR":                    3,
+	"DUTY_CYCLE":                  4,
+	"RX_PARAM_SETUP":              5,
+	"DEV_STATUS":                  6,
+	"NEW_CHANNEL":                 7,
+	"RX_TIMING_SETUP":             8,
+	"TX_PARAM_SETUP":              9,
+	"DL_CHANNEL":                  10,
+	"REKEY":                       11,
+	"ADR_PARAM_SETUP":             12,
+	"DEVICE_TIME":                 13,
+	"FORCE_REJOIN":                14,
+	"REJOIN_PARAM_SETUP":          15,
+	"PING_SLOT_INFO":              16,
+	"PING_SLOT_CHANNEL":           17,
+	"BEACON_TIMING":               18,
+	"BEACON_FREQ":                 19,
+	"DEVICE_MODE":                 32,
+	"RELAY_CONF":                  64,
+	"RELAY_END_DEVICE_CONF":       65,
+	"RELAY_FILTER_LIST":           66,
+	"RELAY_UPDATE_UPLINK_LIST":    67,
+	"RELAY_CTRL_UPLINK_LIST":      68,
+	"RELAY_CONFIGURE_FWD_LIMIT":   69,
+	"RELAY_NOTIFY_NEW_END_DEVICE": 70,
 }
 
 // UnmarshalProtoJSON unmarshals the MACCommandIdentifier from JSON.
@@ -603,6 +610,342 @@ func (x *MACCommandIdentifier) UnmarshalText(b []byte) error {
 
 // UnmarshalJSON unmarshals the MACCommandIdentifier from JSON.
 func (x *MACCommandIdentifier) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayCADPeriodicity to JSON.
+func (x RelayCADPeriodicity) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), RelayCADPeriodicity_name)
+}
+
+// MarshalText marshals the RelayCADPeriodicity to text.
+func (x RelayCADPeriodicity) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), RelayCADPeriodicity_name)), nil
+}
+
+// MarshalJSON marshals the RelayCADPeriodicity to JSON.
+func (x RelayCADPeriodicity) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// RelayCADPeriodicity_customvalue contains custom string values that extend RelayCADPeriodicity_value.
+var RelayCADPeriodicity_customvalue = map[string]int32{
+	"1_SECOND":         0,
+	"500_MILLISECONDS": 1,
+	"250_MILLISECONDS": 2,
+	"100_MILLISECONDS": 3,
+	"50_MILLISECONDS":  4,
+	"20_MILLISECONDS":  5,
+}
+
+// UnmarshalProtoJSON unmarshals the RelayCADPeriodicity from JSON.
+func (x *RelayCADPeriodicity) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(RelayCADPeriodicity_value, RelayCADPeriodicity_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RelayCADPeriodicity enum: %v", err)
+		return
+	}
+	*x = RelayCADPeriodicity(v)
+}
+
+// UnmarshalText unmarshals the RelayCADPeriodicity from text.
+func (x *RelayCADPeriodicity) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), RelayCADPeriodicity_customvalue, RelayCADPeriodicity_value)
+	if err != nil {
+		return err
+	}
+	*x = RelayCADPeriodicity(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RelayCADPeriodicity from JSON.
+func (x *RelayCADPeriodicity) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelaySecondChAckOffset to JSON.
+func (x RelaySecondChAckOffset) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), RelaySecondChAckOffset_name)
+}
+
+// MarshalText marshals the RelaySecondChAckOffset to text.
+func (x RelaySecondChAckOffset) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), RelaySecondChAckOffset_name)), nil
+}
+
+// MarshalJSON marshals the RelaySecondChAckOffset to JSON.
+func (x RelaySecondChAckOffset) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// RelaySecondChAckOffset_customvalue contains custom string values that extend RelaySecondChAckOffset_value.
+var RelaySecondChAckOffset_customvalue = map[string]int32{
+	"0":    0,
+	"200":  1,
+	"400":  2,
+	"800":  3,
+	"1600": 4,
+	"3200": 5,
+}
+
+// UnmarshalProtoJSON unmarshals the RelaySecondChAckOffset from JSON.
+func (x *RelaySecondChAckOffset) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(RelaySecondChAckOffset_value, RelaySecondChAckOffset_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RelaySecondChAckOffset enum: %v", err)
+		return
+	}
+	*x = RelaySecondChAckOffset(v)
+}
+
+// UnmarshalText unmarshals the RelaySecondChAckOffset from text.
+func (x *RelaySecondChAckOffset) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), RelaySecondChAckOffset_customvalue, RelaySecondChAckOffset_value)
+	if err != nil {
+		return err
+	}
+	*x = RelaySecondChAckOffset(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RelaySecondChAckOffset from JSON.
+func (x *RelaySecondChAckOffset) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayLimitBucketSize to JSON.
+func (x RelayLimitBucketSize) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), RelayLimitBucketSize_name)
+}
+
+// MarshalText marshals the RelayLimitBucketSize to text.
+func (x RelayLimitBucketSize) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), RelayLimitBucketSize_name)), nil
+}
+
+// MarshalJSON marshals the RelayLimitBucketSize to JSON.
+func (x RelayLimitBucketSize) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// RelayLimitBucketSize_customvalue contains custom string values that extend RelayLimitBucketSize_value.
+var RelayLimitBucketSize_customvalue = map[string]int32{
+	"1":  0,
+	"2":  1,
+	"4":  2,
+	"12": 3,
+}
+
+// UnmarshalProtoJSON unmarshals the RelayLimitBucketSize from JSON.
+func (x *RelayLimitBucketSize) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(RelayLimitBucketSize_value, RelayLimitBucketSize_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RelayLimitBucketSize enum: %v", err)
+		return
+	}
+	*x = RelayLimitBucketSize(v)
+}
+
+// UnmarshalText unmarshals the RelayLimitBucketSize from text.
+func (x *RelayLimitBucketSize) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), RelayLimitBucketSize_customvalue, RelayLimitBucketSize_value)
+	if err != nil {
+		return err
+	}
+	*x = RelayLimitBucketSize(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RelayLimitBucketSize from JSON.
+func (x *RelayLimitBucketSize) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelaySmartEnableLevel to JSON.
+func (x RelaySmartEnableLevel) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), RelaySmartEnableLevel_name)
+}
+
+// MarshalText marshals the RelaySmartEnableLevel to text.
+func (x RelaySmartEnableLevel) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), RelaySmartEnableLevel_name)), nil
+}
+
+// MarshalJSON marshals the RelaySmartEnableLevel to JSON.
+func (x RelaySmartEnableLevel) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// RelaySmartEnableLevel_customvalue contains custom string values that extend RelaySmartEnableLevel_value.
+var RelaySmartEnableLevel_customvalue = map[string]int32{
+	"8":  0,
+	"16": 1,
+	"32": 2,
+	"64": 3,
+}
+
+// UnmarshalProtoJSON unmarshals the RelaySmartEnableLevel from JSON.
+func (x *RelaySmartEnableLevel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(RelaySmartEnableLevel_value, RelaySmartEnableLevel_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RelaySmartEnableLevel enum: %v", err)
+		return
+	}
+	*x = RelaySmartEnableLevel(v)
+}
+
+// UnmarshalText unmarshals the RelaySmartEnableLevel from text.
+func (x *RelaySmartEnableLevel) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), RelaySmartEnableLevel_customvalue, RelaySmartEnableLevel_value)
+	if err != nil {
+		return err
+	}
+	*x = RelaySmartEnableLevel(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RelaySmartEnableLevel from JSON.
+func (x *RelaySmartEnableLevel) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayWORChannel to JSON.
+func (x RelayWORChannel) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), RelayWORChannel_name)
+}
+
+// MarshalText marshals the RelayWORChannel to text.
+func (x RelayWORChannel) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), RelayWORChannel_name)), nil
+}
+
+// MarshalJSON marshals the RelayWORChannel to JSON.
+func (x RelayWORChannel) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// RelayWORChannel_customvalue contains custom string values that extend RelayWORChannel_value.
+var RelayWORChannel_customvalue = map[string]int32{
+	"DEFAULT":   0,
+	"SECONDARY": 1,
+}
+
+// UnmarshalProtoJSON unmarshals the RelayWORChannel from JSON.
+func (x *RelayWORChannel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(RelayWORChannel_value, RelayWORChannel_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RelayWORChannel enum: %v", err)
+		return
+	}
+	*x = RelayWORChannel(v)
+}
+
+// UnmarshalText unmarshals the RelayWORChannel from text.
+func (x *RelayWORChannel) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), RelayWORChannel_customvalue, RelayWORChannel_value)
+	if err != nil {
+		return err
+	}
+	*x = RelayWORChannel(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RelayWORChannel from JSON.
+func (x *RelayWORChannel) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayResetLimitCounter to JSON.
+func (x RelayResetLimitCounter) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), RelayResetLimitCounter_name)
+}
+
+// MarshalText marshals the RelayResetLimitCounter to text.
+func (x RelayResetLimitCounter) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), RelayResetLimitCounter_name)), nil
+}
+
+// MarshalJSON marshals the RelayResetLimitCounter to JSON.
+func (x RelayResetLimitCounter) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// RelayResetLimitCounter_customvalue contains custom string values that extend RelayResetLimitCounter_value.
+var RelayResetLimitCounter_customvalue = map[string]int32{
+	"ZERO":        0,
+	"RELOAD_RATE": 1,
+	"MAX_VALUE":   2,
+	"NO_RESET":    3,
+}
+
+// UnmarshalProtoJSON unmarshals the RelayResetLimitCounter from JSON.
+func (x *RelayResetLimitCounter) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(RelayResetLimitCounter_value, RelayResetLimitCounter_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RelayResetLimitCounter enum: %v", err)
+		return
+	}
+	*x = RelayResetLimitCounter(v)
+}
+
+// UnmarshalText unmarshals the RelayResetLimitCounter from text.
+func (x *RelayResetLimitCounter) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), RelayResetLimitCounter_customvalue, RelayResetLimitCounter_value)
+	if err != nil {
+		return err
+	}
+	*x = RelayResetLimitCounter(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RelayResetLimitCounter from JSON.
+func (x *RelayResetLimitCounter) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayCtrlUplinkListAction to JSON.
+func (x RelayCtrlUplinkListAction) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), RelayCtrlUplinkListAction_name)
+}
+
+// MarshalText marshals the RelayCtrlUplinkListAction to text.
+func (x RelayCtrlUplinkListAction) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), RelayCtrlUplinkListAction_name)), nil
+}
+
+// MarshalJSON marshals the RelayCtrlUplinkListAction to JSON.
+func (x RelayCtrlUplinkListAction) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// RelayCtrlUplinkListAction_customvalue contains custom string values that extend RelayCtrlUplinkListAction_value.
+var RelayCtrlUplinkListAction_customvalue = map[string]int32{
+	"READ_W_F_CNT":              0,
+	"REMOVE_TRUSTED_END_DEVICE": 1,
+}
+
+// UnmarshalProtoJSON unmarshals the RelayCtrlUplinkListAction from JSON.
+func (x *RelayCtrlUplinkListAction) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(RelayCtrlUplinkListAction_value, RelayCtrlUplinkListAction_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RelayCtrlUplinkListAction enum: %v", err)
+		return
+	}
+	*x = RelayCtrlUplinkListAction(v)
+}
+
+// UnmarshalText unmarshals the RelayCtrlUplinkListAction from text.
+func (x *RelayCtrlUplinkListAction) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), RelayCtrlUplinkListAction_customvalue, RelayCtrlUplinkListAction_value)
+	if err != nil {
+		return err
+	}
+	*x = RelayCtrlUplinkListAction(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RelayCtrlUplinkListAction from JSON.
+func (x *RelayCtrlUplinkListAction) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -2329,6 +2672,206 @@ func (x *TxRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the RelaySecondChannel message to JSON.
+func (x *RelaySecondChannel) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.AckOffset != 0 || s.HasField("ack_offset") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ack_offset")
+		x.AckOffset.MarshalProtoJSON(s)
+	}
+	if x.DataRateIndex != 0 || s.HasField("data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("data_rate_index")
+		x.DataRateIndex.MarshalProtoJSON(s)
+	}
+	if x.Frequency != 0 || s.HasField("frequency") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("frequency")
+		s.WriteUint64(x.Frequency)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelaySecondChannel to JSON.
+func (x *RelaySecondChannel) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelaySecondChannel message from JSON.
+func (x *RelaySecondChannel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ack_offset", "ackOffset":
+			s.AddField("ack_offset")
+			x.AckOffset.UnmarshalProtoJSON(s)
+		case "data_rate_index", "dataRateIndex":
+			s.AddField("data_rate_index")
+			x.DataRateIndex.UnmarshalProtoJSON(s)
+		case "frequency":
+			s.AddField("frequency")
+			x.Frequency = s.ReadUint64()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelaySecondChannel from JSON.
+func (x *RelaySecondChannel) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayUplinkForwardLimits message to JSON.
+func (x *RelayUplinkForwardLimits) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.BucketSize != 0 || s.HasField("bucket_size") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("bucket_size")
+		x.BucketSize.MarshalProtoJSON(s)
+	}
+	if x.ReloadRate != 0 || s.HasField("reload_rate") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("reload_rate")
+		s.WriteUint32(x.ReloadRate)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayUplinkForwardLimits to JSON.
+func (x *RelayUplinkForwardLimits) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayUplinkForwardLimits message from JSON.
+func (x *RelayUplinkForwardLimits) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "bucket_size", "bucketSize":
+			s.AddField("bucket_size")
+			x.BucketSize.UnmarshalProtoJSON(s)
+		case "reload_rate", "reloadRate":
+			s.AddField("reload_rate")
+			x.ReloadRate = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayUplinkForwardLimits from JSON.
+func (x *RelayUplinkForwardLimits) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayForwardLimits message to JSON.
+func (x *RelayForwardLimits) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.BucketSize != 0 || s.HasField("bucket_size") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("bucket_size")
+		x.BucketSize.MarshalProtoJSON(s)
+	}
+	if x.ReloadRate != 0 || s.HasField("reload_rate") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("reload_rate")
+		s.WriteUint32(x.ReloadRate)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayForwardLimits to JSON.
+func (x *RelayForwardLimits) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayForwardLimits message from JSON.
+func (x *RelayForwardLimits) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "bucket_size", "bucketSize":
+			s.AddField("bucket_size")
+			x.BucketSize.UnmarshalProtoJSON(s)
+		case "reload_rate", "reloadRate":
+			s.AddField("reload_rate")
+			x.ReloadRate = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayForwardLimits from JSON.
+func (x *RelayForwardLimits) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayEndDeviceDynamicMode message to JSON.
+func (x *RelayEndDeviceDynamicMode) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.SmartEnableLevel != 0 || s.HasField("smart_enable_level") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("smart_enable_level")
+		x.SmartEnableLevel.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayEndDeviceDynamicMode to JSON.
+func (x *RelayEndDeviceDynamicMode) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayEndDeviceDynamicMode message from JSON.
+func (x *RelayEndDeviceDynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "smart_enable_level", "smartEnableLevel":
+			s.AddField("smart_enable_level")
+			x.SmartEnableLevel.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayEndDeviceDynamicMode from JSON.
+func (x *RelayEndDeviceDynamicMode) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the MACCommand_ResetInd message to JSON.
 func (x *MACCommand_ResetInd) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -3183,6 +3726,565 @@ func (x *MACCommand_DeviceModeConf) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the MACCommand_RelayConfReq_Configuration message to JSON.
+func (x *MACCommand_RelayConfReq_Configuration) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.SecondChannel != nil || s.HasField("second_channel") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("second_channel")
+		x.SecondChannel.MarshalProtoJSON(s.WithField("second_channel"))
+	}
+	if x.DefaultChannelIndex != 0 || s.HasField("default_channel_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("default_channel_index")
+		s.WriteUint32(x.DefaultChannelIndex)
+	}
+	if x.CadPeriodicity != 0 || s.HasField("cad_periodicity") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cad_periodicity")
+		x.CadPeriodicity.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommand_RelayConfReq_Configuration to JSON.
+func (x *MACCommand_RelayConfReq_Configuration) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommand_RelayConfReq_Configuration message from JSON.
+func (x *MACCommand_RelayConfReq_Configuration) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "second_channel", "secondChannel":
+			if s.ReadNil() {
+				x.SecondChannel = nil
+				return
+			}
+			x.SecondChannel = &RelaySecondChannel{}
+			x.SecondChannel.UnmarshalProtoJSON(s.WithField("second_channel", true))
+		case "default_channel_index", "defaultChannelIndex":
+			s.AddField("default_channel_index")
+			x.DefaultChannelIndex = s.ReadUint32()
+		case "cad_periodicity", "cadPeriodicity":
+			s.AddField("cad_periodicity")
+			x.CadPeriodicity.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommand_RelayConfReq_Configuration from JSON.
+func (x *MACCommand_RelayConfReq_Configuration) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACCommand_RelayConfReq message to JSON.
+func (x *MACCommand_RelayConfReq) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Configuration != nil || s.HasField("configuration") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("configuration")
+		x.Configuration.MarshalProtoJSON(s.WithField("configuration"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommand_RelayConfReq to JSON.
+func (x *MACCommand_RelayConfReq) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommand_RelayConfReq message from JSON.
+func (x *MACCommand_RelayConfReq) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "configuration":
+			if s.ReadNil() {
+				x.Configuration = nil
+				return
+			}
+			x.Configuration = &MACCommand_RelayConfReq_Configuration{}
+			x.Configuration.UnmarshalProtoJSON(s.WithField("configuration", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommand_RelayConfReq from JSON.
+func (x *MACCommand_RelayConfReq) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACCommand_RelayEndDeviceConfReq_Configuration message to JSON.
+func (x *MACCommand_RelayEndDeviceConfReq_Configuration) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Mode != nil {
+		switch ov := x.Mode.(type) {
+		case *MACCommand_RelayEndDeviceConfReq_Configuration_Always:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("always")
+			// NOTE: RelayEndDeviceAlwaysMode does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.Always)
+		case *MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("dynamic")
+			ov.Dynamic.MarshalProtoJSON(s.WithField("dynamic"))
+		case *MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("end_device_controlled")
+			// NOTE: RelayEndDeviceControlledMode does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.EndDeviceControlled)
+		}
+	}
+	if x.Backoff != 0 || s.HasField("backoff") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("backoff")
+		s.WriteUint32(x.Backoff)
+	}
+	if x.SecondChannel != nil || s.HasField("second_channel") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("second_channel")
+		x.SecondChannel.MarshalProtoJSON(s.WithField("second_channel"))
+	}
+	if x.ServingDeviceId != "" || s.HasField("serving_device_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("serving_device_id")
+		s.WriteString(x.ServingDeviceId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommand_RelayEndDeviceConfReq_Configuration to JSON.
+func (x *MACCommand_RelayEndDeviceConfReq_Configuration) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommand_RelayEndDeviceConfReq_Configuration message from JSON.
+func (x *MACCommand_RelayEndDeviceConfReq_Configuration) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "always":
+			s.AddField("always")
+			ov := &MACCommand_RelayEndDeviceConfReq_Configuration_Always{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Always = nil
+				return
+			}
+			// NOTE: RelayEndDeviceAlwaysMode does not seem to implement UnmarshalProtoJSON.
+			var v RelayEndDeviceAlwaysMode
+			golang.UnmarshalMessage(s, &v)
+			ov.Always = &v
+		case "dynamic":
+			ov := &MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Dynamic = nil
+				return
+			}
+			ov.Dynamic = &RelayEndDeviceDynamicMode{}
+			ov.Dynamic.UnmarshalProtoJSON(s.WithField("dynamic", true))
+		case "end_device_controlled", "endDeviceControlled":
+			s.AddField("end_device_controlled")
+			ov := &MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.EndDeviceControlled = nil
+				return
+			}
+			// NOTE: RelayEndDeviceControlledMode does not seem to implement UnmarshalProtoJSON.
+			var v RelayEndDeviceControlledMode
+			golang.UnmarshalMessage(s, &v)
+			ov.EndDeviceControlled = &v
+		case "backoff":
+			s.AddField("backoff")
+			x.Backoff = s.ReadUint32()
+		case "second_channel", "secondChannel":
+			if s.ReadNil() {
+				x.SecondChannel = nil
+				return
+			}
+			x.SecondChannel = &RelaySecondChannel{}
+			x.SecondChannel.UnmarshalProtoJSON(s.WithField("second_channel", true))
+		case "serving_device_id", "servingDeviceId":
+			s.AddField("serving_device_id")
+			x.ServingDeviceId = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommand_RelayEndDeviceConfReq_Configuration from JSON.
+func (x *MACCommand_RelayEndDeviceConfReq_Configuration) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACCommand_RelayEndDeviceConfReq message to JSON.
+func (x *MACCommand_RelayEndDeviceConfReq) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Configuration != nil || s.HasField("configuration") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("configuration")
+		x.Configuration.MarshalProtoJSON(s.WithField("configuration"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommand_RelayEndDeviceConfReq to JSON.
+func (x *MACCommand_RelayEndDeviceConfReq) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommand_RelayEndDeviceConfReq message from JSON.
+func (x *MACCommand_RelayEndDeviceConfReq) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "configuration":
+			if s.ReadNil() {
+				x.Configuration = nil
+				return
+			}
+			x.Configuration = &MACCommand_RelayEndDeviceConfReq_Configuration{}
+			x.Configuration.UnmarshalProtoJSON(s.WithField("configuration", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommand_RelayEndDeviceConfReq from JSON.
+func (x *MACCommand_RelayEndDeviceConfReq) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACCommand_RelayUpdateUplinkListReq message to JSON.
+func (x *MACCommand_RelayUpdateUplinkListReq) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.RuleIndex != 0 || s.HasField("rule_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rule_index")
+		s.WriteUint32(x.RuleIndex)
+	}
+	if x.ForwardLimits != nil || s.HasField("forward_limits") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("forward_limits")
+		x.ForwardLimits.MarshalProtoJSON(s.WithField("forward_limits"))
+	}
+	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr")
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
+	}
+	if x.WFCnt != 0 || s.HasField("w_f_cnt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("w_f_cnt")
+		s.WriteUint32(x.WFCnt)
+	}
+	if len(x.RootWorSKey) > 0 || s.HasField("root_wor_s_key") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("root_wor_s_key")
+		types.MarshalHEXBytes(s.WithField("root_wor_s_key"), x.RootWorSKey)
+	}
+	if x.DeviceId != "" || s.HasField("device_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("device_id")
+		s.WriteString(x.DeviceId)
+	}
+	if len(x.SessionKeyId) > 0 || s.HasField("session_key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_key_id")
+		s.WriteBytes(x.SessionKeyId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommand_RelayUpdateUplinkListReq to JSON.
+func (x *MACCommand_RelayUpdateUplinkListReq) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommand_RelayUpdateUplinkListReq message from JSON.
+func (x *MACCommand_RelayUpdateUplinkListReq) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "rule_index", "ruleIndex":
+			s.AddField("rule_index")
+			x.RuleIndex = s.ReadUint32()
+		case "forward_limits", "forwardLimits":
+			if s.ReadNil() {
+				x.ForwardLimits = nil
+				return
+			}
+			x.ForwardLimits = &RelayUplinkForwardLimits{}
+			x.ForwardLimits.UnmarshalProtoJSON(s.WithField("forward_limits", true))
+		case "dev_addr", "devAddr":
+			s.AddField("dev_addr")
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
+		case "w_f_cnt", "wFCnt":
+			s.AddField("w_f_cnt")
+			x.WFCnt = s.ReadUint32()
+		case "root_wor_s_key", "rootWorSKey":
+			s.AddField("root_wor_s_key")
+			x.RootWorSKey = types.Unmarshal16Bytes(s.WithField("root_wor_s_key", false))
+		case "device_id", "deviceId":
+			s.AddField("device_id")
+			x.DeviceId = s.ReadString()
+		case "session_key_id", "sessionKeyId":
+			s.AddField("session_key_id")
+			x.SessionKeyId = s.ReadBytes()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommand_RelayUpdateUplinkListReq from JSON.
+func (x *MACCommand_RelayUpdateUplinkListReq) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACCommand_RelayCtrlUplinkListReq message to JSON.
+func (x *MACCommand_RelayCtrlUplinkListReq) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.RuleIndex != 0 || s.HasField("rule_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rule_index")
+		s.WriteUint32(x.RuleIndex)
+	}
+	if x.Action != 0 || s.HasField("action") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("action")
+		x.Action.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommand_RelayCtrlUplinkListReq to JSON.
+func (x *MACCommand_RelayCtrlUplinkListReq) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommand_RelayCtrlUplinkListReq message from JSON.
+func (x *MACCommand_RelayCtrlUplinkListReq) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "rule_index", "ruleIndex":
+			s.AddField("rule_index")
+			x.RuleIndex = s.ReadUint32()
+		case "action":
+			s.AddField("action")
+			x.Action.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommand_RelayCtrlUplinkListReq from JSON.
+func (x *MACCommand_RelayCtrlUplinkListReq) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACCommand_RelayConfigureFwdLimitReq message to JSON.
+func (x *MACCommand_RelayConfigureFwdLimitReq) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.ResetLimitCounter != 0 || s.HasField("reset_limit_counter") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("reset_limit_counter")
+		x.ResetLimitCounter.MarshalProtoJSON(s)
+	}
+	if x.JoinRequestLimits != nil || s.HasField("join_request_limits") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("join_request_limits")
+		x.JoinRequestLimits.MarshalProtoJSON(s.WithField("join_request_limits"))
+	}
+	if x.NotifyLimits != nil || s.HasField("notify_limits") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("notify_limits")
+		x.NotifyLimits.MarshalProtoJSON(s.WithField("notify_limits"))
+	}
+	if x.GlobalUplinkLimits != nil || s.HasField("global_uplink_limits") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("global_uplink_limits")
+		x.GlobalUplinkLimits.MarshalProtoJSON(s.WithField("global_uplink_limits"))
+	}
+	if x.OverallLimits != nil || s.HasField("overall_limits") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("overall_limits")
+		x.OverallLimits.MarshalProtoJSON(s.WithField("overall_limits"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommand_RelayConfigureFwdLimitReq to JSON.
+func (x *MACCommand_RelayConfigureFwdLimitReq) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommand_RelayConfigureFwdLimitReq message from JSON.
+func (x *MACCommand_RelayConfigureFwdLimitReq) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "reset_limit_counter", "resetLimitCounter":
+			s.AddField("reset_limit_counter")
+			x.ResetLimitCounter.UnmarshalProtoJSON(s)
+		case "join_request_limits", "joinRequestLimits":
+			if s.ReadNil() {
+				x.JoinRequestLimits = nil
+				return
+			}
+			x.JoinRequestLimits = &RelayForwardLimits{}
+			x.JoinRequestLimits.UnmarshalProtoJSON(s.WithField("join_request_limits", true))
+		case "notify_limits", "notifyLimits":
+			if s.ReadNil() {
+				x.NotifyLimits = nil
+				return
+			}
+			x.NotifyLimits = &RelayForwardLimits{}
+			x.NotifyLimits.UnmarshalProtoJSON(s.WithField("notify_limits", true))
+		case "global_uplink_limits", "globalUplinkLimits":
+			if s.ReadNil() {
+				x.GlobalUplinkLimits = nil
+				return
+			}
+			x.GlobalUplinkLimits = &RelayForwardLimits{}
+			x.GlobalUplinkLimits.UnmarshalProtoJSON(s.WithField("global_uplink_limits", true))
+		case "overall_limits", "overallLimits":
+			if s.ReadNil() {
+				x.OverallLimits = nil
+				return
+			}
+			x.OverallLimits = &RelayForwardLimits{}
+			x.OverallLimits.UnmarshalProtoJSON(s.WithField("overall_limits", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommand_RelayConfigureFwdLimitReq from JSON.
+func (x *MACCommand_RelayConfigureFwdLimitReq) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the MACCommand_RelayNotifyNewEndDeviceReq message to JSON.
+func (x *MACCommand_RelayNotifyNewEndDeviceReq) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr")
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
+	}
+	if x.Snr != 0 || s.HasField("snr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("snr")
+		s.WriteInt32(x.Snr)
+	}
+	if x.Rssi != 0 || s.HasField("rssi") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rssi")
+		s.WriteInt32(x.Rssi)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACCommand_RelayNotifyNewEndDeviceReq to JSON.
+func (x *MACCommand_RelayNotifyNewEndDeviceReq) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACCommand_RelayNotifyNewEndDeviceReq message from JSON.
+func (x *MACCommand_RelayNotifyNewEndDeviceReq) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_addr", "devAddr":
+			s.AddField("dev_addr")
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
+		case "snr":
+			s.AddField("snr")
+			x.Snr = s.ReadInt32()
+		case "rssi":
+			s.AddField("rssi")
+			x.Rssi = s.ReadInt32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACCommand_RelayNotifyNewEndDeviceReq from JSON.
+func (x *MACCommand_RelayNotifyNewEndDeviceReq) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the MACCommand message to JSON.
 func (x *MACCommand) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -3335,6 +4437,55 @@ func (x *MACCommand) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("device_mode_conf")
 			ov.DeviceModeConf.MarshalProtoJSON(s.WithField("device_mode_conf"))
+		case *MACCommand_RelayConfReq_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_conf_req")
+			ov.RelayConfReq.MarshalProtoJSON(s.WithField("relay_conf_req"))
+		case *MACCommand_RelayConfAns_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_conf_ans")
+			// NOTE: MACCommand_RelayConfAns does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.RelayConfAns)
+		case *MACCommand_RelayEndDeviceConfReq_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_end_device_conf_req")
+			ov.RelayEndDeviceConfReq.MarshalProtoJSON(s.WithField("relay_end_device_conf_req"))
+		case *MACCommand_RelayEndDeviceConfAns_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_end_device_conf_ans")
+			// NOTE: MACCommand_RelayEndDeviceConfAns does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.RelayEndDeviceConfAns)
+		case *MACCommand_RelayUpdateUplinkListReq_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_update_uplink_list_req")
+			ov.RelayUpdateUplinkListReq.MarshalProtoJSON(s.WithField("relay_update_uplink_list_req"))
+		case *MACCommand_RelayUpdateUplinkListAns_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_update_uplink_list_ans")
+			// NOTE: MACCommand_RelayUpdateUplinkListAns does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.RelayUpdateUplinkListAns)
+		case *MACCommand_RelayCtrlUplinkListReq_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_ctrl_uplink_list_req")
+			ov.RelayCtrlUplinkListReq.MarshalProtoJSON(s.WithField("relay_ctrl_uplink_list_req"))
+		case *MACCommand_RelayCtrlUplinkListAns_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_ctrl_uplink_list_ans")
+			// NOTE: MACCommand_RelayCtrlUplinkListAns does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.RelayCtrlUplinkListAns)
+		case *MACCommand_RelayConfigureFwdLimitReq_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_configure_fwd_limit_req")
+			ov.RelayConfigureFwdLimitReq.MarshalProtoJSON(s.WithField("relay_configure_fwd_limit_req"))
+		case *MACCommand_RelayConfigureFwdLimitAns_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_configure_fwd_limit_ans")
+			// NOTE: MACCommand_RelayConfigureFwdLimitAns does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.RelayConfigureFwdLimitAns)
+		case *MACCommand_RelayNotifyNewEndDeviceReq_:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("relay_notify_new_end_device_req")
+			ov.RelayNotifyNewEndDeviceReq.MarshalProtoJSON(s.WithField("relay_notify_new_end_device_req"))
 		}
 	}
 	s.WriteObjectEnd()
@@ -3671,6 +4822,120 @@ func (x *MACCommand) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			ov.DeviceModeConf = &MACCommand_DeviceModeConf{}
 			ov.DeviceModeConf.UnmarshalProtoJSON(s.WithField("device_mode_conf", true))
+		case "relay_conf_req", "relayConfReq":
+			ov := &MACCommand_RelayConfReq_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayConfReq = nil
+				return
+			}
+			ov.RelayConfReq = &MACCommand_RelayConfReq{}
+			ov.RelayConfReq.UnmarshalProtoJSON(s.WithField("relay_conf_req", true))
+		case "relay_conf_ans", "relayConfAns":
+			s.AddField("relay_conf_ans")
+			ov := &MACCommand_RelayConfAns_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayConfAns = nil
+				return
+			}
+			// NOTE: MACCommand_RelayConfAns does not seem to implement UnmarshalProtoJSON.
+			var v MACCommand_RelayConfAns
+			golang.UnmarshalMessage(s, &v)
+			ov.RelayConfAns = &v
+		case "relay_end_device_conf_req", "relayEndDeviceConfReq":
+			ov := &MACCommand_RelayEndDeviceConfReq_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayEndDeviceConfReq = nil
+				return
+			}
+			ov.RelayEndDeviceConfReq = &MACCommand_RelayEndDeviceConfReq{}
+			ov.RelayEndDeviceConfReq.UnmarshalProtoJSON(s.WithField("relay_end_device_conf_req", true))
+		case "relay_end_device_conf_ans", "relayEndDeviceConfAns":
+			s.AddField("relay_end_device_conf_ans")
+			ov := &MACCommand_RelayEndDeviceConfAns_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayEndDeviceConfAns = nil
+				return
+			}
+			// NOTE: MACCommand_RelayEndDeviceConfAns does not seem to implement UnmarshalProtoJSON.
+			var v MACCommand_RelayEndDeviceConfAns
+			golang.UnmarshalMessage(s, &v)
+			ov.RelayEndDeviceConfAns = &v
+		case "relay_update_uplink_list_req", "relayUpdateUplinkListReq":
+			ov := &MACCommand_RelayUpdateUplinkListReq_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayUpdateUplinkListReq = nil
+				return
+			}
+			ov.RelayUpdateUplinkListReq = &MACCommand_RelayUpdateUplinkListReq{}
+			ov.RelayUpdateUplinkListReq.UnmarshalProtoJSON(s.WithField("relay_update_uplink_list_req", true))
+		case "relay_update_uplink_list_ans", "relayUpdateUplinkListAns":
+			s.AddField("relay_update_uplink_list_ans")
+			ov := &MACCommand_RelayUpdateUplinkListAns_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayUpdateUplinkListAns = nil
+				return
+			}
+			// NOTE: MACCommand_RelayUpdateUplinkListAns does not seem to implement UnmarshalProtoJSON.
+			var v MACCommand_RelayUpdateUplinkListAns
+			golang.UnmarshalMessage(s, &v)
+			ov.RelayUpdateUplinkListAns = &v
+		case "relay_ctrl_uplink_list_req", "relayCtrlUplinkListReq":
+			ov := &MACCommand_RelayCtrlUplinkListReq_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayCtrlUplinkListReq = nil
+				return
+			}
+			ov.RelayCtrlUplinkListReq = &MACCommand_RelayCtrlUplinkListReq{}
+			ov.RelayCtrlUplinkListReq.UnmarshalProtoJSON(s.WithField("relay_ctrl_uplink_list_req", true))
+		case "relay_ctrl_uplink_list_ans", "relayCtrlUplinkListAns":
+			s.AddField("relay_ctrl_uplink_list_ans")
+			ov := &MACCommand_RelayCtrlUplinkListAns_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayCtrlUplinkListAns = nil
+				return
+			}
+			// NOTE: MACCommand_RelayCtrlUplinkListAns does not seem to implement UnmarshalProtoJSON.
+			var v MACCommand_RelayCtrlUplinkListAns
+			golang.UnmarshalMessage(s, &v)
+			ov.RelayCtrlUplinkListAns = &v
+		case "relay_configure_fwd_limit_req", "relayConfigureFwdLimitReq":
+			ov := &MACCommand_RelayConfigureFwdLimitReq_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayConfigureFwdLimitReq = nil
+				return
+			}
+			ov.RelayConfigureFwdLimitReq = &MACCommand_RelayConfigureFwdLimitReq{}
+			ov.RelayConfigureFwdLimitReq.UnmarshalProtoJSON(s.WithField("relay_configure_fwd_limit_req", true))
+		case "relay_configure_fwd_limit_ans", "relayConfigureFwdLimitAns":
+			s.AddField("relay_configure_fwd_limit_ans")
+			ov := &MACCommand_RelayConfigureFwdLimitAns_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayConfigureFwdLimitAns = nil
+				return
+			}
+			// NOTE: MACCommand_RelayConfigureFwdLimitAns does not seem to implement UnmarshalProtoJSON.
+			var v MACCommand_RelayConfigureFwdLimitAns
+			golang.UnmarshalMessage(s, &v)
+			ov.RelayConfigureFwdLimitAns = &v
+		case "relay_notify_new_end_device_req", "relayNotifyNewEndDeviceReq":
+			ov := &MACCommand_RelayNotifyNewEndDeviceReq_{}
+			x.Payload = ov
+			if s.ReadNil() {
+				ov.RelayNotifyNewEndDeviceReq = nil
+				return
+			}
+			ov.RelayNotifyNewEndDeviceReq = &MACCommand_RelayNotifyNewEndDeviceReq{}
+			ov.RelayNotifyNewEndDeviceReq.UnmarshalProtoJSON(s.WithField("relay_notify_new_end_device_req", true))
 		}
 	})
 }
@@ -4030,5 +5295,157 @@ func (x *DeviceEIRPValue) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the DeviceEIRPValue from JSON.
 func (x *DeviceEIRPValue) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayForwardUplinkReq message to JSON.
+func (x *RelayForwardUplinkReq) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.DataRate != nil || s.HasField("data_rate") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("data_rate")
+		// NOTE: DataRate does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.DataRate)
+	}
+	if x.Snr != 0 || s.HasField("snr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("snr")
+		s.WriteInt32(x.Snr)
+	}
+	if x.Rssi != 0 || s.HasField("rssi") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rssi")
+		s.WriteInt32(x.Rssi)
+	}
+	if x.WorChannel != 0 || s.HasField("wor_channel") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("wor_channel")
+		x.WorChannel.MarshalProtoJSON(s)
+	}
+	if x.Frequency != 0 || s.HasField("frequency") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("frequency")
+		s.WriteUint64(x.Frequency)
+	}
+	if len(x.RawPayload) > 0 || s.HasField("raw_payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("raw_payload")
+		s.WriteBytes(x.RawPayload)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayForwardUplinkReq to JSON.
+func (x *RelayForwardUplinkReq) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayForwardUplinkReq message from JSON.
+func (x *RelayForwardUplinkReq) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "data_rate", "dataRate":
+			s.AddField("data_rate")
+			if s.ReadNil() {
+				x.DataRate = nil
+				return
+			}
+			// NOTE: DataRate does not seem to implement UnmarshalProtoJSON.
+			var v DataRate
+			golang.UnmarshalMessage(s, &v)
+			x.DataRate = &v
+		case "snr":
+			s.AddField("snr")
+			x.Snr = s.ReadInt32()
+		case "rssi":
+			s.AddField("rssi")
+			x.Rssi = s.ReadInt32()
+		case "wor_channel", "worChannel":
+			s.AddField("wor_channel")
+			x.WorChannel.UnmarshalProtoJSON(s)
+		case "frequency":
+			s.AddField("frequency")
+			x.Frequency = s.ReadUint64()
+		case "raw_payload", "rawPayload":
+			s.AddField("raw_payload")
+			x.RawPayload = s.ReadBytes()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayForwardUplinkReq from JSON.
+func (x *RelayForwardUplinkReq) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayUplinkToken message to JSON.
+func (x *RelayUplinkToken) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Ids != nil || s.HasField("ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ids")
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
+	}
+	if len(x.SessionKeyId) > 0 || s.HasField("session_key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_key_id")
+		s.WriteBytes(x.SessionKeyId)
+	}
+	if x.FullFCnt != 0 || s.HasField("full_f_cnt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("full_f_cnt")
+		s.WriteUint32(x.FullFCnt)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayUplinkToken to JSON.
+func (x *RelayUplinkToken) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayUplinkToken message from JSON.
+func (x *RelayUplinkToken) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ids":
+			if s.ReadNil() {
+				x.Ids = nil
+				return
+			}
+			x.Ids = &EndDeviceIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
+		case "session_key_id", "sessionKeyId":
+			s.AddField("session_key_id")
+			x.SessionKeyId = s.ReadBytes()
+		case "full_f_cnt", "fullFCnt":
+			s.AddField("full_f_cnt")
+			x.FullFCnt = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayUplinkToken from JSON.
+func (x *RelayUplinkToken) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
