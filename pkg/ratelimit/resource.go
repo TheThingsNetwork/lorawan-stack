@@ -148,6 +148,15 @@ func ApplicationWebhooksDownResource(ctx context.Context, ids *ttnpb.EndDeviceId
 	}
 }
 
+// ConsoleEventsRequestResource represents a request for events from the Console.
+func ConsoleEventsRequestResource(callerID string) Resource {
+	key := fmt.Sprintf("console:internal:events:request:%s", callerID)
+	return &resource{
+		key:     key,
+		classes: []string{"http:console:internal:events"},
+	}
+}
+
 // NewCustomResource returns a new resource. It is used internally by other components.
 func NewCustomResource(key string, classes ...string) Resource {
 	return &resource{key, classes}

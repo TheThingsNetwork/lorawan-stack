@@ -3545,6 +3545,24 @@
       "file": "subscriptions.go"
     }
   },
+  "error:pkg/console/internal/events:rate_exceeded": {
+    "translations": {
+      "en": "request rate exceeded"
+    },
+    "description": {
+      "package": "pkg/console/internal/events",
+      "file": "ratelimit.go"
+    }
+  },
+  "error:pkg/console/internal/events:unknown_caller": {
+    "translations": {
+      "en": "unknown caller type `{type}`"
+    },
+    "description": {
+      "package": "pkg/console/internal/events",
+      "file": "ratelimit.go"
+    }
+  },
   "error:pkg/crypto/cryptoservices:no_app_key": {
     "translations": {
       "en": "no AppKey specified"
