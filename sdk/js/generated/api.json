@@ -23471,7 +23471,7 @@
                   },
                   {
                     "name": "repeated.max_items",
-                    "value": 20
+                    "value": 100
                   }
                 ]
               }
