@@ -77,7 +77,7 @@ require (
 	github.com/uptrace/bun v1.1.16
 	github.com/uptrace/bun/dialect/pgdialect v1.1.16
 	github.com/uptrace/bun/driver/pgdriver v1.1.16
-	github.com/vmihailenco/msgpack/v5 v5.4.0
+	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.45.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.45.0
