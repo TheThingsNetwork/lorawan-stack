@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- The Things Stack is now built with Go 1.21.
+
 ### Deprecated
 
 ### Removed
