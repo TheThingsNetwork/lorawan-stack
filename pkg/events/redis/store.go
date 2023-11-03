@@ -20,6 +20,7 @@ import (
 	"errors"
 	"hash/fnv"
 	"math/rand"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -34,7 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
-	"golang.org/x/exp/slices"
 )
 
 const ttlJitter = 0.01
