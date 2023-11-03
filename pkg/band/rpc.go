@@ -16,9 +16,9 @@ package band
 
 import (
 	"context"
+	"maps"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
