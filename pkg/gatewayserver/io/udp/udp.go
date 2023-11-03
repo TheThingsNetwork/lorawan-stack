@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/binary"
 	"net"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -34,7 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
-	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"slices"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -31,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"golang.org/x/exp/slices"
 )
 
 func channelDataRateRange(

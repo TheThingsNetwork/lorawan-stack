@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"runtime/trace"
+	"slices"
 
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -38,7 +39,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
-	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"

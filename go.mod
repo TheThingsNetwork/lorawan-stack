@@ -1,6 +1,6 @@
 module go.thethings.network/lorawan-stack/v3
 
-go 1.20
+go 1.21
 
 // Use our fork of throttled/throttled/v2.
 replace github.com/throttled/throttled/v2 => github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis

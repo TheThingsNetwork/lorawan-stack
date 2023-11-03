@@ -16,6 +16,7 @@ package crypto_test
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 
 	"github.com/mohae/deepcopy"
@@ -23,7 +24,6 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
-	"golang.org/x/exp/slices"
 )
 
 func TestJoinAcceptEncryption(t *testing.T) {
