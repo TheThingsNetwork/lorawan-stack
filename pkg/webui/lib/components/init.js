@@ -19,8 +19,7 @@ import { setConfiguration } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import IBMPlexMono from '@assets/fonts/ibm-plex-mono-regular.woff2'
-import MaterialIcons from '@assets/fonts/MaterialIcons-Regular.ttf'
-import MaterialIconsOutlined from '@assets/fonts/MaterialIconsOutlined-Regular.otf'
+import MaterialIconsOutlined from '@assets/fonts/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf'
 import TextSecurityDisc from '@assets/fonts/text-security-disc.woff2'
 import LAYOUT from '@ttn-lw/constants/layout'
 
@@ -43,7 +42,7 @@ const m = defineMessages({
 })
 
 // Keep this list updated with fonts used in `/styles/fonts.styl`.
-const fontsToPreload = [IBMPlexMono, MaterialIcons, MaterialIconsOutlined, TextSecurityDisc]
+const fontsToPreload = [IBMPlexMono, MaterialIconsOutlined, TextSecurityDisc]
 
 setConfiguration({
   breakpoints: [
