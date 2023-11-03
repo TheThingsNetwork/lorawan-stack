@@ -90,68 +90,6 @@ summary
 
 // Global one-off styles.
 :global
-  .c-error
-    color: $c-error
-
-  .c-success
-    color: $c-success
-
-  .c-warning
-    color: $c-warning
-
-  .c-active
-    color: $c-active-blue
-
-  .tc-subtle-gray
-    color: $tc-subtle-gray
-
-  .tc-deep-gray
-    color: $tc-deep-gray
-
-  .p-0
-    padding: 0 !important
-
-  .pt-0
-    margin-top: 0 !important
-
-  .pb-0
-    margin-bottom: 0 !important
-
-  .m-0
-    margin: 0 !important
-
-  .mt-0
-    margin-top: 0 !important
-
-  .mb-0
-    margin-bottom: 0 !important
-
-  for $size in 'xxs' 'xs' 's' 'l' 'm' 'l' 'xl' 'xxl'
-    .mt-cs-{$size}
-      margin-top: $cs[$size] !important
-
-    .mb-cs-{$size}
-      margin-bottom: $cs[$size] !important
-
-    .ml-cs-{$size}
-      margin-left: $cs[$size] !important
-
-    .mr-cs-{$size}
-      margin-right: $cs[$size] !important
-
-  for $size in 'xxs' 'xs' 's' 'l' 'm' 'l' 'xl' 'xxl'
-    .mt-ls-{$size}
-      margin-top: $ls[$size] !important
-
-    .mb-ls-{$size}
-      margin-bottom: $ls[$size] !important
-
-    .ml-ls-{$size}
-      margin-left: $ls[$size] !important
-
-    .mr-ls-{$size}
-      margin-right: $ls[$size] !important
-
   .panel-title
     padding-bottom: $cs.xs
     border-bottom: 1px solid $c-divider
