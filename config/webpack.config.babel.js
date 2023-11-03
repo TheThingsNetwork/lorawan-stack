@@ -230,7 +230,7 @@ export default {
         },
       },
       {
-        test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
+        test: /\.(woff|woff2|ttf|eot|otf|jpg|jpeg|png|svg)$/i,
         type: 'asset/resource',
         generator: {
           filename: '[name].[contenthash:20][ext]',
