@@ -22,7 +22,7 @@ import style from './icon.styl'
 // Keep these sorted alphabetically.
 const hardcoded = {
   access: 'lock',
-  api_keys: 'vpn_key',
+  api_keys: 'key',
   application: 'web_asset',
   cluster: 'language',
   collaborators: 'people',
