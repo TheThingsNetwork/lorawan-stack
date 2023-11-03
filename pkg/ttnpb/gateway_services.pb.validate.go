@@ -155,10 +155,10 @@ func (m *AssertGatewayRightsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway_ids":
 
-			if l := len(m.GetGatewayIds()); l < 1 || l > 20 {
+			if l := len(m.GetGatewayIds()); l < 1 || l > 100 {
 				return AssertGatewayRightsRequestValidationError{
 					field:  "gateway_ids",
-					reason: "value must contain between 1 and 20 items, inclusive",
+					reason: "value must contain between 1 and 100 items, inclusive",
 				}
 			}
 

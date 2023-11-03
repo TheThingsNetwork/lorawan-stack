@@ -5240,7 +5240,7 @@ Identifies an end device model with version information.
 
 | Field | Validations |
 | ----- | ----------- |
-| `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
+| `gateway_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `100`</p> |
 | `required` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.BatchDeleteGatewaysRequest">Message `BatchDeleteGatewaysRequest`</a>
