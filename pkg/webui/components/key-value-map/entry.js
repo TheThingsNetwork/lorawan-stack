@@ -104,11 +104,11 @@ const Entry = ({
   const showRemoveButton = atLeastOneEntry ? index !== 0 : true
 
   return (
-    <div className={style.entriesRow}>
+    <div className="d-flex j-start mb-cs-s">
       {!indexAsKey && (
         <InputElement
           data-test-id={_getKeyInputName}
-          className={style.input}
+          className="flex-grow mr-cs-s"
           name={_getKeyInputName}
           placeholder={keyPlaceholder}
           type="text"

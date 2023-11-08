@@ -32,8 +32,6 @@ import { getWebhooksList } from '@console/store/actions/webhooks'
 import { selectWebhooksHealthStatusEnabled } from '@console/store/selectors/application-server'
 import { selectWebhooks, selectWebhooksTotalCount } from '@console/store/selectors/webhooks'
 
-import style from './webhooks-table.styl'
-
 const m = defineMessages({
   templateId: 'Template ID',
   healthy: 'Healthy',
@@ -74,7 +72,8 @@ const WebhooksTable = () => {
       name: 'template_ids.template_id',
       displayName: m.templateId,
       width: 12,
-      render: value => value || <Message className={style.none} content={sharedMessages.none} />,
+      render: value =>
+        value || <Message className="tc-subtle-gray" content={sharedMessages.none} />,
       sortable: true,
     },
   ]
