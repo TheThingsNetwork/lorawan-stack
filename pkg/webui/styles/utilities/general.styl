@@ -13,15 +13,14 @@
 // limitations under the License.
 
 // Grid.
-
 :global
   .grid
     display: grid
-    row-gap: var(--grid-row-gap)
+    row-gap: $grid-row-gap
     width: 100%
 
     // Prevent column-gaps that are wider than the page width when combined.
-    column-gap: calc(min(var(--grid-column-gap), 100% / 11))
+    column-gap: calc(min($grid-column-gap, 100% / 11))
 
     &:not(.auto-columns)
       grid-template-columns: repeat(12, minmax(0, 1fr))
@@ -41,7 +40,7 @@
 
     // Generate responsive grid item styles.
     for $name, $width in $bp
-      +media-query($width)
+      media-query($width)
         for $num in (1..12)
           // Generate responsive grid item overrides.
           .{$name}\\:item-{$num}
@@ -53,11 +52,6 @@
 
     &--center
       align-items: center
-
-  // Flow.
-
-  .flow > * + *
-    margin-top: var(--flow-space, $ls.m)
 
   // Content justification.
 
@@ -79,6 +73,15 @@
   .j-evenly
     justify-content: space-evenly
 
+  .al-center
+    align-items: center
+
+  .al-start
+    align-items: start
+
+  .al-end
+    align-items: end
+
   // Responsive justification styles.
   for $name, $width in $bp
     +media-query($width)
@@ -93,15 +96,6 @@
 
       .{$name}\\:j-between
         justify-content: space-between !important
-
-  .al-center
-    align-items: center
-
-  .al-start
-    align-items: start
-
-  .al-end
-    align-items: end
 
   // Block justification.
 
@@ -126,23 +120,6 @@
   .h-auto
     height: auto
 
-  for $name, $width in $bp
-    +media-query($width)
-      .{$name}\\:w-full
-        width: 100%
-
-      .{$name}\\:w-auto
-        width: auto
-
-      .{$name}\\:w-content
-        width: fit-content
-
-      .{$name}\\:h-full
-        height: 100%
-
-      .{$name}\\:h-auto
-        height: auto
-
   for $num in (1..9)
     $percentage = percentage($num / 10)
     .w-{$num}0
@@ -160,59 +137,55 @@
           height: $percentage
 
   for $name, $width in $bp
-    .w-{$name}
-      max-width: convert('var(--bp-' + $name + ')')
+    +media-query($width)
+      .{$name}\\:w-full
+        width: 100%
 
-    for $bpname, $bpwidth in $bp
-      +media-query($bpwidth)
-        .{$bpname}\\:w-{$name}
-          max-width: convert('var(--bp-' + $name + ')')
+      .{$name}\\:w-auto
+        width: auto
 
-  // Fixed absolute widths and heights.
-  +generate-responsive-classes()
-    for $name, $size in $sz
-      .min-w-{$name}s
-        min-width: $size
-      .max-w-{$name}s
-        max-width: $size
-      .w-{$name}s
-        width: $size
+      .{$name}\\:w-content
+        width: fit-content
 
-    for $name, $size in $sz
-      .min-h-{$name}s
-        min-height: $size
-      .max-h-{$name}s
-        max-height: $size
-      .h-{$name}s
-        height: $size
+      .{$name}\\:h-full
+        height: 100%
 
-  +generate-responsive-classes()
-    // Positioning.
-    .pos-relative
-      position: relative
-    .pos-absolute
-      position: absolute
-    .pos-fixed
-      position: fixed
-    .pos-static
-      position: static
-    // Flex layout.
-    .direction-column
-      flex-direction: column
+      .{$name}\\:h-auto
+        height: auto
 
-    .direction-row
-      flex-direction: row
-
-    .flex-wrap
-      flex-wrap: wrap
+  // Positioning.
+  .pos-relative
+    position: relative
+  .pos-absolute
+    position: absolute
+  .pos-fixed
+    position: fixed
+  .pos-static
+    position: static
+  // Flex layout.
+  .direction-column
+    flex-direction: column
+  .direction-row
+    flex-direction: row
+  .flex-wrap
+    flex-wrap: wrap
 
   for $name, $width in $bp
     +media-query($width)
+      .{$name}\\:pos-relative
+        position: relative
+      .{$name}\\:pos-absolute
+        position: absolute
+      .{$name}\\:pos-fixed
+        position: fixed
+      .{$name}\\:pos-static
+        position: static
       .{$name}\\:direction-column
-        flex-direction: column !important
-
+        flex-direction: column
       .{$name}\\:direction-row
-        flex-direction: row !important
+        flex-direction: row
+      .{$name}\\:flex-wrap
+        flex-wrap: wrap
 
   // Layout shorthands.
   .pos-absolute-stretch
@@ -243,6 +216,14 @@
 
   .flex-no-shrink
     flex-shrink: 0
+
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:direction-column
+        flex-direction: column !important
+
+      .{$name}\\:direction-row
+        flex-direction: row !important
 
   // Opacity.
   .opacity-0
@@ -296,3 +277,110 @@
 
   .cursor-pointer
     cursor: pointer
+
+  // Font sizes.
+
+  for $name in $fs
+    .fs-{$name}
+      font-size: convert('$fs.' + $name)
+
+  // Font weights.
+  .fw-normal
+    font-weight: $fw.normal
+
+  .fw-bold
+    font-weight: $fw.bold
+
+  .fw-bolder
+    font-weight: $fw.bolder
+
+  // Text alignments.
+
+  .text-center
+    text-align: center
+
+  .text-left
+    text-align: left
+
+  .text-right
+    text-align: right
+
+  // Text decorations.
+
+  .td-underline
+    text-decoration: underline
+
+  .td-line-through
+    text-decoration: line-through
+
+  .td-none
+    text-decoration: none
+
+  // Cursor.
+
+  .cursor-pointer
+    cursor: pointer
+
+  .cursor-not-allowed
+    cursor: not-allowed
+
+  .cursor-grab
+    cursor: grab
+
+  .cursor-zoom-in
+    cursor: zoom-in
+
+  .cursor-zoom-out
+    cursor: zoom-out
+
+  // Responsive typography styles.
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:text-center
+        text-align: center !important
+
+      .{$name}\\:text-left
+        text-align: left !important
+
+      .{$name}\\:text-right
+        text-align: right !important
+
+  // DISPLAY UTILITIES.
+  .d-flex
+    display: flex !important
+
+  .d-inline
+    display: inline !important
+
+  .d-block
+    display: block !important
+
+  .d-none
+    display: none !important
+
+  .d-inline-block
+    display: inline-block !important
+
+  .d-inline-flex
+    display: inline-flex !important
+
+  // Responsive display styles.
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:d-flex
+        display: flex !important
+
+      .{$name}\\:d-inline
+        display: inline !important
+
+      .{$name}\\:d-block
+        display: block !important
+
+      .{$name}\\:d-none
+        display: none !important
+
+      .{$name}\\:d-inline-block
+        display: inline-block !important
+
+      .{$name}\\:d-inline-flex
+        display: inline-flex !important

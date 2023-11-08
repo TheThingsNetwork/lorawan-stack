@@ -271,6 +271,13 @@ media-query-height($max)
   @media screen and (max-height: $max)
     {block} // @stylint ignore
 
+generate-responsive-classes()
+  // Base definition.
+  {block}
+  // Responsive classes.
+  for $breakpoint, $width in $bp
+    +media-query($width)
+      {block}
 
 // FUNCTIONAL
 // ==========
