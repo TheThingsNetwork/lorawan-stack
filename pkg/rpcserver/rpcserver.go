@@ -267,6 +267,9 @@ func New(ctx context.Context, opts ...Option) *Server {
 			}
 			return s, false
 		}),
+		runtime.WithOutgoingTrailerMatcher(func(s string) (string, bool) {
+			return s, false
+		}),
 		runtime.WithDisablePathLengthFallback(),
 	)
 	return server
