@@ -35,8 +35,6 @@ import {
   checkFromState,
 } from '@console/lib/feature-checks'
 
-import style from './device-messaging.styl'
-
 const DeviceMessaging = () => {
   const { appId, devId } = useParams()
   const mayScheduleDown = useSelector(state => checkFromState(mayScheduleDownlinks, state))
@@ -59,7 +57,7 @@ const DeviceMessaging = () => {
         <Row>
           {tabs.length > 0 && (
             <Col sm={12}>
-              <Tabs className={style.tabs} tabs={tabs} divider />
+              <Tabs className="mt-0 mb-ls-s s:bg-none s:mr-0" tabs={tabs} divider />
             </Col>
           )}
           <Col lg={8} md={12}>

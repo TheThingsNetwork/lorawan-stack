@@ -32,7 +32,7 @@ const RoutingPolicy = ({ enabled, message, positiveMessage, negativeMessage }) =
     <span className={style.policy} data-enabled={enabled}>
       <Icon
         icon={enabled ? 'check' : 'clear'}
-        className={classnames(style.icon, { 'c-success': enabled, 'c-error': !enabled })}
+        className={classnames('mr-cs-xxs', { 'c-success': enabled, 'c-error': !enabled })}
       />
       <Message content={message} />
     </span>
@@ -54,8 +54,8 @@ const RoutingPolicySheet = ({ policy }) => {
   const { uplink = {}, downlink = {} } = policy
 
   return (
-    <div className={style.container} data-test-id="routing-policy-sheet">
-      <div className={style.uplink}>
+    <div className="d-flex direction-row" data-test-id="routing-policy-sheet">
+      <div className={classnames(style.uplink, 'mr-ls-m')}>
         <Message content={sharedMessages.uplink} component="h4" />
         <RoutingPolicy
           enabled={uplink.join_request}

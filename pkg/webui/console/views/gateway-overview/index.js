@@ -141,7 +141,7 @@ const GatewayOverview = () => {
             message={m.downloadGlobalConf}
           />
         ) : (
-          <Message content={m.globalConfUnavailable} className={style.notAvailable} />
+          <Message content={m.globalConfUnavailable} className="tc-subtle-gray" />
         ),
     })
   }

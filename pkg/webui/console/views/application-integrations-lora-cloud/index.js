@@ -87,12 +87,12 @@ const LoRaCloud = () => {
             <Row>
               <Col lg={8} md={12}>
                 <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
-                <Message content={m.loraCloudInfoText} className={style.info} />
+                <Message content={m.loraCloudInfoText} className="mt-0" />
                 <div>
                   <Message
                     component="h4"
                     content={sharedMessages.furtherResources}
-                    className={style.furtherResources}
+                    className="mb-cs-xs"
                   />
                   <Link.DocLink
                     path="/integrations/application-packages/lora-cloud-device-and-application-services/"
@@ -105,7 +105,7 @@ const LoRaCloud = () => {
                     <Message content={m.officialLoRaCloudDocumentation} />
                   </Link.Anchor>
                 </div>
-                <hr className={style.hRule} />
+                <hr className="mb-0" />
                 <Collapse title="Geolocation" description={m.glsDescription}>
                   <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
                   <LoRaCloudGLSForm />

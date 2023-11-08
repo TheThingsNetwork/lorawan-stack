@@ -92,7 +92,7 @@ const ApplicationOverview = () => {
           </Col>
         </Row>
         <Row>
-          <Col sm={12} className={style.table}>
+          <Col sm={12} className="mt-ls-xl s:mt-ls-xs">
             <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
           </Col>
         </Row>

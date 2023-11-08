@@ -35,8 +35,6 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 
 import m from './messages'
 
-import style from './device-importer.styl'
-
 const statusMap = {
   processing: 'good',
   error: 'bad',
@@ -92,7 +90,7 @@ const Processor = ({
             target={convertedDevices.length}
             showStatus
             showEstimation={!hasErrored && !aborted}
-            className={style.progressBar}
+            className="mb-cs-m"
           >
             <Message
               content={m.progress}
@@ -103,7 +101,7 @@ const Processor = ({
             />
           </ProgressBar>
           {status === 'processing' && (
-            <Message className={style.title} component="h4" content={operationMessage} />
+            <Message className="m-vert-0 ml-0 mr-cs-s" component="h4" content={operationMessage} />
           )}
         </>
       ) : (
@@ -156,8 +154,8 @@ const Processor = ({
               />
               <ul>
                 {deviceErrors.map(({ deviceId, error }) => (
-                  <li key={deviceId} className={style.deviceErrorEntry}>
-                    <pre>{deviceId}</pre>
+                  <li key={deviceId}>
+                    <pre className="mb-cs-xs">{deviceId}</pre>
                     <ErrorMessage useTopmost content={error} />
                   </li>
                 ))}
@@ -170,9 +168,9 @@ const Processor = ({
           )}
         </>
       )}
-      <Message content={m.processLog} component="h3" className={style.processLogTitle} />
+      <Message content={m.processLog} component="h3" className="mb-cs-xxs" />
       <CodeEditor
-        className={style.logOutput}
+        className="mb-cs-m"
         minLines={20}
         maxLines={20}
         mode="json"

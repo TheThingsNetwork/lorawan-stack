@@ -44,8 +44,6 @@ import { address as addressRegexp } from '@console/lib/regexp'
 import { getDefaultGrpcServiceFormatter, getDefaultJavascriptFormatter } from './formatter-values'
 import TestForm from './test-form'
 
-import style from './payload-formatters-form.styl'
-
 const m = defineMessages({
   repository: 'Use Device Repository formatters',
   customJavascipt: 'Custom Javascript formatter',
@@ -464,7 +462,7 @@ const PayloadFormattersForm = ({
         {_showTestSection() && (
           <Col sm={12} lg={6}>
             <TestForm
-              className={style.testForm}
+              className="m:mt-ls-s"
               onSubmit={handleTestSubmit}
               uplink={uplink}
               testResult={testResult}

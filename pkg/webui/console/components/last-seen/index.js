@@ -23,8 +23,6 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import style from './last-seen.styl'
-
 const computeDeltaInSeconds = (from, to) => {
   // Avoid situations when server clock is ahead of the browser clock.
   if (from > to) {
@@ -49,8 +47,8 @@ const LastSeen = React.forwardRef((props, ref) => {
 
   return (
     <Status status={status} pulseTrigger={lastSeen} flipped={flipped} ref={ref}>
-      <div className={classnames(className, style.container)}>
-        {!short && <Message className={style.message} content={message} />}
+      <div className={classnames(className, 'd-inline-block')}>
+        {!short && <Message className="mr-cs-xxs" content={message} />}
         <DateTime.Relative
           value={lastSeen}
           computeDelta={computeDeltaInSeconds}

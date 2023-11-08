@@ -56,11 +56,11 @@ const componentMap = {
 }
 
 const DeploymentComponentStatus = () => (
-  <Row className={style.componentSection}>
-    <Col sm={4} className={style.versionInfoSection}>
+  <Row className="m-vert-ls-l m:mb-ls-xxs">
+    <Col sm={4} className="d-flex direction-column">
       <Message content={m.versionInfo} component="h3" className="panel-title" />
       <span className={style.versionValue}>TTS v{process.env.VERSION}</span>
-      <pre className={style.versionRevision}>{process.env.REVISION}</pre>
+      <pre className="mt-0 fs-s mb-cs-s">{process.env.REVISION}</pre>
       <Link.Anchor href={statusPageBaseUrl} external secondary>
         <Message content={m.statusPage} />
       </Link.Anchor>
@@ -72,9 +72,9 @@ const DeploymentComponentStatus = () => (
         <Message content={m.seeChangelog} />
       </Link.Anchor>
     </Col>
-    <Col sm={8} className={style.componentInfoSection}>
+    <Col sm={8} className="d-flex direction-column">
       <Message className="panel-title" content={m.availableComponents} component="h3" />
-      <div className={style.componentCards}>
+      <div className="d-flex flex-wrap mt-cs-m">
         {Object.keys(stackConfig).map(componentKey => {
           if (componentKey === 'language') {
             return null
