@@ -14,7 +14,6 @@
 
 import React, { useCallback, useState } from 'react'
 import { Col, Row } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -25,10 +24,6 @@ import Message from '@ttn-lw/lib/components/message'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import policyMessages from '@console/lib/packet-broker/messages'
-
-const m = defineMessages({
-  doNotUseADefaultPolicy: 'Do not use a default routing policy for this network',
-})
 
 const useDefaultEncode = val => val === 'default'
 const useDefaultDecode = val => (val ? 'default' : 'no-default')
@@ -49,7 +44,7 @@ const DefaultRoutingPolicyForm = () => {
           encode={useDefaultEncode}
           decode={useDefaultDecode}
         >
-          <Radio label={m.doNotUseADefaultPolicy} value="no-default" />
+          <Radio label={sharedMessages.doNotUseADefaultPolicy} value="no-default" />
           <Radio label={sharedMessages.useDefaultPolicy} value="default" />
         </Form.Field>
       </Col>

@@ -188,6 +188,7 @@ export default defineMessages({
   disabled: 'Disabled',
   disconnected: 'Disconnected',
   documentation: 'Documentation',
+  doNotUseADefaultPolicy: 'Do not use a default routing policy for this network',
   downlink: 'Downlink',
   downlinkAck: 'Downlink ack',
   downlinkFailed: 'Downlink failed',
