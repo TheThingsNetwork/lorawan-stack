@@ -29,7 +29,7 @@
       $scalesuffix = '-0'
     else
       // Compose property using CSS variables.
-      $property = convert('$' + $scale  + '.' + $size + ' !important')
+      $property = convert('$' + $scale  + '.' + $size)
       $scalesuffix = '-' + $scale + '-' + $size
     // Special case for gap
     if $type == 'gap'
