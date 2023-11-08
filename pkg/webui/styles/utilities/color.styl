@@ -56,3 +56,29 @@
 
   for $name in $c
     generate-color-classes($name)
+
+  generate-responsive-color-class($width, $width-name, $color)
+    +media-query($width)
+      .{$width-name}\\:c-{$color}
+        color: convert('$c.' + $color)
+      .{$width-name}\\:c-hover-{$color}:hover
+        color: convert('$c.' + $color)
+      .{$width-name}\\:active-{$color}:active
+        color: convert('$c.' + $color)
+      .{$width-name}\\:c-focus-{$color}:focus
+        color: convert('$c.' + $color)
+
+      .{$width-name}\\:bg-{$color}
+        background-color: convert('$c.' + $color)
+      .{$width-name}\\:bg-hover-{$color}:hover
+        background-color: convert('$c.' + $color)
+      .{$width-name}\\:bg-active-{$color}:active
+        background-color: convert('$c.' + $color)
+      .{$width-name}\\:bg-focus-{$color}:focus
+        background-color: convert('$c.' + $color)
+      .{$width-name}\\:bg-none
+        background: none
+
+  for $name, $width in $bp
+    for $color in $c
+      generate-responsive-color-class($width, $name, $color)
