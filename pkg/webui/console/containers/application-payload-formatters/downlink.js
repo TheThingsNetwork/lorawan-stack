@@ -41,8 +41,6 @@ import {
   selectApplicationLinkFormatters,
 } from '@console/store/selectors/applications'
 
-import style from './application-payload-formatters.styl'
-
 const m = defineMessages({
   title: 'Default downlink payload formatter',
   infoText:
@@ -107,9 +105,7 @@ const ApplicationPayloadFormatters = () => {
     <>
       <PageTitle title={m.title} />
       {hasError && <ErrorNotification content={linkError} small />}
-      {!isNoneType && (
-        <Notification className={style.notification} small info content={m.infoText} />
-      )}
+      {!isNoneType && <Notification className="mb-ls-s" small info content={m.infoText} />}
       {!mayViewLink && <Notification content={m.downlinkResetWarning} info small />}
       <PayloadFormattersForm
         uplink={false}

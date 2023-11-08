@@ -23,8 +23,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Entry from './entry'
 
-import style from './key-value-map.styl'
-
 const m = defineMessages({
   addEntry: 'Add entry',
 })
@@ -76,7 +74,7 @@ const KeyValueMap = ({
   }, [indexAsKey, onChange, value])
 
   return (
-    <div data-test-id={'key-value-map'} className={classnames(className, style.container)}>
+    <div data-test-id={'key-value-map'} className={classnames(className, 'direction-column')}>
       <div>
         {value &&
           value.map((individualValue, index) => (

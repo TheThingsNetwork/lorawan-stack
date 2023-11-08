@@ -46,8 +46,6 @@ import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
 
 import FallbackVersionIdsSection from './fallback-version-ids-section'
 
-import style from './device-import-form.styl'
-
 const m = defineMessages({
   file: 'File',
   formatInfo: 'Format information',
@@ -113,7 +111,7 @@ const DeviceBulkCreateFormInner = props => {
     <>
       <Message
         content={m.infoText}
-        className={style.info}
+        className="mt-0"
         values={{
           DocLink: msg => (
             <Link.DocLink secondary path="/the-things-stack/migrating/import-devices/">
@@ -122,7 +120,7 @@ const DeviceBulkCreateFormInner = props => {
           ),
         }}
       />
-      <hr className={style.hRule} />
+      <hr className="mt-ls-s mb-ls-xs" />
       <DeviceTemplateFormatSelect onChange={handleSelectChange} name="format_id" required />
       <Form.InfoField disabled={!formatSelected} title={m.formatInfo}>
         {formatDescription ? formatDescription : <Message content={m.fileInfoPlaceholder} />}

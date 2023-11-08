@@ -52,8 +52,6 @@ import {
   selectUserInvitationsTotalCount,
 } from '@console/store/selectors/users'
 
-import style from './users-table.styl'
-
 const m = defineMessages({
   invite: 'Invite user',
   revokeInvitation: 'Revoke this invitation',
@@ -231,7 +229,10 @@ const UsersTable = props => {
               return (
                 <span>
                   {userId}{' '}
-                  <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
+                  <Message
+                    className="tc-subtle-gray"
+                    content={sharedMessages.currentUserIndicator}
+                  />
                 </span>
               )
             }
@@ -282,7 +283,7 @@ const UsersTable = props => {
           width: 7,
           render: isAdmin => {
             if (isAdmin) {
-              return <Icon className={style.icon} icon="check" />
+              return <Icon className="c-active-blue" icon="check" />
             }
 
             return null
