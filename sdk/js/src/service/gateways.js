@@ -221,6 +221,14 @@ class Gateways {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  async getBatchStatistics(gatewayIds) {
+    const response = await this._api.Gs.BatchGetGatewayConnectionStats(undefined, {
+      gateway_ids: gatewayIds
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   async getRightsById(gatewayId) {
     const result = await this._api.GatewayAccess.ListRights({
       routeParams: { gateway_id: gatewayId },
