@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- The `http.client.transport.compression` experimental flag. It controls whether the HTTP clients used by the stack support gzip and zstd decompression of server responses. It is enabled by default.
+
 ### Changed
 
 - The Things Stack is now built with Go 1.21.
