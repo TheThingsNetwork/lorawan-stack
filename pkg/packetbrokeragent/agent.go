@@ -75,7 +75,7 @@ type RegistrationInfo struct {
 	Listed        bool
 }
 
-// PacketBrokerClusterBuilder builds a Packet Broker Cluster ID from a The Things Stack Cluster ID.
+// PacketBrokerClusterIDBuilder builds a Packet Broker Cluster ID from a The Things Stack Cluster ID.
 type PacketBrokerClusterIDBuilder func(clusterID string) (string, error)
 
 func literalClusterID(clusterID string) (string, error) {

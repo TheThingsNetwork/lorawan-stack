@@ -556,6 +556,8 @@ func (s *pbaServer) ListNetworks(ctx context.Context, req *ttnpb.ListPacketBroke
 			return res.GetNetworks(), res.GetTotal(), err
 		}
 		res, err := iampbv2.NewCatalogClient(s.iamConn).ListNetworks(ctx, &iampbv2.ListNetworksRequest{
+			NetId:            s.netID.MarshalNumber(),
+			TenantId:         s.tenantIDExtractor(ctx),
 			Offset:           (page - 1) * req.Limit,
 			Limit:            req.Limit,
 			TenantIdContains: req.TenantIdContains,
@@ -576,6 +578,8 @@ func (s *pbaServer) ListHomeNetworks(ctx context.Context, req *ttnpb.ListPacketB
 	}
 	return s.listNetworks(ctx, func() ([]*packetbroker.NetworkOrTenant, uint32, error) {
 		res, err := iampbv2.NewCatalogClient(s.iamConn).ListHomeNetworks(ctx, &iampbv2.ListNetworksRequest{
+			NetId:            s.netID.MarshalNumber(),
+			TenantId:         s.tenantIDExtractor(ctx),
 			Offset:           (page - 1) * req.Limit,
 			Limit:            req.Limit,
 			TenantIdContains: req.TenantIdContains,
