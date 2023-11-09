@@ -10,18 +10,18 @@
 # Dependencies
 /go.mod @johanstokking @adriansmares
 /go.sum @johanstokking @adriansmares
-/package.json @kschiffer @ryaplots
-/yarn.lock @kschiffer @ryaplots @mjamescompton
-/sdk/js/package.json @kschiffer @ryaplots @mjamescompton
-/sdk/js/yarn.lock @kschiffer @ryaplots @mjamescompton
+/package.json @kschiffer @ryaplots @PavelJankoski
+/yarn.lock @kschiffer @ryaplots @mjamescompton @PavelJankoski
+/sdk/js/package.json @kschiffer @ryaplots @mjamescompton @PavelJankoski
+/sdk/js/yarn.lock @kschiffer @ryaplots @mjamescompton @PavelJankoski
 
 # Build pipeline and tooling
 /Makefile @adriansmares
 /tools @adriansmares
 /.github/workflows @adriansmares
-/config @kschiffer @ryaplots @mjamescompton
+/config @kschiffer @ryaplots @mjamescompton @PavelJankoski
 /config/stack @benolayinka @KrishnaIyer
-/cypress @kschiffer @ryaplots @mjamescompton
+/cypress @kschiffer @ryaplots @mjamescompton @PavelJankoski
 
 # API, configuration, CLI and storage compatibility
 /api/*.proto @johanstokking @adriansmares
@@ -49,9 +49,9 @@
 /pkg/rpcmiddleware @johanstokking @adriansmares
 /pkg/rpcserver @johanstokking @adriansmares
 /pkg/types @johanstokking
-/pkg/web @kschiffer @ryaplots @mjamescompton
+/pkg/web @kschiffer @ryaplots @mjamescompton @PavelJankoski
 /pkg/webmiddleware @KrishnaIyer @kschiffer
-/pkg/webui @kschiffer @ryaplots @mjamescompton
+/pkg/webui @kschiffer @ryaplots @mjamescompton @PavelJankoski
 /pkg/ratelimit @johanstokking @KrishnaIyer
 
 # Subsystems
@@ -77,7 +77,7 @@
 
 /pkg/joinserver @johanstokking @adriansmares
 
-/pkg/console @kschiffer @ryaplots @mjamescompton
+/pkg/console @kschiffer @ryaplots @mjamescompton @PavelJankoski
 
 /pkg/packetbrokeragent @johanstokking @adriansmares
 
@@ -91,7 +91,7 @@
 /pkg/devicerepository @adriansmares @KrishnaIyer
 
 # SDKs
-/sdk/js @kschiffer @ryaplots @mjamescompton
+/sdk/js @kschiffer @ryaplots @mjamescompton @PavelJankoski
 
 # Clear generated code
 /api/api.md
