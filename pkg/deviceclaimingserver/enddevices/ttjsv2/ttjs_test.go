@@ -99,7 +99,7 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 	client1 := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
 		NetID: test.DefaultNetID,
 		NSID:  &homeNSID,
-		ASID:  "localhost",
+		ASID:  client1ASID,
 		JoinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
 		},
@@ -176,7 +176,7 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 	client2 := ttjsv2.NewClient(c, fetcher, ttjsv2.Config{
 		NetID: test.DefaultNetID,
 		NSID:  &homeNSID,
-		ASID:  "localhost",
+		ASID:  client2ASID,
 		JoinEUIPrefixes: []types.EUI64Prefix{
 			supportedJoinEUIPrefix,
 		},
