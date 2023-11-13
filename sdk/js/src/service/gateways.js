@@ -223,7 +223,7 @@ class Gateways {
 
   async getBatchStatistics(gatewayIds) {
     const response = await this._api.Gs.BatchGetGatewayConnectionStats(undefined, {
-      gateway_ids: gatewayIds
+      gateway_ids: gatewayIds,
     })
 
     return Marshaler.payloadSingleResponse(response)

@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,43 +28,118 @@ const m = defineMessages({
   switchCamera: 'Switch camera',
 })
 
-const Video = props => {
+const Camera = props => {
   const { onRead, setError, setCapture } = props
-  const videoRef = createRef()
-  const [stream, setStream] = useState(undefined)
-  const [devices, setDevices] = useState([])
   const [cameras, setCameras] = useState([])
-  const [videoMode, setVideoMode] = useState({})
+  const [deviceId, setDeviceId] = useState(undefined)
+
+  const [hasFrontCamera, setHasFrontCamera] = useState(false)
+  const [hasBackCamera, setHasBackCamera] = useState(false)
+
+  const handleSwitchCamera = useCallback(() => {
+    // The majority of mobile device will have labeled front and back cameras.
+    const currentCamera = cameras.find(device => device.deviceId === deviceId)
+
+    if (hasFrontCamera && hasBackCamera) {
+      if (currentCamera.label.toLowerCase().includes('back')) {
+        const frontCamera = cameras.find(device => device.label.toLowerCase().includes('front'))
+        setDeviceId(frontCamera.deviceId)
+      }
+
+      if (currentCamera.label.toLowerCase().includes('front')) {
+        const backCamera = cameras.find(device => device.label.toLowerCase().includes('back'))
+        setDeviceId(backCamera.deviceId)
+      }
+    }
+  }, [cameras, deviceId, hasBackCamera, hasFrontCamera])
+
+  const handleCameraCycle = useCallback(() => {
+    // If there are more than one camera then cycle through them, only if there are no camera clearly labeled and back and front
+    if (cameras.length > 1) {
+      const currentIndex = cameras.findIndex(device => device.deviceId === deviceId)
+
+      const nextDevice = currentIndex !== -1 ? cameras[(currentIndex + 1) % cameras.length] : null
+      setDeviceId(nextDevice.deviceId)
+    }
+  }, [cameras, deviceId])
 
   const getDevices = useCallback(async () => {
-    if (!devices.length) {
-      const enumerateDevices = await navigator.mediaDevices.enumerateDevices()
-      setDevices(enumerateDevices)
+    // Depending on your device you may have access to this list on initial load
+    // If you do not have access to this list then you will need to request a stream to get the list
+    const enumerateDevices = await navigator.mediaDevices.enumerateDevices()
+    const videoInputs = enumerateDevices.filter(device => device.kind === 'videoinput')
+
+    if (videoInputs.length !== cameras.length) {
+      setCameras(videoInputs)
     }
-  }, [devices.length])
+  }, [cameras])
 
-  const getStream = useCallback(async () => {
-    if (devices.length && !stream) {
-      const ua = navigator.userAgent.toLowerCase()
-      const cameras = devices.filter(device => device.kind === 'videoinput')
-      setCameras(cameras)
-      let rearCamera = cameras.find(device => device.label.toLowerCase().includes('back'))
-      if (!rearCamera) {
-        rearCamera = cameras[1] ?? cameras[0]
-      }
-      const videoMode =
-        cameras.length > 1
-          ? ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1
-            ? { facingMode: { exact: 'environment' } }
-            : { deviceId: rearCamera.deviceId }
-          : { facingMode: 'environment' }
+  const setDeviceIdFromStream = useCallback(userStream => {
+    const videoTracks = userStream.getVideoTracks()
 
-      setVideoMode(videoMode)
+    if (videoTracks.length > 0) {
+      const { deviceId } = videoTracks[0].getSettings()
+      setDeviceId(deviceId)
+    }
+  }, [])
+
+  useEffect(() => {
+    setHasFrontCamera(cameras.some(device => device.label.toLowerCase().includes('front')))
+    setHasBackCamera(cameras.some(device => device.label.toLowerCase().includes('back')))
+  }, [cameras])
+
+  return (
+    <>
+      {hasFrontCamera && hasBackCamera ? (
+        <Button icon="switch_camera" message={m.switchCamera} onClick={handleSwitchCamera} />
+      ) : (
+        cameras.length > 1 && (
+          <Button icon="switch_camera" message={m.switchCamera} onClick={handleCameraCycle} />
+        )
+      )}
+
+      <Stream
+        deviceId={deviceId}
+        getDevices={getDevices}
+        setDeviceIdFromStream={setDeviceIdFromStream}
+        onRead={onRead}
+        setError={setError}
+        setCapture={setCapture}
+      />
+    </>
+  )
+}
+
+Camera.propTypes = {
+  onRead: PropTypes.func.isRequired,
+  setCapture: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
+}
+
+const Stream = props => {
+  const { deviceId, getDevices, setDeviceIdFromStream, onRead, setCapture, setError } = props
+  const [stream, setStream] = useState(undefined)
+
+  useEffect(() => {
+    const getStream = async () => {
+      // Initially request the stream with the default camera for facing mode environment
+      // if device id is set then create stream with that device id and display video
       try {
-        const userStream = await navigator.mediaDevices.getUserMedia({
-          video: videoMode ? { ...videoMode } : { facingMode: 'environment' },
-        })
-        setStream(userStream)
+        if (!deviceId) {
+          const userStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' },
+          })
+          // After requesting the stream, get the devices again as we now have permission to see all devices
+          getDevices()
+          // On initial request set the device id from the stream, this should rerender this component
+          setDeviceIdFromStream(userStream)
+        } else {
+          const userStream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId },
+          })
+          // Only set the stream if the device id is set
+          setStream(userStream)
+        }
       } catch (error) {
         if (error instanceof DOMException && error.name === 'NotAllowedError') {
           setCapture(false)
@@ -74,51 +149,29 @@ const Video = props => {
         }
       }
     }
-  }, [devices, setCapture, setError, stream])
 
-  const switchStream = useCallback(async () => {
-    const ua = navigator.userAgent.toLowerCase()
-    if (ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1) {
-      const userStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: {
-            exact: videoMode.facingMode.exact === 'environment' ? 'user' : 'environment',
-          },
-        },
-      })
-      setStream(userStream)
-    } else if (videoMode.facingMode === 'environment') {
-      const userStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user' },
-      })
-      setStream(userStream)
-    } else if (videoMode.facingMode === 'user') {
-      const userStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
-      })
-      setStream(userStream)
-    } else if ('deviceId' in videoMode) {
-      let indexOfCurrentDevice = cameras.findIndex(camera => camera.deviceId === videoMode.deviceId)
-      // The first item will be taken from the beginning of the array after the last item.
-      const nextIndex = ++indexOfCurrentDevice % cameras.length
-      const device = cameras[nextIndex]
-      setVideoMode({ deviceId: device.deviceId })
-      const userStream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: device.deviceId },
-      })
-      setStream(userStream)
-    }
-  }, [cameras, videoMode])
-
-  useEffect(() => {
-    getDevices()
     getStream()
-    return () => {
-      if (stream) {
-        stream.getTracks().map(t => t.stop())
-      }
-    }
-  }, [devices, getDevices, getStream, stream])
+  }, [deviceId, getDevices, setCapture, setDeviceIdFromStream, setError])
+
+  return <Video stream={stream} onRead={onRead} />
+}
+
+Stream.propTypes = {
+  deviceId: PropTypes.string,
+  getDevices: PropTypes.func.isRequired,
+  onRead: PropTypes.func.isRequired,
+  setCapture: PropTypes.func.isRequired,
+  setDeviceIdFromStream: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
+}
+
+Stream.defaultProps = {
+  deviceId: undefined,
+}
+
+const Video = props => {
+  const { stream, onRead } = props
+  const videoRef = createRef()
 
   const handleVideoFrame = useCallback(
     video => {
@@ -137,19 +190,25 @@ const Video = props => {
   )
 
   useEffect(() => {
-    if (devices.length && stream) {
+    if (stream) {
       const video = videoRef.current
       video.srcObject = stream
       handleVideoFrame(video)
     }
-  }, [devices, handleVideoFrame, stream, videoRef])
+
+    return () => {
+      // On android devices if you do not stop the tracks then the camera will error
+      if (stream) {
+        stream.getTracks().forEach(track => {
+          track.stop()
+        })
+      }
+    }
+  }, [handleVideoFrame, stream, videoRef])
 
   return (
     <>
-      {cameras.length > 1 && (
-        <Button icon="switch_camera" message={m.switchCamera} onClick={switchStream} />
-      )}
-      {devices.length && stream ? (
+      {stream ? (
         <video
           autoPlay
           playsInline
@@ -168,10 +227,9 @@ const Video = props => {
 
 Video.propTypes = {
   onRead: PropTypes.func.isRequired,
-  setCapture: PropTypes.func.isRequired,
-  setError: PropTypes.func.isRequired,
   stream: PropTypes.shape({
     active: PropTypes.bool,
+    getTracks: PropTypes.func,
   }),
 }
 
@@ -179,4 +237,4 @@ Video.defaultProps = {
   stream: undefined,
 }
 
-export default Video
+export default Camera
