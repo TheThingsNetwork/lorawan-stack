@@ -36,8 +36,6 @@ import {
 import Message from './message'
 
 import '@ttn-lw/styles/main.styl'
-import '@ttn-lw/styles/utilities/general.styl'
-import '@ttn-lw/styles/utilities/spacing.styl'
 
 const m = defineMessages({
   initializing: 'Initializing…',
