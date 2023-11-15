@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - The Things Stack is now built with Go 1.21.
+- Statistics for gateways are now fetched in a single request.
 
 ### Deprecated
 
