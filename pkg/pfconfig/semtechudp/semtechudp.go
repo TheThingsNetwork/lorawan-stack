@@ -24,8 +24,8 @@ import (
 
 // Config represents the full configuration for Semtech's UDP Packet Forwarder.
 type Config struct {
-	SX1301Conf  shared.SX1301Config `json:"SX1301_conf"`
-	GatewayConf GatewayConf         `json:"gateway_conf"`
+	SX1301Conf  []*shared.SX1301Config `json:"SX1301_conf"`
+	GatewayConf GatewayConf            `json:"gateway_conf"`
 }
 
 // GatewayConf contains the configuration for the gateway's server connection.
@@ -50,22 +50,26 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 	if gateway.GetIds().GetEui() != nil {
 		c.GatewayConf.GatewayID = types.MustEUI64(gateway.GetIds().GetEui()).String()
 	}
-	c.GatewayConf.ServerAddress, c.GatewayConf.ServerPortUp, c.GatewayConf.ServerPortDown = host, uint32(port), uint32(port)
+	c.GatewayConf.ServerAddress = host
+	c.GatewayConf.ServerPortUp = uint32(port)
+	c.GatewayConf.ServerPortDown = uint32(port)
 	server := c.GatewayConf
 	server.Enabled = true
 	c.GatewayConf.Servers = append(c.GatewayConf.Servers, server)
 
-	frequencyPlan, err := store.GetByID(gateway.FrequencyPlanId)
-	if err != nil {
-		return nil, err
-	}
-	if len(frequencyPlan.Radios) != 0 {
-		sx1301Config, err := shared.BuildSX1301Config(frequencyPlan)
+	c.SX1301Conf = make([]*shared.SX1301Config, 0, len(gateway.FrequencyPlanIds))
+	for _, frequencyPlanID := range gateway.FrequencyPlanIds {
+		frequencyPlan, err := store.GetByID(frequencyPlanID)
 		if err != nil {
 			return nil, err
 		}
-		c.SX1301Conf = *sx1301Config
+		if len(frequencyPlan.Radios) != 0 {
+			sx1301Config, err := shared.BuildSX1301Config(frequencyPlan)
+			if err != nil {
+				return nil, err
+			}
+			c.SX1301Conf = append(c.SX1301Conf, sx1301Config)
+		}
 	}
-
 	return &c, nil
 }
