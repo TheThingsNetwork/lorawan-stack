@@ -119,7 +119,10 @@ const getGatewaysLogic = createRequestLogic({
       const gsConfig = selectGsConfig()
       const consoleGsAddress = getHostFromUrl(gsConfig.base_url)
       const gatewayIds = entities.map(e => e.ids)
-      const gatewaysStats = await tts.Gateways.getBatchStatistics(gatewayIds)
+      let gatewaysStats = null
+      if (gatewayIds.length) {
+        gatewaysStats = await tts.Gateways.getBatchStatistics(gatewayIds)
+      }
 
       entities = data.gateways.map(gateway => {
         const gatewayServerAddress = getHostFromUrl(gateway.gateway_server_address)
