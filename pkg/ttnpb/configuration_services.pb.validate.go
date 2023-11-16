@@ -49,6 +49,8 @@ func (m *ListFrequencyPlansRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "base_frequency":
 			// no validation rules for BaseFrequency
+		case "band_id":
+			// no validation rules for BandId
 		default:
 			return ListFrequencyPlansRequestValidationError{
 				field:  name,

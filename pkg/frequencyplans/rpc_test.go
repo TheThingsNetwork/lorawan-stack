@@ -79,4 +79,11 @@ func TestRPCServer(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(base915.FrequencyPlans, should.HaveLength, 2)
 	a.So(base915.FrequencyPlans, should.Resemble, expectedAll[:2])
+
+	bandAS, err := server.ListFrequencyPlans(context.Background(), &ttnpb.ListFrequencyPlansRequest{
+		BandId: "AS_923",
+	})
+	a.So(err, should.BeNil)
+	a.So(bandAS.FrequencyPlans, should.HaveLength, 1)
+	a.So(bandAS.FrequencyPlans[0], should.Resemble, expectedAll[1])
 }

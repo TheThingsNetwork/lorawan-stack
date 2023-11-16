@@ -6707,6 +6707,13 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "band_id",
+            "description": "Optional Band ID to filter the results.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

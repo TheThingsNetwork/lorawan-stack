@@ -3,10 +3,12 @@
 package ttnpb
 
 var ListFrequencyPlansRequestFieldPathsNested = []string{
+	"band_id",
 	"base_frequency",
 }
 
 var ListFrequencyPlansRequestFieldPathsTopLevel = []string{
+	"band_id",
 	"base_frequency",
 }
 var FrequencyPlanDescriptionFieldPathsNested = []string{
