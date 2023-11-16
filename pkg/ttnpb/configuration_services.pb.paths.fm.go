@@ -10,6 +10,7 @@ var ListFrequencyPlansRequestFieldPathsTopLevel = []string{
 	"base_frequency",
 }
 var FrequencyPlanDescriptionFieldPathsNested = []string{
+	"band_id",
 	"base_frequency",
 	"base_id",
 	"id",
@@ -17,6 +18,7 @@ var FrequencyPlanDescriptionFieldPathsNested = []string{
 }
 
 var FrequencyPlanDescriptionFieldPathsTopLevel = []string{
+	"band_id",
 	"base_frequency",
 	"base_id",
 	"id",

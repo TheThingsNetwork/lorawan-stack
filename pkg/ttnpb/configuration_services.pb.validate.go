@@ -139,6 +139,8 @@ func (m *FrequencyPlanDescription) ValidateFields(paths ...string) error {
 			// no validation rules for Name
 		case "base_frequency":
 			// no validation rules for BaseFrequency
+		case "band_id":
+			// no validation rules for BandId
 		default:
 			return FrequencyPlanDescriptionValidationError{
 				field:  name,

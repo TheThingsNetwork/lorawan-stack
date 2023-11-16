@@ -68,6 +68,16 @@ func (dst *FrequencyPlanDescription) SetFields(src *FrequencyPlanDescription, pa
 				var zero uint32
 				dst.BaseFrequency = zero
 			}
+		case "band_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BandId = src.BandId
+			} else {
+				var zero string
+				dst.BandId = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

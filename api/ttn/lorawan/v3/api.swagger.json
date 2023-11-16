@@ -22869,6 +22869,9 @@
           "type": "integer",
           "format": "int64",
           "title": "Base frequency in MHz for hardware support (433, 470, 868 or 915)"
+        },
+        "band_id": {
+          "type": "string"
         }
       }
     },

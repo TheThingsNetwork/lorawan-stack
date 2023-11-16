@@ -2650,6 +2650,7 @@ PeerInfo
 | `base_id` | [`string`](#string) |  | The ID of the frequency that the current frequency plan is based on. |
 | `name` | [`string`](#string) |  |  |
 | `base_frequency` | [`uint32`](#uint32) |  | Base frequency in MHz for hardware support (433, 470, 868 or 915) |
+| `band_id` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.GetPhyVersionsRequest">Message `GetPhyVersionsRequest`</a>
 
