@@ -261,7 +261,7 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 			return err
 		}
 		if len(gtws) != len(gtwIDs) {
-			if is.IsAdmin(ctx) {
+			if authInfo.IsAdmin {
 				// Return the cause only to the admin.
 				// This follows the same logic as in ListRights.
 				return errSomeGatewaysNotFound.New()
@@ -322,6 +322,11 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		if len(entityIDs) == 0 {
 			return nil
 		}
+		if authInfo.IsAdmin {
+			if authInfo.GetUniversalRights().IncludesAll(requiredGatewayRights.GetRights()...) {
+				return nil
+			}
+		}
 		membershipChains, err := st.FindAccountMembershipChains(
 			ctx,
 			ouID,
@@ -332,10 +337,6 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 			return err
 		}
 		if len(membershipChains) != len(entityIDs) {
-			// Some memberships were not found.
-			if is.IsAdmin(ctx) {
-				return errSomeGatewaysNotFound.New()
-			}
 			return errInsufficientRights.New()
 		}
 		for _, chain := range membershipChains {
