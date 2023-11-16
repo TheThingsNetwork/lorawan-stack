@@ -12,56 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import displayName from 'react-display-name'
+import React, { useContext, useEffect } from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { warn } from '@ttn-lw/lib/log'
 
-export const withEnv = Component => {
-  const Base =
-    Component.prototype instanceof React.Component ? React.Component : React.PureComponent
+const useEnv = () => {
+  const context = useContext(EnvProviderContext)
 
-  class WithEnv extends Base {
-    static displayName = `WithEnv(${displayName(Component)})`
-
-    static contextTypes = {
-      env: PropTypes.env,
+  useEffect(() => {
+    if (!context.env) {
+      warn('No env in context')
     }
+  }, [context.env])
 
-    render() {
-      const { env } = this.context
-
-      if (!env) {
-        warn('No env in context, make sure to use env.Provider')
-      }
-
-      return <Component env={env || {}} {...this.props} />
-    }
-  }
-
-  return WithEnv
+  return { env: context.env }
 }
 
-export class EnvProvider extends React.PureComponent {
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    env: PropTypes.env.isRequired,
-  }
+export const EnvProviderContext = React.createContext()
 
-  static childContextTypes = {
-    env: PropTypes.env.isRequired,
-  }
+export const EnvProvider = ({ children, env }) => (
+  <EnvProviderContext.Provider value={{ env }}>{children}</EnvProviderContext.Provider>
+)
 
-  getChildContext() {
-    return {
-      env: this.props.env,
-    }
-  }
-
-  render() {
-    return this.props.children
-  }
+EnvProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+  env: PropTypes.env.isRequired,
 }
 
-export default withEnv
+export default useEnv
