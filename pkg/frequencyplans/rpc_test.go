@@ -26,18 +26,22 @@ import (
 )
 
 func TestRPCServer(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	store := frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{
 		"frequency-plans.yml": []byte(`- id: A
+  band-id: EU_863_870
   description: Frequency Plan A
   base-frequency: 868
   file: A.yml
 - id: B
+  band-id: AS_923
   base-id: A
   description: Frequency Plan B
   file: B.yml
 - id: C
+  band-id: US_902_928
   description: Frequency Plan C
   base-frequency: 915
   file: C.yml`),
@@ -45,13 +49,41 @@ func TestRPCServer(t *testing.T) {
 
 	server := frequencyplans.NewRPCServer(store)
 
-	all, err := server.ListFrequencyPlans(context.Background(), &ttnpb.ListFrequencyPlansRequest{})
+	expectedAll := []*ttnpb.FrequencyPlanDescription{
+		{
+			Id:            "A",
+			BandId:        "EU_863_870",
+			BaseFrequency: 868,
+		},
+		{
+			Id:            "B",
+			BaseId:        "A",
+			BaseFrequency: 868,
+			BandId:        "AS_923",
+		},
+		{
+			Id:            "C",
+			BaseFrequency: 915,
+			BandId:        "US_902_928",
+		},
+	}
+
+	actualAll, err := server.ListFrequencyPlans(context.Background(), &ttnpb.ListFrequencyPlansRequest{})
 	a.So(err, should.BeNil)
-	a.So(all.FrequencyPlans, should.HaveLength, 3)
+	a.So(actualAll.FrequencyPlans, should.HaveLength, 3)
+	a.So(actualAll.FrequencyPlans[0], should.Resemble, expectedAll[0])
 
 	base915, err := server.ListFrequencyPlans(context.Background(), &ttnpb.ListFrequencyPlansRequest{
 		BaseFrequency: 868,
 	})
 	a.So(err, should.BeNil)
 	a.So(base915.FrequencyPlans, should.HaveLength, 2)
+	a.So(base915.FrequencyPlans, should.Resemble, expectedAll[:2])
+
+	bandAS, err := server.ListFrequencyPlans(context.Background(), &ttnpb.ListFrequencyPlansRequest{
+		BandId: "AS_923",
+	})
+	a.So(err, should.BeNil)
+	a.So(bandAS.FrequencyPlans, should.HaveLength, 1)
+	a.So(bandAS.FrequencyPlans[0], should.Resemble, expectedAll[1])
 }

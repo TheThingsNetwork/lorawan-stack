@@ -14,6 +14,7 @@ import (
 // AddSetFlagsForListFrequencyPlansRequest adds flags to select fields in ListFrequencyPlansRequest.
 func AddSetFlagsForListFrequencyPlansRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("base-frequency", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("band-id", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the ListFrequencyPlansRequest message from flags.
@@ -23,6 +24,12 @@ func (m *ListFrequencyPlansRequest) SetFromFlags(flags *pflag.FlagSet, prefix st
 	} else if changed {
 		m.BaseFrequency = val
 		paths = append(paths, flagsplugin.Prefix("base_frequency", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("band_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.BandId = val
+		paths = append(paths, flagsplugin.Prefix("band_id", prefix))
 	}
 	return paths, nil
 }

@@ -32,6 +32,8 @@ message ListFrequencyPlansRequest {
   };
   // Optional base frequency in MHz for hardware support (433, 470, 868 or 915)
   uint32 base_frequency = 1;
+  // Optional Band ID to filter the results.
+  string band_id = 2;
 }
 
 message FrequencyPlanDescription {
@@ -41,6 +43,7 @@ message FrequencyPlanDescription {
   string name = 3;
   // Base frequency in MHz for hardware support (433, 470, 868 or 915)
   uint32 base_frequency = 4;
+  string band_id = 5;
 }
 
 message ListFrequencyPlansResponse {
