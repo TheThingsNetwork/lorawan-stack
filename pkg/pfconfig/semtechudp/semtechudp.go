@@ -16,6 +16,8 @@
 package semtechudp
 
 import (
+	"encoding/json"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -26,6 +28,37 @@ import (
 type Config struct {
 	SX1301Conf  []*shared.SX1301Config `json:"SX1301_conf"`
 	GatewayConf GatewayConf            `json:"gateway_conf"`
+}
+
+// SingleSX1301Config is a helper type for marshaling a config with a single SX1301Config.
+type singleSX1301Config struct {
+	SX1301Conf  *shared.SX1301Config `json:"SX1301_conf"`
+	GatewayConf GatewayConf          `json:"gateway_conf"`
+}
+
+// MarshalJSON implements json.Marshaler.
+// Serializes the SX1301Conf field as an object if it contains a single element and as an array otherwise.
+func (c Config) MarshalJSON() ([]byte, error) {
+	if len(c.SX1301Conf) == 1 {
+		return json.Marshal(singleSX1301Config{
+			SX1301Conf:  c.SX1301Conf[0],
+			GatewayConf: c.GatewayConf,
+		})
+	}
+	type alias Config
+	return json.Marshal(alias(c))
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (c *Config) UnmarshalJSON(data []byte) error {
+	var single singleSX1301Config
+	if err := json.Unmarshal(data, &single); err == nil {
+		c.SX1301Conf = []*shared.SX1301Config{single.SX1301Conf}
+		c.GatewayConf = single.GatewayConf
+		return nil
+	}
+	type alias Config
+	return json.Unmarshal(data, (*alias)(c))
 }
 
 // GatewayConf contains the configuration for the gateway's server connection.
