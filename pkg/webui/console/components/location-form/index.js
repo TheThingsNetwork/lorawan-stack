@@ -104,8 +104,8 @@ const LocationForm = props => {
   } = props
 
   const form = useRef(null)
-  const [latitude, setLatitude] = useState(defaultLocation[0])
-  const [longitude, setLongitude] = useState(defaultLocation[1])
+  const [latitude, setLatitude] = useState(props.initialValues.latitude)
+  const [longitude, setLongitude] = useState(props.initialValues.longitude)
   const [zoom, setZoom] = useState(14)
   const [error, setError] = useState(undefined)
   const [mapCenter, setMapCenter] = useState(undefined)
@@ -123,38 +123,40 @@ const LocationForm = props => {
     markers.push({ position: { longitude, latitude } })
   }
 
-  useEffect(() => {
-    if (entryExists) {
-      setLatitude(initialValues.latitude)
-      setLongitude(initialValues.longitude)
-      setMapCenter([initialValues.latitude, initialValues.longitude])
-    }
-  }, [entryExists, initialValues.latitude, initialValues.longitude])
-
-  useEffect(() => {
-    if (!hasLocationSet(initialValues) && additionalMarkers.length === 0) {
-      if ('geolocation' in navigator) {
+  const getCurrentLocation = useCallback(async () => {
+    let newState = { mapCenter: defaultLocation }
+    if (
+      !hasLocationSet(initialValues) &&
+      additionalMarkers.length === 0 &&
+      'geolocation' in navigator
+    ) {
+      newState = await new Promise(resolve => {
         navigator.geolocation.getCurrentPosition(
           position => {
-            const latitude = isNaN(position.coords.latitude)
-              ? defaultLocation[0]
-              : position.coords.latitude
-            const longitude = isNaN(position.coords.longitude)
-              ? defaultLocation[1]
-              : position.coords.longitude
-            setLatitude(latitude)
-            setLongitude(longitude)
-            setMapCenter([latitude, longitude])
+            resolve({
+              mapCenter: [
+                isNaN(position.coords.latitude) ? defaultLocation[0] : position.coords.latitude,
+                isNaN(position.coords.longitude) ? defaultLocation[1] : position.coords.longitude,
+              ],
+            })
           },
           () => {
-            setMapCenter(defaultLocation)
-            setZoom(2)
+            resolve({ mapCenter: defaultLocation, zoom: 2 })
           },
         )
-      }
+      })
     }
-    setLoading(false)
+
+    return newState
   }, [additionalMarkers.length, initialValues])
+
+  useEffect(() => {
+    getCurrentLocation().then(res => {
+      setMapCenter(res.mapCenter)
+      setZoom(res.zoom ?? 2)
+      setLoading(false)
+    })
+  }, [getCurrentLocation])
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting }) => {
@@ -245,106 +247,104 @@ const LocationForm = props => {
   }, [deleteAll, entityId, onDelete])
 
   return (
-    <React.Fragment>
-      <Form
-        error={error}
-        validateOnChange
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-        formikRef={form}
-      >
-        <Form.SubTitle title={formTitle} />
-        {children}
-        <Message content={sharedMessages.location} component="h4" className="mb-cs-xs mt-0" />
-        {!entryExists && <Notification content={noLocationSetInfo} info small />}
-        <Overlay loading={loading} visible={loading} spinnerMessage={m.loadingLocation}>
-          <LocationMap
-            widget
-            leafletConfig={{ zoom, minZoom: 1 }}
-            mapCenter={mapCenter}
-            markers={markers}
-            onClick={handleClick}
-            clickable
-            centerOnMarkers
-          />
-        </Overlay>
-        <Message
-          content={updatesDisabled ? m.mapDescriptionDisabled : m.mapDescription}
-          component="p"
-          className="p-0 mt-cs-xs mb-cs-l tc-subtle-gray"
+    <Form
+      error={error}
+      validateOnChange
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+      formikRef={form}
+    >
+      <Form.SubTitle title={formTitle} />
+      {children}
+      <Message content={sharedMessages.location} component="h4" className="mb-cs-xs mt-0" />
+      {!entryExists && <Notification content={noLocationSetInfo} info small />}
+      <Overlay loading={loading} visible={loading} spinnerMessage={m.loadingLocation}>
+        <LocationMap
+          widget
+          leafletConfig={{ zoom, minZoom: 1 }}
+          mapCenter={mapCenter}
+          markers={markers}
+          onClick={handleClick}
+          clickable
+          centerOnMarkers
         />
-        {updatesDisabled && disabledInfo && <Notification content={disabledInfo} info small />}
-        <Form.Field
-          type="number"
-          step="any"
-          title={sharedMessages.latitude}
-          description={sharedMessages.latitudeDesc}
-          name="latitude"
-          component={Input}
-          required={!updatesDisabled}
-          disabled={updatesDisabled}
-          onBlur={handleLatitudeChange}
+      </Overlay>
+      <Message
+        content={updatesDisabled ? m.mapDescriptionDisabled : m.mapDescription}
+        component="p"
+        className="p-0 mt-cs-xs mb-cs-l tc-subtle-gray"
+      />
+      {updatesDisabled && disabledInfo && <Notification content={disabledInfo} info small />}
+      <Form.Field
+        type="number"
+        step="any"
+        title={sharedMessages.latitude}
+        description={sharedMessages.latitudeDesc}
+        name="latitude"
+        component={Input}
+        required={!updatesDisabled}
+        disabled={updatesDisabled}
+        onBlur={handleLatitudeChange}
+      />
+      <Form.Field
+        type="number"
+        step="any"
+        title={sharedMessages.longitude}
+        description={sharedMessages.longitudeDesc}
+        name="longitude"
+        component={Input}
+        required={!updatesDisabled}
+        disabled={updatesDisabled}
+        onBlur={handleLongitudeChange}
+      />
+      <Form.Field
+        type="number"
+        step="1"
+        title={sharedMessages.altitude}
+        description={sharedMessages.altitudeDesc}
+        name="altitude"
+        component={Input}
+        required={!updatesDisabled}
+        disabled={updatesDisabled}
+      />
+      <SubmitBar>
+        <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
+        <ModalButton
+          type="button"
+          icon="delete"
+          message={m.deleteLocation}
+          modalData={{
+            children: (
+              <div>
+                <Message
+                  content={onlyAutomaticExists ? m.deleteAllWarning : m.deleteWarning}
+                  component="span"
+                />
+                {entryExists && automaticExists && (
+                  <>
+                    <br />
+                    <br />
+                    <Message content={m.deleteAllInfo} component="span" />
+                    <Checkbox
+                      name="delete-all"
+                      label={m.deleteAllLocations}
+                      onChange={handleDeleteAllCheck}
+                      className="mt-cs-m"
+                      value={deleteAll}
+                    />
+                  </>
+                )}
+              </div>
+            ),
+          }}
+          onApprove={handleDelete}
+          disabled={updatesDisabled || !anyEntryExists}
+          naked
+          danger
         />
-        <Form.Field
-          type="number"
-          step="any"
-          title={sharedMessages.longitude}
-          description={sharedMessages.longitudeDesc}
-          name="longitude"
-          component={Input}
-          required={!updatesDisabled}
-          disabled={updatesDisabled}
-          onBlur={handleLongitudeChange}
-        />
-        <Form.Field
-          type="number"
-          step="1"
-          title={sharedMessages.altitude}
-          description={sharedMessages.altitudeDesc}
-          name="altitude"
-          component={Input}
-          required={!updatesDisabled}
-          disabled={updatesDisabled}
-        />
-        <SubmitBar>
-          <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-          <ModalButton
-            type="button"
-            icon="delete"
-            message={m.deleteLocation}
-            modalData={{
-              children: (
-                <div>
-                  <Message
-                    content={onlyAutomaticExists ? m.deleteAllWarning : m.deleteWarning}
-                    component="span"
-                  />
-                  {entryExists && automaticExists && (
-                    <>
-                      <br />
-                      <br />
-                      <Message content={m.deleteAllInfo} component="span" />
-                      <Checkbox
-                        name="delete-all"
-                        label={m.deleteAllLocations}
-                        onChange={handleDeleteAllCheck}
-                        className="mt-cs-m"
-                        value={deleteAll}
-                      />
-                    </>
-                  )}
-                </div>
-              ),
-            }}
-            onApprove={handleDelete}
-            disabled={updatesDisabled || !anyEntryExists}
-            naked
-            danger
-          />
-        </SubmitBar>
-      </Form>
-    </React.Fragment>
+      </SubmitBar>
+    </Form>
   )
 }
 

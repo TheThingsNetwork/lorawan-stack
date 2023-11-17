@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -48,138 +47,125 @@ import validationSchema from './validation-schema'
 
 const pathPlaceholder = 'sub-topic'
 
-export default class PubsubForm extends Component {
-  static propTypes = {
-    appId: PropTypes.string.isRequired,
-    existCheck: PropTypes.func,
-    initialPubsubValue: PropTypes.pubsub,
-    mqttDisabled: PropTypes.bool.isRequired,
-    natsDisabled: PropTypes.bool.isRequired,
-    onDelete: PropTypes.func,
-    onSubmit: PropTypes.func.isRequired,
-    update: PropTypes.bool.isRequired,
-  }
+const PubsubForm = props => {
+  const form = useRef(null)
+  const modalResolve = useRef(() => {})
+  const modalReject = useRef(() => {})
 
-  static defaultProps = {
-    initialPubsubValue: undefined,
-    existCheck: () => false,
-    onDelete: () => null,
-  }
+  const {
+    initialPubsubValue,
+    update,
+    mqttDisabled,
+    natsDisabled,
+    appId,
+    onSubmit,
+    existCheck,
+    onDelete,
+  } = props
+  const [error, setError] = useState(undefined)
+  const [provider, setProvider] = useState(blankValues._provider)
+  const [mqttSecure, setMqttSecure] = useState(true)
+  const [mqttUseCredentials, setMqttUseCredentials] = useState(true)
+  const [natsUseCredentials, setNatsUseCredentials] = useState(true)
+  const [displayOverwriteModal, setDisplayOverwriteModal] = useState(false)
+  const [existingId, setExistingId] = useState(undefined)
 
-  constructor(props) {
-    super(props)
-
-    this.form = React.createRef()
-    this.modalResolve = () => null
-    this.modalReject = () => null
-
-    const { initialPubsubValue, update, mqttDisabled, natsDisabled } = this.props
-
-    this.state = {
-      error: undefined,
-      mqttDisabled,
-      provider: blankValues._provider,
-      mqttUseCredentials: true,
-      natsUseCredentials: true,
-      natsDisabled,
-      displayOverwriteModal: false,
-      existingId: undefined,
+  const initialValues = useMemo(() => {
+    if (update && initialPubsubValue) {
+      return mapPubsubToFormValues(initialPubsubValue)
     }
+    return {
+      ...blankValues,
+      _provider: provider,
+    }
+  }, [initialPubsubValue, provider, update])
 
+  useEffect(() => {
     if (natsDisabled && mqttDisabled) {
-      this.state.provider = blankValues._provider
+      setProvider(blankValues._provider)
     } else {
-      this.state.provider = natsDisabled ? providers.MQTT : providers.NATS
+      setProvider(natsDisabled ? providers.MQTT : providers.NATS)
     }
 
     if (update && 'nats' in initialPubsubValue) {
       const { password, username } = mapNatsFormValues(initialPubsubValue.nats)
-      this.state.provider = providers.NATS
-      this.state.natsUseCredentials = Boolean(password || username)
+      setProvider(providers.NATS)
+      setNatsUseCredentials(Boolean(password || username))
     } else if (update && 'mqtt' in initialPubsubValue) {
-      this.state.provider = providers.MQTT
-      this.state.mqttSecure = initialPubsubValue.mqtt.use_tls
-      this.state.mqttUseCredentials = Boolean(
-        initialPubsubValue.mqtt.username || initialPubsubValue.mqtt.password,
+      setProvider(providers.MQTT)
+      setMqttSecure(initialPubsubValue.mqtt.use_tls)
+      setMqttUseCredentials(
+        Boolean(initialPubsubValue.mqtt.username || initialPubsubValue.mqtt.password),
       )
     }
-  }
+  }, [initialPubsubValue, mqttDisabled, natsDisabled, update])
 
-  @bind
-  async handleSubmit(values, { resetForm }) {
-    const { appId, onSubmit, existCheck, update } = this.props
+  const handleSubmit = useCallback(
+    async (values, { resetForm }) => {
+      const castedValues = validationSchema.cast(values)
+      const pubsub = mapFormValuesToPubsub(castedValues, appId)
+      setError('')
 
-    const castedValues = validationSchema.cast(values)
-    const pubsub = mapFormValuesToPubsub(castedValues, appId)
-
-    this.setState({ error: '' })
-
-    try {
-      if (!update) {
-        const pubsubId = pubsub.ids.pub_sub_id
-        const exists = await existCheck(pubsubId)
-        if (exists) {
-          this.setState({ displayOverwriteModal: true, existingId: pubsubId })
-          await new Promise((resolve, reject) => {
-            this.modalResolve = resolve
-            this.modalReject = reject
-          })
+      try {
+        if (!update) {
+          const pubsubId = pubsub.ids.pub_sub_id
+          const exists = await existCheck(pubsubId)
+          if (exists) {
+            setDisplayOverwriteModal(true)
+            setExistingId(pubsubId)
+            await new Promise((resolve, reject) => {
+              modalResolve.current = resolve
+              modalReject.current = reject
+            })
+          }
         }
+        await onSubmit(pubsub)
+
+        resetForm({ values })
+      } catch (error) {
+        resetForm({ values })
+        setError(error)
       }
-      await onSubmit(pubsub)
+    },
+    [appId, existCheck, onSubmit, update],
+  )
 
-      resetForm({ values })
-    } catch (error) {
-      resetForm({ values })
-
-      this.setState({ error })
-    }
-  }
-
-  @bind
-  async handleDelete() {
-    const { onDelete } = this.props
+  const handleDelete = useCallback(async () => {
     try {
       await onDelete()
-      this.form.current.resetForm()
+      form.current.resetForm()
     } catch (error) {
-      this.setState({ error })
+      setError(error)
     }
-  }
+  }, [onDelete])
 
-  @bind
-  handleProviderSelect(event) {
-    this.setState({ provider: event.target.value })
-  }
+  const handleProviderSelect = useCallback(event => {
+    setProvider(event.target.value)
+  }, [])
 
-  @bind
-  handleUseCredentialsChangeNats(event) {
-    this.setState({ natsUseCredentials: event.target.checked })
-  }
+  const handleUseCredentialsChangeNats = useCallback(event => {
+    setNatsUseCredentials(event.target.checked)
+  }, [])
 
-  @bind
-  handleMqttUseTlsChange(event) {
-    this.setState({ mqttSecure: event.target.checked })
-  }
+  const handleMqttUseTlsChange = useCallback(event => {
+    setMqttSecure(event.target.checked)
+  }, [])
 
-  @bind
-  handleUseCredentialsChangeMqtt(event) {
-    this.setState({ mqttUseCredentials: event.target.checked })
-  }
+  const handleUseCredentialsChangeMqtt = useCallback(event => {
+    setMqttUseCredentials(event.target.checked)
+  }, [])
 
-  @bind
-  handleReplaceModalDecision(mayReplace) {
+  const handleReplaceModalDecision = useCallback(mayReplace => {
     if (mayReplace) {
-      this.modalResolve()
+      modalResolve.current()
     } else {
-      this.modalReject()
+      modalReject.current()
     }
-    this.setState({ displayOverwriteModal: false })
-  }
+    setDisplayOverwriteModal(false)
+  }, [])
 
-  get natsSection() {
-    const { natsUseCredentials } = this.state
-    return (
+  const natsSection = useMemo(
+    () => (
       <>
         <Form.SubTitle title={m.natsConfig} />
         <Form.Field name="nats.secure" label={m.useSecureConnection} component={Checkbox} />
@@ -187,7 +173,7 @@ export default class PubsubForm extends Component {
           name="nats._use_credentials"
           label={m.useCredentials}
           component={Checkbox}
-          onChange={this.handleUseCredentialsChangeNats}
+          onChange={handleUseCredentialsChangeNats}
         />
         <Form.Field
           name="nats.username"
@@ -223,20 +209,19 @@ export default class PubsubForm extends Component {
           required
         />
       </>
-    )
-  }
+    ),
+    [handleUseCredentialsChangeNats, natsUseCredentials],
+  )
 
-  get mqttSection() {
-    const { mqttSecure, mqttUseCredentials } = this.state
-
-    return (
+  const mqttSection = useMemo(
+    () => (
       <>
         <Form.SubTitle title={m.mqttConfig} />
         <Form.Field
           name="mqtt.use_tls"
           label={m.useSecureConnection}
           component={Checkbox}
-          onChange={this.handleMqttUseTlsChange}
+          onChange={handleMqttUseTlsChange}
         />
         {mqttSecure && (
           <>
@@ -287,7 +272,7 @@ export default class PubsubForm extends Component {
           name="mqtt._use_credentials"
           label={m.useCredentials}
           component={Checkbox}
-          onChange={this.handleUseCredentialsChangeMqtt}
+          onChange={handleUseCredentialsChangeMqtt}
         />
         <Form.Field
           name="mqtt.username"
@@ -320,11 +305,12 @@ export default class PubsubForm extends Component {
           options={qosOptions}
         />
       </>
-    )
-  }
+    ),
+    [handleMqttUseTlsChange, handleUseCredentialsChangeMqtt, mqttSecure, mqttUseCredentials],
+  )
 
-  get messageTypesSection() {
-    return (
+  const messageTypesSection = useMemo(
+    () => (
       <>
         <Form.SubTitle title={sharedMessages.eventEnabledTypes} className="mb-0" />
         <Message component="p" content={m.messageInfo} className="mt-0 mb-ls-xxs" />
@@ -441,93 +427,103 @@ export default class PubsubForm extends Component {
           description={sharedMessages.eventDownlinkReplaceDesc}
         />
       </>
-    )
-  }
+    ),
+    [],
+  )
 
-  render() {
-    const { update, initialPubsubValue, mqttDisabled, natsDisabled } = this.props
-    const { error, provider, displayOverwriteModal, existingId } = this.state
-    let initialValues = blankValues
-    if (update && initialPubsubValue) {
-      initialValues = mapPubsubToFormValues(initialPubsubValue)
-    }
-
-    return (
-      <>
-        <Message
-          content={m.pubsubsDescription}
-          values={{
-            Link: val => (
-              <Link.DocLink path="/integrations/pubsub" secondary>
-                {val}
-              </Link.DocLink>
-            ),
-          }}
-          component="p"
+  return (
+    <>
+      <Message
+        content={m.pubsubsDescription}
+        values={{
+          Link: val => (
+            <Link.DocLink path="/integrations/pubsub" secondary>
+              {val}
+            </Link.DocLink>
+          ),
+        }}
+        component="p"
+      />
+      <hr className="mb-ls-m" />
+      <Form
+        onSubmit={handleSubmit}
+        validationSchema={validationSchema}
+        initialValues={initialValues}
+        error={error}
+        formikRef={form}
+      >
+        <PortalledModal
+          title={sharedMessages.idAlreadyExists}
+          message={{ ...m.alreadyExistsModalMessage, values: { id: existingId } }}
+          buttonMessage={m.replacePubsub}
+          onComplete={handleReplaceModalDecision}
+          approval
+          visible={displayOverwriteModal}
         />
-        <hr className="mb-ls-m" />
-        <Form
-          onSubmit={this.handleSubmit}
-          validationSchema={validationSchema}
-          initialValues={initialValues}
-          error={error}
-          formikRef={this.form}
+        <Form.SubTitle title={sharedMessages.generalSettings} />
+        <Form.Field
+          name="pub_sub_id"
+          title={sharedMessages.pubsubId}
+          placeholder={m.idPlaceholder}
+          component={Input}
+          required
+          autoFocus
+          disabled={update}
+        />
+        <Form.Field
+          horizontal
+          title={sharedMessages.provider}
+          name="_provider"
+          component={Radio.Group}
+          disabled={natsDisabled || mqttDisabled}
         >
-          <PortalledModal
-            title={sharedMessages.idAlreadyExists}
-            message={{ ...m.alreadyExistsModalMessage, values: { id: existingId } }}
-            buttonMessage={m.replacePubsub}
-            onComplete={this.handleReplaceModalDecision}
-            approval
-            visible={displayOverwriteModal}
+          <Radio label="NATS" value={providers.NATS} onChange={handleProviderSelect} />
+          <Radio label="MQTT" value={providers.MQTT} onChange={handleProviderSelect} />
+        </Form.Field>
+        {provider === providers.NATS && natsSection}
+        {provider === providers.MQTT && mqttSection}
+        {messageTypesSection}
+        <SubmitBar>
+          <Form.Submit
+            component={SubmitButton}
+            message={update ? sharedMessages.saveChanges : sharedMessages.addPubsub}
           />
-          <Form.SubTitle title={sharedMessages.generalSettings} />
-          <Form.Field
-            name="pub_sub_id"
-            title={sharedMessages.pubsubId}
-            placeholder={m.idPlaceholder}
-            component={Input}
-            required
-            autoFocus
-            disabled={update}
-          />
-          <Form.Field
-            horizontal
-            title={sharedMessages.provider}
-            name="_provider"
-            component={Radio.Group}
-            disabled={natsDisabled || mqttDisabled}
-          >
-            <Radio label="NATS" value={providers.NATS} onChange={this.handleProviderSelect} />
-            <Radio label="MQTT" value={providers.MQTT} onChange={this.handleProviderSelect} />
-          </Form.Field>
-          {provider === providers.NATS && this.natsSection}
-          {provider === providers.MQTT && this.mqttSection}
-          {this.messageTypesSection}
-          <SubmitBar>
-            <Form.Submit
-              component={SubmitButton}
-              message={update ? sharedMessages.saveChanges : sharedMessages.addPubsub}
+          {update && (
+            <ModalButton
+              type="button"
+              icon="delete"
+              danger
+              naked
+              message={m.deletePubsub}
+              modalData={{
+                message: {
+                  values: { pubsubId: initialPubsubValue.ids.pub_sub_id },
+                  ...m.modalWarning,
+                },
+              }}
+              onApprove={handleDelete}
             />
-            {update && (
-              <ModalButton
-                type="button"
-                icon="delete"
-                danger
-                naked
-                message={m.deletePubsub}
-                modalData={{
-                  message: {
-                    values: { pubsubId: initialPubsubValue.ids.pub_sub_id },
-                    ...m.modalWarning,
-                  },
-                }}
-                onApprove={this.handleDelete}
-              />
-            )}
-          </SubmitBar>
-        </Form>
-      </>
-    )
-  }
+          )}
+        </SubmitBar>
+      </Form>
+    </>
+  )
 }
+PubsubForm.propTypes = {
+  appId: PropTypes.string.isRequired,
+  existCheck: PropTypes.func,
+  initialPubsubValue: PropTypes.pubsub,
+  mqttDisabled: PropTypes.bool.isRequired,
+  natsDisabled: PropTypes.bool.isRequired,
+  onDelete: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
+  update: PropTypes.bool.isRequired,
+}
+
+PubsubForm.defaultProps = {
+  initialPubsubValue: undefined,
+  existCheck: () => false,
+  onDelete: () => null,
+}
+
+export default PubsubForm
