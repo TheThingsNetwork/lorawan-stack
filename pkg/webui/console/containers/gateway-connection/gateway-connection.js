@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import classnames from 'classnames'
 import { FormattedNumber, defineMessages } from 'react-intl'
 
@@ -44,45 +44,26 @@ const m = defineMessages({
     'The amount of received uplinks and sent downlinks of this gateway since the last (re)connect. Note that some gateway types reconnect frequently causing the counter to be reset.',
 })
 
-class GatewayConnection extends React.PureComponent {
-  static propTypes = {
-    className: PropTypes.string,
-    error: PropTypes.oneOfType([PropTypes.error, PropTypes.shape({ message: PropTypes.message })]),
-    fetching: PropTypes.bool,
-    isOtherCluster: PropTypes.bool.isRequired,
-    lastSeen: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number, // Support timestamps.
-      PropTypes.instanceOf(Date),
-    ]),
-    startStatistics: PropTypes.func.isRequired,
-    statistics: PropTypes.gatewayStats,
-    stopStatistics: PropTypes.func.isRequired,
-  }
+const GatewayConnection = props => {
+  const {
+    startStatistics,
+    stopStatistics,
+    statistics,
+    error,
+    fetching,
+    lastSeen,
+    isOtherCluster,
+    className,
+  } = props
 
-  static defaultProps = {
-    className: undefined,
-    fetching: false,
-    error: null,
-    statistics: null,
-    lastSeen: undefined,
-  }
-
-  componentDidMount() {
-    const { startStatistics } = this.props
-
+  useEffect(() => {
     startStatistics()
-  }
+    return () => {
+      stopStatistics()
+    }
+  }, [startStatistics, stopStatistics])
 
-  componentWillUnmount() {
-    const { stopStatistics } = this.props
-
-    stopStatistics()
-  }
-
-  get status() {
-    const { statistics, error, fetching, lastSeen, isOtherCluster } = this.props
-
+  const status = useMemo(() => {
     const statsNotFound = Boolean(error) && isNotFoundError(error)
     const isDisconnected = Boolean(statistics) && Boolean(statistics.disconnected_at)
     const isFetching = !Boolean(statistics) && fetching
@@ -170,11 +151,9 @@ class GatewayConnection extends React.PureComponent {
     }
 
     return node
-  }
+  }, [error, fetching, isOtherCluster, lastSeen, statistics])
 
-  get messages() {
-    const { statistics } = this.props
-
+  const messages = useMemo(() => {
     if (!statistics) {
       return null
     }
@@ -199,18 +178,37 @@ class GatewayConnection extends React.PureComponent {
         </div>
       </Tooltip>
     )
-  }
+  }, [statistics])
 
-  render() {
-    const { className } = this.props
+  return (
+    <div className={classnames(className, style.container)}>
+      {messages}
+      {status}
+    </div>
+  )
+}
 
-    return (
-      <div className={classnames(className, style.container)}>
-        {this.messages}
-        {this.status}
-      </div>
-    )
-  }
+GatewayConnection.propTypes = {
+  className: PropTypes.string,
+  error: PropTypes.oneOfType([PropTypes.error, PropTypes.shape({ message: PropTypes.message })]),
+  fetching: PropTypes.bool,
+  isOtherCluster: PropTypes.bool.isRequired,
+  lastSeen: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number, // Support timestamps.
+    PropTypes.instanceOf(Date),
+  ]),
+  startStatistics: PropTypes.func.isRequired,
+  statistics: PropTypes.gatewayStats,
+  stopStatistics: PropTypes.func.isRequired,
+}
+
+GatewayConnection.defaultProps = {
+  className: undefined,
+  fetching: false,
+  error: null,
+  statistics: null,
+  lastSeen: undefined,
 }
 
 export default GatewayConnection
