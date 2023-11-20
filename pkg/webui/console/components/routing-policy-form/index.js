@@ -33,8 +33,6 @@ import Yup from '@ttn-lw/lib/yup'
 import { isValidPolicy } from '@console/lib/packet-broker/utils'
 import policyMessages from '@console/lib/packet-broker/messages'
 
-import style from './routing-policy-form.styl'
-
 const m = defineMessages({
   saveDefaultPolicy: 'Save default policy',
   useDefaultPolicy: 'Use default routing policy for this network',
@@ -84,7 +82,7 @@ const RoutingPolicyForm = ({
           {networkLevel ? (
             <Form.Field
               component={Radio.Group}
-              className={style.policySource}
+              className="mb-ls-s"
               name="_use_default_policy"
               onChange={handlePolicySourceChange}
               encode={policySourceEncode}
@@ -99,7 +97,7 @@ const RoutingPolicyForm = ({
           ) : (
             <Form.Field
               component={Radio.Group}
-              className={style.policySource}
+              className="mb-ls-s"
               name="_use_default_policy"
               onChange={handlePolicySourceChange}
               encode={useDefaultEncode}
@@ -118,11 +116,7 @@ const RoutingPolicyForm = ({
         {showPolicyCheckboxes && (
           <>
             <Col md={6} xs={12}>
-              <Message
-                content={sharedMessages.uplink}
-                component="h4"
-                className={style.directionHeader}
-              />
+              <Message content={sharedMessages.uplink} component="h4" className="mb-cs-xs" />
               <Form.Field
                 name="policy.uplink.join_request"
                 component={Checkbox}
@@ -155,11 +149,7 @@ const RoutingPolicyForm = ({
               />
             </Col>
             <Col sm={6} xs={12}>
-              <Message
-                content={sharedMessages.downlink}
-                component="h4"
-                className={style.directionHeader}
-              />
+              <Message content={sharedMessages.downlink} component="h4" className="mb-cs-xs" />
               <Form.Field
                 name="policy.downlink.join_accept"
                 component={Checkbox}

@@ -33,15 +33,10 @@ const SortButton = ({ name, onSort, className, active, direction, title }) => {
     [style.buttonDesc]: active && direction === 'desc',
   })
 
-  let icon = 'sort_order'
-  if (active && direction) {
-    icon += `_${direction}`
-  }
-
   return (
     <button className={buttonClassNames} type="button" onClick={handleSort}>
       <Message content={title} />
-      <Icon className={style.icon} icon={icon} nudgeUp />
+      <Icon className={style.icon} icon="sort" nudgeUp />
     </button>
   )
 }

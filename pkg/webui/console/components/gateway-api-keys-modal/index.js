@@ -23,8 +23,6 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './gateway-api-key-modal.styl'
-
 const m = defineMessages({
   modalTitle: 'Download gateway API keys',
   buttonMessage: 'I have downloaded the keys',
@@ -43,7 +41,7 @@ const GatewayApiKeysModal = ({
   downloadCups,
 }) => (
   <PortalledModal
-    className={style.gatewayApiKeyModal}
+    className="d-flex direction-column"
     visible={modalVisible}
     title={m.modalTitle}
     approval={false}

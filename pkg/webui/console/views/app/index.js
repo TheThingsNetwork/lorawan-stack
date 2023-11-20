@@ -72,7 +72,7 @@ const Layout = () => {
     <>
       <ScrollToTop />
       <ErrorView errorRender={errorRender}>
-        <div className={style.app}>
+        <div className="w-full h-full">
           <IntlHelmet
             titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             defaultTitle={siteName}

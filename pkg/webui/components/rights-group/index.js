@@ -140,7 +140,7 @@ const RightsGroup = ({
       children={
         Boolean(m[`${right}_DESCRIPTION`]) && (
           <Message
-            className={style.description}
+            className="tc-subtle-gray w-full"
             component="div"
             content={m[`${right}_DESCRIPTION`]}
           />
@@ -162,7 +162,7 @@ const RightsGroup = ({
         />
       )}
       <Radio.Group
-        className={style.grantType}
+        className="mb-cs-s"
         name="grant_type"
         value={grantType}
         onChange={handleGrantTypeChange}
@@ -172,7 +172,7 @@ const RightsGroup = ({
         <Radio label={m.selectIndividualRights} value="individual" />
       </Radio.Group>
       <Checkbox
-        className={classnames(style.selectAll, style.rightLabel)}
+        className={classnames(style.rightLabel, 'mb-cs-s')}
         name={selectAllName}
         label={selectAllTitle}
         onChange={handleChangeAll}
@@ -181,7 +181,7 @@ const RightsGroup = ({
         disabled={allDisabled}
       />
       <Checkbox.Group
-        className={style.group}
+        className={classnames(style.group, 'pl-ls-xxs')}
         name={name}
         value={rightsValues}
         onChange={handleChange}
