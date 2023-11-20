@@ -175,6 +175,7 @@ export default {
         target: WEBPACK_DEV_SERVER_USE_TLS ? 'https://localhost:8885' : 'http://localhost:1885',
         changeOrigin: true,
         secure: false,
+        ws: true,
       },
     ],
     historyApiFallback: true,

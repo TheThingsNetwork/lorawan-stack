@@ -133,14 +133,14 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         try {
           channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after)
 
-          channel.on('start', () => dispatch(startEventsSuccess(id, { silent })))
-          channel.on('chunk', message => dispatch(getEventSuccess(id, message)))
+          channel.on('open', () => dispatch(startEventsSuccess(id, { silent })))
+          channel.on('message', message => dispatch(getEventSuccess(id, message)))
           channel.on('error', error => dispatch(getEventFailure(id, error)))
           channel.on('close', wasClientRequest =>
             dispatch(closeEvents(id, { silent: wasClientRequest })),
           )
 
-          channel.open()
+          channel.on('open', () => dispatch(startEventsSuccess(id, { silent })))
         } catch (error) {
           if (isUnauthenticatedError(error)) {
             // The user is no longer authenticated; reinitiate the auth flow

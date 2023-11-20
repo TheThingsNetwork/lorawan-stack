@@ -15,13 +15,16 @@
 import autoBind from 'auto-bind'
 
 import Marshaler from '../util/marshaler'
+import subscribeToStream from '../api/stream/subscribeToStream'
+import { STACK_COMPONENTS_MAP } from '../util/constants'
 
 import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
 
 class Organizations {
-  constructor(api) {
+  constructor(api, { stackConfig }) {
     this._api = api
+    this._stackConfig = stackConfig
 
     this.ApiKeys = new ApiKeys(api.OrganizationAccess, {
       parentRoutes: {
@@ -163,7 +166,9 @@ class Organizations {
       after,
     }
 
-    return this._api.Events.Stream(undefined, payload)
+    const baseUrl = this._stackConfig.getComponentUrlByName(STACK_COMPONENTS_MAP.is)
+
+    return subscribeToStream(payload, baseUrl)
   }
 }
 

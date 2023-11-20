@@ -19,8 +19,15 @@ export const notify = (listener, ...args) => {
 }
 
 export const EVENTS = Object.freeze({
-  START: 'start',
-  CHUNK: 'chunk',
+  OPEN: 'open',
+  MESSAGE: 'message',
   ERROR: 'error',
   CLOSE: 'close',
+})
+
+export const MESSAGE_TYPES = Object.freeze({
+  SUBSCRIBE: 'subscribe',
+  UNSUBSCRIBE: 'unsubscribe',
+  PUBLISH: 'publish',
+  ERROR: 'error',
 })

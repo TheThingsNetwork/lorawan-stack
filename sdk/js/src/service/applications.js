@@ -15,6 +15,7 @@
 import autoBind from 'auto-bind'
 
 import Marshaler from '../util/marshaler'
+import subscribeToStream from '../api/stream/subscribeToStream'
 import combineStreams from '../util/combine-streams'
 import { STACK_COMPONENTS_MAP } from '../util/constants'
 
@@ -26,8 +27,7 @@ import Webhooks from './webhooks'
 import PubSubs from './pubsubs'
 import Packages from './application-packages'
 
-const { is: IS, as: AS, ns: NS, js: JS, dtc: DTC } = STACK_COMPONENTS_MAP
-
+const { is: IS, gs: GS } = STACK_COMPONENTS_MAP
 /**
  * Applications Class provides an abstraction on all applications and manages
  * data handling from different sources. It exposes an API to easily work with
@@ -230,17 +230,13 @@ class Applications {
     // Event streams can come from multiple stack components. It is necessary to
     // check for stack components on different hosts and open distinct stream
     // connections for any distinct host if need be.
-    const distinctComponents = this._stackConfig.getComponentsWithDistinctBaseUrls([
-      IS,
-      JS,
-      NS,
-      AS,
-      DTC,
-    ])
+    const distinctComponents = this._stackConfig.getComponentsWithDistinctBaseUrls([IS, GS])
 
-    const streams = distinctComponents.map(component =>
-      this._api.Events.Stream({ component }, payload),
+    const baseUrls = new Set(
+      distinctComponents.map(component => this._stackConfig.getComponentUrlByName(component)),
     )
+
+    const streams = [...baseUrls].map(baseUrl => subscribeToStream(payload, baseUrl))
 
     // Combine all stream sources to one subscription generator.
     return combineStreams(streams)

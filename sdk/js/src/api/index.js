@@ -62,13 +62,12 @@ Signature tried: ${paramSignature}`)
           }
 
           let route = endpoint.pattern
-          const isStream = Boolean(endpoint.stream)
 
           for (const parameter of endpoint.parameters) {
             route = route.replace(`{${parameter}}`, routeParams[parameter])
           }
 
-          return connector.handleRequest(endpoint.method, route, component, payload, isStream)
+          return connector.handleRequest(endpoint.method, route, component, payload)
         }
 
         this[serviceName][`${rpcName}AllowedFieldMaskPaths`] = rpc.allowedFieldMaskPaths
