@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.28.1] - unreleased
+
+### Added
+
 - The `http.client.transport.compression` experimental flag. It controls whether the HTTP clients used by the stack support gzip and zstd decompression of server responses. It is enabled by default.
 - The `http.server.transport.compression` experimental flag. It controls whether the HTTP servers used by the stack support gzip compression of the server response. It is enabled by default.
 
@@ -19,16 +33,10 @@ For details about compatibility between different releases, see the **Commitment
 - The Things Stack is now built with Go 1.21.
 - Statistics for gateways are now fetched in a single request.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Resolve scroll jumps when selecting different tabs of a table in the Console.
 - `BatchGetGatewayConnectionStats` RPC rights check in certain cases.
-
-### Security
 
 ## [3.28.0] - 2023-10-31
 
@@ -2713,7 +2721,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.0...v3.28
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.1...v3.28
+[3.28.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.0...v3.28.1
 [3.28.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.2...v3.28.0
 [3.27.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.1...v3.27.2
 [3.27.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.0...v3.27.1
