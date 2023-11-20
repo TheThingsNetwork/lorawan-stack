@@ -8,9 +8,6 @@ replace github.com/throttled/throttled/v2 => github.com/TheThingsIndustries/thro
 // See https://github.com/mitchellh/mapstructure/pull/278
 replace github.com/mitchellh/mapstructure => github.com/TheThingsIndustries/mapstructure v0.0.0-20230413130846-941bcd1deec3
 
-// See https://github.com/grpc-ecosystem/grpc-gateway/pull/3725
-replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/adriansmares/grpc-gateway/v2 v2.0.0-20231107141503-82f9c7648913
-
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2
 	github.com/KimMachineGun/automemlimit v0.3.0
@@ -44,7 +41,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.2-0.20231120080707-5e5867a3a4b0
 	github.com/hellofresh/health-go/v5 v5.5.0
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/iancoleman/strcase v0.3.0
@@ -55,6 +52,7 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056
 	github.com/json-iterator/go v1.1.12
 	github.com/jtacoma/uritemplates v1.0.0
+	github.com/klauspost/compress v1.17.2
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
 	github.com/mitchellh/mapstructure v1.5.0
@@ -101,10 +99,10 @@ require (
 	go.uber.org/zap v1.26.0
 	gocloud.dev v0.34.0
 	gocloud.dev/pubsub/natspubsub v0.34.0
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.15.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
-	golang.org/x/net v0.17.0
-	golang.org/x/oauth2 v0.13.0
+	golang.org/x/net v0.18.0
+	golang.org/x/oauth2 v0.14.0
 	golang.org/x/sync v0.4.0
 	google.golang.org/genproto v0.0.0-20231030173426-d783a09b4405
 	google.golang.org/genproto/googleapis/api v0.0.0-20231106174013-bbf56f31fb17
@@ -209,7 +207,6 @@ require (
 	github.com/jacobsa/reqtrace v0.0.0-20150505043853-245c9e0234cb // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
@@ -258,7 +255,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/image v0.10.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
-	golang.org/x/term v0.13.0 // indirect
+	golang.org/x/term v0.14.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
