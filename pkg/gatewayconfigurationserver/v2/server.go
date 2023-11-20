@@ -84,9 +84,9 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 
 	middleware := []webmiddleware.MiddlewareFunc{
 		webmiddleware.Namespace("gatewayconfigurationserver/v2"),
-		ratelimit.HTTPMiddleware(s.component.RateLimiter(), "http:gcs"),
 		rewriteAuthorization,
 		webmiddleware.Metadata("Authorization"),
+		ratelimit.HTTPMiddleware(s.component.RateLimiter(), "http:gcs"),
 	}
 
 	router.Handle(
