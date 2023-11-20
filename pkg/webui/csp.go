@@ -66,6 +66,12 @@ func (csp ContentSecurityPolicy) Clean() ContentSecurityPolicy {
 					entry = parsed.Host
 				}
 			}
+			if strings.HasPrefix(entry, "ws://") || strings.HasPrefix(entry, "wss://") {
+				if parsed, err := url.Parse(entry); err == nil {
+					parsed.Path, parsed.RawPath = "", ""
+					entry = parsed.String()
+				}
+			}
 			if _, ok := added[entry]; ok {
 				continue // Skip already added locations.
 			}
@@ -111,4 +117,33 @@ func (csp ContentSecurityPolicy) String() string {
 	result = appendPolicy(result, "base-uri", csp.BaseURI)
 	result = appendPolicy(result, "frame-ancestors", csp.FrameAncestors)
 	return strings.Join(result, " ")
+}
+
+// RewriteScheme rewrites the scheme of the provided URL if it matches a rewrite rule.
+func RewriteScheme(rewrites map[string]string, baseURL string) []string {
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return []string{baseURL}
+	}
+	rewrite, ok := rewrites[u.Scheme]
+	if !ok {
+		return []string{baseURL}
+	}
+	u.Scheme = rewrite
+	return append(make([]string, 0, 2), baseURL, u.String())
+}
+
+// RewriteSchemes rewrites the scheme of the provided URLs if they match a rewrite rule.
+func RewriteSchemes(rewrites map[string]string, baseURLs ...string) []string {
+	urls := make([]string, 0, 2*len(baseURLs))
+	for _, baseURL := range baseURLs {
+		urls = append(urls, RewriteScheme(rewrites, baseURL)...)
+	}
+	return urls
+}
+
+// WebsocketSchemeRewrites contains the rewrite rules for websocket schemes.
+var WebsocketSchemeRewrites = map[string]string{
+	"http":  "ws",
+	"https": "wss",
 }
