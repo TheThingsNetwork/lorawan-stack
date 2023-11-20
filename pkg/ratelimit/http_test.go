@@ -74,6 +74,22 @@ func TestHTTP(t *testing.T) {
 		a.So(limiter.calledWithResource.Classes(), should.Resemble, []string{"http:test:/path/{id}", class, "http"})
 	})
 
+	t.Run("AuthToken", func(t *testing.T) {
+		limiter.limit = false
+		limiter.result = ratelimit.Result{Limit: 10}
+
+		rec := httptest.NewRecorder()
+		req := httpRequest("/path", "10.10.10.10").WithContext(tokenContext(authTokenID))
+		handler.ServeHTTP(rec, req)
+
+		a.So(rec.Header().Get("x-rate-limit-limit"), should.Equal, "10")
+		a.So(rec.Result().StatusCode, should.Equal, http.StatusOK)
+
+		a.So(limiter.calledWithResource.Key(), should.ContainSubstring, "/path")
+		a.So(limiter.calledWithResource.Key(), should.ContainSubstring, authTokenID)
+		a.So(limiter.calledWithResource.Classes(), should.Resemble, []string{class, "http"})
+	})
+
 	t.Run("Limit", func(t *testing.T) {
 		limiter.limit = true
 		rec := httptest.NewRecorder()

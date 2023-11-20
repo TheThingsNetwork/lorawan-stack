@@ -78,8 +78,12 @@ func httpRequestResource(r *http.Request, class string) Resource {
 	if template, ok := pathTemplate(r); ok {
 		specificClasses = append(specificClasses, fmt.Sprintf("%s:%s", class, template))
 	}
+	callerInfo := fmt.Sprintf("ip:%s", httpRemoteIP(r))
+	if authTokenID := authTokenID(r.Context()); authTokenID != unauthenticated {
+		callerInfo = fmt.Sprintf("token:%s", authTokenID)
+	}
 	return &resource{
-		key:     fmt.Sprintf("%s:ip:%s:url:%s", class, httpRemoteIP(r), r.URL.Path),
+		key:     fmt.Sprintf("%s:%s:url:%s", class, callerInfo, r.URL.Path),
 		classes: append(specificClasses, class, "http"),
 	}
 }
@@ -87,7 +91,7 @@ func httpRequestResource(r *http.Request, class string) Resource {
 // grpcMethodResource represents a gRPC request.
 func grpcMethodResource(ctx context.Context, fullMethod string, req any) Resource {
 	key := fmt.Sprintf("grpc:method:%s:%s", fullMethod, grpcEntityFromRequest(ctx, req))
-	if authTokenID := grpcAuthTokenID(ctx); authTokenID != "" {
+	if authTokenID := authTokenID(ctx); authTokenID != unauthenticated {
 		key = fmt.Sprintf("%s:token:%s", key, authTokenID)
 	}
 	return &resource{
@@ -99,7 +103,7 @@ func grpcMethodResource(ctx context.Context, fullMethod string, req any) Resourc
 // grpcStreamAcceptResource represents a new gRPC server stream.
 func grpcStreamAcceptResource(ctx context.Context, fullMethod string) Resource {
 	key := fmt.Sprintf("grpc:stream:accept:%s", fullMethod)
-	if authTokenID := grpcAuthTokenID(ctx); authTokenID != "" {
+	if authTokenID := authTokenID(ctx); authTokenID != unauthenticated {
 		key = fmt.Sprintf("%s:token:%s", key, authTokenID)
 	}
 	return &resource{

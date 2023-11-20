@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
@@ -42,17 +41,6 @@ func grpcEntityFromRequest(ctx context.Context, req any) string {
 
 func grpcIsClusterAuthCall(ctx context.Context) bool {
 	return rpcmetadata.FromIncomingContext(ctx).AuthType == clusterauth.AuthType
-}
-
-func grpcAuthTokenID(ctx context.Context) string {
-	if authValue := rpcmetadata.FromIncomingContext(ctx).AuthValue; authValue != "" {
-		_, id, _, err := auth.SplitToken(authValue)
-		if err != nil {
-			return "unauthenticated"
-		}
-		return id
-	}
-	return "unauthenticated"
 }
 
 // UnaryServerInterceptor returns a gRPC unary server interceptor that rate limits incoming gRPC requests.
