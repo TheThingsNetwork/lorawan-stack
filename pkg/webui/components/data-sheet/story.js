@@ -27,7 +27,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import DataSheet from '.'
 
@@ -73,15 +72,7 @@ const containerStyles = {
 
 export default {
   title: 'Data Sheet',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: true,
-      propTables: [DataSheet],
-    }),
-  ],
+  component: DataSheet,
 }
 
 export const Default = () => (

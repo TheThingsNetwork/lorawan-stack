@@ -15,16 +15,15 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import UnitInput from '@ttn-lw/components/unit-input'
 import Form from '@ttn-lw/components/form'
 
-import { FieldsWrapperExample, info } from './shared'
+import { FieldsWrapperExample } from './shared'
 
 export default {
   title: 'Fields/UnitInput',
-  decorators: [withInfo(info)],
+  component: Form.Field,
 }
 
 export const Default = () => (

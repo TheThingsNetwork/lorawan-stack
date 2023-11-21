@@ -24,6 +24,7 @@ class Example extends React.Component {
   state = {
     busy: false,
     error: false,
+    disabled: false,
   }
 
   render() {

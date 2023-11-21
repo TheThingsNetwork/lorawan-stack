@@ -15,16 +15,15 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import Radio from '@ttn-lw/components/radio-button'
 import Form from '@ttn-lw/components/form'
 
-import { FieldsWrapperExample, info } from './shared'
+import { FieldsWrapperExample } from './shared'
 
 export default {
   title: 'Fields/Radio',
-  decorators: [withInfo(info)],
+  component: Form.Field,
 }
 
 export const Default = () => (

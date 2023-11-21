@@ -13,20 +13,12 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import Pagination from '.'
 
 export default {
   title: 'Pagination',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      propTables: [Pagination],
-    }),
-  ],
+  component: Pagination,
 }
 
 export const Default = () => (

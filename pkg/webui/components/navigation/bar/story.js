@@ -14,21 +14,12 @@
 
 import React from 'react'
 import 'focus-visible/dist/focus-visible'
-import { withInfo } from '@storybook/addon-info'
 
 import NavigationBar from '.'
 
 export default {
   title: 'Navigation',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: false,
-      propTables: [NavigationBar],
-    }),
-  ],
+  component: NavigationBar,
 }
 
 export const _NavigationBar = () => (

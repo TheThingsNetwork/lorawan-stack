@@ -16,9 +16,9 @@
 
 import React from 'react'
 import { Provider } from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
 import { IntlProvider } from 'react-intl'
 import { createMemoryHistory } from 'history'
+import { MemoryRouter } from 'react-router-dom'
 
 import messages from '@ttn-lw/locales/en.json'
 import backendMessages from '@ttn-lw/locales/.backend/en.json'
@@ -35,9 +35,9 @@ export const decorators = [
   Story => (
     <Provider store={store}>
       <IntlProvider key="key" messages={{ ...messages, ...backendMessages }} locale="en-US">
-        <ConnectedRouter history={history}>
+        <MemoryRouter>
           <Center>{Story()}</Center>
-        </ConnectedRouter>
+        </MemoryRouter>
       </IntlProvider>
     </Provider>
   ),
