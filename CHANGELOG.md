@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Server side events replaced with single socket connection using the native WebSocket API.
+
 ### Deprecated
 
 ### Removed

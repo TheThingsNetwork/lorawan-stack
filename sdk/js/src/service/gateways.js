@@ -15,8 +15,9 @@
 import autoBind from 'auto-bind'
 
 import Marshaler from '../util/marshaler'
-import combineStreams from '../util/combine-streams'
+import subscribeToStream from '../api/stream/subscribeToStream'
 import { STACK_COMPONENTS_MAP } from '../util/constants'
+import combineStreams from '../util/combine-streams'
 
 import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
@@ -257,9 +258,11 @@ class Gateways {
       STACK_COMPONENTS_MAP.gs,
     ])
 
-    const streams = distinctComponents.map(component =>
-      this._api.Events.Stream({ component }, payload),
+    const baseUrls = new Set(
+      distinctComponents.map(component => this._stackConfig.getComponentUrlByName(component)),
     )
+
+    const streams = [...baseUrls].map(baseUrl => subscribeToStream(payload, baseUrl))
 
     // Combine all stream sources to one subscription generator.
     return combineStreams(streams)
@@ -273,7 +276,7 @@ class Gateways {
     // https://github.com/TheThingsNetwork/lorawan-stack/issues/3280
     const endpoint = `/gcs/gateways/${gatewayId}/semtechudp/global_conf.json`
 
-    const response = await this._api._connector.handleRequest('get', endpoint, 'gcs', false)
+    const response = await this._api._connector.handleRequest('get', endpoint, 'gcs')
 
     return Marshaler.payloadSingleResponse(response.data)
   }
