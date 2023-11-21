@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import SideNavigationItem from './item'
 
@@ -21,15 +20,7 @@ import { SideNavigation } from '.'
 
 export default {
   title: 'Navigation',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: false,
-      propTables: [SideNavigation],
-    }),
-  ],
+  component: SideNavigation,
 }
 
 export const _SideNavigation = () => {
