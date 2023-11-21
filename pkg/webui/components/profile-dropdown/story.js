@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import Dropdown from '@ttn-lw/components/dropdown'
 
@@ -26,15 +25,7 @@ const handleLogout = () => {
 
 export default {
   title: 'Profile Dropdown',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: false,
-      propTables: [ProfileDropdown],
-    }),
-  ],
+  component: ProfileDropdown,
 }
 
 export const Default = () => (

@@ -37,6 +37,7 @@ module.exports = async ({ config, mode }) => {
   const cfg = {
     ...config,
     resolve: {
+      fallback: { crypto: false },
       alias: {
         ...config.resolve.alias,
         ...bundleConfig.resolve.alias,

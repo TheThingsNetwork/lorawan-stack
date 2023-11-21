@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 import { action } from '@storybook/addon-actions'
 
 import Link from '@ttn-lw/components/link'
@@ -28,15 +27,7 @@ const linkContainerStyle = {
 
 export default {
   title: 'Prompt',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: true,
-      propTables: [Prompt],
-    }),
-  ],
+  component: Prompt,
 }
 
 export const Default = () => (

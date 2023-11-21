@@ -13,22 +13,13 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import Breadcrumb from './breadcrumb'
 import { Breadcrumbs } from './breadcrumbs'
 
 export default {
   title: 'Breadcrumbs',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: false,
-      propTables: [Breadcrumbs, Breadcrumb],
-    }),
-  ],
+  component: [Breadcrumbs, Breadcrumb],
 }
 
 export const Default = () => {

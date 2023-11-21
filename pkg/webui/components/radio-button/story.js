@@ -13,22 +13,14 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import RadioGroup from './group'
 
 import Radio from '.'
 
-const info = {
-  inline: true,
-  header: false,
-  source: false,
-  propTables: [Radio],
-}
-
 export default {
   title: 'Radio',
-  decorators: [withInfo(info)],
+  component: Radio,
 }
 
 export const Default = () => <Radio label="Radio" name="radio" value="1" />
