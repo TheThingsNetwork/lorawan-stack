@@ -33,7 +33,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 // Server implements the Basic Station Configuration and Update Server.
@@ -182,17 +181,6 @@ func (s *Server) RegisterRoutes(web *web.Server) {
 	router := web.Router().NewRoute().Subrouter()
 	router.Use(ratelimit.HTTPMiddleware(s.component.RateLimiter(), "http:gcs:cups"))
 	router.Path("/update-info").HandlerFunc(s.UpdateInfo).Methods(http.MethodPost)
-}
-
-func getContext(r *http.Request) context.Context {
-	ctx := r.Context()
-	md := metadata.New(map[string]string{
-		"authorization": r.Header.Get("Authorization"),
-	})
-	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
-		md = metadata.Join(ctxMd, md)
-	}
-	return metadata.NewIncomingContext(ctx, md)
 }
 
 var errNoTrust = errors.DefineInternal("no_trust", "no trusted certificate found")

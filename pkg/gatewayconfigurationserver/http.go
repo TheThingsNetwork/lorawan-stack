@@ -38,8 +38,8 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 	router := server.Prefix(ttnpb.HTTPAPIPrefix + "/gcs/gateways/{gateway_id}/").Subrouter()
 	router.Use(
 		mux.MiddlewareFunc(webmiddleware.Namespace("gatewayconfigurationserver")),
-		ratelimit.HTTPMiddleware(s.Component.RateLimiter(), "http:gcs"),
 		mux.MiddlewareFunc(webmiddleware.Metadata("Authorization")),
+		ratelimit.HTTPMiddleware(s.Component.RateLimiter(), "http:gcs"),
 		validateAndFillIDs,
 	)
 	if s.config.RequireAuth {

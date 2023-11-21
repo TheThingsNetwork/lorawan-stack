@@ -11,6 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Rate limiting classes for individual HTTP paths.
+- Rate limiting keys for HTTP endpoints now contain the caller API key ID when available. The caller IP is still available as a fallback.
+
 ### Changed
 
 - Server side events replaced with single socket connection using the native WebSocket API.

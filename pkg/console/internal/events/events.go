@@ -62,9 +62,9 @@ func (h *eventsHandler) RegisterRoutes(server *web.Server) {
 	router := server.APIRouter().PathPrefix(ttnpb.HTTPAPIPrefix + "/console/internal/events/").Subrouter()
 	router.Use(
 		mux.MiddlewareFunc(webmiddleware.Namespace("console/internal/events")),
-		ratelimit.HTTPMiddleware(h.component.RateLimiter(), "http:console:internal:events"),
 		mux.MiddlewareFunc(middleware.ProtocolAuthentication(authorizationProtocolPrefix)),
 		mux.MiddlewareFunc(webmiddleware.Metadata("Authorization")),
+		ratelimit.HTTPMiddleware(h.component.RateLimiter(), "http:console:internal:events"),
 	)
 	router.Path("/").HandlerFunc(h.handleEvents).Methods(http.MethodGet)
 }
