@@ -155,7 +155,7 @@ const DeviceImporter = () => {
         devices = await new Promise((resolve, reject) => {
           const chunks = []
 
-          templateStream.on('chunk', message => {
+          templateStream.on('message', message => {
             appendToLog(message)
             chunks.push(message)
           })
@@ -252,7 +252,7 @@ const DeviceImporter = () => {
         createStream.current = tts.Applications.Devices.bulkCreate(appId, devices)
 
         await new Promise(resolve => {
-          createStream.current.on('chunk', handleCreationSuccess)
+          createStream.current.on('message', handleCreationSuccess)
           createStream.current.on('error', handleCreationError)
           createStream.current.on('close', resolve)
 

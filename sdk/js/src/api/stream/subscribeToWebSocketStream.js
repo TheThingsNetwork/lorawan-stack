@@ -27,12 +27,14 @@ const initialListeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, 
  * @async
  * @param {object} payload -  - The body of the initial request.
  * @param {string} baseUrl - The stream baseUrl.
+ * @param {string} endpoint - The stream endpoint.
  *
  * @example
  * (async () => {
  *    const stream = await stream(
  *      { identifiers: [{ application_ids: { application_id: 'my-app' }}]},
- *      'http://localhost:8080/api/v3',
+ *      'http://localhost:8080',
+ *      '/api/v3',
  *    )
  *
  *    // Add listeners to the stream.
@@ -49,7 +51,7 @@ const initialListeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, 
  * @returns {object} The stream subscription object with the `on` function for
  * attaching listeners and the `close` function to close the stream.
  */
-export default async (payload, baseUrl) => {
+export default async (payload, baseUrl, endpoint = '/console/internal/events/') => {
   const subscriptionId = Date.now()
   const subscriptionPayload = JSON.stringify({
     type: MESSAGE_TYPES.SUBSCRIBE,
@@ -61,6 +63,7 @@ export default async (payload, baseUrl) => {
     id: subscriptionId,
   })
   let closeRequested = false
+  const url = baseUrl + endpoint
 
   await new Promise(async resolve => {
     // Add the new subscription to the subscriptions object.
@@ -68,7 +71,7 @@ export default async (payload, baseUrl) => {
     // to resolve the promise after the subscription confirmation message.
     subscriptions = {
       ...subscriptions,
-      [subscriptionId]: { ...initialListeners, url: baseUrl, _resolver: resolve },
+      [subscriptionId]: { ...initialListeners, url, _resolver: resolve },
     }
 
     const token = new Token().get()
@@ -76,33 +79,33 @@ export default async (payload, baseUrl) => {
     const baseUrlParsed = baseUrl.replace('http', 'ws')
 
     // Open up the WebSocket connection if it doesn't exist.
-    if (!wsInstances[baseUrl]) {
-      wsInstances[baseUrl] = new WebSocket(`${baseUrlParsed}/console/internal/events/`, [
+    if (!wsInstances[url]) {
+      wsInstances[url] = new WebSocket(`${baseUrlParsed}${endpoint}`, [
         'ttn.lorawan.v3.console.internal.events.v1',
         `ttn.lorawan.v3.header.authorization.bearer.${tokenParsed}`,
       ])
 
       // Event listener for 'open'
-      wsInstances[baseUrl].addEventListener('open', () => {
-        wsInstances[baseUrl].send(subscriptionPayload)
+      wsInstances[url].addEventListener('open', () => {
+        wsInstances[url].send(subscriptionPayload)
       })
 
       // Broadcast connection errors to all listeners.
-      wsInstances[baseUrl].addEventListener('error', error => {
+      wsInstances[url].addEventListener('error', error => {
         Object.values(subscriptions)
-          .filter(s => s.url === baseUrl)
+          .filter(s => s.url === url)
           .forEach(s => notify(s[EVENTS.ERROR], error))
         resolve()
       })
 
       // Event listener for 'close'
-      wsInstances[baseUrl].addEventListener('close', () => {
-        delete wsInstances[baseUrl]
+      wsInstances[url].addEventListener('close', () => {
+        delete wsInstances[url]
       })
 
       // After the WebSocket connection is open, add the event listeners.
       // Wait for the subscription confirmation message before resolving.
-      wsInstances[baseUrl].addEventListener('message', ({ data }) => {
+      wsInstances[url].addEventListener('message', ({ data }) => {
         const dataParsed = JSON.parse(data)
         const listeners = subscriptions[dataParsed.id]
 
@@ -130,14 +133,14 @@ export default async (payload, baseUrl) => {
           notify(listeners[EVENTS.CLOSE], closeRequested)
           // Remove the subscription.
           delete subscriptions[dataParsed.id]
-          if (!Object.values(subscriptions).some(s => s.url === baseUrl)) {
-            wsInstances[baseUrl].close()
+          if (!Object.values(subscriptions).some(s => s.url === url)) {
+            wsInstances[url].close()
           }
         }
       })
-    } else if (wsInstances[baseUrl] && wsInstances[baseUrl].readyState === WebSocket.OPEN) {
+    } else if (wsInstances[url] && wsInstances[url].readyState === WebSocket.OPEN) {
       // If the WebSocket connection is already open, only add the subscription.
-      wsInstances[baseUrl].send(subscriptionPayload)
+      wsInstances[url].send(subscriptionPayload)
     }
   })
 
@@ -155,13 +158,13 @@ export default async (payload, baseUrl) => {
       return this
     },
     close: () => {
-      if (wsInstances[baseUrl]) {
+      if (wsInstances[url]) {
         closeRequested = true
-        wsInstances[baseUrl].send(unsubscribePayload)
+        wsInstances[url].send(unsubscribePayload)
 
         // Wait for the server to confirm the unsubscribe.
         return new Promise(resolve => {
-          wsInstances[baseUrl].addEventListener('message', ({ data }) => {
+          wsInstances[url].addEventListener('message', ({ data }) => {
             const { type, id } = JSON.parse(data)
             if (id === subscriptionId && type === MESSAGE_TYPES.UNSUBSCRIBE) {
               resolve()

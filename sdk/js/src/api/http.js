@@ -24,6 +24,8 @@ import {
   RATE_LIMIT_RETRIES,
 } from '../util/constants'
 
+import subscribeToHttpStream from './stream/subscribeToHttpStream'
+
 /**
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
  */
@@ -85,7 +87,7 @@ class Http {
     }
   }
 
-  async handleRequest(method, endpoint, component, payload = {}) {
+  async handleRequest(method, endpoint, component, payload = {}, isStream) {
     const parsedComponent = component || this._parseStackComponent(endpoint)
     if (!this._stackConfig.isComponentAvailable(parsedComponent)) {
       // If the component has not been defined in The Things Stack config, make no
@@ -96,6 +98,11 @@ class Http {
     }
 
     try {
+      if (isStream) {
+        const url = this._stackConfig.getComponentUrlByName(parsedComponent) + endpoint
+        return subscribeToHttpStream(payload, url)
+      }
+
       const config = {
         method,
         url: endpoint,

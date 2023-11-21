@@ -15,7 +15,7 @@
 import autoBind from 'auto-bind'
 
 import Marshaler from '../util/marshaler'
-import subscribeToStream from '../api/stream/subscribeToStream'
+import subscribeToWebSocketStream from '../api/stream/subscribeToWebSocketStream'
 import { STACK_COMPONENTS_MAP } from '../util/constants'
 
 import ApiKeys from './api-keys'
@@ -168,7 +168,7 @@ class Organizations {
 
     const baseUrl = this._stackConfig.getComponentUrlByName(STACK_COMPONENTS_MAP.is)
 
-    return subscribeToStream(payload, baseUrl)
+    return subscribeToWebSocketStream(payload, baseUrl)
   }
 }
 
