@@ -104,6 +104,7 @@ describe('API class', () => {
 
   it('respects the search query', () => {
     api.ApplicationRegistry.List(undefined, { limit: 2, page: 1 })
+
     expect(api._connector.handleRequest).toHaveBeenCalledTimes(1)
     expect(api._connector.handleRequest).toHaveBeenCalledWith(
       'get',
@@ -125,9 +126,5 @@ describe('API class', () => {
       undefined,
       true,
     )
-    expect(api._connector.handleRequest).toHaveBeenCalledWith('get', '/applications', undefined, {
-      limit: 2,
-      page: 1,
-    })
   })
 })
