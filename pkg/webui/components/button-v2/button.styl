@@ -21,10 +21,11 @@
   cursor: pointer
   justify-content: center
   align-items: center
-  height: $default-input-height
+  gap: 0.2rem
+  height: 2.1rem
   font-size: 1rem
   text-decoration: none
-  padding: 0 $cs.s
+  padding: 0 $cs.xs
   white-space: nowrap
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05)
 
@@ -50,68 +51,20 @@
 
   &.naked
     transition: background-color color $ad.s
-    border: 1px solid transparent
-    background-color: transparent
+    border: 1px solid $c-backdrop
+    background-color: $c.white
     font-weight: $fw.normal
-    color: $tc-subtle-gray
-
-    &.disabled
-      color: transparentify($tc-subtle-gray, #fff, .25) !important
-
-    &:not(.disabled)
-      &:hover
-        background-color: $c-backdrop
-
-      +focus-visible()
-        background-color: $c-backdrop
-
-      &:active
-        transition-duration: $ad.xs
-        background-color: $c-backdrop
-
-  &:not(.primary):not(.naked)
-    border-dark()
-    border: 1px solid #d3d3d3
-    box-sizing: border-box
-    background-color: #fff
     color: $tc-deep-gray
 
-    &:not(:active)
-      box-shadow: 0px 1px 1px #efefef, inset 0 1px 0 white
+    &:hover
+      background-color: $c-focus
 
-    &.disabled
-      border-color: transparentify(#d3d3d3, #fff, .1)
+    +focus-visible()
+      background-color: $c-focus
 
-      &:not(.busy)
-        color: transparentify($tc-deep-gray, #fff, .25)
-
-    &:not(.disabled)
-      &:hover
-        background-color: #fafafa
-
-      +focus-visible()
-        border: 1px solid $c-active-blue
-        background-color: #fafafa
-
-      &:active
-        transition-duration: $ad.xs
-        background-color: #f6f6f6
-
-    &.warning
-      border-color: $tc-warning
-      color: $tc-warning
-
-      &:not(.disabled)
-        &:hover
-          color: hoverize($tc-warning)
-
-    &.danger
-      border-color: $tc-error
-      color: $tc-error
-
-      &:not(.disabled)
-        &:hover
-          color: hoverize($tc-error)
+    &:active
+      transition-duration: $ad.xs
+      background-color: $c-focus
 
   &.only-icon
     .icon
@@ -132,22 +85,6 @@
         .link-button-message
           display: none
 
-  &.error
-    animation: shake .15s 4 linear
-
-  &.disabled
-    cursor: default
-
-  &.busy:not(.naked),
-  &.busy
-    color: transparent !important
-    position: relative
-    svg
-      center-absolute()
-
-    stop
-      stop-color: $s
-
 @keyframes shake
   0%
     transform: translate(0)
@@ -161,37 +98,5 @@
 .content
   position: relative
 
-.spinner
-  position: absolute
-  top: 0
-  bottom: 0
-  left: - $cs.s
-  right: - $cs.s
-
 .icon
   margin-left: - $cs.xxs
-
-.button-group
-  display: flex
-  flex-direction: column
-  align-items: stretch
-
-  &.align-start
-    justify-content: flex-start
-
-  &.align-end
-    justify-content: flex-end
-
-  &.align-center
-    justify-content: center
-
-  +media-query-min($bp.s)
-    flex-direction: row
-    align-items: center
-
-  .button:not(:last-child)
-    margin-right: $cs.xs
-
-    +media-query($bp.s)
-      margin-bottom: $cs.s !important
-      margin-right: 0 !important
