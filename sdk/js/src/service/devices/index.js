@@ -19,7 +19,7 @@ import traverse from 'traverse'
 
 import { notify, EVENTS } from '../../api/stream/shared'
 import Marshaler from '../../util/marshaler'
-import subscribeToStream from '../../api/stream/subscribeToStream'
+import subscribeToWebSocketStream from '../../api/stream/subscribeToWebSocketStream'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import DownlinkQueue from '../downlink-queue'
 import { STACK_COMPONENTS_MAP } from '../../util/constants'
@@ -664,7 +664,7 @@ class Devices {
       on(eventName, callback) {
         if (listeners[eventName] === undefined) {
           throw new Error(
-            `${eventName} event is not supported. Should be one of: start, error, chunk or close`,
+            `${eventName} event is not supported. Should be one of: open, error, message or close`,
           )
         }
 
@@ -699,7 +699,7 @@ class Devices {
       distinctComponents.map(component => this._stackConfig.getComponentUrlByName(component)),
     )
 
-    const streams = [...baseUrls].map(baseUrl => subscribeToStream(payload, baseUrl))
+    const streams = [...baseUrls].map(baseUrl => subscribeToWebSocketStream(payload, baseUrl))
 
     // Combine all stream sources to one subscription generator.
     return combineStreams(streams)

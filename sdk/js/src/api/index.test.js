@@ -92,6 +92,7 @@ describe('API class', () => {
       '/users/test/applications',
       undefined,
       { name: 'test-name' },
+      false,
     )
   })
 
@@ -105,9 +106,25 @@ describe('API class', () => {
     api.ApplicationRegistry.List(undefined, { limit: 2, page: 1 })
 
     expect(api._connector.handleRequest).toHaveBeenCalledTimes(1)
-    expect(api._connector.handleRequest).toHaveBeenCalledWith('get', '/applications', undefined, {
-      limit: 2,
-      page: 1,
-    })
+    expect(api._connector.handleRequest).toHaveBeenCalledWith(
+      'get',
+      '/applications',
+      undefined,
+      { limit: 2, page: 1 },
+      false,
+    )
+  })
+
+  it('sets stream value to true for streaming endpoints', () => {
+    api.ApplicationRegistry.Events()
+
+    expect(api._connector.handleRequest).toHaveBeenCalledTimes(1)
+    expect(api._connector.handleRequest).toHaveBeenCalledWith(
+      'get',
+      '/events',
+      undefined,
+      undefined,
+      true,
+    )
   })
 })
