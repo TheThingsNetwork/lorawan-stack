@@ -1,0 +1,197 @@
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.button
+  reset-button()
+  display: inline-flex
+  transition: color $ad.s, background $ad.s, border $ad.s, opacity $ad.s
+  border-radius: $br.m
+  outline: 0
+  cursor: pointer
+  justify-content: center
+  align-items: center
+  height: $default-input-height
+  font-size: 1rem
+  text-decoration: none
+  padding: 0 $cs.s
+  white-space: nowrap
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05)
+
+  &.primary
+    color: white
+    background-color: $c-active-blue
+    padding: 0 $cs.s
+    font-weight: $fw.bold
+
+    &.disabled
+      background-color: $c-divider-dark
+
+    &:not(.disabled)
+      &:hover
+        background-color: hoverize($c-active-blue)
+
+      +focus-visible()
+        background-color: hoverize($c-active-blue)
+
+      &:active
+        transition-duration: $ad.xs
+        background-color: activize($c-active-blue)
+
+  &.naked
+    transition: background-color color $ad.s
+    border: 1px solid transparent
+    background-color: transparent
+    font-weight: $fw.normal
+    color: $tc-subtle-gray
+
+    &.disabled
+      color: transparentify($tc-subtle-gray, #fff, .25) !important
+
+    &:not(.disabled)
+      &:hover
+        background-color: $c-backdrop
+
+      +focus-visible()
+        background-color: $c-backdrop
+
+      &:active
+        transition-duration: $ad.xs
+        background-color: $c-backdrop
+
+  &:not(.primary):not(.naked)
+    border-dark()
+    border: 1px solid #d3d3d3
+    box-sizing: border-box
+    background-color: #fff
+    color: $tc-deep-gray
+
+    &:not(:active)
+      box-shadow: 0px 1px 1px #efefef, inset 0 1px 0 white
+
+    &.disabled
+      border-color: transparentify(#d3d3d3, #fff, .1)
+
+      &:not(.busy)
+        color: transparentify($tc-deep-gray, #fff, .25)
+
+    &:not(.disabled)
+      &:hover
+        background-color: #fafafa
+
+      +focus-visible()
+        border: 1px solid $c-active-blue
+        background-color: #fafafa
+
+      &:active
+        transition-duration: $ad.xs
+        background-color: #f6f6f6
+
+    &.warning
+      border-color: $tc-warning
+      color: $tc-warning
+
+      &:not(.disabled)
+        &:hover
+          color: hoverize($tc-warning)
+
+    &.danger
+      border-color: $tc-error
+      color: $tc-error
+
+      &:not(.disabled)
+        &:hover
+          color: hoverize($tc-error)
+
+  &.only-icon
+    .icon
+      margin-right: - $cs.xxs
+
+  &.with-icon
+    .icon
+      margin-right: $cs.xxs
+
+    &.responsive-label
+      padding: $cs.xs
+
+      +media-query($bp.xxs)
+        .icon
+          margin-left: 0
+          margin-right: 0
+
+        .link-button-message
+          display: none
+
+  &.error
+    animation: shake .15s 4 linear
+
+  &.disabled
+    cursor: default
+
+  &.busy:not(.naked),
+  &.busy
+    color: transparent !important
+    position: relative
+    svg
+      center-absolute()
+
+    stop
+      stop-color: $s
+
+@keyframes shake
+  0%
+    transform: translate(0)
+  25%
+    transform: translate(.4em)
+  75%
+    transform: translate(-.4em)
+  100%
+    transform: translate(0)
+
+.content
+  position: relative
+
+.spinner
+  position: absolute
+  top: 0
+  bottom: 0
+  left: - $cs.s
+  right: - $cs.s
+
+.icon
+  margin-left: - $cs.xxs
+
+.button-group
+  display: flex
+  flex-direction: column
+  align-items: stretch
+
+  &.align-start
+    justify-content: flex-start
+
+  &.align-end
+    justify-content: flex-end
+
+  &.align-center
+    justify-content: center
+
+  +media-query-min($bp.s)
+    flex-direction: row
+    align-items: center
+
+  .button:not(:last-child)
+    margin-right: $cs.xs
+
+    +media-query($bp.s)
+      margin-bottom: $cs.s !important
+      margin-right: 0 !important
