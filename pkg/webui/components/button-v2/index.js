@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,12 +32,13 @@ const filterDataProps = props =>
       return acc
     }, {})
 
-const assembleClassnames = ({ message, primary, naked, icon, className }) =>
+const assembleClassnames = ({ message, primary, naked, icon, withDropdown, className }) =>
   classnames(style.button, className, {
     [style.primary]: primary,
     [style.naked]: naked,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
+    [style.withDropdown]: withDropdown,
   })
 
 const buttonChildren = props => {
