@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
 .button
   reset-button()
   display: inline-flex
-  transition: color $ad.s, background $ad.s, border $ad.s, opacity $ad.s
+  transition: background $ad.s
+  transition-timing-function: ease-out
   border-radius: $br.m
   outline: 0
   cursor: pointer
   justify-content: center
   align-items: center
   gap: 0.2rem
-  height: 2.1rem
+  height: 2.3rem
   font-size: 1rem
   text-decoration: none
   padding: 0 $cs.xs
@@ -32,8 +33,6 @@
   &.primary
     color: white
     background-color: $c-active-blue
-    padding: 0 $cs.s
-    font-weight: $fw.bold
 
     &.disabled
       background-color: $c-divider-dark
@@ -53,7 +52,6 @@
     transition: background-color color $ad.s
     border: 1px solid $c-backdrop
     background-color: $c.white
-    font-weight: $fw.normal
     color: $tc-deep-gray
 
     &:hover
@@ -67,13 +65,12 @@
       background-color: $c-focus
 
   &.only-icon
-    .icon
-      margin-right: - $cs.xxs
+    padding: 0 $cs.xs 0 $cs.s
+
+  &.with-dropdown
+    padding: 0 $cs.xxs 0 $cs.xs
 
   &.with-icon
-    .icon
-      margin-right: $cs.xxs
-
     &.responsive-label
       padding: $cs.xs
 
@@ -84,16 +81,6 @@
 
         .link-button-message
           display: none
-
-@keyframes shake
-  0%
-    transform: translate(0)
-  25%
-    transform: translate(.4em)
-  75%
-    transform: translate(-.4em)
-  100%
-    transform: translate(0)
 
 .content
   position: relative
