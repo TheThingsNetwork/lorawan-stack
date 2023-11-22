@@ -41,7 +41,7 @@ const assembleClassnames = ({ message, primary, naked, icon, className }) =>
   })
 
 const buttonChildren = props => {
-  const { icon, message, children } = props
+  const { withDropdown, icon, message, children } = props
 
   const content = Boolean(children) ? (
     children
@@ -49,6 +49,7 @@ const buttonChildren = props => {
     <>
       {icon ? <Icon className={style.icon} icon={icon} /> : null}
       {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
+      {withDropdown ? <Icon icon="expand_more" /> : null}
     </>
   )
 
@@ -58,7 +59,7 @@ const buttonChildren = props => {
 const Button = forwardRef((props, ref) => {
   const {
     autoFocus,
-    withDowpdown,
+    withDropdown,
     name,
     type,
     value,
