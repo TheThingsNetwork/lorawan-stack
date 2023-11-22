@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tag
-  border-dark()
-  horizontalize()
-  background-color: white
-  display: inline-block
-  padding: $cs.xxs $cs.xs
-  border-radius: $br.xs
-  color: $tc-deep-gray
+import React from 'react'
+
+import Link from '.'
+
+export default {
+  title: 'Menu Link',
+}
+
+const ExampleComponent = () => <div>Example component</div>
+
+export const Default = () => (
+  <div>
+    <Link
+      title={'Example name'}
+      icon="group"
+      path="example-path"
+      Component={ExampleComponent}
+      _isRoute
+      exact
+    />
+  </div>
+)
