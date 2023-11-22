@@ -13,209 +13,69 @@
 // limitations under the License.
 
 import React from 'react'
-import bind from 'autobind-decorator'
-import { action } from '@storybook/addon-actions'
-
-import Icon from '@ttn-lw/components/icon'
 
 import Button from '.'
 
-class Example extends React.Component {
-  state = {
-    busy: false,
-    error: false,
-    disabled: false,
-  }
-
-  render() {
-    const { busy, disabled, error } = this.state
-
-    return (
-      <div>
-        <Button
-          busy={busy}
-          onClick={action('click')}
-          message="A Test Button"
-          disabled={disabled}
-          error={error}
-        />
-        <br />
-        <br />
-        <button onClick={this.disable}>{disabled ? 'enable' : 'disable'}</button> &nbsp;
-        <button onClick={this.toggle}>work</button> &nbsp;
-        <button onClick={this.error}>error shake</button>
-      </div>
-    )
-  }
-
-  @bind
-  toggle() {
-    this.setState(state => ({
-      busy: !state.busy,
-    }))
-  }
-
-  @bind
-  disable() {
-    this.setState(state => ({
-      disabled: !state.disabled,
-    }))
-  }
-
-  @bind
-  error() {
-    this.setState({
-      error: true,
-    })
-    setTimeout(
-      function () {
-        this.setState({
-          error: false,
-        })
-      }.bind(this),
-      1200,
-    )
-  }
-}
-
 export default {
-  title: 'Button',
+  title: 'Button V2',
 }
-
-export const Default = () => (
-  <div>
-    <Button message="Default" />
-    <br />
-    <br />
-    <Button message="Default" disabled />
-    <br />
-    <br />
-    <Button message="Default" busy />
-    <br />
-    <br />
-    <Button.Link message="Router Link" to="/test" />
-    <br />
-    <br />
-    <Button.AnchorLink message="Anchor Link" href="#" />
-  </div>
-)
-
-export const Warning = () => (
-  <div>
-    <Button warning message="Warning" />
-    <br />
-    <br />
-    <Button warning message="Warning" disabled />
-    <br />
-    <br />
-    <Button warning message="Warning" busy />
-  </div>
-)
-
-export const Danger = () => (
-  <div>
-    <Button danger message="Danger" />
-    <br />
-    <br />
-    <Button danger message="Danger" disabled />
-    <br />
-    <br />
-    <Button danger message="Danger" busy />
-  </div>
-)
 
 export const Primary = () => (
   <div>
     <Button primary message="Primary" />
-    <br />
-    <br />
-    <Button primary message="Primary" disabled />
-    <br />
-    <br />
-    <Button primary message="Primary" busy />
   </div>
 )
 
 export const WithIcon = () => (
   <div>
-    <Button icon="check" message="With Icon" />
-    <br />
-    <br />
-    <Button icon="check" message="With Icon" disabled />
-    <br />
-    <br />
-    <Button icon="check" message="With Icon" busy />
-    <br />
-    <br />
-    <Button icon="check" message="With Icon" large />
-    <br />
-    <br />
-    <Button icon="check" message="With Icon" large disabled />
-    <br />
-    <br />
-    <Button icon="check" message="With Icon" large busy />
+    <Button primary icon="favorite" message="With Icon" />
+  </div>
+)
+
+export const PrimayOnlyIcon = () => (
+  <div>
+    <Button primary icon="favorite" />
+  </div>
+)
+
+export const PrimayDropdown = () => (
+  <div>
+    <Button primary icon="favorite" message="Dropdown" withDropdown />
+  </div>
+)
+
+export const PrimayOnlyIconDropdown = () => (
+  <div>
+    <Button primary icon="favorite" withDropdown />
   </div>
 )
 
 export const Naked = () => (
   <div>
     <Button naked message="Naked" />
-    <br />
-    <br />
-    <Button naked message="Naked" disabled />
-    <br />
-    <br />
-    <Button naked message="Naked" busy />
   </div>
 )
 
 export const NakedWithIcon = () => (
   <div>
     <Button naked icon="favorite" message="Naked With Icon" />
-    <br />
-    <br />
-    <Button naked icon="favorite" message="Naked With Icon" disabled />
-    <br />
-    <br />
-    <Button naked icon="favorite" message="Naked With Icon" busy />
   </div>
 )
 
-export const OnlyIcon = () => (
+export const NakedOnlyIcon = () => (
   <div>
-    <Button icon="check" />
-    <br />
-    <br />
-    <Button icon="check" disabled />
-    <br />
-    <br />
-    <Button icon="check" busy />
+    <Button naked icon="favorite" />
   </div>
 )
 
-export const CustomContent = () => (
+export const nakedDropdown = () => (
   <div>
-    <Button>
-      Custom content
-      <Icon icon="keyboard_arrow_right" />
-    </Button>
-    <br />
-    <br />
-    <Button disabled>
-      Custom content
-      <Icon icon="keyboard_arrow_right" />
-    </Button>
-    <br />
-    <br />
-    <Button busy>
-      Custom content
-      <Icon icon="keyboard_arrow_right" />
-    </Button>
+    <Button naked icon="favorite" message="Dropdown" withDropdown />
   </div>
 )
 
-CustomContent.story = {
-  name: 'Custom content',
-}
-
-export const Toggle = () => <Example />
+export const NakedOnlyIconDropdown = () => (
+  <div>
+    <Button naked icon="favorite" withDropdown />
+  </div>
+)
