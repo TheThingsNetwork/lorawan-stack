@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { defineMessages } from 'react-intl'
-import bind from 'autobind-decorator'
 import { isPlainObject } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
@@ -89,295 +88,294 @@ const emptyLocation = {
   altitude: undefined,
 }
 
-class LocationForm extends Component {
-  static propTypes = {
-    additionalMarkers: PropTypes.markers,
-    /** Additional fields to be passed as children. */
-    children: PropTypes.node,
-    disabledInfo: PropTypes.message,
-    entityId: PropTypes.string.isRequired,
-    /** The title message shown at the top of the form. */
-    formTitle: PropTypes.message.isRequired,
-    initialValues: PropTypes.entityLocation,
-    noLocationSetInfo: PropTypes.message,
-    /** The handler for the delete function of the form. */
-    onDelete: PropTypes.func.isRequired,
-    /** The handler for the submit function of the form. */
-    onSubmit: PropTypes.func.isRequired,
-    updatesDisabled: PropTypes.bool,
-    validationSchema: PropTypes.shape({
-      cast: PropTypes.func.isRequired,
-    }),
-  }
-
-  static defaultProps = {
-    additionalMarkers: [],
-    children: null,
-    disabledInfo: undefined,
-    initialValues: emptyLocation,
+const LocationForm = props => {
+  const {
+    formTitle,
     validationSchema,
-    updatesDisabled: false,
-    noLocationSetInfo: m.noLocationSetInfo,
+    children,
+    updatesDisabled,
+    additionalMarkers,
+    initialValues,
+    disabledInfo,
+    noLocationSetInfo,
+    onSubmit,
+    onDelete,
+    entityId,
+  } = props
+
+  const form = useRef(null)
+  const [latitude, setLatitude] = useState(props.initialValues.latitude)
+  const [longitude, setLongitude] = useState(props.initialValues.longitude)
+  const [zoom, setZoom] = useState(14)
+  const [error, setError] = useState(undefined)
+  const [mapCenter, setMapCenter] = useState(undefined)
+  const [loading, setLoading] = useState(true)
+  const [deleteAll, setDeleteAll] = useState(
+    !hasLocationSet(initialValues) && Object.keys(additionalMarkers).length !== 0,
+  )
+
+  const entryExists = useMemo(() => hasLocationSet(initialValues), [initialValues])
+  const automaticExists = Object.keys(additionalMarkers).length !== 0
+  const anyEntryExists = entryExists || automaticExists
+  const onlyAutomaticExists = !entryExists && anyEntryExists
+  const markers = [...additionalMarkers]
+  if (typeof longitude === 'number' && typeof latitude === 'number') {
+    markers.push({ position: { longitude, latitude } })
   }
 
-  constructor(props) {
-    super(props)
-
-    this.form = React.createRef()
-
-    this.state = {
-      latitude: props.initialValues.latitude,
-      longitude: props.initialValues.longitude,
-      zoom: 14,
-      error: undefined,
-      mapCenter: undefined,
-      loading: true,
-      deleteAll:
-        !hasLocationSet(props.initialValues) && Object.keys(props.additionalMarkers).length !== 0,
-    }
-  }
-
-  @bind
-  async componentDidMount() {
-    const { initialValues, additionalMarkers } = this.props
-    let newState = { mapCenter: defaultLocation, loading: false }
-    if (!hasLocationSet(initialValues) && additionalMarkers.length === 0) {
-      if ('geolocation' in navigator) {
-        newState = await new Promise(resolve => {
-          navigator.geolocation.getCurrentPosition(
-            position => {
-              resolve({
-                mapCenter: [
-                  isNaN(position.coords.latitude) ? defaultLocation[0] : position.coords.latitude,
-                  isNaN(position.coords.longitude) ? defaultLocation[1] : position.coords.longitude,
-                ],
-                loading: false,
-              })
-            },
-            () => {
-              resolve({ mapCenter: defaultLocation, zoom: 2, loading: false })
-            },
-          )
-        })
-      }
-    }
-    this.setState(newState)
-  }
-
-  @bind
-  async handleSubmit(values, { setSubmitting }) {
-    const { onSubmit, entityId, validationSchema } = this.props
-    this.setState({ error: undefined })
-
-    const castedValues = validationSchema.cast(values)
-
-    try {
-      await onSubmit(castedValues)
-      this.setState({ deleteAll: false })
-      toast({
-        title: entityId,
-        message: m.updateSuccess,
-        type: toast.types.SUCCESS,
+  const getCurrentLocation = useCallback(async () => {
+    let newState = { mapCenter: defaultLocation }
+    if (
+      !hasLocationSet(initialValues) &&
+      additionalMarkers.length === 0 &&
+      'geolocation' in navigator
+    ) {
+      newState = await new Promise(resolve => {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            resolve({
+              mapCenter: [
+                isNaN(position.coords.latitude) ? defaultLocation[0] : position.coords.latitude,
+                isNaN(position.coords.longitude) ? defaultLocation[1] : position.coords.longitude,
+              ],
+            })
+          },
+          () => {
+            resolve({ mapCenter: defaultLocation, zoom: 2 })
+          },
+        )
       })
-    } catch (error) {
-      this.setState({ error })
-      setSubmitting(false)
-    }
-  }
-
-  @bind
-  handleClick(event) {
-    const { updatesDisabled } = this.props
-    const { setValues, values } = this.form.current
-    const latitude = isNaN(event.latlng.lat) ? defaultLocation[0] : event.latlng.lat
-    const longitude = isNaN(event.latlng.lng) ? defaultLocation[1] : event.latlng.lng
-
-    if (updatesDisabled) {
-      return
     }
 
-    this.setState({ latitude, longitude })
-    setValues({
-      ...values,
-      latitude,
-      longitude,
-      altitude: values.altitude ? values.altitude : 0,
+    return newState
+  }, [additionalMarkers.length, initialValues])
+
+  useEffect(() => {
+    getCurrentLocation().then(res => {
+      setMapCenter(res.mapCenter)
+      setZoom(res.zoom ?? 2)
+      setLoading(false)
     })
-  }
+  }, [getCurrentLocation])
 
-  @bind
-  handleLatitudeChange(event) {
-    const { longitude } = this.state
-    const latitude = event.currentTarget.value
-    if (longitude) {
-      this.setState({ latitude, mapCenter: [Number(latitude), Number(longitude)] })
-    } else {
-      this.setState({ latitude })
-    }
-  }
+  const handleSubmit = useCallback(
+    async (values, { setSubmitting }) => {
+      setError(undefined)
 
-  @bind
-  handleLongitudeChange(event) {
-    const { latitude } = this.state
-    const longitude = event.currentTarget.value
-    if (latitude) {
-      this.setState({ longitude, mapCenter: [Number(latitude), Number(longitude)] })
-    } else {
-      this.setState({ longitude })
-    }
-  }
+      const castedValues = validationSchema.cast(values)
 
-  @bind
-  handleDeleteAllCheck(event) {
+      try {
+        await onSubmit(castedValues)
+        setDeleteAll(false)
+        toast({
+          title: entityId,
+          message: m.updateSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (error) {
+        setError(error)
+        setSubmitting(false)
+      }
+    },
+    [entityId, onSubmit, validationSchema],
+  )
+
+  const handleClick = useCallback(
+    event => {
+      const { setValues, values } = form.current
+      const latitude = isNaN(event.latlng.lat) ? defaultLocation[0] : event.latlng.lat
+      const longitude = isNaN(event.latlng.lng) ? defaultLocation[1] : event.latlng.lng
+
+      if (updatesDisabled) {
+        return
+      }
+      setLatitude(latitude)
+      setLongitude(longitude)
+      setValues({
+        ...values,
+        latitude,
+        longitude,
+        altitude: values.altitude ? values.altitude : 0,
+      })
+    },
+    [updatesDisabled],
+  )
+
+  const handleLatitudeChange = useCallback(
+    event => {
+      const latitude = event.currentTarget.value
+      setLatitude(latitude)
+      if (longitude) {
+        setMapCenter([Number(latitude), Number(longitude)])
+      }
+    },
+    [longitude],
+  )
+
+  const handleLongitudeChange = useCallback(
+    event => {
+      const longitude = event.currentTarget.value
+      setLongitude(longitude)
+      if (latitude) {
+        setMapCenter([Number(latitude), Number(longitude)])
+      }
+    },
+    [latitude],
+  )
+
+  const handleDeleteAllCheck = useCallback(event => {
     if (!event || !event.target) {
       return
     }
-    this.setState({ deleteAll: event.target.checked })
-  }
+    setDeleteAll(event.target.checked)
+  }, [])
 
-  @bind
-  async handleDelete() {
-    const { onDelete, entityId } = this.props
-    const { deleteAll } = this.state
-
+  const handleDelete = useCallback(async () => {
     try {
       await onDelete(deleteAll)
-      this.form.current.resetForm({ values: emptyLocation })
-      this.setState({ latitude: undefined, longitude: undefined })
+      form.current.resetForm({ values: emptyLocation })
+      setLatitude(undefined)
+      setLongitude(undefined)
       toast({
         title: entityId,
         message: m.deleteSuccess,
         type: toast.types.SUCCESS,
       })
     } catch (error) {
-      this.setState({ error })
+      setError(error)
     }
-  }
+  }, [deleteAll, entityId, onDelete])
 
-  render() {
-    const {
-      formTitle,
-      validationSchema,
-      children,
-      updatesDisabled,
-      additionalMarkers,
-      initialValues,
-      disabledInfo,
-      noLocationSetInfo,
-    } = this.props
-    const { error, latitude, longitude, mapCenter, zoom, loading, deleteAll } = this.state
-
-    const entryExists = hasLocationSet(initialValues)
-    const automaticExists = Object.keys(additionalMarkers).length !== 0
-    const anyEntryExists = entryExists || automaticExists
-    const onlyAutomaticExists = !entryExists && anyEntryExists
-    const markers = [...additionalMarkers]
-    if (typeof longitude === 'number' && typeof latitude === 'number') {
-      markers.push({ position: { longitude, latitude } })
-    }
-    return (
-      <React.Fragment>
-        <Form
-          error={error}
-          validateOnChange
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={this.handleSubmit}
-          formikRef={this.form}
-        >
-          <Form.SubTitle title={formTitle} />
-          {children}
-          <Message content={sharedMessages.location} component="h4" className="mb-cs-xs mt-0" />
-          {!entryExists && <Notification content={noLocationSetInfo} info small />}
-          <Overlay loading={loading} visible={loading} spinnerMessage={m.loadingLocation}>
-            <LocationMap
-              widget
-              leafletConfig={{ zoom, minZoom: 1 }}
-              mapCenter={mapCenter}
-              markers={markers}
-              onClick={this.handleClick}
-              clickable
-              centerOnMarkers
-            />
-          </Overlay>
-          <Message
-            content={updatesDisabled ? m.mapDescriptionDisabled : m.mapDescription}
-            component="p"
-            className="p-0 mt-cs-xs mb-cs-l tc-subtle-gray"
-          />
-          {updatesDisabled && disabledInfo && <Notification content={disabledInfo} info small />}
-          <Form.Field
-            type="number"
-            step="any"
-            title={sharedMessages.latitude}
-            description={sharedMessages.latitudeDesc}
-            name="latitude"
-            component={Input}
-            required={!updatesDisabled}
-            disabled={updatesDisabled}
-            onBlur={this.handleLatitudeChange}
-          />
-          <Form.Field
-            type="number"
-            step="any"
-            title={sharedMessages.longitude}
-            description={sharedMessages.longitudeDesc}
-            name="longitude"
-            component={Input}
-            required={!updatesDisabled}
-            disabled={updatesDisabled}
-            onBlur={this.handleLongitudeChange}
-          />
-          <Form.Field
-            type="number"
-            step="1"
-            title={sharedMessages.altitude}
-            description={sharedMessages.altitudeDesc}
-            name="altitude"
-            component={Input}
-            required={!updatesDisabled}
-            disabled={updatesDisabled}
-          />
-          <SubmitBar>
-            <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-            <ModalButton
-              type="button"
-              icon="delete"
-              message={m.deleteLocation}
-              modalData={{
-                children: (
-                  <div>
-                    <Message
-                      content={onlyAutomaticExists ? m.deleteAllWarning : m.deleteWarning}
-                      component="span"
+  return (
+    <Form
+      error={error}
+      validateOnChange
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+      formikRef={form}
+    >
+      <Form.SubTitle title={formTitle} />
+      {children}
+      <Message content={sharedMessages.location} component="h4" className="mb-cs-xs mt-0" />
+      {!entryExists && <Notification content={noLocationSetInfo} info small />}
+      <Overlay loading={loading} visible={loading} spinnerMessage={m.loadingLocation}>
+        <LocationMap
+          widget
+          leafletConfig={{ zoom, minZoom: 1 }}
+          mapCenter={mapCenter}
+          markers={markers}
+          onClick={handleClick}
+          clickable
+          centerOnMarkers
+        />
+      </Overlay>
+      <Message
+        content={updatesDisabled ? m.mapDescriptionDisabled : m.mapDescription}
+        component="p"
+        className="p-0 mt-cs-xs mb-cs-l tc-subtle-gray"
+      />
+      {updatesDisabled && disabledInfo && <Notification content={disabledInfo} info small />}
+      <Form.Field
+        type="number"
+        step="any"
+        title={sharedMessages.latitude}
+        description={sharedMessages.latitudeDesc}
+        name="latitude"
+        component={Input}
+        required={!updatesDisabled}
+        disabled={updatesDisabled}
+        onBlur={handleLatitudeChange}
+      />
+      <Form.Field
+        type="number"
+        step="any"
+        title={sharedMessages.longitude}
+        description={sharedMessages.longitudeDesc}
+        name="longitude"
+        component={Input}
+        required={!updatesDisabled}
+        disabled={updatesDisabled}
+        onBlur={handleLongitudeChange}
+      />
+      <Form.Field
+        type="number"
+        step="1"
+        title={sharedMessages.altitude}
+        description={sharedMessages.altitudeDesc}
+        name="altitude"
+        component={Input}
+        required={!updatesDisabled}
+        disabled={updatesDisabled}
+      />
+      <SubmitBar>
+        <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
+        <ModalButton
+          type="button"
+          icon="delete"
+          message={m.deleteLocation}
+          modalData={{
+            children: (
+              <div>
+                <Message
+                  content={onlyAutomaticExists ? m.deleteAllWarning : m.deleteWarning}
+                  component="span"
+                />
+                {entryExists && automaticExists && (
+                  <>
+                    <br />
+                    <br />
+                    <Message content={m.deleteAllInfo} component="span" />
+                    <Checkbox
+                      name="delete-all"
+                      label={m.deleteAllLocations}
+                      onChange={handleDeleteAllCheck}
+                      className="mt-cs-m"
+                      value={deleteAll}
                     />
-                    {entryExists && automaticExists && (
-                      <>
-                        <br />
-                        <br />
-                        <Message content={m.deleteAllInfo} component="span" />
-                        <Checkbox
-                          name="delete-all"
-                          label={m.deleteAllLocations}
-                          onChange={this.handleDeleteAllCheck}
-                          className="mt-cs-m"
-                          value={deleteAll}
-                        />
-                      </>
-                    )}
-                  </div>
-                ),
-              }}
-              onApprove={this.handleDelete}
-              disabled={updatesDisabled || !anyEntryExists}
-              naked
-              danger
-            />
-          </SubmitBar>
-        </Form>
-      </React.Fragment>
-    )
-  }
+                  </>
+                )}
+              </div>
+            ),
+          }}
+          onApprove={handleDelete}
+          disabled={updatesDisabled || !anyEntryExists}
+          naked
+          danger
+        />
+      </SubmitBar>
+    </Form>
+  )
+}
+
+LocationForm.propTypes = {
+  additionalMarkers: PropTypes.markers,
+  /** Additional fields to be passed as children. */
+  children: PropTypes.node,
+  disabledInfo: PropTypes.message,
+  entityId: PropTypes.string.isRequired,
+  /** The title message shown at the top of the form. */
+  formTitle: PropTypes.message.isRequired,
+  initialValues: PropTypes.entityLocation,
+  noLocationSetInfo: PropTypes.message,
+  /** The handler for the delete function of the form. */
+  onDelete: PropTypes.func.isRequired,
+  /** The handler for the submit function of the form. */
+  onSubmit: PropTypes.func.isRequired,
+  updatesDisabled: PropTypes.bool,
+  validationSchema: PropTypes.shape({
+    cast: PropTypes.func.isRequired,
+  }),
+}
+
+LocationForm.defaultProps = {
+  additionalMarkers: [],
+  children: null,
+  disabledInfo: undefined,
+  initialValues: emptyLocation,
+  validationSchema,
+  updatesDisabled: false,
+  noLocationSetInfo: m.noLocationSetInfo,
 }
 
 export { LocationForm as default, hasLocationSet }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useRef } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
@@ -76,27 +76,27 @@ const Overview = () => {
   const mayCreateGtws = useSelector(state => checkFromState(mayCreateGateways, state))
   const supportLink = selectSupportLinkConfig()
   const documentationBaseUrl = selectDocumentationUrlConfig()
-  const appAnimationRef = React.createRef()
-  const gatewayAnimationRef = React.createRef()
+  const appAnimationRef = useRef(null)
+  const gatewayAnimationRef = useRef(null)
 
   useBreadcrumbs('overview', <Breadcrumb path="/" content={sharedMessages.overview} />)
 
   const handleAppChooserMouseEnter = useCallback(() => {
-    appAnimationRef.current.instance.setDirection(1)
-    appAnimationRef.current.instance.goToAndPlay(0)
+    appAnimationRef.current.setDirection(1)
+    appAnimationRef.current.goToAndPlay(0)
   }, [appAnimationRef])
 
   const handleAppChooserMouseLeave = useCallback(() => {
-    appAnimationRef.current.instance.setDirection(-1)
+    appAnimationRef.current.setDirection(-1)
   }, [appAnimationRef])
 
   const handleGatewayChooserMouseEnter = useCallback(() => {
-    gatewayAnimationRef.current.instance.setDirection(1)
-    gatewayAnimationRef.current.instance.goToAndPlay(0)
+    gatewayAnimationRef.current.setDirection(1)
+    gatewayAnimationRef.current.goToAndPlay(0)
   }, [gatewayAnimationRef])
 
   const handleGatewayChooserMouseLeave = useCallback(() => {
-    gatewayAnimationRef.current.instance.setDirection(-1)
+    gatewayAnimationRef.current.setDirection(-1)
   }, [gatewayAnimationRef])
 
   const chooser = useMemo(() => {
@@ -114,7 +114,7 @@ const Overview = () => {
                 onMouseLeave={handleAppChooserMouseLeave}
                 className={style.chooser}
               >
-                <Animation ref={appAnimationRef} animationData={AppAnimation} />
+                <Animation animationRef={appAnimationRef} animationData={AppAnimation} />
                 <Message
                   component="span"
                   content={hasEntities ? m.gotoApplications : m.createApplication}
@@ -131,7 +131,7 @@ const Overview = () => {
                 onMouseLeave={handleGatewayChooserMouseLeave}
                 className={style.chooser}
               >
-                <Animation ref={gatewayAnimationRef} animationData={GatewayAnimation} />
+                <Animation animationRef={gatewayAnimationRef} animationData={GatewayAnimation} />
                 <Message
                   component="span"
                   content={hasEntities ? m.gotoGateways : m.createGateway}

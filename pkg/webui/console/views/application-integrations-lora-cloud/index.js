@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import LoRaCloudImage from '@assets/misc/lora-cloud.png'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { useBreadcrumbs, withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Link from '@ttn-lw/components/link'
 import Collapse from '@ttn-lw/components/collapse'
 
@@ -123,13 +123,4 @@ const LoRaCloud = () => {
   )
 }
 
-export default withBreadcrumb('apps.single.integrations.lora-cloud', props => {
-  const { appId } = props
-
-  return (
-    <Breadcrumb
-      path={`/applications/${appId}/integrations/lora-cloud`}
-      content={sharedMessages.loraCloud}
-    />
-  )
-})(LoRaCloud)
+export default LoRaCloud

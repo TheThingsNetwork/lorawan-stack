@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ class NullableStringSchemaType extends StringSchema {
 
     const self = this
 
-    /* eslint-disable prefer-arrow/prefer-arrow-functions */
     self.withMutation(() => {
       self
         .transform(value => {
@@ -37,9 +36,8 @@ class NullableStringSchemaType extends StringSchema {
 
           return null
         })
-        .nullable(true)
+        .nullable()
     })
-    /* eslint-enable prefer-arrow/prefer-arrow-functions */
   }
 }
 

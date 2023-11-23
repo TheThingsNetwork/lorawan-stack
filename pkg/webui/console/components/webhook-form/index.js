@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { defineMessages, FormattedRelativeTime } from 'react-intl'
-import bind from 'autobind-decorator'
 import { uniq } from 'lodash'
 
 import tts from '@console/api/tts'
@@ -233,120 +232,97 @@ const validationSchema = Yup.object().shape({
     .nullable(),
 })
 
-export default class WebhookForm extends Component {
-  static propTypes = {
-    error: PropTypes.error,
-    existCheck: PropTypes.func,
-    hasUnhealthyWebhookConfig: PropTypes.bool,
-    healthStatusEnabled: PropTypes.bool,
-    initialWebhookValue: PropTypes.shape({
-      ids: PropTypes.shape({
-        webhook_id: PropTypes.string,
-      }),
-      health_status: PropTypes.shape({
-        healthy: PropTypes.shape({}),
-        unhealthy: PropTypes.shape({}),
-      }),
-      headers: PropTypes.shape({
-        Authorization: PropTypes.string,
-      }),
-    }),
-    onDelete: PropTypes.func,
-    onDeleteFailure: PropTypes.func,
-    onDeleteSuccess: PropTypes.func,
-    onReactivate: PropTypes.func,
-    onReactivateSuccess: PropTypes.func,
-    onSubmit: PropTypes.func.isRequired,
-    update: PropTypes.bool.isRequired,
-    webhookRetryInterval: PropTypes.string,
-    webhookTemplate: PropTypes.webhookTemplate,
+const WebhookForm = props => {
+  const {
+    update,
+    initialWebhookValue,
+    webhookTemplate,
+    healthStatusEnabled,
+    webhookRetryInterval,
+    hasUnhealthyWebhookConfig,
+    error: propsError,
+    existCheck,
+    onSubmit,
+    onDelete,
+    onDeleteSuccess,
+    onDeleteFailure,
+    onReactivate,
+    onReactivateSuccess,
+  } = props
+
+  const form = useRef(null)
+  const modalResolve = useRef(() => {})
+  const modalReject = useRef(() => {})
+  const [shouldShowCredentialsInput, setShouldShowCredentialsInput] = useState(
+    Boolean(initialWebhookValue?.headers?.Authorization?.startsWith('Basic ')) &&
+      Boolean(!decodeValues(initialWebhookValue)._headers.find(i => i.decodeError)?.decodeError),
+  )
+  const [showDecodeError, setShowDecodeError] = useState(
+    Boolean(decodeValues(initialWebhookValue)._headers.find(i => i.decodeError)?.decodeError),
+  )
+  const [displayOverwriteModal, setDisplayOverwriteModal] = useState(false)
+  const [existingId, setExistingId] = useState(undefined)
+  const [error, setError] = useState(undefined)
+
+  const retryIntervalValue = webhookRetryInterval?.match(durationRegExp)[0]
+  const retryIntervalUnit = webhookRetryInterval?.match(durationRegExp)[1]
+  const retryIntervalIntlUnit = units[retryIntervalUnit]
+
+  let initialValues = blankValues
+  if (update && initialWebhookValue) {
+    initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
   }
 
-  static defaultProps = {
-    initialWebhookValue: undefined,
-    onReactivate: () => null,
-    onReactivateSuccess: () => null,
-    onDeleteFailure: () => null,
-    onDeleteSuccess: () => null,
-    onDelete: () => null,
-    webhookTemplate: undefined,
-    healthStatusEnabled: false,
-    error: undefined,
-    existCheck: () => null,
-    webhookRetryInterval: null,
-    hasUnhealthyWebhookConfig: false,
-  }
+  const hasTemplate = Boolean(webhookTemplate)
 
-  form = React.createRef()
+  const healthStatus = initialWebhookValue?.health_status
+  const mayReactivate = update && hasUnhealthyWebhookConfig && healthStatus?.unhealthy
+  const isPending = update && healthStatusEnabled && !healthStatus
 
-  modalResolve = () => null
-  modalReject = () => null
-
-  constructor(props) {
-    super(props)
-    const { initialWebhookValue } = this.props
-
-    this.state = {
-      shouldShowCredentialsInput:
-        Boolean(initialWebhookValue?.headers?.Authorization?.startsWith('Basic ')) &&
-        Boolean(!decodeValues(initialWebhookValue)._headers.find(i => i.decodeError)?.decodeError),
-      showDecodeError: Boolean(
-        decodeValues(initialWebhookValue)._headers.find(i => i.decodeError)?.decodeError,
-      ),
-      displayOverwriteModal: false,
-      existingId: undefined,
-      error: undefined,
-    }
-  }
-
-  @bind
-  handleReplaceModalDecision(mayReplace) {
+  const handleReplaceModalDecision = useCallback(mayReplace => {
     if (mayReplace) {
-      this.modalResolve()
+      modalResolve.current()
     } else {
-      this.modalReject()
+      modalReject.current()
     }
-    this.setState({ displayOverwriteModal: false })
-  }
+    setDisplayOverwriteModal(false)
+  }, [])
 
-  @bind
-  async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { onSubmit, existCheck } = this.props
-    const castedWebhookValues = validationSchema.cast(values)
-    const encodedValues = encodeValues(castedWebhookValues)
-    const webhookId = encodedValues.ids.webhook_id
-    const exists = await existCheck(webhookId)
-    this.setState({
-      showDecodeError: Boolean(
-        decodeValues(encodedValues)._headers.find(i => i.decodeError)?.decodeError,
-      ),
-    })
-    if (exists) {
-      this.setState({ displayOverwriteModal: true, existingId: webhookId })
-      await new Promise((resolve, reject) => {
-        this.modalResolve = resolve
-        this.modalReject = reject
-      })
-    }
-    await onSubmit(castedWebhookValues, encodedValues, { setSubmitting, resetForm })
-  }
+  const handleSubmit = useCallback(
+    async (values, { setSubmitting, resetForm }) => {
+      const castedWebhookValues = validationSchema.cast(values)
+      const encodedValues = encodeValues(castedWebhookValues)
+      const webhookId = encodedValues.ids.webhook_id
+      const exists = await existCheck(webhookId)
+      setShowDecodeError(
+        Boolean(decodeValues(encodedValues)._headers.find(i => i.decodeError)?.decodeError),
+      )
 
-  @bind
-  async handleDelete() {
-    const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
+      if (exists) {
+        setDisplayOverwriteModal(true)
+        setExistingId(webhookId)
+        await new Promise((resolve, reject) => {
+          modalResolve.current = resolve
+          modalReject.current = reject
+        })
+      }
+      await onSubmit(castedWebhookValues, encodedValues, { setSubmitting, resetForm })
+    },
+    [existCheck, onSubmit],
+  )
+
+  const handleDelete = useCallback(async () => {
     try {
       await onDelete()
-      this.form.current.resetForm()
+      form.current.resetForm()
       onDeleteSuccess()
     } catch (error) {
-      this.setState({ error })
+      setError(error)
       onDeleteFailure()
     }
-  }
+  }, [onDelete, onDeleteFailure, onDeleteSuccess])
 
-  @bind
-  async handleReactivate() {
-    const { onReactivate, onReactivateSuccess } = this.props
+  const handleReactivate = useCallback(async () => {
     const healthStatus = {
       health_status: null,
     }
@@ -355,342 +331,356 @@ export default class WebhookForm extends Component {
       await onReactivate(healthStatus)
       onReactivateSuccess()
     } catch (error) {
-      this.setState({ error })
+      setError(error)
     }
-  }
+  }, [onReactivate, onReactivateSuccess])
 
-  @bind
-  handleRequestAuthenticationChange(event) {
-    const currentHeaders = this.form.current.values._headers
+  const handleRequestAuthenticationChange = useCallback(event => {
+    const currentHeaders = form.current.values._headers
     if (!event.target.checked) {
-      this.form.current.setFieldValue(
+      form.current.setFieldValue(
         '_headers',
         currentHeaders.filter(i => !i.readOnly),
       )
     } else {
-      this.form.current.setFieldValue('_headers', [
+      form.current.setFieldValue('_headers', [
         { key: 'Authorization', value: 'Basic ...', readOnly: true },
       ])
     }
-    this.setState({ shouldShowCredentialsInput: event.target.checked })
-  }
+    setShouldShowCredentialsInput(event.target.checked)
+  }, [])
 
-  @bind
-  handleHeadersChange() {
-    this.setState({ showDecodeError: !hasNoEmptyEntry })
-  }
+  const handleHeadersChange = useCallback(() => {
+    setShowDecodeError(!hasNoEmptyEntry)
+  }, [])
 
-  render() {
-    const {
-      update,
-      initialWebhookValue,
-      webhookTemplate,
-      healthStatusEnabled,
-      webhookRetryInterval,
-      hasUnhealthyWebhookConfig,
-      error,
-    } = this.props
-
-    const retryIntervalValue = webhookRetryInterval?.match(durationRegExp)[0]
-    const retryIntervalUnit = webhookRetryInterval?.match(durationRegExp)[1]
-    const retryIntervalIntlUnit = units[retryIntervalUnit]
-
-    let initialValues = blankValues
-    if (update && initialWebhookValue) {
-      initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
-    }
-
-    const hasTemplate = Boolean(webhookTemplate)
-
-    const healthStatus = initialWebhookValue?.health_status
-    const mayReactivate = update && hasUnhealthyWebhookConfig && healthStatus?.unhealthy
-    const isPending = update && healthStatusEnabled && !healthStatus
-
-    return (
-      <>
-        {!hasTemplate && (
-          <>
-            <Message
-              content={m.webhooksDescription}
-              values={{
-                Link: val => (
-                  <Link.DocLink path="/integrations/webhooks" secondary>
-                    {val}
-                  </Link.DocLink>
-                ),
-              }}
-              component="p"
-            />
-            <hr className="mb-ls-m" />
-          </>
-        )}
-        {mayReactivate && (
-          <Notification
-            warning
-            content={m.suspendedWebhookMessage}
-            messageValues={{
-              webhookRetryInterval: (
-                <FormattedRelativeTime
-                  style="long"
-                  value={retryIntervalValue}
-                  unit={retryIntervalIntlUnit}
-                />
+  return (
+    <>
+      {!hasTemplate && (
+        <>
+          <Message
+            content={m.webhooksDescription}
+            values={{
+              Link: val => (
+                <Link.DocLink path="/integrations/webhooks" secondary>
+                  {val}
+                </Link.DocLink>
               ),
             }}
-            children={
-              <Button
-                onClick={this.handleReactivate}
-                icon="refresh"
-                message={m.reactivateButtonMessage}
-                className="mt-cs-m"
+            component="p"
+          />
+          <hr className="mb-ls-m" />
+        </>
+      )}
+      {mayReactivate && (
+        <Notification
+          warning
+          content={m.suspendedWebhookMessage}
+          messageValues={{
+            webhookRetryInterval: (
+              <FormattedRelativeTime
+                style="long"
+                value={retryIntervalValue}
+                unit={retryIntervalIntlUnit}
               />
+            ),
+          }}
+          children={
+            <Button
+              onClick={handleReactivate}
+              icon="refresh"
+              message={m.reactivateButtonMessage}
+              className="mt-cs-m"
+            />
+          }
+          small
+        />
+      )}
+      {isPending && <Notification info content={m.pendingInfo} small />}
+      <PortalledModal
+        title={sharedMessages.idAlreadyExists}
+        message={{
+          ...sharedMessages.webhookAlreadyExistsModalMessage,
+          values: { id: existingId },
+        }}
+        buttonMessage={sharedMessages.replaceWebhook}
+        onComplete={handleReplaceModalDecision}
+        approval
+        visible={displayOverwriteModal}
+      />
+      {hasTemplate && <WebhookTemplateInfo webhookTemplate={webhookTemplate} update={update} />}
+      <Form
+        onSubmit={handleSubmit}
+        validationSchema={validationSchema}
+        initialValues={initialValues}
+        error={error || propsError}
+        errorTitle={update ? m.updateErrorTitle : m.createErrorTitle}
+        formikRef={form}
+      >
+        <Form.SubTitle title={sharedMessages.generalSettings} />
+        <Form.Field
+          name="ids.webhook_id"
+          title={sharedMessages.webhookId}
+          placeholder={m.idPlaceholder}
+          component={Input}
+          required
+          autoFocus
+          disabled={update}
+        />
+        <WebhookFormatSelector name="format" required />
+        <Form.Field
+          name="base_url"
+          title={sharedMessages.webhookBaseUrl}
+          placeholder="https://example.com/webhooks"
+          component={Input}
+          required
+        />
+        <Form.Field
+          name="downlink_api_key"
+          title={m.downlinkAPIKey}
+          component={Input}
+          description={m.downlinkAPIKeyDesc}
+          sensitive
+          code
+        />
+        <Form.Field
+          title={m.requestBasicAuth}
+          name="_basic_auth_enabled"
+          label={m.basicAuthCheckbox}
+          onChange={handleRequestAuthenticationChange}
+          component={Checkbox}
+          tooltipId={tooltipIds.BASIC_AUTH}
+        />
+        {shouldShowCredentialsInput && (
+          <Form.FieldContainer horizontal>
+            <Form.Field
+              data-test-id="basic-auth-username"
+              required
+              title={sharedMessages.username}
+              name="_basic_auth_username"
+              component={Input}
+            />
+            <Form.Field
+              data-test-id="basic-auth-password"
+              required
+              title={sharedMessages.password}
+              name="_basic_auth_password"
+              component={Input}
+              sensitive
+            />
+          </Form.FieldContainer>
+        )}
+        {showDecodeError && (
+          <Notification
+            warning
+            content={
+              'Something went wrong and the contents of the Authorization header could not be decoded.'
             }
             small
+            className="mt-cs-xl"
           />
         )}
-        {isPending && <Notification info content={m.pendingInfo} small />}
-        <PortalledModal
-          title={sharedMessages.idAlreadyExists}
-          message={{
-            ...sharedMessages.webhookAlreadyExistsModalMessage,
-            values: { id: this.state.existingId },
-          }}
-          buttonMessage={sharedMessages.replaceWebhook}
-          onComplete={this.handleReplaceModalDecision}
-          approval
-          visible={this.state.displayOverwriteModal}
+        <Form.Field
+          name="_headers"
+          title={m.additionalHeaders}
+          keyPlaceholder={sharedMessages.authorization}
+          valuePlaceholder={sharedMessages.bearerMyAuthToken}
+          addMessage={sharedMessages.addHeaderEntry}
+          component={KeyValueMap}
+          isReadOnly={isReadOnly}
+          onChange={handleHeadersChange}
         />
-        {hasTemplate && <WebhookTemplateInfo webhookTemplate={webhookTemplate} update={update} />}
-        <Form
-          onSubmit={this.handleSubmit}
-          validationSchema={validationSchema}
-          initialValues={initialValues}
-          error={this.state.error || error}
-          errorTitle={update ? m.updateErrorTitle : m.createErrorTitle}
-          formikRef={this.form}
-        >
-          <Form.SubTitle title={sharedMessages.generalSettings} />
-          <Form.Field
-            name="ids.webhook_id"
-            title={sharedMessages.webhookId}
-            placeholder={m.idPlaceholder}
-            component={Input}
-            required
-            autoFocus
-            disabled={update}
+        <Form.Field
+          name="field_mask.paths"
+          title={m.filterEventData}
+          valuePlaceholder={m.fieldMaskPlaceholder}
+          component={KeyValueMap}
+          tooltipId={tooltipIds.FILTER_EVENT_DATA}
+          inputElement={Select}
+          addMessage={m.filtersAdd}
+          additionalInputProps={{ options: filterOptions }}
+          indexAsKey
+        />
+        <Form.SubTitle title={sharedMessages.eventEnabledTypes} className="mb-0" />
+        <Message component="p" content={m.messageInfo} className="mt-0 mb-ls-xxs" />
+        <Form.Field
+          name="uplink_message"
+          type="toggled-input"
+          enabledMessage={sharedMessages.uplinkMessage}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventUplinkMessageDesc}
+        />
+        <Form.Field
+          name="uplink_normalized"
+          type="toggled-input"
+          enabledMessage={sharedMessages.uplinkNormalized}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventUplinkNormalizedDesc}
+        />
+        <Form.Field
+          name="join_accept"
+          type="toggled-input"
+          enabledMessage={sharedMessages.joinAccept}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventJoinAcceptDesc}
+        />
+        <Form.Field
+          name="downlink_ack"
+          type="toggled-input"
+          enabledMessage={sharedMessages.downlinkAck}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventDownlinkAckDesc}
+        />
+        <Form.Field
+          name="downlink_nack"
+          type="toggled-input"
+          enabledMessage={sharedMessages.downlinkNack}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventDownlinkNackDesc}
+        />
+        <Form.Field
+          name="downlink_sent"
+          type="toggled-input"
+          enabledMessage={sharedMessages.downlinkSent}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventDownlinkSentDesc}
+        />
+        <Form.Field
+          name="downlink_failed"
+          type="toggled-input"
+          enabledMessage={sharedMessages.downlinkFailed}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventDownlinkFailedDesc}
+        />
+        <Form.Field
+          name="downlink_queued"
+          type="toggled-input"
+          enabledMessage={sharedMessages.downlinkQueued}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventDownlinkQueuedDesc}
+        />
+        <Form.Field
+          name="downlink_queue_invalidated"
+          type="toggled-input"
+          enabledMessage={sharedMessages.downlinkQueueInvalidated}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventDownlinkQueueInvalidatedDesc}
+          tooltipId={tooltipIds.DOWNLINK_QUEUE_INVALIDATED}
+        />
+        <Form.Field
+          name="location_solved"
+          type="toggled-input"
+          enabledMessage={sharedMessages.locationSolved}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventLocationSolvedDesc}
+        />
+        <Form.Field
+          name="service_data"
+          type="toggled-input"
+          enabledMessage={sharedMessages.serviceData}
+          placeholder={pathPlaceholder}
+          decode={decodeMessageType}
+          encode={encodeMessageType}
+          component={Input.Toggled}
+          description={sharedMessages.eventServiceDataDesc}
+        />
+        <SubmitBar>
+          <Form.Submit
+            component={SubmitButton}
+            message={update ? sharedMessages.saveChanges : sharedMessages.addWebhook}
           />
-          <WebhookFormatSelector name="format" required />
-          <Form.Field
-            name="base_url"
-            title={sharedMessages.webhookBaseUrl}
-            placeholder="https://example.com/webhooks"
-            component={Input}
-            required
-          />
-          <Form.Field
-            name="downlink_api_key"
-            title={m.downlinkAPIKey}
-            component={Input}
-            description={m.downlinkAPIKeyDesc}
-            sensitive
-            code
-          />
-          <Form.Field
-            title={m.requestBasicAuth}
-            name="_basic_auth_enabled"
-            label={m.basicAuthCheckbox}
-            onChange={this.handleRequestAuthenticationChange}
-            component={Checkbox}
-            tooltipId={tooltipIds.BASIC_AUTH}
-          />
-          {this.state.shouldShowCredentialsInput && (
-            <Form.FieldContainer horizontal>
-              <Form.Field
-                data-test-id="basic-auth-username"
-                required
-                title={sharedMessages.username}
-                name="_basic_auth_username"
-                component={Input}
-                onChange={this.handleBasicAuthUsernameChange}
-              />
-              <Form.Field
-                data-test-id="basic-auth-password"
-                required
-                title={sharedMessages.password}
-                name="_basic_auth_password"
-                component={Input}
-                sensitive
-              />
-            </Form.FieldContainer>
-          )}
-          {this.state.showDecodeError && (
-            <Notification
-              warning
-              content={
-                'Something went wrong and the contents of the Authorization header could not be decoded.'
-              }
-              small
-              className="mt-cs-xl"
+          {update && (
+            <ModalButton
+              type="button"
+              icon="delete"
+              danger
+              naked
+              message={m.deleteWebhook}
+              modalData={{
+                message: {
+                  values: { webhookId: initialWebhookValue.ids.webhook_id },
+                  ...m.modalWarning,
+                },
+              }}
+              onApprove={handleDelete}
             />
           )}
-          <Form.Field
-            name="_headers"
-            title={m.additionalHeaders}
-            keyPlaceholder={sharedMessages.authorization}
-            valuePlaceholder={sharedMessages.bearerMyAuthToken}
-            addMessage={sharedMessages.addHeaderEntry}
-            component={KeyValueMap}
-            isReadOnly={isReadOnly}
-            onChange={this.handleHeadersChange}
-          />
-          <Form.Field
-            name="field_mask.paths"
-            title={m.filterEventData}
-            valuePlaceholder={m.fieldMaskPlaceholder}
-            component={KeyValueMap}
-            tooltipId={tooltipIds.FILTER_EVENT_DATA}
-            inputElement={Select}
-            addMessage={m.filtersAdd}
-            additionalInputProps={{ options: filterOptions }}
-            indexAsKey
-          />
-          <Form.SubTitle title={sharedMessages.eventEnabledTypes} className="mb-0" />
-          <Message component="p" content={m.messageInfo} className="mt-0 mb-ls-xxs" />
-          <Form.Field
-            name="uplink_message"
-            type="toggled-input"
-            enabledMessage={sharedMessages.uplinkMessage}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventUplinkMessageDesc}
-          />
-          <Form.Field
-            name="uplink_normalized"
-            type="toggled-input"
-            enabledMessage={sharedMessages.uplinkNormalized}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventUplinkNormalizedDesc}
-          />
-          <Form.Field
-            name="join_accept"
-            type="toggled-input"
-            enabledMessage={sharedMessages.joinAccept}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventJoinAcceptDesc}
-          />
-          <Form.Field
-            name="downlink_ack"
-            type="toggled-input"
-            enabledMessage={sharedMessages.downlinkAck}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventDownlinkAckDesc}
-          />
-          <Form.Field
-            name="downlink_nack"
-            type="toggled-input"
-            enabledMessage={sharedMessages.downlinkNack}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventDownlinkNackDesc}
-          />
-          <Form.Field
-            name="downlink_sent"
-            type="toggled-input"
-            enabledMessage={sharedMessages.downlinkSent}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventDownlinkSentDesc}
-          />
-          <Form.Field
-            name="downlink_failed"
-            type="toggled-input"
-            enabledMessage={sharedMessages.downlinkFailed}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventDownlinkFailedDesc}
-          />
-          <Form.Field
-            name="downlink_queued"
-            type="toggled-input"
-            enabledMessage={sharedMessages.downlinkQueued}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventDownlinkQueuedDesc}
-          />
-          <Form.Field
-            name="downlink_queue_invalidated"
-            type="toggled-input"
-            enabledMessage={sharedMessages.downlinkQueueInvalidated}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventDownlinkQueueInvalidatedDesc}
-            tooltipId={tooltipIds.DOWNLINK_QUEUE_INVALIDATED}
-          />
-          <Form.Field
-            name="location_solved"
-            type="toggled-input"
-            enabledMessage={sharedMessages.locationSolved}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventLocationSolvedDesc}
-          />
-          <Form.Field
-            name="service_data"
-            type="toggled-input"
-            enabledMessage={sharedMessages.serviceData}
-            placeholder={pathPlaceholder}
-            decode={decodeMessageType}
-            encode={encodeMessageType}
-            component={Input.Toggled}
-            description={sharedMessages.eventServiceDataDesc}
-          />
-          <SubmitBar>
-            <Form.Submit
-              component={SubmitButton}
-              message={update ? sharedMessages.saveChanges : sharedMessages.addWebhook}
-            />
-            {update && (
-              <ModalButton
-                type="button"
-                icon="delete"
-                danger
-                naked
-                message={m.deleteWebhook}
-                modalData={{
-                  message: {
-                    values: { webhookId: initialWebhookValue.ids.webhook_id },
-                    ...m.modalWarning,
-                  },
-                }}
-                onApprove={this.handleDelete}
-              />
-            )}
-          </SubmitBar>
-        </Form>
-      </>
-    )
-  }
+        </SubmitBar>
+      </Form>
+    </>
+  )
 }
+
+WebhookForm.propTypes = {
+  error: PropTypes.error,
+  existCheck: PropTypes.func,
+  hasUnhealthyWebhookConfig: PropTypes.bool,
+  healthStatusEnabled: PropTypes.bool,
+  initialWebhookValue: PropTypes.shape({
+    ids: PropTypes.shape({
+      webhook_id: PropTypes.string,
+    }),
+    health_status: PropTypes.shape({
+      healthy: PropTypes.shape({}),
+      unhealthy: PropTypes.shape({}),
+    }),
+    headers: PropTypes.shape({
+      Authorization: PropTypes.string,
+    }),
+  }),
+  onDelete: PropTypes.func,
+  onDeleteFailure: PropTypes.func,
+  onDeleteSuccess: PropTypes.func,
+  onReactivate: PropTypes.func,
+  onReactivateSuccess: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
+  update: PropTypes.bool.isRequired,
+  webhookRetryInterval: PropTypes.string,
+  webhookTemplate: PropTypes.webhookTemplate,
+}
+
+WebhookForm.defaultProps = {
+  initialWebhookValue: undefined,
+  onReactivate: () => null,
+  onReactivateSuccess: () => null,
+  onDeleteFailure: () => null,
+  onDeleteSuccess: () => null,
+  onDelete: () => null,
+  webhookTemplate: undefined,
+  healthStatusEnabled: false,
+  error: undefined,
+  existCheck: () => null,
+  webhookRetryInterval: null,
+  hasUnhealthyWebhookConfig: false,
+}
+export default WebhookForm

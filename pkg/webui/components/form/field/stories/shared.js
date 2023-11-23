@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable react/prop-types */
-
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { action } from '@storybook/addon-actions'
 
 import Yup from '@ttn-lw/lib/yup'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Form from '../..'
 
@@ -38,28 +37,31 @@ const validationSchema = Yup.object().shape({
   error: errorSchema,
 })
 
-class FieldsWrapperExample extends React.Component {
-  form = React.createRef()
-
-  componentDidMount() {
-    if (this.form.current) {
-      this.form.current.setFieldError('error', 'Something went wrong.')
-      this.form.current.setFieldTouched('error')
+const FieldsWrapperExample = props => {
+  const formRef = useRef(null)
+  const { initialValues, children } = props
+  useEffect(() => {
+    if (formRef.current) {
+      formRef.current.setFieldError('error', 'Something went wrong.')
+      formRef.current.setFieldTouched('error')
     }
-  }
+  }, [])
 
-  render() {
-    return (
-      <Form
-        onSubmit={handleSubmit}
-        initialValues={this.props.initialValues}
-        formikRef={this.form}
-        validationSchema={validationSchema}
-      >
-        {this.props.children}
-      </Form>
-    )
-  }
+  return (
+    <Form
+      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      formikRef={formRef}
+      validationSchema={validationSchema}
+    >
+      {children}
+    </Form>
+  )
+}
+
+FieldsWrapperExample.propTypes = {
+  children: PropTypes.node.isRequired,
+  initialValues: PropTypes.shape({}).isRequired,
 }
 
 export { info, FieldsWrapperExample }
