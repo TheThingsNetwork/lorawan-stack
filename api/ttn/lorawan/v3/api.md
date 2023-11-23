@@ -276,11 +276,11 @@
   - [Message `MACState.UplinkMessage.RxMetadata.RelayMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata)
   - [Message `MACState.UplinkMessage.TxSettings`](#ttn.lorawan.v3.MACState.UplinkMessage.TxSettings)
   - [Message `RelayParameters`](#ttn.lorawan.v3.RelayParameters)
+  - [Message `RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule)
   - [Message `ResetAndGetEndDeviceRequest`](#ttn.lorawan.v3.ResetAndGetEndDeviceRequest)
   - [Message `ServedRelayParameters`](#ttn.lorawan.v3.ServedRelayParameters)
   - [Message `ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits)
   - [Message `ServingRelayParameters`](#ttn.lorawan.v3.ServingRelayParameters)
-  - [Message `ServingRelayParameters.UplinkForwardingRule`](#ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule)
   - [Message `Session`](#ttn.lorawan.v3.Session)
   - [Message `SetEndDeviceRequest`](#ttn.lorawan.v3.SetEndDeviceRequest)
   - [Message `UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest)
@@ -4373,6 +4373,21 @@ This is used internally by the Network Server.
 | `serving` | [`ServingRelayParameters`](#ttn.lorawan.v3.ServingRelayParameters) |  | Parameters related to a relay which is serving end devices. |
 | `served` | [`ServedRelayParameters`](#ttn.lorawan.v3.ServedRelayParameters) |  | Parameters related to an end device served by a relay. |
 
+### <a name="ttn.lorawan.v3.RelayUplinkForwardingRule">Message `RelayUplinkForwardingRule`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limits` | [`RelayUplinkForwardLimits`](#ttn.lorawan.v3.RelayUplinkForwardLimits) |  | Bucket configuration for the served end device. If unset, no individual limits will apply to the end device, but the relay global limitations will apply. |
+| `last_w_f_cnt` | [`uint32`](#uint32) |  | Last wake on radio frame counter used by the served end device. |
+| `device_id` | [`string`](#string) |  | End device identifier of the served end device. |
+| `session_key_id` | [`bytes`](#bytes) |  | Session key ID of the session keys used to derive the root relay session key. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
 ### <a name="ttn.lorawan.v3.ResetAndGetEndDeviceRequest">Message `ResetAndGetEndDeviceRequest`</a>
 
 | Field | Type | Label | Description |
@@ -4421,7 +4436,7 @@ This is used internally by the Network Server.
 | `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
 | `default_channel_index` | [`uint32`](#uint32) |  | Index of the default wake on radio channel. |
 | `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  | Channel activity detection periodicity. |
-| `uplink_forwarding_rules` | [`ServingRelayParameters.UplinkForwardingRule`](#ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule) | repeated | Configured uplink forwarding rules. |
+| `uplink_forwarding_rules` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) | repeated | Configured uplink forwarding rules. |
 | `limits` | [`ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits) |  | Configured forwarding limits. If unset, the default value from Network Server configuration will be used. |
 
 #### Field Rules
@@ -4431,21 +4446,6 @@ This is used internally by the Network Server.
 | `default_channel_index` | <p>`uint32.lte`: `255`</p> |
 | `cad_periodicity` | <p>`enum.defined_only`: `true`</p> |
 | `uplink_forwarding_rules` | <p>`repeated.max_items`: `16`</p> |
-
-### <a name="ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule">Message `ServingRelayParameters.UplinkForwardingRule`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `limits` | [`RelayUplinkForwardLimits`](#ttn.lorawan.v3.RelayUplinkForwardLimits) |  | Bucket configuration for the served end device. If unset, no individual limits will apply to the end device, but the relay global limitations will apply. |
-| `last_w_f_cnt` | [`uint32`](#uint32) |  | Last wake on radio frame counter used by the served end device. |
-| `device_id` | [`string`](#string) |  | End device identifier of the served end device. |
-| `session_key_id` | [`bytes`](#bytes) |  | Session key ID of the session keys used to derive the root relay session key. |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.Session">Message `Session`</a>
 

@@ -19323,29 +19323,6 @@
       "default": "ENABLED",
       "description": " - ENABLED: No restrictions are in place.\n - WARNING: Warnings are being emitted that the provider will be deprecated in the future.\n - DISABLED: New integrations cannot be set up, and old ones do not start."
     },
-    "ServingRelayParametersUplinkForwardingRule": {
-      "type": "object",
-      "properties": {
-        "limits": {
-          "$ref": "#/definitions/v3RelayUplinkForwardLimits",
-          "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply."
-        },
-        "last_w_f_cnt": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Last wake on radio frame counter used by the served end device."
-        },
-        "device_id": {
-          "type": "string",
-          "description": "End device identifier of the served end device."
-        },
-        "session_key_id": {
-          "type": "string",
-          "format": "byte",
-          "description": "Session key ID of the session keys used to derive the root relay session key."
-        }
-      }
-    },
     "TxAcknowledgmentResult": {
       "type": "string",
       "enum": [
@@ -25668,6 +25645,29 @@
         }
       }
     },
+    "v3RelayUplinkForwardingRule": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/v3RelayUplinkForwardLimits",
+          "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply."
+        },
+        "last_w_f_cnt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Last wake on radio frame counter used by the served end device."
+        },
+        "device_id": {
+          "type": "string",
+          "description": "End device identifier of the served end device."
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte",
+          "description": "Session key ID of the session keys used to derive the root relay session key."
+        }
+      }
+    },
     "v3Right": {
       "type": "string",
       "enum": [
@@ -25929,7 +25929,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/ServingRelayParametersUplinkForwardingRule"
+            "$ref": "#/definitions/v3RelayUplinkForwardingRule"
           },
           "description": "Configured uplink forwarding rules."
         },

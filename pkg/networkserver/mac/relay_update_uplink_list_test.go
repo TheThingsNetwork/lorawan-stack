@@ -69,7 +69,7 @@ func TestDeviceNeedsRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -93,7 +93,7 @@ func TestDeviceNeedsRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 12,
 
@@ -109,7 +109,7 @@ func TestDeviceNeedsRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											Limits: &ttnpb.RelayUplinkForwardLimits{
 												BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_12,
@@ -137,7 +137,7 @@ func TestDeviceNeedsRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 12,
 
@@ -159,7 +159,7 @@ func TestDeviceNeedsRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{},
 										{
 											LastWFCnt: 12,
@@ -215,7 +215,7 @@ func TestEnqueueRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -237,7 +237,7 @@ func TestEnqueueRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -296,7 +296,7 @@ func TestEnqueueRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -318,7 +318,7 @@ func TestEnqueueRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -345,7 +345,7 @@ func TestEnqueueRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -367,7 +367,7 @@ func TestEnqueueRelayUpdateUplinkListReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -467,7 +467,7 @@ func TestHandleRelayUpdateUplinkListAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -497,7 +497,7 @@ func TestHandleRelayUpdateUplinkListAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -513,7 +513,7 @@ func TestHandleRelayUpdateUplinkListAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -542,7 +542,7 @@ func TestHandleRelayUpdateUplinkListAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -564,7 +564,7 @@ func TestHandleRelayUpdateUplinkListAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -600,7 +600,7 @@ func TestHandleRelayUpdateUplinkListAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 
@@ -622,7 +622,7 @@ func TestHandleRelayUpdateUplinkListAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									UplinkForwardingRules: []*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+									UplinkForwardingRules: []*ttnpb.RelayUplinkForwardingRule{
 										{
 											LastWFCnt: 42,
 

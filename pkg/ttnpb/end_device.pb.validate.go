@@ -393,6 +393,126 @@ var _ interface {
 	ErrorName() string
 } = ServingRelayForwardingLimitsValidationError{}
 
+// ValidateFields checks the field values on RelayUplinkForwardingRule with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RelayUplinkForwardingRule) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = RelayUplinkForwardingRuleFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "limits":
+
+			if v, ok := interface{}(m.GetLimits()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RelayUplinkForwardingRuleValidationError{
+						field:  "limits",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "last_w_f_cnt":
+			// no validation rules for LastWFCnt
+		case "device_id":
+
+			if m.GetDeviceId() != "" {
+
+				if utf8.RuneCountInString(m.GetDeviceId()) > 36 {
+					return RelayUplinkForwardingRuleValidationError{
+						field:  "device_id",
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_RelayUplinkForwardingRule_DeviceId_Pattern.MatchString(m.GetDeviceId()) {
+					return RelayUplinkForwardingRuleValidationError{
+						field:  "device_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		case "session_key_id":
+			// no validation rules for SessionKeyId
+		default:
+			return RelayUplinkForwardingRuleValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// RelayUplinkForwardingRuleValidationError is the validation error returned by
+// RelayUplinkForwardingRule.ValidateFields if the designated constraints
+// aren't met.
+type RelayUplinkForwardingRuleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RelayUplinkForwardingRuleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RelayUplinkForwardingRuleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RelayUplinkForwardingRuleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RelayUplinkForwardingRuleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RelayUplinkForwardingRuleValidationError) ErrorName() string {
+	return "RelayUplinkForwardingRuleValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RelayUplinkForwardingRuleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRelayUplinkForwardingRule.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RelayUplinkForwardingRuleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RelayUplinkForwardingRuleValidationError{}
+
+var _RelayUplinkForwardingRule_DeviceId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on ServingRelayParameters with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -4929,127 +5049,6 @@ var _ interface {
 } = BatchGetEndDevicesRequestValidationError{}
 
 var _BatchGetEndDevicesRequest_DeviceIds_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
-
-// ValidateFields checks the field values on
-// ServingRelayParameters_UplinkForwardingRule with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *ServingRelayParameters_UplinkForwardingRule) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = ServingRelayParameters_UplinkForwardingRuleFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "limits":
-
-			if v, ok := interface{}(m.GetLimits()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return ServingRelayParameters_UplinkForwardingRuleValidationError{
-						field:  "limits",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		case "last_w_f_cnt":
-			// no validation rules for LastWFCnt
-		case "device_id":
-
-			if m.GetDeviceId() != "" {
-
-				if utf8.RuneCountInString(m.GetDeviceId()) > 36 {
-					return ServingRelayParameters_UplinkForwardingRuleValidationError{
-						field:  "device_id",
-						reason: "value length must be at most 36 runes",
-					}
-				}
-
-				if !_ServingRelayParameters_UplinkForwardingRule_DeviceId_Pattern.MatchString(m.GetDeviceId()) {
-					return ServingRelayParameters_UplinkForwardingRuleValidationError{
-						field:  "device_id",
-						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
-					}
-				}
-
-			}
-
-		case "session_key_id":
-			// no validation rules for SessionKeyId
-		default:
-			return ServingRelayParameters_UplinkForwardingRuleValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// ServingRelayParameters_UplinkForwardingRuleValidationError is the validation
-// error returned by
-// ServingRelayParameters_UplinkForwardingRule.ValidateFields if the
-// designated constraints aren't met.
-type ServingRelayParameters_UplinkForwardingRuleValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e ServingRelayParameters_UplinkForwardingRuleValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e ServingRelayParameters_UplinkForwardingRuleValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e ServingRelayParameters_UplinkForwardingRuleValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e ServingRelayParameters_UplinkForwardingRuleValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e ServingRelayParameters_UplinkForwardingRuleValidationError) ErrorName() string {
-	return "ServingRelayParameters_UplinkForwardingRuleValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e ServingRelayParameters_UplinkForwardingRuleValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sServingRelayParameters_UplinkForwardingRule.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = ServingRelayParameters_UplinkForwardingRuleValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = ServingRelayParameters_UplinkForwardingRuleValidationError{}
-
-var _ServingRelayParameters_UplinkForwardingRule_DeviceId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on MACParameters_Channel with the
 // rules defined in the proto definition for this message. If any rules are

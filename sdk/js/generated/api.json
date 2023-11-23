@@ -19113,6 +19113,78 @@
           ]
         },
         {
+          "name": "RelayUplinkForwardingRule",
+          "longName": "RelayUplinkForwardingRule",
+          "fullName": "ttn.lorawan.v3.RelayUplinkForwardingRule",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "limits",
+              "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply.",
+              "label": "",
+              "type": "RelayUplinkForwardLimits",
+              "longType": "RelayUplinkForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayUplinkForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "last_w_f_cnt",
+              "description": "Last wake on radio frame counter used by the served end device.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "device_id",
+              "description": "End device identifier of the served end device.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_key_id",
+              "description": "Session key ID of the session keys used to derive the root relay session key.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ResetAndGetEndDeviceRequest",
           "longName": "ResetAndGetEndDeviceRequest",
           "fullName": "ttn.lorawan.v3.ResetAndGetEndDeviceRequest",
@@ -19398,9 +19470,9 @@
               "name": "uplink_forwarding_rules",
               "description": "Configured uplink forwarding rules.",
               "label": "repeated",
-              "type": "UplinkForwardingRule",
-              "longType": "ServingRelayParameters.UplinkForwardingRule",
-              "fullType": "ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule",
+              "type": "RelayUplinkForwardingRule",
+              "longType": "RelayUplinkForwardingRule",
+              "fullType": "ttn.lorawan.v3.RelayUplinkForwardingRule",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -19421,78 +19493,6 @@
               "type": "ServingRelayForwardingLimits",
               "longType": "ServingRelayForwardingLimits",
               "fullType": "ttn.lorawan.v3.ServingRelayForwardingLimits",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "UplinkForwardingRule",
-          "longName": "ServingRelayParameters.UplinkForwardingRule",
-          "fullName": "ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "limits",
-              "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply.",
-              "label": "",
-              "type": "RelayUplinkForwardLimits",
-              "longType": "RelayUplinkForwardLimits",
-              "fullType": "ttn.lorawan.v3.RelayUplinkForwardLimits",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "last_w_f_cnt",
-              "description": "Last wake on radio frame counter used by the served end device.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "device_id",
-              "description": "End device identifier of the served end device.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.max_len",
-                    "value": 36
-                  },
-                  {
-                    "name": "string.pattern",
-                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
-                  }
-                ]
-              }
-            },
-            {
-              "name": "session_key_id",
-              "description": "Session key ID of the session keys used to derive the root relay session key.",
-              "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

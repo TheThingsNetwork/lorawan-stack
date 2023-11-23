@@ -240,7 +240,7 @@ func relayLoopbackFunc(
 }
 
 func relayUpdateRules(
-	deviceID string, sessionKeyID []byte, rules []*ttnpb.ServingRelayParameters_UplinkForwardingRule,
+	deviceID string, sessionKeyID []byte, rules []*ttnpb.RelayUplinkForwardingRule,
 ) bool {
 	for _, rule := range rules {
 		if rule.DeviceId != deviceID || bytes.Equal(rule.SessionKeyId, sessionKeyID) {
@@ -278,7 +278,7 @@ func (ns *NetworkServer) deliverRelaySessionKeys(ctx context.Context, dev *ttnpb
 					return nil, nil, nil
 				}
 				var paths []string
-				for path, rules := range map[string][]*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+				for path, rules := range map[string][]*ttnpb.RelayUplinkForwardingRule{
 					"mac_settings.desired_relay.mode.serving.uplink_forwarding_rules":                 serving.MacSettings.GetDesiredRelay().GetServing().GetUplinkForwardingRules(),                     // nolint:lll
 					"mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules":         serving.MacState.GetDesiredParameters().GetRelay().GetServing().GetUplinkForwardingRules(),        // nolint:lll
 					"pending_mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules": serving.PendingMacState.GetDesiredParameters().GetRelay().GetServing().GetUplinkForwardingRules(), // nolint:lll

@@ -314,8 +314,8 @@ func (x *ServingRelayForwardingLimits) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
-// MarshalProtoJSON marshals the ServingRelayParameters_UplinkForwardingRule message to JSON.
-func (x *ServingRelayParameters_UplinkForwardingRule) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+// MarshalProtoJSON marshals the RelayUplinkForwardingRule message to JSON.
+func (x *RelayUplinkForwardingRule) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
 		s.WriteNil()
 		return
@@ -345,13 +345,13 @@ func (x *ServingRelayParameters_UplinkForwardingRule) MarshalProtoJSON(s *jsonpl
 	s.WriteObjectEnd()
 }
 
-// MarshalJSON marshals the ServingRelayParameters_UplinkForwardingRule to JSON.
-func (x *ServingRelayParameters_UplinkForwardingRule) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals the RelayUplinkForwardingRule to JSON.
+func (x *RelayUplinkForwardingRule) MarshalJSON() ([]byte, error) {
 	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
 }
 
-// UnmarshalProtoJSON unmarshals the ServingRelayParameters_UplinkForwardingRule message from JSON.
-func (x *ServingRelayParameters_UplinkForwardingRule) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+// UnmarshalProtoJSON unmarshals the RelayUplinkForwardingRule message from JSON.
+func (x *RelayUplinkForwardingRule) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
 		return
 	}
@@ -379,8 +379,8 @@ func (x *ServingRelayParameters_UplinkForwardingRule) UnmarshalProtoJSON(s *json
 	})
 }
 
-// UnmarshalJSON unmarshals the ServingRelayParameters_UplinkForwardingRule from JSON.
-func (x *ServingRelayParameters_UplinkForwardingRule) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON unmarshals the RelayUplinkForwardingRule from JSON.
+func (x *RelayUplinkForwardingRule) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -464,7 +464,7 @@ func (x *ServingRelayParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 					x.UplinkForwardingRules = append(x.UplinkForwardingRules, nil)
 					return
 				}
-				v := &ServingRelayParameters_UplinkForwardingRule{}
+				v := &RelayUplinkForwardingRule{}
 				v.UnmarshalProtoJSON(s.WithField("uplink_forwarding_rules", false))
 				if s.Err() != nil {
 					return

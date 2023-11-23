@@ -70,6 +70,21 @@ var ServingRelayForwardingLimitsFieldPathsTopLevel = []string{
 	"reset_behavior",
 	"uplink_messages",
 }
+var RelayUplinkForwardingRuleFieldPathsNested = []string{
+	"device_id",
+	"last_w_f_cnt",
+	"limits",
+	"limits.bucket_size",
+	"limits.reload_rate",
+	"session_key_id",
+}
+
+var RelayUplinkForwardingRuleFieldPathsTopLevel = []string{
+	"device_id",
+	"last_w_f_cnt",
+	"limits",
+	"session_key_id",
+}
 var ServingRelayParametersFieldPathsNested = []string{
 	"cad_periodicity",
 	"default_channel_index",
@@ -4659,21 +4674,6 @@ var BatchGetEndDevicesRequestFieldPathsTopLevel = []string{
 	"application_ids",
 	"device_ids",
 	"field_mask",
-}
-var ServingRelayParameters_UplinkForwardingRuleFieldPathsNested = []string{
-	"device_id",
-	"last_w_f_cnt",
-	"limits",
-	"limits.bucket_size",
-	"limits.reload_rate",
-	"session_key_id",
-}
-
-var ServingRelayParameters_UplinkForwardingRuleFieldPathsTopLevel = []string{
-	"device_id",
-	"last_w_f_cnt",
-	"limits",
-	"session_key_id",
 }
 var MACParameters_ChannelFieldPathsNested = []string{
 	"downlink_frequency",

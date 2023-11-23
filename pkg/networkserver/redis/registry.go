@@ -83,7 +83,7 @@ func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 
 func (r *DeviceRegistry) relayRulesMapping(ctx context.Context, dev *ttnpb.EndDevice) map[string]string {
 	m := make(map[string]string)
-	add := func(rules []*ttnpb.ServingRelayParameters_UplinkForwardingRule) {
+	add := func(rules []*ttnpb.RelayUplinkForwardingRule) {
 		for _, rule := range rules {
 			if rule.GetDeviceId() == "" {
 				continue
@@ -96,7 +96,7 @@ func (r *DeviceRegistry) relayRulesMapping(ctx context.Context, dev *ttnpb.EndDe
 			m[path] = servedUID
 		}
 	}
-	for _, rules := range [][]*ttnpb.ServingRelayParameters_UplinkForwardingRule{
+	for _, rules := range [][]*ttnpb.RelayUplinkForwardingRule{
 		dev.GetMacSettings().GetRelay().GetServing().GetUplinkForwardingRules(),
 		dev.GetMacSettings().GetDesiredRelay().GetServing().GetUplinkForwardingRules(),
 		dev.GetMacState().GetCurrentParameters().GetRelay().GetServing().GetUplinkForwardingRules(),
