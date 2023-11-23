@@ -278,8 +278,8 @@
   - [Message `RelayParameters`](#ttn.lorawan.v3.RelayParameters)
   - [Message `ResetAndGetEndDeviceRequest`](#ttn.lorawan.v3.ResetAndGetEndDeviceRequest)
   - [Message `ServedRelayParameters`](#ttn.lorawan.v3.ServedRelayParameters)
+  - [Message `ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits)
   - [Message `ServingRelayParameters`](#ttn.lorawan.v3.ServingRelayParameters)
-  - [Message `ServingRelayParameters.ForwardingLimits`](#ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits)
   - [Message `ServingRelayParameters.UplinkForwardingRule`](#ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule)
   - [Message `Session`](#ttn.lorawan.v3.Session)
   - [Message `SetEndDeviceRequest`](#ttn.lorawan.v3.SetEndDeviceRequest)
@@ -4404,25 +4404,7 @@ This is used internally by the Network Server.
 | `backoff` | <p>`uint32.lte`: `63`</p> |
 | `serving_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
-### <a name="ttn.lorawan.v3.ServingRelayParameters">Message `ServingRelayParameters`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
-| `default_channel_index` | [`uint32`](#uint32) |  | Index of the default wake on radio channel. |
-| `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  | Channel activity detection periodicity. |
-| `uplink_forwarding_rules` | [`ServingRelayParameters.UplinkForwardingRule`](#ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule) | repeated | Configured uplink forwarding rules. |
-| `limits` | [`ServingRelayParameters.ForwardingLimits`](#ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits) |  | Configured forwarding limits. If unset, the default value from Network Server configuration will be used. |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `default_channel_index` | <p>`uint32.lte`: `255`</p> |
-| `cad_periodicity` | <p>`enum.defined_only`: `true`</p> |
-| `uplink_forwarding_rules` | <p>`repeated.max_items`: `16`</p> |
-
-### <a name="ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits">Message `ServingRelayParameters.ForwardingLimits`</a>
+### <a name="ttn.lorawan.v3.ServingRelayForwardingLimits">Message `ServingRelayForwardingLimits`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4431,6 +4413,24 @@ This is used internally by the Network Server.
 | `notifications` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  | Bucket configuration for unknown device notifications. If unset, no individual limits will apply to unknown end device notifications, but the relay overall limitations will still apply. |
 | `uplink_messages` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  | Bucket configuration for uplink messages across all served end devices. If unset, no individual limits will apply to uplink messages across all served end devices, but the relay overall limitations will still apply. |
 | `overall` | [`RelayForwardLimits`](#ttn.lorawan.v3.RelayForwardLimits) |  | Bucket configuration for all relay messages. If unset, no overall limits will apply to the relay, but individual limitations will still apply. |
+
+### <a name="ttn.lorawan.v3.ServingRelayParameters">Message `ServingRelayParameters`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
+| `default_channel_index` | [`uint32`](#uint32) |  | Index of the default wake on radio channel. |
+| `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  | Channel activity detection periodicity. |
+| `uplink_forwarding_rules` | [`ServingRelayParameters.UplinkForwardingRule`](#ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule) | repeated | Configured uplink forwarding rules. |
+| `limits` | [`ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits) |  | Configured forwarding limits. If unset, the default value from Network Server configuration will be used. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `default_channel_index` | <p>`uint32.lte`: `255`</p> |
+| `cad_periodicity` | <p>`enum.defined_only`: `true`</p> |
+| `uplink_forwarding_rules` | <p>`repeated.max_items`: `16`</p> |
 
 ### <a name="ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule">Message `ServingRelayParameters.UplinkForwardingRule`</a>
 

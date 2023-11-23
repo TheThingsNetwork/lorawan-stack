@@ -261,6 +261,138 @@ var _ interface {
 	ErrorName() string
 } = BoolValueValidationError{}
 
+// ValidateFields checks the field values on ServingRelayForwardingLimits with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ServingRelayForwardingLimits) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ServingRelayForwardingLimitsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "reset_behavior":
+			// no validation rules for ResetBehavior
+		case "join_requests":
+
+			if v, ok := interface{}(m.GetJoinRequests()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayForwardingLimitsValidationError{
+						field:  "join_requests",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "notifications":
+
+			if v, ok := interface{}(m.GetNotifications()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayForwardingLimitsValidationError{
+						field:  "notifications",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "uplink_messages":
+
+			if v, ok := interface{}(m.GetUplinkMessages()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayForwardingLimitsValidationError{
+						field:  "uplink_messages",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "overall":
+
+			if v, ok := interface{}(m.GetOverall()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayForwardingLimitsValidationError{
+						field:  "overall",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ServingRelayForwardingLimitsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ServingRelayForwardingLimitsValidationError is the validation error returned
+// by ServingRelayForwardingLimits.ValidateFields if the designated
+// constraints aren't met.
+type ServingRelayForwardingLimitsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ServingRelayForwardingLimitsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ServingRelayForwardingLimitsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ServingRelayForwardingLimitsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ServingRelayForwardingLimitsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ServingRelayForwardingLimitsValidationError) ErrorName() string {
+	return "ServingRelayForwardingLimitsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ServingRelayForwardingLimitsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sServingRelayForwardingLimits.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ServingRelayForwardingLimitsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ServingRelayForwardingLimitsValidationError{}
+
 // ValidateFields checks the field values on ServingRelayParameters with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -4918,138 +5050,6 @@ var _ interface {
 } = ServingRelayParameters_UplinkForwardingRuleValidationError{}
 
 var _ServingRelayParameters_UplinkForwardingRule_DeviceId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
-
-// ValidateFields checks the field values on
-// ServingRelayParameters_ForwardingLimits with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
-func (m *ServingRelayParameters_ForwardingLimits) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = ServingRelayParameters_ForwardingLimitsFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "reset_behavior":
-			// no validation rules for ResetBehavior
-		case "join_requests":
-
-			if v, ok := interface{}(m.GetJoinRequests()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return ServingRelayParameters_ForwardingLimitsValidationError{
-						field:  "join_requests",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		case "notifications":
-
-			if v, ok := interface{}(m.GetNotifications()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return ServingRelayParameters_ForwardingLimitsValidationError{
-						field:  "notifications",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		case "uplink_messages":
-
-			if v, ok := interface{}(m.GetUplinkMessages()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return ServingRelayParameters_ForwardingLimitsValidationError{
-						field:  "uplink_messages",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		case "overall":
-
-			if v, ok := interface{}(m.GetOverall()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return ServingRelayParameters_ForwardingLimitsValidationError{
-						field:  "overall",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		default:
-			return ServingRelayParameters_ForwardingLimitsValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// ServingRelayParameters_ForwardingLimitsValidationError is the validation
-// error returned by ServingRelayParameters_ForwardingLimits.ValidateFields if
-// the designated constraints aren't met.
-type ServingRelayParameters_ForwardingLimitsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e ServingRelayParameters_ForwardingLimitsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e ServingRelayParameters_ForwardingLimitsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e ServingRelayParameters_ForwardingLimitsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e ServingRelayParameters_ForwardingLimitsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e ServingRelayParameters_ForwardingLimitsValidationError) ErrorName() string {
-	return "ServingRelayParameters_ForwardingLimitsValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e ServingRelayParameters_ForwardingLimitsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sServingRelayParameters_ForwardingLimits.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = ServingRelayParameters_ForwardingLimitsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = ServingRelayParameters_ForwardingLimitsValidationError{}
 
 // ValidateFields checks the field values on MACParameters_Channel with the
 // rules defined in the proto definition for this message. If any rules are

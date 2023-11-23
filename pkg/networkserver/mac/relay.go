@@ -68,7 +68,7 @@ func relayForwardLimitsFields(limits *ttnpb.RelayForwardLimits, prefix string) [
 	}
 }
 
-func relayConfigureForwardLimitsFields(limits *ttnpb.ServingRelayParameters_ForwardingLimits) log.Fielder {
+func relayConfigureForwardLimitsFields(limits *ttnpb.ServingRelayForwardingLimits) log.Fielder {
 	if limits == nil {
 		return log.Fields()
 	}

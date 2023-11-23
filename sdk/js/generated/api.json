@@ -19261,6 +19261,78 @@
           ]
         },
         {
+          "name": "ServingRelayForwardingLimits",
+          "longName": "ServingRelayForwardingLimits",
+          "fullName": "ttn.lorawan.v3.ServingRelayForwardingLimits",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "reset_behavior",
+              "description": "Reset behavior of the buckets upon limit update.",
+              "label": "",
+              "type": "RelayResetLimitCounter",
+              "longType": "RelayResetLimitCounter",
+              "fullType": "ttn.lorawan.v3.RelayResetLimitCounter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "join_requests",
+              "description": "Bucket configuration for join requests.\nIf unset, no individual limits will apply to join requests, but the relay overall limitations will apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "notifications",
+              "description": "Bucket configuration for unknown device notifications.\nIf unset, no individual limits will apply to unknown end device notifications, but the relay overall\nlimitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink_messages",
+              "description": "Bucket configuration for uplink messages across all served end devices.\nIf unset, no individual limits will apply to uplink messages across all served end devices, but the relay\noverall limitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "overall",
+              "description": "Bucket configuration for all relay messages.\nIf unset, no overall limits will apply to the relay, but individual limitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ServingRelayParameters",
           "longName": "ServingRelayParameters",
           "fullName": "ttn.lorawan.v3.ServingRelayParameters",
@@ -19346,81 +19418,9 @@
               "name": "limits",
               "description": "Configured forwarding limits.\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
-              "type": "ForwardingLimits",
-              "longType": "ServingRelayParameters.ForwardingLimits",
-              "fullType": "ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "ForwardingLimits",
-          "longName": "ServingRelayParameters.ForwardingLimits",
-          "fullName": "ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "reset_behavior",
-              "description": "Reset behavior of the buckets upon limit update.",
-              "label": "",
-              "type": "RelayResetLimitCounter",
-              "longType": "RelayResetLimitCounter",
-              "fullType": "ttn.lorawan.v3.RelayResetLimitCounter",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "join_requests",
-              "description": "Bucket configuration for join requests.\nIf unset, no individual limits will apply to join requests, but the relay overall limitations will apply.",
-              "label": "",
-              "type": "RelayForwardLimits",
-              "longType": "RelayForwardLimits",
-              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "notifications",
-              "description": "Bucket configuration for unknown device notifications.\nIf unset, no individual limits will apply to unknown end device notifications, but the relay overall\nlimitations will still apply.",
-              "label": "",
-              "type": "RelayForwardLimits",
-              "longType": "RelayForwardLimits",
-              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "uplink_messages",
-              "description": "Bucket configuration for uplink messages across all served end devices.\nIf unset, no individual limits will apply to uplink messages across all served end devices, but the relay\noverall limitations will still apply.",
-              "label": "",
-              "type": "RelayForwardLimits",
-              "longType": "RelayForwardLimits",
-              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "overall",
-              "description": "Bucket configuration for all relay messages.\nIf unset, no overall limits will apply to the relay, but individual limitations will still apply.",
-              "label": "",
-              "type": "RelayForwardLimits",
-              "longType": "RelayForwardLimits",
-              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "type": "ServingRelayForwardingLimits",
+              "longType": "ServingRelayForwardingLimits",
+              "fullType": "ttn.lorawan.v3.ServingRelayForwardingLimits",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

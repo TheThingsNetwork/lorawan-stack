@@ -224,6 +224,96 @@ func (x *BoolValue) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ServingRelayForwardingLimits message to JSON.
+func (x *ServingRelayForwardingLimits) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.ResetBehavior != 0 || s.HasField("reset_behavior") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("reset_behavior")
+		x.ResetBehavior.MarshalProtoJSON(s)
+	}
+	if x.JoinRequests != nil || s.HasField("join_requests") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("join_requests")
+		x.JoinRequests.MarshalProtoJSON(s.WithField("join_requests"))
+	}
+	if x.Notifications != nil || s.HasField("notifications") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("notifications")
+		x.Notifications.MarshalProtoJSON(s.WithField("notifications"))
+	}
+	if x.UplinkMessages != nil || s.HasField("uplink_messages") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("uplink_messages")
+		x.UplinkMessages.MarshalProtoJSON(s.WithField("uplink_messages"))
+	}
+	if x.Overall != nil || s.HasField("overall") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("overall")
+		x.Overall.MarshalProtoJSON(s.WithField("overall"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ServingRelayForwardingLimits to JSON.
+func (x *ServingRelayForwardingLimits) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServingRelayForwardingLimits message from JSON.
+func (x *ServingRelayForwardingLimits) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "reset_behavior", "resetBehavior":
+			s.AddField("reset_behavior")
+			x.ResetBehavior.UnmarshalProtoJSON(s)
+		case "join_requests", "joinRequests":
+			if s.ReadNil() {
+				x.JoinRequests = nil
+				return
+			}
+			x.JoinRequests = &RelayForwardLimits{}
+			x.JoinRequests.UnmarshalProtoJSON(s.WithField("join_requests", true))
+		case "notifications":
+			if s.ReadNil() {
+				x.Notifications = nil
+				return
+			}
+			x.Notifications = &RelayForwardLimits{}
+			x.Notifications.UnmarshalProtoJSON(s.WithField("notifications", true))
+		case "uplink_messages", "uplinkMessages":
+			if s.ReadNil() {
+				x.UplinkMessages = nil
+				return
+			}
+			x.UplinkMessages = &RelayForwardLimits{}
+			x.UplinkMessages.UnmarshalProtoJSON(s.WithField("uplink_messages", true))
+		case "overall":
+			if s.ReadNil() {
+				x.Overall = nil
+				return
+			}
+			x.Overall = &RelayForwardLimits{}
+			x.Overall.UnmarshalProtoJSON(s.WithField("overall", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ServingRelayForwardingLimits from JSON.
+func (x *ServingRelayForwardingLimits) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the ServingRelayParameters_UplinkForwardingRule message to JSON.
 func (x *ServingRelayParameters_UplinkForwardingRule) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -291,96 +381,6 @@ func (x *ServingRelayParameters_UplinkForwardingRule) UnmarshalProtoJSON(s *json
 
 // UnmarshalJSON unmarshals the ServingRelayParameters_UplinkForwardingRule from JSON.
 func (x *ServingRelayParameters_UplinkForwardingRule) UnmarshalJSON(b []byte) error {
-	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the ServingRelayParameters_ForwardingLimits message to JSON.
-func (x *ServingRelayParameters_ForwardingLimits) MarshalProtoJSON(s *jsonplugin.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.ResetBehavior != 0 || s.HasField("reset_behavior") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("reset_behavior")
-		x.ResetBehavior.MarshalProtoJSON(s)
-	}
-	if x.JoinRequests != nil || s.HasField("join_requests") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("join_requests")
-		x.JoinRequests.MarshalProtoJSON(s.WithField("join_requests"))
-	}
-	if x.Notifications != nil || s.HasField("notifications") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("notifications")
-		x.Notifications.MarshalProtoJSON(s.WithField("notifications"))
-	}
-	if x.UplinkMessages != nil || s.HasField("uplink_messages") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("uplink_messages")
-		x.UplinkMessages.MarshalProtoJSON(s.WithField("uplink_messages"))
-	}
-	if x.Overall != nil || s.HasField("overall") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("overall")
-		x.Overall.MarshalProtoJSON(s.WithField("overall"))
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the ServingRelayParameters_ForwardingLimits to JSON.
-func (x *ServingRelayParameters_ForwardingLimits) MarshalJSON() ([]byte, error) {
-	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the ServingRelayParameters_ForwardingLimits message from JSON.
-func (x *ServingRelayParameters_ForwardingLimits) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.ReadAny() // ignore unknown field
-		case "reset_behavior", "resetBehavior":
-			s.AddField("reset_behavior")
-			x.ResetBehavior.UnmarshalProtoJSON(s)
-		case "join_requests", "joinRequests":
-			if s.ReadNil() {
-				x.JoinRequests = nil
-				return
-			}
-			x.JoinRequests = &RelayForwardLimits{}
-			x.JoinRequests.UnmarshalProtoJSON(s.WithField("join_requests", true))
-		case "notifications":
-			if s.ReadNil() {
-				x.Notifications = nil
-				return
-			}
-			x.Notifications = &RelayForwardLimits{}
-			x.Notifications.UnmarshalProtoJSON(s.WithField("notifications", true))
-		case "uplink_messages", "uplinkMessages":
-			if s.ReadNil() {
-				x.UplinkMessages = nil
-				return
-			}
-			x.UplinkMessages = &RelayForwardLimits{}
-			x.UplinkMessages.UnmarshalProtoJSON(s.WithField("uplink_messages", true))
-		case "overall":
-			if s.ReadNil() {
-				x.Overall = nil
-				return
-			}
-			x.Overall = &RelayForwardLimits{}
-			x.Overall.UnmarshalProtoJSON(s.WithField("overall", true))
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the ServingRelayParameters_ForwardingLimits from JSON.
-func (x *ServingRelayParameters_ForwardingLimits) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -476,7 +476,7 @@ func (x *ServingRelayParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 				x.Limits = nil
 				return
 			}
-			x.Limits = &ServingRelayParameters_ForwardingLimits{}
+			x.Limits = &ServingRelayForwardingLimits{}
 			x.Limits.UnmarshalProtoJSON(s.WithField("limits", true))
 		}
 	})

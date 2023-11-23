@@ -61,7 +61,7 @@ func TestDeviceNeedsRelayConfigureFwdLimitReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{},
+									Limits: &ttnpb.ServingRelayForwardingLimits{},
 								},
 							},
 						},
@@ -85,7 +85,7 @@ func TestDeviceNeedsRelayConfigureFwdLimitReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{
+									Limits: &ttnpb.ServingRelayForwardingLimits{
 										JoinRequests: &ttnpb.RelayForwardLimits{
 											BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 											ReloadRate: 12,
@@ -111,7 +111,7 @@ func TestDeviceNeedsRelayConfigureFwdLimitReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{
+									Limits: &ttnpb.ServingRelayForwardingLimits{
 										JoinRequests: &ttnpb.RelayForwardLimits{
 											BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 											ReloadRate: 12,
@@ -129,7 +129,7 @@ func TestDeviceNeedsRelayConfigureFwdLimitReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{
+									Limits: &ttnpb.ServingRelayForwardingLimits{
 										JoinRequests: &ttnpb.RelayForwardLimits{
 											BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 											ReloadRate: 12,
@@ -190,7 +190,7 @@ func TestEnqueueRelayConfigureFwdLimitReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{},
+									Limits: &ttnpb.ServingRelayForwardingLimits{},
 								},
 							},
 						},
@@ -210,7 +210,7 @@ func TestEnqueueRelayConfigureFwdLimitReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{},
+									Limits: &ttnpb.ServingRelayForwardingLimits{},
 								},
 							},
 						},
@@ -248,7 +248,7 @@ func TestEnqueueRelayConfigureFwdLimitReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{
+									Limits: &ttnpb.ServingRelayForwardingLimits{
 										JoinRequests: &ttnpb.RelayForwardLimits{
 											BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 											ReloadRate: 12,
@@ -277,7 +277,7 @@ func TestEnqueueRelayConfigureFwdLimitReq(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{
+									Limits: &ttnpb.ServingRelayForwardingLimits{
 										JoinRequests: &ttnpb.RelayForwardLimits{
 											BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 											ReloadRate: 12,
@@ -369,7 +369,7 @@ func TestHandleRelayConfigureFwdLimitAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{},
+									Limits: &ttnpb.ServingRelayForwardingLimits{},
 								},
 							},
 						},
@@ -385,7 +385,7 @@ func TestHandleRelayConfigureFwdLimitAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{},
+									Limits: &ttnpb.ServingRelayForwardingLimits{},
 								},
 							},
 						},
@@ -394,7 +394,7 @@ func TestHandleRelayConfigureFwdLimitAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{},
+									Limits: &ttnpb.ServingRelayForwardingLimits{},
 								},
 							},
 						},
@@ -423,7 +423,7 @@ func TestHandleRelayConfigureFwdLimitAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{
+									Limits: &ttnpb.ServingRelayForwardingLimits{
 										JoinRequests: &ttnpb.RelayForwardLimits{
 											BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 											ReloadRate: 12,
@@ -457,7 +457,7 @@ func TestHandleRelayConfigureFwdLimitAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{
+									Limits: &ttnpb.ServingRelayForwardingLimits{
 										JoinRequests: &ttnpb.RelayForwardLimits{
 											BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 											ReloadRate: 12,
@@ -475,7 +475,7 @@ func TestHandleRelayConfigureFwdLimitAns(t *testing.T) {
 						Relay: &ttnpb.RelayParameters{
 							Mode: &ttnpb.RelayParameters_Serving{
 								Serving: &ttnpb.ServingRelayParameters{
-									Limits: &ttnpb.ServingRelayParameters_ForwardingLimits{
+									Limits: &ttnpb.ServingRelayForwardingLimits{
 										JoinRequests: &ttnpb.RelayForwardLimits{
 											BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 											ReloadRate: 12,

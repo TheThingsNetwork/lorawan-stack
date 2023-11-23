@@ -26,7 +26,7 @@ import (
 var (
 	// defaultRelayForwardingLimits is the default relay forward limits, based on the contents of the
 	// relay specification.
-	defaultRelayForwardingLimits = &ttnpb.ServingRelayParameters_ForwardingLimits{
+	defaultRelayForwardingLimits = &ttnpb.ServingRelayForwardingLimits{
 		JoinRequests: &ttnpb.RelayForwardLimits{
 			BucketSize: ttnpb.RelayLimitBucketSize_RELAY_LIMIT_BUCKET_SIZE_2,
 			ReloadRate: 4,
@@ -142,7 +142,7 @@ func HandleRelayConfigureFwdLimitAns(
 				// either of these conditions is not true, the current serving parameters will be nil.
 				return nil
 			}
-			currentServing.Limits = &ttnpb.ServingRelayParameters_ForwardingLimits{
+			currentServing.Limits = &ttnpb.ServingRelayForwardingLimits{
 				ResetBehavior:  req.ResetLimitCounter,
 				JoinRequests:   req.JoinRequestLimits,
 				Notifications:  req.NotifyLimits,

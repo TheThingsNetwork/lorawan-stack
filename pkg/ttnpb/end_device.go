@@ -106,7 +106,7 @@ func (v *RelayForwardLimits) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
-func (v *ServingRelayParameters_ForwardingLimits) FieldIsZero(p string) bool {
+func (v *ServingRelayForwardingLimits) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
 	}

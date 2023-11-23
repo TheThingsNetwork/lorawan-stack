@@ -128,6 +128,126 @@ func (dst *BoolValue) SetFields(src *BoolValue, paths ...string) error {
 	return nil
 }
 
+func (dst *ServingRelayForwardingLimits) SetFields(src *ServingRelayForwardingLimits, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "reset_behavior":
+			if len(subs) > 0 {
+				return fmt.Errorf("'reset_behavior' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ResetBehavior = src.ResetBehavior
+			} else {
+				dst.ResetBehavior = 0
+			}
+		case "join_requests":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayForwardLimits
+				if (src == nil || src.JoinRequests == nil) && dst.JoinRequests == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.JoinRequests
+				}
+				if dst.JoinRequests != nil {
+					newDst = dst.JoinRequests
+				} else {
+					newDst = &RelayForwardLimits{}
+					dst.JoinRequests = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.JoinRequests = src.JoinRequests
+				} else {
+					dst.JoinRequests = nil
+				}
+			}
+		case "notifications":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayForwardLimits
+				if (src == nil || src.Notifications == nil) && dst.Notifications == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Notifications
+				}
+				if dst.Notifications != nil {
+					newDst = dst.Notifications
+				} else {
+					newDst = &RelayForwardLimits{}
+					dst.Notifications = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Notifications = src.Notifications
+				} else {
+					dst.Notifications = nil
+				}
+			}
+		case "uplink_messages":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayForwardLimits
+				if (src == nil || src.UplinkMessages == nil) && dst.UplinkMessages == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UplinkMessages
+				}
+				if dst.UplinkMessages != nil {
+					newDst = dst.UplinkMessages
+				} else {
+					newDst = &RelayForwardLimits{}
+					dst.UplinkMessages = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UplinkMessages = src.UplinkMessages
+				} else {
+					dst.UplinkMessages = nil
+				}
+			}
+		case "overall":
+			if len(subs) > 0 {
+				var newDst, newSrc *RelayForwardLimits
+				if (src == nil || src.Overall == nil) && dst.Overall == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Overall
+				}
+				if dst.Overall != nil {
+					newDst = dst.Overall
+				} else {
+					newDst = &RelayForwardLimits{}
+					dst.Overall = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Overall = src.Overall
+				} else {
+					dst.Overall = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ServingRelayParameters) SetFields(src *ServingRelayParameters, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -186,7 +306,7 @@ func (dst *ServingRelayParameters) SetFields(src *ServingRelayParameters, paths 
 			}
 		case "limits":
 			if len(subs) > 0 {
-				var newDst, newSrc *ServingRelayParameters_ForwardingLimits
+				var newDst, newSrc *ServingRelayForwardingLimits
 				if (src == nil || src.Limits == nil) && dst.Limits == nil {
 					continue
 				}
@@ -196,7 +316,7 @@ func (dst *ServingRelayParameters) SetFields(src *ServingRelayParameters, paths 
 				if dst.Limits != nil {
 					newDst = dst.Limits
 				} else {
-					newDst = &ServingRelayParameters_ForwardingLimits{}
+					newDst = &ServingRelayForwardingLimits{}
 					dst.Limits = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
@@ -3751,126 +3871,6 @@ func (dst *ServingRelayParameters_UplinkForwardingRule) SetFields(src *ServingRe
 				dst.SessionKeyId = src.SessionKeyId
 			} else {
 				dst.SessionKeyId = nil
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *ServingRelayParameters_ForwardingLimits) SetFields(src *ServingRelayParameters_ForwardingLimits, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "reset_behavior":
-			if len(subs) > 0 {
-				return fmt.Errorf("'reset_behavior' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ResetBehavior = src.ResetBehavior
-			} else {
-				dst.ResetBehavior = 0
-			}
-		case "join_requests":
-			if len(subs) > 0 {
-				var newDst, newSrc *RelayForwardLimits
-				if (src == nil || src.JoinRequests == nil) && dst.JoinRequests == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.JoinRequests
-				}
-				if dst.JoinRequests != nil {
-					newDst = dst.JoinRequests
-				} else {
-					newDst = &RelayForwardLimits{}
-					dst.JoinRequests = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.JoinRequests = src.JoinRequests
-				} else {
-					dst.JoinRequests = nil
-				}
-			}
-		case "notifications":
-			if len(subs) > 0 {
-				var newDst, newSrc *RelayForwardLimits
-				if (src == nil || src.Notifications == nil) && dst.Notifications == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.Notifications
-				}
-				if dst.Notifications != nil {
-					newDst = dst.Notifications
-				} else {
-					newDst = &RelayForwardLimits{}
-					dst.Notifications = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.Notifications = src.Notifications
-				} else {
-					dst.Notifications = nil
-				}
-			}
-		case "uplink_messages":
-			if len(subs) > 0 {
-				var newDst, newSrc *RelayForwardLimits
-				if (src == nil || src.UplinkMessages == nil) && dst.UplinkMessages == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.UplinkMessages
-				}
-				if dst.UplinkMessages != nil {
-					newDst = dst.UplinkMessages
-				} else {
-					newDst = &RelayForwardLimits{}
-					dst.UplinkMessages = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.UplinkMessages = src.UplinkMessages
-				} else {
-					dst.UplinkMessages = nil
-				}
-			}
-		case "overall":
-			if len(subs) > 0 {
-				var newDst, newSrc *RelayForwardLimits
-				if (src == nil || src.Overall == nil) && dst.Overall == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.Overall
-				}
-				if dst.Overall != nil {
-					newDst = dst.Overall
-				} else {
-					newDst = &RelayForwardLimits{}
-					dst.Overall = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.Overall = src.Overall
-				} else {
-					dst.Overall = nil
-				}
 			}
 
 		default:

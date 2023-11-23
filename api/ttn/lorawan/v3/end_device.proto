@@ -88,6 +88,30 @@ message BoolValue {
   bool value = 1;
 }
 
+message ServingRelayForwardingLimits {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  // Reset behavior of the buckets upon limit update.
+  RelayResetLimitCounter reset_behavior = 1;
+  // Bucket configuration for join requests.
+  // If unset, no individual limits will apply to join requests, but the relay overall limitations will apply.
+  RelayForwardLimits join_requests = 2;
+  // Bucket configuration for unknown device notifications.
+  // If unset, no individual limits will apply to unknown end device notifications, but the relay overall
+  // limitations will still apply.
+  RelayForwardLimits notifications = 3;
+  // Bucket configuration for uplink messages across all served end devices.
+  // If unset, no individual limits will apply to uplink messages across all served end devices, but the relay
+  // overall limitations will still apply.
+  RelayForwardLimits uplink_messages = 4;
+  // Bucket configuration for all relay messages.
+  // If unset, no overall limits will apply to the relay, but individual limitations will still apply.
+  RelayForwardLimits overall = 5;
+}
+
 message ServingRelayParameters {
   option (thethings.flags.message) = {
     select: true,
@@ -118,27 +142,9 @@ message ServingRelayParameters {
   }
   // Configured uplink forwarding rules.
   repeated UplinkForwardingRule uplink_forwarding_rules = 4 [(validate.rules).repeated.max_items = 16];
-  message ForwardingLimits {
-    // Reset behavior of the buckets upon limit update.
-    RelayResetLimitCounter reset_behavior = 1;
-    // Bucket configuration for join requests.
-    // If unset, no individual limits will apply to join requests, but the relay overall limitations will apply.
-    RelayForwardLimits join_requests = 2;
-    // Bucket configuration for unknown device notifications.
-    // If unset, no individual limits will apply to unknown end device notifications, but the relay overall
-    // limitations will still apply.
-    RelayForwardLimits notifications = 3;
-    // Bucket configuration for uplink messages across all served end devices.
-    // If unset, no individual limits will apply to uplink messages across all served end devices, but the relay
-    // overall limitations will still apply.
-    RelayForwardLimits uplink_messages = 4;
-    // Bucket configuration for all relay messages.
-    // If unset, no overall limits will apply to the relay, but individual limitations will still apply.
-    RelayForwardLimits overall = 5;
-  }
   // Configured forwarding limits.
   // If unset, the default value from Network Server configuration will be used.
-  ForwardingLimits limits = 5;
+  ServingRelayForwardingLimits limits = 5;
 }
 
 message ServedRelayParameters {
