@@ -592,6 +592,30 @@
   - [Service `Ns`](#ttn.lorawan.v3.Ns)
   - [Service `NsEndDeviceBatchRegistry`](#ttn.lorawan.v3.NsEndDeviceBatchRegistry)
   - [Service `NsEndDeviceRegistry`](#ttn.lorawan.v3.NsEndDeviceRegistry)
+- [File `ttn/lorawan/v3/networkserver_relay.proto`](#ttn/lorawan/v3/networkserver_relay.proto)
+  - [Message `CreateRelayRequest`](#ttn.lorawan.v3.CreateRelayRequest)
+  - [Message `CreateRelayResponse`](#ttn.lorawan.v3.CreateRelayResponse)
+  - [Message `CreateRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.CreateRelayUplinkForwardingRuleRequest)
+  - [Message `CreateRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.CreateRelayUplinkForwardingRuleResponse)
+  - [Message `DeleteRelayRequest`](#ttn.lorawan.v3.DeleteRelayRequest)
+  - [Message `DeleteRelayResponse`](#ttn.lorawan.v3.DeleteRelayResponse)
+  - [Message `DeleteRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.DeleteRelayUplinkForwardingRuleRequest)
+  - [Message `DeleteRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.DeleteRelayUplinkForwardingRuleResponse)
+  - [Message `GetRelayRequest`](#ttn.lorawan.v3.GetRelayRequest)
+  - [Message `GetRelayResponse`](#ttn.lorawan.v3.GetRelayResponse)
+  - [Message `GetRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.GetRelayUplinkForwardingRuleRequest)
+  - [Message `GetRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.GetRelayUplinkForwardingRuleResponse)
+  - [Message `ListRelayUplinkForwardingRulesRequest`](#ttn.lorawan.v3.ListRelayUplinkForwardingRulesRequest)
+  - [Message `ListRelayUplinkForwardingRulesResponse`](#ttn.lorawan.v3.ListRelayUplinkForwardingRulesResponse)
+  - [Message `RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration)
+  - [Message `RelayConfiguration.Served`](#ttn.lorawan.v3.RelayConfiguration.Served)
+  - [Message `RelayConfiguration.Serving`](#ttn.lorawan.v3.RelayConfiguration.Serving)
+  - [Message `RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule)
+  - [Message `UpdateRelayRequest`](#ttn.lorawan.v3.UpdateRelayRequest)
+  - [Message `UpdateRelayResponse`](#ttn.lorawan.v3.UpdateRelayResponse)
+  - [Message `UpdateRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleRequest)
+  - [Message `UpdateRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleResponse)
+  - [Service `NsRelayConfigurationService`](#ttn.lorawan.v3.NsRelayConfigurationService)
 - [File `ttn/lorawan/v3/notification_service.proto`](#ttn/lorawan/v3/notification_service.proto)
   - [Message `CreateNotificationRequest`](#ttn.lorawan.v3.CreateNotificationRequest)
   - [Message `CreateNotificationResponse`](#ttn.lorawan.v3.CreateNotificationResponse)
@@ -8500,6 +8524,268 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `Set` | `POST` | `/api/v3/ns/applications/{end_device.ids.application_ids.application_id}/devices` | `*` |
 | `ResetFactoryDefaults` | `PATCH` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/ns/applications/{application_ids.application_id}/devices/{device_id}` |  |
+
+## <a name="ttn/lorawan/v3/networkserver_relay.proto">File `ttn/lorawan/v3/networkserver_relay.proto`</a>
+
+### <a name="ttn.lorawan.v3.CreateRelayRequest">Message `CreateRelayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `configuration` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.CreateRelayResponse">Message `CreateRelayResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+
+### <a name="ttn.lorawan.v3.CreateRelayUplinkForwardingRuleRequest">Message `CreateRelayUplinkForwardingRuleRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+| `index` | [`uint32`](#uint32) |  | Index of the uplink forwarding rule. |
+| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `index` | <p>`uint32.lte`: `15`</p> |
+| `uplink_forwarding_rule` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.CreateRelayUplinkForwardingRuleResponse">Message `CreateRelayUplinkForwardingRuleResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+
+### <a name="ttn.lorawan.v3.DeleteRelayRequest">Message `DeleteRelayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DeleteRelayResponse">Message `DeleteRelayResponse`</a>
+
+### <a name="ttn.lorawan.v3.DeleteRelayUplinkForwardingRuleRequest">Message `DeleteRelayUplinkForwardingRuleRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+| `index` | [`uint32`](#uint32) |  | Index of the uplink forwarding rule. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `index` | <p>`uint32.lte`: `15`</p> |
+
+### <a name="ttn.lorawan.v3.DeleteRelayUplinkForwardingRuleResponse">Message `DeleteRelayUplinkForwardingRuleResponse`</a>
+
+### <a name="ttn.lorawan.v3.GetRelayRequest">Message `GetRelayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask of the fields to return. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetRelayResponse">Message `GetRelayResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+
+### <a name="ttn.lorawan.v3.GetRelayUplinkForwardingRuleRequest">Message `GetRelayUplinkForwardingRuleRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+| `index` | [`uint32`](#uint32) |  | Index of the uplink forwarding rule. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask of the fields to return. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `index` | <p>`uint32.lte`: `15`</p> |
+
+### <a name="ttn.lorawan.v3.GetRelayUplinkForwardingRuleResponse">Message `GetRelayUplinkForwardingRuleResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+
+### <a name="ttn.lorawan.v3.ListRelayUplinkForwardingRulesRequest">Message `ListRelayUplinkForwardingRulesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask of the fields to return. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ListRelayUplinkForwardingRulesResponse">Message `ListRelayUplinkForwardingRulesResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `uplink_forwarding_rules` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) | repeated | Uplink forwarding rules. |
+
+### <a name="ttn.lorawan.v3.RelayConfiguration">Message `RelayConfiguration`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `serving` | [`RelayConfiguration.Serving`](#ttn.lorawan.v3.RelayConfiguration.Serving) |  |  |
+| `served` | [`RelayConfiguration.Served`](#ttn.lorawan.v3.RelayConfiguration.Served) |  |  |
+
+### <a name="ttn.lorawan.v3.RelayConfiguration.Served">Message `RelayConfiguration.Served`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `always` | [`RelayEndDeviceAlwaysMode`](#ttn.lorawan.v3.RelayEndDeviceAlwaysMode) |  | The end device will always attempt to use the relay mode in order to send uplink messages. |
+| `dynamic` | [`RelayEndDeviceDynamicMode`](#ttn.lorawan.v3.RelayEndDeviceDynamicMode) |  | The end device will attempt to use relay mode only after a number of uplink messages have been sent without receiving a valid a downlink message. |
+| `end_device_controlled` | [`RelayEndDeviceControlledMode`](#ttn.lorawan.v3.RelayEndDeviceControlledMode) |  | The end device will control when it uses the relay mode. This is the default mode. |
+| `backoff` | [`uint32`](#uint32) |  | Number of uplinks to be sent without a wake on radio frame. |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
+| `serving_device_id` | [`string`](#string) |  | End device identifier of the serving end device. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `backoff` | <p>`uint32.lte`: `63`</p> |
+| `serving_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.RelayConfiguration.Serving">Message `RelayConfiguration.Serving`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
+| `default_channel_index` | [`uint32`](#uint32) |  | Index of the default wake on radio channel. |
+| `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  | Channel activity detection periodicity. |
+| `limits` | [`ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits) |  | Configured forwarding limits. If unset, the default value from Network Server configuration will be used. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `default_channel_index` | <p>`uint32.lte`: `255`</p> |
+| `cad_periodicity` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule">Message `RelayConfigurationUplinkForwardingRule`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limits` | [`RelayUplinkForwardLimits`](#ttn.lorawan.v3.RelayUplinkForwardLimits) |  | Bucket configuration for the served end device. If unset, no individual limits will apply to the end device, but the relay global limitations will apply. |
+| `last_w_f_cnt` | [`uint32`](#uint32) |  | Last wake on radio frame counter used by the served end device. |
+| `device_id` | [`string`](#string) |  | End device identifier of the served end device. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.UpdateRelayRequest">Message `UpdateRelayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask of the fields to update. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `configuration` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UpdateRelayResponse">Message `UpdateRelayResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+
+### <a name="ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleRequest">Message `UpdateRelayUplinkForwardingRuleRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
+| `index` | [`uint32`](#uint32) |  | Index of the uplink forwarding rule. |
+| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask of the fields to update. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `index` | <p>`uint32.lte`: `15`</p> |
+| `uplink_forwarding_rule` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleResponse">Message `UpdateRelayUplinkForwardingRuleResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+
+### <a name="ttn.lorawan.v3.NsRelayConfigurationService">Service `NsRelayConfigurationService`</a>
+
+The NsRelayConfigurationService provides configuration management capabilities for relays.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `CreateRelay` | [`CreateRelayRequest`](#ttn.lorawan.v3.CreateRelayRequest) | [`CreateRelayResponse`](#ttn.lorawan.v3.CreateRelayResponse) | Create a relay. |
+| `GetRelay` | [`GetRelayRequest`](#ttn.lorawan.v3.GetRelayRequest) | [`GetRelayResponse`](#ttn.lorawan.v3.GetRelayResponse) | Get a relay. |
+| `UpdateRelay` | [`UpdateRelayRequest`](#ttn.lorawan.v3.UpdateRelayRequest) | [`UpdateRelayResponse`](#ttn.lorawan.v3.UpdateRelayResponse) | Update a relay. |
+| `DeleteRelay` | [`DeleteRelayRequest`](#ttn.lorawan.v3.DeleteRelayRequest) | [`DeleteRelayResponse`](#ttn.lorawan.v3.DeleteRelayResponse) | Delete a relay. |
+| `CreateRelayUplinkForwardingRule` | [`CreateRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.CreateRelayUplinkForwardingRuleRequest) | [`CreateRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.CreateRelayUplinkForwardingRuleResponse) | Create an uplink forwarding rule. |
+| `GetRelayUplinkForwardingRule` | [`GetRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.GetRelayUplinkForwardingRuleRequest) | [`GetRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.GetRelayUplinkForwardingRuleResponse) | Get an uplink forwarding rule. |
+| `ListRelayUplinkForwardingRules` | [`ListRelayUplinkForwardingRulesRequest`](#ttn.lorawan.v3.ListRelayUplinkForwardingRulesRequest) | [`ListRelayUplinkForwardingRulesResponse`](#ttn.lorawan.v3.ListRelayUplinkForwardingRulesResponse) | List uplink forwarding rules. |
+| `UpdateRelayUplinkForwardingRule` | [`UpdateRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleRequest) | [`UpdateRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleResponse) | Update an uplink forwarding rule. |
+| `DeleteRelayUplinkForwardingRule` | [`DeleteRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.DeleteRelayUplinkForwardingRuleRequest) | [`DeleteRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.DeleteRelayUplinkForwardingRuleResponse) | Delete an uplink forwarding rule. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `CreateRelay` | `POST` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays` | `*` |
+| `GetRelay` | `GET` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}` |  |
+| `UpdateRelay` | `PUT` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}` | `*` |
+| `DeleteRelay` | `DELETE` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}` |  |
+| `CreateRelayUplinkForwardingRule` | `POST` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules` | `*` |
+| `GetRelayUplinkForwardingRule` | `GET` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules/{index}` |  |
+| `ListRelayUplinkForwardingRules` | `GET` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules` |  |
+| `UpdateRelayUplinkForwardingRule` | `PUT` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules/{index}` | `*` |
+| `DeleteRelayUplinkForwardingRule` | `DELETE` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules/{index}` |  |
 
 ## <a name="ttn/lorawan/v3/notification_service.proto">File `ttn/lorawan/v3/notification_service.proto`</a>
 

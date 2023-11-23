@@ -5675,6 +5675,224 @@
       ]
     }
   },
+  "NsRelayConfigurationService": {
+    "CreateRelay": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id"
+          ]
+        }
+      ]
+    },
+    "GetRelay": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "mode",
+        "mode.served",
+        "mode.served.backoff",
+        "mode.served.mode",
+        "mode.served.mode.always",
+        "mode.served.mode.dynamic",
+        "mode.served.mode.dynamic.smart_enable_level",
+        "mode.served.mode.end_device_controlled",
+        "mode.served.second_channel",
+        "mode.served.second_channel.ack_offset",
+        "mode.served.second_channel.data_rate_index",
+        "mode.served.second_channel.frequency",
+        "mode.served.serving_device_id",
+        "mode.serving",
+        "mode.serving.cad_periodicity",
+        "mode.serving.default_channel_index",
+        "mode.serving.limits",
+        "mode.serving.limits.join_requests",
+        "mode.serving.limits.join_requests.bucket_size",
+        "mode.serving.limits.join_requests.reload_rate",
+        "mode.serving.limits.notifications",
+        "mode.serving.limits.notifications.bucket_size",
+        "mode.serving.limits.notifications.reload_rate",
+        "mode.serving.limits.overall",
+        "mode.serving.limits.overall.bucket_size",
+        "mode.serving.limits.overall.reload_rate",
+        "mode.serving.limits.reset_behavior",
+        "mode.serving.limits.uplink_messages",
+        "mode.serving.limits.uplink_messages.bucket_size",
+        "mode.serving.limits.uplink_messages.reload_rate",
+        "mode.serving.second_channel",
+        "mode.serving.second_channel.ack_offset",
+        "mode.serving.second_channel.data_rate_index",
+        "mode.serving.second_channel.frequency"
+      ]
+    },
+    "UpdateRelay": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "mode",
+        "mode.served",
+        "mode.served.backoff",
+        "mode.served.mode",
+        "mode.served.mode.always",
+        "mode.served.mode.dynamic",
+        "mode.served.mode.dynamic.smart_enable_level",
+        "mode.served.mode.end_device_controlled",
+        "mode.served.second_channel",
+        "mode.served.second_channel.ack_offset",
+        "mode.served.second_channel.data_rate_index",
+        "mode.served.second_channel.frequency",
+        "mode.served.serving_device_id",
+        "mode.serving",
+        "mode.serving.cad_periodicity",
+        "mode.serving.default_channel_index",
+        "mode.serving.limits",
+        "mode.serving.limits.join_requests",
+        "mode.serving.limits.join_requests.bucket_size",
+        "mode.serving.limits.join_requests.reload_rate",
+        "mode.serving.limits.notifications",
+        "mode.serving.limits.notifications.bucket_size",
+        "mode.serving.limits.notifications.reload_rate",
+        "mode.serving.limits.overall",
+        "mode.serving.limits.overall.bucket_size",
+        "mode.serving.limits.overall.reload_rate",
+        "mode.serving.limits.reset_behavior",
+        "mode.serving.limits.uplink_messages",
+        "mode.serving.limits.uplink_messages.bucket_size",
+        "mode.serving.limits.uplink_messages.reload_rate",
+        "mode.serving.second_channel",
+        "mode.serving.second_channel.ack_offset",
+        "mode.serving.second_channel.data_rate_index",
+        "mode.serving.second_channel.frequency"
+      ]
+    },
+    "DeleteRelay": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ]
+    },
+    "CreateRelayUplinkForwardingRule": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ]
+    },
+    "GetRelayUplinkForwardingRule": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules/{index}",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id",
+            "index"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "device_id",
+        "last_w_f_cnt",
+        "limits",
+        "limits.bucket_size",
+        "limits.reload_rate"
+      ]
+    },
+    "ListRelayUplinkForwardingRules": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "device_id",
+        "last_w_f_cnt",
+        "limits",
+        "limits.bucket_size",
+        "limits.reload_rate"
+      ]
+    },
+    "UpdateRelayUplinkForwardingRule": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules/{index}",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id",
+            "index"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "device_id",
+        "last_w_f_cnt",
+        "limits",
+        "limits.bucket_size",
+        "limits.reload_rate"
+      ]
+    },
+    "DeleteRelayUplinkForwardingRule": {
+      "file": "ttn/lorawan/v3/networkserver_relay.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules/{index}",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id",
+            "index"
+          ]
+        }
+      ]
+    }
+  },
   "NotificationService": {
     "Create": {
       "file": "ttn/lorawan/v3/notification_service.proto",

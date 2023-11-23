@@ -150,6 +150,9 @@
       "name": "NsEndDeviceBatchRegistry"
     },
     {
+      "name": "NsRelayConfigurationService"
+    },
+    {
       "name": "NotificationService"
     },
     {
@@ -12432,6 +12435,672 @@
         ]
       }
     },
+    "/ns/applications/{end_device_ids.application_ids.application_id}/relays": {
+      "post": {
+        "summary": "Create a relay.",
+        "operationId": "NsRelayConfigurationService_CreateRelay",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3CreateRelayResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "end_device_ids": {
+                  "type": "object",
+                  "properties": {
+                    "device_id": {
+                      "type": "string"
+                    },
+                    "application_ids": {
+                      "type": "object"
+                    },
+                    "dev_eui": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
+                      "description": "The LoRaWAN DevEUI."
+                    },
+                    "join_eui": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
+                      "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
+                    },
+                    "dev_addr": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "2600ABCD",
+                      "description": "The LoRaWAN DevAddr."
+                    }
+                  },
+                  "description": "End device identifiers of the relay.",
+                  "title": "End device identifiers of the relay."
+                },
+                "configuration": {
+                  "$ref": "#/definitions/v3RelayConfiguration",
+                  "description": "Relay configuration."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      }
+    },
+    "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}": {
+      "get": {
+        "summary": "Get a relay.",
+        "operationId": "NsRelayConfigurationService_GetRelay",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetRelayResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "Field mask of the fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a relay.",
+        "operationId": "NsRelayConfigurationService_DeleteRelay",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3DeleteRelayResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      },
+      "put": {
+        "summary": "Update a relay.",
+        "operationId": "NsRelayConfigurationService_UpdateRelay",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3UpdateRelayResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "end_device_ids": {
+                  "type": "object",
+                  "properties": {
+                    "application_ids": {
+                      "type": "object"
+                    },
+                    "dev_eui": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
+                      "description": "The LoRaWAN DevEUI."
+                    },
+                    "join_eui": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
+                      "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
+                    },
+                    "dev_addr": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "2600ABCD",
+                      "description": "The LoRaWAN DevAddr."
+                    }
+                  },
+                  "description": "End device identifiers of the relay.",
+                  "title": "End device identifiers of the relay."
+                },
+                "configuration": {
+                  "$ref": "#/definitions/v3RelayConfiguration",
+                  "description": "Relay configuration."
+                },
+                "field_mask": {
+                  "type": "string",
+                  "description": "Field mask of the fields to update."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      }
+    },
+    "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules": {
+      "get": {
+        "summary": "List uplink forwarding rules.",
+        "operationId": "NsRelayConfigurationService_ListRelayUplinkForwardingRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ListRelayUplinkForwardingRulesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "Field mask of the fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      },
+      "post": {
+        "summary": "Create an uplink forwarding rule.",
+        "operationId": "NsRelayConfigurationService_CreateRelayUplinkForwardingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3CreateRelayUplinkForwardingRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "end_device_ids": {
+                  "type": "object",
+                  "properties": {
+                    "application_ids": {
+                      "type": "object"
+                    },
+                    "dev_eui": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
+                      "description": "The LoRaWAN DevEUI."
+                    },
+                    "join_eui": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
+                      "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
+                    },
+                    "dev_addr": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "2600ABCD",
+                      "description": "The LoRaWAN DevAddr."
+                    }
+                  },
+                  "description": "End device identifiers of the relay.",
+                  "title": "End device identifiers of the relay."
+                },
+                "index": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "Index of the uplink forwarding rule."
+                },
+                "uplink_forwarding_rule": {
+                  "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+                  "description": "Uplink forwarding rule."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      }
+    },
+    "/ns/applications/{end_device_ids.application_ids.application_id}/relays/{end_device_ids.device_id}/uplink-forwarding-rules/{index}": {
+      "get": {
+        "summary": "Get an uplink forwarding rule.",
+        "operationId": "NsRelayConfigurationService_GetRelayUplinkForwardingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetRelayUplinkForwardingRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "index",
+            "description": "Index of the uplink forwarding rule.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "Field mask of the fields to return.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      },
+      "delete": {
+        "summary": "Delete an uplink forwarding rule.",
+        "operationId": "NsRelayConfigurationService_DeleteRelayUplinkForwardingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3DeleteRelayUplinkForwardingRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "index",
+            "description": "Index of the uplink forwarding rule.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      },
+      "put": {
+        "summary": "Update an uplink forwarding rule.",
+        "operationId": "NsRelayConfigurationService_UpdateRelayUplinkForwardingRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3UpdateRelayUplinkForwardingRuleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "index",
+            "description": "Index of the uplink forwarding rule.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "end_device_ids": {
+                  "type": "object",
+                  "properties": {
+                    "application_ids": {
+                      "type": "object"
+                    },
+                    "dev_eui": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
+                      "description": "The LoRaWAN DevEUI."
+                    },
+                    "join_eui": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "70B3D57ED000ABCD",
+                      "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
+                    },
+                    "dev_addr": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "2600ABCD",
+                      "description": "The LoRaWAN DevAddr."
+                    }
+                  },
+                  "description": "End device identifiers of the relay.",
+                  "title": "End device identifiers of the relay."
+                },
+                "uplink_forwarding_rule": {
+                  "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+                  "description": "Uplink forwarding rule."
+                },
+                "field_mask": {
+                  "type": "string",
+                  "description": "Field mask of the fields to update."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "NsRelayConfigurationService"
+        ]
+      }
+    },
     "/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}": {
       "get": {
         "summary": "GetDefaultMACSettings retrieves the default MAC settings for a frequency plan.",
@@ -19323,6 +19992,58 @@
       "default": "ENABLED",
       "description": " - ENABLED: No restrictions are in place.\n - WARNING: Warnings are being emitted that the provider will be deprecated in the future.\n - DISABLED: New integrations cannot be set up, and old ones do not start."
     },
+    "RelayConfigurationServed": {
+      "type": "object",
+      "properties": {
+        "always": {
+          "$ref": "#/definitions/v3RelayEndDeviceAlwaysMode",
+          "description": "The end device will always attempt to use the relay mode in order to send uplink messages."
+        },
+        "dynamic": {
+          "$ref": "#/definitions/v3RelayEndDeviceDynamicMode",
+          "description": "The end device will attempt to use relay mode only after a number of uplink messages have been sent without\nreceiving a valid a downlink message."
+        },
+        "end_device_controlled": {
+          "$ref": "#/definitions/v3RelayEndDeviceControlledMode",
+          "description": "The end device will control when it uses the relay mode. This is the default mode."
+        },
+        "backoff": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of uplinks to be sent without a wake on radio frame."
+        },
+        "second_channel": {
+          "$ref": "#/definitions/v3RelaySecondChannel",
+          "description": "Second wake on radio channel configuration."
+        },
+        "serving_device_id": {
+          "type": "string",
+          "description": "End device identifier of the serving end device."
+        }
+      }
+    },
+    "RelayConfigurationServing": {
+      "type": "object",
+      "properties": {
+        "second_channel": {
+          "$ref": "#/definitions/v3RelaySecondChannel",
+          "description": "Second wake on radio channel configuration."
+        },
+        "default_channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the default wake on radio channel."
+        },
+        "cad_periodicity": {
+          "$ref": "#/definitions/v3RelayCADPeriodicity",
+          "description": "Channel activity detection periodicity."
+        },
+        "limits": {
+          "$ref": "#/definitions/v3ServingRelayForwardingLimits",
+          "description": "Configured forwarding limits.\nIf unset, the default value from Network Server configuration will be used."
+        }
+      }
+    },
     "TxAcknowledgmentResult": {
       "type": "string",
       "enum": [
@@ -21830,6 +22551,24 @@
         }
       }
     },
+    "v3CreateRelayResponse": {
+      "type": "object",
+      "properties": {
+        "configuration": {
+          "$ref": "#/definitions/v3RelayConfiguration",
+          "description": "Relay configuration."
+        }
+      }
+    },
+    "v3CreateRelayUplinkForwardingRuleResponse": {
+      "type": "object",
+      "properties": {
+        "uplink_forwarding_rule": {
+          "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+          "description": "Uplink forwarding rule."
+        }
+      }
+    },
     "v3CreateUserRequest": {
       "type": "object",
       "properties": {
@@ -21994,6 +22733,12 @@
           }
         }
       }
+    },
+    "v3DeleteRelayResponse": {
+      "type": "object"
+    },
+    "v3DeleteRelayUplinkForwardingRuleResponse": {
+      "type": "object"
     },
     "v3DevAddrPrefix": {
       "type": "object",
@@ -23448,6 +24193,24 @@
         }
       }
     },
+    "v3GetRelayResponse": {
+      "type": "object",
+      "properties": {
+        "configuration": {
+          "$ref": "#/definitions/v3RelayConfiguration",
+          "description": "Relay configuration."
+        }
+      }
+    },
+    "v3GetRelayUplinkForwardingRuleResponse": {
+      "type": "object",
+      "properties": {
+        "uplink_forwarding_rule": {
+          "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+          "description": "Uplink forwarding rule."
+        }
+      }
+    },
     "v3GetStoredApplicationUpCountResponse": {
       "type": "object",
       "properties": {
@@ -23744,6 +24507,19 @@
             "type": "object",
             "$ref": "#/definitions/v3Notification"
           }
+        }
+      }
+    },
+    "v3ListRelayUplinkForwardingRulesResponse": {
+      "type": "object",
+      "properties": {
+        "uplink_forwarding_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule"
+          },
+          "description": "Uplink forwarding rules."
         }
       }
     },
@@ -25523,6 +26299,35 @@
       "default": "RELAY_CAD_PERIODICITY_1_SECOND",
       "title": "- RELAY_CAD_PERIODICITY_20_MILLISECONDS: sic"
     },
+    "v3RelayConfiguration": {
+      "type": "object",
+      "properties": {
+        "serving": {
+          "$ref": "#/definitions/RelayConfigurationServing"
+        },
+        "served": {
+          "$ref": "#/definitions/RelayConfigurationServed"
+        }
+      }
+    },
+    "v3RelayConfigurationUplinkForwardingRule": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/v3RelayUplinkForwardLimits",
+          "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply."
+        },
+        "last_w_f_cnt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Last wake on radio frame counter used by the served end device."
+        },
+        "device_id": {
+          "type": "string",
+          "description": "End device identifier of the served end device."
+        }
+      }
+    },
     "v3RelayCtrlUplinkListAction": {
       "type": "string",
       "enum": [
@@ -26169,6 +26974,24 @@
         "online_ttl": {
           "type": "string",
           "description": "Time to live of the online status."
+        }
+      }
+    },
+    "v3UpdateRelayResponse": {
+      "type": "object",
+      "properties": {
+        "configuration": {
+          "$ref": "#/definitions/v3RelayConfiguration",
+          "description": "Relay configuration."
+        }
+      }
+    },
+    "v3UpdateRelayUplinkForwardingRuleResponse": {
+      "type": "object",
+      "properties": {
+        "uplink_forwarding_rule": {
+          "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+          "description": "Uplink forwarding rule."
         }
       }
     },

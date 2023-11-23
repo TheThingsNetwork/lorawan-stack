@@ -1501,6 +1501,32 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		Allowed: nsEndDeviceReadFieldPaths[:],
 	},
 
+	// Relays:
+	"/ttn.lorawan.v3.NsRelayConfigurationService/GetRelay": {
+		All:     RelayConfigurationFieldPathsNested,
+		Allowed: RelayConfigurationFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.NsRelayConfigurationService/UpdateRelay": {
+		All:     RelayConfigurationFieldPathsNested,
+		Allowed: RelayConfigurationFieldPathsNested,
+		Set:     true,
+	},
+
+	// Relay Uplink Forwarding Rules:
+	"/ttn.lorawan.v3.NsRelayConfigurationService/GetRelayUplinkForwardingRule": {
+		All:     RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+		Allowed: RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.NsRelayConfigurationService/ListRelayUplinkForwardingRules": {
+		All:     RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+		Allowed: RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.NsRelayConfigurationService/UpdateRelayUplinkForwardingRule": {
+		All:     RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+		Allowed: RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+		Set:     true,
+	},
+
 	// Gateways:
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchGateways": {
 		All: GatewayFieldPathsNested,
