@@ -30,17 +30,12 @@ import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
-import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { isNotEnabledError } from '@console/lib/packet-broker/utils'
 
-import {
-  registerPacketBroker,
-  deregisterPacketBroker,
-  getHomeNetworkDefaultGatewayVisibility,
-} from '@console/store/actions/packet-broker'
+import { registerPacketBroker, deregisterPacketBroker } from '@console/store/actions/packet-broker'
 
 import {
   selectRegistered,
@@ -224,20 +219,15 @@ const PacketBroker = () => {
                 />
               </PortalledModal>
             </Col>
-            <RequireRequest requestAction={getHomeNetworkDefaultGatewayVisibility()}>
-              <Col md={12} style={{ position: 'relative' }} className="mt-cs-xxl">
-                <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
-                <Routes>
-                  <Route path="routing-configuration/*" Component={RoutingConfigurationView} />
-                  <Route
-                    path="default-gateway-visibility"
-                    Component={DefaultGatewayVisibilityView}
-                  />
-                  <Route path="/" element={<Navigate to="routing-configuration" />} />
-                  <Route path="*" component={GenericNotFound} />
-                </Routes>
-              </Col>
-            </RequireRequest>
+            <Col md={12} style={{ position: 'relative' }} className="mt-cs-xxl">
+              <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
+              <Routes>
+                <Route path="routing-configuration/*" Component={RoutingConfigurationView} />
+                <Route path="default-gateway-visibility" Component={DefaultGatewayVisibilityView} />
+                <Route path="/" element={<Navigate to="routing-configuration" />} />
+                <Route path="*" component={GenericNotFound} />
+              </Routes>
+            </Col>
           </>
         )}
       </Row>
