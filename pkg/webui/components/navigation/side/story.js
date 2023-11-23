@@ -29,7 +29,7 @@ export const _SideNavigation = () => {
   const header = {
     title: 'test-application',
     icon: applicationIcon,
-    iconAlt: 'Application',
+    iconAlt: { id: 'application', defaultMessage: 'Application' },
     to: '/',
   }
 
