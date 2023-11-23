@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import applicationIcon from '@assets/misc/application.svg'
+
 import SideNavigationItem from './item'
 
 import { SideNavigation } from '.'
@@ -26,7 +28,8 @@ export default {
 export const _SideNavigation = () => {
   const header = {
     title: 'test-application',
-    icon: 'application',
+    icon: applicationIcon,
+    iconAlt: 'Application',
     to: '/',
   }
 
