@@ -158,14 +158,7 @@ const SideNavigation = ({
       <nav className={navigationClassNames} ref={node} data-test-id="navigation-sidebar">
         <div className={style.mobileHeader} onClick={onDrawerExpandClick}>
           <Icon className={style.expandIcon} icon="more_vert" />
-          <img
-            className={style.icon}
-            src={header.icon}
-            alt={intl.formatMessage({
-              id: `${header.iconAlt}-alt`,
-              defaultMessage: header.iconAlt,
-            })}
-          />
+          <img className={style.icon} src={header.icon} alt={intl.formatMessage(header.iconAlt)} />
           <Message className={style.message} content={header.title} />
         </div>
         <div>
@@ -175,10 +168,7 @@ const SideNavigation = ({
                 <img
                   className={style.icon}
                   src={header.icon}
-                  alt={intl.formatMessage({
-                    id: `${header.iconAlt}-alt`,
-                    defaultMessage: header.iconAlt,
-                  })}
+                  alt={intl.formatMessage(header.iconAlt)}
                 />
                 <Message className={style.message} content={header.title} />
               </div>
