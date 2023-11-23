@@ -13,12 +13,16 @@
 // limitations under the License.
 
 ul.dropdown
-  border-normal()
+  transition: color $ad.s, background $ad.s
+  transition-timing-function: ease-out
+  border-radius: $br.l
+  border: 1px solid $c.grey-200
+  background: $c.white
+  box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.06)
   z-index: $zi.nav
   right: 0
   position: absolute
-  background: white
-  padding: 0
+  padding: $cs.s
   min-width: 14rem
   z-index: $zi.dropdown
   margin: 0
@@ -58,20 +62,29 @@ ul.dropdown
       padding: $cs.m
       width: 100%
       &:not(.active)
-        color: $tc-deep-gray
-
-      &.active
-        border-left: $c-active-blue 5px solid
-        color: $c-active-blue
-
-      &:hover
-        color: white
+        color: $c.grey-700
 
         .icon
-          color: white
+          color: $c.grey-500
+
+      &.active
+        border-radius: $br.m
+        background: $c.tts-primary-150
+        color: $tc-deep-gray
+        font-weight: $fw.bold
+
+        .icon
+          color: $tc-deep-gray
+
+      &:hover
+        color: $tc-deep-gray
+
+        .icon
+          color: $tc-deep-gray
 
     .icon
       margin-right: $cs.xs
 
     &:hover
-      background-color: $c-active-blue
+      color: $tc-deep-gray
+      text-decoration: none
