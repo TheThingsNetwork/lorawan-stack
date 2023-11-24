@@ -39,6 +39,7 @@ const assembleClassnames = ({
   danger,
   warning,
   primary,
+  grey,
   naked,
   unstyled,
   icon,
@@ -54,6 +55,7 @@ const assembleClassnames = ({
     [style.danger]: danger,
     [style.warning]: warning,
     [style.primary]: primary,
+    [style.grey]: grey,
     [style.naked]: naked,
     [style.busy]: busy,
     [style.withIcon]: icon !== undefined && message,
@@ -189,6 +191,11 @@ const commonPropTypes = {
    * button.
    */
   primary: PropTypes.bool,
+  /**
+   * A flag specifying whether the `grey` styling should applied to the
+   * button.
+   */
+  grey: PropTypes.bool,
   /**
    * A flag specifying whether the `naked` styling should applied to the
    * button.
