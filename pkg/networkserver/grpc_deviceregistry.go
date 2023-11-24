@@ -3565,7 +3565,7 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 type nsEndDeviceBatchRegistry struct {
 	ttnpb.UnimplementedNsEndDeviceBatchRegistryServer
 
-	NS *NetworkServer
+	devices DeviceRegistry
 }
 
 // Delete implements ttipb.NsEndDeviceBatchRegistryServer.
@@ -3581,7 +3581,7 @@ func (srv *nsEndDeviceBatchRegistry) Delete(
 	); err != nil {
 		return nil, err
 	}
-	deleted, err := srv.NS.devices.BatchDelete(ctx, req.ApplicationIds, req.DeviceIds)
+	deleted, err := srv.devices.BatchDelete(ctx, req.ApplicationIds, req.DeviceIds)
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to delete device from registry")
 		return nil, err

@@ -46,7 +46,6 @@ var (
 	errRelayRXWindowUnavailable = errors.DefineUnavailable("relay_rx_windows_available", "no RX windows available")
 	errRelayMTYpe               = errors.DefineInvalidArgument("relay_m_type", "invalid MType")
 	errRelayFullFCnt            = errors.DefineInvalidArgument("relay_full_f_cnt", "invalid full FCnt")
-	errRelayNotServing          = errors.DefineUnavailable("relay_serving", "relay not serving")
 )
 
 type relayKeyService struct {
