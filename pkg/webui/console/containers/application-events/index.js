@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo } from 'react'
-import { connect } from 'react-redux'
+import React, { useCallback, useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import Events from '@console/components/events'
 
@@ -38,17 +39,37 @@ import {
 } from '@console/store/selectors/applications'
 
 const ApplicationEvents = props => {
-  const {
-    appId,
-    events,
-    widget,
-    paused,
-    onClear,
-    onPauseToggle,
-    truncated,
-    onFilterChange,
-    filter,
-  } = props
+  const { appId } = useParams()
+  const { widget } = props
+
+  const events = useSelector(state => selectApplicationEvents(state, appId))
+  const paused = useSelector(state => selectApplicationEventsPaused(state, appId))
+  const truncated = useSelector(state => selectApplicationEventsTruncated(state, appId))
+  const filter = useSelector(state => selectApplicationEventsFilter(state, appId))
+
+  const dispatch = useDispatch()
+
+  const onClear = useCallback(() => {
+    dispatch(clearApplicationEventsStream(appId))
+  }, [appId, dispatch])
+
+  const onPauseToggle = useCallback(
+    paused => {
+      if (paused) {
+        dispatch(resumeApplicationEventsStream(appId))
+        return
+      }
+      dispatch(pauseApplicationEventsStream(appId))
+    },
+    [appId, dispatch],
+  )
+
+  const onFilterChange = useCallback(
+    filterId => {
+      dispatch(setApplicationEventsFilter(appId, filterId))
+    },
+    [appId, dispatch],
+  )
 
   const content = useMemo(() => {
     if (widget) {
@@ -75,40 +96,11 @@ const ApplicationEvents = props => {
 }
 
 ApplicationEvents.propTypes = {
-  appId: PropTypes.string.isRequired,
-  events: PropTypes.events,
-  filter: PropTypes.eventFilter,
-  onClear: PropTypes.func.isRequired,
-  onFilterChange: PropTypes.func.isRequired,
-  onPauseToggle: PropTypes.func.isRequired,
-  paused: PropTypes.bool.isRequired,
-  truncated: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
 ApplicationEvents.defaultProps = {
   widget: false,
-  events: [],
-  filter: undefined,
 }
 
-export default connect(
-  (state, props) => {
-    const { appId } = props
-
-    return {
-      events: selectApplicationEvents(state, appId),
-      paused: selectApplicationEventsPaused(state, appId),
-      truncated: selectApplicationEventsTruncated(state, appId),
-      filter: selectApplicationEventsFilter(state, appId),
-    }
-  },
-  (dispatch, ownProps) => ({
-    onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
-    onPauseToggle: paused =>
-      paused
-        ? dispatch(resumeApplicationEventsStream(ownProps.appId))
-        : dispatch(pauseApplicationEventsStream(ownProps.appId)),
-    onFilterChange: filterId => dispatch(setApplicationEventsFilter(ownProps.appId, filterId)),
-  }),
-)(ApplicationEvents)
+export default ApplicationEvents
