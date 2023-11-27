@@ -580,6 +580,8 @@
   "console.containers.organizations-table.index.restoreFail": "エラーが発生し、組織を復元することができませんでした",
   "console.containers.organizations-table.index.purgeSuccess": "パージされた組織",
   "console.containers.organizations-table.index.purgeFail": "エラーが発生したため、組織をパージすることができませんでした",
+  "console.containers.owners-select.index.title": "",
+  "console.containers.owners-select.index.warning": "",
   "console.containers.owners-select.owners-select.title": "",
   "console.containers.owners-select.owners-select.warning": "",
   "console.containers.packet-broker-networks-table.index.nonDefaultPolicies": "デフォルトでないポリシーを持つネットワーク",

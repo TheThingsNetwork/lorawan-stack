@@ -580,6 +580,8 @@
   "console.containers.organizations-table.index.restoreFail": "There was an error and the organization could not be restored",
   "console.containers.organizations-table.index.purgeSuccess": "Organization purged",
   "console.containers.organizations-table.index.purgeFail": "There was an error and the organization could not be purged",
+  "console.containers.owners-select.index.title": "Owner",
+  "console.containers.owners-select.index.warning": "There was an error and the list of organizations could not be displayed",
   "console.containers.owners-select.owners-select.title": "Owner",
   "console.containers.owners-select.owners-select.warning": "There was an error and the list of organizations could not be displayed",
   "console.containers.packet-broker-networks-table.index.nonDefaultPolicies": "Networks with non-default policies",
