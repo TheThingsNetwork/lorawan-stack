@@ -32,8 +32,6 @@ import {
 } from '@console/store/selectors/gateways'
 import { selectGatewayLastSeen } from '@console/store/selectors/gateway-status'
 
-import withConnectionReactor from './gateway-connection-reactor'
-
 export default GatewayConnection =>
   connect(
     (state, ownProps) => {
@@ -56,4 +54,4 @@ export default GatewayConnection =>
       stopStatistics: () => dispatch(stopGatewayStatistics()),
       updateGatewayStatistics: () => dispatch(updateGatewayStatistics(ownProps.gtwId)),
     }),
-  )(withConnectionReactor(GatewayConnection))
+  )(GatewayConnection)

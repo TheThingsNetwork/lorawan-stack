@@ -25,6 +25,8 @@ import Message from '@ttn-lw/lib/components/message'
 
 import LastSeen from '@console/components/last-seen'
 
+import useConnectionReactor from '@console/containers/gateway-connection/useConnectionReactor'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError, isTranslated } from '@ttn-lw/lib/errors/utils'
@@ -55,6 +57,8 @@ const GatewayConnection = props => {
     isOtherCluster,
     className,
   } = props
+
+  useConnectionReactor()
 
   useEffect(() => {
     startStatistics()
