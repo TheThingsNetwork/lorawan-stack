@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
 
 import Events from '@console/components/events'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -50,25 +50,34 @@ const GatewayEvents = props => {
     filter,
   } = props
 
-  if (widget) {
-    return (
-      <Events.Widget events={events} entityId={gtwId} toAllUrl={`/gateways/${gtwId}/data`} scoped />
-    )
-  }
+  const content = useMemo(() => {
+    if (widget) {
+      return (
+        <Events.Widget
+          events={events}
+          entityId={gtwId}
+          toAllUrl={`/gateways/${gtwId}/data`}
+          scoped
+        />
+      )
+    }
 
-  return (
-    <Events
-      events={events}
-      entityId={gtwId}
-      paused={paused}
-      onClear={onClear}
-      onPauseToggle={onPauseToggle}
-      onFilterChange={onFilterChange}
-      truncated={truncated}
-      filter={filter}
-      scoped
-    />
-  )
+    return (
+      <Events
+        events={events}
+        entityId={gtwId}
+        paused={paused}
+        onClear={onClear}
+        onPauseToggle={onPauseToggle}
+        onFilterChange={onFilterChange}
+        truncated={truncated}
+        filter={filter}
+        scoped
+      />
+    )
+  }, [events, filter, gtwId, onClear, onFilterChange, onPauseToggle, paused, truncated, widget])
+
+  return <Require featureCheck={mayViewGatewayEvents}>{content}</Require>
 }
 
 GatewayEvents.propTypes = {
@@ -89,25 +98,23 @@ GatewayEvents.defaultProps = {
   filter: undefined,
 }
 
-export default withFeatureRequirement(mayViewGatewayEvents)(
-  connect(
-    (state, props) => {
-      const { gtwId } = props
+export default connect(
+  (state, props) => {
+    const { gtwId } = props
 
-      return {
-        events: selectGatewayEvents(state, gtwId),
-        paused: selectGatewayEventsPaused(state, gtwId),
-        truncated: selectGatewayEventsTruncated(state, gtwId),
-        filter: selectGatewayEventsFilter(state, gtwId),
-      }
-    },
-    (dispatch, ownProps) => ({
-      onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
-      onPauseToggle: paused =>
-        paused
-          ? dispatch(resumeGatewayEventsStream(ownProps.gtwId))
-          : dispatch(pauseGatewayEventsStream(ownProps.gtwId)),
-      onFilterChange: filterId => dispatch(setGatewayEventsFilter(ownProps.gtwId, filterId)),
-    }),
-  )(GatewayEvents),
-)
+    return {
+      events: selectGatewayEvents(state, gtwId),
+      paused: selectGatewayEventsPaused(state, gtwId),
+      truncated: selectGatewayEventsTruncated(state, gtwId),
+      filter: selectGatewayEventsFilter(state, gtwId),
+    }
+  },
+  (dispatch, ownProps) => ({
+    onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
+    onPauseToggle: paused =>
+      paused
+        ? dispatch(resumeGatewayEventsStream(ownProps.gtwId))
+        : dispatch(pauseGatewayEventsStream(ownProps.gtwId)),
+    onFilterChange: filterId => dispatch(setGatewayEventsFilter(ownProps.gtwId, filterId)),
+  }),
+)(GatewayEvents)

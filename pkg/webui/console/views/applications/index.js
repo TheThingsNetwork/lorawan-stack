@@ -21,7 +21,7 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import Application from '@console/views/application'
 import ApplicationsList from '@console/views/applications-list'
@@ -36,15 +36,17 @@ const Applications = () => {
   useBreadcrumbs('apps', <Breadcrumb path="/applications" content={sharedMessages.applications} />)
 
   return (
-    <Routes>
-      <Route index Component={ApplicationsList} />
-      <Route path="add" Component={ApplicationAdd} />
-      <Route
-        path=":appId/*"
-        element={<ValidateRouteParam check={{ appId: pathIdRegexp }} Component={Application} />}
-      />
-      <Route path="*" Component={GenericNotFound} />
-    </Routes>
+    <Require featureCheck={mayViewApplications} otherwise={{ redirect: '/' }}>
+      <Routes>
+        <Route index Component={ApplicationsList} />
+        <Route path="add" Component={ApplicationAdd} />
+        <Route
+          path=":appId/*"
+          element={<ValidateRouteParam check={{ appId: pathIdRegexp }} Component={Application} />}
+        />
+        <Route path="*" Component={GenericNotFound} />
+      </Routes>
+    </Require>
   )
 }
-export default withFeatureRequirement(mayViewApplications, { redirect: '/' })(Applications)
+export default Applications

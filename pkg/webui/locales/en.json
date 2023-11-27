@@ -342,6 +342,7 @@
   "console.components.pubsub-form.messages.mqttClientIdPlaceholder": "my-client-id",
   "console.components.pubsub-form.messages.mqttServerUrlPlaceholder": "mqtts://example.com",
   "console.components.pubsub-form.messages.subscribeQos": "Subscribe QoS",
+  "console.components.pubsub-form.messages.providerDescription": "Changing the Pub/Sub provider has been disabled by an administrator",
   "console.components.pubsub-form.messages.publishQos": "Publish QoS",
   "console.components.pubsub-form.messages.tlsCa": "Root CA certificate",
   "console.components.pubsub-form.messages.tlsClientCert": "Client certificate",

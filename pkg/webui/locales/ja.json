@@ -342,6 +342,7 @@
   "console.components.pubsub-form.messages.mqttClientIdPlaceholder": "my-client-id",
   "console.components.pubsub-form.messages.mqttServerUrlPlaceholder": "mqtts://example.com",
   "console.components.pubsub-form.messages.subscribeQos": "QoSを購読",
+  "console.components.pubsub-form.messages.providerDescription": "",
   "console.components.pubsub-form.messages.publishQos": "QoSを発行",
   "console.components.pubsub-form.messages.tlsCa": "ルート認証局証明書",
   "console.components.pubsub-form.messages.tlsClientCert": "クライアント証明書",

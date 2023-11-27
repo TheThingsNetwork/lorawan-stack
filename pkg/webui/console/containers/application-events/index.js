@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
 
 import Events from '@console/components/events'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -50,24 +50,28 @@ const ApplicationEvents = props => {
     filter,
   } = props
 
-  if (widget) {
-    return (
-      <Events.Widget entityId={appId} events={events} toAllUrl={`/applications/${appId}/data`} />
-    )
-  }
+  const content = useMemo(() => {
+    if (widget) {
+      return (
+        <Events.Widget entityId={appId} events={events} toAllUrl={`/applications/${appId}/data`} />
+      )
+    }
 
-  return (
-    <Events
-      entityId={appId}
-      events={events}
-      paused={paused}
-      onClear={onClear}
-      truncated={truncated}
-      filter={filter}
-      onPauseToggle={onPauseToggle}
-      onFilterChange={onFilterChange}
-    />
-  )
+    return (
+      <Events
+        entityId={appId}
+        events={events}
+        paused={paused}
+        onClear={onClear}
+        truncated={truncated}
+        filter={filter}
+        onPauseToggle={onPauseToggle}
+        onFilterChange={onFilterChange}
+      />
+    )
+  }, [appId, events, filter, onClear, onFilterChange, onPauseToggle, paused, truncated, widget])
+
+  return <Require featureCheck={mayViewApplicationEvents}>{content}</Require>
 }
 
 ApplicationEvents.propTypes = {
@@ -88,25 +92,23 @@ ApplicationEvents.defaultProps = {
   filter: undefined,
 }
 
-export default withFeatureRequirement(mayViewApplicationEvents)(
-  connect(
-    (state, props) => {
-      const { appId } = props
+export default connect(
+  (state, props) => {
+    const { appId } = props
 
-      return {
-        events: selectApplicationEvents(state, appId),
-        paused: selectApplicationEventsPaused(state, appId),
-        truncated: selectApplicationEventsTruncated(state, appId),
-        filter: selectApplicationEventsFilter(state, appId),
-      }
-    },
-    (dispatch, ownProps) => ({
-      onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
-      onPauseToggle: paused =>
-        paused
-          ? dispatch(resumeApplicationEventsStream(ownProps.appId))
-          : dispatch(pauseApplicationEventsStream(ownProps.appId)),
-      onFilterChange: filterId => dispatch(setApplicationEventsFilter(ownProps.appId, filterId)),
-    }),
-  )(ApplicationEvents),
-)
+    return {
+      events: selectApplicationEvents(state, appId),
+      paused: selectApplicationEventsPaused(state, appId),
+      truncated: selectApplicationEventsTruncated(state, appId),
+      filter: selectApplicationEventsFilter(state, appId),
+    }
+  },
+  (dispatch, ownProps) => ({
+    onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
+    onPauseToggle: paused =>
+      paused
+        ? dispatch(resumeApplicationEventsStream(ownProps.appId))
+        : dispatch(pauseApplicationEventsStream(ownProps.appId)),
+    onFilterChange: filterId => dispatch(setApplicationEventsFilter(ownProps.appId, filterId)),
+  }),
+)(ApplicationEvents)
