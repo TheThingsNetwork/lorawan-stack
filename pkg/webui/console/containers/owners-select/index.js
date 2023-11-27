@@ -34,7 +34,7 @@ const m = defineMessages({
   warning: 'There was an error and the list of organizations could not be displayed',
 })
 
-const Index = props => {
+const OwnersSelect = props => {
   const { autoFocus, menuPlacement, name, onChange, required } = props
 
   const user = useSelector(selectUser)
@@ -80,7 +80,7 @@ const Index = props => {
   )
 }
 
-Index.propTypes = {
+OwnersSelect.propTypes = {
   autoFocus: PropTypes.bool,
   menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
   name: PropTypes.string.isRequired,
@@ -88,11 +88,11 @@ Index.propTypes = {
   required: PropTypes.bool,
 }
 
-Index.defaultProps = {
+OwnersSelect.defaultProps = {
   autoFocus: false,
   onChange: () => null,
   menuPlacement: 'auto',
   required: false,
 }
 
-export default Index
+export default OwnersSelect
