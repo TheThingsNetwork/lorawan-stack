@@ -15,7 +15,6 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
 
 import deviceIcon from '@assets/misc/end-device.svg'
 
@@ -54,8 +53,7 @@ const m = defineMessages({
 const { Content } = EntityTitleSection
 
 const DeviceTitleSection = props => {
-  const { appId, devId } = useParams()
-  const { fetching, children } = props
+  const { appId, devId, fetching, children } = props
   const device = useSelector(state => selectDeviceByIds(state, appId, devId))
   const uplinkFrameCount = useSelector(state =>
     selectDeviceDerivedUplinkFrameCount(state, appId, devId),
@@ -133,7 +131,9 @@ const DeviceTitleSection = props => {
 }
 
 DeviceTitleSection.propTypes = {
+  appId: PropTypes.string.isRequired,
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
+  devId: PropTypes.string.isRequired,
   fetching: PropTypes.bool,
 }
 

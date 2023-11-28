@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Events from '@console/components/events'
@@ -33,8 +32,7 @@ import {
 } from '@console/store/selectors/organizations'
 
 const OrganizationEvents = props => {
-  const { orgId } = useParams()
-  const { widget } = props
+  const { orgId, widget } = props
 
   const events = useSelector(state => selectOrganizationEvents(state, orgId))
   const paused = useSelector(state => selectOrganizationEventsPaused(state, orgId))
@@ -82,6 +80,7 @@ const OrganizationEvents = props => {
 }
 
 OrganizationEvents.propTypes = {
+  orgId: PropTypes.string.isRequired,
   widget: PropTypes.bool,
 }
 

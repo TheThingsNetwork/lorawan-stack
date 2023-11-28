@@ -14,7 +14,6 @@
 
 import React, { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
 
 import Events from '@console/components/events'
 
@@ -39,8 +38,7 @@ import {
 } from '@console/store/selectors/applications'
 
 const ApplicationEvents = props => {
-  const { appId } = useParams()
-  const { widget } = props
+  const { appId, widget } = props
 
   const events = useSelector(state => selectApplicationEvents(state, appId))
   const paused = useSelector(state => selectApplicationEventsPaused(state, appId))
@@ -96,6 +94,7 @@ const ApplicationEvents = props => {
 }
 
 ApplicationEvents.propTypes = {
+  appId: PropTypes.string.isRequired,
   widget: PropTypes.bool,
 }
 
