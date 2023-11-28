@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FullViewError, FullViewErrorInner } from './error'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedFullErrorView = connect(FullViewError)
+import { selectOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
-export { ConnectedFullErrorView as default, FullViewError, FullViewErrorInner }
+export default ErrorView =>
+  connect(state => ({
+    onlineStatus: selectOnlineStatus(state),
+  }))(ErrorView)

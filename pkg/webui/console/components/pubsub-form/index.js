@@ -475,6 +475,7 @@ const PubsubForm = props => {
           title={sharedMessages.provider}
           name="_provider"
           component={Radio.Group}
+          description={natsDisabled || mqttDisabled ? m.providerDescription : undefined}
           disabled={natsDisabled || mqttDisabled}
         >
           <Radio label="NATS" value={providers.NATS} onChange={handleProviderSelect} />

@@ -25,7 +25,7 @@ import Header from '@ttn-lw/components/header'
 
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 import { ErrorView } from '@ttn-lw/lib/components/error-view'
-import FullViewError from '@ttn-lw/lib/components/full-view-error'
+import { FullViewError } from '@ttn-lw/lib/components/full-view-error'
 import Init from '@ttn-lw/lib/components/init'
 
 import Logo from '@account/containers/logo'

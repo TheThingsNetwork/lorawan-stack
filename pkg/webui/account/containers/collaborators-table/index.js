@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { defineMessages, useIntl } from 'react-intl'
+import { bindActionCreators } from 'redux'
 import { createSelector } from 'reselect'
 
 import Icon from '@ttn-lw/components/icon'
@@ -28,12 +29,10 @@ import FetchTable from '@ttn-lw/containers/fetch-table'
 import Message from '@ttn-lw/lib/components/message'
 
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
+import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import {
-  getCollaboratorsList,
-  deleteCollaborator as deleteCollaboratorAction,
-} from '@ttn-lw/lib/store/actions/collaborators'
+import { getCollaboratorsList, deleteCollaborator } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
@@ -53,17 +52,9 @@ const m = defineMessages({
 })
 
 const CollaboratorsTable = props => {
-  const { ...rest } = props
+  const { clientId, currentUserId, handleDeleteCollaborator, ...rest } = props
   const dispatch = useDispatch()
   const intl = useIntl()
-  const clientId = useSelector(selectSelectedClientId)
-  const currentUserId = useSelector(selectUserId)
-
-  const handleDeleteCollaborator = React.useCallback(
-    (collaboratorID, isUsr) =>
-      dispatch(attachPromise(deleteCollaboratorAction('client', clientId, collaboratorID, isUsr))),
-    [clientId, dispatch],
-  )
 
   const deleteCollaborator = React.useCallback(
     async ids => {
@@ -203,4 +194,30 @@ const CollaboratorsTable = props => {
   )
 }
 
-export default CollaboratorsTable
+CollaboratorsTable.propTypes = {
+  clientId: PropTypes.string.isRequired,
+  currentUserId: PropTypes.string.isRequired,
+  handleDeleteCollaborator: PropTypes.func.isRequired,
+}
+
+export default connect(
+  state => ({
+    clientId: selectSelectedClientId(state),
+    currentUserId: selectUserId(state),
+  }),
+  dispatch => ({
+    ...bindActionCreators(
+      {
+        handleDeleteCollaborator: attachPromise(deleteCollaborator),
+      },
+      dispatch,
+    ),
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    handleDeleteCollaborator: (collaboratorID, isUsr) =>
+      dispatchProps.handleDeleteCollaborator('client', stateProps.clientId, collaboratorID, isUsr),
+  }),
+)(CollaboratorsTable)
