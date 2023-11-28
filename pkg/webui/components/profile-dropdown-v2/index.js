@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useRef, useState } from 'react'
+import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
@@ -46,7 +47,13 @@ const ProfileDropdown = props => {
   }, [handleClickOutside])
 
   return (
-    <Button naked className={className} onClick={toggleDropdown} ref={node} {...rest}>
+    <Button
+      naked
+      className={classnames(styles.container, className)}
+      onClick={toggleDropdown}
+      ref={node}
+      {...rest}
+    >
       <Message content={userName} className={styles.id} />
       <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
       <Icon icon={expanded ? 'expand_less' : 'expand_more'} />

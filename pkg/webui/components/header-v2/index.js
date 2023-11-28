@@ -12,98 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React from 'react'
 import classnames from 'classnames'
-import { useDispatch, useSelector } from 'react-redux'
 
 import { Breadcrumbs } from '@ttn-lw/components/breadcrumbs/breadcrumbs'
 import Button from '@ttn-lw/components/button-v2'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown-v2'
-import Dropdown from '@ttn-lw/components/dropdown'
-import { BreadcrumbsConsumer, useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import selectAccountUrl from '@console/lib/selectors/app-config'
-import { checkFromState, mayViewOrEditApiKeys } from '@console/lib/feature-checks'
-
-import { logout } from '@account/store/actions/user'
 
 import style from './header-v2.styl'
 
-const accountUrl = selectAccountUrl()
-const Header = ({ className, user, ...rest }) => {
+const Header = ({ breadcrumbs, className, profileDropdownItems, user, ...rest }) => (
   // Const isGuest = !Boolean(user)
-  const dispatch = useDispatch()
 
-  const mayHandleApiKeys = useSelector(state =>
-    user ? checkFromState(mayViewOrEditApiKeys, state) : false,
-  )
+  <header {...rest} className={classnames(className, style.container)}>
+    <Breadcrumbs breadcrumbs={breadcrumbs} />
 
-  const handleLogout = useCallback(() => {
-    dispatch(logout())
-  }, [dispatch])
-
-  const dropdownItems = (
-    <>
-      <Dropdown.Item
-        title={sharedMessages.profileSettings}
-        icon="user"
-        path={`${accountUrl}/profile-settings`}
-        external
-      />
-      {mayHandleApiKeys && (
-        <Dropdown.Item title={sharedMessages.apiKeys} icon="api_keys" path="/user/api-keys" />
-      )}
-      <Dropdown.Item
-        title={sharedMessages.adminPanel}
-        icon="lock"
-        path="/admin-panel/network-information"
-      />
-      <hr />
-      <Dropdown.Item
-        title={sharedMessages.getSupport}
-        icon="help"
-        path="https://thethingsindustries.com/support"
-        external
-      />
-      <Dropdown.Item
-        title={sharedMessages.documentation}
-        icon="description"
-        path="https://thethingsindustries.com/docs"
-        external
-      />
-      <hr />
-      <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
-    </>
-  )
-
-  return (
-    <header {...rest} className={classnames(className, style.container)}>
-      <BreadcrumbsConsumer>
-        {({ breadcrumbs }) => <Breadcrumbs breadcrumbs={breadcrumbs} />}
-      </BreadcrumbsConsumer>
-      <div className={style.buttons}>
-        <Button naked icon="add" withDropdown />
-        <Button naked icon="grade" withDropdown />
-        <Button naked icon="inbox" />
-        <ProfileDropdown
-          userName={user.name || user.ids.user_id}
-          data-test-id="profile-dropdown"
-          profilePicture={user.profile_picture}
-        >
-          {dropdownItems}
-        </ProfileDropdown>
-      </div>
-    </header>
-  )
-}
+    <div className={style.buttons}>
+      <Button naked icon="add" withDropdown />
+      <Button naked icon="grade" withDropdown />
+      <Button naked icon="inbox" />
+      <ProfileDropdown
+        userName={user.name || user.ids.user_id}
+        data-test-id="profile-dropdown"
+        profilePicture={user.profile_picture}
+      >
+        {profileDropdownItems}
+      </ProfileDropdown>
+    </div>
+  </header>
+)
 
 Header.propTypes = {
+  /** A list of breadcrumb elements. */
+  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.element]))
+    .isRequired,
   /** The classname applied to the component. */
   className: PropTypes.string,
+  profileDropdownItems: PropTypes.node.isRequired,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
    * guest header is rendered.
