@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
 
 import {
   isGsDownlinkSendEvent,
@@ -12,8 +11,7 @@ import { updateGatewayStatistics } from '@console/store/actions/gateways'
 
 import { selectLatestGatewayEvent } from '@console/store/selectors/gateways'
 
-const useConnectionReactor = () => {
-  const { gtwId } = useParams()
+const useConnectionReactor = gtwId => {
   const latestEvent = useSelector(state => selectLatestGatewayEvent(state, gtwId))
   const dispatch = useDispatch()
   const prevEvent = useRef(null)
