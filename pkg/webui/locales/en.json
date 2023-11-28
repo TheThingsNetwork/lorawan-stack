@@ -514,6 +514,7 @@
   "console.containers.device-profile-section.device-selection.brand-select.brand-select.noOptionsMessage": "No matching brand found",
   "console.containers.device-profile-section.device-selection.fw-version-select.index.title": "Firmware Ver.",
   "console.containers.device-profile-section.device-selection.hw-version-select.index.title": "Hardware Ver.",
+  "console.containers.device-profile-section.device-selection.model-select.index.noOptionsMessage": "No matching model found",
   "console.containers.device-profile-section.device-selection.model-select.model-select.noOptionsMessage": "No matching model found",
   "console.containers.device-profile-section.hints.other-hint.hintTitle": "Your end device will be added soon!",
   "console.containers.device-profile-section.hints.other-hint.hintMessage": "We're sorry, but your device is not yet part of The LoRaWAN Device Repository. You can use <b>enter end device specifics manually</b> option above, using the information your end device manufacturer provided e.g. in the product's data sheet. Please also refer to our documentation on <GuideLink>Adding Devices</GuideLink>.",

@@ -514,6 +514,7 @@
   "console.containers.device-profile-section.device-selection.brand-select.brand-select.noOptionsMessage": "",
   "console.containers.device-profile-section.device-selection.fw-version-select.index.title": "",
   "console.containers.device-profile-section.device-selection.hw-version-select.index.title": "",
+  "console.containers.device-profile-section.device-selection.model-select.index.noOptionsMessage": "",
   "console.containers.device-profile-section.device-selection.model-select.model-select.noOptionsMessage": "",
   "console.containers.device-profile-section.hints.other-hint.hintTitle": "お客様のエンドデバイスはすぐに追加されます！",
   "console.containers.device-profile-section.hints.other-hint.hintMessage": "申し訳ありませんが、あなたのデバイスはまだLoRaWANデバイスリポジトリの一部ではありません。エンドデバイスの製造元が提供する情報（製品のデータシートなど）を使用して、上記のenter end device specifics manuallyオプションを使用することができます。また、デバイスの追加に関するドキュメントも参照してください",
