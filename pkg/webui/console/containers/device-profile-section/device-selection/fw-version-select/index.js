@@ -15,7 +15,6 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
 
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
@@ -41,9 +40,8 @@ const formatOptions = (versions = []) =>
     .concat([{ value: SELECT_OTHER_OPTION, label: sharedMessages.otherOption }])
 
 const FirmwareVersionSelect = props => {
-  const { brandId, modelId, hwVersion } = useParams()
-  const { name, onChange, ...rest } = props
-  const { setFieldValue } = useFormContext()
+  const { name, onChange, brandId, modelId, hwVersion, ...rest } = props
+  const { setFieldValue, values } = useFormContext()
 
   const versions = useSelector(state =>
     selectDeviceModelFirmwareVersions(state, brandId, modelId).filter(
@@ -58,10 +56,10 @@ const FirmwareVersionSelect = props => {
   const options = React.useMemo(() => formatOptions(versions), [versions])
 
   React.useEffect(() => {
-    if (options.length > 0 && options.length <= 2) {
+    if (options.length > 0 && options.length <= 2 && !values.version_ids.firmware_version.length) {
       setFieldValue('version_ids.firmware_version', options[0].value)
     }
-  }, [setFieldValue, options])
+  }, [setFieldValue, options, values.version_ids.firmware_version.length])
 
   return (
     <Field {...rest} options={options} name={name} title={m.title} component={Select} autoFocus />
@@ -69,6 +67,9 @@ const FirmwareVersionSelect = props => {
 }
 
 FirmwareVersionSelect.propTypes = {
+  brandId: PropTypes.string.isRequired,
+  hwVersion: PropTypes.string.isRequired,
+  modelId: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
 }
