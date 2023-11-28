@@ -24,7 +24,7 @@ import { BreadcrumbsProvider } from '@ttn-lw/components/breadcrumbs/context'
 import Header from '@ttn-lw/components/header'
 
 import { ErrorView } from '@ttn-lw/lib/components/error-view'
-import { FullViewError } from '@ttn-lw/lib/components/full-view-error'
+import FullViewError from '@ttn-lw/lib/components/full-view-error'
 import Init from '@ttn-lw/lib/components/init'
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 
