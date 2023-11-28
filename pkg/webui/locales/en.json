@@ -512,6 +512,8 @@
   "console.containers.device-profile-section.device-selection.band-select.index.title": "Profile (Region)",
   "console.containers.device-profile-section.device-selection.brand-select.brand-select.title": "End device brand",
   "console.containers.device-profile-section.device-selection.brand-select.brand-select.noOptionsMessage": "No matching brand found",
+  "console.containers.device-profile-section.device-selection.brand-select.index.title": "End device brand",
+  "console.containers.device-profile-section.device-selection.brand-select.index.noOptionsMessage": "No matching brand found",
   "console.containers.device-profile-section.device-selection.fw-version-select.index.title": "Firmware Ver.",
   "console.containers.device-profile-section.device-selection.hw-version-select.index.title": "Hardware Ver.",
   "console.containers.device-profile-section.device-selection.model-select.index.noOptionsMessage": "No matching model found",

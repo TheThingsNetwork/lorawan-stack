@@ -512,6 +512,8 @@
   "console.containers.device-profile-section.device-selection.band-select.index.title": "プロフィール（リージョン）",
   "console.containers.device-profile-section.device-selection.brand-select.brand-select.title": "",
   "console.containers.device-profile-section.device-selection.brand-select.brand-select.noOptionsMessage": "",
+  "console.containers.device-profile-section.device-selection.brand-select.index.title": "",
+  "console.containers.device-profile-section.device-selection.brand-select.index.noOptionsMessage": "",
   "console.containers.device-profile-section.device-selection.fw-version-select.index.title": "",
   "console.containers.device-profile-section.device-selection.hw-version-select.index.title": "",
   "console.containers.device-profile-section.device-selection.model-select.index.noOptionsMessage": "",
