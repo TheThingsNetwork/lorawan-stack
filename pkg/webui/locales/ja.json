@@ -501,6 +501,7 @@
   "console.containers.device-profile-section.device-selection.brand-select.brand-select.title": "",
   "console.containers.device-profile-section.device-selection.brand-select.brand-select.noOptionsMessage": "",
   "console.containers.device-profile-section.device-selection.fw-version-select.fw-version-select.title": "",
+  "console.containers.device-profile-section.device-selection.fw-version-select.index.title": "",
   "console.containers.device-profile-section.device-selection.hw-version-select.hw-version-select.title": "",
   "console.containers.device-profile-section.device-selection.model-select.model-select.noOptionsMessage": "",
   "console.containers.device-profile-section.hints.other-hint.hintTitle": "お客様のエンドデバイスはすぐに追加されます！",
