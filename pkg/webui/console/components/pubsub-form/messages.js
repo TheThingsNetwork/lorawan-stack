@@ -31,6 +31,7 @@ export default defineMessages({
   mqttClientIdPlaceholder: 'my-client-id',
   mqttServerUrlPlaceholder: 'mqtts://example.com',
   subscribeQos: 'Subscribe QoS',
+  providerDescription: 'Changing the Pub/Sub provider has been disabled by an administrator',
   publishQos: 'Publish QoS',
   tlsCa: 'Root CA certificate',
   tlsClientCert: 'Client certificate',

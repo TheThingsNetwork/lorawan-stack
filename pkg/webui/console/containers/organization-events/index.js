@@ -12,9 +12,80 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Events from './organization-events'
-import connect from './connect'
+import React, { useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-const ConnectedOrganizationEvents = connect(Events)
+import Events from '@console/components/events'
 
-export { ConnectedOrganizationEvents as default, Events }
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import {
+  clearOrganizationEventsStream,
+  pauseOrganizationEventsStream,
+  resumeOrganizationEventsStream,
+} from '@console/store/actions/organizations'
+
+import {
+  selectOrganizationEvents,
+  selectOrganizationEventsPaused,
+  selectOrganizationEventsTruncated,
+} from '@console/store/selectors/organizations'
+
+const OrganizationEvents = props => {
+  const { orgId, widget } = props
+
+  const events = useSelector(state => selectOrganizationEvents(state, orgId))
+  const paused = useSelector(state => selectOrganizationEventsPaused(state, orgId))
+  const truncated = useSelector(state => selectOrganizationEventsTruncated(state, orgId))
+
+  const dispatch = useDispatch()
+
+  const onPauseToggle = useCallback(
+    paused => {
+      if (paused) {
+        dispatch(resumeOrganizationEventsStream(orgId))
+        return
+      }
+      dispatch(pauseOrganizationEventsStream(orgId))
+    },
+    [dispatch, orgId],
+  )
+
+  const onClear = useCallback(() => {
+    dispatch(clearOrganizationEventsStream(orgId))
+  }, [dispatch, orgId])
+
+  if (widget) {
+    return (
+      <Events.Widget
+        events={events}
+        toAllUrl={`/organizations/${orgId}/data`}
+        entityId={orgId}
+        scoped
+      />
+    )
+  }
+
+  return (
+    <Events
+      events={events}
+      paused={paused}
+      onClear={onClear}
+      onPauseToggle={onPauseToggle}
+      truncated={truncated}
+      entityId={orgId}
+      disableFiltering
+    />
+  )
+}
+
+OrganizationEvents.propTypes = {
+  orgId: PropTypes.string.isRequired,
+  widget: PropTypes.bool,
+}
+
+OrganizationEvents.defaultProps = {
+  widget: false,
+}
+
+export default OrganizationEvents
