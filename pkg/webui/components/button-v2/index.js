@@ -17,7 +17,7 @@ import classnames from 'classnames'
 import { useIntl } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
+import Dropdown from '@ttn-lw/components/dropdown-v2'
 
 import Message from '@ttn-lw/lib/components/message'
 
