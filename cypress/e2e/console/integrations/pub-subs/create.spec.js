@@ -347,7 +347,6 @@ describe('Application Pub/Sub create', () => {
         cy.intercept('GET', `/api/v3/as/configuration`, response)
       })
       it('succeeds setting MQTT as default provider', () => {
-        // Cy.findByLabelText('MQTT').should('be.checked')
         cy.findByLabelText('NATS').should('be.disabled')
         cy.findByText(description).should('be.visible')
       })
@@ -374,7 +373,6 @@ describe('Application Pub/Sub create', () => {
       })
 
       it('succeeds setting NATS as default provider', () => {
-        // Cy.findByLabelText('NATS').should('be.checked')
         cy.findByLabelText('MQTT').should('be.disabled')
         cy.findByText(description).should('be.visible')
       })
