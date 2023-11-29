@@ -14,7 +14,7 @@
 
 import React, { useRef } from 'react'
 
-import Dropdown from '@ttn-lw/components/dropdown'
+import Dropdown from '@ttn-lw/components/dropdown-v2'
 
 import Button from '.'
 
