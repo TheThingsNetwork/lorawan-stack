@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, forwardRef, useMemo } from 'react'
+import React, { useCallback, forwardRef, useMemo, useState } from 'react'
 import classnames from 'classnames'
 import { useIntl } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,17 +33,17 @@ const filterDataProps = props =>
       return acc
     }, {})
 
-const assembleClassnames = ({ message, primary, naked, icon, withDropdown, className }) =>
+const assembleClassnames = ({ message, primary, naked, icon, dropdownItems, className }) =>
   classnames(style.button, className, {
     [style.primary]: primary,
     [style.naked]: naked,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
-    [style.withDropdown]: withDropdown,
+    [style.withDropdown]: Boolean(dropdownItems),
   })
 
 const buttonChildren = props => {
-  const { withDropdown, icon, message, children } = props
+  const { dropdownItems, icon, message, expanded, children } = props
 
   const content = Boolean(children) ? (
     children
@@ -50,7 +51,12 @@ const buttonChildren = props => {
     <>
       {icon ? <Icon className={style.icon} icon={icon} /> : null}
       {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
-      {withDropdown ? <Icon icon="expand_more" /> : null}
+      {dropdownItems ? (
+        <>
+          <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />
+          {expanded ? <Dropdown className={style.dropdown}>{dropdownItems}</Dropdown> : null}
+        </>
+      ) : null}
     </>
   )
 
@@ -60,7 +66,7 @@ const buttonChildren = props => {
 const Button = forwardRef((props, ref) => {
   const {
     autoFocus,
-    withDropdown,
+    dropdownItems,
     name,
     type,
     value,
@@ -70,17 +76,40 @@ const Button = forwardRef((props, ref) => {
     form,
     ...rest
   } = props
+  const [expanded, setExpanded] = useState(false)
 
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
 
+  const handleClickOutside = useCallback(
+    e => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setExpanded(false)
+      }
+    },
+    [ref],
+  )
+
+  const toggleDropdown = useCallback(() => {
+    setExpanded(oldExpanded => {
+      const newState = !oldExpanded
+      if (newState) document.addEventListener('mousedown', handleClickOutside)
+      else document.removeEventListener('mousedown', handleClickOutside)
+      return newState
+    })
+  }, [handleClickOutside])
+
   const handleClick = useCallback(
     evt => {
+      if (dropdownItems) {
+        toggleDropdown()
+        return
+      }
       // Passing a value to the onClick handler is useful for components that
       // are rendered multiple times, e.g. in a list. The value can be used to
       // identify the component that was clicked.
       onClick(evt, value)
     },
-    [onClick, value],
+    [dropdownItems, onClick, toggleDropdown, value],
   )
 
   const intl = useIntl()
@@ -96,7 +125,7 @@ const Button = forwardRef((props, ref) => {
     <button
       className={buttonClassNames}
       onClick={handleClick}
-      children={buttonChildren(props)}
+      children={buttonChildren({ ...props, expanded })}
       ref={ref}
       {...htmlProps}
     />
@@ -137,6 +166,8 @@ const commonPropTypes = {
   autoFocus: PropTypes.bool,
   /** A message to be evaluated and passed to the <button /> element. */
   title: PropTypes.message,
+  /** Dropdown items of the button. */
+  dropdownItems: PropTypes.node,
 }
 
 buttonChildren.propTypes = {
@@ -145,6 +176,7 @@ buttonChildren.propTypes = {
    * Spinner, Icon, and/or Message.
    */
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
+  expanded: PropTypes.bool,
   icon: commonPropTypes.icon,
   message: commonPropTypes.message,
 }
@@ -153,6 +185,7 @@ buttonChildren.defaultProps = {
   icon: undefined,
   message: undefined,
   children: null,
+  expanded: false,
 }
 
 Button.propTypes = {
