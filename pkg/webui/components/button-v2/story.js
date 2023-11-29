@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useRef } from 'react'
+
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Button from '.'
 
@@ -20,62 +22,85 @@ export default {
   title: 'Button V2',
 }
 
+const dropdownItems = (
+  <React.Fragment>
+    <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
+    <Dropdown.Item title="Logout" icon="power_settings_new" path="/logout" />
+  </React.Fragment>
+)
+
 export const Primary = () => (
-  <div>
+  <div style={{ textAlign: 'center' }}>
     <Button primary message="Primary" />
   </div>
 )
 
 export const WithIcon = () => (
-  <div>
+  <div style={{ textAlign: 'center' }}>
     <Button primary icon="favorite" message="With Icon" />
   </div>
 )
 
 export const PrimayOnlyIcon = () => (
-  <div>
+  <div style={{ textAlign: 'center' }}>
     <Button primary icon="favorite" />
   </div>
 )
 
-export const PrimayDropdown = () => (
-  <div>
-    <Button primary icon="favorite" message="Dropdown" withDropdown />
-  </div>
-)
+export const PrimayDropdown = () => {
+  const ref = useRef()
 
-export const PrimayOnlyIconDropdown = () => (
-  <div>
-    <Button primary icon="favorite" withDropdown />
-  </div>
-)
+  return (
+    <div style={{ textAlign: 'center', height: '6rem' }}>
+      <Button primary icon="favorite" message="Dropdown" ref={ref} dropdownItems={dropdownItems} />
+    </div>
+  )
+}
+
+export const PrimayOnlyIconDropdown = () => {
+  const ref = useRef()
+
+  return (
+    <div style={{ textAlign: 'center', height: '6rem' }}>
+      <Button primary icon="favorite" dropdownItems={dropdownItems} ref={ref} />
+    </div>
+  )
+}
 
 export const Naked = () => (
-  <div>
+  <div style={{ textAlign: 'center' }}>
     <Button naked message="Naked" />
   </div>
 )
 
 export const NakedWithIcon = () => (
-  <div>
+  <div style={{ textAlign: 'center' }}>
     <Button naked icon="favorite" message="Naked With Icon" />
   </div>
 )
 
 export const NakedOnlyIcon = () => (
-  <div>
+  <div style={{ textAlign: 'center' }}>
     <Button naked icon="favorite" />
   </div>
 )
 
-export const nakedDropdown = () => (
-  <div>
-    <Button naked icon="favorite" message="Dropdown" withDropdown />
-  </div>
-)
+export const NakedDropdown = () => {
+  const ref = useRef()
 
-export const NakedOnlyIconDropdown = () => (
-  <div>
-    <Button naked icon="favorite" withDropdown />
-  </div>
-)
+  return (
+    <div style={{ textAlign: 'center', height: '6rem' }}>
+      <Button naked icon="favorite" message="Dropdown" dropdownItems={dropdownItems} ref={ref} />
+    </div>
+  )
+}
+
+export const NakedOnlyIconDropdown = () => {
+  const ref = useRef()
+
+  return (
+    <div style={{ textAlign: 'center', height: '6rem' }}>
+      <Button naked icon="favorite" dropdownItems={dropdownItems} ref={ref} />
+    </div>
+  )
+}
