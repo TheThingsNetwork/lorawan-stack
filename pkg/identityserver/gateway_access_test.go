@@ -589,6 +589,21 @@ func TestGatewayBatchAccess(t *testing.T) {
 	locUserKey, _ := p.NewAPIKey(locUser.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	locUserCreds := rpcCreds(locUserKey)
 
+	dualMembershipUser := p.NewUser()
+	dualMembershipUserKey, _ := p.NewAPIKey(dualMembershipUser.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	dualMembershipUserCreds := rpcCreds(dualMembershipUserKey)
+	p.NewMembership(
+		dualMembershipUser.GetOrganizationOrUserIdentifiers(),
+		gtw3.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_ALL,
+	)
+	org1 := p.NewOrganization(dualMembershipUser.GetOrganizationOrUserIdentifiers())
+	p.NewMembership(
+		org1.GetOrganizationOrUserIdentifiers(),
+		gtw3.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_ALL,
+	)
+
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayBatchAccessClient(cc)
 
@@ -955,6 +970,20 @@ func TestGatewayBatchAccess(t *testing.T) {
 					},
 				},
 				Credentials: usr1Creds,
+			},
+			{
+				Name: "Dual membership user",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw3.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				Credentials: dualMembershipUserCreds,
 			},
 		} {
 			tc := tc

@@ -20,7 +20,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 func allPotentialRights(eIDs *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) *ttnpb.Rights {
@@ -292,21 +291,21 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		if bothStatsAndLocation {
 			for _, gtw := range gtws {
 				if gtw.StatusPublic && gtw.LocationPublic {
-					publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+					publicGatewayIds[gtw.IDString()] = struct{}{}
 				}
 			}
 		} else {
 			if onlyPublicStats {
 				for _, gtw := range gtws {
 					if gtw.StatusPublic {
-						publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+						publicGatewayIds[gtw.IDString()] = struct{}{}
 					}
 				}
 			}
 			if onlyPublicLocation {
 				for _, gtw := range gtws {
 					if gtw.LocationPublic {
-						publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+						publicGatewayIds[gtw.IDString()] = struct{}{}
 					}
 				}
 			}
@@ -314,7 +313,7 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 
 		entityIDs := make([]string, 0, len(gtwIDs))
 		for _, gtwID := range gtwIDs {
-			if _, ok := publicGatewayIds[unique.ID(ctx, gtwID)]; ok {
+			if _, ok := publicGatewayIds[gtwID.IDString()]; ok {
 				continue
 			}
 			entityIDs = append(entityIDs, gtwID.GetEntityIdentifiers().IDString())
@@ -336,12 +335,14 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		if err != nil {
 			return err
 		}
-		if len(membershipChains) != len(entityIDs) {
-			return errInsufficientRights.New()
-		}
+		entityRights := make(map[string]*ttnpb.Rights, len(membershipChains))
 		for _, chain := range membershipChains {
+			id := chain.EntityIdentifiers.IDString()
+			entityRights[id] = entityRights[id].Union(chain.GetRights())
+		}
+		for _, entityID := range entityIDs {
 			// Make sure that there are no extra rights requested.
-			if !chain.GetRights().IncludesAll(requiredGatewayRights.GetRights()...) {
+			if !entityRights[entityID].IncludesAll(requiredGatewayRights.GetRights()...) {
 				return errInsufficientRights.New()
 			}
 		}
