@@ -24,6 +24,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Batch gateway rights assertions when multiple membership chains are available (for example, both via a user and an organization).
+
 ### Security
 
 ## [3.28.1] - 2023-11-27
