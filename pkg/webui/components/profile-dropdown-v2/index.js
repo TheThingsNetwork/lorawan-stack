@@ -16,7 +16,7 @@ import React, { useCallback, useRef, useState } from 'react'
 import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
+import Dropdown from '@ttn-lw/components/dropdown-v2'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
 import Button from '@ttn-lw/components/button-v2'
 
