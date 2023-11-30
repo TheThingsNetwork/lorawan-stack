@@ -15,7 +15,7 @@
 import React from 'react'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Dropdown from '@ttn-lw/components/dropdown'
+import Dropdown from '@ttn-lw/components/dropdown-v2'
 
 import Header from '.'
 
@@ -30,6 +30,13 @@ export default {
   title: 'Header V2',
 }
 
+const dropdownItems = (
+  <>
+    <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
+    <Dropdown.Item title="Logout" icon="power_settings_new" path="/logout" />
+  </>
+)
+
 export const Default = () => {
   const breadcrumbs = [
     <Breadcrumb key="1" path="/applications" content="Applications" />,
@@ -37,16 +44,15 @@ export const Default = () => {
     <Breadcrumb key="3" path="/applications/test-app/devices" content="Devices" />,
   ]
 
-  const items = (
-    <React.Fragment>
-      <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
-      <Dropdown.Item title="Logout" icon="power_settings_new" path="/logout" />
-    </React.Fragment>
-  )
-
   return (
     <div style={{ height: '6rem' }}>
-      <Header user={user} breadcrumbs={breadcrumbs} profileDropdownItems={items} />
+      <Header
+        user={user}
+        breadcrumbs={breadcrumbs}
+        profileDropdownItems={dropdownItems}
+        addDropdownItems={dropdownItems}
+        starDropdownItems={dropdownItems}
+      />
     </div>
   )
 }

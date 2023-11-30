@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useRef } from 'react'
 import classnames from 'classnames'
 
 import { Breadcrumbs } from '@ttn-lw/components/breadcrumbs/breadcrumbs'
@@ -23,34 +23,52 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './header-v2.styl'
 
-const Header = ({ breadcrumbs, className, profileDropdownItems, user, ...rest }) => (
+const Header = ({
+  breadcrumbs,
+  className,
+  addDropdownItems,
+  starDropdownItems,
+  profileDropdownItems,
+  user,
+  ...rest
+}) => {
+  const addRef = useRef(null)
+  const starRef = useRef(null)
+
   // Const isGuest = !Boolean(user)
 
-  <header {...rest} className={classnames(className, style.container)}>
-    <Breadcrumbs breadcrumbs={breadcrumbs} />
+  return (
+    <header {...rest} className={classnames(className, style.container)}>
+      <Breadcrumbs breadcrumbs={breadcrumbs} />
 
-    <div className={style.buttons}>
-      <Button naked icon="add" withDropdown />
-      <Button naked icon="grade" withDropdown />
-      <Button naked icon="inbox" />
-      <ProfileDropdown
-        userName={user.name || user.ids.user_id}
-        data-test-id="profile-dropdown"
-        profilePicture={user.profile_picture}
-      >
-        {profileDropdownItems}
-      </ProfileDropdown>
-    </div>
-  </header>
-)
+      <div className={style.buttons}>
+        <Button naked icon="add" dropdownItems={addDropdownItems} ref={addRef} />
+        <Button naked icon="grade" dropdownItems={starDropdownItems} ref={starRef} />
+        <Button naked icon="inbox" />
+        <ProfileDropdown
+          userName={user.name || user.ids.user_id}
+          data-test-id="profile-dropdown"
+          profilePicture={user.profile_picture}
+        >
+          {profileDropdownItems}
+        </ProfileDropdown>
+      </div>
+    </header>
+  )
+}
 
 Header.propTypes = {
+  /** The dropdown items when the add button is clicked. */
+  addDropdownItems: PropTypes.node.isRequired,
   /** A list of breadcrumb elements. */
   breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.element]))
     .isRequired,
   /** The classname applied to the component. */
   className: PropTypes.string,
+  /** The dropdown items when the profile button is clicked. */
   profileDropdownItems: PropTypes.node.isRequired,
+  /** The dropdown items when the star button is clicked. */
+  starDropdownItems: PropTypes.node.isRequired,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
    * guest header is rendered.
