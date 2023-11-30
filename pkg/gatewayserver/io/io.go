@@ -60,8 +60,11 @@ type Server interface {
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillGatewayContext fills the given context and identifiers.
 	// This method should only be used for request contexts.
-	FillGatewayContext(ctx context.Context,
-		ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error)
+	FillGatewayContext(
+		ctx context.Context, ids *ttnpb.GatewayIdentifiers,
+	) (context.Context, *ttnpb.GatewayIdentifiers, error)
+	// AssertGatewayRights checks that the caller has the required rights over the provided gateway identifiers.
+	AssertGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
 	Connect(

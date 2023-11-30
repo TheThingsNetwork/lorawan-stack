@@ -37,6 +37,10 @@ func (srv mockServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gateway
 	return ctx, srv.ids, nil
 }
 
+func (mockServer) AssertGatewayRights(context.Context, *ttnpb.GatewayIdentifiers, ...ttnpb.Right) error {
+	return nil
+}
+
 func (mockServer) Connect(
 	context.Context, io.Frontend, *ttnpb.GatewayIdentifiers, *ttnpb.GatewayRemoteAddress, ...io.ConnectionOption,
 ) (*io.Connection, error) {
