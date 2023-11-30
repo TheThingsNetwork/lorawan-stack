@@ -17,6 +17,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Server side events replaced with single socket connection using the native WebSocket API.
+- Gateways now disconnect if the Gateway Server address has changed.
+  - This enables CUPS-enabled gateways to change their LNS before the periodic CUPS lookup occurs.
 
 ### Deprecated
 
