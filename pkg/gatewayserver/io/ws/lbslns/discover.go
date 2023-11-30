@@ -18,7 +18,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
@@ -32,7 +31,13 @@ import (
 var errEmptyGatewayEUI = errors.DefineFailedPrecondition("empty_gateway_eui", "empty gateway EUI")
 
 // HandleConnectionInfo implements Formatter.
-func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io.Server, info ws.ServerInfo, receivedAt time.Time) []byte {
+func (f *lbsLNS) HandleConnectionInfo(
+	ctx context.Context,
+	raw []byte,
+	server io.Server,
+	info ws.ServerInfo,
+	assertAuth func(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error,
+) []byte {
 	var req DiscoverQuery
 
 	if err := json.Unmarshal(raw, &req); err != nil {
@@ -51,6 +56,10 @@ func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io
 		return logAndWrapDiscoverError(ctx, err, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
 	}
 	ctx = filledCtx
+
+	if err := assertAuth(ctx, ids); err != nil {
+		return logAndWrapDiscoverError(ctx, err, fmt.Sprintf("Unauthorized"))
+	}
 
 	euiWithPrefix := fmt.Sprintf("eui-%s", types.MustEUI64(ids.Eui).OrZero().String())
 	res := DiscoverResponse{

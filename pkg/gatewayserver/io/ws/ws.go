@@ -117,6 +117,18 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 		"remote_addr", r.RemoteAddr,
 	))
 	logger := log.FromContext(ctx)
+
+	assertAuth := func(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
+		ctx, hasAuth := withForwardedAuth(ctx, ids, r.Header.Get("Authorization"))
+		if !hasAuth {
+			if !s.cfg.AllowUnauthenticated {
+				return errNoAuthProvided.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+			return nil
+		}
+		return s.server.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK)
+	}
+
 	ws, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
@@ -154,7 +166,7 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 		Address: net.JoinHostPort(host, port),
 	}
 
-	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, info, time.Now())
+	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, info, assertAuth)
 	if err := ws.WriteMessage(websocket.TextMessage, resp); err != nil {
 		logger.WithError(err).Warn("Failed to write connection info response message")
 		return
@@ -202,47 +214,12 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 
-	var md metadata.MD
-
-	if auth != "" {
-		if !strings.HasPrefix(auth, "Bearer ") {
-			auth = fmt.Sprintf("Bearer %s", auth)
-		}
-		md = metadata.New(map[string]string{
-			"id":            ids.GatewayId,
-			"authorization": auth,
-		})
-	}
-
-	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
-		md = metadata.Join(ctxMd, md)
-	}
-	ctx = metadata.NewIncomingContext(ctx, md)
 	// If a fallback frequency is defined in the server context, inject it into local the context.
 	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
 		ctx = frequencyplans.WithFallbackID(ctx, fallback)
 	}
 
-	var hasAuth bool
-	if auth != "" {
-		if !strings.HasPrefix(auth, "Bearer ") {
-			auth = fmt.Sprintf("Bearer %s", auth)
-		}
-		md = metadata.New(map[string]string{
-			"authorization": auth,
-		})
-		hasAuth = true
-	}
-
-	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
-		md = metadata.Join(ctxMd, md)
-	}
-	ctx = metadata.NewIncomingContext(ctx, md)
-	// If a fallback frequency is defined in the server context, inject it into local the context.
-	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
-		ctx = frequencyplans.WithFallbackID(ctx, fallback)
-	}
-
+	ctx, hasAuth := withForwardedAuth(ctx, ids, auth)
 	if !hasAuth {
 		if !s.cfg.AllowUnauthenticated {
 			// We error here directly as there is no auth.
@@ -415,4 +392,25 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		case downstreamCh <- downstream:
 		}
 	}
+}
+
+func withForwardedAuth(ctx context.Context, ids *ttnpb.GatewayIdentifiers, auth string) (context.Context, bool) {
+	var md metadata.MD
+	var hasAuth bool
+	if auth != "" {
+		if !strings.HasPrefix(auth, "Bearer ") {
+			auth = fmt.Sprintf("Bearer %s", auth)
+		}
+		m := map[string]string{"authorization": auth}
+		if ids != nil {
+			m["id"] = ids.GatewayId
+		}
+		md = metadata.New(m)
+		if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+			md = metadata.Join(ctxMd, md)
+		}
+		ctx = metadata.NewIncomingContext(ctx, md)
+		hasAuth = true
+	}
+	return ctx, hasAuth
 }

@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 - Server side events replaced with single socket connection using the native WebSocket API.
 - Gateways now disconnect if the Gateway Server address has changed.
   - This enables CUPS-enabled gateways to change their LNS before the periodic CUPS lookup occurs.
+- The LoRa Basics Station discovery endpoint now verifies the authorization credentials of the caller.
+  - This enables the gateways to migrate to another instance gracefully while using CUPS.
 
 ### Deprecated
 

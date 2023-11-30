@@ -41,12 +41,22 @@ type Formatter interface {
 	Endpoints() Endpoints
 	// HandleConnectionInfo handles connection information requests from web socket based protocols.
 	// This function returns a byte stream that contains connection information (ex: scheme, host, port etc) or an error if applicable.
-	HandleConnectionInfo(ctx context.Context, raw []byte, server io.Server, serverInfo ServerInfo, receivedAt time.Time) []byte
+	HandleConnectionInfo(
+		ctx context.Context,
+		raw []byte,
+		server io.Server,
+		serverInfo ServerInfo,
+		assertAuth func(context.Context, *ttnpb.GatewayIdentifiers) error,
+	) []byte
 	// HandleUp handles upstream messages from web socket based gateways.
 	// This function optionally returns a byte stream to be sent as response to the upstream message.
-	HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error)
+	HandleUp(
+		ctx context.Context, raw []byte, ids *ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time,
+	) ([]byte, error)
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
 	FromDownlink(ctx context.Context, down *ttnpb.DownlinkMessage, bandID string, dlTime time.Time) ([]byte, error)
 	// TransferTime generates a spurious time transfer message for a particular server time.
-	TransferTime(ctx context.Context, serverTime time.Time, gpsTime *time.Time, concentratorTime *scheduling.ConcentratorTime) ([]byte, error)
+	TransferTime(
+		ctx context.Context, serverTime time.Time, gpsTime *time.Time, concentratorTime *scheduling.ConcentratorTime,
+	) ([]byte, error)
 }
