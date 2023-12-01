@@ -26,7 +26,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import LastSeen from '@console/components/last-seen'
 
-import useConnectionReactor from '@console/containers/gateway-connection/useConnectionReactor'
+import useConnectionReactor from '@console/containers/gateway-connection/use-connection-reactor'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
