@@ -18,7 +18,6 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
@@ -69,9 +68,11 @@ func TestDiscover(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			msg, err := json.Marshal(tc.Query)
 			a.So(err, should.BeNil)
-			resp := lbsLNS.HandleConnectionInfo(ctx, msg, mockServer, info, time.Now())
+			resp := lbsLNS.HandleConnectionInfo(ctx, msg, mockServer, info, noopAssertRights)
 			expected, _ := json.Marshal(tc.ExpectedResponse)
 			a.So(string(resp), should.Equal, string(expected))
 		})
 	}
 }
+
+func noopAssertRights(context.Context, *ttnpb.GatewayIdentifiers) error { return nil }
