@@ -33,17 +33,17 @@ const filterDataProps = props =>
       return acc
     }, {})
 
-const assembleClassnames = ({ message, primary, naked, icon, dropdownItems, className }) =>
+const assembleClassnames = ({ message, primary, secondary, icon, dropdownItems, className }) =>
   classnames(style.button, className, {
     [style.primary]: primary,
-    [style.naked]: naked,
+    [style.secondary]: secondary,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
     [style.withDropdown]: Boolean(dropdownItems),
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, message, expanded, children } = props
+  const { dropdownItems, icon, message, expanded, isHoverDropdown, children } = props
 
   const content = Boolean(children) ? (
     children
@@ -52,10 +52,16 @@ const buttonChildren = props => {
       {icon ? <Icon className={style.icon} icon={icon} /> : null}
       {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
       {dropdownItems ? (
-        <>
-          <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />
-          {expanded ? <Dropdown className={style.dropdown}>{dropdownItems}</Dropdown> : null}
-        </>
+        isHoverDropdown ? (
+          <div>
+            {expanded ? <Dropdown className={style.dropdown}>{dropdownItems}</Dropdown> : null}
+          </div>
+        ) : (
+          <>
+            <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />
+            {expanded ? <Dropdown className={style.dropdown}>{dropdownItems}</Dropdown> : null}
+          </>
+        )
       ) : null}
     </>
   )
@@ -74,6 +80,7 @@ const Button = forwardRef((props, ref) => {
     onBlur,
     onClick,
     form,
+    isHoverDropdown,
     ...rest
   } = props
   const [expanded, setExpanded] = useState(false)
@@ -92,11 +99,9 @@ const Button = forwardRef((props, ref) => {
   const toggleDropdown = useCallback(() => {
     setExpanded(oldExpanded => {
       const newState = !oldExpanded
-      if (newState) document.addEventListener('mousedown', handleClickOutside)
-      else document.removeEventListener('mousedown', handleClickOutside)
       return newState
     })
-  }, [handleClickOutside])
+  }, [])
 
   const handleClick = useCallback(
     evt => {
@@ -112,6 +117,14 @@ const Button = forwardRef((props, ref) => {
     [dropdownItems, onClick, toggleDropdown, value],
   )
 
+  const handleMouseEnter = useCallback(() => {
+    setExpanded(true)
+  }, [setExpanded])
+
+  const handleMouseLeave = useCallback(() => {
+    setExpanded(false)
+  }, [setExpanded])
+
   const intl = useIntl()
 
   let title = rawTitle
@@ -124,8 +137,10 @@ const Button = forwardRef((props, ref) => {
   return (
     <button
       className={buttonClassNames}
-      onClick={handleClick}
-      children={buttonChildren({ ...props, expanded })}
+      onClick={isHoverDropdown ? null : handleClick}
+      onMouseEnter={isHoverDropdown ? handleMouseEnter : null}
+      onMouseLeave={isHoverDropdown ? handleMouseLeave : null}
+      children={buttonChildren({ ...props, expanded, handleMouseEnter, handleMouseLeave })}
       ref={ref}
       {...htmlProps}
     />
