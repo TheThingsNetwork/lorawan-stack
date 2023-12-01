@@ -12,39 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.link
-  transition: color $ad.s, background $ad.s
-  transition-timing-function: ease-out
-  border-radius: $br.m
-  text-decoration: none
-  color: $c.grey-700
-  display: flex
-  align-items: center
-  gap: 0.5rem
-  padding: 0.5rem 0.3rem
-  position: relative
+import React from 'react'
 
-  .icon
-    color: $c.grey-500
+import Button from '@ttn-lw/components/button'
 
-  &.active
-    background: $c.tts-primary-150
-    color: $tc-deep-gray
-    font-weight: $fw.bold
+import { selectApplicationSiteName, selectAssetsRootPath } from '@ttn-lw/lib/selectors/env'
 
-    .icon
-      color: $tc-deep-gray
+const SideHeader = () => {
+  const logo = {
+    src: `${selectAssetsRootPath()}/tts-logo.svg`,
+    alt: `${selectApplicationSiteName()} Logo`,
+  }
+  return (
+    <div className="d-flex j-between">
+      <img {...logo} className="w-50" />
+      <Button icon="left_panel_close" naked />
+    </div>
+  )
+}
 
-  &:visited
-    color: $c.grey-700
-    text-decoration: none
-
-    .icon
-      color: $c.grey-500
-
-  &:hover
-    color: $tc-deep-gray
-    text-decoration: none
-
-    .icon
-      color: $tc-deep-gray
+export default SideHeader
