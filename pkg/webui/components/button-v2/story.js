@@ -67,40 +67,46 @@ export const PrimayOnlyIconDropdown = () => {
   )
 }
 
-export const Naked = () => (
+export const Secondary = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button naked message="Naked" />
+    <Button secondary message="Secondary" />
   </div>
 )
 
-export const NakedWithIcon = () => (
+export const SecondaryWithIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button naked icon="favorite" message="Naked With Icon" />
+    <Button secondary icon="favorite" message="Secondary With Icon" />
   </div>
 )
 
-export const NakedOnlyIcon = () => (
+export const SecondaryOnlyIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button naked icon="favorite" />
+    <Button secondary icon="favorite" />
   </div>
 )
 
-export const NakedDropdown = () => {
+export const SecondaryDropdown = () => {
   const ref = useRef()
 
   return (
     <div style={{ textAlign: 'center', height: '6rem' }}>
-      <Button naked icon="favorite" message="Dropdown" dropdownItems={dropdownItems} ref={ref} />
+      <Button
+        secondary
+        icon="favorite"
+        message="Dropdown"
+        dropdownItems={dropdownItems}
+        ref={ref}
+      />
     </div>
   )
 }
 
-export const NakedOnlyIconDropdown = () => {
+export const SecondaryOnlyIconDropdown = () => {
   const ref = useRef()
 
   return (
     <div style={{ textAlign: 'center', height: '6rem' }}>
-      <Button naked icon="favorite" dropdownItems={dropdownItems} ref={ref} />
+      <Button secondary icon="favorite" dropdownItems={dropdownItems} ref={ref} />
     </div>
   )
 }
