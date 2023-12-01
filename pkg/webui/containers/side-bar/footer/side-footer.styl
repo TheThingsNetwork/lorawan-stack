@@ -12,25 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+.side-footer
+  bottom: 0
+  position: absolute
 
-import Link from '.'
-
-export default {
-  title: 'Menu Link',
-}
-
-const ExampleComponent = () => <div>Example component</div>
-
-export const Default = () => (
-  <div>
-    <Link
-      title={'Example name'}
-      icon="group"
-      path="example-path"
-      Component={ExampleComponent}
-      _isRoute
-      exact
-    />
-  </div>
-)
+  &-button
+    justify-content: space-between
+    width: 100%
