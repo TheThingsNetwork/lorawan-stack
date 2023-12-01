@@ -18,6 +18,7 @@ import SectionLabel from '.'
 
 export default {
   title: 'Sidebar/SectionLabel',
+  component: SectionLabel,
 }
 
 export const Default = () => <SectionLabel label="Top entities" icon="add" />
