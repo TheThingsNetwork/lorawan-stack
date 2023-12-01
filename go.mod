@@ -10,7 +10,7 @@ replace github.com/mitchellh/mapstructure => github.com/TheThingsIndustries/maps
 
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2
-	github.com/KimMachineGun/automemlimit v0.3.0
+	github.com/KimMachineGun/automemlimit v0.4.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/TheThingsIndustries/mystique v0.0.0-20221125120501-80ab21781b6d
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
