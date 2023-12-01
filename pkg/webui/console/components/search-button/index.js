@@ -13,23 +13,28 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
+import classNames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './search-button.styl'
 
-const SearchButton = ({ onClick }) => {
+const SearchButton = ({ onClick, className }) => {
   const handleClick = useCallback(() => {
     onClick()
   }, [onClick])
   return (
-    <Button onClick={handleClick} naked className={style.searchButton}>
-      <Icon icon="search" className={style.icon} />
+    <Button onClick={handleClick} naked className={classNames(style.searchButton, className)}>
+      <div className="d-flex gap-cs-xs">
+        <Icon icon="search" className={style.icon} />
+        <Message content={sharedMessages.search} className="mt-cs-xxs mb-cs-xxs" />
+      </div>
       <div className={style.backslashContainer}>
         <Message content="/" component="p" className={style.backslash} />
       </div>
@@ -38,7 +43,12 @@ const SearchButton = ({ onClick }) => {
 }
 
 SearchButton.propTypes = {
+  className: PropTypes.string,
   onClick: PropTypes.func.isRequired,
+}
+
+SearchButton.defaultProps = {
+  className: undefined,
 }
 
 export default SearchButton
