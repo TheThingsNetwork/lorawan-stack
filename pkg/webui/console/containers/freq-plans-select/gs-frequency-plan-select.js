@@ -69,6 +69,7 @@ const GatewayFrequencyPlansSelect = () => {
       additionalInputProps={{ options: freqPlanOptions }}
       distinctOptions
       atLeastOneEntry
+      filterByTag
       required
     />
   )

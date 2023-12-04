@@ -44,6 +44,7 @@ const Entry = ({
   removeMessage,
   distinctOptions,
   atLeastOneEntry,
+  filterByTag,
 }) => {
   const [currentValue, setCurrentValue] = useState(value)
   const [newOptions, setNewOptions] = useState(undefined)
@@ -98,8 +99,15 @@ const Entry = ({
     } else {
       newOptions = options.filter(v => !fieldValue.includes(v.value))
     }
-    setNewOptions(newOptions)
-  }, [currentValue, options, fieldValue])
+
+    let taggedOptions = newOptions
+    if (fieldValue.length >= 2 && filterByTag) {
+      const selectedOption = options.find(v => v.value === fieldValue[0])
+      taggedOptions = newOptions.filter(v => selectedOption.tag === v.tag)
+    }
+
+    setNewOptions(taggedOptions)
+  }, [currentValue, options, fieldValue, filterByTag])
 
   const showRemoveButton = atLeastOneEntry ? index !== 0 : true
 
@@ -157,6 +165,7 @@ Entry.propTypes = {
   atLeastOneEntry: PropTypes.bool,
   distinctOptions: PropTypes.bool,
   fieldValue: PropTypes.any,
+  filterByTag: PropTypes.bool,
   index: PropTypes.number.isRequired,
   indexAsKey: PropTypes.bool.isRequired,
   inputElement: PropTypes.elementType.isRequired,
@@ -184,6 +193,7 @@ Entry.defaultProps = {
   distinctOptions: false,
   fieldValue: undefined,
   atLeastOneEntry: false,
+  filterByTag: false,
 }
 
 export default Entry

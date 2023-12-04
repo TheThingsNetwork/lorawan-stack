@@ -46,6 +46,7 @@ const KeyValueMap = ({
   valuePlaceholder,
   distinctOptions,
   atLeastOneEntry,
+  filterByTag,
 }) => {
   const handleEntryChange = useCallback(
     (index, newValues) => {
@@ -98,6 +99,7 @@ const KeyValueMap = ({
               removeMessage={removeMessage}
               distinctOptions={distinctOptions}
               atLeastOneEntry={atLeastOneEntry}
+              filterByTag={filterByTag}
             />
           ))}
       </div>
@@ -122,6 +124,7 @@ KeyValueMap.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
   distinctOptions: PropTypes.bool,
+  filterByTag: PropTypes.bool,
   indexAsKey: PropTypes.bool,
   inputElement: PropTypes.elementType,
   isReadOnly: PropTypes.func,
@@ -157,6 +160,7 @@ KeyValueMap.defaultProps = {
   removeMessage: undefined,
   distinctOptions: false,
   atLeastOneEntry: false,
+  filterByTag: false,
 }
 
 export default KeyValueMap
