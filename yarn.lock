@@ -1451,10 +1451,10 @@
   resolved "https://registry.yarnpkg.com/@babel/regjsgen/-/regjsgen-0.8.0.tgz#f0ba69b075e1f05fb2825b7fad991e7adbb18310"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
 
-"@babel/runtime-corejs2@^7.23.2":
-  version "7.23.2"
-  resolved "https://registry.yarnpkg.com/@babel/runtime-corejs2/-/runtime-corejs2-7.23.2.tgz#a482c6e233fb2efa6456ce299da1b440b87260ed"
-  integrity sha512-lTwRWGcAUBANnxD0A4c5/wKQ0eLhgdAy9kdY2rzTmmliumBQ8u8awykMnaQAnZR3PC47jLRjGoj+hozZqy9Bww==
+"@babel/runtime-corejs2@^7.23.5":
+  version "7.23.5"
+  resolved "https://registry.yarnpkg.com/@babel/runtime-corejs2/-/runtime-corejs2-7.23.5.tgz#b828c9e412d2ae0d08f3fc0406befb645b97e97d"
+  integrity sha512-htng2Ks50HN2/hvRU2P6cIzPods3CXaDt0Rf0bhsJc+hD3gaVPreL/UA24jcjqrVRUgu14KucMiCLu6hMjjryQ==
   dependencies:
     core-js "^2.6.12"
     regenerator-runtime "^0.14.0"
@@ -12216,7 +12216,7 @@ tsutils@^3.21.0:
     tslib "^1.8.1"
 
 "ttn-lw@file:sdk/js":
-  version "3.28.0"
+  version "3.28.1"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     auto-bind "^5.0.1"
