@@ -13,27 +13,33 @@
 // limitations under the License.
 
 .search-button
+  color: $c.grey-500
   width: 100%
   position: relative
   display: flex
   justify-content: space-between
   border-radius: $br.l
-  border: 1.132px solid #E6E6E6
-  box-shadow: 0px 3.39623px 18.11321px 0px rgba(0, 0, 0, 0.06)
-  padding: $cs.xxs
-  gap: 0.4rem
+  border: 1px solid #E6E6E6
+  box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.06)
+  padding: $cs.xs
+  gap: $cs.xxs
+
+  p
+    line-height: 1.4
 
   .icon
-    color: $c.grey-700
     font-size: $fs.xl
 
   .backslash-container
-    height: 1rem
-    border-radius: $br.s
+    height: 1.5rem
+    width: 1.5rem
+    text-align: center
+    border-radius: $br.m
     border: 1px solid $c.grey-200
-    padding: $cs.xxs $cs.xs
     font-size: $fs.s
 
+    p
+      line-height: 1
 
     .backslash
-      margin: -1px 0 0
+      margin: 3px 0 0

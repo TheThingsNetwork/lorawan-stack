@@ -31,9 +31,9 @@ const SearchButton = ({ onClick, className }) => {
   }, [onClick])
   return (
     <Button onClick={handleClick} naked className={classNames(style.searchButton, className)}>
-      <div className="d-flex gap-cs-xs">
+      <div className="d-flex gap-cs-xxs">
         <Icon icon="search" className={style.icon} />
-        <Message content={sharedMessages.search} className="mt-cs-xxs mb-cs-xxs" />
+        <Message content={sharedMessages.search} component="p" className="m-0" />
       </div>
       <div className={style.backslashContainer}>
         <Message content="/" component="p" className={style.backslash} />
