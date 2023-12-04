@@ -43,7 +43,7 @@ const assembleClassnames = ({ message, primary, secondary, icon, dropdownItems, 
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, message, expanded, isHoverDropdown, children } = props
+  const { dropdownItems, icon, message, expanded, isHoverDropdown, dropdownClassName, children } = props
 
   const content = Boolean(children) ? (
     children
@@ -54,12 +54,12 @@ const buttonChildren = props => {
       {dropdownItems ? (
         isHoverDropdown ? (
           <div>
-            {expanded ? <Dropdown className={style.dropdown}>{dropdownItems}</Dropdown> : null}
+            {expanded ? <Dropdown className={classnames(style.dropdown, dropdownClassName)}>{dropdownItems}</Dropdown> : null}
           </div>
         ) : (
           <>
             <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />
-            {expanded ? <Dropdown className={style.dropdown}>{dropdownItems}</Dropdown> : null}
+            {expanded ? <Dropdown className={classnames(style.dropdown, dropdownClassName)}>{dropdownItems}</Dropdown> : null}
           </>
         )
       ) : null}
@@ -99,6 +99,8 @@ const Button = forwardRef((props, ref) => {
   const toggleDropdown = useCallback(() => {
     setExpanded(oldExpanded => {
       const newState = !oldExpanded
+      if (newState) document.addEventListener('mousedown', handleClickOutside)
+      else document.removeEventListener('mousedown', handleClickOutside)
       return newState
     })
   }, [])
