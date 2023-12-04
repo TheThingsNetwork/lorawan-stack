@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import classnames from 'classnames'
 import { NavLink } from 'react-router-dom'
 
@@ -58,8 +58,11 @@ const DropdownItem = ({
   showActive,
   tabIndex,
   external,
+  hasSubmenu,
+  submenuItems,
   ...rest
 }) => {
+  const [expandedSubmenu, setExpandedSubmenu] = useState(false)
   const iconElement = icon && <Icon className={style.icon} icon={icon} nudgeUp />
   const activeClassName = classnames({
     [style.active]: (!Boolean(action) && showActive) || active,
@@ -90,9 +93,35 @@ const DropdownItem = ({
       <Message content={title} />
     </NavLink>
   )
+
+  const handleMouseEnter = useCallback(() => {
+    setExpandedSubmenu(true)
+  }, [setExpandedSubmenu])
+
+  const handleMouseLeave = useCallback(() => {
+    setExpandedSubmenu(false)
+  }, [setExpandedSubmenu])
+
+  const withSubmenu = (
+    <button
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={classnames(style.button, 'd-flex', 'j-between')}
+    >
+      <div>
+        {iconElement}
+        <Message content={title} />
+      </div>
+      <Icon icon="chevron_right" />
+      {expandedSubmenu ? (
+        <Dropdown className={classnames(style.submenu)}>{submenuItems}</Dropdown>
+      ) : null}
+    </button>
+  )
+
   return (
     <li className={style.dropdownItem} key={title.id || title} {...rest}>
-      {ItemElement}
+      {hasSubmenu && Boolean(submenuItems) ? withSubmenu : ItemElement}
     </li>
   )
 }

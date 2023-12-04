@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react'
+import React, { useRef } from 'react'
 import classNames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
@@ -32,18 +32,34 @@ const statusPageBaseUrl = selectPageStatusBaseUrlConfig()
 
 const clusterDropdownItems = (
   <>
-    <Dropdown.Item title="Cluster" icon="public" />
+    <Dropdown.Item title="Cluster selection" icon="public" path="/cluster" />
+  </>
+)
+
+const submenuItems = (
+  <>
+    <Dropdown.Item title="EN" />
+    <Dropdown.Item title="JP" />
   </>
 )
 
 const supportDropdownItems = (
   <>
-    <Dropdown.Item title="Cluster" icon="public" />
+    <Dropdown.Item title="Documentation" icon="menu_book" path={documentationBaseUrl} />
+    <Dropdown.Item title="Support" icon="support" path={supportLink} />
+    <Dropdown.Item title="Status page" icon="monitor_heart" path={statusPageBaseUrl} />
+    <Dropdown.Item
+      title="Language"
+      icon="language"
+      path="/support"
+      hasSubmenu
+      submenuItems={submenuItems}
+    />
   </>
 )
 
 const SideFooter = () => {
-  const [isExpanded, setIsExpanded] = useState(false)
+  const ref = useRef(null)
 
   return (
     <div
@@ -63,7 +79,9 @@ const SideFooter = () => {
         message={`v${process.env.VERSION} (${process.env.REVISION})`}
         icon="support"
         dropdownItems={supportDropdownItems}
+        dropdownClassName={style.sideFooterHoverDropdown}
         isHoverDropdown
+        ref={ref}
       />
       <Button
         secondary
@@ -71,6 +89,8 @@ const SideFooter = () => {
         icon="public"
         message="EU1"
         dropdownItems={clusterDropdownItems}
+        dropdownClassName={style.sideFooterDropdown}
+        ref={ref}
       />
     </div>
   )
