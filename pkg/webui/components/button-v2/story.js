@@ -51,7 +51,7 @@ export const PrimayDropdown = () => {
   const ref = useRef()
 
   return (
-    <div style={{ textAlign: 'center', height: '6rem' }}>
+    <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
       <Button primary icon="favorite" message="Dropdown" ref={ref} dropdownItems={dropdownItems} />
     </div>
   )
@@ -61,7 +61,7 @@ export const PrimayOnlyIconDropdown = () => {
   const ref = useRef()
 
   return (
-    <div style={{ textAlign: 'center', height: '6rem' }}>
+    <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
       <Button primary icon="favorite" dropdownItems={dropdownItems} ref={ref} />
     </div>
   )
@@ -89,7 +89,7 @@ export const SecondaryDropdown = () => {
   const ref = useRef()
 
   return (
-    <div style={{ textAlign: 'center', height: '6rem' }}>
+    <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
       <Button
         secondary
         icon="favorite"
@@ -105,7 +105,7 @@ export const SecondaryOnlyIconDropdown = () => {
   const ref = useRef()
 
   return (
-    <div style={{ textAlign: 'center', height: '6rem' }}>
+    <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
       <Button secondary icon="favorite" dropdownItems={dropdownItems} ref={ref} />
     </div>
   )
