@@ -24,7 +24,7 @@ const GtwListSideNavigation = () => {
 
   return (
     <div>
-      <SectionLabel label="Top entities" icon="add" />
+      <SectionLabel label="Top entities" icon="add" className="mt-cs-m" />
       <SideNavigation>
         {topEntities.map(({ path, entity, title }) => (
           <SideNavigation.Item title={title} path={path} icon={entity} key={path} />

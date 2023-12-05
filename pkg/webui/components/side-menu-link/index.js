@@ -24,10 +24,11 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './side-menu-link.styl'
 
-const MenuLink = ({ icon, title, path, onClick, exact }) => {
+const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
   const className = useCallback(
-    ({ isActive }) => classNames(style.link, { [style.active]: isActive }),
-    [],
+    ({ isActive }) =>
+      classNames(style.link, { [style.active]: isActive, [style.disabled]: disabled }),
+    [disabled],
   )
 
   return (
@@ -38,6 +39,7 @@ const MenuLink = ({ icon, title, path, onClick, exact }) => {
 }
 
 MenuLink.propTypes = {
+  disabled: PropTypes.bool,
   exact: PropTypes.bool.isRequired,
   icon: PropTypes.string,
   onClick: PropTypes.func,
@@ -48,6 +50,7 @@ MenuLink.propTypes = {
 MenuLink.defaultProps = {
   icon: undefined,
   onClick: () => null,
+  disabled: false,
 }
 
 export default MenuLink
