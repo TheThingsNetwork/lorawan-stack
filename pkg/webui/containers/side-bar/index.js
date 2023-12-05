@@ -16,13 +16,14 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import classNames from 'classnames'
 
-import SearchButton from '@console/components/search-button'
+import SearchButton from '@ttn-lw/components/search-button'
 
-import Switcher from './switcher'
 import SideBarNavigation from './navigation'
 import SideBarContext from './context'
 import SideHeader from './header'
 import SideFooter from './footer'
+import getCookie from './utils'
+import SwitcherContainer from './switcher'
 
 import style from './side-bar.styl'
 
@@ -30,16 +31,24 @@ const SideBar = () => {
   const { pathname } = useLocation()
   const [layer, setLayer] = React.useState(pathname ?? '/')
 
+  const topEntitiesCookie = getCookie('topEntities')
+    ? getCookie('topEntities')
+        .split('_')
+        .map(cookie => JSON.parse(cookie))
+    : []
+
+  const topEntities = topEntitiesCookie?.filter(cookie => cookie.tag === layer.split('/')[1])
+
   return (
     <div
       className={classNames(
         style.sidebar,
-        'd-flex pos-relative align-center direction-column gap-cs-s p-cs-s bg-tts-primary-050',
+        'd-flex pos-fixed align-center direction-column gap-cs-s p-cs-s bg-tts-primary-050',
       )}
     >
       <SideHeader />
-      <SideBarContext.Provider value={{ layer, setLayer }}>
-        <Switcher />
+      <SideBarContext.Provider value={{ layer, setLayer, topEntities }}>
+        <SwitcherContainer />
         <SearchButton />
         <SideBarNavigation />
       </SideBarContext.Provider>

@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef } from 'react'
-import classNames from 'classnames'
+import React from 'react'
 
-import Button from '@ttn-lw/components/button-v2'
-import Dropdown from '@ttn-lw/components/dropdown-v2'
+import SideFooter from '@ttn-lw/components/side-footer'
 
 import {
   selectDocumentationUrlConfig,
@@ -24,76 +22,16 @@ import {
   selectSupportLinkConfig,
 } from '@ttn-lw/lib/selectors/env'
 
-import style from './side-footer.styl'
-
 const supportLink = selectSupportLinkConfig()
 const documentationBaseUrl = selectDocumentationUrlConfig()
 const statusPageBaseUrl = selectPageStatusBaseUrlConfig()
 
-const clusterDropdownItems = (
-  <>
-    <Dropdown.Item title="Cluster selection" icon="public" path="/cluster" />
-  </>
+const Footer = () => (
+  <SideFooter
+    supportLink={supportLink}
+    documentationBaseUrl={documentationBaseUrl}
+    statusPageBaseUrl={statusPageBaseUrl}
+  />
 )
 
-const submenuItems = (
-  <>
-    <Dropdown.Item title="EN" />
-    <Dropdown.Item title="JP" />
-  </>
-)
-
-const supportDropdownItems = (
-  <>
-    <Dropdown.Item title="Documentation" icon="menu_book" path={documentationBaseUrl} />
-    <Dropdown.Item title="Support" icon="support" path={supportLink} />
-    <Dropdown.Item title="Status page" icon="monitor_heart" path={statusPageBaseUrl} />
-    <Dropdown.Item
-      title="Language"
-      icon="language"
-      path="/support"
-      hasSubmenu
-      submenuItems={submenuItems}
-    />
-  </>
-)
-
-const SideFooter = () => {
-  const ref = useRef(null)
-
-  return (
-    <div
-      className={classNames(
-        style.sideFooter,
-        'd-flex',
-        'j-center',
-        'align-center',
-        'gap-cs-xxs',
-        'fs-xs',
-        'w-90',
-      )}
-    >
-      <Button
-        className={style.sideFooterButton}
-        secondary
-        message={`v${process.env.VERSION} (${process.env.REVISION})`}
-        icon="support"
-        dropdownItems={supportDropdownItems}
-        dropdownClassName={style.sideFooterHoverDropdown}
-        isHoverDropdown
-        ref={ref}
-      />
-      <Button
-        secondary
-        withDropdown
-        icon="public"
-        message="EU1"
-        dropdownItems={clusterDropdownItems}
-        dropdownClassName={style.sideFooterDropdown}
-        ref={ref}
-      />
-    </div>
-  )
-}
-
-export default SideFooter
+export default Footer

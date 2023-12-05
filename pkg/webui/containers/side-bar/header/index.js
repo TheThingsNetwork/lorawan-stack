@@ -14,21 +14,16 @@
 
 import React from 'react'
 
-import Button from '@ttn-lw/components/button'
+import SideHeader from '@ttn-lw/components/side-header'
 
 import { selectApplicationSiteName, selectAssetsRootPath } from '@ttn-lw/lib/selectors/env'
 
-const SideHeader = () => {
+const Header = () => {
   const logo = {
     src: `${selectAssetsRootPath()}/tts-logo.svg`,
     alt: `${selectApplicationSiteName()} Logo`,
   }
-  return (
-    <div className="d-flex j-between">
-      <img {...logo} className="w-50" />
-      <Button icon="left_panel_close" naked />
-    </div>
-  )
+  return <SideHeader logo={logo} />
 }
 
-export default SideHeader
+export default Header

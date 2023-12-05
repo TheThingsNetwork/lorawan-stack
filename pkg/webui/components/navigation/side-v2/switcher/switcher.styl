@@ -12,31 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.link
-  transition: color $ad.s, background $ad.s
-  transition-timing-function: ease-out
+.switcher-container
   border-radius: $br.m
-  text-decoration: none
-  color: $c.grey-700
-  display: flex
-  align-items: center
-  gap: $cs.xxs
-  padding: $cs.xs
-  position: relative
+  border: 1px solid $c.grey-200
+  box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.06)
+  font-weight: $fw.light
 
-  .icon
-    color: $c.grey-500
-
-  &.active
-    background: $c.tts-primary-150
-    color: $c.grey-900
-
-    .icon
-      color: $c.grey-900
-
-  &:hover
-    color: $c.grey-900
+  .link
+    transition: color $ad.s, background $ad.s
+    transition-timing-function: ease-out
+    border-radius: $br.m
     text-decoration: none
+    color: $c.grey-700
+    display: flex
+    justify-content: center
+    width: 100%
 
-    .icon
-      color: $c.grey-900
+    &.active
+      background: $c.grey-900
+      color: $c.white
+      font-weight: $fw.bold
+
+    &:visited
+      text-decoration: none
+      &:not(.active)
+        color: $c.grey-700
+
+    &:hover
+      text-decoration: none
+      &:not(.active)
+        font-weight: $fw.normal

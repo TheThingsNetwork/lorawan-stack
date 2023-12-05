@@ -12,34 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.search-button
-  color: $c.grey-500
-  width: 100%
-  position: relative
-  display: flex
-  justify-content: space-between
-  border-radius: $br.l
-  border: 1px solid #E6E6E6
-  box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.06)
-  padding: $cs.xs
-  gap: $cs.xxs
+.side-footer
+  bottom: 0
+  position: absolute
 
-  p
-    line-height: 1.4
+  &-button
+    justify-content: space-between
+    width: 100%
 
-  .icon
-    font-size: $fs.xl
+  &-dropdown
+    width: 15.5rem
 
-  .backslash-container
-    height: 1.5rem
-    width: 1.5rem
-    text-align: center
-    border-radius: $br.m
-    border: 1px solid $c.grey-200
-    font-size: $fs.s
-
-    p
-      line-height: 1
-
-    .backslash
-      margin: 3px 0 0
+  &-hover-dropdown
+    right: -80px !important
+    width: 15.5rem
+    margin-top: -7rem !important

@@ -13,18 +13,12 @@
 // limitations under the License.
 
 import React, { useCallback, useContext } from 'react'
-import { NavLink } from 'react-router-dom'
-import classNames from 'classnames'
+
+import Switcher from '@ttn-lw/components/navigation/side-v2/switcher'
 
 import SideBarContext from '@ttn-lw/containers/side-bar/context'
 
-import Message from '@ttn-lw/lib/components/message'
-
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import style from './switcher.styl'
-
-const Switcher = () => {
+const SwitcherContainer = () => {
   const { layer, setLayer } = useContext(SideBarContext)
 
   const handleClick = useCallback(
@@ -34,48 +28,7 @@ const Switcher = () => {
     [setLayer],
   )
 
-  const overviewClassName = classNames(
-    style.link,
-    { [style.active]: layer === '/' || layer === '/console' },
-    'p-vert-cs-s',
-    'p-sides-0',
-  )
-
-  const applicationsClassName = classNames(
-    style.link,
-    { [style.active]: layer.includes('/applications') },
-    'p-vert-cs-s',
-    'p-sides-0',
-  )
-
-  const gatewaysClassName = classNames(
-    style.link,
-    { [style.active]: layer.includes('/gateways') },
-    'p-vert-cs-s',
-    'p-sides-0',
-  )
-
-  return (
-    <div
-      className={classNames(
-        style.switcherContainer,
-        'd-flex',
-        'j-center',
-        'gap-cs-xxs',
-        'p-cs-xxs',
-      )}
-    >
-      <NavLink to="/" onClick={handleClick} className={overviewClassName}>
-        <Message content={sharedMessages.overview} />
-      </NavLink>
-      <NavLink to="/applications" onClick={handleClick} className={applicationsClassName}>
-        <Message content={sharedMessages.applications} />
-      </NavLink>
-      <NavLink to="/gateways" onClick={handleClick} className={gatewaysClassName}>
-        <Message content={sharedMessages.gateways} />
-      </NavLink>
-    </div>
-  )
+  return <Switcher layer={layer} onClick={handleClick} />
 }
 
-export default Switcher
+export default SwitcherContainer
