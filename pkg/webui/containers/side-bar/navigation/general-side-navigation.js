@@ -31,7 +31,7 @@ const GeneralSideNavigation = () => {
         <SideNavigation.Item title="Personal API keys" path="/user/api-keys" icon="key" />
         <SideNavigation.Item title="Network Operations Center" path="/noc" icon="ssid_chart" />
         <SideNavigation.Item title="Admin panel" path="/admin-panel" icon="admin_panel_settings" />
-        <SectionLabel label="Top entities" icon="add" className="mt-cs-l" />
+        <SectionLabel label="Top entities" icon="add" className="mt-cs-m" />
         {topEntities.map(({ path, title, entity }) => (
           <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
         ))}

@@ -64,6 +64,27 @@
       transition-duration: $ad.xs
       background-color: $c-focus
 
+  &.naked
+    transition: background-color color $ad.s
+    border: none
+    background-color: none
+    box-shadow: unset
+    color: $tc-subtle-gray
+
+    &.only-icon
+      padding: 0 $cs.xxs 0 0.55rem
+
+    &:not(.disabled)
+      &:hover
+        background-color: $c-backdrop
+
+      +focus-visible()
+        background-color: $c-backdrop
+
+      &:active
+        transition-duration: $ad.xs
+        background-color: $c-backdrop
+
   &.only-icon
     padding: 0 $cs.xs 0 0.65rem
 
