@@ -33,17 +33,27 @@ const filterDataProps = props =>
       return acc
     }, {})
 
-const assembleClassnames = ({ message, primary, secondary, icon, dropdownItems, className }) =>
+const assembleClassnames = ({
+  message,
+  primary,
+  secondary,
+  naked,
+  icon,
+  dropdownItems,
+  className,
+}) =>
   classnames(style.button, className, {
     [style.primary]: primary,
     [style.secondary]: secondary,
+    [style.naked]: naked,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
     [style.withDropdown]: Boolean(dropdownItems),
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, message, expanded, isHoverDropdown, dropdownClassName, children } = props
+  const { dropdownItems, icon, message, expanded, isHoverDropdown, dropdownClassName, children } =
+    props
 
   const content = Boolean(children) ? (
     children
@@ -54,12 +64,20 @@ const buttonChildren = props => {
       {dropdownItems ? (
         isHoverDropdown ? (
           <div>
-            {expanded ? <Dropdown className={classnames(style.dropdown, dropdownClassName)}>{dropdownItems}</Dropdown> : null}
+            {expanded ? (
+              <Dropdown className={classnames(style.dropdown, dropdownClassName)}>
+                {dropdownItems}
+              </Dropdown>
+            ) : null}
           </div>
         ) : (
           <>
             <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />
-            {expanded ? <Dropdown className={classnames(style.dropdown, dropdownClassName)}>{dropdownItems}</Dropdown> : null}
+            {expanded ? (
+              <Dropdown className={classnames(style.dropdown, dropdownClassName)}>
+                {dropdownItems}
+              </Dropdown>
+            ) : null}
           </>
         )
       ) : null}

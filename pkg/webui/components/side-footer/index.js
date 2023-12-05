@@ -12,15 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef } from 'react'
+import React, { useCallback, useContext, useRef } from 'react'
 import classNames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
 import Dropdown from '@ttn-lw/components/dropdown-v2'
 
+import { LanguageContext } from '@ttn-lw/lib/components/with-locale'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './side-footer.styl'
+
+const LanguageOption = ({ locale, title, currentLocale, onSetLocale }) => {
+  const handleSetLocale = useCallback(() => {
+    onSetLocale(locale)
+  }, [locale, onSetLocale])
+
+  return <Dropdown.Item title={title} action={handleSetLocale} active={locale === currentLocale} />
+}
+
+LanguageOption.propTypes = {
+  currentLocale: PropTypes.string.isRequired,
+  locale: PropTypes.string.isRequired,
+  onSetLocale: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+}
 
 const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) => {
   const ref = useRef(null)
@@ -31,19 +48,39 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
     </>
   )
 
-  const submenuItems = (
-    <>
-      <Dropdown.Item title="EN" />
-      <Dropdown.Item title="JP" />
-    </>
+  const languageContext = useContext(LanguageContext)
+  const { locale, supportedLocales, setLocale } = languageContext || {}
+
+  const handleSetLocale = useCallback(
+    locale => {
+      setLocale(locale)
+    },
+    [setLocale],
   )
+
+  const submenuItems = Object.keys(supportedLocales).map(l => (
+    <LanguageOption
+      locale={l}
+      key={l}
+      title={supportedLocales[l]}
+      currentLocale={locale}
+      onSetLocale={handleSetLocale}
+    />
+  ))
 
   const supportDropdownItems = (
     <>
       <Dropdown.Item title="Documentation" icon="menu_book" path={documentationBaseUrl} />
       <Dropdown.Item title="Support" icon="support" path={supportLink} />
       <Dropdown.Item title="Status page" icon="monitor_heart" path={statusPageBaseUrl} />
-      <Dropdown.Item title="Language" icon="language" path="/support" submenuItems={submenuItems} />
+      {Boolean(languageContext) && (
+        <Dropdown.Item
+          title="Language"
+          icon="language"
+          path="/support"
+          submenuItems={submenuItems}
+        />
+      )}
     </>
   )
 

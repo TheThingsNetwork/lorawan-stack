@@ -20,8 +20,6 @@ import TtsLogo from '@assets/static/tts-logo.svg'
 import Switcher from '@ttn-lw/components/navigation/side-v2/switcher'
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SideHeader from '@ttn-lw/components/side-header'
-import SideFooter from '@ttn-lw/components/side-footer'
-
 import SearchButton from '@ttn-lw/components/search-button'
 
 import style from './side-bar.styl'
@@ -65,10 +63,5 @@ export const Default = () => (
         icon="general_settings"
       />
     </SideNavigation>
-    <SideFooter
-      supportLink={'/support'}
-      documentationBaseUrl={'/docs'}
-      statusPageBaseUrl={'/status'}
-    />
   </div>
 )

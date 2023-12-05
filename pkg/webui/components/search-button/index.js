@@ -30,7 +30,7 @@ const SearchButton = ({ onClick, className }) => {
     onClick()
   }, [onClick])
   return (
-    <Button onClick={handleClick} naked className={classNames(style.searchButton, className)}>
+    <Button onClick={handleClick} secondary className={classNames(style.searchButton, className)}>
       <div className="d-flex gap-cs-xxs">
         <Icon icon="search" className={style.icon} />
         <Message content={sharedMessages.search} component="p" className="m-0" />
