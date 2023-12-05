@@ -21,4 +21,20 @@ export default {
   component: Switcher,
 }
 
-export const Default = () => <Switcher />
+const SwictherExample = () => {
+  const [layer, setLayer] = React.useState('/')
+  const handleClick = React.useCallback(
+    evt => {
+      setLayer(evt.target.getAttribute('href'))
+    },
+    [setLayer],
+  )
+
+  return <Switcher layer={layer} onClick={handleClick} />
+}
+
+export const Default = () => (
+  <div style={{ width: '300px' }}>
+    <SwictherExample />
+  </div>
+)

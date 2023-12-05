@@ -12,18 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.side-footer
-  bottom: 0
-  position: absolute
+import React from 'react'
 
-  &-button
-    justify-content: space-between
-    width: 100%
+import Button from '@ttn-lw/components/button'
 
-  &-dropdown
-    width: 15.5rem
+import PropTypes from '@ttn-lw/lib/prop-types'
 
-  &-hover-dropdown
-    right: -73px !important
-    width: 15.5rem
-    margin-top: -6.5rem !important
+const SideHeader = ({ logo }) => (
+  <div className="d-flex j-between">
+    <img {...logo} className="w-50" />
+    <Button icon="left_panel_close" naked />
+  </div>
+)
+
+SideHeader.propTypes = {
+  logo: PropTypes.shape({
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.string.isRequired,
+  }).isRequired,
+}
+
+export default SideHeader

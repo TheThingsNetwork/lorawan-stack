@@ -12,58 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React, { useContext } from 'react'
 
 import SectionLabel from '@ttn-lw/components/section-label'
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 
-import getCookie from '../utils'
+import SideBarContext from '../context'
 
 const AppListSideNavigation = () => {
-/*   // To be removed
-  const cookie = [
-    JSON.stringify({
-      path: '/applications/parking-lot-occupancy',
-      entity: 'application',
-      title: 'Parking Lot Occupancy',
-      tag: 'general',
-    }),
-    JSON.stringify({
-      path: '/applications/parking-lot-occupancy',
-      entity: 'application',
-      title: 'Parking Lot Occupancy',
-      tag: 'application',
-    }),
-    JSON.stringify({
-      path: '/applications/parking-lot-occupancy',
-      entity: 'gateway',
-      title: 'Parking Lot Occupancy',
-      tag: 'gateway',
-    }),
-    JSON.stringify({
-      path: '/applications/parking-lot-occupancy',
-      entity: 'device',
-      title: 'Parking Lot Occupancy',
-      tag: 'device',
-    }),
-    JSON.stringify({
-      path: '/applications/parking-lot-occupancy',
-      entity: 'device',
-      title: 'Parking Lot Occupancy',
-      tag: 'general',
-    }),
-  ].join('_')
-
-  useEffect(() => {
-    document.cookie = `topEntities=${cookie};expires=1365094617464;domain=localhost;SameSite=None`
-  }, [cookie])
-  // End of To be removed */
-
-  const topEntitiesCookie = getCookie('topEntities')
-    .split('_')
-    .map(cookie => JSON.parse(cookie))
-
-  const topEntities = topEntitiesCookie.filter(cookie => cookie.tag === 'application')
+  const { topEntities } = useContext(SideBarContext)
 
   return (
     <div>

@@ -58,7 +58,6 @@ const DropdownItem = ({
   showActive,
   tabIndex,
   external,
-  hasSubmenu,
   submenuItems,
   ...rest
 }) => {
@@ -121,7 +120,7 @@ const DropdownItem = ({
 
   return (
     <li className={style.dropdownItem} key={title.id || title} {...rest}>
-      {hasSubmenu && Boolean(submenuItems) ? withSubmenu : ItemElement}
+      {Boolean(submenuItems) ? withSubmenu : ItemElement}
     </li>
   )
 }
@@ -134,6 +133,7 @@ DropdownItem.propTypes = {
   icon: PropTypes.string,
   path: PropTypes.string,
   showActive: PropTypes.bool,
+  submenuItems: PropTypes.arrayOf(PropTypes.node),
   tabIndex: PropTypes.string,
   title: PropTypes.message.isRequired,
 }
@@ -147,6 +147,7 @@ DropdownItem.defaultProps = {
   path: undefined,
   showActive: true,
   tabIndex: '0',
+  submenuItems: undefined,
 }
 
 const DropdownHeaderItem = ({ title }) => (

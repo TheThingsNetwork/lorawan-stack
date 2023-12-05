@@ -16,7 +16,7 @@ import React from 'react'
 
 import SideNavigationItem from './item'
 
-import { SideNavigation } from '.'
+import SideNavigation from '.'
 
 export default {
   title: 'Navigation v2',
