@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -145,6 +145,9 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
           if (isUnauthenticatedError(error)) {
             // The user is no longer authenticated; reinitiate the auth flow
             // by refreshing the page.
+            // NOTE: As a result of the WebSocket refactor, the error shape is
+            // now very unspecific and authentication errors like before are
+            // not thrown anymore. This should be addressed eventually.
             window.location.reload()
           } else {
             dispatch(startEventsFailure(id, error))
@@ -174,21 +177,16 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         allow(action)
       },
       process: ({ action }, dispatch, done) => {
-        if (channel) {
-          try {
-            channel.close()
-          } catch (error) {
-            if (isNetworkError(error) || isTimeoutError(action.payload)) {
-              // Set the connection status to `checking` to trigger connection checks
-              // and detect possible offline state.
-              dispatch(setStatusChecking())
+        if (action.error) {
+          if (action.error?.message === 'timeout') {
+            // Set the connection status to `checking` to trigger connection checks
+            // and detect possible offline state.
+            dispatch(setStatusChecking())
 
-              // In case of a network error, the connection could not be closed
-              // since the network connection is disrupted. We can regard this
-              // as equivalent to a closed connection.
-              return done()
-            }
-            throw error
+            // In case of a network error, the connection could not be closed
+            // since the network connection is disrupted. We can regard this
+            // as equivalent to a closed connection.
+            return done()
           }
         }
         done()
@@ -245,6 +243,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       type: SET_CONNECTION_STATUS,
       process: ({ getState, action }, dispatch, done) => {
         const isOnline = action.payload.onlineStatus === ONLINE_STATUS.ONLINE
+        const isOffline = action.payload.onlineStatus === ONLINE_STATUS.OFFLINE
 
         if (isOnline) {
           const state = getState()
@@ -268,6 +267,8 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
               dispatch(dispatch(startEvents(ids)))
             }
           }
+        } else if (isOffline) {
+          // If the app went offline, close the event stream.
         }
 
         done()
