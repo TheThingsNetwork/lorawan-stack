@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import classnames from 'classnames'
 import { NavLink } from 'react-router-dom'
 
@@ -25,15 +25,49 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './dropdown.styl'
 
-const Dropdown = React.forwardRef(({ className, children, larger, onItemsClick }, ref) => (
-  <ul
-    onClick={onItemsClick}
-    className={classnames(style.dropdown, className, { [style.larger]: larger })}
-    ref={ref}
-  >
-    {children}
-  </ul>
-))
+const Dropdown = ({ className, children, larger, onItemsClick }) => {
+  const ref = useRef(null)
+  const [isBelow, setIsBelow] = useState(false)
+  const [isOnRight, setIsOnRight] = useState(false)
+
+  useEffect(() => {
+    const positionDropdown = () => {
+      if (ref.current) {
+        const parentRect = ref.current.parentElement.getBoundingClientRect()
+        const spaceBelow = window.innerHeight - parentRect.bottom
+        const spaceAbove = parentRect.top
+        const spaceLeft = parentRect.left
+        const spaceRight = window.innerWidth - parentRect.right
+
+        setIsBelow(spaceBelow > ref.current.clientHeight || spaceAbove < ref.current.clientHeight)
+
+        setIsOnRight(spaceRight < spaceLeft)
+      }
+    }
+
+    positionDropdown()
+    window.addEventListener('resize', positionDropdown)
+
+    return () => {
+      window.removeEventListener('resize', positionDropdown)
+    }
+  }, [])
+  return (
+    <ul
+      onClick={onItemsClick}
+      className={classnames(style.dropdown, className, {
+        [style.larger]: larger,
+        [style.below]: isBelow,
+        [style.above]: !isBelow,
+        [style.right]: !isOnRight,
+        [style.left]: isOnRight,
+      })}
+      ref={ref}
+    >
+      {children}
+    </ul>
+  )
+}
 
 Dropdown.propTypes = {
   children: PropTypes.node.isRequired,
