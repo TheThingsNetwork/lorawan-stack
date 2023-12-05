@@ -12,19 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useContext } from 'react'
 
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SectionLabel from '@ttn-lw/components/section-label'
 
-import getCookie from '../utils'
+import SideBarContext from '../context'
 
 const GeneralSideNavigation = () => {
-  const topEntitiesCookie = getCookie('topEntities')
-    .split('_')
-    .map(cookie => JSON.parse(cookie))
-
-  const topEntities = topEntitiesCookie.filter(cookie => cookie.tag === 'general')
+  const { topEntities } = useContext(SideBarContext)
 
   return (
     <div>

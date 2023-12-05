@@ -26,7 +26,7 @@ const SideBarNavigation = () => {
   const { layer } = React.useContext(SideBarContext)
 
   return (
-    <div className="mt-cs-m fs-s">
+    <div className="mt-cs-xs">
       {(layer === '/' || layer === '/console') && <GeneralSideNavigation />}
       {layer.includes('/applications/') && <AppSideNavigation />}
       {layer.includes('/applications') && <AppListSideNavigation />}
