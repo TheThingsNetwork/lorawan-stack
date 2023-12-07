@@ -30,6 +30,13 @@ const SidebarNavigation = () => {
 
   const showAppSideNavigation = layer.includes('/applications/') && !layer.includes('/devices/')
 
+  const showGeneralSideNavigation =
+    (layer === '/' || layer === '/console') &&
+    !layer.includes('/applications/') &&
+    !layer.includes('/gateways/')
+
+  const showAppSideNavigation = layer.includes('/applications/') && !layer.includes('/devices/')
+
   return (
     <div>
       {showGeneralSideNavigation && <GeneralSideNavigation />}
