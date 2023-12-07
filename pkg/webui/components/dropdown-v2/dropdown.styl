@@ -54,9 +54,8 @@ ul.dropdown
         padding: $cs.l
 
   hr
-    margin-top: 0
-    height: .1rem
-    background-color: $c-divider
+    height: 1px
+    background-color: $c['grey-200']
 
   li.dropdown-header-item
     display: block
@@ -102,6 +101,8 @@ ul.dropdown
 
       &:hover
         color: $tc-deep-gray
+        background: $c.tts-primary-150
+        transition: background 0.2s ease
 
         .icon
           color: $tc-deep-gray
