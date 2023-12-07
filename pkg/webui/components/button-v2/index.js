@@ -121,7 +121,7 @@ const Button = forwardRef((props, ref) => {
       else document.removeEventListener('mousedown', handleClickOutside)
       return newState
     })
-  }, [])
+  }, [handleClickOutside])
 
   const handleClick = useCallback(
     evt => {

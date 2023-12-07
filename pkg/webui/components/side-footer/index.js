@@ -18,6 +18,8 @@ import classNames from 'classnames'
 import Button from '@ttn-lw/components/button-v2'
 import Dropdown from '@ttn-lw/components/dropdown-v2'
 
+import SideBarContext from '@ttn-lw/containers/side-bar/context'
+
 import { LanguageContext } from '@ttn-lw/lib/components/with-locale'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -40,6 +42,7 @@ LanguageOption.propTypes = {
 }
 
 const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) => {
+  const { isMinimized } = useContext(SideBarContext)
   const ref = useRef(null)
 
   const clusterDropdownItems = (
@@ -99,22 +102,24 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
       <Button
         className={style.sideFooterButton}
         secondary
-        message={`v${process.env.VERSION} (${process.env.REVISION})`}
+        message={!isMinimized ? `v${process.env.VERSION} (${process.env.REVISION})` : undefined}
         icon="support"
         dropdownItems={supportDropdownItems}
         dropdownClassName={style.sideFooterHoverDropdown}
         isHoverDropdown
         ref={ref}
       />
-      <Button
-        secondary
-        withDropdown
-        icon="public"
-        message="EU1"
-        dropdownItems={clusterDropdownItems}
-        dropdownClassName={style.sideFooterDropdown}
-        ref={ref}
-      />
+      {!isMinimized && (
+        <Button
+          secondary
+          withDropdown
+          icon="public"
+          message="EU1"
+          dropdownItems={clusterDropdownItems}
+          dropdownClassName={style.sideFooterDropdown}
+          ref={ref}
+        />
+      )}
     </div>
   )
 }

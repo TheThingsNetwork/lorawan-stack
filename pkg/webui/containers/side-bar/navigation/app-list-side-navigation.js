@@ -20,16 +20,21 @@ import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SideBarContext from '../context'
 
 const AppListSideNavigation = () => {
-  const { topEntities } = useContext(SideBarContext)
+  const { topEntities, isMinimized } = useContext(SideBarContext)
 
   return (
     <div>
-      <SectionLabel label="Top entities" icon="add" />
-      <SideNavigation>
-        {topEntities.map(({ path, entity, title }) => (
-          <SideNavigation.Item title={title} path={path} icon={entity} key={path} />
-        ))}
-      </SideNavigation>
+      {!isMinimized && (
+        <>
+          <SectionLabel label="Top entities" icon="add" />
+
+          <SideNavigation>
+            {topEntities.map(({ path, entity, title }) => (
+              <SideNavigation.Item title={title} path={path} icon={entity} key={path} />
+            ))}
+          </SideNavigation>
+        </>
+      )}
     </div>
   )
 }

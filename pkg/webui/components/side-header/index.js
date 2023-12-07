@@ -12,18 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useContext } from 'react'
+import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
 
+import SideBarContext from '@ttn-lw/containers/side-bar/context'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const SideHeader = ({ logo }) => (
-  <div className="d-flex j-between">
-    <img {...logo} className="w-50" />
-    <Button icon="left_panel_close" naked />
-  </div>
-)
+const SideHeader = ({ logo }) => {
+  const { onMinimizeToggle, isMinimized } = useContext(SideBarContext)
+
+  return (
+    <div
+      className={classnames('d-flex', 'j-between', {
+        'direction-column': isMinimized,
+        'gap-cs-xs': isMinimized,
+      })}
+    >
+      <img {...logo} className={classnames({ 'w-50': !isMinimized })} />
+      <Button icon="left_panel_close" naked onClick={onMinimizeToggle} />
+    </div>
+  )
+}
 
 SideHeader.propTypes = {
   logo: PropTypes.shape({

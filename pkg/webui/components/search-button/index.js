@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useContext } from 'react'
 import classNames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
@@ -24,20 +24,32 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './search-button.styl'
+import SideBarContext from '@ttn-lw/containers/side-bar/context'
 
 const SearchButton = ({ onClick, className }) => {
+  const { isMinimized } = useContext(SideBarContext)
+
   const handleClick = useCallback(() => {
     onClick()
   }, [onClick])
+
   return (
-    <Button onClick={handleClick} secondary className={classNames(style.searchButton, className)}>
+    <Button
+      onClick={handleClick}
+      secondary
+      className={classNames(style.searchButton, className, {
+        [style.searchButtonMinimized]: isMinimized,
+      })}
+    >
       <div className="d-flex gap-cs-xxs">
         <Icon icon="search" className={style.icon} />
-        <Message content={sharedMessages.search} component="p" className="m-0" />
+        {!isMinimized && <Message content={sharedMessages.search} component="p" className="m-0" />}
       </div>
-      <div className={style.backslashContainer}>
-        <Message content="/" component="p" className={style.backslash} />
-      </div>
+      {!isMinimized && (
+        <div className={style.backslashContainer}>
+          <Message content="/" component="p" className={style.backslash} />
+        </div>
+      )}
     </Button>
   )
 }
