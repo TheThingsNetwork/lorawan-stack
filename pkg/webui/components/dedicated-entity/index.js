@@ -21,12 +21,22 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import Icon from '../icon'
+
 import style from './dedicated-entity.styl'
 
-const DedicatedEntity = ({ label, icon, className, onClick, 'data-test-id': dataTestId }) => (
+const DedicatedEntity = ({
+  label,
+  icon,
+  className,
+  onClick,
+  'data-test-id': dataTestId,
+  entityIcon,
+}) => (
   <div className={classnames(className, style.dedicatedEntity)} data-test-id={dataTestId}>
     <Button className={style.button} primary grey icon={icon} onClick={onClick} />
     <hr className={style.divider} />
+    {entityIcon ? <Icon icon={entityIcon} /> : null}
     <Message content={label} className={style.label} component="p" />
   </div>
 )
@@ -34,6 +44,7 @@ const DedicatedEntity = ({ label, icon, className, onClick, 'data-test-id': data
 DedicatedEntity.propTypes = {
   className: PropTypes.string,
   'data-test-id': PropTypes.string,
+  entityIcon: PropTypes.string,
   icon: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   onClick: PropTypes.func,
@@ -43,6 +54,7 @@ DedicatedEntity.defaultProps = {
   onClick: () => null,
   className: undefined,
   'data-test-id': 'dedicated-entity',
+  entityIcon: undefined,
 }
 
 export default DedicatedEntity

@@ -19,7 +19,7 @@ import Switcher from '@ttn-lw/components/navigation/side-v2/switcher'
 import SideBarContext from '@ttn-lw/containers/side-bar/context'
 
 const SwitcherContainer = () => {
-  const { layer, setLayer } = useContext(SideBarContext)
+  const { layer, setLayer, isMinimized } = useContext(SideBarContext)
 
   const handleClick = useCallback(
     evt => {
@@ -28,7 +28,7 @@ const SwitcherContainer = () => {
     [setLayer],
   )
 
-  return <Switcher layer={layer} onClick={handleClick} />
+  return <Switcher layer={layer} isMinimized={isMinimized} onClick={handleClick} />
 }
 
 export default SwitcherContainer

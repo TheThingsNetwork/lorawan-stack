@@ -16,6 +16,8 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import classNames from 'classnames'
 
+import Icon from '@ttn-lw/components/icon'
+
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -23,7 +25,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './switcher.styl'
 
-const Switcher = ({ layer, onClick }) => {
+const Switcher = ({ layer, onClick, isMinimized }) => {
   const overviewClassName = classNames(
     style.link,
     { [style.active]: layer === '/' || layer === '/console' },
@@ -53,24 +55,33 @@ const Switcher = ({ layer, onClick }) => {
         'j-center',
         'gap-cs-xxs',
         'p-cs-xxs',
+        { 'direction-column': isMinimized },
       )}
     >
       <NavLink to="/" onClick={onClick} className={overviewClassName}>
-        <Message content={sharedMessages.overview} />
+        {isMinimized ? <Icon icon="home" /> : null}
+        {!isMinimized ? <Message content={sharedMessages.overview} /> : null}
       </NavLink>
       <NavLink to="/applications" onClick={onClick} className={applicationsClassName}>
-        <Message content={sharedMessages.applications} />
+        {isMinimized ? <Icon icon="application" /> : null}
+        {!isMinimized ? <Message content={sharedMessages.applications} /> : null}
       </NavLink>
       <NavLink to="/gateways" onClick={onClick} className={gatewaysClassName}>
-        <Message content={sharedMessages.gateways} />
+        {isMinimized ? <Icon icon="gateway" /> : null}
+        {!isMinimized ? <Message content={sharedMessages.gateways} /> : null}
       </NavLink>
     </div>
   )
 }
 
 Switcher.propTypes = {
+  isMinimized: PropTypes.bool,
   layer: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
+}
+
+Switcher.defaultProps = {
+  isMinimized: false,
 }
 
 export default Switcher

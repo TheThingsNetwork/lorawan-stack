@@ -20,21 +20,25 @@ import SectionLabel from '@ttn-lw/components/section-label'
 import SideBarContext from '../context'
 
 const GeneralSideNavigation = () => {
-  const { topEntities } = useContext(SideBarContext)
+  const { topEntities, isMinimized } = useContext(SideBarContext)
 
   return (
     <div>
-      <SideNavigation>
+      <SideNavigation className="mt-cs-xs">
         <SideNavigation.Item title="Dashboard" path="/" icon="overview" exact />
         <SideNavigation.Item title="Organizations" path="/organizations" icon="group" />
-        <SideNavigation.Item title="Notifications" path="/notifications" icon="notifications" />
+        <SideNavigation.Item title="Notifications" path="/notifications" icon="inbox" />
         <SideNavigation.Item title="Personal API keys" path="/user/api-keys" icon="key" />
         <SideNavigation.Item title="Network Operations Center" path="/noc" icon="ssid_chart" />
         <SideNavigation.Item title="Admin panel" path="/admin-panel" icon="admin_panel_settings" />
-        <SectionLabel label="Top entities" icon="add" className="mt-cs-m" />
-        {topEntities.map(({ path, title, entity }) => (
-          <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
-        ))}
+        {!isMinimized && (
+          <>
+            <SectionLabel label="Top entities" icon="add" className="mt-cs-m" />
+            {topEntities.map(({ path, title, entity }) => (
+              <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
+            ))}
+          </>
+        )}
       </SideNavigation>
     </div>
   )

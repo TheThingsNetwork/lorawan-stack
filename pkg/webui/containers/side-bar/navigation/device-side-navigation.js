@@ -20,31 +20,43 @@ import DedicatedEntity from '@ttn-lw/components/dedicated-entity'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
+import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 import SideBarContext from '../context'
 
-const GtwSideNavigation = () => {
-  const gtw = useSelector(selectSelectedGateway)
-  const gtwId = useSelector(selectSelectedGatewayId)
+const DeviceSideNavigation = () => {
+  const device = useSelector(selectSelectedDevice)
+  const deviceId = useSelector(selectSelectedDeviceId)
   const { isMinimized } = useContext(SideBarContext)
 
-  const entityId = gtw ? gtw.name ?? gtwId : gtwId
+  const entityId = device ? device.name ?? deviceId : deviceId
 
   return (
     <SideNavigation>
       {!isMinimized && (
-        <DedicatedEntity label={entityId} icon="arrow_left_alt" className="mt-cs-xs mb-cs-m" />
+        <DedicatedEntity
+          label={entityId}
+          entityIcon="device"
+          icon="arrow_left_alt"
+          className="mt-cs-xs mb-cs-m"
+        />
       )}
-      <SideNavigation.Item title={'Gateway overview'} path="" icon="gateway" exact />
-      <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="list_alt" />
+      <SideNavigation.Item title={'End device overview'} path="" icon="grid_view" exact />
+      <SideNavigation.Item title={sharedMessages.liveData} path="/data" icon="list_alt" />
+      <SideNavigation.Item title={'Messaging'} path="messaging" icon="swap_vert" />
       <SideNavigation.Item title={sharedMessages.location} path="location" icon="map" />
-      <SideNavigation.Item
-        title={sharedMessages.collaborators}
-        path="collaborators"
-        icon="organization"
-      />
-      <SideNavigation.Item title={sharedMessages.apiKeys} path="api-keys" icon="api_keys" />
+{/*       <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="developer_mode">
+        <SideNavigation.Item
+          title={sharedMessages.uplink}
+          path="payload-formatters/uplink"
+          icon="uplink"
+        />
+        <SideNavigation.Item
+          title={sharedMessages.downlink}
+          path="payload-formatters/downlink"
+          icon="downlink"
+        />
+      </SideNavigation.Item> */}
       <SideNavigation.Item
         title={sharedMessages.generalSettings}
         path="general-settings"
@@ -54,4 +66,4 @@ const GtwSideNavigation = () => {
   )
 }
 
-export default GtwSideNavigation
+export default DeviceSideNavigation

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
@@ -20,31 +20,30 @@ import DedicatedEntity from '@ttn-lw/components/dedicated-entity'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-import { selectSelectedDeviceId } from '@console/store/selectors/devices'
+import {
+  selectSelectedApplication,
+  selectSelectedApplicationId,
+} from '@console/store/selectors/applications'
 
 import SideBarContext from '../context'
 
 const AppSideNavigation = () => {
-  const { layer } = React.useContext(SideBarContext)
+  const app = useSelector(selectSelectedApplication)
   const appId = useSelector(selectSelectedApplicationId)
-  const deviceId = useSelector(selectSelectedDeviceId)
+  const { isMinimized } = useContext(SideBarContext)
 
-  const entityId = React.useMemo(() => {
-    if (layer.includes('/devices/')) {
-      return deviceId
-    }
-
-    return appId
-  }, [appId, deviceId, layer])
+  const entityId = app ? app.name ?? appId : appId
 
   return (
     <SideNavigation>
-      <DedicatedEntity label={entityId} icon="arrow_left_alt" />
-      <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
-      <SideNavigation.Item title={sharedMessages.devices} path="devices" icon="devices" />
-      <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="data" />
-      <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="code">
+      {!isMinimized && (
+        <DedicatedEntity label={entityId} icon="arrow_left_alt" className="mt-cs-xs mb-cs-m" />
+      )}
+      <SideNavigation.Item title={'Application overview'} path="" icon="group" exact />
+      <SideNavigation.Item title={sharedMessages.devices} path="/devices" icon="device" />
+      <SideNavigation.Item title={sharedMessages.liveData} path="/data" icon="list_alt" />
+      <SideNavigation.Item title={'Network Information Center'} path="/noc" icon="ssid_chart" />
+{/*       <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="developer_mode">
         <SideNavigation.Item
           title={sharedMessages.uplink}
           path="payload-formatters/uplink"
@@ -55,8 +54,8 @@ const AppSideNavigation = () => {
           path="payload-formatters/downlink"
           icon="downlink"
         />
-      </SideNavigation.Item>
-      <SideNavigation.Item title={sharedMessages.integrations} icon="integration">
+      </SideNavigation.Item> */}
+{/*       <SideNavigation.Item title={sharedMessages.integrations} icon="integration">
         <SideNavigation.Item
           title={sharedMessages.mqtt}
           path="integrations/mqtt"
@@ -77,7 +76,7 @@ const AppSideNavigation = () => {
           path="integrations/lora-cloud"
           icon="extension"
         />
-      </SideNavigation.Item>
+      </SideNavigation.Item> */}
       <SideNavigation.Item
         title={sharedMessages.collaborators}
         path="collaborators"

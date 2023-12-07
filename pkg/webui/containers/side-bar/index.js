@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import classNames from 'classnames'
 
@@ -29,7 +29,12 @@ import style from './side-bar.styl'
 
 const SideBar = () => {
   const { pathname } = useLocation()
-  const [layer, setLayer] = React.useState(pathname ?? '/')
+  const [layer, setLayer] = useState(pathname ?? '/')
+  const [isMinimized, setIsMinimized] = useState(false)
+
+  const onMinimizeToggle = useCallback(async () => {
+    setIsMinimized(prev => !prev)
+  }, [])
 
   const topEntitiesCookie = getCookie('topEntities')
     ? getCookie('topEntities')
@@ -43,16 +48,20 @@ const SideBar = () => {
     <div
       className={classNames(
         style.sidebar,
-        'd-flex pos-fixed align-center direction-column gap-cs-s p-cs-s bg-tts-primary-050',
+        'd-flex pos-fixed align-center direction-column gap-cs-s bg-tts-primary-050',
+        { [style.sidebarMinimized]: isMinimized, 'p-cs-s': !isMinimized, 'p-cs-xs': isMinimized },
       )}
+      id="sidebar-v2"
     >
-      <SideHeader />
-      <SideBarContext.Provider value={{ layer, setLayer, topEntities }}>
+      <SideBarContext.Provider
+        value={{ layer, setLayer, topEntities, onMinimizeToggle, isMinimized }}
+      >
+        <SideHeader />
         <SwitcherContainer />
         <SearchButton />
         <SideBarNavigation />
+        <SideFooter />
       </SideBarContext.Provider>
-      <SideFooter />
     </div>
   )
 }

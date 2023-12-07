@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { NavLink } from 'react-router-dom'
 import classNames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
+
+import SideBarContext from '@ttn-lw/containers/side-bar/context'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -25,15 +27,22 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './side-menu-link.styl'
 
 const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
+  const { isMinimized } = useContext(SideBarContext)
+
   const className = useCallback(
     ({ isActive }) =>
-      classNames(style.link, { [style.active]: isActive, [style.disabled]: disabled }),
-    [disabled],
+      classNames(style.link, {
+        [style.active]: isActive,
+        [style.disabled]: disabled,
+        'j-center': isMinimized,
+      }),
+    [disabled, isMinimized],
   )
 
   return (
     <NavLink to={path} className={className} end={exact} onClick={onClick}>
-      {icon && <Icon icon={icon} className={classNames(style.icon)} />} <Message content={title} />
+      {icon && <Icon icon={icon} className={classNames(style.icon)} />}{' '}
+      {!isMinimized && <Message content={title} />}
     </NavLink>
   )
 }
