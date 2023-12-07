@@ -514,7 +514,7 @@
   "console.containers.freq-plans-select.utils.none": "Do not set a frequency plan",
   "console.containers.freq-plans-select.utils.selectFrequencyPlan": "Select a frequency plan...",
   "console.containers.freq-plans-select.utils.addFrequencyPlan": "Add frequency plan",
-  "console.containers.freq-plans-select.utils.frequencyPlanDescription": "Note: most gateways use a single frequency plan. Some 16 and 64 channel gateways however allow setting multiple. Furthermore, setting frequency plans from different brands is not supported.",
+  "console.containers.freq-plans-select.utils.frequencyPlanDescription": "Note: most gateways use a single frequency plan. Some 16 and 64 channel gateways however allow setting multiple within the same band.",
   "console.containers.gateway-connection.index.lastSeenAvailableTooltip": "The elapsed time since the network registered the last activity of this gateway. This is determined from received uplinks, or sent status messages of this gateway.",
   "console.containers.gateway-connection.index.disconnectedTooltip": "The gateway has currently no TCP connection established with the Gateway Server. For (rare) UDP based gateways, this can also mean that the gateway initiated no pull/push data request within the last 30 seconds.",
   "console.containers.gateway-connection.index.connectedTooltip": "This gateway is connected to the Gateway Server but the network has not registered any activity (sent uplinks or status messages) from it yet.",

@@ -159,7 +159,12 @@ describe('Gateway create', () => {
       .first()
       .selectOption(gateway.frequency_plan)
     cy.findByRole('button', { name: /Add frequency plan/ }).click()
-    cy.findByText('Frequency plan').parent().parent().find('input').eq(2).selectOption('US_902_928')
+    cy.findByText('Frequency plan')
+      .parent()
+      .parent()
+      .find('input')
+      .eq(2)
+      .selectOption('EU_863_870_TTN')
     cy.findByRole('button', { name: 'Register gateway' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')

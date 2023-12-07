@@ -22,5 +22,5 @@ export const m = defineMessages({
   selectFrequencyPlan: 'Select a frequency plan...',
   addFrequencyPlan: 'Add frequency plan',
   frequencyPlanDescription:
-    'Note: most gateways use a single frequency plan. Some 16 and 64 channel gateways however allow setting multiple. Furthermore, setting frequency plans from different brands is not supported.',
+    'Note: most gateways use a single frequency plan. Some 16 and 64 channel gateways however allow setting multiple within the same band.',
 })
