@@ -12498,8 +12498,8 @@
                   "description": "End device identifiers of the relay.",
                   "title": "End device identifiers of the relay."
                 },
-                "configuration": {
-                  "$ref": "#/definitions/v3RelayConfiguration",
+                "settings": {
+                  "$ref": "#/definitions/v3RelaySettings",
                   "description": "Relay configuration."
                 }
               }
@@ -12702,8 +12702,8 @@
                   "description": "End device identifiers of the relay.",
                   "title": "End device identifiers of the relay."
                 },
-                "configuration": {
-                  "$ref": "#/definitions/v3RelayConfiguration",
+                "settings": {
+                  "$ref": "#/definitions/v3RelaySettings",
                   "description": "Relay configuration."
                 },
                 "field_mask": {
@@ -12856,8 +12856,8 @@
                   "format": "int64",
                   "description": "Index of the uplink forwarding rule."
                 },
-                "uplink_forwarding_rule": {
-                  "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+                "rule": {
+                  "$ref": "#/definitions/v3RelayUplinkForwardingRule",
                   "description": "Uplink forwarding rule."
                 }
               }
@@ -13084,8 +13084,8 @@
                   "description": "End device identifiers of the relay.",
                   "title": "End device identifiers of the relay."
                 },
-                "uplink_forwarding_rule": {
-                  "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+                "rule": {
+                  "$ref": "#/definitions/v3RelayUplinkForwardingRule",
                   "description": "Uplink forwarding rule."
                 },
                 "field_mask": {
@@ -19992,58 +19992,6 @@
       "default": "ENABLED",
       "description": " - ENABLED: No restrictions are in place.\n - WARNING: Warnings are being emitted that the provider will be deprecated in the future.\n - DISABLED: New integrations cannot be set up, and old ones do not start."
     },
-    "RelayConfigurationServed": {
-      "type": "object",
-      "properties": {
-        "always": {
-          "$ref": "#/definitions/v3RelayEndDeviceAlwaysMode",
-          "description": "The end device will always attempt to use the relay mode in order to send uplink messages."
-        },
-        "dynamic": {
-          "$ref": "#/definitions/v3RelayEndDeviceDynamicMode",
-          "description": "The end device will attempt to use relay mode only after a number of uplink messages have been sent without\nreceiving a valid a downlink message."
-        },
-        "end_device_controlled": {
-          "$ref": "#/definitions/v3RelayEndDeviceControlledMode",
-          "description": "The end device will control when it uses the relay mode. This is the default mode."
-        },
-        "backoff": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Number of uplinks to be sent without a wake on radio frame."
-        },
-        "second_channel": {
-          "$ref": "#/definitions/v3RelaySecondChannel",
-          "description": "Second wake on radio channel configuration."
-        },
-        "serving_device_id": {
-          "type": "string",
-          "description": "End device identifier of the serving end device."
-        }
-      }
-    },
-    "RelayConfigurationServing": {
-      "type": "object",
-      "properties": {
-        "second_channel": {
-          "$ref": "#/definitions/v3RelaySecondChannel",
-          "description": "Second wake on radio channel configuration."
-        },
-        "default_channel_index": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Index of the default wake on radio channel."
-        },
-        "cad_periodicity": {
-          "$ref": "#/definitions/v3RelayCADPeriodicity",
-          "description": "Channel activity detection periodicity."
-        },
-        "limits": {
-          "$ref": "#/definitions/v3ServingRelayForwardingLimits",
-          "description": "Configured forwarding limits.\nIf unset, the default value from Network Server configuration will be used."
-        }
-      }
-    },
     "TxAcknowledgmentResult": {
       "type": "string",
       "enum": [
@@ -22554,8 +22502,8 @@
     "v3CreateRelayResponse": {
       "type": "object",
       "properties": {
-        "configuration": {
-          "$ref": "#/definitions/v3RelayConfiguration",
+        "settings": {
+          "$ref": "#/definitions/v3RelaySettings",
           "description": "Relay configuration."
         }
       }
@@ -22563,8 +22511,8 @@
     "v3CreateRelayUplinkForwardingRuleResponse": {
       "type": "object",
       "properties": {
-        "uplink_forwarding_rule": {
-          "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+        "rule": {
+          "$ref": "#/definitions/v3RelayUplinkForwardingRule",
           "description": "Uplink forwarding rule."
         }
       }
@@ -24196,8 +24144,8 @@
     "v3GetRelayResponse": {
       "type": "object",
       "properties": {
-        "configuration": {
-          "$ref": "#/definitions/v3RelayConfiguration",
+        "settings": {
+          "$ref": "#/definitions/v3RelaySettings",
           "description": "Relay configuration."
         }
       }
@@ -24205,8 +24153,8 @@
     "v3GetRelayUplinkForwardingRuleResponse": {
       "type": "object",
       "properties": {
-        "uplink_forwarding_rule": {
-          "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+        "rule": {
+          "$ref": "#/definitions/v3RelayUplinkForwardingRule",
           "description": "Uplink forwarding rule."
         }
       }
@@ -24513,11 +24461,11 @@
     "v3ListRelayUplinkForwardingRulesResponse": {
       "type": "object",
       "properties": {
-        "uplink_forwarding_rules": {
+        "rules": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule"
+            "$ref": "#/definitions/v3RelayUplinkForwardingRule"
           },
           "description": "Uplink forwarding rules."
         }
@@ -25024,12 +24972,12 @@
           "description": "Whether or not downlink messages should be scheduled.\nThis option can be used in order to disable any downlink interaction with the end device. It will affect all types\nof downlink messages: data and MAC downlinks, and join accepts."
         },
         "relay": {
-          "$ref": "#/definitions/lorawanv3RelayParameters",
-          "description": "The relay parameters the end device is using.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+          "$ref": "#/definitions/v3RelaySettings",
+          "description": "The relay settings the end device is using.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "desired_relay": {
-          "$ref": "#/definitions/lorawanv3RelayParameters",
-          "description": "The relay parameters the Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+          "$ref": "#/definitions/v3RelaySettings",
+          "description": "The relay settings the Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         }
       }
     },
@@ -26299,35 +26247,6 @@
       "default": "RELAY_CAD_PERIODICITY_1_SECOND",
       "title": "- RELAY_CAD_PERIODICITY_20_MILLISECONDS: sic"
     },
-    "v3RelayConfiguration": {
-      "type": "object",
-      "properties": {
-        "serving": {
-          "$ref": "#/definitions/RelayConfigurationServing"
-        },
-        "served": {
-          "$ref": "#/definitions/RelayConfigurationServed"
-        }
-      }
-    },
-    "v3RelayConfigurationUplinkForwardingRule": {
-      "type": "object",
-      "properties": {
-        "limits": {
-          "$ref": "#/definitions/v3RelayUplinkForwardLimits",
-          "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply."
-        },
-        "last_w_f_cnt": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Last wake on radio frame counter used by the served end device."
-        },
-        "device_id": {
-          "type": "string",
-          "description": "End device identifier of the served end device."
-        }
-      }
-    },
     "v3RelayCtrlUplinkListAction": {
       "type": "string",
       "enum": [
@@ -26425,6 +26344,18 @@
           "description": "The frequency (Hz) used by the wake on radio message."
         }
       }
+    },
+    "v3RelaySettings": {
+      "type": "object",
+      "properties": {
+        "serving": {
+          "$ref": "#/definitions/v3ServingRelaySettings"
+        },
+        "served": {
+          "$ref": "#/definitions/v3ServedRelaySettings"
+        }
+      },
+      "description": "RelaySettings represent the settings of a relay.\nThis is used internally by the Network Server."
     },
     "v3RelaySmartEnableLevel": {
       "type": "string",
@@ -26677,7 +26608,37 @@
         "backoff": {
           "type": "integer",
           "format": "int64",
-          "description": "Number of uplinks to be sent without a wake on radio frame."
+          "description": "Number of wake on radio frames to be sent without an acknowledgement before sending the uplink message directly."
+        },
+        "second_channel": {
+          "$ref": "#/definitions/v3RelaySecondChannel",
+          "description": "Second wake on radio channel configuration."
+        },
+        "serving_device_id": {
+          "type": "string",
+          "description": "End device identifier of the serving end device."
+        }
+      }
+    },
+    "v3ServedRelaySettings": {
+      "type": "object",
+      "properties": {
+        "always": {
+          "$ref": "#/definitions/v3RelayEndDeviceAlwaysMode",
+          "description": "The end device will always attempt to use the relay mode in order to send uplink messages."
+        },
+        "dynamic": {
+          "$ref": "#/definitions/v3RelayEndDeviceDynamicMode",
+          "description": "The end device will attempt to use relay mode only after a number of uplink messages have been sent without\nreceiving a valid a downlink message."
+        },
+        "end_device_controlled": {
+          "$ref": "#/definitions/v3RelayEndDeviceControlledMode",
+          "description": "The end device will control when it uses the relay mode. This is the default mode."
+        },
+        "backoff": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of wake on radio frames to be sent without an acknowledgement before sending the uplink message directly.\nIf unset, the default value from Network Server configuration will be used."
         },
         "second_channel": {
           "$ref": "#/definitions/v3RelaySecondChannel",
@@ -26725,6 +26686,36 @@
           "type": "integer",
           "format": "int64",
           "description": "Index of the default wake on radio channel."
+        },
+        "cad_periodicity": {
+          "$ref": "#/definitions/v3RelayCADPeriodicity",
+          "description": "Channel activity detection periodicity."
+        },
+        "uplink_forwarding_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3RelayUplinkForwardingRule"
+          },
+          "description": "Configured uplink forwarding rules."
+        },
+        "limits": {
+          "$ref": "#/definitions/v3ServingRelayForwardingLimits",
+          "description": "Configured forwarding limits.\nIf unset, the default value from Network Server configuration will be used."
+        }
+      }
+    },
+    "v3ServingRelaySettings": {
+      "type": "object",
+      "properties": {
+        "second_channel": {
+          "$ref": "#/definitions/v3RelaySecondChannel",
+          "description": "Second wake on radio channel configuration."
+        },
+        "default_channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the default wake on radio channel.\nIf unset, the default value from Network Server configuration will be used."
         },
         "cad_periodicity": {
           "$ref": "#/definitions/v3RelayCADPeriodicity",
@@ -26980,8 +26971,8 @@
     "v3UpdateRelayResponse": {
       "type": "object",
       "properties": {
-        "configuration": {
-          "$ref": "#/definitions/v3RelayConfiguration",
+        "settings": {
+          "$ref": "#/definitions/v3RelaySettings",
           "description": "Relay configuration."
         }
       }
@@ -26989,8 +26980,8 @@
     "v3UpdateRelayUplinkForwardingRuleResponse": {
       "type": "object",
       "properties": {
-        "uplink_forwarding_rule": {
-          "$ref": "#/definitions/v3RelayConfigurationUplinkForwardingRule",
+        "rule": {
+          "$ref": "#/definitions/v3RelayUplinkForwardingRule",
           "description": "Uplink forwarding rule."
         }
       }

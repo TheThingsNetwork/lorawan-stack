@@ -5735,7 +5735,8 @@
         "mode.serving.second_channel",
         "mode.serving.second_channel.ack_offset",
         "mode.serving.second_channel.data_rate_index",
-        "mode.serving.second_channel.frequency"
+        "mode.serving.second_channel.frequency",
+        "mode.serving.uplink_forwarding_rules"
       ]
     },
     "UpdateRelay": {
@@ -5785,7 +5786,8 @@
         "mode.serving.second_channel",
         "mode.serving.second_channel.ack_offset",
         "mode.serving.second_channel.data_rate_index",
-        "mode.serving.second_channel.frequency"
+        "mode.serving.second_channel.frequency",
+        "mode.serving.uplink_forwarding_rules"
       ]
     },
     "DeleteRelay": {
@@ -5833,7 +5835,8 @@
         "last_w_f_cnt",
         "limits",
         "limits.bucket_size",
-        "limits.reload_rate"
+        "limits.reload_rate",
+        "session_key_id"
       ]
     },
     "ListRelayUplinkForwardingRules": {
@@ -5853,7 +5856,8 @@
         "last_w_f_cnt",
         "limits",
         "limits.bucket_size",
-        "limits.reload_rate"
+        "limits.reload_rate",
+        "session_key_id"
       ]
     },
     "UpdateRelayUplinkForwardingRule": {
@@ -5875,7 +5879,8 @@
         "last_w_f_cnt",
         "limits",
         "limits.bucket_size",
-        "limits.reload_rate"
+        "limits.reload_rate",
+        "session_key_id"
       ]
     },
     "DeleteRelayUplinkForwardingRule": {

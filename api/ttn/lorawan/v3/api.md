@@ -276,11 +276,14 @@
   - [Message `MACState.UplinkMessage.RxMetadata.RelayMetadata`](#ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata)
   - [Message `MACState.UplinkMessage.TxSettings`](#ttn.lorawan.v3.MACState.UplinkMessage.TxSettings)
   - [Message `RelayParameters`](#ttn.lorawan.v3.RelayParameters)
+  - [Message `RelaySettings`](#ttn.lorawan.v3.RelaySettings)
   - [Message `RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule)
   - [Message `ResetAndGetEndDeviceRequest`](#ttn.lorawan.v3.ResetAndGetEndDeviceRequest)
   - [Message `ServedRelayParameters`](#ttn.lorawan.v3.ServedRelayParameters)
+  - [Message `ServedRelaySettings`](#ttn.lorawan.v3.ServedRelaySettings)
   - [Message `ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits)
   - [Message `ServingRelayParameters`](#ttn.lorawan.v3.ServingRelayParameters)
+  - [Message `ServingRelaySettings`](#ttn.lorawan.v3.ServingRelaySettings)
   - [Message `Session`](#ttn.lorawan.v3.Session)
   - [Message `SetEndDeviceRequest`](#ttn.lorawan.v3.SetEndDeviceRequest)
   - [Message `UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest)
@@ -607,10 +610,6 @@
   - [Message `GetRelayUplinkForwardingRuleResponse`](#ttn.lorawan.v3.GetRelayUplinkForwardingRuleResponse)
   - [Message `ListRelayUplinkForwardingRulesRequest`](#ttn.lorawan.v3.ListRelayUplinkForwardingRulesRequest)
   - [Message `ListRelayUplinkForwardingRulesResponse`](#ttn.lorawan.v3.ListRelayUplinkForwardingRulesResponse)
-  - [Message `RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration)
-  - [Message `RelayConfiguration.Served`](#ttn.lorawan.v3.RelayConfiguration.Served)
-  - [Message `RelayConfiguration.Serving`](#ttn.lorawan.v3.RelayConfiguration.Serving)
-  - [Message `RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule)
   - [Message `UpdateRelayRequest`](#ttn.lorawan.v3.UpdateRelayRequest)
   - [Message `UpdateRelayResponse`](#ttn.lorawan.v3.UpdateRelayResponse)
   - [Message `UpdateRelayUplinkForwardingRuleRequest`](#ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleRequest)
@@ -4151,8 +4150,8 @@ This is used internally by the Network Server.
 | `downlink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether downlink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `adr` | [`ADRSettings`](#ttn.lorawan.v3.ADRSettings) |  | Adaptive Data Rate settings. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `schedule_downlinks` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether or not downlink messages should be scheduled. This option can be used in order to disable any downlink interaction with the end device. It will affect all types of downlink messages: data and MAC downlinks, and join accepts. |
-| `relay` | [`RelayParameters`](#ttn.lorawan.v3.RelayParameters) |  | The relay parameters the end device is using. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
-| `desired_relay` | [`RelayParameters`](#ttn.lorawan.v3.RelayParameters) |  | The relay parameters the Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `relay` | [`RelaySettings`](#ttn.lorawan.v3.RelaySettings) |  | The relay settings the end device is using. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `desired_relay` | [`RelaySettings`](#ttn.lorawan.v3.RelaySettings) |  | The relay settings the Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 
 #### Field Rules
 
@@ -4397,6 +4396,16 @@ This is used internally by the Network Server.
 | `serving` | [`ServingRelayParameters`](#ttn.lorawan.v3.ServingRelayParameters) |  | Parameters related to a relay which is serving end devices. |
 | `served` | [`ServedRelayParameters`](#ttn.lorawan.v3.ServedRelayParameters) |  | Parameters related to an end device served by a relay. |
 
+### <a name="ttn.lorawan.v3.RelaySettings">Message `RelaySettings`</a>
+
+RelaySettings represent the settings of a relay.
+This is used internally by the Network Server.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `serving` | [`ServingRelaySettings`](#ttn.lorawan.v3.ServingRelaySettings) |  |  |
+| `served` | [`ServedRelaySettings`](#ttn.lorawan.v3.ServedRelaySettings) |  |  |
+
 ### <a name="ttn.lorawan.v3.RelayUplinkForwardingRule">Message `RelayUplinkForwardingRule`</a>
 
 | Field | Type | Label | Description |
@@ -4432,7 +4441,25 @@ This is used internally by the Network Server.
 | `always` | [`RelayEndDeviceAlwaysMode`](#ttn.lorawan.v3.RelayEndDeviceAlwaysMode) |  | The end device will always attempt to use the relay mode in order to send uplink messages. |
 | `dynamic` | [`RelayEndDeviceDynamicMode`](#ttn.lorawan.v3.RelayEndDeviceDynamicMode) |  | The end device will attempt to use relay mode only after a number of uplink messages have been sent without receiving a valid a downlink message. |
 | `end_device_controlled` | [`RelayEndDeviceControlledMode`](#ttn.lorawan.v3.RelayEndDeviceControlledMode) |  | The end device will control when it uses the relay mode. This is the default mode. |
-| `backoff` | [`uint32`](#uint32) |  | Number of uplinks to be sent without a wake on radio frame. |
+| `backoff` | [`uint32`](#uint32) |  | Number of wake on radio frames to be sent without an acknowledgement before sending the uplink message directly. |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
+| `serving_device_id` | [`string`](#string) |  | End device identifier of the serving end device. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `backoff` | <p>`uint32.lte`: `63`</p> |
+| `serving_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.ServedRelaySettings">Message `ServedRelaySettings`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `always` | [`RelayEndDeviceAlwaysMode`](#ttn.lorawan.v3.RelayEndDeviceAlwaysMode) |  | The end device will always attempt to use the relay mode in order to send uplink messages. |
+| `dynamic` | [`RelayEndDeviceDynamicMode`](#ttn.lorawan.v3.RelayEndDeviceDynamicMode) |  | The end device will attempt to use relay mode only after a number of uplink messages have been sent without receiving a valid a downlink message. |
+| `end_device_controlled` | [`RelayEndDeviceControlledMode`](#ttn.lorawan.v3.RelayEndDeviceControlledMode) |  | The end device will control when it uses the relay mode. This is the default mode. |
+| `backoff` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Number of wake on radio frames to be sent without an acknowledgement before sending the uplink message directly. If unset, the default value from Network Server configuration will be used. |
 | `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
 | `serving_device_id` | [`string`](#string) |  | End device identifier of the serving end device. |
 
@@ -4459,6 +4486,24 @@ This is used internally by the Network Server.
 | ----- | ---- | ----- | ----------- |
 | `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
 | `default_channel_index` | [`uint32`](#uint32) |  | Index of the default wake on radio channel. |
+| `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  | Channel activity detection periodicity. |
+| `uplink_forwarding_rules` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) | repeated | Configured uplink forwarding rules. |
+| `limits` | [`ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits) |  | Configured forwarding limits. If unset, the default value from Network Server configuration will be used. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `default_channel_index` | <p>`uint32.lte`: `255`</p> |
+| `cad_periodicity` | <p>`enum.defined_only`: `true`</p> |
+| `uplink_forwarding_rules` | <p>`repeated.max_items`: `16`</p> |
+
+### <a name="ttn.lorawan.v3.ServingRelaySettings">Message `ServingRelaySettings`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
+| `default_channel_index` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Index of the default wake on radio channel. If unset, the default value from Network Server configuration will be used. |
 | `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  | Channel activity detection periodicity. |
 | `uplink_forwarding_rules` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) | repeated | Configured uplink forwarding rules. |
 | `limits` | [`ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits) |  | Configured forwarding limits. If unset, the default value from Network Server configuration will be used. |
@@ -8532,20 +8577,20 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
-| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+| `settings` | [`RelaySettings`](#ttn.lorawan.v3.RelaySettings) |  | Relay configuration. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `end_device_ids` | <p>`message.required`: `true`</p> |
-| `configuration` | <p>`message.required`: `true`</p> |
+| `settings` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateRelayResponse">Message `CreateRelayResponse`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+| `settings` | [`RelaySettings`](#ttn.lorawan.v3.RelaySettings) |  | Relay configuration. |
 
 ### <a name="ttn.lorawan.v3.CreateRelayUplinkForwardingRuleRequest">Message `CreateRelayUplinkForwardingRuleRequest`</a>
 
@@ -8553,7 +8598,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ---- | ----- | ----------- |
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
 | `index` | [`uint32`](#uint32) |  | Index of the uplink forwarding rule. |
-| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+| `rule` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) |  | Uplink forwarding rule. |
 
 #### Field Rules
 
@@ -8561,13 +8606,13 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ----------- |
 | `end_device_ids` | <p>`message.required`: `true`</p> |
 | `index` | <p>`uint32.lte`: `15`</p> |
-| `uplink_forwarding_rule` | <p>`message.required`: `true`</p> |
+| `rule` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateRelayUplinkForwardingRuleResponse">Message `CreateRelayUplinkForwardingRuleResponse`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+| `rule` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) |  | Uplink forwarding rule. |
 
 ### <a name="ttn.lorawan.v3.DeleteRelayRequest">Message `DeleteRelayRequest`</a>
 
@@ -8616,7 +8661,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+| `settings` | [`RelaySettings`](#ttn.lorawan.v3.RelaySettings) |  | Relay configuration. |
 
 ### <a name="ttn.lorawan.v3.GetRelayUplinkForwardingRuleRequest">Message `GetRelayUplinkForwardingRuleRequest`</a>
 
@@ -8637,7 +8682,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+| `rule` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) |  | Uplink forwarding rule. |
 
 ### <a name="ttn.lorawan.v3.ListRelayUplinkForwardingRulesRequest">Message `ListRelayUplinkForwardingRulesRequest`</a>
 
@@ -8656,69 +8701,14 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `uplink_forwarding_rules` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) | repeated | Uplink forwarding rules. |
-
-### <a name="ttn.lorawan.v3.RelayConfiguration">Message `RelayConfiguration`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `serving` | [`RelayConfiguration.Serving`](#ttn.lorawan.v3.RelayConfiguration.Serving) |  |  |
-| `served` | [`RelayConfiguration.Served`](#ttn.lorawan.v3.RelayConfiguration.Served) |  |  |
-
-### <a name="ttn.lorawan.v3.RelayConfiguration.Served">Message `RelayConfiguration.Served`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `always` | [`RelayEndDeviceAlwaysMode`](#ttn.lorawan.v3.RelayEndDeviceAlwaysMode) |  | The end device will always attempt to use the relay mode in order to send uplink messages. |
-| `dynamic` | [`RelayEndDeviceDynamicMode`](#ttn.lorawan.v3.RelayEndDeviceDynamicMode) |  | The end device will attempt to use relay mode only after a number of uplink messages have been sent without receiving a valid a downlink message. |
-| `end_device_controlled` | [`RelayEndDeviceControlledMode`](#ttn.lorawan.v3.RelayEndDeviceControlledMode) |  | The end device will control when it uses the relay mode. This is the default mode. |
-| `backoff` | [`uint32`](#uint32) |  | Number of uplinks to be sent without a wake on radio frame. |
-| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
-| `serving_device_id` | [`string`](#string) |  | End device identifier of the serving end device. |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `backoff` | <p>`uint32.lte`: `63`</p> |
-| `serving_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-
-### <a name="ttn.lorawan.v3.RelayConfiguration.Serving">Message `RelayConfiguration.Serving`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `second_channel` | [`RelaySecondChannel`](#ttn.lorawan.v3.RelaySecondChannel) |  | Second wake on radio channel configuration. |
-| `default_channel_index` | [`uint32`](#uint32) |  | Index of the default wake on radio channel. |
-| `cad_periodicity` | [`RelayCADPeriodicity`](#ttn.lorawan.v3.RelayCADPeriodicity) |  | Channel activity detection periodicity. |
-| `limits` | [`ServingRelayForwardingLimits`](#ttn.lorawan.v3.ServingRelayForwardingLimits) |  | Configured forwarding limits. If unset, the default value from Network Server configuration will be used. |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `default_channel_index` | <p>`uint32.lte`: `255`</p> |
-| `cad_periodicity` | <p>`enum.defined_only`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule">Message `RelayConfigurationUplinkForwardingRule`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `limits` | [`RelayUplinkForwardLimits`](#ttn.lorawan.v3.RelayUplinkForwardLimits) |  | Bucket configuration for the served end device. If unset, no individual limits will apply to the end device, but the relay global limitations will apply. |
-| `last_w_f_cnt` | [`uint32`](#uint32) |  | Last wake on radio frame counter used by the served end device. |
-| `device_id` | [`string`](#string) |  | End device identifier of the served end device. |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `rules` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) | repeated | Uplink forwarding rules. |
 
 ### <a name="ttn.lorawan.v3.UpdateRelayRequest">Message `UpdateRelayRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
-| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+| `settings` | [`RelaySettings`](#ttn.lorawan.v3.RelaySettings) |  | Relay configuration. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask of the fields to update. |
 
 #### Field Rules
@@ -8726,13 +8716,13 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `end_device_ids` | <p>`message.required`: `true`</p> |
-| `configuration` | <p>`message.required`: `true`</p> |
+| `settings` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.UpdateRelayResponse">Message `UpdateRelayResponse`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `configuration` | [`RelayConfiguration`](#ttn.lorawan.v3.RelayConfiguration) |  | Relay configuration. |
+| `settings` | [`RelaySettings`](#ttn.lorawan.v3.RelaySettings) |  | Relay configuration. |
 
 ### <a name="ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleRequest">Message `UpdateRelayUplinkForwardingRuleRequest`</a>
 
@@ -8740,7 +8730,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ---- | ----- | ----------- |
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | End device identifiers of the relay. |
 | `index` | [`uint32`](#uint32) |  | Index of the uplink forwarding rule. |
-| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+| `rule` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) |  | Uplink forwarding rule. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | Field mask of the fields to update. |
 
 #### Field Rules
@@ -8749,13 +8739,13 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ----------- |
 | `end_device_ids` | <p>`message.required`: `true`</p> |
 | `index` | <p>`uint32.lte`: `15`</p> |
-| `uplink_forwarding_rule` | <p>`message.required`: `true`</p> |
+| `rule` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.UpdateRelayUplinkForwardingRuleResponse">Message `UpdateRelayUplinkForwardingRuleResponse`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `uplink_forwarding_rule` | [`RelayConfigurationUplinkForwardingRule`](#ttn.lorawan.v3.RelayConfigurationUplinkForwardingRule) |  | Uplink forwarding rule. |
+| `rule` | [`RelayUplinkForwardingRule`](#ttn.lorawan.v3.RelayUplinkForwardingRule) |  | Uplink forwarding rule. |
 
 ### <a name="ttn.lorawan.v3.NsRelayConfigurationService">Service `NsRelayConfigurationService`</a>
 

@@ -171,7 +171,7 @@ message ServedRelayParameters {
     // The end device will control when it uses the relay mode. This is the default mode.
     RelayEndDeviceControlledMode end_device_controlled = 3;
   }
-  // Number of uplinks to be sent without a wake on radio frame.
+  // Number of wake on radio frames to be sent without an acknowledgement before sending the uplink message directly.
   uint32 backoff = 4 [(validate.rules).uint32.lte = 63];
   // Second wake on radio channel configuration.
   RelaySecondChannel second_channel = 5;
@@ -199,6 +199,75 @@ message RelayParameters {
     ServingRelayParameters serving = 25;
     // Parameters related to an end device served by a relay.
     ServedRelayParameters served = 26;
+  }
+}
+
+message ServingRelaySettings {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  // Second wake on radio channel configuration.
+  RelaySecondChannel second_channel = 1;
+  reserved 2; // DEPRECATED: default_channel_index (uint32)
+  // Index of the default wake on radio channel.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt32Value default_channel_index = 6 [(validate.rules).uint32.lte = 255];
+  // Channel activity detection periodicity.
+  RelayCADPeriodicity cad_periodicity = 3 [(validate.rules).enum.defined_only = true];
+  // Configured uplink forwarding rules.
+  repeated RelayUplinkForwardingRule uplink_forwarding_rules = 4 [(validate.rules).repeated.max_items = 16];
+  // Configured forwarding limits.
+  // If unset, the default value from Network Server configuration will be used.
+  ServingRelayForwardingLimits limits = 5;
+}
+
+message ServedRelaySettings {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+
+  oneof mode {
+    option (validate.required) = true;
+
+    // The end device will always attempt to use the relay mode in order to send uplink messages.
+    RelayEndDeviceAlwaysMode always = 1;
+    // The end device will attempt to use relay mode only after a number of uplink messages have been sent without
+    // receiving a valid a downlink message.
+    RelayEndDeviceDynamicMode dynamic = 2;
+    // The end device will control when it uses the relay mode. This is the default mode.
+    RelayEndDeviceControlledMode end_device_controlled = 3;
+  }
+  reserved 4; // DEPRECATED: backoff (uint32)
+  // Number of wake on radio frames to be sent without an acknowledgement before sending the uplink message directly.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt32Value backoff = 7 [(validate.rules).uint32.lte = 63];
+  // Second wake on radio channel configuration.
+  RelaySecondChannel second_channel = 5;
+
+  // End device identifier of the serving end device.
+  string serving_device_id = 6 [(validate.rules).string = {
+    pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
+    max_len: 36
+  }];
+}
+
+// RelaySettings represent the settings of a relay.
+// This is used internally by the Network Server.
+message RelaySettings {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true,
+    semantical: true
+  };
+
+  oneof mode {
+    option (validate.required) = true;
+
+    ServingRelaySettings serving = 1;
+    ServedRelaySettings served = 2;
   }
 }
 
@@ -561,13 +630,13 @@ message MACSettings {
   // of downlink messages: data and MAC downlinks, and join accepts.
   BoolValue schedule_downlinks = 35;
 
-  // The relay parameters the end device is using.
+  // The relay settings the end device is using.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
-  RelayParameters relay = 36;
+  RelaySettings relay = 36;
 
-  // The relay parameters the Network Server should configure device to use via MAC commands.
+  // The relay settings the Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
-  RelayParameters desired_relay = 37;
+  RelaySettings desired_relay = 37;
 }
 
 // MACState represents the state of MAC layer of the device.

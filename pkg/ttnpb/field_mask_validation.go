@@ -1503,27 +1503,27 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 
 	// Relays:
 	"/ttn.lorawan.v3.NsRelayConfigurationService/GetRelay": {
-		All:     RelayConfigurationFieldPathsNested,
-		Allowed: RelayConfigurationFieldPathsNested,
+		All:     RelaySettingsFieldPathsNested,
+		Allowed: RelaySettingsFieldPathsNested,
 	},
 	"/ttn.lorawan.v3.NsRelayConfigurationService/UpdateRelay": {
-		All:     RelayConfigurationFieldPathsNested,
-		Allowed: RelayConfigurationFieldPathsNested,
+		All:     RelaySettingsFieldPathsNested,
+		Allowed: RelaySettingsFieldPathsNested,
 		Set:     true,
 	},
 
 	// Relay Uplink Forwarding Rules:
 	"/ttn.lorawan.v3.NsRelayConfigurationService/GetRelayUplinkForwardingRule": {
-		All:     RelayConfigurationUplinkForwardingRuleFieldPathsNested,
-		Allowed: RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+		All:     RelayUplinkForwardingRuleFieldPathsNested,
+		Allowed: RelayUplinkForwardingRuleFieldPathsNested,
 	},
 	"/ttn.lorawan.v3.NsRelayConfigurationService/ListRelayUplinkForwardingRules": {
-		All:     RelayConfigurationUplinkForwardingRuleFieldPathsNested,
-		Allowed: RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+		All:     RelayUplinkForwardingRuleFieldPathsNested,
+		Allowed: RelayUplinkForwardingRuleFieldPathsNested,
 	},
 	"/ttn.lorawan.v3.NsRelayConfigurationService/UpdateRelayUplinkForwardingRule": {
-		All:     RelayConfigurationUplinkForwardingRuleFieldPathsNested,
-		Allowed: RelayConfigurationUplinkForwardingRuleFieldPathsNested,
+		All:     RelayUplinkForwardingRuleFieldPathsNested,
+		Allowed: RelayUplinkForwardingRuleFieldPathsNested,
 		Set:     true,
 	},
 

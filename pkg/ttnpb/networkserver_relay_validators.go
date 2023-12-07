@@ -21,7 +21,7 @@ func (req *UpdateRelayRequest) ValidateContext(context.Context) error {
 	if len(req.FieldMask.GetPaths()) == 0 {
 		return req.ValidateFields()
 	}
-	return req.ValidateFields(append(FieldsWithPrefix("configuration", req.FieldMask.GetPaths()...),
+	return req.ValidateFields(append(FieldsWithPrefix("settings", req.FieldMask.GetPaths()...),
 		"end_device_ids.application_ids",
 		"end_device_ids.device_id",
 	)...)
@@ -32,7 +32,7 @@ func (req *UpdateRelayUplinkForwardingRuleRequest) ValidateContext(context.Conte
 	if len(req.FieldMask.GetPaths()) == 0 {
 		return req.ValidateFields()
 	}
-	return req.ValidateFields(append(FieldsWithPrefix("uplink_forwarding_rule", req.FieldMask.GetPaths()...),
+	return req.ValidateFields(append(FieldsWithPrefix("rule", req.FieldMask.GetPaths()...),
 		"end_device_ids.application_ids",
 		"end_device_ids.device_id",
 		"index",
