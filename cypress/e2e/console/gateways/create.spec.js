@@ -174,7 +174,7 @@ describe('Gateway create', () => {
     )
     cy.findByRole('heading', { name: `eui-${gateway.eui}` })
     cy.findByText('Frequency plan')
-    cy.findByText('EU_863_870 , US_902_928_FSB_1').should('be.visible')
+    cy.findByText('EU_863_870 , EU_863_870_TTN').should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
   })
 
