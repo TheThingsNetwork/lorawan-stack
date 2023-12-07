@@ -1660,11 +1660,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if field, validate := hasSetField("mac_settings.desired_relay.mode.serving.default_channel_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					if dev.GetMacSettings().GetDesiredRelay().GetServing() == nil {
+					chIdx := dev.GetMacSettings().GetDesiredRelay().GetServing().GetDefaultChannelIndex()
+					if chIdx == nil {
 						return nil
 					}
-					chIdx := dev.MacSettings.DesiredRelay.GetServing().DefaultChannelIndex
-					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+					if chIdx.Value >= uint32(len(phy.Relay.WORChannels)) {
 						return newInvalidFieldValueError(field)
 					}
 					return nil
@@ -1878,11 +1878,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if field, validate := hasSetField("mac_settings.relay.mode.serving.default_channel_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					if dev.GetMacSettings().GetRelay().GetServing() == nil {
+					chIdx := dev.GetMacSettings().GetRelay().GetServing().GetDefaultChannelIndex()
+					if chIdx == nil {
 						return nil
 					}
-					chIdx := dev.MacSettings.Relay.GetServing().DefaultChannelIndex
-					if chIdx >= uint32(len(phy.Relay.WORChannels)) {
+					if chIdx.Value >= uint32(len(phy.Relay.WORChannels)) {
 						return newInvalidFieldValueError(field)
 					}
 					return nil
