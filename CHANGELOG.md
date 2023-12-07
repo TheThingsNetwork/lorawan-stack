@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Rate limiting classes for individual HTTP paths.
 - Rate limiting keys for HTTP endpoints now contain the caller API key ID when available. The caller IP is still available as a fallback.
+- Allow users to set multiple frequency plans only in the same band in the Console.
 
 ### Changed
 

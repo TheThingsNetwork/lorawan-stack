@@ -159,7 +159,12 @@ describe('Gateway create', () => {
       .first()
       .selectOption(gateway.frequency_plan)
     cy.findByRole('button', { name: /Add frequency plan/ }).click()
-    cy.findByText('Frequency plan').parent().parent().find('input').eq(2).selectOption('US_902_928')
+    cy.findByText('Frequency plan')
+      .parent()
+      .parent()
+      .find('input')
+      .eq(2)
+      .selectOption('EU_863_870_TTN')
     cy.findByRole('button', { name: 'Register gateway' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
@@ -169,7 +174,7 @@ describe('Gateway create', () => {
     )
     cy.findByRole('heading', { name: `eui-${gateway.eui}` })
     cy.findByText('Frequency plan')
-    cy.findByText('EU_863_870 , US_902_928_FSB_1').should('be.visible')
+    cy.findByText('EU_863_870 , EU_863_870_TTN').should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
   })
 

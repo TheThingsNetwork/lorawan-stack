@@ -294,7 +294,7 @@ describe('Gateway general settings', () => {
   })
 
   it('succeeds editing multiple frequency plans', () => {
-    const newFrequencyPlan = 'Asia 920-923 MHz'
+    const newFrequencyPlan = 'Europe 863-870 MHz, 6 channels for roaming (Draft)'
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(
       `${Cypress.config('consoleRootPath')}/gateways/${gateway2.ids.gateway_id}/general-settings`,
