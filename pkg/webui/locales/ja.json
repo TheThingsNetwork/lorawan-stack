@@ -2370,6 +2370,7 @@
   "error:pkg/networkserver:relay_already_exists": "",
   "error:pkg/networkserver:relay_full_f_cnt": "",
   "error:pkg/networkserver:relay_m_type": "",
+  "error:pkg/networkserver:relay_manage_uplink_forwarding_rules": "",
   "error:pkg/networkserver:relay_not_found": "",
   "error:pkg/networkserver:relay_not_served": "",
   "error:pkg/networkserver:relay_not_serving": "",

@@ -20,7 +20,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/proto"
 )
@@ -31,13 +32,16 @@ var (
 	errRelayAlreadyExists = errors.DefineAlreadyExists("relay_already_exists", "relay already exists")
 	errRelayNotFound      = errors.DefineNotFound("relay_not_found", "relay not found")
 	errRelayNotServed     = errors.DefineUnavailable("relay_not_served", "relay not served")
-	errRelayNotServing    = errors.DefineUnavailable("relay_not_serving", "relay not serving")
 
 	errRelayUplinkForwardingRuleAlreadyExists = errors.DefineAlreadyExists(
 		"relay_uplink_forwarding_rule_already_exists", "relay uplink forwarding rule already exists",
 	)
 	errRelayUplinkForwardingRuleNotFound = errors.DefineNotFound(
 		"relay_uplink_forwarding_rule_not_found", "relay uplink forwarding rule not found",
+	)
+
+	errRelayManageUplinkForwardingRules = errors.DefineInvalidArgument(
+		"relay_manage_uplink_forwarding_rules", "relay uplink forwarding rules must be managed by dedicated RPCs",
 	)
 )
 
@@ -56,6 +60,9 @@ func (s *nsRelayConfigurationService) CreateRelay(
 		ctx, req.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 	); err != nil {
 		return nil, err
+	}
+	if req.Settings.GetServing().GetUplinkForwardingRules() != nil {
+		return nil, errRelayManageUplinkForwardingRules.New()
 	}
 	fps, err := s.frequencyPlans(ctx)
 	if err != nil {
@@ -79,15 +86,15 @@ func (s *nsRelayConfigurationService) CreateRelay(
 			if dev.MacSettings.GetDesiredRelay() != nil {
 				return nil, nil, errRelayAlreadyExists.New()
 			}
-			phy, err := DeviceBand(dev, fps)
+			phy, err := internal.DeviceBand(dev, fps)
 			if err != nil {
 				return nil, nil, err
 			}
-			parameters := relayParametersFromConfiguration(req.Configuration)
-			if err := validateRelayConfiguration(parameters, phy, "configuration"); err != nil {
+			if err := validateRelaySettings(req.Settings, phy, "settings"); err != nil {
 				return nil, nil, err
 			}
-			dev.MacSettings = &ttnpb.MACSettings{DesiredRelay: parameters}
+			dev.MacSettings = &ttnpb.MACSettings{DesiredRelay: req.Settings}
+			parameters := mac.RelayParametersFromRelaySettings(req.Settings, phy)
 			paths := []string{"mac_settings.desired_relay"}
 			for path, desiredParameters := range map[string]*ttnpb.MACParameters{
 				"mac_state.desired_parameters.relay":         dev.MacState.GetDesiredParameters(),
@@ -106,7 +113,7 @@ func (s *nsRelayConfigurationService) CreateRelay(
 		return nil, err
 	}
 	return &ttnpb.CreateRelayResponse{
-		Configuration: req.Configuration,
+		Settings: req.Settings,
 	}, nil
 }
 
@@ -133,7 +140,7 @@ func (s *nsRelayConfigurationService) GetRelay(
 		return nil, errRelayNotFound.New()
 	}
 	return &ttnpb.GetRelayResponse{
-		Configuration: relayConfigurationFromParameters(dev.MacSettings.DesiredRelay),
+		Settings: dev.MacSettings.DesiredRelay,
 	}, nil
 }
 
@@ -145,6 +152,10 @@ func (s *nsRelayConfigurationService) UpdateRelay(
 		ctx, req.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 	); err != nil {
 		return nil, err
+	}
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "mode.serving.uplink_forwarding_rules") &&
+		len(req.Settings.GetServing().GetUplinkForwardingRules()) != 0 {
+		return nil, errRelayManageUplinkForwardingRules.New()
 	}
 	fps, err := s.frequencyPlans(ctx)
 	if err != nil {
@@ -168,20 +179,19 @@ func (s *nsRelayConfigurationService) UpdateRelay(
 			if dev.MacSettings.GetDesiredRelay() == nil {
 				return nil, nil, errRelayNotFound.New()
 			}
-			phy, err := DeviceBand(dev, fps)
+			phy, err := internal.DeviceBand(dev, fps)
 			if err != nil {
 				return nil, nil, err
 			}
-			parameters := dev.MacSettings.DesiredRelay
-			if err := parameters.SetFields(
-				relayParametersFromConfiguration(req.Configuration), req.FieldMask.GetPaths()...,
-			); err != nil {
+			settings := dev.MacSettings.DesiredRelay
+			if err := settings.SetFields(req.Settings, req.FieldMask.GetPaths()...); err != nil {
 				return nil, nil, err
 			}
-			if err := validateRelayConfiguration(parameters, phy, "configuration"); err != nil {
+			if err := validateRelaySettings(settings, phy, "settings"); err != nil {
 				return nil, nil, err
 			}
-			dev.MacSettings.DesiredRelay = parameters
+			dev.MacSettings.DesiredRelay = settings
+			parameters := mac.RelayParametersFromRelaySettings(settings, phy)
 			paths := []string{"mac_settings.desired_relay"}
 			for path, desiredParameters := range map[string]*ttnpb.MACParameters{
 				"mac_state.desired_parameters.relay":         dev.MacState.GetDesiredParameters(),
@@ -200,7 +210,7 @@ func (s *nsRelayConfigurationService) UpdateRelay(
 		return nil, err
 	}
 	return &ttnpb.UpdateRelayResponse{
-		Configuration: req.Configuration,
+		Settings: req.Settings,
 	}, nil
 }
 
@@ -262,7 +272,7 @@ func (s *nsRelayConfigurationService) CreateRelayUplinkForwardingRule( // nolint
 	_, ctx, err := s.devices.SetByID(
 		ctx,
 		req.EndDeviceIds.ApplicationIds,
-		req.UplinkForwardingRule.DeviceId,
+		req.Rule.DeviceId,
 		[]string{
 			"mac_settings.desired_relay",
 			"mac_state.desired_parameters.relay",
@@ -293,19 +303,7 @@ func (s *nsRelayConfigurationService) CreateRelayUplinkForwardingRule( // nolint
 				served.ServingDeviceId = req.EndDeviceIds.DeviceId
 				paths = ttnpb.AddFields(paths, path)
 			}
-			var sessionKeyID []byte
-			for _, session := range []*ttnpb.Session{
-				dev.Session,
-				dev.PendingSession,
-			} {
-				if session.GetKeys() == nil {
-					continue
-				}
-				if len(session.Keys.SessionKeyId) == 0 {
-					continue
-				}
-				sessionKeyID = session.Keys.SessionKeyId
-			}
+			servedSessionKeyID := deviceSessionKeyID(dev)
 			if _, _, err := s.devices.SetByID(
 				ctx,
 				req.EndDeviceIds.ApplicationIds,
@@ -342,8 +340,8 @@ func (s *nsRelayConfigurationService) CreateRelayUplinkForwardingRule( // nolint
 							servingSettings.UplinkForwardingRules[i] = &ttnpb.RelayUplinkForwardingRule{}
 						}
 					}
-					rule := relayUplinkForwardingRuleFromConfiguration(req.UplinkForwardingRule)
-					rule.SessionKeyId = sessionKeyID
+					rule := req.Rule
+					rule.SessionKeyId = servedSessionKeyID
 					servingSettings.UplinkForwardingRules[req.Index] = rule
 					paths := []string{"mac_settings.desired_relay.mode.serving.uplink_forwarding_rules"}
 					for path, serving := range map[string]*ttnpb.ServingRelayParameters{
@@ -369,7 +367,7 @@ func (s *nsRelayConfigurationService) CreateRelayUplinkForwardingRule( // nolint
 		return nil, err
 	}
 	return &ttnpb.CreateRelayUplinkForwardingRuleResponse{
-		UplinkForwardingRule: req.UplinkForwardingRule,
+		Rule: req.Rule,
 	}, nil
 }
 
@@ -408,7 +406,7 @@ func (s *nsRelayConfigurationService) GetRelayUplinkForwardingRule(
 		return nil, err
 	}
 	return &ttnpb.GetRelayUplinkForwardingRuleResponse{
-		UplinkForwardingRule: relayConfigurationUplinkForwardingRuleFromUplinkForwardingRule(rule),
+		Rule: rule,
 	}, nil
 }
 
@@ -438,12 +436,16 @@ func (s *nsRelayConfigurationService) ListRelayUplinkForwardingRules(
 	if servingSettings == nil {
 		return nil, errRelayNotServing.New()
 	}
-	rules := make([]*ttnpb.RelayConfigurationUplinkForwardingRule, 0, len(servingSettings.UplinkForwardingRules))
+	rules := make([]*ttnpb.RelayUplinkForwardingRule, 0, len(servingSettings.UplinkForwardingRules))
 	for _, rule := range servingSettings.UplinkForwardingRules {
-		rules = append(rules, relayConfigurationUplinkForwardingRuleFromUplinkForwardingRule(rule))
+		filtered := &ttnpb.RelayUplinkForwardingRule{}
+		if err := filtered.SetFields(rule, req.FieldMask.GetPaths()...); err != nil {
+			return nil, err
+		}
+		rules = append(rules, filtered)
 	}
 	return &ttnpb.ListRelayUplinkForwardingRulesResponse{
-		UplinkForwardingRules: rules,
+		Rules: rules,
 	}, nil
 }
 
@@ -456,7 +458,7 @@ func (s *nsRelayConfigurationService) UpdateRelayUplinkForwardingRule( // nolint
 	); err != nil {
 		return nil, err
 	}
-	updateServingDeviceID := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "serving_device_id")
+	updateServedDeviceID := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "device_id")
 	var servedSessionKeyID []byte
 	updateServingDevice := func(_ context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
@@ -473,18 +475,17 @@ func (s *nsRelayConfigurationService) UpdateRelayUplinkForwardingRule( // nolint
 			proto.Equal(servingSettings.UplinkForwardingRules[req.Index], emptyRelayUplinkForwardingRule) {
 			return nil, nil, errRelayUplinkForwardingRuleNotFound.New()
 		}
-		rule := servingSettings.UplinkForwardingRules[req.Index]
-		patch := relayUplinkForwardingRuleFromConfiguration(req.UplinkForwardingRule)
-		patchPaths := req.FieldMask.GetPaths()
-		if updateServingDeviceID {
-			patch.SessionKeyId = servedSessionKeyID
-			patchPaths = ttnpb.AddFields(patchPaths, "session_key_id")
+		paths := req.FieldMask.GetPaths()
+		if updateServedDeviceID {
+			req.Rule.SessionKeyId = servedSessionKeyID
+			paths = ttnpb.AddFields(paths, "session_key_id")
 		}
-		if err := rule.SetFields(patch, patchPaths...); err != nil {
+		rule := servingSettings.UplinkForwardingRules[req.Index]
+		if err := rule.SetFields(req.Rule, paths...); err != nil {
 			return nil, nil, err
 		}
 		servingSettings.UplinkForwardingRules[req.Index] = rule
-		paths := []string{"mac_settings.desired_relay.mode.serving.uplink_forwarding_rules"}
+		paths = []string{"mac_settings.desired_relay.mode.serving.uplink_forwarding_rules"}
 		for path, serving := range map[string]*ttnpb.ServingRelayParameters{
 			"mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules":         dev.MacState.GetDesiredParameters().GetRelay().GetServing(),        // nolint: lll
 			"pending_mac_state.desired_parameters.relay.mode.serving.uplink_forwarding_rules": dev.PendingMacState.GetDesiredParameters().GetRelay().GetServing(), // nolint: lll
@@ -498,11 +499,11 @@ func (s *nsRelayConfigurationService) UpdateRelayUplinkForwardingRule( // nolint
 		return dev, paths, nil
 	}
 	ctx, err := ctx, error(nil)
-	if updateServingDeviceID {
+	if updateServedDeviceID {
 		_, ctx, err = s.devices.SetByID(
 			ctx,
 			req.EndDeviceIds.ApplicationIds,
-			req.UplinkForwardingRule.DeviceId,
+			req.Rule.DeviceId,
 			[]string{
 				"mac_settings.desired_relay",
 				"mac_state.desired_parameters.relay",
@@ -533,18 +534,7 @@ func (s *nsRelayConfigurationService) UpdateRelayUplinkForwardingRule( // nolint
 					served.ServingDeviceId = req.EndDeviceIds.DeviceId
 					paths = ttnpb.AddFields(paths, path)
 				}
-				for _, session := range []*ttnpb.Session{
-					dev.Session,
-					dev.PendingSession,
-				} {
-					if session.GetKeys() == nil {
-						continue
-					}
-					if len(session.Keys.SessionKeyId) == 0 {
-						continue
-					}
-					servedSessionKeyID = session.Keys.SessionKeyId
-				}
+				servedSessionKeyID = deviceSessionKeyID(dev)
 				if _, _, err := s.devices.SetByID(
 					ctx,
 					req.EndDeviceIds.ApplicationIds,
@@ -579,7 +569,7 @@ func (s *nsRelayConfigurationService) UpdateRelayUplinkForwardingRule( // nolint
 		return nil, err
 	}
 	return &ttnpb.UpdateRelayUplinkForwardingRuleResponse{
-		UplinkForwardingRule: req.UplinkForwardingRule,
+		Rule: req.Rule,
 	}, nil
 }
 
@@ -636,4 +626,20 @@ func (s *nsRelayConfigurationService) DeleteRelayUplinkForwardingRule(
 		return nil, err
 	}
 	return &ttnpb.DeleteRelayUplinkForwardingRuleResponse{}, nil
+}
+
+func deviceSessionKeyID(dev *ttnpb.EndDevice) (sessionKeyID []byte) {
+	for _, session := range []*ttnpb.Session{
+		dev.GetSession(),
+		dev.GetPendingSession(),
+	} {
+		if session.GetKeys() == nil {
+			continue
+		}
+		if len(session.Keys.SessionKeyId) == 0 {
+			continue
+		}
+		sessionKeyID = session.Keys.SessionKeyId
+	}
+	return sessionKeyID
 }

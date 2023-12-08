@@ -7901,6 +7901,15 @@
       "file": "relay.go"
     }
   },
+  "error:pkg/networkserver:relay_manage_uplink_forwarding_rules": {
+    "translations": {
+      "en": "relay uplink forwarding rules must be managed by dedicated RPCs"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_relay.go"
+    }
+  },
   "error:pkg/networkserver:relay_not_found": {
     "translations": {
       "en": "relay not found"
@@ -7925,7 +7934,7 @@
     },
     "description": {
       "package": "pkg/networkserver",
-      "file": "grpc_relay.go"
+      "file": "relay.go"
     }
   },
   "error:pkg/networkserver:relay_recent_uplinks": {

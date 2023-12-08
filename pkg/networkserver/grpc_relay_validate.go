@@ -15,11 +15,11 @@
 package networkserver
 
 import (
-	"fmt"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func validateRelaySecondChannel(secondCh *ttnpb.RelaySecondChannel, phy *band.Band, path ...string) error {
@@ -42,7 +42,7 @@ func validateRelaySecondChannel(secondCh *ttnpb.RelaySecondChannel, phy *band.Ba
 	return nil
 }
 
-func validateRelayConfigurationServed(served *ttnpb.ServedRelayParameters, phy *band.Band, path ...string) error {
+func validateServedRelaySettings(served *ttnpb.ServedRelaySettings, phy *band.Band, path ...string) error {
 	if served == nil {
 		return nil
 	}
@@ -52,14 +52,17 @@ func validateRelayConfigurationServed(served *ttnpb.ServedRelayParameters, phy *
 	return nil
 }
 
-func validateDefaultChannelIndex(index uint32, phy *band.Band, path ...string) error {
-	if index >= uint32(len(phy.Relay.WORChannels)) {
+func validateDefaultChannelIndex(index *wrapperspb.UInt32Value, phy *band.Band, path ...string) error {
+	if index == nil {
+		return nil
+	}
+	if index.Value >= uint32(len(phy.Relay.WORChannels)) {
 		return newInvalidFieldValueError(strings.Join(append(path, "default_channel_index"), "."))
 	}
 	return nil
 }
 
-func validateRelayConfigurationServing(serving *ttnpb.ServingRelayParameters, phy *band.Band, path ...string) error {
+func validateServingRelaySettings(serving *ttnpb.ServingRelaySettings, phy *band.Band, path ...string) error {
 	if serving == nil {
 		return nil
 	}
@@ -74,18 +77,16 @@ func validateRelayConfigurationServing(serving *ttnpb.ServingRelayParameters, ph
 	return nil
 }
 
-func validateRelayConfiguration(conf *ttnpb.RelayParameters, phy *band.Band, path ...string) error {
+func validateRelaySettings(conf *ttnpb.RelaySettings, phy *band.Band, path ...string) error {
 	if conf == nil {
 		return nil
 	}
-	switch mode := conf.Mode.(type) {
-	case *ttnpb.RelayParameters_Served:
-		return validateRelayConfigurationServed(mode.Served, phy, append(path, "mode", "served")...)
-	case *ttnpb.RelayParameters_Serving:
-		return validateRelayConfigurationServing(mode.Serving, phy, append(path, "mode", "serving")...)
-	case nil:
-		return nil
+	switch {
+	case conf.GetServed() != nil:
+		return validateServedRelaySettings(conf.GetServed(), phy, append(path, "mode", "served")...)
+	case conf.GetServing() != nil:
+		return validateServingRelaySettings(conf.GetServing(), phy, append(path, "mode", "serving")...)
 	default:
-		panic(fmt.Sprintf("unknown mode %T", mode))
+		panic("unreachable")
 	}
 }
