@@ -185,7 +185,7 @@ CollapsableItem.defaultProps = {
 }
 
 const LinkItem = ({ onClick, title, icon, exact, path, onDropdownItemsClick }) => {
-  const handleLinkItemClick = React.useCallback(
+  const handleLinkItemClick = useCallback(
     event => {
       document.activeElement.blur()
       onClick(event)

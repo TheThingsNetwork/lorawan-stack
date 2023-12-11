@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
+
 import SideNavigationItem from './item'
 
 import SideNavigation from '.'
@@ -21,6 +23,11 @@ import SideNavigation from '.'
 export default {
   title: 'Navigation v2',
   component: SideNavigation,
+  decorators: [
+    storyFn => (
+      <SidebarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SidebarContext.Provider>
+    ),
+  ],
 }
 
 export const _SideNavigation = () => (

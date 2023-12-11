@@ -76,22 +76,6 @@
       &.disabled
         background-color: transparentify($c-error, #fff, .25)
 
-    &.grey
-      background-color: $c['grey-500']
-
-      &:not(.disabled)
-        &:hover
-          background-color: hoverize($c['grey-500'])
-
-        +focus-visible()
-          background-color: hoverize($c['grey-500'])
-
-        &:active
-          background-color: activize($c['grey-500'])
-
-      &.disabled
-        background-color: transparentify($c['grey-500'], #fff, .25)
-
   &.naked
     transition: background-color color $ad.s
     border: 1px solid transparent
@@ -118,8 +102,6 @@
 
     &.danger
       color: $tc-error
-    &.grey
-      color: $c['grey-500']
 
   &:not(.primary):not(.naked)
     border-dark()
