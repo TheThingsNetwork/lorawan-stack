@@ -69,16 +69,16 @@ const DeviceTitleSection = props => {
   const bottomBarLeft = (
     <>
       <Tooltip content={<Message content={m.uplinkDownlinkTooltip} />}>
-        <div className={style.messages}>
+        <div className="d-flex">
           <Content.MessagesCount
             icon="uplink"
             value={showUplinkCount ? uplinkFrameCount : notAvailableElem}
-            iconClassName={showUplinkCount ? style.messageIcon : style.notAvailable}
+            iconClassName={showUplinkCount ? 'c-active-blue' : 'tc-subtle-gray'}
           />
           <Content.MessagesCount
             icon="downlink"
             value={showDownlinkCount ? downlinkFrameCount : notAvailableElem}
-            iconClassName={showUplinkCount ? style.messageIcon : style.notAvailable}
+            iconClassName={showUplinkCount ? 'c-active-blue' : 'tc-subtle-gray'}
           />
         </div>
       </Tooltip>
@@ -118,7 +118,7 @@ const DeviceTitleSection = props => {
       iconAlt={sharedMessages.device}
     >
       <Content
-        className={style.content}
+        className="m-vert-ls-xxs m-sides-0"
         creationDate={device.created_at}
         fetching={fetching}
         bottomBarLeft={bottomBarLeft}

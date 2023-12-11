@@ -46,8 +46,8 @@ export default {
 }
 
 const SwictherExample = () => {
-  const [layer, setLayer] = React.useState('/')
-  const handleClick = React.useCallback(
+  const [layer, setLayer] = useState('/')
+  const handleClick = useCallback(
     evt => {
       setLayer(evt.target.getAttribute('href'))
     },

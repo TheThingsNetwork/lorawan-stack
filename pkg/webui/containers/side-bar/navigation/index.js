@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useContext } from 'react'
 
 import SidebarContext from '../context'
 
@@ -24,7 +24,7 @@ import GeneralSideNavigation from './general-side-navigation'
 import DeviceSideNavigation from './device-side-navigation'
 
 const SidebarNavigation = () => {
-  const { layer } = React.useContext(SidebarContext)
+  const { layer } = useContext(SidebarContext)
 
   const showGeneralSideNavigation = !layer.includes('/applications') && !layer.includes('/gateways')
 

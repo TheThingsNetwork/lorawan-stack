@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
@@ -33,7 +33,7 @@ const DedicatedEntity = ({
   'data-test-id': dataTestId,
   entityIcon,
 }) => {
-  const [hovered, setHovered] = React.useState(false)
+  const [hovered, setHovered] = useState(false)
   const onMouseEnter = useCallback(() => setHovered(true), [])
   const onMouseLeave = useCallback(() => setHovered(false), [])
 
