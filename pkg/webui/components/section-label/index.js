@@ -15,7 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Button from '@ttn-lw/components/button'
+import Button from '@ttn-lw/components/button-v2'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 

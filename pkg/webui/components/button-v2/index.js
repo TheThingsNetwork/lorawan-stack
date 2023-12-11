@@ -38,6 +38,7 @@ const assembleClassnames = ({
   primary,
   secondary,
   naked,
+  grey,
   icon,
   dropdownItems,
   className,
@@ -46,6 +47,7 @@ const assembleClassnames = ({
     [style.primary]: primary,
     [style.secondary]: secondary,
     [style.naked]: naked,
+    [style.grey]: grey,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
     [style.withDropdown]: Boolean(dropdownItems),
@@ -99,6 +101,8 @@ const Button = forwardRef((props, ref) => {
     onClick,
     form,
     isHoverDropdown,
+    onMouseEnter,
+    onMouseLeave,
     ...rest
   } = props
   const [expanded, setExpanded] = useState(false)
@@ -138,12 +142,14 @@ const Button = forwardRef((props, ref) => {
   )
 
   const handleMouseEnter = useCallback(() => {
-    setExpanded(true)
-  }, [setExpanded])
+    if (isHoverDropdown) setExpanded(true)
+    onMouseEnter()
+  }, [setExpanded, onMouseEnter, isHoverDropdown])
 
   const handleMouseLeave = useCallback(() => {
-    setExpanded(false)
-  }, [setExpanded])
+    if (isHoverDropdown) setExpanded(false)
+    onMouseLeave()
+  }, [setExpanded, onMouseLeave, isHoverDropdown])
 
   const intl = useIntl()
 
@@ -158,8 +164,8 @@ const Button = forwardRef((props, ref) => {
     <button
       className={buttonClassNames}
       onClick={isHoverDropdown ? null : handleClick}
-      onMouseEnter={isHoverDropdown ? handleMouseEnter : null}
-      onMouseLeave={isHoverDropdown ? handleMouseLeave : null}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       children={buttonChildren({ ...props, expanded, handleMouseEnter, handleMouseLeave })}
       ref={ref}
       {...htmlProps}
@@ -230,7 +236,14 @@ Button.propTypes = {
    * Not called if the button is in the `busy` or `disabled` state.
    */
   onClick: PropTypes.func,
+  onMouseEnter: PropTypes.func,
+  onMouseLeave: PropTypes.func,
   ...commonPropTypes,
+}
+
+Button.defaultProps = {
+  onMouseEnter: () => null,
+  onMouseLeave: () => null,
 }
 
 export default Button
