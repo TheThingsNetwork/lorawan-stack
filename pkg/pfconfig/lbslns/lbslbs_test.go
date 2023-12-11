@@ -271,7 +271,7 @@ func TestGetRouterConfig(t *testing.T) {
 			t.Parallel()
 
 			a, ctx := test.New(t)
-			fps := map[string]*frequencyplans.FrequencyPlan{tc.FrequencyPlanID: &tc.FrequencyPlan}
+			fps := []*frequencyplans.FrequencyPlan{&tc.FrequencyPlan}
 			cfg, err := GetRouterConfig(ctx, tc.FrequencyPlan.BandID, fps, tc.Features, time.Now(), 0)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
@@ -295,7 +295,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		BandID         string
-		FrequencyPlans map[string]*frequencyplans.FrequencyPlan
+		FrequencyPlans []*frequencyplans.FrequencyPlan
 		Cfg            RouterConfig
 		Features       TestFeatures
 		ErrorAssertion func(err error) bool
@@ -303,8 +303,8 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 		{
 			Name:   "ValidFrequencyPlan",
 			BandID: "US_902_928",
-			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{
-				test.USFrequencyPlanID: {
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{
+				{
 					BandID: "US_902_928",
 					Radios: []frequencyplans.Radio{
 						{
@@ -322,7 +322,8 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 							Frequency: 925000000,
 						},
 					},
-				}, "US_902_928_Custom": {
+				},
+				{
 					BandID: "US_902_928",
 					Radios: []frequencyplans.Radio{
 						{

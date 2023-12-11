@@ -74,7 +74,7 @@ type RegistrationInfo struct {
 	Listed        bool
 }
 
-// PacketBrokerClusterBuilder builds a Packet Broker Cluster ID from a The Things Stack Cluster ID.
+// PacketBrokerClusterIDBuilder builds a Packet Broker Cluster ID from a The Things Stack Cluster ID.
 type PacketBrokerClusterIDBuilder func(clusterID string) (string, error)
 
 func literalClusterID(clusterID string) (string, error) {
@@ -177,7 +177,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			}
 			devAddrPrefix := types.DevAddrPrefix{
 				DevAddr: devAddr,
-				Length:  uint8(conf.NetID.IDBits()),
+				Length:  uint8(32 - types.NwkAddrBits(conf.NetID)),
 			}
 			devAddrPrefixes = append(devAddrPrefixes, devAddrPrefix)
 		}
@@ -675,7 +675,8 @@ func (a *Agent) handleDownlinkMessage(
 		}
 	}
 
-	uid, msg, err := fromPBDownlink(ctx, down.Message, receivedAt, a.forwarderConfig)
+	forwarderData := forwarderAdditionalData(down.ForwarderNetId, down.ForwarderTenantId, down.ForwarderClusterId)
+	uid, msg, err := fromPBDownlink(ctx, down.Message, forwarderData, receivedAt, a.forwarderConfig)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to convert incoming downlink message")
 		return err
@@ -944,7 +945,7 @@ func (a *Agent) handleUplink(
 		if up.Message == nil {
 			return
 		}
-		ctx = appendDownlinkCorrelationID(ctx, up.Id)
+		ctx = appendUplinkCorrelationID(ctx, up.Id)
 		var forwarderNetID types.NetID
 		forwarderNetID.UnmarshalNumber(up.ForwarderNetId)
 		ctx = log.NewContextWithFields(ctx, log.Fields(

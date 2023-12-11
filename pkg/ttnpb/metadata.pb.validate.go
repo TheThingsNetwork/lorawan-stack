@@ -78,6 +78,18 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "relay":
+
+			if v, ok := interface{}(m.GetRelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RxMetadataValidationError{
+						field:  "relay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "antenna_index":
 			// no validation rules for AntennaIndex
 		case "time":
@@ -627,3 +639,109 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PacketBrokerRouteHopValidationError{}
+
+// ValidateFields checks the field values on RelayMetadata with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RelayMetadata) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = RelayMetadataFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "device_id":
+
+			if utf8.RuneCountInString(m.GetDeviceId()) > 36 {
+				return RelayMetadataValidationError{
+					field:  "device_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_RelayMetadata_DeviceId_Pattern.MatchString(m.GetDeviceId()) {
+				return RelayMetadataValidationError{
+					field:  "device_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		case "wor_channel":
+
+			if _, ok := RelayWORChannel_name[int32(m.GetWorChannel())]; !ok {
+				return RelayMetadataValidationError{
+					field:  "wor_channel",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return RelayMetadataValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// RelayMetadataValidationError is the validation error returned by
+// RelayMetadata.ValidateFields if the designated constraints aren't met.
+type RelayMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RelayMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RelayMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RelayMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RelayMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RelayMetadataValidationError) ErrorName() string { return "RelayMetadataValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RelayMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRelayMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RelayMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RelayMetadataValidationError{}
+
+var _RelayMetadata_DeviceId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")

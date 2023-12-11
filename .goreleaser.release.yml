@@ -120,10 +120,14 @@ snapcrafts:
         plugs: [home, network, network-bind]
         command: ttn-lw-stack.wrapper
         completer: config/completion/bash/ttn-lw-stack
+        environment:
+          XDG_CACHE_HOME: $SNAP_USER_COMMON
       ttn-lw-cli:
         plugs: [home, network, network-bind]
         command: ttn-lw-cli.wrapper
         completer: config/completion/bash/ttn-lw-cli-snap
+        environment:
+          XDG_CACHE_HOME: $SNAP_USER_COMMON
 
 brews:
   - name: ttn-lw-stack

@@ -57,11 +57,10 @@ const m = defineMessages({
   sessionInfo: 'Session information',
   pendingSessionInfo: 'Session information (pending)',
   latestData: 'Latest data',
-  rootKeys: 'Root keys',
   keysNotExposed: 'Keys are not exposed',
   failedAccessOtherHostDevice:
     'The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
-  macData: 'Download MAC data',
+  downloadMacData: 'Download MAC data',
   sensitiveDataWarning:
     'The MAC data can contain sensitive information such as session keys that can be used to decrypt messages. <b>Do not share this information publicly</b>.',
   noSessionWarning:
@@ -194,7 +193,7 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
       }
     } else if (supports_join) {
       activationInfoData.items.push({
-        key: m.rootKeys,
+        key: sharedMessages.rootKeys,
         value: <Message content={sharedMessages.provisionedOnExternalJoinServer} />,
       })
     }
@@ -266,7 +265,7 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
                   },
             }}
             onApprove={onExport}
-            message={m.macData}
+            message={m.downloadMacData}
             type="button"
             icon="file_download"
           />
@@ -308,14 +307,14 @@ const DeviceOverview = () => {
 
         if (!('mac_state' in result)) {
           toast({
-            title: m.macData,
+            title: m.downloadMacData,
             message: m.macStateError,
             type: toast.types.ERROR,
           })
         }
       } catch {
         toast({
-          title: m.macData,
+          title: m.downloadMacData,
           message: m.macStateError,
           type: toast.types.ERROR,
         })

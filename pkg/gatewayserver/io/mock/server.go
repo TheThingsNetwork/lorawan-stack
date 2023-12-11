@@ -76,6 +76,11 @@ func (s *server) FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdent
 	return ctx, ids, nil
 }
 
+// AssertRights implements io.Server.
+func (*server) AssertGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
+	return rights.RequireGateway(ctx, ids, required...)
+}
+
 // Connect implements io.Server.
 func (s *server) Connect(
 	ctx context.Context,
@@ -84,7 +89,7 @@ func (s *server) Connect(
 	addr *ttnpb.GatewayRemoteAddress,
 	opts ...io.ConnectionOption,
 ) (*io.Connection, error) {
-	if err := rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
+	if err := s.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 	gtw, err := s.identityStore.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: ids})

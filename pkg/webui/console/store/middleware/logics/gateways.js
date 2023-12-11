@@ -118,39 +118,41 @@ const getGatewaysLogic = createRequestLogic({
     if (options.withStatus) {
       const gsConfig = selectGsConfig()
       const consoleGsAddress = getHostFromUrl(gsConfig.base_url)
+      const gatewayIds = entities.map(e => e.ids)
+      let gatewaysStats = null
+      if (gatewayIds.length) {
+        gatewaysStats = await tts.Gateways.getBatchStatistics(gatewayIds)
+      }
 
-      entities = await Promise.all(
-        data.gateways.map(gateway => {
-          const gatewayServerAddress = getHostFromUrl(gateway.gateway_server_address)
+      entities = data.gateways.map(gateway => {
+        const gatewayServerAddress = getHostFromUrl(gateway.gateway_server_address)
 
-          if (!Boolean(gatewayServerAddress)) {
-            return Promise.resolve({ ...gateway, status: 'unknown' })
-          }
+        if (!Boolean(gatewayServerAddress)) {
+          return { ...gateway, status: 'unknown' }
+        }
 
-          if (gatewayServerAddress !== consoleGsAddress) {
-            return Promise.resolve({ ...gateway, status: 'other-cluster' })
-          }
+        if (gatewayServerAddress !== consoleGsAddress) {
+          return { ...gateway, status: 'other-cluster' }
+        }
 
-          const id = getGatewayId(gateway)
-          return tts.Gateways.getStatisticsById(id)
-            .then(stats => {
-              let status = 'unknown'
-              if (Boolean(stats) && Boolean(stats.connected_at)) {
-                status = 'connected'
-              } else if (Boolean(stats) && Boolean(stats.disconnected_at)) {
-                status = 'disconnected'
-              }
-              return { ...gateway, status }
-            })
-            .catch(err => {
-              if (err && err.code === 5) {
-                return { ...gateway, status: 'disconnected' }
-              }
+        if (!gatewaysStats?.entries) {
+          return { ...gateway, status: 'disconnected' }
+        }
 
-              return { ...gateway, status: 'unknown' }
-            })
-        }),
-      )
+        const id = getGatewayId(gateway)
+        let status = 'unknown'
+
+        if (Boolean(gatewaysStats.entries[id]) && Boolean(gatewaysStats.entries[id].connected_at)) {
+          status = 'connected'
+        } else if (
+          !Boolean(gatewaysStats.entries[id]) ||
+          Boolean(gatewaysStats.entries[id].disconnected_at)
+        ) {
+          status = 'disconnected'
+        }
+
+        return { ...gateway, status }
+      })
     }
 
     return {

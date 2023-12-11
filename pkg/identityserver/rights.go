@@ -20,7 +20,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 func allPotentialRights(eIDs *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) *ttnpb.Rights {
@@ -252,13 +251,16 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		return errInsufficientRights.New()
 	}
 
+	// If the caller has specified the identifiers multiple times, deduplicate them.
+	gtwIDs = uniqueIdentifiers(gtwIDs)
+
 	return is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		gtws, err := st.FindGateways(ctx, gtwIDs, []string{"ids", "status_public", "location_public"})
 		if err != nil {
 			return err
 		}
 		if len(gtws) != len(gtwIDs) {
-			if is.IsAdmin(ctx) {
+			if authInfo.IsAdmin {
 				// Return the cause only to the admin.
 				// This follows the same logic as in ListRights.
 				return errSomeGatewaysNotFound.New()
@@ -289,21 +291,21 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		if bothStatsAndLocation {
 			for _, gtw := range gtws {
 				if gtw.StatusPublic && gtw.LocationPublic {
-					publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+					publicGatewayIds[gtw.IDString()] = struct{}{}
 				}
 			}
 		} else {
 			if onlyPublicStats {
 				for _, gtw := range gtws {
 					if gtw.StatusPublic {
-						publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+						publicGatewayIds[gtw.IDString()] = struct{}{}
 					}
 				}
 			}
 			if onlyPublicLocation {
 				for _, gtw := range gtws {
 					if gtw.LocationPublic {
-						publicGatewayIds[unique.ID(ctx, gtw.Ids)] = struct{}{}
+						publicGatewayIds[gtw.IDString()] = struct{}{}
 					}
 				}
 			}
@@ -311,10 +313,18 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 
 		entityIDs := make([]string, 0, len(gtwIDs))
 		for _, gtwID := range gtwIDs {
-			if _, ok := publicGatewayIds[unique.ID(ctx, gtwID)]; ok {
+			if _, ok := publicGatewayIds[gtwID.IDString()]; ok {
 				continue
 			}
 			entityIDs = append(entityIDs, gtwID.GetEntityIdentifiers().IDString())
+		}
+		if len(entityIDs) == 0 {
+			return nil
+		}
+		if authInfo.IsAdmin {
+			if authInfo.GetUniversalRights().IncludesAll(requiredGatewayRights.GetRights()...) {
+				return nil
+			}
 		}
 		membershipChains, err := st.FindAccountMembershipChains(
 			ctx,
@@ -325,19 +335,30 @@ func (is *IdentityServer) assertGatewayRights( // nolint:gocyclo
 		if err != nil {
 			return err
 		}
-		if len(membershipChains) != len(entityIDs) {
-			// Some memberships were not found.
-			if is.IsAdmin(ctx) {
-				return errSomeGatewaysNotFound.New()
-			}
-			return errInsufficientRights.New()
-		}
+		entityRights := make(map[string]*ttnpb.Rights, len(membershipChains))
 		for _, chain := range membershipChains {
+			id := chain.EntityIdentifiers.IDString()
+			entityRights[id] = entityRights[id].Union(chain.GetRights())
+		}
+		for _, entityID := range entityIDs {
 			// Make sure that there are no extra rights requested.
-			if !chain.GetRights().IncludesAll(requiredGatewayRights.GetRights()...) {
+			if !entityRights[entityID].IncludesAll(requiredGatewayRights.GetRights()...) {
 				return errInsufficientRights.New()
 			}
 		}
 		return nil
 	})
+}
+
+func uniqueIdentifiers[T ttnpb.IDStringer](ids []T) []T {
+	m := make(map[string]struct{}, len(ids))
+	result := make([]T, 0, len(ids))
+	for _, id := range ids {
+		if _, ok := m[id.IDString()]; ok {
+			continue
+		}
+		m[id.IDString()] = struct{}{}
+		result = append(result, id)
+	}
+	return result
 }

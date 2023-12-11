@@ -11,23 +11,10 @@ Your review is required for a newly registered user.
 Dear {{ .ReceiverName }},
 </p>
 <p>
-A new user just registered on <b>{{ .Network.Name }}</b>.
+A new user with ID <code>{{ .User.Ids.IDString }}</code> just registered on <b>{{ .Network.Name }}</b>.
 Since user registration requires admin approval, you need to approve this user before they can login.
 </p>
 
-<p>
-<b>User ID:</b> <code>{{ .User.Ids.IDString }}</code>
-</p>
-<p>
-<b>Name:</b> {{ with .User.Name }}{{ . }}{{ else }}<i>none</i>{{ end }}
-</p>
-<p>
-<b>Description:</b> {{ with .User.Description }}{{ . }}{{ else }}<i>none</i>{{ end }}
-</p>
-<p>
-<b>Email Address:</b> {{ with .User.PrimaryEmailAddress }}{{ . }}{{ else }}<i>none</i>{{ end }}
-</p>
-<p>
 You can review this user <a href="{{ .ConsoleURL }}">in the Console</a>.
 </p>
 {{- end -}}

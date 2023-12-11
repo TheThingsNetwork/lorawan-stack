@@ -90,5 +90,5 @@ var CN_470_510_20_B_RP2_v1_0_4 = Band{
 
 	Relay: cn470510RelayParameters,
 
-	SharedParameters: universalSharedParameters,
+	SharedParameters: relayAwareSharedParameters,
 }

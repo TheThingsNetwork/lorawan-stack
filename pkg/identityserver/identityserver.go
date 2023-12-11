@@ -88,14 +88,17 @@ func (is *IdentityServer) configFromContext(ctx context.Context) *Config {
 // GenerateCSPString returns a Content-Security-Policy header value
 // for OAuth and Account app template.
 func GenerateCSPString(config *oauth.Config, nonce string) string {
+	baseURLs := webui.RewriteSchemes(
+		webui.WebsocketSchemeRewrites,
+		config.UI.StackConfig.IS.BaseURL,
+	)
 	return webui.ContentSecurityPolicy{
-		ConnectionSource: []string{
+		ConnectionSource: append([]string{
 			"'self'",
-			config.UI.StackConfig.IS.BaseURL,
 			config.UI.SentryDSN,
 			"gravatar.com",
 			"www.gravatar.com",
-		},
+		}, baseURLs...),
 		StyleSource: []string{
 			"'self'",
 			config.UI.AssetsBaseURL,

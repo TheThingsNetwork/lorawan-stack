@@ -56,6 +56,16 @@ var (
 			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{}},
 		}),
 	)
+	evtDropRelayUplink = events.Define(
+		"ns.up.relay.drop", "drop relay message",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithErrorDataType(),
+	)
+	evtProcessRelayUplink = events.Define(
+		"ns.up.relay.process", "successfully processed relay message",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.UplinkMessage{}),
+	)
 	evtScheduleDataDownlinkAttempt = events.Define(
 		"ns.down.data.schedule.attempt", "schedule data downlink for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),

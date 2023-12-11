@@ -23,6 +23,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
@@ -58,6 +59,7 @@ func New(c *component.Component, config Config) (*Console, error) {
 	}
 
 	c.RegisterWeb(console)
+	c.RegisterWeb(events.New(c))
 
 	return console, nil
 }
@@ -88,22 +90,25 @@ func path(u string) (string, error) {
 }
 
 func generateConsoleCSPString(config *Config, nonce string, others ...webui.ContentSecurityPolicy) string {
+	baseURLs := webui.RewriteSchemes(
+		webui.WebsocketSchemeRewrites,
+		config.UI.StackConfig.GS.BaseURL,
+		config.UI.StackConfig.IS.BaseURL,
+		config.UI.StackConfig.JS.BaseURL,
+		config.UI.StackConfig.NS.BaseURL,
+		config.UI.StackConfig.AS.BaseURL,
+		config.UI.StackConfig.EDTC.BaseURL,
+		config.UI.StackConfig.QRG.BaseURL,
+		config.UI.StackConfig.GCS.BaseURL,
+		config.UI.StackConfig.DCS.BaseURL,
+	)
 	return webui.ContentSecurityPolicy{
-		ConnectionSource: []string{
+		ConnectionSource: append([]string{
 			"'self'",
-			config.UI.StackConfig.GS.BaseURL,
-			config.UI.StackConfig.IS.BaseURL,
-			config.UI.StackConfig.JS.BaseURL,
-			config.UI.StackConfig.NS.BaseURL,
-			config.UI.StackConfig.AS.BaseURL,
-			config.UI.StackConfig.EDTC.BaseURL,
-			config.UI.StackConfig.QRG.BaseURL,
-			config.UI.StackConfig.GCS.BaseURL,
-			config.UI.StackConfig.DCS.BaseURL,
 			config.UI.SentryDSN,
 			"gravatar.com",
 			"www.gravatar.com",
-		},
+		}, baseURLs...),
 		StyleSource: []string{
 			"'self'",
 			config.UI.AssetsBaseURL,

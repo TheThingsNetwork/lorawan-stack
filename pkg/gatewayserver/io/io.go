@@ -60,8 +60,11 @@ type Server interface {
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillGatewayContext fills the given context and identifiers.
 	// This method should only be used for request contexts.
-	FillGatewayContext(ctx context.Context,
-		ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error)
+	FillGatewayContext(
+		ctx context.Context, ids *ttnpb.GatewayIdentifiers,
+	) (context.Context, *ttnpb.GatewayIdentifiers, error)
+	// AssertGatewayRights checks that the caller has the required rights over the provided gateway identifiers.
+	AssertGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
 	Connect(
@@ -109,7 +112,7 @@ type Connection struct {
 	frontend         Frontend
 	gateway          *ttnpb.Gateway
 	gatewayPrimaryFP *frequencyplans.FrequencyPlan
-	gatewayFPs       map[string]*frequencyplans.FrequencyPlan
+	gatewayFPs       []*frequencyplans.FrequencyPlan
 	band             *band.Band
 	fps              *frequencyplans.Store
 	scheduler        *scheduling.Scheduler
@@ -178,13 +181,17 @@ func NewConnection(
 		opt(connectionOptions)
 	}
 
-	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))
+	gatewayFPLen := len(gateway.FrequencyPlanIds)
+	if gatewayFPLen == 0 {
+		gatewayFPLen = 1
+	}
+	gatewayFPs := make([]*frequencyplans.FrequencyPlan, gatewayFPLen)
 	fp0ID := gateway.FrequencyPlanId
 	fp0, err := fps.GetByID(fp0ID)
 	if err != nil {
 		return nil, err
 	}
-	gatewayFPs[fp0ID] = fp0
+	gatewayFPs[0] = fp0
 	phy, err := band.GetLatest(fp0.BandID)
 	if err != nil {
 		return nil, err
@@ -202,7 +209,7 @@ func NewConnection(
 			if fpn.BandID != fp0.BandID {
 				return nil, errFrequencyPlansNotFromSameBand.New()
 			}
-			gatewayFPs[gateway.FrequencyPlanIds[i]] = fpn
+			gatewayFPs[i] = fpn
 		}
 	}
 
@@ -530,16 +537,13 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	var fp *frequencyplans.FrequencyPlan
 	fpID := request.GetFrequencyPlanId()
 	if fpID != "" {
-		fp = c.gatewayFPs[fpID]
-		if fp == nil {
-			// The requested frequency plan is not configured for the gateway. Load the plan and enforce that it's in the same band.
-			fp, err = c.fps.GetByID(fpID)
-			if err != nil {
-				return false, false, 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanId)
-			}
-			if fp.BandID != c.band.ID {
-				return false, false, 0, errFrequencyPlansNotFromSameBand.New()
-			}
+		// Load the plan and enforce that it's in the same band.
+		fp, err = c.fps.GetByID(fpID)
+		if err != nil {
+			return false, false, 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanId)
+		}
+		if fp.BandID != c.band.ID {
+			return false, false, 0, errFrequencyPlansNotFromSameBand.New()
 		}
 	} else {
 		// Backwards compatibility. If there's no FrequencyPlanID in the TxRequest, then there must be only one Frequency
@@ -863,7 +867,7 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 }
 
 // FrequencyPlans returns the frequency plans for the gateway.
-func (c *Connection) FrequencyPlans() map[string]*frequencyplans.FrequencyPlan { return c.gatewayFPs }
+func (c *Connection) FrequencyPlans() []*frequencyplans.FrequencyPlan { return c.gatewayFPs }
 
 // PrimaryFrequencyPlan returns the primary frequency plan of the gateway.
 func (c *Connection) PrimaryFrequencyPlan() *frequencyplans.FrequencyPlan { return c.gatewayPrimaryFP }

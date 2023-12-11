@@ -55,7 +55,10 @@ class TTS {
     this.Ns = new Ns(this.api.Ns)
     this.Is = new Is(this.api.Is)
     this.As = new As(this.api)
-    this.Organizations = new Organizations(this.api)
+    this.Organizations = new Organizations(this.api, {
+      defaultUserId,
+      stackConfig: stackConfiguration,
+    })
     this.Users = new Users(this.api)
     this.Auth = new Auth(this.api.EntityAccess)
     this.Sessions = new Sessions(this.api)

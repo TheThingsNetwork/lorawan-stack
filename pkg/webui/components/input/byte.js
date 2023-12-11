@@ -55,139 +55,134 @@ const upper = str => str.toUpperCase()
 
 const clean = str => (typeof str === 'string' ? str.replace(voidChars, '') : str)
 
-const ByteInput = ({
-  onBlur,
-  value,
-  className,
-  min,
-  max,
-  onChange,
-  placeholder,
-  showPerChar,
-  unbounded,
-  ...rest
-}) => {
-  const onCopy = useCallback(evt => {
-    const input = evt.target
-    const selectedValue = input.value.substr(
-      input.selectionStart,
-      input.selectionEnd - input.selectionStart,
-    )
-    evt.clipboardData.setData('text/plain', clean(selectedValue))
-    evt.preventDefault()
-  }, [])
-
-  const onPaste = useCallback(
-    evt => {
-      // Ignore empty pastes.
-      if (evt?.clipboardData?.getData('text/plain')?.length === 0) {
-        return
-      }
-      const val = evt.target.value
-      const cleanedSelection = clean(
-        val.substr(
-          evt.target.selectionStart,
-          Math.max(1, evt.target.selectionEnd - evt.target.selectionStart),
-        ),
+const ByteInput = React.forwardRef(
+  (
+    { onBlur, value, className, min, max, onChange, placeholder, showPerChar, unbounded, ...rest },
+    ref,
+  ) => {
+    const onCopy = useCallback(evt => {
+      const input = evt.target
+      const selectedValue = input.value.substr(
+        input.selectionStart,
+        input.selectionEnd - input.selectionStart,
       )
+      evt.clipboardData.setData('text/plain', clean(selectedValue))
+      evt.preventDefault()
+    }, [])
 
-      // To avoid the masked input from cutting off characters when the cursor
-      // is placed in the mask placeholders, the placeholder chars are removed before
-      // the paste is applied, unless the user made a selection to paste into.
-      // This will ensure a consistent pasting experience.
-      if (!unbounded && cleanedSelection === '') {
-        evt.target.value = val.replace(voidChars, '')
-      }
-    },
-    [unbounded],
-  )
+    const onPaste = useCallback(
+      evt => {
+        // Ignore empty pastes.
+        if (evt?.clipboardData?.getData('text/plain')?.length === 0) {
+          return
+        }
+        const val = evt.target.value
+        const cleanedSelection = clean(
+          val.substr(
+            evt.target.selectionStart,
+            Math.max(1, evt.target.selectionEnd - evt.target.selectionStart),
+          ),
+        )
 
-  const onChangeCallback = useCallback(
-    evt => {
-      const data = evt?.nativeEvent?.data
-
-      // Due to the way that react-text-mask works, it is not possible to
-      // store the cleaned value, since it would create ambiguity between
-      // values like `AA` and `AA `. This causes backspaces to not work
-      // if it targets the space character, since the deleted space would
-      // be re-added right away. Hence, unbounded inputs need to remove
-      // the space paddings manually.
-      let newValue = unbounded ? evt.target.value : clean(evt.target.value)
-
-      // Make sure values entered at the end of the input (with placeholders)
-      // are added as expected. `selectionStart` cannot be used due to
-      // inconsistent behavior on Android phones.
-      if (
-        evt.target.value.endsWith(PLACEHOLDER_CHAR) &&
-        data &&
-        hex.test(data) &&
-        value === newValue
-      ) {
-        newValue += data
-      }
-
-      onChange({
-        target: {
-          name: evt.target.name,
-          value: newValue,
-        },
-      })
-    },
-    [onChange, value, unbounded],
-  )
-
-  const onBlurCallback = useCallback(
-    evt => {
-      onBlur({
-        relatedTarget: evt.relatedTarget,
-        target: {
-          name: evt.target.name,
-          value: clean(evt.target.value),
-        },
-      })
-    },
-    [onBlur],
-  )
-
-  const onCut = useCallback(evt => {
-    evt.preventDefault()
-    // Recreate cut action by deleting and reusing copy handler.
-    document.execCommand('copy')
-    document.execCommand('delete')
-  }, [])
-
-  // Instead of calculating the max width dynamically, which leads to various issues
-  // with pasting, it's better to use a high max value for unbounded inputs instead.
-  const calculatedMax = max || 4096
-
-  if (!unbounded && typeof max !== 'number') {
-    warn(
-      'Byte input has been setup without `max` prop. Always use a max prop unless using `unbounded`',
+        // To avoid the masked input from cutting off characters when the cursor
+        // is placed in the mask placeholders, the placeholder chars are removed before
+        // the paste is applied, unless the user made a selection to paste into.
+        // This will ensure a consistent pasting experience.
+        if (!unbounded && cleanedSelection === '') {
+          evt.target.value = val.replace(voidChars, '')
+        }
+      },
+      [unbounded],
     )
-  }
 
-  return (
-    <MaskedInput
-      key="input"
-      className={classnames(className, style.byte)}
-      value={value}
-      mask={mask(min, calculatedMax, showPerChar)}
-      placeholderChar={PLACEHOLDER_CHAR}
-      keepCharPositions={false}
-      pipe={upper}
-      onChange={onChangeCallback}
-      placeholder={placeholder}
-      onCopy={onCopy}
-      onCut={onCut}
-      onBlur={onBlurCallback}
-      onPaste={onPaste}
-      showMask={!placeholder && !unbounded}
-      guide={!unbounded}
-      {...rest}
-      type="text"
-    />
-  )
-}
+    const onChangeCallback = useCallback(
+      evt => {
+        const data = evt?.nativeEvent?.data
+
+        // Due to the way that react-text-mask works, it is not possible to
+        // store the cleaned value, since it would create ambiguity between
+        // values like `AA` and `AA `. This causes backspaces to not work
+        // if it targets the space character, since the deleted space would
+        // be re-added right away. Hence, unbounded inputs need to remove
+        // the space paddings manually.
+        let newValue = unbounded ? evt.target.value : clean(evt.target.value)
+
+        // Make sure values entered at the end of the input (with placeholders)
+        // are added as expected. `selectionStart` cannot be used due to
+        // inconsistent behavior on Android phones.
+        if (
+          evt.target.value.endsWith(PLACEHOLDER_CHAR) &&
+          data &&
+          hex.test(data) &&
+          value === newValue
+        ) {
+          newValue += data
+        }
+
+        onChange({
+          target: {
+            name: evt.target.name,
+            value: newValue,
+          },
+        })
+      },
+      [onChange, value, unbounded],
+    )
+
+    const onBlurCallback = useCallback(
+      evt => {
+        onBlur({
+          relatedTarget: evt.relatedTarget,
+          target: {
+            name: evt.target.name,
+            value: clean(evt.target.value),
+          },
+        })
+      },
+      [onBlur],
+    )
+
+    const onCut = useCallback(evt => {
+      evt.preventDefault()
+      // Recreate cut action by deleting and reusing copy handler.
+      document.execCommand('copy')
+      document.execCommand('delete')
+    }, [])
+
+    // Instead of calculating the max width dynamically, which leads to various issues
+    // with pasting, it's better to use a high max value for unbounded inputs instead.
+    const calculatedMax = max || 4096
+
+    if (!unbounded && typeof max !== 'number') {
+      warn(
+        'Byte input has been setup without `max` prop. Always use a max prop unless using `unbounded`',
+      )
+    }
+
+    return (
+      <MaskedInput
+        key="input"
+        className={classnames(className, style.byte)}
+        value={value}
+        mask={mask(min, calculatedMax, showPerChar)}
+        placeholderChar={PLACEHOLDER_CHAR}
+        keepCharPositions={false}
+        pipe={upper}
+        onChange={onChangeCallback}
+        placeholder={placeholder}
+        onCopy={onCopy}
+        onCut={onCut}
+        onBlur={onBlurCallback}
+        onPaste={onPaste}
+        showMask={!placeholder && !unbounded}
+        guide={!unbounded}
+        {...rest}
+        type="text"
+        ref={ref}
+      />
+    )
+  },
+)
 
 ByteInput.propTypes = {
   className: PropTypes.string,

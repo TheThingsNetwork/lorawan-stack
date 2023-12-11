@@ -537,7 +537,7 @@ type gatewayBatchAccess struct {
 }
 
 var (
-	errEmtpyRequest = errors.DefineInvalidArgument(
+	errEmptyRequest = errors.DefineInvalidArgument(
 		"empty_request",
 		"empty request",
 	)
@@ -555,7 +555,7 @@ func (gba *gatewayBatchAccess) AssertRights(
 	// Sanitize request.
 	required := req.Required.Unique()
 	if len(required.GetRights()) == 0 {
-		return nil, errEmtpyRequest.New()
+		return nil, errEmptyRequest.New()
 	}
 
 	// Check that the request is checking only gateway rights.

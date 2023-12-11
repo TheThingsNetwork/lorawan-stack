@@ -16,6 +16,8 @@ import { defineMessages } from 'react-intl'
 
 import CreateFetchSelect from '@console/containers/fetch-select'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import { getWebhookFormats } from '@console/store/actions/webhook-formats'
 
 import {
@@ -25,7 +27,6 @@ import {
 } from '@console/store/selectors/webhook-formats'
 
 const m = defineMessages({
-  title: 'Webhook format',
   warning: 'Webhook formats unavailable',
 })
 
@@ -35,5 +36,5 @@ export default CreateFetchSelect({
   errorSelector: selectWebhookFormatsError,
   fetchingSelector: selectWebhookFormatsFetching,
   defaultWarning: m.warning,
-  defaultTitle: m.title,
+  defaultTitle: sharedMessages.webhookFormat,
 })

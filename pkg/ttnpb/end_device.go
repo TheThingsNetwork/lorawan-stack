@@ -60,6 +60,222 @@ func (v *BoolValue) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
+func (v *ServedRelayParameters) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "backoff":
+		return v.Backoff == 0
+	case "mode":
+		return v.Mode == nil
+	case "mode.always":
+		return v.GetAlways() == nil
+	case "mode.dynamic":
+		return v.GetDynamic() == nil
+	case "mode.dynamic.smart_enable_level":
+		return v.GetDynamic().FieldIsZero("smart_enable_level")
+	case "mode.end_device_controlled":
+		return v.GetEndDeviceControlled() == nil
+	case "second_channel":
+		return v.SecondChannel == nil
+	case "second_channel.ack_offset":
+		return v.SecondChannel.FieldIsZero("ack_offset")
+	case "second_channel.data_rate_index":
+		return v.SecondChannel.FieldIsZero("data_rate_index")
+	case "second_channel.frequency":
+		return v.SecondChannel.FieldIsZero("frequency")
+	case "serving_device_id":
+		return v.ServingDeviceId == ""
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *RelayForwardLimits) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "bucket_size":
+		return v.BucketSize == 0
+	case "reload_rate":
+		return v.ReloadRate == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ServingRelayForwardingLimits) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "reset_behavior":
+		return v.ResetBehavior == 0
+	case "join_requests":
+		return v.JoinRequests == nil
+	case "join_requests.bucket_size":
+		return v.JoinRequests.FieldIsZero("bucket_size")
+	case "join_requests.reload_rate":
+		return v.JoinRequests.FieldIsZero("reload_rate")
+	case "notifications":
+		return v.Notifications == nil
+	case "notifications.bucket_size":
+		return v.Notifications.FieldIsZero("bucket_size")
+	case "notifications.reload_rate":
+		return v.Notifications.FieldIsZero("reload_rate")
+	case "uplink_messages":
+		return v.UplinkMessages == nil
+	case "uplink_messages.bucket_size":
+		return v.UplinkMessages.FieldIsZero("bucket_size")
+	case "uplink_messages.reload_rate":
+		return v.UplinkMessages.FieldIsZero("reload_rate")
+	case "overall":
+		return v.Overall == nil
+	case "overall.bucket_size":
+		return v.Overall.FieldIsZero("bucket_size")
+	case "overall.reload_rate":
+		return v.Overall.FieldIsZero("reload_rate")
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ServingRelayParameters) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "second_channel":
+		return v.SecondChannel == nil
+	case "second_channel.ack_offset":
+		return v.SecondChannel.FieldIsZero("ack_offset")
+	case "second_channel.data_rate_index":
+		return v.SecondChannel.FieldIsZero("data_rate_index")
+	case "second_channel.frequency":
+		return v.SecondChannel.FieldIsZero("frequency")
+	case "default_channel_index":
+		return v.DefaultChannelIndex == 0
+	case "cad_periodicity":
+		return v.CadPeriodicity == 0
+	case "uplink_forwarding_rules":
+		return v.UplinkForwardingRules == nil
+	case "limits":
+		return v.Limits == nil
+	case "limits.reset_behavior":
+		return v.Limits.FieldIsZero("reset_behavior")
+	case "limits.join_requests":
+		return v.Limits.FieldIsZero("join_requests")
+	case "limits.join_requests.bucket_size":
+		return v.Limits.FieldIsZero("join_requests.bucket_size")
+	case "limits.join_requests.reload_rate":
+		return v.Limits.FieldIsZero("join_requests.reload_rate")
+	case "limits.notifications":
+		return v.Limits.FieldIsZero("notifications")
+	case "limits.notifications.bucket_size":
+		return v.Limits.FieldIsZero("notifications.bucket_size")
+	case "limits.notifications.reload_rate":
+		return v.Limits.FieldIsZero("notifications.reload_rate")
+	case "limits.uplink_messages":
+		return v.Limits.FieldIsZero("uplink_messages")
+	case "limits.uplink_messages.bucket_size":
+		return v.Limits.FieldIsZero("uplink_messages.bucket_size")
+	case "limits.uplink_messages.reload_rate":
+		return v.Limits.FieldIsZero("uplink_messages.reload_rate")
+	case "limits.overall":
+		return v.Limits.FieldIsZero("overall")
+	case "limits.overall.bucket_size":
+		return v.Limits.FieldIsZero("overall.bucket_size")
+	case "limits.overall.reload_rate":
+		return v.Limits.FieldIsZero("overall.reload_rate")
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *RelayParameters) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "mode":
+		return v.Mode == nil
+	case "mode.served":
+		return v.GetServed() == nil
+	case "mode.served.backoff":
+		return v.GetServed().FieldIsZero("backoff")
+	case "mode.served.mode":
+		return v.GetServed().FieldIsZero("mode")
+	case "mode.served.mode.always":
+		return v.GetServed().FieldIsZero("mode.always")
+	case "mode.served.mode.dynamic":
+		return v.GetServed().FieldIsZero("mode.dynamic")
+	case "mode.served.mode.dynamic.smart_enable_level":
+		return v.GetServed().FieldIsZero("mode.dynamic.smart_enable_level")
+	case "mode.served.mode.end_device_controlled":
+		return v.GetServed().FieldIsZero("mode.end_device_controlled")
+	case "mode.served.second_channel":
+		return v.GetServed().FieldIsZero("second_channel")
+	case "mode.served.second_channel.ack_offset":
+		return v.GetServed().FieldIsZero("second_channel.ack_offset")
+	case "mode.served.second_channel.data_rate_index":
+		return v.GetServed().FieldIsZero("second_channel.data_rate_index")
+	case "mode.served.second_channel.frequency":
+		return v.GetServed().FieldIsZero("second_channel.frequency")
+	case "mode.served.default_channel_index":
+		return v.GetServed().FieldIsZero("default_channel_index")
+	case "mode.served.serving_device_id":
+		return v.GetServed().FieldIsZero("serving_device_id")
+	case "mode.serving":
+		return v.GetServing() == nil
+	case "mode.serving.second_channel":
+		return v.GetServing().FieldIsZero("second_channel")
+	case "mode.serving.second_channel.ack_offset":
+		return v.GetServing().FieldIsZero("second_channel.ack_offset")
+	case "mode.serving.second_channel.data_rate_index":
+		return v.GetServing().FieldIsZero("second_channel.data_rate_index")
+	case "mode.serving.second_channel.frequency":
+		return v.GetServing().FieldIsZero("second_channel.frequency")
+	case "mode.serving.default_channel_index":
+		return v.GetServing().FieldIsZero("default_channel_index")
+	case "mode.serving.cad_periodicity":
+		return v.GetServing().FieldIsZero("cad_periodicity")
+	case "mode.serving.uplink_forwarding_rules":
+		return v.GetServing().FieldIsZero("uplink_forwarding_rules")
+	case "mode.serving.limits":
+		return v.GetServing().FieldIsZero("limits")
+	case "mode.serving.limits.reset_behavior":
+		return v.GetServing().FieldIsZero("limits.reset_behavior")
+	case "mode.serving.limits.join_requests":
+		return v.GetServing().FieldIsZero("limits.join_requests")
+	case "mode.serving.limits.join_requests.bucket_size":
+		return v.GetServing().FieldIsZero("limits.join_requests.bucket_size")
+	case "mode.serving.limits.join_requests.reload_rate":
+		return v.GetServing().FieldIsZero("limits.join_requests.reload_rate")
+	case "mode.serving.limits.notifications":
+		return v.GetServing().FieldIsZero("limits.notifications")
+	case "mode.serving.limits.notifications.bucket_size":
+		return v.GetServing().FieldIsZero("limits.notifications.bucket_size")
+	case "mode.serving.limits.notifications.reload_rate":
+		return v.GetServing().FieldIsZero("limits.notifications.reload_rate")
+	case "mode.serving.limits.uplink_messages":
+		return v.GetServing().FieldIsZero("limits.uplink_messages")
+	case "mode.serving.limits.uplink_messages.bucket_size":
+		return v.GetServing().FieldIsZero("limits.uplink_messages.bucket_size")
+	case "mode.serving.limits.uplink_messages.reload_rate":
+		return v.GetServing().FieldIsZero("limits.uplink_messages.reload_rate")
+	case "mode.serving.limits.overall":
+		return v.GetServing().FieldIsZero("limits.overall")
+	case "mode.serving.limits.overall.bucket_size":
+		return v.GetServing().FieldIsZero("limits.overall.bucket_size")
+	case "mode.serving.limits.overall.reload_rate":
+		return v.GetServing().FieldIsZero("limits.overall.reload_rate")
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
 func (v *EndDeviceAuthenticationCode) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
@@ -315,6 +531,154 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.PingSlotPeriodicity == nil
 	case "ping_slot_periodicity.value":
 		return v.PingSlotPeriodicity.FieldIsZero("value")
+	case "relay":
+		return v.Relay == nil
+	case "relay.mode":
+		return v.Relay.FieldIsZero("mode")
+	case "relay.mode.served":
+		return v.Relay.FieldIsZero("mode.served")
+	case "relay.mode.served.backoff":
+		return v.Relay.FieldIsZero("mode.served.backoff")
+	case "relay.mode.served.mode":
+		return v.Relay.FieldIsZero("mode.served.mode")
+	case "relay.mode.served.mode.always":
+		return v.Relay.FieldIsZero("mode.served.mode.always")
+	case "relay.mode.served.mode.dynamic":
+		return v.Relay.FieldIsZero("mode.served.mode.dynamic")
+	case "relay.mode.served.mode.dynamic.smart_enable_level":
+		return v.Relay.FieldIsZero("mode.served.mode.dynamic.smart_enable_level")
+	case "relay.mode.served.mode.end_device_controlled":
+		return v.Relay.FieldIsZero("mode.served.mode.end_device_controlled")
+	case "relay.mode.served.second_channel":
+		return v.Relay.FieldIsZero("mode.served.second_channel")
+	case "relay.mode.served.second_channel.ack_offset":
+		return v.Relay.FieldIsZero("mode.served.second_channel.ack_offset")
+	case "relay.mode.served.second_channel.data_rate_index":
+		return v.Relay.FieldIsZero("mode.served.second_channel.data_rate_index")
+	case "relay.mode.served.second_channel.frequency":
+		return v.Relay.FieldIsZero("mode.served.second_channel.frequency")
+	case "relay.mode.served.default_channel_index":
+		return v.Relay.FieldIsZero("mode.served.default_channel_index")
+	case "relay.mode.served.serving_device_id":
+		return v.Relay.FieldIsZero("mode.served.serving_device_id")
+	case "relay.mode.serving":
+		return v.Relay.FieldIsZero("mode.serving")
+	case "relay.mode.serving.second_channel":
+		return v.Relay.FieldIsZero("mode.serving.second_channel")
+	case "relay.mode.serving.second_channel.ack_offset":
+		return v.Relay.FieldIsZero("mode.serving.second_channel.ack_offset")
+	case "relay.mode.serving.second_channel.data_rate_index":
+		return v.Relay.FieldIsZero("mode.serving.second_channel.data_rate_index")
+	case "relay.mode.serving.second_channel.frequency":
+		return v.Relay.FieldIsZero("mode.serving.second_channel.frequency")
+	case "relay.mode.serving.default_channel_index":
+		return v.Relay.FieldIsZero("mode.serving.default_channel_index")
+	case "relay.mode.serving.cad_periodicity":
+		return v.Relay.FieldIsZero("mode.serving.cad_periodicity")
+	case "relay.mode.serving.uplink_forwarding_rules":
+		return v.Relay.FieldIsZero("mode.serving.uplink_forwarding_rules")
+	case "relay.mode.serving.limits":
+		return v.Relay.FieldIsZero("mode.serving.limits")
+	case "relay.mode.serving.limits.reset_behavior":
+		return v.Relay.FieldIsZero("mode.serving.limits.reset_behavior")
+	case "relay.mode.serving.limits.join_requests":
+		return v.Relay.FieldIsZero("mode.serving.limits.join_requests")
+	case "relay.mode.serving.limits.join_requests.bucket_size":
+		return v.Relay.FieldIsZero("mode.serving.limits.join_requests.bucket_size")
+	case "relay.mode.serving.limits.join_requests.reload_rate":
+		return v.Relay.FieldIsZero("mode.serving.limits.join_requests.reload_rate")
+	case "relay.mode.serving.limits.notifications":
+		return v.Relay.FieldIsZero("mode.serving.limits.notifications")
+	case "relay.mode.serving.limits.notifications.bucket_size":
+		return v.Relay.FieldIsZero("mode.serving.limits.notifications.bucket_size")
+	case "relay.mode.serving.limits.notifications.reload_rate":
+		return v.Relay.FieldIsZero("mode.serving.limits.notifications.reload_rate")
+	case "relay.mode.serving.limits.uplink_messages":
+		return v.Relay.FieldIsZero("mode.serving.limits.uplink_messages")
+	case "relay.mode.serving.limits.uplink_messages.bucket_size":
+		return v.Relay.FieldIsZero("mode.serving.limits.uplink_messages.bucket_size")
+	case "relay.mode.serving.limits.uplink_messages.reload_rate":
+		return v.Relay.FieldIsZero("mode.serving.limits.uplink_messages.reload_rate")
+	case "relay.mode.serving.limits.overall":
+		return v.Relay.FieldIsZero("mode.serving.limits.overall")
+	case "relay.mode.serving.limits.overall.bucket_size":
+		return v.Relay.FieldIsZero("mode.serving.limits.overall.bucket_size")
+	case "relay.mode.serving.limits.overall.reload_rate":
+		return v.Relay.FieldIsZero("mode.serving.limits.overall.reload_rate")
+	case "desired_relay":
+		return v.DesiredRelay == nil
+	case "desired_relay.mode":
+		return v.DesiredRelay.FieldIsZero("mode")
+	case "desired_relay.mode.served":
+		return v.DesiredRelay.FieldIsZero("mode.served")
+	case "desired_relay.mode.served.backoff":
+		return v.DesiredRelay.FieldIsZero("mode.served.backoff")
+	case "desired_relay.mode.served.mode":
+		return v.DesiredRelay.FieldIsZero("mode.served.mode")
+	case "desired_relay.mode.served.mode.always":
+		return v.DesiredRelay.FieldIsZero("mode.served.mode.always")
+	case "desired_relay.mode.served.mode.dynamic":
+		return v.DesiredRelay.FieldIsZero("mode.served.mode.dynamic")
+	case "desired_relay.mode.served.mode.dynamic.smart_enable_level":
+		return v.DesiredRelay.FieldIsZero("mode.served.mode.dynamic.smart_enable_level")
+	case "desired_relay.mode.served.mode.end_device_controlled":
+		return v.DesiredRelay.FieldIsZero("mode.served.mode.end_device_controlled")
+	case "desired_relay.mode.served.second_channel":
+		return v.DesiredRelay.FieldIsZero("mode.served.second_channel")
+	case "desired_relay.mode.served.second_channel.ack_offset":
+		return v.DesiredRelay.FieldIsZero("mode.served.second_channel.ack_offset")
+	case "desired_relay.mode.served.second_channel.data_rate_index":
+		return v.DesiredRelay.FieldIsZero("mode.served.second_channel.data_rate_index")
+	case "desired_relay.mode.served.second_channel.frequency":
+		return v.DesiredRelay.FieldIsZero("mode.served.second_channel.frequency")
+	case "desired_relay.mode.served.default_channel_index":
+		return v.DesiredRelay.FieldIsZero("mode.served.default_channel_index")
+	case "desired_relay.mode.served.serving_device_id":
+		return v.DesiredRelay.FieldIsZero("mode.served.serving_device_id")
+	case "desired_relay.mode.serving":
+		return v.DesiredRelay.FieldIsZero("mode.serving")
+	case "desired_relay.mode.serving.second_channel":
+		return v.DesiredRelay.FieldIsZero("mode.serving.second_channel")
+	case "desired_relay.mode.serving.second_channel.ack_offset":
+		return v.DesiredRelay.FieldIsZero("mode.serving.second_channel.ack_offset")
+	case "desired_relay.mode.serving.second_channel.data_rate_index":
+		return v.DesiredRelay.FieldIsZero("mode.serving.second_channel.data_rate_index")
+	case "desired_relay.mode.serving.second_channel.frequency":
+		return v.DesiredRelay.FieldIsZero("mode.serving.second_channel.frequency")
+	case "desired_relay.mode.serving.default_channel_index":
+		return v.DesiredRelay.FieldIsZero("mode.serving.default_channel_index")
+	case "desired_relay.mode.serving.cad_periodicity":
+		return v.DesiredRelay.FieldIsZero("mode.serving.cad_periodicity")
+	case "desired_relay.mode.serving.uplink_forwarding_rules":
+		return v.DesiredRelay.FieldIsZero("mode.serving.uplink_forwarding_rules")
+	case "desired_relay.mode.serving.limits":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits")
+	case "desired_relay.mode.serving.limits.reset_behavior":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.reset_behavior")
+	case "desired_relay.mode.serving.limits.join_requests":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.join_requests")
+	case "desired_relay.mode.serving.limits.join_requests.bucket_size":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.join_requests.bucket_size")
+	case "desired_relay.mode.serving.limits.join_requests.reload_rate":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.join_requests.reload_rate")
+	case "desired_relay.mode.serving.limits.notifications":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.notifications")
+	case "desired_relay.mode.serving.limits.notifications.bucket_size":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.notifications.bucket_size")
+	case "desired_relay.mode.serving.limits.notifications.reload_rate":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.notifications.reload_rate")
+	case "desired_relay.mode.serving.limits.uplink_messages":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.uplink_messages")
+	case "desired_relay.mode.serving.limits.uplink_messages.bucket_size":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.uplink_messages.bucket_size")
+	case "desired_relay.mode.serving.limits.uplink_messages.reload_rate":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.uplink_messages.reload_rate")
+	case "desired_relay.mode.serving.limits.overall":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.overall")
+	case "desired_relay.mode.serving.limits.overall.bucket_size":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.overall.bucket_size")
+	case "desired_relay.mode.serving.limits.overall.reload_rate":
+		return v.DesiredRelay.FieldIsZero("mode.serving.limits.overall.reload_rate")
 	case "resets_f_cnt":
 		return v.ResetsFCnt == nil
 	case "resets_f_cnt.value":
@@ -411,6 +775,80 @@ func (v *MACParameters) FieldIsZero(p string) bool {
 		return v.RejoinCountPeriodicity == 0
 	case "rejoin_time_periodicity":
 		return v.RejoinTimePeriodicity == 0
+	case "relay":
+		return v.Relay == nil
+	case "relay.mode":
+		return v.Relay.FieldIsZero("mode")
+	case "relay.mode.served":
+		return v.Relay.FieldIsZero("mode.served")
+	case "relay.mode.served.backoff":
+		return v.Relay.FieldIsZero("mode.served.backoff")
+	case "relay.mode.served.mode":
+		return v.Relay.FieldIsZero("mode.served.mode")
+	case "relay.mode.served.mode.always":
+		return v.Relay.FieldIsZero("mode.served.mode.always")
+	case "relay.mode.served.mode.dynamic":
+		return v.Relay.FieldIsZero("mode.served.mode.dynamic")
+	case "relay.mode.served.mode.dynamic.smart_enable_level":
+		return v.Relay.FieldIsZero("mode.served.mode.dynamic.smart_enable_level")
+	case "relay.mode.served.mode.end_device_controlled":
+		return v.Relay.FieldIsZero("mode.served.mode.end_device_controlled")
+	case "relay.mode.served.second_channel":
+		return v.Relay.FieldIsZero("mode.served.second_channel")
+	case "relay.mode.served.second_channel.ack_offset":
+		return v.Relay.FieldIsZero("mode.served.second_channel.ack_offset")
+	case "relay.mode.served.second_channel.data_rate_index":
+		return v.Relay.FieldIsZero("mode.served.second_channel.data_rate_index")
+	case "relay.mode.served.second_channel.frequency":
+		return v.Relay.FieldIsZero("mode.served.second_channel.frequency")
+	case "relay.mode.served.default_channel_index":
+		return v.Relay.FieldIsZero("mode.served.default_channel_index")
+	case "relay.mode.served.serving_device_id":
+		return v.Relay.FieldIsZero("mode.served.serving_device_id")
+	case "relay.mode.serving":
+		return v.Relay.FieldIsZero("mode.serving")
+	case "relay.mode.serving.second_channel":
+		return v.Relay.FieldIsZero("mode.serving.second_channel")
+	case "relay.mode.serving.second_channel.ack_offset":
+		return v.Relay.FieldIsZero("mode.serving.second_channel.ack_offset")
+	case "relay.mode.serving.second_channel.data_rate_index":
+		return v.Relay.FieldIsZero("mode.serving.second_channel.data_rate_index")
+	case "relay.mode.serving.second_channel.frequency":
+		return v.Relay.FieldIsZero("mode.serving.second_channel.frequency")
+	case "relay.mode.serving.default_channel_index":
+		return v.Relay.FieldIsZero("mode.serving.default_channel_index")
+	case "relay.mode.serving.cad_periodicity":
+		return v.Relay.FieldIsZero("mode.serving.cad_periodicity")
+	case "relay.mode.serving.uplink_forwarding_rules":
+		return v.Relay.FieldIsZero("mode.serving.uplink_forwarding_rules")
+	case "relay.mode.serving.limits":
+		return v.Relay.FieldIsZero("mode.serving.limits")
+	case "relay.mode.serving.limits.reset_behavior":
+		return v.Relay.FieldIsZero("mode.serving.limits.reset_behavior")
+	case "relay.mode.serving.limits.join_requests":
+		return v.Relay.FieldIsZero("mode.serving.limits.join_requests")
+	case "relay.mode.serving.limits.join_requests.bucket_size":
+		return v.Relay.FieldIsZero("mode.serving.limits.join_requests.bucket_size")
+	case "relay.mode.serving.limits.join_requests.reload_rate":
+		return v.Relay.FieldIsZero("mode.serving.limits.join_requests.reload_rate")
+	case "relay.mode.serving.limits.notifications":
+		return v.Relay.FieldIsZero("mode.serving.limits.notifications")
+	case "relay.mode.serving.limits.notifications.bucket_size":
+		return v.Relay.FieldIsZero("mode.serving.limits.notifications.bucket_size")
+	case "relay.mode.serving.limits.notifications.reload_rate":
+		return v.Relay.FieldIsZero("mode.serving.limits.notifications.reload_rate")
+	case "relay.mode.serving.limits.uplink_messages":
+		return v.Relay.FieldIsZero("mode.serving.limits.uplink_messages")
+	case "relay.mode.serving.limits.uplink_messages.bucket_size":
+		return v.Relay.FieldIsZero("mode.serving.limits.uplink_messages.bucket_size")
+	case "relay.mode.serving.limits.uplink_messages.reload_rate":
+		return v.Relay.FieldIsZero("mode.serving.limits.uplink_messages.reload_rate")
+	case "relay.mode.serving.limits.overall":
+		return v.Relay.FieldIsZero("mode.serving.limits.overall")
+	case "relay.mode.serving.limits.overall.bucket_size":
+		return v.Relay.FieldIsZero("mode.serving.limits.overall.bucket_size")
+	case "relay.mode.serving.limits.overall.reload_rate":
+		return v.Relay.FieldIsZero("mode.serving.limits.overall.reload_rate")
 	case "rx1_data_rate_offset":
 		return v.Rx1DataRateOffset == 0
 	case "rx1_delay":
@@ -579,6 +1017,80 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.CurrentParameters.FieldIsZero("rejoin_count_periodicity")
 	case "current_parameters.rejoin_time_periodicity":
 		return v.CurrentParameters.FieldIsZero("rejoin_time_periodicity")
+	case "current_parameters.relay":
+		return v.CurrentParameters.FieldIsZero("relay")
+	case "current_parameters.relay.mode":
+		return v.CurrentParameters.FieldIsZero("relay.mode")
+	case "current_parameters.relay.mode.served":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served")
+	case "current_parameters.relay.mode.served.backoff":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.backoff")
+	case "current_parameters.relay.mode.served.mode":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.mode")
+	case "current_parameters.relay.mode.served.mode.always":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.mode.always")
+	case "current_parameters.relay.mode.served.mode.dynamic":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.mode.dynamic")
+	case "current_parameters.relay.mode.served.mode.dynamic.smart_enable_level":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.mode.dynamic.smart_enable_level")
+	case "current_parameters.relay.mode.served.mode.end_device_controlled":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.mode.end_device_controlled")
+	case "current_parameters.relay.mode.served.second_channel":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.second_channel")
+	case "current_parameters.relay.mode.served.second_channel.ack_offset":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.second_channel.ack_offset")
+	case "current_parameters.relay.mode.served.second_channel.data_rate_index":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.second_channel.data_rate_index")
+	case "current_parameters.relay.mode.served.second_channel.frequency":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.second_channel.frequency")
+	case "current_parameters.relay.mode.served.default_channel_index":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.default_channel_index")
+	case "current_parameters.relay.mode.served.serving_device_id":
+		return v.CurrentParameters.FieldIsZero("relay.mode.served.serving_device_id")
+	case "current_parameters.relay.mode.serving":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving")
+	case "current_parameters.relay.mode.serving.second_channel":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.second_channel")
+	case "current_parameters.relay.mode.serving.second_channel.ack_offset":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.second_channel.ack_offset")
+	case "current_parameters.relay.mode.serving.second_channel.data_rate_index":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.second_channel.data_rate_index")
+	case "current_parameters.relay.mode.serving.second_channel.frequency":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.second_channel.frequency")
+	case "current_parameters.relay.mode.serving.default_channel_index":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.default_channel_index")
+	case "current_parameters.relay.mode.serving.cad_periodicity":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.cad_periodicity")
+	case "current_parameters.relay.mode.serving.uplink_forwarding_rules":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.uplink_forwarding_rules")
+	case "current_parameters.relay.mode.serving.limits":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits")
+	case "current_parameters.relay.mode.serving.limits.reset_behavior":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.reset_behavior")
+	case "current_parameters.relay.mode.serving.limits.join_requests":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.join_requests")
+	case "current_parameters.relay.mode.serving.limits.join_requests.bucket_size":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.join_requests.bucket_size")
+	case "current_parameters.relay.mode.serving.limits.join_requests.reload_rate":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.join_requests.reload_rate")
+	case "current_parameters.relay.mode.serving.limits.notifications":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.notifications")
+	case "current_parameters.relay.mode.serving.limits.notifications.bucket_size":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.notifications.bucket_size")
+	case "current_parameters.relay.mode.serving.limits.notifications.reload_rate":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.notifications.reload_rate")
+	case "current_parameters.relay.mode.serving.limits.uplink_messages":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.uplink_messages")
+	case "current_parameters.relay.mode.serving.limits.uplink_messages.bucket_size":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.uplink_messages.bucket_size")
+	case "current_parameters.relay.mode.serving.limits.uplink_messages.reload_rate":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.uplink_messages.reload_rate")
+	case "current_parameters.relay.mode.serving.limits.overall":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.overall")
+	case "current_parameters.relay.mode.serving.limits.overall.bucket_size":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.overall.bucket_size")
+	case "current_parameters.relay.mode.serving.limits.overall.reload_rate":
+		return v.CurrentParameters.FieldIsZero("relay.mode.serving.limits.overall.reload_rate")
 	case "current_parameters.rx1_data_rate_offset":
 		return v.CurrentParameters.FieldIsZero("rx1_data_rate_offset")
 	case "current_parameters.rx1_delay":
@@ -635,6 +1147,80 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.DesiredParameters.FieldIsZero("rejoin_count_periodicity")
 	case "desired_parameters.rejoin_time_periodicity":
 		return v.DesiredParameters.FieldIsZero("rejoin_time_periodicity")
+	case "desired_parameters.relay":
+		return v.DesiredParameters.FieldIsZero("relay")
+	case "desired_parameters.relay.mode":
+		return v.DesiredParameters.FieldIsZero("relay.mode")
+	case "desired_parameters.relay.mode.served":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served")
+	case "desired_parameters.relay.mode.served.backoff":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.backoff")
+	case "desired_parameters.relay.mode.served.mode":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.mode")
+	case "desired_parameters.relay.mode.served.mode.always":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.mode.always")
+	case "desired_parameters.relay.mode.served.mode.dynamic":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.mode.dynamic")
+	case "desired_parameters.relay.mode.served.mode.dynamic.smart_enable_level":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.mode.dynamic.smart_enable_level")
+	case "desired_parameters.relay.mode.served.mode.end_device_controlled":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.mode.end_device_controlled")
+	case "desired_parameters.relay.mode.served.second_channel":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.second_channel")
+	case "desired_parameters.relay.mode.served.second_channel.ack_offset":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.second_channel.ack_offset")
+	case "desired_parameters.relay.mode.served.second_channel.data_rate_index":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.second_channel.data_rate_index")
+	case "desired_parameters.relay.mode.served.second_channel.frequency":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.second_channel.frequency")
+	case "desired_parameters.relay.mode.served.default_channel_index":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.default_channel_index")
+	case "desired_parameters.relay.mode.served.serving_device_id":
+		return v.DesiredParameters.FieldIsZero("relay.mode.served.serving_device_id")
+	case "desired_parameters.relay.mode.serving":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving")
+	case "desired_parameters.relay.mode.serving.second_channel":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.second_channel")
+	case "desired_parameters.relay.mode.serving.second_channel.ack_offset":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.second_channel.ack_offset")
+	case "desired_parameters.relay.mode.serving.second_channel.data_rate_index":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.second_channel.data_rate_index")
+	case "desired_parameters.relay.mode.serving.second_channel.frequency":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.second_channel.frequency")
+	case "desired_parameters.relay.mode.serving.default_channel_index":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.default_channel_index")
+	case "desired_parameters.relay.mode.serving.cad_periodicity":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.cad_periodicity")
+	case "desired_parameters.relay.mode.serving.uplink_forwarding_rules":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.uplink_forwarding_rules")
+	case "desired_parameters.relay.mode.serving.limits":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits")
+	case "desired_parameters.relay.mode.serving.limits.reset_behavior":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.reset_behavior")
+	case "desired_parameters.relay.mode.serving.limits.join_requests":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.join_requests")
+	case "desired_parameters.relay.mode.serving.limits.join_requests.bucket_size":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.join_requests.bucket_size")
+	case "desired_parameters.relay.mode.serving.limits.join_requests.reload_rate":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.join_requests.reload_rate")
+	case "desired_parameters.relay.mode.serving.limits.notifications":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.notifications")
+	case "desired_parameters.relay.mode.serving.limits.notifications.bucket_size":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.notifications.bucket_size")
+	case "desired_parameters.relay.mode.serving.limits.notifications.reload_rate":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.notifications.reload_rate")
+	case "desired_parameters.relay.mode.serving.limits.uplink_messages":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.uplink_messages")
+	case "desired_parameters.relay.mode.serving.limits.uplink_messages.bucket_size":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.uplink_messages.bucket_size")
+	case "desired_parameters.relay.mode.serving.limits.uplink_messages.reload_rate":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.uplink_messages.reload_rate")
+	case "desired_parameters.relay.mode.serving.limits.overall":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.overall")
+	case "desired_parameters.relay.mode.serving.limits.overall.bucket_size":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.overall.bucket_size")
+	case "desired_parameters.relay.mode.serving.limits.overall.reload_rate":
+		return v.DesiredParameters.FieldIsZero("relay.mode.serving.limits.overall.reload_rate")
 	case "desired_parameters.rx1_data_rate_offset":
 		return v.DesiredParameters.FieldIsZero("rx1_data_rate_offset")
 	case "desired_parameters.rx1_delay":
@@ -815,6 +1401,10 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.PendingJoinRequest.FieldIsZero("rx_delay")
 	case "pending_join_request.selected_mac_version":
 		return v.PendingJoinRequest.FieldIsZero("selected_mac_version")
+	case "pending_relay_downlink":
+		return v.PendingRelayDownlink == nil
+	case "pending_relay_downlink.raw_payload":
+		return v.PendingRelayDownlink.FieldIsZero("raw_payload")
 	case "pending_requests":
 		return v.PendingRequests == nil
 	case "ping_slot_periodicity":
@@ -1199,6 +1789,150 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MacSettings.FieldIsZero("ping_slot_periodicity")
 	case "mac_settings.ping_slot_periodicity.value":
 		return v.MacSettings.FieldIsZero("ping_slot_periodicity.value")
+	case "mac_settings.relay":
+		return v.MacSettings.FieldIsZero("relay")
+	case "mac_settings.relay.mode":
+		return v.MacSettings.FieldIsZero("relay.mode")
+	case "mac_settings.relay.mode.served":
+		return v.MacSettings.FieldIsZero("relay.mode.served")
+	case "mac_settings.relay.mode.served.backoff":
+		return v.MacSettings.FieldIsZero("relay.mode.served.backoff")
+	case "mac_settings.relay.mode.served.mode":
+		return v.MacSettings.FieldIsZero("relay.mode.served.mode")
+	case "mac_settings.relay.mode.served.mode.always":
+		return v.MacSettings.FieldIsZero("relay.mode.served.mode.always")
+	case "mac_settings.relay.mode.served.mode.dynamic":
+		return v.MacSettings.FieldIsZero("relay.mode.served.mode.dynamic")
+	case "mac_settings.relay.mode.served.mode.dynamic.smart_enable_level":
+		return v.MacSettings.FieldIsZero("relay.mode.served.mode.dynamic.smart_enable_level")
+	case "mac_settings.relay.mode.served.mode.end_device_controlled":
+		return v.MacSettings.FieldIsZero("relay.mode.served.mode.end_device_controlled")
+	case "mac_settings.relay.mode.served.second_channel":
+		return v.MacSettings.FieldIsZero("relay.mode.served.second_channel")
+	case "mac_settings.relay.mode.served.second_channel.ack_offset":
+		return v.MacSettings.FieldIsZero("relay.mode.served.second_channel.ack_offset")
+	case "mac_settings.relay.mode.served.second_channel.data_rate_index":
+		return v.MacSettings.FieldIsZero("relay.mode.served.second_channel.data_rate_index")
+	case "mac_settings.relay.mode.served.second_channel.frequency":
+		return v.MacSettings.FieldIsZero("relay.mode.served.second_channel.frequency")
+	case "mac_settings.relay.mode.served.serving_device_id":
+		return v.MacSettings.FieldIsZero("relay.mode.served.serving_device_id")
+	case "mac_settings.relay.mode.serving":
+		return v.MacSettings.FieldIsZero("relay.mode.serving")
+	case "mac_settings.relay.mode.serving.second_channel":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.second_channel")
+	case "mac_settings.relay.mode.serving.second_channel.ack_offset":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.second_channel.ack_offset")
+	case "mac_settings.relay.mode.serving.second_channel.data_rate_index":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.second_channel.data_rate_index")
+	case "mac_settings.relay.mode.serving.second_channel.frequency":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.second_channel.frequency")
+	case "mac_settings.relay.mode.serving.default_channel_index":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.default_channel_index")
+	case "mac_settings.relay.mode.serving.cad_periodicity":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.cad_periodicity")
+	case "mac_settings.relay.mode.serving.uplink_forwarding_rules":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.uplink_forwarding_rules")
+	case "mac_settings.relay.mode.serving.limits":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits")
+	case "mac_settings.relay.mode.serving.limits.reset_behavior":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.reset_behavior")
+	case "mac_settings.relay.mode.serving.limits.join_requests":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.join_requests")
+	case "mac_settings.relay.mode.serving.limits.join_requests.bucket_size":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.join_requests.bucket_size")
+	case "mac_settings.relay.mode.serving.limits.join_requests.reload_rate":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.join_requests.reload_rate")
+	case "mac_settings.relay.mode.serving.limits.notifications":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.notifications")
+	case "mac_settings.relay.mode.serving.limits.notifications.bucket_size":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.notifications.bucket_size")
+	case "mac_settings.relay.mode.serving.limits.notifications.reload_rate":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.notifications.reload_rate")
+	case "mac_settings.relay.mode.serving.limits.uplink_messages":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.uplink_messages")
+	case "mac_settings.relay.mode.serving.limits.uplink_messages.bucket_size":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.uplink_messages.bucket_size")
+	case "mac_settings.relay.mode.serving.limits.uplink_messages.reload_rate":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.uplink_messages.reload_rate")
+	case "mac_settings.relay.mode.serving.limits.overall":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.overall")
+	case "mac_settings.relay.mode.serving.limits.overall.bucket_size":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.overall.bucket_size")
+	case "mac_settings.relay.mode.serving.limits.overall.reload_rate":
+		return v.MacSettings.FieldIsZero("relay.mode.serving.limits.overall.reload_rate")
+	case "mac_settings.desired_relay":
+		return v.MacSettings.FieldIsZero("desired_relay")
+	case "mac_settings.desired_relay.mode":
+		return v.MacSettings.FieldIsZero("desired_relay.mode")
+	case "mac_settings.desired_relay.mode.served":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served")
+	case "mac_settings.desired_relay.mode.served.backoff":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.backoff")
+	case "mac_settings.desired_relay.mode.served.mode":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.mode")
+	case "mac_settings.desired_relay.mode.served.mode.always":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.mode.always")
+	case "mac_settings.desired_relay.mode.served.mode.dynamic":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.mode.dynamic")
+	case "mac_settings.desired_relay.mode.served.mode.dynamic.smart_enable_level":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.mode.dynamic.smart_enable_level")
+	case "mac_settings.desired_relay.mode.served.mode.end_device_controlled":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.mode.end_device_controlled")
+	case "mac_settings.desired_relay.mode.served.second_channel":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.second_channel")
+	case "mac_settings.desired_relay.mode.served.second_channel.ack_offset":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.second_channel.ack_offset")
+	case "mac_settings.desired_relay.mode.served.second_channel.data_rate_index":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.second_channel.data_rate_index")
+	case "mac_settings.desired_relay.mode.served.second_channel.frequency":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.second_channel.frequency")
+	case "mac_settings.desired_relay.mode.served.serving_device_id":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.served.serving_device_id")
+	case "mac_settings.desired_relay.mode.serving":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving")
+	case "mac_settings.desired_relay.mode.serving.second_channel":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.second_channel")
+	case "mac_settings.desired_relay.mode.serving.second_channel.ack_offset":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.second_channel.ack_offset")
+	case "mac_settings.desired_relay.mode.serving.second_channel.data_rate_index":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.second_channel.data_rate_index")
+	case "mac_settings.desired_relay.mode.serving.second_channel.frequency":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.second_channel.frequency")
+	case "mac_settings.desired_relay.mode.serving.default_channel_index":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.default_channel_index")
+	case "mac_settings.desired_relay.mode.serving.cad_periodicity":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.cad_periodicity")
+	case "mac_settings.desired_relay.mode.serving.uplink_forwarding_rules":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.uplink_forwarding_rules")
+	case "mac_settings.desired_relay.mode.serving.limits":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits")
+	case "mac_settings.desired_relay.mode.serving.limits.reset_behavior":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.reset_behavior")
+	case "mac_settings.desired_relay.mode.serving.limits.join_requests":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.join_requests")
+	case "mac_settings.desired_relay.mode.serving.limits.join_requests.bucket_size":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.join_requests.bucket_size")
+	case "mac_settings.desired_relay.mode.serving.limits.join_requests.reload_rate":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.join_requests.reload_rate")
+	case "mac_settings.desired_relay.mode.serving.limits.notifications":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.notifications")
+	case "mac_settings.desired_relay.mode.serving.limits.notifications.bucket_size":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.notifications.bucket_size")
+	case "mac_settings.desired_relay.mode.serving.limits.notifications.reload_rate":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.notifications.reload_rate")
+	case "mac_settings.desired_relay.mode.serving.limits.uplink_messages":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.uplink_messages")
+	case "mac_settings.desired_relay.mode.serving.limits.uplink_messages.bucket_size":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.uplink_messages.bucket_size")
+	case "mac_settings.desired_relay.mode.serving.limits.uplink_messages.reload_rate":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.uplink_messages.reload_rate")
+	case "mac_settings.desired_relay.mode.serving.limits.overall":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.overall")
+	case "mac_settings.desired_relay.mode.serving.limits.overall.bucket_size":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.overall.bucket_size")
+	case "mac_settings.desired_relay.mode.serving.limits.overall.reload_rate":
+		return v.MacSettings.FieldIsZero("desired_relay.mode.serving.limits.overall.reload_rate")
 	case "mac_settings.resets_f_cnt":
 		return v.MacSettings.FieldIsZero("resets_f_cnt")
 	case "mac_settings.resets_f_cnt.value":

@@ -450,6 +450,11 @@ type connectionEntry struct {
 	tasksDone *sync.WaitGroup
 }
 
+// AssertGatewayRights checks that the caller has the required rights over the provided gateway identifiers.
+func (gs *GatewayServer) AssertGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers, rights ...ttnpb.Right) error {
+	return gs.entityRegistry.AssertGatewayRights(ctx, ids, rights...)
+}
+
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
 func (gs *GatewayServer) Connect(
@@ -459,7 +464,7 @@ func (gs *GatewayServer) Connect(
 	addr *ttnpb.GatewayRemoteAddress,
 	opts ...io.ConnectionOption,
 ) (*io.Connection, error) {
-	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
+	if err := gs.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 
@@ -486,6 +491,7 @@ func (gs *GatewayServer) Connect(
 			"enforce_duty_cycle",
 			"frequency_plan_id",
 			"frequency_plan_ids",
+			"gateway_server_address",
 			"location_public",
 			"require_authenticated_connection",
 			"schedule_anytime_delay",
@@ -611,7 +617,8 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 		connected.StatusPublic != current.StatusPublic ||
 		connected.UpdateLocationFromStatus != current.UpdateLocationFromStatus ||
 		connected.FrequencyPlanId != current.FrequencyPlanId ||
-		len(connected.FrequencyPlanIds) != len(current.FrequencyPlanIds) {
+		len(connected.FrequencyPlanIds) != len(current.FrequencyPlanIds) ||
+		connected.GatewayServerAddress != current.GatewayServerAddress {
 		return true
 	}
 	for i := range connected.FrequencyPlanIds {
@@ -646,6 +653,7 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 					"enforce_duty_cycle",
 					"frequency_plan_id",
 					"frequency_plan_ids",
+					"gateway_server_address",
 					"location_public",
 					"require_authenticated_connection",
 					"schedule_anytime_delay",

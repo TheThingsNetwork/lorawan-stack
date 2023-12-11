@@ -32,6 +32,8 @@ message ListFrequencyPlansRequest {
   };
   // Optional base frequency in MHz for hardware support (433, 470, 868 or 915)
   uint32 base_frequency = 1;
+  // Optional Band ID to filter the results.
+  string band_id = 2;
 }
 
 message FrequencyPlanDescription {
@@ -41,6 +43,7 @@ message FrequencyPlanDescription {
   string name = 3;
   // Base frequency in MHz for hardware support (433, 470, 868 or 915)
   uint32 base_frequency = 4;
+  string band_id = 5;
 }
 
 message ListFrequencyPlansResponse {
@@ -135,6 +138,8 @@ message BandDescription {
   google.protobuf.Duration max_retransmit_timeout = 21;
   repeated float tx_offset = 22;
   DataRateIndex max_adr_data_rate_index = 23;
+  google.protobuf.Duration relay_forward_delay = 34;
+  google.protobuf.Duration relay_receive_delay = 35;
 
   bool tx_param_setup_req_support = 24;
   float default_max_eirp = 25;

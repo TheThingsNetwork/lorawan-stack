@@ -17,6 +17,7 @@ import { generateCollaborator } from '../../../support/utils'
 describe('Gateway general settings', () => {
   let user
   let gateway
+  let gateway2
   const collabUserId = 'test-collab-user'
   const collabUser = {
     ids: { user_id: collabUserId },
@@ -46,7 +47,20 @@ describe('Gateway general settings', () => {
         key: 'value',
       },
     }
+    gateway2 = {
+      ids: { gateway_id: 'test-gateway-frequency-plans', eui: '0000000000000001' },
+      name: 'Test Gateway Frequency Plans',
+      description: 'Gateway for testing multiple frequency plans',
+      schedule_anytime_delay: '523ms',
+      enforce_duty_cycle: true,
+      gateway_server_address: 'localhost',
+      attributes: {
+        key: 'value',
+      },
+      frequency_plan_ids: ['EU_863_870', 'US_902_928_FSB_1'],
+    }
     cy.createGateway(gateway, user.ids.user_id)
+    cy.createGateway(gateway2, user.ids.user_id)
   })
 
   it('displays newly created gateway values', () => {
@@ -122,9 +136,9 @@ describe('Gateway general settings', () => {
     cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
     cy.findByRole('button', { name: /Delete gateway/ }).should('be.visible')
     cy.findByRole('heading', { name: 'LoRaWAN options' }).should('be.visible')
-    cy.findByLabelText('Frequency plan').should('not.exist')
+    cy.findByText('Frequency plan').should('not.exist')
     cy.findByRole('button', { name: 'Expand' }).click()
-    cy.findByLabelText('Frequency plan').should('be.visible')
+    cy.findByText('Frequency plan').should('be.visible')
     cy.findByLabelText(/Enforce duty cycle/)
       .should('exist')
       .and('have.attr', 'value', 'true')
@@ -192,7 +206,11 @@ describe('Gateway general settings', () => {
         cy.findByLabelText(/Enforce duty cycle/).uncheck()
         cy.findByLabelText('Schedule any time delay').clear()
         cy.findByLabelText('Schedule any time delay').type('1')
-        cy.findByLabelText('Frequency plan').type(`${newFrequencyPlan}{enter}`)
+        cy.findByText('Frequency plan')
+          .parents('div[data-test-id="form-field"]')
+          .find('input')
+          .first()
+          .selectOption(newFrequencyPlan)
         cy.findByRole('button', { name: 'Save changes' }).click()
       })
 
@@ -272,6 +290,38 @@ describe('Gateway general settings', () => {
       .parent()
       .within(() => {
         cy.findByText(user.ids.user_id).should('be.visible')
+      })
+  })
+
+  it('succeeds editing multiple frequency plans', () => {
+    const newFrequencyPlan = 'Europe 863-870 MHz, 6 channels for roaming (Draft)'
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway2.ids.gateway_id}/general-settings`,
+    )
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByText('Frequency plan')
+          .parents('div[data-test-id="form-field"]')
+          .find('input')
+          .first()
+          .selectOption(newFrequencyPlan)
+        cy.findByRole('button', { name: 'Save changes' }).click()
+      })
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText('Gateway updated').should('be.visible')
+    cy.reload()
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByText('Frequency plan')
+        cy.findByText(newFrequencyPlan)
       })
   })
 

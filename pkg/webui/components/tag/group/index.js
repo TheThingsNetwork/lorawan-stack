@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
 
 import Tooltip from '@ttn-lw/components/tooltip'
 
@@ -28,97 +27,62 @@ const measureWidth = element => {
   if (!element) {
     return 0
   }
-
-  return element.current.clientWidth
+  return element.clientWidth
 }
 
-// The width in pixels for the left tag.
 const LEFT_TAG_WIDTH = 40
-// The space between the tags.
 const TAG_SPACE_WIDTH = 3
 
-class TagGroup extends React.Component {
-  static propTypes = {
-    className: PropTypes.string,
-    tagMaxWidth: PropTypes.number.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.shape(Tag.PropTypes)).isRequired,
-  }
+const TagGroup = ({ className, tagMaxWidth, tags }) => {
+  const [left, setLeft] = useState(0)
+  const element = useRef(null)
 
-  static defaultProps = {
-    className: undefined,
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      left: 0,
-    }
-
-    this.element = React.createRef()
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.handleWindowResize)
-
-    this.handleWindowResize()
-  }
-
-  componentDidUpdate(prevProps) {
-    const props = this.props
-
-    // Calculate fit on any props change.
-    if (prevProps.tags !== props.tags) {
-      this.checkTagsFit()
-    }
-  }
-
-  checkTagsFit() {
-    this.handleWindowResize()
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleWindowResize)
-  }
-
-  @bind
-  handleWindowResize() {
-    const { tags, tagMaxWidth } = this.props
-
-    const containerWidth = measureWidth(this.element)
+  const handleWindowResize = useCallback(() => {
+    const containerWidth = measureWidth(element.current)
     const totalTagCount = tags.length
     const possibleFitCount = Math.floor(containerWidth / tagMaxWidth) || 1
 
-    // Count for the left tag and paddings between tags.
     const leftTagWidth = totalTagCount !== possibleFitCount ? LEFT_TAG_WIDTH : 0
     const spaceWidth = possibleFitCount > 1 ? possibleFitCount * TAG_SPACE_WIDTH : 0
 
     const finalAvailableWidth = containerWidth - leftTagWidth - spaceWidth
     const finalLeft = Math.floor(finalAvailableWidth / tagMaxWidth) || 1
 
-    this.setState({
-      left: totalTagCount - finalLeft,
-    })
-  }
+    setLeft(totalTagCount - finalLeft)
+  }, [tagMaxWidth, tags.length])
 
-  render() {
-    const { className, tags } = this.props
-    const { left } = this.state
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowResize)
+    handleWindowResize()
 
-    const ts = tags.slice(0, tags.length - left)
-    const leftGroup = <div className={style.leftGroup}>{tags.slice(tags.length - left)}</div>
+    return () => {
+      window.removeEventListener('resize', handleWindowResize)
+    }
+  }, [handleWindowResize, tags])
 
-    return (
-      <div ref={this.element} className={classnames(className, style.group)}>
-        {ts}
-        {left > 0 && (
-          <Tooltip content={leftGroup}>
-            <Tag content={`+${left}`} />
-          </Tooltip>
-        )}
-      </div>
-    )
-  }
+  const ts = useMemo(() => tags.slice(0, tags.length - left), [left, tags])
+  const leftGroup = <div className={style.leftGroup}>{tags.slice(tags.length - left)}</div>
+
+  return (
+    <div ref={element} className={classnames(className, style.group)}>
+      {ts}
+      {left > 0 && (
+        <Tooltip content={leftGroup}>
+          <Tag content={`+${left}`} />
+        </Tooltip>
+      )}
+    </div>
+  )
+}
+
+TagGroup.propTypes = {
+  className: PropTypes.string,
+  tagMaxWidth: PropTypes.number.isRequired,
+  tags: PropTypes.arrayOf(PropTypes.shape(Tag.PropTypes)).isRequired,
+}
+
+TagGroup.defaultProps = {
+  className: undefined,
 }
 
 export default TagGroup

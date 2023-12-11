@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect as storeConnect } from 'react-redux'
-import bind from 'autobind-decorator'
+import React, { useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
@@ -37,66 +36,60 @@ export default ({
   defaultDescription,
   additionalOptions = [],
 }) => {
-  @storeConnect(
-    state => ({
-      options: [...optionsFormatter(optionsSelector(state)), ...additionalOptions],
-      error: errorSelector(state),
-      fetching: fetchingSelector(state),
-    }),
-    { fetchOptions },
-  )
-  class FetchSelect extends React.PureComponent {
-    static propTypes = {
-      ...fieldPropTypes,
-      ...Select.propTypes,
-      defaultWarning: PropTypes.message,
-      description: PropTypes.message,
-      fetchOptions: PropTypes.func.isRequired,
-      menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
-      onChange: PropTypes.func,
-      options: PropTypes.arrayOf(
-        PropTypes.shape({ value: PropTypes.string, label: PropTypes.message }),
-      ),
-      title: PropTypes.message,
-      warning: PropTypes.message,
-    }
+  const FetchSelect = props => {
+    const { warning, onChange, ...rest } = props
+    const options = [...optionsFormatter(useSelector(optionsSelector)), ...additionalOptions]
+    const error = useSelector(errorSelector)
+    const fetching = useSelector(fetchingSelector)
+    const dispatch = useDispatch()
 
-    static defaultProps = {
-      description: defaultDescription,
-      menuPlacement: 'auto',
-      onChange: () => null,
-      options: [],
-      title: defaultTitle,
-      warning: undefined,
-      defaultWarning,
-    }
+    useEffect(() => {
+      dispatch(fetchOptions())
+    }, [dispatch])
 
-    componentDidMount() {
-      const { fetchOptions } = this.props
+    const handleChange = useCallback(
+      value => {
+        const selectedOption = options.find(option => option.value === value)
+        onChange(selectedOption)
+      },
+      [onChange, options],
+    )
 
-      fetchOptions()
-    }
+    return (
+      <Field
+        {...rest}
+        options={options}
+        component={Select}
+        isLoading={fetching}
+        warning={Boolean(error) ? defaultWarning : warning}
+        onChange={handleChange}
+      />
+    )
+  }
 
-    @bind
-    handleChange(value) {
-      const { onChange, options } = this.props
+  FetchSelect.propTypes = {
+    ...fieldPropTypes,
+    ...Select.propTypes,
+    defaultWarning: PropTypes.message,
+    description: PropTypes.message,
+    fetchOptions: PropTypes.func.isRequired,
+    menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
+    onChange: PropTypes.func,
+    options: PropTypes.arrayOf(
+      PropTypes.shape({ value: PropTypes.string, label: PropTypes.message }),
+    ),
+    title: PropTypes.message,
+    warning: PropTypes.message,
+  }
 
-      onChange(options.find(e => e.value === value))
-    }
-
-    render() {
-      const { error, fetching, warning, defaultWarning, ...rest } = this.props
-
-      return (
-        <Field
-          {...rest}
-          component={Select}
-          isLoading={fetching}
-          warning={Boolean(error) ? defaultWarning : warning}
-          onChange={this.handleChange}
-        />
-      )
-    }
+  FetchSelect.defaultProps = {
+    description: defaultDescription,
+    menuPlacement: 'auto',
+    onChange: () => null,
+    options: [],
+    title: defaultTitle,
+    warning: undefined,
+    defaultWarning,
   }
 
   return FetchSelect

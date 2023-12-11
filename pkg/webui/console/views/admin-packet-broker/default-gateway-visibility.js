@@ -19,12 +19,16 @@ import { useSelector, useDispatch } from 'react-redux'
 import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import GatewayVisibilityForm from '@console/components/gateway-visibility-form'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { setHomeNetworkDefaultGatewayVisibility } from '@console/store/actions/packet-broker'
+import {
+  getHomeNetworkDefaultGatewayVisibility,
+  setHomeNetworkDefaultGatewayVisibility,
+} from '@console/store/actions/packet-broker'
 
 import { selectHomeNetworkDefaultGatewayVisibility } from '@console/store/selectors/packet-broker'
 
@@ -55,18 +59,20 @@ const DefaultGatewayVisibilityView = () => {
   )
 
   return (
-    <Col md={12}>
-      <Message
-        content={m.gatewayVisibilityInformation}
-        component="p"
-        className={style.routingPolicyInformation}
-      />
-      <GatewayVisibilityForm
-        onSubmit={handleDefaultGatewayVisibilitySubmit}
-        initialValues={initialValues}
-        error={formError}
-      />
-    </Col>
+    <RequireRequest requestAction={getHomeNetworkDefaultGatewayVisibility()}>
+      <Col md={12}>
+        <Message
+          content={m.gatewayVisibilityInformation}
+          component="p"
+          className={style.routingPolicyInformation}
+        />
+        <GatewayVisibilityForm
+          onSubmit={handleDefaultGatewayVisibilitySubmit}
+          initialValues={initialValues}
+          error={formError}
+        />
+      </Col>
+    </RequireRequest>
   )
 }
 

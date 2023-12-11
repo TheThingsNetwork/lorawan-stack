@@ -20,7 +20,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"os"
-	"sync"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -167,7 +166,6 @@ type NetworkServer struct {
 	newDevAddr      newDevAddrFunc
 	devAddrPrefixes devAddrPrefixesFunc
 
-	applicationServers *sync.Map // string -> *applicationUpStream
 	applicationUplinks ApplicationUplinkQueue
 
 	downlinkTasks      DownlinkTaskQueue
@@ -282,7 +280,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		clusterID:                conf.ClusterID,
 		newDevAddr:               makeNewDevAddrFunc(devAddrPrefixes...),
 		devAddrPrefixes:          makeDevAddrPrefixesFunc(devAddrPrefixes...),
-		applicationServers:       &sync.Map{},
 		applicationUplinks:       conf.ApplicationUplinkQueue.Queue,
 		deduplicationWindow:      makeWindowDurationFunc(conf.DeduplicationWindow),
 		collectionWindow:         makeWindowDurationFunc(conf.DeduplicationWindow + conf.CooldownWindow),
@@ -349,8 +346,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	for id, dispatcher := range map[string]interface {
 		Dispatch(context.Context, string) error
 	}{
-		downlinkDispatchTaskName:          ns.downlinkTasks,
-		applicationUplinkDispatchTaskName: ns.applicationUplinks,
+		downlinkDispatchTaskName: ns.downlinkTasks,
 	} {
 		dispatcher := dispatcher
 		ns.RegisterTask(&task.Config{

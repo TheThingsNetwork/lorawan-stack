@@ -15,8 +15,6 @@
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
-  // Field messages
-  payload: 'Payload',
   MACPayload: 'MAC payload',
   devAddr: 'DevAddr',
   fPort: 'FPort',
@@ -37,6 +35,7 @@ const messages = defineMessages({
   rx2DataRateIndex: 'Rx2 Data Rate Index',
   rx2Frequency: 'Rx2 Frequency',
   class: 'Class',
+
   // Generic messages
   eventDetails: 'Event details',
   rawEvent: 'Raw event',
@@ -53,7 +52,6 @@ const messages = defineMessages({
     'Old events have been truncated to save memory. The current event limit per stream is {limit}.',
   eventUnavailable: 'This event is not available anymore. It was likely truncated to save memory.',
   verboseStream: 'Verbose stream',
-  confirmedDownlink: 'Confirmed downlink',
   confirmedUplink: 'Confirmed uplink',
 })
 

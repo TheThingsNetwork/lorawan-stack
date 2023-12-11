@@ -36,8 +36,6 @@ import style from './webhooks-table.styl'
 
 const m = defineMessages({
   templateId: 'Template ID',
-  format: 'Format',
-  baseUrl: 'Base URL',
   healthy: 'Healthy',
   pending: 'Pending',
   requestsFailing: 'Requests failing',
@@ -68,7 +66,7 @@ const WebhooksTable = () => {
     },
     {
       name: 'base_url',
-      displayName: m.baseUrl,
+      displayName: sharedMessages.webhookBaseUrl,
       width: 40,
       sortable: true,
     },

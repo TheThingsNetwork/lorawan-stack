@@ -43,6 +43,9 @@ type DeviceRegistry interface {
 	RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, f func(context.Context, *UplinkMatch) (bool, error)) error
 	SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 	Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
+	BatchGetByID(
+		ctx context.Context, appID *ttnpb.ApplicationIdentifiers, deviceIDs []string, paths []string,
+	) ([]*ttnpb.EndDevice, error)
 	BatchDelete(
 		ctx context.Context,
 		appIDs *ttnpb.ApplicationIdentifiers,

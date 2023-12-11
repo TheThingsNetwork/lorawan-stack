@@ -16,8 +16,6 @@ import React from 'react'
 import { useFormikContext } from 'formik'
 import { defineMessages } from 'react-intl'
 
-import frequencyPlans from '@console/constants/frequency-plans'
-
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -28,7 +26,7 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import { GsFrequencyPlansSelect as FrequencyPlansSelect } from '@console/containers/freq-plans-select'
+import GsFrequencyPlansSelect from '@console/containers/freq-plans-select/gs-frequency-plan-select'
 
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -41,8 +39,6 @@ const m = defineMessages({
     'Select which information can be seen by other network participants, including {packetBrokerURL}',
   shareGatewayInfoDescription:
     'Choose this option eg. if your gateway is powered by {loraBasicStationURL}',
-  generateAPIKeyCups: 'Generate API key for CUPS',
-  generateAPIKeyLNS: 'Generate API key for LNS',
 })
 
 const PacketBrokerURL = (
@@ -67,7 +63,7 @@ const initialValues = {
   },
   status_public: true,
   location_public: true,
-  frequency_plan_id: '',
+  frequency_plan_ids: [''],
   name: '',
   require_authenticated_connection: false,
   gateway_server_address: gsEnabled ? new URL(gsBaseURL).hostname : '',
@@ -95,19 +91,7 @@ const GatewayRegistrationFormSections = () => {
         component={Input}
         tooltipId={tooltipIds.GATEWAY_NAME}
       />
-      {gsEnabled && (
-        <FrequencyPlansSelect
-          name="frequency_plan_id"
-          menuPlacement="top"
-          tooltipId={tooltipIds.FREQUENCY_PLAN}
-          warning={
-            values.frequency_plan_id === frequencyPlans.EMPTY_FREQ_PLAN
-              ? sharedMessages.frequencyPlanWarning
-              : undefined
-          }
-          required
-        />
-      )}
+      {gsEnabled && <GsFrequencyPlansSelect />}
       <Form.Field
         name="require_authenticated_connection"
         component={Checkbox}
@@ -125,7 +109,7 @@ const GatewayRegistrationFormSections = () => {
           <Form.Field
             name="_create_api_key_cups"
             component={Checkbox}
-            label={m.generateAPIKeyCups}
+            label={sharedMessages.generateAPIKeyCups}
             tooltipId={tooltipIds.GATEWAY_GENERATE_API_KEY_CUPS}
             className="mb-0"
             labelAsTitle
@@ -133,7 +117,7 @@ const GatewayRegistrationFormSections = () => {
           <Form.Field
             name="_create_api_key_lns"
             component={Checkbox}
-            label={m.generateAPIKeyLNS}
+            label={sharedMessages.generateAPIKeyLNS}
             className="mb-cs-xl"
             tooltipId={tooltipIds.GATEWAY_GENERATE_API_KEY_LNS}
             labelAsTitle

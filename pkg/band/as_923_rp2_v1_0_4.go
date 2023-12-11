@@ -112,6 +112,6 @@ var as923RP2104Band = func(id string, offset as923GroupOffset) Band {
 
 		Relay: as923RelayParameters(offset),
 
-		SharedParameters: universalSharedParameters,
+		SharedParameters: relayAwareSharedParameters,
 	}
 }

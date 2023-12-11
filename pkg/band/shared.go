@@ -44,16 +44,34 @@ type SharedParameters struct {
 	MinRetransmitTimeout time.Duration
 	// MaxRetransmitTimeout is the maximum retransmit timeout.
 	MaxRetransmitTimeout time.Duration
+
+	// RelayForwardDelay is the default delay between the end of the uplink transmission and the start of the
+	// relay transmission.
+	RelayForwardDelay time.Duration
+	// RelayReceiveDelay is the default RxR window timing in seconds.
+	RelayReceiveDelay time.Duration
+	// ServedRelayBackoff is the default number of wake on radio attempts before sending the uplink message directly
+	// by a served relay device.
+	ServedRelayBackoff uint32
 }
 
-var universalSharedParameters = SharedParameters{
-	ReceiveDelay1:        time.Second,
-	ReceiveDelay2:        2 * time.Second,
-	JoinAcceptDelay1:     5 * time.Second,
-	JoinAcceptDelay2:     6 * time.Second,
-	MaxFCntGap:           16384,
-	ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_64,
-	ADRAckDelay:          ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_32,
-	MinRetransmitTimeout: time.Second,
-	MaxRetransmitTimeout: 3 * time.Second,
-}
+var (
+	universalSharedParameters = SharedParameters{
+		ReceiveDelay1:        time.Second,
+		ReceiveDelay2:        2 * time.Second,
+		JoinAcceptDelay1:     5 * time.Second,
+		JoinAcceptDelay2:     6 * time.Second,
+		MaxFCntGap:           16384,
+		ADRAckLimit:          ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_64,
+		ADRAckDelay:          ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_32,
+		MinRetransmitTimeout: time.Second,
+		MaxRetransmitTimeout: 3 * time.Second,
+	}
+	relayAwareSharedParameters = func() SharedParameters {
+		parameters := universalSharedParameters
+		parameters.RelayForwardDelay = 50 * time.Millisecond
+		parameters.RelayReceiveDelay = 18 * time.Second
+		parameters.ServedRelayBackoff = 8
+		return parameters
+	}()
+)

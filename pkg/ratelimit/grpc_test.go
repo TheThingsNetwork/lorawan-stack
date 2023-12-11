@@ -53,12 +53,6 @@ func (ss *serverStream) SetHeader(md metadata.MD) error {
 	return nil
 }
 
-func grpcTokenContext(authTokenID string) context.Context {
-	return metadata.NewIncomingContext(test.Context(), metadata.Pairs(
-		"authorization", fmt.Sprintf("Bearer NNSXS.%s.authTokenKey", authTokenID),
-	))
-}
-
 func grpcClusterContext() context.Context {
 	return metadata.NewIncomingContext(test.Context(), metadata.Pairs(
 		"authorization", fmt.Sprintf("%s %X", clusterauth.AuthType, []byte{0x00, 0x01, 0x02}),
@@ -82,7 +76,6 @@ func TestGRPC(t *testing.T) {
 
 	const (
 		unaryMethod  = "/Service/UnaryMethod"
-		authTokenID  = "my-token-id"
 		streamMethod = "/Service/StreamMethod"
 	)
 
@@ -157,7 +150,7 @@ func TestGRPC(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				intercept := ratelimit.UnaryServerInterceptor(tc.limiter)
 
-				ctx := grpcTokenContext(authTokenID)
+				ctx := tokenContext(authTokenID)
 				if tc.cluster {
 					ctx = grpcClusterContext()
 				}
@@ -219,7 +212,7 @@ func TestGRPC(t *testing.T) {
 			} {
 				t.Run(tc.name, func(t *testing.T) {
 					intercept := ratelimit.StreamServerInterceptor(tc.limiter)
-					ss := &serverStream{t: t, ctx: grpcTokenContext(authTokenID)}
+					ss := &serverStream{t: t, ctx: tokenContext(authTokenID)}
 					if tc.cluster {
 						ss.ctx = grpcClusterContext()
 					}
@@ -238,7 +231,7 @@ func TestGRPC(t *testing.T) {
 				"grpc:stream:up":     &mockLimiter{},
 			}
 			intercept := ratelimit.StreamServerInterceptor(limiter)
-			ss := &serverStream{t: t, ctx: grpcTokenContext(authTokenID)}
+			ss := &serverStream{t: t, ctx: tokenContext(authTokenID)}
 			info := &grpc.StreamServerInfo{FullMethod: streamMethod}
 
 			keyFromFirstStream := ""

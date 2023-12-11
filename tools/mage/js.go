@@ -237,7 +237,7 @@ func (js Js) ExtractLocaleFiles() error {
 	if mg.Verbose() {
 		fmt.Println("Building frontend locale files")
 	}
-	return sh.Run("node", "tools/mage/translations.js")
+	return sh.Run("node", "tools/mage/translations.js", "--ignore-duplicates")
 }
 
 // BackendTranslations builds the backend locale files.

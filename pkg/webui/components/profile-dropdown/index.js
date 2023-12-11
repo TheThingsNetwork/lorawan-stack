@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback, useRef, useState } from 'react'
 import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
@@ -24,69 +23,41 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import styles from './profile-dropdown.styl'
 
-export default class ProfileDropdown extends React.PureComponent {
-  state = {
-    expanded: false,
-  }
+const ProfileDropdown = props => {
+  const [expanded, setExpanded] = useState(false)
+  const node = useRef(null)
+  const { userName, className, children, profilePicture, ...rest } = props
 
-  @bind
-  showDropdown() {
-    document.addEventListener('mousedown', this.handleClickOutside)
-    this.setState({ expanded: true })
-  }
-
-  @bind
-  hideDropdown() {
-    document.removeEventListener('mousedown', this.handleClickOutside)
-    this.setState({ expanded: false })
-  }
-
-  @bind
-  handleClickOutside(e) {
-    if (!this.node.contains(e.target)) {
-      this.hideDropdown()
+  const handleClickOutside = useCallback(e => {
+    if (node.current && !node.current.contains(e.target)) {
+      setExpanded(false)
     }
-  }
+  }, [])
 
-  @bind
-  toggleDropdown() {
-    let { expanded } = this.state
-    expanded = !expanded
-    if (expanded) {
-      this.showDropdown()
-    } else {
-      this.hideDropdown()
-    }
-  }
+  const toggleDropdown = useCallback(() => {
+    setExpanded(oldExpanded => {
+      const newState = !oldExpanded
+      if (newState) document.addEventListener('mousedown', handleClickOutside)
+      else document.removeEventListener('mousedown', handleClickOutside)
+      return newState
+    })
+  }, [handleClickOutside])
 
-  @bind
-  ref(node) {
-    this.node = node
-  }
-
-  render() {
-    const { userName, className, children, profilePicture, ...rest } = this.props
-
-    return (
-      <div
-        className={classnames(styles.container, className)}
-        onClick={this.toggleDropdown}
-        onKeyPress={this.toggleDropdown}
-        ref={this.ref}
-        tabIndex="0"
-        role="button"
-        {...rest}
-      >
-        <ProfilePicture profilePicture={profilePicture} className={styles.profilePicture} />
-        <span className={styles.id}>{userName}</span>
-        <Icon
-          className={styles.dropdownIcon}
-          icon={this.state.expanded ? 'arrow_drop_up' : 'arrow_drop_down'}
-        />
-        {this.state.expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
-      </div>
-    )
-  }
+  return (
+    <div
+      className={classnames(styles.container, className)}
+      onClick={toggleDropdown}
+      ref={node}
+      tabIndex="0"
+      role="button"
+      {...rest}
+    >
+      <ProfilePicture profilePicture={profilePicture} className={styles.profilePicture} />
+      <span className={styles.id}>{userName}</span>
+      <Icon className={styles.dropdownIcon} icon={expanded ? 'arrow_drop_up' : 'arrow_drop_down'} />
+      {expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
+    </div>
+  )
 }
 
 ProfileDropdown.propTypes = {
@@ -106,3 +77,5 @@ ProfileDropdown.defaultProps = {
   className: undefined,
   profilePicture: undefined,
 }
+
+export default ProfileDropdown

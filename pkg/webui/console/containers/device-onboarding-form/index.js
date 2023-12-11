@@ -26,6 +26,7 @@ import Notification from '@ttn-lw/components/notification'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectAsEnabled, selectJsEnabled, selectNsEnabled } from '@ttn-lw/lib/selectors/env'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { checkFromState } from '@account/lib/feature-checks'
 import { mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
@@ -73,7 +74,7 @@ const DeviceOnboardingFormInner = () => {
             <Radio label={m.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
           </Form.Field>
           <SubmitBar>
-            <Form.Submit message={m.submitTitle} component={SubmitButton} />
+            <Form.Submit message={sharedMessages.registerEndDevice} component={SubmitButton} />
           </SubmitBar>
         </>
       )}

@@ -23,11 +23,15 @@ import (
 	"time"
 
 	"github.com/gregjones/httpcache"
+	"github.com/klauspost/compress/gzhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
+
+var transportCompressionFeatureFlag = experimental.DefineFeature("http.client.transport.compression", true)
 
 // defaultHTTPClientTimeout is the default timeout for the HTTP client.
 const defaultHTTPClientTimeout = 10 * time.Second
@@ -95,11 +99,14 @@ func (p *provider) HTTPClient(ctx context.Context, opts ...Option) (*http.Client
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = options.tlsConfig
 
-	otelTransport := otelhttp.NewTransport(transport,
+	var rt http.RoundTripper = transport
+	if transportCompressionFeatureFlag.GetValue(ctx) {
+		rt = gzhttp.Transport(rt)
+	}
+	rt = otelhttp.NewTransport(
+		rt,
 		otelhttp.WithTracerProvider(tracing.FromContext(ctx)),
 	)
-
-	rt := http.RoundTripper(otelTransport)
 	if options.cache {
 		rt = &httpcache.Transport{
 			Transport:           rt,

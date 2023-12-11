@@ -106,5 +106,5 @@ var MA_869_870_Draft_Universal = Band{
 	},
 	PingSlotFrequencies: ma869870DraftBeaconFrequencies,
 
-	SharedParameters: universalSharedParameters,
+	SharedParameters: relayAwareSharedParameters,
 }

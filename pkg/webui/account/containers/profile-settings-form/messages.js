@@ -20,14 +20,12 @@ export default defineMessages({
   successMessage: 'Profile updated',
   deleteAccount: 'Delete account',
   useGravatar: 'Use Gravatar',
-  uploadAnImage: 'Upload an image',
   gravatarInfo:
     "If available, we're using the <link>Gravatar</link> image associated with your email address. You can upload a different profile picture by selecting the option above.",
   gravatarInfoGravatarOnly:
     "If available, we're using the <link>Gravatar</link> image associated with your email address. Please follow the instructions on the Gravatar website to change your profile picture.",
   primaryEmailAddressDescription: 'Primary email address associated with your account',
   deleteAccountError: 'There was an error and your account could not be deleted',
-  deleteAccountSuccess: 'Account deleted',
   imageRequired:
     'Please select a file to use as your profile picture or choose "Gravatar" as source',
   imageUpload: 'Image upload',

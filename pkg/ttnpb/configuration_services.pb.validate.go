@@ -49,6 +49,8 @@ func (m *ListFrequencyPlansRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "base_frequency":
 			// no validation rules for BaseFrequency
+		case "band_id":
+			// no validation rules for BandId
 		default:
 			return ListFrequencyPlansRequestValidationError{
 				field:  name,
@@ -139,6 +141,8 @@ func (m *FrequencyPlanDescription) ValidateFields(paths ...string) error {
 			// no validation rules for Name
 		case "base_frequency":
 			// no validation rules for BaseFrequency
+		case "band_id":
+			// no validation rules for BandId
 		default:
 			return FrequencyPlanDescriptionValidationError{
 				field:  name,
@@ -769,6 +773,30 @@ func (m *BandDescription) ValidateFields(paths ...string) error {
 
 		case "max_adr_data_rate_index":
 			// no validation rules for MaxAdrDataRateIndex
+		case "relay_forward_delay":
+
+			if v, ok := interface{}(m.GetRelayForwardDelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "relay_forward_delay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "relay_receive_delay":
+
+			if v, ok := interface{}(m.GetRelayReceiveDelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BandDescriptionValidationError{
+						field:  "relay_receive_delay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "tx_param_setup_req_support":
 			// no validation rules for TxParamSetupReqSupport
 		case "default_max_eirp":

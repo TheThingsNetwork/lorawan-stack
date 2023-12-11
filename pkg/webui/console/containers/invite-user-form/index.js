@@ -31,7 +31,6 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { sendInvite } from '@console/store/actions/users'
 
 const m = defineMessages({
-  emailPlaceholder: 'mail@example.com',
   invitationsDescription:
     'You can invite users to this network by providing an email address. The person will then get an email with instructions on how to join your network.',
 })
@@ -80,7 +79,7 @@ const InviteForm = () => {
           title={sharedMessages.emailAddress}
           component={Input}
           name="email"
-          placeholder={m.emailPlaceholder}
+          placeholder={sharedMessages.emailPlaceholder}
           required
         />
         <SubmitBar>

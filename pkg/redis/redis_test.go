@@ -487,57 +487,62 @@ func TestTaskQueue(t *testing.T) {
 	}
 }
 
+func makeProto(t *testing.T, s string) proto.Message {
+	t.Helper()
+	return &ttnpb.APIKey{Id: s}
+}
+
+func makeProtoString(t *testing.T, s string) string {
+	t.Helper()
+	m := makeProto(t, s)
+	return test.Must(MarshalProto(m))
+}
+
 func TestProtoDeduplicator(t *testing.T) {
 	a, ctx := test.New(t)
 
 	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
-
-	makeProto := func(s string) proto.Message {
-		return &ttnpb.APIKey{Id: s}
-	}
-	makeProtoString := func(s string) string {
-		m := makeProto(s)
-		s, _ = MarshalProto(m)
-		return s
-	}
+	limit := 50
 
 	ttl := (1 << 12) * test.Delay
 	key1 := cl.Key("test1")
 	key2 := cl.Key("test2")
 
-	v, err := DeduplicateProtos(ctx, cl, key1, ttl)
+	v, err := DeduplicateProtos(ctx, cl, key1, ttl, limit)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeTrue)
 
-	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeProto("proto1"))
+	v, err = DeduplicateProtos(ctx, cl, key1, ttl, limit, makeProto(t, "proto1"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeFalse)
 
-	v, err = DeduplicateProtos(ctx, cl, key2, ttl, makeProto("proto1"))
+	v, err = DeduplicateProtos(ctx, cl, key2, ttl, limit, makeProto(t, "proto1"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeTrue)
 
-	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeProto("proto1"))
+	v, err = DeduplicateProtos(ctx, cl, key1, ttl, limit, makeProto(t, "proto1"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeFalse)
 
-	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeProto("proto2"), makeProto("proto3"))
+	v, err = DeduplicateProtos(
+		ctx, cl, key1, ttl, limit, makeProto(t, "proto2"), makeProto(t, "proto3"),
+	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.BeFalse)
 
-	v, err = DeduplicateProtos(ctx, cl, key2, ttl, makeProto("proto2"))
+	v, err = DeduplicateProtos(ctx, cl, key2, ttl, limit, makeProto(t, "proto2"))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -556,10 +561,10 @@ func TestProtoDeduplicator(t *testing.T) {
 		t.FailNow()
 	}
 	a.So(ss, should.Resemble, []string{
-		makeProtoString("proto1"),
-		makeProtoString("proto1"),
-		makeProtoString("proto2"),
-		makeProtoString("proto3"),
+		makeProtoString(t, "proto1"),
+		makeProtoString(t, "proto1"),
+		makeProtoString(t, "proto2"),
+		makeProtoString(t, "proto3"),
 	})
 	a.So(lockTTL, should.BeGreaterThan, 0)
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
@@ -579,13 +584,71 @@ func TestProtoDeduplicator(t *testing.T) {
 		t.FailNow()
 	}
 	a.So(ss, should.Resemble, []string{
-		makeProtoString("proto1"),
-		makeProtoString("proto2"),
+		makeProtoString(t, "proto1"),
+		makeProtoString(t, "proto2"),
 	})
 	a.So(lockTTL, should.BeGreaterThan, 0)
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
 	a.So(listTTL, should.BeGreaterThan, 0)
 	a.So(listTTL, should.BeLessThanOrEqualTo, ttl)
+}
+
+func TestProtoDeduplicatorRespectsLimit(t *testing.T) {
+	t.Parallel()
+	a, ctx := test.New(t)
+	cl, flush := test.NewRedis(ctx, "redis_test")
+	defer flush()
+	defer cl.Close()
+
+	ttl := (1 << 12) * test.Delay
+	key := cl.Key("test1")
+	limit := 30
+	protoID := 0
+
+	for i := 0; i < limit+3; i++ {
+		s := fmt.Sprintf("proto%d", protoID)
+		_, err := DeduplicateProtos(ctx, cl, key, ttl, limit, makeProto(t, s))
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		protoID++
+	}
+
+	actual, err := cl.LRange(ctx, ListKey(key), 0, -1).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(actual, should.HaveLength, limit)
+	expected := make([]string, limit)
+	for i := limit - 1; i >= 0; i-- {
+		s := fmt.Sprintf("proto%d", protoID-limit+i)
+		expected[i] = makeProtoString(t, s)
+	}
+	a.So(actual, should.Resemble, expected)
+
+	bulkedProtosLen := limit + 5
+	bulkedProtos := make([]proto.Message, bulkedProtosLen)
+	for i := 0; i < bulkedProtosLen; i++ {
+		s := fmt.Sprintf("proto%d", protoID)
+		bulkedProtos[i] = makeProto(t, s)
+		protoID++
+	}
+
+	if _, err := DeduplicateProtos(ctx, cl, key, ttl, limit, bulkedProtos...); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	actual, err = cl.LRange(ctx, ListKey(key), 0, -1).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(actual, should.HaveLength, limit)
+	expected = make([]string, limit)
+	for i := limit - 1; i >= 0; i-- {
+		s := fmt.Sprintf("proto%d", protoID-limit+i)
+		expected[i] = makeProtoString(t, s)
+	}
+	a.So(actual, should.Resemble, expected)
 }
 
 func TestMutex(t *testing.T) {

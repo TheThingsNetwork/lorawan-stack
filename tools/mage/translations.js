@@ -14,6 +14,7 @@
 
 /* global process */
 /* eslint-disable no-alert, no-console */
+/* eslint-disable import/no-commonjs */
 
 const fs = require('fs')
 const path = require('path')
@@ -32,7 +33,7 @@ const env = process.env
  * @param {string|Array<string>} s - The string or array to flatten.
  * @returns {Array<string>} - A flat array of strings.
  */
-const flatten = function (s) {
+const flatten = s => {
   if (!s) {
     return []
   }
@@ -52,6 +53,8 @@ const backendMessages = argv.backendMessages || env.MESSAGES_BACKEND || 'config/
 const defaultLocale = argv.default || env.DEFAULT_LOCALE || 'en'
 const exportForTranslation = argv['export-for-interpreters'] || env.EXPORT_FOR_INTERPRETERS || false
 const verbose = ('verbose' in argv && argv.verbose !== 'false') || false
+const ignoreDuplicates =
+  ('ignore-duplicates' in argv && argv['ignore-duplicates'] !== 'false') || false
 
 if (argv.help) {
   console.log(`Usage: translations [opts]
@@ -76,6 +79,7 @@ Options:
   --backend-only <flag>.    Flag that determines whether only backend messages will be processed
   --verbose                 verbose output for debugging purposes
   --export-for-translation  Flag that determines whether the messages will be exported for interpreters
+  --ignore-duplicates       Flag that determines whether the program will ignore duplicate messages
   --help                    show this help message
 `)
 }
@@ -85,18 +89,17 @@ Options:
  *
  * @param {string} pat - The glob pattern, eg. "./foo/*.js".
  * @returns {Promise<Array<string>>} - A promise that resolves to an array of
- *   filenames that match the pattern.
+ * filenames that match the pattern.
  */
-const glob = function (pat) {
-  return new Promise(function (resolve, reject) {
-    g(pat, function (err, res) {
+const glob = pat =>
+  new Promise((resolve, reject) => {
+    g(pat, (err, res) => {
       if (err) {
         return reject(err)
       }
       return resolve(res)
     })
   })
-}
 
 /**
  * Read a file from disk.
@@ -104,19 +107,18 @@ const glob = function (pat) {
  * @param {string} filename - The name of the file to read.
  * @returns {Promise<string>} - The contents of the file.
  */
-const read = function (filename) {
-  return new Promise(function (resolve, reject) {
+const read = filename =>
+  new Promise((resolve, reject) => {
     if (verbose) {
       console.log(`reading from ${filename}`)
     }
-    fs.readFile(filename, function (err, res) {
+    fs.readFile(filename, (err, res) => {
       if (err) {
         return reject(err)
       }
       return resolve(res)
     })
   })
-}
 
 /**
  * Write to a file.
@@ -126,19 +128,18 @@ const read = function (filename) {
  *
  * @returns {Promise<undefined>} - A promise that resolves when the file has been written.
  */
-const write = function (filename, content) {
-  return new Promise(function (resolve, reject) {
+const write = (filename, content) =>
+  new Promise((resolve, reject) => {
     if (verbose) {
       console.log('writing', filename)
     }
-    fs.writeFile(filename, content, function (err, res) {
+    fs.writeFile(filename, content, (err, res) => {
       if (err) {
         return reject(err)
       }
       return resolve(res)
     })
   })
-}
 
 /**
  * Read the locales from the localesDir (specified by --locales) and parse
@@ -147,24 +148,67 @@ const write = function (filename, content) {
  * Locales that are in the localesDir but not in --support will be omitted.
  *
  * @returns {object} - The locales, keyed by locale name.
- *   For example: `{ en: { ... }, ja: { ... }}`.
+ * For example: `{ en: { ... }, ja: { ... }}`.
  */
-const readLocales = async function () {
+const readLocales = async () => {
   const loc = await Promise.all(
-    support.map(async function (locale) {
+    support.map(async locale => {
       let parsed = {}
+      let content
       try {
-        const content = await read(`${path.resolve(localesDir)}/${locale}.json`)
+        content = await read(`${path.resolve(localesDir)}/${locale}.json`)
         parsed = JSON.parse(content)
-      } catch (err) {}
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          // Check if there are merge conflicts in the JSON file
+          if (content.includes('<<<<<<<') && content.includes('>>>>>>>')) {
+            throw new SyntaxError(
+              `Error parsing ${locale}.json: merge conflicts found.\n\nPlease resolve merge conflicts before continuing.`,
+            )
+          }
+          throw err
+        }
+      }
 
       parsed.__locale = locale
+
+      // Detect duplicate messages in the English locale and store them per message
+      // this will cause a non-zero exit code so that this issue can be caught in CI
+      if (locale === defaultLocale) {
+        const duplicates = Object.entries(parsed)
+          .reduce((acc, [id, message]) => {
+            const existing = acc.find(d => d.message === message)
+            if (existing) {
+              existing.ids.push(id)
+            } else {
+              acc.push({ message, ids: [id] })
+            }
+            return acc
+          }, [])
+          .filter(d => d.ids.length > 1)
+
+        if (duplicates.length > 0) {
+          // Write duplicates to a file
+          await write(
+            `${path.resolve(localesDir)}/${locale}-duplicates.json`,
+            JSON.stringify(duplicates, null, 2),
+          )
+
+          console.warn(
+            `Duplicate messages found in the "${locale}" locale. This means that the same message text is used more than once. See ${locale}-duplicates.json for details and resolve the issue before continuing.`,
+          )
+
+          if (!ignoreDuplicates) {
+            process.exit(1)
+          }
+        }
+      }
 
       return parsed
     }),
   )
 
-  return loc.reduce(function (acc, next) {
+  return loc.reduce((acc, next) => {
     const locale = next.__locale
     delete next.__locale
 
@@ -181,7 +225,7 @@ const readLocales = async function () {
  *
  * @returns {object} - The messages, keyed by message id.
  */
-const readMessages = async function () {
+const readMessages = async () => {
   if (!messagesDir) {
     return {}
   }
@@ -189,10 +233,8 @@ const readMessages = async function () {
   return files
     .map(f => fs.readFileSync(f, 'utf-8'))
     .map(c => JSON.parse(c))
-    .reduce(function (acc, next) {
-      return [...acc, ...next]
-    }, [])
-    .reduce(function (acc, next) {
+    .reduce((acc, next) => [...acc, ...next], [])
+    .reduce((acc, next) => {
       if (next.id in acc) {
         console.warn(`message id ${next.id} seen multiple times`)
       }
@@ -209,13 +251,13 @@ const readMessages = async function () {
  *
  * @returns {object} - The backend messages, keyed by message id.
  */
-const readBackendMessages = async function () {
+const readBackendMessages = async () => {
   if (!backendMessages) {
     return {}
   }
   const backend = JSON.parse(await read(`${path.resolve(backendMessages)}`))
-  return Object.keys(backend).reduce(function (acc, id) {
-    return {
+  return Object.keys(backend).reduce(
+    (acc, id) => ({
       ...acc,
       [id]: {
         id,
@@ -223,8 +265,9 @@ const readBackendMessages = async function () {
         locales: backend[id].translations,
         description: backend[id].description,
       },
-    }
-  }, {})
+    }),
+    {},
+  )
 }
 
 /**
@@ -234,7 +277,7 @@ const readBackendMessages = async function () {
  * @param {Array<string>} pth - The path to find in the object.
  * @returns {any} - The value of the key at the path, or null if not found.
  */
-const get = function (object, ...pth) {
+const get = (object, ...pth) => {
   if (object === null) {
     return null
   }
@@ -256,17 +299,17 @@ const get = function (object, ...pth) {
  * Write locales to their corresponding file in the localesDir (specified by --locales).
  *
  * @param {object} locales - The locales to write.
- * @param backendIds
+ * @param {Array} backendIds - The ids of the backend messages.
  * @returns {Promise<undefined>} - A promise that resolves when all locales have been written.
  */
-const writeLocales = async function (locales, backendIds) {
-  return Promise.all(
-    Object.keys(locales).map(async function (key) {
+const writeLocales = async (locales, backendIds) =>
+  Promise.all(
+    Object.keys(locales).map(async key => {
       const locale = locales[key]
       let cleaned = locale
       if (key === defaultLocale && !backendOnly) {
         // Remove backend keys from the default locale
-        cleaned = Object.keys(locale).reduce(function (acc, next) {
+        cleaned = Object.keys(locale).reduce((acc, next) => {
           if (!backendIds.includes(next)) {
             return {
               ...acc,
@@ -281,23 +324,22 @@ const writeLocales = async function (locales, backendIds) {
       await write(`${localesDir}/${key}.json`, content)
     }),
   )
-}
 
 /**
  * Write messages out for supported locales as CSV, for use when translating.
  *
  * @param {object} locales - The locales to write.
- * @param targetLanguage - The language (locale) to translate to.
+ * @param {string} targetLanguage - The language (locale) to translate to.
  * @returns {Promise<undefined>} - A promise that resolves when the file has been written.
  */
-const writeInterpreterFile = async function (locales, targetLanguage) {
+const writeInterpreterFile = async (locales, targetLanguage) => {
   // Write the data as CSV, the first column being the message id
   // the second column being the English message, and the third being the target language message.
 
   const locale = locales[targetLanguage]
   const content = Object.keys(locale)
     .filter(id => !locale[id])
-    .map(function (id) {
+    .map(id => {
       const message = locale[id] || ''
       // Add proper escapes
       const english = locales[defaultLocale][id].replace(/"/g, '""')
@@ -309,7 +351,7 @@ const writeInterpreterFile = async function (locales, targetLanguage) {
 }
 
 // Main function.
-const main = async function () {
+const main = async () => {
   const [locales, messages, backend] = await Promise.all([
     readLocales(),
     readMessages(),
@@ -353,14 +395,14 @@ const main = async function () {
 
   if (exportForTranslation) {
     const supportWithoutDefault = support.filter(s => s !== defaultLocale)
-    supportWithoutDefault.forEach(async function (targetLanguage) {
+    supportWithoutDefault.forEach(async targetLanguage => {
       await writeInterpreterFile(updated, targetLanguage)
     })
   }
   console.log('Locale files updated.')
 }
 
-main().catch(function (err) {
+main().catch(err => {
   console.error(err)
   process.exit(1)
 })
