@@ -43,15 +43,13 @@ export const eventMessages = {
 
     'synthetic.status.reconnected:type': 'Stream reconnected',
     'synthetic.status.reconnected:preview': 'The stream connection has been re-established',
-
     'synthetic.status.reconnected:details':
-      'The Console was able to reconnect to the internet and resumed the event stream. Subsequent event data will be received and displayed. Note that event data which was possibly emitted during the network disruption will not be re-delivered.',
+      'The Console was able to reconnect to the network and resumed the event stream. Subsequent event data will be received and displayed. Note that event data which was possibly emitted during the network disruption will only be re-delivered within the range of the event retention configuration for your network.',
 
     'synthetic.status.closed:type': 'Stream connection closed',
-    'synthetic.status.closed:preview': 'The connection was closed by the stream provider',
-
+    'synthetic.status.closed:preview': 'The connection was closed',
     'synthetic.status.closed:details':
-      'The Console received a close signal from the stream provider. This usually means that the backend server shut down. This can have various causes, such as scheduled maintenance or malfunction which caused a forced restart. The Console will then reconnect automatically once the stream provider becomes available again.',
+      'The event stream was closed. This can be for various reasons, such as your machine going into standby mode or the internet connection being interrupted. The stream will reconnect automatically once the internet connection has been re-established.',
 
     'synthetic.status.cleared:type': 'Events cleared',
     'synthetic.status.cleared:preview': 'The events list has been cleared',

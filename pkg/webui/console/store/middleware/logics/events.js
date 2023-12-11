@@ -1,4 +1,4 @@
-// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -132,15 +132,14 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
 
         try {
           channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after)
+          dispatch(startEventsSuccess(id, { silent }))
 
-          channel.on('open', () => dispatch(startEventsSuccess(id, { silent })))
           channel.on('message', message => dispatch(getEventSuccess(id, message)))
           channel.on('error', error => dispatch(getEventFailure(id, error)))
-          channel.on('close', wasClientRequest =>
-            dispatch(closeEvents(id, { silent: wasClientRequest })),
-          )
-
-          channel.on('open', () => dispatch(startEventsSuccess(id, { silent })))
+          channel.on('close', wasClientRequest => {
+            dispatch(closeEvents(id, { silent: wasClientRequest }))
+            channel = null
+          })
         } catch (error) {
           if (isUnauthenticatedError(error)) {
             // The user is no longer authenticated; reinitiate the auth flow

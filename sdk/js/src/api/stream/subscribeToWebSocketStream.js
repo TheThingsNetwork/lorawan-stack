@@ -111,6 +111,9 @@ export default async (
 
           // Event listener for 'close'
           wsInstances[url].addEventListener('close', closeEvent => {
+            // TODO: Handle close event codes.
+            // https://github.com/TheThingsNetwork/lorawan-stack/issues/6752
+
             delete wsInstances[url]
             Object.values(subscriptions)
               .filter(s => s.url === url)
