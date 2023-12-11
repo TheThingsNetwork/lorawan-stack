@@ -21,11 +21,11 @@ import Switcher from '@ttn-lw/components/switcher'
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SideHeader from '@ttn-lw/components/side-header'
 import SearchButton from '@ttn-lw/components/search-button'
+import SideFooter from '@ttn-lw/components/side-footer'
 
 import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 import style from './side-bar.styl'
-import SideFooter from '@ttn-lw/components/side-footer'
 
 export default {
   title: 'Sidebar/Sidebar',
