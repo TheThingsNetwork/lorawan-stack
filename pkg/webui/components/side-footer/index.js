@@ -61,15 +61,17 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
     [setLocale],
   )
 
-  const submenuItems = Object.keys(supportedLocales).map(l => (
-    <LanguageOption
-      locale={l}
-      key={l}
-      title={supportedLocales[l]}
-      currentLocale={locale}
-      onSetLocale={handleSetLocale}
-    />
-  ))
+  const submenuItems = supportedLocales
+    ? Object.keys(supportedLocales).map(l => (
+        <LanguageOption
+          locale={l}
+          key={l}
+          title={supportedLocales[l]}
+          currentLocale={locale}
+          onSetLocale={handleSetLocale}
+        />
+      ))
+    : null
 
   const supportDropdownItems = (
     <>
@@ -92,9 +94,9 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
       className={classNames(
         style.sideFooter,
         'd-flex',
-        'j-center',
+        'j-between',
         'align-center',
-        'gap-cs-xxs',
+        'gap-cs-xs',
         'fs-xs',
         'w-90',
       )}

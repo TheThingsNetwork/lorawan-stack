@@ -14,7 +14,7 @@
 
 import React, { useCallback, useContext } from 'react'
 
-import Switcher from '@ttn-lw/components/navigation/side-v2/switcher'
+import Switcher from '@ttn-lw/components/switcher'
 
 import SideBarContext from '@ttn-lw/containers/side-bar/context'
 

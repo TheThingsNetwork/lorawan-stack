@@ -17,7 +17,7 @@ import classNames from 'classnames'
 
 import TtsLogo from '@assets/static/tts-logo.svg'
 
-import Switcher from '@ttn-lw/components/navigation/side-v2/switcher'
+import Switcher from '@ttn-lw/components/switcher'
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SideHeader from '@ttn-lw/components/side-header'
 import SearchButton from '@ttn-lw/components/search-button'
@@ -25,9 +25,10 @@ import SearchButton from '@ttn-lw/components/search-button'
 import SideBarContext from '@ttn-lw/containers/side-bar/context'
 
 import style from './side-bar.styl'
+import SideFooter from '@ttn-lw/components/side-footer'
 
 export default {
-  title: 'Navigation v2/Side bar',
+  title: 'Sidebar/Sidebar',
   decorators: [
     storyFn => {
       const [isMinimized, setIsMinimized] = useState(false)
@@ -62,7 +63,7 @@ export const Default = () => (
       style.sidebar,
       'd-flex pos-relative align-center direction-column gap-cs-s p-cs-s bg-tts-primary-050',
     )}
-    style={{ width: '17rem' }}
+    style={{ width: '17rem', height: '96vh' }}
   >
     <SideHeader logo={{ src: TtsLogo, alt: 'logo' }} />
     <SwictherExample />
@@ -79,5 +80,10 @@ export const Default = () => (
         icon="general_settings"
       />
     </SideNavigation>
+    <SideFooter
+      supportLink={'/support'}
+      documentationBaseUrl={'/docs'}
+      statusPageBaseUrl={'/status'}
+    />
   </div>
 )

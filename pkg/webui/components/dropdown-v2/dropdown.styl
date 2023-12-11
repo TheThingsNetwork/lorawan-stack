@@ -14,8 +14,7 @@
 
 ul.dropdown
   font-size: $fs.s
-  transition: color $ad.s, background $ad.s
-  transition-timing-function: ease-out
+  transition: color 0.2s ease-in-out
   border-radius: $br.l
   border: 1px solid $c.grey-200
   background: $c.white
@@ -76,6 +75,7 @@ ul.dropdown
       reset-button()
 
     & > a.button, & > button.button
+      transition: color 0.2s ease-in-out
       box-sizing: border-box
       line-height: 1
       display: block
@@ -84,16 +84,16 @@ ul.dropdown
       width: 100%
       &:not(.active)
         color: $c.grey-700
-        transition: color 0.2s ease
+        transition: color 0.2s ease-in-out
 
         .icon
           color: $c.grey-700
-          transition: color 0.2s ease
+          transition: color 0.2s ease-in-out
 
       &.active
         border-radius: $br.m
         background: $c.tts-primary-150
-        transition: background 0.2s ease
+        transition: background 0.2s ease-in-out
         color: $tc-deep-gray
 
         .icon
@@ -102,7 +102,8 @@ ul.dropdown
       &:hover
         color: $tc-deep-gray
         background: $c.tts-primary-150
-        transition: background 0.2s ease
+        transition: background 0.2s ease-in-out
+        border-radius: $br.m
 
         .icon
           color: $tc-deep-gray
@@ -116,4 +117,4 @@ ul.dropdown
 
   .submenu
     bottom: 0 !important
-    left: 215px !important
+    left: 233px !important

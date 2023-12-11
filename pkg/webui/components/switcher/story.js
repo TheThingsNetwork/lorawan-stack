@@ -12,18 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.side-footer
-  bottom: 0
-  position: absolute
+import React from 'react'
 
-  &-button
-    justify-content: space-between
-    width: 100%
+import Switcher from '.'
 
-  &-dropdown
-    width: 15.5rem
+export default {
+  title: 'Sidebar/Switcher',
+  component: Switcher,
+}
 
-  &-hover-dropdown
-    right: -80px !important
-    width: 15.5rem
-    margin-top: -7rem !important
+const SwictherExample = () => {
+  const [layer, setLayer] = React.useState('/')
+  const handleClick = React.useCallback(
+    evt => {
+      setLayer(evt.target.getAttribute('href'))
+    },
+    [setLayer],
+  )
+
+  return <Switcher layer={layer} onClick={handleClick} />
+}
+
+export const Default = () => (
+  <div style={{ width: '300px' }}>
+    <SwictherExample />
+  </div>
+)
