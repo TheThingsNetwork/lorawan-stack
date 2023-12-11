@@ -18,7 +18,7 @@ import classNames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 
-import SideBarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -27,7 +27,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './side-menu-link.styl'
 
 const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
-  const { isMinimized } = useContext(SideBarContext)
+  const { isMinimized } = useContext(SidebarContext)
 
   const className = useCallback(
     ({ isActive }) =>

@@ -21,13 +21,15 @@ import DedicatedEntity from '@ttn-lw/components/dedicated-entity'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
-import SideBarContext from '../context'
+import SidebarContext from '../context'
 
 const DeviceSideNavigation = () => {
   const device = useSelector(selectSelectedDevice)
   const deviceId = useSelector(selectSelectedDeviceId)
-  const { isMinimized } = useContext(SideBarContext)
+  const appId = useSelector(selectSelectedApplicationId)
+  const { isMinimized } = useContext(SidebarContext)
 
   const entityId = device ? device.name ?? deviceId : deviceId
 
@@ -41,25 +43,42 @@ const DeviceSideNavigation = () => {
           className="mt-cs-xs mb-cs-m"
         />
       )}
-      <SideNavigation.Item title={'End device overview'} path="" icon="grid_view" exact />
-      <SideNavigation.Item title={sharedMessages.liveData} path="/data" icon="list_alt" />
-      <SideNavigation.Item title={'Messaging'} path="messaging" icon="swap_vert" />
-      <SideNavigation.Item title={sharedMessages.location} path="location" icon="map" />
-{/*       <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="developer_mode">
+      <SideNavigation.Item
+        title={sharedMessages.endDeviceOverview}
+        path={`applications/${appId}/devices/${deviceId}`}
+        icon="grid_view"
+        exact
+      />
+      <SideNavigation.Item
+        title={sharedMessages.liveData}
+        path={`applications/${appId}/devices/${deviceId}/data`}
+        icon="list_alt"
+      />
+      <SideNavigation.Item
+        title={'Messaging'}
+        path={`applications/${appId}/devices/${deviceId}/messaging`}
+        icon="swap_vert"
+      />
+      <SideNavigation.Item
+        title={sharedMessages.location}
+        path={`applications/${appId}/devices/${deviceId}/location`}
+        icon="map"
+      />
+      <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="developer_mode">
         <SideNavigation.Item
           title={sharedMessages.uplink}
-          path="payload-formatters/uplink"
+          path={`applications/${appId}/devices/${deviceId}/payload-formatters/uplink`}
           icon="uplink"
         />
         <SideNavigation.Item
           title={sharedMessages.downlink}
-          path="payload-formatters/downlink"
+          path={`applications/${appId}/devices/${deviceId}/payload-formatters/downlink`}
           icon="downlink"
         />
-      </SideNavigation.Item> */}
+      </SideNavigation.Item>
       <SideNavigation.Item
         title={sharedMessages.generalSettings}
-        path="general-settings"
+        path={`applications/${appId}/devices/${deviceId}/general-settings`}
         icon="general_settings"
       />
     </SideNavigation>

@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import SideBarContext from '../context'
+import SidebarContext from '../context'
 
 import AppListSideNavigation from './app-list-side-navigation'
 import AppSideNavigation from './app-side-navigation'
@@ -23,13 +23,10 @@ import GtwSideNavigation from './gtw-side-navigation'
 import GeneralSideNavigation from './general-side-navigation'
 import DeviceSideNavigation from './device-side-navigation'
 
-const SideBarNavigation = () => {
-  const { layer } = React.useContext(SideBarContext)
+const SidebarNavigation = () => {
+  const { layer } = React.useContext(SidebarContext)
 
-  const showGeneralSideNavigation =
-    (layer === '/' || layer === '/console') &&
-    !layer.includes('/applications/') &&
-    !layer.includes('/gateways/')
+  const showGeneralSideNavigation = !layer.includes('/applications') && !layer.includes('/gateways')
 
   const showAppSideNavigation = layer.includes('/applications/') && !layer.includes('/devices/')
 
@@ -45,4 +42,4 @@ const SideBarNavigation = () => {
   )
 }
 
-export default SideBarNavigation
+export default SidebarNavigation

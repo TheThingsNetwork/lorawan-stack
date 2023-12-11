@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import SideBarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 import Footer from '.'
 
@@ -23,7 +23,7 @@ export default {
   component: Footer,
   decorators: [
     storyFn => (
-      <SideBarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SideBarContext.Provider>
+      <SidebarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SidebarContext.Provider>
     ),
   ],
 }
@@ -31,7 +31,7 @@ export default {
 export const Default = () => (
   <div
     style={{ width: '17rem', height: '96vh' }}
-    className="d-flex pos-fixed align-center direction-column"
+    className="d-flex pos-fixed al-center direction-column"
   >
     <Footer supportLink={'/support'} documentationBaseUrl={'/docs'} statusPageBaseUrl={'/status'} />
   </div>

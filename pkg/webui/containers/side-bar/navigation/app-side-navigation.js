@@ -25,70 +25,89 @@ import {
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 
-import SideBarContext from '../context'
+import SidebarContext from '../context'
 
 const AppSideNavigation = () => {
   const app = useSelector(selectSelectedApplication)
   const appId = useSelector(selectSelectedApplicationId)
-  const { isMinimized } = useContext(SideBarContext)
+  const { isMinimized } = useContext(SidebarContext)
 
   const entityId = app ? app.name ?? appId : appId
 
   return (
-    <SideNavigation>
-      {!isMinimized && (
-        <DedicatedEntity label={entityId} icon="arrow_left_alt" className="mt-cs-xs mb-cs-m" />
-      )}
-      <SideNavigation.Item title={'Application overview'} path="" icon="group" exact />
-      <SideNavigation.Item title={sharedMessages.devices} path="/devices" icon="device" />
-      <SideNavigation.Item title={sharedMessages.liveData} path="/data" icon="list_alt" />
-      <SideNavigation.Item title={'Network Information Center'} path="/noc" icon="ssid_chart" />
-{/*       <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="developer_mode">
+    <>
+      <SideNavigation>
+        {!isMinimized && (
+          <DedicatedEntity label={entityId} icon="arrow_left_alt" className="mt-cs-xs mb-cs-m" />
+        )}
         <SideNavigation.Item
-          title={sharedMessages.uplink}
-          path="payload-formatters/uplink"
-          icon="uplink"
+          title={sharedMessages.appOverview}
+          path={`applications/${appId}`}
+          icon="group"
+          exact
         />
         <SideNavigation.Item
-          title={sharedMessages.downlink}
-          path="payload-formatters/downlink"
-          icon="downlink"
-        />
-      </SideNavigation.Item> */}
-{/*       <SideNavigation.Item title={sharedMessages.integrations} icon="integration">
-        <SideNavigation.Item
-          title={sharedMessages.mqtt}
-          path="integrations/mqtt"
-          icon="extension"
+          title={sharedMessages.devices}
+          path={`applications/${appId}/devices`}
+          icon="device"
         />
         <SideNavigation.Item
-          title={sharedMessages.webhooks}
-          path="integrations/webhooks"
-          icon="extension"
+          title={sharedMessages.liveData}
+          path={`applications/${appId}/data`}
+          icon="list_alt"
+        />
+        {/* <SideNavigation.Item title={'Network Information Center'} path="/noc" icon="ssid_chart" /> */}
+        <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="developer_mode">
+          <SideNavigation.Item
+            title={sharedMessages.uplink}
+            path={`applications/${appId}/payload-formatters/uplink`}
+            icon="uplink"
+          />
+          <SideNavigation.Item
+            title={sharedMessages.downlink}
+            path={`applications/${appId}/payload-formatters/downlink`}
+            icon="downlink"
+          />
+        </SideNavigation.Item>
+        <SideNavigation.Item title={sharedMessages.integrations} icon="integration">
+          <SideNavigation.Item
+            title={sharedMessages.mqtt}
+            path={`applications/${appId}/integrations/mqtt`}
+            icon="extension"
+          />
+          <SideNavigation.Item
+            title={sharedMessages.webhooks}
+            path={`applications/${appId}/integrations/webhooks`}
+            icon="extension"
+          />
+          <SideNavigation.Item
+            title={sharedMessages.pubsubs}
+            path={`applications/${appId}/integrations/pubsubs`}
+            icon="extension"
+          />
+          <SideNavigation.Item
+            title={sharedMessages.loraCloud}
+            path={`applications/${appId}/integrations/lora-cloud`}
+            icon="extension"
+          />
+        </SideNavigation.Item>
+        <SideNavigation.Item
+          title={sharedMessages.collaborators}
+          path={`applications/${appId}/collaborators`}
+          icon="organization"
         />
         <SideNavigation.Item
-          title={sharedMessages.pubsubs}
-          path="integrations/pubsubs"
-          icon="extension"
+          title={sharedMessages.apiKeys}
+          path={`applications/${appId}/api-keys`}
+          icon="api_keys"
         />
         <SideNavigation.Item
-          title={sharedMessages.loraCloud}
-          path="integrations/lora-cloud"
-          icon="extension"
+          title={sharedMessages.generalSettings}
+          path={`applications/${appId}/general-settings`}
+          icon="general_settings"
         />
-      </SideNavigation.Item> */}
-      <SideNavigation.Item
-        title={sharedMessages.collaborators}
-        path="collaborators"
-        icon="organization"
-      />
-      <SideNavigation.Item title={sharedMessages.apiKeys} path="api-keys" icon="api_keys" />
-      <SideNavigation.Item
-        title={sharedMessages.generalSettings}
-        path="general-settings"
-        icon="general_settings"
-      />
-    </SideNavigation>
+      </SideNavigation>
+    </>
   )
 }
 

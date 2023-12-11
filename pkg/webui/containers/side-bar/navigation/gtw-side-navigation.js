@@ -22,12 +22,12 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
-import SideBarContext from '../context'
+import SidebarContext from '../context'
 
 const GtwSideNavigation = () => {
   const gtw = useSelector(selectSelectedGateway)
   const gtwId = useSelector(selectSelectedGatewayId)
-  const { isMinimized } = useContext(SideBarContext)
+  const { isMinimized } = useContext(SidebarContext)
 
   const entityId = gtw ? gtw.name ?? gtwId : gtwId
 
@@ -36,18 +36,35 @@ const GtwSideNavigation = () => {
       {!isMinimized && (
         <DedicatedEntity label={entityId} icon="arrow_left_alt" className="mt-cs-xs mb-cs-m" />
       )}
-      <SideNavigation.Item title={'Gateway overview'} path="" icon="gateway" exact />
-      <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="list_alt" />
-      <SideNavigation.Item title={sharedMessages.location} path="location" icon="map" />
+      <SideNavigation.Item
+        title={sharedMessages.gatewayOverview}
+        path={`gateways/${gtwId}`}
+        icon="gateway"
+        exact
+      />
+      <SideNavigation.Item
+        title={sharedMessages.liveData}
+        path={`gateways/${gtwId}/data`}
+        icon="list_alt"
+      />
+      <SideNavigation.Item
+        title={sharedMessages.location}
+        path={`gateways/${gtwId}/location`}
+        icon="map"
+      />
       <SideNavigation.Item
         title={sharedMessages.collaborators}
-        path="collaborators"
+        path={`gateways/${gtwId}/collaborators`}
         icon="organization"
       />
-      <SideNavigation.Item title={sharedMessages.apiKeys} path="api-keys" icon="api_keys" />
+      <SideNavigation.Item
+        title={sharedMessages.apiKeys}
+        path={`gateways/${gtwId}/api-keys`}
+        icon="api_keys"
+      />
       <SideNavigation.Item
         title={sharedMessages.generalSettings}
-        path="general-settings"
+        path={`gateways/${gtwId}/general-settings`}
         icon="general_settings"
       />
     </SideNavigation>

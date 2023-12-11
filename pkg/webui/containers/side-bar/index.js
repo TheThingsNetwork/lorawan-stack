@@ -18,8 +18,8 @@ import classNames from 'classnames'
 
 import SearchButton from '@ttn-lw/components/search-button'
 
-import SideBarNavigation from './navigation'
-import SideBarContext from './context'
+import SidebarNavigation from './navigation'
+import SidebarContext from './context'
 import SideHeader from './header'
 import SideFooter from './footer'
 import getCookie from './utils'
@@ -27,7 +27,7 @@ import SwitcherContainer from './switcher'
 
 import style from './side-bar.styl'
 
-const SideBar = () => {
+const Sidebar = () => {
   const { pathname } = useLocation()
   const [layer, setLayer] = useState(pathname ?? '/')
   const [isMinimized, setIsMinimized] = useState(false)
@@ -44,26 +44,30 @@ const SideBar = () => {
 
   const topEntities = topEntitiesCookie?.filter(cookie => cookie.tag === layer.split('/')[1])
 
+  const sidebarClassnames = classNames(
+    style.sidebar,
+    'd-flex pos-fixed direction-column gap-cs-s bg-tts-primary-050',
+    {
+      [style.sidebarMinimized]: isMinimized,
+      'p-cs-s': !isMinimized,
+      'p-vert-cs-m': isMinimized,
+      'p-sides-cs-xs': isMinimized,
+    },
+  )
+
   return (
-    <div
-      className={classNames(
-        style.sidebar,
-        'd-flex pos-fixed align-center direction-column gap-cs-s bg-tts-primary-050',
-        { [style.sidebarMinimized]: isMinimized, 'p-cs-s': !isMinimized, 'p-cs-xs': isMinimized },
-      )}
-      id="sidebar-v2"
-    >
-      <SideBarContext.Provider
+    <div className={sidebarClassnames} id="sidebar-v2">
+      <SidebarContext.Provider
         value={{ layer, setLayer, topEntities, onMinimizeToggle, isMinimized }}
       >
         <SideHeader />
         <SwitcherContainer />
         <SearchButton />
-        <SideBarNavigation />
+        <SidebarNavigation />
         <SideFooter />
-      </SideBarContext.Provider>
+      </SidebarContext.Provider>
     </div>
   )
 }
 
-export default SideBar
+export default Sidebar

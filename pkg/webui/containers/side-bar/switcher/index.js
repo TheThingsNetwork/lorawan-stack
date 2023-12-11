@@ -16,14 +16,14 @@ import React, { useCallback, useContext } from 'react'
 
 import Switcher from '@ttn-lw/components/switcher'
 
-import SideBarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 const SwitcherContainer = () => {
-  const { layer, setLayer, isMinimized } = useContext(SideBarContext)
+  const { layer, setLayer, isMinimized } = useContext(SidebarContext)
 
   const handleClick = useCallback(
     evt => {
-      setLayer(evt.target.getAttribute('href'))
+      setLayer(evt.target.getAttribute('href') ?? evt.target.parentNode.getAttribute('href'))
     },
     [setLayer],
   )

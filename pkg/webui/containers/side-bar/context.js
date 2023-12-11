@@ -14,6 +14,6 @@
 
 import React from 'react'
 
-const SideBarContext = React.createContext()
+const SidebarContext = React.createContext()
 
-export default SideBarContext
+export default SidebarContext
