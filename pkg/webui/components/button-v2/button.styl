@@ -23,10 +23,10 @@
   cursor: pointer
   justify-content: center
   align-items: center
-  gap: 0.25rem
-  height: 2.25rem
+  gap: $cs.xxs
+  height: 2.5rem
   text-decoration: none
-  padding: 0 $cs.s
+  padding: 0 $cs.m
   white-space: nowrap
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05)
 
@@ -86,12 +86,14 @@
         background-color: $c-backdrop
 
   &.only-icon
-    padding: 0 $cs.xs 0 0.65rem
+    width: 2.5rem
+    padding: 0 $cs.xs 0 0.73rem
 
   &.with-dropdown
     padding: 0 $cs.xxs 0 $cs.xs
 
   &.with-dropdown&.only-icon
+    width: fit-content
     .icon
       margin-left: 0
 

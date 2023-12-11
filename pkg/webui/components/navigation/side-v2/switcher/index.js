@@ -49,14 +49,9 @@ const Switcher = ({ layer, onClick, isMinimized }) => {
 
   return (
     <div
-      className={classNames(
-        style.switcherContainer,
-        'd-flex',
-        'j-center',
-        'gap-cs-xxs',
-        'p-cs-xxs',
-        { 'direction-column': isMinimized },
-      )}
+      className={classNames(style.switcherContainer, 'd-flex', 'j-center', 'p-cs-xxs', {
+        'direction-column': isMinimized,
+      })}
     >
       <NavLink to="/" onClick={onClick} className={overviewClassName}>
         {isMinimized ? <Icon icon="home" /> : null}

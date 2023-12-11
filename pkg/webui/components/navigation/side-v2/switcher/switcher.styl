@@ -19,19 +19,19 @@
   font-weight: $fw.light
 
   .link
-    transition: color $ad.s, background $ad.s
-    transition-timing-function: ease-out
-    border-radius: $br.m
+    transition: 0.2s all ease-in-out
+    border-radius: $br.m - 0.125rem
     text-decoration: none
     color: $c.grey-700
     display: flex
     justify-content: center
     width: 100%
+    font-weight: $fw.bold
 
     &.active
       background: $c.grey-900
       color: $c.white
-      font-weight: $fw.bold
+      transition: 0.2s background ease-in-out
 
     &:visited
       text-decoration: none
@@ -40,5 +40,6 @@
 
     &:hover
       text-decoration: none
+      transition: 0.2s background ease-in-out
       &:not(.active)
-        font-weight: $fw.normal
+        background: $c.grey-100
