@@ -28,3 +28,23 @@
 .buttons > &:not(:last-child)
   margin-right: $cs.s
 
+.bookmark-button
+  +media-query($bp.s)
+    display: none
+
+.breadcrumbs
+  +media-query($bp.s)
+    display: none
+
+.mobile-menu
+  display: flex
+  align-items: center
+  gap: 7px
+  +media-query-min($bp.s)
+    display: none
+
+.logo-link
+  display: flex
+
+.logo
+  height: 1.5rem

@@ -20,8 +20,6 @@ import Dropdown from '@ttn-lw/components/dropdown-v2'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
 import Button from '@ttn-lw/components/button-v2'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import styles from './profile-dropdown-v2.styl'
@@ -29,7 +27,7 @@ import styles from './profile-dropdown-v2.styl'
 const ProfileDropdown = props => {
   const [expanded, setExpanded] = useState(false)
   const node = useRef(null)
-  const { userName, className, children, profilePicture, ...rest } = props
+  const { brandLogo, className, children, profilePicture, ...rest } = props
 
   const handleClickOutside = useCallback(e => {
     if (node.current && !node.current.contains(e.target)) {
@@ -48,13 +46,13 @@ const ProfileDropdown = props => {
 
   return (
     <Button
-      naked
+      secondary
       className={classnames(styles.container, className)}
       onClick={toggleDropdown}
       ref={node}
       {...rest}
     >
-      <Message content={userName} className={styles.id} />
+      {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
       <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
       <Icon icon={expanded ? 'expand_less' : 'expand_more'} />
       {expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
@@ -63,6 +61,10 @@ const ProfileDropdown = props => {
 }
 
 ProfileDropdown.propTypes = {
+  brandLogo: PropTypes.shape({
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.string.isRequired,
+  }),
   /**
    * A list of items for the dropdown component. See `<Dropdown />`'s `items`
    * proptypes for details.
@@ -71,11 +73,10 @@ ProfileDropdown.propTypes = {
   className: PropTypes.string,
   /** The profile picture of the current user. */
   profilePicture: PropTypes.profilePicture,
-  /** The name/id of the current user. */
-  userName: PropTypes.string.isRequired,
 }
 
 ProfileDropdown.defaultProps = {
+  brandLogo: undefined,
   className: undefined,
   profilePicture: undefined,
 }

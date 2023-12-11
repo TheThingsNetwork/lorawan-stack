@@ -18,12 +18,15 @@ import classnames from 'classnames'
 import { Breadcrumbs } from '@ttn-lw/components/breadcrumbs/breadcrumbs'
 import Button from '@ttn-lw/components/button-v2'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown-v2'
+import Link from '@ttn-lw/components/link'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './header-v2.styl'
 
 const Header = ({
+  brandLogo,
+  logo,
   breadcrumbs,
   className,
   addDropdownItems,
@@ -39,14 +42,26 @@ const Header = ({
 
   return (
     <header {...rest} className={classnames(className, style.container)}>
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
+      <Breadcrumbs className={style.breadcrumbs} breadcrumbs={breadcrumbs} />
+      <div className={style.mobileMenu}>
+        <Button secondary icon="menu" />
+        <Link to="/" className={style.logoLink}>
+          <img {...logo} className={style.logo} />
+        </Link>
+      </div>
 
       <div className={style.buttons}>
-        <Button naked icon="add" dropdownItems={addDropdownItems} ref={addRef} />
-        <Button naked icon="grade" dropdownItems={starDropdownItems} ref={starRef} />
-        <Button naked icon="inbox" />
+        <Button secondary icon="add" dropdownItems={addDropdownItems} ref={addRef} />
+        <Button
+          secondary
+          icon="grade"
+          dropdownItems={starDropdownItems}
+          ref={starRef}
+          className={style.bookmarkButton}
+        />
+        <Button secondary icon="inbox" />
         <ProfileDropdown
-          userName={user.name || user.ids.user_id}
+          brandLogo={brandLogo}
           data-test-id="profile-dropdown"
           profilePicture={user.profile_picture}
         >
@@ -57,14 +72,21 @@ const Header = ({
   )
 }
 
+const imgPropType = PropTypes.shape({
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired,
+})
+
 Header.propTypes = {
   /** The dropdown items when the add button is clicked. */
   addDropdownItems: PropTypes.node.isRequired,
+  brandLogo: imgPropType,
   /** A list of breadcrumb elements. */
   breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.element]))
     .isRequired,
   /** The classname applied to the component. */
   className: PropTypes.string,
+  logo: imgPropType.isRequired,
   /** The dropdown items when the profile button is clicked. */
   profileDropdownItems: PropTypes.node.isRequired,
   /** The dropdown items when the star button is clicked. */
@@ -79,6 +101,7 @@ Header.propTypes = {
 Header.defaultProps = {
   className: undefined,
   user: undefined,
+  brandLogo: undefined,
 }
 
 export default Header
