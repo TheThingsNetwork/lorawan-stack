@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import deviceIcon from '@assets/misc/end-device.svg'
 
@@ -31,6 +32,13 @@ import LastSeen from '@console/components/last-seen'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import {
+  selectDeviceByIds,
+  selectDeviceDerivedDownlinkFrameCount,
+  selectDeviceDerivedUplinkFrameCount,
+  selectDeviceLastSeen,
+} from '@console/store/selectors/devices'
+
 const m = defineMessages({
   uplinkDownlinkTooltip:
     'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.',
@@ -43,8 +51,15 @@ const m = defineMessages({
 const { Content } = EntityTitleSection
 
 const DeviceTitleSection = props => {
-  const { devId, fetching, device, uplinkFrameCount, downlinkFrameCount, lastSeen, children } =
-    props
+  const { appId, devId, fetching, children } = props
+  const device = useSelector(state => selectDeviceByIds(state, appId, devId))
+  const uplinkFrameCount = useSelector(state =>
+    selectDeviceDerivedUplinkFrameCount(state, appId, devId),
+  )
+  const downlinkFrameCount = useSelector(state =>
+    selectDeviceDerivedDownlinkFrameCount(state, appId, devId),
+  )
+  const lastSeen = useSelector(state => selectDeviceLastSeen(state, appId, devId))
   const showLastSeen = Boolean(lastSeen)
   const showUplinkCount = typeof uplinkFrameCount === 'number'
   const showDownlinkCount = typeof downlinkFrameCount === 'number'
@@ -114,21 +129,15 @@ const DeviceTitleSection = props => {
 }
 
 DeviceTitleSection.propTypes = {
+  appId: PropTypes.string.isRequired,
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   devId: PropTypes.string.isRequired,
-  device: PropTypes.device.isRequired,
-  downlinkFrameCount: PropTypes.number,
   fetching: PropTypes.bool,
-  lastSeen: PropTypes.string,
-  uplinkFrameCount: PropTypes.number,
 }
 
 DeviceTitleSection.defaultProps = {
-  uplinkFrameCount: undefined,
-  lastSeen: undefined,
   children: null,
   fetching: false,
-  downlinkFrameCount: undefined,
 }
 
 export default DeviceTitleSection
