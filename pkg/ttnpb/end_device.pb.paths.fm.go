@@ -47,6 +47,44 @@ var BoolValueFieldPathsNested = []string{
 var BoolValueFieldPathsTopLevel = []string{
 	"value",
 }
+var ServingRelayForwardingLimitsFieldPathsNested = []string{
+	"join_requests",
+	"join_requests.bucket_size",
+	"join_requests.reload_rate",
+	"notifications",
+	"notifications.bucket_size",
+	"notifications.reload_rate",
+	"overall",
+	"overall.bucket_size",
+	"overall.reload_rate",
+	"reset_behavior",
+	"uplink_messages",
+	"uplink_messages.bucket_size",
+	"uplink_messages.reload_rate",
+}
+
+var ServingRelayForwardingLimitsFieldPathsTopLevel = []string{
+	"join_requests",
+	"notifications",
+	"overall",
+	"reset_behavior",
+	"uplink_messages",
+}
+var RelayUplinkForwardingRuleFieldPathsNested = []string{
+	"device_id",
+	"last_w_f_cnt",
+	"limits",
+	"limits.bucket_size",
+	"limits.reload_rate",
+	"session_key_id",
+}
+
+var RelayUplinkForwardingRuleFieldPathsTopLevel = []string{
+	"device_id",
+	"last_w_f_cnt",
+	"limits",
+	"session_key_id",
+}
 var ServingRelayParametersFieldPathsNested = []string{
 	"cad_periodicity",
 	"default_channel_index",
@@ -4636,44 +4674,6 @@ var BatchGetEndDevicesRequestFieldPathsTopLevel = []string{
 	"application_ids",
 	"device_ids",
 	"field_mask",
-}
-var ServingRelayParameters_UplinkForwardingRuleFieldPathsNested = []string{
-	"device_id",
-	"last_w_f_cnt",
-	"limits",
-	"limits.bucket_size",
-	"limits.reload_rate",
-	"session_key_id",
-}
-
-var ServingRelayParameters_UplinkForwardingRuleFieldPathsTopLevel = []string{
-	"device_id",
-	"last_w_f_cnt",
-	"limits",
-	"session_key_id",
-}
-var ServingRelayParameters_ForwardingLimitsFieldPathsNested = []string{
-	"join_requests",
-	"join_requests.bucket_size",
-	"join_requests.reload_rate",
-	"notifications",
-	"notifications.bucket_size",
-	"notifications.reload_rate",
-	"overall",
-	"overall.bucket_size",
-	"overall.reload_rate",
-	"reset_behavior",
-	"uplink_messages",
-	"uplink_messages.bucket_size",
-	"uplink_messages.reload_rate",
-}
-
-var ServingRelayParameters_ForwardingLimitsFieldPathsTopLevel = []string{
-	"join_requests",
-	"notifications",
-	"overall",
-	"reset_behavior",
-	"uplink_messages",
 }
 var MACParameters_ChannelFieldPathsNested = []string{
 	"downlink_frequency",

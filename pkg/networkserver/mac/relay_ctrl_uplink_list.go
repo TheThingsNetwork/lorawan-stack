@@ -153,7 +153,7 @@ func HandleRelayCtrlUplinkListAns(
 			switch req.Action {
 			case ttnpb.RelayCtrlUplinkListAction_RELAY_CTRL_UPLINK_LIST_ACTION_READ_W_F_CNT:
 			case ttnpb.RelayCtrlUplinkListAction_RELAY_CTRL_UPLINK_LIST_ACTION_REMOVE_TRUSTED_END_DEVICE:
-				currentServing.UplinkForwardingRules[req.RuleIndex] = &ttnpb.ServingRelayParameters_UplinkForwardingRule{}
+				currentServing.UplinkForwardingRules[req.RuleIndex] = &ttnpb.RelayUplinkForwardingRule{}
 			default:
 				panic("unreachable")
 			}

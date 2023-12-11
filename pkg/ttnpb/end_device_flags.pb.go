@@ -172,6 +172,213 @@ func (m *BoolValue) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []s
 	return paths, nil
 }
 
+// AddSelectFlagsForServingRelayForwardingLimits adds flags to select fields in ServingRelayForwardingLimits.
+func AddSelectFlagsForServingRelayForwardingLimits(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("reset-behavior", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("reset-behavior", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("join-requests", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("join-requests", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("join-requests", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("notifications", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("notifications", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("notifications", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("uplink-messages", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("uplink-messages", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("uplink-messages", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("overall", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("overall", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("overall", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forServingRelayForwardingLimits message from select flags.
+func PathsFromSelectFlagsForServingRelayForwardingLimits(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("reset_behavior", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("reset_behavior", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("join_requests", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("join_requests", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("join_requests", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("notifications", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("notifications", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("notifications", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("uplink_messages", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("uplink_messages", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("uplink_messages", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("overall", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("overall", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("overall", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForServingRelayForwardingLimits adds flags to select fields in ServingRelayForwardingLimits.
+func AddSetFlagsForServingRelayForwardingLimits(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("reset-behavior", prefix), flagsplugin.EnumValueDesc(RelayResetLimitCounter_value), flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("join-requests", prefix), hidden)
+	AddSetFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("notifications", prefix), hidden)
+	AddSetFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("uplink-messages", prefix), hidden)
+	AddSetFlagsForRelayForwardLimits(flags, flagsplugin.Prefix("overall", prefix), hidden)
+}
+
+// SetFromFlags sets the ServingRelayForwardingLimits message from flags.
+func (m *ServingRelayForwardingLimits) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("reset_behavior", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RelayResetLimitCounter_value)
+		if err != nil {
+			return nil, err
+		}
+		m.ResetBehavior = RelayResetLimitCounter(enumValue)
+		paths = append(paths, flagsplugin.Prefix("reset_behavior", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("join_requests", prefix)); changed {
+		if m.JoinRequests == nil {
+			m.JoinRequests = &RelayForwardLimits{}
+		}
+		if setPaths, err := m.JoinRequests.SetFromFlags(flags, flagsplugin.Prefix("join_requests", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("notifications", prefix)); changed {
+		if m.Notifications == nil {
+			m.Notifications = &RelayForwardLimits{}
+		}
+		if setPaths, err := m.Notifications.SetFromFlags(flags, flagsplugin.Prefix("notifications", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("uplink_messages", prefix)); changed {
+		if m.UplinkMessages == nil {
+			m.UplinkMessages = &RelayForwardLimits{}
+		}
+		if setPaths, err := m.UplinkMessages.SetFromFlags(flags, flagsplugin.Prefix("uplink_messages", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("overall", prefix)); changed {
+		if m.Overall == nil {
+			m.Overall = &RelayForwardLimits{}
+		}
+		if setPaths, err := m.Overall.SetFromFlags(flags, flagsplugin.Prefix("overall", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRelayUplinkForwardingRule adds flags to select fields in RelayUplinkForwardingRule.
+func AddSelectFlagsForRelayUplinkForwardingRule(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("limits", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("limits", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayUplinkForwardLimits(flags, flagsplugin.Prefix("limits", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("last-w-f-cnt", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("last-w-f-cnt", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("device-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("device-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("session-key-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("session-key-id", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelayUplinkForwardingRule message from select flags.
+func PathsFromSelectFlagsForRelayUplinkForwardingRule(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("limits", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("limits", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayUplinkForwardLimits(flags, flagsplugin.Prefix("limits", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("last_w_f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("last_w_f_cnt", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("device_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("device_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("session_key_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("session_key_id", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRelayUplinkForwardingRule adds flags to select fields in RelayUplinkForwardingRule.
+func AddSetFlagsForRelayUplinkForwardingRule(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForRelayUplinkForwardLimits(flags, flagsplugin.Prefix("limits", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("last-w-f-cnt", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("device-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("session-key-id", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RelayUplinkForwardingRule message from flags.
+func (m *RelayUplinkForwardingRule) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("limits", prefix)); changed {
+		if m.Limits == nil {
+			m.Limits = &RelayUplinkForwardLimits{}
+		}
+		if setPaths, err := m.Limits.SetFromFlags(flags, flagsplugin.Prefix("limits", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("last_w_f_cnt", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.LastWFCnt = val
+		paths = append(paths, flagsplugin.Prefix("last_w_f_cnt", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("device_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DeviceId = val
+		paths = append(paths, flagsplugin.Prefix("device_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBytes(flags, flagsplugin.Prefix("session_key_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.SessionKeyId = val
+		paths = append(paths, flagsplugin.Prefix("session_key_id", prefix))
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForServingRelayParameters adds flags to select fields in ServingRelayParameters.
 func AddSelectFlagsForServingRelayParameters(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("second-channel", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("second-channel", prefix), true), flagsplugin.WithHidden(hidden)))
@@ -180,7 +387,7 @@ func AddSelectFlagsForServingRelayParameters(flags *pflag.FlagSet, prefix string
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cad-periodicity", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cad-periodicity", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("uplink-forwarding-rules", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("uplink-forwarding-rules", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("limits", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("limits", prefix), true), flagsplugin.WithHidden(hidden)))
-	// NOTE: limits (ServingRelayParameters_ForwardingLimits) does not seem to have select flags.
+	AddSelectFlagsForServingRelayForwardingLimits(flags, flagsplugin.Prefix("limits", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forServingRelayParameters message from select flags.
@@ -215,7 +422,11 @@ func PathsFromSelectFlagsForServingRelayParameters(flags *pflag.FlagSet, prefix 
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("limits", prefix))
 	}
-	// NOTE: limits (ServingRelayParameters_ForwardingLimits) does not seem to have select flags.
+	if selectPaths, err := PathsFromSelectFlagsForServingRelayForwardingLimits(flags, flagsplugin.Prefix("limits", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
 	return paths, nil
 }
 
@@ -225,7 +436,7 @@ func AddSetFlagsForServingRelayParameters(flags *pflag.FlagSet, prefix string, h
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("default-channel-index", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("cad-periodicity", prefix), flagsplugin.EnumValueDesc(RelayCADPeriodicity_value), flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping UplinkForwardingRules because repeated messages are currently not supported.
-	// FIXME: Skipping Limits because it does not seem to implement AddSetFlags.
+	AddSetFlagsForServingRelayForwardingLimits(flags, flagsplugin.Prefix("limits", prefix), hidden)
 }
 
 // SetFromFlags sets the ServingRelayParameters message from flags.
@@ -257,7 +468,16 @@ func (m *ServingRelayParameters) SetFromFlags(flags *pflag.FlagSet, prefix strin
 		paths = append(paths, flagsplugin.Prefix("cad_periodicity", prefix))
 	}
 	// FIXME: Skipping UplinkForwardingRules because it does not seem to implement AddSetFlags.
-	// FIXME: Skipping Limits because it does not seem to implement AddSetFlags.
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("limits", prefix)); changed {
+		if m.Limits == nil {
+			m.Limits = &ServingRelayForwardingLimits{}
+		}
+		if setPaths, err := m.Limits.SetFromFlags(flags, flagsplugin.Prefix("limits", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
 	return paths, nil
 }
 

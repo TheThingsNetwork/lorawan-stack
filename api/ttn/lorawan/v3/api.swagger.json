@@ -19323,54 +19323,6 @@
       "default": "ENABLED",
       "description": " - ENABLED: No restrictions are in place.\n - WARNING: Warnings are being emitted that the provider will be deprecated in the future.\n - DISABLED: New integrations cannot be set up, and old ones do not start."
     },
-    "ServingRelayParametersForwardingLimits": {
-      "type": "object",
-      "properties": {
-        "reset_behavior": {
-          "$ref": "#/definitions/v3RelayResetLimitCounter",
-          "description": "Reset behavior of the buckets upon limit update."
-        },
-        "join_requests": {
-          "$ref": "#/definitions/v3RelayForwardLimits",
-          "description": "Bucket configuration for join requests.\nIf unset, no individual limits will apply to join requests, but the relay overall limitations will apply."
-        },
-        "notifications": {
-          "$ref": "#/definitions/v3RelayForwardLimits",
-          "description": "Bucket configuration for unknown device notifications.\nIf unset, no individual limits will apply to unknown end device notifications, but the relay overall\nlimitations will still apply."
-        },
-        "uplink_messages": {
-          "$ref": "#/definitions/v3RelayForwardLimits",
-          "description": "Bucket configuration for uplink messages across all served end devices.\nIf unset, no individual limits will apply to uplink messages across all served end devices, but the relay\noverall limitations will still apply."
-        },
-        "overall": {
-          "$ref": "#/definitions/v3RelayForwardLimits",
-          "description": "Bucket configuration for all relay messages.\nIf unset, no overall limits will apply to the relay, but individual limitations will still apply."
-        }
-      }
-    },
-    "ServingRelayParametersUplinkForwardingRule": {
-      "type": "object",
-      "properties": {
-        "limits": {
-          "$ref": "#/definitions/v3RelayUplinkForwardLimits",
-          "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply."
-        },
-        "last_w_f_cnt": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Last wake on radio frame counter used by the served end device."
-        },
-        "device_id": {
-          "type": "string",
-          "description": "End device identifier of the served end device."
-        },
-        "session_key_id": {
-          "type": "string",
-          "format": "byte",
-          "description": "Session key ID of the session keys used to derive the root relay session key."
-        }
-      }
-    },
     "TxAcknowledgmentResult": {
       "type": "string",
       "enum": [
@@ -25693,6 +25645,29 @@
         }
       }
     },
+    "v3RelayUplinkForwardingRule": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/v3RelayUplinkForwardLimits",
+          "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply."
+        },
+        "last_w_f_cnt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Last wake on radio frame counter used by the served end device."
+        },
+        "device_id": {
+          "type": "string",
+          "description": "End device identifier of the served end device."
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte",
+          "description": "Session key ID of the session keys used to derive the root relay session key."
+        }
+      }
+    },
     "v3Right": {
       "type": "string",
       "enum": [
@@ -25909,6 +25884,31 @@
         }
       }
     },
+    "v3ServingRelayForwardingLimits": {
+      "type": "object",
+      "properties": {
+        "reset_behavior": {
+          "$ref": "#/definitions/v3RelayResetLimitCounter",
+          "description": "Reset behavior of the buckets upon limit update."
+        },
+        "join_requests": {
+          "$ref": "#/definitions/v3RelayForwardLimits",
+          "description": "Bucket configuration for join requests.\nIf unset, no individual limits will apply to join requests, but the relay overall limitations will apply."
+        },
+        "notifications": {
+          "$ref": "#/definitions/v3RelayForwardLimits",
+          "description": "Bucket configuration for unknown device notifications.\nIf unset, no individual limits will apply to unknown end device notifications, but the relay overall\nlimitations will still apply."
+        },
+        "uplink_messages": {
+          "$ref": "#/definitions/v3RelayForwardLimits",
+          "description": "Bucket configuration for uplink messages across all served end devices.\nIf unset, no individual limits will apply to uplink messages across all served end devices, but the relay\noverall limitations will still apply."
+        },
+        "overall": {
+          "$ref": "#/definitions/v3RelayForwardLimits",
+          "description": "Bucket configuration for all relay messages.\nIf unset, no overall limits will apply to the relay, but individual limitations will still apply."
+        }
+      }
+    },
     "v3ServingRelayParameters": {
       "type": "object",
       "properties": {
@@ -25929,12 +25929,12 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/ServingRelayParametersUplinkForwardingRule"
+            "$ref": "#/definitions/v3RelayUplinkForwardingRule"
           },
           "description": "Configured uplink forwarding rules."
         },
         "limits": {
-          "$ref": "#/definitions/ServingRelayParametersForwardingLimits",
+          "$ref": "#/definitions/v3ServingRelayForwardingLimits",
           "description": "Configured forwarding limits.\nIf unset, the default value from Network Server configuration will be used."
         }
       }

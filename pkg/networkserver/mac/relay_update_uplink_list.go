@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	emptyRelayUplinkForwardingRule = &ttnpb.ServingRelayParameters_UplinkForwardingRule{}
+	emptyRelayUplinkForwardingRule = &ttnpb.RelayUplinkForwardingRule{}
 
 	// EvtEnqueueRelayUpdateUplinkListRequest is emitted when a relay update uplink list request is enqueued.
 	EvtEnqueueRelayUpdateUplinkListRequest = defineEnqueueMACRequestEvent(
@@ -178,12 +178,12 @@ func HandleRelayUpdateUplinkListAns(
 				currentServing.UplinkForwardingRules = append(
 					currentServing.UplinkForwardingRules,
 					make(
-						[]*ttnpb.ServingRelayParameters_UplinkForwardingRule,
+						[]*ttnpb.RelayUplinkForwardingRule,
 						1+int(req.RuleIndex-uint32(n)),
 					)...,
 				)
 				for i := n; i < len(currentServing.UplinkForwardingRules); i++ {
-					currentServing.UplinkForwardingRules[i] = &ttnpb.ServingRelayParameters_UplinkForwardingRule{}
+					currentServing.UplinkForwardingRules[i] = &ttnpb.RelayUplinkForwardingRule{}
 				}
 			}
 			rule := currentServing.UplinkForwardingRules[req.RuleIndex]

@@ -224,78 +224,8 @@ func (x *BoolValue) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
-// MarshalProtoJSON marshals the ServingRelayParameters_UplinkForwardingRule message to JSON.
-func (x *ServingRelayParameters_UplinkForwardingRule) MarshalProtoJSON(s *jsonplugin.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.Limits != nil || s.HasField("limits") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("limits")
-		x.Limits.MarshalProtoJSON(s.WithField("limits"))
-	}
-	if x.LastWFCnt != 0 || s.HasField("last_w_f_cnt") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("last_w_f_cnt")
-		s.WriteUint32(x.LastWFCnt)
-	}
-	if x.DeviceId != "" || s.HasField("device_id") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("device_id")
-		s.WriteString(x.DeviceId)
-	}
-	if len(x.SessionKeyId) > 0 || s.HasField("session_key_id") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("session_key_id")
-		s.WriteBytes(x.SessionKeyId)
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the ServingRelayParameters_UplinkForwardingRule to JSON.
-func (x *ServingRelayParameters_UplinkForwardingRule) MarshalJSON() ([]byte, error) {
-	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the ServingRelayParameters_UplinkForwardingRule message from JSON.
-func (x *ServingRelayParameters_UplinkForwardingRule) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.ReadAny() // ignore unknown field
-		case "limits":
-			if s.ReadNil() {
-				x.Limits = nil
-				return
-			}
-			x.Limits = &RelayUplinkForwardLimits{}
-			x.Limits.UnmarshalProtoJSON(s.WithField("limits", true))
-		case "last_w_f_cnt", "lastWFCnt":
-			s.AddField("last_w_f_cnt")
-			x.LastWFCnt = s.ReadUint32()
-		case "device_id", "deviceId":
-			s.AddField("device_id")
-			x.DeviceId = s.ReadString()
-		case "session_key_id", "sessionKeyId":
-			s.AddField("session_key_id")
-			x.SessionKeyId = s.ReadBytes()
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the ServingRelayParameters_UplinkForwardingRule from JSON.
-func (x *ServingRelayParameters_UplinkForwardingRule) UnmarshalJSON(b []byte) error {
-	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the ServingRelayParameters_ForwardingLimits message to JSON.
-func (x *ServingRelayParameters_ForwardingLimits) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+// MarshalProtoJSON marshals the ServingRelayForwardingLimits message to JSON.
+func (x *ServingRelayForwardingLimits) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
 		s.WriteNil()
 		return
@@ -330,13 +260,13 @@ func (x *ServingRelayParameters_ForwardingLimits) MarshalProtoJSON(s *jsonplugin
 	s.WriteObjectEnd()
 }
 
-// MarshalJSON marshals the ServingRelayParameters_ForwardingLimits to JSON.
-func (x *ServingRelayParameters_ForwardingLimits) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals the ServingRelayForwardingLimits to JSON.
+func (x *ServingRelayForwardingLimits) MarshalJSON() ([]byte, error) {
 	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
 }
 
-// UnmarshalProtoJSON unmarshals the ServingRelayParameters_ForwardingLimits message from JSON.
-func (x *ServingRelayParameters_ForwardingLimits) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+// UnmarshalProtoJSON unmarshals the ServingRelayForwardingLimits message from JSON.
+func (x *ServingRelayForwardingLimits) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
 		return
 	}
@@ -379,8 +309,78 @@ func (x *ServingRelayParameters_ForwardingLimits) UnmarshalProtoJSON(s *jsonplug
 	})
 }
 
-// UnmarshalJSON unmarshals the ServingRelayParameters_ForwardingLimits from JSON.
-func (x *ServingRelayParameters_ForwardingLimits) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON unmarshals the ServingRelayForwardingLimits from JSON.
+func (x *ServingRelayForwardingLimits) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayUplinkForwardingRule message to JSON.
+func (x *RelayUplinkForwardingRule) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Limits != nil || s.HasField("limits") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limits")
+		x.Limits.MarshalProtoJSON(s.WithField("limits"))
+	}
+	if x.LastWFCnt != 0 || s.HasField("last_w_f_cnt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_w_f_cnt")
+		s.WriteUint32(x.LastWFCnt)
+	}
+	if x.DeviceId != "" || s.HasField("device_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("device_id")
+		s.WriteString(x.DeviceId)
+	}
+	if len(x.SessionKeyId) > 0 || s.HasField("session_key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_key_id")
+		s.WriteBytes(x.SessionKeyId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayUplinkForwardingRule to JSON.
+func (x *RelayUplinkForwardingRule) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayUplinkForwardingRule message from JSON.
+func (x *RelayUplinkForwardingRule) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "limits":
+			if s.ReadNil() {
+				x.Limits = nil
+				return
+			}
+			x.Limits = &RelayUplinkForwardLimits{}
+			x.Limits.UnmarshalProtoJSON(s.WithField("limits", true))
+		case "last_w_f_cnt", "lastWFCnt":
+			s.AddField("last_w_f_cnt")
+			x.LastWFCnt = s.ReadUint32()
+		case "device_id", "deviceId":
+			s.AddField("device_id")
+			x.DeviceId = s.ReadString()
+		case "session_key_id", "sessionKeyId":
+			s.AddField("session_key_id")
+			x.SessionKeyId = s.ReadBytes()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayUplinkForwardingRule from JSON.
+func (x *RelayUplinkForwardingRule) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -464,7 +464,7 @@ func (x *ServingRelayParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 					x.UplinkForwardingRules = append(x.UplinkForwardingRules, nil)
 					return
 				}
-				v := &ServingRelayParameters_UplinkForwardingRule{}
+				v := &RelayUplinkForwardingRule{}
 				v.UnmarshalProtoJSON(s.WithField("uplink_forwarding_rules", false))
 				if s.Err() != nil {
 					return
@@ -476,7 +476,7 @@ func (x *ServingRelayParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 				x.Limits = nil
 				return
 			}
-			x.Limits = &ServingRelayParameters_ForwardingLimits{}
+			x.Limits = &ServingRelayForwardingLimits{}
 			x.Limits.UnmarshalProtoJSON(s.WithField("limits", true))
 		}
 	})
