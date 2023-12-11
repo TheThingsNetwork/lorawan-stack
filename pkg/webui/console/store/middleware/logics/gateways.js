@@ -252,7 +252,7 @@ const updateGatewayStatisticsLogic = createRequestLogic({
 const getGatewayEventLocationLogic = createLogic({
   type: gateways.GET_GTW_EVENT_MESSAGE_SUCCESS,
   validate: ({ action }, allow, reject) => {
-    if (action.event.name !== 'gs.status.receive' || !action?.event?.data?.antenna_locations) {
+    if (action?.event?.name !== 'gs.status.receive' || !action?.event?.data?.antenna_locations) {
       reject(action)
     } else {
       allow(action)
