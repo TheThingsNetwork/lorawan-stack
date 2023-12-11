@@ -42042,6 +42042,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "fanout_notifications",
+              "description": "Determines if a notification will be sent to the collaborators. If false it, notifications will be sent only to the\nadministrative or technical contact.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

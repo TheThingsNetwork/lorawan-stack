@@ -9236,6 +9236,7 @@ is used to manage OAuth client authorizations for users.
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization. This field is deprecated. Use administrative_contact and technical_contact instead. |
 | `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `fanout_notifications` | [`bool`](#bool) |  | Determines if a notification will be sent to the collaborators. If false it, notifications will be sent only to the administrative or technical contact. |
 
 #### Field Rules
 

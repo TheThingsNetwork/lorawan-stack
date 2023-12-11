@@ -23,6 +23,7 @@ func AddSelectFlagsForOrganization(flags *pflag.FlagSet, prefix string, hidden b
 	AddSelectFlagsForOrganizationOrUserIdentifiers(flags, flagsplugin.Prefix("administrative-contact", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("technical-contact", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("technical-contact", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForOrganizationOrUserIdentifiers(flags, flagsplugin.Prefix("technical-contact", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("fanout-notifications", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("fanout-notifications", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forOrganization message from select flags.
@@ -72,6 +73,11 @@ func PathsFromSelectFlagsForOrganization(flags *pflag.FlagSet, prefix string) (p
 	} else {
 		paths = append(paths, selectPaths...)
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("fanout_notifications", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("fanout_notifications", prefix))
+	}
 	return paths, nil
 }
 
@@ -84,6 +90,7 @@ func AddSetFlagsForOrganization(flags *pflag.FlagSet, prefix string, hidden bool
 	// FIXME: Skipping ContactInfo because repeated messages are currently not supported.
 	AddSetFlagsForOrganizationOrUserIdentifiers(flags, flagsplugin.Prefix("administrative-contact", prefix), hidden)
 	AddSetFlagsForOrganizationOrUserIdentifiers(flags, flagsplugin.Prefix("technical-contact", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("fanout-notifications", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the Organization message from flags.
@@ -136,6 +143,12 @@ func (m *Organization) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths 
 		} else {
 			paths = append(paths, setPaths...)
 		}
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("fanout_notifications", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FanoutNotifications = val
+		paths = append(paths, flagsplugin.Prefix("fanout_notifications", prefix))
 	}
 	return paths, nil
 }

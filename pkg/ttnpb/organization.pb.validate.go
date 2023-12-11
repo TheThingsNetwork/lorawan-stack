@@ -203,6 +203,8 @@ func (m *Organization) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "fanout_notifications":
+			// no validation rules for FanoutNotifications
 		default:
 			return OrganizationValidationError{
 				field:  name,

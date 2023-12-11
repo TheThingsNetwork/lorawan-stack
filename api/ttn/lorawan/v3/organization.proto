@@ -91,7 +91,11 @@ message Organization {
   reserved 13;
   reserved "gateway_limit";
 
-  // next: 14
+  // Determines if a notification will be sent to the collaborators. If false it, notifications will be sent only to the
+  // administrative or technical contact.
+  bool fanout_notifications = 14;
+
+  // next: 15
 }
 
 message Organizations {

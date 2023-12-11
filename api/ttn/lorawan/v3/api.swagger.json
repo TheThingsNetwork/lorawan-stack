@@ -13811,6 +13811,10 @@
                     },
                     "technical_contact": {
                       "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+                    },
+                    "fanout_notifications": {
+                      "type": "boolean",
+                      "description": "Determines if a notification will be sent to the collaborators. If false it, notifications will be sent only to the\nadministrative or technical contact."
                     }
                   }
                 },
@@ -25609,6 +25613,10 @@
         },
         "technical_contact": {
           "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+        },
+        "fanout_notifications": {
+          "type": "boolean",
+          "description": "Determines if a notification will be sent to the collaborators. If false it, notifications will be sent only to the\nadministrative or technical contact."
         }
       }
     },
