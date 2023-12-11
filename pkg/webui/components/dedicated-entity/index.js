@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 
-import Button from '@ttn-lw/components/button'
+import Button from '@ttn-lw/components/button-v2'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,14 +32,33 @@ const DedicatedEntity = ({
   onClick,
   'data-test-id': dataTestId,
   entityIcon,
-}) => (
-  <div className={classnames(className, style.dedicatedEntity)} data-test-id={dataTestId}>
-    <Button className={style.button} primary grey icon={icon} onClick={onClick} />
-    <hr className={style.divider} />
-    {entityIcon ? <Icon icon={entityIcon} /> : null}
-    <Message content={label} className={style.label} component="p" />
-  </div>
-)
+}) => {
+  const [hovered, setHovered] = React.useState(false)
+  const onMouseEnter = useCallback(() => setHovered(true), [])
+  const onMouseLeave = useCallback(() => setHovered(false), [])
+
+  return (
+    <div className={classnames(className, style.dedicatedEntity)} data-test-id={dataTestId}>
+      <Button
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        className={classnames(style.button, { [style.buttonHovered]: hovered })}
+        primary
+        grey
+        icon={icon}
+        message={hovered ? 'Go back to Applications list' : undefined}
+        onClick={onClick}
+      />
+      {!hovered ? (
+        <>
+          <hr className={style.divider} />
+          {entityIcon ? <Icon icon={entityIcon} /> : null}
+          <Message content={label} className={style.label} component="p" />
+        </>
+      ) : null}
+    </div>
+  )
+}
 
 DedicatedEntity.propTypes = {
   className: PropTypes.string,
