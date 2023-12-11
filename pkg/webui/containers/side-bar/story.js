@@ -22,7 +22,7 @@ import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SideHeader from '@ttn-lw/components/side-header'
 import SearchButton from '@ttn-lw/components/search-button'
 
-import SideBarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 import style from './side-bar.styl'
 import SideFooter from '@ttn-lw/components/side-footer'
@@ -37,9 +37,9 @@ export default {
         setIsMinimized(prev => !prev)
       }, [])
       return (
-        <SideBarContext.Provider value={{ isMinimized, onMinimizeToggle }}>
+        <SidebarContext.Provider value={{ isMinimized, onMinimizeToggle }}>
           {storyFn()}
-        </SideBarContext.Provider>
+        </SidebarContext.Provider>
       )
     },
   ],
@@ -61,7 +61,7 @@ export const Default = () => (
   <div
     className={classNames(
       style.sidebar,
-      'd-flex pos-relative align-center direction-column gap-cs-s p-cs-s bg-tts-primary-050',
+      'd-flex pos-relative direction-column gap-cs-s p-cs-s bg-tts-primary-050',
     )}
     style={{ width: '17rem', height: '96vh' }}
   >

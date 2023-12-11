@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import SideBarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 import SearchButton from '.'
 
@@ -22,7 +22,7 @@ export default {
   title: 'Sidebar/SearchButton',
   decorators: [
     storyFn => (
-      <SideBarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SideBarContext.Provider>
+      <SidebarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SidebarContext.Provider>
     ),
   ],
 }

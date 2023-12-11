@@ -17,18 +17,19 @@ import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
 
-import SideBarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const SideHeader = ({ logo }) => {
-  const { onMinimizeToggle, isMinimized } = useContext(SideBarContext)
+  const { onMinimizeToggle, isMinimized } = useContext(SidebarContext)
 
   return (
     <div
       className={classnames('d-flex', 'j-between', {
         'direction-column': isMinimized,
         'gap-cs-xs': isMinimized,
+        'al-center': isMinimized,
       })}
     >
       <img {...logo} className={classnames({ 'w-50': !isMinimized })} />

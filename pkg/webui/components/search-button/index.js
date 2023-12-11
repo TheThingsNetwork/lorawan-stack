@@ -18,16 +18,17 @@ import classNames from 'classnames'
 import Button from '@ttn-lw/components/button-v2'
 import Icon from '@ttn-lw/components/icon'
 
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
+
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './search-button.styl'
-import SideBarContext from '@ttn-lw/containers/side-bar/context'
 
 const SearchButton = ({ onClick, className }) => {
-  const { isMinimized } = useContext(SideBarContext)
+  const { isMinimized } = useContext(SidebarContext)
 
   const handleClick = useCallback(() => {
     onClick()

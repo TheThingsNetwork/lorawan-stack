@@ -17,10 +17,11 @@ import React, { useContext } from 'react'
 import SideHeader from '@ttn-lw/components/side-header'
 
 import { selectApplicationSiteName, selectAssetsRootPath } from '@ttn-lw/lib/selectors/env'
-import SideBarContext from '../context'
+
+import SidebarContext from '../context'
 
 const Header = () => {
-  const { isMinimized } = useContext(SideBarContext)
+  const { isMinimized } = useContext(SidebarContext)
   const logo = {
     src: isMinimized
       ? `${selectAssetsRootPath()}/tts-logo-icon.svg`

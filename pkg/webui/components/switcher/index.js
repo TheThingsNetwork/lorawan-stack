@@ -28,7 +28,7 @@ import style from './switcher.styl'
 const Switcher = ({ layer, onClick, isMinimized }) => {
   const overviewClassName = classNames(
     style.link,
-    { [style.active]: layer === '/' || layer === '/console' },
+    { [style.active]: !layer.includes('/applications') && !layer.includes('/gateways') },
     'p-vert-cs-s',
     'p-sides-0',
   )

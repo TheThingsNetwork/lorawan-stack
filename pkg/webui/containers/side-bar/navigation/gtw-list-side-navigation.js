@@ -17,23 +17,22 @@ import React, { useContext } from 'react'
 import SectionLabel from '@ttn-lw/components/section-label'
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 
-import SideBarContext from '../context'
+import SidebarContext from '../context'
 
 const GtwListSideNavigation = () => {
-  const { topEntities, isMinimized } = useContext(SideBarContext)
+  const { topEntities, isMinimized } = useContext(SidebarContext)
+  if (isMinimized || topEntities.length === 0) {
+    return null
+  }
 
   return (
     <div>
-      {!isMinimized && (
-        <>
-          <SectionLabel label="Top entities" icon="add" />
-          <SideNavigation>
-            {topEntities.map(({ path, entity, title }) => (
-              <SideNavigation.Item title={title} path={path} icon={entity} key={path} />
-            ))}
-          </SideNavigation>
-        </>
-      )}
+      <SectionLabel label="Top entities" icon="add" />
+      <SideNavigation>
+        {topEntities.map(({ path, entity, title }) => (
+          <SideNavigation.Item title={title} path={path} icon={entity} key={path} />
+        ))}
+      </SideNavigation>
     </div>
   )
 }

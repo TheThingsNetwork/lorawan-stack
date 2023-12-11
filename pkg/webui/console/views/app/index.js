@@ -27,7 +27,7 @@ import classnames from 'classnames'
 import { ToastContainer } from '@ttn-lw/components/toast'
 import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
 
-import SideBar from '@ttn-lw/containers/side-bar'
+import Sidebar from '@ttn-lw/containers/side-bar'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -95,7 +95,7 @@ const Layout = () => {
           />
           <div id="modal-container" />
           <div className="grid">
-            <SideBar />
+            <Sidebar />
             <main className={classnames(style.main, 'w-full', 'h-full', 'item-8', 'item-start-4')}>
               <WithAuth
                 user={user}

@@ -18,10 +18,11 @@ import classNames from 'classnames'
 import Button from '@ttn-lw/components/button-v2'
 import Dropdown from '@ttn-lw/components/dropdown-v2'
 
-import SideBarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 import { LanguageContext } from '@ttn-lw/lib/components/with-locale'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './side-footer.styl'
@@ -42,7 +43,7 @@ LanguageOption.propTypes = {
 }
 
 const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) => {
-  const { isMinimized } = useContext(SideBarContext)
+  const { isMinimized } = useContext(SidebarContext)
   const ref = useRef(null)
 
   const clusterDropdownItems = (
@@ -75,12 +76,20 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
 
   const supportDropdownItems = (
     <>
-      <Dropdown.Item title="Documentation" icon="menu_book" path={documentationBaseUrl} />
-      <Dropdown.Item title="Support" icon="support" path={supportLink} />
-      <Dropdown.Item title="Status page" icon="monitor_heart" path={statusPageBaseUrl} />
+      <Dropdown.Item
+        title={sharedMessages.documentation}
+        icon="menu_book"
+        path={documentationBaseUrl}
+      />
+      <Dropdown.Item title={sharedMessages.support} icon="support" path={supportLink} />
+      <Dropdown.Item
+        title={sharedMessages.statusPage}
+        icon="monitor_heart"
+        path={statusPageBaseUrl}
+      />
       {Boolean(languageContext) && (
         <Dropdown.Item
-          title="Language"
+          title={sharedMessages.language}
           icon="language"
           path="/support"
           submenuItems={submenuItems}
@@ -89,25 +98,30 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
     </>
   )
 
+  const sideFooterClassnames = classNames(
+    style.sideFooter,
+    'd-flex',
+    'j-center',
+    'al-center',
+    'gap-cs-xs',
+    'fs-xs',
+    {
+      'w-80': isMinimized,
+      'w-90': !isMinimized,
+    },
+  )
+
   return (
-    <div
-      className={classNames(
-        style.sideFooter,
-        'd-flex',
-        'j-between',
-        'align-center',
-        'gap-cs-xs',
-        'fs-xs',
-        'w-90',
-      )}
-    >
+    <div className={sideFooterClassnames}>
       <Button
         className={style.sideFooterButton}
         secondary
         message={!isMinimized ? `v${process.env.VERSION} (${process.env.REVISION})` : undefined}
         icon="support"
         dropdownItems={supportDropdownItems}
-        dropdownClassName={style.sideFooterHoverDropdown}
+        dropdownClassName={classNames(style.sideFooterHoverDropdown, {
+          [style.sideFooterHoverDropdownMinimized]: isMinimized,
+        })}
         isHoverDropdown
         ref={ref}
       />

@@ -17,6 +17,8 @@ import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
 
+import Message from '@ttn-lw/lib/components/message'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './section-label.styl'
@@ -30,7 +32,7 @@ const SectionLabel = ({
   'data-test-id': dataTestId,
 }) => (
   <div className={classnames(className, style.sectionLabel)} data-test-id={dataTestId}>
-    {label}
+    <Message content={label} />
     <Button naked icon={icon} disabled={buttonDisabled} onClick={onClick} />
   </div>
 )

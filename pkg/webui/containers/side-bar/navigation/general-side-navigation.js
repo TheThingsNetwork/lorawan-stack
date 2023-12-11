@@ -17,20 +17,37 @@ import React, { useContext } from 'react'
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SectionLabel from '@ttn-lw/components/section-label'
 
-import SideBarContext from '../context'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import SidebarContext from '../context'
 
 const GeneralSideNavigation = () => {
-  const { topEntities, isMinimized } = useContext(SideBarContext)
+  const { topEntities, isMinimized } = useContext(SidebarContext)
 
   return (
     <div>
       <SideNavigation className="mt-cs-xs">
-        <SideNavigation.Item title="Dashboard" path="/" icon="overview" exact />
-        <SideNavigation.Item title="Organizations" path="/organizations" icon="group" />
-        <SideNavigation.Item title="Notifications" path="/notifications" icon="inbox" />
-        <SideNavigation.Item title="Personal API keys" path="/user/api-keys" icon="key" />
-        <SideNavigation.Item title="Network Operations Center" path="/noc" icon="ssid_chart" />
-        <SideNavigation.Item title="Admin panel" path="/admin-panel" icon="admin_panel_settings" />
+        <SideNavigation.Item title={sharedMessages.dashboard} path="/" icon="overview" exact />
+        <SideNavigation.Item
+          title={sharedMessages.organizations}
+          path="/organizations"
+          icon="group"
+        />
+        <SideNavigation.Item
+          title={sharedMessages.notifications}
+          path="/notifications"
+          icon="inbox"
+        />
+        <SideNavigation.Item
+          title={sharedMessages.personalApiKeys}
+          path="/user/api-keys"
+          icon="key"
+        />
+        <SideNavigation.Item
+          title={sharedMessages.adminPanel}
+          path="/admin-panel"
+          icon="admin_panel_settings"
+        />
         {!isMinimized && (
           <>
             <SectionLabel label="Top entities" icon="add" className="mt-cs-m" />
