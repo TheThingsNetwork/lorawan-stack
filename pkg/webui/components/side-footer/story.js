@@ -14,27 +14,25 @@
 
 import React from 'react'
 
-import Switcher from '.'
+import SideBarContext from '@ttn-lw/containers/side-bar/context'
+
+import Footer from '.'
 
 export default {
-  title: 'Navigation v2/Switcher',
-  component: Switcher,
-}
-
-const SwictherExample = () => {
-  const [layer, setLayer] = React.useState('/')
-  const handleClick = React.useCallback(
-    evt => {
-      setLayer(evt.target.getAttribute('href'))
-    },
-    [setLayer],
-  )
-
-  return <Switcher layer={layer} onClick={handleClick} />
+  title: 'Sidebar/Footer',
+  component: Footer,
+  decorators: [
+    storyFn => (
+      <SideBarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SideBarContext.Provider>
+    ),
+  ],
 }
 
 export const Default = () => (
-  <div style={{ width: '300px' }}>
-    <SwictherExample />
+  <div
+    style={{ width: '17rem', height: '96vh' }}
+    className="d-flex pos-fixed align-center direction-column"
+  >
+    <Footer supportLink={'/support'} documentationBaseUrl={'/docs'} statusPageBaseUrl={'/status'} />
   </div>
 )

@@ -19,7 +19,7 @@ import SideBarContext from '@ttn-lw/containers/side-bar/context'
 import SearchButton from '.'
 
 export default {
-  title: 'Search button',
+  title: 'Sidebar/SearchButton',
   decorators: [
     storyFn => (
       <SideBarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SideBarContext.Provider>
