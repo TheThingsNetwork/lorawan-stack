@@ -44,7 +44,7 @@ const statusMap = {
 }
 
 const docLinkValue = msg => (
-  <Link.DocLink secondary path="/the-thing-stack/migrating/import-devices/">
+  <Link.DocLink secondary path="/devices/adding-devices/adding-devices-in-bulk">
     {msg}
   </Link.DocLink>
 )
