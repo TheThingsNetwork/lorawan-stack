@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import classNames from 'classnames'
 
 import TtsLogo from '@assets/static/tts-logo.svg'
@@ -22,10 +22,26 @@ import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SideHeader from '@ttn-lw/components/side-header'
 import SearchButton from '@ttn-lw/components/search-button'
 
+import SideBarContext from '@ttn-lw/containers/side-bar/context'
+
 import style from './side-bar.styl'
 
 export default {
   title: 'Navigation v2/Side bar',
+  decorators: [
+    storyFn => {
+      const [isMinimized, setIsMinimized] = useState(false)
+
+      const onMinimizeToggle = useCallback(async () => {
+        setIsMinimized(prev => !prev)
+      }, [])
+      return (
+        <SideBarContext.Provider value={{ isMinimized, onMinimizeToggle }}>
+          {storyFn()}
+        </SideBarContext.Provider>
+      )
+    },
+  ],
 }
 
 const SwictherExample = () => {
