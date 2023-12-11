@@ -937,6 +937,7 @@
     "MinRetransmitTimeout": 1000000000,
     "MaxRetransmitTimeout": 3000000000,
     "RelayForwardDelay": 0,
-    "RelayReceiveDelay": 0
+    "RelayReceiveDelay": 0,
+    "ServedRelayBackoff": 0
   }
 }

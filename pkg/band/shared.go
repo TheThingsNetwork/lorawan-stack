@@ -50,6 +50,9 @@ type SharedParameters struct {
 	RelayForwardDelay time.Duration
 	// RelayReceiveDelay is the default RxR window timing in seconds.
 	RelayReceiveDelay time.Duration
+	// ServedRelayBackoff is the default number of wake on radio attempts before sending the uplink message directly
+	// by a served relay device.
+	ServedRelayBackoff uint32
 }
 
 var (
@@ -68,6 +71,7 @@ var (
 		parameters := universalSharedParameters
 		parameters.RelayForwardDelay = 50 * time.Millisecond
 		parameters.RelayReceiveDelay = 18 * time.Second
+		parameters.ServedRelayBackoff = 8
 		return parameters
 	}()
 )
