@@ -34,6 +34,7 @@ func WrapUplinkTokens(gateway, forwarder []byte, agent *ttnpb.PacketBrokerAgentU
 func TestWrapGatewayUplinkToken(t *testing.T) {
 	a, ctx := test.New(t)
 	key := bytes.Repeat([]byte{0x42}, 16)
+	forwarderData := []byte("000013:tnt:eu1")
 	blockCipher, err := aes.NewCipher(key)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -43,15 +44,19 @@ func TestWrapGatewayUplinkToken(t *testing.T) {
 		t.FailNow()
 	}
 
-	wrappedToken, err := wrapGatewayUplinkToken(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"},
-		[]byte{0x1, 0x2, 0x3}, aead,
+	wrappedToken, err := wrapGatewayUplinkToken(
+		ctx,
+		&ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"},
+		[]byte{0x1, 0x2, 0x3},
+		forwarderData,
+		aead,
 	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	t.Logf("Wrapped token: %q", base64.RawStdEncoding.EncodeToString(wrappedToken))
 
-	uid, gtwToken, err := unwrapGatewayUplinkToken(wrappedToken, aead)
+	uid, gtwToken, err := unwrapGatewayUplinkToken(wrappedToken, forwarderData, aead)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

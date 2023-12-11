@@ -261,6 +261,718 @@ var _ interface {
 	ErrorName() string
 } = BoolValueValidationError{}
 
+// ValidateFields checks the field values on ServingRelayForwardingLimits with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ServingRelayForwardingLimits) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ServingRelayForwardingLimitsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "reset_behavior":
+			// no validation rules for ResetBehavior
+		case "join_requests":
+
+			if v, ok := interface{}(m.GetJoinRequests()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayForwardingLimitsValidationError{
+						field:  "join_requests",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "notifications":
+
+			if v, ok := interface{}(m.GetNotifications()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayForwardingLimitsValidationError{
+						field:  "notifications",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "uplink_messages":
+
+			if v, ok := interface{}(m.GetUplinkMessages()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayForwardingLimitsValidationError{
+						field:  "uplink_messages",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "overall":
+
+			if v, ok := interface{}(m.GetOverall()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayForwardingLimitsValidationError{
+						field:  "overall",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ServingRelayForwardingLimitsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ServingRelayForwardingLimitsValidationError is the validation error returned
+// by ServingRelayForwardingLimits.ValidateFields if the designated
+// constraints aren't met.
+type ServingRelayForwardingLimitsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ServingRelayForwardingLimitsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ServingRelayForwardingLimitsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ServingRelayForwardingLimitsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ServingRelayForwardingLimitsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ServingRelayForwardingLimitsValidationError) ErrorName() string {
+	return "ServingRelayForwardingLimitsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ServingRelayForwardingLimitsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sServingRelayForwardingLimits.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ServingRelayForwardingLimitsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ServingRelayForwardingLimitsValidationError{}
+
+// ValidateFields checks the field values on RelayUplinkForwardingRule with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RelayUplinkForwardingRule) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = RelayUplinkForwardingRuleFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "limits":
+
+			if v, ok := interface{}(m.GetLimits()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RelayUplinkForwardingRuleValidationError{
+						field:  "limits",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "last_w_f_cnt":
+			// no validation rules for LastWFCnt
+		case "device_id":
+
+			if m.GetDeviceId() != "" {
+
+				if utf8.RuneCountInString(m.GetDeviceId()) > 36 {
+					return RelayUplinkForwardingRuleValidationError{
+						field:  "device_id",
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_RelayUplinkForwardingRule_DeviceId_Pattern.MatchString(m.GetDeviceId()) {
+					return RelayUplinkForwardingRuleValidationError{
+						field:  "device_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		case "session_key_id":
+			// no validation rules for SessionKeyId
+		default:
+			return RelayUplinkForwardingRuleValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// RelayUplinkForwardingRuleValidationError is the validation error returned by
+// RelayUplinkForwardingRule.ValidateFields if the designated constraints
+// aren't met.
+type RelayUplinkForwardingRuleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RelayUplinkForwardingRuleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RelayUplinkForwardingRuleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RelayUplinkForwardingRuleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RelayUplinkForwardingRuleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RelayUplinkForwardingRuleValidationError) ErrorName() string {
+	return "RelayUplinkForwardingRuleValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RelayUplinkForwardingRuleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRelayUplinkForwardingRule.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RelayUplinkForwardingRuleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RelayUplinkForwardingRuleValidationError{}
+
+var _RelayUplinkForwardingRule_DeviceId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+// ValidateFields checks the field values on ServingRelayParameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ServingRelayParameters) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ServingRelayParametersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "second_channel":
+
+			if v, ok := interface{}(m.GetSecondChannel()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayParametersValidationError{
+						field:  "second_channel",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "default_channel_index":
+
+			if m.GetDefaultChannelIndex() > 255 {
+				return ServingRelayParametersValidationError{
+					field:  "default_channel_index",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
+		case "cad_periodicity":
+
+			if _, ok := RelayCADPeriodicity_name[int32(m.GetCadPeriodicity())]; !ok {
+				return ServingRelayParametersValidationError{
+					field:  "cad_periodicity",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "uplink_forwarding_rules":
+
+			if len(m.GetUplinkForwardingRules()) > 16 {
+				return ServingRelayParametersValidationError{
+					field:  "uplink_forwarding_rules",
+					reason: "value must contain no more than 16 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetUplinkForwardingRules() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ServingRelayParametersValidationError{
+							field:  fmt.Sprintf("uplink_forwarding_rules[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "limits":
+
+			if v, ok := interface{}(m.GetLimits()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServingRelayParametersValidationError{
+						field:  "limits",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ServingRelayParametersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ServingRelayParametersValidationError is the validation error returned by
+// ServingRelayParameters.ValidateFields if the designated constraints aren't met.
+type ServingRelayParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ServingRelayParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ServingRelayParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ServingRelayParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ServingRelayParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ServingRelayParametersValidationError) ErrorName() string {
+	return "ServingRelayParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ServingRelayParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sServingRelayParameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ServingRelayParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ServingRelayParametersValidationError{}
+
+// ValidateFields checks the field values on ServedRelayParameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ServedRelayParameters) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ServedRelayParametersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "backoff":
+
+			if m.GetBackoff() > 63 {
+				return ServedRelayParametersValidationError{
+					field:  "backoff",
+					reason: "value must be less than or equal to 63",
+				}
+			}
+
+		case "second_channel":
+
+			if v, ok := interface{}(m.GetSecondChannel()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ServedRelayParametersValidationError{
+						field:  "second_channel",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "serving_device_id":
+
+			if utf8.RuneCountInString(m.GetServingDeviceId()) > 36 {
+				return ServedRelayParametersValidationError{
+					field:  "serving_device_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_ServedRelayParameters_ServingDeviceId_Pattern.MatchString(m.GetServingDeviceId()) {
+				return ServedRelayParametersValidationError{
+					field:  "serving_device_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		case "mode":
+			if m.Mode == nil {
+				return ServedRelayParametersValidationError{
+					field:  "mode",
+					reason: "value is required",
+				}
+			}
+			if len(subs) == 0 {
+				subs = []string{
+					"always", "dynamic", "end_device_controlled",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "always":
+					w, ok := m.Mode.(*ServedRelayParameters_Always)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetAlways()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ServedRelayParametersValidationError{
+								field:  "always",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "dynamic":
+					w, ok := m.Mode.(*ServedRelayParameters_Dynamic)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetDynamic()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ServedRelayParametersValidationError{
+								field:  "dynamic",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "end_device_controlled":
+					w, ok := m.Mode.(*ServedRelayParameters_EndDeviceControlled)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetEndDeviceControlled()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ServedRelayParametersValidationError{
+								field:  "end_device_controlled",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				}
+			}
+		default:
+			return ServedRelayParametersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ServedRelayParametersValidationError is the validation error returned by
+// ServedRelayParameters.ValidateFields if the designated constraints aren't met.
+type ServedRelayParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ServedRelayParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ServedRelayParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ServedRelayParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ServedRelayParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ServedRelayParametersValidationError) ErrorName() string {
+	return "ServedRelayParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ServedRelayParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sServedRelayParameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ServedRelayParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ServedRelayParametersValidationError{}
+
+var _ServedRelayParameters_ServingDeviceId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+// ValidateFields checks the field values on RelayParameters with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RelayParameters) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = RelayParametersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "mode":
+			if m.Mode == nil {
+				return RelayParametersValidationError{
+					field:  "mode",
+					reason: "value is required",
+				}
+			}
+			if len(subs) == 0 {
+				subs = []string{
+					"serving", "served",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "serving":
+					w, ok := m.Mode.(*RelayParameters_Serving)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetServing()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return RelayParametersValidationError{
+								field:  "serving",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "served":
+					w, ok := m.Mode.(*RelayParameters_Served)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetServed()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return RelayParametersValidationError{
+								field:  "served",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				}
+			}
+		default:
+			return RelayParametersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// RelayParametersValidationError is the validation error returned by
+// RelayParameters.ValidateFields if the designated constraints aren't met.
+type RelayParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RelayParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RelayParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RelayParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RelayParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RelayParametersValidationError) ErrorName() string { return "RelayParametersValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RelayParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRelayParameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RelayParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RelayParametersValidationError{}
+
 // ValidateFields checks the field values on MACParameters with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -470,6 +1182,18 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACParametersValidationError{
 						field:  "ping_slot_data_rate_index_value",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "relay":
+
+			if v, ok := interface{}(m.GetRelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACParametersValidationError{
+						field:  "relay",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -1275,6 +1999,30 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "relay":
+
+			if v, ok := interface{}(m.GetRelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "relay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "desired_relay":
+
+			if v, ok := interface{}(m.GetDesiredRelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_relay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return MACSettingsValidationError{
 				field:  name,
@@ -1644,6 +2392,18 @@ func (m *MACState) ValidateFields(paths ...string) error {
 		case "last_adr_change_f_cnt_up":
 			// no validation rules for LastAdrChangeFCntUp
 		case "recent_mac_command_identifiers":
+
+		case "pending_relay_downlink":
+
+			if v, ok := interface{}(m.GetPendingRelayDownlink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACStateValidationError{
+						field:  "pending_relay_downlink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
 
 		default:
 			return MACStateValidationError{
@@ -5984,6 +6744,18 @@ func (m *MACState_UplinkMessage_RxMetadata) ValidateFields(paths ...string) erro
 				}
 			}
 
+		case "relay":
+
+			if v, ok := interface{}(m.GetRelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACState_UplinkMessage_RxMetadataValidationError{
+						field:  "relay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return MACState_UplinkMessage_RxMetadataValidationError{
 				field:  name,
@@ -6127,6 +6899,79 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACState_UplinkMessage_RxMetadata_PacketBrokerMetadataValidationError{}
+
+// ValidateFields checks the field values on
+// MACState_UplinkMessage_RxMetadata_RelayMetadata with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MACState_UplinkMessage_RxMetadata_RelayMetadata) ValidateFields(paths ...string) error {
+	if len(paths) > 0 {
+		return fmt.Errorf("message MACState_UplinkMessage_RxMetadata_RelayMetadata has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+// MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError is the
+// validation error returned by
+// MACState_UplinkMessage_RxMetadata_RelayMetadata.ValidateFields if the
+// designated constraints aren't met.
+type MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError) ErrorName() string {
+	return "MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACState_UplinkMessage_RxMetadata_RelayMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACState_UplinkMessage_RxMetadata_RelayMetadataValidationError{}
 
 // ValidateFields checks the field values on MACState_DownlinkMessage_Message
 // with the rules defined in the proto definition for this message. If any

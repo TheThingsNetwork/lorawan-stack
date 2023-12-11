@@ -23,7 +23,7 @@ import Form from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
 import UnitInput from '@ttn-lw/components/unit-input'
 
-import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
+import GatewayFrequencyPlansSelect from '@console/containers/freq-plans-select/gs-frequency-plan-select'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -48,7 +48,7 @@ const decodeDelayValue = value => {
   }
 }
 
-const isEmptyFrequencyPlan = value => value === frequencyPlans.EMPTY_FREQ_PLAN
+const isEmptyFrequencyPlan = value => value?.includes(frequencyPlans.EMPTY_FREQ_PLAN)
 
 const isNotValidDuration = value => {
   const { duration, unit } = decodeDelayValue(value)
@@ -78,18 +78,10 @@ const LorawanSettingsForm = React.memo(props => {
     setShouldDisplayWarning(isNotValidDuration(value))
   }, [])
 
-  const [showFrequencyPlanWarning, setShowFrequencyPlanWarning] = React.useState(
-    isEmptyFrequencyPlan(gateway.frequency_plan_id) || !gateway.frequency_plan_id,
-  )
-
-  const onFrequencyPlanChange = React.useCallback(freqPlan => {
-    setShowFrequencyPlanWarning(isEmptyFrequencyPlan(freqPlan.value))
-  }, [])
-
   const initialValues = React.useMemo(
     () => ({
       ...validationSchema.cast(gateway),
-      frequency_plan_id: gateway.frequency_plan_id || frequencyPlans.EMPTY_FREQ_PLAN,
+      frequency_plan_ids: gateway.frequency_plan_ids || [frequencyPlans.EMPTY_FREQ_PLAN],
     }),
     [gateway],
   )
@@ -97,8 +89,8 @@ const LorawanSettingsForm = React.memo(props => {
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(
-        isEmptyFrequencyPlan(values.frequency_plan_id)
-          ? { ...values, frequency_plan_id: '' }
+        isEmptyFrequencyPlan(values.frequency_plan_ids)
+          ? { ...values, frequency_plan_ids: [''] }
           : values,
       )
 
@@ -122,13 +114,7 @@ const LorawanSettingsForm = React.memo(props => {
       error={error}
       enableReinitialize
     >
-      <GsFrequencyPlansSelect
-        name="frequency_plan_id"
-        menuPlacement="top"
-        onChange={onFrequencyPlanChange}
-        warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
-        tooltipId={tooltipIds.FREQUENCY_PLAN}
-      />
+      <GatewayFrequencyPlansSelect />
       <Form.Field
         title={sharedMessages.gatewayScheduleDownlinkLate}
         name="schedule_downlink_late"

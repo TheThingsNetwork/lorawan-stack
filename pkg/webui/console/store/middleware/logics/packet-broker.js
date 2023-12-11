@@ -263,7 +263,12 @@ const setPacketBrokerHomeNetworkPolicyLogic = createRequestLogic({
     const ids = extractPacketBrokerIdsFromCombinedId(id)
     await tts.PacketBrokerAgent.setHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id, policy)
 
-    return policy
+    const newPolicy = { home_network_id: { net_id: ids.net_id }, ...policy }
+    if ('tenant_id' in ids) {
+      newPolicy.home_network_id.tenant_id = ids.tenant_id
+    }
+
+    return newPolicy
   },
 })
 
@@ -286,6 +291,34 @@ const deletePacketBrokerHomeNetworkPolicyLogic = createRequestLogic({
     }
 
     return ids
+  },
+})
+
+const deleteAllPacketBrokerHomeNetworkPoliciesLogic = createRequestLogic({
+  type: packetBroker.DELETE_ALL_HOME_NETWORK_ROUTING_POLICIES,
+  process: async ({ action }) => {
+    const {
+      payload: { ids },
+    } = action
+
+    try {
+      await Promise.all(
+        ids.map(async id => {
+          const ids = extractPacketBrokerIdsFromCombinedId(id)
+          if (typeof ids === 'number') {
+            return tts.PacketBrokerAgent.deleteHomeNetworkRoutingPolicy(ids)
+          }
+
+          return tts.PacketBrokerAgent.deleteHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id)
+        }),
+      )
+
+      return ids
+    } catch (error) {
+      if (!isNotFoundError(error)) {
+        throw error
+      }
+    }
   },
 })
 
@@ -346,6 +379,7 @@ export default [
   getPacketBrokerHomeNetworkPoliciesLogic,
   setPacketBrokerHomeNetworkPolicyLogic,
   deletePacketBrokerHomeNetworkPolicyLogic,
+  deleteAllPacketBrokerHomeNetworkPoliciesLogic,
   getDefaultGatewayVisibilityLogic,
   setDefaultGatewayVisibilityLogic,
   deleteDefaultGatewayVisibilityLogic,

@@ -24,13 +24,12 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Message from '@ttn-lw/lib/components/message'
 
 import { selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './code.styl'
 
 const m = defineMessages({
-  code: 'Authorization code',
   codeDescription: 'Your authorization code is:',
-  backToAccount: 'Back to {siteTitle}',
 })
 
 const siteTitle = selectApplicationSiteTitle()
@@ -47,7 +46,7 @@ const Code = () => {
     <Container>
       <Row>
         <Col lg={4} md={6} sm={12}>
-          <PageTitle title={m.code} />
+          <PageTitle title={sharedMessages.authorizationCode} />
           <Message
             content={m.codeDescription}
             component="label"
@@ -63,7 +62,7 @@ const Code = () => {
           <Button.Link
             to="/"
             icon="keyboard_arrow_left"
-            message={{ ...m.backToAccount, values: { siteTitle } }}
+            message={{ ...sharedMessages.backTo, values: { siteTitle } }}
           />
         </Col>
       </Row>

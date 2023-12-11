@@ -16,18 +16,18 @@ import { defineMessages } from 'react-intl'
 
 import TYPES from '@console/constants/formatter-types'
 
+import sharedMessages from './shared-messages'
+
 const m = defineMessages({
-  grpc: 'GRPC service',
   repository: 'Repository',
   javascript: 'Javascript',
-  none: 'None',
   cayennelpp: 'CayenneLPP',
 })
 
 export default Object.freeze({
   [TYPES.JAVASCRIPT]: m.javascript,
   [TYPES.REPOSITORY]: m.repository,
-  [TYPES.NONE]: m.none,
+  [TYPES.NONE]: sharedMessages.none,
   [TYPES.GRPC]: m.grpc,
   [TYPES.CAYENNELPP]: m.cayennelpp,
 })

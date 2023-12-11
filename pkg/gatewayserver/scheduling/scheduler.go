@@ -81,7 +81,7 @@ var (
 // If no time source is specified, the system time is used.
 func NewScheduler(
 	ctx context.Context,
-	fps map[string]*frequencyplans.FrequencyPlan,
+	fps []*frequencyplans.FrequencyPlan,
 	enforceDutyCycle bool,
 	dutyCycleStyle DutyCycleStyle,
 	scheduleAnytimeDelay *time.Duration,
@@ -188,7 +188,7 @@ func NewScheduler(
 // Scheduler is a packet scheduler that takes time conflicts and sub-band restrictions into account.
 type Scheduler struct {
 	clock                *RolloverClock
-	fps                  map[string]*frequencyplans.FrequencyPlan
+	fps                  []*frequencyplans.FrequencyPlan
 	timeOffAir           frequencyplans.TimeOffAir
 	timeSource           TimeSource
 	subBands             []*SubBand

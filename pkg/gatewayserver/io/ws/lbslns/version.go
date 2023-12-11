@@ -64,7 +64,7 @@ func (*lbsLNS) GetRouterConfig(
 	ctx context.Context,
 	msg []byte,
 	bandID string,
-	fps map[string]*frequencyplans.FrequencyPlan,
+	fps []*frequencyplans.FrequencyPlan,
 	antennaGain int,
 	receivedAt time.Time,
 ) (context.Context, []byte, *ttnpb.GatewayStatus, error) {

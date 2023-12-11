@@ -45,7 +45,6 @@ import {
 
 const m = defineMessages({
   tokenDescription: 'Geolocation access token as configured within LoRa Cloud',
-  setLoRaCloudToken: 'Set LoRa Cloud token',
   deleteWarning:
     'Are you sure you want to delete the LoRaCloud Geolocation token? This action cannot be undone.',
   queryType: 'Query type',

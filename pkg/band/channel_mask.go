@@ -17,8 +17,7 @@ package band
 import (
 	"fmt"
 	"math"
-
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 // ChMaskCntlPair pairs a ChMaskCntl with a mask.

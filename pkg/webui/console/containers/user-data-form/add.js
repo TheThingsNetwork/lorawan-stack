@@ -16,7 +16,7 @@ import React, { useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { Container, Col, Row } from 'react-grid-system'
-import { defineMessages, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Form from '@ttn-lw/components/form'
@@ -43,22 +43,6 @@ const approvalStates = [
   'STATE_FLAGGED',
   'STATE_SUSPENDED',
 ]
-
-const m = defineMessages({
-  adminLabel: 'Grant this user admin status',
-  adminDescription:
-    'Admin status enables overarching rights such as managing other users or modifying entities regardless of collaboration status',
-  userDescPlaceholder: 'Description for my new user',
-  userDescDescription: 'Optional user description; can also be used to save notes about the user',
-  userIdPlaceholder: 'jane-doe',
-  userNamePlaceholder: 'Jane Doe',
-  emailPlaceholder: 'mail@example.com',
-  emailAddressDescription:
-    'Primary email address used for logging in; this address is not publicly visible',
-  emailAddressValidation: 'Treat email address as validated',
-  emailAddressValidationDescription:
-    'Enable this option if you do not need this user to validate the email address',
-})
 
 const baseValidationSchema = Yup.object().shape({
   ids: Yup.object().shape({
@@ -152,22 +136,22 @@ const UserDataFormAdd = () => {
             <Form.Field
               title={sharedMessages.name}
               name="name"
-              placeholder={m.userNamePlaceholder}
+              placeholder={sharedMessages.userNamePlaceholder}
               component={Input}
             />
             <Form.Field
               title={sharedMessages.description}
               name="description"
               type="textarea"
-              placeholder={m.userDescPlaceholder}
-              description={m.userDescDescription}
+              placeholder={sharedMessages.userDescription}
+              description={sharedMessages.userDescDescription}
               component={Input}
             />
             <Form.Field
               title={sharedMessages.emailAddress}
               name="primary_email_address"
-              placeholder={m.emailPlaceholder}
-              description={m.emailAddressDescription}
+              placeholder={sharedMessages.emailPlaceholder}
+              description={sharedMessages.emailAddressDescription}
               component={Input}
               required
             />
@@ -181,14 +165,14 @@ const UserDataFormAdd = () => {
             <Form.Field
               name="_validate_email"
               component={Checkbox}
-              label={m.emailAddressValidation}
-              description={m.emailAddressValidationDescription}
+              label={sharedMessages.emailAddressValidation}
+              description={sharedMessages.emailAddressValidationDescription}
             />
             <Form.Field
               name="admin"
               component={Checkbox}
-              label={m.adminLabel}
-              description={m.adminDescription}
+              label={sharedMessages.grantAdminStatus}
+              description={sharedMessages.adminDescription}
             />
             <Form.Field
               title={sharedMessages.password}

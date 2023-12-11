@@ -25,7 +25,6 @@ import style from './webhook-template-info.styl'
 
 const m = defineMessages({
   about: 'About {name}',
-  documentation: 'Documentation',
   setupWebhook: 'Setup webhook for {name}',
   editWebhook: 'Edit webhook for {name}',
 })

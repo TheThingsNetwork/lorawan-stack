@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { defineMessages } from 'react-intl'
-
 import CreateFetchSelect from '@console/containers/fetch-select'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getGsFrequencyPlans, getNsFrequencyPlans } from '@console/store/actions/configuration'
 
@@ -25,13 +25,7 @@ import {
   selectFrequencyPlansFetching,
 } from '@console/store/selectors/configuration'
 
-const m = defineMessages({
-  title: 'Frequency plan',
-  warning: 'Frequency plans unavailable',
-  none: 'Do not set a frequency plan',
-})
-
-const formatOptions = plans => plans.map(plan => ({ value: plan.id, label: plan.name }))
+import { formatOptions, m } from './utils'
 
 export const CreateFrequencyPlansSelect = (source, options = {}) =>
   CreateFetchSelect({
@@ -40,7 +34,7 @@ export const CreateFrequencyPlansSelect = (source, options = {}) =>
     fetchingSelector: selectFrequencyPlansFetching,
     errorSelector: selectFrequencyPlansError,
     defaultWarning: m.warning,
-    defaultTitle: m.title,
+    defaultTitle: sharedMessages.frequencyPlan,
     optionsFormatter: formatOptions,
     additionalOptions: source === 'gs' ? [{ value: 'no-frequency-plan', label: m.none }] : [],
     ...options,

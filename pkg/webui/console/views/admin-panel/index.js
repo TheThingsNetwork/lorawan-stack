@@ -30,6 +30,8 @@ import UserManagement from '@console/views/admin-user-management'
 import PacketBrokerRouter from '@console/views/admin-packet-broker'
 import NetworkInformation from '@console/views/admin-panel-network-information'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   checkFromState,
   mayConfigurePacketBroker,
@@ -38,25 +40,26 @@ import {
 } from '@console/lib/feature-checks'
 
 const m = defineMessages({
-  adminPanel: 'Admin panel',
-  networkInformation: 'Network information',
   userManagement: 'User management',
   globalNetworkSettings: 'Global network settings',
   peeringSettings: 'Peering settings',
 })
 
 const AdminPanel = () => {
-  useBreadcrumbs('admin-panel', <Breadcrumb path="/admin-panel" content={m.adminPanel} />)
+  useBreadcrumbs(
+    'admin-panel',
+    <Breadcrumb path="/admin-panel" content={sharedMessages.adminPanel} />,
+  )
   const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))
   const showPacketBroker = useSelector(state => checkFromState(mayConfigurePacketBroker, state))
 
   return (
     <Require featureCheck={mayPerformAdminActions} otherwise={{ redirect: '/' }}>
       <Breadcrumbs />
-      <IntlHelmet title={m.adminPanel} />
+      <IntlHelmet title={sharedMessages.adminPanel} />
       <PanelView>
         <PanelView.Item
-          title={m.networkInformation}
+          title={sharedMessages.networkInformation}
           icon="view_compact"
           path="network-information"
           Component={NetworkInformation}

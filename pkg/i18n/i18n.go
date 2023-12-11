@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -27,7 +28,6 @@ import (
 	"sync"
 
 	"github.com/gotnospirit/messageformat"
-	"golang.org/x/exp/maps"
 )
 
 const defaultLanguage = "en" // The language of the messages written in Go files.

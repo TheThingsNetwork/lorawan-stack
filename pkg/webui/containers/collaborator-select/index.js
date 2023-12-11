@@ -32,6 +32,7 @@ import { selectSearchResultAccountIds } from '@ttn-lw/lib/store/selectors/search
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { selectCollaborators } from '@ttn-lw/lib/store/selectors/collaborators'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { composeOption } from './util'
 
@@ -43,7 +44,11 @@ const customMenu = props => {
   return (
     <components.Menu {...props}>
       {showSuggestions && (
-        <Message content={m.suggestions} className="ml-cs-s mt-cs-xxs mb-cs-xxs" component="h4" />
+        <Message
+          content={sharedMessages.suggestions}
+          className="ml-cs-s mt-cs-xxs mb-cs-xxs"
+          component="h4"
+        />
       )}
       {props.children}
     </components.Menu>
@@ -67,8 +72,6 @@ SingleValue.propTypes = {
 }
 
 const m = defineMessages({
-  noOptionsMessage: 'No matching user or organization was found',
-  suggestions: 'Suggestions',
   setYourself: 'Set yourself as {name}',
 })
 
@@ -90,7 +93,10 @@ const Suggest = ({
   const [showSuggestions, setShowSuggestions] = useState(collaboratorsList !== 0)
   const searchResultsRef = useRef()
   searchResultsRef.current = searchResults
-  const handleNoOptions = useCallback(() => formatMessage(m.noOptionsMessage), [formatMessage])
+  const noOptionsMessage = useCallback(
+    () => formatMessage(sharedMessages.noMatchingUserFound),
+    [formatMessage],
+  )
   const collaboratorOf = {
     path: `${entity}_ids.${entity}_id`,
     id: entityId,
@@ -149,7 +155,7 @@ const Suggest = ({
         name={name}
         defaultOptions={initialOptions}
         component={Select.Suggested}
-        noOptionsMessage={handleNoOptions}
+        noOptionsMessage={noOptionsMessage}
         loadOptions={handleLoadingOptions}
         showOptionIcon
         openMenuOnFocus

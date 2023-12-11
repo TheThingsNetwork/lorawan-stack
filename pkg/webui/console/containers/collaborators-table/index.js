@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages, useIntl } from 'react-intl'
 import { createSelector } from 'reselect'
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 
 import Tag from '@ttn-lw/components/tag'
 import TagGroup from '@ttn-lw/components/tag/group'
@@ -36,10 +36,6 @@ import style from './collaborators-table.styl'
 
 const RIGHT_TAG_MAX_WIDTH = 140
 
-const m = defineMessages({
-  id: 'User / Organization ID',
-})
-
 const rowKeySelector = row => row._type
 
 const getCollaboratorPathPrefix = collaborator =>
@@ -54,7 +50,7 @@ const CollaboratorsTable = props => {
   const headers = [
     {
       name: 'ids',
-      displayName: m.id,
+      displayName: sharedMessages.userOrgId,
       sortable: true,
       sortKey: 'id',
       width: 30,

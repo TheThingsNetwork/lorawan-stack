@@ -1,6 +1,6 @@
 Hello,
 
-You have been invited by user foo-usr to join The Things Network.
+You have been invited to join The Things Network.
 
 You can now go to https://eu1.cloud.thethings.network/oauth/register?invitation_token=TOKEN to register your user account.
 

@@ -224,6 +224,446 @@ func (x *BoolValue) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ServingRelayForwardingLimits message to JSON.
+func (x *ServingRelayForwardingLimits) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.ResetBehavior != 0 || s.HasField("reset_behavior") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("reset_behavior")
+		x.ResetBehavior.MarshalProtoJSON(s)
+	}
+	if x.JoinRequests != nil || s.HasField("join_requests") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("join_requests")
+		x.JoinRequests.MarshalProtoJSON(s.WithField("join_requests"))
+	}
+	if x.Notifications != nil || s.HasField("notifications") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("notifications")
+		x.Notifications.MarshalProtoJSON(s.WithField("notifications"))
+	}
+	if x.UplinkMessages != nil || s.HasField("uplink_messages") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("uplink_messages")
+		x.UplinkMessages.MarshalProtoJSON(s.WithField("uplink_messages"))
+	}
+	if x.Overall != nil || s.HasField("overall") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("overall")
+		x.Overall.MarshalProtoJSON(s.WithField("overall"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ServingRelayForwardingLimits to JSON.
+func (x *ServingRelayForwardingLimits) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServingRelayForwardingLimits message from JSON.
+func (x *ServingRelayForwardingLimits) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "reset_behavior", "resetBehavior":
+			s.AddField("reset_behavior")
+			x.ResetBehavior.UnmarshalProtoJSON(s)
+		case "join_requests", "joinRequests":
+			if s.ReadNil() {
+				x.JoinRequests = nil
+				return
+			}
+			x.JoinRequests = &RelayForwardLimits{}
+			x.JoinRequests.UnmarshalProtoJSON(s.WithField("join_requests", true))
+		case "notifications":
+			if s.ReadNil() {
+				x.Notifications = nil
+				return
+			}
+			x.Notifications = &RelayForwardLimits{}
+			x.Notifications.UnmarshalProtoJSON(s.WithField("notifications", true))
+		case "uplink_messages", "uplinkMessages":
+			if s.ReadNil() {
+				x.UplinkMessages = nil
+				return
+			}
+			x.UplinkMessages = &RelayForwardLimits{}
+			x.UplinkMessages.UnmarshalProtoJSON(s.WithField("uplink_messages", true))
+		case "overall":
+			if s.ReadNil() {
+				x.Overall = nil
+				return
+			}
+			x.Overall = &RelayForwardLimits{}
+			x.Overall.UnmarshalProtoJSON(s.WithField("overall", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ServingRelayForwardingLimits from JSON.
+func (x *ServingRelayForwardingLimits) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayUplinkForwardingRule message to JSON.
+func (x *RelayUplinkForwardingRule) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Limits != nil || s.HasField("limits") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limits")
+		x.Limits.MarshalProtoJSON(s.WithField("limits"))
+	}
+	if x.LastWFCnt != 0 || s.HasField("last_w_f_cnt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_w_f_cnt")
+		s.WriteUint32(x.LastWFCnt)
+	}
+	if x.DeviceId != "" || s.HasField("device_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("device_id")
+		s.WriteString(x.DeviceId)
+	}
+	if len(x.SessionKeyId) > 0 || s.HasField("session_key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_key_id")
+		s.WriteBytes(x.SessionKeyId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayUplinkForwardingRule to JSON.
+func (x *RelayUplinkForwardingRule) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayUplinkForwardingRule message from JSON.
+func (x *RelayUplinkForwardingRule) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "limits":
+			if s.ReadNil() {
+				x.Limits = nil
+				return
+			}
+			x.Limits = &RelayUplinkForwardLimits{}
+			x.Limits.UnmarshalProtoJSON(s.WithField("limits", true))
+		case "last_w_f_cnt", "lastWFCnt":
+			s.AddField("last_w_f_cnt")
+			x.LastWFCnt = s.ReadUint32()
+		case "device_id", "deviceId":
+			s.AddField("device_id")
+			x.DeviceId = s.ReadString()
+		case "session_key_id", "sessionKeyId":
+			s.AddField("session_key_id")
+			x.SessionKeyId = s.ReadBytes()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayUplinkForwardingRule from JSON.
+func (x *RelayUplinkForwardingRule) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ServingRelayParameters message to JSON.
+func (x *ServingRelayParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.SecondChannel != nil || s.HasField("second_channel") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("second_channel")
+		x.SecondChannel.MarshalProtoJSON(s.WithField("second_channel"))
+	}
+	if x.DefaultChannelIndex != 0 || s.HasField("default_channel_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("default_channel_index")
+		s.WriteUint32(x.DefaultChannelIndex)
+	}
+	if x.CadPeriodicity != 0 || s.HasField("cad_periodicity") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cad_periodicity")
+		x.CadPeriodicity.MarshalProtoJSON(s)
+	}
+	if len(x.UplinkForwardingRules) > 0 || s.HasField("uplink_forwarding_rules") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("uplink_forwarding_rules")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.UplinkForwardingRules {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("uplink_forwarding_rules"))
+		}
+		s.WriteArrayEnd()
+	}
+	if x.Limits != nil || s.HasField("limits") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limits")
+		x.Limits.MarshalProtoJSON(s.WithField("limits"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ServingRelayParameters to JSON.
+func (x *ServingRelayParameters) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServingRelayParameters message from JSON.
+func (x *ServingRelayParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "second_channel", "secondChannel":
+			if s.ReadNil() {
+				x.SecondChannel = nil
+				return
+			}
+			x.SecondChannel = &RelaySecondChannel{}
+			x.SecondChannel.UnmarshalProtoJSON(s.WithField("second_channel", true))
+		case "default_channel_index", "defaultChannelIndex":
+			s.AddField("default_channel_index")
+			x.DefaultChannelIndex = s.ReadUint32()
+		case "cad_periodicity", "cadPeriodicity":
+			s.AddField("cad_periodicity")
+			x.CadPeriodicity.UnmarshalProtoJSON(s)
+		case "uplink_forwarding_rules", "uplinkForwardingRules":
+			s.AddField("uplink_forwarding_rules")
+			if s.ReadNil() {
+				x.UplinkForwardingRules = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.UplinkForwardingRules = append(x.UplinkForwardingRules, nil)
+					return
+				}
+				v := &RelayUplinkForwardingRule{}
+				v.UnmarshalProtoJSON(s.WithField("uplink_forwarding_rules", false))
+				if s.Err() != nil {
+					return
+				}
+				x.UplinkForwardingRules = append(x.UplinkForwardingRules, v)
+			})
+		case "limits":
+			if s.ReadNil() {
+				x.Limits = nil
+				return
+			}
+			x.Limits = &ServingRelayForwardingLimits{}
+			x.Limits.UnmarshalProtoJSON(s.WithField("limits", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ServingRelayParameters from JSON.
+func (x *ServingRelayParameters) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ServedRelayParameters message to JSON.
+func (x *ServedRelayParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Mode != nil {
+		switch ov := x.Mode.(type) {
+		case *ServedRelayParameters_Always:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("always")
+			// NOTE: RelayEndDeviceAlwaysMode does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.Always)
+		case *ServedRelayParameters_Dynamic:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("dynamic")
+			ov.Dynamic.MarshalProtoJSON(s.WithField("dynamic"))
+		case *ServedRelayParameters_EndDeviceControlled:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("end_device_controlled")
+			// NOTE: RelayEndDeviceControlledMode does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.EndDeviceControlled)
+		}
+	}
+	if x.Backoff != 0 || s.HasField("backoff") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("backoff")
+		s.WriteUint32(x.Backoff)
+	}
+	if x.SecondChannel != nil || s.HasField("second_channel") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("second_channel")
+		x.SecondChannel.MarshalProtoJSON(s.WithField("second_channel"))
+	}
+	if x.ServingDeviceId != "" || s.HasField("serving_device_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("serving_device_id")
+		s.WriteString(x.ServingDeviceId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ServedRelayParameters to JSON.
+func (x *ServedRelayParameters) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServedRelayParameters message from JSON.
+func (x *ServedRelayParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "always":
+			s.AddField("always")
+			ov := &ServedRelayParameters_Always{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Always = nil
+				return
+			}
+			// NOTE: RelayEndDeviceAlwaysMode does not seem to implement UnmarshalProtoJSON.
+			var v RelayEndDeviceAlwaysMode
+			golang.UnmarshalMessage(s, &v)
+			ov.Always = &v
+		case "dynamic":
+			ov := &ServedRelayParameters_Dynamic{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Dynamic = nil
+				return
+			}
+			ov.Dynamic = &RelayEndDeviceDynamicMode{}
+			ov.Dynamic.UnmarshalProtoJSON(s.WithField("dynamic", true))
+		case "end_device_controlled", "endDeviceControlled":
+			s.AddField("end_device_controlled")
+			ov := &ServedRelayParameters_EndDeviceControlled{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.EndDeviceControlled = nil
+				return
+			}
+			// NOTE: RelayEndDeviceControlledMode does not seem to implement UnmarshalProtoJSON.
+			var v RelayEndDeviceControlledMode
+			golang.UnmarshalMessage(s, &v)
+			ov.EndDeviceControlled = &v
+		case "backoff":
+			s.AddField("backoff")
+			x.Backoff = s.ReadUint32()
+		case "second_channel", "secondChannel":
+			if s.ReadNil() {
+				x.SecondChannel = nil
+				return
+			}
+			x.SecondChannel = &RelaySecondChannel{}
+			x.SecondChannel.UnmarshalProtoJSON(s.WithField("second_channel", true))
+		case "serving_device_id", "servingDeviceId":
+			s.AddField("serving_device_id")
+			x.ServingDeviceId = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ServedRelayParameters from JSON.
+func (x *ServedRelayParameters) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RelayParameters message to JSON.
+func (x *RelayParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Mode != nil {
+		switch ov := x.Mode.(type) {
+		case *RelayParameters_Serving:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("serving")
+			ov.Serving.MarshalProtoJSON(s.WithField("serving"))
+		case *RelayParameters_Served:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("served")
+			ov.Served.MarshalProtoJSON(s.WithField("served"))
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RelayParameters to JSON.
+func (x *RelayParameters) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RelayParameters message from JSON.
+func (x *RelayParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "serving":
+			ov := &RelayParameters_Serving{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Serving = nil
+				return
+			}
+			ov.Serving = &ServingRelayParameters{}
+			ov.Serving.UnmarshalProtoJSON(s.WithField("serving", true))
+		case "served":
+			ov := &RelayParameters_Served{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Served = nil
+				return
+			}
+			ov.Served = &ServedRelayParameters{}
+			ov.Served.UnmarshalProtoJSON(s.WithField("served", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RelayParameters from JSON.
+func (x *RelayParameters) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the MACParameters_Channel message to JSON.
 func (x *MACParameters_Channel) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -422,6 +862,11 @@ func (x *MACParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("ping_slot_data_rate_index_value")
 		x.PingSlotDataRateIndexValue.MarshalProtoJSON(s.WithField("ping_slot_data_rate_index_value"))
 	}
+	if x.Relay != nil || s.HasField("relay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("relay")
+		x.Relay.MarshalProtoJSON(s.WithField("relay"))
+	}
 	s.WriteObjectEnd()
 }
 
@@ -545,6 +990,13 @@ func (x *MACParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.PingSlotDataRateIndexValue = &DataRateIndexValue{}
 			x.PingSlotDataRateIndexValue.UnmarshalProtoJSON(s.WithField("ping_slot_data_rate_index_value", false))
+		case "relay":
+			if s.ReadNil() {
+				x.Relay = nil
+				return
+			}
+			x.Relay = &RelayParameters{}
+			x.Relay.UnmarshalProtoJSON(s.WithField("relay", true))
 		}
 	})
 }
@@ -1229,6 +1681,16 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("schedule_downlinks")
 		x.ScheduleDownlinks.MarshalProtoJSON(s.WithField("schedule_downlinks"))
 	}
+	if x.Relay != nil || s.HasField("relay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("relay")
+		x.Relay.MarshalProtoJSON(s.WithField("relay"))
+	}
+	if x.DesiredRelay != nil || s.HasField("desired_relay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("desired_relay")
+		x.DesiredRelay.MarshalProtoJSON(s.WithField("desired_relay"))
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1534,6 +1996,20 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.ScheduleDownlinks = &BoolValue{}
 			x.ScheduleDownlinks.UnmarshalProtoJSON(s.WithField("schedule_downlinks", false))
+		case "relay":
+			if s.ReadNil() {
+				x.Relay = nil
+				return
+			}
+			x.Relay = &RelayParameters{}
+			x.Relay.UnmarshalProtoJSON(s.WithField("relay", true))
+		case "desired_relay", "desiredRelay":
+			if s.ReadNil() {
+				x.DesiredRelay = nil
+				return
+			}
+			x.DesiredRelay = &RelayParameters{}
+			x.DesiredRelay.UnmarshalProtoJSON(s.WithField("desired_relay", true))
 		}
 	})
 }
@@ -1742,6 +2218,12 @@ func (x *MACState_UplinkMessage_RxMetadata) MarshalProtoJSON(s *jsonplugin.Marsh
 		// NOTE: MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata does not seem to implement MarshalProtoJSON.
 		golang.MarshalMessage(s, x.PacketBroker)
 	}
+	if x.Relay != nil || s.HasField("relay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("relay")
+		// NOTE: MACState_UplinkMessage_RxMetadata_RelayMetadata does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Relay)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1788,6 +2270,16 @@ func (x *MACState_UplinkMessage_RxMetadata) UnmarshalProtoJSON(s *jsonplugin.Unm
 			var v MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata
 			golang.UnmarshalMessage(s, &v)
 			x.PacketBroker = &v
+		case "relay":
+			s.AddField("relay")
+			if s.ReadNil() {
+				x.Relay = nil
+				return
+			}
+			// NOTE: MACState_UplinkMessage_RxMetadata_RelayMetadata does not seem to implement UnmarshalProtoJSON.
+			var v MACState_UplinkMessage_RxMetadata_RelayMetadata
+			golang.UnmarshalMessage(s, &v)
+			x.Relay = &v
 		}
 	})
 }
@@ -2381,6 +2873,12 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if x.PendingRelayDownlink != nil || s.HasField("pending_relay_downlink") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("pending_relay_downlink")
+		// NOTE: RelayForwardDownlinkReq does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.PendingRelayDownlink)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -2609,6 +3107,16 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				v.UnmarshalProtoJSON(s)
 				x.RecentMacCommandIdentifiers = append(x.RecentMacCommandIdentifiers, v)
 			})
+		case "pending_relay_downlink", "pendingRelayDownlink":
+			s.AddField("pending_relay_downlink")
+			if s.ReadNil() {
+				x.PendingRelayDownlink = nil
+				return
+			}
+			// NOTE: RelayForwardDownlinkReq does not seem to implement UnmarshalProtoJSON.
+			var v RelayForwardDownlinkReq
+			golang.UnmarshalMessage(s, &v)
+			x.PendingRelayDownlink = &v
 		}
 	})
 }

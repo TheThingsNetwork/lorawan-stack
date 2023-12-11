@@ -100,5 +100,5 @@ var IN_865_867_RP2_V1_0_4 = Band{
 
 	Relay: in865867RelayParameters,
 
-	SharedParameters: universalSharedParameters,
+	SharedParameters: relayAwareSharedParameters,
 }

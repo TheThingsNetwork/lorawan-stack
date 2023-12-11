@@ -904,6 +904,568 @@ var DefaultMACCommands = MACCommandSpec{
 			return nil
 		}),
 	},
+
+	ttnpb.MACCommandIdentifier_CID_RELAY_CONF: &MACCommandDescriptor{
+		InitiatedByDevice: false,
+
+		UplinkLength: 1,
+		AppendUplink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			pld := cmd.GetRelayConfAns()
+			var status byte
+			if pld.SecondChannelFrequencyAck {
+				status |= 1
+			}
+			if pld.SecondChannelAckOffsetAck {
+				status |= (1 << 1)
+			}
+			if pld.SecondChannelDataRateIndexAck {
+				status |= (1 << 2)
+			}
+			if pld.SecondChannelIndexAck {
+				status |= (1 << 3)
+			}
+			if pld.DefaultChannelIndexAck {
+				status |= (1 << 4)
+			}
+			if pld.CadPeriodicityAck {
+				status |= (1 << 5)
+			}
+			b = append(b, status)
+			return b, nil
+		},
+		UnmarshalUplink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_CONF,
+			"RelayConfAns",
+			1,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				cmd.Payload = &ttnpb.MACCommand_RelayConfAns_{
+					RelayConfAns: &ttnpb.MACCommand_RelayConfAns{
+						SecondChannelFrequencyAck:     b[0]&1 == 1,
+						SecondChannelAckOffsetAck:     (b[0]>>1)&1 == 1,
+						SecondChannelDataRateIndexAck: (b[0]>>2)&1 == 1,
+						SecondChannelIndexAck:         (b[0]>>3)&1 == 1,
+						DefaultChannelIndexAck:        (b[0]>>4)&1 == 1,
+						CadPeriodicityAck:             (b[0]>>5)&1 == 1,
+					},
+				}
+				return nil
+			},
+		),
+
+		DownlinkLength: 5,
+		AppendDownlink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			pld := cmd.GetRelayConfReq()
+			conf := pld.GetConfiguration()
+			if conf == nil {
+				b = append(b, 0x00, 0x00, 0x00, 0x00, 0x00)
+				return b, nil
+			}
+			var chSettings uint16
+			chSettings |= 1 << 13 // StartStop
+			if conf.CadPeriodicity > 5 {
+				return nil, errExpectedLowerOrEqual("CADPeriodicity", 5)(conf.CadPeriodicity)
+			}
+			chSettings |= uint16(conf.CadPeriodicity&0x7) << 10
+			if conf.DefaultChannelIndex > 1 {
+				return nil, errExpectedLowerOrEqual("DefaultChannelIndex", 1)(conf.DefaultChannelIndex)
+			}
+			chSettings |= uint16(conf.DefaultChannelIndex&0x1) << 9
+			var secondChFrequency uint64
+			if secondCh := conf.SecondChannel; secondCh != nil {
+				chSettings |= 1 << 7 // SecondChannelIndex
+				if secondCh.DataRateIndex > 15 {
+					return nil, errExpectedLowerOrEqual("SecondChannelDataRateIndex", 15)(secondCh.DataRateIndex)
+				}
+				chSettings |= uint16(secondCh.DataRateIndex&0xf) << 3
+				if secondCh.AckOffset > 5 {
+					return nil, errExpectedLowerOrEqual("SecondChannelAckOffset", 5)(secondCh.AckOffset)
+				}
+				chSettings |= uint16(secondCh.AckOffset & 0x7)
+				if secondCh.Frequency < 100000 || secondCh.Frequency > byteutil.MaxUint24*phy.FreqMultiplier {
+					return nil, errExpectedBetween(
+						"SecondChannelFrequency", 100000, byteutil.MaxUint24*phy.FreqMultiplier,
+					)(secondCh.Frequency)
+				}
+				secondChFrequency = secondCh.Frequency
+			}
+			b = byteutil.AppendUint16(b, chSettings, 2)
+			b = byteutil.AppendUint64(b, secondChFrequency/phy.FreqMultiplier, 3)
+			return b, nil
+		},
+		UnmarshalDownlink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_CONF,
+			"RelayConfReq",
+			5,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				payload := &ttnpb.MACCommand_RelayConfReq_{
+					RelayConfReq: &ttnpb.MACCommand_RelayConfReq{},
+				}
+				cmd.Payload = payload
+				chSettings := byteutil.ParseUint16(b[0:2])
+				if chSettings&(1<<13) == 0 {
+					return nil
+				}
+				conf := &ttnpb.MACCommand_RelayConfReq_Configuration{
+					SecondChannel:       nil,
+					DefaultChannelIndex: uint32(chSettings>>9) & 0x1,
+					CadPeriodicity:      ttnpb.RelayCADPeriodicity(chSettings>>10) & 0x7,
+				}
+				if chSettings&(1<<7) != 0 {
+					conf.SecondChannel = &ttnpb.RelaySecondChannel{
+						Frequency:     byteutil.ParseUint64(b[2:5]) * phy.FreqMultiplier,
+						AckOffset:     ttnpb.RelaySecondChAckOffset(chSettings) & 0x7,
+						DataRateIndex: ttnpb.DataRateIndex(chSettings>>3) & 0xf,
+					}
+				}
+				payload.RelayConfReq.Configuration = conf
+				return nil
+			},
+		),
+	},
+	ttnpb.MACCommandIdentifier_CID_RELAY_END_DEVICE_CONF: &MACCommandDescriptor{
+		InitiatedByDevice: false,
+
+		UplinkLength: 1,
+		AppendUplink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			pld := cmd.GetRelayEndDeviceConfAns()
+			var status byte
+			if pld.SecondChannelFrequencyAck {
+				status |= 1
+			}
+			if pld.SecondChannelDataRateIndexAck {
+				status |= (1 << 1)
+			}
+			if pld.SecondChannelIndexAck {
+				status |= (1 << 2)
+			}
+			if pld.BackoffAck {
+				status |= (1 << 3)
+			}
+			b = append(b, status)
+			return b, nil
+		},
+		UnmarshalUplink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_END_DEVICE_CONF,
+			"RelayEndDeviceConfAns",
+			1,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				cmd.Payload = &ttnpb.MACCommand_RelayEndDeviceConfAns_{
+					RelayEndDeviceConfAns: &ttnpb.MACCommand_RelayEndDeviceConfAns{
+						SecondChannelFrequencyAck:     b[0]&1 == 1,
+						SecondChannelDataRateIndexAck: (b[0]>>1)&1 == 1,
+						SecondChannelIndexAck:         (b[0]>>2)&1 == 1,
+						BackoffAck:                    (b[0]>>3)&1 == 1,
+					},
+				}
+				return nil
+			},
+		),
+
+		DownlinkLength: 6,
+		AppendDownlink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			pld := cmd.GetRelayEndDeviceConfReq()
+			conf := pld.GetConfiguration()
+			if conf == nil {
+				b = append(b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
+				return b, nil
+			}
+			var mode byte
+			switch conf.Mode.(type) {
+			case *ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Always:
+				mode |= 1 << 2
+			case *ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic:
+				mode |= 2 << 2
+				smartEnableLevel := conf.GetDynamic().GetSmartEnableLevel()
+				if smartEnableLevel > 3 {
+					return nil, errExpectedLowerOrEqual("SmartEnableLevel", 3)(smartEnableLevel)
+				}
+				mode |= byte(conf.GetDynamic().GetSmartEnableLevel() & 0x3)
+			case *ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled:
+				mode |= 3 << 2
+			default:
+				return nil, errExpectedLengthLowerOrEqual("mode", 3)(conf.Mode)
+			}
+			b = append(b, mode)
+			var chSettings uint16
+			if conf.Backoff > 63 {
+				return nil, errExpectedLowerOrEqual("Backoff", 63)(conf.Backoff)
+			}
+			chSettings |= uint16(conf.Backoff&0x3f) << 9
+			var secondChFrequency uint64
+			if secondCh := conf.SecondChannel; secondCh != nil {
+				chSettings |= 1 << 7 // SecondChannelIndex
+				if secondCh.DataRateIndex > 15 {
+					return nil, errExpectedLowerOrEqual("SecondChannelDataRateIndex", 15)(secondCh.DataRateIndex)
+				}
+				chSettings |= uint16(secondCh.DataRateIndex&0xf) << 3
+				if secondCh.Frequency < 100000 || secondCh.Frequency > byteutil.MaxUint24*phy.FreqMultiplier {
+					return nil, errExpectedBetween(
+						"SecondChannelFrequency", 100000, byteutil.MaxUint24*phy.FreqMultiplier,
+					)(secondCh.Frequency)
+				}
+				if secondCh.AckOffset > 5 {
+					return nil, errExpectedLowerOrEqual("SecondChannelAckOffset", 5)(secondCh.AckOffset)
+				}
+				chSettings |= uint16(secondCh.AckOffset & 0x7)
+				secondChFrequency = secondCh.Frequency
+			}
+			b = byteutil.AppendUint16(b, chSettings, 2)
+			b = byteutil.AppendUint64(b, secondChFrequency/phy.FreqMultiplier, 3)
+			return b, nil
+		},
+		UnmarshalDownlink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_END_DEVICE_CONF,
+			"RelayEndDeviceConfReq",
+			6,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				payload := &ttnpb.MACCommand_RelayEndDeviceConfReq_{
+					RelayEndDeviceConfReq: &ttnpb.MACCommand_RelayEndDeviceConfReq{},
+				}
+				cmd.Payload = payload
+				var conf *ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration
+				switch mode := b[0] >> 2; mode {
+				case 0:
+					return nil
+				case 1:
+					conf = &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration{
+						Mode: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Always{},
+					}
+				case 2:
+					conf = &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration{
+						Mode: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_Dynamic{
+							Dynamic: &ttnpb.RelayEndDeviceDynamicMode{
+								SmartEnableLevel: ttnpb.RelaySmartEnableLevel(b[0] & 0x3),
+							},
+						},
+					}
+				case 3:
+					conf = &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration{
+						Mode: &ttnpb.MACCommand_RelayEndDeviceConfReq_Configuration_EndDeviceControlled{},
+					}
+				default:
+					return errExpectedLengthLowerOrEqual("mode", 3)(mode)
+				}
+				payload.RelayEndDeviceConfReq.Configuration = conf
+				chSettings := byteutil.ParseUint16(b[1:3])
+				conf.Backoff = uint32(chSettings>>9) & 0x3f
+				if chSettings&(1<<7) != 0 {
+					conf.SecondChannel = &ttnpb.RelaySecondChannel{
+						Frequency:     byteutil.ParseUint64(b[3:6]) * phy.FreqMultiplier,
+						AckOffset:     ttnpb.RelaySecondChAckOffset(chSettings) & 0x7,
+						DataRateIndex: ttnpb.DataRateIndex(chSettings>>3) & 0xf,
+					}
+				}
+				return nil
+			}),
+	},
+	ttnpb.MACCommandIdentifier_CID_RELAY_UPDATE_UPLINK_LIST: &MACCommandDescriptor{
+		InitiatedByDevice: false,
+
+		UplinkLength: 0,
+		AppendUplink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			return b, nil
+		},
+		UnmarshalUplink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_UPDATE_UPLINK_LIST,
+			"RelayUpdateUplinkListAns",
+			0,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				cmd.Payload = &ttnpb.MACCommand_RelayUpdateUplinkListAns_{
+					RelayUpdateUplinkListAns: &ttnpb.MACCommand_RelayUpdateUplinkListAns{},
+				}
+				return nil
+			},
+		),
+
+		DownlinkLength: 26,
+		AppendDownlink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			pld := cmd.GetRelayUpdateUplinkListReq()
+			if pld.RuleIndex > 15 {
+				return nil, errExpectedLowerOrEqual("RuleIndex", 15)(pld.RuleIndex)
+			}
+			b = append(b, byte(pld.RuleIndex))
+			var uplinkLimit byte = 0x3f
+			if limits := pld.ForwardLimits; limits != nil {
+				if limits.BucketSize > 3 {
+					return nil, errExpectedLowerOrEqual("BucketSize", 3)(limits.BucketSize)
+				}
+				uplinkLimit = byte(limits.BucketSize&0x3) << 6
+				if limits.ReloadRate > 62 {
+					return nil, errExpectedLowerOrEqual("ReloadRate", 62)(limits.ReloadRate)
+				}
+				uplinkLimit |= byte(limits.ReloadRate)
+			}
+			b = append(b, uplinkLimit)
+			if n := len(pld.DevAddr); n != 4 {
+				return nil, errExpectedLengthEncodedEqual("DevAddr", 4)(n)
+			}
+			devAddr := make([]byte, 4)
+			copyReverse(devAddr, pld.DevAddr)
+			b = append(b, devAddr...)
+			b = byteutil.AppendUint32(b, pld.WFCnt, 4)
+			if n := len(pld.RootWorSKey); n != 16 {
+				return nil, errExpectedLengthEncodedEqual("RootWorSKey", 16)(n)
+			}
+			b = append(b, pld.RootWorSKey...)
+			return b, nil
+		},
+		UnmarshalDownlink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_UPDATE_UPLINK_LIST,
+			"RelayUpdateUplinkListReq",
+			26,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				req := &ttnpb.MACCommand_RelayUpdateUplinkListReq{
+					DevAddr: make([]byte, 4),
+				}
+				cmd.Payload = &ttnpb.MACCommand_RelayUpdateUplinkListReq_{
+					RelayUpdateUplinkListReq: req,
+				}
+				req.RuleIndex = uint32(b[0])
+				if req.RuleIndex > 7 {
+					return errExpectedLowerOrEqual("RuleIndex", 7)(req.RuleIndex)
+				}
+				uplinkLimit := b[1]
+				if (uplinkLimit & 0x3f) != 0x3f {
+					req.ForwardLimits = &ttnpb.RelayUplinkForwardLimits{
+						BucketSize: ttnpb.RelayLimitBucketSize(uplinkLimit >> 6),
+						ReloadRate: uint32(uplinkLimit & 0x3f),
+					}
+				}
+				copyReverse(req.DevAddr[:], b[2:6])
+				req.WFCnt = byteutil.ParseUint32(b[6:10])
+				req.RootWorSKey = b[10:26]
+				return nil
+			},
+		),
+	},
+	ttnpb.MACCommandIdentifier_CID_RELAY_CTRL_UPLINK_LIST: &MACCommandDescriptor{
+		InitiatedByDevice: false,
+
+		UplinkLength: 5,
+		AppendUplink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			pld := cmd.GetRelayCtrlUplinkListAns()
+			var status byte
+			if pld.RuleIndexAck {
+				status |= 1
+			}
+			b = append(b, status)
+			b = byteutil.AppendUint32(b, pld.WFCnt, 4)
+			return b, nil
+		},
+		UnmarshalUplink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_CTRL_UPLINK_LIST,
+			"RelayCtrlUplinkListAns",
+			5,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				cmd.Payload = &ttnpb.MACCommand_RelayCtrlUplinkListAns_{
+					RelayCtrlUplinkListAns: &ttnpb.MACCommand_RelayCtrlUplinkListAns{
+						RuleIndexAck: b[0]&1 == 1,
+						WFCnt:        byteutil.ParseUint32(b[1:5]),
+					},
+				}
+				return nil
+			},
+		),
+
+		DownlinkLength: 1,
+		AppendDownlink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			req := cmd.GetRelayCtrlUplinkListReq()
+			if req.RuleIndex > 15 {
+				return nil, errExpectedLowerOrEqual("RuleIndex", 7)(req.RuleIndex)
+			}
+			var action byte
+			action |= byte(req.RuleIndex) & 0xf
+			if req.Action > 1 {
+				return nil, errExpectedLowerOrEqual("Action", 1)(req.Action)
+			}
+			action |= byte(req.Action&0x1) << 4
+			b = append(b, action)
+			return b, nil
+		},
+		UnmarshalDownlink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_CTRL_UPLINK_LIST,
+			"RelayCtrlUplinkListReq",
+			1,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				cmd.Payload = &ttnpb.MACCommand_RelayCtrlUplinkListReq_{
+					RelayCtrlUplinkListReq: &ttnpb.MACCommand_RelayCtrlUplinkListReq{
+						RuleIndex: uint32(b[0] & 0xf),
+						Action:    ttnpb.RelayCtrlUplinkListAction(b[0] >> 4),
+					},
+				}
+				return nil
+			},
+		),
+	},
+	ttnpb.MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT: &MACCommandDescriptor{
+		InitiatedByDevice: false,
+
+		UplinkLength: 0,
+		AppendUplink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			return b, nil
+		},
+		UnmarshalUplink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT,
+			"RelayConfigureFwdLimitAns",
+			0,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				cmd.Payload = &ttnpb.MACCommand_RelayConfigureFwdLimitAns_{
+					RelayConfigureFwdLimitAns: &ttnpb.MACCommand_RelayConfigureFwdLimitAns{},
+				}
+				return nil
+			},
+		),
+
+		DownlinkLength: 5,
+		AppendDownlink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			pld := cmd.GetRelayConfigureFwdLimitReq()
+			if pld.ResetLimitCounter > 3 {
+				return nil, errExpectedLowerOrEqual("ResetLimitCounter", 3)(pld.ResetLimitCounter)
+			}
+			var overallReloadRate byte = 0x7f
+			var overallBucketSize byte
+			if overall := pld.OverallLimits; overall != nil {
+				if overall.ReloadRate > 126 {
+					return nil, errExpectedLowerOrEqual("ReloadRate", 126)(overall.ReloadRate)
+				}
+				overallReloadRate = byte(overall.ReloadRate & 0x7f)
+				if overall.BucketSize > 3 {
+					return nil, errExpectedLowerOrEqual("BucketSize", 3)(overall.BucketSize)
+				}
+				overallBucketSize = byte(overall.BucketSize & 0x3)
+			}
+			var globalUplinkReloadRate byte = 0x7f
+			var globalUplinkBucketSize byte
+			if global := pld.GlobalUplinkLimits; global != nil {
+				if global.ReloadRate > 126 {
+					return nil, errExpectedLowerOrEqual("ReloadRate", 126)(global.ReloadRate)
+				}
+				globalUplinkReloadRate = byte(global.ReloadRate & 0x7f)
+				if global.BucketSize > 3 {
+					return nil, errExpectedLowerOrEqual("BucketSize", 3)(global.BucketSize)
+				}
+				globalUplinkBucketSize = byte(global.BucketSize & 0x3)
+			}
+			var notifyReloadRate byte = 0x7f
+			var notifyBucketSize byte
+			if notify := pld.NotifyLimits; notify != nil {
+				if notify.ReloadRate > 126 {
+					return nil, errExpectedLowerOrEqual("ReloadRate", 126)(notify.ReloadRate)
+				}
+				notifyReloadRate = byte(notify.ReloadRate & 0x7f)
+				if notify.BucketSize > 3 {
+					return nil, errExpectedLowerOrEqual("BucketSize", 3)(notify.BucketSize)
+				}
+				notifyBucketSize = byte(notify.BucketSize & 0x3)
+			}
+			var joinRequestLimits byte = 0x7f
+			var joinRequestBucketSize byte
+			if joinReq := pld.JoinRequestLimits; joinReq != nil {
+				if joinReq.ReloadRate > 126 {
+					return nil, errExpectedLowerOrEqual("ReloadRate", 126)(joinReq.ReloadRate)
+				}
+				joinRequestLimits = byte(joinReq.ReloadRate & 0x7f)
+				if joinReq.BucketSize > 3 {
+					return nil, errExpectedLowerOrEqual("BucketSize", 3)(joinReq.BucketSize)
+				}
+				joinRequestBucketSize = byte(joinReq.BucketSize & 0x3)
+			}
+			var reloadRate uint32
+			reloadRate |= uint32(overallReloadRate)
+			reloadRate |= uint32(globalUplinkReloadRate) << 7
+			reloadRate |= uint32(notifyReloadRate) << 14
+			reloadRate |= uint32(joinRequestLimits) << 21
+			reloadRate |= uint32(pld.ResetLimitCounter&0x3) << 28
+			b = byteutil.AppendUint32(b, reloadRate, 4)
+			var bucketSize byte
+			bucketSize |= overallBucketSize
+			bucketSize |= globalUplinkBucketSize << 2
+			bucketSize |= notifyBucketSize << 4
+			bucketSize |= joinRequestBucketSize << 6
+			b = append(b, bucketSize)
+			return b, nil
+		},
+		UnmarshalDownlink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT,
+			"RelayConfigureFwdLimitReq",
+			5,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				req := &ttnpb.MACCommand_RelayConfigureFwdLimitReq{}
+				cmd.Payload = &ttnpb.MACCommand_RelayConfigureFwdLimitReq_{
+					RelayConfigureFwdLimitReq: req,
+				}
+				bucketSize, reloadRate := b[4], byteutil.ParseUint32(b[0:4])
+				req.ResetLimitCounter = ttnpb.RelayResetLimitCounter((reloadRate >> 28) & 0x3)
+				if reloadRate := reloadRate & 0x7f; reloadRate != 0x7f {
+					req.OverallLimits = &ttnpb.RelayForwardLimits{
+						BucketSize: ttnpb.RelayLimitBucketSize(bucketSize & 0x3),
+						ReloadRate: reloadRate,
+					}
+				}
+				if reloadRate := (reloadRate >> 7) & 0x7f; reloadRate != 0x7f {
+					req.GlobalUplinkLimits = &ttnpb.RelayForwardLimits{
+						BucketSize: ttnpb.RelayLimitBucketSize((bucketSize >> 2) & 0x3),
+						ReloadRate: reloadRate,
+					}
+				}
+				if reloadRate := (reloadRate >> 14) & 0x7f; reloadRate != 0x7f {
+					req.NotifyLimits = &ttnpb.RelayForwardLimits{
+						BucketSize: ttnpb.RelayLimitBucketSize((bucketSize >> 4) & 0x3),
+						ReloadRate: reloadRate,
+					}
+				}
+				if reloadRate := (reloadRate >> 21) & 0x7f; reloadRate != 0x7f {
+					req.JoinRequestLimits = &ttnpb.RelayForwardLimits{
+						BucketSize: ttnpb.RelayLimitBucketSize((bucketSize >> 6) & 0x3),
+						ReloadRate: reloadRate,
+					}
+				}
+				return nil
+			},
+		),
+	},
+	ttnpb.MACCommandIdentifier_CID_RELAY_NOTIFY_NEW_END_DEVICE: &MACCommandDescriptor{
+		InitiatedByDevice: true,
+
+		UplinkLength: 6,
+		AppendUplink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
+			pld := cmd.GetRelayNotifyNewEndDeviceReq()
+			var powerLevel uint16
+			if pld.Snr < -20 || pld.Snr > 11 {
+				return nil, errExpectedBetween("SNR", -20, 11)(pld.Snr)
+			}
+			powerLevel |= uint16(pld.Snr+20) & 0x1f
+			if pld.Rssi < -142 || pld.Rssi > -15 {
+				return nil, errExpectedBetween("RSSI", -142, -15)(pld.Rssi)
+			}
+			powerLevel |= uint16(-pld.Rssi-15) & 0x7f << 5
+			b = byteutil.AppendUint16(b, powerLevel, 2)
+			if n := len(pld.DevAddr); n != 4 {
+				return nil, errExpectedLengthEncodedEqual("DevAddr", 4)(n)
+			}
+			devAddr := make([]byte, 4)
+			copyReverse(devAddr, pld.DevAddr)
+			b = append(b, devAddr...)
+			return b, nil
+		},
+		UnmarshalUplink: newMACUnmarshaler(
+			ttnpb.MACCommandIdentifier_CID_RELAY_NOTIFY_NEW_END_DEVICE,
+			"RelayNotifyNewEndDeviceReq",
+			6,
+			func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+				req := &ttnpb.MACCommand_RelayNotifyNewEndDeviceReq{}
+				cmd.Payload = &ttnpb.MACCommand_RelayNotifyNewEndDeviceReq_{
+					RelayNotifyNewEndDeviceReq: req,
+				}
+				powerLevel := byteutil.ParseUint16(b[0:2])
+				req.Snr = int32(powerLevel&0x1f) - 20
+				req.Rssi = -int32(powerLevel>>5&0x7f) - 15
+				req.DevAddr = make([]byte, 4)
+				copyReverse(req.DevAddr, b[2:6])
+				return nil
+			},
+		),
+	},
 }
 
 var (

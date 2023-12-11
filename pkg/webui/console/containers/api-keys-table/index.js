@@ -29,7 +29,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import style from './api-keys-table.styl'
 
 const m = defineMessages({
-  keyId: 'Key ID',
   grantedRights: 'Granted Rights',
 })
 
@@ -42,7 +41,7 @@ const ApiKeysTable = props => {
   const headers = [
     {
       name: 'id',
-      displayName: m.keyId,
+      displayName: sharedMessages.keyId,
       width: 20,
       sortKey: 'api_key_id',
       render: id => <span className={style.keyId}>{id}</span>,

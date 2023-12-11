@@ -328,3 +328,141 @@ func (pld *MACCommand_DeviceModeConf) MACCommand() *MACCommand {
 		},
 	}
 }
+
+// MACCommand returns the RelayConfReq MAC command as a *MACCommand.
+func (pld *MACCommand_RelayConfReq) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_CONF,
+		Payload: &MACCommand_RelayConfReq_{
+			RelayConfReq: pld,
+		},
+	}
+}
+
+// MACCommand returns the RelayConfAns MAC command as a *MACCommand.
+func (pld *MACCommand_RelayConfAns) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_CONF,
+		Payload: &MACCommand_RelayConfAns_{
+			RelayConfAns: pld,
+		},
+	}
+}
+
+// MACCommand returns the EndDeviceConfReq MAC command as a *MACCommand.
+func (pld *MACCommand_RelayEndDeviceConfReq) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_END_DEVICE_CONF,
+		Payload: &MACCommand_RelayEndDeviceConfReq_{
+			RelayEndDeviceConfReq: pld,
+		},
+	}
+}
+
+// MACCommand returns the EndDeviceConfAns MAC command as a *MACCommand.
+func (pld *MACCommand_RelayEndDeviceConfAns) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_END_DEVICE_CONF,
+		Payload: &MACCommand_RelayEndDeviceConfAns_{
+			RelayEndDeviceConfAns: pld,
+		},
+	}
+}
+
+// MACCommand returns the UpdateUplinkListReq MAC command as a *MACCommand.
+func (pld *MACCommand_RelayUpdateUplinkListReq) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_UPDATE_UPLINK_LIST,
+		Payload: &MACCommand_RelayUpdateUplinkListReq_{
+			RelayUpdateUplinkListReq: pld,
+		},
+	}
+}
+
+// MACCommand returns the UpdateUplinkListAns MAC command as a *MACCommand.
+func (pld *MACCommand_RelayUpdateUplinkListAns) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_UPDATE_UPLINK_LIST,
+		Payload: &MACCommand_RelayUpdateUplinkListAns_{
+			RelayUpdateUplinkListAns: pld,
+		},
+	}
+}
+
+// MACCommand returns the RelayCtrlUplinkListReq MAC command as a *MACCommand.
+func (pld *MACCommand_RelayCtrlUplinkListReq) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_CTRL_UPLINK_LIST,
+		Payload: &MACCommand_RelayCtrlUplinkListReq_{
+			RelayCtrlUplinkListReq: pld,
+		},
+	}
+}
+
+// MACCommand returns the RelayCtrlUplinkListAns MAC command as a *MACCommand.
+func (pld *MACCommand_RelayCtrlUplinkListAns) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_CTRL_UPLINK_LIST,
+		Payload: &MACCommand_RelayCtrlUplinkListAns_{
+			RelayCtrlUplinkListAns: pld,
+		},
+	}
+}
+
+// MACCommand returns the ConfigureFwdLimitReq MAC command as a *MACCommand.
+func (pld *MACCommand_RelayConfigureFwdLimitReq) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT,
+		Payload: &MACCommand_RelayConfigureFwdLimitReq_{
+			RelayConfigureFwdLimitReq: pld,
+		},
+	}
+}
+
+// MACCommand returns the ConfigureFwdLimitAns MAC command as a *MACCommand.
+func (pld *MACCommand_RelayConfigureFwdLimitAns) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_CONFIGURE_FWD_LIMIT,
+		Payload: &MACCommand_RelayConfigureFwdLimitAns_{
+			RelayConfigureFwdLimitAns: pld,
+		},
+	}
+}
+
+// MACCommand returns the NotifyNewEndDeviceReq MAC command as a *MACCommand.
+func (pld *MACCommand_RelayNotifyNewEndDeviceReq) MACCommand() *MACCommand {
+	return &MACCommand{
+		Cid: MACCommandIdentifier_CID_RELAY_NOTIFY_NEW_END_DEVICE,
+		Payload: &MACCommand_RelayNotifyNewEndDeviceReq_{
+			RelayNotifyNewEndDeviceReq: pld,
+		},
+	}
+}
+
+// sanitizableMACCommandPayload is a MAC command payload that can be sanitized.
+type sanitizableMACCommandPayload interface {
+	// sanitizedMACCommand returns a sanitized copy of the MAC command.
+	sanitizedMACCommand() *MACCommand
+}
+
+// Sanitized returns a sanitized copy of the MAC command.
+func (m *MACCommand) Sanitized() *MACCommand {
+	if v, ok := m.GetPayload().(sanitizableMACCommandPayload); ok {
+		return v.sanitizedMACCommand()
+	}
+	return m
+}
+
+var _ sanitizableMACCommandPayload = (*MACCommand_RelayUpdateUplinkListReq_)(nil)
+
+// Sanitized returns a sanitized copy of the payload.
+func (pld *MACCommand_RelayUpdateUplinkListReq) Sanitized() *MACCommand_RelayUpdateUplinkListReq {
+	pld = Clone(pld)
+	pld.RootWorSKey = nil
+	return pld
+}
+
+// sanitizedMACCommand returns a sanitized copy of the MAC command.
+func (pld *MACCommand_RelayUpdateUplinkListReq_) sanitizedMACCommand() *MACCommand {
+	return pld.RelayUpdateUplinkListReq.Sanitized().MACCommand()
+}

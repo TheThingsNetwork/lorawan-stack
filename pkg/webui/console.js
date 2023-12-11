@@ -23,7 +23,6 @@ import sentryConfig from '@ttn-lw/constants/sentry'
 import { BreadcrumbsProvider } from '@ttn-lw/components/breadcrumbs/context'
 import Header from '@ttn-lw/components/header'
 
-import { EnvProvider } from '@ttn-lw/lib/components/env'
 import { ErrorView } from '@ttn-lw/lib/components/error-view'
 import { FullViewError } from '@ttn-lw/lib/components/full-view-error'
 import Init from '@ttn-lw/lib/components/init'
@@ -33,7 +32,6 @@ import Logo from '@console/containers/logo'
 
 import App from '@console/views/app'
 
-import env from '@ttn-lw/lib/env'
 import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
 
 import createStore from './console/store'
@@ -58,17 +56,15 @@ const errorRender = error => (
 
 DOM.render(
   <ErrorView errorRender={errorRender}>
-    <EnvProvider env={env}>
-      <Provider store={store}>
-        <WithLocale>
-          <Init>
-            <BreadcrumbsProvider>
-              <App history={history} />
-            </BreadcrumbsProvider>
-          </Init>
-        </WithLocale>
-      </Provider>
-    </EnvProvider>
+    <Provider store={store}>
+      <WithLocale>
+        <Init>
+          <BreadcrumbsProvider>
+            <App history={history} />
+          </BreadcrumbsProvider>
+        </Init>
+      </WithLocale>
+    </Provider>
   </ErrorView>,
   rootElement,
 )

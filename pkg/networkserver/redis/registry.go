@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -38,6 +39,8 @@ var (
 	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errReadOnlyField      = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
+
+	errRelayServed = errors.DefineAlreadyExists("relay_served", "`{served}` is already served by `{serving}`")
 )
 
 // DeviceSchemaVersion is the Network Server database schema version regarding the devices namespace.
@@ -78,6 +81,34 @@ func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 	return r.Redis.Key("eui", joinEUI.String(), devEUI.String())
 }
 
+func (r *DeviceRegistry) relayRulesMapping(ctx context.Context, dev *ttnpb.EndDevice) map[string]string {
+	m := make(map[string]string)
+	add := func(rules []*ttnpb.RelayUplinkForwardingRule) {
+		for _, rule := range rules {
+			if rule.GetDeviceId() == "" {
+				continue
+			}
+			servedUID := unique.ID(ctx, &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: dev.Ids.ApplicationIds,
+				DeviceId:       rule.DeviceId,
+			})
+			path := r.Redis.Key("relay", "rules", servedUID)
+			m[path] = servedUID
+		}
+	}
+	for _, rules := range [][]*ttnpb.RelayUplinkForwardingRule{
+		dev.GetMacSettings().GetRelay().GetServing().GetUplinkForwardingRules(),
+		dev.GetMacSettings().GetDesiredRelay().GetServing().GetUplinkForwardingRules(),
+		dev.GetMacState().GetCurrentParameters().GetRelay().GetServing().GetUplinkForwardingRules(),
+		dev.GetMacState().GetDesiredParameters().GetRelay().GetServing().GetUplinkForwardingRules(),
+		dev.GetPendingMacState().GetCurrentParameters().GetRelay().GetServing().GetUplinkForwardingRules(),
+		dev.GetPendingMacState().GetDesiredParameters().GetRelay().GetServing().GetUplinkForwardingRules(),
+	} {
+		add(rules)
+	}
+	return m
+}
+
 // GetByID gets device by appID, devID.
 func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	defer trace.StartRegion(ctx, "get end device by id").End()
@@ -99,6 +130,48 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationId
 		return nil, ctx, err
 	}
 	return pb, ctx, nil
+}
+
+// BatchGetByID gets devices by appID, deviceIDs.
+func (r *DeviceRegistry) BatchGetByID(
+	ctx context.Context, appID *ttnpb.ApplicationIdentifiers, deviceIDs []string, paths []string,
+) ([]*ttnpb.EndDevice, error) {
+	defer trace.StartRegion(ctx, "batch get end device by id").End()
+
+	keys := make([]string, len(deviceIDs))
+	for i, devID := range deviceIDs {
+		ids := &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: appID,
+			DeviceId:       devID,
+		}
+		if err := ids.ValidateContext(ctx); err != nil {
+			return nil, err
+		}
+		keys[i] = r.uidKey(unique.ID(ctx, ids))
+	}
+
+	results, err := r.Redis.MGet(ctx, keys...).Result()
+	if err != nil {
+		return nil, ttnredis.ConvertError(err)
+	}
+
+	protos := make([]*ttnpb.EndDevice, len(deviceIDs))
+	for i, result := range results {
+		switch cmd := result.(type) {
+		case nil:
+		case string:
+			dev := &ttnpb.EndDevice{}
+			if err := ttnredis.UnmarshalProto(cmd, dev); err != nil {
+				return nil, err
+			}
+			dev, err = ttnpb.FilterGetEndDevice(dev, paths...)
+			if err != nil {
+				return nil, err
+			}
+			protos[i] = dev
+		}
+	}
+	return protos, nil
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
@@ -658,6 +731,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 						uid,
 					)
 				}
+				if relayRulesMapping := r.relayRulesMapping(ctx, stored); len(relayRulesMapping) > 0 {
+					p.Del(ctx, maps.Keys(relayRulesMapping)...)
+				}
 				return nil
 			}
 
@@ -687,6 +763,28 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 						return err
 					} else {
 						return registry.UniqueEUIViolationErr(ctx, joinEUI, devEUI, storedUIDStr)
+					}
+				}
+				if relayRulesMapping := r.relayRulesMapping(ctx, pb); len(relayRulesMapping) > 0 {
+					keys := maps.Keys(relayRulesMapping)
+					if err := tx.Watch(ctx, keys...).Err(); err != nil {
+						return err
+					}
+					ruleUIDs, err := tx.MGet(ctx, keys...).Result()
+					if err != nil {
+						return err
+					}
+					for i, ruleUID := range ruleUIDs {
+						switch ruleUID := ruleUID.(type) {
+						case nil:
+						case string:
+							return errRelayServed.WithAttributes(
+								"served", relayRulesMapping[keys[i]],
+								"serving", ruleUID,
+							)
+						default:
+							panic("unreachable")
+						}
 					}
 				}
 			} else {
@@ -848,6 +946,56 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 				}
 			}
 
+			storedRelayRulesMapping := r.relayRulesMapping(ctx, stored)
+			updatedRelayRulesMapping := r.relayRulesMapping(ctx, updated)
+			if !maps.Equal(storedRelayRulesMapping, updatedRelayRulesMapping) {
+				storedRelayRulesKeys := maps.Keys(storedRelayRulesMapping)
+				updatedRelayRulesKeys := maps.Keys(updatedRelayRulesMapping)
+				if err := tx.Watch(ctx, append(storedRelayRulesKeys, updatedRelayRulesKeys...)...).Err(); err != nil {
+					return err
+				}
+
+				removed := make([]string, 0, len(storedRelayRulesKeys))
+				for _, storedKey := range storedRelayRulesKeys {
+					if _, ok := updatedRelayRulesMapping[storedKey]; !ok {
+						removed = append(removed, storedKey)
+					}
+				}
+				if len(removed) > 0 {
+					p.Del(ctx, removed...)
+				}
+
+				added := make([]string, 0, len(updatedRelayRulesKeys))
+				for _, updatedKey := range updatedRelayRulesKeys {
+					if _, ok := storedRelayRulesMapping[updatedKey]; !ok {
+						added = append(added, updatedKey)
+					}
+				}
+				if len(added) > 0 {
+					ruleUIDs, err := tx.MGet(ctx, added...).Result()
+					if err != nil {
+						return err
+					}
+					for i, ruleUID := range ruleUIDs {
+						switch ruleUID := ruleUID.(type) {
+						case nil:
+						case string:
+							return errRelayServed.WithAttributes(
+								"served", updatedRelayRulesMapping[added[i]],
+								"serving", ruleUID,
+							)
+						default:
+							panic("unreachable")
+						}
+					}
+					addedMapping := make(map[string]string, len(added))
+					for _, addedKey := range added {
+						addedMapping[addedKey] = uid
+					}
+					p.MSet(ctx, addedMapping)
+				}
+			}
+
 			_, err := ttnredis.SetProto(ctx, p, uk, updated, 0)
 			if err != nil {
 				return err
@@ -930,6 +1078,7 @@ func (r *DeviceRegistry) BatchDelete(
 			return err
 		}
 		euiKeys := make([]string, 0, len(raw))
+		relayRulesKeys := make([]string, 0, len(raw))
 		for _, raw := range raw {
 			switch val := raw.(type) {
 			case nil:
@@ -964,6 +1113,7 @@ func (r *DeviceRegistry) BatchDelete(
 						)),
 					}...)
 				}
+				relayRulesKeys = append(relayRulesKeys, maps.Keys(r.relayRulesMapping(ctx, dev))...)
 			}
 		}
 		// If the provided end device identifiers are not registered, it is possible
@@ -974,8 +1124,13 @@ func (r *DeviceRegistry) BatchDelete(
 				return err
 			}
 		}
+		if len(relayRulesKeys) > 0 {
+			if err := tx.Watch(ctx, relayRulesKeys...).Err(); err != nil {
+				return err
+			}
+		}
 		if _, err := tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
-			p.Del(ctx, append(uidKeys, euiKeys...)...)
+			p.Del(ctx, append(append(uidKeys, euiKeys...), relayRulesKeys...)...)
 			for uid, keys := range addrMapping {
 				for _, key := range keys {
 					removeAddrMapping(ctx, p, key, uid)

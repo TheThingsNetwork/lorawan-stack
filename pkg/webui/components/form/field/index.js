@@ -192,7 +192,7 @@ const FormField = props => {
   const hasTooltip = Boolean(tooltipId)
   const hasTitle = Boolean(title)
   const showError = touched && !isEmpty(errors)
-  const showWarning = isEmpty(errors) && Boolean(warning)
+  const showWarning = !showError && Boolean(warning)
   const error = showError && errors[0]
   const showDescription = !showError && !showWarning && Boolean(description)
   const tooltipIcon = hasTooltip ? <Tooltip id={tooltipId} glossaryTerm={title} /> : null

@@ -107,6 +107,20 @@ func TestFieldIsZero(t *testing.T) {
 		(*SetEndDeviceRequest)(nil):                             EndDeviceFieldPathsNested,
 		&UpdateEndDeviceRequest{}:                               EndDeviceFieldPathsNested,
 		(*UpdateEndDeviceRequest)(nil):                          EndDeviceFieldPathsNested,
+		&RelayParameters{}:                                      RelayParametersFieldPathsNested,
+		(*RelayParameters)(nil):                                 RelayParametersFieldPathsNested,
+		&ServedRelayParameters{}:                                ServedRelayParametersFieldPathsNested,
+		(*ServedRelayParameters)(nil):                           ServedRelayParametersFieldPathsNested,
+		&ServingRelayParameters{}:                               ServingRelayParametersFieldPathsNested,
+		(*ServingRelayParameters)(nil):                          ServingRelayParametersFieldPathsNested,
+		&RelaySecondChannel{}:                                   RelaySecondChannelFieldPathsNested,
+		(*RelaySecondChannel)(nil):                              RelaySecondChannelFieldPathsNested,
+		&RelayEndDeviceDynamicMode{}:                            RelayEndDeviceDynamicModeFieldPathsNested,
+		(*RelayEndDeviceDynamicMode)(nil):                       RelayEndDeviceDynamicModeFieldPathsNested,
+		&RelayForwardLimits{}:                                   RelayForwardLimitsFieldPathsNested,
+		(*RelayForwardLimits)(nil):                              RelayForwardLimitsFieldPathsNested,
+		&ServingRelayForwardingLimits{}:                         ServingRelayForwardingLimitsFieldPathsNested,
+		(*ServingRelayForwardingLimits)(nil):                    ServingRelayForwardingLimitsFieldPathsNested,
 	} {
 		for _, p := range paths {
 			v, p := v, p

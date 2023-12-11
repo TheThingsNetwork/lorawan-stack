@@ -181,7 +181,7 @@ service GatewayConfigurator {
 message AssertGatewayRightsRequest {
   repeated GatewayIdentifiers gateway_ids = 1 [
     (validate.rules).repeated.min_items = 1,
-    (validate.rules).repeated.max_items = 20
+    (validate.rules).repeated.max_items = 100
   ];
   Rights required = 2 [(validate.rules).message.required = true];
 }

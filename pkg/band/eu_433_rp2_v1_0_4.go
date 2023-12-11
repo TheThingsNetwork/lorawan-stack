@@ -88,5 +88,5 @@ var EU_433_RP2_V1_0_4 = Band{
 	},
 	PingSlotFrequencies: eu433BeaconFrequencies,
 
-	SharedParameters: universalSharedParameters,
+	SharedParameters: relayAwareSharedParameters,
 }

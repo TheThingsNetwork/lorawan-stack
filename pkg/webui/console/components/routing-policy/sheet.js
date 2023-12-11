@@ -65,13 +65,13 @@ const RoutingPolicySheet = ({ policy }) => {
         />
         <RoutingPolicy
           enabled={uplink.mac_data}
-          message={m.macData}
+          message={sharedMessages.macData}
           positiveMessage={m.forwardsMacData}
           negativeMessage={m.doesNotForwardMacData}
         />
         <RoutingPolicy
           enabled={uplink.application_data}
-          message={m.applicationData}
+          message={sharedMessages.appData}
           positiveMessage={m.forwardsApplicationData}
           negativeMessage={m.doesNotForwardApplicationData}
         />
@@ -92,19 +92,19 @@ const RoutingPolicySheet = ({ policy }) => {
         <Message content={sharedMessages.downlink} component="h4" />
         <RoutingPolicy
           enabled={downlink.join_accept}
-          message={m.joinAccept}
+          message={sharedMessages.joinAccept}
           positiveMessage={m.allowsJoinAccept}
           negativeMessage={m.doesNotAllowJoinAccept}
         />
         <RoutingPolicy
           enabled={downlink.mac_data}
-          message={m.macData}
+          message={sharedMessages.macData}
           positiveMessage={m.allowsMacData}
           negativeMessage={m.doesNotAllowMacData}
         />
         <RoutingPolicy
           enabled={downlink.application_data}
-          message={m.applicationData}
+          message={sharedMessages.appData}
           positiveMessage={m.allowsApplicationData}
           negativeMessage={m.doesNotAllowApplicationData}
         />

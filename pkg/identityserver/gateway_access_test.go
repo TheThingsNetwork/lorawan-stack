@@ -589,16 +589,30 @@ func TestGatewayBatchAccess(t *testing.T) {
 	locUserKey, _ := p.NewAPIKey(locUser.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	locUserCreds := rpcCreds(locUserKey)
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		is.config.AdminRights.All = true
+	dualMembershipUser := p.NewUser()
+	dualMembershipUserKey, _ := p.NewAPIKey(dualMembershipUser.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	dualMembershipUserCreds := rpcCreds(dualMembershipUserKey)
+	p.NewMembership(
+		dualMembershipUser.GetOrganizationOrUserIdentifiers(),
+		gtw3.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_ALL,
+	)
+	org1 := p.NewOrganization(dualMembershipUser.GetOrganizationOrUserIdentifiers())
+	p.NewMembership(
+		org1.GetOrganizationOrUserIdentifiers(),
+		gtw3.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_ALL,
+	)
 
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayBatchAccessClient(cc)
 
 		for _, tc := range []struct {
-			Name           string
-			Credentials    grpc.CallOption
-			Request        *ttnpb.AssertGatewayRightsRequest
-			ErrorAssertion func(error) bool
+			Name               string
+			Credentials        grpc.CallOption
+			Request            *ttnpb.AssertGatewayRightsRequest
+			ErrorAssertion     func(error) bool
+			LimitedAdminRights bool
 		}{
 			{
 				Name:           "Empty request",
@@ -772,6 +786,20 @@ func TestGatewayBatchAccess(t *testing.T) {
 				ErrorAssertion: errors.IsPermissionDenied,
 			},
 			{
+				Name: "Universal rights for admin",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw3.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS,
+						},
+					},
+				},
+				Credentials: adminCreds,
+			},
+			{
 				Name: "Limited rights for admin",
 				Request: &ttnpb.AssertGatewayRightsRequest{
 					GatewayIds: []*ttnpb.GatewayIdentifiers{
@@ -783,8 +811,9 @@ func TestGatewayBatchAccess(t *testing.T) {
 						},
 					},
 				},
-				Credentials:    adminCreds,
-				ErrorAssertion: errors.IsNotFound,
+				Credentials:        adminCreds,
+				ErrorAssertion:     errors.IsPermissionDenied,
+				LimitedAdminRights: true,
 			},
 			{
 				Name: "Read Stats Failure",
@@ -942,9 +971,25 @@ func TestGatewayBatchAccess(t *testing.T) {
 				},
 				Credentials: usr1Creds,
 			},
+			{
+				Name: "Dual membership user",
+				Request: &ttnpb.AssertGatewayRightsRequest{
+					GatewayIds: []*ttnpb.GatewayIdentifiers{
+						gtw3.GetIds(),
+					},
+					Required: &ttnpb.Rights{
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_GATEWAY_ALL,
+						},
+					},
+				},
+				Credentials: dualMembershipUserCreds,
+			},
 		} {
 			tc := tc
 			t.Run(tc.Name, func(t *testing.T) {
+				is.config.AdminRights.All = !tc.LimitedAdminRights
+
 				_, err := reg.AssertRights(ctx, tc.Request, tc.Credentials)
 				if err != nil {
 					if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {

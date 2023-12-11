@@ -15,13 +15,14 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import ClientAdd from '@account/containers/oauth-client-add'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getUserRights } from '@account/store/actions/user'
 
@@ -32,10 +33,6 @@ import {
   selectUserPseudoRights,
 } from '@account/store/selectors/user'
 
-const m = defineMessages({
-  addClient: 'Add OAuth client',
-})
-
 const OAuthClientAddInner = () => {
   const userId = useSelector(selectUserId)
   const isAdmin = useSelector(selectUserIsAdmin)
@@ -44,7 +41,7 @@ const OAuthClientAddInner = () => {
 
   return (
     <Container>
-      <PageTitle tall title={m.addClient} />
+      <PageTitle tall title={sharedMessages.addOAuthClient} />
       <Row>
         <Col lg={8} md={12}>
           <ClientAdd

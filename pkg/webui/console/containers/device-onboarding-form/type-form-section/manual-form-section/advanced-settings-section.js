@@ -58,10 +58,6 @@ const m = defineMessages({
   skipJsRegistration: 'Skip registration on Join Server',
   multicastClassCapabilities: 'LoRaWAN class for multicast downlinks',
   register: 'Register manually',
-  macSettingsError:
-    'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
-  fpNotFoundError:
-    'The LoRaWAN version <code>{lorawanVersion}</code> does not support the <code>{freqPlan}</code> frequency plan. Please choose a different MAC version or frequency plan.',
 })
 
 const emptyDefaultMacSettings = {}
@@ -154,7 +150,7 @@ const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
 
   return {
     value: `PING_EVERY_${value}S`,
-    label: <Message content={messages.pingSlotPeriodicityValue} values={{ count: value }} />,
+    label: <Message content={sharedMessages.secondInterval} values={{ count: value }} />,
   }
 })
 
@@ -230,7 +226,7 @@ const AdvancedSettingsSection = () => {
         if (isBackend(err) && getBackendErrorName(err) === 'no_band_version') {
           toast({
             type: toast.types.ERROR,
-            message: m.fpNotFoundError,
+            message: sharedMessages.fpNotFoundError,
             messageValues: {
               lorawanVersion: lorawan_phy_version,
               freqPlan: frequency_plan_id,
@@ -240,7 +236,7 @@ const AdvancedSettingsSection = () => {
         } else {
           toast({
             type: toast.types.ERROR,
-            message: m.macSettingsError,
+            message: sharedMessages.macSettingsError,
             messageValues: {
               freqPlan: frequency_plan_id,
               code: msg => <code>{msg}</code>,
@@ -336,7 +332,7 @@ const AdvancedSettingsSection = () => {
               <Form.FieldContainer horizontal>
                 <Form.Field
                   required={!isUndefined(mac_settings.rx1_data_rate_offset)}
-                  title={messages.rx1DataRateOffsetTitle}
+                  title={sharedMessages.rx1DataRateOffset}
                   type="number"
                   name="mac_settings.rx1_data_rate_offset"
                   component={Input}
@@ -386,7 +382,7 @@ const AdvancedSettingsSection = () => {
               <Form.FieldContainer horizontal>
                 <Form.Field
                   required={!isUndefined(defaultMacSettings.class_b_timeout)}
-                  title={messages.classBTimeout}
+                  title={sharedMessages.classBTimeout}
                   name="mac_settings.class_b_timeout"
                   tooltipId={tooltipIds.CLASS_B_TIMEOUT}
                   component={UnitInput.Duration}
@@ -401,7 +397,7 @@ const AdvancedSettingsSection = () => {
                   }
                 />
                 <Form.Field
-                  title={messages.pingSlotPeriodicityTitle}
+                  title={sharedMessages.pingSlotPeriodicity}
                   name="mac_settings.ping_slot_periodicity"
                   tooltipId={tooltipIds.PING_SLOT_PERIODICITY}
                   component={Select}
@@ -433,8 +429,8 @@ const AdvancedSettingsSection = () => {
                   type="number"
                   min={100000}
                   required={!isUndefined(defaultMacSettings.beacon_frequency)}
-                  title={messages.beaconFrequency}
-                  placeholder={messages.frequencyPlaceholder}
+                  title={sharedMessages.beaconFrequency}
+                  placeholder={sharedMessages.frequencyPlaceholder}
                   name="mac_settings.beacon_frequency"
                   tooltipId={tooltipIds.BEACON_FREQUENCY}
                   component={UnitInput.Hertz}
@@ -450,8 +446,8 @@ const AdvancedSettingsSection = () => {
                   type="number"
                   min={100000}
                   required={!isUndefined(defaultMacSettings.ping_slot_frequency)}
-                  title={messages.pingSlotFrequencyTitle}
-                  placeholder={messages.frequencyPlaceholder}
+                  title={sharedMessages.pingSlotFrequency}
+                  placeholder={sharedMessages.frequencyPlaceholder}
                   name="mac_settings.ping_slot_frequency"
                   tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
                   component={UnitInput.Hertz}
@@ -470,7 +466,7 @@ const AdvancedSettingsSection = () => {
             {isClassC && (
               <Form.Field
                 required={!isUndefined(defaultMacSettings.class_c_timeout)}
-                title={messages.classCTimeout}
+                title={sharedMessages.classCTimeout}
                 name="mac_settings.class_c_timeout"
                 tooltipId={tooltipIds.CLASS_C_TIMEOUT}
                 component={UnitInput.Duration}
@@ -509,8 +505,8 @@ const AdvancedSettingsSection = () => {
               min={100000}
               step={100}
               required={!isUndefined(defaultMacSettings.rx2_frequency)}
-              title={messages.rx2FrequencyTitle}
-              placeholder={messages.frequencyPlaceholder}
+              title={sharedMessages.rx2Frequency}
+              placeholder={sharedMessages.frequencyPlaceholder}
               name="mac_settings.rx2_frequency"
               tooltipId={tooltipIds.RX2_FREQUENCY}
               component={UnitInput.Hertz}
@@ -528,9 +524,9 @@ const AdvancedSettingsSection = () => {
               indexAsKey
               name="mac_settings.factory_preset_frequencies"
               component={KeyValueMap}
-              title={messages.factoryPresetFreqTitle}
+              title={sharedMessages.factoryPresetFrequencies}
               addMessage={messages.freqAdd}
-              valuePlaceholder={messages.frequencyPlaceholder}
+              valuePlaceholder={sharedMessages.frequencyPlaceholder}
               tooltipId={tooltipIds.FACTORY_PRESET_FREQUENCIES}
               encode={factoryPresetFreqEncoder}
               decode={factoryPresetFreqDecoder}

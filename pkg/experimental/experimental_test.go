@@ -24,6 +24,8 @@ import (
 )
 
 func TestExperimentalFeatures(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
 	r := NewRegistry()
@@ -32,21 +34,21 @@ func TestExperimentalFeatures(t *testing.T) {
 
 	feature := DefineFeature("experimental.feature", false)
 	a.So(feature.GetValue(ctx), should.BeFalse)
-	a.So(AllFeatures(ctx), should.Resemble, map[string]bool{"experimental.feature": false})
+	a.So(AllFeatures(ctx)["experimental.feature"], should.BeFalse)
 	a.So(feature.GetValue(context.Background()), should.BeFalse)
-	a.So(AllFeatures(context.Background()), should.Resemble, map[string]bool{"experimental.feature": false})
+	a.So(AllFeatures(context.Background())["experimental.feature"], should.BeFalse)
 
 	r.EnableFeatures("experimental.feature")
 	a.So(feature.GetValue(ctx), should.BeTrue)
-	a.So(AllFeatures(ctx), should.Resemble, map[string]bool{"experimental.feature": true})
+	a.So(AllFeatures(ctx)["experimental.feature"], should.BeTrue)
 	a.So(feature.GetValue(context.Background()), should.BeFalse)
-	a.So(AllFeatures(context.Background()), should.Resemble, map[string]bool{"experimental.feature": false})
+	a.So(AllFeatures(context.Background())["experimental.feature"], should.BeFalse)
 
 	EnableFeatures("experimental.feature")
 	r.DisableFeatures("experimental.feature")
 
 	a.So(feature.GetValue(ctx), should.BeFalse)
-	a.So(AllFeatures(ctx), should.Resemble, map[string]bool{"experimental.feature": false})
+	a.So(AllFeatures(ctx)["experimental.feature"], should.BeFalse)
 	a.So(feature.GetValue(context.Background()), should.BeTrue)
-	a.So(AllFeatures(context.Background()), should.Resemble, map[string]bool{"experimental.feature": true})
+	a.So(AllFeatures(context.Background())["experimental.feature"], should.BeTrue)
 }

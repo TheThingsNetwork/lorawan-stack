@@ -14,33 +14,22 @@
 
 /* eslint-disable react/prop-types, import/prefer-default-export */
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback, useState } from 'react'
 
 import Input from '..'
 
-class Example extends React.Component {
-  constructor(props) {
-    super(props)
+const Example = props => {
+  const { value: initialValue, type, component: Component, ...rest } = props
 
-    this.state = {
-      value: props.value || '',
-    }
-  }
+  const [value, setValue] = useState(initialValue || '')
 
-  @bind
-  onChange(value) {
-    this.setState({ value })
-  }
+  const handleChangeInput = useCallback(newValue => {
+    setValue(newValue)
+  }, [])
 
-  render() {
-    const { type, component: Component, ...props } = this.props
-    const { value } = this.state
+  const InputComponent = Component || Input
 
-    const InputComponent = Component ? Component : Input
-
-    return <InputComponent {...props} type={type} onChange={this.onChange} value={value} />
-  }
+  return <InputComponent {...rest} type={type} onChange={handleChangeInput} value={value} />
 }
 
 export { Example }

@@ -689,6 +689,9 @@
     "ADRAckLimit": "ADR_ACK_LIMIT_64",
     "ADRAckDelay": "ADR_ACK_DELAY_32",
     "MinRetransmitTimeout": 1000000000,
-    "MaxRetransmitTimeout": 3000000000
+    "MaxRetransmitTimeout": 3000000000,
+    "RelayForwardDelay": 50000000,
+    "RelayReceiveDelay": 18000000000,
+    "ServedRelayBackoff": 8
   }
 }

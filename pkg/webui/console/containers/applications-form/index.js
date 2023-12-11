@@ -45,7 +45,6 @@ const m = defineMessages({
     'Optional application description; can also be used to save notes about the application',
   appDescription:
     'Within applications, you can register and manage end devices, aggregate their sensor data and act on it using our many integration options.{break}Learn more in our <Link>Applications Guide</Link>',
-  createApplication: 'Create application',
 })
 
 const validationSchema = Yup.object().shape({
@@ -141,7 +140,7 @@ const ApplicationForm = props => {
         component={Input}
       />
       <SubmitBar>
-        <Form.Submit message={m.createApplication} component={SubmitButton} />
+        <Form.Submit message={sharedMessages.createApplication} component={SubmitButton} />
       </SubmitBar>
     </Form>
   )
