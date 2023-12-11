@@ -116,7 +116,7 @@ const DeviceBulkCreateFormInner = props => {
         className={style.info}
         values={{
           DocLink: msg => (
-            <Link.DocLink secondary path="/the-things-stack/migrating/import-devices/">
+            <Link.DocLink secondary path="/devices/adding-devices/adding-devices-in-bulk">
               {msg}
             </Link.DocLink>
           ),
