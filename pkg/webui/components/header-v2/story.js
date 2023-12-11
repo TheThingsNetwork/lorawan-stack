@@ -14,8 +14,11 @@
 
 import React from 'react'
 
+import TtsLogo from '@assets/static/logo.svg'
+
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Dropdown from '@ttn-lw/components/dropdown-v2'
+import ExampleLogo from '@ttn-lw/components/logo/story-logo.svg'
 
 import Header from '.'
 
@@ -52,6 +55,8 @@ export const Default = () => {
         profileDropdownItems={dropdownItems}
         addDropdownItems={dropdownItems}
         starDropdownItems={dropdownItems}
+        brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+        logo={{ src: TtsLogo, alt: 'Logo' }}
       />
     </div>
   )

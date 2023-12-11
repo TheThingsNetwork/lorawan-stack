@@ -36,12 +36,13 @@ const Dropdown = ({ className, children, larger, onItemsClick }) => {
         const parentRect = ref.current.parentElement.getBoundingClientRect()
         const spaceBelow = window.innerHeight - parentRect.bottom
         const spaceAbove = parentRect.top
-        const spaceLeft = parentRect.left
-        const spaceRight = window.innerWidth - parentRect.right
+        const dropdownHeight = ref.current.clientHeight
+        const dropdownWidth = ref.current.clientWidth
+        const spaceOnLeft = parentRect.left
 
-        setIsBelow(spaceBelow > ref.current.clientHeight || spaceAbove < ref.current.clientHeight)
+        setIsBelow(spaceBelow > dropdownHeight || spaceAbove < dropdownHeight)
 
-        setIsOnRight(spaceRight < spaceLeft)
+        setIsOnRight(spaceOnLeft > dropdownWidth)
       }
     }
 
@@ -59,8 +60,8 @@ const Dropdown = ({ className, children, larger, onItemsClick }) => {
         [style.larger]: larger,
         [style.below]: isBelow,
         [style.above]: !isBelow,
-        [style.right]: !isOnRight,
-        [style.left]: isOnRight,
+        [style.right]: isOnRight,
+        [style.left]: !isOnRight,
       })}
       ref={ref}
     >
