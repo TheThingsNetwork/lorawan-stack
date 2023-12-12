@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React, { useCallback, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import DedicatedEntity from '@ttn-lw/components/dedicated-entity'
@@ -25,13 +27,24 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 
 import SidebarContext from '../context'
 
+const m = defineMessages({
+  buttonMessage: 'Back to Devices list',
+})
+
 const DeviceSideNavigation = () => {
   const device = useSelector(selectSelectedDevice)
   const deviceId = useSelector(selectSelectedDeviceId)
   const appId = useSelector(selectSelectedApplicationId)
-  const { isMinimized } = useContext(SidebarContext)
+  const { isMinimized, setLayer } = useContext(SidebarContext)
+  const navigate = useNavigate()
 
   const entityId = device ? device.name ?? deviceId : deviceId
+
+  const handleBackClick = useCallback(() => {
+    const path = `/applications/${appId}/devices`
+    navigate(path)
+    setLayer(path)
+  }, [navigate, appId, setLayer])
 
   return (
     <SideNavigation>
@@ -41,6 +54,8 @@ const DeviceSideNavigation = () => {
           entityIcon="device"
           icon="arrow_left_alt"
           className="mt-cs-xs mb-cs-m"
+          buttonMessage={m.buttonMessage}
+          onClick={handleBackClick}
         />
       )}
       <SideNavigation.Item
