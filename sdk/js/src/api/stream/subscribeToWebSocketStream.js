@@ -93,11 +93,6 @@ export default async (
             `ttn.lorawan.v3.header.authorization.bearer.${tokenParsed}`,
           ])
 
-          // Event listener for 'open'
-          wsInstances[url].addEventListener('open', () => {
-            wsInstances[url].send(subscriptionPayload)
-          })
-
           // Broadcast connection errors to all listeners.
           wsInstances[url].addEventListener('error', error => {
             Object.values(subscriptions)
@@ -163,9 +158,16 @@ export default async (
               }
             }
           })
-        } else if (wsInstances[url] && wsInstances[url].readyState === WebSocket.OPEN) {
+        }
+
+        if (wsInstances[url] && wsInstances[url].readyState === WebSocket.OPEN) {
           // If the WebSocket connection is already open, only add the subscription.
           wsInstances[url].send(subscriptionPayload)
+        } else if (wsInstances[url] && wsInstances[url].readyState === WebSocket.CONNECTING) {
+          // Otherwise wait for the connection to open and then add the subscription.
+          wsInstances[url].addEventListener('open', () => {
+            wsInstances[url].send(subscriptionPayload)
+          })
         }
       } catch (error) {
         const err = error instanceof Error ? error : new Error(error)
