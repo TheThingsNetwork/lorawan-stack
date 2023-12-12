@@ -78,6 +78,34 @@ func (is *IdentityServer) notifyInternal(ctx context.Context, req *ttnpb.CreateN
 
 var errNoReceiverUserIDs = errors.Define("no_receiver_user_ids", "no receiver users ids")
 
+// getContactReceivers checks if the entityID to provide the appropriate receiverID.
+// If is an user, returns the entityID.
+// If is an organization, it checks if the fanout_notifications is enabled. If enabled returns the organizationID but
+// otherwise it returns the organization's administrative or technical contact.
+func (is *IdentityServer) getContactReceivers(
+	ctx context.Context, entityID *ttnpb.OrganizationOrUserIdentifiers, entityMask []string,
+) (*ttnpb.OrganizationOrUserIdentifiers, error) {
+	if entityID.EntityType() != "organization" {
+		return entityID, nil
+	}
+	org, err := is.store.GetOrganization(
+		ctx, entityID.GetOrganizationIds(), append(entityMask, "fanout_notifications"),
+	)
+	if err != nil {
+		return nil, err
+	}
+	if org.FanoutNotifications {
+		return entityID, nil
+	}
+	if contact := org.GetAdministrativeContact(); contact != nil {
+		return contact, nil
+	}
+	if contact := org.GetTechnicalContact(); contact != nil {
+		return contact, nil
+	}
+	return entityID, nil
+}
+
 func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *ttnpb.CreateNotificationRequest) ([]*ttnpb.UserIdentifiers, error) {
 	var receiverIDs []*ttnpb.OrganizationOrUserIdentifiers
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -120,11 +148,23 @@ func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *
 				return err
 			}
 			if entity != nil { // NOTE: entity is nil for entities that don't support contacts.
-				if receiversContains(req.Receivers, ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT) && entity.GetAdministrativeContact() != nil {
-					receiverIDs = append(receiverIDs, entity.GetAdministrativeContact())
+				adminContact, err := is.getContactReceivers(
+					ctx, entity.GetAdministrativeContact(), []string{"administrative_contact"},
+				)
+				if err != nil {
+					return err
 				}
-				if receiversContains(req.Receivers, ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_TECHNICAL_CONTACT) && entity.GetTechnicalContact() != nil {
-					receiverIDs = append(receiverIDs, entity.GetTechnicalContact())
+				if adminContact != nil {
+					receiverIDs = append(receiverIDs, adminContact)
+				}
+				techContact, err := is.getContactReceivers(
+					ctx, entity.GetTechnicalContact(), []string{"technical_contact"},
+				)
+				if err != nil {
+					return err
+				}
+				if techContact != nil {
+					receiverIDs = append(receiverIDs, techContact)
 				}
 			}
 		}
