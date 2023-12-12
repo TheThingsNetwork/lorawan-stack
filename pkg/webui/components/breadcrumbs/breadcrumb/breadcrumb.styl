@@ -15,14 +15,14 @@
 .link
   one-liner()
   text-decoration: none
-  color: $tc-subtle-gray
+  color: $c['grey-700'] !important
   min-height: 18px
 
   &:not(:last-child):after
     material-icon()
     margin: 0 $cs.xxs
     content: 'keyboard_arrow_right'
-    color: $tc-subtle-gray
+    color: $c['grey-400']
 
   +focus-visible()
     text-decoration: underline
@@ -31,8 +31,11 @@
 
 .last
   one-liner()
+  display: flex
+  align-items: center
   color: $tc-deep-gray
   min-height: 18px
+  font-weight: $fw.bold
   +media-query($bp.s)
     &:last-child
       padding-right: $ls.xxs

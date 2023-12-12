@@ -47,10 +47,12 @@ const Dropdown = ({ className, children, larger, onItemsClick }) => {
     }
 
     positionDropdown()
+    window.addEventListener('scroll', positionDropdown)
     window.addEventListener('resize', positionDropdown)
 
     return () => {
       window.removeEventListener('resize', positionDropdown)
+      window.removeEventListener('scroll', positionDropdown)
     }
   }, [])
   return (

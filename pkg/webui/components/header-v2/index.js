@@ -42,22 +42,22 @@ const Header = ({
 
   return (
     <header {...rest} className={classnames(className, style.container)}>
-      <Breadcrumbs className={style.breadcrumbs} breadcrumbs={breadcrumbs} />
+      <Breadcrumbs className="s:d-none" breadcrumbs={breadcrumbs} />
       <div className={style.mobileMenu}>
         <Button secondary icon="menu" />
-        <Link to="/" className={style.logoLink}>
+        <Link to="/" className="d-flex">
           <img {...logo} className={style.logo} />
         </Link>
       </div>
 
-      <div className={style.buttons}>
+      <div className="d-flex al-center gap-cs-xs">
         <Button secondary icon="add" dropdownItems={addDropdownItems} ref={addRef} />
         <Button
           secondary
           icon="grade"
           dropdownItems={starDropdownItems}
           ref={starRef}
-          className={style.bookmarkButton}
+          className="s:d-none"
         />
         <Button secondary icon="inbox" />
         <ProfileDropdown
