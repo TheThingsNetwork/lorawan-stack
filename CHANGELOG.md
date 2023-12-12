@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.28.2] - unreleased
+
+### Added
+
 - Rate limiting classes for individual HTTP paths.
 - Rate limiting keys for HTTP endpoints now contain the caller API key ID when available. The caller IP is still available as a fallback.
 - Allow users to set multiple frequency plans only in the same band in the Console.
@@ -23,15 +37,9 @@ For details about compatibility between different releases, see the **Commitment
 - The LoRa Basics Station discovery endpoint now verifies the authorization credentials of the caller.
   - This enables the gateways to migrate to another instance gracefully while using CUPS.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Batch gateway rights assertions when multiple membership chains are available (for example, both via a user and an organization).
-
-### Security
 
 ## [3.28.1] - 2023-11-27
 
@@ -2733,7 +2741,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.1...v3.28
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.2...v3.28
+[3.28.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.1...v3.28.2
 [3.28.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.0...v3.28.1
 [3.28.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.2...v3.28.0
 [3.27.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.1...v3.27.2
