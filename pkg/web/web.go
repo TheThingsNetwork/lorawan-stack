@@ -30,7 +30,6 @@ import (
 	"github.com/klauspost/compress/gzhttp"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
@@ -40,19 +39,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 	"gopkg.in/yaml.v2"
 )
-
-var responseCompressionFeatureFlag = experimental.DefineFeature("http.server.transport.compression", true)
-
-func compressionMiddleware(ctx context.Context) (func(http.Handler) http.Handler, error) {
-	if !responseCompressionFeatureFlag.GetValue(ctx) {
-		return func(next http.Handler) http.Handler { return next }, nil
-	}
-	m, err := gzhttp.NewWrapper()
-	if err != nil {
-		return nil, err
-	}
-	return func(h http.Handler) http.Handler { return m(h) }, nil
-}
 
 // Registerer allows components to register their services to the web server.
 type Registerer interface {
@@ -189,7 +175,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	if err := proxyConfiguration.ParseAndAddTrusted(options.trustedProxies...); err != nil {
 		return nil, err
 	}
-	compressor, err := compressionMiddleware(ctx)
+	compressor, err := gzhttp.NewWrapper()
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +186,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 			"text/html": webhandlers.Template,
 		}),
 		mux.MiddlewareFunc(webmiddleware.Recover()),
-		compressor,
+		func(next http.Handler) http.Handler { return compressor(next) },
 		otelmux.Middleware("ttn-lw-stack", otelmux.WithTracerProvider(tracing.FromContext(ctx))),
 		mux.MiddlewareFunc(webmiddleware.FillContext(options.contextFillers...)),
 		mux.MiddlewareFunc(webmiddleware.Peer()),
