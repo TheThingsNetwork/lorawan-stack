@@ -13,38 +13,21 @@
 // limitations under the License.
 
 .container
-  padding: 0 $cs.l
+  padding: 0 $cs.m
   background: $c['tts-primary-050']
   z-index: $zi.nav
   border-bottom: 1px solid $c-divider
   display: flex
   justify-content: space-between
   align-items: center
-
-.buttons
-  display: flex
-  align-items: center
-
-.buttons > &:not(:last-child)
-  margin-right: $cs.s
-
-.bookmark-button
-  +media-query($bp.s)
-    display: none
-
-.breadcrumbs
-  +media-query($bp.s)
-    display: none
+  height: 4rem
 
 .mobile-menu
   display: flex
   align-items: center
-  gap: 7px
+  gap: $cs.xs
   +media-query-min($bp.s)
     display: none
 
-.logo-link
-  display: flex
-
 .logo
-  height: 1.5rem
+  height: $cs.l

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import TtsLogo from '@assets/static/logo.svg'
+import TtsLogo from '@assets/static/tts-logo.svg'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Dropdown from '@ttn-lw/components/dropdown-v2'
