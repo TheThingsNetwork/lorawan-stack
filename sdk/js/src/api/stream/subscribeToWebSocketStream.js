@@ -20,6 +20,7 @@ import { notify, EVENTS, MESSAGE_TYPES } from './shared'
 const wsInstances = {}
 let subscriptions = {}
 const initialListeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: {} }), {})
+let closeRequested = false
 
 /**
  * Opens a new stream.
@@ -68,7 +69,6 @@ export default async (
     type: MESSAGE_TYPES.UNSUBSCRIBE,
     id: subscriptionId,
   })
-  let closeRequested = false
   const url = baseUrl + endpoint
 
   await Promise.race([
