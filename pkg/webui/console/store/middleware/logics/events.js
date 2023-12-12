@@ -275,6 +275,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
     }),
     createLogic({
       type: SET_EVENT_FILTER,
+      debounce: 250,
       process: async ({ action }, dispatch, done) => {
         if (channel) {
           try {
