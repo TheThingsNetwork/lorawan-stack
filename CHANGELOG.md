@@ -17,6 +17,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Removed
 
+- The `http.client.transport.compression` and `http.server.transport.compression` experimental flags.
+
 ### Fixed
 
 ### Security
