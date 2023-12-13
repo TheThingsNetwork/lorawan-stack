@@ -30,17 +30,37 @@ var (
 	upgradeHeader       = textproto.CanonicalMIMEHeaderKey("Upgrade")
 )
 
+func headerTokens(h http.Header, key string) []string {
+	var tokens []string
+	for _, value := range h[key] {
+		value := strings.Split(strings.TrimSpace(value), ",")
+		for _, token := range value {
+			token := strings.TrimSpace(token)
+			tokens = append(tokens, token)
+		}
+	}
+	return tokens
+}
+
+func containsHeaderToken(h http.Header, key, token string) bool {
+	for _, t := range headerTokens(h, key) {
+		if strings.EqualFold(t, token) {
+			return true
+		}
+	}
+	return false
+}
+
 func isWebSocketRequest(r *http.Request) bool {
 	h := r.Header
-	return strings.EqualFold(h.Get(connectionHeader), "upgrade") &&
-		strings.EqualFold(h.Get(upgradeHeader), "websocket")
+	return containsHeaderToken(h, connectionHeader, "upgrade") && containsHeaderToken(h, upgradeHeader, "websocket")
 }
 
 // ProtocolAuthentication returns a middleware that authenticates WebSocket requests using the subprotocol.
 // The subprotocol must be prefixed with the given prefix.
 // The token is extracted from the subprotocol and used to authenticate the request.
-// If the token is valid, the subprotocol is removed from the request.
-// If the token is invalid, the request is not authenticated.
+// If the token is valid, the subprotocol is removed from the request, and the original authorization header is removed.
+// If the token is invalid, the request is unchanged.
 func ProtocolAuthentication(prefix string) func(http.Handler) http.Handler {
 	prefixLen := len(prefix)
 	return func(next http.Handler) http.Handler {
@@ -49,24 +69,19 @@ func ProtocolAuthentication(prefix string) func(http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
-			if r.Header.Get(authorizationHeader) != "" {
-				next.ServeHTTP(w, r)
-				return
-			}
-			protocols := strings.Split(strings.TrimSpace(r.Header.Get(protocolHeader)), ",")
-			newProtocols := make([]string, 0, len(protocols))
+			var protocols []string
 			token := ""
-			for _, protocol := range protocols {
+			for _, protocol := range headerTokens(r.Header, protocolHeader) {
 				p := strings.TrimSpace(protocol)
 				if len(p) >= prefixLen && strings.EqualFold(prefix, p[:prefixLen]) {
 					token = p[prefixLen:]
 					continue
 				}
-				newProtocols = append(newProtocols, p)
+				protocols = append(protocols, p)
 			}
 			if _, _, _, err := auth.SplitToken(token); err == nil {
-				if len(newProtocols) > 0 {
-					r.Header.Set(protocolHeader, strings.Join(newProtocols, ","))
+				if len(protocols) > 0 {
+					r.Header.Set(protocolHeader, strings.Join(protocols, ","))
 				} else {
 					r.Header.Del(protocolHeader)
 				}
