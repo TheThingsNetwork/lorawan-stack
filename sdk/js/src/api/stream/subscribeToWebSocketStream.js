@@ -59,7 +59,7 @@ export default async (
   endpoint = '/console/internal/events/',
   timeout = 10000,
 ) => {
-  const subscriptionId = Date.now()
+  const subscriptionId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
   const subscriptionPayload = JSON.stringify({
     type: MESSAGE_TYPES.SUBSCRIBE,
     id: subscriptionId,
@@ -76,6 +76,9 @@ export default async (
       // Add the new subscription to the subscriptions object.
       // Also add the resolver function to the subscription object to be able
       // to resolve the promise after the subscription confirmation message.
+      if (subscriptionId in subscriptions) {
+        reject(new Error('Subscription with the same ID already exists'))
+      }
       subscriptions = {
         ...subscriptions,
         [subscriptionId]: { ...initialListeners, url, _resolver: resolve },
@@ -94,14 +97,15 @@ export default async (
           ])
 
           // Broadcast connection errors to all listeners.
-          wsInstances[url].addEventListener('error', error => {
+          wsInstances[url].addEventListener('error', () => {
+            const err = new Error('Error in WebSocket connection')
             Object.values(subscriptions)
               .filter(s => s.url === url)
-              .forEach(s => notify(s[EVENTS.ERROR], new Error(error)))
+              .forEach(s => notify(s[EVENTS.ERROR], err))
             // The error is an error event, but we should only throw proper errors.
             // It has an optional error code that we could use to map to a proper error.
             // However, the error codes are optional and not always used.
-            reject(new Error('Error in WebSocket connection'))
+            reject(err)
           })
 
           // Event listener for 'close'
