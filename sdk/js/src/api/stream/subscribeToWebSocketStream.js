@@ -15,25 +15,15 @@
 import traverse from 'traverse'
 
 import Token from '../../util/token'
-import { warn } from '../../../../../pkg/webui/lib/log'
 
 import { notify, EVENTS, MESSAGE_TYPES } from './shared'
 
 const initialListeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: {} }), {})
 
-const newSubscription = (resolve, reject, unsubscribe) => {
-  const listeners = { ...initialListeners }
+const newSubscription = (unsubscribe, newListeners, resolve, reject) => {
+  const listeners = { ...initialListeners, ...newListeners }
   let closeRequested = false
   const externalSubscription = {
-    on: (eventName, callback) => {
-      if (!Object.values(EVENTS).includes(eventName)) {
-        throw new Error(
-          `${eventName} event is not supported. Should be one of: open, message, error or close`,
-        )
-      }
-      listeners[eventName] = callback
-      return externalSubscription
-    },
     close: () => {
       closeRequested = true
       return unsubscribe()
@@ -108,7 +98,6 @@ const newInstance = (wsInstance, onClose) => {
     const subscription = traverse(subscriptions).get([sid]) || null
 
     if (!subscription) {
-      warn('Message received for closed or unknown subscription with ID', sid)
       return
     }
 
@@ -125,7 +114,7 @@ const newInstance = (wsInstance, onClose) => {
   })
 
   return {
-    subscribe: (sid, resolve, reject, subscribePayload, unsubscribePayload) => {
+    subscribe: (sid, subscribePayload, unsubscribePayload, listeners, resolve, reject) => {
       if (sid in subscriptions) {
         throw new Error(`Subscription with ID ${sid} already exists`)
       }
@@ -140,7 +129,6 @@ const newInstance = (wsInstance, onClose) => {
           wsInstance.readyState === WebSocket.CLOSED ||
           wsInstance.readyState === WebSocket.CLOSING
         ) {
-          warn('WebSocket was already closed')
           return Promise.resolve()
         }
 
@@ -165,7 +153,7 @@ const newInstance = (wsInstance, onClose) => {
         return unsubscribed
       }
 
-      const subscription = newSubscription(resolve, reject, unsubscribe)
+      const subscription = newSubscription(unsubscribe, listeners, resolve, reject)
       subscriptions[sid] = subscription
 
       if (wsInstance.readyState === WebSocket.OPEN) {
@@ -206,37 +194,43 @@ const state = newStore()
  * @async
  * @param {object} payload -  - The body of the initial request.
  * @param {string} baseUrl - The stream baseUrl.
+ * @param {object} listeners - The listeners object.
  * @param {string} endpoint - The stream endpoint.
- * @param {number} timeout - The timeout for the stream.
+ * @param {number} timeout - The connection timeout for the stream.
  *
  * @example
  * (async () => {
  *    const stream = await stream(
  *      { identifiers: [{ application_ids: { application_id: 'my-app' }}]},
  *      'http://localhost:8080',
- *      '/api/v3',
+ *      {
+ *        message: ({ data }) => console.log('received data', JSON.parse(data)),
+ *        error: error => console.log(error),
+ *        close: wasClientRequest => console.log(wasClientRequest ? 'conn closed by client' : 'conn closed by server'),
+ *      },
  *    )
  *
- *    // Add listeners to the stream.
- *    stream
- *      .on('open', () => console.log('conn opened'))
- *      .on('message', ({ data }) => console.log('received data', JSON.parse(data)))
- *      .on('error', error => console.log(error))
- *      .on('close', wasClientRequest => console.log(wasClientRequest ? 'conn closed by client' : 'conn closed by server'))
- *
- *     // Close the stream after 20 s.
+ *    // Close the stream after 20 s.
  *    setTimeout(() => stream.close(), 20000)
  * })()
  *
- * @returns {object} The stream subscription object with the `on` function for
- * attaching listeners and the `close` function to close the stream.
+ * @returns {object} The stream subscription object the `close` function to close the stream.
  */
 export default async (
   payload,
   baseUrl,
+  listeners,
   endpoint = '/console/internal/events/',
   timeout = 10000,
 ) => {
+  for (const eventName of Object.keys(listeners)) {
+    if (!Object.values(EVENTS).includes(eventName)) {
+      throw new Error(
+        `${eventName} event is not supported. Should be one of: open, message, error or close`,
+      )
+    }
+  }
+
   const subscriptionId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
   const subscriptionPayload = JSON.stringify({
     type: MESSAGE_TYPES.SUBSCRIBE,
@@ -269,7 +263,14 @@ export default async (
       // Add the new subscription to the subscriptions object.
       // Also add the resolver functions to the subscription object to be able
       // to resolve the promise after the subscription confirmation message.
-      instance.subscribe(subscriptionId, resolve, reject, subscriptionPayload, unsubscribePayload)
+      instance.subscribe(
+        subscriptionId,
+        subscriptionPayload,
+        unsubscribePayload,
+        listeners,
+        resolve,
+        reject,
+      )
     }),
     new Promise((_resolve, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
   ])

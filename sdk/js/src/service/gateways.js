@@ -240,7 +240,7 @@ class Gateways {
 
   // Events Stream
 
-  async openStream(identifiers, names, tail, after) {
+  async openStream(identifiers, names, tail, after, listeners) {
     const payload = {
       identifiers: identifiers.map(id => ({
         gateway_ids: { gateway_id: id },
@@ -262,7 +262,9 @@ class Gateways {
       distinctComponents.map(component => this._stackConfig.getComponentUrlByName(component)),
     )
 
-    const streams = [...baseUrls].map(baseUrl => subscribeToWebSocketStream(payload, baseUrl))
+    const streams = [...baseUrls].map(baseUrl =>
+      subscribeToWebSocketStream(payload, baseUrl, listeners),
+    )
 
     // Combine all stream sources to one subscription generator.
     return combineStreams(streams)
