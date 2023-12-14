@@ -19,7 +19,13 @@ import CONNECTION_STATUS from '@console/constants/connection-status'
 import EVENT_TAIL from '@console/constants/event-tail'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
-import { isUnauthenticatedError, isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
+import {
+  isUnauthenticatedError,
+  isPermissionDeniedError,
+  isNetworkError,
+  isTimeoutError,
+} from '@ttn-lw/lib/errors/utils'
+import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { SET_CONNECTION_STATUS, setStatusChecking } from '@ttn-lw/lib/store/actions/status'
 import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
@@ -131,22 +137,24 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const filterRegExp = Boolean(filter) ? filter.filterRegExp : undefined
 
         try {
-          channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after)
+          const listeners = {
+            message: message => dispatch(getEventSuccess(id, message)),
+            error: error => dispatch(getEventFailure(id, error)),
+            close: wasClientRequest => {
+              dispatch(closeEvents(id, { silent: wasClientRequest }))
+              channel?.close()
+              channel = null
+            },
+          }
+          channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after, listeners)
           dispatch(startEventsSuccess(id, { silent }))
-
-          channel.on('message', message => dispatch(getEventSuccess(id, message)))
-          channel.on('error', error => dispatch(getEventFailure(id, error)))
-          channel.on('close', wasClientRequest => {
-            dispatch(closeEvents(id, { silent: wasClientRequest }))
-            channel = null
-          })
         } catch (error) {
-          if (isUnauthenticatedError(error)) {
+          if (
+            error instanceof TokenError &&
+            (isUnauthenticatedError(error?.cause) || isPermissionDeniedError(error?.cause))
+          ) {
             // The user is no longer authenticated; reinitiate the auth flow
             // by refreshing the page.
-            // NOTE: As a result of the WebSocket refactor, the error shape is
-            // now very unspecific and authentication errors like before are
-            // not thrown anymore. This should be addressed eventually.
             window.location.reload()
           } else {
             dispatch(startEventsFailure(id, error))
@@ -177,7 +185,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       },
       process: async ({ action }, dispatch, done) => {
         if (action.type === START_EVENTS_FAILURE) {
-          if (action?.error?.message === 'timeout') {
+          if (action.error?.message === 'timeout') {
             // Set the connection status to `checking` to trigger connection checks
             // and detect possible offline state.
             dispatch(setStatusChecking())
@@ -211,8 +219,9 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const status = selectEntityEventsStatus(getState(), id)
         const connected = status === CONNECTION_STATUS.CONNECTED
         const interrupted = selectEntityEventsInterrupted(getState(), id)
-        if (!connected && interrupted) {
+        if (!connected || interrupted) {
           reject()
+          return
         }
 
         allow(action)

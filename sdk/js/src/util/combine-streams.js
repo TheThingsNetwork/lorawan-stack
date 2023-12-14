@@ -16,8 +16,8 @@
  * Combines multiple streams into a single subscription provider.
  *
  * @param {Array} streams - An array of (async) stream functions.
- * @returns {object} The stream subscription object with the `on` function for
- * attaching listeners and the `close` function to close the stream.
+ * @returns {object} The stream subscription object with the `close` function
+ * to close the stream.
  */
 const combinedStream = async streams => {
   if (!(streams instanceof Array) || streams.length === 0) {
@@ -26,19 +26,22 @@ const combinedStream = async streams => {
     return streams[0]
   }
 
-  const subscribers = await Promise.all(streams)
-
-  return {
-    on: (eventName, callback) => {
-      for (const subscriber of subscribers) {
-        subscriber.on(eventName, callback)
-      }
-    },
-    close: () => {
-      for (const subscriber of subscribers) {
-        subscriber.close()
-      }
-    },
+  try {
+    const subscribers = await Promise.all(streams)
+    return {
+      close: () => Promise.all(subscribers.map(subscriber => subscriber.close())),
+    }
+  } catch (error) {
+    // Ensure that if only some streams fail, the successful ones are closed.
+    await Promise.all(
+      streams.map(async stream => {
+        try {
+          const subscriber = await stream
+          await subscriber.close()
+        } catch {}
+      }),
+    )
+    throw error
   }
 }
 

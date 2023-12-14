@@ -156,7 +156,7 @@ class Organizations {
 
   // Events stream.
 
-  async openStream(identifiers, names, tail, after) {
+  async openStream(identifiers, names, tail, after, listeners) {
     const payload = {
       identifiers: identifiers.map(id => ({
         organization_ids: { organization_id: id },
@@ -168,7 +168,7 @@ class Organizations {
 
     const baseUrl = this._stackConfig.getComponentUrlByName(STACK_COMPONENTS_MAP.is)
 
-    return subscribeToWebSocketStream(payload, baseUrl)
+    return subscribeToWebSocketStream(payload, baseUrl, listeners)
   }
 }
 

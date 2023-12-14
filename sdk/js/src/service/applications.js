@@ -217,7 +217,7 @@ class Applications {
 
   // Events Stream
 
-  async openStream(identifiers, names, tail, after) {
+  async openStream(identifiers, names, tail, after, listeners) {
     const payload = {
       identifiers: identifiers.map(id => ({
         application_ids: { application_id: id },
@@ -236,7 +236,9 @@ class Applications {
       distinctComponents.map(component => this._stackConfig.getComponentUrlByName(component)),
     )
 
-    const streams = [...baseUrls].map(baseUrl => subscribeToWebSocketStream(payload, baseUrl))
+    const streams = [...baseUrls].map(baseUrl =>
+      subscribeToWebSocketStream(payload, baseUrl, listeners),
+    )
 
     // Combine all stream sources to one subscription generator.
     return combineStreams(streams)
