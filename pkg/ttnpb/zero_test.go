@@ -121,6 +121,12 @@ func TestFieldIsZero(t *testing.T) {
 		(*RelayForwardLimits)(nil):                              RelayForwardLimitsFieldPathsNested,
 		&ServingRelayForwardingLimits{}:                         ServingRelayForwardingLimitsFieldPathsNested,
 		(*ServingRelayForwardingLimits)(nil):                    ServingRelayForwardingLimitsFieldPathsNested,
+		&RelaySettings{}:                                        RelaySettingsFieldPathsNested,
+		(*RelaySettings)(nil):                                   RelaySettingsFieldPathsNested,
+		&ServedRelaySettings{}:                                  ServedRelaySettingsFieldPathsNested,
+		(*ServedRelaySettings)(nil):                             ServedRelaySettingsFieldPathsNested,
+		&ServingRelaySettings{}:                                 ServingRelaySettingsFieldPathsNested,
+		(*ServingRelaySettings)(nil):                            ServingRelaySettingsFieldPathsNested,
 	} {
 		for _, p := range paths {
 			v, p := v, p

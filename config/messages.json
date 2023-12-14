@@ -7874,6 +7874,15 @@
       "file": "grpc_gsns.go"
     }
   },
+  "error:pkg/networkserver:relay_already_exists": {
+    "translations": {
+      "en": "relay already exists"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_relay.go"
+    }
+  },
   "error:pkg/networkserver:relay_full_f_cnt": {
     "translations": {
       "en": "invalid full FCnt"
@@ -7886,6 +7895,42 @@
   "error:pkg/networkserver:relay_m_type": {
     "translations": {
       "en": "invalid MType"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_manage_uplink_forwarding_rules": {
+    "translations": {
+      "en": "relay uplink forwarding rules must be managed by dedicated RPCs"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_not_found": {
+    "translations": {
+      "en": "relay not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_not_served": {
+    "translations": {
+      "en": "relay not served"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_not_serving": {
+    "translations": {
+      "en": "relay not serving"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -7919,15 +7964,6 @@
       "file": "relay.go"
     }
   },
-  "error:pkg/networkserver:relay_serving": {
-    "translations": {
-      "en": "relay not serving"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "relay.go"
-    }
-  },
   "error:pkg/networkserver:relay_session": {
     "translations": {
       "en": "relay session not found"
@@ -7944,6 +7980,24 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_uplink_forwarding_rule_already_exists": {
+    "translations": {
+      "en": "relay uplink forwarding rule already exists"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_uplink_forwarding_rule_not_found": {
+    "translations": {
+      "en": "relay uplink forwarding rule not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_relay.go"
     }
   },
   "error:pkg/networkserver:relay_uplink_token": {

@@ -709,6 +709,324 @@ func (m *RelayParameters) SetFromFlags(flags *pflag.FlagSet, prefix string) (pat
 	return paths, nil
 }
 
+// AddSelectFlagsForServingRelaySettings adds flags to select fields in ServingRelaySettings.
+func AddSelectFlagsForServingRelaySettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("second-channel", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("second-channel", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelaySecondChannel(flags, flagsplugin.Prefix("second-channel", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("default-channel-index", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("default-channel-index", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cad-periodicity", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cad-periodicity", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("uplink-forwarding-rules", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("uplink-forwarding-rules", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("limits", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("limits", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForServingRelayForwardingLimits(flags, flagsplugin.Prefix("limits", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forServingRelaySettings message from select flags.
+func PathsFromSelectFlagsForServingRelaySettings(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("second_channel", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("second_channel", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelaySecondChannel(flags, flagsplugin.Prefix("second_channel", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("default_channel_index", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("default_channel_index", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("cad_periodicity", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("cad_periodicity", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("uplink_forwarding_rules", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("uplink_forwarding_rules", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("limits", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("limits", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForServingRelayForwardingLimits(flags, flagsplugin.Prefix("limits", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForServingRelaySettings adds flags to select fields in ServingRelaySettings.
+func AddSetFlagsForServingRelaySettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForRelaySecondChannel(flags, flagsplugin.Prefix("second-channel", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("default-channel-index", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("cad-periodicity", prefix), flagsplugin.EnumValueDesc(RelayCADPeriodicity_value), flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping UplinkForwardingRules because repeated messages are currently not supported.
+	AddSetFlagsForServingRelayForwardingLimits(flags, flagsplugin.Prefix("limits", prefix), hidden)
+}
+
+// SetFromFlags sets the ServingRelaySettings message from flags.
+func (m *ServingRelaySettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("second_channel", prefix)); changed {
+		if m.SecondChannel == nil {
+			m.SecondChannel = &RelaySecondChannel{}
+		}
+		if setPaths, err := m.SecondChannel.SetFromFlags(flags, flagsplugin.Prefix("second_channel", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("default_channel_index", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.DefaultChannelIndex = &wrapperspb.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("default_channel_index", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("cad_periodicity", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, RelayCADPeriodicity_value)
+		if err != nil {
+			return nil, err
+		}
+		m.CadPeriodicity = RelayCADPeriodicity(enumValue)
+		paths = append(paths, flagsplugin.Prefix("cad_periodicity", prefix))
+	}
+	// FIXME: Skipping UplinkForwardingRules because it does not seem to implement AddSetFlags.
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("limits", prefix)); changed {
+		if m.Limits == nil {
+			m.Limits = &ServingRelayForwardingLimits{}
+		}
+		if setPaths, err := m.Limits.SetFromFlags(flags, flagsplugin.Prefix("limits", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForServedRelaySettings adds flags to select fields in ServedRelaySettings.
+func AddSelectFlagsForServedRelaySettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.always", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.always", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayEndDeviceAlwaysMode(flags, flagsplugin.Prefix("mode.always", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.dynamic", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.dynamic", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayEndDeviceDynamicMode(flags, flagsplugin.Prefix("mode.dynamic", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.end-device-controlled", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.end-device-controlled", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelayEndDeviceControlledMode(flags, flagsplugin.Prefix("mode.end-device-controlled", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("backoff", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("backoff", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("second-channel", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("second-channel", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForRelaySecondChannel(flags, flagsplugin.Prefix("second-channel", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("serving-device-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("serving-device-id", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forServedRelaySettings message from select flags.
+func PathsFromSelectFlagsForServedRelaySettings(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.always", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.always", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayEndDeviceAlwaysMode(flags, flagsplugin.Prefix("mode.always", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.dynamic", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.dynamic", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayEndDeviceDynamicMode(flags, flagsplugin.Prefix("mode.dynamic", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.end_device_controlled", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.end_device_controlled", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelayEndDeviceControlledMode(flags, flagsplugin.Prefix("mode.end_device_controlled", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("backoff", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("backoff", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("second_channel", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("second_channel", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForRelaySecondChannel(flags, flagsplugin.Prefix("second_channel", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("serving_device_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("serving_device_id", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForServedRelaySettings adds flags to select fields in ServedRelaySettings.
+func AddSetFlagsForServedRelaySettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForRelayEndDeviceAlwaysMode(flags, flagsplugin.Prefix("mode.always", prefix), hidden)
+	AddSetFlagsForRelayEndDeviceDynamicMode(flags, flagsplugin.Prefix("mode.dynamic", prefix), hidden)
+	AddSetFlagsForRelayEndDeviceControlledMode(flags, flagsplugin.Prefix("mode.end-device-controlled", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("backoff", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForRelaySecondChannel(flags, flagsplugin.Prefix("second-channel", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("serving-device-id", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ServedRelaySettings message from flags.
+func (m *ServedRelaySettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.always", prefix)); changed {
+		ov := &ServedRelaySettings_Always{}
+		if ov.Always == nil {
+			ov.Always = &RelayEndDeviceAlwaysMode{}
+		}
+		if setPaths, err := ov.Always.SetFromFlags(flags, flagsplugin.Prefix("mode.always", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.dynamic", prefix)); changed {
+		ov := &ServedRelaySettings_Dynamic{}
+		if ov.Dynamic == nil {
+			ov.Dynamic = &RelayEndDeviceDynamicMode{}
+		}
+		if setPaths, err := ov.Dynamic.SetFromFlags(flags, flagsplugin.Prefix("mode.dynamic", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.end_device_controlled", prefix)); changed {
+		ov := &ServedRelaySettings_EndDeviceControlled{}
+		if ov.EndDeviceControlled == nil {
+			ov.EndDeviceControlled = &RelayEndDeviceControlledMode{}
+		}
+		if setPaths, err := ov.EndDeviceControlled.SetFromFlags(flags, flagsplugin.Prefix("mode.end_device_controlled", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("backoff", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Backoff = &wrapperspb.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("backoff", prefix))
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("second_channel", prefix)); changed {
+		if m.SecondChannel == nil {
+			m.SecondChannel = &RelaySecondChannel{}
+		}
+		if setPaths, err := m.SecondChannel.SetFromFlags(flags, flagsplugin.Prefix("second_channel", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("serving_device_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ServingDeviceId = val
+		paths = append(paths, flagsplugin.Prefix("serving_device_id", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForRelaySettings adds flags to select fields in RelaySettings.
+func AddSelectFlagsForRelaySettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.serving", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.serving", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForServingRelaySettings(flags, flagsplugin.Prefix("mode.serving", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.served", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mode.served", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForServedRelaySettings(flags, flagsplugin.Prefix("mode.served", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forRelaySettings message from select flags.
+func PathsFromSelectFlagsForRelaySettings(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.serving", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.serving", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForServingRelaySettings(flags, flagsplugin.Prefix("mode.serving", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mode.served", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mode.served", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForServedRelaySettings(flags, flagsplugin.Prefix("mode.served", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForRelaySettings adds flags to select fields in RelaySettings.
+func AddSetFlagsForRelaySettings(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForServingRelaySettings(flags, flagsplugin.Prefix("mode.serving", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.serving", prefix), "", flagsplugin.WithHidden(hidden)))
+	AddSetFlagsForServedRelaySettings(flags, flagsplugin.Prefix("mode.served", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.served", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the RelaySettings message from flags.
+func (m *RelaySettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.serving", prefix)); changed {
+		ov := &RelaySettings_Serving{}
+		if ov.Serving == nil {
+			ov.Serving = &ServingRelaySettings{}
+		}
+		if setPaths, err := ov.Serving.SetFromFlags(flags, flagsplugin.Prefix("mode.serving", prefix)); err != nil {
+			return nil, err
+		} else if len(setPaths) == 0 {
+			paths = append(paths, "mode.serving")
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mode.served", prefix)); changed {
+		ov := &RelaySettings_Served{}
+		if ov.Served == nil {
+			ov.Served = &ServedRelaySettings{}
+		}
+		if setPaths, err := ov.Served.SetFromFlags(flags, flagsplugin.Prefix("mode.served", prefix)); err != nil {
+			return nil, err
+		} else if len(setPaths) == 0 {
+			paths = append(paths, "mode.served")
+		} else {
+			paths = append(paths, setPaths...)
+		}
+		m.Mode = ov
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForMACParameters_Channel adds flags to select fields in MACParameters_Channel.
 func AddSelectFlagsForMACParameters_Channel(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("uplink-frequency", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("uplink-frequency", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -1718,9 +2036,9 @@ func AddSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bo
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("schedule-downlinks", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("schedule-downlinks", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForBoolValue(flags, flagsplugin.Prefix("schedule-downlinks", prefix), true)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("relay", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("relay", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForRelayParameters(flags, flagsplugin.Prefix("relay", prefix), hidden)
+	AddSelectFlagsForRelaySettings(flags, flagsplugin.Prefix("relay", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("desired-relay", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("desired-relay", prefix), true), flagsplugin.WithHidden(hidden)))
-	AddSelectFlagsForRelayParameters(flags, flagsplugin.Prefix("desired-relay", prefix), hidden)
+	AddSelectFlagsForRelaySettings(flags, flagsplugin.Prefix("desired-relay", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forMACSettings message from select flags.
@@ -2035,7 +2353,7 @@ func PathsFromSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string) (pa
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("relay", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForRelayParameters(flags, flagsplugin.Prefix("relay", prefix)); err != nil {
+	if selectPaths, err := PathsFromSelectFlagsForRelaySettings(flags, flagsplugin.Prefix("relay", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -2045,7 +2363,7 @@ func PathsFromSelectFlagsForMACSettings(flags *pflag.FlagSet, prefix string) (pa
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("desired_relay", prefix))
 	}
-	if selectPaths, err := PathsFromSelectFlagsForRelayParameters(flags, flagsplugin.Prefix("desired_relay", prefix)); err != nil {
+	if selectPaths, err := PathsFromSelectFlagsForRelaySettings(flags, flagsplugin.Prefix("desired_relay", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -2115,8 +2433,8 @@ func AddSetFlagsForMACSettings(flags *pflag.FlagSet, prefix string, hidden bool)
 	AddSetFlagsForADRSettings(flags, flagsplugin.Prefix("adr", prefix), hidden)
 	AddSetFlagsForBoolValue(flags, flagsplugin.Prefix("schedule-downlinks", prefix), true)
 	flagsplugin.AddAlias(flags, flagsplugin.Prefix("schedule-downlinks.value", prefix), flagsplugin.Prefix("schedule-downlinks", prefix), flagsplugin.WithHidden(hidden))
-	AddSetFlagsForRelayParameters(flags, flagsplugin.Prefix("relay", prefix), hidden)
-	AddSetFlagsForRelayParameters(flags, flagsplugin.Prefix("desired-relay", prefix), hidden)
+	AddSetFlagsForRelaySettings(flags, flagsplugin.Prefix("relay", prefix), hidden)
+	AddSetFlagsForRelaySettings(flags, flagsplugin.Prefix("desired-relay", prefix), hidden)
 }
 
 // SetFromFlags sets the MACSettings message from flags.
@@ -2435,7 +2753,7 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("relay", prefix)); changed {
 		if m.Relay == nil {
-			m.Relay = &RelayParameters{}
+			m.Relay = &RelaySettings{}
 		}
 		if setPaths, err := m.Relay.SetFromFlags(flags, flagsplugin.Prefix("relay", prefix)); err != nil {
 			return nil, err
@@ -2445,7 +2763,7 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("desired_relay", prefix)); changed {
 		if m.DesiredRelay == nil {
-			m.DesiredRelay = &RelayParameters{}
+			m.DesiredRelay = &RelaySettings{}
 		}
 		if setPaths, err := m.DesiredRelay.SetFromFlags(flags, flagsplugin.Prefix("desired_relay", prefix)); err != nil {
 			return nil, err
