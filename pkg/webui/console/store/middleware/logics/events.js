@@ -175,9 +175,9 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
 
         allow(action)
       },
-      process: ({ action }, dispatch, done) => {
-        if (action.error) {
-          if (action.error?.message === 'timeout') {
+      process: async ({ action }, dispatch, done) => {
+        if (action.type === START_EVENTS_FAILURE) {
+          if (action?.error?.message === 'timeout') {
             // Set the connection status to `checking` to trigger connection checks
             // and detect possible offline state.
             dispatch(setStatusChecking())
@@ -187,6 +187,10 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
             // as equivalent to a closed connection.
             return done()
           }
+        }
+        if (action.type === STOP_EVENTS && Boolean(channel)) {
+          // Close the connection if it wasn't closed already.
+          await channel.close()
         }
         done()
       },
