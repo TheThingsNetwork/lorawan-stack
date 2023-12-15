@@ -19,6 +19,12 @@ import Switcher from '.'
 export default {
   title: 'Sidebar/Switcher',
   component: Switcher,
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1312%3A7620&mode=design&t=Hbk2Qngeg1xqg4V3-1',
+    },
+  },
 }
 
 const SwictherExample = () => {

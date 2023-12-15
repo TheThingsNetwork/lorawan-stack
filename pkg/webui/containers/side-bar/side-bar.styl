@@ -19,6 +19,17 @@
   height: 97.5vh
   min-width: 17rem
   max-width: 24rem
+  +media-query($bp.m)
+    sidebar-transition(left, box-shadow)
+    top: $header-height-mobile
+    left: -60vw
+    bottom: 0
+    width: 60vw
+    max-width: 20rem
+
+    &-open
+      box-shadow: 0 0 13rem 2rem rgba(0,0,0,.4)
+      left: 0
 
   &-minimized
     width: 4rem

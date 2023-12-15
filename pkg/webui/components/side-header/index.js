@@ -15,14 +15,22 @@
 import React, { useContext } from 'react'
 import classnames from 'classnames'
 
+import LAYOUT from '@ttn-lw/constants/layout'
+
 import Button from '@ttn-lw/components/button-v2'
 
 import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+const getViewportWidth = () =>
+  Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+
 const SideHeader = ({ logo }) => {
   const { onMinimizeToggle, isMinimized } = useContext(SidebarContext)
+
+  const viewportWidth = getViewportWidth()
+  const isMobile = viewportWidth <= LAYOUT.BREAKPOINTS.M
 
   return (
     <div
@@ -33,7 +41,7 @@ const SideHeader = ({ logo }) => {
       })}
     >
       <img {...logo} className={classnames({ 'w-50': !isMinimized })} />
-      <Button icon="left_panel_close" naked onClick={onMinimizeToggle} />
+      {isMobile && <Button icon="left_panel_close" naked onClick={onMinimizeToggle} />}
     </div>
   )
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useContext } from 'react'
-import classNames from 'classnames'
+import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
 import Icon from '@ttn-lw/components/icon'
@@ -38,7 +38,7 @@ const SearchButton = ({ onClick, className }) => {
     <Button
       onClick={handleClick}
       secondary
-      className={classNames(style.searchButton, className, {
+      className={classnames(style.searchButton, className, {
         [style.searchButtonMinimized]: isMinimized,
       })}
     >
