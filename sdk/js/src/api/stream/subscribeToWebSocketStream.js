@@ -16,14 +16,13 @@ import traverse from 'traverse'
 
 import Token from '../../util/token'
 
-import { notify, EVENTS, MESSAGE_TYPES } from './shared'
+import { notify, newQueuedListeners, EVENTS, MESSAGE_TYPES, INITIAL_LISTENERS } from './shared'
 
-const initialListeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: {} }), {})
-
-const newSubscription = (unsubscribe, newListeners, resolve, reject) => {
-  const listeners = { ...initialListeners, ...newListeners }
+const newSubscription = (unsubscribe, originalListeners, resolve, reject) => {
   let closeRequested = false
+  const [open, listeners] = newQueuedListeners(originalListeners)
   const externalSubscription = {
+    open,
     close: () => {
       closeRequested = true
       return unsubscribe()
@@ -44,7 +43,6 @@ const newSubscription = (unsubscribe, newListeners, resolve, reject) => {
     },
     onMessage: dataParsed => {
       if (dataParsed.type === MESSAGE_TYPES.SUBSCRIBE) {
-        notify(listeners[EVENTS.OPEN])
         // Resolve the promise after the subscription confirmation message.
         resolve(externalSubscription)
       }
@@ -210,11 +208,15 @@ const state = newStore()
  *      },
  *    )
  *
+ *    // Start the stream in order to start dispatching events.
+ *    stream.open()
+ *
  *    // Close the stream after 20 s.
  *    setTimeout(() => stream.close(), 20000)
  * })()
  *
- * @returns {object} The stream subscription object the `close` function to close the stream.
+ * @returns {object} The stream subscription object the `open` function to start sending events to the listeners and
+ * the `close` function to close the stream.
  */
 export default async (
   payload,
@@ -226,10 +228,11 @@ export default async (
   for (const eventName of Object.keys(listeners)) {
     if (!Object.values(EVENTS).includes(eventName)) {
       throw new Error(
-        `${eventName} event is not supported. Should be one of: open, message, error or close`,
+        `${eventName} event is not supported. Should be one of: message, error or close`,
       )
     }
   }
+  const filledListeners = { ...INITIAL_LISTENERS, ...listeners }
 
   const subscriptionId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
   const subscriptionPayload = JSON.stringify({
@@ -267,7 +270,7 @@ export default async (
         subscriptionId,
         subscriptionPayload,
         unsubscribePayload,
-        listeners,
+        filledListeners,
         resolve,
         reject,
       )
