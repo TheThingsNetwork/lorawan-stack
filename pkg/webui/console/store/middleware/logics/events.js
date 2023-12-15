@@ -142,12 +142,12 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
             error: error => dispatch(getEventFailure(id, error)),
             close: wasClientRequest => {
               dispatch(closeEvents(id, { silent: wasClientRequest }))
-              channel?.close()
               channel = null
             },
           }
           channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after, listeners)
           dispatch(startEventsSuccess(id, { silent }))
+          channel.open()
         } catch (error) {
           if (
             error instanceof TokenError &&
@@ -288,7 +288,6 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
     }),
     createLogic({
       type: SET_EVENT_FILTER,
-      debounce: 250,
       process: async ({ action }, dispatch, done) => {
         if (channel) {
           try {

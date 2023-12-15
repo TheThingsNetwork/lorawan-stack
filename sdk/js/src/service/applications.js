@@ -15,8 +15,7 @@
 import autoBind from 'auto-bind'
 
 import Marshaler from '../util/marshaler'
-import subscribeToWebSocketStream from '../api/stream/subscribeToWebSocketStream'
-import combineStreams from '../util/combine-streams'
+import subscribeToWebSocketStreams from '../api/stream/subscribeToWebSocketStreams'
 import { STACK_COMPONENTS_MAP } from '../util/constants'
 
 import Devices from './devices'
@@ -235,13 +234,8 @@ class Applications {
     const baseUrls = new Set(
       distinctComponents.map(component => this._stackConfig.getComponentUrlByName(component)),
     )
-
-    const streams = [...baseUrls].map(baseUrl =>
-      subscribeToWebSocketStream(payload, baseUrl, listeners),
-    )
-
     // Combine all stream sources to one subscription generator.
-    return combineStreams(streams)
+    return subscribeToWebSocketStreams(payload, [...baseUrls], listeners)
   }
 }
 
