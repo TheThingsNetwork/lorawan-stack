@@ -66,7 +66,6 @@ const newSubscription = (unsubscribe, originalListeners, resolve, reject, resolv
 
 const newInstance = (wsInstance, onClose) => {
   const subscriptions = {}
-  let closeRequested = false
 
   // Broadcast connection errors to all subscriptions.
   wsInstance.addEventListener('error', () => {
@@ -78,11 +77,6 @@ const newInstance = (wsInstance, onClose) => {
 
   // Broadcast connection closure to all subscriptions.
   wsInstance.addEventListener('close', closeEvent => {
-    if (closeRequested) {
-      // If the close has been requested already, the instance has been
-      // deregistered and there are no subscriptions left.
-      return
-    }
     // TODO: Handle close event codes.
     // https://github.com/TheThingsNetwork/lorawan-stack/issues/6752
     for (const subscription of Object.values(subscriptions)) {
@@ -105,11 +99,6 @@ const newInstance = (wsInstance, onClose) => {
 
     if (dataParsed.type === MESSAGE_TYPES.UNSUBSCRIBE) {
       delete subscriptions[sid]
-      if (Object.keys(subscriptions).length === 0) {
-        closeRequested = true
-        wsInstance.close()
-        onClose()
-      }
     }
   })
 
