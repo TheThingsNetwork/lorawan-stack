@@ -18,6 +18,12 @@ import DedicatedEntity from '.'
 
 export default {
   title: 'Sidebar/DedicatedEntity',
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1345%3A11699&mode=design&t=Hbk2Qngeg1xqg4V3-1',
+    },
+  },
 }
 
 export const Default = () => <DedicatedEntity label="Adrian's Test Lab" icon="arrow_left_alt" />

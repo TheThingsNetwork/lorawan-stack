@@ -19,6 +19,12 @@ import SectionLabel from '.'
 export default {
   title: 'Sidebar/SectionLabel',
   component: SectionLabel,
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1312%3A27341&mode=design&t=Hbk2Qngeg1xqg4V3-1',
+    },
+  },
 }
 
 export const Default = () => <SectionLabel label="Top entities" icon="add" />

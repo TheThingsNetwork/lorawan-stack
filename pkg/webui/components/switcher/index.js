@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import classNames from 'classnames'
+import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -26,21 +26,21 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './switcher.styl'
 
 const Switcher = ({ layer, onClick, isMinimized }) => {
-  const overviewClassName = classNames(
+  const overviewClassName = classnames(
     style.link,
     { [style.active]: !layer.includes('/applications') && !layer.includes('/gateways') },
     'p-vert-cs-s',
     'p-sides-0',
   )
 
-  const applicationsClassName = classNames(
+  const applicationsClassName = classnames(
     style.link,
     { [style.active]: layer.includes('/applications') },
     'p-vert-cs-s',
     'p-sides-0',
   )
 
-  const gatewaysClassName = classNames(
+  const gatewaysClassName = classnames(
     style.link,
     { [style.active]: layer.includes('/gateways') },
     'p-vert-cs-s',
@@ -49,7 +49,7 @@ const Switcher = ({ layer, onClick, isMinimized }) => {
 
   return (
     <div
-      className={classNames(style.switcherContainer, 'd-flex', 'j-center', 'p-cs-xxs', {
+      className={classnames(style.switcherContainer, 'd-flex', 'j-center', 'p-cs-xxs', {
         'direction-column': isMinimized,
       })}
     >
