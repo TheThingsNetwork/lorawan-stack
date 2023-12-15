@@ -18,7 +18,7 @@ import Token from '../../util/token'
 
 import { notify, newQueuedListeners, EVENTS, MESSAGE_TYPES, INITIAL_LISTENERS } from './shared'
 
-const newSubscription = (unsubscribe, originalListeners, resolve, reject) => {
+const newSubscription = (unsubscribe, originalListeners, resolve, reject, resolveClose) => {
   let closeRequested = false
   const [open, listeners] = newQueuedListeners(originalListeners)
   const externalSubscription = {
@@ -37,6 +37,7 @@ const newSubscription = (unsubscribe, originalListeners, resolve, reject) => {
     },
     onClose: closeEvent => {
       notify(listeners[EVENTS.CLOSE], closeRequested)
+      resolveClose()
       // If the connection has been closed while we are trying subscribe, we should
       // reject the promise in order to propagate the implicit subscription failure.
       reject(new Error(`WebSocket connection closed unexpectedly with code ${closeEvent.code}`))
@@ -57,6 +58,7 @@ const newSubscription = (unsubscribe, originalListeners, resolve, reject) => {
 
       if (dataParsed.type === MESSAGE_TYPES.UNSUBSCRIBE) {
         notify(listeners[EVENTS.CLOSE], closeRequested)
+        resolveClose()
       }
     },
   }
@@ -117,41 +119,26 @@ const newInstance = (wsInstance, onClose) => {
         throw new Error(`Subscription with ID ${sid} already exists`)
       }
 
-      let unsubscribed = null
+      // The `unsubscribed` promise is used in order to guarantee that calls to the `close` method
+      // of the subscription finish _after_ the closure events have been emitted. Callers can expect
+      // that after `close` resolves, no further events will be emitted.
+      let resolveClose = null
+      const unsubscribed = new Promise(resolve => {
+        resolveClose = resolve
+      })
+      let unsubscribeCalled = false
       const unsubscribe = () => {
-        if (unsubscribed) {
-          return unsubscribed
-        }
+        if (!unsubscribeCalled) {
+          unsubscribeCalled = true
 
-        if (
-          wsInstance.readyState === WebSocket.CLOSED ||
-          wsInstance.readyState === WebSocket.CLOSING
-        ) {
-          return Promise.resolve()
-        }
-
-        wsInstance.send(unsubscribePayload)
-
-        // Wait for the server to confirm the unsubscribe.
-        unsubscribed = new Promise(resolve => {
-          const onMessage = ({ data }) => {
-            const { type, id } = JSON.parse(data)
-            if (id === sid && type === MESSAGE_TYPES.UNSUBSCRIBE) {
-              resolve()
-              wsInstance.removeEventListener('message', onMessage)
-            }
+          if (wsInstance.state === WebSocket.open) {
+            wsInstance.send(unsubscribePayload)
           }
-          wsInstance.addEventListener('message', onMessage)
-          const onClose = () => {
-            resolve()
-            wsInstance.removeEventListener('close', onClose)
-          }
-          wsInstance.addEventListener('close', onClose)
-        })
+        }
         return unsubscribed
       }
 
-      const subscription = newSubscription(unsubscribe, listeners, resolve, reject)
+      const subscription = newSubscription(unsubscribe, listeners, resolve, reject, resolveClose)
       subscriptions[sid] = subscription
 
       if (wsInstance.readyState === WebSocket.OPEN) {
