@@ -20,6 +20,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/protocol"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/subscriptions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
@@ -54,7 +55,7 @@ func (m *mux) Responses() <-chan protocol.Response {
 
 // Run implements Interface.
 func (m *mux) Run(ctx context.Context) (err error) {
-	ctx, cancel := context.WithCancelCause(ctx)
+	ctx, cancel := errorcontext.New(ctx)
 	defer func() { cancel(err) }()
 	subs := m.createSubs(ctx, cancel)
 	defer subs.Close()
