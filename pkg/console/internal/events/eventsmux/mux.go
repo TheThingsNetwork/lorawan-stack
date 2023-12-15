@@ -18,6 +18,7 @@ package eventsmux
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/protocol"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/subscriptions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
@@ -64,6 +65,9 @@ func (m *mux) Run(ctx context.Context) (err error) {
 		case <-ctx.Done():
 			return ctx.Err()
 		case req := <-m.requestCh:
+			if err := rights.RequireAuthenticated(ctx); err != nil {
+				return err
+			}
 			var resp protocol.Response
 			switch req := req.(type) {
 			case *protocol.SubscribeRequest:
