@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/subscriptions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -143,7 +144,7 @@ func runTestSubscriptions(
 	_, historical := subscriber.(interface{ historical() })
 
 	a, ctx := test.New(t)
-	ctx, cancel := context.WithCancelCause(ctx)
+	ctx, cancel := errorcontext.New(ctx)
 	defer cancel(nil)
 
 	timeout := test.Delay << 3
