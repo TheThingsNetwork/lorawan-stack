@@ -35,7 +35,6 @@ import {
   createStartEventsStreamFailureActionType,
   createStartEventsStreamSuccessActionType,
   createEventStreamClosedActionType,
-  createGetEventMessageFailureActionType,
   createGetEventMessageSuccessActionType,
   createSetEventsFilterActionType,
   getEventMessageSuccess,
@@ -71,7 +70,6 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
   const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
   const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
-  const GET_EVENT_MESSAGE_FAILURE = createGetEventMessageFailureActionType(reducerName)
   const GET_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(reducerName)
   const SET_EVENT_FILTER = createSetEventsFilterActionType(reducerName)
   const startEventsSuccess = startEventsStreamSuccess(reducerName)
@@ -140,10 +138,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
           const listeners = {
             message: message => dispatch(getEventSuccess(id, message)),
             error: error => dispatch(getEventFailure(id, error)),
-            close: wasClientRequest => {
-              dispatch(closeEvents(id, { silent: wasClientRequest }))
-              channel = null
-            },
+            close: wasClientRequest => dispatch(closeEvents(id, { silent: wasClientRequest })),
           }
           channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after, listeners)
           dispatch(startEventsSuccess(id, { silent }))
@@ -204,7 +199,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       },
     }),
     createLogic({
-      type: [GET_EVENT_MESSAGE_FAILURE, EVENT_STREAM_CLOSED],
+      type: EVENT_STREAM_CLOSED,
       cancelType: [START_EVENTS_SUCCESS, GET_EVENT_MESSAGE_SUCCESS, STOP_EVENTS],
       warnTimeout: 0,
       validate: ({ getState, action = {} }, allow, reject) => {
