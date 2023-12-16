@@ -18,7 +18,44 @@ import Token from '../../util/token'
 
 import { notify, newQueuedListeners, EVENTS, MESSAGE_TYPES, INITIAL_LISTENERS } from './shared'
 
-const newSubscription = (unsubscribe, originalListeners, resolve, reject, resolveClose) => {
+export class ConnectionError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'ConnectionError'
+  }
+}
+
+export class ConnectionClosedError extends ConnectionError {
+  constructor(message, code) {
+    super(message)
+    this.name = 'ConnectionClosedError'
+    this.code = code
+  }
+}
+
+export class ConnectionTimeoutError extends ConnectionError {
+  constructor(message) {
+    super(message)
+    this.name = 'ConnectionTimeoutError'
+  }
+}
+
+export class ProtocolError extends Error {
+  constructor(error) {
+    super(error.message)
+    this.name = 'ProtocolError'
+    this.code = error.code
+    this.details = error.details
+  }
+}
+
+const newSubscription = (
+  unsubscribe,
+  originalListeners,
+  resolveSubscribe,
+  rejectSubscribe,
+  resolveClose,
+) => {
   let closeRequested = false
   const [open, listeners] = newQueuedListeners(originalListeners)
   const externalSubscription = {
@@ -31,25 +68,25 @@ const newSubscription = (unsubscribe, originalListeners, resolve, reject, resolv
   return {
     onError: err => {
       notify(listeners[EVENTS.ERROR], err)
-      // If an error occurs while we are trying to subscribe, we should reject
-      // the promise in order to propagate the implicit subscription failure.
-      reject(err)
+
+      rejectSubscribe(err)
     },
     onClose: closeEvent => {
       notify(listeners[EVENTS.CLOSE], closeRequested)
+
+      rejectSubscribe(new ConnectionClosedError('WebSocket connection closed', closeEvent.code))
       resolveClose()
-      // If the connection has been closed while we are trying subscribe, we should
-      // reject the promise in order to propagate the implicit subscription failure.
-      reject(new Error(`WebSocket connection closed unexpectedly with code ${closeEvent.code}`))
     },
     onMessage: dataParsed => {
       if (dataParsed.type === MESSAGE_TYPES.SUBSCRIBE) {
-        // Resolve the promise after the subscription confirmation message.
-        resolve(externalSubscription)
+        resolveSubscribe(externalSubscription)
       }
 
       if (dataParsed.type === MESSAGE_TYPES.ERROR) {
-        notify(listeners[EVENTS.ERROR], dataParsed.error)
+        const err = new ProtocolError(dataParsed.error)
+        notify(listeners[EVENTS.ERROR], err)
+
+        rejectSubscribe(err)
       }
 
       if (dataParsed.type === MESSAGE_TYPES.PUBLISH) {
@@ -58,6 +95,7 @@ const newSubscription = (unsubscribe, originalListeners, resolve, reject, resolv
 
       if (dataParsed.type === MESSAGE_TYPES.UNSUBSCRIBE) {
         notify(listeners[EVENTS.CLOSE], closeRequested)
+
         resolveClose()
       }
     },
@@ -69,7 +107,7 @@ const newInstance = (wsInstance, onClose) => {
 
   // Broadcast connection errors to all subscriptions.
   wsInstance.addEventListener('error', () => {
-    const err = new Error('Error in WebSocket connection')
+    const err = new ConnectionError('WebSocket connection error')
     for (const subscription of Object.values(subscriptions)) {
       subscription.onError(err)
     }
@@ -165,6 +203,20 @@ const state = newStore()
 /**
  * Opens a new stream.
  *
+ * Implementation guarantees:
+ * - No events will be sent to the listeners before the `open` function is called.
+ * - No events will be sent to the listeners after the `close` function is called.
+ * - The `close` function will resolve after all events have been sent to the listeners.
+ * - The `close` function does not throw any errors.
+ * - The `close` function can be called multiple times.
+ * - The `open` function can be called multiple times.
+ * - The `open` function does not throw any errors, as long as the event listeners do not throw.
+ * - No `message` event will follow an `error` event.
+ * - No `message` event will follow a `close` event.
+ * - No `error` event will follow a `close` event.
+ * - No `error` event will follow another `error` event.
+ * - No `close` event will follow another `close` event.
+ *
  * @async
  * @param {object} payload -  - The body of the initial request.
  * @param {string} baseUrl - The stream baseUrl.
@@ -225,32 +277,44 @@ export default async (
   const tokenParsed = typeof token === 'function' ? `${(await token()).access_token}` : token
   const baseUrlParsed = baseUrl.replace('http', 'ws')
 
-  return await Promise.race([
-    new Promise((resolve, reject) => {
-      let instance = state.getInstance(url)
-      // Open up the WebSocket connection if it doesn't exist.
-      if (!instance) {
-        instance = state.setInstance(
-          url,
-          new WebSocket(`${baseUrlParsed}${endpoint}`, [
-            'ttn.lorawan.v3.console.internal.events.v1',
-            `ttn.lorawan.v3.header.authorization.bearer.${tokenParsed}`,
-          ]),
-        )
-      }
-
-      // Add the new subscription to the subscriptions object.
-      // Also add the resolver functions to the subscription object to be able
-      // to resolve the promise after the subscription confirmation message.
-      instance.subscribe(
-        subscriptionId,
-        subscriptionPayload,
-        unsubscribePayload,
-        filledListeners,
-        resolve,
-        reject,
+  const subscribe = new Promise((resolve, reject) => {
+    let instance = state.getInstance(url)
+    // Open up the WebSocket connection if it doesn't exist.
+    if (!instance) {
+      instance = state.setInstance(
+        url,
+        new WebSocket(`${baseUrlParsed}${endpoint}`, [
+          'ttn.lorawan.v3.console.internal.events.v1',
+          `ttn.lorawan.v3.header.authorization.bearer.${tokenParsed}`,
+        ]),
       )
-    }),
-    new Promise((_resolve, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
-  ])
+    }
+
+    // Add the new subscription to the subscriptions object.
+    // Also add the resolver functions to the subscription object to be able
+    // to resolve the promise after the subscription confirmation message.
+    instance.subscribe(
+      subscriptionId,
+      subscriptionPayload,
+      unsubscribePayload,
+      filledListeners,
+      resolve,
+      reject,
+    )
+  })
+
+  try {
+    return await Promise.race([
+      subscribe,
+      new Promise((_resolve, reject) =>
+        setTimeout(() => reject(new ConnectionTimeoutError('Timed out')), timeout),
+      ),
+    ])
+  } catch (err) {
+    subscribe.then(
+      subscription => subscription.close(),
+      () => {},
+    )
+    throw err
+  }
 }

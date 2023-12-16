@@ -150,6 +150,7 @@ const createNamedEventReducer = (reducerName = '') => {
             : state.events),
           error: action.error,
           status: CONNECTION_STATUS.DISCONNECTED,
+          interrupted: true,
         }
       case GET_EVENT_FAILURE:
         return {
