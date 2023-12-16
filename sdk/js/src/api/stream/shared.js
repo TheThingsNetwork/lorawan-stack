@@ -57,6 +57,7 @@ export const newQueuedListeners = listeners => {
       for (const [event, args] of queue) {
         notify(listeners[event], ...args)
       }
+      queue.splice(0, queue.length)
     },
     queuedListeners,
   ]

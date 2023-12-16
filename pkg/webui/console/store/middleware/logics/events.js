@@ -19,12 +19,6 @@ import CONNECTION_STATUS from '@console/constants/connection-status'
 import EVENT_TAIL from '@console/constants/event-tail'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
-import {
-  isUnauthenticatedError,
-  isPermissionDeniedError,
-  isNetworkError,
-  isTimeoutError,
-} from '@ttn-lw/lib/errors/utils'
 import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { SET_CONNECTION_STATUS, setStatusChecking } from '@ttn-lw/lib/store/actions/status'
 import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
@@ -144,10 +138,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
           dispatch(startEventsSuccess(id, { silent }))
           channel.open()
         } catch (error) {
-          if (
-            error instanceof TokenError &&
-            (isUnauthenticatedError(error?.cause) || isPermissionDeniedError(error?.cause))
-          ) {
+          if (error instanceof TokenError) {
             // The user is no longer authenticated; reinitiate the auth flow
             // by refreshing the page.
             window.location.reload()
@@ -180,16 +171,14 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       },
       process: async ({ action }, dispatch, done) => {
         if (action.type === START_EVENTS_FAILURE) {
-          if (action.error?.message === 'timeout') {
-            // Set the connection status to `checking` to trigger connection checks
-            // and detect possible offline state.
-            dispatch(setStatusChecking())
+          // Set the connection status to `checking` to trigger connection checks
+          // and detect possible offline state.
+          dispatch(setStatusChecking())
 
-            // In case of a network error, the connection could not be closed
-            // since the network connection is disrupted. We can regard this
-            // as equivalent to a closed connection.
-            return done()
-          }
+          // In case of a network error, the connection could not be closed
+          // since the network connection is disrupted. We can regard this
+          // as equivalent to a closed connection.
+          return done()
         }
         if (action.type === STOP_EVENTS && Boolean(channel)) {
           // Close the connection if it wasn't closed already.
@@ -284,18 +273,9 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
     createLogic({
       type: SET_EVENT_FILTER,
       process: async ({ action }, dispatch, done) => {
-        if (channel) {
-          try {
-            await channel.close()
-          } catch (error) {
-            if (isNetworkError(error) || isTimeoutError(action.payload)) {
-              dispatch(setStatusChecking())
-            } else {
-              throw error
-            }
-          } finally {
-            dispatch(startEvents(action.id, { silent: true }))
-          }
+        if (Boolean(channel)) {
+          await channel.close()
+          dispatch(startEvents(action.id, { silent: true }))
         }
         done()
       },
