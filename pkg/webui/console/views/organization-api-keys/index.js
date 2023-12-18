@@ -36,7 +36,7 @@ import { mayViewOrEditOrganizationApiKeys } from '@console/lib/feature-checks'
 const OrganizationApiKeys = () => {
   const { orgId } = useParams()
 
-  useBreadcrumbs('org.single.api-keys', [
+  useBreadcrumbs('orgs.single.api-keys', [
     {
       path: `/organizations/${orgId}/api-keys`,
       content: sharedMessages.apiKeys,

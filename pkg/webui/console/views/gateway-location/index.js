@@ -30,7 +30,7 @@ import { mayViewOrEditGatewayLocation } from '@console/lib/feature-checks'
 const GatewayLocation = () => {
   const { gtwId } = useParams()
 
-  useBreadcrumbs('gateway.single.data', [
+  useBreadcrumbs('gtws.single.data', [
     {
       path: `/gateways/${gtwId}/location`,
       content: sharedMessages.location,

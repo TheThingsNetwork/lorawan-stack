@@ -73,9 +73,7 @@ const PortalledBreadcrumbs = ({ className, ...rest }) => {
       nodes.push(
         ReactDom.createPortal(
           <div className={classnames(className, style.breadcrumbsContainer)}>
-            <Container>
-              <Breadcrumbs {...rest} />
-            </Container>
+            <Breadcrumbs {...rest} />
           </div>,
           element,
         ),
