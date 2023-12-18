@@ -196,9 +196,9 @@ message RelayParameters {
     option (validate.required) = true;
 
     // Parameters related to a relay which is serving end devices.
-    ServingRelayParameters serving = 25;
+    ServingRelayParameters serving = 1;
     // Parameters related to an end device served by a relay.
-    ServedRelayParameters served = 26;
+    ServedRelayParameters served = 2;
   }
 }
 
