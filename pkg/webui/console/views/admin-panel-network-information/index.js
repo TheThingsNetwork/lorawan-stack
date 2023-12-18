@@ -14,7 +14,6 @@
 
 import React from 'react'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -31,13 +30,12 @@ import { getUsersList } from '@console/store/actions/users'
 import { getOrganizationsList } from '@console/store/actions/organizations'
 
 const NetworkInformation = () => {
-  useBreadcrumbs(
-    'admin-panel.network-information',
-    <Breadcrumb
-      path={`/admin-panel/network-information`}
-      content={sharedMessages.networkInformation}
-    />,
-  )
+  useBreadcrumbs('admin-panel.network-information', [
+    {
+      path: `/admin-panel/network-information`,
+      content: sharedMessages.networkInformation,
+    },
+  ])
 
   const requestActions = [
     getApplicationsList(),

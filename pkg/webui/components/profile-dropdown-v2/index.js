@@ -19,6 +19,7 @@ import Icon from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown-v2'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
 import Button from '@ttn-lw/components/button-v2'
+import style from '@ttn-lw/components/button-v2/button.styl'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -54,8 +55,13 @@ const ProfileDropdown = props => {
     >
       {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
       <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
-      <Icon icon={expanded ? 'expand_less' : 'expand_more'} />
-      {expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
+      <Icon
+        className={classnames(style.arrowIcon, {
+          [style['arrow-icon-expanded']]: expanded,
+        })}
+        icon="expand_more"
+      />
+      <Dropdown open={expanded}>{children}</Dropdown>
     </Button>
   )
 }

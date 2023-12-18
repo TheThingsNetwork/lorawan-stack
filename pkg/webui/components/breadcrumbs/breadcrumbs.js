@@ -13,33 +13,54 @@
 // limitations under the License.
 
 import React from 'react'
-import ReactDom from 'react-dom'
 import classnames from 'classnames'
 import { Container } from 'react-grid-system'
+import ReactDom from 'react-dom'
+
+import Link from '@ttn-lw/components/link'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './breadcrumbs.styl'
 
 const Breadcrumbs = ({ className, breadcrumbs }) => (
-  <nav className={classnames(className, style.breadcrumbs)}>
-    {breadcrumbs.map((component, index) =>
-      React.cloneElement(component, {
-        key: index,
-        isLast: index === breadcrumbs.length - 1,
-      }),
+  <div className={classnames(className, style.breadcrumbs, 'd-flex', 'al-center', 'gap-cs-xs')}>
+    {breadcrumbs.map((b, index) =>
+      index !== breadcrumbs.length - 1 ? (
+        <React.Fragment key={b.id}>
+          <Link to={b.path} secondary className={style.link}>
+            <Message content={b.content} />
+          </Link>
+          <Icon icon="arrow_forward_ios" small className={style['arrow-icon']} />
+        </React.Fragment>
+      ) : (
+        <Message
+          key={b.id}
+          content={b.content}
+          component="p"
+          className={classnames(style.last, 'm-0')}
+        />
+      ),
     )}
-  </nav>
+  </div>
 )
 
 Breadcrumbs.propTypes = {
-  /** A list of breadcrumb elements. */
-  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.element])),
+  /** An array of breadcrumbs. */
+  breadcrumbs: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      path: PropTypes.string.isRequired,
+      content: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
   className: PropTypes.string,
 }
 
 Breadcrumbs.defaultProps = {
-  breadcrumbs: undefined,
   className: undefined,
 }
 

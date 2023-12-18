@@ -21,7 +21,6 @@ import { GATEWAY } from '@console/constants/entities'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -36,10 +35,12 @@ import { selectApiKeyById } from '@console/store/selectors/api-keys'
 const GatewayApiKeyEditInner = () => {
   const { gtwId, apiKeyId } = useParams()
 
-  useBreadcrumbs(
-    'gtws.single.api-keys.edit',
-    <Breadcrumb path={`/gateways/${gtwId}/api-keys/${apiKeyId}`} content={sharedMessages.edit} />,
-  )
+  useBreadcrumbs('gtws.single.api-keys.edit', [
+    {
+      path: `/gateways/${gtwId}/api-keys/${apiKeyId}`,
+      content: sharedMessages.edit,
+    },
+  ])
 
   return (
     <Container>

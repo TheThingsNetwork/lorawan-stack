@@ -18,7 +18,6 @@ import { useParams } from 'react-router-dom'
 
 import { ORGANIZATION } from '@console/constants/entities'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -29,10 +28,12 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 const OrganizationApiKeyAdd = () => {
   const { orgId } = useParams()
 
-  useBreadcrumbs(
-    'orgs.single.api-keys.add',
-    <Breadcrumb path={`/organizations/${orgId}/api-keys/add`} content={sharedMessages.add} />,
-  )
+  useBreadcrumbs('orgs.single.api-keys.add', [
+    {
+      path: `/organizations/${orgId}/api-keys/add`,
+      content: sharedMessages.add,
+    },
+  ])
 
   return (
     <Container>

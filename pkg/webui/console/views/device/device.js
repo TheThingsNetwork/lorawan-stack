@@ -18,7 +18,6 @@ import { useLocation, useParams, Routes, Route } from 'react-router-dom'
 import { Col, Row, Container } from 'react-grid-system'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Tabs from '@ttn-lw/components/tabs'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -78,10 +77,12 @@ const Device = () => {
     ? location.pathname
     : 'messaging'
 
-  useBreadcrumbs(
-    'apps.single.devices.single',
-    <Breadcrumb path={`/applications/${appId}/devices/${devId}`} content={name || devId} />,
-  )
+  useBreadcrumbs('apps.single.devices.single', [
+    {
+      path: `/applications/${appId}/devices/${devId}`,
+      content: name || devId,
+    },
+  ])
 
   const tabs = [
     { title: sharedMessages.overview, name: 'overview', link: basePath },

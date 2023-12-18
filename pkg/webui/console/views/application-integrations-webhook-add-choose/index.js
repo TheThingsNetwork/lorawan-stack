@@ -23,7 +23,6 @@ import BlankWebhookImg from '@assets/misc/blank-webhook.svg'
 import PageTitle from '@ttn-lw/components/page-title'
 import Link from '@ttn-lw/components/link'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -87,13 +86,12 @@ const WebhookChooser = () => {
 const ApplicationWebhookAddChooser = () => {
   const { appId } = useParams()
 
-  useBreadcrumbs(
-    'apps.single.integrations.webhooks.add.from-template',
-    <Breadcrumb
-      path={`/applications/${appId}/integrations/webhooks/add/template`}
-      content={sharedMessages.add}
-    />,
-  )
+  useBreadcrumbs('apps.single.integrations.webhooks.add.from-template', [
+    {
+      path: `/applications/${appId}/integrations/webhooks/add/template`,
+      content: sharedMessages.add,
+    },
+  ])
 
   return (
     <Routes>

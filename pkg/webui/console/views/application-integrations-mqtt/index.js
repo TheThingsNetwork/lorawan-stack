@@ -19,7 +19,6 @@ import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import DataSheet from '@ttn-lw/components/data-sheet'
 import Button from '@ttn-lw/components/button'
@@ -64,10 +63,12 @@ const ApplicationMqtt = () => {
   const [apiKey, setApiKey] = useState()
   const dispatch = useDispatch()
 
-  useBreadcrumbs(
-    'apps.single.integrations.mqtt',
-    <Breadcrumb path={`/applications/${appId}/integrations/mqtt`} content={sharedMessages.mqtt} />,
-  )
+  useBreadcrumbs('apps.single.integrations.mqtt', [
+    {
+      path: `/applications/${appId}/integrations/mqtt`,
+      content: sharedMessages.mqtt,
+    },
+  ])
 
   const handleGeneratePasswordClick = useCallback(async () => {
     const key = {

@@ -17,7 +17,6 @@ import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import WithRootClass from '@ttn-lw/lib/components/with-root-class'
@@ -35,10 +34,12 @@ const m = defineMessages({
 const Data = () => {
   const { orgId } = useParams()
 
-  useBreadcrumbs(
-    'orgs.single.data',
-    <Breadcrumb path={`/organizations/${orgId}/data`} content={sharedMessages.liveData} />,
-  )
+  useBreadcrumbs('orgs.single.data', [
+    {
+      path: `/organizations/${orgId}/data`,
+      content: sharedMessages.liveData,
+    },
+  ])
 
   return (
     <WithRootClass className={style.stageFlex} id="stage">

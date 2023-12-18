@@ -66,20 +66,21 @@ const buttonChildren = props => {
       {dropdownItems ? (
         isHoverDropdown ? (
           <div>
-            {expanded ? (
-              <Dropdown className={classnames(style.dropdown, dropdownClassName)}>
-                {dropdownItems}
-              </Dropdown>
-            ) : null}
+            <Dropdown className={classnames(style.dropdown, dropdownClassName)} open={expanded}>
+              {dropdownItems}
+            </Dropdown>
           </div>
         ) : (
           <>
-            <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />
-            {expanded ? (
-              <Dropdown className={classnames(style.dropdown, dropdownClassName)}>
-                {dropdownItems}
-              </Dropdown>
-            ) : null}
+            <Icon
+              className={classnames(style.arrowIcon, {
+                [style['arrow-icon-expanded']]: expanded,
+              })}
+              icon="expand_more"
+            />
+            <Dropdown className={classnames(style.dropdown, dropdownClassName)} open={expanded}>
+              {dropdownItems}
+            </Dropdown>
           </>
         )
       ) : null}

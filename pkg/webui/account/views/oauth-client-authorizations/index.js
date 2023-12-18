@@ -15,7 +15,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
@@ -28,10 +27,12 @@ import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const OAuthClientAuthorizations = () => {
-  useBreadcrumbs(
-    'client-authorizations',
-    <Breadcrumb path="/client-authorizations" content={sharedMessages.oauthClientAuthorizations} />,
-  )
+  useBreadcrumbs('client-authorizations', [
+    {
+      path: '/client-authorizations',
+      content: sharedMessages.oauthClientAuthorizations,
+    },
+  ])
 
   return (
     <Routes>

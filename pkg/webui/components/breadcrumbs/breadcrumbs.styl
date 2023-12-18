@@ -13,15 +13,9 @@
 // limitations under the License.
 
 .breadcrumbs
-  color: $tc-subtle-gray
-  height: $breadcrumbs-bar-height
-  display: flex
-  align-items: center
   overflow: hidden
-
   +media-query($bp.s)
     overflow: auto
-    margin-right: $ls.xxs * -1
     scrollbar-width: none
 
     &::-webkit-scrollbar
@@ -31,3 +25,14 @@
     border-normal('bottom')
     box-sizing: border-box
     height: $breadcrumbs-bar-height
+
+.link
+  text-decoration: none
+
+.arrow-icon
+  display: block
+  color: $c['grey-400']
+
+.last
+  color: $tc-deep-gray
+  font-weight: $fw.bold

@@ -15,7 +15,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -32,10 +31,12 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { apiKeyPath as apiKeyPathRegexp } from '@console/lib/regexp'
 
 const UserApiKeys = () => {
-  useBreadcrumbs(
-    'usr.single.api-keys',
-    <Breadcrumb path={`/user/api-keys`} content={sharedMessages.personalApiKeys} />,
-  )
+  useBreadcrumbs('usr.single.api-keys', [
+    {
+      path: `/user/api-keys`,
+      content: sharedMessages.personalApiKeys,
+    },
+  ])
 
   return (
     <ErrorView errorRender={SubViewError}>

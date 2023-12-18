@@ -17,7 +17,6 @@ import { useSelector } from 'react-redux'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Tab from '@ttn-lw/components/tabs'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -36,13 +35,12 @@ const DevicePayloadFormatters = () => {
   const appId = useSelector(selectSelectedApplicationId)
   const devId = useSelector(selectSelectedDeviceId)
 
-  useBreadcrumbs(
-    'device.single.payload-formatters',
-    <Breadcrumb
-      path={`/applications/${appId}/devices/${devId}/payload-formatters`}
-      content={sharedMessages.payloadFormatters}
-    />,
-  )
+  useBreadcrumbs('device.single.payload-formatters', [
+    {
+      path: `/applications/${appId}/devices/${devId}/payload-formatters`,
+      content: sharedMessages.payloadFormatters,
+    },
+  ])
 
   const tabs = [
     { title: sharedMessages.uplink, name: 'uplink', link: 'uplink' },

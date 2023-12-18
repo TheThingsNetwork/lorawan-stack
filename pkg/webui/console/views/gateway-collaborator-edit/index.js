@@ -20,7 +20,6 @@ import { useSelector } from 'react-redux'
 import { GATEWAY } from '@console/constants/entities'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -34,13 +33,12 @@ import { selectCollaboratorById } from '@ttn-lw/lib/store/selectors/collaborator
 const GatewayCollaboratorEditInner = () => {
   const { gtwId, collaboratorId, collaboratorType } = useParams()
 
-  useBreadcrumbs(
-    'gtws.single.collaborators.edit',
-    <Breadcrumb
-      path={`/gateways/${gtwId}/collaborators/${collaboratorType}/${collaboratorId}`}
-      content={sharedMessages.edit}
-    />,
-  )
+  useBreadcrumbs('gtws.single.collaborators.edit', [
+    {
+      path: `/gateways/${gtwId}/collaborators/${collaboratorType}/${collaboratorId}`,
+      content: sharedMessages.edit,
+    },
+  ])
 
   return (
     <Container>

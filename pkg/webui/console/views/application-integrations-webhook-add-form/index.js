@@ -20,7 +20,6 @@ import { useSelector } from 'react-redux'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
@@ -49,13 +48,12 @@ const ApplicationWebhookAddForm = () => {
     breadcrumbContent = webhookTemplate.name
   }
 
-  useBreadcrumbs(
-    'apps.single.integrations.webhooks.various.add',
-    <Breadcrumb
-      path={`/applications/${appId}/integrations/webhooks/add/template/${templateId}`}
-      content={breadcrumbContent}
-    />,
-  )
+  useBreadcrumbs('apps.single.integrations.webhooks.various.add', [
+    {
+      path: `/applications/${appId}/integrations/webhooks/add/template/${templateId}`,
+      content: breadcrumbContent,
+    },
+  ])
 
   const navigateToList = useCallback(
     () => navigate(`/applications/${appId}/integrations/webhooks`),
