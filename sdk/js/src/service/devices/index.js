@@ -19,12 +19,11 @@ import traverse from 'traverse'
 
 import { notify, EVENTS } from '../../api/stream/shared'
 import Marshaler from '../../util/marshaler'
-import subscribeToWebSocketStream from '../../api/stream/subscribeToWebSocketStream'
+import subscribeToWebSocketStreams from '../../api/stream/subscribeToWebSocketStreams'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import DownlinkQueue from '../downlink-queue'
 import { STACK_COMPONENTS_MAP } from '../../util/constants'
 import DeviceClaim from '../claim'
-import combineStreams from '../../util/combine-streams'
 
 import Repository from './repository'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
@@ -680,7 +679,7 @@ class Devices {
 
   // Events Stream
 
-  async openStream(identifiers, names, tail, after) {
+  async openStream(identifiers, names, tail, after, listeners) {
     const payload = {
       identifiers: identifiers.map(ids => ({
         device_ids: ids,
@@ -698,11 +697,8 @@ class Devices {
     const baseUrls = new Set(
       distinctComponents.map(component => this._stackConfig.getComponentUrlByName(component)),
     )
-
-    const streams = [...baseUrls].map(baseUrl => subscribeToWebSocketStream(payload, baseUrl))
-
     // Combine all stream sources to one subscription generator.
-    return combineStreams(streams)
+    return subscribeToWebSocketStreams(payload, [...baseUrls], listeners)
   }
 
   async simulateUplink(applicationId, deviceId, uplink) {

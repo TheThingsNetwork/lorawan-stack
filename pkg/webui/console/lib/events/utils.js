@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ingestError } from '@ttn-lw/lib/errors/utils'
+
 import { createNetworkErrorEvent, createUnknownErrorEvent } from './definitions'
 
 export const defineSyntheticEvent = name => data => ({
@@ -23,13 +25,30 @@ export const defineSyntheticEvent = name => data => ({
   data,
 })
 
+const convertError = error => {
+  if (error instanceof Error) {
+    return {
+      ...error,
+      message: error.message,
+      name: error.name,
+      // The stack is omitted intentionally, as it is not relevant for a user.
+    }
+  }
+  return error
+}
+
 export const createSyntheticEventFromError = error => {
   if (error instanceof Error) {
-    const errorString = error.toString()
-    if (error.message === 'network error' || error.message === 'Error in body stream') {
-      return createNetworkErrorEvent({ error: errorString })
+    if (
+      error.name === 'ConnectionError' ||
+      error.name === 'ConnectionClosedError' ||
+      error.name === 'ConnectionTimeoutError'
+    ) {
+      return createNetworkErrorEvent({ error: convertError(error) })
+    } else if (error.name === 'ProtocolError') {
+      ingestError(error.error)
+      return createUnknownErrorEvent({ error: convertError(error) })
     }
-
-    return createUnknownErrorEvent({ error: errorString })
+    return createUnknownErrorEvent({ error: convertError(error) })
   }
 }

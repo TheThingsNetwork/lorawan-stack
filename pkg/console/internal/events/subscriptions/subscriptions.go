@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights/rightsutil"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -141,7 +142,7 @@ func (s *subscriptions) Subscribe(
 		return err
 	}
 	ch := make(chan events.Event, channelSize(tail))
-	ctx, cancel := context.WithCancelCause(s.ctx)
+	ctx, cancel := errorcontext.New(s.ctx)
 	defer func() {
 		if err != nil {
 			cancel(err)

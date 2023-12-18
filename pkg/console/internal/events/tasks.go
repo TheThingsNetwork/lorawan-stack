@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/eventsmux"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/protocol"
@@ -73,6 +74,24 @@ func makeWriteTask(conn *websocket.Conn, m eventsmux.Interface, cancel func(erro
 				return ctx.Err()
 			case response := <-m.Responses():
 				if err := wsjson.Write(ctx, conn, response); err != nil {
+					return err
+				}
+			}
+		}
+	}
+}
+
+func makePingTask(conn *websocket.Conn, cancel func(error), period time.Duration) func(context.Context) error {
+	return func(ctx context.Context) (err error) {
+		ticker := time.NewTicker(period)
+		defer ticker.Stop()
+		defer func() { cancel(err) }()
+		for {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-ticker.C:
+				if err := conn.Ping(ctx); err != nil {
 					return err
 				}
 			}

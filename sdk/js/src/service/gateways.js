@@ -15,9 +15,8 @@
 import autoBind from 'auto-bind'
 
 import Marshaler from '../util/marshaler'
-import subscribeToWebSocketStream from '../api/stream/subscribeToWebSocketStream'
+import subscribeToWebSocketStreams from '../api/stream/subscribeToWebSocketStreams'
 import { STACK_COMPONENTS_MAP } from '../util/constants'
-import combineStreams from '../util/combine-streams'
 
 import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
@@ -240,7 +239,7 @@ class Gateways {
 
   // Events Stream
 
-  async openStream(identifiers, names, tail, after) {
+  async openStream(identifiers, names, tail, after, listeners) {
     const payload = {
       identifiers: identifiers.map(id => ({
         gateway_ids: { gateway_id: id },
@@ -261,11 +260,8 @@ class Gateways {
     const baseUrls = new Set(
       distinctComponents.map(component => this._stackConfig.getComponentUrlByName(component)),
     )
-
-    const streams = [...baseUrls].map(baseUrl => subscribeToWebSocketStream(payload, baseUrl))
-
     // Combine all stream sources to one subscription generator.
-    return combineStreams(streams)
+    return subscribeToWebSocketStreams(payload, [...baseUrls], listeners)
   }
 
   // Gateway Configuration Server.

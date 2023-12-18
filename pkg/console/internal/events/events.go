@@ -19,6 +19,7 @@ import (
 	"context"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -26,8 +27,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/eventsmux"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/subscriptions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -40,6 +43,9 @@ import (
 const (
 	authorizationProtocolPrefix = "ttn.lorawan.v3.header.authorization.bearer."
 	protocolV1                  = "ttn.lorawan.v3.console.internal.events.v1"
+
+	pingPeriod = time.Minute
+	pingJitter = 0.1
 )
 
 // Component is the interface of the component to the events API handler.
@@ -95,7 +101,7 @@ func (h *eventsHandler) handleEvents(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close(websocket.StatusNormalClosure, "main task closed")
 
-	ctx, cancel := context.WithCancelCause(ctx)
+	ctx, cancel := errorcontext.New(ctx)
 	defer cancel(nil)
 
 	var wg sync.WaitGroup
@@ -108,6 +114,7 @@ func (h *eventsHandler) handleEvents(w http.ResponseWriter, r *http.Request) {
 		"console_events_mux":   makeMuxTask(m, cancel),
 		"console_events_read":  makeReadTask(conn, m, rateLimit, cancel),
 		"console_events_write": makeWriteTask(conn, m, cancel),
+		"console_events_ping":  makePingTask(conn, cancel, random.Jitter(pingPeriod, pingJitter)),
 	} {
 		wg.Add(1)
 		h.component.StartTask(&task.Config{
