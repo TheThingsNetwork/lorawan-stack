@@ -46,7 +46,8 @@ const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
       }
     }
 
-    positionDropdown()
+    setTimeout(() => positionDropdown(), 200)
+
     window.addEventListener('scroll', positionDropdown)
     window.addEventListener('resize', positionDropdown)
 
