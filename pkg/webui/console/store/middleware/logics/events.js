@@ -91,8 +91,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       },
       validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
-          reject()
-          return
+          return reject()
         }
 
         const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
@@ -104,11 +103,10 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING
         if (connected || connecting || !isOnline) {
-          reject()
-          return
+          return reject()
         }
 
-        allow(action)
+        return allow(action)
       },
       process: async ({ getState, action }, dispatch) => {
         const { id, silent } = action
@@ -152,8 +150,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       type: [STOP_EVENTS, START_EVENTS_FAILURE],
       validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
-          reject()
-          return
+          return reject()
         }
 
         const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
@@ -163,11 +160,10 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING
         if (!connected && !connecting) {
-          reject()
-          return
+          return reject()
         }
 
-        allow(action)
+        return allow(action)
       },
       process: async ({ action }, dispatch, done) => {
         if (action.type === START_EVENTS_FAILURE) {
@@ -184,7 +180,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
           // Close the connection if it wasn't closed already.
           await channel.close()
         }
-        done()
+        return done()
       },
     }),
     createLogic({
@@ -193,8 +189,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       warnTimeout: 0,
       validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
-          reject()
-          return
+          return reject()
         }
 
         const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
@@ -204,11 +199,10 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const connected = status === CONNECTION_STATUS.CONNECTED
         const interrupted = selectEntityEventsInterrupted(getState(), id)
         if (!connected || interrupted) {
-          reject()
-          return
+          return reject()
         }
 
-        allow(action)
+        return allow(action)
       },
       process: ({ getState, action }, dispatch, done) => {
         const isOnline = selectIsOnlineStatus(getState())
@@ -227,11 +221,11 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
               dispatch(startEvents(action.id))
             } else {
               clearInterval(reconnector)
-              done()
+              return done()
             }
           }, 5000)
         } else {
-          done()
+          return done()
         }
       },
     }),
@@ -267,17 +261,18 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
           // If the app went offline, close the event stream.
         }
 
-        done()
+        return done()
       },
     }),
     createLogic({
       type: SET_EVENT_FILTER,
+      debounce: 250,
       process: async ({ action }, dispatch, done) => {
         if (Boolean(channel)) {
           await channel.close()
           dispatch(startEvents(action.id, { silent: true }))
         }
-        done()
+        return done()
       },
     }),
   ]

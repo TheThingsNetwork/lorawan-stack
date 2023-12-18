@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ingestError } from '@ttn-lw/lib/errors/utils'
+
 import { createNetworkErrorEvent, createUnknownErrorEvent } from './definitions'
 
 export const defineSyntheticEvent = name => data => ({
@@ -44,6 +46,7 @@ export const createSyntheticEventFromError = error => {
     ) {
       return createNetworkErrorEvent({ error: convertError(error) })
     } else if (error.name === 'ProtocolError') {
+      ingestError(error.error)
       return createUnknownErrorEvent({ error: convertError(error) })
     }
     return createUnknownErrorEvent({ error: convertError(error) })
