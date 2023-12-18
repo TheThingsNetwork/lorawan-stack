@@ -18,7 +18,6 @@ import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -57,13 +56,12 @@ const ApplicationPayloadFormatters = () => {
 const ApplicationPayloadFormattersInner = () => {
   const { appId } = useParams()
 
-  useBreadcrumbs(
-    'apps.single.payload-formatters',
-    <Breadcrumb
-      path={`/applications/${appId}/payload-formatters`}
-      content={sharedMessages.payloadFormatters}
-    />,
-  )
+  useBreadcrumbs('apps.single.payload-formatters', [
+    {
+      path: `/applications/${appId}/payload-formatters`,
+      content: sharedMessages.payloadFormatters,
+    },
+  ])
 
   return (
     <Container>

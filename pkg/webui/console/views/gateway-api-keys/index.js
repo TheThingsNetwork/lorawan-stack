@@ -15,7 +15,6 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -37,10 +36,12 @@ import { mayViewOrEditGatewayApiKeys } from '@console/lib/feature-checks'
 const GatewayApiKeys = () => {
   const { gtwId } = useParams()
 
-  useBreadcrumbs(
-    'gtws.single.api-keys',
-    <Breadcrumb path={`/gateways/${gtwId}/api-keys`} content={sharedMessages.apiKeys} />,
-  )
+  useBreadcrumbs('gtws.single.api-keys', [
+    {
+      path: `/gateways/${gtwId}/api-keys`,
+      content: sharedMessages.apiKeys,
+    },
+  ])
 
   return (
     <Require

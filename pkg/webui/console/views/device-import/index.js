@@ -18,7 +18,6 @@ import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Notification from '@ttn-lw/components/notification'
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -46,10 +45,12 @@ const m = defineMessages({
 
 const DeviceAddBulk = () => {
   const appId = useSelector(selectSelectedApplicationId)
-  useBreadcrumbs(
-    'devices.import',
-    <Breadcrumb path={`/applications/${appId}/devices/import`} content={sharedMessages.import} />,
-  )
+  useBreadcrumbs('devices.import', [
+    {
+      path: `/applications/${appId}/devices/import`,
+      content: sharedMessages.import,
+    },
+  ])
 
   const deviceTemplateFormats = useSelector(selectDeviceTemplateFormats)
   const deviceTemplateFormatsFetching = useSelector(selectDeviceTemplateFormatsFetching)

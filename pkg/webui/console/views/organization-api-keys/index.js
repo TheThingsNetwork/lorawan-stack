@@ -15,7 +15,6 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -37,10 +36,12 @@ import { mayViewOrEditOrganizationApiKeys } from '@console/lib/feature-checks'
 const OrganizationApiKeys = () => {
   const { orgId } = useParams()
 
-  useBreadcrumbs(
-    'org.single.api-keys',
-    <Breadcrumb path={`/organizations/${orgId}/api-keys`} content={sharedMessages.apiKeys} />,
-  )
+  useBreadcrumbs('org.single.api-keys', [
+    {
+      path: `/organizations/${orgId}/api-keys`,
+      content: sharedMessages.apiKeys,
+    },
+  ])
 
   return (
     <Require

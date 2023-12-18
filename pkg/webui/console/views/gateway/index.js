@@ -19,7 +19,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import gatewayIcon from '@assets/misc/gateway.svg'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import SideNavigation from '@ttn-lw/components/navigation/side'
 
@@ -108,7 +107,12 @@ const GatewayInner = () => {
 
   const gatewayName = gateway?.name || gtwId
 
-  useBreadcrumbs('gtws.single', <Breadcrumb path={`/gateways/${gtwId}`} content={gatewayName} />)
+  useBreadcrumbs('gtws.single', [
+    {
+      path: `/gateways/${gtwId}`,
+      content: gatewayName,
+    },
+  ])
 
   return (
     <>

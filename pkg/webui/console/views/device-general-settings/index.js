@@ -19,7 +19,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import tts from '@console/api/tts'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
 import Collapse from '@ttn-lw/components/collapse'
@@ -75,13 +74,12 @@ const DeviceGeneralSettings = () => {
   const jsConfig = selectJsConfig()
   const nsConfig = selectNsConfig()
 
-  useBreadcrumbs(
-    'device.general',
-    <Breadcrumb
-      path={`/applications/${appId}/devices/${devId}/general-settings`}
-      content={sharedMessages.generalSettings}
-    />,
-  )
+  useBreadcrumbs('device.general', [
+    {
+      path: `/applications/${appId}/devices/${devId}/general-settings`,
+      content: sharedMessages.generalSettings,
+    },
+  ])
 
   const handleSubmit = useCallback(
     async patch => dispatch(attachPromise(updateDevice(appId, devId, patch))),

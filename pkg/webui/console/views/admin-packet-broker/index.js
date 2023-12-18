@@ -16,7 +16,6 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
@@ -34,13 +33,12 @@ import PacketBroker from './admin-packet-broker'
 import NetworkRoutingPolicy from './network-routing-policy'
 
 const PacketBrokerRouter = () => {
-  useBreadcrumbs(
-    'admin-panel.packet-broker',
-    <Breadcrumb
-      path={'/admin-panel/packet-broker/routing-configuration'}
-      content={sharedMessages.packetBroker}
-    />,
-  )
+  useBreadcrumbs('admin-panel.packet-broker', [
+    {
+      path: '/admin-panel/packet-broker/routing-configuration',
+      content: sharedMessages.packetBroker,
+    },
+  ])
 
   return (
     <Require featureCheck={mayConfigurePacketBroker} otherwise={{ redirect: '/' }}>

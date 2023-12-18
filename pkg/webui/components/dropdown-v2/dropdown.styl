@@ -24,6 +24,14 @@ ul.dropdown
   min-width: 14rem
   z-index: $zi.dropdown
   margin: $cs.xxs 0 0
+  opacity: 0
+  visibility: hidden
+  transition: opacity 0.2s ease-in-out, visibility 0s linear 0.2s
+
+  &.open
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease-in-out, visibility 0s linear
 
   &.below
     bottom: auto
@@ -75,7 +83,6 @@ ul.dropdown
       reset-button()
 
     & > a.button, & > button.button
-      transition: color 0.2s ease-in-out
       box-sizing: border-box
       line-height: 1
       display: block
@@ -85,16 +92,14 @@ ul.dropdown
       min-height: 2.429rem
       &:not(.active)
         color: $c.grey-700
-        transition: color 0.2s ease-in-out
 
         .icon
           color: $c.grey-700
-          transition: color 0.2s ease-in-out
 
       &.active
         border-radius: $br.m
         background: $c.tts-primary-150
-        transition: background 0.2s ease-in-out
+        transition: background 0.1s ease-in-out
         color: $tc-deep-gray
 
         .icon
@@ -103,7 +108,7 @@ ul.dropdown
       &:hover
         color: $tc-deep-gray
         background: $c.tts-primary-150
-        transition: background 0.2s ease-in-out
+        transition: background 0.1s ease-in-out
         border-radius: $br.m
 
         .icon

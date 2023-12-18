@@ -20,7 +20,6 @@ import applicationIcon from '@assets/misc/application.svg'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import SideNavigation from '@ttn-lw/components/navigation/side'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -111,7 +110,12 @@ const ApplicationInner = () => {
   const stopStream = React.useCallback(id => dispatch(stopApplicationEventsStream(id)), [dispatch])
 
   useEffect(() => () => stopStream(appId), [appId, stopStream])
-  useBreadcrumbs('apps.single', <Breadcrumb path={`/applications/${appId}`} content={name} />)
+  useBreadcrumbs('apps.single', [
+    {
+      path: `/applications/${appId}`,
+      content: name,
+    },
+  ])
 
   return (
     <>

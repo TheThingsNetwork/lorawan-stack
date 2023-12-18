@@ -19,7 +19,6 @@ import { useParams } from 'react-router-dom'
 import { GATEWAY } from '@console/constants/entities'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ConsoleCollaboratorsForm from '@console/containers/collaborators-form'
@@ -29,10 +28,12 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 const GatewayCollaboratorAdd = () => {
   const { gtwId } = useParams()
 
-  useBreadcrumbs(
-    'gtws.single.collaborators.add',
-    <Breadcrumb path={`/gateways/${gtwId}/collaborators/add`} content={sharedMessages.add} />,
-  )
+  useBreadcrumbs('gtws.single.collaborators.add', [
+    {
+      path: `/gateways/${gtwId}/collaborators/add`,
+      content: sharedMessages.add,
+    },
+  ])
 
   return (
     <Container>

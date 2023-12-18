@@ -16,7 +16,6 @@ import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
@@ -39,10 +38,12 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 const Devices = () => {
   const appId = useSelector(selectSelectedApplicationId)
 
-  useBreadcrumbs(
-    'apps.single.devices',
-    <Breadcrumb path={`/applications/${appId}/devices`} content={sharedMessages.devices} />,
-  )
+  useBreadcrumbs('apps.single.devices', [
+    {
+      path: `/applications/${appId}/devices`,
+      content: sharedMessages.devices,
+    },
+  ])
 
   return (
     <Require

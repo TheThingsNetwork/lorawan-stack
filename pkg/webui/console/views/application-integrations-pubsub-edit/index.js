@@ -18,7 +18,6 @@ import { defineMessages } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 import toast from '@ttn-lw/components/toast'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -76,13 +75,12 @@ const EditPubsubInner = () => {
     dispatch(getPubsub(appId, pubsubId, pubsubEntitySelector))
   }, [dispatch, appId, pubsubId])
 
-  useBreadcrumbs(
-    'apps.single.integrations.edit',
-    <Breadcrumb
-      path={`/applications/${appId}/integrations/${pubsubId}`}
-      content={sharedMessages.edit}
-    />,
-  )
+  useBreadcrumbs('apps.single.integrations.edit', [
+    {
+      path: `/applications/${appId}/integrations/${pubsubId}`,
+      content: sharedMessages.edit,
+    },
+  ])
 
   const handleSubmit = useCallback(
     async patch => {

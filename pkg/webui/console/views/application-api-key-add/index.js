@@ -19,7 +19,6 @@ import { useParams } from 'react-router-dom'
 import { APPLICATION } from '@console/constants/entities'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import { ApiKeyCreateForm } from '@console/containers/api-key-form'
@@ -29,10 +28,12 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 const ApplicationApiKeyAdd = () => {
   const { appId } = useParams()
 
-  useBreadcrumbs(
-    'apps.single.api-keys.add',
-    <Breadcrumb path={`/applications/${appId}/api-keys/add`} content={sharedMessages.add} />,
-  )
+  useBreadcrumbs('apps.single.api-keys.add', [
+    {
+      path: `/applications/${appId}/api-keys/add`,
+      content: sharedMessages.add,
+    },
+  ])
 
   return (
     <Container>

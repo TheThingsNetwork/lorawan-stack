@@ -22,7 +22,6 @@ import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 import Notification from '@ttn-lw/components/notification'
 import PageTitle from '@ttn-lw/components/page-title'
 import toast from '@ttn-lw/components/toast'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import ErrorNotification from '@ttn-lw/components/error-notification'
 
@@ -57,13 +56,12 @@ const ApplicationPayloadFormatters = () => {
   const [type, setType] = useState(formatters.down_formatter || PAYLOAD_FORMATTER_TYPES.NONE)
   const dispatch = useDispatch()
 
-  useBreadcrumbs(
-    'apps.single.payload-formatters.uplink',
-    <Breadcrumb
-      path={`/applications/${appId}/payload-formatters/uplink`}
-      content={sharedMessages.uplink}
-    />,
-  )
+  useBreadcrumbs('apps.single.payload-formatters.uplink', [
+    {
+      path: `/applications/${appId}/payload-formatters/uplink`,
+      content: sharedMessages.uplink,
+    },
+  ])
 
   const onSubmit = useCallback(
     async values =>

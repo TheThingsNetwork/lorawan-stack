@@ -14,19 +14,30 @@
 
 import React from 'react'
 
-import Breadcrumb from './breadcrumb'
 import { Breadcrumbs } from './breadcrumbs'
 
 export default {
   title: 'Breadcrumbs',
-  component: [Breadcrumbs, Breadcrumb],
+  component: [Breadcrumbs],
 }
 
 export const Default = () => {
   const breadcrumbs = [
-    <Breadcrumb key="1" path="/applications" content="Applications" />,
-    <Breadcrumb key="2" path="/applications/test-app" content="test-app" />,
-    <Breadcrumb key="3" path="/applications/test-app/devices" content="Devices" />,
+    {
+      id: '1',
+      path: '/applications',
+      content: 'Applications',
+    },
+    {
+      id: '2',
+      path: '/applications/test-app',
+      content: 'test-app',
+    },
+    {
+      id: '3',
+      path: '/applications/test-app/devices',
+      content: 'Devices',
+    },
   ]
 
   return <Breadcrumbs breadcrumbs={breadcrumbs} />

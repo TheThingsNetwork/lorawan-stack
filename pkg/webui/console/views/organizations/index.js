@@ -15,7 +15,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -33,10 +32,12 @@ import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
 const Organizations = () => {
-  useBreadcrumbs(
-    'orgs',
-    <Breadcrumb path="/organizations" content={sharedMessages.organizations} />,
-  )
+  useBreadcrumbs('orgs', [
+    {
+      path: '/organizations',
+      content: sharedMessages.organizations,
+    },
+  ])
 
   return (
     <Require featureCheck={mayViewOrganizationsOfUser} otherwise={{ redirect: '/' }}>

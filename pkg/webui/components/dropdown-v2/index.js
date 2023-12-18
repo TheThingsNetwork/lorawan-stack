@@ -25,7 +25,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './dropdown.styl'
 
-const Dropdown = ({ className, children, larger, onItemsClick }) => {
+const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
   const ref = useRef(null)
   const [isBelow, setIsBelow] = useState(false)
   const [isOnRight, setIsOnRight] = useState(false)
@@ -64,6 +64,7 @@ const Dropdown = ({ className, children, larger, onItemsClick }) => {
         [style.above]: !isBelow,
         [style.right]: isOnRight,
         [style.left]: !isOnRight,
+        [style.open]: open,
       })}
       ref={ref}
     >
@@ -77,6 +78,7 @@ Dropdown.propTypes = {
   className: PropTypes.string,
   larger: PropTypes.bool,
   onItemsClick: PropTypes.func,
+  open: PropTypes.bool.isRequired,
 }
 
 Dropdown.defaultProps = {

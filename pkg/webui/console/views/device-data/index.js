@@ -16,7 +16,6 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -39,13 +38,12 @@ const Data = () => {
   const device = useSelector(selectSelectedDevice)
   const devId = useSelector(selectSelectedDeviceId)
 
-  useBreadcrumbs(
-    'device.single.data',
-    <Breadcrumb
-      path={`/applications/${appId}/devices/${devId}/data`}
-      content={sharedMessages.liveData}
-    />,
-  )
+  useBreadcrumbs('device.single.data', [
+    {
+      path: `/applications/${appId}/devices/${devId}/data`,
+      content: sharedMessages.liveData,
+    },
+  ])
 
   if (!device) {
     return <GenericNotFound />

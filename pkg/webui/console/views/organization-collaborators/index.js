@@ -15,7 +15,6 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -37,13 +36,12 @@ import { mayViewOrEditOrganizationCollaborators } from '@console/lib/feature-che
 const OrganizationCollaborators = () => {
   const { orgId } = useParams()
 
-  useBreadcrumbs(
-    'orgs.single.collaborators',
-    <Breadcrumb
-      path={`/organizations/${orgId}/collaborators`}
-      content={sharedMessages.collaborators}
-    />,
-  )
+  useBreadcrumbs('orgs.single.collaborators', [
+    {
+      path: `/organizations/${orgId}/collaborators`,
+      content: sharedMessages.collaborators,
+    },
+  ])
 
   return (
     <Require

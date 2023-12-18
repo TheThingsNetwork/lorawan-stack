@@ -18,7 +18,6 @@ import { useSelector } from 'react-redux'
 
 import { USER } from '@console/constants/entities'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -35,10 +34,12 @@ import { selectUserId } from '@account/store/selectors/user'
 const UserApiKeyAddInner = () => {
   const userId = useSelector(selectUserId)
 
-  useBreadcrumbs(
-    'usr.single.api-keys.add',
-    <Breadcrumb path={`/users/api-keys/add`} content={sharedMessages.add} />,
-  )
+  useBreadcrumbs('usr.single.api-keys.add', [
+    {
+      path: `/users/api-keys/add`,
+      content: sharedMessages.add,
+    },
+  ])
 
   return (
     <Container>

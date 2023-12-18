@@ -21,7 +21,6 @@ import AppAnimation from '@assets/animations/illustrations/app.json'
 import GatewayAnimation from '@assets/animations/illustrations/gateway.json'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -79,7 +78,12 @@ const Overview = () => {
   const appAnimationRef = useRef(null)
   const gatewayAnimationRef = useRef(null)
 
-  useBreadcrumbs('overview', <Breadcrumb path="/" content={sharedMessages.overview} />)
+  useBreadcrumbs('overview', [
+    {
+      path: '/',
+      content: sharedMessages.overview,
+    },
+  ])
 
   const handleAppChooserMouseEnter = useCallback(() => {
     appAnimationRef.current.setDirection(1)

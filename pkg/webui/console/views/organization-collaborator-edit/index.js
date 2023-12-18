@@ -21,7 +21,6 @@ import { ORGANIZATION } from '@console/constants/entities'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -34,13 +33,12 @@ import { getCollaborator } from '@ttn-lw/lib/store/actions/collaborators'
 const OrganizationCollaboratorEditInner = () => {
   const { orgId, collaboratorId } = useParams()
 
-  useBreadcrumbs(
-    'orgs.single.collaborators.edit',
-    <Breadcrumb
-      path={`/organizations/${orgId}/collaborators/user/${collaboratorId}`}
-      content={sharedMessages.edit}
-    />,
-  )
+  useBreadcrumbs('orgs.single.collaborators.edit', [
+    {
+      path: `/organizations/${orgId}/collaborators/user/${collaboratorId}`,
+      content: sharedMessages.edit,
+    },
+  ])
 
   return (
     <Container>

@@ -22,7 +22,6 @@ import LORA_CLOUD_GLS from '@console/constants/lora-cloud-gls'
 import LoRaCloudImage from '@assets/misc/lora-cloud.png'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Link from '@ttn-lw/components/link'
 import Collapse from '@ttn-lw/components/collapse'
@@ -62,13 +61,12 @@ const LoRaCloud = () => {
   const appId = useSelector(selectSelectedApplicationId)
   const selector = ['data']
 
-  useBreadcrumbs(
-    'apps.single.integrations.lora-cloud',
-    <Breadcrumb
-      path={`/applications/${appId}/integrations/lora-cloud`}
-      content={sharedMessages.loraCloud}
-    />,
-  )
+  useBreadcrumbs('apps.single.integrations.lora-cloud', [
+    {
+      path: `/applications/${appId}/integrations/lora-cloud`,
+      content: sharedMessages.loraCloud,
+    },
+  ])
 
   return (
     <Require
