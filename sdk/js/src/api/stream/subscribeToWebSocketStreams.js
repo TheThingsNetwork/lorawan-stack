@@ -93,7 +93,11 @@ export default async (
         try {
           const stream = await pendingStream
           await stream.close()
-        } catch {}
+        } catch {
+          // Only the pending stream promise may throw, as `close` does not throw.
+          // Although multiple streams may fail, we will rethrow only the first error
+          // and ignore the rest, as they are not really actionable.
+        }
       }),
     )
     throw error
