@@ -150,13 +150,12 @@ const createNamedEventReducer = (reducerName = '') => {
             : state.events),
           error: action.error,
           status: CONNECTION_STATUS.DISCONNECTED,
+          interrupted: true,
         }
       case GET_EVENT_FAILURE:
         return {
           ...state,
           ...addEvent(state, createSyntheticEventFromError(action.error)),
-          status: CONNECTION_STATUS.DISCONNECTED,
-          interrupted: true,
         }
       case PAUSE_EVENTS:
         return {

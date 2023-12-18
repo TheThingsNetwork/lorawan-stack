@@ -125,6 +125,10 @@ func TestMux(t *testing.T) { // nolint:gocyclo
 			unique.ID(ctx, appIDs): ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL),
 		}),
 	})
+	ctx = rights.NewContextWithAuthInfo(ctx, &ttnpb.AuthInfoResponse{
+		UniversalRights: ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL),
+		IsAdmin:         true,
+	})
 
 	subs := &mockSubscriptions{
 		ctx:       ctx,

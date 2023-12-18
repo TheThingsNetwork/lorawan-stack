@@ -19,7 +19,7 @@ import CONNECTION_STATUS from '@console/constants/connection-status'
 import EVENT_TAIL from '@console/constants/event-tail'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
-import { isUnauthenticatedError, isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
+import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { SET_CONNECTION_STATUS, setStatusChecking } from '@ttn-lw/lib/store/actions/status'
 import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
@@ -29,7 +29,6 @@ import {
   createStartEventsStreamFailureActionType,
   createStartEventsStreamSuccessActionType,
   createEventStreamClosedActionType,
-  createGetEventMessageFailureActionType,
   createGetEventMessageSuccessActionType,
   createSetEventsFilterActionType,
   getEventMessageSuccess,
@@ -65,7 +64,6 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
   const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
   const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
-  const GET_EVENT_MESSAGE_FAILURE = createGetEventMessageFailureActionType(reducerName)
   const GET_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(reducerName)
   const SET_EVENT_FILTER = createSetEventsFilterActionType(reducerName)
   const startEventsSuccess = startEventsStreamSuccess(reducerName)
@@ -93,8 +91,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       },
       validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
-          reject()
-          return
+          return reject()
         }
 
         const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
@@ -106,11 +103,10 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING
         if (connected || connecting || !isOnline) {
-          reject()
-          return
+          return reject()
         }
 
-        allow(action)
+        return allow(action)
       },
       process: async ({ getState, action }, dispatch) => {
         const { id, silent } = action
@@ -131,22 +127,18 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const filterRegExp = Boolean(filter) ? filter.filterRegExp : undefined
 
         try {
-          channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after)
+          const listeners = {
+            message: message => dispatch(getEventSuccess(id, message)),
+            error: error => dispatch(getEventFailure(id, error)),
+            close: wasClientRequest => dispatch(closeEvents(id, { silent: wasClientRequest })),
+          }
+          channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after, listeners)
           dispatch(startEventsSuccess(id, { silent }))
-
-          channel.on('message', message => dispatch(getEventSuccess(id, message)))
-          channel.on('error', error => dispatch(getEventFailure(id, error)))
-          channel.on('close', wasClientRequest => {
-            dispatch(closeEvents(id, { silent: wasClientRequest }))
-            channel = null
-          })
+          channel.open()
         } catch (error) {
-          if (isUnauthenticatedError(error)) {
+          if (error instanceof TokenError) {
             // The user is no longer authenticated; reinitiate the auth flow
             // by refreshing the page.
-            // NOTE: As a result of the WebSocket refactor, the error shape is
-            // now very unspecific and authentication errors like before are
-            // not thrown anymore. This should be addressed eventually.
             window.location.reload()
           } else {
             dispatch(startEventsFailure(id, error))
@@ -158,8 +150,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       type: [STOP_EVENTS, START_EVENTS_FAILURE],
       validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
-          reject()
-          return
+          return reject()
         }
 
         const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
@@ -169,40 +160,36 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING
         if (!connected && !connecting) {
-          reject()
-          return
+          return reject()
         }
 
-        allow(action)
+        return allow(action)
       },
       process: async ({ action }, dispatch, done) => {
         if (action.type === START_EVENTS_FAILURE) {
-          if (action?.error?.message === 'timeout') {
-            // Set the connection status to `checking` to trigger connection checks
-            // and detect possible offline state.
-            dispatch(setStatusChecking())
+          // Set the connection status to `checking` to trigger connection checks
+          // and detect possible offline state.
+          dispatch(setStatusChecking())
 
-            // In case of a network error, the connection could not be closed
-            // since the network connection is disrupted. We can regard this
-            // as equivalent to a closed connection.
-            return done()
-          }
+          // In case of a network error, the connection could not be closed
+          // since the network connection is disrupted. We can regard this
+          // as equivalent to a closed connection.
+          return done()
         }
         if (action.type === STOP_EVENTS && Boolean(channel)) {
           // Close the connection if it wasn't closed already.
           await channel.close()
         }
-        done()
+        return done()
       },
     }),
     createLogic({
-      type: [GET_EVENT_MESSAGE_FAILURE, EVENT_STREAM_CLOSED],
+      type: EVENT_STREAM_CLOSED,
       cancelType: [START_EVENTS_SUCCESS, GET_EVENT_MESSAGE_SUCCESS, STOP_EVENTS],
       warnTimeout: 0,
       validate: ({ getState, action = {} }, allow, reject) => {
         if (!action.id) {
-          reject()
-          return
+          return reject()
         }
 
         const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
@@ -211,11 +198,11 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const status = selectEntityEventsStatus(getState(), id)
         const connected = status === CONNECTION_STATUS.CONNECTED
         const interrupted = selectEntityEventsInterrupted(getState(), id)
-        if (!connected && interrupted) {
-          reject()
+        if (!connected || interrupted) {
+          return reject()
         }
 
-        allow(action)
+        return allow(action)
       },
       process: ({ getState, action }, dispatch, done) => {
         const isOnline = selectIsOnlineStatus(getState())
@@ -234,11 +221,11 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
               dispatch(startEvents(action.id))
             } else {
               clearInterval(reconnector)
-              done()
+              return done()
             }
           }, 5000)
         } else {
-          done()
+          return done()
         }
       },
     }),
@@ -274,27 +261,18 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
           // If the app went offline, close the event stream.
         }
 
-        done()
+        return done()
       },
     }),
     createLogic({
       type: SET_EVENT_FILTER,
       debounce: 250,
       process: async ({ action }, dispatch, done) => {
-        if (channel) {
-          try {
-            await channel.close()
-          } catch (error) {
-            if (isNetworkError(error) || isTimeoutError(action.payload)) {
-              dispatch(setStatusChecking())
-            } else {
-              throw error
-            }
-          } finally {
-            dispatch(startEvents(action.id, { silent: true }))
-          }
+        if (Boolean(channel)) {
+          await channel.close()
+          dispatch(startEvents(action.id, { silent: true }))
         }
-        done()
+        return done()
       },
     }),
   ]
