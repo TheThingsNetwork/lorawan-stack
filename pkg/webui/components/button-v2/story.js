@@ -20,6 +20,12 @@ import Button from '.'
 
 export default {
   title: 'Button V2',
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=590%3A51411&mode=design&t=Hbk2Qngeg1xqg4V3-1',
+    },
+  },
 }
 
 const dropdownItems = (

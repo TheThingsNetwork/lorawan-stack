@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import classNames from 'classnames'
+import classnames from 'classnames'
 
 import TtsLogo from '@assets/static/tts-logo.svg'
 
@@ -43,6 +43,12 @@ export default {
       )
     },
   ],
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1293%3A8589&mode=design&t=Hbk2Qngeg1xqg4V3-1',
+    },
+  },
 }
 
 const SwictherExample = () => {
@@ -59,7 +65,7 @@ const SwictherExample = () => {
 
 export const Default = () => (
   <div
-    className={classNames(
+    className={classnames(
       style.sidebar,
       'd-flex pos-relative direction-column gap-cs-s p-cs-s bg-tts-primary-050',
     )}

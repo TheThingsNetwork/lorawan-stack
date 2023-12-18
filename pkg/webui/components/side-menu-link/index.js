@@ -14,7 +14,7 @@
 
 import React, { useCallback, useContext } from 'react'
 import { NavLink } from 'react-router-dom'
-import classNames from 'classnames'
+import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -31,7 +31,7 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
 
   const className = useCallback(
     ({ isActive }) =>
-      classNames(style.link, {
+      classnames(style.link, {
         [style.active]: isActive,
         [style.disabled]: disabled,
         'j-center': isMinimized,
@@ -41,7 +41,7 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
 
   return (
     <NavLink to={path} className={className} end={exact} onClick={onClick}>
-      {icon && <Icon icon={icon} className={classNames(style.icon)} />}{' '}
+      {icon && <Icon icon={icon} className={classnames(style.icon)} />}{' '}
       {!isMinimized && <Message content={title} />}
     </NavLink>
   )

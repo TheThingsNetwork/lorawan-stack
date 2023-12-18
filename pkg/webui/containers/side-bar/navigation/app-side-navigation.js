@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React, { useCallback, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import DedicatedEntity from '@ttn-lw/components/dedicated-entity'
@@ -27,18 +29,35 @@ import {
 
 import SidebarContext from '../context'
 
+const m = defineMessages({
+  buttonMessage: 'Back to Applications list',
+})
+
 const AppSideNavigation = () => {
   const app = useSelector(selectSelectedApplication)
   const appId = useSelector(selectSelectedApplicationId)
-  const { isMinimized } = useContext(SidebarContext)
+  const { isMinimized, setLayer } = useContext(SidebarContext)
+  const navigate = useNavigate()
 
   const entityId = app ? app.name ?? appId : appId
+
+  const handleBackClick = useCallback(() => {
+    const path = '/applications'
+    navigate(path)
+    setLayer(path)
+  }, [navigate, setLayer])
 
   return (
     <>
       <SideNavigation>
         {!isMinimized && (
-          <DedicatedEntity label={entityId} icon="arrow_left_alt" className="mt-cs-xs mb-cs-m" />
+          <DedicatedEntity
+            label={entityId}
+            buttonMessage={m.buttonMessage}
+            icon="arrow_left_alt"
+            className="mt-cs-xs mb-cs-m"
+            onClick={handleBackClick}
+          />
         )}
         <SideNavigation.Item
           title={sharedMessages.appOverview}

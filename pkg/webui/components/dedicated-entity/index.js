@@ -32,6 +32,7 @@ const DedicatedEntity = ({
   onClick,
   'data-test-id': dataTestId,
   entityIcon,
+  buttonMessage,
 }) => {
   const [hovered, setHovered] = useState(false)
   const onMouseEnter = useCallback(() => setHovered(true), [])
@@ -46,7 +47,7 @@ const DedicatedEntity = ({
         primary
         grey
         icon={icon}
-        message={hovered ? 'Go back to Applications list' : undefined}
+        message={hovered ? buttonMessage : undefined}
         onClick={onClick}
       />
       {!hovered ? (
@@ -61,6 +62,7 @@ const DedicatedEntity = ({
 }
 
 DedicatedEntity.propTypes = {
+  buttonMessage: PropTypes.message,
   className: PropTypes.string,
   'data-test-id': PropTypes.string,
   entityIcon: PropTypes.string,
@@ -74,6 +76,7 @@ DedicatedEntity.defaultProps = {
   className: undefined,
   'data-test-id': 'dedicated-entity',
   entityIcon: undefined,
+  buttonMessage: undefined,
 }
 
 export default DedicatedEntity

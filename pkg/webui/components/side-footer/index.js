@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useContext, useRef } from 'react'
-import classNames from 'classnames'
+import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button-v2'
 import Dropdown from '@ttn-lw/components/dropdown-v2'
@@ -98,7 +98,7 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
     </>
   )
 
-  const sideFooterClassnames = classNames(
+  const sideFooterClassnames = classnames(
     style.sideFooter,
     'd-flex',
     'j-center',
@@ -119,7 +119,7 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
         message={!isMinimized ? `v${process.env.VERSION} (${process.env.REVISION})` : undefined}
         icon="support"
         dropdownItems={supportDropdownItems}
-        dropdownClassName={classNames(style.sideFooterHoverDropdown, {
+        dropdownClassName={classnames(style.sideFooterHoverDropdown, {
           [style.sideFooterHoverDropdownMinimized]: isMinimized,
         })}
         isHoverDropdown

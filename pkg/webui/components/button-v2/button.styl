@@ -28,7 +28,6 @@
   text-decoration: none
   padding: 0 $cs.m
   white-space: nowrap
-  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05)
 
   .arrow-icon
     transform: rotate(0deg)
@@ -74,9 +73,21 @@
 
   &.secondary
     transition: background-color color $ad.s
-    border: 1px solid $c-backdrop
-    background-color: $c.white
     color: $tc-deep-gray
+    background-color: white
+    box-shadow: 0px 2px 2px 0px rgba(0 0 0 7%), inset 0px 0px 0px 1px white
+    &:before
+      content: ''
+      position: absolute
+      top: 0
+      left: 0
+      right: 0
+      bottom: 0
+      border-radius: 0.57rem
+      margin: -1px
+      z-index: -1
+      background: radial-gradient(to bottom, #E8E7EC, #D7D7D7)
+
 
     &:hover
       background-color: $c-focus
@@ -87,6 +98,7 @@
     &:active
       transition-duration: $ad.xs
       background-color: $c-focus
+      box-shadow: none
 
   &.naked
     transition: background-color color $ad.s
