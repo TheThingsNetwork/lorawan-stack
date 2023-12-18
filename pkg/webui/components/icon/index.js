@@ -56,7 +56,7 @@ const hardcoded = {
   join: 'link',
   link: 'link',
   location: 'place',
-  logout: 'power_settings_new',
+  logout: 'logout',
   organization: 'people',
   overview: 'dashboard',
   packet_broker: 'camera',
