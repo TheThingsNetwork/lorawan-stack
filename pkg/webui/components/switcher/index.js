@@ -49,7 +49,7 @@ const Switcher = ({ layer, onClick, isMinimized }) => {
 
   return (
     <div
-      className={classnames(style.switcherContainer, 'd-flex', 'j-center', 'p-cs-xxs', {
+      className={classnames(style.switcherContainer, 'd-flex', 'j-center', 'p-cs-xxs', 'mb-cs-m', {
         'direction-column': isMinimized,
       })}
     >

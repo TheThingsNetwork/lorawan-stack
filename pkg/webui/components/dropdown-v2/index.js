@@ -153,7 +153,9 @@ const DropdownItem = ({
       </div>
       <Icon icon="chevron_right" />
       {expandedSubmenu ? (
-        <Dropdown className={classnames(style.submenu)}>{submenuItems}</Dropdown>
+        <div className={style.submenuContainer}>
+          <Dropdown className={style.submenuDropdown}>{submenuItems}</Dropdown>
+        </div>
       ) : null}
     </button>
   )
