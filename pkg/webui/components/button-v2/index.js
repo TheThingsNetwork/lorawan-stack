@@ -54,7 +54,7 @@ const assembleClassnames = ({
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, message, expanded, isHoverDropdown, dropdownClassName, children } =
+  const { dropdownItems, icon, message, expanded, noDropdownIcon, dropdownClassName, children } =
     props
 
   const content = Boolean(children) ? (
@@ -64,24 +64,14 @@ const buttonChildren = props => {
       {icon ? <Icon className={style.icon} icon={icon} /> : null}
       {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
       {dropdownItems ? (
-        isHoverDropdown ? (
-          <div>
-            {expanded ? (
-              <Dropdown className={classnames(style.dropdown, dropdownClassName)}>
-                {dropdownItems}
-              </Dropdown>
-            ) : null}
-          </div>
-        ) : (
-          <>
-            <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />
-            {expanded ? (
-              <Dropdown className={classnames(style.dropdown, dropdownClassName)}>
-                {dropdownItems}
-              </Dropdown>
-            ) : null}
-          </>
-        )
+        <>
+          {!noDropdownIcon && <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />}
+          {expanded ? (
+            <Dropdown className={classnames(style.dropdown, dropdownClassName)}>
+              {dropdownItems}
+            </Dropdown>
+          ) : null}
+        </>
       ) : null}
     </>
   )
@@ -141,16 +131,6 @@ const Button = forwardRef((props, ref) => {
     [dropdownItems, onClick, toggleDropdown, value],
   )
 
-  const handleMouseEnter = useCallback(() => {
-    if (isHoverDropdown) setExpanded(true)
-    onMouseEnter()
-  }, [setExpanded, onMouseEnter, isHoverDropdown])
-
-  const handleMouseLeave = useCallback(() => {
-    if (isHoverDropdown) setExpanded(false)
-    onMouseLeave()
-  }, [setExpanded, onMouseLeave, isHoverDropdown])
-
   const intl = useIntl()
 
   let title = rawTitle
@@ -164,9 +144,7 @@ const Button = forwardRef((props, ref) => {
     <button
       className={buttonClassNames}
       onClick={isHoverDropdown ? null : handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      children={buttonChildren({ ...props, expanded, handleMouseEnter, handleMouseLeave })}
+      children={buttonChildren({ ...props, expanded })}
       ref={ref}
       {...htmlProps}
     />

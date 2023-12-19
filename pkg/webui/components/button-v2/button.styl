@@ -16,9 +16,8 @@
   reset-button()
   position: relative
   display: inline-flex
-  transition: background $ad.s
-  transition-timing-function: ease-out
-  border-radius: $br.m
+  transition: 0.2s all ease-in-out
+  border-radius: $br.l
   outline: 0
   cursor: pointer
   justify-content: center
@@ -30,6 +29,7 @@
   white-space: nowrap
 
   &.primary
+    transition: 0.2s all ease-in-out
     color: white
     background-color: $c-active-blue
 
@@ -38,13 +38,14 @@
 
     &:not(.disabled)
       &:hover
+        transition: 0.2s all ease-in-out
         background-color: hoverize($c-active-blue)
 
       +focus-visible()
         background-color: hoverize($c-active-blue)
 
       &:active
-        transition-duration: $ad.xs
+        transition: 0.2s all ease-in-out
         background-color: activize($c-active-blue)
 
     &.grey
@@ -64,7 +65,7 @@
         background-color: transparentify($c.grey-500, #fff, .25)
 
   &.secondary
-    transition: background-color color $ad.s
+    transition: 0.2s all ease-in-out
     color: $tc-deep-gray
     background-color: white
     box-shadow: 0px 2px 2px 0px rgba(0 0 0 4.5%), inset 0px 0px 0px 1px white
@@ -73,6 +74,7 @@
 
 
     &:hover
+      transition: 0.2s all ease-in-out
       background-color: $c-focus
       background: linear-gradient(to bottom, $c-focus, $c-focus) padding-box, linear-gradient(to bottom, #E8E7EC, #D7D7D7) border-box
 
@@ -81,13 +83,13 @@
       background: linear-gradient(to bottom, $c-focus, $c-focus) padding-box, linear-gradient(to bottom, #E8E7EC, #D7D7D7) border-box
 
     &:active
-      transition-duration: $ad.xs
+      transition: 0.2s all ease-in-out
       background-color: $c-focus
       background: linear-gradient(to bottom, $c-focus, $c-focus) padding-box, linear-gradient(to bottom, #E8E7EC, #D7D7D7) border-box
       box-shadow: none
 
   &.naked
-    transition: background-color color $ad.s
+    transition: 0.2s all ease-in-out
     border: none
     background-color: none
     box-shadow: unset

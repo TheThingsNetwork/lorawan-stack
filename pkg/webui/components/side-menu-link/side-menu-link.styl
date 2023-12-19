@@ -14,12 +14,12 @@
 
 .link
   transition: 0.2s all ease-in-out
-  border-radius: $br.m
+  border-radius: $br.l
   text-decoration: none
   color: $c.grey-700
   display: flex
   align-items: center
-  gap: $cs.xxs
+  gap: $cs.xs
   padding: $cs.xs
   position: relative
 
@@ -32,13 +32,13 @@
     transition: 0.2s background ease-in-out
 
     .icon
-      color: $c.grey-900
+      color: inherit
 
   &.disabled
     color: $c.grey-400
 
     .icon
-      color: $c.grey-400
+      color: inherit
 
   &:hover
     color: $c.grey-900
@@ -46,4 +46,4 @@
     transition: 0.2s color ease-in-out
 
     .icon
-      color: $c.grey-900
+      color: inherit

@@ -13,25 +13,25 @@
 // limitations under the License.
 
 ul.dropdown
-  font-size: $fs.s
+  font-size: $fs.m
   transition: color 0.2s ease-in-out
   border-radius: $br.l
   border: 1px solid $c.grey-200
   background: $c.white
   box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.06)
   position: absolute
-  padding: $cs.xs
+  padding: $cs.s
   min-width: 14rem
   z-index: $zi.dropdown
   margin: $cs.xxs 0 0
 
   &.below
     bottom: auto
-    top: calc(100% + 2px)
+    top: calc(100% + 7px)
 
   &.above
     top: auto
-    bottom: calc(100% + 2px)
+    bottom: calc(100% + 7px)
 
   &.left
     left: 0
@@ -82,6 +82,7 @@ ul.dropdown
       text-decoration: none
       padding: $cs.xs
       width: 100%
+      min-height: 2.429rem
       &:not(.active)
         color: $c.grey-700
         transition: color 0.2s ease-in-out
@@ -115,6 +116,14 @@ ul.dropdown
       color: $tc-deep-gray
       text-decoration: none
 
-  .submenu
-    bottom: 0 !important
-    left: 233px !important
+  .submenu-container
+    bottom: 0px
+    left: 0px
+    position: absolute
+    width: 180%
+    height: 5rem
+    z-index: 9999
+
+  .submenu-dropdown
+    bottom: -0px !important
+    left: calc(100% + -213px) !important

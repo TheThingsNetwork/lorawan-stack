@@ -44,7 +44,8 @@ LanguageOption.propTypes = {
 
 const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) => {
   const { isMinimized } = useContext(SidebarContext)
-  const ref = useRef(null)
+  const supportButtonRef = useRef(null)
+  const clusterButtonRef = useRef(null)
 
   const clusterDropdownItems = (
     <>
@@ -104,36 +105,31 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
     'j-center',
     'al-center',
     'gap-cs-xs',
-    'fs-xs',
-    {
-      'w-80': isMinimized,
-      'w-90': !isMinimized,
-    },
+    'fs-s',
   )
 
   return (
     <div className={sideFooterClassnames}>
       <Button
-        className={style.sideFooterButton}
+        className={classnames(style.sideFooterButton, style.sideFooterFullWidth)}
         secondary
-        message={!isMinimized ? `v${process.env.VERSION} (${process.env.REVISION})` : undefined}
         icon="support"
+        message={!isMinimized ? `v${process.env.VERSION} (${process.env.REVISION})` : undefined}
         dropdownItems={supportDropdownItems}
-        dropdownClassName={classnames(style.sideFooterHoverDropdown, {
-          [style.sideFooterHoverDropdownMinimized]: isMinimized,
-        })}
-        isHoverDropdown
-        ref={ref}
+        dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterSupportDropdown)}
+        noDropdownIcon
+        ref={supportButtonRef}
       />
       {!isMinimized && (
         <Button
+          className={style.sideFooterButton}
           secondary
-          withDropdown
           icon="public"
           message="EU1"
+          noDropdownIcon
           dropdownItems={clusterDropdownItems}
           dropdownClassName={style.sideFooterDropdown}
-          ref={ref}
+          ref={clusterButtonRef}
         />
       )}
     </div>

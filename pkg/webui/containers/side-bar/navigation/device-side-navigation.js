@@ -52,7 +52,7 @@ const DeviceSideNavigation = () => {
         <DedicatedEntity
           label={entityId}
           entityIcon="device"
-          icon="arrow_left_alt"
+          icon="arrow_left"
           className="mt-cs-xs mb-cs-m"
           buttonMessage={m.buttonMessage}
           onClick={handleBackClick}
