@@ -25,7 +25,12 @@ module.exports = {
     '../../pkg/webui/**/*.mdx',
     '../../pkg/webui/**/*stories.mdx',
   ],
-  addons: ['@storybook/addon-actions', '@storybook/addon-essentials', '@storybook/addon-mdx-gfm'],
+  addons: [
+    '@storybook/addon-actions',
+    '@storybook/addon-essentials',
+    '@storybook/addon-mdx-gfm',
+    '@storybook/addon-designs',
+  ],
   staticDirs: ['../../public'],
   docs: {
     autodocs: true,
