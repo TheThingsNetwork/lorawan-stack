@@ -43,7 +43,7 @@ const Header = ({
   return (
     <header {...rest} className={classnames(className, style.container)}>
       <Breadcrumbs className="s:d-none" breadcrumbs={breadcrumbs} />
-      <div className={style.mobileMenu}>
+      <div className="d-none s:d-flex al-center gap-cs-xs">
         <Button secondary icon="menu" />
         <Link to="/" className="d-flex">
           <img {...logo} className={style.logo} />
