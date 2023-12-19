@@ -54,7 +54,7 @@ const AppSideNavigation = () => {
           <DedicatedEntity
             label={entityId}
             buttonMessage={m.buttonMessage}
-            icon="arrow_left_alt"
+            icon="arrow_left"
             className="mt-cs-xs mb-cs-m"
             onClick={handleBackClick}
           />
