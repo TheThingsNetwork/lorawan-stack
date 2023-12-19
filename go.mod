@@ -55,6 +55,7 @@ require (
 	github.com/klauspost/compress v1.17.4
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
+	github.com/mileusna/useragent v1.3.4
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.10.7
