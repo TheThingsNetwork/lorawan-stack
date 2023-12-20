@@ -96,7 +96,11 @@ const AppSideNavigation = () => {
         )}
         {/* <SideNavigation.Item title={'Network Information Center'} path="/noc" icon="ssid_chart" /> */}
         {maySetApplicationPayloadFormatters.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="developer_mode">
+          <SideNavigation.Item
+            title={sharedMessages.payloadFormatters}
+            icon="developer_mode"
+            isMinimized={isMinimized}
+          >
             <SideNavigation.Item
               title={sharedMessages.uplink}
               path={`applications/${appId}/payload-formatters/uplink`}
@@ -110,7 +114,11 @@ const AppSideNavigation = () => {
           </SideNavigation.Item>
         )}
         {mayCreateOrEditApplicationIntegrations.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.integrations} icon="integration">
+          <SideNavigation.Item
+            title={sharedMessages.integrations}
+            icon="integration"
+            isMinimized={isMinimized}
+          >
             <SideNavigation.Item
               title={sharedMessages.mqtt}
               path={`applications/${appId}/integrations/mqtt`}

@@ -16,7 +16,7 @@
   list-style-type: none
   padding: 0
   margin: 0
-  overflow: hidden
+  overflow: visible
   font-size: $fs.m
 
   & > li:not(:last-child)
@@ -29,8 +29,8 @@
     transition: height $ad.m ease-in-out
 
   &-nested > li
-    height: 0
-    transition: visibility $ad.m, height $ad.m ease-in-out
+    height: 0px
+    transition: height $ad.m ease-in-out
 
   &-nested:not(.list-expanded) > li
     visibility: hidden
