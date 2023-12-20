@@ -30,7 +30,7 @@ const AppListSideNavigation = () => {
 
   return (
     <div>
-      <SectionLabel label={sharedMessages.topEntities} icon="add" />
+      <SectionLabel label={sharedMessages.topApplications} icon="add" />
       <SideNavigation>
         {topEntities.map(({ path, entity, title }) => (
           <SideNavigation.Item title={title} path={path} icon={entity} key={path} />

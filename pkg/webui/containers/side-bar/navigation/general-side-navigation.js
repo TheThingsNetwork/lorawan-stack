@@ -74,7 +74,7 @@ const GeneralSideNavigation = () => {
         )}
         {!isMinimized && (
           <>
-            <SectionLabel label="Top entities" icon="add" className="mt-cs-m" />
+            <SectionLabel label={sharedMessages.topEntities} icon="add" className="mt-cs-m" />
             {topEntities.map(({ path, title, entity }) => (
               <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
             ))}

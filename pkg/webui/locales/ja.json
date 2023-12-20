@@ -1427,6 +1427,8 @@
   "lib.shared-messages.token": "トークン",
   "lib.shared-messages.tokenDelete": "トークン削除",
   "lib.shared-messages.tokenDeleted": "削除されたトークン",
+  "lib.shared-messages.topApplications": "",
+  "lib.shared-messages.topGateways": "",
   "lib.shared-messages.topEntities": "",
   "lib.shared-messages.tokenSet": "トークンの設定",
   "lib.shared-messages.tokenUpdated": "トークンの更新",
