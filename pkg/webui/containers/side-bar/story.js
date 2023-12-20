@@ -75,21 +75,17 @@ export const Default = () => (
     <SwitcherExample />
     <SearchButton />
     <SideNavigation className="mt-cs-xs">
-      <SideNavigation.Item title={'Overview'} path="" icon="overview" exact />
-      <SideNavigation.Item title={'Live data'} path="data" icon="data" />
-      <SideNavigation.Item title={'Location'} path="location" icon="location" />
-      <SideNavigation.Item title={'Collaborators'} path="collaborators" icon="organization" />
-      <SideNavigation.Item title={'API keys'} path="api-keys" icon="api_keys" />
+      <SideNavigation.Item title="Overview" path="" icon="overview" exact />
+      <SideNavigation.Item title="Live data" path="data" icon="data" />
+      <SideNavigation.Item title="Location" path="location" icon="location" />
+      <SideNavigation.Item title="Collaborators" path="collaborators" icon="organization" />
+      <SideNavigation.Item title="API keys" path="api-keys" icon="api_keys" />
       <SideNavigation.Item
-        title={'General settings'}
+        title="General settings"
         path="general-settings"
         icon="general_settings"
       />
     </SideNavigation>
-    <SideFooter
-      supportLink={'/support'}
-      documentationBaseUrl={'/docs'}
-      statusPageBaseUrl={'/status'}
-    />
+    <SideFooter supportLink="/support" documentationBaseUrl="/docs" statusPageBaseUrl="/status" />
   </div>
 )

@@ -80,7 +80,7 @@ const buttonChildren = props => {
     </>
   )
 
-  return <>{content}</>
+  return content
 }
 
 const Button = forwardRef((props, ref) => {
@@ -94,8 +94,6 @@ const Button = forwardRef((props, ref) => {
     onBlur,
     onClick,
     form,
-    onMouseEnter,
-    onMouseLeave,
     ...rest
   } = props
   const [expanded, setExpanded] = useState(false)
@@ -146,7 +144,7 @@ const Button = forwardRef((props, ref) => {
   return (
     <button
       className={buttonClassNames}
-      onClick={dropdownItems ? handleClick : undefined}
+      onClick={handleClick}
       children={buttonChildren({ ...props, expanded })}
       ref={ref}
       {...htmlProps}

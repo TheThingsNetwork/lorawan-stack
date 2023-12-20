@@ -40,7 +40,7 @@ const SwictherExample = () => {
 }
 
 export const Default = () => (
-  <div style={{ width: '300px' }}>
+  <div style={{ maxWidth: '20rem' }}>
     <SwictherExample />
   </div>
 )

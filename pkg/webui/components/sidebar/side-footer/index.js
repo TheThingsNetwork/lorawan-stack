@@ -24,8 +24,17 @@ import { LanguageContext } from '@ttn-lw/lib/components/with-locale'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import {
+  selectDocumentationUrlConfig,
+  selectPageStatusBaseUrlConfig,
+  selectSupportLinkConfig,
+} from '@ttn-lw/lib/selectors/env'
 
 import style from './side-footer.styl'
+
+const supportLink = selectSupportLinkConfig()
+const documentationBaseUrl = selectDocumentationUrlConfig()
+const statusPageBaseUrl = selectPageStatusBaseUrlConfig()
 
 const LanguageOption = ({ locale, title, currentLocale, onSetLocale }) => {
   const handleSetLocale = useCallback(() => {
@@ -42,7 +51,7 @@ LanguageOption.propTypes = {
   title: PropTypes.string.isRequired,
 }
 
-const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) => {
+const SideFooter = () => {
   const { isMinimized } = useContext(SidebarContext)
   const supportButtonRef = useRef(null)
   const clusterButtonRef = useRef(null)
@@ -134,12 +143,6 @@ const SideFooter = ({ supportLink, documentationBaseUrl, statusPageBaseUrl }) =>
       )}
     </div>
   )
-}
-
-SideFooter.propTypes = {
-  documentationBaseUrl: PropTypes.string.isRequired,
-  statusPageBaseUrl: PropTypes.string.isRequired,
-  supportLink: PropTypes.string.isRequired,
 }
 
 export default SideFooter

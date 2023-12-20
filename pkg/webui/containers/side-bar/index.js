@@ -19,12 +19,13 @@ import classnames from 'classnames'
 import LAYOUT from '@ttn-lw/constants/layout'
 
 import SearchButton from '@ttn-lw/components/sidebar/search-button'
+import SideFooter from '@ttn-lw/components/sidebar/side-footer'
+
+import getCookie from '@ttn-lw/lib/cookie'
 
 import SidebarNavigation from './navigation'
 import SidebarContext from './context'
 import SideHeader from './header'
-import SideFooter from './footer'
-import getCookie from './utils'
 import SwitcherContainer from './switcher'
 
 import style from './side-bar.styl'
@@ -36,7 +37,6 @@ const Sidebar = () => {
   const viewportWidth = getViewportWidth()
   const isMobile = viewportWidth <= LAYOUT.BREAKPOINTS.M
   const { pathname } = useLocation()
-  const [layer, setLayer] = useState(pathname ?? '/')
   const [isMinimized, setIsMinimized] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const node = useRef()
@@ -51,7 +51,7 @@ const Sidebar = () => {
         .map(cookie => JSON.parse(cookie))
     : []
 
-  const topEntities = topEntitiesCookie?.filter(cookie => cookie.tag === layer.split('/')[1])
+  const topEntities = topEntitiesCookie?.filter(cookie => cookie.tag === pathname.split('/')[1])
 
   const sidebarClassnames = classnames(
     style.sidebar,
@@ -106,9 +106,7 @@ const Sidebar = () => {
 
   return (
     <div className={sidebarClassnames} id="sidebar-v2">
-      <SidebarContext.Provider
-        value={{ layer, setLayer, topEntities, onMinimizeToggle, isMinimized }}
-      >
+      <SidebarContext.Provider value={{ topEntities, onMinimizeToggle, isMinimized }}>
         <div className="d-flex direction-column gap-cs-m">
           <SideHeader />
           <div>

@@ -12,23 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useContext } from 'react'
+import React, { useContext } from 'react'
 
 import Switcher from '@ttn-lw/components/sidebar/switcher'
 
 import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
 const SwitcherContainer = () => {
-  const { layer, setLayer, isMinimized } = useContext(SidebarContext)
+  const { isMinimized } = useContext(SidebarContext)
 
-  const handleClick = useCallback(
-    evt => {
-      setLayer(evt.target.getAttribute('href') ?? evt.target.parentNode.getAttribute('href'))
-    },
-    [setLayer],
-  )
-
-  return <Switcher layer={layer} isMinimized={isMinimized} onClick={handleClick} />
+  return <Switcher isMinimized={isMinimized} />
 }
 
 export default SwitcherContainer

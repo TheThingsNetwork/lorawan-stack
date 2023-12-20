@@ -13,41 +13,65 @@
 // limitations under the License.
 
 import React, { useContext } from 'react'
+import { useSelector } from 'react-redux'
 
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import {
+  checkFromState,
+  mayViewOrEditApiKeys,
+  mayViewOrganizationsOfUser,
+} from '@console/lib/feature-checks'
+
+import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
+
 import SidebarContext from '../context'
 
 const GeneralSideNavigation = () => {
   const { topEntities, isMinimized } = useContext(SidebarContext)
 
+  const isUserAdmin = useSelector(selectUserIsAdmin)
+  const user = useSelector(selectUser)
+  const mayViewOrgs = useSelector(state =>
+    user ? checkFromState(mayViewOrganizationsOfUser, state) : false,
+  )
+  const mayHandleApiKeys = useSelector(state =>
+    user ? checkFromState(mayViewOrEditApiKeys, state) : false,
+  )
+
   return (
     <div>
       <SideNavigation className="mt-cs-xs">
         <SideNavigation.Item title={sharedMessages.dashboard} path="/" icon="overview" exact />
-        <SideNavigation.Item
-          title={sharedMessages.organizations}
-          path="/organizations"
-          icon="group"
-        />
+        {mayViewOrgs && (
+          <SideNavigation.Item
+            title={sharedMessages.organizations}
+            path="/organizations"
+            icon="group"
+          />
+        )}
         <SideNavigation.Item
           title={sharedMessages.notifications}
           path="/notifications"
           icon="inbox"
         />
-        <SideNavigation.Item
-          title={sharedMessages.personalApiKeys}
-          path="/user/api-keys"
-          icon="key"
-        />
-        <SideNavigation.Item
-          title={sharedMessages.adminPanel}
-          path="/admin-panel"
-          icon="admin_panel_settings"
-        />
+        {mayHandleApiKeys && (
+          <SideNavigation.Item
+            title={sharedMessages.personalApiKeys}
+            path="/user/api-keys"
+            icon="key"
+          />
+        )}
+        {isUserAdmin && (
+          <SideNavigation.Item
+            title={sharedMessages.adminPanel}
+            path="/admin-panel"
+            icon="admin_panel_settings"
+          />
+        )}
         {!isMinimized && (
           <>
             <SectionLabel label="Top entities" icon="add" className="mt-cs-m" />

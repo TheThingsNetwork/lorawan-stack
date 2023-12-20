@@ -26,7 +26,7 @@ import style from './dedicated-entity.styl'
 
 const DedicatedEntity = ({ label, icon, className, buttonMessage, path, exact, handleClick }) => (
   <NavLink
-    className={classnames(className, style.dedicatedEntity)}
+    className={classnames(className, style.dedicatedEntity, 'd-flex', 'al-center')}
     to={path}
     end={exact}
     onClick={handleClick}

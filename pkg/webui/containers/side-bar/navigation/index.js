@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
-
-import SidebarContext from '../context'
+import React from 'react'
+import { useLocation } from 'react-router-dom'
 
 import AppListSideNavigation from './app-list-side-navigation'
 import AppSideNavigation from './app-side-navigation'
@@ -23,19 +22,20 @@ import GtwSideNavigation from './gtw-side-navigation'
 import GeneralSideNavigation from './general-side-navigation'
 
 const SidebarNavigation = () => {
-  const { layer } = useContext(SidebarContext)
+  const { pathname } = useLocation()
 
-  const showGeneralSideNavigation = !layer.includes('/applications') && !layer.includes('/gateways')
+  const showGeneralSideNavigation =
+    !pathname.includes('/applications') && !pathname.includes('/gateways')
 
-  const showAppSideNavigation = layer.includes('/applications/')
+  const showAppSideNavigation = pathname.includes('/applications/')
 
   return (
     <div>
       {showGeneralSideNavigation && <GeneralSideNavigation />}
       {showAppSideNavigation && <AppSideNavigation />}
-      {layer.includes('/applications') && <AppListSideNavigation />}
-      {layer.includes('/gateways/') && <GtwSideNavigation />}
-      {layer.includes('/gateways') && <GtwListSideNavigation />}
+      {pathname.includes('/applications') && <AppListSideNavigation />}
+      {pathname.includes('/gateways/') && <GtwSideNavigation />}
+      {pathname.includes('/gateways') && <GtwListSideNavigation />}
     </div>
   )
 }
