@@ -177,6 +177,98 @@ var RelayParametersFieldPathsNested = []string{
 var RelayParametersFieldPathsTopLevel = []string{
 	"mode",
 }
+var ServingRelaySettingsFieldPathsNested = []string{
+	"cad_periodicity",
+	"default_channel_index",
+	"limits",
+	"limits.join_requests",
+	"limits.join_requests.bucket_size",
+	"limits.join_requests.reload_rate",
+	"limits.notifications",
+	"limits.notifications.bucket_size",
+	"limits.notifications.reload_rate",
+	"limits.overall",
+	"limits.overall.bucket_size",
+	"limits.overall.reload_rate",
+	"limits.reset_behavior",
+	"limits.uplink_messages",
+	"limits.uplink_messages.bucket_size",
+	"limits.uplink_messages.reload_rate",
+	"second_channel",
+	"second_channel.ack_offset",
+	"second_channel.data_rate_index",
+	"second_channel.frequency",
+	"uplink_forwarding_rules",
+}
+
+var ServingRelaySettingsFieldPathsTopLevel = []string{
+	"cad_periodicity",
+	"default_channel_index",
+	"limits",
+	"second_channel",
+	"uplink_forwarding_rules",
+}
+var ServedRelaySettingsFieldPathsNested = []string{
+	"backoff",
+	"mode",
+	"mode.always",
+	"mode.dynamic",
+	"mode.dynamic.smart_enable_level",
+	"mode.end_device_controlled",
+	"second_channel",
+	"second_channel.ack_offset",
+	"second_channel.data_rate_index",
+	"second_channel.frequency",
+	"serving_device_id",
+}
+
+var ServedRelaySettingsFieldPathsTopLevel = []string{
+	"backoff",
+	"mode",
+	"second_channel",
+	"serving_device_id",
+}
+var RelaySettingsFieldPathsNested = []string{
+	"mode",
+	"mode.served",
+	"mode.served.backoff",
+	"mode.served.mode",
+	"mode.served.mode.always",
+	"mode.served.mode.dynamic",
+	"mode.served.mode.dynamic.smart_enable_level",
+	"mode.served.mode.end_device_controlled",
+	"mode.served.second_channel",
+	"mode.served.second_channel.ack_offset",
+	"mode.served.second_channel.data_rate_index",
+	"mode.served.second_channel.frequency",
+	"mode.served.serving_device_id",
+	"mode.serving",
+	"mode.serving.cad_periodicity",
+	"mode.serving.default_channel_index",
+	"mode.serving.limits",
+	"mode.serving.limits.join_requests",
+	"mode.serving.limits.join_requests.bucket_size",
+	"mode.serving.limits.join_requests.reload_rate",
+	"mode.serving.limits.notifications",
+	"mode.serving.limits.notifications.bucket_size",
+	"mode.serving.limits.notifications.reload_rate",
+	"mode.serving.limits.overall",
+	"mode.serving.limits.overall.bucket_size",
+	"mode.serving.limits.overall.reload_rate",
+	"mode.serving.limits.reset_behavior",
+	"mode.serving.limits.uplink_messages",
+	"mode.serving.limits.uplink_messages.bucket_size",
+	"mode.serving.limits.uplink_messages.reload_rate",
+	"mode.serving.second_channel",
+	"mode.serving.second_channel.ack_offset",
+	"mode.serving.second_channel.data_rate_index",
+	"mode.serving.second_channel.frequency",
+	"mode.serving.uplink_forwarding_rules",
+}
+
+var RelaySettingsFieldPathsTopLevel = []string{
+	"mode",
+}
 var MACParametersFieldPathsNested = []string{
 	"adr_ack_delay",
 	"adr_ack_delay_exponent",

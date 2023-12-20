@@ -276,6 +276,172 @@ func (v *RelayParameters) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
+func (v *ServedRelaySettings) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "backoff":
+		return v.Backoff == nil
+	case "mode":
+		return v.Mode == nil
+	case "mode.always":
+		return v.GetAlways() == nil
+	case "mode.dynamic":
+		return v.GetDynamic() == nil
+	case "mode.dynamic.smart_enable_level":
+		return v.GetDynamic().FieldIsZero("smart_enable_level")
+	case "mode.end_device_controlled":
+		return v.GetEndDeviceControlled() == nil
+	case "second_channel":
+		return v.SecondChannel == nil
+	case "second_channel.ack_offset":
+		return v.SecondChannel.FieldIsZero("ack_offset")
+	case "second_channel.data_rate_index":
+		return v.SecondChannel.FieldIsZero("data_rate_index")
+	case "second_channel.frequency":
+		return v.SecondChannel.FieldIsZero("frequency")
+	case "serving_device_id":
+		return v.ServingDeviceId == ""
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ServingRelaySettings) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "second_channel":
+		return v.SecondChannel == nil
+	case "second_channel.ack_offset":
+		return v.SecondChannel.FieldIsZero("ack_offset")
+	case "second_channel.data_rate_index":
+		return v.SecondChannel.FieldIsZero("data_rate_index")
+	case "second_channel.frequency":
+		return v.SecondChannel.FieldIsZero("frequency")
+	case "default_channel_index":
+		return v.DefaultChannelIndex == nil
+	case "cad_periodicity":
+		return v.CadPeriodicity == 0
+	case "uplink_forwarding_rules":
+		return v.UplinkForwardingRules == nil
+	case "limits":
+		return v.Limits == nil
+	case "limits.reset_behavior":
+		return v.Limits.FieldIsZero("reset_behavior")
+	case "limits.join_requests":
+		return v.Limits.FieldIsZero("join_requests")
+	case "limits.join_requests.bucket_size":
+		return v.Limits.FieldIsZero("join_requests.bucket_size")
+	case "limits.join_requests.reload_rate":
+		return v.Limits.FieldIsZero("join_requests.reload_rate")
+	case "limits.notifications":
+		return v.Limits.FieldIsZero("notifications")
+	case "limits.notifications.bucket_size":
+		return v.Limits.FieldIsZero("notifications.bucket_size")
+	case "limits.notifications.reload_rate":
+		return v.Limits.FieldIsZero("notifications.reload_rate")
+	case "limits.uplink_messages":
+		return v.Limits.FieldIsZero("uplink_messages")
+	case "limits.uplink_messages.bucket_size":
+		return v.Limits.FieldIsZero("uplink_messages.bucket_size")
+	case "limits.uplink_messages.reload_rate":
+		return v.Limits.FieldIsZero("uplink_messages.reload_rate")
+	case "limits.overall":
+		return v.Limits.FieldIsZero("overall")
+	case "limits.overall.bucket_size":
+		return v.Limits.FieldIsZero("overall.bucket_size")
+	case "limits.overall.reload_rate":
+		return v.Limits.FieldIsZero("overall.reload_rate")
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *RelaySettings) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "mode":
+		return v.Mode == nil
+	case "mode.served":
+		return v.GetServed() == nil
+	case "mode.served.backoff":
+		return v.GetServed().FieldIsZero("backoff")
+	case "mode.served.mode":
+		return v.GetServed().FieldIsZero("mode")
+	case "mode.served.mode.always":
+		return v.GetServed().FieldIsZero("mode.always")
+	case "mode.served.mode.dynamic":
+		return v.GetServed().FieldIsZero("mode.dynamic")
+	case "mode.served.mode.dynamic.smart_enable_level":
+		return v.GetServed().FieldIsZero("mode.dynamic.smart_enable_level")
+	case "mode.served.mode.end_device_controlled":
+		return v.GetServed().FieldIsZero("mode.end_device_controlled")
+	case "mode.served.second_channel":
+		return v.GetServed().FieldIsZero("second_channel")
+	case "mode.served.second_channel.ack_offset":
+		return v.GetServed().FieldIsZero("second_channel.ack_offset")
+	case "mode.served.second_channel.data_rate_index":
+		return v.GetServed().FieldIsZero("second_channel.data_rate_index")
+	case "mode.served.second_channel.frequency":
+		return v.GetServed().FieldIsZero("second_channel.frequency")
+	case "mode.served.default_channel_index":
+		return v.GetServed().FieldIsZero("default_channel_index")
+	case "mode.served.serving_device_id":
+		return v.GetServed().FieldIsZero("serving_device_id")
+	case "mode.serving":
+		return v.GetServing() == nil
+	case "mode.serving.second_channel":
+		return v.GetServing().FieldIsZero("second_channel")
+	case "mode.serving.second_channel.ack_offset":
+		return v.GetServing().FieldIsZero("second_channel.ack_offset")
+	case "mode.serving.second_channel.data_rate_index":
+		return v.GetServing().FieldIsZero("second_channel.data_rate_index")
+	case "mode.serving.second_channel.frequency":
+		return v.GetServing().FieldIsZero("second_channel.frequency")
+	case "mode.serving.default_channel_index":
+		return v.GetServing().FieldIsZero("default_channel_index")
+	case "mode.serving.cad_periodicity":
+		return v.GetServing().FieldIsZero("cad_periodicity")
+	case "mode.serving.uplink_forwarding_rules":
+		return v.GetServing().FieldIsZero("uplink_forwarding_rules")
+	case "mode.serving.limits":
+		return v.GetServing().FieldIsZero("limits")
+	case "mode.serving.limits.reset_behavior":
+		return v.GetServing().FieldIsZero("limits.reset_behavior")
+	case "mode.serving.limits.join_requests":
+		return v.GetServing().FieldIsZero("limits.join_requests")
+	case "mode.serving.limits.join_requests.bucket_size":
+		return v.GetServing().FieldIsZero("limits.join_requests.bucket_size")
+	case "mode.serving.limits.join_requests.reload_rate":
+		return v.GetServing().FieldIsZero("limits.join_requests.reload_rate")
+	case "mode.serving.limits.notifications":
+		return v.GetServing().FieldIsZero("limits.notifications")
+	case "mode.serving.limits.notifications.bucket_size":
+		return v.GetServing().FieldIsZero("limits.notifications.bucket_size")
+	case "mode.serving.limits.notifications.reload_rate":
+		return v.GetServing().FieldIsZero("limits.notifications.reload_rate")
+	case "mode.serving.limits.uplink_messages":
+		return v.GetServing().FieldIsZero("limits.uplink_messages")
+	case "mode.serving.limits.uplink_messages.bucket_size":
+		return v.GetServing().FieldIsZero("limits.uplink_messages.bucket_size")
+	case "mode.serving.limits.uplink_messages.reload_rate":
+		return v.GetServing().FieldIsZero("limits.uplink_messages.reload_rate")
+	case "mode.serving.limits.overall":
+		return v.GetServing().FieldIsZero("limits.overall")
+	case "mode.serving.limits.overall.bucket_size":
+		return v.GetServing().FieldIsZero("limits.overall.bucket_size")
+	case "mode.serving.limits.overall.reload_rate":
+		return v.GetServing().FieldIsZero("limits.overall.reload_rate")
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
 func (v *EndDeviceAuthenticationCode) FieldIsZero(p string) bool {
 	if v == nil {
 		return true

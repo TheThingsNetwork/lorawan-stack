@@ -46,7 +46,7 @@ var (
 	errRelayRXWindowUnavailable = errors.DefineUnavailable("relay_rx_windows_available", "no RX windows available")
 	errRelayMTYpe               = errors.DefineInvalidArgument("relay_m_type", "invalid MType")
 	errRelayFullFCnt            = errors.DefineInvalidArgument("relay_full_f_cnt", "invalid full FCnt")
-	errRelayNotServing          = errors.DefineUnavailable("relay_serving", "relay not serving")
+	errRelayNotServing          = errors.DefineUnavailable("relay_not_serving", "relay not serving")
 )
 
 type relayKeyService struct {
@@ -261,7 +261,7 @@ var relayDeliverSessionKeysPaths = ttnpb.AddFields(
 )
 
 func (ns *NetworkServer) deliverRelaySessionKeys(ctx context.Context, dev *ttnpb.EndDevice, sessionKeyID []byte) error {
-	for _, served := range []*ttnpb.ServedRelayParameters{
+	for _, served := range []*ttnpb.ServedRelaySettings{
 		dev.MacSettings.GetRelay().GetServed(),
 		dev.MacSettings.GetDesiredRelay().GetServed(),
 	} {

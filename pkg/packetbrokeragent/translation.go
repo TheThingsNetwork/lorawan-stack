@@ -20,7 +20,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
 	"io"
 	"time"
 
@@ -39,7 +38,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-	"gopkg.in/square/go-jose.v2"
 )
 
 var toPBRegion = map[string]packetbroker.Region{
@@ -164,18 +162,6 @@ func toPBTerrestrialAntennaPlacement(p ttnpb.GatewayAntennaPlacement) packetbrok
 	return packetbroker.TerrestrialAntennaPlacement(p)
 }
 
-type legacyAgentUplinkToken struct {
-	ForwarderNetID     types.NetID `json:"fnid"`
-	ForwarderTenantID  string      `json:"ftid,omitempty"`
-	ForwarderClusterID string      `json:"fcid,omitempty"`
-}
-
-type legacyCompoundUplinkToken struct {
-	Gateway   []byte                  `json:"g,omitempty"`
-	Forwarder []byte                  `json:"f,omitempty"`
-	Agent     *legacyAgentUplinkToken `json:"a,omitempty"`
-}
-
 func wrapUplinkTokens(gateway, forwarder []byte, agent *ttnpb.PacketBrokerAgentUplinkToken) ([]byte, error) {
 	return proto.Marshal(&ttnpb.PacketBrokerAgentCompoundUplinkToken{
 		Gateway:   gateway,
@@ -184,35 +170,14 @@ func wrapUplinkTokens(gateway, forwarder []byte, agent *ttnpb.PacketBrokerAgentU
 	})
 }
 
-func unwrapLegacyUplinkTokens(token []byte) (gateway, forwarder []byte, agent *legacyAgentUplinkToken, err error) {
-	var t legacyCompoundUplinkToken
-	if err := json.Unmarshal(token, &t); err != nil {
-		return nil, nil, nil, err
-	}
-	return t.Gateway, t.Forwarder, t.Agent, nil
-}
-
 func unwrapUplinkTokens(
 	token []byte,
 ) (gateway, forwarder []byte, agent *ttnpb.PacketBrokerAgentUplinkToken, err error) {
-	if gateway, forwarder, agent, err := unwrapLegacyUplinkTokens(token); err == nil {
-		agent := &ttnpb.PacketBrokerAgentUplinkToken{
-			ForwarderNetId:     agent.ForwarderNetID[:],
-			ForwarderTenantId:  agent.ForwarderTenantID,
-			ForwarderClusterId: agent.ForwarderClusterID,
-		}
-		return gateway, forwarder, agent, nil
-	}
 	var t ttnpb.PacketBrokerAgentCompoundUplinkToken
 	if err := proto.Unmarshal(token, &t); err != nil {
 		return nil, nil, nil, err
 	}
 	return t.Gateway, t.Forwarder, t.Agent, nil
-}
-
-type legacyGatewayUplinkToken struct {
-	GatewayUID string `json:"uid"`
-	Token      []byte `json:"t"`
 }
 
 func encryptPlaintext(plaintext, additionalData []byte, aead cipher.AEAD) ([]byte, error) {
@@ -247,28 +212,7 @@ func wrapGatewayUplinkToken(
 	return encryptPlaintext(plaintext, forwarderData, aead)
 }
 
-func unwrapLegacyGatewayUplinkToken(token, key []byte) (string, []byte, error) {
-	obj, err := jose.ParseEncrypted(string(token))
-	if err != nil {
-		return "", nil, err
-	}
-	plaintext, err := obj.Decrypt(key)
-	if err != nil {
-		return "", nil, err
-	}
-	var t legacyGatewayUplinkToken
-	if err := json.Unmarshal(plaintext, &t); err != nil {
-		return "", nil, err
-	}
-	return t.GatewayUID, t.Token, nil
-}
-
-func unwrapGatewayUplinkToken(
-	token, forwarderData []byte, aead cipher.AEAD, legacyKey []byte,
-) (string, []byte, error) {
-	if uid, token, err := unwrapLegacyGatewayUplinkToken(token, legacyKey); err == nil {
-		return uid, token, nil
-	}
+func unwrapGatewayUplinkToken(token, forwarderData []byte, aead cipher.AEAD) (string, []byte, error) {
 	plaintext, err := decryptCiphertext(token, forwarderData, aead)
 	if err != nil {
 		return "", nil, err
@@ -751,7 +695,7 @@ func fromPBDownlink(
 	receivedAt time.Time,
 	conf ForwarderConfig,
 ) (uid string, res *ttnpb.DownlinkMessage, err error) {
-	uid, token, err := unwrapGatewayUplinkToken(msg.GatewayUplinkToken, forwarderData, conf.TokenAEAD, conf.TokenKey)
+	uid, token, err := unwrapGatewayUplinkToken(msg.GatewayUplinkToken, forwarderData, conf.TokenAEAD)
 	if err != nil {
 		return "", nil, errUnwrapGatewayUplinkToken.WithCause(err)
 	}

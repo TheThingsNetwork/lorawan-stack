@@ -157,8 +157,10 @@ type NetworkServer struct {
 	*component.Component
 	ctx context.Context
 
-	devices      DeviceRegistry
-	batchDevices *nsEndDeviceBatchRegistry
+	devices DeviceRegistry
+
+	batchDevices       ttnpb.NsEndDeviceBatchRegistryServer
+	relayConfiguration ttnpb.NsRelayConfigurationServiceServer
 
 	netID           netIDFunc
 	nsID            nsIDFunc
@@ -284,6 +286,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		deduplicationWindow:      makeWindowDurationFunc(conf.DeduplicationWindow),
 		collectionWindow:         makeWindowDurationFunc(conf.DeduplicationWindow + conf.CooldownWindow),
 		devices:                  wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
+		batchDevices:             &nsEndDeviceBatchRegistry{devices: conf.Devices},
+		relayConfiguration:       &nsRelayConfigurationService{devices: conf.Devices, frequencyPlans: c.FrequencyPlansStore},
 		downlinkTasks:            conf.DownlinkTaskQueue.Queue,
 		downlinkPriorities:       downlinkPriorities,
 		defaultMACSettings:       defaultMACSettings,
@@ -301,9 +305,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		QueueSize:  int(conf.ApplicationUplinkQueue.FastBufferSize),
 		MaxWorkers: int(conf.ApplicationUplinkQueue.FastNumConsumers),
 	})
-	ns.batchDevices = &nsEndDeviceBatchRegistry{
-		NS: ns,
-	}
 	ctx = ns.Context()
 
 	if len(opts) == 0 {
@@ -326,6 +327,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			"/ttn.lorawan.v3.NsEndDeviceRegistry",
 			"/ttn.lorawan.v3.NsEndDeviceBatchRegistry",
 			"/ttn.lorawan.v3.Ns",
+			"/ttn.lorawan.v3.RelayConfigurationService",
 		} {
 			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
 		}
@@ -395,6 +397,7 @@ func (ns *NetworkServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterNsEndDeviceRegistryServer(s, ns)
 	ttnpb.RegisterNsEndDeviceBatchRegistryServer(s, ns.batchDevices)
 	ttnpb.RegisterNsServer(s, ns)
+	ttnpb.RegisterNsRelayConfigurationServiceServer(s, ns.relayConfiguration)
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -402,6 +405,7 @@ func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 	ttnpb.RegisterNsEndDeviceRegistryHandler(ns.Context(), s, conn)
 	ttnpb.RegisterNsEndDeviceBatchRegistryHandler(ns.Context(), s, conn) // nolint:errcheck
 	ttnpb.RegisterNsHandler(ns.Context(), s, conn)
+	ttnpb.RegisterNsRelayConfigurationServiceHandler(ns.Context(), s, conn) // nolint:errcheck
 }
 
 // Roles returns the roles that the Network Server fulfills.

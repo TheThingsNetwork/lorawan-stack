@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -127,8 +128,8 @@ func relayCtrlUplinkListReqFields(req *ttnpb.MACCommand_RelayCtrlUplinkListReq) 
 	)
 }
 
-// DeviceDefaultRelayParameters returns the default relay parameters for the given device.
-func DeviceDefaultRelayParameters(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) *ttnpb.RelayParameters {
+// DeviceDefaultRelaySettings returns the default relay parameters for the given device.
+func DeviceDefaultRelaySettings(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) *ttnpb.RelaySettings {
 	switch {
 	case dev.GetMacSettings().GetRelay() != nil:
 		return dev.MacSettings.Relay
@@ -139,14 +140,88 @@ func DeviceDefaultRelayParameters(dev *ttnpb.EndDevice, defaults *ttnpb.MACSetti
 	}
 }
 
-// DeviceDesiredRelayParameters returns the desired relay parameters for the given device.
-func DeviceDesiredRelayParameters(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) *ttnpb.RelayParameters {
+// DeviceDesiredRelaySettings returns the desired relay parameters for the given device.
+func DeviceDesiredRelaySettings(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) *ttnpb.RelaySettings {
 	switch {
 	case dev.GetMacSettings().GetDesiredRelay() != nil:
 		return dev.MacSettings.DesiredRelay
 	case defaults.DesiredRelay != nil:
 		return defaults.DesiredRelay
 	default:
-		return DeviceDefaultRelayParameters(dev, defaults)
+		return DeviceDefaultRelaySettings(dev, defaults)
 	}
+}
+
+// ServedRelayParametersFromServedRelaySettings returns the served relay parameters for the given settings.
+func ServedRelayParametersFromServedRelaySettings(
+	settings *ttnpb.ServedRelaySettings, phy *band.Band,
+) *ttnpb.ServedRelayParameters {
+	if settings == nil {
+		return nil
+	}
+	parameters := &ttnpb.ServedRelayParameters{
+		Backoff:         phy.ServedRelayBackoff,
+		SecondChannel:   settings.SecondChannel,
+		ServingDeviceId: settings.ServingDeviceId,
+	}
+	if backoff := settings.Backoff; backoff != nil {
+		parameters.Backoff = backoff.Value
+	}
+	switch {
+	case settings.GetAlways() != nil:
+		parameters.Mode = &ttnpb.ServedRelayParameters_Always{
+			Always: settings.GetAlways(),
+		}
+	case settings.GetDynamic() != nil:
+		parameters.Mode = &ttnpb.ServedRelayParameters_Dynamic{
+			Dynamic: settings.GetDynamic(),
+		}
+	case settings.GetEndDeviceControlled() != nil:
+		parameters.Mode = &ttnpb.ServedRelayParameters_EndDeviceControlled{
+			EndDeviceControlled: settings.GetEndDeviceControlled(),
+		}
+	default:
+		panic("unreachable")
+	}
+	return parameters
+}
+
+// ServingRelayParametersFromServingRelaySettings returns the serving relay parameters for the given settings.
+func ServingRelayParametersFromServingRelaySettings(
+	settings *ttnpb.ServingRelaySettings,
+) *ttnpb.ServingRelayParameters {
+	if settings == nil {
+		return nil
+	}
+	parameters := &ttnpb.ServingRelayParameters{
+		SecondChannel:         settings.SecondChannel,
+		CadPeriodicity:        settings.CadPeriodicity,
+		UplinkForwardingRules: settings.UplinkForwardingRules,
+		Limits:                settings.Limits,
+	}
+	if defaultChIdx := settings.DefaultChannelIndex; defaultChIdx != nil {
+		parameters.DefaultChannelIndex = defaultChIdx.Value
+	}
+	return parameters
+}
+
+// RelayParametersFromRelaySettings returns the relay parameters for the given settings.
+func RelayParametersFromRelaySettings(settings *ttnpb.RelaySettings, phy *band.Band) *ttnpb.RelayParameters {
+	if settings == nil {
+		return nil
+	}
+	parameters := &ttnpb.RelayParameters{}
+	switch {
+	case settings.GetServed() != nil:
+		parameters.Mode = &ttnpb.RelayParameters_Served{
+			Served: ServedRelayParametersFromServedRelaySettings(settings.GetServed(), phy),
+		}
+	case settings.GetServing() != nil:
+		parameters.Mode = &ttnpb.RelayParameters_Serving{
+			Serving: ServingRelayParametersFromServingRelaySettings(settings.GetServing()),
+		}
+	default:
+		panic("unreachable")
+	}
+	return parameters
 }

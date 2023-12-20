@@ -1,92 +1,126 @@
 c/identity server:
-  - pkg/identityserver/*
-  - pkg/identityserver/**/*
-  - pkg/account/*
-  - pkg/account/**/*
-  - pkg/oauth/*
-  - pkg/oauth/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/identityserver/*
+          - pkg/identityserver/**/*
+          - pkg/account/*
+          - pkg/account/**/*
+          - pkg/oauth/*
+          - pkg/oauth/**/*
 
 c/gateway server:
-  - pkg/gatewayserver/*
-  - pkg/gatewayserver/**/*
-  - pkg/basicstation/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/gatewayserver/*
+          - pkg/gatewayserver/**/*
+          - pkg/basicstation/*
 
 c/gateway conf server:
-  - pkg/gatewayconfigurationserver/*
-  - pkg/gatewayconfigurationserver/**/*
-  - pkg/basicstation/*
-  - pkg/basicstation/cups/*
-  - pkg/pfconfig/*
-  - pkg/pfconfig/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/gatewayconfigurationserver/*
+          - pkg/gatewayconfigurationserver/**/*
+          - pkg/basicstation/*
+          - pkg/basicstation/cups/*
+          - pkg/pfconfig/*
+          - pkg/pfconfig/**/*
 
 c/network server:
-  - pkg/networkserver/*
-  - pkg/networkserver/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/networkserver/*
+          - pkg/networkserver/**/*
 
 c/device converter:
-  - pkg/devicetemplateconverter/*
-  - pkg/devicetemplates/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/devicetemplateconverter/*
+          - pkg/devicetemplates/*
 
 c/application server:
-  - pkg/applicationserver/*
-  - pkg/applicationserver/**/*
-  - pkg/messageprocessors/*
-  - pkg/messageprocessors/**/*
-  - pkg/scripting/*
-  - pkg/scripting/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/applicationserver/*
+          - pkg/applicationserver/**/*
+          - pkg/messageprocessors/*
+          - pkg/messageprocessors/**/*
+          - pkg/scripting/*
+          - pkg/scripting/**/*
 
 c/join server:
-  - pkg/joinserver/*
-  - pkg/joinserver/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/joinserver/*
+          - pkg/joinserver/**/*
 
 c/console:
-  - pkg/console/*
-  - pkg/console/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/console/*
+          - pkg/console/**/*
 
 c/packet broker agent:
-  - pkg/packetbrokeragent/*
-  - pkg/packetbrokeragent/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/packetbrokeragent/*
+          - pkg/packetbrokeragent/**/*
 
 compat/api:
-  - api/*.proto
+  - changed-files:
+      - any-glob-to-any-file:
+          - api/*.proto
 
 compat/config:
-  - cmd/**/config.go
-  - cmd/**/config.*.go
-  - pkg/**/config.go
-  - pkg/**/config.*.go
-  - pkg/config/*.go
-  - pkg/config/**/*.go
+  - changed-files:
+      - any-glob-to-any-file:
+          - cmd/**/config.go
+          - cmd/**/config.*.go
+          - pkg/**/config.go
+          - pkg/**/config.*.go
+          - pkg/config/*.go
+          - pkg/config/**/*.go
 
 compat/db:
-  - pkg/identityserver/store/*.go
-  - pkg/identityserver/store/**/*.go
-  - pkg/identityserver/gormstore/*.go
-  - pkg/identityserver/gormstore/**/*.go
-  - pkg/**/redis/*.go
-  - pkg/**/redis/**/*.go
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/identityserver/store/*.go
+          - pkg/identityserver/store/**/*.go
+          - pkg/identityserver/bunstore/*.go
+          - pkg/identityserver/bunstore/**/*.go
+          - pkg/**/redis/*.go
+          - pkg/**/redis/**/*.go
 
 security:
-  - pkg/crypto/*
-  - pkg/crypto/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/crypto/*
+          - pkg/crypto/**/*
 
 # NOTE: We're not assigning bump/minor because that is a choice for the maintainer.
 
 dependencies:
-  - go.mod
-  - go.sum
-  - yarn.lock
-  - sdk/js/yarn.lock
+  - changed-files:
+      - any-glob-to-any-file:
+          - go.mod
+          - go.sum
+          - yarn.lock
+          - sdk/js/yarn.lock
 
 ui/cli:
-  - cmd/ttn-lw-cli/*
-  - cmd/ttn-lw-cli/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - cmd/ttn-lw-cli/*
+          - cmd/ttn-lw-cli/**/*
 
 ui/web:
-  - pkg/webui/*
-  - pkg/webui/**/*
-  - pkg/web/oauthclient/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - pkg/webui/*
+          - pkg/webui/**/*
+          - pkg/web/oauthclient/*
 
 tooling:
-  - tools/*
-  - tools/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - tools/*
+          - tools/**/*

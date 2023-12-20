@@ -12,7 +12,7 @@ RUN rm -rf /srv/ttn-lorawan/lorawan-frequency-plans/.git
 COPY data/lorawan-webhook-templates /srv/ttn-lorawan/lorawan-webhook-templates
 RUN rm -rf /srv/ttn-lorawan/lorawan-webhook-templates/.git
 
-FROM alpine:3.18
+FROM alpine:3.19
 
 RUN addgroup -g 886 thethings && adduser -u 886 -S -G thethings thethings
 
