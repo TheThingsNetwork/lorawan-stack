@@ -51,18 +51,6 @@ export default {
   },
 }
 
-const SwitcherExample = () => {
-  const [layer, setLayer] = useState('/')
-  const handleClick = useCallback(
-    evt => {
-      setLayer(evt.target.getAttribute('href'))
-    },
-    [setLayer],
-  )
-
-  return <Switcher layer={layer} onClick={handleClick} />
-}
-
 export const Default = () => (
   <div
     className={classnames(
@@ -72,7 +60,7 @@ export const Default = () => (
     style={{ width: '17rem', height: '96vh' }}
   >
     <SideHeader logo={{ src: TtsLogo, alt: 'logo' }} />
-    <SwitcherExample />
+    <Switcher />
     <SearchButton />
     <SideNavigation className="mt-cs-xs">
       <SideNavigation.Item title="Overview" path="" icon="overview" exact />

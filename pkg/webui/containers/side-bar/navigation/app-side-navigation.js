@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useContext } from 'react'
+import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
@@ -56,25 +56,19 @@ const AppSideNavigation = () => {
   const rights = useSelector(selectApplicationRights)
   const natsDisabled = useSelector(selectNatsProviderDisabled)
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
-  const { isMinimized, setLayer } = useContext(SidebarContext)
+  const { isMinimized } = useContext(SidebarContext)
 
   const entityId = app ? app.name ?? appId : appId
 
-  const handleBackClick = useCallback(() => {
-    const path = '/applications'
-    setLayer(path)
-  }, [setLayer])
-
   return (
     <>
-      <SideNavigation>
+      <SideNavigation className="mb-cs-m">
         {!isMinimized && (
           <DedicatedEntity
             label={entityId}
             buttonMessage={m.buttonMessage}
             icon="arrow_back"
             className="mt-cs-xs mb-cs-l"
-            handleClick={handleBackClick}
             path={`/applications`}
           />
         )}

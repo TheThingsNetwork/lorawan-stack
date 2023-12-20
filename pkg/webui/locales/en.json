@@ -1430,6 +1430,8 @@
   "lib.shared-messages.token": "Token",
   "lib.shared-messages.tokenDelete": "Token delete",
   "lib.shared-messages.tokenDeleted": "Token deleted",
+  "lib.shared-messages.topApplications": "Top applications",
+  "lib.shared-messages.topGateways": "Top gateways",
   "lib.shared-messages.topEntities": "Top entities",
   "lib.shared-messages.tokenSet": "Set token",
   "lib.shared-messages.tokenUpdated": "Token updated",

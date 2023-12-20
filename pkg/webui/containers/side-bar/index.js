@@ -51,7 +51,8 @@ const Sidebar = () => {
         .map(cookie => JSON.parse(cookie))
     : []
 
-  const topEntities = topEntitiesCookie?.filter(cookie => cookie.tag === pathname.split('/')[1])
+  const tag = pathname === '/' ? 'general' : pathname.split('/')[1]
+  const topEntities = topEntitiesCookie?.filter(cookie => cookie.tag === tag)
 
   const sidebarClassnames = classnames(
     style.sidebar,

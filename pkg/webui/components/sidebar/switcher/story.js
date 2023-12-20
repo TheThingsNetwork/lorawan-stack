@@ -27,20 +27,8 @@ export default {
   },
 }
 
-const SwictherExample = () => {
-  const [layer, setLayer] = React.useState('/')
-  const handleClick = React.useCallback(
-    evt => {
-      setLayer(evt.target.getAttribute('href'))
-    },
-    [setLayer],
-  )
-
-  return <Switcher layer={layer} onClick={handleClick} />
-}
-
 export const Default = () => (
   <div style={{ maxWidth: '20rem' }}>
-    <SwictherExample />
+    <Switcher />
   </div>
 )

@@ -501,6 +501,8 @@ export default defineMessages({
   token: 'Token',
   tokenDelete: 'Token delete',
   tokenDeleted: 'Token deleted',
+  topApplications: 'Top applications',
+  topGateways: 'Top gateways',
   topEntities: 'Top entities',
   tokenSet: 'Set token',
   tokenUpdated: 'Token updated',
