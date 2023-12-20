@@ -38,41 +38,32 @@
 
 .button
   reset-button()
-  one-liner()
   width: 100%
   transition: color $ad.s, background $ad.s
   transition-timing-function: ease-out
-  border-radius: $br.m
   text-decoration: none
-  color: $c.grey-700
   display: flex
   align-items: center
-  gap: 0.5rem
-  padding: 0.5rem 0.3rem
+  justify-content: start
   position: relative
+  padding-left: $cs.xs
+  gap: $cs.xs !important
 
-  &:active
-    background: $c.tts-primary-150
-    color: $tc-deep-gray
-    font-weight: $fw.bold
-
-    .icon
-      color: $tc-deep-gray
-
-  &-active
-    background: $c.tts-primary-150
-    color: $tc-deep-gray
-    font-weight: $fw.bold
-
-    .icon
-      color: $tc-deep-gray
+  span
+    &:not(:first-child)
+      color: $c.grey-700 !important
 
   &:hover
-    color: $tc-deep-gray
+    background: none !important
+    color: $tc-deep-gray !important
     text-decoration: none
 
+    span
+      &:not(:first-child)
+        color: $c.grey-900 !important
+
     .icon
-      color: $tc-deep-gray
+      color: inherit
 
 .message
   vertical-align: middle

@@ -34,7 +34,7 @@ export default {
 }
 
 export const Default = () => (
-  <div>
+  <div style={{ maxWidth: '20rem' }}>
     <SearchButton />
   </div>
 )

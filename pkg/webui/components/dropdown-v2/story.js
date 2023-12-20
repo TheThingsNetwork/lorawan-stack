@@ -26,11 +26,11 @@ export default {
 export const Default = () => (
   <div style={{ height: '8rem' }}>
     <Dropdown className={style.example}>
-      <Dropdown.HeaderItem title={'dropdown items'} />
-      <Dropdown.Item title={'Profile Settings'} path={'profile/path'} icon="person" />
-      <Dropdown.Item title={'Admin panel'} path={'admin/path'} icon="admin_panel_settings" />
+      <Dropdown.HeaderItem title="dropdown items" />
+      <Dropdown.Item title="Profile Settings" path="profile/path" icon="person" />
+      <Dropdown.Item title="Admin panel" path="admin/path" icon="admin_panel_settings" />
       <hr />
-      <Dropdown.Item title={'Logout'} path={'logout/path'} icon="logout" />
+      <Dropdown.Item title="Logout" path="logout/path" icon="logout" />
     </Dropdown>
   </div>
 )

@@ -39,6 +39,6 @@ export const Default = () => (
     style={{ width: '17rem', height: '96vh' }}
     className="d-flex pos-fixed al-center direction-column"
   >
-    <Footer supportLink={'/support'} documentationBaseUrl={'/docs'} statusPageBaseUrl={'/status'} />
+    <Footer supportLink="/support" documentationBaseUrl="/docs" statusPageBaseUrl="/status" />
   </div>
 )

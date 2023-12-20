@@ -41,7 +41,7 @@ const SideHeader = ({ logo }) => {
       })}
     >
       <img {...logo} className={classnames({ 'w-50': !isMinimized })} />
-      <Button icon="left_panel_close" naked onClick={onMinimizeToggle} />
+      {!isMobile && <Button icon="left_panel_close" naked onClick={onMinimizeToggle} />}
     </div>
   )
 }

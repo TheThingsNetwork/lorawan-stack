@@ -16,16 +16,16 @@ import React, { useCallback, useEffect, useState } from 'react'
 import classnames from 'classnames'
 
 import Dropdown from '@ttn-lw/components/dropdown'
-import Icon from '@ttn-lw/components/icon'
 import MenuLink from '@ttn-lw/components/sidebar/side-menu-link'
-
-import Message from '@ttn-lw/lib/components/message'
+import Button from '@ttn-lw/components/button-v2'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import SideNavigationList from '../list'
 
 import style from './item.styl'
+import Message from '@ttn-lw/lib/components/message'
+import Icon from '@ttn-lw/components/icon'
 
 const handleItemClick = event => {
   if (event && event.target) {
@@ -51,7 +51,7 @@ const SideNavigationItem = props => {
         [],
       )
       for (const path of paths) {
-        if (location.pathname.startsWith(path)) {
+        if (location.pathname.includes(path)) {
           setIsExpanded(true)
           return
         }
@@ -116,12 +116,10 @@ SideNavigationItem.defaultProps = {
 const CollapsableItem = ({
   children,
   onClick,
-  isActive,
   isExpanded,
   title,
   icon,
   depth,
-  currentPathName,
   onDropdownItemsClick,
 }) => {
   const subItems = children
@@ -132,18 +130,9 @@ const CollapsableItem = ({
       icon: item.props.icon,
     }))
 
-  const subItemActive = subItems.some(item => item.path === currentPathName)
-
   return (
     <>
-      <button
-        className={classnames(style.button, {
-          [style.buttonActive]: isActive,
-          [style.linkActive]: subItemActive,
-        })}
-        type="button"
-        onClick={onClick}
-      >
+      <Button className={style.button} naked onClick={onClick}>
         {icon && <Icon icon={icon} className={style.icon} />}
         <Message content={title} className={style.message} />
         <Icon
@@ -152,7 +141,7 @@ const CollapsableItem = ({
             [style.expandIconOpen]: isExpanded,
           })}
         />
-      </button>
+      </Button>
       <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
         <Dropdown.HeaderItem title={title.defaultMessage} />
         {subItems.map(item => (
@@ -168,10 +157,8 @@ const CollapsableItem = ({
 
 CollapsableItem.propTypes = {
   children: PropTypes.node,
-  currentPathName: PropTypes.string.isRequired,
   depth: PropTypes.number.isRequired,
   icon: PropTypes.string,
-  isActive: PropTypes.bool.isRequired,
   isExpanded: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   onDropdownItemsClick: PropTypes.func,
