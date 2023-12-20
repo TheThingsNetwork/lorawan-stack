@@ -15,6 +15,7 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -36,12 +37,10 @@ import { mayViewOrEditGatewayCollaborators } from '@console/lib/feature-checks'
 const GatewayCollaborators = () => {
   const { gtwId } = useParams()
 
-  useBreadcrumbs('gtws.single.collaborators', [
-    {
-      path: `/gateways/${gtwId}/collaborators`,
-      content: sharedMessages.collaborators,
-    },
-  ])
+  useBreadcrumbs(
+    'gtws.single.collaborators',
+    <Breadcrumb path={`/gateways/${gtwId}/collaborators`} content={sharedMessages.collaborators} />,
+  )
 
   return (
     <Require

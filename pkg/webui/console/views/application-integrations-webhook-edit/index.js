@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -45,12 +46,13 @@ const ApplicationWebhookEditInner = () => {
   const webhook = useSelector(selectSelectedWebhook)
   const webhookTemplateId = getWebhookTemplateId(webhook)
   const webhookTemplate = useSelector(state => selectWebhookTemplateById(state, webhookTemplateId))
-  useBreadcrumbs('apps.single.integrations.webhooks.edit', [
-    {
-      path: `/applications/${appId}/integrations/${webhookId}`,
-      content: sharedMessages.edit,
-    },
-  ])
+  useBreadcrumbs(
+    'apps.single.integrations.webhooks.edit',
+    <Breadcrumb
+      path={`/applications/${appId}/integrations/${webhookId}`}
+      content={sharedMessages.edit}
+    />,
+  )
 
   return (
     <Container>

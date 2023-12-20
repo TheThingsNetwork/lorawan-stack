@@ -15,18 +15,20 @@
 import React from 'react'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import PacketBrokerNetworksTable from '@console/containers/packet-broker-networks-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const NetworkRoutingPoliciesView = () => {
-  useBreadcrumbs('admin-panel.packet-broker.routing-configuration.networks', [
-    {
-      path: '/admin-panel/packet-broker/routing-configuration/networks',
-      content: sharedMessages.networks,
-    },
-  ])
+  useBreadcrumbs(
+    'admin-panel.packet-broker.routing-configuration.networks',
+    <Breadcrumb
+      path={'/admin-panel/packet-broker/routing-configuration/networks'}
+      content={sharedMessages.networks}
+    />,
+  )
 
   return <PacketBrokerNetworksTable />
 }

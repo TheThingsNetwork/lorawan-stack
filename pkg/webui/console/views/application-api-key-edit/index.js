@@ -21,6 +21,7 @@ import { APPLICATION } from '@console/constants/entities'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -35,12 +36,13 @@ import { selectApiKeyById } from '@console/store/selectors/api-keys'
 const ApplicationApiKeyEditInner = () => {
   const { apiKeyId, appId } = useParams()
 
-  useBreadcrumbs('apps.single.api-keys.edit', [
-    {
-      path: `/applications/${appId}/api-keys/${apiKeyId}`,
-      content: sharedMessages.edit,
-    },
-  ])
+  useBreadcrumbs(
+    'apps.single.api-keys.edit',
+    <Breadcrumb
+      path={`/applications/${appId}/api-keys/${apiKeyId}`}
+      content={sharedMessages.edit}
+    />,
+  )
 
   return (
     <Container>

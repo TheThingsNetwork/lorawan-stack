@@ -20,6 +20,7 @@ import { useParams } from 'react-router-dom'
 import DataSheet from '@ttn-lw/components/data-sheet'
 import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import toast from '@ttn-lw/components/toast'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Link from '@ttn-lw/components/link'
@@ -71,18 +72,21 @@ const NetworkRoutingPolicyViewInner = () => {
   )
   const defaultRoutingPolicy = useSelector(selectHomeNetworkDefaultRoutingPolicy)
 
-  useBreadcrumbs('admin-panel.packet-broker.routing-configuration.networks.single', [
-    {
-      path: '/admin-panel/packet-broker/routing-configuration/networks',
-      content: sharedMessages.networks,
-    },
-    {
-      path: `/admin-panel/packet-broker/routing-configuration/networks/${netId}${
-        tenantId ? `/${tenantId}` : ''
-      }`,
-      content: network.name || displayId,
-    },
-  ])
+  useBreadcrumbs(
+    'admin-panel.packet-broker.routing-configuration.networks.single',
+    <>
+      <Breadcrumb
+        path={'/admin-panel/packet-broker/routing-configuration/networks'}
+        content={sharedMessages.networks}
+      />
+      <Breadcrumb
+        path={`/admin-panel/packet-broker/routing-configuration/networks/${netId}${
+          tenantId ? `/${tenantId}` : ''
+        }`}
+        content={network.name || displayId}
+      />
+    </>,
+  )
 
   const handleRoutingPolicySubmit = useCallback(
     async value => {

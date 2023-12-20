@@ -18,6 +18,7 @@ import { defineMessages } from '@formatjs/intl'
 
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -45,12 +46,10 @@ const m = defineMessages({
 })
 
 const AdminPanel = () => {
-  useBreadcrumbs('admin-panel', [
-    {
-      path: '/admin-panel',
-      content: sharedMessages.adminPanel,
-    },
-  ])
+  useBreadcrumbs(
+    'admin-panel',
+    <Breadcrumb path="/admin-panel" content={sharedMessages.adminPanel} />,
+  )
   const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))
   const showPacketBroker = useSelector(state => checkFromState(mayConfigurePacketBroker, state))
 

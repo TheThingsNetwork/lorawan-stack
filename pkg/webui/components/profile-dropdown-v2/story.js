@@ -30,7 +30,7 @@ export default {
 }
 
 export const Default = () => (
-  <div style={{ height: '25rem', marginLeft: '120px' }}>
+  <div style={{ height: '25rem', marginLeft: '15rem' }}>
     <ProfileDropdown brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}>
       <Dropdown.Item title="Profile settings" icon="person" path="/profile-settings" />
       <Dropdown.Item

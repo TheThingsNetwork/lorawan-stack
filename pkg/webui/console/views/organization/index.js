@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import organizationIcon from '@assets/misc/organization.svg'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import SideNavigation from '@ttn-lw/components/navigation/side'
 
@@ -91,12 +92,7 @@ const OrganizationInner = () => {
     checkFromState(mayEditBasicOrganizationInformation, state),
   )
 
-  useBreadcrumbs('orgs.single', [
-    {
-      path: `/organizations/${orgId}`,
-      content: name,
-    },
-  ])
+  useBreadcrumbs('orgs.single', <Breadcrumb path={`/organizations/${orgId}`} content={name} />)
 
   useEffect(
     () => () => {

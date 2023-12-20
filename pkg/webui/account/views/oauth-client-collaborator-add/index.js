@@ -19,6 +19,7 @@ import { useParams } from 'react-router-dom'
 import { CLIENT } from '@console/constants/entities'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -31,12 +32,14 @@ import { getClientRights } from '@account/store/actions/clients'
 
 const OAuthClientCollaboratorAddInner = () => {
   const { clientId } = useParams()
-  useBreadcrumbs('clients.single.collaborators.add', [
-    {
-      path: `/oauth-clients/${clientId}/collaborators/add`,
-      content: sharedMessages.add,
-    },
-  ])
+
+  useBreadcrumbs(
+    'clients.single.collaborators.add',
+    <Breadcrumb
+      path={`/oauth-clients/${clientId}/collaborators/add`}
+      content={sharedMessages.add}
+    />,
+  )
 
   return (
     <Container>

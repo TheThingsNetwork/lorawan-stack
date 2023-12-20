@@ -16,6 +16,7 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ApplicationEvents from '@console/containers/application-events'
@@ -34,12 +35,10 @@ const ApplicationData = () => {
 
   useRootClass(style.stageFlex, 'stage')
 
-  useBreadcrumbs('apps.single.data', [
-    {
-      path: `/applications/${appId}/data`,
-      content: sharedMessages.appData,
-    },
-  ])
+  useBreadcrumbs(
+    'apps.single.data',
+    <Breadcrumb path={`/applications/${appId}/data`} content={sharedMessages.appData} />,
+  )
 
   return (
     <Require

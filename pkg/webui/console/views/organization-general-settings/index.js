@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Spinner from '@ttn-lw/components/spinner'
 
 import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
@@ -60,12 +61,13 @@ const GeneralSettings = () => {
   )
   const orgId = useSelector(selectSelectedOrganizationId)
 
-  useBreadcrumbs('orgs.single.general-settings', [
-    {
-      path: `/organizations/${orgId}/general-settings`,
-      content: sharedMessages.generalSettings,
-    },
-  ])
+  useBreadcrumbs(
+    'orgs.single.general-settings',
+    <Breadcrumb
+      path={`/organizations/${orgId}/general-settings`}
+      content={sharedMessages.generalSettings}
+    />,
+  )
 
   // Conditionally load API Keys and Collaborators to determine whether
   // deleting is possible.

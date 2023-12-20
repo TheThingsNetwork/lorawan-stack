@@ -20,6 +20,7 @@ import { useSelector } from 'react-redux'
 import { ORGANIZATION } from '@console/constants/entities'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -35,12 +36,13 @@ import { selectApiKeyById } from '@console/store/selectors/api-keys'
 const OrganizationApiKeyEditInner = () => {
   const { orgId, apiKeyId } = useParams()
 
-  useBreadcrumbs('orgs.single.api-keys.edit', [
-    {
-      path: `/organizations/${orgId}/api-keys/${apiKeyId}`,
-      content: sharedMessages.edit,
-    },
-  ])
+  useBreadcrumbs(
+    'orgs.single.api-keys.edit',
+    <Breadcrumb
+      path={`/organizations/${orgId}/api-keys/${apiKeyId}`}
+      content={sharedMessages.edit}
+    />,
+  )
 
   return (
     <Container>
