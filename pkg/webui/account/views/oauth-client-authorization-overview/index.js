@@ -20,6 +20,7 @@ import { Routes, Route, useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Tabs from '@ttn-lw/components/tabs'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
@@ -53,12 +54,10 @@ const AuthorizationOverviewInner = () => {
   const client = useSelector(state => selectClientById(state, clientId))
   const clientName = client?.name || clientId
 
-  useBreadcrumbs('client-authorizations.single', [
-    {
-      path: `/client-authorizations/${clientId}`,
-      content: clientId,
-    },
-  ])
+  useBreadcrumbs(
+    'client-authorizations.single',
+    <Breadcrumb path={`/client-authorizations/${clientId}`} content={clientId} />,
+  )
 
   const basePath = `/client-authorizations/${clientId}`
 

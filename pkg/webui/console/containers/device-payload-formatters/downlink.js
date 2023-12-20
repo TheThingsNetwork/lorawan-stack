@@ -20,6 +20,7 @@ import { useParams } from 'react-router-dom'
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 import tts from '@console/api/tts'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
 import Notification from '@ttn-lw/components/notification'
@@ -62,12 +63,13 @@ const DevicePayloadFormatters = () => {
   )
   const dispatch = useDispatch()
 
-  useBreadcrumbs('device.single.payload-formatters.downlink', [
-    {
-      path: `/applications/${appId}/devices/${devId}/payload-formatters/downlink`,
-      content: sharedMessages.downlink,
-    },
-  ])
+  useBreadcrumbs(
+    'device.single.payload-formatters.downlink',
+    <Breadcrumb
+      path={`/applications/${appId}/devices/${devId}/payload-formatters/downlink`}
+      content={sharedMessages.downlink}
+    />,
+  )
 
   const onSubmit = useCallback(
     async values => {

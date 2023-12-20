@@ -46,7 +46,7 @@ const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
       }
     }
 
-    setTimeout(() => positionDropdown(), 200)
+    const t = setTimeout(() => positionDropdown(), 200)
 
     window.addEventListener('scroll', positionDropdown)
     window.addEventListener('resize', positionDropdown)
@@ -54,6 +54,7 @@ const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
     return () => {
       window.removeEventListener('resize', positionDropdown)
       window.removeEventListener('scroll', positionDropdown)
+      clearTimeout(t)
     }
   }, [])
   return (

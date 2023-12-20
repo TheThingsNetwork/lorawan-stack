@@ -16,6 +16,7 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -28,12 +29,10 @@ import { getUser } from '@console/store/actions/users'
 const UserManagementEdit = () => {
   const { userId } = useParams()
 
-  useBreadcrumbs('admin-panel.user-management.edit', [
-    {
-      path: `./${userId}`,
-      content: sharedMessages.edit,
-    },
-  ])
+  useBreadcrumbs(
+    'admin-panel.user-management.edit',
+    <Breadcrumb path={`./${userId}`} content={sharedMessages.edit} />,
+  )
 
   return (
     <RequireRequest

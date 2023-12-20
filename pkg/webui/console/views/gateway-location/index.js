@@ -17,6 +17,7 @@ import { Col, Row, Container } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import GatewayLocationForm from '@console/containers/gateway-location-form'
@@ -30,12 +31,10 @@ import { mayViewOrEditGatewayLocation } from '@console/lib/feature-checks'
 const GatewayLocation = () => {
   const { gtwId } = useParams()
 
-  useBreadcrumbs('gtws.single.data', [
-    {
-      path: `/gateways/${gtwId}/location`,
-      content: sharedMessages.location,
-    },
-  ])
+  useBreadcrumbs(
+    'gtws.single.data',
+    <Breadcrumb path={`/gateways/${gtwId}/location`} content={sharedMessages.location} />,
+  )
 
   return (
     <Require

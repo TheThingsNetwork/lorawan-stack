@@ -24,6 +24,7 @@ import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
@@ -60,12 +61,13 @@ const TokensTable = () => {
   const tokenIds = useSelector(tokenIdsSelector)
   const dispatch = useDispatch()
 
-  useBreadcrumbs('client-authorizations.single.access-tokens', [
-    {
-      path: `/client-authorizations/${clientId}/access-tokens`,
-      content: sharedMessages.accessTokens,
-    },
-  ])
+  useBreadcrumbs(
+    'client-authorizations.single.access-tokens',
+    <Breadcrumb
+      path={`/client-authorizations/${clientId}/access-tokens`}
+      content={sharedMessages.accessTokens}
+    />,
+  )
 
   const handleDeleteToken = React.useCallback(
     async id => {

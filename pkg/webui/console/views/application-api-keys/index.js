@@ -15,6 +15,7 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -37,12 +38,10 @@ import ApplicationApiKeyEdit from '../application-api-key-edit'
 const ApplicationApiKeys = () => {
   const { appId } = useParams()
 
-  useBreadcrumbs('apps.single.api-keys', [
-    {
-      path: `/applications/${appId}/api-keys`,
-      content: sharedMessages.apiKeys,
-    },
-  ])
+  useBreadcrumbs(
+    'apps.single.api-keys',
+    <Breadcrumb path={`/applications/${appId}/api-keys`} content={sharedMessages.apiKeys} />,
+  )
 
   return (
     <Require

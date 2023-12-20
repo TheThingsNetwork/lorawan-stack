@@ -15,6 +15,7 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -35,12 +36,13 @@ import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 
 const ApplicationPubsubs = () => {
   const { appId } = useParams()
-  useBreadcrumbs('apps.single.integrations.pubsubs', [
-    {
-      path: `/applications/${appId}/integrations/pubsubs`,
-      content: sharedMessages.pubsubs,
-    },
-  ])
+  useBreadcrumbs(
+    'apps.single.integrations.pubsubs',
+    <Breadcrumb
+      path={`/applications/${appId}/integrations/pubsubs`}
+      content={sharedMessages.pubsubs}
+    />,
+  )
   return (
     <Require
       featureCheck={mayViewApplicationEvents}

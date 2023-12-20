@@ -19,6 +19,7 @@ import { useParams } from 'react-router-dom'
 
 import { USER } from '@console/constants/entities'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -38,12 +39,10 @@ const UserApiKeyEditInner = () => {
   const userId = useSelector(selectUserId)
   const { apiKeyId } = useParams()
 
-  useBreadcrumbs('usr.single.api-keys.edit', [
-    {
-      path: `/users/api-keys/edit/${apiKeyId}`,
-      content: sharedMessages.edit,
-    },
-  ])
+  useBreadcrumbs(
+    'usr.single.api-keys.edit',
+    <Breadcrumb path={`/users/api-keys/edit/${apiKeyId}`} content={sharedMessages.edit} />,
+  )
 
   return (
     <Container>

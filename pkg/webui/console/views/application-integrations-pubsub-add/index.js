@@ -19,6 +19,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import PubsubForm from '@console/components/pubsub-form'
 
@@ -41,12 +42,10 @@ const ApplicationPubsubAdd = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  useBreadcrumbs('apps.single.integrations.add', [
-    {
-      path: `/applications/${appId}/integrations/add`,
-      content: sharedMessages.add,
-    },
-  ])
+  useBreadcrumbs(
+    'apps.single.integrations.add',
+    <Breadcrumb path={`/applications/${appId}/integrations/add`} content={sharedMessages.add} />,
+  )
 
   const existCheck = useCallback(
     async pubsubId => {

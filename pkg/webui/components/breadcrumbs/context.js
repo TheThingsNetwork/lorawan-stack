@@ -16,25 +16,21 @@ import React, { useContext, useEffect, useState } from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const BreadcrumbsContext = React.createContext({
-  add: () => {},
-  remove: () => {},
-  breadcrumbs: [],
-})
+const BreadcrumbsContext = React.createContext()
 const { Provider, Consumer } = BreadcrumbsContext
 
 const BreadcrumbsProvider = ({ children }) => {
   const [breadcrumbs, setBreadcrumbs] = useState([])
 
-  const add = (id, breadcrumbs) => {
+  const add = (id, breadcrumb) => {
     setBreadcrumbs(prev => {
       const index = prev.findIndex(({ id: breadcrumbId }) => breadcrumbId === id)
       if (index === -1) {
-        return [...prev, ...breadcrumbs].sort((a, b) => (a.id < b.id ? -1 : 1))
+        return [...prev, { id, breadcrumb }].sort((a, b) => (a.id < b.id ? -1 : 1))
       }
 
-      // Replace breadcrumbs with existing id.
-      return [...prev.slice(0, index), ...breadcrumbs, ...prev.slice(index + breadcrumbs.length)]
+      // Replace breadcrumb with existing id.
+      return [...prev.slice(0, index), { id, breadcrumb }, ...prev.slice(index + 1)]
     })
   }
 
@@ -45,7 +41,7 @@ const BreadcrumbsProvider = ({ children }) => {
   const value = {
     add,
     remove,
-    breadcrumbs,
+    breadcrumbs: breadcrumbs.map(b => b.breadcrumb),
   }
 
   return <Provider value={value}>{children}</Provider>
@@ -55,14 +51,11 @@ BreadcrumbsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 }
 
-const useBreadcrumbs = (id, breadcrumbs) => {
+const useBreadcrumbs = (id, element) => {
   const context = useContext(BreadcrumbsContext)
 
   useEffect(() => {
-    context.add(
-      id,
-      breadcrumbs.map(b => ({ ...b, id })),
-    )
+    context.add(id, element)
     return () => {
       context.remove(id)
     }

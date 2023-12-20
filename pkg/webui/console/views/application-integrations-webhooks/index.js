@@ -15,6 +15,7 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -39,12 +40,13 @@ import { listWebhookTemplates } from '@console/store/actions/webhook-templates'
 const ApplicationWebhooksInner = () => {
   const { appId } = useParams()
 
-  useBreadcrumbs('apps.single.integrations.webhooks', [
-    {
-      path: `/applications/${appId}/integrations/webhooks`,
-      content: sharedMessages.webhooks,
-    },
-  ])
+  useBreadcrumbs(
+    'apps.single.integrations.webhooks',
+    <Breadcrumb
+      path={`/applications/${appId}/integrations/webhooks`}
+      content={sharedMessages.webhooks}
+    />,
+  )
 
   return (
     <ErrorView errorRender={SubViewError}>

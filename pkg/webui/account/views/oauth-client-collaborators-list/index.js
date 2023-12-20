@@ -19,6 +19,7 @@ import { useParams } from 'react-router-dom'
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -29,12 +30,13 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 const OAuthClientCollaboratorsList = () => {
   const { clientId } = useParams()
 
-  useBreadcrumbs('clients.single.collaborators', [
-    {
-      path: `/oauth-clients/${clientId}/collaborators`,
-      content: sharedMessages.collaborators,
-    },
-  ])
+  useBreadcrumbs(
+    'clients.single.collaborators',
+    <Breadcrumb
+      path={`/oauth-clients/${clientId}/collaborators`}
+      content={sharedMessages.collaborators}
+    />,
+  )
 
   return (
     <Container>

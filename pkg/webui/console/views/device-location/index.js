@@ -17,6 +17,7 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useSelector, useDispatch } from 'react-redux'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -47,12 +48,13 @@ const DeviceGeneralSettings = () => {
   const devId = useSelector(selectSelectedDeviceId)
   const device = useSelector(selectSelectedDevice)
 
-  useBreadcrumbs('device.single.location', [
-    {
-      path: `/applications/${appId}/devices/${devId}/location`,
-      content: sharedMessages.location,
-    },
-  ])
+  useBreadcrumbs(
+    'device.single.location',
+    <Breadcrumb
+      path={`/applications/${appId}/devices/${devId}/location`}
+      content={sharedMessages.location}
+    />,
+  )
 
   const handleSubmit = useCallback(
     async location => {

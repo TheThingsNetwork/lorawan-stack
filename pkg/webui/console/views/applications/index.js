@@ -15,6 +15,7 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -32,12 +33,7 @@ import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 import { mayViewApplications } from '@console/lib/feature-checks'
 
 const Applications = () => {
-  useBreadcrumbs('apps', [
-    {
-      path: '/applications',
-      content: sharedMessages.applications,
-    },
-  ])
+  useBreadcrumbs('apps', <Breadcrumb path="/applications" content={sharedMessages.applications} />)
 
   return (
     <Require featureCheck={mayViewApplications} otherwise={{ redirect: '/' }}>

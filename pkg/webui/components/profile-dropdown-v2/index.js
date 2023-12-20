@@ -53,8 +53,10 @@ const ProfileDropdown = props => {
       ref={node}
       {...rest}
     >
-      {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
-      <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
+      <div className="d-flex gap-cs-xs al-center">
+        {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
+        <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
+      </div>
       <Icon
         className={classnames(style.arrowIcon, {
           [style['arrow-icon-expanded']]: expanded,

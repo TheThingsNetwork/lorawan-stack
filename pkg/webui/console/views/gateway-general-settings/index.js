@@ -20,6 +20,7 @@ import { isEqual } from 'lodash'
 
 import toast from '@ttn-lw/components/toast'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 import Collapse from '@ttn-lw/components/collapse'
 
@@ -187,12 +188,13 @@ const GatewaySettings = () => {
     [mayDeleteGtw, mayViewApiKeys, mayViewCollaborators, gtwId],
   )
 
-  useBreadcrumbs('gtws.single.general-settings', [
-    {
-      path: `/gateways/${gtwId}/general-settings`,
-      content: sharedMessages.generalSettings,
-    },
-  ])
+  useBreadcrumbs(
+    'gtws.single.general-settings',
+    <Breadcrumb
+      path={`/gateways/${gtwId}/general-settings`}
+      content={sharedMessages.generalSettings}
+    />,
+  )
 
   return (
     <Require

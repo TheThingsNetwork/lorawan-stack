@@ -30,7 +30,11 @@ export default {
 }
 
 export const Default = () => (
+<<<<<<< HEAD
   <div style={{ height: '6rem', marginLeft: '120px' }}>
+=======
+  <div style={{ height: '25rem', marginLeft: '15rem' }}>
+>>>>>>> bd663e15d9 (console: Implemented PR suggestions and rollback breadcrumb component)
     <ProfileDropdown brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}>
       <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
       <Dropdown.Item title="Logout" icon="power_settings_new" action={handleLogout} />

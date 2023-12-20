@@ -12,22 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
 
-import Breadcrumb from './breadcrumb'
-import { Breadcrumbs } from './breadcrumbs'
+.container
+  &:not(:last-child):after
+    material-icon()
+    margin: 0 $cs.xxs
+    content: 'keyboard_arrow_right'
+    color: $c['grey-400']
 
-export default {
-  title: 'Breadcrumbs',
-  component: [Breadcrumbs, Breadcrumb],
-}
 
-export const Default = () => {
-  const breadcrumbs = [
-    <Breadcrumb key="1" path="/applications" content="Applications" />,
-    <Breadcrumb key="2" path="/applications/test-app" content="test-app" />,
-    <Breadcrumb key="3" path="/applications/test-app/devices" content="Devices" />,
-  ]
+.link
+  one-liner()
+  text-decoration: none
+  color: $tc-subtle-gray
+  min-height: 18px
+  +focus-visible()
+    text-decoration: underline
+    color: $tc-deep-gray
 
-  return <Breadcrumbs breadcrumbs={breadcrumbs} />
-}
+
+.last
+  one-liner()
+  display: flex
+  align-items: center
+  color: $tc-deep-gray
+  min-height: 18px
+  font-weight: $fw.bold
+  +media-query($bp.s)
+    &:last-child
+      padding-right: $ls.xxs

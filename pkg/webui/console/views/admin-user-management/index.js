@@ -16,6 +16,7 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
@@ -35,12 +36,10 @@ import { mayManageUsers } from '@console/lib/feature-checks'
 import UserManagement from './admin-user-management'
 
 const UserManagementRouter = () => {
-  useBreadcrumbs('admin-panel.user-management', [
-    {
-      path: '/admin-panel/user-management',
-      content: sharedMessages.userManagement,
-    },
-  ])
+  useBreadcrumbs(
+    'admin-panel.user-management',
+    <Breadcrumb path="/admin-panel/user-management" content={sharedMessages.userManagement} />,
+  )
   return (
     <Require featureCheck={mayManageUsers} otherwise={{ redirect: '/' }}>
       <IntlHelmet title={sharedMessages.userManagement} />

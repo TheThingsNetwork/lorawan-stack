@@ -15,6 +15,7 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -32,12 +33,13 @@ import { userPathId as userPathIdRegexp } from '@ttn-lw/lib/regexp'
 const ApplicationCollaborators = () => {
   const { appId } = useParams()
 
-  useBreadcrumbs('apps.single.collaborators', [
-    {
-      path: `/applications/${appId}/collaborators`,
-      content: sharedMessages.collaborators,
-    },
-  ])
+  useBreadcrumbs(
+    'apps.single.collaborators',
+    <Breadcrumb
+      path={`/applications/${appId}/collaborators`}
+      content={sharedMessages.collaborators}
+    />,
+  )
 
   return (
     <ErrorView errorRender={SubViewError}>
