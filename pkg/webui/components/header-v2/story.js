@@ -18,6 +18,7 @@ import TtsLogo from '@assets/static/tts-logo.svg'
 
 import Dropdown from '@ttn-lw/components/dropdown-v2'
 import ExampleLogo from '@ttn-lw/components/logo/story-logo-new.svg'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import Header from '.'
 
@@ -73,21 +74,9 @@ const profileDropdownItems = (
 
 export const Default = () => {
   const breadcrumbs = [
-    {
-      id: '1',
-      path: '/applications',
-      content: 'Applications',
-    },
-    {
-      id: '2',
-      path: '/applications/test-app',
-      content: 'test-app',
-    },
-    {
-      id: '3',
-      path: '/applications/test-app/devices',
-      content: 'Devices',
-    },
+    <Breadcrumb key="1" path="/applications" content="Applications" />,
+    <Breadcrumb key="2" path="/applications/test-app" content="test-app" />,
+    <Breadcrumb key="3" path="/applications/test-app/devices" content="Devices" />,
   ]
 
   return (
