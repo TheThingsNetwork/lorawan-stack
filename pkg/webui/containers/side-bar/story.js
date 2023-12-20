@@ -17,11 +17,11 @@ import classnames from 'classnames'
 
 import TtsLogo from '@assets/static/tts-logo.svg'
 
-import Switcher from '@ttn-lw/components/switcher'
+import Switcher from '@ttn-lw/components/sidebar/switcher'
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
-import SideHeader from '@ttn-lw/components/side-header'
-import SearchButton from '@ttn-lw/components/search-button'
-import SideFooter from '@ttn-lw/components/side-footer'
+import SideHeader from '@ttn-lw/components/sidebar/side-header'
+import SearchButton from '@ttn-lw/components/sidebar/search-button'
+import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 
 import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
@@ -51,7 +51,7 @@ export default {
   },
 }
 
-const SwictherExample = () => {
+const SwitcherExample = () => {
   const [layer, setLayer] = useState('/')
   const handleClick = useCallback(
     evt => {
@@ -72,24 +72,20 @@ export const Default = () => (
     style={{ width: '17rem', height: '96vh' }}
   >
     <SideHeader logo={{ src: TtsLogo, alt: 'logo' }} />
-    <SwictherExample />
+    <SwitcherExample />
     <SearchButton />
     <SideNavigation className="mt-cs-xs">
-      <SideNavigation.Item title={'Overview'} path="" icon="overview" exact />
-      <SideNavigation.Item title={'Live data'} path="data" icon="data" />
-      <SideNavigation.Item title={'Location'} path="location" icon="location" />
-      <SideNavigation.Item title={'Collaborators'} path="collaborators" icon="organization" />
-      <SideNavigation.Item title={'API keys'} path="api-keys" icon="api_keys" />
+      <SideNavigation.Item title="Overview" path="" icon="overview" exact />
+      <SideNavigation.Item title="Live data" path="data" icon="data" />
+      <SideNavigation.Item title="Location" path="location" icon="location" />
+      <SideNavigation.Item title="Collaborators" path="collaborators" icon="organization" />
+      <SideNavigation.Item title="API keys" path="api-keys" icon="api_keys" />
       <SideNavigation.Item
-        title={'General settings'}
+        title="General settings"
         path="general-settings"
         icon="general_settings"
       />
     </SideNavigation>
-    <SideFooter
-      supportLink={'/support'}
-      documentationBaseUrl={'/docs'}
-      statusPageBaseUrl={'/status'}
-    />
+    <SideFooter supportLink="/support" documentationBaseUrl="/docs" statusPageBaseUrl="/status" />
   </div>
 )

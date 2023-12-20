@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-$minimize-button-height = 5rem
-
-// This style is to be applied to the portalled container.
 .container
   border-normal(right)
   display: flex
@@ -32,35 +29,6 @@ $minimize-button-height = 5rem
     z-index: $zi.nav
     +media-query-height(500px)
       position: static
-
-  .minimize-button
-    reset-button()
-    transition-color()
-    border-normal(top)
-    box-sizing: border-box
-    color: $tc-subtle-gray
-    background-color: white
-    position: sticky
-    top: "calc(100vh - %s)" % $minimize-button-height
-    width: 100%
-    height: $minimize-button-height
-    margin-bottom: 1px
-    flex-shrink: 0
-    &:not(.minimize-button-minimized)
-      padding-left: $cs.l
-      text-align: left
-    &-minimized
-      padding-left: 0
-      text-align: center
-    +media-query-min($bp.s)
-      display: block
-    +media-query($bp.s)
-      display: none
-    &:hover
-      color: $tc-deep-gray
-    span:first-child
-      nudge('up')
-
 
 .navigation
   box-sizing: border-box
@@ -94,36 +62,6 @@ $minimize-button-height = 5rem
 
       .drawer
         overflow: visible
-
-.header
-  border-normal(bottom)
-  sidebar-transition(padding)
-  height: 6rem
-  color: $tc-deep-gray
-  box-sizing: border-box
-  display: flex
-  align-items: center
-  padding: $cs.xl $cs.l
-  font-weight: $fw.bold
-
-.mobile-header
-  align-items: center
-  +media-query-min($bp.s)
-    display: none
-  +media-query($bp.s)
-    border-normal(bottom)
-    display: flex
-    padding: 0 $cs.s
-    height: $sidebar-mobile-menu-height
-
-  .expand-icon
-    margin-right: $cs.s
-    font-size: 2rem
-    color: $tc-subtle-gray
-
-.icon
-  width: 2rem
-  margin-right: $cs.m
 
 .drawer
   background-color: white

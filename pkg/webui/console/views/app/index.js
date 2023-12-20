@@ -27,7 +27,7 @@ import classnames from 'classnames'
 import { ToastContainer } from '@ttn-lw/components/toast'
 import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
 
-import Footer from '@ttn-lw/containers/footer'
+import SideBar from '@ttn-lw/containers/side-bar'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -88,33 +88,34 @@ const Layout = () => {
     <>
       <ScrollRestoration getKey={getScrollRestorationKey} />
       <ErrorView errorRender={errorRender}>
-        <div className={style.app}>
+        <div>
           <IntlHelmet
             titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             defaultTitle={siteName}
           />
           <div id="modal-container" />
-          <Header />
-          <main className={style.main}>
-            <WithAuth
-              user={user}
-              fetching={fetching}
-              error={error}
-              errorComponent={FullViewErrorInner}
-              rights={rights}
-              isAdmin={isAdmin}
-            >
-              <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-              <div id="sidebar" className={sidebarStyle.container} />
-              <div className={style.content}>
-                <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
-                <div className={style.stage} id="stage">
-                  <Outlet />
+          <div className="grid">
+            <SideBar />
+            <main className={classnames(style.main, 'w-full', 'h-full', 'item-8', 'item-start-4')}>
+              <WithAuth
+                user={user}
+                fetching={fetching}
+                error={error}
+                errorComponent={FullViewErrorInner}
+                rights={rights}
+                isAdmin={isAdmin}
+              >
+                <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
+                <div id="sidebar" className={sidebarStyle.container} />
+                <div className={style.content}>
+                  <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
+                  <div className={style.stage} id="stage">
+                    <Outlet />
+                  </div>
                 </div>
-              </div>
-            </WithAuth>
-          </main>
-          <Footer className={style.footer} />
+              </WithAuth>
+            </main>
+          </div>
         </div>
       </ErrorView>
     </>

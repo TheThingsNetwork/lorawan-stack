@@ -1,0 +1,56 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.dedicated-entity
+  text-decoration: none
+  line-height: 1.6rem
+  color: $c.grey-900
+
+  &-item
+    display: flex
+
+  &-label
+    font-size: $fs.m
+    font-weight: $fw.normal
+    margin: 0 0 0 $cs.xs
+
+  &-divider
+    display: list-item
+    height: 1.8rem
+    margin: 0 $cs.xs 0 $cs.s
+    border-left: 1px solid $c.grey-200
+    background-color: $c.grey-200
+
+  &-button
+    border-radius: $br.l
+    max-width: 2.5rem
+    padding: 0 $cs.xs 0 0.73rem
+
+    span
+      &:not(:first-child)
+        display: none
+
+  &:hover
+    .dedicated-entity-button
+      justify-content: start
+      max-width: 100%
+      width: 100%
+      padding: 0 $cs.m 0 0.73rem
+
+      span
+        &:not(:first-child)
+          display: flex
+
+    .dedicated-entity-item
+      display: none

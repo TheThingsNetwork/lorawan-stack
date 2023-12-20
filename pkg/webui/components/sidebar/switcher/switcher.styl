@@ -12,27 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.dedicated-entity
-  display: flex
-  align-items: center
-
-.label
-  font-size: $fs.m
-  font-weight: $fw.normal
-  margin: 0 0 0 $cs.xs
-
-.divider
-  display: list-item
-  height: 1.8rem
-  margin: 0 $cs.xs
-  border-left: 1px solid $c.grey-200
-  background-color: $c.grey-200
-
-.button
+.switcher-container
   border-radius: $br.l
-  transition: 0.2s all ease-in-out
+  border: 1px solid $c.grey-100
+  background: white
+  box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.05)
+  font-weight: $fw.light
 
-  &-hovered
-    justify-content: start
-    width: 100% !important
+  .link
     transition: 0.2s all ease-in-out
+    border-radius: $br.m
+    text-decoration: none
+    color: $c.grey-700
+    display: flex
+    justify-content: center
+    width: 100%
+    font-weight: $fw.bold
+
+    &.active
+      background: $c.grey-900
+      color: $c.white
+
+    &:visited
+      text-decoration: none
+      &:not(.active)
+        color: $c.grey-700
+
+    &:hover
+      text-decoration: none
+      &:not(.active)
+        background: $c.grey-100

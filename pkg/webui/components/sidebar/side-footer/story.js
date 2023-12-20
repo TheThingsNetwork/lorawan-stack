@@ -16,10 +16,11 @@ import React from 'react'
 
 import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
-import SearchButton from '.'
+import Footer from '.'
 
 export default {
-  title: 'Sidebar/SearchButton',
+  title: 'Sidebar/Footer',
+  component: Footer,
   decorators: [
     storyFn => (
       <SidebarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SidebarContext.Provider>
@@ -28,13 +29,16 @@ export default {
   parameters: {
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1345%3A11586&mode=design&t=Hbk2Qngeg1xqg4V3-1',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1345%3A11247&mode=design&t=Hbk2Qngeg1xqg4V3-1',
     },
   },
 }
 
 export const Default = () => (
-  <div>
-    <SearchButton />
+  <div
+    style={{ width: '17rem', height: '96vh' }}
+    className="d-flex pos-fixed al-center direction-column"
+  >
+    <Footer supportLink="/support" documentationBaseUrl="/docs" statusPageBaseUrl="/status" />
   </div>
 )

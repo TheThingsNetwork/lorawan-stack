@@ -13,16 +13,28 @@
 // limitations under the License.
 
 import React, { useCallback, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
-import DedicatedEntity from '@ttn-lw/components/dedicated-entity'
+import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
+import {
+  mayViewGatewayInfo,
+  mayViewGatewayEvents,
+  mayViewOrEditGatewayLocation,
+  mayViewOrEditGatewayCollaborators,
+  mayViewOrEditGatewayApiKeys,
+  mayEditBasicGatewayInformation,
+} from '@console/lib/feature-checks'
+
+import {
+  selectSelectedGateway,
+  selectSelectedGatewayId,
+  selectGatewayRights,
+} from '@console/store/selectors/gateways'
 
 import SidebarContext from '../context'
 
@@ -33,16 +45,15 @@ const m = defineMessages({
 const GtwSideNavigation = () => {
   const gtw = useSelector(selectSelectedGateway)
   const gtwId = useSelector(selectSelectedGatewayId)
+  const rights = useSelector(selectGatewayRights)
   const { isMinimized, setLayer } = useContext(SidebarContext)
-  const navigate = useNavigate()
 
   const entityId = gtw ? gtw.name ?? gtwId : gtwId
 
   const handleBackClick = useCallback(() => {
     const path = '/gateways'
-    navigate(path)
     setLayer(path)
-  }, [navigate, setLayer])
+  }, [setLayer])
 
   return (
     <SideNavigation>
@@ -50,42 +61,55 @@ const GtwSideNavigation = () => {
         <DedicatedEntity
           label={entityId}
           buttonMessage={m.buttonMessage}
-          icon="arrow_left"
-          className="mt-cs-xs mb-cs-m"
-          onClick={handleBackClick}
+          icon="arrow_back"
+          className="mt-cs-xs mb-cs-l"
+          handleClick={handleBackClick}
+          path={`/gateways`}
         />
       )}
-      <SideNavigation.Item
-        title={sharedMessages.gatewayOverview}
-        path={`gateways/${gtwId}`}
-        icon="gateway"
-        exact
-      />
-      <SideNavigation.Item
-        title={sharedMessages.liveData}
-        path={`gateways/${gtwId}/data`}
-        icon="list_alt"
-      />
-      <SideNavigation.Item
-        title={sharedMessages.location}
-        path={`gateways/${gtwId}/location`}
-        icon="map"
-      />
-      <SideNavigation.Item
-        title={sharedMessages.collaborators}
-        path={`gateways/${gtwId}/collaborators`}
-        icon="organization"
-      />
-      <SideNavigation.Item
-        title={sharedMessages.apiKeys}
-        path={`gateways/${gtwId}/api-keys`}
-        icon="api_keys"
-      />
-      <SideNavigation.Item
-        title={sharedMessages.generalSettings}
-        path={`gateways/${gtwId}/general-settings`}
-        icon="general_settings"
-      />
+      {mayViewGatewayInfo.check(rights) && (
+        <SideNavigation.Item
+          title={sharedMessages.gatewayOverview}
+          path={`gateways/${gtwId}`}
+          icon="gateway"
+          exact
+        />
+      )}
+      {mayViewGatewayEvents.check(rights) && (
+        <SideNavigation.Item
+          title={sharedMessages.liveData}
+          path={`gateways/${gtwId}/data`}
+          icon="list_alt"
+        />
+      )}
+      {mayViewOrEditGatewayLocation.check(rights) && (
+        <SideNavigation.Item
+          title={sharedMessages.location}
+          path={`gateways/${gtwId}/location`}
+          icon="map"
+        />
+      )}
+      {mayViewOrEditGatewayCollaborators.check(rights) && (
+        <SideNavigation.Item
+          title={sharedMessages.collaborators}
+          path={`gateways/${gtwId}/collaborators`}
+          icon="organization"
+        />
+      )}
+      {mayViewOrEditGatewayApiKeys.check(rights) && (
+        <SideNavigation.Item
+          title={sharedMessages.apiKeys}
+          path={`gateways/${gtwId}/api-keys`}
+          icon="api_keys"
+        />
+      )}
+      {mayEditBasicGatewayInformation.check(rights) && (
+        <SideNavigation.Item
+          title={sharedMessages.generalSettings}
+          path={`gateways/${gtwId}/general-settings`}
+          icon="general_settings"
+        />
+      )}
     </SideNavigation>
   )
 }

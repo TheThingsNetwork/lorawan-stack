@@ -14,17 +14,33 @@
 
 import React from 'react'
 
-import SectionLabel from '.'
+import Switcher from '.'
 
 export default {
-  title: 'Sidebar/SectionLabel',
-  component: SectionLabel,
+  title: 'Sidebar/Switcher',
+  component: Switcher,
   parameters: {
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1312%3A27341&mode=design&t=Hbk2Qngeg1xqg4V3-1',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1312%3A7620&mode=design&t=Hbk2Qngeg1xqg4V3-1',
     },
   },
 }
 
-export const Default = () => <SectionLabel label="Top entities" icon="add" />
+const SwictherExample = () => {
+  const [layer, setLayer] = React.useState('/')
+  const handleClick = React.useCallback(
+    evt => {
+      setLayer(evt.target.getAttribute('href'))
+    },
+    [setLayer],
+  )
+
+  return <Switcher layer={layer} onClick={handleClick} />
+}
+
+export const Default = () => (
+  <div style={{ maxWidth: '20rem' }}>
+    <SwictherExample />
+  </div>
+)

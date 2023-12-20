@@ -14,7 +14,7 @@
 
 import React, { useContext } from 'react'
 
-import SideHeader from '@ttn-lw/components/side-header'
+import SideHeader from '@ttn-lw/components/sidebar/side-header'
 
 import { selectApplicationSiteName, selectAssetsRootPath } from '@ttn-lw/lib/selectors/env'
 

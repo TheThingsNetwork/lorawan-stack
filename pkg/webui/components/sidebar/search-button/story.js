@@ -12,38 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.link
-  transition: 0.2s all ease-in-out
-  border-radius: $br.l
-  text-decoration: none
-  color: $c.grey-700
-  display: flex
-  align-items: center
-  gap: $cs.xs
-  padding: $cs.xs
-  position: relative
+import React from 'react'
 
-  .icon
-    color: $c.grey-500
+import SidebarContext from '@ttn-lw/containers/side-bar/context'
 
-  &.active
-    background: $c.tts-primary-150
-    color: $c.grey-900
-    transition: 0.2s background ease-in-out
+import SearchButton from '.'
 
-    .icon
-      color: inherit
+export default {
+  title: 'Sidebar/SearchButton',
+  decorators: [
+    storyFn => (
+      <SidebarContext.Provider value={{ isMinimized: false }}>{storyFn()}</SidebarContext.Provider>
+    ),
+  ],
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/2023-console-redesign?type=design&node-id=1345%3A11586&mode=design&t=Hbk2Qngeg1xqg4V3-1',
+    },
+  },
+}
 
-  &.disabled
-    color: $c.grey-400
-
-    .icon
-      color: inherit
-
-  &:hover
-    color: $c.grey-900
-    text-decoration: none
-    transition: 0.2s color ease-in-out
-
-    .icon
-      color: inherit
+export const Default = () => (
+  <div style={{ maxWidth: '20rem' }}>
+    <SearchButton />
+  </div>
+)

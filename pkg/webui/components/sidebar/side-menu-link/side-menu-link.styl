@@ -12,26 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+.link
+  transition: 0.2s all ease-in-out
+  border-radius: $br.l
+  text-decoration: none
+  color: $c.grey-700
+  display: flex
+  align-items: center
+  gap: $cs.xs
+  padding: $cs.xs
+  position: relative
 
-import SideFooter from '@ttn-lw/components/side-footer'
+  .icon
+    color: $c.grey-500
 
-import {
-  selectDocumentationUrlConfig,
-  selectPageStatusBaseUrlConfig,
-  selectSupportLinkConfig,
-} from '@ttn-lw/lib/selectors/env'
+  &.active
+    background: $c.tts-primary-150
+    color: $c.grey-900
 
-const supportLink = selectSupportLinkConfig()
-const documentationBaseUrl = selectDocumentationUrlConfig()
-const statusPageBaseUrl = selectPageStatusBaseUrlConfig()
+    .icon
+      color: inherit
 
-const Footer = () => (
-  <SideFooter
-    supportLink={supportLink}
-    documentationBaseUrl={documentationBaseUrl}
-    statusPageBaseUrl={statusPageBaseUrl}
-  />
-)
+  &.disabled
+    color: $c.grey-400
 
-export default Footer
+    .icon
+      color: inherit
+
+  &:hover
+    color: $c.grey-900
+    text-decoration: none
+
+    .icon
+      color: inherit
