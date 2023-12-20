@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/mileusna/useragent"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/eventsmux"
@@ -90,10 +91,21 @@ func (h *eventsHandler) handleEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Safari versions above 15 cannot handle compression correctly when the
+	// `NSURLSession Websocket` experimental feature is enabled (it is enabled by default).
+	// Versions above 17 still show the same issues, but the experimental feature is baseline.
+	// As such, we disable compression for Safari for all versions in order to ensure the best
+	// user experience.
+	// https://github.com/TheThingsNetwork/lorawan-stack/issues/6782
+	compressionMode := websocket.CompressionContextTakeover
+	if ua := useragent.Parse(r.UserAgent()); ua.Name == useragent.Safari {
+		compressionMode = websocket.CompressionDisabled
+	}
+
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		Subprotocols:       []string{protocolV1},
 		InsecureSkipVerify: true, // CORS is not enabled for APIs.
-		CompressionMode:    websocket.CompressionContextTakeover,
+		CompressionMode:    compressionMode,
 	})
 	if err != nil {
 		logger.WithError(err).Debug("Failed to accept WebSocket")
