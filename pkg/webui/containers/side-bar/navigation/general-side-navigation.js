@@ -15,7 +15,7 @@
 import React, { useContext } from 'react'
 
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
-import SectionLabel from '@ttn-lw/components/section-label'
+import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 

@@ -13,12 +13,11 @@
 // limitations under the License.
 
 import React, { useCallback, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import SideNavigation from '@ttn-lw/components/navigation/side-v2'
-import DedicatedEntity from '@ttn-lw/components/dedicated-entity'
+import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -37,15 +36,13 @@ const AppSideNavigation = () => {
   const app = useSelector(selectSelectedApplication)
   const appId = useSelector(selectSelectedApplicationId)
   const { isMinimized, setLayer } = useContext(SidebarContext)
-  const navigate = useNavigate()
 
   const entityId = app ? app.name ?? appId : appId
 
   const handleBackClick = useCallback(() => {
     const path = '/applications'
-    navigate(path)
     setLayer(path)
-  }, [navigate, setLayer])
+  }, [setLayer])
 
   return (
     <>
@@ -54,9 +51,10 @@ const AppSideNavigation = () => {
           <DedicatedEntity
             label={entityId}
             buttonMessage={m.buttonMessage}
-            icon="arrow_left"
-            className="mt-cs-xs mb-cs-m"
-            onClick={handleBackClick}
+            icon="arrow_back"
+            className="mt-cs-xs mb-cs-l"
+            handleClick={handleBackClick}
+            path={`/applications`}
           />
         )}
         <SideNavigation.Item

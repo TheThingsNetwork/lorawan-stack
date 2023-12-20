@@ -18,7 +18,7 @@ import classnames from 'classnames'
 
 import LAYOUT from '@ttn-lw/constants/layout'
 
-import SearchButton from '@ttn-lw/components/search-button'
+import SearchButton from '@ttn-lw/components/sidebar/search-button'
 
 import SidebarNavigation from './navigation'
 import SidebarContext from './context'

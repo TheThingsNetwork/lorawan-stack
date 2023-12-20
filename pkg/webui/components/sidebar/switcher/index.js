@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
@@ -26,6 +26,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './switcher.styl'
 
 const Switcher = ({ layer, onClick, isMinimized }) => {
+  // <NavLink to="/"> effectively ignores the end prop and only matches when you're at the root route.
+  // https://reactrouter.com/en/main/components/nav-link
   const overviewClassName = classnames(
     style.link,
     { [style.active]: !layer.includes('/applications') && !layer.includes('/gateways') },
@@ -33,18 +35,10 @@ const Switcher = ({ layer, onClick, isMinimized }) => {
     'p-sides-0',
   )
 
-  const applicationsClassName = classnames(
-    style.link,
-    { [style.active]: layer.includes('/applications') },
-    'p-vert-cs-s',
-    'p-sides-0',
-  )
-
-  const gatewaysClassName = classnames(
-    style.link,
-    { [style.active]: layer.includes('/gateways') },
-    'p-vert-cs-s',
-    'p-sides-0',
+  const className = useCallback(
+    ({ isActive }) =>
+      classnames(style.link, { [style.active]: isActive }, 'p-vert-cs-s', 'p-sides-0'),
+    [],
   )
 
   return (
@@ -57,11 +51,11 @@ const Switcher = ({ layer, onClick, isMinimized }) => {
         {isMinimized ? <Icon icon="home" /> : null}
         {!isMinimized ? <Message content={sharedMessages.overview} /> : null}
       </NavLink>
-      <NavLink to="/applications" onClick={onClick} className={applicationsClassName}>
+      <NavLink to="/applications" onClick={onClick} className={className}>
         {isMinimized ? <Icon icon="application" /> : null}
         {!isMinimized ? <Message content={sharedMessages.applications} /> : null}
       </NavLink>
-      <NavLink to="/gateways" onClick={onClick} className={gatewaysClassName}>
+      <NavLink to="/gateways" onClick={onClick} className={className}>
         {isMinimized ? <Icon icon="gateway" /> : null}
         {!isMinimized ? <Message content={sharedMessages.gateways} /> : null}
       </NavLink>
