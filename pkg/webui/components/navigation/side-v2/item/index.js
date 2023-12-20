@@ -17,7 +17,7 @@ import classnames from 'classnames'
 
 import Dropdown from '@ttn-lw/components/dropdown'
 import Icon from '@ttn-lw/components/icon'
-import MenuLink from '@ttn-lw/components/side-menu-link'
+import MenuLink from '@ttn-lw/components/sidebar/side-menu-link'
 
 import Message from '@ttn-lw/lib/components/message'
 

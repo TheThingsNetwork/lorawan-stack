@@ -21,20 +21,18 @@ import AppSideNavigation from './app-side-navigation'
 import GtwListSideNavigation from './gtw-list-side-navigation'
 import GtwSideNavigation from './gtw-side-navigation'
 import GeneralSideNavigation from './general-side-navigation'
-import DeviceSideNavigation from './device-side-navigation'
 
 const SidebarNavigation = () => {
   const { layer } = useContext(SidebarContext)
 
   const showGeneralSideNavigation = !layer.includes('/applications') && !layer.includes('/gateways')
 
-  const showAppSideNavigation = layer.includes('/applications/') && !layer.includes('/devices/')
+  const showAppSideNavigation = layer.includes('/applications/')
 
   return (
     <div>
       {showGeneralSideNavigation && <GeneralSideNavigation />}
       {showAppSideNavigation && <AppSideNavigation />}
-      {layer.includes('/devices/') && <DeviceSideNavigation />}
       {layer.includes('/applications') && <AppListSideNavigation />}
       {layer.includes('/gateways/') && <GtwSideNavigation />}
       {layer.includes('/gateways') && <GtwListSideNavigation />}

@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import SideFooter from '@ttn-lw/components/side-footer'
+import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 
 import {
   selectDocumentationUrlConfig,

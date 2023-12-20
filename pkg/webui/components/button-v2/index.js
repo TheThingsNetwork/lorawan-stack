@@ -43,15 +43,19 @@ const assembleClassnames = ({
   dropdownItems,
   className,
 }) =>
-  classnames(style.button, className, {
-    [style.primary]: primary,
-    [style.secondary]: secondary,
-    [style.naked]: naked,
-    [style.grey]: grey,
-    [style.withIcon]: icon !== undefined && message,
-    [style.onlyIcon]: icon !== undefined && !message,
-    [style.withDropdown]: Boolean(dropdownItems),
-  })
+  classnames(
+    style.button,
+    {
+      [style.primary]: primary,
+      [style.secondary]: secondary,
+      [style.naked]: naked,
+      [style.grey]: grey,
+      [style.withIcon]: icon !== undefined && message,
+      [style.onlyIcon]: icon !== undefined && !message,
+      [style.withDropdown]: Boolean(dropdownItems),
+    },
+    className,
+  )
 
 const buttonChildren = props => {
   const { dropdownItems, icon, message, expanded, noDropdownIcon, dropdownClassName, children } =
@@ -90,7 +94,6 @@ const Button = forwardRef((props, ref) => {
     onBlur,
     onClick,
     form,
-    isHoverDropdown,
     onMouseEnter,
     onMouseLeave,
     ...rest
@@ -143,7 +146,7 @@ const Button = forwardRef((props, ref) => {
   return (
     <button
       className={buttonClassNames}
-      onClick={isHoverDropdown ? null : handleClick}
+      onClick={dropdownItems ? handleClick : undefined}
       children={buttonChildren({ ...props, expanded })}
       ref={ref}
       {...htmlProps}
@@ -214,14 +217,11 @@ Button.propTypes = {
    * Not called if the button is in the `busy` or `disabled` state.
    */
   onClick: PropTypes.func,
-  onMouseEnter: PropTypes.func,
-  onMouseLeave: PropTypes.func,
   ...commonPropTypes,
 }
 
 Button.defaultProps = {
-  onMouseEnter: () => null,
-  onMouseLeave: () => null,
+  onClick: () => null,
 }
 
 export default Button

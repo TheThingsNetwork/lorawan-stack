@@ -12,34 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.switcher-container
-  border-radius: $br.l
-  border: 1px solid $c.grey-200
-  box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.06)
-  font-weight: $fw.light
+.search-button
+  font-size: $fs.m
+  color: $c.grey-500 !important
+  width: 100%
+  position: relative
+  display: flex
+  justify-content: space-between
+  padding: $cs.xs $cs.xxs
+  gap: $cs.xxs
+  box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.05) !important
+  background: white !important
+  border: 1px solid $c.grey-100 !important
 
-  .link
-    transition: 0.2s all ease-in-out
+  &:hover
+    background-color: $c-focus !important
+
+  &-minimized
+    justify-content: center
+
+  p
+    line-height: 1.4
+
+  .icon
+    font-size: $fs.xl
+
+  .backslash-container
+    height: 1.5rem
+    width: 1.5rem
+    text-align: center
     border-radius: $br.m
-    text-decoration: none
-    color: $c.grey-700
+    border: 1px solid $c.grey-200
+    font-size: $fs.s
     display: flex
     justify-content: center
-    width: 100%
-    font-weight: $fw.bold
-
-    &.active
-      background: $c.grey-900
-      color: $c.white
-      transition: 0.2s background ease-in-out
-
-    &:visited
-      text-decoration: none
-      &:not(.active)
-        color: $c.grey-700
-
-    &:hover
-      text-decoration: none
-      transition: 0.2s background ease-in-out
-      &:not(.active)
-        background: $c.grey-100
+    align-items: center

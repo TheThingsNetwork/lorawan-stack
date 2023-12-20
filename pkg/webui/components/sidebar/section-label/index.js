@@ -21,8 +21,6 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './section-label.styl'
-
 const SectionLabel = ({
   label,
   icon,
@@ -31,7 +29,18 @@ const SectionLabel = ({
   buttonDisabled,
   'data-test-id': dataTestId,
 }) => (
-  <div className={classnames(className, style.sectionLabel)} data-test-id={dataTestId}>
+  <div
+    className={classnames(
+      className,
+      'd-flex',
+      'j-between',
+      'al-center',
+      'c-grey-500',
+      'ml-cs-s',
+      'fs-s',
+    )}
+    data-test-id={dataTestId}
+  >
     <Message content={label} />
     <Button naked icon={icon} disabled={buttonDisabled} onClick={onClick} />
   </div>
@@ -43,11 +52,10 @@ SectionLabel.propTypes = {
   'data-test-id': PropTypes.string,
   icon: PropTypes.string.isRequired,
   label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
-  onClick: PropTypes.func,
+  onClick: PropTypes.func.isRequired,
 }
 
 SectionLabel.defaultProps = {
-  onClick: () => null,
   buttonDisabled: false,
   className: undefined,
   'data-test-id': 'section-label',
