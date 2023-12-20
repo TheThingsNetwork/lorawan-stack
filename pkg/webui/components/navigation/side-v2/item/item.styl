@@ -13,47 +13,25 @@
 // limitations under the License.
 
 .item
-  +media-query-min($bp.s)
-    &-minimized
-      position: relative
-      .message,
-      .expand-icon
-      .sub-items
-        display: none
-
-      .icon
-        margin-right: 0
-
-      .link,
-      .button
-        display: flex
-        padding: $cs.m 0
-        height: auto
-        justify-content: space-evenly
-
-      &:focus-within,
-      &:hover
-        .fly-out-list
-          display: block
+  &:hover
+    .fly-out-list
+      display: block
 
 .button
   reset-button()
   width: 100%
-  transition: color $ad.s, background $ad.s
-  transition-timing-function: ease-out
+  transition: 0.2s background-color ease-in, 0.2s color ease-in
   text-decoration: none
   display: flex
   align-items: center
-  justify-content: start
   position: relative
-  padding-left: $cs.xs
   gap: $cs.xs !important
 
   span
     &:not(:first-child)
       color: $c.grey-700 !important
 
-  &:hover
+  &:hover&:not(&-active)
     background: none !important
     color: $tc-deep-gray !important
     text-decoration: none
@@ -61,6 +39,24 @@
     span
       &:not(:first-child)
         color: $c.grey-900 !important
+
+    .icon
+      color: inherit
+
+  &-active
+    background: $c.tts-primary-150
+    color: $c.grey-900 !important
+
+    &:hover
+      background: $c.tts-primary-150 !important
+      color: $c.grey-900 !important
+
+      span
+        &:not(:first-child)
+          color: $c.grey-900 !important
+
+      .icon
+        color: inherit
 
     .icon
       color: inherit
@@ -78,16 +74,14 @@
   &-open
     transform: translateY(-50%) rotate(180deg)
 
+.fly-out-list-container
+  top: 0
+  left: 0
+  position: absolute
+  width: 180%
+  height: 13rem
+
 .fly-out-list
   display: none
-  left: 3rem
-  top: 0
-
-  &::before
-    content: ''
-    position: absolute
-    top: -10px
-    bottom: -10px
-    left: -10px
-    right: -10px
-    z-index: -1
+  left: 5rem !important
+  top: 0 !important

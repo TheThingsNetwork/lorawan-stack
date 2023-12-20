@@ -15,17 +15,18 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import classnames from 'classnames'
 
-import Dropdown from '@ttn-lw/components/dropdown'
+import Dropdown from '@ttn-lw/components/dropdown-v2'
 import MenuLink from '@ttn-lw/components/sidebar/side-menu-link'
 import Button from '@ttn-lw/components/button-v2'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import SideNavigationList from '../list'
 
 import style from './item.styl'
-import Message from '@ttn-lw/lib/components/message'
-import Icon from '@ttn-lw/components/icon'
 
 const handleItemClick = event => {
   if (event && event.target) {
@@ -34,7 +35,7 @@ const handleItemClick = event => {
 }
 
 const SideNavigationItem = props => {
-  const { className, children, title, depth, icon, path, exact, isActive } = props
+  const { className, children, title, depth, icon, path, exact, isActive, isMinimized } = props
   const [isExpanded, setIsExpanded] = useState(false)
 
   const handleExpandCollapsableItem = useCallback(() => {
@@ -69,6 +70,7 @@ const SideNavigationItem = props => {
           depth={depth}
           isActive={isActive}
           isExpanded={isExpanded}
+          isMinimized={isMinimized}
           children={children}
           currentPathName={location.pathname}
           onDropdownItemsClick={handleItemClick}
@@ -97,6 +99,7 @@ SideNavigationItem.propTypes = {
   icon: PropTypes.string,
   /** A flag specifying whether the side navigation item is active or not. */
   isActive: PropTypes.bool,
+  isMinimized: PropTypes.bool,
   /** The path of the linkable side navigation item. */
   path: PropTypes.string,
   /** The title of the side navigation item. */
@@ -111,16 +114,19 @@ SideNavigationItem.defaultProps = {
   isActive: false,
   depth: 0,
   path: undefined,
+  isMinimized: false,
 }
 
 const CollapsableItem = ({
   children,
   onClick,
   isExpanded,
+  isMinimized,
   title,
   icon,
   depth,
   onDropdownItemsClick,
+  currentPathName,
 }) => {
   const subItems = children
     .filter(item => Boolean(item) && 'props' in item)
@@ -130,36 +136,65 @@ const CollapsableItem = ({
       icon: item.props.icon,
     }))
 
+  const subItemActive = subItems.some(item => currentPathName.includes(item.path))
+
   return (
     <>
-      <Button className={style.button} naked onClick={onClick}>
+      <Button
+        className={classnames(style.button, {
+          'j-start': !isMinimized,
+          'j-center': isMinimized,
+          'pl-cs-xs': !isMinimized,
+          'pl-0': !isMinimized,
+          [style.buttonActive]: isMinimized && subItemActive,
+        })}
+        naked
+        onClick={onClick}
+      >
         {icon && <Icon icon={icon} className={style.icon} />}
-        <Message content={title} className={style.message} />
-        <Icon
-          icon="keyboard_arrow_down"
-          className={classnames(style.expandIcon, {
-            [style.expandIconOpen]: isExpanded,
-          })}
-        />
+        {!isMinimized && (
+          <>
+            <Message content={title} className={style.message} />
+            <Icon
+              icon="keyboard_arrow_down"
+              className={classnames(style.expandIcon, {
+                [style.expandIconOpen]: isExpanded,
+              })}
+            />
+          </>
+        )}
+        {isMinimized && (
+          <div className={style.flyOutListContainer}>
+            <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
+              <Dropdown.HeaderItem title={title.defaultMessage} />
+              {subItems.map(item => (
+                <Dropdown.Item
+                  key={item.path}
+                  title={item.title}
+                  path={item.path}
+                  icon={item.icon}
+                />
+              ))}
+            </Dropdown>
+          </div>
+        )}
       </Button>
-      <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
-        <Dropdown.HeaderItem title={title.defaultMessage} />
-        {subItems.map(item => (
-          <Dropdown.Item key={item.path} title={item.title} path={item.path} icon={item.icon} />
-        ))}
-      </Dropdown>
-      <SideNavigationList depth={depth + 1} isExpanded={isExpanded} className={style.subItems}>
-        {children}
-      </SideNavigationList>
+      {!isMinimized && (
+        <SideNavigationList depth={depth + 1} isExpanded={isExpanded} className={style.subItems}>
+          {children}
+        </SideNavigationList>
+      )}
     </>
   )
 }
 
 CollapsableItem.propTypes = {
   children: PropTypes.node,
+  currentPathName: PropTypes.string.isRequired,
   depth: PropTypes.number.isRequired,
   icon: PropTypes.string,
   isExpanded: PropTypes.bool.isRequired,
+  isMinimized: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   onDropdownItemsClick: PropTypes.func,
   title: PropTypes.message.isRequired,
@@ -171,7 +206,7 @@ CollapsableItem.defaultProps = {
   onDropdownItemsClick: () => null,
 }
 
-const LinkItem = ({ onClick, title, icon, exact, path, onDropdownItemsClick }) => {
+const LinkItem = ({ onClick, title, icon, exact, path }) => {
   const handleLinkItemClick = useCallback(
     event => {
       document.activeElement.blur()
@@ -183,9 +218,6 @@ const LinkItem = ({ onClick, title, icon, exact, path, onDropdownItemsClick }) =
   return (
     <>
       <MenuLink path={path} title={title} icon={icon} onClick={handleLinkItemClick} exact={exact} />
-      <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
-        <Dropdown.Item title={title} path={path} showActive={false} icon={''} tabIndex="-1" />
-      </Dropdown>
     </>
   )
 }
@@ -194,7 +226,6 @@ LinkItem.propTypes = {
   exact: PropTypes.bool.isRequired,
   icon: PropTypes.string,
   onClick: PropTypes.func,
-  onDropdownItemsClick: PropTypes.func,
   path: PropTypes.string,
   title: PropTypes.message.isRequired,
 }
@@ -203,7 +234,6 @@ LinkItem.defaultProps = {
   icon: undefined,
   path: undefined,
   onClick: () => null,
-  onDropdownItemsClick: () => null,
 }
 
 export default SideNavigationItem
