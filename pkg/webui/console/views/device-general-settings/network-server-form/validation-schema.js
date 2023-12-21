@@ -92,6 +92,7 @@ const validationSchema = Yup.object()
                 key: Yup.string()
                   .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                   .test('is-not-all-zero-key', messages.validateSessionKey, isNonZeroSessionKey)
+                  .default('')
                   .required(sharedMessages.validateRequired),
               }),
               s_nwk_s_int_key: Yup.lazy(() =>
@@ -104,6 +105,7 @@ const validationSchema = Yup.object()
                           messages.validateSessionKey,
                           isNonZeroSessionKey,
                         )
+                        .default('')
                         .required(sharedMessages.validateRequired),
                     })
                   : Yup.object().strip(),
@@ -118,6 +120,7 @@ const validationSchema = Yup.object()
                           messages.validateSessionKey,
                           isNonZeroSessionKey,
                         )
+                        .default('')
                         .required(sharedMessages.validateRequired),
                     })
                   : Yup.object().strip(),
