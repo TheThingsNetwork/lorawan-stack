@@ -30,33 +30,35 @@ const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
   const [isBelow, setIsBelow] = useState(false)
   const [isOnRight, setIsOnRight] = useState(false)
 
-  useEffect(() => {
-    const positionDropdown = () => {
-      if (ref.current) {
-        const parentRect = ref.current.parentElement.getBoundingClientRect()
-        const spaceBelow = window.innerHeight - parentRect.bottom
-        const spaceAbove = parentRect.top
-        const dropdownHeight = ref.current.clientHeight
-        const dropdownWidth = ref.current.clientWidth
-        const spaceOnLeft = parentRect.left
+  const positionDropdown = useCallback(() => {
+    if (ref.current) {
+      const parentRect = ref.current.parentElement.getBoundingClientRect()
+      const spaceBelow = window.innerHeight - parentRect.bottom
+      const spaceAbove = parentRect.top
+      const dropdownHeight = ref.current.clientHeight
+      const dropdownWidth = ref.current.clientWidth
+      const spaceOnLeft = parentRect.left
 
-        setIsBelow(spaceBelow > dropdownHeight || spaceAbove < dropdownHeight)
+      setIsBelow(spaceBelow > dropdownHeight || spaceAbove < dropdownHeight)
 
-        setIsOnRight(spaceOnLeft > dropdownWidth)
-      }
+      setIsOnRight(spaceOnLeft > dropdownWidth)
     }
+  }, [])
 
-    const t = setTimeout(() => positionDropdown(), 200)
+  useEffect(() => {
+    positionDropdown()
+  }, [positionDropdown, open])
 
+  useEffect(() => {
     window.addEventListener('scroll', positionDropdown)
     window.addEventListener('resize', positionDropdown)
 
     return () => {
       window.removeEventListener('resize', positionDropdown)
       window.removeEventListener('scroll', positionDropdown)
-      clearTimeout(t)
     }
-  }, [])
+  }, [positionDropdown])
+
   return (
     <ul
       onClick={onItemsClick}
