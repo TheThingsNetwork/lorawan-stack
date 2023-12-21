@@ -46,7 +46,7 @@ const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
   }, [])
 
   useEffect(() => {
-    positionDropdown()
+    if (open) positionDropdown()
   }, [positionDropdown, open])
 
   useEffect(() => {
