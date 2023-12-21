@@ -167,6 +167,14 @@ const DeviceImporter = () => {
 
         if (devices.length === 0) {
           throw conversionError
+        } else {
+          const invalidEntries = devices.filter(device => !('end_device' in device))
+          if (devices.some(device => !('end_device' in device))) {
+            appendToLog('Invalid responses found:')
+            appendToLog(invalidEntries)
+
+            throw conversionError
+          }
         }
 
         setConvertedDevices(devices)
