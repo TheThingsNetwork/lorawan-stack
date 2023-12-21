@@ -22,7 +22,7 @@ import {
 } from 'formik'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { defineMessages } from 'react-intl'
-import { isPlainObject, isFunction, pick, omitBy, pull, merge } from 'lodash'
+import { isPlainObject, isFunction, pick, omitBy, pull, merge, first } from 'lodash'
 
 import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
@@ -215,7 +215,12 @@ const Form = props => {
       const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
       if (firstErrorNode) {
         scrollIntoView(firstErrorNode, { behavior: 'smooth' })
-        firstErrorNode.querySelector('input,textarea,canvas,video').focus({ preventScroll: true })
+        const errorInput = firstErrorNode.querySelector('input,textarea,canvas,video')
+        if (errorInput) {
+          errorInput.focus({ preventScroll: true })
+        } else if ('focus' in firstErrorNode) {
+          firstErrorNode.focus({ preventScroll: true })
+        }
       }
     }
   }, [error, isSubmitting, isValid])
