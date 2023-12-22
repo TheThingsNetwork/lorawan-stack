@@ -18,9 +18,9 @@ import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 
-import SidebarContext from '@ttn-lw/containers/side-bar/context'
-
 import Message from '@ttn-lw/lib/components/message'
+
+import SidebarContext from '@console/containers/side-bar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
