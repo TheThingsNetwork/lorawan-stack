@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix Add collaborator form not validating collaborator on submit in the Console.
+
 ### Security
 
 ## [3.28.2] - 2023-12-20
