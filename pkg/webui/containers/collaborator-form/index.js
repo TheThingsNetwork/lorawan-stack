@@ -35,6 +35,8 @@ import { userId as collaboratorIdRegexp } from '@ttn-lw/lib/regexp'
 
 import useCollaboratorData from './hooks'
 
+const isNotEmpty = collaborator => collaborator === ''
+
 const collaboratorOrganizationSchema = Yup.object().shape({
   organization_id: Yup.string().matches(collaboratorIdRegexp, sharedMessages.validateAlphanum),
 })
@@ -52,8 +54,7 @@ const validationSchema = Yup.object().shape({
         otherwise: schema => schema.concat(collaboratorUserSchema),
       }),
     })
-    .required(sharedMessages.validateRequired)
-    .nullable(),
+    .test('is not empty', sharedMessages.validateRequired, isNotEmpty),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 
