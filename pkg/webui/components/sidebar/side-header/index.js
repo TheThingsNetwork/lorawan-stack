@@ -19,9 +19,11 @@ import LAYOUT from '@ttn-lw/constants/layout'
 
 import Button from '@ttn-lw/components/button-v2'
 
-import SidebarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@console/containers/side-bar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import style from './side-header.styl'
 
 const getViewportWidth = () =>
   Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
@@ -40,7 +42,10 @@ const SideHeader = ({ logo }) => {
         'al-center': isMinimized,
       })}
     >
-      <img {...logo} className={classnames({ 'w-50': !isMinimized })} />
+      <img
+        {...logo}
+        className={classnames({ 'w-50': !isMinimized, [style.miniLogo]: isMinimized })}
+      />
       {!isMobile && <Button icon="left_panel_close" naked onClick={onMinimizeToggle} />}
     </div>
   )

@@ -23,7 +23,7 @@ import SideHeader from '@ttn-lw/components/sidebar/side-header'
 import SearchButton from '@ttn-lw/components/sidebar/search-button'
 import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 
-import SidebarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@console/containers/side-bar/context'
 
 import style from './side-bar.styl'
 

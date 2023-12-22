@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import SidebarContext from '@ttn-lw/containers/side-bar/context'
+import SidebarContext from '@console/containers/side-bar/context'
 
 import SideNavigationItem from './item'
 

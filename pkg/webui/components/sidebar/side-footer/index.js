@@ -18,9 +18,9 @@ import classnames from 'classnames'
 import Button from '@ttn-lw/components/button-v2'
 import Dropdown from '@ttn-lw/components/dropdown-v2'
 
-import SidebarContext from '@ttn-lw/containers/side-bar/context'
-
 import { LanguageContext } from '@ttn-lw/lib/components/with-locale'
+
+import SidebarContext from '@console/containers/side-bar/context'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'

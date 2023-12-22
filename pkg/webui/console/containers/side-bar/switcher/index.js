@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.side-footer
-  margin-top: auto
+import React, { useContext } from 'react'
 
-  &-full-width
-    width: 100%
+import Switcher from '@ttn-lw/components/sidebar/switcher'
 
-  &-button
-    justify-content: space-between
-    padding: 0 $cs.m !important
+import SidebarContext from '@console/containers/side-bar/context'
 
-  &-support-dropdown
-    right: -79px !important
+const SwitcherContainer = () => {
+  const { isMinimized } = useContext(SidebarContext)
 
-  &-dropdown
-    width: 18rem
+  return <Switcher isMinimized={isMinimized} />
+}
+
+export default SwitcherContainer
