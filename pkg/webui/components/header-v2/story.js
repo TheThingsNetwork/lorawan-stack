@@ -16,7 +16,7 @@ import React from 'react'
 
 import TtsLogo from '@assets/static/tts-logo.svg'
 
-import Dropdown from '@ttn-lw/components/dropdown-v2'
+import Dropdown from '@ttn-lw/components/dropdown'
 import ExampleLogo from '@ttn-lw/components/logo/story-logo-new.svg'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 

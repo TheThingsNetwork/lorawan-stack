@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import classnames from 'classnames'
 
-import Dropdown from '@ttn-lw/components/dropdown-v2'
+import Dropdown from '@ttn-lw/components/dropdown'
 import MenuLink from '@ttn-lw/components/sidebar/side-menu-link'
 import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'

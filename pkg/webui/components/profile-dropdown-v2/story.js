@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import Dropdown from '@ttn-lw/components/dropdown-v2'
+import Dropdown from '@ttn-lw/components/dropdown'
 import ExampleLogo from '@ttn-lw/components/logo/story-logo-new.svg'
 
 import ProfileDropdown from '.'
