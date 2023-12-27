@@ -15,7 +15,7 @@
 import React, { useCallback, useContext } from 'react'
 import classnames from 'classnames'
 
-import Button from '@ttn-lw/components/button-v2'
+import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'

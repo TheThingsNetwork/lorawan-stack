@@ -16,7 +16,7 @@ import React, { useRef } from 'react'
 import classnames from 'classnames'
 
 import { Breadcrumbs } from '@ttn-lw/components/breadcrumbs/breadcrumbs'
-import Button from '@ttn-lw/components/button-v2'
+import Button from '@ttn-lw/components/button'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown-v2'
 import Link from '@ttn-lw/components/link'
 
