@@ -47,7 +47,7 @@ const m = defineMessages({
 const DeviceAddBulk = () => {
   const appId = useSelector(selectSelectedApplicationId)
   useBreadcrumbs(
-    'devices.import',
+    'device.import',
     <Breadcrumb path={`/applications/${appId}/devices/import`} content={sharedMessages.import} />,
   )
 

@@ -27,6 +27,14 @@
   padding: 0 $cs.m
   white-space: nowrap
 
+  .arrow-icon
+    transform: rotate(0deg)
+    transition: transform .2s
+
+  .arrow-icon-expanded
+    transform: rotate(180deg)
+    transition: transform .2s
+
   &.primary
     transition: 0.2s all ease-in-out
     color: white

@@ -32,7 +32,7 @@ const GatewayLocation = () => {
   const { gtwId } = useParams()
 
   useBreadcrumbs(
-    'gateway.single.data',
+    'gtws.single.data',
     <Breadcrumb path={`/gateways/${gtwId}/location`} content={sharedMessages.location} />,
   )
 

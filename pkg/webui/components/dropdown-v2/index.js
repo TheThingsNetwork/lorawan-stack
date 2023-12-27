@@ -25,33 +25,40 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './dropdown.styl'
 
-const Dropdown = ({ className, children, larger, onItemsClick }) => {
+const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
   const ref = useRef(null)
   const [isBelow, setIsBelow] = useState(false)
   const [isOnRight, setIsOnRight] = useState(false)
 
-  useEffect(() => {
-    const positionDropdown = () => {
-      if (ref.current) {
-        const parentRect = ref.current.parentElement.getBoundingClientRect()
-        const spaceBelow = window.innerHeight - parentRect.bottom
-        const spaceAbove = parentRect.top
-        const spaceLeft = parentRect.left
-        const spaceRight = window.innerWidth - parentRect.right
+  const positionDropdown = useCallback(() => {
+    if (ref.current) {
+      const parentRect = ref.current.parentElement.getBoundingClientRect()
+      const spaceBelow = window.innerHeight - parentRect.bottom
+      const spaceAbove = parentRect.top
+      const dropdownHeight = ref.current.clientHeight
+      const dropdownWidth = ref.current.clientWidth
+      const spaceOnLeft = parentRect.left
 
-        setIsBelow(spaceBelow > ref.current.clientHeight || spaceAbove < ref.current.clientHeight)
+      setIsBelow(spaceBelow > dropdownHeight || spaceAbove < dropdownHeight)
 
-        setIsOnRight(spaceRight < spaceLeft)
-      }
+      setIsOnRight(spaceOnLeft > dropdownWidth)
     }
+  }, [])
 
-    positionDropdown()
+  useEffect(() => {
+    if (open) positionDropdown()
+  }, [positionDropdown, open])
+
+  useEffect(() => {
+    window.addEventListener('scroll', positionDropdown)
     window.addEventListener('resize', positionDropdown)
 
     return () => {
       window.removeEventListener('resize', positionDropdown)
+      window.removeEventListener('scroll', positionDropdown)
     }
-  }, [])
+  }, [positionDropdown])
+
   return (
     <ul
       onClick={onItemsClick}
@@ -59,8 +66,9 @@ const Dropdown = ({ className, children, larger, onItemsClick }) => {
         [style.larger]: larger,
         [style.below]: isBelow,
         [style.above]: !isBelow,
-        [style.right]: !isOnRight,
-        [style.left]: isOnRight,
+        [style.right]: isOnRight,
+        [style.left]: !isOnRight,
+        [style.open]: open,
       })}
       ref={ref}
     >
@@ -74,6 +82,7 @@ Dropdown.propTypes = {
   className: PropTypes.string,
   larger: PropTypes.bool,
   onItemsClick: PropTypes.func,
+  open: PropTypes.bool.isRequired,
 }
 
 Dropdown.defaultProps = {

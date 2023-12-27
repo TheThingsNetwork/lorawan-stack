@@ -69,12 +69,17 @@ const buttonChildren = props => {
       {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
       {dropdownItems ? (
         <>
-          {!noDropdownIcon && <Icon icon={`${!expanded ? 'expand_more' : 'expand_less'}`} />}
-          {expanded ? (
-            <Dropdown className={classnames(style.dropdown, dropdownClassName)}>
-              {dropdownItems}
-            </Dropdown>
-          ) : null}
+          {!noDropdownIcon && (
+            <Icon
+              className={classnames(style.arrowIcon, {
+                [style['arrow-icon-expanded']]: expanded,
+              })}
+              icon="expand_more"
+            />
+          )}
+          <Dropdown className={classnames(dropdownClassName)} open={expanded}>
+            {dropdownItems}
+          </Dropdown>
         </>
       ) : null}
     </>
