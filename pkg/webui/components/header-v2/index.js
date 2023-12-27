@@ -33,6 +33,7 @@ const Header = ({
   starDropdownItems,
   profileDropdownItems,
   user,
+  onMenuClick,
   ...rest
 }) => {
   const addRef = useRef(null)
@@ -44,7 +45,7 @@ const Header = ({
     <header {...rest} className={classnames(className, style.container)}>
       <Breadcrumbs className="s:d-none" breadcrumbs={breadcrumbs} />
       <div className="d-none s:d-flex al-center gap-cs-xs">
-        <Button secondary icon="menu" />
+        <Button secondary icon="menu" onClick={onMenuClick} />
         <Link to="/" className="d-flex">
           <img {...logo} className={style.logo} />
         </Link>
@@ -63,7 +64,7 @@ const Header = ({
         <ProfileDropdown
           brandLogo={brandLogo}
           data-test-id="profile-dropdown"
-          profilePicture={user.profile_picture}
+          profilePicture={user?.profile_picture}
         >
           {profileDropdownItems}
         </ProfileDropdown>
@@ -87,6 +88,8 @@ Header.propTypes = {
   /** The classname applied to the component. */
   className: PropTypes.string,
   logo: imgPropType.isRequired,
+  /** A handler for when the menu button is clicked. */
+  onMenuClick: PropTypes.func.isRequired,
   /** The dropdown items when the profile button is clicked. */
   profileDropdownItems: PropTypes.node.isRequired,
   /** The dropdown items when the star button is clicked. */

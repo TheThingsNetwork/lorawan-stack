@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import classnames from 'classnames'
 
@@ -22,6 +22,7 @@ import SearchButton from '@ttn-lw/components/sidebar/search-button'
 import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 
 import getCookie from '@ttn-lw/lib/cookie'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import SidebarNavigation from './navigation'
 import SidebarContext from './context'
@@ -33,13 +34,11 @@ import style from './side-bar.styl'
 const getViewportWidth = () =>
   Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
-const Sidebar = () => {
+const Sidebar = ({ isDrawerOpen }) => {
   const viewportWidth = getViewportWidth()
   const isMobile = viewportWidth <= LAYOUT.BREAKPOINTS.M
   const { pathname } = useLocation()
   const [isMinimized, setIsMinimized] = useState(false)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const node = useRef()
 
   const onMinimizeToggle = useCallback(async () => {
     setIsMinimized(prev => !prev)
@@ -66,45 +65,6 @@ const Sidebar = () => {
     },
   )
 
-  const closeDrawer = useCallback(() => {
-    setIsDrawerOpen(false)
-    document.body.classList.remove(style.scrollLock)
-  }, [])
-
-  const openDrawer = useCallback(() => {
-    setIsDrawerOpen(true)
-    document.body.classList.add(style.scrollLock)
-  }, [])
-
-  useEffect(() => {
-    const onClickOutside = e => {
-      if (isDrawerOpen && node.current && !node.current.contains(e.target)) {
-        closeDrawer()
-      }
-    }
-
-    if (isDrawerOpen) {
-      document.addEventListener('mousedown', onClickOutside)
-      return () => document.removeEventListener('mousedown', onClickOutside)
-    }
-  }, [isDrawerOpen, closeDrawer])
-
-  const onDrawerExpandClick = useCallback(() => {
-    if (!isDrawerOpen) {
-      openDrawer()
-    } else {
-      closeDrawer()
-    }
-  }, [isDrawerOpen, openDrawer, closeDrawer])
-
-  // TODO: Add this function in the header component to close and open the drawer sidebar.
-  // To be done after the merge of the header component.
-  const onLeafItemClick = useCallback(() => {
-    if (isDrawerOpen) {
-      onDrawerExpandClick()
-    }
-  }, [isDrawerOpen, onDrawerExpandClick])
-
   return (
     <div className={sidebarClassnames} id="sidebar-v2">
       <SidebarContext.Provider value={{ topEntities, onMinimizeToggle, isMinimized }}>
@@ -120,6 +80,14 @@ const Sidebar = () => {
       </SidebarContext.Provider>
     </div>
   )
+}
+
+Sidebar.propTypes = {
+  isDrawerOpen: PropTypes.bool,
+}
+
+Sidebar.defaultProps = {
+  isDrawerOpen: false,
 }
 
 export default Sidebar
