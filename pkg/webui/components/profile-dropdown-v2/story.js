@@ -14,8 +14,8 @@
 
 import React from 'react'
 
-import Dropdown from '@ttn-lw/components/dropdown-v2'
-import ExampleLogo from '@ttn-lw/components/logo/story-logo.svg'
+import Dropdown from '@ttn-lw/components/dropdown'
+import ExampleLogo from '@ttn-lw/components/logo/story-logo-new.svg'
 
 import ProfileDropdown from '.'
 
@@ -30,11 +30,7 @@ export default {
 }
 
 export const Default = () => (
-<<<<<<< HEAD
-  <div style={{ height: '6rem', marginLeft: '120px' }}>
-=======
   <div style={{ height: '25rem', marginLeft: '15rem' }}>
->>>>>>> bd663e15d9 (console: Implemented PR suggestions and rollback breadcrumb component)
     <ProfileDropdown brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}>
       <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
       <Dropdown.Item title="Logout" icon="power_settings_new" action={handleLogout} />

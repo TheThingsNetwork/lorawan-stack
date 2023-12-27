@@ -16,7 +16,7 @@ import React, { useCallback, useContext, useRef } from 'react'
 import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
-import Dropdown from '@ttn-lw/components/dropdown-v2'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import { LanguageContext } from '@ttn-lw/lib/components/with-locale'
 

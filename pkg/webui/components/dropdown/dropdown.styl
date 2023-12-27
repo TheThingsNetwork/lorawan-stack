@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,47 @@
 // limitations under the License.
 
 ul.dropdown
-  border-normal()
-  z-index: $zi.nav
-  right: 0
+  font-size: $fs.m
+  border-radius: $br.l
+  border: 1px solid $c.grey-200
+  list-style-type: none
+  background: $c.white
+  box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.06)
   position: absolute
-  background: white
-  padding: 0
+  padding: $cs.s
   min-width: 14rem
   z-index: $zi.dropdown
-  margin: 0
+  margin: $cs.xxs 0 0
+  opacity: 0
+  visibility: hidden
+  transition: opacity 0.2s ease-in-out, visibility 0s linear 0.2s
+
+  &.open
+    opacity: 1
+    visibility: visible
+    transition: opacity 0.2s ease-in-out, visibility 0s linear
+
+  &.below
+    bottom: auto
+    top: calc(100% + 7px)
+
+  &.above
+    top: auto
+    bottom: calc(100% + 7px)
+
+  &.left
+    left: 0
+    right: auto
+
+  &.right
+    right: 0
+    left: auto
+
+  &.example
+    bottom: auto
+    top: 0
+    left: 0
+    right: auto
 
   &.larger
     li.dropdown-item
@@ -29,9 +61,8 @@ ul.dropdown
         padding: $cs.l
 
   hr
-    margin-top: 0
-    height: .1rem
-    background-color: $c-divider
+    height: 1px
+    background-color: $c.grey-200
 
   li.dropdown-header-item
     display: block
@@ -44,8 +75,8 @@ ul.dropdown
       padding: $cs.m
 
   li.dropdown-item
-    display: block
     margin-bottom: 0
+    text-align: left
 
     button.button
       reset-button()
@@ -53,25 +84,51 @@ ul.dropdown
     & > a.button, & > button.button
       box-sizing: border-box
       line-height: 1
-      display: block
+      display: flex
+      align-items: center
       text-decoration: none
-      padding: $cs.m
+      padding: $cs.xs
       width: 100%
+      min-height: 2.429rem
       &:not(.active)
-        color: $tc-deep-gray
-
-      &.active
-        border-left: $c-active-blue 5px solid
-        color: $c-active-blue
-
-      &:hover
-        color: white
+        color: $c.grey-700
 
         .icon
-          color: white
+          color: $c.grey-700
+
+      &.active
+        border-radius: $br.m
+        background: $c.tts-primary-150
+        transition: background 0.1s ease-in-out
+        color: $tc-deep-gray
+
+        .icon
+          color: $tc-deep-gray
+
+      &:hover
+        color: $tc-deep-gray
+        background: $c.tts-primary-150
+        transition: background 0.1s ease-in-out
+        border-radius: $br.m
+
+        .icon
+          color: $tc-deep-gray
 
     .icon
       margin-right: $cs.xs
 
     &:hover
-      background-color: $c-active-blue
+      color: $tc-deep-gray
+      text-decoration: none
+
+  .submenu-container
+    bottom: 0px
+    left: 0px
+    position: absolute
+    width: 180%
+    height: 5rem
+    z-index: 9999
+
+  .submenu-dropdown
+    bottom: -0px !important
+    left: calc(100% + -213px) !important
