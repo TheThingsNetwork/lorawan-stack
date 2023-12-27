@@ -17,7 +17,7 @@ import classnames from 'classnames'
 
 import LAYOUT from '@ttn-lw/constants/layout'
 
-import Button from '@ttn-lw/components/button-v2'
+import Button from '@ttn-lw/components/button'
 
 import SidebarContext from '@console/containers/side-bar/context'
 

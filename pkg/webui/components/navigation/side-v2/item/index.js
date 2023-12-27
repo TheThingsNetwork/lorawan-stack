@@ -17,7 +17,7 @@ import classnames from 'classnames'
 
 import Dropdown from '@ttn-lw/components/dropdown-v2'
 import MenuLink from '@ttn-lw/components/sidebar/side-menu-link'
-import Button from '@ttn-lw/components/button-v2'
+import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -148,7 +148,7 @@ const CollapsableItem = ({
           'pl-0': !isMinimized,
           [style.buttonActive]: isMinimized && subItemActive,
         })}
-        naked
+        unstyled
         onClick={onClick}
       >
         {icon && <Icon icon={icon} className={style.icon} />}
