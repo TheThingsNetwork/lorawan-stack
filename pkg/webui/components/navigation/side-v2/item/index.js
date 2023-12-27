@@ -165,7 +165,7 @@ const CollapsableItem = ({
         )}
         {isMinimized && (
           <div className={style.flyOutListContainer}>
-            <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
+            <Dropdown open className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
               <Dropdown.HeaderItem title={title.defaultMessage} />
               {subItems.map(item => (
                 <Dropdown.Item
