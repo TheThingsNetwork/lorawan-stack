@@ -141,10 +141,7 @@ const Layout = () => {
               rights={rights}
               isAdmin={isAdmin}
             >
-              <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-              <div id="sidebar" className={sidebarStyle.container} />
               <div className={style.content}>
-                <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                 <div className={style.stage} id="stage">
                   <Outlet />
                 </div>
