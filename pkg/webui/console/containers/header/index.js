@@ -16,11 +16,11 @@ import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import HeaderComponent from '@ttn-lw/components/header'
-import NavigationBar from '@ttn-lw/components/navigation/bar'
 import Dropdown from '@ttn-lw/components/dropdown'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectAssetsRootPath, selectBrandingRootPath } from '@ttn-lw/lib/selectors/env'
 
 import selectAccountUrl from '@console/lib/selectors/app-config'
 import {
@@ -39,12 +39,11 @@ import Logo from '../logo'
 
 const accountUrl = selectAccountUrl()
 
-const Header = ({ searchable, handleSearchRequest }) => {
+const Header = () => {
   const dispatch = useDispatch()
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
   const user = useSelector(selectUser)
-  const isUserAdmin = useSelector(selectUserIsAdmin)
   const mayViewApps = useSelector(state =>
     user ? checkFromState(mayViewApplications, state) : false,
   )
@@ -56,40 +55,26 @@ const Header = ({ searchable, handleSearchRequest }) => {
     user ? checkFromState(mayViewOrEditApiKeys, state) : false,
   )
 
-  const navigation = [
-    {
-      title: sharedMessages.overview,
-      icon: 'overview',
-      path: '',
-      exact: true,
-      hidden: !mayViewApps && !mayViewGateways,
-    },
-    {
-      title: sharedMessages.applications,
-      icon: 'application',
-      path: '/applications',
-      hidden: !mayViewApps,
-    },
-    {
-      title: sharedMessages.gateways,
-      icon: 'gateway',
-      path: '/gateways',
-      hidden: !mayViewGtws,
-    },
-    {
-      title: sharedMessages.organizations,
-      icon: 'organization',
-      path: '/organizations',
-      hidden: !mayViewOrgs,
-    },
-  ]
-
-  const navigationEntries = (
-    <React.Fragment>
-      {navigation.map(
-        ({ hidden, ...rest }) => !hidden && <NavigationBar.Item {...rest} key={rest.title.id} />,
+  const plusDropdownItems = (
+    <>
+      {mayViewApps && (
+        <Dropdown.Item
+          title="Add new application"
+          icon="display_settings"
+          path="/applications/add"
+        />
       )}
-    </React.Fragment>
+      {mayViewGtws && <Dropdown.Item title="Add new gateway" icon="router" path="/gateways/add" />}
+      {mayViewOrgs && (
+        <Dropdown.Item title="Add new organization" icon="support" path="/organizations/add" />
+      )}
+
+      <Dropdown.Item
+        title="Register end device in application"
+        icon="settings_remote"
+        path="/devices/add"
+      />
+    </>
   )
 
   const dropdownItems = (
@@ -126,74 +111,24 @@ const Header = ({ searchable, handleSearchRequest }) => {
     </React.Fragment>
   )
 
-  const mobileDropdownItems = (
-    <React.Fragment>
-      {navigation.map(
-        ({ hidden, ...rest }) => !hidden && <Dropdown.Item {...rest} key={rest.title.id} />,
-      )}
-      <React.Fragment>
-        <hr />
-        <Dropdown.Item
-          title={sharedMessages.profileSettings}
-          icon="user"
-          path={`${accountUrl}/profile-settings`}
-          external
-        />
-      </React.Fragment>
-      {mayHandleApiKeys && (
-        <Dropdown.Item
-          title={sharedMessages.personalApiKeys}
-          icon="api_keys"
-          path="/user/api-keys"
-        />
-      )}
-      {isUserAdmin && (
-        <Dropdown.Item
-          title={sharedMessages.adminPanel}
-          icon="lock"
-          path="/admin-panel/network-information"
-        />
-      )}
-      <hr />
-      <Dropdown.Item
-        title={sharedMessages.getSupport}
-        icon="help"
-        path="https://thethingsindustries.com/support"
-        external
-      />
-      <Dropdown.Item
-        title={sharedMessages.documentation}
-        icon="description"
-        path="https://thethingsindustries.com/docs"
-        external
-      />
-    </React.Fragment>
-  )
+  const hasCustomBranding = selectBrandingRootPath() !== selectAssetsRootPath()
+  const brandLogo = hasCustomBranding
+    ? {
+        src: `${selectBrandingRootPath()}/logo.svg`,
+        alt: 'Logo',
+      }
+    : undefined
 
   return (
     <HeaderComponent
       user={user}
-      dropdownItems={dropdownItems}
-      mobileDropdownItems={mobileDropdownItems}
-      navigationEntries={navigationEntries}
-      searchable={searchable}
-      onSearchRequest={handleSearchRequest}
-      onLogout={handleLogout}
+      profileDropdownItems={dropdownItems}
+      addDropdownItems={plusDropdownItems}
+      starDropdownItems={[]}
+      brandLogo={brandLogo}
       logo={<Logo />}
     />
   )
-}
-
-Header.propTypes = {
-  /** A handler for when the user used the search input. */
-  handleSearchRequest: PropTypes.func,
-  /** A flag identifying whether the header should display the search input. */
-  searchable: PropTypes.bool,
-}
-
-Header.defaultProps = {
-  handleSearchRequest: () => null,
-  searchable: false,
 }
 
 export default Header

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,128 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mobile-styles($breakpoint)
-  +media-query($breakpoint)
-    &.mobile-menu-open
-      position: fixed
-      z-index: $zi.mobile-menu
-      top: 0
-      left: 0
-      height: 100vh
-      background-color: white
-
-      .hamburger img
-        width: 1.5rem
-
-    .mobile-menu-button
-      display: block
-
-    .nav-list
-      display: none
-
-    .profile-dropdown
-      display: none
-
-    .mobile-menu
-      display: flex
-
-  +media-query-between($bp.s, $breakpoint)
-    .mobile-menu
-      height: 'calc(100vh - %s)' % $header-height
-
-  +media-query($bp.s)
-    z-index: $zi.mobile-menu
-    position: fixed
-    top: 0
-
-    & + main
-        padding-top: $header-height
-        +media-query($bp.s)
-          padding-top: $header-height-mobile
-
-    .bar
-      height: $header-height-mobile
-      background-color: white
-      padding: 0 $ls.xxs
-
-    .mobile-menu
-      height: 'calc(100vh - %s)' % $header-height-mobile
-      top: $header-height-mobile
-
-    .mobile-menu-button
-      width: $header-height-mobile
-      margin-right: $ls.xxs * -1
-
 .container
-  mobile-styles($bp.m)
-  background-color: white
+  padding: 0 $cs.m
+  background: $c['tts-primary-050']
   z-index: $zi.nav
-  width: 100%
-
-.bar
-  border-normal('bottom')
-  background: linear-gradient(bottom left, 0% #F8F8F8, 60% white) // @stylint ignore
-  height: $header-height
-  box-sizing: border-box
-  position: relative
+  border-bottom: 1px solid $c-divider
   display: flex
-  padding: 0 $ls.s
   justify-content: space-between
-  flex: none
+  align-items: center
+  height: 4rem
 
 .logo
-  display: inline-flex
-  align-items: center
-  justify-content: flex-start
-
-  img
-    nudge('up')
-
-.nav-list
-  display: flex
-  align-items: stretch
-  justify-content: flex-start
-  padding: 0 $ls.m
-  flex-grow: 2
-  height: 100%
-  max-width: 56rem
-  flex-shrink: 0
-
-.profile-dropdown
-  margin-right: -2rem
-
-.mobile-menu-button
-  reset-button()
-  display: none
-  width: $header-height
-  margin-right: $ls.s * -1
-  height: 100%
-  position: relative
-
-  .hamburger
-    center-absolute()
-    display: block
-    width: 2rem
-    height: 100%
-
-    img
-      center-absolute()
-      width: 2rem
-
-.left
-  display: flex
-  align-items: center
-  max-width: 42rem
-  flex-grow: 1
-
-.right
-  padding-left: $cs.l
-  display: flex
-  align-items: center
-  justify-content: flex-end
-  max-width: 25rem
-  flex-grow: 2
-
-  & > div:first-child
-    max-width: 15rem
-    border-color: $c-divider-dark
+  height: $cs.l

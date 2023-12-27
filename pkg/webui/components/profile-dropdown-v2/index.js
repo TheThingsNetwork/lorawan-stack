@@ -19,7 +19,7 @@ import Icon from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
 import Button from '@ttn-lw/components/button'
-import style from '@ttn-lw/components/button-v2/button.styl'
+import style from '@ttn-lw/components/button/button.styl'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
