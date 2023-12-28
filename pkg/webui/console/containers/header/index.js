@@ -18,7 +18,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import HeaderComponent from '@ttn-lw/components/header'
 import Dropdown from '@ttn-lw/components/dropdown'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectAssetsRootPath, selectBrandingRootPath } from '@ttn-lw/lib/selectors/env'
 
@@ -28,7 +27,6 @@ import {
   mayViewApplications,
   mayViewGateways,
   mayViewOrganizationsOfUser,
-  mayViewOrEditApiKeys,
 } from '@console/lib/feature-checks'
 
 import { logout } from '@console/store/actions/logout'
@@ -51,9 +49,7 @@ const Header = () => {
   const mayViewOrgs = useSelector(state =>
     user ? checkFromState(mayViewOrganizationsOfUser, state) : false,
   )
-  const mayHandleApiKeys = useSelector(state =>
-    user ? checkFromState(mayViewOrEditApiKeys, state) : false,
-  )
+  const isAdmin = useSelector(selectUserIsAdmin)
 
   const plusDropdownItems = (
     <>
@@ -85,14 +81,13 @@ const Header = () => {
         path={`${accountUrl}/profile-settings`}
         external
       />
-      {mayHandleApiKeys && (
-        <Dropdown.Item title={sharedMessages.apiKeys} icon="api_keys" path="/user/api-keys" />
+      {isAdmin && (
+        <Dropdown.Item
+          title={sharedMessages.adminPanel}
+          icon="lock"
+          path="/admin-panel/network-information"
+        />
       )}
-      <Dropdown.Item
-        title={sharedMessages.adminPanel}
-        icon="lock"
-        path="/admin-panel/network-information"
-      />
       <hr />
       <Dropdown.Item
         title={sharedMessages.getSupport}

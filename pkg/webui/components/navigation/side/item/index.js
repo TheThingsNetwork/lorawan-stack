@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import classnames from 'classnames'
 
 import Dropdown from '@ttn-lw/components/dropdown'
+import MenuLink from '@ttn-lw/components/sidebar/side-menu-link'
+import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -23,8 +25,6 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import SideNavigationList from '../list'
-import NavigationLink from '../../link'
-import SideNavigationContext from '../context'
 
 import style from './item.styl'
 
@@ -35,8 +35,7 @@ const handleItemClick = event => {
 }
 
 const SideNavigationItem = props => {
-  const { className, children, title, depth, icon, path, exact, isActive } = props
-  const { isMinimized, onLeafItemClick } = useContext(SideNavigationContext)
+  const { className, children, title, depth, icon, path, exact, isActive, isMinimized } = props
   const [isExpanded, setIsExpanded] = useState(false)
 
   const handleExpandCollapsableItem = useCallback(() => {
@@ -53,7 +52,7 @@ const SideNavigationItem = props => {
         [],
       )
       for (const path of paths) {
-        if (location.pathname.startsWith(path)) {
+        if (location.pathname.includes(path)) {
           setIsExpanded(true)
           return
         }
@@ -62,11 +61,7 @@ const SideNavigationItem = props => {
   }, [children])
 
   return (
-    <li
-      className={classnames(className, style.item, {
-        [style.itemMinimized]: isMinimized,
-      })}
-    >
+    <li className={classnames(className, style.item)}>
       {Boolean(children) ? (
         <CollapsableItem
           title={title}
@@ -82,7 +77,6 @@ const SideNavigationItem = props => {
         />
       ) : (
         <LinkItem
-          onClick={onLeafItemClick}
           title={title}
           icon={icon}
           exact={exact}
@@ -105,6 +99,7 @@ SideNavigationItem.propTypes = {
   icon: PropTypes.string,
   /** A flag specifying whether the side navigation item is active or not. */
   isActive: PropTypes.bool,
+  isMinimized: PropTypes.bool,
   /** The path of the linkable side navigation item. */
   path: PropTypes.string,
   /** The title of the side navigation item. */
@@ -119,18 +114,19 @@ SideNavigationItem.defaultProps = {
   isActive: false,
   depth: 0,
   path: undefined,
+  isMinimized: false,
 }
 
 const CollapsableItem = ({
   children,
   onClick,
-  isActive,
   isExpanded,
+  isMinimized,
   title,
   icon,
   depth,
-  currentPathName,
   onDropdownItemsClick,
+  currentPathName,
 }) => {
   const subItems = children
     .filter(item => Boolean(item) && 'props' in item)
@@ -140,36 +136,54 @@ const CollapsableItem = ({
       icon: item.props.icon,
     }))
 
-  const subItemActive = subItems.some(item => item.path === currentPathName)
+  const subItemActive = subItems.some(item => currentPathName.includes(item.path))
 
   return (
     <>
-      <button
+      <Button
         className={classnames(style.button, {
-          [style.buttonActive]: isActive,
-          [style.linkActive]: subItemActive,
+          'j-start': !isMinimized,
+          'j-center': isMinimized,
+          'pl-cs-xs': !isMinimized,
+          'pl-0': !isMinimized,
+          [style.buttonActive]: isMinimized && subItemActive,
         })}
-        type="button"
+        unstyled
         onClick={onClick}
       >
         {icon && <Icon icon={icon} className={style.icon} />}
-        <Message content={title} className={style.message} />
-        <Icon
-          icon="keyboard_arrow_down"
-          className={classnames(style.expandIcon, {
-            [style.expandIconOpen]: isExpanded,
-          })}
-        />
-      </button>
-      <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
-        <Dropdown.HeaderItem title={title.defaultMessage} />
-        {subItems.map(item => (
-          <Dropdown.Item key={item.path} title={item.title} path={item.path} icon={item.icon} />
-        ))}
-      </Dropdown>
-      <SideNavigationList depth={depth + 1} isExpanded={isExpanded} className={style.subItems}>
-        {children}
-      </SideNavigationList>
+        {!isMinimized && (
+          <>
+            <Message content={title} className={style.message} />
+            <Icon
+              icon="keyboard_arrow_down"
+              className={classnames(style.expandIcon, {
+                [style.expandIconOpen]: isExpanded,
+              })}
+            />
+          </>
+        )}
+        {isMinimized && (
+          <div className={style.flyOutListContainer}>
+            <Dropdown open className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
+              <Dropdown.HeaderItem title={title.defaultMessage} />
+              {subItems.map(item => (
+                <Dropdown.Item
+                  key={item.path}
+                  title={item.title}
+                  path={item.path}
+                  icon={item.icon}
+                />
+              ))}
+            </Dropdown>
+          </div>
+        )}
+      </Button>
+      {!isMinimized && (
+        <SideNavigationList depth={depth + 1} isExpanded={isExpanded} className={style.subItems}>
+          {children}
+        </SideNavigationList>
+      )}
     </>
   )
 }
@@ -179,8 +193,8 @@ CollapsableItem.propTypes = {
   currentPathName: PropTypes.string.isRequired,
   depth: PropTypes.number.isRequired,
   icon: PropTypes.string,
-  isActive: PropTypes.bool.isRequired,
   isExpanded: PropTypes.bool.isRequired,
+  isMinimized: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   onDropdownItemsClick: PropTypes.func,
   title: PropTypes.message.isRequired,
@@ -192,8 +206,8 @@ CollapsableItem.defaultProps = {
   onDropdownItemsClick: () => null,
 }
 
-const LinkItem = ({ onClick, title, icon, exact, path, onDropdownItemsClick }) => {
-  const handleLinkItemClick = React.useCallback(
+const LinkItem = ({ onClick, title, icon, exact, path }) => {
+  const handleLinkItemClick = useCallback(
     event => {
       document.activeElement.blur()
       onClick(event)
@@ -203,19 +217,7 @@ const LinkItem = ({ onClick, title, icon, exact, path, onDropdownItemsClick }) =
 
   return (
     <>
-      <NavigationLink
-        onClick={handleLinkItemClick}
-        className={style.link}
-        activeClassName={style.linkActive}
-        exact={exact}
-        path={path}
-      >
-        {icon && <Icon icon={icon} className={style.icon} />}
-        <Message content={title} className={style.message} />
-      </NavigationLink>
-      <Dropdown className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
-        <Dropdown.Item title={title} path={path} showActive={false} icon={''} tabIndex="-1" />
-      </Dropdown>
+      <MenuLink path={path} title={title} icon={icon} onClick={handleLinkItemClick} exact={exact} />
     </>
   )
 }
@@ -224,7 +226,6 @@ LinkItem.propTypes = {
   exact: PropTypes.bool.isRequired,
   icon: PropTypes.string,
   onClick: PropTypes.func,
-  onDropdownItemsClick: PropTypes.func,
   path: PropTypes.string,
   title: PropTypes.message.isRequired,
 }
@@ -233,7 +234,6 @@ LinkItem.defaultProps = {
   icon: undefined,
   path: undefined,
   onClick: () => null,
-  onDropdownItemsClick: () => null,
 }
 
 export default SideNavigationItem

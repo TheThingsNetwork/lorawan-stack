@@ -12,27 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.main
-  position: relative
-  display: flex
-  flex-direction: column
-  +media-query-min($bp.s)
-    min-height: "calc(100vh - %s - %s)" % ($header-height $footer-height)
-  +media-query($bp.s)
-    min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height)
-  +media-query($bp.xs)
-    min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height * 2)
-
-global-sidebar()
-
 .content
   position: relative
-  flex: 1
   display: flex
   flex-direction: column
 
 .stage
-  flex: 1
   &:not(.stage-flex)
     padding-bottom: $ls.xxs
   &-flex

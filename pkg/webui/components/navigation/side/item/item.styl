@@ -13,106 +13,53 @@
 // limitations under the License.
 
 .item
-  +media-query-min($bp.s)
-    &-minimized
-      position: relative
-      .message,
-      .expand-icon
-      .sub-items
-        display: none
-
-      .icon
-        margin-right: 0
-
-      .link,
-      .button
-        display: flex
-        padding: $cs.m 0
-        height: auto
-        justify-content: space-evenly
-
-      &:focus-within,
-      &:hover
-        .fly-out-list
-          display: block
+  &:hover
+    .fly-out-list
+      display: block
 
 .button
   reset-button()
-  one-liner()
   width: 100%
-  display: block
-  text-align: left
+  transition: 0.2s background-color ease-in, 0.2s color ease-in
+  text-decoration: none
+  display: flex
+  align-items: center
   position: relative
-  padding: $cs.s $cs.xxl $cs.s $cs.xl
-  height: 3.1rem
-  transition: background-color $ad.m, color $ad.s ease-in
+  gap: $cs.xs !important
 
-  &:active
-    background-color: lighter($c-active-blue-hover, 10)
+  span
+    &:not(:first-child)
+      color: $c.grey-700 !important
 
-  &-active,
-  &:hover
-    color: $c-active-blue
+  &:hover&:not(&-active)
+    background: none !important
+    color: $tc-deep-gray !important
+    text-decoration: none
 
-.link
-  one-liner()
-  color: $tc-deep-gray
-  padding: $cs.m $cs.xxl $cs.m $cs.xl
-  display: block
-  position: relative
-
-  &:not(&-active)::before // @stylint ignore
-    content: ''
-    position: absolute
-    z-index: -1
-    top: 0
-    left: 0
-    width: 0
-    height: 100%
-    background-color: $c-backdrop-lighter
-    transition: width $ad.s ease-out 0s, background-color $ad.s linear
-
-  &:hover:not(&-active)::before // @stylint ignore
-    width: 100%
-    transition: width $ad.s ease-out $ad.m, background-color $ad.s linear
-
-  &::after
-    content: ''
-    position: absolute
-    top: 0
-    left: 0
-    width: 3px
-    height: 100%
-    background-color: $c-subtle-fill
-    transform: scaleY(0)
-    transform-origin: center
-    transition: transform $ad.m ease-in-out, background-color $ad.s linear
-
-  &:hover:not(&-active)::after // @stylint ignore
-    transform: scaleY(1)
-
-  &-active
-    background-color: $c-backdrop-lighter
-    color: $c-active-blue
-
-    &::before
-      content: ''
-      position: absolute
-      bottom: 0
-      left: 0
-      height: 100%
-      display: block
-      width: 3px
-      background: $c-active-blue
+    span
+      &:not(:first-child)
+        color: $c.grey-900 !important
 
     .icon
-      color: $c-active-blue
+      color: inherit
 
-.icon
-  margin-right: $cs.s
-  vertical-align: middle
-  color: $c-icon-fill
-  font-size: 1.5rem
+  &-active
+    background: $c.tts-primary-150
+    color: $c.grey-900 !important
+
+    &:hover
+      background: $c.tts-primary-150 !important
+      color: $c.grey-900 !important
+
+      span
+        &:not(:first-child)
+          color: $c.grey-900 !important
+
+      .icon
+        color: inherit
+
+    .icon
+      color: inherit
 
 .message
   vertical-align: middle
@@ -127,16 +74,14 @@
   &-open
     transform: translateY(-50%) rotate(180deg)
 
+.fly-out-list-container
+  top: 0
+  left: 0
+  position: absolute
+  width: 180%
+  height: 13rem
+
 .fly-out-list
   display: none
-  left: 3rem
-  top: 0
-
-  &::before
-    content: ''
-    position: absolute
-    top: -10px
-    bottom: -10px
-    left: -10px
-    right: -10px
-    z-index: -1
+  left: 5rem !important
+  top: 0 !important

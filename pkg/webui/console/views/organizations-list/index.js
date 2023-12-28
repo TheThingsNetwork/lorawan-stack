@@ -17,21 +17,28 @@ import { Row, Col, Container } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import OrganizationsTable from '@console/containers/organizations-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const List = () => (
-  <Container>
-    <Row>
-      <IntlHelmet title={sharedMessages.organizations} />
-      <Col>
-        <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
-      </Col>
-    </Row>
-  </Container>
-)
+const List = () => {
+  useBreadcrumbs('orgs.list', <Breadcrumb path="/organizations" content={sharedMessages.list} />)
+
+  return (
+    <Container>
+      <Row>
+        <IntlHelmet title={sharedMessages.organizations} />
+        <Col>
+          <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
 
 export default List
