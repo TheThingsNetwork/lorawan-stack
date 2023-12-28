@@ -1249,6 +1249,7 @@
   "lib.shared-messages.lbsLNSSecretDescription": "LoRa Basics Station LNS 接続のための認証キーです。このフィールドは、他のゲートウェイでは無視されます",
   "lib.shared-messages.link": "リンク",
   "lib.shared-messages.linked": "リンク済",
+  "lib.shared-messages.list": "",
   "lib.shared-messages.liveData": "ライブデータ",
   "lib.shared-messages.location": "場所",
   "lib.shared-messages.locationDescription": "公開に設定すると、ゲートウェイの位置がネットワークの他のユーザーから見えることがあります",

@@ -27,14 +27,20 @@ const SidebarNavigation = () => {
   const showGeneralSideNavigation =
     !pathname.includes('/applications') && !pathname.includes('/gateways')
 
-  const showAppSideNavigation = pathname.includes('/applications/')
+  const showSingleAppSideNavigation = pathname.match(
+    new RegExp('/applications/[a-z0-9](?:[-]?[a-z0-9]){1,}'),
+  )
+
+  const showSingleGatewaySideNavigation = pathname.match(
+    new RegExp('/gateways/[a-z0-9](?:[-]?[a-z0-9]){1,}'),
+  )
 
   return (
     <div>
       {showGeneralSideNavigation && <GeneralSideNavigation />}
-      {showAppSideNavigation && <AppSideNavigation />}
+      {showSingleAppSideNavigation && <AppSideNavigation />}
       {pathname.includes('/applications') && <AppListSideNavigation />}
-      {pathname.includes('/gateways/') && <GtwSideNavigation />}
+      {showSingleGatewaySideNavigation && <GtwSideNavigation />}
       {pathname.includes('/gateways') && <GtwListSideNavigation />}
     </div>
   )

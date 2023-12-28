@@ -16,12 +16,8 @@ import React, { useEffect } from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import organizationIcon from '@assets/misc/organization.svg'
-
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
-import SideNavigation from '@ttn-lw/components/navigation/side'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -35,17 +31,9 @@ import OrganizationGeneralSettings from '@console/views/organization-general-set
 import OrganizationApiKeys from '@console/views/organization-api-keys'
 import OrganizationCollaborators from '@console/views/organization-collaborators'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 
-import {
-  checkFromState,
-  mayViewOrganizationInformation,
-  mayViewOrEditOrganizationApiKeys,
-  mayViewOrEditOrganizationCollaborators,
-  mayEditBasicOrganizationInformation,
-  mayViewOrganizationsOfUser,
-} from '@console/lib/feature-checks'
+import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
 import {
   getOrganization,
@@ -85,15 +73,6 @@ const OrganizationInner = () => {
   const name = organization.name || orgId
   const dispatch = useDispatch()
   const siteName = selectApplicationSiteName()
-  const mayViewOrEditApiKeys = useSelector(state =>
-    checkFromState(mayViewOrEditOrganizationApiKeys, state),
-  )
-  const mayViewOrEditCollaborators = useSelector(state =>
-    checkFromState(mayViewOrEditOrganizationCollaborators, state),
-  )
-  const mayEditInformation = useSelector(state =>
-    checkFromState(mayEditBasicOrganizationInformation, state),
-  )
 
   useBreadcrumbs('orgs.single', <Breadcrumb path={`/organizations/${orgId}`} content={name} />)
 
@@ -106,38 +85,7 @@ const OrganizationInner = () => {
 
   return (
     <React.Fragment>
-      <Breadcrumbs />
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
-      <SideNavigation
-        header={{
-          title: organization.name || orgId,
-          icon: organizationIcon,
-          iconAlt: sharedMessages.organization,
-          to: '',
-        }}
-      >
-        {mayViewOrganizationInformation && (
-          <SideNavigation.Item title={sharedMessages.overview} icon="overview" path="" exact />
-        )}
-        <SideNavigation.Item title={sharedMessages.liveData} icon="data" path="data" />
-        {mayViewOrEditCollaborators && (
-          <SideNavigation.Item
-            title={sharedMessages.collaborators}
-            icon="collaborators"
-            path="collaborators"
-          />
-        )}
-        {mayViewOrEditApiKeys && (
-          <SideNavigation.Item title={sharedMessages.apiKeys} icon="api_keys" path="api-keys" />
-        )}
-        {mayEditInformation && (
-          <SideNavigation.Item
-            title={sharedMessages.generalSettings}
-            icon="general_settings"
-            path="general-settings"
-          />
-        )}
-      </SideNavigation>
       <Routes>
         <Route index Component={OrganizationOverview} />
         <Route path="data" Component={OrganizationData} />

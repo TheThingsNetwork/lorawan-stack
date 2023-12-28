@@ -16,12 +16,8 @@ import React, { useCallback, useEffect } from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import gatewayIcon from '@assets/misc/gateway.svg'
-
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
-import SideNavigation from '@ttn-lw/components/navigation/side'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -35,17 +31,7 @@ import GatewayApiKeys from '@console/views/gateway-api-keys'
 import GatewayOverview from '@console/views/gateway-overview'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
-
-import {
-  mayViewGatewayInfo,
-  mayViewGatewayEvents,
-  mayViewOrEditGatewayLocation,
-  mayViewOrEditGatewayCollaborators,
-  mayViewOrEditGatewayApiKeys,
-  mayEditBasicGatewayInformation,
-} from '@console/lib/feature-checks'
 
 import {
   getGateway,
@@ -53,7 +39,7 @@ import {
   getGatewaysRightsList,
 } from '@console/store/actions/gateways'
 
-import { selectSelectedGateway, selectGatewayRights } from '@console/store/selectors/gateways'
+import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
 const Gateway = () => {
   const { gtwId } = useParams()
@@ -104,7 +90,6 @@ const Gateway = () => {
 const GatewayInner = () => {
   const { gtwId } = useParams()
   const gateway = useSelector(selectSelectedGateway)
-  const rights = useSelector(selectGatewayRights)
 
   const gatewayName = gateway?.name || gtwId
 
@@ -112,43 +97,7 @@ const GatewayInner = () => {
 
   return (
     <>
-      <Breadcrumbs />
       <IntlHelmet titleTemplate={`%s - ${gatewayName} - ${selectApplicationSiteName()}`} />
-      <SideNavigation
-        header={{
-          icon: gatewayIcon,
-          iconAlt: sharedMessages.gateway,
-          title: gatewayName,
-          to: '',
-        }}
-      >
-        {mayViewGatewayInfo.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
-        )}
-        {mayViewGatewayEvents.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="data" />
-        )}
-        {mayViewOrEditGatewayLocation.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.location} path="location" icon="location" />
-        )}
-        {mayViewOrEditGatewayCollaborators.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.collaborators}
-            path="collaborators"
-            icon="organization"
-          />
-        )}
-        {mayViewOrEditGatewayApiKeys.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.apiKeys} path="api-keys" icon="api_keys" />
-        )}
-        {mayEditBasicGatewayInformation.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.generalSettings}
-            path="general-settings"
-            icon="general_settings"
-          />
-        )}
-      </SideNavigation>
       <Routes>
         <Route index Component={GatewayOverview} />
         <Route path="api-keys/*" Component={GatewayApiKeys} />

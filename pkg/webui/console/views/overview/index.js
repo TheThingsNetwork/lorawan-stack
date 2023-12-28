@@ -180,7 +180,6 @@ const Overview = () => {
               <HelpLink supportLink={supportLink} documentationLink={documentationBaseUrl} />
             </Col>
           </Row>
-          {chooser}
         </div>
         <DeploymentComponentStatus />
       </Container>

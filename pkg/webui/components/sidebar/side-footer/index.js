@@ -137,7 +137,7 @@ const SideFooter = () => {
           message="EU1"
           noDropdownIcon
           dropdownItems={clusterDropdownItems}
-          dropdownClassName={style.sideFooterDropdown}
+          dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterClusterDropdown)}
           ref={clusterButtonRef}
         />
       )}
