@@ -307,6 +307,7 @@ export default defineMessages({
     'The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.',
   link: 'Link',
   linked: 'Linked',
+  list: 'List',
   liveData: 'Live data',
   location: 'Location',
   locationDescription:

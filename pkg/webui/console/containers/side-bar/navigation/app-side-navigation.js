@@ -16,7 +16,7 @@ import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import SideNavigation from '@ttn-lw/components/navigation/side-v2'
+import SideNavigation from '@ttn-lw/components/navigation/side'
 import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'

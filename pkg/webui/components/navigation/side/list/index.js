@@ -25,6 +25,7 @@ const SideNavigationList = ({ children, className, depth, isExpanded }) => {
     [style.listNested]: !isRoot,
     [style.listExpanded]: isExpanded,
   })
+
   return <ul className={listClassNames}>{children}</ul>
 }
 

@@ -18,6 +18,8 @@ import classnames from 'classnames'
 import Icon from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
+import Button from '@ttn-lw/components/button'
+import style from '@ttn-lw/components/button/button.styl'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -26,7 +28,7 @@ import styles from './profile-dropdown.styl'
 const ProfileDropdown = props => {
   const [expanded, setExpanded] = useState(false)
   const node = useRef(null)
-  const { userName, className, children, profilePicture, ...rest } = props
+  const { brandLogo, className, children, profilePicture, ...rest } = props
 
   const handleClickOutside = useCallback(e => {
     if (node.current && !node.current.contains(e.target)) {
@@ -44,23 +46,33 @@ const ProfileDropdown = props => {
   }, [handleClickOutside])
 
   return (
-    <div
+    <Button
+      secondary
       className={classnames(styles.container, className)}
       onClick={toggleDropdown}
       ref={node}
-      tabIndex="0"
-      role="button"
       {...rest}
     >
-      <ProfilePicture profilePicture={profilePicture} className={styles.profilePicture} />
-      <span className={styles.id}>{userName}</span>
-      <Icon className={styles.dropdownIcon} icon={expanded ? 'arrow_drop_up' : 'arrow_drop_down'} />
-      {expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
-    </div>
+      <div className="d-flex gap-cs-xs al-center">
+        {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
+        <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
+      </div>
+      <Icon
+        className={classnames(style.arrowIcon, {
+          [style['arrow-icon-expanded']]: expanded,
+        })}
+        icon="expand_more"
+      />
+      <Dropdown open={expanded}>{children}</Dropdown>
+    </Button>
   )
 }
 
 ProfileDropdown.propTypes = {
+  brandLogo: PropTypes.shape({
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.string.isRequired,
+  }),
   /**
    * A list of items for the dropdown component. See `<Dropdown />`'s `items`
    * proptypes for details.
@@ -69,11 +81,10 @@ ProfileDropdown.propTypes = {
   className: PropTypes.string,
   /** The profile picture of the current user. */
   profilePicture: PropTypes.profilePicture,
-  /** The name/id of the current user. */
-  userName: PropTypes.string.isRequired,
 }
 
 ProfileDropdown.defaultProps = {
+  brandLogo: undefined,
   className: undefined,
   profilePicture: undefined,
 }

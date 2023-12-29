@@ -16,7 +16,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
-import Button from '@ttn-lw/components/button-v2'
+import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 

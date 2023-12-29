@@ -25,9 +25,6 @@ import {
 import classnames from 'classnames'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
-import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
-
-import Footer from '@ttn-lw/containers/footer'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -37,6 +34,7 @@ import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-v
 
 import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
+import Sidebar from '@console/containers/side-bar'
 
 import Overview from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -125,33 +123,36 @@ const Layout = () => {
     <>
       <ScrollRestoration getKey={getScrollRestorationKey} />
       <ErrorView errorRender={errorRender}>
-        <div className="w-full h-full">
+        <div className="h-full">
           <IntlHelmet
             titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             defaultTitle={siteName}
           />
           <div id="modal-container" />
-          <Header />
-          <main className={style.main}>
-            <WithAuth
-              user={user}
-              fetching={fetching}
-              error={error}
-              errorComponent={FullViewErrorInner}
-              rights={rights}
-              isAdmin={isAdmin}
-            >
-              <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-              <div id="sidebar" className={sidebarStyle.container} />
-              <div className={style.content}>
-                <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
-                <div className={style.stage} id="stage">
-                  <Outlet />
-                </div>
-              </div>
-            </WithAuth>
-          </main>
-          <Footer className={style.footer} />
+          <div className="d-flex">
+            <div style={{ width: '24.25rem' }}>
+              <Sidebar isDrawerOpen={isDrawerOpen} />
+            </div>
+            <div className="w-90">
+              <Header onMenuClick={onDrawerExpandClick} />
+              <main className={classnames(style.main, 'd-flex', 'flex-column')}>
+                <WithAuth
+                  user={user}
+                  fetching={fetching}
+                  error={error}
+                  errorComponent={FullViewErrorInner}
+                  rights={rights}
+                  isAdmin={isAdmin}
+                >
+                  <div className={style.content}>
+                    <div className={style.stage} id="stage">
+                      <Outlet />
+                    </div>
+                  </div>
+                </WithAuth>
+              </main>
+            </div>
+          </div>
         </div>
       </ErrorView>
     </>

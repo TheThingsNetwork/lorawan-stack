@@ -1246,6 +1246,7 @@
   "lib.shared-messages.lbsLNSSecretDescription": "The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.",
   "lib.shared-messages.link": "Link",
   "lib.shared-messages.linked": "Linked",
+  "lib.shared-messages.list": "List",
   "lib.shared-messages.liveData": "Live data",
   "lib.shared-messages.location": "Location",
   "lib.shared-messages.locationDescription": "When set to public, the gateway location may be visible to other users of the network",
