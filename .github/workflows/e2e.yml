@@ -108,7 +108,7 @@ jobs:
       - name: Zip build artifacts
         run: zip -r build.zip .env/cache/database.pgdump .env/admin_api_key.txt data/lorawan-devices-index public ttn-lw-stack tools/bin/mage
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-files
           path: build.zip
@@ -196,19 +196,19 @@ jobs:
             !cypress/e2e/smoke/smoke.spec.js
             ${{ steps.get-failed-spec.outputs.neg-failed-test }}
       - name: Upload logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: logs
           path: .cache/devStack.log
       - name: Upload screenshots for failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
           path: cypress/screenshots
       - name: Upload name of failing test
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-failed-test-spec
@@ -260,13 +260,13 @@ jobs:
           record: true
           spec: cypress/e2e/smoke/smoke.spec.js
       - name: Upload logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: logs
           path: .cache/devStack.log
       - name: Upload screenshots for failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
