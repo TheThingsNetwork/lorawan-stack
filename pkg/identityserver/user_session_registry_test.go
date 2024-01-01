@@ -18,7 +18,7 @@ import (
 	"context"
 	"testing"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
@@ -41,7 +41,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 
 	a, ctx := test.New(t)
 
-	randomUUID := uuid.NewV4().String()
+	randomUUID := uuid.NewString()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserSessionRegistryClient(cc)
