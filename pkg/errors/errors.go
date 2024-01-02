@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
 )
@@ -102,7 +102,8 @@ func build(d *Definition, skip int) *Error {
 		grpcStatus: new(atomic.Value),
 	}
 	if generateCorrelationIDs {
-		e.correlationID = hex.EncodeToString(uuid.NewV4().Bytes())
+		u := uuid.New()
+		e.correlationID = hex.EncodeToString(u[:])
 	}
 	if skip > 0 {
 		e.stack = callers(skip)
