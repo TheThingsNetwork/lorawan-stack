@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ATTENTION!
-// ==========
-//
-// Includes added here will be applied for every stylus file in the project
-// and is meant for global definitions, such as variables and mixins.
-// Be careful not to include files that include style definitions, as
-// this will result in many duplicate style definitions.
+make-variables($name, $theme)
+  $dict = lookup('$' + $name)
+  for $key, $value in $dict[$theme][color]
+    {'--c-'}{$key}: $value
+  for $key, $value in $dict[$theme][shadow]
+    {'--shadow-'}{$key}: $value
 
-@require 'nib'
+// Generate CSS variables based on token definitions.
 
-@require './variables/generic.styl'
-@require './variables/colors.styl'
-@require './variables/tokens.styl'
-@require './mixins.styl'
+:root, :before, :after
+  make-variables('tokens', 'theme-light')
+

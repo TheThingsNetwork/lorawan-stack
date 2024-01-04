@@ -21,25 +21,25 @@ border-normal($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: $width solid $c-divider
+  border{$prefix + $side}: $width solid var(--c-border-neutral-light)
 
 border-dark($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: $width solid $c-divider-dark
+  border{$prefix + $side}: $width solid var(--c-border-neutral-normal)
 
 border-input($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: $width solid $c-input-border
+  border{$prefix + $side}: $width solid var(--c-border-neutral-semibold)
 
 border-subtle($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: $width solid $c-divider-subtle
+  border{$prefix + $side}: $width solid var(--c-border-neutral-extralight)
 
 pseudo-border($size, $color)
   &:before
@@ -77,21 +77,21 @@ lighter($color, $step = 1)
 // Hoverize and activize will return shaded values for active and hover state.
 // This will improve consistency for shaded colors.
 hoverize($color)
-  if ($color == $c-active-blue)
-    $c-active-blue-hover
+  if ($color == var(--c-text-brand-normal))
+    var(--c-text-brand-normal)-hover
   else
     darker($color, 2)
 
 activize($color)
-  if ($color == $c-active-blue)
-    $c-active-blue-active
+  if ($color == var(--c-text-brand-normal))
+    var(--c-text-brand-normal)-active
   else
     darker($color, 3)
 
 // For text colors and lines
 tc-hoverize($color)
-  if ($color == $tc-active)
-    $tc-active-hover
+  if ($color == var(--c-text-brand-normal))
+    var(--c-text-brand-normal)-hover
   else
     darker($color, 2)
 
