@@ -116,31 +116,36 @@ const SideFooter = () => {
     'al-center',
     'gap-cs-xs',
     'fs-s',
+    { [style.isMinimized]: isMinimized },
   )
 
   return (
     <div className={sideFooterClassnames}>
       <Button
-        className={classnames(style.sideFooterButton, style.sideFooterFullWidth)}
+        className={classnames(style.sideFooterButton, style.supportButton)}
         secondary
         icon="support"
-        message={!isMinimized ? `v${process.env.VERSION} (${process.env.REVISION})` : undefined}
         dropdownItems={supportDropdownItems}
+        dropdownPosition="above"
+        dropdownClassName={style.sideFooterDropdown}
         noDropdownIcon
         ref={supportButtonRef}
+      >
+        <span className={style.sideFooterVersion}>
+          v{process.env.VERSION} ({process.env.REVISION})
+        </span>
+      </Button>
+      <Button
+        className={classnames(style.sideFooterButton, style.clusterButton)}
+        secondary
+        icon="public"
+        message="EU1"
+        noDropdownIcon
+        dropdownItems={clusterDropdownItems}
+        dropdownPosition="above"
+        dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterClusterDropdown)}
+        ref={clusterButtonRef}
       />
-      {!isMinimized && (
-        <Button
-          className={style.sideFooterButton}
-          secondary
-          icon="public"
-          message="EU1"
-          noDropdownIcon
-          dropdownItems={clusterDropdownItems}
-          dropdownClassName={style.sideFooterClusterDropdown}
-          ref={clusterButtonRef}
-        />
-      )}
     </div>
   )
 }

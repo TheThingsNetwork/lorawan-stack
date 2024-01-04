@@ -64,7 +64,7 @@ const GtwSideNavigation = () => {
       {mayViewGatewayInfo.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.gatewayOverview}
-          path={`gateways/${gtwId}`}
+          path={`/gateways/${gtwId}`}
           icon="gateway"
           exact
         />
@@ -72,35 +72,35 @@ const GtwSideNavigation = () => {
       {mayViewGatewayEvents.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.liveData}
-          path={`gateways/${gtwId}/data`}
+          path={`/gateways/${gtwId}/data`}
           icon="list_alt"
         />
       )}
       {mayViewOrEditGatewayLocation.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.location}
-          path={`gateways/${gtwId}/location`}
+          path={`/gateways/${gtwId}/location`}
           icon="map"
         />
       )}
       {mayViewOrEditGatewayCollaborators.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.collaborators}
-          path={`gateways/${gtwId}/collaborators`}
+          path={`/gateways/${gtwId}/collaborators`}
           icon="organization"
         />
       )}
       {mayViewOrEditGatewayApiKeys.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.apiKeys}
-          path={`gateways/${gtwId}/api-keys`}
+          path={`/gateways/${gtwId}/api-keys`}
           icon="api_keys"
         />
       )}
       {mayEditBasicGatewayInformation.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.generalSettings}
-          path={`gateways/${gtwId}/general-settings`}
+          path={`/gateways/${gtwId}/general-settings`}
           icon="general_settings"
         />
       )}
