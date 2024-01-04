@@ -1,0 +1,153 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// CONSOLE DESIGN TOKENS
+// =====================
+// This file is the single source of truth for tokens.
+// All utility classes and CSS variables will be generated from this file.
+// Base colors are in the file `variables/colors.styl`.
+
+$tokens = {
+
+  theme-light: {
+
+    color: {
+
+      // BACKGROUND COLORS
+      // =================
+
+      // Neutral
+
+      'bg-neutral-min': $c.neutral-white // Background color for panels, dropdowns, inputs, tab, table, ...
+      'bg-neutral-min-hover': $c.neutral-025 // Background color for panels, dropdowns, inputs, tab, table, ... on hover.
+      'bg-neutral-light': $c.neutral-075 // Background for navigation element items on hover.
+      'bg-neutral-semilight': $c.neutral-100 // Background for the console dashboard.
+      'bg-neutral-heavy': $c.neutral-900 // Background for navigation element items when active.
+
+      // Brand
+
+      'bg-brand-extralight': $c.tts-025 // Background for navigation elements background.
+      'bg-brand-light': $c.tts-100 // ?
+      'bg-brand-normal': $c.tts-500 // Background for highlight elements.
+      'bg-brand-normal-hover': $c.tts-600 // Background for highlight elements on hover.
+
+      // Semantic
+
+      'bg-success-light': $c.success-075 // Background for success elements surface.
+      'bg-warning-light': $c.warning-075 // Background for warning elements surface.
+      'bg-error-light': $c.error-075 // Background for error elements surface.
+      'bg-info-light': $c.information-075 // Background for info elements surface.
+
+      'bg-success-normal': $c.success-600 // Background for success highlight elements.
+      'bg-warning-normal': $c.warning-600 // Background for warning highlight elements.
+      'bg-error-normal': $c.error-600 // Background for error highlight elements.
+      'bg-info-normal': $c.info-600 // Background for info highlight elements.
+
+      'bg-success-normal-hover': $c.success-700 // Background for success highlight elements on hover.
+      'bg-warning-normal-hover': $c.warning-700 // Background for warning highlight elements on hover.
+      'bg-error-normal-hover': $c.error-700 // Background for error highlight elements on hover.
+      'bg-info-normal-hover': $c.info-700 // Background for info highlight elements on hover.
+
+      // TEXT COLORS
+      // ===========
+
+      // Neutral
+
+      'text-neutral-min': $c.neutral-white // Text and icon color on brand color background or active color background.
+      'text-neutral-extralight': $c.neutral-400 // Text and icon color for disable text or darker text on dark background.
+      'text-neutral-light': $c.neutral-500 // Text and icon color for second level information text.
+      'text-neutral-semilight': $c.neutral-600 // Text and icon color for enable text in a menu.
+      'text-neutral-heavy': $c.neutral-900 // Text and icon color for primary information or text when hover.
+
+      // Brand
+
+      'text-brand-normal': $c.tts-500 // Text and icon color for highlight information.
+      'text-brand-normal-hover': $c.tts-600 // Text and icon color for highlight information on hover.
+      'text-brand-normal-active': $c.tts-700 // Text and icon color for highlight information on active.
+
+      // Semantic
+
+      'text-success-bold': $c.success-800 // Text and icon color for success information on success surface.
+      'text-warning-bold': $c.warning-800 // Text and icon color for warning information on warning surface.
+      'text-error-bold': $c.error-800 // Text and icon color for error information on error surface.
+      'text-info-bold': $c.information-800 // Text and icon color for info information on info surface.
+
+      'text-success-normal': $c.success-600 // Text and icon color for success information.
+      'text-warning-normal': $c.warning-600 // Text and icon color for warning information.
+      'text-error-normal': $c.error-600 // Text and icon color for error information.
+      'text-info-normal': $c.information-600 // Text and icon color for info information.
+
+      'text-success-normal-hover': $c.success-700 // Text and icon color for success information on hover.
+      'text-warning-normal-hover': $c.warning-700 // Text and icon color for warning information on hover.
+      'text-error-normal-hover': $c.error-700 // Text and icon color for error information on hover.
+      'text-info-normal-hover': $c.information-700 // Text and icon color for info information on hover.
+
+      // ICON COLORS
+      // ===========
+
+      // Neutral
+
+      'icon-neutral': $c.neutral-700 // Icon color for default icon color.
+      'icon-neutral-light': $c.neutral-500 // Icon color for subtle icon color.
+
+      // Brand
+
+      'icon-brand-normal': $c.tts-500 // Icon color for highlight icon color.
+      'icon-brand-normal-hover': $c.tts-600 // Icon color for highlight icon color on hover.
+      'icon-brand-normal-active': $c.tts-700 // Icon color for highlight icon color on active.
+
+      // Semantic
+
+      'icon-success-normal': $c.success-600 // Icon color for success icon color.
+      'icon-warning-normal': $c.warning-600 // Icon color for warning icon color.
+      'icon-error-normal': $c.error-600 // Icon color for error icon color.
+      'icon-info-normal': $c.information-600 // Icon color for info icon color.
+
+      // BORDER COLORS
+      // =============
+
+      // Neutral
+
+      'border-neutral-extralight': $c.neutral-050 // Border for subtle table raws border bottoms.
+      'border-neutral-light': $c.neutral-100 // Border for divider lines and default element borders.
+      'border-neutral-normal': $c.neutral-300 // Border for default input borders.
+      'border-neutral-semibold': $c.neutral-500 // Border for default input borders on hover.
+      'border-neutral-bold': $c.neutral-700 // Border for divider lines and default element borders on dark surface.
+
+      // Brand
+
+      'border-brand-normal': $c.tts-600 // Border for input element borders on focus.
+
+      // Semantic
+
+      'border-success-normal': $c.success-600 // Border for success element borders.
+      'border-warning-normal': $c.warning-600 // Border for warning element borders.
+      'border-error-normal': $c.error-600 // Border for error element borders.
+      'border-info-normal': $c.information-600 // Border for info element borders.
+
+      // Gradients
+
+      'gradient-neutral-light-01': $c.neutral-100 // First part of gradient for default input borders.
+      'gradient-neutral-light-02': $c.neutral-300 // Second part of gradient for default input borders.
+
+    },
+
+    shadow: {
+      'box-error-normal': 0 0 3px 2px rgba(219, 35, 40,.2) // Shadow for focused inputs and other elements that have errors.
+      'box-warning-normal': 0 0 3px 2px rgba(219, 118, 0,.2) // Shadow for focused inputs and other elements that have errors.
+    }
+
+  }
+
+}
