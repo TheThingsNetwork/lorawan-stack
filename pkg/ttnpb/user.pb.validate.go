@@ -32,6 +32,113 @@ var (
 	_ = anypb.Any{}
 )
 
+// ValidateFields checks the field values on UserConsolePreferences with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UserConsolePreferences) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = UserConsolePreferencesFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "console_theme":
+			// no validation rules for ConsoleTheme
+		case "dashboard_layouts":
+
+			if v, ok := interface{}(m.GetDashboardLayouts()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UserConsolePreferencesValidationError{
+						field:  "dashboard_layouts",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "sort_by":
+
+			if v, ok := interface{}(m.GetSortBy()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UserConsolePreferencesValidationError{
+						field:  "sort_by",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return UserConsolePreferencesValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// UserConsolePreferencesValidationError is the validation error returned by
+// UserConsolePreferences.ValidateFields if the designated constraints aren't met.
+type UserConsolePreferencesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UserConsolePreferencesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UserConsolePreferencesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UserConsolePreferencesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UserConsolePreferencesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UserConsolePreferencesValidationError) ErrorName() string {
+	return "UserConsolePreferencesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UserConsolePreferencesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUserConsolePreferences.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UserConsolePreferencesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UserConsolePreferencesValidationError{}
+
 // ValidateFields checks the field values on User with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *User) ValidateFields(paths ...string) error {
@@ -282,6 +389,18 @@ func (m *User) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserValidationError{
 						field:  "profile_picture",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "console_preferences":
+
+			if v, ok := interface{}(m.GetConsolePreferences()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UserValidationError{
+						field:  "console_preferences",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -3276,3 +3395,332 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CreateLoginTokenResponseValidationError{}
+
+// ValidateFields checks the field values on
+// UserConsolePreferences_DashboardLayouts with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *UserConsolePreferences_DashboardLayouts) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = UserConsolePreferences_DashboardLayoutsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "api_key":
+			// no validation rules for ApiKey
+		case "application":
+			// no validation rules for Application
+		case "collaborator":
+			// no validation rules for Collaborator
+		case "end_device":
+			// no validation rules for EndDevice
+		case "gateway":
+			// no validation rules for Gateway
+		case "organization":
+			// no validation rules for Organization
+		case "overview":
+			// no validation rules for Overview
+		case "user":
+			// no validation rules for User
+		default:
+			return UserConsolePreferences_DashboardLayoutsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// UserConsolePreferences_DashboardLayoutsValidationError is the validation
+// error returned by UserConsolePreferences_DashboardLayouts.ValidateFields if
+// the designated constraints aren't met.
+type UserConsolePreferences_DashboardLayoutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UserConsolePreferences_DashboardLayoutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UserConsolePreferences_DashboardLayoutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UserConsolePreferences_DashboardLayoutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UserConsolePreferences_DashboardLayoutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UserConsolePreferences_DashboardLayoutsValidationError) ErrorName() string {
+	return "UserConsolePreferences_DashboardLayoutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UserConsolePreferences_DashboardLayoutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUserConsolePreferences_DashboardLayouts.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UserConsolePreferences_DashboardLayoutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UserConsolePreferences_DashboardLayoutsValidationError{}
+
+// ValidateFields checks the field values on UserConsolePreferences_SortBy with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *UserConsolePreferences_SortBy) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = UserConsolePreferences_SortByFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "api_key":
+
+			if _, ok := _UserConsolePreferences_SortBy_ApiKey_InLookup[m.GetApiKey()]; !ok {
+				return UserConsolePreferences_SortByValidationError{
+					field:  "api_key",
+					reason: "value must be in list [ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]",
+				}
+			}
+
+		case "application":
+
+			if _, ok := _UserConsolePreferences_SortBy_Application_InLookup[m.GetApplication()]; !ok {
+				return UserConsolePreferences_SortByValidationError{
+					field:  "application",
+					reason: "value must be in list [ application_id -application_id name -name created_at -created_at]",
+				}
+			}
+
+		case "collaborator":
+
+			if _, ok := _UserConsolePreferences_SortBy_Collaborator_InLookup[m.GetCollaborator()]; !ok {
+				return UserConsolePreferences_SortByValidationError{
+					field:  "collaborator",
+					reason: "value must be in list [ id -id rights -rights]",
+				}
+			}
+
+		case "end_device":
+
+			if _, ok := _UserConsolePreferences_SortBy_EndDevice_InLookup[m.GetEndDevice()]; !ok {
+				return UserConsolePreferences_SortByValidationError{
+					field:  "end_device",
+					reason: "value must be in list [ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]",
+				}
+			}
+
+		case "gateway":
+
+			if _, ok := _UserConsolePreferences_SortBy_Gateway_InLookup[m.GetGateway()]; !ok {
+				return UserConsolePreferences_SortByValidationError{
+					field:  "gateway",
+					reason: "value must be in list [ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]",
+				}
+			}
+
+		case "organization":
+
+			if _, ok := _UserConsolePreferences_SortBy_Organization_InLookup[m.GetOrganization()]; !ok {
+				return UserConsolePreferences_SortByValidationError{
+					field:  "organization",
+					reason: "value must be in list [ organization_id -organization_id name -name created_at -created_at]",
+				}
+			}
+
+		case "user":
+
+			if _, ok := _UserConsolePreferences_SortBy_User_InLookup[m.GetUser()]; !ok {
+				return UserConsolePreferences_SortByValidationError{
+					field:  "user",
+					reason: "value must be in list [ user_id -user_id name -name primary_email_address -primary_email_address state -state admin -admin created_at -created_at]",
+				}
+			}
+
+		default:
+			return UserConsolePreferences_SortByValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// UserConsolePreferences_SortByValidationError is the validation error
+// returned by UserConsolePreferences_SortBy.ValidateFields if the designated
+// constraints aren't met.
+type UserConsolePreferences_SortByValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UserConsolePreferences_SortByValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UserConsolePreferences_SortByValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UserConsolePreferences_SortByValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UserConsolePreferences_SortByValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UserConsolePreferences_SortByValidationError) ErrorName() string {
+	return "UserConsolePreferences_SortByValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UserConsolePreferences_SortByValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUserConsolePreferences_SortBy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UserConsolePreferences_SortByValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UserConsolePreferences_SortByValidationError{}
+
+var _UserConsolePreferences_SortBy_ApiKey_InLookup = map[string]struct{}{
+	"":            {},
+	"api_key_id":  {},
+	"-api_key_id": {},
+	"name":        {},
+	"-name":       {},
+	"created_at":  {},
+	"-created_at": {},
+	"expires_at":  {},
+	"-expires_at": {},
+}
+
+var _UserConsolePreferences_SortBy_Application_InLookup = map[string]struct{}{
+	"":                {},
+	"application_id":  {},
+	"-application_id": {},
+	"name":            {},
+	"-name":           {},
+	"created_at":      {},
+	"-created_at":     {},
+}
+
+var _UserConsolePreferences_SortBy_Collaborator_InLookup = map[string]struct{}{
+	"":        {},
+	"id":      {},
+	"-id":     {},
+	"rights":  {},
+	"-rights": {},
+}
+
+var _UserConsolePreferences_SortBy_EndDevice_InLookup = map[string]struct{}{
+	"":              {},
+	"device_id":     {},
+	"-device_id":    {},
+	"join_eui":      {},
+	"-join_eui":     {},
+	"dev_eui":       {},
+	"-dev_eui":      {},
+	"name":          {},
+	"-name":         {},
+	"description":   {},
+	"-description":  {},
+	"created_at":    {},
+	"-created_at":   {},
+	"last_seen_at":  {},
+	"-last_seen_at": {},
+}
+
+var _UserConsolePreferences_SortBy_Gateway_InLookup = map[string]struct{}{
+	"":             {},
+	"gateway_id":   {},
+	"-gateway_id":  {},
+	"gateway_eui":  {},
+	"-gateway_eui": {},
+	"name":         {},
+	"-name":        {},
+	"created_at":   {},
+	"-created_at":  {},
+}
+
+var _UserConsolePreferences_SortBy_Organization_InLookup = map[string]struct{}{
+	"":                 {},
+	"organization_id":  {},
+	"-organization_id": {},
+	"name":             {},
+	"-name":            {},
+	"created_at":       {},
+	"-created_at":      {},
+}
+
+var _UserConsolePreferences_SortBy_User_InLookup = map[string]struct{}{
+	"":                       {},
+	"user_id":                {},
+	"-user_id":               {},
+	"name":                   {},
+	"-name":                  {},
+	"primary_email_address":  {},
+	"-primary_email_address": {},
+	"state":                  {},
+	"-state":                 {},
+	"admin":                  {},
+	"-admin":                 {},
+	"created_at":             {},
+	"-created_at":            {},
+}
