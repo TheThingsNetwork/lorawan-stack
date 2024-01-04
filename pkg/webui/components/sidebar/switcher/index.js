@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
@@ -26,40 +26,40 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './switcher.styl'
 
 const Switcher = ({ isMinimized }) => {
-  const { pathname } = useLocation()
-  // <NavLink to="/"> effectively ignores the end prop and only matches when you're at the root route.
-  // https://reactrouter.com/en/main/components/nav-link
-  const overviewClassName = classnames(
-    style.link,
-    { [style.active]: !pathname.includes('/applications') && !pathname.includes('/gateways') },
-    'p-vert-cs-s',
-    'p-sides-0',
-  )
+  const paddingClass = isMinimized ? 'p-vert-cs-xs' : 'p-vert-cs-s'
 
-  const className = useCallback(
+  const getNavLinkClass = useCallback(
     ({ isActive }) =>
-      classnames(style.link, { [style.active]: isActive }, 'p-vert-cs-s', 'p-sides-0'),
-    [],
+      classnames(style.link, isActive ? style.active : '', paddingClass, 'p-sides-0'),
+    [paddingClass],
   )
 
   return (
     <div
-      className={classnames(style.switcherContainer, 'd-flex', 'j-center', 'p-cs-xxs', 'mb-cs-m', {
+      className={classnames(style.switcherContainer, {
         'direction-column': isMinimized,
       })}
     >
-      <NavLink to="/" className={overviewClassName}>
-        {isMinimized ? <Icon icon="home" /> : <Message content={sharedMessages.overview} />}
-      </NavLink>
-      <NavLink to="/applications" className={className}>
+      <NavLink to="/" className={getNavLinkClass}>
         {isMinimized ? (
-          <Icon icon="application" />
+          <Icon icon="home" className={style.icon} />
+        ) : (
+          <Message content={sharedMessages.overview} />
+        )}
+      </NavLink>
+      <NavLink to="/applications" className={getNavLinkClass}>
+        {isMinimized ? (
+          <Icon icon="application" className={style.icon} />
         ) : (
           <Message content={sharedMessages.applications} />
         )}
       </NavLink>
-      <NavLink to="/gateways" className={className}>
-        {isMinimized ? <Icon icon="gateway" /> : <Message content={sharedMessages.gateways} />}
+      <NavLink to="/gateways" className={getNavLinkClass}>
+        {isMinimized ? (
+          <Icon icon="gateway" className={style.icon} />
+        ) : (
+          <Message content={sharedMessages.gateways} />
+        )}
       </NavLink>
     </div>
   )

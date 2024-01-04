@@ -16,7 +16,7 @@ import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import SideNavigation from '@ttn-lw/components/navigation/side'
+import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -67,9 +67,9 @@ const AppSideNavigation = () => {
           <DedicatedEntity
             label={entityId}
             buttonMessage={m.buttonMessage}
-            icon="arrow_back"
             className="mt-cs-xs mb-cs-l"
-            path={`/applications`}
+            path={`/applications/${appId}`}
+            backPath="/applications"
           />
         )}
         {mayViewApplicationInfo.check(rights) && (

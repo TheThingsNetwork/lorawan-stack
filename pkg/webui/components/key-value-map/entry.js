@@ -151,7 +151,8 @@ const Entry = ({
           title={m.deleteEntry}
           message={removeMessage}
           disabled={readOnly}
-          danger={!Boolean(removeMessage)}
+          danger
+          naked
         />
       )}
     </div>

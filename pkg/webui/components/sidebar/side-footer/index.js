@@ -57,9 +57,7 @@ const SideFooter = () => {
   const clusterButtonRef = useRef(null)
 
   const clusterDropdownItems = (
-    <>
-      <Dropdown.Item title="Cluster selection" icon="public" path="/cluster" />
-    </>
+    <Dropdown.Item title="Cluster selection" icon="public" path="/cluster" />
   )
 
   const languageContext = useContext(LanguageContext)
@@ -72,7 +70,7 @@ const SideFooter = () => {
     [setLocale],
   )
 
-  const submenuItems = supportedLocales
+  const languageItems = supportedLocales
     ? Object.keys(supportedLocales).map(l => (
         <LanguageOption
           locale={l}
@@ -90,19 +88,22 @@ const SideFooter = () => {
         title={sharedMessages.documentation}
         icon="menu_book"
         path={documentationBaseUrl}
+        external
       />
-      <Dropdown.Item title={sharedMessages.support} icon="support" path={supportLink} />
+      <Dropdown.Item title={sharedMessages.support} icon="support" path={supportLink} external />
       <Dropdown.Item
         title={sharedMessages.statusPage}
         icon="monitor_heart"
         path={statusPageBaseUrl}
+        external
       />
       {Boolean(languageContext) && (
         <Dropdown.Item
           title={sharedMessages.language}
           icon="language"
           path="/support"
-          submenuItems={submenuItems}
+          submenuItems={languageItems}
+          external
         />
       )}
     </>
@@ -125,7 +126,6 @@ const SideFooter = () => {
         icon="support"
         message={!isMinimized ? `v${process.env.VERSION} (${process.env.REVISION})` : undefined}
         dropdownItems={supportDropdownItems}
-        dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterSupportDropdown)}
         noDropdownIcon
         ref={supportButtonRef}
       />
@@ -137,7 +137,7 @@ const SideFooter = () => {
           message="EU1"
           noDropdownIcon
           dropdownItems={clusterDropdownItems}
-          dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterClusterDropdown)}
+          dropdownClassName={style.sideFooterClusterDropdown}
           ref={clusterButtonRef}
         />
       )}

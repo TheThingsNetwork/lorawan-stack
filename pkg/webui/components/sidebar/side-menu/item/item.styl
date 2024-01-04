@@ -1,4 +1,4 @@
-// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+.item
+  &:hover
+    .fly-out-list-container
+      display: block
+
+.message
+  vertical-align: middle
+
+.expand-icon
+  position: absolute
+  right: $cs.xs
+  top: 50%
+  transform: translateY(-50%)
+  transition: transform $ad.m ease-in-out
+
+  &-open
+    transform: translateY(-50%) rotate(180deg)
+
+.fly-out-list-container
+  display: none
+  top: - $cs.m
+  left: calc(3rem - 2px)
+  position: absolute
+  padding-left: 1rem
+  z-index: $zi.dropdown
+
+.fly-out-list
+  position: static !important
+
 .link
-  transition: 0.2s all ease-in-out
+  transition: color 50ms linear
   border-radius: $br.l
   text-decoration: none
   color: $c.grey-700
@@ -22,8 +51,11 @@
   gap: $cs.xs
   padding: $cs.xs
   position: relative
+  box-sizing: border-box
+  width: 100%
 
   .icon
+    transition: color 50ms linear
     color: $c.grey-500
 
   &.active
@@ -45,3 +77,4 @@
 
     .icon
       color: inherit
+

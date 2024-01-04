@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useRef, useState } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
 import Button from '@ttn-lw/components/button'
 import style from '@ttn-lw/components/button/button.styl'
@@ -26,45 +25,22 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import styles from './profile-dropdown.styl'
 
 const ProfileDropdown = props => {
-  const [expanded, setExpanded] = useState(false)
-  const node = useRef(null)
   const { brandLogo, className, children, profilePicture, ...rest } = props
 
-  const handleClickOutside = useCallback(e => {
-    if (node.current && !node.current.contains(e.target)) {
-      setExpanded(false)
-    }
-  }, [])
-
-  const toggleDropdown = useCallback(() => {
-    setExpanded(oldExpanded => {
-      const newState = !oldExpanded
-      if (newState) document.addEventListener('mousedown', handleClickOutside)
-      else document.removeEventListener('mousedown', handleClickOutside)
-      return newState
-    })
-  }, [handleClickOutside])
-
   return (
-    <Button
-      secondary
-      className={classnames(styles.container, className)}
-      onClick={toggleDropdown}
-      ref={node}
-      {...rest}
-    >
-      <div className="d-flex gap-cs-xs al-center">
-        {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
-        <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
-      </div>
-      <Icon
-        className={classnames(style.arrowIcon, {
-          [style['arrow-icon-expanded']]: expanded,
-        })}
-        icon="expand_more"
-      />
-      <Dropdown open={expanded}>{children}</Dropdown>
-    </Button>
+    <div className="pos-relative">
+      <Button
+        secondary
+        className={classnames(styles.container, className, 'pr-0')}
+        dropdownItems={children}
+        {...rest}
+      >
+        <div className="d-flex gap-cs-xs al-center">
+          {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
+          <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
+        </div>
+      </Button>
+    </div>
   )
 }
 

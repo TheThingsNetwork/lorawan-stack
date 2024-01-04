@@ -50,6 +50,7 @@ const Collapse = props => {
         <div className={style.button}>
           <Button
             type="button"
+            secondary
             className={style.expandButton}
             disabled={disabled}
             message={collapsed ? m.expand : m.collapse}

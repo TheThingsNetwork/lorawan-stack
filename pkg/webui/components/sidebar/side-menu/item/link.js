@@ -17,6 +17,7 @@ import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -24,7 +25,7 @@ import SidebarContext from '@console/containers/side-bar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './side-menu-link.styl'
+import style from './item.styl'
 
 const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
   const { isMinimized } = useContext(SidebarContext)
@@ -43,6 +44,13 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
     <NavLink to={path} className={className} end={exact} onClick={onClick}>
       {icon && <Icon icon={icon} className={classnames(style.icon)} />}{' '}
       {!isMinimized && <Message content={title} />}
+      {isMinimized && (
+        <div className={style.flyOutListContainer}>
+          <Dropdown open className={style.flyOutList} onItemsClick={onClick}>
+            <Dropdown.HeaderItem title={title.defaultMessage} />
+          </Dropdown>
+        </div>
+      )}
     </NavLink>
   )
 }
