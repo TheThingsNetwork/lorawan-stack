@@ -59,7 +59,6 @@ const validationSchema = Yup.object().shape({
         otherwise: schema => schema.concat(collaboratorUserSchema),
       }),
     })
-    .nullable()
     .test('collaborator is not empty', sharedMessages.validateRequired, emptyCollaboratorCheck),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
