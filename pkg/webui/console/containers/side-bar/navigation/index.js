@@ -24,25 +24,21 @@ import GeneralSideNavigation from './general-side-navigation'
 const SidebarNavigation = () => {
   const { pathname } = useLocation()
 
-  const showGeneralSideNavigation =
-    !pathname.includes('/applications') && !pathname.includes('/gateways')
-
-  const showSingleAppSideNavigation = pathname.match(
-    new RegExp('/applications/[a-z0-9](?:[-]?[a-z0-9]){1,}'),
-  )
-
-  const showSingleGatewaySideNavigation = pathname.match(
-    new RegExp('/gateways/[a-z0-9](?:[-]?[a-z0-9]){1,}'),
-  )
+  const isApplicationsPath = pathname.startsWith('/applications')
+  const isGatewaysPath = pathname.startsWith('/gateways')
+  const isSingleAppPath =
+    isApplicationsPath && /\/applications\/[a-z0-9]+([-]?[a-z0-9]+)*\/?/i.test(pathname)
+  const isSingleGatewayPath =
+    isGatewaysPath && /\/gateways\/[a-z0-9]+([-]?[a-z0-9]+)*\/?/i.test(pathname)
 
   return (
-    <div>
-      {showGeneralSideNavigation && <GeneralSideNavigation />}
-      {showSingleAppSideNavigation && <AppSideNavigation />}
-      {pathname.includes('/applications') && <AppListSideNavigation />}
-      {showSingleGatewaySideNavigation && <GtwSideNavigation />}
-      {pathname.includes('/gateways') && <GtwListSideNavigation />}
-    </div>
+    <>
+      {!isApplicationsPath && !isGatewaysPath && <GeneralSideNavigation />}
+      {isSingleAppPath && <AppSideNavigation />}
+      {isApplicationsPath && <AppListSideNavigation />}
+      {isSingleGatewayPath && <GtwSideNavigation />}
+      {isGatewaysPath && <GtwListSideNavigation />}
+    </>
   )
 }
 

@@ -20,18 +20,18 @@ ul.dropdown
   background: $c.white
   box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.06)
   position: absolute
-  padding: $cs.s
-  min-width: 14rem
+  padding: $cs.xs
+  width: max-content
+  min-width: 16rem
+  max-width: 24rem
   z-index: $zi.dropdown
   margin: $cs.xxs 0 0
   opacity: 0
   visibility: hidden
-  transition: opacity 0.2s ease-in-out, visibility 0s linear 0.2s
 
   &.open
     opacity: 1
     visibility: visible
-    transition: opacity 0.2s ease-in-out, visibility 0s linear
 
   &.below
     bottom: auto
@@ -63,6 +63,7 @@ ul.dropdown
   hr
     height: 1px
     background-color: $c.grey-200
+    margin: 2px 0
 
   li.dropdown-header-item
     display: block
@@ -72,7 +73,7 @@ ul.dropdown
     span
       line-height: 1
       display: block
-      padding: $cs.m
+      padding: $cs.s
 
   li.dropdown-item
     margin-bottom: 0
@@ -80,6 +81,7 @@ ul.dropdown
 
     button.button
       reset-button()
+      position: relative
 
     & > a.button, & > button.button
       box-sizing: border-box
@@ -89,26 +91,11 @@ ul.dropdown
       text-decoration: none
       padding: $cs.xs
       width: 100%
-      min-height: 2.429rem
-      &:not(.active)
-        color: $c.grey-700
-
-        .icon
-          color: $c.grey-700
-
-      &.active
-        border-radius: $br.m
-        background: $c.tts-primary-150
-        transition: background 0.1s ease-in-out
-        color: $tc-deep-gray
-
-        .icon
-          color: $tc-deep-gray
+      min-height: 2.5rem
 
       &:hover
         color: $tc-deep-gray
         background: $c.tts-primary-150
-        transition: background 0.1s ease-in-out
         border-radius: $br.m
 
         .icon
@@ -121,14 +108,8 @@ ul.dropdown
       color: $tc-deep-gray
       text-decoration: none
 
-  .submenu-container
-    bottom: 0px
-    left: 0px
-    position: absolute
-    width: 180%
-    height: 5rem
-    z-index: 9999
-
   .submenu-dropdown
-    bottom: -0px !important
-    left: calc(100% + -213px) !important
+    bottom: - $cs.xs
+    left: calc(100% + .5rem) // Width plus padding.
+    z-index: $zi.dropdown
+

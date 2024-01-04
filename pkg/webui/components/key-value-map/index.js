@@ -107,6 +107,7 @@ const KeyValueMap = ({
           onClick={addEmptyEntry}
           disabled={disabled}
           icon="add"
+          secondary
         />
       </div>
     </div>

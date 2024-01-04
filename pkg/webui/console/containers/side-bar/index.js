@@ -55,24 +55,24 @@ const Sidebar = ({ isDrawerOpen }) => {
 
   const sidebarClassnames = classnames(
     style.sidebar,
-    'd-flex pos-fixed direction-column j-between gap-cs-m bg-tts-primary-050',
+    'd-flex direction-column j-between gap-cs-m bg-tts-primary-050',
     {
       [style.sidebarMinimized]: isMinimized,
       [style.sidebarOpen]: isMobile && isDrawerOpen,
-      'p-cs-s': !isMinimized,
-      'p-vert-cs-m': isMinimized,
+      'p-cs-m': !isMinimized,
+      'p-vert-cs-l': isMinimized,
       'p-sides-cs-xs': isMinimized,
     },
   )
 
   return (
-    <div className={sidebarClassnames} id="sidebar-v2">
+    <div className={sidebarClassnames} id="sidebar">
       <SidebarContext.Provider value={{ topEntities, onMinimizeToggle, isMinimized }}>
         <div className="d-flex direction-column gap-cs-m">
           <SideHeader />
-          <div>
+          <div className="d-flex direction-column gap-cs-m">
             <SwitcherContainer />
-            <SearchButton />
+            <SearchButton onClick={() => null} />
           </div>
           <SidebarNavigation />
         </div>

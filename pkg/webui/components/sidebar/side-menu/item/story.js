@@ -16,7 +16,7 @@ import React from 'react'
 
 import SidebarContext from '@console/containers/side-bar/context'
 
-import Link from '.'
+import Link from './link'
 
 export default {
   title: 'Side Menu Link',

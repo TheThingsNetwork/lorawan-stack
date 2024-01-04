@@ -50,7 +50,13 @@ const GatewayApiKeysModal = ({
   >
     <ButtonGroup>
       {lnsKey && (
-        <Button type="button" message={m.downloadLns} onClick={downloadLns} icon="file_download" />
+        <Button
+          type="button"
+          message={m.downloadLns}
+          onClick={downloadLns}
+          icon="file_download"
+          secondary
+        />
       )}
       {cupsKey && (
         <Button
@@ -58,6 +64,7 @@ const GatewayApiKeysModal = ({
           message={m.downloadCups}
           onClick={downloadCups}
           icon="file_download"
+          secondary
         />
       )}
     </ButtonGroup>

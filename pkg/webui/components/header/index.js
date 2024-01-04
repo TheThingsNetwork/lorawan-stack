@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
@@ -25,8 +25,7 @@ import style from './header.styl'
 
 const Header = ({
   brandLogo,
-  logo,
-  breadcrumbs,
+  Logo,
   className,
   addDropdownItems,
   starDropdownItems,
@@ -34,43 +33,30 @@ const Header = ({
   user,
   onMenuClick,
   ...rest
-}) => {
-  const addRef = useRef(null)
-  const starRef = useRef(null)
-
+}) => (
   // Const isGuest = !Boolean(user)
 
-  return (
-    <header {...rest} className={classnames(className, style.container)}>
-      <div className={classnames('breadcrumbs', 's:d-none')} />
-      <div className="d-none s:d-flex al-center gap-cs-xs">
-        <Button secondary icon="menu" onClick={onMenuClick} />
-        <Link to="/" className="d-flex">
-          <img {...logo} className={style.logo} />
-        </Link>
-      </div>
+  <header {...rest} className={classnames(className, style.container)}>
+    <div className={classnames('breadcrumbs', 's:d-none')} />
+    <div className="d-none s:d-flex al-center gap-cs-xs">
+      <Button secondary icon="menu" onClick={onMenuClick} />
+      <Logo className={style.logo} />
+    </div>
 
-      <div className="d-flex al-center gap-cs-xs">
-        <Button secondary icon="add" dropdownItems={addDropdownItems} ref={addRef} />
-        <Button
-          secondary
-          icon="grade"
-          dropdownItems={starDropdownItems}
-          ref={starRef}
-          className="s:d-none"
-        />
-        <Button secondary icon="inbox" />
-        <ProfileDropdown
-          brandLogo={brandLogo}
-          data-test-id="profile-dropdown"
-          profilePicture={user?.profile_picture}
-        >
-          {profileDropdownItems}
-        </ProfileDropdown>
-      </div>
-    </header>
-  )
-}
+    <div className="d-flex al-center gap-cs-xs">
+      <Button secondary icon="add" dropdownItems={addDropdownItems} />
+      <Button secondary icon="grade" dropdownItems={starDropdownItems} className="s:d-none" />
+      <Button secondary icon="inbox" />
+      <ProfileDropdown
+        brandLogo={brandLogo}
+        data-test-id="profile-dropdown"
+        profilePicture={user?.profile_picture}
+      >
+        {profileDropdownItems}
+      </ProfileDropdown>
+    </div>
+  </header>
+)
 
 const imgPropType = PropTypes.shape({
   src: PropTypes.string.isRequired,
@@ -78,15 +64,12 @@ const imgPropType = PropTypes.shape({
 })
 
 Header.propTypes = {
+  Logo: PropTypes.elementType.isRequired,
   /** The dropdown items when the add button is clicked. */
   addDropdownItems: PropTypes.node.isRequired,
   brandLogo: imgPropType,
-  /** A list of breadcrumb elements. */
-  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.element]))
-    .isRequired,
   /** The classname applied to the component. */
   className: PropTypes.string,
-  logo: imgPropType.isRequired,
   /** A handler for when the menu button is clicked. */
   onMenuClick: PropTypes.func.isRequired,
   /** The dropdown items when the profile button is clicked. */

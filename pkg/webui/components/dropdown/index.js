@@ -100,49 +100,58 @@ const DropdownItem = ({
   exact,
   showActive,
   tabIndex,
-  external,
   submenuItems,
+  external,
   ...rest
 }) => {
   const [expandedSubmenu, setExpandedSubmenu] = useState(false)
+  const [leaveDelayTimer, setLeaveDelayTimer] = useState(null)
   const iconElement = icon && <Icon className={style.icon} icon={icon} nudgeUp />
-  const activeClassName = classnames({
-    [style.active]: (!Boolean(action) && showActive) || active,
-  })
-  const cls = useCallback(
-    ({ isActive }) => classnames(style.button, { [activeClassName]: isActive }),
-    [activeClassName],
-  )
   const ItemElement = action ? (
     <button
       onClick={action}
       onKeyPress={action}
       role="tab"
       tabIndex={tabIndex}
-      className={classnames(style.button, activeClassName)}
+      className={style.button}
     >
       {iconElement}
       <Message content={title} />
     </button>
-  ) : external ? (
-    <Link.Anchor href={path} external tabIndex={tabIndex} className={style.button}>
+  ) : (
+    <Link.Anchor href={path} external={external} tabIndex={tabIndex} className={style.button}>
       {Boolean(iconElement) ? iconElement : null}
       <Message content={title} />
     </Link.Anchor>
-  ) : (
-    <NavLink className={cls} to={path} end={exact} tabIndex={tabIndex}>
-      {iconElement}
-      <Message content={title} />
-    </NavLink>
   )
 
   const handleMouseEnter = useCallback(() => {
+    if (leaveDelayTimer) {
+      clearTimeout(leaveDelayTimer)
+      setLeaveDelayTimer(null)
+    }
     setExpandedSubmenu(true)
-  }, [setExpandedSubmenu])
+  }, [leaveDelayTimer])
 
   const handleMouseLeave = useCallback(() => {
-    setExpandedSubmenu(false)
-  }, [setExpandedSubmenu])
+    // Set a timer when mouse leaves, to only close after a delay.
+    // This prevents the menu from closing when the mouse moves over the submenu
+    // and also makes the UI more forgiving when the mouse accidentally leaves the menu.
+    setLeaveDelayTimer(
+      setTimeout(() => {
+        setExpandedSubmenu(false)
+      }, 250),
+    )
+  }, [])
+
+  useEffect(
+    () => () => {
+      if (leaveDelayTimer) {
+        clearTimeout(leaveDelayTimer)
+      }
+    },
+    [leaveDelayTimer],
+  )
 
   const withSubmenu = (
     <button
@@ -155,13 +164,9 @@ const DropdownItem = ({
         <Message content={title} />
       </div>
       <Icon icon="chevron_right" />
-      {expandedSubmenu ? (
-        <div className={style.submenuContainer}>
-          <Dropdown open={expandedSubmenu} className={style.submenuDropdown}>
-            {submenuItems}
-          </Dropdown>
-        </div>
-      ) : null}
+      <Dropdown open={expandedSubmenu} className={style.submenuDropdown}>
+        {submenuItems}
+      </Dropdown>
     </button>
   )
 

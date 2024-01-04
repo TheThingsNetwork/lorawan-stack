@@ -37,12 +37,11 @@ const SearchButton = ({ onClick, className }) => {
   return (
     <Button
       onClick={handleClick}
-      secondary
       className={classnames(style.searchButton, className, {
         [style.searchButtonMinimized]: isMinimized,
       })}
     >
-      <div className="d-flex gap-cs-xxs">
+      <div className="d-flex gap-cs-xxs al-center">
         <Icon icon="search" className={style.icon} />
         {!isMinimized && <Message content={sharedMessages.search} component="p" className="m-0" />}
       </div>

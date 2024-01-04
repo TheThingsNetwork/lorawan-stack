@@ -15,7 +15,7 @@
 import React, { useContext } from 'react'
 
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
-import SideNavigation from '@ttn-lw/components/navigation/side'
+import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -24,7 +24,7 @@ import SidebarContext from '../context'
 const AppListSideNavigation = () => {
   const { topEntities, isMinimized } = useContext(SidebarContext)
 
-  if (isMinimized || topEntities.length === 0) {
+  if (isMinimized) {
     return null
   }
 

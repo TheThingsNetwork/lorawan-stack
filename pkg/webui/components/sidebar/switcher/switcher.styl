@@ -16,22 +16,25 @@
   border-radius: $br.l
   border: 1px solid $c.grey-100
   background: white
-  box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.05)
-  font-weight: $fw.light
+  box-shadow: 0px 2px 7px 1px rgba(0, 0, 0, 0.06)
+  display: flex
+  gap: $cs.xxs
+  justify-content: center
+  padding: $cs.xxs
 
   .link
-    transition: 0.2s all ease-in-out
     border-radius: $br.m
     text-decoration: none
     color: $c.grey-700
     display: flex
     justify-content: center
     width: 100%
-    font-weight: $fw.bold
+    transition: background 200ms ease-in-out
 
     &.active
       background: $c.grey-900
       color: $c.white
+      font-weight: $fw.bold
 
     &:visited
       text-decoration: none
@@ -42,3 +45,7 @@
       text-decoration: none
       &:not(.active)
         background: $c.grey-100
+
+  .icon
+    font-size: $fs.xl
+    font-weight: 300

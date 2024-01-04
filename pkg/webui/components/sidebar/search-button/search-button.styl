@@ -14,36 +14,43 @@
 
 .search-button
   font-size: $fs.m
-  color: $c.grey-500 !important
+  color: $c.grey-500
   width: 100%
   position: relative
   display: flex
   justify-content: space-between
-  padding: $cs.xs $cs.xxs
+  padding: $cs.xxs $cs.xxs
   gap: $cs.xxs
-  box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.05) !important
-  background: white !important
-  border: 1px solid $c.grey-100 !important
+  box-shadow: 0px 2px 7px 1px rgba(0, 0, 0, 0.06)
+  background: white
+  border: 1px solid $c.grey-100
+  border-radius: $br.l
+  transition: border-color 0.08s linear, box-shadow 0.08s linear, color 0.08s linear
 
   &:hover
-    background-color: $c-focus !important
+    border: 1px solid $c.grey-200
+    color: $c.grey-700
+    box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.08)
 
   &-minimized
     justify-content: center
+    padding: $cs.xs $cs.xxs
 
   p
     line-height: 1.4
 
   .icon
     font-size: $fs.xl
+    position: relative
+    top: 1px
 
   .backslash-container
-    height: 1.5rem
-    width: 1.5rem
+    height: 1.65rem // 24px
+    width: 1.65rem // 24px
     text-align: center
     border-radius: $br.m
     border: 1px solid $c.grey-200
-    font-size: $fs.s
+    font-size: $fs.m
     display: flex
     justify-content: center
     align-items: center

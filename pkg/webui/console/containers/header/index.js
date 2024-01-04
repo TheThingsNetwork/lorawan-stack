@@ -121,7 +121,8 @@ const Header = () => {
       addDropdownItems={plusDropdownItems}
       starDropdownItems={[]}
       brandLogo={brandLogo}
-      logo={<Logo />}
+      Logo={Logo}
+      onMenuClick={() => null}
     />
   )
 }

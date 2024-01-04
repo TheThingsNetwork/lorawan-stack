@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
@@ -24,40 +24,37 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './dedicated-entity.styl'
 
-const DedicatedEntity = ({ label, icon, className, buttonMessage, path, exact, handleClick }) => (
-  <NavLink
-    className={classnames(className, style.dedicatedEntity, 'd-flex', 'al-center')}
-    to={path}
-    end={exact}
-    onClick={handleClick}
-  >
-    <Button
-      className={style.dedicatedEntityButton}
-      primary
-      grey
-      icon={icon}
-      message={buttonMessage}
-    />
-    <div className={style.dedicatedEntityItem}>
+const DedicatedEntity = ({ label, className, buttonMessage, path, backPath, exact }) => (
+  <div className={classnames(className, style.dedicatedEntity)}>
+    <Link to={backPath} end={exact} className={style.dedicatedEntityCurtain}>
+      <Button
+        className={style.dedicatedEntityButton}
+        icon="arrow_left_alt"
+        message={buttonMessage}
+      />
+    </Link>
+    <Link
+      className={classnames(style.dedicatedEntityItem, 'd-flex', 'al-center')}
+      to={path}
+      end={exact}
+    >
       <hr className={style.dedicatedEntityDivider} />
       <Message content={label} className={style.dedicatedEntityLabel} component="p" />
-    </div>
-  </NavLink>
+    </Link>
+  </div>
 )
 
 DedicatedEntity.propTypes = {
-  buttonMessage: PropTypes.message,
+  backPath: PropTypes.string.isRequired,
+  buttonMessage: PropTypes.message.isRequired,
   className: PropTypes.string,
   exact: PropTypes.bool,
-  handleClick: PropTypes.func.isRequired,
-  icon: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   path: PropTypes.string.isRequired,
 }
 
 DedicatedEntity.defaultProps = {
   className: undefined,
-  buttonMessage: undefined,
   exact: false,
 }
 

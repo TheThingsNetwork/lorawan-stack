@@ -12,5 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.mini-logo
-  width: 4rem
+.header-container
+  display: flex
+  justify-content: space-between
+  align-items: center
+  gap: $cs.m
+
+  &.is-minimized
+    flex-direction: column
+    gap: $cs.xs
+
+  .minimize-button
+    transition: none
+
+  &:not(.is-minimized)
+    .minimize-button
+      margin-top: - $cs.xxs
+      margin-right: - $cs.s
+
+  .logo
+    width: 9.57rem
+
+  .mini-logo
+    width: 2.8rem

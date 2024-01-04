@@ -149,7 +149,7 @@ const OrganizationsTable = () => {
         }),
         render: details => (
           <ButtonGroup align="end">
-            <Button message={sharedMessages.restore} onClick={details.restore} />
+            <Button message={sharedMessages.restore} onClick={details.restore} secondary />
             <DeleteModalButton
               entityId={details.id}
               entityName={name}

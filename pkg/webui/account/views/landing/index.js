@@ -18,7 +18,7 @@ import classnames from 'classnames'
 
 import authRoutes from '@account/constants/auth-routes'
 
-import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
+import sidebarStyle from '@ttn-lw/components/sidebar/side-menu/side.styl'
 
 import Footer from '@ttn-lw/containers/footer'
 

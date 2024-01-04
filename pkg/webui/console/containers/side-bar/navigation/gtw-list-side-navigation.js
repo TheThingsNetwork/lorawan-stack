@@ -15,7 +15,7 @@
 import React, { useContext } from 'react'
 
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
-import SideNavigation from '@ttn-lw/components/navigation/side'
+import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -29,7 +29,7 @@ const GtwListSideNavigation = () => {
 
   return (
     <div>
-      <SectionLabel label={sharedMessages.topGateways} icon="add" />
+      <SectionLabel label={sharedMessages.topGateways} icon="add" onClick={() => null} />
       <SideNavigation>
         {topEntities.map(({ path, entity, title }) => (
           <SideNavigation.Item title={title} path={path} icon={entity} key={path} />
