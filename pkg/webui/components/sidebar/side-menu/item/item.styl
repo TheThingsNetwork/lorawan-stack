@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.item
-  &:hover
-    .fly-out-list-container
-      display: block
-
 .message
   vertical-align: middle
 
@@ -30,20 +25,9 @@
   &-open
     transform: translateY(-50%) rotate(180deg)
 
-.fly-out-list-container
-  display: none
-  top: - $cs.m
-  left: calc(3rem - 2px)
-  position: absolute
-  padding-left: 1rem
-  z-index: $zi.dropdown
-
-.fly-out-list
-  position: static !important
-
 .link
   transition: color 50ms linear
-  border-radius: $br.l
+  border-radius: $br.m
   text-decoration: none
   color: $c.grey-700
   display: flex
@@ -53,10 +37,7 @@
   position: relative
   box-sizing: border-box
   width: 100%
-
-  .icon
-    transition: color 50ms linear
-    color: $c.grey-500
+  padding-left: $cs.xs
 
   &.active
     background: $c.tts-primary-150
@@ -73,8 +54,41 @@
 
   &:hover
     color: $c.grey-900
-    text-decoration: none
 
     .icon
       color: inherit
 
+.is-minimized
+  justify-content: center
+
+  .title
+    display: none
+
+  .expand-icon
+    display: none
+
+  .icon
+    transition: color 50ms linear
+    color: $c.grey-500
+
+.sub-item-list
+  &.is-minimized
+    +media-query-min($bp.m)
+      display: none
+
+.fly-out-list
+  top: - $cs.xs
+  left: calc(4rem - 3px)
+  position: absolute
+  padding-left: 1rem
+  z-index: $zi.dropdown
+
+  // Pseudo element to extend the clickable area
+  // to connect with the parent button.
+  &:before
+    content: ""
+    position: absolute
+    top: 0
+    left: -1rem
+    width: 1rem
+    height: 100%

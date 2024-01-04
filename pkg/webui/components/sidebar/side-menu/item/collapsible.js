@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useRef } from 'react'
 import classnames from 'classnames'
 
 import Dropdown from '@ttn-lw/components/dropdown'
@@ -38,6 +38,7 @@ const CollapsibleItem = ({
   onDropdownItemsClick,
   currentPathName,
 }) => {
+  const ref = useRef()
   const subItems = children
     .filter(item => Boolean(item) && 'props' in item)
     .map(item => ({
@@ -49,50 +50,45 @@ const CollapsibleItem = ({
   const subItemActive = subItems.some(item => currentPathName.includes(item.path))
 
   return (
-    <>
+    <div className={classnames('pos-relative', { [style.isMinimized]: isMinimized })} ref={ref}>
       <Button
         className={classnames(style.link, {
-          'j-center': isMinimized,
-          'pl-cs-xs': !isMinimized,
-          'pl-0': !isMinimized,
-          [style.buttonActive]: isMinimized && subItemActive,
+          [style.active]: isMinimized && subItemActive,
+          [style.isMinimized]: isMinimized,
         })}
         onClick={onClick}
       >
         {icon && <Icon icon={icon} className={style.icon} />}
-        {!isMinimized && (
-          <>
-            <Message content={title} className={style.message} />
-            <Icon
-              icon="keyboard_arrow_down"
-              className={classnames(style.expandIcon, {
-                [style.expandIconOpen]: isExpanded,
-              })}
-            />
-          </>
-        )}
-        {isMinimized && (
-          <div className={style.flyOutListContainer}>
-            <Dropdown open className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
-              <Dropdown.HeaderItem title={title.defaultMessage} />
-              {subItems.map(item => (
-                <Dropdown.Item
-                  key={item.path}
-                  title={item.title}
-                  path={item.path}
-                  icon={item.icon}
-                />
-              ))}
-            </Dropdown>
-          </div>
-        )}
+        <Message content={title} className={style.title} />
+        <Icon
+          icon="keyboard_arrow_down"
+          className={classnames(style.expandIcon, {
+            [style.expandIconOpen]: isExpanded,
+          })}
+        />
       </Button>
-      {!isMinimized && (
-        <SideNavigationList depth={depth + 1} isExpanded={isExpanded}>
-          {children}
-        </SideNavigationList>
+      {isMinimized && (
+        <Dropdown.Attached
+          className={style.flyOutList}
+          onItemsClick={onDropdownItemsClick}
+          attachedRef={ref}
+          position="manual"
+          hover
+        >
+          <Dropdown.HeaderItem title={title.defaultMessage} />
+          {subItems.map(item => (
+            <Dropdown.Item key={item.path} title={item.title} path={item.path} icon={item.icon} />
+          ))}
+        </Dropdown.Attached>
       )}
-    </>
+      <SideNavigationList
+        depth={depth + 1}
+        className={classnames(style.subItemList, { [style.isMinimized]: isMinimized })}
+        isExpanded={isExpanded}
+      >
+        {children}
+      </SideNavigationList>
+    </div>
   )
 }
 

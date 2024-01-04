@@ -15,12 +15,41 @@
 .side-footer
   margin-top: auto
 
-  &-full-width
+  .support-button
     width: 100%
+
+    button
+      width: 100%
 
   &-button
     justify-content: space-between
 
-  &-cluster-dropdown
-    left: initial !important
-    right: 0 !important
+  &.is-minimized
+    +media-query-min($bp.m)
+      .cluster-button
+        display: none
+
+      .side-footer-version
+        display: none
+
+      .support-button button
+        justify-content: center
+
+        span:first-child
+          margin: 0
+
+  .side-footer-dropdown
+    width: calc(19rem - 2px)
+    min-width: initial
+    max-width: initial
+
+  .side-footer-version
+    margin-left: $cs.xxs
+
+  .support-button button
+    width: 100% !important
+    justify-content: flex-start
+
+  ul.side-footer-cluster-dropdown
+    left: initial
+    right: 0

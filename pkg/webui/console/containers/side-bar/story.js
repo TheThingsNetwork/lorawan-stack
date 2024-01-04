@@ -18,7 +18,7 @@ import classnames from 'classnames'
 import TtsLogo from '@assets/static/tts-logo.svg'
 
 import Switcher from '@ttn-lw/components/sidebar/switcher'
-import SideNavigation from '@ttn-lw/components/navigation/side'
+import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import SideHeader from '@ttn-lw/components/sidebar/side-header'
 import SearchButton from '@ttn-lw/components/sidebar/search-button'
 import SideFooter from '@ttn-lw/components/sidebar/side-footer'
