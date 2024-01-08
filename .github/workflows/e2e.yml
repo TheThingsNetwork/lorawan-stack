@@ -141,7 +141,7 @@ jobs:
           sudo apt-get update
           sudo apt-get --only-upgrade install google-chrome-stable
           google-chrome --version
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         name: Download build artifacts
         with:
           name: "build-files"
@@ -233,7 +233,7 @@ jobs:
         uses: ./.github/actions/build-mage
       - name: Install Node and Dependencies
         uses: ./.github/actions/install-node-and-deps
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         name: Download build artifacts
         with:
           name: "build-files"
