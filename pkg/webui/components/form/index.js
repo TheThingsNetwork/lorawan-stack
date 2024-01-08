@@ -215,7 +215,12 @@ const Form = props => {
       const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
       if (firstErrorNode) {
         scrollIntoView(firstErrorNode, { behavior: 'smooth' })
-        firstErrorNode.querySelector('input,textarea,canvas,video').focus({ preventScroll: true })
+        const errorInput = firstErrorNode.querySelector('input,textarea,canvas,video')
+        if (errorInput) {
+          errorInput.focus({ preventScroll: true })
+        } else if ('focus' in firstErrorNode) {
+          firstErrorNode.focus({ preventScroll: true })
+        }
       }
     }
   }, [error, isSubmitting, isValid])
