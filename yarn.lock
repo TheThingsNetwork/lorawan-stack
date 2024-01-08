@@ -1268,10 +1268,10 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.22.5"
 
-"@babel/plugin-transform-strict-mode@^7.22.5":
-  version "7.22.5"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-strict-mode/-/plugin-transform-strict-mode-7.22.5.tgz#e172cfbbecfac495262ee597b7d603c9fd961e97"
-  integrity sha512-AlwU99zrq+YSuRGQtACJ2fm4QkhcpvUh68tnlUTWrM0j+11+IM0Z4jAo+S1/NJq6nDhBkvuLFHynt0y5HbNFLA==
+"@babel/plugin-transform-strict-mode@^7.23.3":
+  version "7.23.3"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-strict-mode/-/plugin-transform-strict-mode-7.23.3.tgz#6422705446cc5bce8bad38d21a84b9649ca2d270"
+  integrity sha512-+36/x1ROxW7J1Opm6Q5OaC7AHNHObdIIOfMvnEY4S+Yk5HUZdFH3jv4+P8FpEbge6baEscTpfcGN70VRgJEIzg==
   dependencies:
     "@babel/helper-plugin-utils" "^7.22.5"
 
