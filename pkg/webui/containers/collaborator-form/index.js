@@ -15,6 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
+import { isEmpty } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
@@ -35,7 +36,11 @@ import { userId as collaboratorIdRegexp } from '@ttn-lw/lib/regexp'
 
 import useCollaboratorData from './hooks'
 
-const isNotEmpty = collaborator => collaborator === ''
+const emptyCollaboratorCheck = collab =>
+  !(collab === '') &&
+  !(collab === undefined) &&
+  !(collab === null) &&
+  !(collab instanceof Object && Object.values(collab).every(val => !Boolean(val) || isEmpty(val)))
 
 const collaboratorOrganizationSchema = Yup.object().shape({
   organization_id: Yup.string().matches(collaboratorIdRegexp, sharedMessages.validateAlphanum),
@@ -54,7 +59,7 @@ const validationSchema = Yup.object().shape({
         otherwise: schema => schema.concat(collaboratorUserSchema),
       }),
     })
-    .test('is not empty', sharedMessages.validateRequired, isNotEmpty),
+    .test('collaborator is not empty', sharedMessages.validateRequired, emptyCollaboratorCheck),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 
