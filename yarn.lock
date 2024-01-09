@@ -5075,10 +5075,10 @@ core-js@^2.6.12, core-js@^2.6.5:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
   integrity sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==
 
-core-js@^3.0.1, core-js@^3.9.1:
-  version "3.19.3"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.19.3.tgz#6df8142a996337503019ff3235a7022d7cdf4559"
-  integrity sha512-LeLBMgEGSsG7giquSzvgBrTS7V5UL6ks3eQlUSbN8dJStlLFiRzUm5iqsRyzUB8carhfKjkJ2vzKqE6z1Vga9g==
+core-js@^3.0.1, core-js@^3.33.2:
+  version "3.35.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.35.0.tgz#58e651688484f83c34196ca13f099574ee53d6b4"
+  integrity sha512-ntakECeqg81KqMueeGJ79Q5ZgQNR+6eaE8sxGCx62zMbAIj65q+uYvatToew3m6eAGdU4gNZwpZ34NMe4GYswg==
 
 core-util-is@1.0.2:
   version "1.0.2"
@@ -10929,15 +10929,15 @@ redux-actions@^2.6.5:
     reduce-reducers "^0.4.3"
     to-camel-case "^1.0.0"
 
-redux-logic@^3.0.2:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/redux-logic/-/redux-logic-3.0.3.tgz#17719127b288b3ced13bd255b37283711f7de2a1"
-  integrity sha512-jnwuUEDAhURiR3wKWACrUrsG128T3p+StmjwzA3w42WBGS469MsIohV62+VI7yolLIRV2Nn3y1zMbUukV46gBw==
+redux-logic@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/redux-logic/-/redux-logic-5.0.1.tgz#19821105592098061ea8ad047e4b7ba156041a9c"
+  integrity sha512-GoIOf/VokF01yDSGCjmozGTTAtZpFvePa67i5mFJS4fZ4fgYX/+zY5AIMT8R37TuWmfxKUb9wo7/MIEBUBSa8w==
   dependencies:
-    core-js "^3.9.1"
+    core-js "^3.33.2"
     is-promise "^4.0.0"
     loose-envify "^1.4.0"
-    rxjs "^6.6.6"
+    rxjs "^7.8.1"
 
 redux-sentry-middleware@^0.2.2:
   version "0.2.2"
@@ -11175,13 +11175,6 @@ run-parallel@^1.1.9:
   integrity sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==
   dependencies:
     queue-microtask "^1.2.2"
-
-rxjs@^6.6.6:
-  version "6.6.7"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
-  integrity sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ==
-  dependencies:
-    tslib "^1.9.0"
 
 rxjs@^7.4.0, rxjs@^7.8.1:
   version "7.8.1"
@@ -12215,7 +12208,7 @@ tsconfig-paths@^3.14.2:
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
-tslib@^1.8.1, tslib@^1.9.0:
+tslib@^1.8.1:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
