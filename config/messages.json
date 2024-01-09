@@ -152,6 +152,69 @@
       "file": "i18n.go"
     }
   },
+  "enum:CID_RELAY_CONF": {
+    "translations": {
+      "en": "relay configuration"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_CONFIGURE_FWD_LIMIT": {
+    "translations": {
+      "en": "manage uplink forwarding limits"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_CTRL_UPLINK_LIST": {
+    "translations": {
+      "en": "manage uplink forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_END_DEVICE_CONF": {
+    "translations": {
+      "en": "end device relay configuration"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_FILTER_LIST": {
+    "translations": {
+      "en": "manage join request forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_NOTIFY_NEW_END_DEVICE": {
+    "translations": {
+      "en": "new end device under relay"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:CID_RELAY_UPDATE_UPLINK_LIST": {
+    "translations": {
+      "en": "update uplink forwarding rules"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:CID_RESET": {
     "translations": {
       "en": "reset"
@@ -1349,6 +1412,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:class_b_c_gateway_identifiers": {
+    "translations": {
+      "en": "invalid class B/C gateway identifiers"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:conflicting_paths": {
     "translations": {
       "en": "conflicting set and unset field mask paths"
@@ -2108,6 +2180,15 @@
   "error:pkg/applicationserver/io/grpc:payload_crypto_skipped": {
     "translations": {
       "en": "payload crypto skipped"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/grpc",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/applicationserver/io/grpc:simulated": {
+    "translations": {
+      "en": "simulated traffic cannot be simulated again"
     },
     "description": {
       "package": "pkg/applicationserver/io/grpc",
@@ -3491,6 +3572,60 @@
       "file": "shared.go"
     }
   },
+  "error:pkg/console/internal/events/protocol:message_type": {
+    "translations": {
+      "en": "invalid message type `{type}`"
+    },
+    "description": {
+      "package": "pkg/console/internal/events/protocol",
+      "file": "protocol.go"
+    }
+  },
+  "error:pkg/console/internal/events/subscriptions:already_subscribed": {
+    "translations": {
+      "en": "already subscribed with ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/console/internal/events/subscriptions",
+      "file": "subscriptions.go"
+    }
+  },
+  "error:pkg/console/internal/events/subscriptions:no_identifiers": {
+    "translations": {
+      "en": "no identifiers"
+    },
+    "description": {
+      "package": "pkg/console/internal/events/subscriptions",
+      "file": "subscriptions.go"
+    }
+  },
+  "error:pkg/console/internal/events/subscriptions:not_subscribed": {
+    "translations": {
+      "en": "not subscribed with ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/console/internal/events/subscriptions",
+      "file": "subscriptions.go"
+    }
+  },
+  "error:pkg/console/internal/events:rate_exceeded": {
+    "translations": {
+      "en": "request rate exceeded"
+    },
+    "description": {
+      "package": "pkg/console/internal/events",
+      "file": "ratelimit.go"
+    }
+  },
+  "error:pkg/console/internal/events:unknown_caller": {
+    "translations": {
+      "en": "unknown caller type `{type}`"
+    },
+    "description": {
+      "package": "pkg/console/internal/events",
+      "file": "ratelimit.go"
+    }
+  },
   "error:pkg/crypto/cryptoservices:no_app_key": {
     "translations": {
       "en": "no AppKey specified"
@@ -4364,15 +4499,6 @@
       "file": "conversion.go"
     }
   },
-  "error:pkg/events/grpc:invalid_regexp": {
-    "translations": {
-      "en": "invalid regexp"
-    },
-    "description": {
-      "package": "pkg/events/grpc",
-      "file": "grpc.go"
-    }
-  },
   "error:pkg/events/grpc:no_identifiers": {
     "translations": {
       "en": "no identifiers"
@@ -4382,27 +4508,9 @@
       "file": "grpc.go"
     }
   },
-  "error:pkg/events/grpc:no_matching_events": {
-    "translations": {
-      "en": "no matching events for regexp `{regexp}`"
-    },
-    "description": {
-      "package": "pkg/events/grpc",
-      "file": "grpc.go"
-    }
-  },
   "error:pkg/events/grpc:storage_disabled": {
     "translations": {
       "en": "events storage is not not enabled"
-    },
-    "description": {
-      "package": "pkg/events/grpc",
-      "file": "grpc.go"
-    }
-  },
-  "error:pkg/events/grpc:unknown_event_name": {
-    "translations": {
-      "en": "unknown event `{name}`"
     },
     "description": {
       "package": "pkg/events/grpc",
@@ -4425,6 +4533,33 @@
     "description": {
       "package": "pkg/events/redis",
       "file": "codec.go"
+    }
+  },
+  "error:pkg/events:invalid_regexp": {
+    "translations": {
+      "en": "invalid regexp"
+    },
+    "description": {
+      "package": "pkg/events",
+      "file": "pattern.go"
+    }
+  },
+  "error:pkg/events:no_matching_events": {
+    "translations": {
+      "en": "no matching events for regexp `{regexp}`"
+    },
+    "description": {
+      "package": "pkg/events",
+      "file": "pattern.go"
+    }
+  },
+  "error:pkg/events:unknown_event_name": {
+    "translations": {
+      "en": "unknown event `{name}`"
+    },
+    "description": {
+      "package": "pkg/events",
+      "file": "pattern.go"
     }
   },
   "error:pkg/fetch:fetch_file": {
@@ -6229,7 +6364,7 @@
   },
   "error:pkg/identityserver:validations_already_sent": {
     "translations": {
-      "en": "validations for this contact info already sent"
+      "en": "validations for this contact info already sent, wait `{retry_interval}` before retrying"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -7064,6 +7199,15 @@
       "file": "javascript.go"
     }
   },
+  "error:pkg/messageprocessors/javascript:output_encoding": {
+    "translations": {
+      "en": "{errors}"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/javascript",
+      "file": "javascript.go"
+    }
+  },
   "error:pkg/messageprocessors/javascript:output_errors": {
     "translations": {
       "en": "{errors}"
@@ -7343,6 +7487,15 @@
       "file": "application_uplink_queue.go"
     }
   },
+  "error:pkg/networkserver/redis:invalid_uid": {
+    "translations": {
+      "en": "invalid UID"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "application_uplink_queue.go"
+    }
+  },
   "error:pkg/networkserver/redis:missing_downlink_correlation_id": {
     "translations": {
       "en": "missing identifier correlation ID on downlink message"
@@ -7370,6 +7523,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver/redis:missing_uid": {
+    "translations": {
+      "en": "missing UID"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "application_uplink_queue.go"
+    }
+  },
   "error:pkg/networkserver/redis:no_uplink_match": {
     "translations": {
       "en": "no device matches uplink"
@@ -7382,6 +7544,15 @@
   "error:pkg/networkserver/redis:read_only_field": {
     "translations": {
       "en": "read-only field `{field}`"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:relay_served": {
+    "translations": {
+      "en": "`{served}` is already served by `{serving}`"
     },
     "description": {
       "package": "pkg/networkserver/redis",
@@ -7701,6 +7872,87 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "grpc_gsns.go"
+    }
+  },
+  "error:pkg/networkserver:relay_full_f_cnt": {
+    "translations": {
+      "en": "invalid full FCnt"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_m_type": {
+    "translations": {
+      "en": "invalid MType"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_recent_uplinks": {
+    "translations": {
+      "en": "recent uplinks not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_rx_windows_available": {
+    "translations": {
+      "en": "no RX windows available"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_schedule": {
+    "translations": {
+      "en": "relay schedule"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_serving": {
+    "translations": {
+      "en": "relay not serving"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_session": {
+    "translations": {
+      "en": "relay session not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_session_key_id": {
+    "translations": {
+      "en": "relay session key ID not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
+    }
+  },
+  "error:pkg/networkserver:relay_uplink_token": {
+    "translations": {
+      "en": "invalid relay uplink token"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "relay.go"
     }
   },
   "error:pkg/networkserver:schedule": {
@@ -10583,6 +10835,132 @@
       "file": "rekey.go"
     }
   },
+  "event:ns.mac.relay_conf.answer.accept": {
+    "translations": {
+      "en": "relay configuration accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
+  "event:ns.mac.relay_conf.answer.reject": {
+    "translations": {
+      "en": "relay configuration rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
+  "event:ns.mac.relay_conf.request": {
+    "translations": {
+      "en": "relay configuration request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_conf.go"
+    }
+  },
+  "event:ns.mac.relay_configure_fwd_limit.answer": {
+    "translations": {
+      "en": "relay configure forward limit answer received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_configure_fwd_limit.go"
+    }
+  },
+  "event:ns.mac.relay_configure_fwd_limit.request": {
+    "translations": {
+      "en": "relay configure forward limit request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_configure_fwd_limit.go"
+    }
+  },
+  "event:ns.mac.relay_ctrl_uplink_list.answer.accept": {
+    "translations": {
+      "en": "relay control uplink list accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_ctrl_uplink_list.answer.reject": {
+    "translations": {
+      "en": "relay control uplink list rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_ctrl_uplink_list.request": {
+    "translations": {
+      "en": "relay control uplink list request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_ctrl_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_end_device_conf.answer.accept": {
+    "translations": {
+      "en": "relay end device configuration accept received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
+  "event:ns.mac.relay_end_device_conf.answer.reject": {
+    "translations": {
+      "en": "relay end device configuration rejection received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
+  "event:ns.mac.relay_end_device_conf.request": {
+    "translations": {
+      "en": "relay end device configuration request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_end_device_conf.go"
+    }
+  },
+  "event:ns.mac.relay_notify_new_end_device.indication": {
+    "translations": {
+      "en": "relay notify new end device indication received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_notify_new_end_device.go"
+    }
+  },
+  "event:ns.mac.relay_update_uplink_list.answer": {
+    "translations": {
+      "en": "relay update uplink list answer received"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_update_uplink_list.go"
+    }
+  },
+  "event:ns.mac.relay_update_uplink_list.request": {
+    "translations": {
+      "en": "relay update uplink list request enqueued"
+    },
+    "description": {
+      "package": "pkg/networkserver/mac",
+      "file": "relay_update_uplink_list.go"
+    }
+  },
   "event:ns.mac.reset.confirmation": {
     "translations": {
       "en": "device reset confirmation enqueued"
@@ -10784,6 +11162,24 @@
   "event:ns.up.join.receive": {
     "translations": {
       "en": "receive join-request"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.relay.drop": {
+    "translations": {
+      "en": "drop relay message"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.relay.process": {
+    "translations": {
+      "en": "successfully processed relay message"
     },
     "description": {
       "package": "pkg/networkserver",

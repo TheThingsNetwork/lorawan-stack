@@ -150,6 +150,16 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			return false
 		}
 
+		batchStored, err := reg.BatchGetByID(
+			ctx, pb.Ids.ApplicationIds, []string{pb.Ids.DeviceId}, ttnpb.EndDeviceFieldPathsTopLevel,
+		)
+		if !test.AllTrue(
+			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
+			a.So(batchStored, should.HaveLength, 1) && a.So(batchStored[0], should.BeNil),
+		) {
+			t.Error("BatchGetByID assertion failed with empty registry")
+		}
+
 		stored, storedCtx, err = reg.GetByEUI(
 			ctx,
 			types.MustEUI64(pb.Ids.JoinEui).OrZero(),
@@ -221,6 +231,17 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			return false
 		}
 		ctx = storedCtx
+
+		batchStored, err := reg.BatchGetByID(
+			ctx, pb.Ids.ApplicationIds, []string{pb.Ids.DeviceId}, ttnpb.EndDeviceFieldPathsTopLevel,
+		)
+		if !test.AllTrue(
+			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
+			a.So(batchStored, should.HaveLength, 1) && a.So(batchStored[0], should.Resemble, pb),
+		) {
+			t.Error("BatchGetByID assertion failed with non-empty registry")
+			return false
+		}
 
 		stored, storedCtx, err = reg.GetByEUI(
 			ctx,

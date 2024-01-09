@@ -20,7 +20,10 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/gorilla/mux"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -44,18 +47,51 @@ type resource struct {
 func (r *resource) Key() string       { return r.key }
 func (r *resource) Classes() []string { return r.classes }
 
+const unauthenticated = "unauthenticated"
+
+func authTokenID(ctx context.Context) string {
+	if authValue := rpcmetadata.FromIncomingContext(ctx).AuthValue; authValue != "" {
+		_, id, _, err := auth.SplitToken(authValue)
+		if err != nil {
+			return unauthenticated
+		}
+		return id
+	}
+	return unauthenticated
+}
+
+var pathTemplate = func(r *http.Request) (string, bool) {
+	route := mux.CurrentRoute(r)
+	if route == nil {
+		return "", false
+	}
+	pathTemplate, err := route.GetPathTemplate()
+	if err != nil {
+		return "", false
+	}
+	return pathTemplate, true
+}
+
 // httpRequestResource represents an HTTP request. Avoid using directly, use HTTPMiddleware instead.
 func httpRequestResource(r *http.Request, class string) Resource {
+	specificClasses := make([]string, 0, 3)
+	if template, ok := pathTemplate(r); ok {
+		specificClasses = append(specificClasses, fmt.Sprintf("%s:%s", class, template))
+	}
+	callerInfo := fmt.Sprintf("ip:%s", httpRemoteIP(r))
+	if authTokenID := authTokenID(r.Context()); authTokenID != unauthenticated {
+		callerInfo = fmt.Sprintf("token:%s", authTokenID)
+	}
 	return &resource{
-		key:     fmt.Sprintf("%s:ip:%s:url:%s", class, httpRemoteIP(r), r.URL.Path),
-		classes: []string{class, "http"},
+		key:     fmt.Sprintf("%s:%s:url:%s", class, callerInfo, r.URL.Path),
+		classes: append(specificClasses, class, "http"),
 	}
 }
 
 // grpcMethodResource represents a gRPC request.
 func grpcMethodResource(ctx context.Context, fullMethod string, req any) Resource {
 	key := fmt.Sprintf("grpc:method:%s:%s", fullMethod, grpcEntityFromRequest(ctx, req))
-	if authTokenID := grpcAuthTokenID(ctx); authTokenID != "" {
+	if authTokenID := authTokenID(ctx); authTokenID != unauthenticated {
 		key = fmt.Sprintf("%s:token:%s", key, authTokenID)
 	}
 	return &resource{
@@ -67,7 +103,7 @@ func grpcMethodResource(ctx context.Context, fullMethod string, req any) Resourc
 // grpcStreamAcceptResource represents a new gRPC server stream.
 func grpcStreamAcceptResource(ctx context.Context, fullMethod string) Resource {
 	key := fmt.Sprintf("grpc:stream:accept:%s", fullMethod)
-	if authTokenID := grpcAuthTokenID(ctx); authTokenID != "" {
+	if authTokenID := authTokenID(ctx); authTokenID != unauthenticated {
 		key = fmt.Sprintf("%s:token:%s", key, authTokenID)
 	}
 	return &resource{
@@ -145,6 +181,15 @@ func ApplicationWebhooksDownResource(ctx context.Context, ids *ttnpb.EndDeviceId
 	return &resource{
 		key:     key,
 		classes: []string{"as:down:web"},
+	}
+}
+
+// ConsoleEventsRequestResource represents a request for events from the Console.
+func ConsoleEventsRequestResource(callerID string) Resource {
+	key := fmt.Sprintf("console:internal:events:request:%s", callerID)
+	return &resource{
+		key:     key,
+		classes: []string{"http:console:internal:events"},
 	}
 }
 

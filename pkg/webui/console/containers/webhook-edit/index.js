@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useState } from 'react'
-import { defineMessages } from 'react-intl'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -26,15 +25,9 @@ import WebhookForm from '@console/components/webhook-form'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { updateWebhook } from '@console/store/actions/webhooks'
-
-const m = defineMessages({
-  editWebhook: 'Edit webhook',
-  updateSuccess: 'Webhook updated',
-  deleteSuccess: 'Webhook deleted',
-  reactivateSuccess: 'Webhook activated',
-})
 
 const WebhookEdit = props => {
   const {
@@ -68,7 +61,7 @@ const WebhookEdit = props => {
   )
   const showSuccessToast = React.useCallback(() => {
     toast({
-      message: m.updateSuccess,
+      message: sharedMessages.webhookUpdated,
       type: toast.types.SUCCESS,
     })
   }, [])
@@ -94,7 +87,7 @@ const WebhookEdit = props => {
   }, [appId, webhookId])
   const handleDeleteSuccess = React.useCallback(() => {
     toast({
-      message: m.deleteSuccess,
+      message: sharedMessages.webhookDeleted,
       type: toast.types.SUCCESS,
     })
 
@@ -103,7 +96,7 @@ const WebhookEdit = props => {
 
   const handleReactivateSuccess = React.useCallback(() => {
     toast({
-      message: m.reactivateSuccess,
+      message: sharedMessages.reactivateSuccess,
       type: toast.types.SUCCESS,
     })
   }, [])

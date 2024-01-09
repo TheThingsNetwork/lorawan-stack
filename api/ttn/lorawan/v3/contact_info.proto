@@ -74,6 +74,7 @@ message ContactInfoValidation {
   repeated ContactInfo contact_info = 4;
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp expires_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }
 
 // The ContactInfoRegistry service, exposed by the Identity Server, is used for

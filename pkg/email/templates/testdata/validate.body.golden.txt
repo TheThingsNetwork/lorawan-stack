@@ -2,7 +2,7 @@ Hello,
 
 Please confirm your email address for The Things Network.
 
-Your email address "john.doe@example.com" will be used by user "foo-usr".
+Your email address will be linked to user "foo-usr".
 
 You can go to https://eu1.cloud.thethings.network/oauth/validate?reference=ID&token=TOKEN to confirm your email address.
 Alternatively, you can use the reference "ID" and confirmation token "TOKEN" directly.

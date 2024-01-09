@@ -271,6 +271,13 @@ media-query-height($max)
   @media screen and (max-height: $max)
     {block} // @stylint ignore
 
+generate-responsive-classes()
+  // Base definition.
+  {block}
+  // Responsive classes.
+  for $breakpoint, $width in $bp
+    +media-query($width)
+      {block}
 
 // FUNCTIONAL
 // ==========
@@ -289,10 +296,10 @@ focus-visible()
 // =====
 
 material-icon()
-  font-family: 'Material Icons'
+  font-family: 'Material Symbols Rounded'
   font-weight: normal
   font-style: normal
-  font-size: 1.3rem
+  font-size: 1.428rem
   line-height: 1
   letter-spacing: normal
   text-transform: none
@@ -354,7 +361,7 @@ transition-color()
 
 sidebar-transition($properties)
   transition-timing-function: cubic-bezier(.18,.71,.3,.99)
-  transition-duration: 330ms
+  transition-duration: 0ms
   transition-property: $properties
 
 // Global classes attached by the sidebar component.

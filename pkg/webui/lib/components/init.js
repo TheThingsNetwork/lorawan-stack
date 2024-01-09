@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import 'focus-visible/dist/focus-visible'
 import { setConfiguration } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import SourceSansRegular from '@assets/fonts/source-sans-pro-v13-latin_latin-ext-regular.woff2'
-import SourceSans600 from '@assets/fonts/source-sans-pro-v13-latin_latin-ext-600.woff2'
-import SourceSans700 from '@assets/fonts/source-sans-pro-v13-latin_latin-ext-700.woff2'
 import IBMPlexMono from '@assets/fonts/ibm-plex-mono-regular.woff2'
-import MaterialIcons from '@assets/fonts/materialicons.woff2'
+import MaterialIconsRounded from '@assets/fonts/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf'
 import TextSecurityDisc from '@assets/fonts/text-security-disc.woff2'
 import LAYOUT from '@ttn-lw/constants/layout'
 
@@ -39,20 +36,16 @@ import {
 import Message from './message'
 
 import '@ttn-lw/styles/main.styl'
+import '@ttn-lw/styles/utilities/general.styl'
+import '@ttn-lw/styles/utilities/spacing.styl'
+import '@ttn-lw/styles/utilities/color.styl'
 
 const m = defineMessages({
   initializing: 'Initializing…',
 })
 
 // Keep this list updated with fonts used in `/styles/fonts.styl`.
-const fontsToPreload = [
-  SourceSansRegular,
-  SourceSans600,
-  SourceSans700,
-  IBMPlexMono,
-  MaterialIcons,
-  TextSecurityDisc,
-]
+const fontsToPreload = [IBMPlexMono, MaterialIconsRounded, TextSecurityDisc]
 
 setConfiguration({
   breakpoints: [
@@ -70,32 +63,13 @@ setConfiguration({
   gutterWidth: LAYOUT.GUTTER_WIDTH,
 })
 
-@connect(
-  state => ({
-    initialized: !selectInitFetching(state) && selectIsInitialized(state),
-    error: selectInitError(state),
-  }),
-  dispatch => ({
-    initialize: () => dispatch(initialize()),
-  }),
-)
-export default class Init extends React.PureComponent {
-  static propTypes = {
-    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
-    error: PropTypes.error,
-    initialize: PropTypes.func.isRequired,
-    initialized: PropTypes.bool,
-  }
+const Init = ({ children }) => {
+  const initialized = useSelector(state => !selectInitFetching(state) && selectIsInitialized(state))
+  const error = useSelector(state => selectInitError(state))
+  const dispatch = useDispatch()
 
-  static defaultProps = {
-    initialized: false,
-    error: undefined,
-  }
-
-  componentDidMount() {
-    const { initialize } = this.props
-
-    initialize()
+  useEffect(() => {
+    dispatch(initialize())
 
     // Preload font files to avoid flashes of unstyled text.
     for (const fontUrl of fontsToPreload) {
@@ -106,25 +80,27 @@ export default class Init extends React.PureComponent {
       linkElem.setAttribute('crossorigin', 'anonymous')
       document.getElementsByTagName('head')[0].appendChild(linkElem)
     }
+  }, [dispatch])
+
+  if (error) {
+    throw error
   }
 
-  render() {
-    const { initialized, error } = this.props
-
-    if (error) {
-      throw error
-    }
-
-    if (!initialized) {
-      return (
-        <div style={{ height: '100vh' }}>
-          <Spinner center>
-            <Message content={m.initializing} />
-          </Spinner>
-        </div>
-      )
-    }
-
-    return this.props.children
+  if (!initialized) {
+    return (
+      <div style={{ height: '100vh' }}>
+        <Spinner center>
+          <Message content={m.initializing} />
+        </Spinner>
+      </div>
+    )
   }
+
+  return children
 }
+
+Init.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+}
+
+export default Init

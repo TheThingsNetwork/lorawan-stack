@@ -32,12 +32,8 @@ import { getWebhooksList } from '@console/store/actions/webhooks'
 import { selectWebhooksHealthStatusEnabled } from '@console/store/selectors/application-server'
 import { selectWebhooks, selectWebhooksTotalCount } from '@console/store/selectors/webhooks'
 
-import style from './webhooks-table.styl'
-
 const m = defineMessages({
   templateId: 'Template ID',
-  format: 'Format',
-  baseUrl: 'Base URL',
   healthy: 'Healthy',
   pending: 'Pending',
   requestsFailing: 'Requests failing',
@@ -68,7 +64,7 @@ const WebhooksTable = () => {
     },
     {
       name: 'base_url',
-      displayName: m.baseUrl,
+      displayName: sharedMessages.webhookBaseUrl,
       width: 40,
       sortable: true,
     },
@@ -76,7 +72,8 @@ const WebhooksTable = () => {
       name: 'template_ids.template_id',
       displayName: m.templateId,
       width: 12,
-      render: value => value || <Message className={style.none} content={sharedMessages.none} />,
+      render: value =>
+        value || <Message className="tc-subtle-gray" content={sharedMessages.none} />,
       sortable: true,
     },
   ]

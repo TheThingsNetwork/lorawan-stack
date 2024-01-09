@@ -17,6 +17,16 @@ func (dst *ListFrequencyPlansRequest) SetFields(src *ListFrequencyPlansRequest, 
 				var zero uint32
 				dst.BaseFrequency = zero
 			}
+		case "band_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BandId = src.BandId
+			} else {
+				var zero string
+				dst.BandId = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -67,6 +77,16 @@ func (dst *FrequencyPlanDescription) SetFields(src *FrequencyPlanDescription, pa
 			} else {
 				var zero uint32
 				dst.BaseFrequency = zero
+			}
+		case "band_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BandId = src.BandId
+			} else {
+				var zero string
+				dst.BandId = zero
 			}
 
 		default:
@@ -399,6 +419,24 @@ func (dst *BandDescription) SetFields(src *BandDescription, paths ...string) err
 				dst.MaxAdrDataRateIndex = src.MaxAdrDataRateIndex
 			} else {
 				dst.MaxAdrDataRateIndex = 0
+			}
+		case "relay_forward_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'relay_forward_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RelayForwardDelay = src.RelayForwardDelay
+			} else {
+				dst.RelayForwardDelay = nil
+			}
+		case "relay_receive_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'relay_receive_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RelayReceiveDelay = src.RelayReceiveDelay
+			} else {
+				dst.RelayReceiveDelay = nil
 			}
 		case "tx_param_setup_req_support":
 			if len(subs) > 0 {

@@ -52,10 +52,10 @@ const RoutingPolicyMatrix = ({ policy }) => {
   const { uplink = {}, downlink = {} } = policy
 
   return (
-    <div className={style.container}>
-      <div className={style.uplink}>
+    <div className="d-flex direction-column">
+      <div className="d-flex mb-cs-xxs al-center gap-cs-xxs">
         <Tooltip content={<Message content={m.uplinkPolicies} />} placement="top">
-          <Icon small icon="uplink" className={style.icon} />
+          <Icon small icon="uplink" className="tc-subtle-gray" />
         </Tooltip>
         <PolicyPoint
           symbol="J"
@@ -88,9 +88,9 @@ const RoutingPolicyMatrix = ({ policy }) => {
           negativeMessage={m.doesNotForwardLocalization}
         />
       </div>
-      <div className={style.downlink}>
+      <div className={classnames(style.downlink, 'd-flex', 'al-center', 'gap-cs-xxs')}>
         <Tooltip content={<Message content={m.downlinkPolicies} />} placement="bottom">
-          <Icon small icon="downlink" className={style.icon} />
+          <Icon small icon="downlink" className="tc-subtle-gray" />
         </Tooltip>
         <PolicyPoint
           symbol="J"

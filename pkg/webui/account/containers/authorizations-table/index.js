@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
@@ -32,11 +31,6 @@ import {
 } from '@account/store/selectors/authorizations'
 import { selectUserId } from '@account/store/selectors/user'
 
-const m = defineMessages({
-  clientId: 'Client ID',
-  tableTitle: 'OAuth client authorizations',
-})
-
 const getItemPathPrefix = item => `${item.client_ids.client_id}`
 
 const OAuthClientAuthorizationsTable = () => {
@@ -46,7 +40,7 @@ const OAuthClientAuthorizationsTable = () => {
     const baseHeaders = [
       {
         name: 'client_ids.client_id',
-        displayName: m.clientId,
+        displayName: sharedMessages.clientId,
         width: 20,
       },
       {
@@ -84,7 +78,7 @@ const OAuthClientAuthorizationsTable = () => {
       getItemsAction={getItems}
       baseDataSelector={baseDataSelector}
       getItemPathPrefix={getItemPathPrefix}
-      tableTitle={<Message content={m.tableTitle} />}
+      tableTitle={<Message content={sharedMessages.oauthClientAuthorizations} />}
       clickable
     />
   )

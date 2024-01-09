@@ -14,6 +14,10 @@
 
 package ttjsv2
 
+import (
+	"context"
+)
+
 // ClaimData contains information about the claim.
 type ClaimData struct {
 	HomeNetID string  `json:"homeNetID"`
@@ -36,6 +40,25 @@ type ClaimRequest struct {
 	RegenerateOwnerToken *bool   `json:"regenerateOwnerToken,omitempty"`
 	Lock                 *bool   `json:"lock,omitempty"`
 	KEK                  *KEK    `json:"kek,omitempty"`
+}
+
+// Apply applies the context to the request.
+func (req ClaimRequest) Apply(ctx context.Context, c Component) (ClaimRequest, error) {
+	deriv := req
+	if req.HomeNSID != nil {
+		deriv.HomeNSID = stringValue(*req.HomeNSID)
+	}
+	if req.RegenerateOwnerToken != nil {
+		deriv.RegenerateOwnerToken = boolValue(*req.RegenerateOwnerToken)
+	}
+	if req.Lock != nil {
+		deriv.Lock = boolValue(*req.Lock)
+	}
+	if req.KEK != nil {
+		kek := *req.KEK
+		deriv.KEK = &kek
+	}
+	return deriv, nil
 }
 
 // ErrorResponse is a message that may be returned by The Things Join Server in case of an error.

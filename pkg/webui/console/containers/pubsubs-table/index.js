@@ -30,7 +30,6 @@ import { getPubsubsList } from '@console/store/actions/pubsubs'
 import { selectPubsubs, selectPubsubsTotalCount } from '@console/store/selectors/pubsubs'
 
 const m = defineMessages({
-  format: 'Format',
   host: 'Server host',
 })
 
@@ -74,7 +73,7 @@ const headers = [
   },
   {
     name: 'format',
-    displayName: m.format,
+    displayName: sharedMessages.format,
     width: 9,
     sortable: true,
   },

@@ -45,7 +45,12 @@ describe('Packet Broker networks', () => {
     cy.intercept('/api/v3/pba/home-networks/policies*', {
       fixture: 'console/packet-broker/policies-home-network.json',
     })
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/networks`)
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/admin-panel/packet-broker/routing-configuration/networks`,
+    )
+    cy.findByLabelText('Use custom routing policies').check()
 
     const { networks } = this.networks
     const networksFiltered = networks.filter(
@@ -73,7 +78,11 @@ describe('Packet Broker networks', () => {
       n => n.forwarder_id.net_id === 19 && n.forwarder_id.tenant_id === 'johan',
     )
 
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker/networks/19/johan`)
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/admin-panel/packet-broker/routing-configuration/networks/19/johan`,
+    )
 
     cy.findAllByText(`${network.id.net_id.toString(16).padStart(6, '0')}/${network.id.tenant_id}`)
     cy.findByText(

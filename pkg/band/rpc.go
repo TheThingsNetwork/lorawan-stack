@@ -16,9 +16,9 @@ package band
 
 import (
 	"context"
+	"maps"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -150,6 +150,13 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 		Relay:         &ttnpb.BandDescription_RelayParameters{},
 	}
 
+	if b.SharedParameters.RelayForwardDelay != 0 {
+		bandDescription.RelayForwardDelay = durationpb.New(b.SharedParameters.RelayForwardDelay)
+	}
+	if b.SharedParameters.RelayReceiveDelay != 0 {
+		bandDescription.RelayReceiveDelay = durationpb.New(b.SharedParameters.RelayReceiveDelay)
+	}
+
 	for _, channel := range b.UplinkChannels {
 		bandDescription.UplinkChannels = append(bandDescription.UplinkChannels, &ttnpb.BandDescription_Channel{
 			Frequency:   channel.Frequency,
@@ -175,10 +182,10 @@ func (b Band) BandDescription() *ttnpb.BandDescription {
 		})
 	}
 
-	for index, datarate := range b.DataRates {
+	for index, dataRate := range b.DataRates {
 		bandDescription.DataRates[uint32(index)] = &ttnpb.BandDescription_BandDataRate{
 			Rate: &ttnpb.DataRate{
-				Modulation: datarate.Rate.Modulation,
+				Modulation: dataRate.Rate.Modulation,
 			},
 		}
 	}

@@ -38,7 +38,8 @@ var (
 		"no_validation_needed", "no validation needed for this contact info",
 	)
 	errValidationsAlreadySent = errors.DefineAlreadyExists(
-		"validations_already_sent", "validations for this contact info already sent",
+		"validations_already_sent",
+		"validations for this contact info already sent, wait `{retry_interval}` before retrying",
 	)
 )
 
@@ -106,17 +107,33 @@ func (is *IdentityServer) requestContactInfoValidation(
 	if err != nil {
 		return nil, err
 	}
+	now := time.Now()
+	ttl := is.configFromContext(ctx).UserRegistration.ContactInfoValidation.TokenTTL
+	expires := now.Add(ttl)
+	retryInterval := is.configFromContext(ctx).UserRegistration.ContactInfoValidation.RetryInterval
+
 	var contactInfo []*ttnpb.ContactInfo
+	resendValidation := make(map[string]*ttnpb.ContactInfoValidation)
+
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		contactInfo, err = st.GetContactInfo(ctx, ids)
-		return err
+		if err != nil {
+			return err
+		}
+
+		validations, err := st.ListRefreshableValidations(ctx, ids, retryInterval)
+		if err != nil {
+			return err
+		}
+		for _, v := range validations {
+			resendValidation[v.ContactInfo[0].Value] = v
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	now := time.Now()
-	ttl := is.configFromContext(ctx).UserRegistration.ContactInfoValidation.TokenTTL
-	expires := now.Add(ttl)
+
 	emailValidations := make(map[string]*ttnpb.ContactInfoValidation)
 	for _, info := range contactInfo {
 		if info.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL && info.ValidatedAt == nil {
@@ -144,7 +161,7 @@ func (is *IdentityServer) requestContactInfoValidation(
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		for email, validation := range emailValidations {
-			validation, err = st.CreateValidation(ctx, validation)
+			v, err := st.CreateValidation(ctx, validation)
 			if err != nil {
 				if errors.IsAlreadyExists(err) {
 					delete(emailValidations, email)
@@ -154,8 +171,18 @@ func (is *IdentityServer) requestContactInfoValidation(
 			}
 			log.FromContext(ctx).WithFields(log.Fields(
 				"email", email,
-				"token", validation.Token,
+				"token", v.Token,
 			)).Info("Created email validation token")
+			emailValidations[email] = v
+
+			// Remove from resend list if a new validation was created.
+			delete(resendValidation, email)
+		}
+
+		for email, validation := range resendValidation {
+			if err := st.RefreshValidation(ctx, validation); err != nil {
+				return err
+			}
 			emailValidations[email] = validation
 		}
 		return nil
@@ -171,7 +198,7 @@ func (is *IdentityServer) requestContactInfoValidation(
 			EntityIdentifiers: validation.Entity,
 			ID:                validation.Id,
 			Token:             validation.Token,
-			TTL:               ttl,
+			TTL:               validation.ExpiresAt.AsTime().Sub(now),
 		}
 		go is.SendTemplateEmailToUsers( // nolint:errcheck
 			is.FromRequestContext(ctx),
@@ -186,7 +213,7 @@ func (is *IdentityServer) requestContactInfoValidation(
 		validation.Token = "" // Unset tokens after sending emails
 	}
 	if len(pendingContactInfo) == 0 {
-		return nil, errValidationsAlreadySent.New()
+		return nil, errValidationsAlreadySent.WithAttributes("retry_interval", retryInterval)
 	}
 
 	return &ttnpb.ContactInfoValidation{

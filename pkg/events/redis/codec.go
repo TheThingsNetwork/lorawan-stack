@@ -25,6 +25,20 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+var binaryEncoding = base64.RawStdEncoding
+
+func encodeBinary(b []byte) string {
+	return binaryEncoding.EncodeToString(b)
+}
+
+func decodeBinary(s string) ([]byte, error) {
+	var found bool
+	if s, found = strings.CutSuffix(s, "="); found {
+		s = strings.TrimSuffix(s, "=")
+	}
+	return binaryEncoding.DecodeString(s)
+}
+
 func encodeEventData(evt events.Event) (string, error) {
 	pb, err := events.Proto(evt)
 	if err != nil {
@@ -34,7 +48,7 @@ func encodeEventData(evt events.Event) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return protoEncodingPrefix + base64.StdEncoding.EncodeToString(bpb), nil
+	return protoEncodingPrefix + encodeBinary(bpb), nil
 }
 
 var errUnknownEncoding = errors.DefineInvalidArgument("unknown_encoding", "unknown encoding")
@@ -43,7 +57,7 @@ func decodeEventData(enc string, evt *ttnpb.Event) error {
 	if !strings.HasPrefix(enc, protoEncodingPrefix) {
 		return errUnknownEncoding.New()
 	}
-	bpb, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(enc, protoEncodingPrefix))
+	bpb, err := decodeBinary(strings.TrimPrefix(enc, protoEncodingPrefix))
 	if err != nil {
 		return err
 	}
@@ -85,7 +99,7 @@ func encodeEventMeta(evt events.Event, id *ttnpb.EntityIdentifiers) ([]string, e
 	if err != nil {
 		return nil, err
 	}
-	return append(meta, eventSparseKey, base64.StdEncoding.EncodeToString(rb)), nil
+	return append(meta, eventSparseKey, encodeBinary(rb)), nil
 }
 
 func decodeEventMeta(values map[string]any) (*ttnpb.Event, error) {
@@ -95,7 +109,7 @@ func decodeEventMeta(values map[string]any) (*ttnpb.Event, error) {
 		ok          bool
 	)
 	if sparseEvent, ok = values[eventSparseKey].(string); ok {
-		b64, err := base64.StdEncoding.DecodeString(sparseEvent)
+		b64, err := decodeBinary(sparseEvent)
 		if err != nil {
 			return nil, err
 		}

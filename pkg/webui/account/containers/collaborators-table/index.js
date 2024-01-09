@@ -46,12 +46,9 @@ import style from './client-collaborators.styl'
 const RIGHT_TAG_MAX_WIDTH = 140
 
 const m = defineMessages({
-  id: 'User / Organization ID',
-  addCollaborator: 'Add collaborator',
   deleteCollaboratorError: 'There was an error and the collaborator could not be deleted',
   deleteOnlyCollaboratorError:
     'This collaborator could not be deleted because every client needs at least one collaborator with all rights',
-  removeButtonMessage: 'Remove',
 })
 
 const CollaboratorsTable = props => {
@@ -87,7 +84,7 @@ const CollaboratorsTable = props => {
     const baseHeaders = [
       {
         name: 'ids',
-        displayName: m.id,
+        displayName: sharedMessages.userOrgId,
         render: ids => {
           const isUser = 'user_ids' in ids
           const collaboratorId = getCollaboratorId({ ids })
@@ -144,7 +141,7 @@ const CollaboratorsTable = props => {
           <Button
             type="button"
             onClick={details.delete}
-            message={m.removeButtonMessage}
+            message={sharedMessages.remove}
             icon="delete"
             danger
           />
@@ -188,7 +185,7 @@ const CollaboratorsTable = props => {
       headers={headers}
       rowKeySelector={rowKeySelector}
       getItemPathPrefix={getCollaboratorPathPrefix}
-      addMessage={m.addCollaborator}
+      addMessage={sharedMessages.addCollaborator}
       getItemsAction={getItems}
       baseDataSelector={baseDataSelector}
       tableTitle={<Message content={sharedMessages.collaborator} />}

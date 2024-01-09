@@ -50,8 +50,6 @@ import {
 } from '@console/store/selectors/applications'
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
-import style from './application-title-section.styl'
-
 const m = defineMessages({
   lastSeenAvailableTooltip:
     'The elapsed time since the network registered activity (sent uplinks, confirmed downlinks or (re)join requests) of the end device(s) in this application.',
@@ -94,12 +92,7 @@ const ApplicationTitleSection = ({ appId }) => {
       content={<Message content={m.noActivityTooltip} />}
       docPath="/getting-started/console/troubleshooting"
     >
-      <Status
-        status="mediocre"
-        label={sharedMessages.noRecentActivity}
-        className={style.lastSeen}
-        flipped
-      >
+      <Status status="mediocre" label={sharedMessages.noRecentActivity} className="mr-cs-l" flipped>
         <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
       </Status>
     </DocTooltip>

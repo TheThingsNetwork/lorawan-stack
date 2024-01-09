@@ -32,7 +32,6 @@ const m = defineMessages({
   profileEdit: 'Edit profile',
   generalSettingsDescription:
     'Change basic info such as your name, profile picture or email address.',
-  changePasswordTitle: 'Change password',
   changePasswordDescription: 'Set up a new password for your account.',
 })
 
@@ -55,7 +54,10 @@ const ProfileSettings = () => {
             >
               <ProfileSettingsForm />
             </Collapse>
-            <Collapse title={m.changePasswordTitle} description={m.changePasswordDescription}>
+            <Collapse
+              title={sharedMessages.changePassword}
+              description={m.changePasswordDescription}
+            >
               <ChangePasswordForm />
             </Collapse>
           </Overlay>

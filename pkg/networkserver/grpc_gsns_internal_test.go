@@ -26,15 +26,30 @@ import (
 )
 
 func TestAppendRecentUplink(t *testing.T) {
+	t.Parallel()
+	dataRate := (&ttnpb.LoRaDataRate{
+		SpreadingFactor: uint32(7),
+		Bandwidth:       125_000,
+		CodingRate:      "4/5",
+	}).DataRate()
+	macSettings := &ttnpb.MACState_UplinkMessage_TxSettings{
+		DataRate: dataRate,
+	}
+	settings := &ttnpb.TxSettings{
+		DataRate: dataRate,
+	}
 	ups := [...]*ttnpb.MACState_UplinkMessage{
 		{
 			DeviceChannelIndex: 1,
+			Settings:           macSettings,
 		},
 		{
 			DeviceChannelIndex: 2,
+			Settings:           macSettings,
 		},
 		{
 			DeviceChannelIndex: 3,
+			Settings:           macSettings,
 		},
 	}
 	for _, tc := range []struct {
@@ -46,6 +61,7 @@ func TestAppendRecentUplink(t *testing.T) {
 		{
 			Up: &ttnpb.UplinkMessage{
 				DeviceChannelIndex: 1,
+				Settings:           settings,
 			},
 			Window:   1,
 			Expected: ups[:1],
@@ -54,6 +70,7 @@ func TestAppendRecentUplink(t *testing.T) {
 			Recent: ups[:1],
 			Up: &ttnpb.UplinkMessage{
 				DeviceChannelIndex: 2,
+				Settings:           settings,
 			},
 			Window:   1,
 			Expected: ups[1:2],
@@ -62,6 +79,7 @@ func TestAppendRecentUplink(t *testing.T) {
 			Recent: ups[:2],
 			Up: &ttnpb.UplinkMessage{
 				DeviceChannelIndex: 3,
+				Settings:           settings,
 			},
 			Window:   1,
 			Expected: ups[2:3],
@@ -70,6 +88,7 @@ func TestAppendRecentUplink(t *testing.T) {
 			Recent: ups[:1],
 			Up: &ttnpb.UplinkMessage{
 				DeviceChannelIndex: 2,
+				Settings:           settings,
 			},
 			Window:   2,
 			Expected: ups[:2],
@@ -78,6 +97,7 @@ func TestAppendRecentUplink(t *testing.T) {
 			Recent: ups[:2],
 			Up: &ttnpb.UplinkMessage{
 				DeviceChannelIndex: 3,
+				Settings:           settings,
 			},
 			Window:   2,
 			Expected: ups[1:3],

@@ -16,9 +16,12 @@ package packetbrokeragent
 
 import (
 	"context"
+	"crypto/cipher"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"io"
 	"time"
 
 	packetbroker "go.packetbroker.org/api/v3"
@@ -32,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -160,55 +164,90 @@ func toPBTerrestrialAntennaPlacement(p ttnpb.GatewayAntennaPlacement) packetbrok
 	return packetbroker.TerrestrialAntennaPlacement(p)
 }
 
-type agentUplinkToken struct {
+type legacyAgentUplinkToken struct {
 	ForwarderNetID     types.NetID `json:"fnid"`
 	ForwarderTenantID  string      `json:"ftid,omitempty"`
 	ForwarderClusterID string      `json:"fcid,omitempty"`
 }
 
-type compoundUplinkToken struct {
-	Gateway   []byte            `json:"g,omitempty"`
-	Forwarder []byte            `json:"f,omitempty"`
-	Agent     *agentUplinkToken `json:"a,omitempty"`
+type legacyCompoundUplinkToken struct {
+	Gateway   []byte                  `json:"g,omitempty"`
+	Forwarder []byte                  `json:"f,omitempty"`
+	Agent     *legacyAgentUplinkToken `json:"a,omitempty"`
 }
 
-func wrapUplinkTokens(gateway, forwarder []byte, agent *agentUplinkToken) ([]byte, error) {
-	return json.Marshal(compoundUplinkToken{gateway, forwarder, agent})
+func wrapUplinkTokens(gateway, forwarder []byte, agent *ttnpb.PacketBrokerAgentUplinkToken) ([]byte, error) {
+	return proto.Marshal(&ttnpb.PacketBrokerAgentCompoundUplinkToken{
+		Gateway:   gateway,
+		Forwarder: forwarder,
+		Agent:     agent,
+	})
 }
 
-func unwrapUplinkTokens(token []byte) (gateway, forwarder []byte, agent *agentUplinkToken, err error) {
-	var t compoundUplinkToken
+func unwrapLegacyUplinkTokens(token []byte) (gateway, forwarder []byte, agent *legacyAgentUplinkToken, err error) {
+	var t legacyCompoundUplinkToken
 	if err := json.Unmarshal(token, &t); err != nil {
 		return nil, nil, nil, err
 	}
 	return t.Gateway, t.Forwarder, t.Agent, nil
 }
 
-type gatewayUplinkToken struct {
+func unwrapUplinkTokens(
+	token []byte,
+) (gateway, forwarder []byte, agent *ttnpb.PacketBrokerAgentUplinkToken, err error) {
+	if gateway, forwarder, agent, err := unwrapLegacyUplinkTokens(token); err == nil {
+		agent := &ttnpb.PacketBrokerAgentUplinkToken{
+			ForwarderNetId:     agent.ForwarderNetID[:],
+			ForwarderTenantId:  agent.ForwarderTenantID,
+			ForwarderClusterId: agent.ForwarderClusterID,
+		}
+		return gateway, forwarder, agent, nil
+	}
+	var t ttnpb.PacketBrokerAgentCompoundUplinkToken
+	if err := proto.Unmarshal(token, &t); err != nil {
+		return nil, nil, nil, err
+	}
+	return t.Gateway, t.Forwarder, t.Agent, nil
+}
+
+type legacyGatewayUplinkToken struct {
 	GatewayUID string `json:"uid"`
 	Token      []byte `json:"t"`
 }
 
-func wrapGatewayUplinkToken(ctx context.Context, ids *ttnpb.GatewayIdentifiers, ulToken []byte, encrypter jose.Encrypter) ([]byte, error) {
-	plaintext, err := json.Marshal(gatewayUplinkToken{
-		GatewayUID: unique.ID(ctx, ids),
+func encryptPlaintext(plaintext, additionalData []byte, aead cipher.AEAD) ([]byte, error) {
+	nonce := make([]byte, aead.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, err
+	}
+	return proto.Marshal(&ttnpb.PacketBrokerAgentEncryptedPayload{
+		Ciphertext: aead.Seal(nil, nonce, plaintext, additionalData),
+		Nonce:      nonce,
+	})
+}
+
+func decryptCiphertext(payload, additionalData []byte, aead cipher.AEAD) ([]byte, error) {
+	var encrypted ttnpb.PacketBrokerAgentEncryptedPayload
+	if err := proto.Unmarshal(payload, &encrypted); err != nil {
+		return nil, err
+	}
+	return aead.Open(nil, encrypted.Nonce, encrypted.Ciphertext, additionalData)
+}
+
+func wrapGatewayUplinkToken(
+	ctx context.Context, ids *ttnpb.GatewayIdentifiers, ulToken, forwarderData []byte, aead cipher.AEAD,
+) ([]byte, error) {
+	plaintext, err := proto.Marshal(&ttnpb.PacketBrokerAgentGatewayUplinkToken{
+		GatewayUid: unique.ID(ctx, ids),
 		Token:      ulToken,
 	})
 	if err != nil {
 		return nil, err
 	}
-	obj, err := encrypter.Encrypt(plaintext)
-	if err != nil {
-		return nil, err
-	}
-	s, err := obj.CompactSerialize()
-	if err != nil {
-		return nil, err
-	}
-	return []byte(s), nil
+	return encryptPlaintext(plaintext, forwarderData, aead)
 }
 
-func unwrapGatewayUplinkToken(token, key []byte) (string, []byte, error) {
+func unwrapLegacyGatewayUplinkToken(token, key []byte) (string, []byte, error) {
 	obj, err := jose.ParseEncrypted(string(token))
 	if err != nil {
 		return "", nil, err
@@ -217,11 +256,28 @@ func unwrapGatewayUplinkToken(token, key []byte) (string, []byte, error) {
 	if err != nil {
 		return "", nil, err
 	}
-	var t gatewayUplinkToken
+	var t legacyGatewayUplinkToken
 	if err := json.Unmarshal(plaintext, &t); err != nil {
 		return "", nil, err
 	}
 	return t.GatewayUID, t.Token, nil
+}
+
+func unwrapGatewayUplinkToken(
+	token, forwarderData []byte, aead cipher.AEAD, legacyKey []byte,
+) (string, []byte, error) {
+	if uid, token, err := unwrapLegacyGatewayUplinkToken(token, legacyKey); err == nil {
+		return uid, token, nil
+	}
+	plaintext, err := decryptCiphertext(token, forwarderData, aead)
+	if err != nil {
+		return "", nil, err
+	}
+	var t ttnpb.PacketBrokerAgentGatewayUplinkToken
+	if err := proto.Unmarshal(plaintext, &t); err != nil {
+		return "", nil, err
+	}
+	return t.GatewayUid, t.Token, nil
 }
 
 type gatewayIdentifier interface {
@@ -266,7 +322,9 @@ var (
 	errWrapGatewayUplinkToken    = errors.DefineAborted("wrap_gateway_uplink_token", "wrap gateway uplink token")
 )
 
-func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config ForwarderConfig) (*packetbroker.UplinkMessage, error) {
+func toPBUplink(
+	ctx context.Context, msg *ttnpb.GatewayUplinkMessage, forwarderData []byte, config ForwarderConfig,
+) (*packetbroker.UplinkMessage, error) {
 	msg.Message.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
@@ -400,7 +458,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 			if len(gatewayUplinkToken) == 0 {
 				var err error
-				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, md.GatewayIds, md.UplinkToken, config.TokenEncrypter)
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(
+					ctx, md.GatewayIds, md.UplinkToken, forwarderData, config.TokenAEAD,
+				)
 				if err != nil {
 					return nil, errWrapGatewayUplinkToken.WithCause(err)
 				}
@@ -460,10 +520,10 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	)
 	if len(msg.Message.GatewayUplinkToken) > 0 || len(msg.Message.ForwarderUplinkToken) > 0 {
 		downlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE
-		token := &agentUplinkToken{
-			ForwarderNetID:     forwarderNetID,
-			ForwarderTenantID:  msg.ForwarderTenantId,
-			ForwarderClusterID: msg.ForwarderClusterId,
+		token := &ttnpb.PacketBrokerAgentUplinkToken{
+			ForwarderNetId:     forwarderNetID[:],
+			ForwarderTenantId:  msg.ForwarderTenantId,
+			ForwarderClusterId: msg.ForwarderClusterId,
 		}
 		var err error
 		uplinkToken, err = wrapUplinkTokens(msg.Message.GatewayUplinkToken, msg.Message.ForwarderUplinkToken, token)
@@ -616,7 +676,9 @@ var (
 	errIncompatibleDataRate       = errors.DefineInvalidArgument("incompatible_data_rate", "incompatible data rate in Rx{rx_window}")
 )
 
-func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequencyPlansStore) (*packetbroker.DownlinkMessage, *agentUplinkToken, error) {
+func toPBDownlink(
+	_ context.Context, msg *ttnpb.DownlinkMessage, fps frequencyPlansStore,
+) (*packetbroker.DownlinkMessage, *ttnpb.PacketBrokerAgentUplinkToken, error) {
 	req := msg.GetRequest()
 	if req == nil {
 		return nil, nil, errNoRequest.New()
@@ -668,7 +730,7 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 	if len(uplinkToken) == 0 {
 		return nil, nil, errInvalidDownlinkPath.New()
 	}
-	var token *agentUplinkToken
+	var token *ttnpb.PacketBrokerAgentUplinkToken
 	down.GatewayUplinkToken, down.ForwarderUplinkToken, token, err = unwrapUplinkTokens(uplinkToken)
 	if err != nil {
 		return nil, nil, errInvalidDownlinkPath.WithCause(err)
@@ -682,8 +744,14 @@ var (
 	errInvalidRx1Delay          = errors.DefineInvalidArgument("invalid_rx1_delay", "invalid Rx1 delay")
 )
 
-func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, receivedAt time.Time, conf ForwarderConfig) (uid string, res *ttnpb.DownlinkMessage, err error) {
-	uid, token, err := unwrapGatewayUplinkToken(msg.GatewayUplinkToken, conf.TokenKey)
+func fromPBDownlink(
+	ctx context.Context,
+	msg *packetbroker.DownlinkMessage,
+	forwarderData []byte,
+	receivedAt time.Time,
+	conf ForwarderConfig,
+) (uid string, res *ttnpb.DownlinkMessage, err error) {
+	uid, token, err := unwrapGatewayUplinkToken(msg.GatewayUplinkToken, forwarderData, conf.TokenAEAD, conf.TokenKey)
 	if err != nil {
 		return "", nil, errUnwrapGatewayUplinkToken.WithCause(err)
 	}

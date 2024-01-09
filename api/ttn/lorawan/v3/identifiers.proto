@@ -228,7 +228,7 @@ message EndDeviceVersionIdentifiers {
 message NetworkIdentifiers {
   option (thethings.flags.message) = {
     select: true,
-    set: false
+    set: true
   };
   // LoRa Alliance NetID.
   bytes net_id = 1 [

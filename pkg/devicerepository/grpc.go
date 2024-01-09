@@ -65,7 +65,7 @@ func (dr *DeviceRepository) ListBrands(
 	ctx context.Context,
 	req *ttnpb.ListEndDeviceBrandsRequest,
 ) (*ttnpb.ListEndDeviceBrandsResponse, error) {
-	if err := rights.RequireAuthentication(ctx); err != nil {
+	if err := rights.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
 	if req.Limit > defaultLimit || req.Limit == 0 {
@@ -97,7 +97,7 @@ func (dr *DeviceRepository) GetBrand(
 	ctx context.Context,
 	req *ttnpb.GetEndDeviceBrandRequest,
 ) (*ttnpb.EndDeviceBrand, error) {
-	if err := rights.RequireAuthentication(ctx); err != nil {
+	if err := rights.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
 	response, err := dr.store.GetBrands(store.GetBrandsRequest{
@@ -121,7 +121,7 @@ func (dr *DeviceRepository) ListModels(
 	ctx context.Context,
 	req *ttnpb.ListEndDeviceModelsRequest,
 ) (*ttnpb.ListEndDeviceModelsResponse, error) {
-	if err := rights.RequireAuthentication(ctx); err != nil {
+	if err := rights.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
 	if req.Limit > defaultLimit || req.Limit == 0 {
@@ -152,7 +152,7 @@ func (dr *DeviceRepository) GetModel(
 	ctx context.Context,
 	req *ttnpb.GetEndDeviceModelRequest,
 ) (*ttnpb.EndDeviceModel, error) {
-	if err := rights.RequireAuthentication(ctx); err != nil {
+	if err := rights.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
 	response, err := dr.store.GetModels(store.GetModelsRequest{
@@ -177,7 +177,7 @@ func (dr *DeviceRepository) GetTemplate(
 	ctx context.Context,
 	req *ttnpb.GetTemplateRequest,
 ) (*ttnpb.EndDeviceTemplate, error) {
-	if err := rights.RequireAuthentication(ctx); err != nil {
+	if err := rights.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
 	return dr.store.GetTemplate(req, nil)
@@ -189,7 +189,7 @@ func getDecoder(
 	f func(store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error),
 ) (*ttnpb.MessagePayloadDecoder, error) {
 	if clusterauth.Authorized(ctx) != nil {
-		if err := rights.RequireAuthentication(ctx); err != nil {
+		if err := rights.RequireAuthenticated(ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -218,7 +218,7 @@ func (dr *DeviceRepository) GetDownlinkEncoder(
 	req *ttnpb.GetPayloadFormatterRequest,
 ) (*ttnpb.MessagePayloadEncoder, error) {
 	if clusterauth.Authorized(ctx) != nil {
-		if err := rights.RequireAuthentication(ctx); err != nil {
+		if err := rights.RequireAuthenticated(ctx); err != nil {
 			return nil, err
 		}
 	}

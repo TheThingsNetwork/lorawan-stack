@@ -30,7 +30,6 @@ export default defineMessages({
   errorOccurred: 'An error occurred and the request could not be completed.',
   errorId: 'Error ID: <code>{errorId}</code>',
   correlationId: 'Correlation ID: <code>{correlationId}</code>',
-  loginFailed: 'Login failed',
   loginFailedDescription:
     'There was an error causing the login to fail. This might be due to server-side misconfiguration or a browser-cookie problem. Please try logging in again.',
   loginFailedAbortDescription:

@@ -15,6 +15,7 @@
 import React, { useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import classnames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import Input from '@ttn-lw/components/input'
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -35,7 +36,9 @@ import {
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 
-import style from './dev-eui.styl'
+const m = defineMessages({
+  unknownError: 'Unknown error while generating DevEUI',
+})
 
 const DevEUIComponent = props => {
   const { name, required, disabled, autoFocus } = props
@@ -60,7 +63,7 @@ const DevEUIComponent = props => {
     },
   }
 
-  const indicatorCls = classnames(style.indicator, {
+  const indicatorCls = classnames('ml-cs-s', 'al-center', 'tc-subtle-gray', {
     'tc-error':
       applicationDevEUICounter === env.devEUIConfig.applicationLimit || Boolean(errorMessage),
   })
@@ -93,7 +96,7 @@ const DevEUIComponent = props => {
     } catch (error) {
       if (getBackendErrorName(error) === 'global_eui_limit_reached') {
         setErrorMessage(sharedMessages.devEUIBlockLimitReached)
-      } else setErrorMessage(sharedMessages.unknownError)
+      } else setErrorMessage(m.unknownError)
       setDevEUIGenerated(true)
     }
   }, [handleDevEUIRequest, handleIdPrefill])

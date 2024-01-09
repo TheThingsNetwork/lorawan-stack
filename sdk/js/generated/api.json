@@ -9379,6 +9379,30 @@
               "defaultValue": ""
             },
             {
+              "name": "relay_forward_delay",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_receive_delay",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "tx_param_setup_req_support",
               "description": "",
               "label": "",
@@ -9857,6 +9881,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "band_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -10125,6 +10161,18 @@
               "type": "uint32",
               "longType": "uint32",
               "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "band_id",
+              "description": "Optional Band ID to filter the results.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -10497,6 +10545,18 @@
             },
             {
               "name": "expires_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "updated_at",
               "description": "",
               "label": "",
               "type": "Timestamp",
@@ -17248,7 +17308,7 @@
             },
             {
               "name": "uplink_dwell_time",
-              "description": "Whether uplink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).",
+              "description": "Whether uplink dwell time is set (400ms).\nIf unset, then the value is either unknown or irrelevant(Network Server cannot modify it).",
               "label": "",
               "type": "BoolValue",
               "longType": "BoolValue",
@@ -17260,7 +17320,7 @@
             },
             {
               "name": "downlink_dwell_time",
-              "description": "Whether downlink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).",
+              "description": "Whether downlink dwell time is set (400ms).\nIf unset, then the value is either unknown or irrelevant(Network Server cannot modify it).",
               "label": "",
               "type": "BoolValue",
               "longType": "BoolValue",
@@ -17301,6 +17361,18 @@
               "type": "DataRateIndexValue",
               "longType": "DataRateIndexValue",
               "fullType": "ttn.lorawan.v3.DataRateIndexValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay",
+              "description": "Relay parameters.",
+              "label": "",
+              "type": "RelayParameters",
+              "longType": "RelayParameters",
+              "fullType": "ttn.lorawan.v3.RelayParameters",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -17847,6 +17919,30 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "relay",
+              "description": "The relay parameters the end device is using.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "RelayParameters",
+              "longType": "RelayParameters",
+              "fullType": "ttn.lorawan.v3.RelayParameters",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "desired_relay",
+              "description": "The relay parameters the Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "RelayParameters",
+              "longType": "RelayParameters",
+              "fullType": "ttn.lorawan.v3.RelayParameters",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -18195,6 +18291,18 @@
               "type": "MACCommandIdentifier",
               "longType": "MACCommandIdentifier",
               "fullType": "ttn.lorawan.v3.MACCommandIdentifier",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pending_relay_downlink",
+              "description": "Pending relay downlink contents.\nThe pending downlink will be scheduled to the relay in either Rx1 or Rx2.\nThe pending downlink will be cleared after the scheduling attempt.",
+              "label": "",
+              "type": "RelayForwardDownlinkReq",
+              "longType": "RelayForwardDownlinkReq",
+              "fullType": "ttn.lorawan.v3.RelayForwardDownlinkReq",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -18899,6 +19007,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "relay",
+              "description": "",
+              "label": "",
+              "type": "RelayMetadata",
+              "longType": "MACState.UplinkMessage.RxMetadata.RelayMetadata",
+              "fullType": "ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -18906,6 +19026,17 @@
           "name": "PacketBrokerMetadata",
           "longName": "MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata",
           "fullName": "ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "RelayMetadata",
+          "longName": "MACState.UplinkMessage.RxMetadata.RelayMetadata",
+          "fullName": "ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata",
           "description": "",
           "hasExtensions": false,
           "hasFields": false,
@@ -18946,6 +19077,42 @@
           ]
         },
         {
+          "name": "RelayParameters",
+          "longName": "RelayParameters",
+          "fullName": "ttn.lorawan.v3.RelayParameters",
+          "description": "RelayParameters represent the parameters of a relay.\nThis is used internally by the Network Server.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "serving",
+              "description": "Parameters related to a relay which is serving end devices.",
+              "label": "",
+              "type": "ServingRelayParameters",
+              "longType": "ServingRelayParameters",
+              "fullType": "ttn.lorawan.v3.ServingRelayParameters",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "served",
+              "description": "Parameters related to an end device served by a relay.",
+              "label": "",
+              "type": "ServedRelayParameters",
+              "longType": "ServedRelayParameters",
+              "fullType": "ttn.lorawan.v3.ServedRelayParameters",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ResetAndGetEndDeviceRequest",
           "longName": "ResetAndGetEndDeviceRequest",
           "fullName": "ttn.lorawan.v3.ResetAndGetEndDeviceRequest",
@@ -18982,6 +19149,350 @@
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
               "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ServedRelayParameters",
+          "longName": "ServedRelayParameters",
+          "fullName": "ttn.lorawan.v3.ServedRelayParameters",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "always",
+              "description": "The end device will always attempt to use the relay mode in order to send uplink messages.",
+              "label": "",
+              "type": "RelayEndDeviceAlwaysMode",
+              "longType": "RelayEndDeviceAlwaysMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceAlwaysMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "dynamic",
+              "description": "The end device will attempt to use relay mode only after a number of uplink messages have been sent without\nreceiving a valid a downlink message.",
+              "label": "",
+              "type": "RelayEndDeviceDynamicMode",
+              "longType": "RelayEndDeviceDynamicMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceDynamicMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_controlled",
+              "description": "The end device will control when it uses the relay mode. This is the default mode.",
+              "label": "",
+              "type": "RelayEndDeviceControlledMode",
+              "longType": "RelayEndDeviceControlledMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceControlledMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "backoff",
+              "description": "Number of uplinks to be sent without a wake on radio frame.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 63
+                  }
+                ]
+              }
+            },
+            {
+              "name": "second_channel",
+              "description": "Second wake on radio channel configuration.",
+              "label": "",
+              "type": "RelaySecondChannel",
+              "longType": "RelaySecondChannel",
+              "fullType": "ttn.lorawan.v3.RelaySecondChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "serving_device_id",
+              "description": "End device identifier of the serving end device.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ServingRelayParameters",
+          "longName": "ServingRelayParameters",
+          "fullName": "ttn.lorawan.v3.ServingRelayParameters",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "second_channel",
+              "description": "Second wake on radio channel configuration.",
+              "label": "",
+              "type": "RelaySecondChannel",
+              "longType": "RelaySecondChannel",
+              "fullType": "ttn.lorawan.v3.RelaySecondChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "default_channel_index",
+              "description": "Index of the default wake on radio channel.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cad_periodicity",
+              "description": "Channel activity detection periodicity.",
+              "label": "",
+              "type": "RelayCADPeriodicity",
+              "longType": "RelayCADPeriodicity",
+              "fullType": "ttn.lorawan.v3.RelayCADPeriodicity",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "uplink_forwarding_rules",
+              "description": "Configured uplink forwarding rules.",
+              "label": "repeated",
+              "type": "UplinkForwardingRule",
+              "longType": "ServingRelayParameters.UplinkForwardingRule",
+              "fullType": "ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 16
+                  }
+                ]
+              }
+            },
+            {
+              "name": "limits",
+              "description": "Configured forwarding limits.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "ForwardingLimits",
+              "longType": "ServingRelayParameters.ForwardingLimits",
+              "fullType": "ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ForwardingLimits",
+          "longName": "ServingRelayParameters.ForwardingLimits",
+          "fullName": "ttn.lorawan.v3.ServingRelayParameters.ForwardingLimits",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "reset_behavior",
+              "description": "Reset behavior of the buckets upon limit update.",
+              "label": "",
+              "type": "RelayResetLimitCounter",
+              "longType": "RelayResetLimitCounter",
+              "fullType": "ttn.lorawan.v3.RelayResetLimitCounter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "join_requests",
+              "description": "Bucket configuration for join requests.\nIf unset, no individual limits will apply to join requests, but the relay overall limitations will apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "notifications",
+              "description": "Bucket configuration for unknown device notifications.\nIf unset, no individual limits will apply to unknown end device notifications, but the relay overall\nlimitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink_messages",
+              "description": "Bucket configuration for uplink messages across all served end devices.\nIf unset, no individual limits will apply to uplink messages across all served end devices, but the relay\noverall limitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "overall",
+              "description": "Bucket configuration for all relay messages.\nIf unset, no overall limits will apply to the relay, but individual limitations will still apply.",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UplinkForwardingRule",
+          "longName": "ServingRelayParameters.UplinkForwardingRule",
+          "fullName": "ttn.lorawan.v3.ServingRelayParameters.UplinkForwardingRule",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "limits",
+              "description": "Bucket configuration for the served end device.\nIf unset, no individual limits will apply to the end device, but the relay global limitations will apply.",
+              "label": "",
+              "type": "RelayUplinkForwardLimits",
+              "longType": "RelayUplinkForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayUplinkForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "last_w_f_cnt",
+              "description": "Last wake on radio frame counter used by the served end device.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "device_id",
+              "description": "End device identifier of the served end device.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_key_id",
+              "description": "Session key ID of the session keys used to derive the root relay session key.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -22984,7 +23495,7 @@
                   },
                   {
                     "name": "repeated.max_items",
-                    "value": 20
+                    "value": 100
                   }
                 ]
               }
@@ -25408,6 +25919,30 @@
               "type": "BoolValue",
               "longType": "google.protobuf.BoolValue",
               "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "token_ttl",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "retry_interval",
+              "description": "The minimum interval between validation emails.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -28442,6 +28977,41 @@
               "name": "CID_DEVICE_MODE",
               "number": "32",
               "description": ""
+            },
+            {
+              "name": "CID_RELAY_CONF",
+              "number": "64",
+              "description": ""
+            },
+            {
+              "name": "CID_RELAY_END_DEVICE_CONF",
+              "number": "65",
+              "description": ""
+            },
+            {
+              "name": "CID_RELAY_FILTER_LIST",
+              "number": "66",
+              "description": ""
+            },
+            {
+              "name": "CID_RELAY_UPDATE_UPLINK_LIST",
+              "number": "67",
+              "description": ""
+            },
+            {
+              "name": "CID_RELAY_CTRL_UPLINK_LIST",
+              "number": "68",
+              "description": ""
+            },
+            {
+              "name": "CID_RELAY_CONFIGURE_FWD_LIMIT",
+              "number": "69",
+              "description": ""
+            },
+            {
+              "name": "CID_RELAY_NOTIFY_NEW_END_DEVICE",
+              "number": "70",
+              "description": ""
             }
           ]
         },
@@ -29037,6 +29607,202 @@
               "name": "REJOIN_TIME_15",
               "number": "15",
               "description": "Every ~1.1 year."
+            }
+          ]
+        },
+        {
+          "name": "RelayCADPeriodicity",
+          "longName": "RelayCADPeriodicity",
+          "fullName": "ttn.lorawan.v3.RelayCADPeriodicity",
+          "description": "",
+          "values": [
+            {
+              "name": "RELAY_CAD_PERIODICITY_1_SECOND",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "RELAY_CAD_PERIODICITY_500_MILLISECONDS",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "RELAY_CAD_PERIODICITY_250_MILLISECONDS",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "RELAY_CAD_PERIODICITY_100_MILLISECONDS",
+              "number": "3",
+              "description": ""
+            },
+            {
+              "name": "RELAY_CAD_PERIODICITY_50_MILLISECONDS",
+              "number": "4",
+              "description": ""
+            },
+            {
+              "name": "RELAY_CAD_PERIODICITY_20_MILLISECONDS",
+              "number": "5",
+              "description": "sic"
+            }
+          ]
+        },
+        {
+          "name": "RelayCtrlUplinkListAction",
+          "longName": "RelayCtrlUplinkListAction",
+          "fullName": "ttn.lorawan.v3.RelayCtrlUplinkListAction",
+          "description": "",
+          "values": [
+            {
+              "name": "RELAY_CTRL_UPLINK_LIST_ACTION_READ_W_F_CNT",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "RELAY_CTRL_UPLINK_LIST_ACTION_REMOVE_TRUSTED_END_DEVICE",
+              "number": "1",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayLimitBucketSize",
+          "longName": "RelayLimitBucketSize",
+          "fullName": "ttn.lorawan.v3.RelayLimitBucketSize",
+          "description": "",
+          "values": [
+            {
+              "name": "RELAY_LIMIT_BUCKET_SIZE_1",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "RELAY_LIMIT_BUCKET_SIZE_2",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "RELAY_LIMIT_BUCKET_SIZE_4",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "RELAY_LIMIT_BUCKET_SIZE_12",
+              "number": "3",
+              "description": "sic"
+            }
+          ]
+        },
+        {
+          "name": "RelayResetLimitCounter",
+          "longName": "RelayResetLimitCounter",
+          "fullName": "ttn.lorawan.v3.RelayResetLimitCounter",
+          "description": "",
+          "values": [
+            {
+              "name": "RELAY_RESET_LIMIT_COUNTER_ZERO",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "RELAY_RESET_LIMIT_COUNTER_RELOAD_RATE",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "RELAY_RESET_LIMIT_COUNTER_MAX_VALUE",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "RELAY_RESET_LIMIT_COUNTER_NO_RESET",
+              "number": "3",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "RelaySecondChAckOffset",
+          "longName": "RelaySecondChAckOffset",
+          "fullName": "ttn.lorawan.v3.RelaySecondChAckOffset",
+          "description": "",
+          "values": [
+            {
+              "name": "RELAY_SECOND_CH_ACK_OFFSET_0",
+              "number": "0",
+              "description": "0 kHz"
+            },
+            {
+              "name": "RELAY_SECOND_CH_ACK_OFFSET_200",
+              "number": "1",
+              "description": "200 kHz"
+            },
+            {
+              "name": "RELAY_SECOND_CH_ACK_OFFSET_400",
+              "number": "2",
+              "description": "400 kHz"
+            },
+            {
+              "name": "RELAY_SECOND_CH_ACK_OFFSET_800",
+              "number": "3",
+              "description": "800 kHz"
+            },
+            {
+              "name": "RELAY_SECOND_CH_ACK_OFFSET_1600",
+              "number": "4",
+              "description": "1.6 MHz"
+            },
+            {
+              "name": "RELAY_SECOND_CH_ACK_OFFSET_3200",
+              "number": "5",
+              "description": "3.2 MHz"
+            }
+          ]
+        },
+        {
+          "name": "RelaySmartEnableLevel",
+          "longName": "RelaySmartEnableLevel",
+          "fullName": "ttn.lorawan.v3.RelaySmartEnableLevel",
+          "description": "",
+          "values": [
+            {
+              "name": "RELAY_SMART_ENABLE_LEVEL_8",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "RELAY_SMART_ENABLE_LEVEL_16",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "RELAY_SMART_ENABLE_LEVEL_32",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "RELAY_SMART_ENABLE_LEVEL_64",
+              "number": "3",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayWORChannel",
+          "longName": "RelayWORChannel",
+          "fullName": "ttn.lorawan.v3.RelayWORChannel",
+          "description": "",
+          "values": [
+            {
+              "name": "RELAY_WOR_CHANNEL_DEFAULT",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "RELAY_WOR_CHANNEL_SECONDARY",
+              "number": "1",
+              "description": ""
             }
           ]
         },
@@ -30601,6 +31367,138 @@
               "isoneof": true,
               "oneofdecl": "payload",
               "defaultValue": ""
+            },
+            {
+              "name": "relay_conf_req",
+              "description": "",
+              "label": "",
+              "type": "RelayConfReq",
+              "longType": "MACCommand.RelayConfReq",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayConfReq",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_conf_ans",
+              "description": "",
+              "label": "",
+              "type": "RelayConfAns",
+              "longType": "MACCommand.RelayConfAns",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayConfAns",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_end_device_conf_req",
+              "description": "",
+              "label": "",
+              "type": "RelayEndDeviceConfReq",
+              "longType": "MACCommand.RelayEndDeviceConfReq",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_end_device_conf_ans",
+              "description": "",
+              "label": "",
+              "type": "RelayEndDeviceConfAns",
+              "longType": "MACCommand.RelayEndDeviceConfAns",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayEndDeviceConfAns",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_update_uplink_list_req",
+              "description": "",
+              "label": "",
+              "type": "RelayUpdateUplinkListReq",
+              "longType": "MACCommand.RelayUpdateUplinkListReq",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListReq",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_update_uplink_list_ans",
+              "description": "",
+              "label": "",
+              "type": "RelayUpdateUplinkListAns",
+              "longType": "MACCommand.RelayUpdateUplinkListAns",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListAns",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_ctrl_uplink_list_req",
+              "description": "",
+              "label": "",
+              "type": "RelayCtrlUplinkListReq",
+              "longType": "MACCommand.RelayCtrlUplinkListReq",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListReq",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_ctrl_uplink_list_ans",
+              "description": "",
+              "label": "",
+              "type": "RelayCtrlUplinkListAns",
+              "longType": "MACCommand.RelayCtrlUplinkListAns",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListAns",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_configure_fwd_limit_req",
+              "description": "",
+              "label": "",
+              "type": "RelayConfigureFwdLimitReq",
+              "longType": "MACCommand.RelayConfigureFwdLimitReq",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitReq",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_configure_fwd_limit_ans",
+              "description": "",
+              "label": "",
+              "type": "RelayConfigureFwdLimitAns",
+              "longType": "MACCommand.RelayConfigureFwdLimitAns",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitAns",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay_notify_new_end_device_req",
+              "description": "",
+              "label": "",
+              "type": "RelayNotifyNewEndDeviceReq",
+              "longType": "MACCommand.RelayNotifyNewEndDeviceReq",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayNotifyNewEndDeviceReq",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "payload",
+              "defaultValue": ""
             }
           ]
         },
@@ -31741,6 +32639,752 @@
           ]
         },
         {
+          "name": "RelayConfAns",
+          "longName": "MACCommand.RelayConfAns",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayConfAns",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "second_channel_frequency_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "second_channel_ack_offset_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "second_channel_data_rate_index_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "second_channel_index_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "default_channel_index_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cad_periodicity_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayConfReq",
+          "longName": "MACCommand.RelayConfReq",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayConfReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "configuration",
+              "description": "",
+              "label": "",
+              "type": "Configuration",
+              "longType": "MACCommand.RelayConfReq.Configuration",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayConfReq.Configuration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Configuration",
+          "longName": "MACCommand.RelayConfReq.Configuration",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayConfReq.Configuration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "second_channel",
+              "description": "",
+              "label": "",
+              "type": "RelaySecondChannel",
+              "longType": "RelaySecondChannel",
+              "fullType": "ttn.lorawan.v3.RelaySecondChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "default_channel_index",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cad_periodicity",
+              "description": "",
+              "label": "",
+              "type": "RelayCADPeriodicity",
+              "longType": "RelayCADPeriodicity",
+              "fullType": "ttn.lorawan.v3.RelayCADPeriodicity",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RelayConfigureFwdLimitAns",
+          "longName": "MACCommand.RelayConfigureFwdLimitAns",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitAns",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "RelayConfigureFwdLimitReq",
+          "longName": "MACCommand.RelayConfigureFwdLimitReq",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayConfigureFwdLimitReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "reset_limit_counter",
+              "description": "",
+              "label": "",
+              "type": "RelayResetLimitCounter",
+              "longType": "RelayResetLimitCounter",
+              "fullType": "ttn.lorawan.v3.RelayResetLimitCounter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "join_request_limits",
+              "description": "",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "notify_limits",
+              "description": "",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "global_uplink_limits",
+              "description": "",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "overall_limits",
+              "description": "",
+              "label": "",
+              "type": "RelayForwardLimits",
+              "longType": "RelayForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayCtrlUplinkListAns",
+          "longName": "MACCommand.RelayCtrlUplinkListAns",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListAns",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "rule_index_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "w_f_cnt",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayCtrlUplinkListReq",
+          "longName": "MACCommand.RelayCtrlUplinkListReq",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayCtrlUplinkListReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "rule_index",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "action",
+              "description": "",
+              "label": "",
+              "type": "RelayCtrlUplinkListAction",
+              "longType": "RelayCtrlUplinkListAction",
+              "fullType": "ttn.lorawan.v3.RelayCtrlUplinkListAction",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayEndDeviceConfAns",
+          "longName": "MACCommand.RelayEndDeviceConfAns",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayEndDeviceConfAns",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "second_channel_frequency_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "second_channel_data_rate_index_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "second_channel_index_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "backoff_ack",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayEndDeviceConfReq",
+          "longName": "MACCommand.RelayEndDeviceConfReq",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "configuration",
+              "description": "",
+              "label": "",
+              "type": "Configuration",
+              "longType": "MACCommand.RelayEndDeviceConfReq.Configuration",
+              "fullType": "ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq.Configuration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Configuration",
+          "longName": "MACCommand.RelayEndDeviceConfReq.Configuration",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayEndDeviceConfReq.Configuration",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "always",
+              "description": "",
+              "label": "",
+              "type": "RelayEndDeviceAlwaysMode",
+              "longType": "RelayEndDeviceAlwaysMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceAlwaysMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "dynamic",
+              "description": "",
+              "label": "",
+              "type": "RelayEndDeviceDynamicMode",
+              "longType": "RelayEndDeviceDynamicMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceDynamicMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_controlled",
+              "description": "",
+              "label": "",
+              "type": "RelayEndDeviceControlledMode",
+              "longType": "RelayEndDeviceControlledMode",
+              "fullType": "ttn.lorawan.v3.RelayEndDeviceControlledMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "backoff",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 63
+                  }
+                ]
+              }
+            },
+            {
+              "name": "second_channel",
+              "description": "",
+              "label": "",
+              "type": "RelaySecondChannel",
+              "longType": "RelaySecondChannel",
+              "fullType": "ttn.lorawan.v3.RelaySecondChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "serving_device_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RelayNotifyNewEndDeviceReq",
+          "longName": "MACCommand.RelayNotifyNewEndDeviceReq",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayNotifyNewEndDeviceReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dev_addr",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 4
+                  }
+                ]
+              }
+            },
+            {
+              "name": "snr",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "int32.lte",
+                    "value": 11
+                  },
+                  {
+                    "name": "int32.gte",
+                    "value": -20
+                  }
+                ]
+              }
+            },
+            {
+              "name": "rssi",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "int32.lte",
+                    "value": -15
+                  },
+                  {
+                    "name": "int32.gte",
+                    "value": -142
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RelayUpdateUplinkListAns",
+          "longName": "MACCommand.RelayUpdateUplinkListAns",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListAns",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "RelayUpdateUplinkListReq",
+          "longName": "MACCommand.RelayUpdateUplinkListReq",
+          "fullName": "ttn.lorawan.v3.MACCommand.RelayUpdateUplinkListReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "rule_index",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "forward_limits",
+              "description": "",
+              "label": "",
+              "type": "RelayUplinkForwardLimits",
+              "longType": "RelayUplinkForwardLimits",
+              "fullType": "ttn.lorawan.v3.RelayUplinkForwardLimits",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "dev_addr",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 4
+                  }
+                ]
+              }
+            },
+            {
+              "name": "w_f_cnt",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "root_wor_s_key",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 16
+                  }
+                ]
+              }
+            },
+            {
+              "name": "device_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_key_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ResetConf",
           "longName": "MACCommand.ResetConf",
           "fullName": "ttn.lorawan.v3.MACCommand.ResetConf",
@@ -32417,6 +34061,448 @@
             {
               "name": "rejoin_cnt",
               "description": "Contains RJCount0 or RJCount1 depending on rejoin_type.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayEndDeviceAlwaysMode",
+          "longName": "RelayEndDeviceAlwaysMode",
+          "fullName": "ttn.lorawan.v3.RelayEndDeviceAlwaysMode",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "RelayEndDeviceControlledMode",
+          "longName": "RelayEndDeviceControlledMode",
+          "fullName": "ttn.lorawan.v3.RelayEndDeviceControlledMode",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "RelayEndDeviceDynamicMode",
+          "longName": "RelayEndDeviceDynamicMode",
+          "fullName": "ttn.lorawan.v3.RelayEndDeviceDynamicMode",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "smart_enable_level",
+              "description": "The number of consecutive uplinks without a valid downlink before the end device attempts\nto use the relay mode to transmit messages.",
+              "label": "",
+              "type": "RelaySmartEnableLevel",
+              "longType": "RelaySmartEnableLevel",
+              "fullType": "ttn.lorawan.v3.RelaySmartEnableLevel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RelayForwardDownlinkReq",
+          "longName": "RelayForwardDownlinkReq",
+          "fullName": "ttn.lorawan.v3.RelayForwardDownlinkReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "raw_payload",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelayForwardLimits",
+          "longName": "RelayForwardLimits",
+          "fullName": "ttn.lorawan.v3.RelayForwardLimits",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bucket_size",
+              "description": "The multiplier used to compute the total bucket size for the limits.\nThe multiplier is multiplied by the reload rate in order to compute the total bucket size.",
+              "label": "",
+              "type": "RelayLimitBucketSize",
+              "longType": "RelayLimitBucketSize",
+              "fullType": "ttn.lorawan.v3.RelayLimitBucketSize",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "reload_rate",
+              "description": "The number of tokens which are replenished in the bucket every hour.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 126
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RelayForwardUplinkReq",
+          "longName": "RelayForwardUplinkReq",
+          "fullName": "ttn.lorawan.v3.RelayForwardUplinkReq",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "data_rate",
+              "description": "",
+              "label": "",
+              "type": "DataRate",
+              "longType": "DataRate",
+              "fullType": "ttn.lorawan.v3.DataRate",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "snr",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "int32.lte",
+                    "value": 11
+                  },
+                  {
+                    "name": "int32.gte",
+                    "value": -20
+                  }
+                ]
+              }
+            },
+            {
+              "name": "rssi",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "int32.lte",
+                    "value": -15
+                  },
+                  {
+                    "name": "int32.gte",
+                    "value": -142
+                  }
+                ]
+              }
+            },
+            {
+              "name": "wor_channel",
+              "description": "",
+              "label": "",
+              "type": "RelayWORChannel",
+              "longType": "RelayWORChannel",
+              "fullType": "ttn.lorawan.v3.RelayWORChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "frequency",
+              "description": "Uplink channel frequency (Hz).",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "raw_payload",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RelaySecondChannel",
+          "longName": "RelaySecondChannel",
+          "fullName": "ttn.lorawan.v3.RelaySecondChannel",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ack_offset",
+              "description": "The frequency (Hz) offset used for the WOR acknowledgement.",
+              "label": "",
+              "type": "RelaySecondChAckOffset",
+              "longType": "RelaySecondChAckOffset",
+              "fullType": "ttn.lorawan.v3.RelaySecondChAckOffset",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "data_rate_index",
+              "description": "The data rate index used by the WOR and WOR acknowledgement.",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "frequency",
+              "description": "The frequency (Hz) used by the wake on radio message.",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RelayUplinkForwardLimits",
+          "longName": "RelayUplinkForwardLimits",
+          "fullName": "ttn.lorawan.v3.RelayUplinkForwardLimits",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bucket_size",
+              "description": "The multiplier used to compute the total bucket size for the limits.\nThe multiplier is multiplied by the reload rate in order to compute the total bucket size.",
+              "label": "",
+              "type": "RelayLimitBucketSize",
+              "longType": "RelayLimitBucketSize",
+              "fullType": "ttn.lorawan.v3.RelayLimitBucketSize",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "reload_rate",
+              "description": "The number of tokens which are replenished in the bucket every hour.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 62
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RelayUplinkToken",
+          "longName": "RelayUplinkToken",
+          "fullName": "ttn.lorawan.v3.RelayUplinkToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "session_key_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "full_f_cnt",
+              "description": "",
               "label": "",
               "type": "uint32",
               "longType": "uint32",
@@ -33835,7 +35921,7 @@
             },
             {
               "name": "simulated",
-              "description": "Signals if the message is coming from the Network Server or is simulated.",
+              "description": "Signals if the message is coming from the Network Server or is simulated.\nThe Application Server automatically sets this field, and callers must not manually set it.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -35468,6 +37554,62 @@
           ]
         },
         {
+          "name": "RelayMetadata",
+          "longName": "RelayMetadata",
+          "fullName": "ttn.lorawan.v3.RelayMetadata",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "device_id",
+              "description": "End device identifiers of the relay.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "wor_channel",
+              "description": "Wake on radio channel.",
+              "label": "",
+              "type": "RelayWORChannel",
+              "longType": "RelayWORChannel",
+              "fullType": "ttn.lorawan.v3.RelayWORChannel",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "RxMetadata",
           "longName": "RxMetadata",
           "fullName": "ttn.lorawan.v3.RxMetadata",
@@ -35504,6 +37646,18 @@
               "type": "PacketBrokerMetadata",
               "longType": "PacketBrokerMetadata",
               "fullType": "ttn.lorawan.v3.PacketBrokerMetadata",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "relay",
+              "description": "",
+              "label": "",
+              "type": "RelayMetadata",
+              "longType": "RelayMetadata",
+              "fullType": "ttn.lorawan.v3.RelayMetadata",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -39652,6 +41806,174 @@
                   }
                 ]
               }
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerAgentCompoundUplinkToken",
+          "longName": "PacketBrokerAgentCompoundUplinkToken",
+          "fullName": "ttn.lorawan.v3.PacketBrokerAgentCompoundUplinkToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "forwarder",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent",
+              "description": "",
+              "label": "",
+              "type": "PacketBrokerAgentUplinkToken",
+              "longType": "PacketBrokerAgentUplinkToken",
+              "fullType": "ttn.lorawan.v3.PacketBrokerAgentUplinkToken",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerAgentEncryptedPayload",
+          "longName": "PacketBrokerAgentEncryptedPayload",
+          "fullName": "ttn.lorawan.v3.PacketBrokerAgentEncryptedPayload",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ciphertext",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "nonce",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerAgentGatewayUplinkToken",
+          "longName": "PacketBrokerAgentGatewayUplinkToken",
+          "fullName": "ttn.lorawan.v3.PacketBrokerAgentGatewayUplinkToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_uid",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "token",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerAgentUplinkToken",
+          "longName": "PacketBrokerAgentUplinkToken",
+          "fullName": "ttn.lorawan.v3.PacketBrokerAgentUplinkToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "forwarder_net_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "forwarder_tenant_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "forwarder_cluster_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

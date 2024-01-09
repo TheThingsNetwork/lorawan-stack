@@ -15,7 +15,24 @@
 /* eslint-disable import/no-commonjs */
 
 module.exports = {
-  stories: ['../../pkg/webui/**/story.js', '../../pkg/webui/**/*.stories.js'],
-  addons: ['@storybook/addon-actions/register', '@storybook/addon-info'],
+  framework: {
+    name: '@storybook/react-webpack5',
+    options: {},
+  },
+  stories: [
+    '../../pkg/webui/**/story.js',
+    '../../pkg/webui/**/*.stories.js',
+    '../../pkg/webui/**/*.mdx',
+    '../../pkg/webui/**/*stories.mdx',
+  ],
+  addons: [
+    '@storybook/addon-actions',
+    '@storybook/addon-essentials',
+    '@storybook/addon-mdx-gfm',
+    '@storybook/addon-designs',
+  ],
   staticDirs: ['../../public'],
+  docs: {
+    autodocs: true,
+  },
 }

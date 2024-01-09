@@ -519,6 +519,8 @@ type FrequencyPlanDescription struct {
 	ID string `yaml:"id"`
 	// BaseID is the ID of the base frequency plan that this frequency plan extends (optional).
 	BaseID string `yaml:"base-id,omitempty"`
+	// BandID is the ID of the band that this frequency plan uses.
+	BandID string `yaml:"band-id,omitempty"`
 	// Name is a human readable name of the frequency plan.
 	Name string `yaml:"name"`
 	// BaseFrequency is the base frequency of the frequency plan (i.e. 868, 915)

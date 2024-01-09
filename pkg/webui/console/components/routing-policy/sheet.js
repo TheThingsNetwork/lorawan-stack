@@ -32,7 +32,7 @@ const RoutingPolicy = ({ enabled, message, positiveMessage, negativeMessage }) =
     <span className={style.policy} data-enabled={enabled}>
       <Icon
         icon={enabled ? 'check' : 'clear'}
-        className={classnames(style.icon, { 'c-success': enabled, 'c-error': !enabled })}
+        className={classnames('mr-cs-xxs', { 'c-success': enabled, 'c-error': !enabled })}
       />
       <Message content={message} />
     </span>
@@ -54,8 +54,8 @@ const RoutingPolicySheet = ({ policy }) => {
   const { uplink = {}, downlink = {} } = policy
 
   return (
-    <div className={style.container} data-test-id="routing-policy-sheet">
-      <div className={style.uplink}>
+    <div className="d-flex direction-row" data-test-id="routing-policy-sheet">
+      <div className={classnames(style.uplink, 'mr-ls-m')}>
         <Message content={sharedMessages.uplink} component="h4" />
         <RoutingPolicy
           enabled={uplink.join_request}
@@ -65,13 +65,13 @@ const RoutingPolicySheet = ({ policy }) => {
         />
         <RoutingPolicy
           enabled={uplink.mac_data}
-          message={m.macData}
+          message={sharedMessages.macData}
           positiveMessage={m.forwardsMacData}
           negativeMessage={m.doesNotForwardMacData}
         />
         <RoutingPolicy
           enabled={uplink.application_data}
-          message={m.applicationData}
+          message={sharedMessages.appData}
           positiveMessage={m.forwardsApplicationData}
           negativeMessage={m.doesNotForwardApplicationData}
         />
@@ -92,19 +92,19 @@ const RoutingPolicySheet = ({ policy }) => {
         <Message content={sharedMessages.downlink} component="h4" />
         <RoutingPolicy
           enabled={downlink.join_accept}
-          message={m.joinAccept}
+          message={sharedMessages.joinAccept}
           positiveMessage={m.allowsJoinAccept}
           negativeMessage={m.doesNotAllowJoinAccept}
         />
         <RoutingPolicy
           enabled={downlink.mac_data}
-          message={m.macData}
+          message={sharedMessages.macData}
           positiveMessage={m.allowsMacData}
           negativeMessage={m.doesNotAllowMacData}
         />
         <RoutingPolicy
           enabled={downlink.application_data}
-          message={m.applicationData}
+          message={sharedMessages.appData}
           positiveMessage={m.allowsApplicationData}
           negativeMessage={m.doesNotAllowApplicationData}
         />

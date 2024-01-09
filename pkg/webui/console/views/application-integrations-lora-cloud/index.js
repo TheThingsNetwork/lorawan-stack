@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import LoRaCloudImage from '@assets/misc/lora-cloud.png'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { useBreadcrumbs, withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Link from '@ttn-lw/components/link'
 import Collapse from '@ttn-lw/components/collapse'
 
@@ -52,7 +52,6 @@ const m = defineMessages({
   loraCloudInfoText:
     'Lora Cloud provides value added APIs that enable simple solutions for common tasks related to LoRaWAN networks and LoRa-based devices. You can setup our LoRaCloud integrations below.',
   officialLoRaCloudDocumentation: 'Official LoRa Cloud documentation',
-  setToken: 'Set LoRa Cloud token',
   dasDescription:
     'With the LoRa Cloud Modem and Geolocation Services protocol, you can manage common device functionality at the application layer for LoRaWAN-enabled devices.',
   glsDescription:
@@ -88,12 +87,12 @@ const LoRaCloud = () => {
             <Row>
               <Col lg={8} md={12}>
                 <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
-                <Message content={m.loraCloudInfoText} className={style.info} />
+                <Message content={m.loraCloudInfoText} className="mt-0" />
                 <div>
                   <Message
                     component="h4"
                     content={sharedMessages.furtherResources}
-                    className={style.furtherResources}
+                    className="mb-cs-xs"
                   />
                   <Link.DocLink
                     path="/integrations/application-packages/lora-cloud-device-and-application-services/"
@@ -106,13 +105,13 @@ const LoRaCloud = () => {
                     <Message content={m.officialLoRaCloudDocumentation} />
                   </Link.Anchor>
                 </div>
-                <hr className={style.hRule} />
+                <hr className="mb-0" />
                 <Collapse title="Geolocation" description={m.glsDescription}>
-                  <Message component="h3" content={m.setToken} />
+                  <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
                   <LoRaCloudGLSForm />
                 </Collapse>
                 <Collapse title="Device & Application Services" description={m.dasDescription}>
-                  <Message component="h3" content={m.setToken} />
+                  <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
                   <LoRaCloudDASForm />
                 </Collapse>
               </Col>
@@ -124,13 +123,4 @@ const LoRaCloud = () => {
   )
 }
 
-export default withBreadcrumb('apps.single.integrations.lora-cloud', props => {
-  const { appId } = props
-
-  return (
-    <Breadcrumb
-      path={`/applications/${appId}/integrations/lora-cloud`}
-      content={sharedMessages.loraCloud}
-    />
-  )
-})(LoRaCloud)
+export default LoRaCloud

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import style from './story.styl'
 
@@ -52,15 +51,14 @@ const iconElement = icons.map(icon => (
 
 export default {
   title: 'Icon',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      propTables: [Icon],
-      text: doc,
-    }),
-  ],
+  component: Icon,
+  parameters: {
+    docs: {
+      description: {
+        component: doc,
+      },
+    },
+  },
 }
 
 export const Icons = () => <div>{iconElement}</div>

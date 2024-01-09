@@ -1,0 +1,389 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Grid.
+:global
+  .grid
+    display: grid
+    row-gap: $grid-row-gap
+    width: 100%
+
+    // Prevent column-gaps that are wider than the page width when combined.
+    column-gap: calc(min($grid-column-gap, 100% / 11))
+
+    &:not(.auto-columns)
+      grid-template-columns: repeat(12, minmax(0, 1fr))
+
+    &.auto-columns
+      grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr))
+
+    // Generate basic grid item classes.
+    for $num in (1..12)
+      .item-{$num}
+        grid-column-end: span $num
+
+    // Generate start-column (offset) classes.
+    for $num in (1..12)
+      .item-start-{$num}
+        grid-column-start: $num
+
+    // Generate responsive grid item styles.
+    for $name, $width in $bp
+      media-query($width)
+        for $num in (1..12)
+          // Generate responsive grid item overrides.
+          .{$name}\\:item-{$num}
+            grid-column-end: span $num
+
+          // Generate responsive start-colum (offset) item overrides.
+          .{$name}\\:item-start-{$num}
+            grid-column-start: $num
+
+    &--center
+      align-items: center
+
+  // Content justification.
+
+  .j-center
+    justify-content: center
+
+  .j-start
+    justify-content: start
+
+  .j-end
+    justify-content: end
+
+  .j-between
+    justify-content: space-between
+
+  .j-around
+    justify-content: space-around
+
+  .j-evenly
+    justify-content: space-evenly
+
+  .al-center
+    align-items: center
+
+  .al-start
+    align-items: start
+
+  .al-end
+    align-items: end
+
+  // Responsive justification styles.
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:j-center
+        justify-content: center !important
+
+      .{$name}\\:j-start
+        justify-content: start !important
+
+      .{$name}\\:end
+        justify-content: end !important
+
+      .{$name}\\:j-between
+        justify-content: space-between !important
+
+  // Block justification.
+
+  .block-center
+    margin-left: auto
+    margin-right: auto
+
+  // Width and height.
+
+  .w-full
+    width: 100%
+
+  .w-auto
+    width: auto
+
+  .w-content
+    width: fit-content
+
+  .h-full
+    height: 100%
+
+  .h-auto
+    height: auto
+
+  .h-vh
+    height: 100vh
+
+  for $num in (1..9)
+    $percentage = percentage($num / 10)
+    .w-{$num}0
+      width: $percentage
+
+    .h-{$num}0
+      width: $percentage
+
+    for $name, $width in $bp
+      +media-query($width)
+        .{$name}\\:w-{$num}0
+          width: $percentage
+
+        .{$name}\\:h-{$num}0
+          height: $percentage
+
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:w-full
+        width: 100%
+
+      .{$name}\\:w-auto
+        width: auto
+
+      .{$name}\\:w-content
+        width: fit-content
+
+      .{$name}\\:h-full
+        height: 100%
+
+      .{$name}\\:h-auto
+        height: auto
+
+  // Positioning.
+  .pos-relative
+    position: relative
+  .pos-absolute
+    position: absolute
+  .pos-fixed
+    position: fixed
+  .pos-static
+    position: static
+  // Flex layout.
+  .direction-column
+    flex-direction: column
+  .direction-row
+    flex-direction: row
+  .flex-wrap
+    flex-wrap: wrap
+
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:pos-relative
+        position: relative
+      .{$name}\\:pos-absolute
+        position: absolute
+      .{$name}\\:pos-fixed
+        position: fixed
+      .{$name}\\:pos-static
+        position: static
+      .{$name}\\:direction-column
+        flex-direction: column
+      .{$name}\\:direction-row
+        flex-direction: row
+      .{$name}\\:flex-wrap
+        flex-wrap: wrap
+
+  // Layout shorthands.
+  .pos-absolute-stretch
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+
+  .flex-horizontal
+    display: flex
+    justify-content: space-between
+    align-items: center
+
+  .flex-column
+    display: flex
+    justify-content: space-between
+    flex-direction: column
+
+  .flex-grow
+    flex-grow: 1
+
+  .flex-no-grow
+    flex-grow: 0
+
+  .flex-shrink
+    flex-shrink: 1
+
+  .flex-no-shrink
+    flex-shrink: 0
+
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:direction-column
+        flex-direction: column !important
+
+      .{$name}\\:direction-row
+        flex-direction: row !important
+
+  // Opacity.
+  .opacity-0
+    opacity: 0
+  for $num in (1..10)
+    $percentage = percentage($num / 10)
+    .opacity-{$num}0
+      opacity: $percentage
+
+  // Miscellaneous.
+  .overflow-hidden
+    overflow: hidden
+
+  .overflow-auto
+    overflow: auto
+
+  .overflow-visible
+    overflow: visible
+
+  .overflow-scroll
+    overflow: scroll
+
+  .overflow-x-hidden
+    overflow-x: hidden
+
+  .overflow-x-auto
+    overflow-x: auto
+
+  .overflow-x-visible
+    overflow-x: visible
+
+  .overflow-x-scroll
+    overflow-x: scroll
+
+  .overflow-y-hidden
+    overflow-y: hidden
+
+  .overflow-y-auto
+    overflow-y: auto
+
+  .overflow-y-visible
+    overflow-y: visible
+
+  .overflow-y-scroll
+    overflow-y: scroll
+
+  .text-overflow-ellipsis
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+
+  .cursor-pointer
+    cursor: pointer
+
+  // Font sizes.
+
+  for $name in $fs
+    .fs-{$name}
+      font-size: convert('$fs.' + $name)
+
+  // Font weights.
+  .fw-normal
+    font-weight: $fw.normal
+
+  .fw-bold
+    font-weight: $fw.bold
+
+  .fw-bolder
+    font-weight: $fw.bolder
+
+  // Text alignments.
+
+  .text-center
+    text-align: center
+
+  .text-left
+    text-align: left
+
+  .text-right
+    text-align: right
+
+  // Text decorations.
+
+  .td-underline
+    text-decoration: underline
+
+  .td-line-through
+    text-decoration: line-through
+
+  .td-none
+    text-decoration: none
+
+  // Cursor.
+
+  .cursor-pointer
+    cursor: pointer
+
+  .cursor-not-allowed
+    cursor: not-allowed
+
+  .cursor-grab
+    cursor: grab
+
+  .cursor-zoom-in
+    cursor: zoom-in
+
+  .cursor-zoom-out
+    cursor: zoom-out
+
+  // Responsive typography styles.
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:text-center
+        text-align: center !important
+
+      .{$name}\\:text-left
+        text-align: left !important
+
+      .{$name}\\:text-right
+        text-align: right !important
+
+  // DISPLAY UTILITIES.
+  .d-flex
+    display: flex !important
+
+  .d-inline
+    display: inline !important
+
+  .d-block
+    display: block !important
+
+  .d-none
+    display: none !important
+
+  .d-inline-block
+    display: inline-block !important
+
+  .d-inline-flex
+    display: inline-flex !important
+
+  // Responsive display styles.
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:d-flex
+        display: flex !important
+
+      .{$name}\\:d-inline
+        display: inline !important
+
+      .{$name}\\:d-block
+        display: block !important
+
+      .{$name}\\:d-none
+        display: none !important
+
+      .{$name}\\:d-inline-block
+        display: inline-block !important
+
+      .{$name}\\:d-inline-flex
+        display: inline-flex !important

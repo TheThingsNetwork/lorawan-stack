@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -26,6 +27,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+)
+
+var (
+	appendUplinkCorrelationID   = events.RegisterCorrelationIDPrefix("uplink", "ns:uplink")
+	appendDownlinkCorrelationID = events.RegisterCorrelationIDPrefix("downlink", "ns:downlink")
+	appendTxAckCorrelationID    = events.RegisterCorrelationIDPrefix("tx_ack", "ns:tx_ack")
 )
 
 // nsScheduleWindow returns minimum time.Duration between downlink being added to the queue and it being sent to GS for transmission.
@@ -249,6 +256,9 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		case mac.ContainsStickyMACCommand(dev.MacState.RecentMacCommandIdentifiers...):
 			logger.Debug("Sticky MAC response received, choose class A downlink slot")
 			return classA, true
+		case dev.MacState.PendingRelayDownlink != nil:
+			logger.Debug("Pending relay downlink, choose class A downlink slot")
+			return classA, true
 		case mac.DeviceNeedsADRParamSetupReq(dev, phy):
 			logger.Debug("Device needs ADRParamSetupReq, choose class A downlink slot")
 			return classA, true
@@ -287,6 +297,21 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 			return classA, true
 		case mac.DeviceNeedsTxParamSetupReq(dev, phy):
 			logger.Debug("Device needs TxParamSetupReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayConfReq(dev):
+			logger.Debug("Device needs RelayConfReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayEndDeviceConfReq(dev):
+			logger.Debug("Device needs RelayEndDeviceConfReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayUpdateUplinkListReq(dev):
+			logger.Debug("Device needs RelayUpdateUplinkListReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayCtrlUplinkListReq(dev):
+			logger.Debug("Device needs RelayCtrlUplinkListReq, choose class A downlink slot")
+			return classA, true
+		case mac.DeviceNeedsRelayConfigureFwdLimitReq(dev):
+			logger.Debug("Device needs RelayConfigureFwdLimitReq, choose class A downlink slot")
 			return classA, true
 		}
 	}
@@ -419,8 +444,10 @@ func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, ups []*ttnp
 	}
 	if err := ns.sendApplicationUplinks(ctx, ttnpb.NewNsAsClient(conn), ups...); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
+		if !retryableUplinkError(err) {
+			return
+		}
 		ns.enqueueApplicationUplinks(ctx, ups...)
-		return
 	}
 }
 
@@ -456,3 +483,11 @@ var (
 		"session",
 	}
 )
+
+func retryableUplinkError(err error) bool {
+	return errors.IsCanceled(err) ||
+		errors.IsDeadlineExceeded(err) ||
+		errors.IsResourceExhausted(err) ||
+		errors.IsAborted(err) ||
+		errors.IsUnavailable(err)
+}

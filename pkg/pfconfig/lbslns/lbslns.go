@@ -274,7 +274,7 @@ type RouterFeatures interface {
 func GetRouterConfig(
 	ctx context.Context,
 	bandID string,
-	fps map[string]*frequencyplans.FrequencyPlan,
+	fps []*frequencyplans.FrequencyPlan,
 	features RouterFeatures,
 	dlTime time.Time,
 	antennaGain int,
@@ -386,7 +386,7 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 }
 
 // getMinMaxFrequencies extract the minimum and maximum frequencies between all the bands.
-func getMinMaxFrequencies(fps map[string]*frequencyplans.FrequencyPlan) (min uint64, max uint64, err error) {
+func getMinMaxFrequencies(fps []*frequencyplans.FrequencyPlan) (min uint64, max uint64, err error) {
 	min = math.MaxUint64
 	for _, fp := range fps {
 		if len(fp.Radios) == 0 {

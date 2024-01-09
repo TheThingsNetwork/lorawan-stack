@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,77 +12,64 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { FormattedDate, FormattedTime } from 'react-intl'
-import bind from 'autobind-decorator'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import { ingestError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { warn } from '@ttn-lw/lib/log'
 
 import RelativeTime from './relative'
 
-class DateTime extends React.PureComponent {
-  state = { hasError: false }
+const DateTime = props => {
+  const {
+    value,
+    date,
+    time,
+    className,
+    children,
+    dateFormatOptions,
+    timeFormatOptions,
+    firstToLower,
+    noTitle,
+  } = props
 
-  static getDerivedStateFromError() {
-    return { hasError: true }
-  }
+  const renderUnknown = (
+    <time className={className}>
+      <Message content={sharedMessages.unknown} firstToLower={firstToLower} />
+    </time>
+  )
 
-  @bind
-  renderUnknown() {
-    const { className, firstToLower } = this.props
-    return (
-      <time className={className}>
-        <Message content={sharedMessages.unknown} firstToLower={firstToLower} />
-      </time>
-    )
-  }
-
-  componentDidCatch(error, info) {
-    const { value } = this.props
-    warn(`Error rendering date time with value: "${value}"`, error, info)
-    ingestError(error, { ingestedBy: 'DateTimeComponent', value, info })
-  }
-
-  renderDateTime(formattedDate, formattedTime, dateValue) {
-    const { className, children, date, time, noTitle } = this.props
-
-    let result = ''
-    if (date) {
-      result += formattedDate
-    }
-
-    if (time) {
+  const renderDateTime = useCallback(
+    (formattedDate, formattedTime, dateValue) => {
+      let result = ''
       if (date) {
-        result += ' '
+        result += formattedDate
       }
 
-      result += formattedTime
-    }
+      if (time) {
+        if (date) {
+          result += ' '
+        }
+        result += formattedTime
+      }
 
-    return (
-      <time
-        className={className}
-        dateTime={dateValue.toISOString()}
-        title={noTitle ? undefined : result}
-      >
-        {children ? children(result) : result}
-      </time>
-    )
-  }
+      return (
+        <time
+          className={className}
+          dateTime={dateValue.toISOString()}
+          title={noTitle ? undefined : result}
+        >
+          {children ? children(result) : result}
+        </time>
+      )
+    },
+    [children, className, date, noTitle, time],
+  )
 
-  render() {
-    const { value, dateFormatOptions, timeFormatOptions } = this.props
-    const { hasError } = this.state
-
-    if (hasError) {
-      return this.renderUnknown()
-    }
-
+  try {
     let dateValue = value
     if (!(value instanceof Date)) {
       dateValue = new Date(value)
@@ -92,11 +79,14 @@ class DateTime extends React.PureComponent {
       <FormattedDate value={dateValue} {...dateFormatOptions}>
         {date => (
           <FormattedTime value={dateValue} {...timeFormatOptions}>
-            {time => this.renderDateTime(date, time, dateValue)}
+            {time => renderDateTime(date, time, dateValue)}
           </FormattedTime>
         )}
       </FormattedDate>
     )
+  } catch (error) {
+    warn(`Error rendering date time with value: "${value}"`, error)
+    return renderUnknown
   }
 }
 
@@ -105,23 +95,14 @@ DateTime.Relative = RelativeTime
 DateTime.propTypes = {
   children: PropTypes.func,
   className: PropTypes.string,
-  /** The time to be displayed. */
   date: PropTypes.bool,
-  /** Whether to show the time. */
   dateFormatOptions: PropTypes.shape({}),
-  /** Whether to convert the first character of the resulting message to lowercase. */
   firstToLower: PropTypes.bool,
-  /** Whether to show the title or not. */
   noTitle: PropTypes.bool,
-  // See https://formatjs.io/docs/react-intl/components/#formatteddate
   time: PropTypes.bool,
-  // See https://formatjs.io/docs/react-intl/components/#formattedtime
   timeFormatOptions: PropTypes.shape({}),
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number, // Support timestamps.
-    PropTypes.instanceOf(Date),
-  ]).isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)])
+    .isRequired,
 }
 
 DateTime.defaultProps = {

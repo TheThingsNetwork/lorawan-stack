@@ -116,6 +116,8 @@ var DefaultEventsConfig = func() config.Events {
 	c.Redis.Workers = 16
 	c.Redis.Publish.QueueSize = 8192
 	c.Redis.Publish.MaxWorkers = 1024
+	c.Batch.TargetSize = 64
+	c.Batch.Delay = 32 * time.Millisecond
 	return c
 }()
 

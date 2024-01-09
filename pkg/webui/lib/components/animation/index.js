@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,51 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React, { useEffect, useRef } from 'react'
 import lottie from 'lottie-web'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-export default class Animation extends Component {
-  static propTypes = {
-    animationData: PropTypes.shape({}).isRequired,
-    lottieConfig: PropTypes.shape({}),
-  }
+const Animation = props => {
+  const containerRef = useRef(null)
 
-  static defaultProps = {
-    lottieConfig: {},
-  }
+  const { animationData, lottieConfig, animationRef, ...rest } = props
 
-  constructor(props) {
-    super(props)
-
-    this.containerRef = React.createRef()
-    this.instance = null
-  }
-
-  componentDidMount() {
-    const { lottieConfig } = this.props
-
-    this.instance = lottie.loadAnimation({
-      container: this.containerRef.current,
+  useEffect(() => {
+    animationRef.current = lottie.loadAnimation({
+      container: containerRef.current,
       renderer: 'svg',
       loop: false,
       autoplay: false,
-      animationData: this.props.animationData,
+      animationData,
       ...lottieConfig,
     })
-  }
 
-  render() {
-    const { lottieConfig, animationData, ...rest } = this.props
+    return () => {
+      animationRef.current = null
+    }
+  }, [animationData, animationRef, lottieConfig])
 
-    return (
-      <div
-        ref={this.containerRef}
-        onMouseEnter={this.handleOnMouseEnter}
-        onMouseLeave={this.handleOnMouseLeave}
-        {...rest}
-      />
-    )
-  }
+  return <div ref={containerRef} {...rest} />
 }
+
+Animation.propTypes = {
+  animationData: PropTypes.shape({}).isRequired,
+  animationRef: PropTypes.shape({ current: PropTypes.any }).isRequired,
+  lottieConfig: PropTypes.shape({}),
+}
+
+Animation.defaultProps = {
+  lottieConfig: {},
+}
+
+export default Animation

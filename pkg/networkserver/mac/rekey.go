@@ -42,10 +42,12 @@ func HandleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	evs := events.Builders{
 		EvtReceiveRekeyIndication.With(events.WithData(pld)),
 	}
-	if !dev.SupportsJoin {
+	if !dev.SupportsJoin || !macspec.UseRekeyInd(dev.LorawanVersion) {
 		return evs, nil
 	}
-	if dev.PendingSession != nil && dev.MacState.PendingJoinRequest != nil && types.MustDevAddr(dev.PendingSession.DevAddr).OrZero().Equal(devAddr) {
+	if dev.PendingSession != nil &&
+		dev.MacState.PendingJoinRequest != nil &&
+		types.MustDevAddr(dev.PendingSession.DevAddr).OrZero().Equal(devAddr) {
 		dev.Ids.DevAddr = dev.PendingSession.DevAddr
 		dev.Session = dev.PendingSession
 	}

@@ -12,9 +12,70 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import connect from './connect'
-import FirmwareVersionSelect from './fw-version-select'
+import React from 'react'
+import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
-const ConnectedFirmwareVersionSelect = connect(FirmwareVersionSelect)
+import Field from '@ttn-lw/components/form/field'
+import Select from '@ttn-lw/components/select'
+import { useFormContext } from '@ttn-lw/components/form'
 
-export { ConnectedFirmwareVersionSelect as default, FirmwareVersionSelect }
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { isUnknownHwVersion, SELECT_OTHER_OPTION } from '@console/lib/device-utils'
+
+import { selectDeviceModelFirmwareVersions } from '@console/store/selectors/device-repository'
+
+const m = defineMessages({
+  title: 'Firmware Ver.',
+})
+
+const formatOptions = (versions = []) =>
+  versions
+    .map(version => ({
+      value: version.version,
+      label: version.version,
+    }))
+    .concat([{ value: SELECT_OTHER_OPTION, label: sharedMessages.otherOption }])
+
+const FirmwareVersionSelect = props => {
+  const { name, onChange, brandId, modelId, hwVersion, ...rest } = props
+  const { setFieldValue, values } = useFormContext()
+
+  const versions = useSelector(state =>
+    selectDeviceModelFirmwareVersions(state, brandId, modelId).filter(
+      ({ supported_hardware_versions = [] }) =>
+        (Boolean(hwVersion) && supported_hardware_versions.includes(hwVersion)) ||
+        // Include firmware versions when there are no hardware versions configured in device repository
+        // for selected end device model.
+        isUnknownHwVersion(hwVersion),
+    ),
+  )
+
+  const options = React.useMemo(() => formatOptions(versions), [versions])
+
+  React.useEffect(() => {
+    if (options.length > 0 && options.length <= 2 && !values.version_ids.firmware_version.length) {
+      setFieldValue('version_ids.firmware_version', options[0].value)
+    }
+  }, [setFieldValue, options, values.version_ids.firmware_version.length])
+
+  return (
+    <Field {...rest} options={options} name={name} title={m.title} component={Select} autoFocus />
+  )
+}
+
+FirmwareVersionSelect.propTypes = {
+  brandId: PropTypes.string.isRequired,
+  hwVersion: PropTypes.string.isRequired,
+  modelId: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func,
+}
+
+FirmwareVersionSelect.defaultProps = {
+  onChange: () => null,
+}
+
+export default FirmwareVersionSelect

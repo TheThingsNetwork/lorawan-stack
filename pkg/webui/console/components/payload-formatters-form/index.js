@@ -44,10 +44,7 @@ import { address as addressRegexp } from '@console/lib/regexp'
 import { getDefaultGrpcServiceFormatter, getDefaultJavascriptFormatter } from './formatter-values'
 import TestForm from './test-form'
 
-import style from './payload-formatters-form.styl'
-
 const m = defineMessages({
-  grpc: 'GRPC service',
   repository: 'Use Device Repository formatters',
   customJavascipt: 'Custom Javascript formatter',
   formatterType: 'Formatter type',
@@ -57,7 +54,6 @@ const m = defineMessages({
   grpcFieldDescription: 'The address of the service to connect to',
   appFormatter: 'Use application payload formatter',
   appFormatterWarning: 'This option will affect both uplink and downlink formatter',
-  setupSubTitle: 'Setup',
   defaultFormatter:
     'Click <Link>here</Link> to modify the default payload formatter for this application. The payload formatter of this application is currently set to `{defaultFormatter}`',
   pasteRepositoryFormatter: 'Paste repository formatter',
@@ -80,7 +76,7 @@ const formatterOptions = [
   { label: m.appFormatter, value: TYPES.DEFAULT },
   { label: m.repository, value: TYPES.REPOSITORY },
   { label: m.customJavascipt, value: TYPES.JAVASCRIPT },
-  { label: m.grpc, value: TYPES.GRPC },
+  { label: sharedMessages.grpcService, value: TYPES.GRPC },
   { label: 'CayenneLPP', value: TYPES.CAYENNELPP },
   { label: sharedMessages.none, value: TYPES.NONE },
 ]
@@ -420,7 +416,7 @@ const PayloadFormattersForm = ({
           >
             {() => (
               <>
-                <Form.SubTitle title={m.setupSubTitle} />
+                <Form.SubTitle title={sharedMessages.setup} />
                 <Form.Field
                   name={FIELD_NAMES.SELECT}
                   title={m.formatterType}
@@ -466,7 +462,7 @@ const PayloadFormattersForm = ({
         {_showTestSection() && (
           <Col sm={12} lg={6}>
             <TestForm
-              className={style.testForm}
+              className="m:mt-ls-s"
               onSubmit={handleTestSubmit}
               uplink={uplink}
               testResult={testResult}

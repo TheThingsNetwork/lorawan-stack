@@ -112,5 +112,5 @@ var AU_915_928_RP2_v1_0_4 = Band{
 
 	Relay: au915928RelayParameters,
 
-	SharedParameters: universalSharedParameters,
+	SharedParameters: relayAwareSharedParameters,
 }

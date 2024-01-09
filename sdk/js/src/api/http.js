@@ -24,7 +24,7 @@ import {
   RATE_LIMIT_RETRIES,
 } from '../util/constants'
 
-import stream from './stream/stream-node'
+import subscribeToHttpStream from './stream/subscribeToHttpStream'
 
 /**
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
@@ -100,7 +100,7 @@ class Http {
     try {
       if (isStream) {
         const url = this._stackConfig.getComponentUrlByName(parsedComponent) + endpoint
-        return stream(payload, url)
+        return subscribeToHttpStream(payload, url)
       }
 
       const config = {

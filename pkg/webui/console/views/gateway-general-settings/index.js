@@ -77,14 +77,21 @@ const GatewayGeneralSettingsInner = () => {
   const handleSubmit = useCallback(
     async values => {
       const formValues = { ...values }
-      const { attributes } = formValues
+      const { attributes, frequency_plan_ids } = formValues
       if (isEqual(gateway.attributes || {}, attributes)) {
         delete formValues.attributes
       }
-      const changed = diff(gateway, formValues)
-      const update = 'attributes' in changed ? { ...changed, attributes } : changed
+      if (isEqual(gateway.frequency_plan_ids || {}, frequency_plan_ids)) {
+        delete formValues.frequency_plan_ids
+      }
+
+      const changed = diff(gateway, formValues, {
+        patchArraysItems: false,
+        patchInFull: ['attributes', 'frequency_plan_ids'],
+      })
+
       try {
-        await dispatch(updateGateway(gtwId, update))
+        await dispatch(updateGateway(gtwId, changed))
         toast({
           title: gtwId,
           message: m.updateSuccess,
@@ -104,7 +111,7 @@ const GatewayGeneralSettingsInner = () => {
   const handleDelete = useCallback(
     async shouldPurge => {
       try {
-        await dispatch(attachPromise(deleteGateway(gtwId, shouldPurge || false)))
+        await dispatch(attachPromise(deleteGateway(gtwId, { purge: shouldPurge || false })))
         navigate('/gateways')
         toast({
           title: gtwId,
@@ -145,7 +152,7 @@ const GatewayGeneralSettingsInner = () => {
             />
           </Collapse>
           <Collapse
-            title={m.lorawanTitle}
+            title={sharedMessages.lorawanOptions}
             description={m.lorawanDescription}
             disabled={false}
             initialCollapsed

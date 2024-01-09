@@ -46,14 +46,11 @@ import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
 
 import FallbackVersionIdsSection from './fallback-version-ids-section'
 
-import style from './device-import-form.styl'
-
 const m = defineMessages({
   file: 'File',
   formatInfo: 'Format information',
   selectAFile: 'Please select a template file',
   fileInfoPlaceholder: 'Please select a template format',
-  claiming: 'Claiming',
   setClaimAuthCode: 'Set claim authentication code',
   targetedComponents: 'Targeted components',
   advancedSectionTitle: 'Advanced end device claiming settings',
@@ -114,7 +111,7 @@ const DeviceBulkCreateFormInner = props => {
     <>
       <Message
         content={m.infoText}
-        className={style.info}
+        className="mt-0"
         values={{
           DocLink: msg => (
             <Link.DocLink secondary path="/the-things-stack/migrating/import-devices/">
@@ -123,7 +120,7 @@ const DeviceBulkCreateFormInner = props => {
           ),
         }}
       />
-      <hr className={style.hRule} />
+      <hr className="mt-ls-s mb-ls-xs" />
       <DeviceTemplateFormatSelect onChange={handleSelectChange} name="format_id" required />
       <Form.InfoField disabled={!formatSelected} title={m.formatInfo}>
         {formatDescription ? formatDescription : <Message content={m.fileInfoPlaceholder} />}
@@ -143,7 +140,7 @@ const DeviceBulkCreateFormInner = props => {
           <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
             <Form.Field
               disabled={!jsEnabled}
-              title={m.claiming}
+              title={sharedMessages.claiming}
               label={m.setClaimAuthCode}
               component={Checkbox}
               name="set_claim_auth_code"

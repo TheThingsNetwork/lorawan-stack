@@ -50,6 +50,7 @@ var testTemplateData = email.NewTemplateData(
 )
 
 func TestEmailTemplates(t *testing.T) {
+	t.Parallel()
 	defer func() {
 		if t.Failed() {
 			t.Log("NOTE: If you encounter a diff, you may have to run this test with the -write-golden flag.")
@@ -60,7 +61,7 @@ func TestEmailTemplates(t *testing.T) {
 		UserId: "foo-usr",
 	}
 
-	for _, tt := range []struct {
+	for _, tc := range []struct {
 		TemplateName string
 		TemplateData email.TemplateData
 	}{
@@ -103,11 +104,13 @@ func TestEmailTemplates(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tt.TemplateName, func(t *testing.T) {
+		tc := tc
+		t.Run(tc.TemplateName, func(t *testing.T) {
+			t.Parallel()
 			a, ctx := test.New(t)
 
-			emailTemplate := email.GetTemplate(ctx, tt.TemplateName)
-			message, err := emailTemplate.Execute(tt.TemplateData)
+			emailTemplate := email.GetTemplate(ctx, tc.TemplateName)
+			message, err := emailTemplate.Execute(tc.TemplateData)
 			if a.So(err, should.BeNil) && a.So(message, should.NotBeNil) {
 				if err = compareMessageToGolden(message); err != nil {
 					t.Error(err)
@@ -118,6 +121,7 @@ func TestEmailTemplates(t *testing.T) {
 }
 
 func TestNotificationEmailTemplates(t *testing.T) {
+	t.Parallel()
 	defer func() {
 		if t.Failed() {
 			t.Log("NOTE: If you encounter a diff, you may have to run this test with the -write-golden flag.")
@@ -343,9 +347,11 @@ func TestNotificationEmailTemplates(t *testing.T) {
 			}),
 		},
 	} {
+		notification := ttnpb.Clone(notification)
 		notification.CreatedAt = now
 		notification.Email = true
 		t.Run(notification.NotificationType, func(t *testing.T) {
+			t.Parallel()
 			a, ctx := test.New(t)
 
 			emailNotification := email.GetNotification(ctx, notification.GetNotificationType())

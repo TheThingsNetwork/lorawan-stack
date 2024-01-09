@@ -220,7 +220,7 @@ const ProfileEditForm = () => {
           onChange={setProfilePictureSource}
         >
           <Radio label={m.useGravatar} value="gravatar" />
-          <Radio label={m.uploadAnImage} value="upload" />
+          <Radio label={sharedMessages.uploadAnImage} value="upload" />
         </Form.Field>
       )}
       {!disableUploadConfig && profilePictureSource === 'upload' && (

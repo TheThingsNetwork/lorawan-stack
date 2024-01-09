@@ -12,39 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.app
+.container
+  overflow: hidden
   height: 100%
-  width: 100%
-
-.main
-  position: relative
-  display: flex
-  flex-direction: column
-  +media-query-min($bp.s)
-    min-height: "calc(100vh - %s - %s)" % ($header-height $footer-height)
-  +media-query($bp.s)
-    min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height)
-  +media-query($bp.xs)
-    min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height * 2)
-
-global-sidebar()
 
 .content
   position: relative
-  flex: 1
   display: flex
   flex-direction: column
 
+.main
+  overflow-y: auto
+
 .stage
-  flex: 1
-  &:not(.stage-flex)
-    padding-bottom: $ls.xxs
-  &-flex
-    display: flex
-    flex-direction: column
-    overflow-y: auto
-  &-bg
-    background-color: #F6F9FC
+  display: flex
+  flex-direction: column
 
 .mobile-breadcrumbs
   +media-query-min($bp.s)

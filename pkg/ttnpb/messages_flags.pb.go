@@ -165,7 +165,7 @@ func AddSetFlagsForApplicationUplink(flags *pflag.FlagSet, prefix string, hidden
 	// FIXME: Skipping NormalizedPayload because this repeated WKT is currently not supported.
 	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("normalized-payload-warnings", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping RxMetadata because repeated messages are currently not supported.
-	// FIXME: Skipping Settings because it does not seem to implement AddSetFlags.
+	AddSetFlagsForTxSettings(flags, flagsplugin.Prefix("settings", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewTimestampFlag(flagsplugin.Prefix("received-at", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForKeyEnvelope(flags, flagsplugin.Prefix("app-s-key", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("last-a-f-cnt-down", prefix), "", flagsplugin.WithHidden(hidden)))
@@ -173,7 +173,7 @@ func AddSetFlagsForApplicationUplink(flags *pflag.FlagSet, prefix string, hidden
 	flags.AddFlag(flagsplugin.NewDurationFlag(flagsplugin.Prefix("consumed-airtime", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping Locations because maps with message value types are currently not supported.
 	AddSetFlagsForEndDeviceVersionIdentifiers(flags, flagsplugin.Prefix("version-ids", prefix), hidden)
-	// FIXME: Skipping NetworkIds because it does not seem to implement AddSetFlags.
+	AddSetFlagsForNetworkIdentifiers(flags, flagsplugin.Prefix("network-ids", prefix), hidden)
 }
 
 // SetFromFlags sets the ApplicationUplink message from flags.
@@ -217,7 +217,16 @@ func (m *ApplicationUplink) SetFromFlags(flags *pflag.FlagSet, prefix string) (p
 		paths = append(paths, flagsplugin.Prefix("normalized_payload_warnings", prefix))
 	}
 	// FIXME: Skipping RxMetadata because it does not seem to implement AddSetFlags.
-	// FIXME: Skipping Settings because it does not seem to implement AddSetFlags.
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("settings", prefix)); changed {
+		if m.Settings == nil {
+			m.Settings = &TxSettings{}
+		}
+		if setPaths, err := m.Settings.SetFromFlags(flags, flagsplugin.Prefix("settings", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
 	if val, changed, err := flagsplugin.GetTimestamp(flags, flagsplugin.Prefix("received_at", prefix)); err != nil {
 		return nil, err
 	} else if changed {
@@ -263,7 +272,16 @@ func (m *ApplicationUplink) SetFromFlags(flags *pflag.FlagSet, prefix string) (p
 			paths = append(paths, setPaths...)
 		}
 	}
-	// FIXME: Skipping NetworkIds because it does not seem to implement AddSetFlags.
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("network_ids", prefix)); changed {
+		if m.NetworkIds == nil {
+			m.NetworkIds = &NetworkIdentifiers{}
+		}
+		if setPaths, err := m.NetworkIds.SetFromFlags(flags, flagsplugin.Prefix("network_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
 	return paths, nil
 }
 

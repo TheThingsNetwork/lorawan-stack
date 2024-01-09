@@ -137,6 +137,15 @@ func (dst *ContactInfoValidation) SetFields(src *ContactInfoValidation, paths ..
 			} else {
 				dst.ExpiresAt = nil
 			}
+		case "updated_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				dst.UpdatedAt = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

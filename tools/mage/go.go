@@ -292,3 +292,8 @@ func (Go) Generate() error {
 func (Go) Messages() error {
 	return runGoTool("generate_i18n.go")
 }
+
+// EventData builds the file with event data.
+func (Go) EventData() error {
+	return runGoTool("generate_event_data.go")
+}

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,83 +13,42 @@
 // limitations under the License.
 
 import React from 'react'
-import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
+import Button from '@ttn-lw/components/button'
+import style from '@ttn-lw/components/button/button.styl'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import styles from './profile-dropdown.styl'
 
-export default class ProfileDropdown extends React.PureComponent {
-  state = {
-    expanded: false,
-  }
+const ProfileDropdown = props => {
+  const { brandLogo, className, children, profilePicture, ...rest } = props
 
-  @bind
-  showDropdown() {
-    document.addEventListener('mousedown', this.handleClickOutside)
-    this.setState({ expanded: true })
-  }
-
-  @bind
-  hideDropdown() {
-    document.removeEventListener('mousedown', this.handleClickOutside)
-    this.setState({ expanded: false })
-  }
-
-  @bind
-  handleClickOutside(e) {
-    if (!this.node.contains(e.target)) {
-      this.hideDropdown()
-    }
-  }
-
-  @bind
-  toggleDropdown() {
-    let { expanded } = this.state
-    expanded = !expanded
-    if (expanded) {
-      this.showDropdown()
-    } else {
-      this.hideDropdown()
-    }
-  }
-
-  @bind
-  ref(node) {
-    this.node = node
-  }
-
-  render() {
-    const { userName, className, children, profilePicture, ...rest } = this.props
-
-    return (
-      <div
-        className={classnames(styles.container, className)}
-        onClick={this.toggleDropdown}
-        onKeyPress={this.toggleDropdown}
-        ref={this.ref}
-        tabIndex="0"
-        role="button"
+  return (
+    <div className="pos-relative">
+      <Button
+        secondary
+        className={classnames(styles.container, className, 'pr-0')}
+        dropdownItems={children}
         {...rest}
       >
-        <ProfilePicture profilePicture={profilePicture} className={styles.profilePicture} />
-        <span className={styles.id}>{userName}</span>
-        <Icon
-          className={styles.dropdownIcon}
-          icon={this.state.expanded ? 'arrow_drop_up' : 'arrow_drop_down'}
-        />
-        {this.state.expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
-      </div>
-    )
-  }
+        <div className="d-flex gap-cs-xs al-center">
+          {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
+          <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
+        </div>
+      </Button>
+    </div>
+  )
 }
 
 ProfileDropdown.propTypes = {
+  brandLogo: PropTypes.shape({
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.string.isRequired,
+  }),
   /**
    * A list of items for the dropdown component. See `<Dropdown />`'s `items`
    * proptypes for details.
@@ -98,11 +57,12 @@ ProfileDropdown.propTypes = {
   className: PropTypes.string,
   /** The profile picture of the current user. */
   profilePicture: PropTypes.profilePicture,
-  /** The name/id of the current user. */
-  userName: PropTypes.string.isRequired,
 }
 
 ProfileDropdown.defaultProps = {
+  brandLogo: undefined,
   className: undefined,
   profilePicture: undefined,
 }
+
+export default ProfileDropdown

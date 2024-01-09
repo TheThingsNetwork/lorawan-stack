@@ -211,6 +211,54 @@ var (
 			return nil
 		},
 	}
+	nsDBPurgeCommand = &cobra.Command{
+		Use:   "purge",
+		Short: "Purge Network Server application data",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if config.Redis.IsZero() {
+				panic("Only Redis is supported by this command")
+			}
+
+			logger.Info("Connecting to Redis database...")
+			cl := NewNetworkServerApplicationUplinkQueueRedis(config)
+			defer cl.Close()
+
+			var purged uint64
+
+			genericUIDKeys := nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*")
+			invalidationUIDKeys := ttnredis.Key(genericUIDKeys, "invalidation")
+			joinAcceptUIDKeys := ttnredis.Key(genericUIDKeys, "join-accept")
+			taskQueueKeys := ttnredis.Key(cl.Key("application"), "*")
+
+			targets := []string{
+				genericUIDKeys,
+				invalidationUIDKeys,
+				joinAcceptUIDKeys,
+				taskQueueKeys,
+			}
+
+			pipeliner := cl.Pipeline()
+			for _, target := range targets {
+				err := ttnredis.RangeRedisKeys(ctx, cl, target, ttnredis.DefaultRangeCount,
+					func(k string) (bool, error) {
+						pipeliner.Del(ctx, k)
+						purged++
+						return true, nil
+					})
+				if err != nil {
+					logger.WithError(err).Error("Failed to purge Network Server application data")
+					return err
+				}
+			}
+			if _, err := pipeliner.Exec(ctx); err != nil {
+				logger.WithError(err).Error("Failed to purge Network Server application data")
+				return err
+			}
+
+			logger.WithField("records_purged_count", purged).Info("Purged Network Server application data")
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -221,4 +269,5 @@ func init() {
 	nsDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	nsDBCleanupCommand.Flags().Duration("pagination-delay", 100, "Delay between batch requests")
 	nsDBCommand.AddCommand(nsDBCleanupCommand)
+	nsDBCommand.AddCommand(nsDBPurgeCommand)
 }

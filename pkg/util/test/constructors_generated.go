@@ -483,6 +483,15 @@ func (MACStateOptionNamespace) WithRecentMacCommandIdentifiers(vs ...ttnpb.MACCo
 	}
 }
 
+// WithPendingRelayDownlink returns a MACStateOption, which returns a copy of ttnpb.MACState with PendingRelayDownlink set to v.
+func (MACStateOptionNamespace) WithPendingRelayDownlink(v *ttnpb.RelayForwardDownlinkReq) MACStateOption {
+	return func(x *ttnpb.MACState) *ttnpb.MACState {
+		copy := ttnpb.Clone(x)
+		copy.PendingRelayDownlink = v
+		return copy
+	}
+}
+
 // Compose returns a functional composition of opts as a singular MACStateOption.
 func (MACStateOptionNamespace) Compose(opts ...MACStateOption) MACStateOption {
 	return func(x *ttnpb.MACState) *ttnpb.MACState {

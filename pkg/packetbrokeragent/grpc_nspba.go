@@ -16,7 +16,6 @@ package packetbrokeragent
 
 import (
 	"context"
-	"fmt"
 
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -39,10 +38,8 @@ func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkM
 		return nil, err
 	}
 
-	ctx = events.ContextWithCorrelationID(ctx, append(
-		down.CorrelationIds,
-		fmt.Sprintf("pba:downlink:%s", events.NewCorrelationID()),
-	)...)
+	ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIds...)
+	ctx = appendDownlinkCorrelationID(ctx)
 	down.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	fps, err := s.frequencyPlans(ctx)
@@ -57,9 +54,9 @@ func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkM
 	}
 
 	ctxMsg := &downlinkMessage{
-		Context:          s.contextDecoupler.FromRequestContext(ctx),
-		agentUplinkToken: token,
-		DownlinkMessage:  msg,
+		Context:                      s.contextDecoupler.FromRequestContext(ctx),
+		PacketBrokerAgentUplinkToken: token,
+		DownlinkMessage:              msg,
 	}
 	select {
 	case <-ctx.Done():

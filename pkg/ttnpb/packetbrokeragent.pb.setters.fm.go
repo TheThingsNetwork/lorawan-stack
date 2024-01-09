@@ -1377,6 +1377,159 @@ func (dst *ListForwarderRoutingPoliciesRequest) SetFields(src *ListForwarderRout
 	return nil
 }
 
+func (dst *PacketBrokerAgentUplinkToken) SetFields(src *PacketBrokerAgentUplinkToken, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "forwarder_net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'forwarder_net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ForwarderNetId = src.ForwarderNetId
+			} else {
+				dst.ForwarderNetId = nil
+			}
+		case "forwarder_tenant_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'forwarder_tenant_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ForwarderTenantId = src.ForwarderTenantId
+			} else {
+				var zero string
+				dst.ForwarderTenantId = zero
+			}
+		case "forwarder_cluster_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'forwarder_cluster_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ForwarderClusterId = src.ForwarderClusterId
+			} else {
+				var zero string
+				dst.ForwarderClusterId = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *PacketBrokerAgentGatewayUplinkToken) SetFields(src *PacketBrokerAgentGatewayUplinkToken, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_uid":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_uid' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayUid = src.GatewayUid
+			} else {
+				var zero string
+				dst.GatewayUid = zero
+			}
+		case "token":
+			if len(subs) > 0 {
+				return fmt.Errorf("'token' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Token = src.Token
+			} else {
+				dst.Token = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *PacketBrokerAgentCompoundUplinkToken) SetFields(src *PacketBrokerAgentCompoundUplinkToken, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Gateway = src.Gateway
+			} else {
+				dst.Gateway = nil
+			}
+		case "forwarder":
+			if len(subs) > 0 {
+				return fmt.Errorf("'forwarder' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Forwarder = src.Forwarder
+			} else {
+				dst.Forwarder = nil
+			}
+		case "agent":
+			if len(subs) > 0 {
+				var newDst, newSrc *PacketBrokerAgentUplinkToken
+				if (src == nil || src.Agent == nil) && dst.Agent == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Agent
+				}
+				if dst.Agent != nil {
+					newDst = dst.Agent
+				} else {
+					newDst = &PacketBrokerAgentUplinkToken{}
+					dst.Agent = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Agent = src.Agent
+				} else {
+					dst.Agent = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *PacketBrokerAgentEncryptedPayload) SetFields(src *PacketBrokerAgentEncryptedPayload, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ciphertext":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ciphertext' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Ciphertext = src.Ciphertext
+			} else {
+				dst.Ciphertext = nil
+			}
+		case "nonce":
+			if len(subs) > 0 {
+				return fmt.Errorf("'nonce' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Nonce = src.Nonce
+			} else {
+				dst.Nonce = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *PacketBrokerGateway_GatewayIdentifiers) SetFields(src *PacketBrokerGateway_GatewayIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

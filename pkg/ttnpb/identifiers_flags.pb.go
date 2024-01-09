@@ -481,3 +481,54 @@ func PathsFromSelectFlagsForNetworkIdentifiers(flags *pflag.FlagSet, prefix stri
 	}
 	return paths, nil
 }
+
+// AddSetFlagsForNetworkIdentifiers adds flags to select fields in NetworkIdentifiers.
+func AddSetFlagsForNetworkIdentifiers(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(customflags.New3BytesFlag(flagsplugin.Prefix("net-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New8BytesFlag(flagsplugin.Prefix("ns-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("tenant-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("cluster-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("cluster-address", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("tenant-address", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the NetworkIdentifiers message from flags.
+func (m *NetworkIdentifiers) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NetId = val
+		paths = append(paths, flagsplugin.Prefix("net_id", prefix))
+	}
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("ns_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.NsId = val
+		paths = append(paths, flagsplugin.Prefix("ns_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("tenant_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.TenantId = val
+		paths = append(paths, flagsplugin.Prefix("tenant_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("cluster_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ClusterId = val
+		paths = append(paths, flagsplugin.Prefix("cluster_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("cluster_address", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ClusterAddress = val
+		paths = append(paths, flagsplugin.Prefix("cluster_address", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("tenant_address", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.TenantAddress = val
+		paths = append(paths, flagsplugin.Prefix("tenant_address", prefix))
+	}
+	return paths, nil
+}

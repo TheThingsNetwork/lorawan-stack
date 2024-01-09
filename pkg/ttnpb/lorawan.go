@@ -1197,3 +1197,43 @@ func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
 	}
 	return nil
 }
+
+// FieldIsZero returns whether path p is zero.
+func (v *RelaySecondChannel) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "ack_offset":
+		return v.AckOffset == 0
+	case "data_rate_index":
+		return v.DataRateIndex == 0
+	case "frequency":
+		return v.Frequency == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *RelayEndDeviceDynamicMode) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "smart_enable_level":
+		return v.SmartEnableLevel == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *RelayForwardDownlinkReq) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "raw_payload":
+		return v.RawPayload == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}

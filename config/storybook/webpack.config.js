@@ -14,6 +14,9 @@
 
 /* eslint-env node */
 /* eslint-disable import/no-commonjs */
+import fs from 'fs'
+import path from 'path'
+
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 require('@babel/register')
 
@@ -22,9 +25,16 @@ const { default: bundleConfig, styleConfig } = require('../webpack.config.babel'
 // List of allowed plugins.
 const allow = [MiniCssExtractPlugin]
 
+const { CONTEXT = '.' } = process.env
+const context = path.resolve(CONTEXT)
+const supportedLocales = fs
+  .readdirSync(path.resolve(context, 'pkg/webui/locales'))
+  .filter(fn => fn.endsWith('.json'))
+  .map(fn => fn.split('.')[0])
+
 module.exports = async ({ config, mode }) => {
+  const webpack = require('webpack')
   if (mode === 'PRODUCTION') {
-    const webpack = require('webpack')
     allow.push(webpack.DllReferencePlugin)
   }
 
@@ -37,6 +47,7 @@ module.exports = async ({ config, mode }) => {
   const cfg = {
     ...config,
     resolve: {
+      fallback: { crypto: false },
       alias: {
         ...config.resolve.alias,
         ...bundleConfig.resolve.alias,
@@ -49,7 +60,13 @@ module.exports = async ({ config, mode }) => {
     module: {
       rules: [...config.module.rules, styleConfig],
     },
-    plugins: [...config.plugins, ...filteredPlugins],
+    plugins: [
+      ...config.plugins,
+      ...filteredPlugins,
+      new webpack.DefinePlugin({
+        'process.predefined.SUPPORTED_LOCALES': JSON.stringify(supportedLocales),
+      }),
+    ],
   }
 
   return cfg

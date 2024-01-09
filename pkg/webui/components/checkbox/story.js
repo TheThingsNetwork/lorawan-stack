@@ -14,18 +14,10 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { withInfo } from '@storybook/addon-info'
 
 import CheckboxGroup from './group'
 
 import Checkbox from '.'
-
-const info = {
-  inline: true,
-  header: false,
-  source: false,
-  propTables: [Checkbox],
-}
 
 class IndeterminateCheckboxExample extends React.Component {
   state = {
@@ -90,7 +82,7 @@ class IndeterminateCheckboxExample extends React.Component {
 
 export default {
   title: 'Checkbox',
-  decorators: [withInfo(info)],
+  component: Checkbox,
 }
 
 export const Default = () => <Checkbox label="Checkbox" name="checkbox" />

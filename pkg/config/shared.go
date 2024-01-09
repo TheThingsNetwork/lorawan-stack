@@ -58,14 +58,15 @@ type Sentry struct {
 
 // GRPC represents gRPC listener configuration.
 type GRPC struct {
-	AllowInsecureForCredentials bool `name:"allow-insecure-for-credentials" description:"Allow transmission of credentials over insecure transport"` //nolint:lll
+	AllowInsecureForCredentials bool `name:"allow-insecure-for-credentials" description:"Allow transmission of credentials over insecure transport"` // nolint:lll
 
 	Listen    string `name:"listen" description:"Address for the TCP gRPC server to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the TLS gRPC server to listen on"`
 
 	TrustedProxies []string `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
 
-	LogIgnoreMethods []string `name:"log-ignore-methods" description:"List of paths for which successful requests will not be logged"` //nolint:lll
+	LogIgnoreMethods            []string `name:"log-ignore-methods" description:"List of methods for which requests will not be logged"`                         // nolint:lll
+	CorrelationIDsIgnoreMethods []string `name:"correlation-ids-ignore-methods" description:"List of methods for which no RPC correlation IDs will be injected"` // nolint:lll
 }
 
 // Cookie represents cookie configuration.
@@ -146,11 +147,19 @@ type RedisEvents struct {
 	} `name:"publish"`
 }
 
+// BatchEvents represents the configuration for batch event publication.
+type BatchEvents struct {
+	Enable     bool          `name:"enable" description:"Enable events batching (EXPERIMENTAL)"`
+	TargetSize int           `name:"target-size" description:"The minimum number of items in a batch. A batch may contain at most twice the target size items (EXPERIMENTAL)"` // nolint:lll
+	Delay      time.Duration `name:"delay" description:"For how long to delay event submission in order to build a batch (EXPERIMENTAL)"`                                      // nolint:lll
+}
+
 // Events represents configuration for the events system.
 type Events struct {
 	Backend string      `name:"backend" description:"Backend to use for events (internal, redis, cloud)"`
 	Redis   RedisEvents `name:"redis"`
 	Cloud   CloudEvents `name:"cloud"`
+	Batch   BatchEvents `name:"batch"`
 }
 
 // Rights represents the configuration to apply when fetching entity rights.

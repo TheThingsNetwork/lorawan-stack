@@ -17,6 +17,7 @@ import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
@@ -35,6 +36,7 @@ const Gateways = () => {
   useBreadcrumbs('gtws', <Breadcrumb path="/gateways" content={sharedMessages.gateways} />)
   return (
     <Require featureCheck={mayViewGateways} otherwise={{ redirect: '/' }}>
+      <Breadcrumbs />
       <Routes>
         <Route index Component={GatewaysList} />
         <Route path="add" Component={GatewayAdd} />

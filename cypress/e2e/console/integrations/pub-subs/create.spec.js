@@ -323,4 +323,85 @@ describe('Application Pub/Sub create', () => {
       })
     })
   })
+
+  describe('Disabled Providers', () => {
+    const description = 'Changing the Pub/Sub provider has been disabled by an administrator'
+
+    describe('NATS disabled', () => {
+      const response = {
+        configuration: {
+          pubsub: {
+            providers: {
+              nats: 'DISABLED',
+            },
+          },
+        },
+      }
+
+      beforeEach(() => {
+        cy.loginConsole({ user_id: userId, password: user.password })
+        cy.visit(
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+
+        cy.intercept('GET', `/api/v3/as/configuration`, response)
+      })
+      it('succeeds setting MQTT as default provider', () => {
+        cy.findByLabelText('NATS').should('be.disabled')
+        cy.findByText(description).should('be.visible')
+      })
+    })
+
+    describe('MQTT disabled', () => {
+      const description = 'Changing the Pub/Sub provider has been disabled by an administrator'
+      const response = {
+        configuration: {
+          pubsub: {
+            providers: {
+              mqtt: 'DISABLED',
+            },
+          },
+        },
+      }
+
+      beforeEach(() => {
+        cy.loginConsole({ user_id: userId, password: user.password })
+        cy.visit(
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+        cy.intercept('GET', `/api/v3/as/configuration`, response)
+      })
+
+      it('succeeds setting NATS as default provider', () => {
+        cy.findByLabelText('MQTT').should('be.disabled')
+        cy.findByText(description).should('be.visible')
+      })
+    })
+
+    describe('MQTT and NATS disabled', () => {
+      const response = {
+        configuration: {
+          pubsub: {
+            providers: {
+              mqtt: 'DISABLED',
+              nats: 'DISABLED',
+            },
+          },
+        },
+      }
+
+      beforeEach(() => {
+        cy.loginConsole({ user_id: userId, password: user.password })
+        cy.on('uncaught:exception', () => false)
+        cy.visit(
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
+        )
+        cy.intercept('GET', `/api/v3/as/configuration`, response)
+      })
+
+      it('succeeds showing not found page', () => {
+        cy.findByRole('heading', { name: /Not found/ }).should('be.visible')
+      })
+    })
+  })
 })

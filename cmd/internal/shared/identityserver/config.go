@@ -56,6 +56,7 @@ func init() {
 	DefaultIdentityServerConfig.UserRegistration.Enabled = true
 	DefaultIdentityServerConfig.UserRegistration.Invitation.TokenTTL = 7 * 24 * time.Hour
 	DefaultIdentityServerConfig.UserRegistration.ContactInfoValidation.TokenTTL = 2 * 24 * time.Hour
+	DefaultIdentityServerConfig.UserRegistration.ContactInfoValidation.RetryInterval = time.Hour
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinLength = 8
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MaxLength = 1000
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinUppercase = 1

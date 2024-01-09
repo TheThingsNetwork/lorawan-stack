@@ -175,6 +175,7 @@ export default {
         target: WEBPACK_DEV_SERVER_USE_TLS ? 'https://localhost:8885' : 'http://localhost:1885',
         changeOrigin: true,
         secure: false,
+        ws: true,
       },
     ],
     historyApiFallback: true,
@@ -230,7 +231,7 @@ export default {
         },
       },
       {
-        test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
+        test: /\.(woff|woff2|ttf|eot|otf|jpg|jpeg|png|svg)$/i,
         type: 'asset/resource',
         generator: {
           filename: '[name].[contenthash:20][ext]',

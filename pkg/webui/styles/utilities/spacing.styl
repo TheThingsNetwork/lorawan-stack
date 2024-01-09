@@ -1,0 +1,75 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+:global
+  // SPACING UTILITIES
+
+  // This logic creates a spacing utility class based on
+  // scale, type, direction, size, etc.
+  // eg. `mb-ls-xs`, `md:mt-cs-m`, `m-0`, `p-sides-0`, etc.
+  create-spacing-classes($prefix, $scale, $type, $direction, $size)
+    $initial = substr($direction, 0, 1)
+    $t = substr($type, 0, 1)
+    $property = ()
+
+    // Account for 0 sizes, eg. `mb-0`
+    if $scale == 0
+      $property = 0
+      $scalesuffix = '-0'
+    else
+      // Compose property using CSS variables.
+      $property = convert('$' + $scale  + '.' + $size + ' !important')
+      $scalesuffix = '-' + $scale + '-' + $size
+    // Special case for gap
+    if $type == 'gap'
+      if $direction == ''
+        .gap{$scalesuffix}
+          gap: $property
+    // Account for all-sides margins/paddings.
+    else if $direction == ''
+      .{$prefix}{$t}{$scalesuffix}
+        {$type}: $property
+    // Account for special cases, vert (top/bottom) and sides (left/right).
+    else if $direction == 'vert' || $direction == 'sides'
+      .{$prefix}{$t}-{$direction}{$scalesuffix}
+        if $direction == 'vert'
+          {$type}-top: $property
+          {$type}-bottom: $property
+        else
+          {$type}-right: $property
+          {$type}-left: $property
+    // Default assignment.
+    else
+      // Eg. `.xs:mb-cs-s`.
+      .{$prefix}{$t}{$initial}{$scalesuffix}
+        // Eg. `margin-bottom: $cs.s)`.
+        {$type}-{$direction}: $property
+
+  // Iterate through types, scales, directions, sizes and generate classes.
+  for $type in 'margin' 'padding' 'gap'
+    for $direction in 'left' 'right' 'top' 'bottom' 'vert' 'sides' ''
+      create-spacing-classes('', 0, $type, $direction, $size)
+      for $scale in 'cs' 'ls'
+        for $size in lookup('$' + $scale)
+          create-spacing-classes('', $scale, $type, $direction, $size)
+
+    // Generate responsive classes.
+    for $name, $width in $bp
+      $prefix = $name + '\:'
+      +media-query($width)
+        for $direction in 'left' 'right' 'top' 'bottom' 'vert' 'sides' ''
+          create-spacing-classes($prefix, 0, $type, $direction, $size)
+          for $scale in 'cs' 'ls'
+            for $size in lookup('$' + $scale)
+              create-spacing-classes($prefix, $scale, $type, $direction, $size)

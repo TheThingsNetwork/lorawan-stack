@@ -123,7 +123,7 @@ func (c *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuth
 		"url", reqURL,
 	))
 
-	claimReq := &ClaimRequest{
+	claimReq := ClaimRequest{
 		OwnerToken: claimAuthenticationCode,
 		Lock:       boolValue(true),
 		HomeNetID:  c.config.NetID.String(),
@@ -131,6 +131,10 @@ func (c *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuth
 	}
 	if c.config.NSID != nil {
 		claimReq.HomeNSID = stringValue(c.config.NSID.String())
+	}
+	claimReq, err := claimReq.Apply(ctx, c)
+	if err != nil {
+		return err
 	}
 	buf, err := json.Marshal(claimReq)
 	if err != nil {

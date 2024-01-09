@@ -35,6 +35,8 @@ var registeredWebhookIDs = &ttnpb.ApplicationWebhookIdentifiers{
 }
 
 func TestHealthStatusRegistry(t *testing.T) {
+	t.Parallel()
+
 	a, ctx := test.New(t)
 
 	redisClient, flush := test.NewRedis(ctx, "web_test")
@@ -48,18 +50,25 @@ func TestHealthStatusRegistry(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err := webhookRegistry.Set(ctx, registeredWebhookIDs, nil, func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
-		return &ttnpb.ApplicationWebhook{
-			Ids:     registeredWebhookIDs,
-			BaseUrl: "http://example.com",
-			Format:  "json",
-		}, []string{"ids", "base_url", "format"}, nil
-	})
+	_, err := webhookRegistry.Set(
+		ctx,
+		registeredWebhookIDs,
+		nil,
+		func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+			return &ttnpb.ApplicationWebhook{
+				Ids:     registeredWebhookIDs,
+				BaseUrl: "http://example.com",
+				Format:  "json",
+			}, []string{"ids", "base_url", "format"}, nil
+		},
+	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	r, err := http.NewRequestWithContext(web.WithWebhookID(ctx, registeredWebhookIDs), http.MethodPost, "http://foo.bar", nil)
+	r, err := http.NewRequestWithContext(
+		web.WithWebhookID(ctx, registeredWebhookIDs), http.MethodPost, "http://foo.bar", nil,
+	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -193,7 +202,9 @@ func TestHealthStatusRegistry(t *testing.T) {
 	})
 }
 
-func TestHealthCheckSink(t *testing.T) {
+func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
+	t.Parallel()
+
 	a, ctx := test.New(t)
 
 	redisClient, flush := test.NewRedis(ctx, "web_test")
@@ -207,13 +218,18 @@ func TestHealthCheckSink(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err := webhookRegistry.Set(ctx, registeredWebhookIDs, nil, func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
-		return &ttnpb.ApplicationWebhook{
-			Ids:     registeredWebhookIDs,
-			BaseUrl: "http://example.com",
-			Format:  "json",
-		}, []string{"ids", "base_url", "format"}, nil
-	})
+	_, err := webhookRegistry.Set(
+		ctx,
+		registeredWebhookIDs,
+		nil,
+		func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+			return &ttnpb.ApplicationWebhook{
+				Ids:     registeredWebhookIDs,
+				BaseUrl: "http://example.com",
+				Format:  "json",
+			}, []string{"ids", "base_url", "format"}, nil
+		},
+	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -225,13 +241,18 @@ func TestHealthCheckSink(t *testing.T) {
 	registry := web.NewHealthStatusRegistry(webhookRegistry)
 	healthSink := web.NewHealthCheckSink(sink, registry, 4, 8*Timeout)
 
-	r, err := http.NewRequestWithContext(web.WithWebhookID(ctx, registeredWebhookIDs), http.MethodPost, "http://foo.bar", nil)
+	r, err := http.NewRequestWithContext(
+		web.WithWebhookID(ctx, registeredWebhookIDs), http.MethodPost, "http://foo.bar", nil,
+	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
 	// No processing error - the webhook should move to healthy.
 	err = healthSink.Process(r)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	select {
 	case <-sink.ch:
 	case <-time.After(Timeout):
@@ -255,6 +276,9 @@ func TestHealthCheckSink(t *testing.T) {
 	for i := 1; i <= 4; i++ {
 		now := time.Now()
 		err = healthSink.Process(r)
+		if !a.So(err, should.HaveSameErrorDefinitionAs, requestErr) {
+			t.FailNow()
+		}
 		select {
 		case <-sink.ch:
 		case <-time.After(Timeout):
@@ -277,6 +301,9 @@ func TestHealthCheckSink(t *testing.T) {
 	for i := 1; i <= 4; i++ {
 		// The request should not reach the underlying sink.
 		err = healthSink.Process(r)
+		if !a.So(err, should.NotBeNil) {
+			t.FailNow()
+		}
 		select {
 		case <-sink.ch:
 			t.Fatal("unexpected request")
@@ -300,6 +327,9 @@ func TestHealthCheckSink(t *testing.T) {
 	for i := 1; i <= 4; i++ {
 		now := time.Now()
 		err = healthSink.Process(r)
+		if !a.So(err, should.NotBeNil) {
+			t.FailNow()
+		}
 		if i == 1 {
 			select {
 			case <-sink.ch:
@@ -339,6 +369,9 @@ func TestHealthCheckSink(t *testing.T) {
 	// No processing error - the webhook should move to healthy.
 	for i := 1; i <= 4; i++ {
 		err = healthSink.Process(r)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		select {
 		case <-sink.ch:
 		case <-time.After(Timeout):

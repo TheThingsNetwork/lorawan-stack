@@ -1,11 +1,6 @@
 Dear John Doe,
 
-A new user just registered on The Things Network.
+A new user with with ID foo-usr just registered on The Things Network.
 Since user registration requires admin approval, you need to approve this user before they can login.
-
-User ID: foo-usr
-Name: Foo User
-Description: Foo User Description
-Email Address: foo@example.com
 
 You can go to https://console.cloud.thethings.network/admin-panel/user-management/foo-usr to review this user in the Console.

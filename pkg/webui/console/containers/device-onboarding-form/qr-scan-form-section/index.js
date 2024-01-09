@@ -177,7 +177,7 @@ const DeviceQRScanFormSection = () => {
           />
         ) : (
           <QRModalButton
-            message={m.scanEndDevice}
+            message={sharedMessages.scanEndDevice}
             onApprove={handleQRCodeApprove}
             onCancel={handleQRCodeCancel}
             onRead={handleQRCodeRead}

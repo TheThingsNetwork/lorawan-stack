@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -22,96 +21,85 @@ import style from './group.styl'
 
 export const CheckboxGroupContext = React.createContext()
 
-class CheckboxGroup extends React.Component {
-  static propTypes = {
-    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
-    className: PropTypes.string,
-    disabled: PropTypes.bool,
-    horizontal: PropTypes.bool,
-    initialValue: PropTypes.shape({}),
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
-    onFocus: PropTypes.func,
-    value: PropTypes.shape({}),
-  }
+const CheckboxGroup = props => {
+  const {
+    children,
+    className,
+    horizontal,
+    onChange,
+    disabled,
+    onFocus,
+    onBlur,
+    value: valueProp,
+    ...rest
+  } = props
+  const hasValue = Boolean(valueProp)
+  const [value, setValue] = React.useState(hasValue ? valueProp : rest.initialValue || {})
 
-  static defaultProps = {
-    className: undefined,
-    disabled: false,
-    initialValue: undefined,
-    value: {},
-    horizontal: false,
-    onChange: () => null,
-    onBlur: () => null,
-    onFocus: () => null,
-  }
-
-  constructor(props) {
-    super(props)
-
-    let value
-    if ('value' in props) {
-      value = props.value
-    } else if ('initialValue' in props) {
-      value = props.initialValue
-    } else {
-      value = {}
+  React.useEffect(() => {
+    if (valueProp) {
+      setValue(valueProp || {})
     }
+  }, [valueProp])
 
-    this.state = { value }
+  const handleCheckboxChange = useCallback(
+    async event => {
+      const { target } = event
+
+      const newValue = { ...value, [target.name]: target.checked }
+
+      if (!hasValue) {
+        setValue(newValue)
+      }
+
+      onChange(newValue)
+    },
+    [onChange, hasValue, value],
+  )
+
+  const getCheckboxValue = useCallback(name => value[name] || false, [value])
+
+  const ctx = {
+    className: style.groupCheckbox,
+    onChange: handleCheckboxChange,
+    getValue: getCheckboxValue,
+    onBlur,
+    onFocus,
+    disabled,
   }
 
-  static getDerivedStateFromProps(props) {
-    if ('value' in props) {
-      return { value: props.value || {} }
-    }
+  const cls = classnames(className, style.group, {
+    [style.horizontal]: horizontal,
+  })
 
-    return null
-  }
+  return (
+    <div className={cls}>
+      <CheckboxGroupContext.Provider value={ctx}>{children}</CheckboxGroupContext.Provider>
+    </div>
+  )
+}
 
-  @bind
-  async handleCheckboxChange(event) {
-    const { onChange } = this.props
-    const { target } = event
+CheckboxGroup.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  horizontal: PropTypes.bool,
+  initialValue: PropTypes.shape({}),
+  onBlur: PropTypes.func,
+  onChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  value: PropTypes.shape({}),
+}
 
-    const value = { ...this.state.value, [target.name]: target.checked }
-
-    if (!('value' in this.props)) {
-      await this.setState({ value })
-    }
-
-    onChange(value)
-  }
-
-  @bind
-  getCheckboxValue(name) {
-    const { value } = this.state
-
-    return value[name] || false
-  }
-
-  render() {
-    const { className, disabled, onFocus, onBlur, horizontal, children } = this.props
-
-    const ctx = {
-      className: style.groupCheckbox,
-      onChange: this.handleCheckboxChange,
-      getValue: this.getCheckboxValue,
-      onBlur,
-      onFocus,
-      disabled,
-    }
-
-    const cls = classnames(className, style.group, {
-      [style.horizontal]: horizontal,
-    })
-
-    return (
-      <div className={cls}>
-        <CheckboxGroupContext.Provider value={ctx}>{children}</CheckboxGroupContext.Provider>
-      </div>
-    )
-  }
+CheckboxGroup.defaultProps = {
+  className: undefined,
+  disabled: false,
+  initialValue: undefined,
+  value: {},
+  horizontal: false,
+  onChange: () => null,
+  onBlur: () => null,
+  onFocus: () => null,
 }
 
 export default CheckboxGroup

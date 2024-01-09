@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
+import React, { useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Events from '@console/components/events'
 
@@ -35,18 +35,40 @@ import {
 } from '@console/store/selectors/devices'
 
 const DeviceEvents = props => {
-  const {
-    appId,
-    devId,
-    events,
-    widget,
-    paused,
-    onClear,
-    onPauseToggle,
-    onFilterChange,
-    truncated,
-    filter,
-  } = props
+  const { devIds, widget } = props
+
+  const appId = getApplicationId(devIds)
+  const devId = getDeviceId(devIds)
+  const combinedId = combineDeviceIds(appId, devId)
+
+  const events = useSelector(state => selectDeviceEvents(state, combinedId))
+  const paused = useSelector(state => selectDeviceEventsPaused(state, combinedId))
+  const truncated = useSelector(state => selectDeviceEventsTruncated(state, combinedId))
+  const filter = useSelector(state => selectDeviceEventsFilter(state, combinedId))
+
+  const dispatch = useDispatch()
+
+  const onClear = useCallback(() => {
+    dispatch(clearDeviceEventsStream(devIds))
+  }, [devIds, dispatch])
+
+  const onPauseToggle = useCallback(
+    paused => {
+      if (paused) {
+        dispatch(resumeDeviceEventsStream(devIds))
+        return
+      }
+      dispatch(pauseDeviceEventsStream(devIds))
+    },
+    [devIds, dispatch],
+  )
+
+  const onFilterChange = useCallback(
+    filterId => {
+      dispatch(setDeviceEventsFilter(devIds, filterId))
+    },
+    [devIds, dispatch],
+  )
 
   if (widget) {
     return (
@@ -76,57 +98,17 @@ const DeviceEvents = props => {
 }
 
 DeviceEvents.propTypes = {
-  appId: PropTypes.string.isRequired,
-  devId: PropTypes.string.isRequired,
   devIds: PropTypes.shape({
     device_id: PropTypes.string,
     application_ids: PropTypes.shape({
       application_id: PropTypes.string,
     }),
   }).isRequired,
-  events: PropTypes.events,
-  filter: PropTypes.eventFilter,
-  onClear: PropTypes.func.isRequired,
-  onFilterChange: PropTypes.func.isRequired,
-  onPauseToggle: PropTypes.func.isRequired,
-  paused: PropTypes.bool.isRequired,
-  truncated: PropTypes.bool.isRequired,
   widget: PropTypes.bool,
 }
 
 DeviceEvents.defaultProps = {
   widget: false,
-  events: [],
-  filter: undefined,
 }
 
-export default connect(
-  (state, props) => {
-    const { devIds } = props
-
-    const appId = getApplicationId(devIds)
-    const devId = getDeviceId(devIds)
-    const combinedId = combineDeviceIds(appId, devId)
-
-    return {
-      devId,
-      appId,
-      events: selectDeviceEvents(state, combinedId),
-      paused: selectDeviceEventsPaused(state, combinedId),
-      truncated: selectDeviceEventsTruncated(state, combinedId),
-      filter: selectDeviceEventsFilter(state, combinedId),
-    }
-  },
-  (dispatch, ownProps) => {
-    const { devIds } = ownProps
-
-    return {
-      onClear: () => dispatch(clearDeviceEventsStream(devIds)),
-      onPauseToggle: paused =>
-        paused
-          ? dispatch(resumeDeviceEventsStream(devIds))
-          : dispatch(pauseDeviceEventsStream(devIds)),
-      onFilterChange: filterId => dispatch(setDeviceEventsFilter(devIds, filterId)),
-    }
-  },
-)(DeviceEvents)
+export default DeviceEvents

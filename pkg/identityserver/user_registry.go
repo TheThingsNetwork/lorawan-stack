@@ -213,7 +213,8 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	var primaryEmailAddressFound bool
 	for _, contactInfo := range req.User.ContactInfo {
-		if contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
+		if contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL &&
+			contactInfo.Value == req.User.PrimaryEmailAddress {
 			primaryEmailAddressFound = true
 			if contactInfo.ValidatedAt != nil {
 				req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
@@ -296,8 +297,6 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		})
 	}
 
-	// TODO: Send welcome email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
-
 	if _, err := is.requestContactInfoValidation(ctx, req.User.GetIds().GetEntityIdentifiers()); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not send contact info validations")
 	}
@@ -322,7 +321,7 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "profile_picture") {
 		if is.configFromContext(ctx).ProfilePicture.UseGravatar {
 			if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address") {
-				req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "primary_email_address")
+				req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.GetPaths(), "primary_email_address")
 				defer func() {
 					if usr != nil {
 						usr.PrimaryEmailAddress = ""
@@ -431,8 +430,9 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 
 	if !updatedByAdmin {
-		req.User.PrimaryEmailAddressValidatedAt = nil
 		cleanContactInfo(req.User.ContactInfo)
+		req.User.PrimaryEmailAddressValidatedAt = nil
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.GetPaths(), "primary_email_address_validated_at")
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
@@ -471,6 +471,9 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		defer func() { is.setFullProfilePictureURL(ctx, usr) }()
 	}
 
+	updatePrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address")
+	updateContactInfo := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "admin") {
 			if err := isLastAdmin(ctx, st, req.User.Ids); err != nil {
@@ -478,41 +481,79 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				return err
 			}
 		}
-		updatingContactInfo := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+
 		var contactInfo []*ttnpb.ContactInfo
-		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address")
-		if updatingContactInfo || updatingPrimaryEmailAddress {
-			if updatingContactInfo {
-				contactInfo, err = st.SetContactInfo(ctx, req.User.GetIds(), req.User.ContactInfo)
+
+		if updateContactInfo {
+			contactInfo, err = st.SetContactInfo(ctx, req.User.GetIds(), req.User.ContactInfo)
+			if err != nil {
+				return err
+			}
+		}
+
+		if updatePrimaryEmailAddress {
+			// If no update was done to contactInfo list then fetch it.
+			if !updateContactInfo {
+				contactInfo, err = st.GetContactInfo(ctx, req.User.GetIds())
 				if err != nil {
 					return err
 				}
 			}
-			if updatingPrimaryEmailAddress {
-				if !updatingContactInfo {
-					contactInfo, err = st.GetContactInfo(ctx, req.User.GetIds())
-					if err != nil {
-						return err
-					}
+			oldUser, err := st.GetUser(ctx, req.User.GetIds(), []string{"primary_email_address"})
+			if err != nil {
+				return err
+			}
+			oldEmailAddress := oldUser.PrimaryEmailAddress
+
+			foundOldEmailAddress := false
+			for _, contactInfo := range contactInfo {
+				if contactInfo.ContactMethod != ttnpb.ContactMethod_CONTACT_METHOD_EMAIL {
+					continue
 				}
-				if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address_validated_at") {
-					for _, contactInfo := range contactInfo {
-						if contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
-							req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
-							req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "primary_email_address_validated_at")
-							break
-						}
+				if contactInfo.Value == oldEmailAddress {
+					foundOldEmailAddress = true
+
+					if updatedByAdmin {
+						req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
+						req.FieldMask.Paths = ttnpb.AddFields(
+							req.FieldMask.GetPaths(), "primary_email_address_validated_at",
+						)
 					}
+
+					contactInfo.Value = req.User.PrimaryEmailAddress
+					contactInfo.ValidatedAt = req.User.PrimaryEmailAddressValidatedAt
+					break
 				}
 			}
+
+			// If the old email was not found on the contact info list it replaces everything with the new email.
+			if !foundOldEmailAddress {
+				contactInfo = []*ttnpb.ContactInfo{{
+					ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+					Value:         req.User.PrimaryEmailAddress,
+					ValidatedAt:   req.User.PrimaryEmailAddressValidatedAt,
+				}}
+			}
+			contactInfo, err = st.SetContactInfo(ctx, req.User.GetIds(), contactInfo)
+			if err != nil {
+				return err
+			}
 		}
+
+		// In order to avoid double patching the contact info list we exclude it from the update.
+		// TODO: remove the separate store operations for ContactInfo
+		// (https://github.com/TheThingsNetwork/lorawan-stack/issues/6515).
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+
 		usr, err = st.UpdateUser(ctx, req.User, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
-		if updatingContactInfo {
+
+		if updateContactInfo || updatePrimaryEmailAddress {
 			usr.ContactInfo = contactInfo
 		}
+
 		return nil
 	})
 	if err != nil {
@@ -531,6 +572,15 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			Receivers: []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
 			Email:     true,
 		})
+	}
+
+	// NOTE: The reason we validate the `updatingPrimaryEmailAddress` is because all changes on the primary email imply
+	// in a indirect changed to the contact info list. And if not validated the same is reflected on the contact info
+	// and a new validation should be requested.
+	if updatePrimaryEmailAddress && usr.PrimaryEmailAddressValidatedAt == nil {
+		if _, err := is.requestContactInfoValidation(ctx, req.User.GetIds().GetEntityIdentifiers()); err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send contact info validations")
+		}
 	}
 
 	return usr, nil

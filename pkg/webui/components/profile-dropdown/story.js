@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import Dropdown from '@ttn-lw/components/dropdown'
+import ExampleLogo from '@ttn-lw/components/logo/story-logo-new.svg'
 
 import ProfileDropdown from '.'
 
@@ -25,23 +25,27 @@ const handleLogout = () => {
 }
 
 export default {
-  title: 'Profile Dropdown',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: false,
-      propTables: [ProfileDropdown],
-    }),
-  ],
+  title: 'Profile Dropdown V2',
+  component: ProfileDropdown,
 }
 
 export const Default = () => (
-  <div style={{ height: '6rem' }}>
-    <ProfileDropdown style={{ marginLeft: '120px' }} userId="johndoe">
-      <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
-      <Dropdown.Item title="Logout" icon="power_settings_new" action={handleLogout} />
+  <div style={{ height: '25rem', marginLeft: '15rem' }}>
+    <ProfileDropdown brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}>
+      <Dropdown.Item title="Profile settings" icon="person" path="/profile-settings" />
+      <Dropdown.Item
+        title="Manage cloud subscription"
+        icon="credit_card"
+        path="/manage-cloud-subs"
+      />
+      <Dropdown.Item title="Network Operations Center" icon="bar_chart" path="/network_ops" />
+      <Dropdown.Item title="Admin panel" icon="admin_panel_settings" path="/admin-panel" />
+      <hr />
+      <Dropdown.Item title="Upgrade" icon="stars" path="/upgrade" />
+      <Dropdown.Item title="Get support" icon="support" path="/support" />
+      <Dropdown.Item title="Documentation" icon="menu_book" path="/documentation" />
+      <hr />
+      <Dropdown.Item title="Logout" icon="logout" action={handleLogout} />
     </ProfileDropdown>
   </div>
 )

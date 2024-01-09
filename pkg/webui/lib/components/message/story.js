@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 import { IntlProvider } from 'react-intl'
 
 import doc from './message.md'
@@ -49,19 +48,19 @@ const IntlDecorator = storyFn => (
 
 export default {
   title: 'Utility Components/Message',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      text: doc,
-      propTables: [Message],
-    }),
-    IntlDecorator,
-  ],
+  component: Message,
+  parameters: {
+    docs: {
+      description: {
+        component: doc,
+      },
+    },
+  },
+  decorators: [IntlDecorator],
 }
 
 export const Default = () => <Message content={exampleMessage} />
+
 export const Placeholder = () => <Message content={placeholderMessage} values={{ number: 5 }} />
 export const String = () => (
   <Message content="I can also be just a string, but will issue a warning" />

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useRef } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { components } from 'react-select'
 
@@ -25,6 +25,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { searchAccounts } from '@ttn-lw/lib/store/actions/search-accounts'
 import { selectSearchResultAccountIds } from '@ttn-lw/lib/store/selectors/search-accounts'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import styles from './account-select.styl'
 
@@ -44,18 +45,16 @@ SingleValue.propTypes = {
   }).isRequired,
 }
 
-const m = defineMessages({
-  noOptionsMessage: 'No matching user or organization was found',
-  suggestions: 'Suggestions',
-})
-
 const Suggest = ({ entity, ...rest }) => {
   const dispatch = useDispatch()
   const searchResults = useSelector(selectSearchResultAccountIds)
   const searchResultsRef = useRef()
   searchResultsRef.current = searchResults
   const { formatMessage } = useIntl()
-  const handleNoOptions = useCallback(() => formatMessage(m.noOptionsMessage), [formatMessage])
+  const noOptionsMessage = useCallback(
+    () => formatMessage(sharedMessages.noMatchingUserFound),
+    [formatMessage],
+  )
   const onlyUsers = entity === 'organization'
 
   const handleLoadingOptions = useCallback(
@@ -95,7 +94,7 @@ const Suggest = ({ entity, ...rest }) => {
       component={Select.Suggested}
       openMenuOnFocus={false}
       openMenuOnClick={false}
-      noOptionsMessage={handleNoOptions}
+      noOptionsMessage={noOptionsMessage}
       loadOptions={handleLoadingOptions}
       autoFocus
       showOptionIcon

@@ -1,97 +1,97 @@
 # Root
-/** @johanstokking @adriansmares
-/CODEOWNERS @johanstokking
-/LICENSE @johanstokking
+/** @TheThingsNetwork/stack-reviewers-1
+/CODEOWNERS @TheThingsNetwork/stack-reviewers-2
+/LICENSE @TheThingsNetwork/stack-reviewers-2
 /CHANGELOG.md
 
 # Clear common folders
 /pkg
 
 # Dependencies
-/go.mod @johanstokking @adriansmares
-/go.sum @johanstokking @adriansmares
-/package.json @kschiffer @ryaplots
-/yarn.lock @kschiffer @ryaplots @mjamescompton
-/sdk/js/package.json @kschiffer @ryaplots @mjamescompton
-/sdk/js/yarn.lock @kschiffer @ryaplots @mjamescompton
+/go.mod @TheThingsNetwork/stack-reviewers-1
+/go.sum @TheThingsNetwork/stack-reviewers-1
+/package.json @TheThingsNetwork/stack-reviewers-3
+/yarn.lock @TheThingsNetwork/stack-reviewers-3
+/sdk/js/package.json @TheThingsNetwork/stack-reviewers-3
+/sdk/js/yarn.lock @TheThingsNetwork/stack-reviewers-3
 
 # Build pipeline and tooling
-/Makefile @adriansmares
-/tools @adriansmares
-/.github/workflows @adriansmares
-/config @kschiffer @ryaplots @mjamescompton
-/config/stack @benolayinka @KrishnaIyer
-/cypress @kschiffer @ryaplots @mjamescompton
+/Makefile @TheThingsNetwork/stack-reviewers-4
+/tools @TheThingsNetwork/stack-reviewers-4
+/.github/workflows @TheThingsNetwork/stack-reviewers-4
+/config @TheThingsNetwork/stack-reviewers-3
+/config/stack @TheThingsNetwork/stack-reviewers-5
+/cypress @TheThingsNetwork/stack-reviewers-3
 
 # API, configuration, CLI and storage compatibility
-/api/*.proto @johanstokking @adriansmares
-/cmd @adriansmares
-/pkg/**/config.go @adriansmares
-/pkg/**/registry.go @adriansmares
-/pkg/config/shared.go @adriansmares
-/pkg/goproto @johanstokking @adriansmares
-/pkg/identityserver/store @johanstokking @adriansmares
-/pkg/jsonpb @johanstokking @adriansmares
-/pkg/ttnpb @johanstokking @adriansmares
+/api/*.proto @TheThingsNetwork/stack-reviewers-1
+/cmd @TheThingsNetwork/stack-reviewers-4
+/pkg/**/config.go @TheThingsNetwork/stack-reviewers-4
+/pkg/**/registry.go @TheThingsNetwork/stack-reviewers-4
+/pkg/config/shared.go @TheThingsNetwork/stack-reviewers-4
+/pkg/goproto @TheThingsNetwork/stack-reviewers-1
+/pkg/identityserver/store @TheThingsNetwork/stack-reviewers-1
+/pkg/jsonpb @TheThingsNetwork/stack-reviewers-1
+/pkg/ttnpb @TheThingsNetwork/stack-reviewers-1
 
 # Security
-/pkg/auth @johanstokking @adriansmares
-/pkg/crypto @johanstokking @adriansmares
+/pkg/auth @TheThingsNetwork/stack-reviewers-1
+/pkg/crypto @TheThingsNetwork/stack-reviewers-1
 
 # Shared components
-/pkg/band @johanstokking @KrishnaIyer
-/pkg/cluster @johanstokking @adriansmares
-/pkg/component @johanstokking @adriansmares
-/pkg/errors @johanstokking @adriansmares
-/pkg/events @adriansmares
-/pkg/frequencyplans @johanstokking @KrishnaIyer
-/pkg/interop @johanstokking @adriansmares
-/pkg/rpcmiddleware @johanstokking @adriansmares
-/pkg/rpcserver @johanstokking @adriansmares
-/pkg/types @johanstokking
-/pkg/web @kschiffer @ryaplots @mjamescompton
-/pkg/webmiddleware @KrishnaIyer @kschiffer
-/pkg/webui @kschiffer @ryaplots @mjamescompton
-/pkg/ratelimit @johanstokking @KrishnaIyer
+/pkg/band @TheThingsNetwork/stack-reviewers-7
+/pkg/cluster @TheThingsNetwork/stack-reviewers-1
+/pkg/component @TheThingsNetwork/stack-reviewers-1
+/pkg/errors @TheThingsNetwork/stack-reviewers-1
+/pkg/events @TheThingsNetwork/stack-reviewers-4
+/pkg/frequencyplans @TheThingsNetwork/stack-reviewers-7
+/pkg/interop @TheThingsNetwork/stack-reviewers-1
+/pkg/rpcmiddleware @TheThingsNetwork/stack-reviewers-1
+/pkg/rpcserver @TheThingsNetwork/stack-reviewers-1
+/pkg/types @TheThingsNetwork/stack-reviewers-2
+/pkg/web @TheThingsNetwork/stack-reviewers-3
+/pkg/webmiddleware @TheThingsNetwork/stack-reviewers-8
+/pkg/webui @TheThingsNetwork/stack-reviewers-3
+/pkg/ratelimit @TheThingsNetwork/stack-reviewers-7
 
 # Subsystems
 
-/pkg/identityserver @adriansmares @nicholaspcr
-/pkg/email @kschiffer @nicholaspcr
-/pkg/oauth @kschiffer @nicholaspcr
-/pkg/account @kschiffer @nicholaspcr
-/pkg/web/oauthclient @kschiffer @nicholaspcr
+/pkg/identityserver @TheThingsNetwork/stack-reviewers-9
+/pkg/email @TheThingsNetwork/stack-reviewers-10
+/pkg/oauth @TheThingsNetwork/stack-reviewers-10
+/pkg/account @TheThingsNetwork/stack-reviewers-10
+/pkg/web/oauthclient @TheThingsNetwork/stack-reviewers-10
 
-/pkg/gatewayserver @johanstokking @KrishnaIyer @adriansmares
-/pkg/gatewayconfigurationserver @KrishnaIyer @adriansmares
-/pkg/pfconfig @KrishnaIyer @adriansmares
-/pkg/basicstation @KrishnaIyer @adriansmares
+/pkg/gatewayserver @TheThingsNetwork/stack-reviewers-11
+/pkg/gatewayconfigurationserver @TheThingsNetwork/stack-reviewers-12
+/pkg/pfconfig @TheThingsNetwork/stack-reviewers-12
+/pkg/basicstation @TheThingsNetwork/stack-reviewers-12
 
-/pkg/networkserver @johanstokking @adriansmares
-/pkg/specification/macspec @johanstokking @adriansmares
-/pkg/encoding/lorawan @johanstokking @adriansmares
+/pkg/networkserver @TheThingsNetwork/stack-reviewers-1
+/pkg/specification/macspec @TheThingsNetwork/stack-reviewers-1
+/pkg/encoding/lorawan @TheThingsNetwork/stack-reviewers-1
 
-/pkg/applicationserver @johanstokking @adriansmares @KrishnaIyer
-/pkg/messageprocessors @johanstokking @adriansmares @KrishnaIyer
-/pkg/scripting @johanstokking @adriansmares @KrishnaIyer
+/pkg/applicationserver @TheThingsNetwork/stack-reviewers-11
+/pkg/messageprocessors @TheThingsNetwork/stack-reviewers-11
+/pkg/scripting @TheThingsNetwork/stack-reviewers-11
 
-/pkg/joinserver @johanstokking @adriansmares
+/pkg/joinserver @TheThingsNetwork/stack-reviewers-1
 
-/pkg/console @kschiffer @ryaplots @mjamescompton
+/pkg/console @TheThingsNetwork/stack-reviewers-3
 
-/pkg/packetbrokeragent @johanstokking @adriansmares
+/pkg/packetbrokeragent @TheThingsNetwork/stack-reviewers-1
 
-/pkg/devicetemplateconverter @adriansmares @KrishnaIyer
-/pkg/devicetemplates @adriansmares @KrishnaIyer
-/pkg/qrcode @adriansmares @KrishnaIyer
-/pkg/qrcodegenerator @adriansmares @KrishnaIyer
+/pkg/devicetemplateconverter  @TheThingsNetwork/stack-reviewers-12
+/pkg/devicetemplates  @TheThingsNetwork/stack-reviewers-12
+/pkg/qrcode  @TheThingsNetwork/stack-reviewers-12
+/pkg/qrcodegenerator  @TheThingsNetwork/stack-reviewers-12
 
-/pkg/deviceclaimingserver @nicholaspcr @KrishnaIyer
+/pkg/deviceclaimingserver @TheThingsNetwork/stack-reviewers-13
 
-/pkg/devicerepository @adriansmares @KrishnaIyer
+/pkg/devicerepository  @TheThingsNetwork/stack-reviewers-12
 
 # SDKs
-/sdk/js @kschiffer @ryaplots @mjamescompton
+/sdk/js @TheThingsNetwork/stack-reviewers-3
 
 # Clear generated code
 /api/api.md

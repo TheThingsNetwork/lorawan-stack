@@ -26,8 +26,6 @@ import Message from '@ttn-lw/lib/components/message'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './delete-modal-button.styl'
-
 const DeleteModalButton = props => {
   const {
     confirmMessage,
@@ -68,6 +66,7 @@ const DeleteModalButton = props => {
     <ModalButton
       type="button"
       icon="delete"
+      naked
       danger
       onApprove={handleDeleteApprove}
       onCancel={onCancel}
@@ -83,7 +82,7 @@ const DeleteModalButton = props => {
           <div>
             <Message
               content={title}
-              values={{ entityName: name, pre: name => <pre className={style.id}>{name}</pre> }}
+              values={{ entityName: name, pre: name => <pre className="d-inline">{name}</pre> }}
               component="span"
             />
             <Message
@@ -95,7 +94,7 @@ const DeleteModalButton = props => {
               {mayPurge && (
                 <Form.Field
                   name="purge"
-                  className={style.hardDeleteCheckbox}
+                  className="mt-ls-xxs"
                   component={Checkbox}
                   onChange={handlePurgeEntityChange}
                   title={sharedMessages.deleteModalReleaseIdTitle}
@@ -121,11 +120,11 @@ const DeleteModalButton = props => {
                 <>
                   <Message
                     content={confirmMessage}
-                    values={{ entityId, pre: id => <pre className={style.id}>{id}</pre> }}
+                    values={{ entityId, pre: id => <pre className="d-inline">{id}</pre> }}
                     component="span"
                   />
                   <Input
-                    className={style.confirmInput}
+                    className="mt-ls-xxs"
                     data-test-id="confirm_deletion"
                     value={confirmId}
                     onChange={setConfirmId}

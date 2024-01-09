@@ -92,5 +92,5 @@ var RU_864_870_RP2_V1_0_4 = Band{
 
 	Relay: ru864870RelayParameters,
 
-	SharedParameters: universalSharedParameters,
+	SharedParameters: relayAwareSharedParameters,
 }

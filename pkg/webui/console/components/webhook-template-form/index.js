@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { defineMessages } from 'react-intl'
-import bind from 'autobind-decorator'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -34,133 +33,136 @@ const m = defineMessages({
   idPlaceholder: 'my-new-{templateId}-webhook',
 })
 
-export default class WebhookTemplateForm extends Component {
-  static propTypes = {
-    convertTemplateToWebhook: PropTypes.func.isRequired,
-    error: PropTypes.string,
-    existCheck: PropTypes.func,
-    onSubmit: PropTypes.func.isRequired,
-    templateId: PropTypes.string.isRequired,
-    webhookTemplate: PropTypes.webhookTemplate.isRequired,
-  }
+const WebhookTemplateForm = props => {
+  const [displayOverwriteModal, setDisplayOverwriteModal] = useState(false)
+  const [existingId, setExistingId] = useState(undefined)
+  const modalResolve = useRef(null)
+  const modalReject = useRef(null)
 
-  static defaultProps = {
-    error: undefined,
-    existCheck: () => null,
-  }
+  const { convertTemplateToWebhook, error, existCheck, onSubmit, templateId, webhookTemplate } =
+    props
 
-  modalResolve = () => null
-  modalReject = () => null
-
-  state = {
-    displayOverwriteModal: false,
-    existingId: undefined,
-  }
-
-  @bind
-  handleReplaceModalDecision(mayReplace) {
+  const handleReplaceModalDecision = useCallback(mayReplace => {
+    if (!modalResolve.current || !modalReject.current) return
     if (mayReplace) {
-      this.modalResolve()
+      modalResolve.current()
     } else {
-      this.modalReject()
+      modalReject.current()
     }
-    this.setState({ displayOverwriteModal: false })
-  }
+    setDisplayOverwriteModal(false)
+  }, [])
 
-  @bind
-  async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { onSubmit, convertTemplateToWebhook, existCheck } = this.props
-    const webhook = await convertTemplateToWebhook(values)
-    const webhookId = webhook.ids.webhook_id
-    const exists = await existCheck(webhookId)
-    if (exists) {
-      this.setState({ displayOverwriteModal: true, existingId: webhookId })
-      await new Promise((resolve, reject) => {
-        this.modalResolve = resolve
-        this.modalReject = reject
-      })
-    }
-    await onSubmit(values, webhook, { setSubmitting, resetForm })
-  }
+  const handleSubmit = useCallback(
+    async (values, { setSubmitting, resetForm }) => {
+      const webhook = await convertTemplateToWebhook(values)
+      const webhookId = webhook.ids.webhook_id
+      const exists = await existCheck(webhookId)
+      if (exists) {
+        setDisplayOverwriteModal(true)
+        setExistingId(webhookId)
+        await new Promise((resolve, reject) => {
+          modalResolve.current = resolve
+          modalReject.current = reject
+        })
+      }
+      await onSubmit(values, webhook, { setSubmitting, resetForm })
+    },
+    [convertTemplateToWebhook, existCheck, onSubmit],
+  )
 
-  render() {
-    const { templateId, webhookTemplate, error } = this.props
-    const { name, fields = [] } = webhookTemplate
+  const { name, fields = [] } = webhookTemplate
 
-    const validationSchema = Yup.object({
-      ...fields.reduce(
-        (acc, field) => ({
-          ...acc,
-          [field.id]: field.optional
-            ? Yup.string()
-            : Yup.string().required(sharedMessages.validateRequired),
-        }),
-        {
-          webhook_id: Yup.string()
-            .min(3, Yup.passValues(sharedMessages.validateTooShort))
-            .max(36, Yup.passValues(sharedMessages.validateTooLong))
-            .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-            .required(sharedMessages.validateRequired),
-        },
-      ),
-    })
-
-    const initialValues = fields.reduce(
-      (acc, field) => ({ ...acc, [field.id]: field.default_value || '' }),
+  const validationSchema = Yup.object({
+    ...fields.reduce(
+      (acc, field) => ({
+        ...acc,
+        [field.id]: field.optional
+          ? Yup.string()
+          : Yup.string().required(sharedMessages.validateRequired),
+      }),
       {
-        webhook_id: '',
+        webhook_id: Yup.string()
+          .min(3, Yup.passValues(sharedMessages.validateTooShort))
+          .max(36, Yup.passValues(sharedMessages.validateTooLong))
+          .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
+          .required(sharedMessages.validateRequired),
       },
-    )
-    return (
-      <div>
-        <PortalledModal
-          title={sharedMessages.idAlreadyExists}
-          message={{
-            ...sharedMessages.webhookAlreadyExistsModalMessage,
-            values: { id: this.state.existingId },
-          }}
-          buttonMessage={sharedMessages.replaceWebhook}
-          onComplete={this.handleReplaceModalDecision}
-          approval
-          visible={this.state.displayOverwriteModal}
+    ),
+  })
+
+  const initialValues = useMemo(
+    () =>
+      fields.reduce((acc, field) => ({ ...acc, [field.id]: field.default_value || '' }), {
+        webhook_id: '',
+      }),
+    [fields],
+  )
+
+  return (
+    <div>
+      <PortalledModal
+        title={sharedMessages.idAlreadyExists}
+        message={{
+          ...sharedMessages.webhookAlreadyExistsModalMessage,
+          values: { id: existingId },
+        }}
+        buttonMessage={sharedMessages.replaceWebhook}
+        onComplete={handleReplaceModalDecision}
+        approval
+        visible={displayOverwriteModal}
+      />
+      <WebhookTemplateInfo webhookTemplate={webhookTemplate} />
+      <Form
+        onSubmit={handleSubmit}
+        validationSchema={validationSchema}
+        initialValues={initialValues}
+        error={error}
+      >
+        <Form.Field
+          name="webhook_id"
+          title={sharedMessages.webhookId}
+          placeholder={{ ...m.idPlaceholder, values: { templateId } }}
+          component={Input}
+          required
+          autoFocus
         />
-        <WebhookTemplateInfo webhookTemplate={webhookTemplate} />
-        <Form
-          onSubmit={this.handleSubmit}
-          validationSchema={validationSchema}
-          initialValues={initialValues}
-          error={error}
-        >
+        {fields.map(field => (
           <Form.Field
-            name="webhook_id"
-            title={sharedMessages.webhookId}
-            placeholder={{ ...m.idPlaceholder, values: { templateId } }}
             component={Input}
-            required
-            autoFocus
+            name={field.id}
+            title={field.name}
+            description={field.description}
+            key={field.id}
+            required={!field.optional}
+            sensitive={field.secret}
           />
-          {fields.map(field => (
-            <Form.Field
-              component={Input}
-              name={field.id}
-              title={field.name}
-              description={field.description}
-              key={field.id}
-              required={!field.optional}
-              sensitive={field.secret}
-            />
-          ))}
-          <SubmitBar>
-            <Form.Submit
-              component={SubmitButton}
-              message={{
-                ...m.createTemplate,
-                values: { template: name },
-              }}
-            />
-          </SubmitBar>
-        </Form>
-      </div>
-    )
-  }
+        ))}
+        <SubmitBar>
+          <Form.Submit
+            component={SubmitButton}
+            message={{
+              ...m.createTemplate,
+              values: { template: name },
+            }}
+          />
+        </SubmitBar>
+      </Form>
+    </div>
+  )
 }
+
+WebhookTemplateForm.propTypes = {
+  convertTemplateToWebhook: PropTypes.func.isRequired,
+  error: PropTypes.string,
+  existCheck: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
+  templateId: PropTypes.string.isRequired,
+  webhookTemplate: PropTypes.webhookTemplate.isRequired,
+}
+
+WebhookTemplateForm.defaultProps = {
+  error: undefined,
+  existCheck: () => null,
+}
+
+export default WebhookTemplateForm
