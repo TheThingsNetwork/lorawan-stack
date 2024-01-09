@@ -46,23 +46,24 @@ export const NotificationListItem = ({ notification, selectedNotification, handl
 
   return (
     <Button key={notification.id} onClick={handleClick} value={notification.id} className={classes}>
-      {showUnseenStatus && (
-        <Status pulse={false} status="good" className={classNames('mr-cs-xs', style.unseenMark)} />
-      )}
       <div className={titleClasses}>
-        <div className={style.notificationPreviewTitleText}>
-          <Notification.Title
-            data={notification}
-            notificationType={notification.notification_type}
-          />
+        <div className="d-flex">
+          {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
+          <div className={style.notificationPreviewTitleText}>
+            <Notification.Title
+              data={notification}
+              notificationType={notification.notification_type}
+            />
+          </div>
         </div>
         <div>
-          <DateTime.Relative
-            relativeTimeStyle="short"
-            showAbsoluteAfter={2}
-            dateTimeProps={{
-              time: false,
-              dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
+          <DateTime
+            date={false}
+            dateFormatOptions={{ month: '2-digit', day: '2-digit', year: 'numeric' }}
+            timeFormatOptions={{
+              hour: 'numeric',
+              minute: 'numeric',
+              hourCycle: 'h23',
             }}
             value={notification.created_at}
             className={style.notificationTime}
@@ -96,15 +97,4 @@ NotificationListItem.defaultProps = {
   selectedNotification: undefined,
 }
 
-export const NotificationListSpinner = () => {
-  const classes = classNames(style.notificationPreview, 'm-0')
-  const titleClasses = classNames(style.notificationPreviewTitle)
-
-  return (
-    <div className={classes}>
-      <div className={titleClasses}>
-        <Spinner faded small center />
-      </div>
-    </div>
-  )
-}
+export const NotificationListSpinner = () => <Spinner faded small center />

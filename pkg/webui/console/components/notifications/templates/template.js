@@ -31,6 +31,7 @@ const ContentTemplate = ({ messages, values, withList, listTitle, listElement })
         content={messages.body}
         values={{ ...defaultValues, ...values.body }}
         component="p"
+        className="mt-0"
       />
       {'entities' in messages && (
         <Message

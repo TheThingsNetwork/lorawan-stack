@@ -12,54 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.notifications-container
-  border-radius: $br.s
-  min-height: 85vh
-  +media-query($bp.s)
-    min-height: 100%
-
 .notification-list
   display: flex
   flex-direction: column
-  border-right: 1px solid #E4E4E4
-  border-radius: $br.m 0 0 $br.m
-  background-color: white
-  padding: 0 !important
-
-  +media-query($bp.s)
-    margin-top: 0 !important
-    margin-bottom: 0 !important
+  border-right: 1px solid rgba(0, 0, 0, 0.09)
 
   &-change-button
-    color: $c-active-blue !important
+    display: flex
+    align-self: center
+    width: fit-content
+    margin-top $cs.m
+    color: $c.tts-primary !important
 
   &.notification-selected
     +media-query($bp.s)
       display: none
 
 .notification-header
-  border-bottom: 1px solid #E4E4E4
+  min-height: 2.5rem
+  display: flex
+  justify-content: space-between
   align-items: center
-  padding: $cs.s 0
-
-  +media-query($bp.s)
-    display: flex
-
-  &-icon
-    top: 5px !important
-    padding-right: $cs.xs
-
-    &.notifications
-      color: $c-active-blue
-
-    &.archived
-      color: $c-warning
+  border-bottom: 1px solid rgba(0, 0, 0, 0.09)
+  padding: $cs.m
 
   &-date
-    font-size: 1.1rem
-    padding-right: $cs.xs
-    padding-left: 0
-    padding-top: 0.2rem
+    color: $c.grey-700
 
     &.notification-selected
       display: block
@@ -73,23 +51,27 @@
 
   .total-notifications
     border-radius: 45%
-    background-color: $c-active-blue
-    color: white
-    padding: 0 0.8rem
-    margin-left: $cs.xs
-    line-height: 1.6
+    background-color: $c.tts-primary
+    color: $c.white
+    padding: 0 0.45rem
+    margin-left: $cs.xxs
+    font-size: $fs.s
     position: relative
-    top: 5px
-    height: 70%
+    height: 90%
+    line-height: 1.7
+    top: 2px
 
   &-action
     display: flex
-    justify-content: end
     align-items: center
+    gap: $cs.s
+
     +media-query($bp.s)
       max-width: fit-content !important
 
   &-title
+    font-weight: $fwv2.semibold
+
     +media-query($bp.s)
       max-width: 70% !important
 
@@ -103,56 +85,48 @@
       font-size: 3rem
 
 .notification-preview
-  height: 8rem
+  height: 6.286rem
   width: 100%
-  position: relative
-  border: none !important
-  border-bottom: 1px solid #E4E4E4 !important
-  border-radius: 0
-  box-shadow: none !important
-  padding: $cs.l
-  justify-content: start
-  flex-direction: column
-  align-items: start
+  border-bottom: 1px solid rgba(0, 0, 0, 0.09)
+  padding: $cs.m
 
   &.notification-selected
-    background-color: $c-active-blue !important
+    background-color: $c.tts-primary
     +media-query($bp.s)
-      background-color: unset !important
+      background-color: unset
 
   &-title
-    color: $tc-black
-    font-weight: 600
-    font-size: 1.05rem
     display: flex
     justify-content: space-between
-    width: 100%
+    margin-bottom: $cs.xs
+    font-weight: 600
 
     &.notification-selected
-      color: white
+      color: $c.white
       +media-query($bp.s)
         color: $tc-black
 
       .notification-time
-        color: white
+        color: $c.white
 
     .notification-time
+      font-size: $fs.s
       font-weight: normal
-      color: $tc-deep-gray
+      color: $c.grey-700
 
     &-text
-      width: 80%
       overflow: hidden
       text-overflow: ellipsis
 
   &-content
     width: 100%
-    color: $tc-subtle-gray
+    color: $c.grey-700
     overflow: hidden
     display: -webkit-box
     -webkit-box-orient: vertical
     -webkit-line-clamp: 2 /* start showing ellipsis when 2nd line is reached */
     white-space: pre-wrap
+    font-size: $fs.s
 
     &.notification-selected
       color: white
@@ -160,19 +134,17 @@
         color: $tc-subtle-gray
 
   &.notification-selected
-    color: white
+    color: $c.white
     +media-query($bp.s)
       color: $tc-subtle-gray
 
   .unseen-mark
-    position: absolute
-    top: 21px
-    left: 2px
+    position: relative
+    top: -1px
+    left: -5px
 
 .notification-content
-  background-color: white
-  border-radius: 0 $br.m $br.m 0
-
+  width: 100%
   +media-query($bp.s)
     display: none
     height: 88vh
