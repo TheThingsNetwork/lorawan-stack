@@ -126,7 +126,7 @@
     "redux-actions": "^2.6.5",
     "redux-logic": "^3.0.2",
     "redux-sentry-middleware": "^0.2.2",
-    "reselect": "^4.1.8",
+    "reselect": "^5.1.0",
     "scroll-into-view-if-needed": "^3.1.0",
     "ttn-lw": "file:sdk/js",
     "unicode-properties": "^1.4.1",
