@@ -253,6 +253,10 @@ export default defineMessages({
   gatewayDescPlaceholder: 'Description for my new gateway',
   gatewayDescription: 'Gateway description',
   gatewayEUI: 'Gateway EUI',
+  gatewayFanoutNotificationsTitle: 'Fan-out notifications',
+  gatewayFanoutNotificationsLabel: 'Enable fan-out notifications',
+  gatewayFanoutNotificationsDescription:
+    'Notifications sent to this organization will be propagated to all collaborators instead of the respective administrative or technical contact.',
   gatewayID: 'Gateway ID',
   gatewayIdPlaceholder: 'my-new-gateway',
   gatewayLocation: 'Gateway location',

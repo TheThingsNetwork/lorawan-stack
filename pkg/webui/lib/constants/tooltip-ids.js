@@ -46,6 +46,7 @@ export default Object.freeze({
   GATEWAY_ATTRIBUTES: 'gateway-attributes',
   GATEWAY_DESCRIPTION: 'gateway-description',
   GATEWAY_EUI: 'gateway-eui',
+  GATEWAY_FANOUT_NOTIFICATIONS: 'gateway-fanout-notifications',
   GATEWAY_ID: 'gateway-id',
   GATEWAY_LOCATION_PUBLIC: 'gateway-location-public',
   GATEWAY_NAME: 'gateway-name',

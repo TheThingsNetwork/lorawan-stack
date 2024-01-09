@@ -66,7 +66,10 @@ const Organization = () => {
     <Require featureCheck={mayViewOrganizationsOfUser} otherwise={{ redirect: '/' }}>
       <RequireRequest
         requestAction={[
-          getOrganization(orgId, 'name,description,administrative_contact,technical_contact'),
+          getOrganization(
+            orgId,
+            'name,description,administrative_contact,technical_contact,fanout_notifications',
+          ),
           getOrganizationsRightsList(orgId),
         ]}
       >

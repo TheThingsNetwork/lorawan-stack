@@ -20,6 +20,7 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import Checkbox from '@ttn-lw/components/checkbox'
 
 import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
 import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
@@ -29,6 +30,7 @@ import Message from '@ttn-lw/lib/components/message'
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { id as organizationIdRegexp } from '@ttn-lw/lib/regexp'
 import contactSchema from '@ttn-lw/lib/shared-schemas'
 
@@ -144,6 +146,19 @@ const OrganizationForm = props => {
           />
           <Message
             content={m.techContactDescription}
+            component="p"
+            className="mt-cs-xs tc-subtle-gray"
+          />
+          <Form.Field
+            title={sharedMessages.gatewayFanoutNotificationsTitle}
+            name="fanout_notifications"
+            component={Checkbox}
+            label={sharedMessages.gatewayFanoutNotificationsLabel}
+            description={sharedMessages.gatewayFanoutNotificationsDescription}
+            tooltipId={tooltipIds.GATEWAY_FANOUT_NOTIFICATIONS}
+          />
+          <Message
+            content={m.gatewayFanoutNotificationsDescription}
             component="p"
             className="mt-cs-xs tc-subtle-gray"
           />
