@@ -14,7 +14,6 @@
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Col, Row } from 'react-grid-system'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 
@@ -63,16 +62,16 @@ const NotificationContent = ({
 
   return (
     <>
-      <Row justify="between" className={classNames(style.notificationHeader, 'm-0')}>
-        <Col md={8} className={classNames(style.notificationHeaderTitle, 'pr-0', 'd-flex')}>
+      <div className={style.notificationHeader}>
+        <div className={style.notificationHeaderTitle}>
           <Button icon="arrow_back_ios" naked onClick={handleBack} className={style.backButton} />
           <div>
-            <h3 className="m-0">
+            <p className="m-0">
               <Notification.Title
                 data={selectedNotification}
                 notificationType={selectedNotification.notification_type}
               />
-            </h3>
+            </p>
             <DateTime
               value={selectedNotification.created_at}
               dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
@@ -86,8 +85,8 @@ const NotificationContent = ({
               })}
             />
           </div>
-        </Col>
-        <Col md={4} className={classNames(style.notificationHeaderAction, 'pl-0', 'pr-cs-xxs')}>
+        </div>
+        <div className={style.notificationHeaderAction}>
           <DateTime
             value={selectedNotification.created_at}
             dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
@@ -105,19 +104,17 @@ const NotificationContent = ({
             message={isArchive ? m.unarchive : m.archive}
             icon="archive"
             value={selectedNotification.id}
-            textPaddedRight
+            secondary
           />
-        </Col>
-      </Row>
-      <Row className="m-0">
-        <Col>
-          <Notification.Content
-            receiver={userId}
-            data={selectedNotification}
-            notificationType={selectedNotification.notification_type}
-          />
-        </Col>
-      </Row>
+        </div>
+      </div>
+      <div className="p-cs-xl">
+        <Notification.Content
+          receiver={userId}
+          data={selectedNotification}
+          notificationType={selectedNotification.notification_type}
+        />
+      </div>
     </>
   )
 }

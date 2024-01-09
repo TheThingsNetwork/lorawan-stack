@@ -14,31 +14,32 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Container } from 'react-grid-system'
+
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
-import WithRootClass from '@ttn-lw/lib/components/with-root-class'
 
 import NotificationsContainer from '@console/containers/notifications'
 
-import style from '@console/views/app/app.styl'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getUnseenNotifications } from '@console/store/actions/notifications'
 
 import { selectUserId } from '@console/store/selectors/logout'
 
-import styles from './notifications.styl'
-
 const NotificationsView = () => {
   const userId = useSelector(selectUserId)
+  useBreadcrumbs(
+    'notifications',
+    <Breadcrumb path="/notifications?*" content={sharedMessages.notifications} />,
+  )
 
   return (
     <RequireRequest requestAction={getUnseenNotifications(userId)}>
-      <WithRootClass className={style.stageBg} id="stage">
-        <Container className={styles.mobileContainer}>
-          <NotificationsContainer />
-        </Container>
-      </WithRootClass>
+      <Breadcrumbs />
+      <NotificationsContainer />
     </RequireRequest>
   )
 }

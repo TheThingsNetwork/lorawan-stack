@@ -14,7 +14,6 @@
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Col, Row } from 'react-grid-system'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 import { FixedSizeList as List } from 'react-window'
@@ -81,10 +80,7 @@ const NotificationList = ({
     }
   }, [dispatch, userId, unseenIds])
 
-  const classes = classNames(styles.notificationHeaderIcon, 'm-0', {
-    [styles.notifications]: !isArchive,
-    [styles.archived]: isArchive,
-  })
+  const classes = classNames(styles.notificationHeaderIcon)
 
   const Item = ({ index, style }) =>
     isItemLoaded(index) ? (
@@ -108,12 +104,12 @@ const NotificationList = ({
 
   return (
     <>
-      <Row justify="between" className={classNames(styles.notificationHeader, 'm-0')}>
-        <Col className="pl-cs-s pr-cs-s d-flex">
-          <Icon icon={isArchive ? 'archive' : 'notifications'} nudgeDown className={classes} />
+      <div className={styles.notificationHeader}>
+        <div className={classNames(styles.notificationHeaderTitle, 'd-flex gap-cs-xxs')}>
+          <Icon icon={isArchive ? 'archive' : 'inbox'} nudgeDown className={classes} />
           <Message
-            component="h3"
             content={isArchive ? m.archived : sharedMessages.notifications}
+            component="p"
             className="m-0"
           />
           {Boolean(totalUnseenCount) && !isArchive && (
@@ -121,16 +117,16 @@ const NotificationList = ({
               {totalUnseenCount}
             </span>
           )}
-        </Col>
+        </div>
         {!isArchive && (
           <Button
+            secondary
             icon="visibility"
             onClick={handleMarkAllAsSeen}
             message={m.markAllAsRead}
-            className="mr-cs-s"
           />
         )}
-      </Row>
+      </div>
       <InfiniteLoader
         loadMoreItems={loadNextPage}
         isItemLoaded={isItemLoaded}
@@ -138,9 +134,9 @@ const NotificationList = ({
       >
         {({ onItemsRendered, ref }) => (
           <List
-            height={500}
-            itemSize={112}
-            width={416}
+            height={570}
+            itemSize={88}
+            width={460}
             ref={ref}
             itemCount={itemCount}
             onItemsRendered={onItemsRendered}

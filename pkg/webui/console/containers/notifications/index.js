@@ -14,7 +14,6 @@
 
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Col, Row } from 'react-grid-system'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 
@@ -80,13 +79,13 @@ const Notifications = () => {
     setShowArchived(showArchived === 'false' ? 'true' : 'false')
     setItems([])
     setHasNextPage(true)
+    setSelectedNotification(undefined)
   }, [setShowArchived, showArchived, setPage])
 
   return (
-    <Row className={classNames(style.notificationsContainer, 'm-0')}>
-      <Col
-        md={4}
-        className={classNames(style.notificationList, 'mt-cs-l', 'mb-cs-l', {
+    <div className="d-flex h-vh">
+      <div
+        className={classNames(style.notificationList, {
           [style.notificationSelected]: selectedNotification,
         })}
       >
@@ -99,18 +98,15 @@ const Notifications = () => {
           selectedNotification={selectedNotification}
           isArchive={showArchived === 'true'}
         />
-        <Row direction="column" align="center" className="mt-cs-xxl">
-          <Button
-            onClick={handleShowArchived}
-            naked
-            message={showArchived === 'true' ? m.seeAll : m.seeArchived}
-            className={style.notificationListChangeButton}
-          />
-        </Row>
-      </Col>
-      <Col
-        md={8}
-        className={classNames(style.notificationContent, 'mt-cs-l', 'mb-cs-l', 'p-0', {
+        <Button
+          onClick={handleShowArchived}
+          naked
+          message={showArchived === 'true' ? m.seeAll : m.seeArchived}
+          className={style.notificationListChangeButton}
+        />
+      </div>
+      <div
+        className={classNames(style.notificationContent, {
           [style.notificationSelected]: selectedNotification,
         })}
       >
@@ -120,10 +116,12 @@ const Notifications = () => {
             selectedNotification={selectedNotification}
             fetchItems={loadNextPage}
             isArchive={showArchived === 'true'}
+            setHasNextPage={setHasNextPage}
+            setPage={setPage}
           />
         )}
-      </Col>
-    </Row>
+      </div>
+    </div>
   )
 }
 
