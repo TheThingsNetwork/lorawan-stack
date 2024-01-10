@@ -883,10 +883,14 @@ func PathsFromSelectFlagsForServedRelaySettings(flags *pflag.FlagSet, prefix str
 // AddSetFlagsForServedRelaySettings adds flags to select fields in ServedRelaySettings.
 func AddSetFlagsForServedRelaySettings(flags *pflag.FlagSet, prefix string, hidden bool) {
 	AddSetFlagsForRelayEndDeviceAlwaysMode(flags, flagsplugin.Prefix("mode.always", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.always", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForRelayEndDeviceDynamicMode(flags, flagsplugin.Prefix("mode.dynamic", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.dynamic", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForRelayEndDeviceControlledMode(flags, flagsplugin.Prefix("mode.end-device-controlled", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mode.end-device-controlled", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("backoff", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForRelaySecondChannel(flags, flagsplugin.Prefix("second-channel", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("second-channel", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("serving-device-id", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
@@ -899,6 +903,8 @@ func (m *ServedRelaySettings) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 		}
 		if setPaths, err := ov.Always.SetFromFlags(flags, flagsplugin.Prefix("mode.always", prefix)); err != nil {
 			return nil, err
+		} else if len(setPaths) == 0 {
+			paths = append(paths, "mode.always")
 		} else {
 			paths = append(paths, setPaths...)
 		}
@@ -911,6 +917,8 @@ func (m *ServedRelaySettings) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 		}
 		if setPaths, err := ov.Dynamic.SetFromFlags(flags, flagsplugin.Prefix("mode.dynamic", prefix)); err != nil {
 			return nil, err
+		} else if len(setPaths) == 0 {
+			paths = append(paths, "mode.dynamic")
 		} else {
 			paths = append(paths, setPaths...)
 		}
@@ -923,6 +931,8 @@ func (m *ServedRelaySettings) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 		}
 		if setPaths, err := ov.EndDeviceControlled.SetFromFlags(flags, flagsplugin.Prefix("mode.end_device_controlled", prefix)); err != nil {
 			return nil, err
+		} else if len(setPaths) == 0 {
+			paths = append(paths, "mode.end_device_controlled")
 		} else {
 			paths = append(paths, setPaths...)
 		}
@@ -940,6 +950,8 @@ func (m *ServedRelaySettings) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 		}
 		if setPaths, err := m.SecondChannel.SetFromFlags(flags, flagsplugin.Prefix("second_channel", prefix)); err != nil {
 			return nil, err
+		} else if len(setPaths) == 0 {
+			paths = append(paths, "second_channel")
 		} else {
 			paths = append(paths, setPaths...)
 		}
