@@ -226,7 +226,8 @@ message ServingRelaySettings {
 message ServedRelaySettings {
   option (thethings.flags.message) = {
     select: true,
-    set: true
+    set: true,
+    semantical: true
   };
 
   oneof mode {
