@@ -16,8 +16,6 @@ import React, { useContext } from 'react'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
 
-import LAYOUT from '@ttn-lw/constants/layout'
-
 import Button from '@ttn-lw/components/button'
 
 import SidebarContext from '@console/containers/side-bar/context'
@@ -26,14 +24,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './side-header.styl'
 
-const getViewportWidth = () =>
-  Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-
 const SideHeader = ({ logo, miniLogo }) => {
-  const { onMinimizeToggle, isMinimized } = useContext(SidebarContext)
-
-  const viewportWidth = getViewportWidth()
-  const isMobile = viewportWidth <= LAYOUT.BREAKPOINTS.M
+  const { onMinimizeToggle, isMinimized, onDrawerCloseClick } = useContext(SidebarContext)
 
   return (
     <div
@@ -43,17 +35,21 @@ const SideHeader = ({ logo, miniLogo }) => {
     >
       {/* Render two logos to prevent layout flashes when switching between minimized and maximized states. */}
       <Link to="/">
-        <img {...logo} className={classnames(style.logo, { 'd-none': isMinimized })} />
-        <img {...miniLogo} className={classnames(style.miniLogo, { 'd-none': !isMinimized })} />
+        <img {...logo} className={classnames(style.logo)} />
+        <img {...miniLogo} className={classnames(style.miniLogo)} />
       </Link>
-      {!isMobile && (
-        <Button
-          className={style.minimizeButton}
-          icon={isMinimized ? 'left_panel_open' : 'left_panel_close'}
-          onClick={onMinimizeToggle}
-          naked
-        />
-      )}
+      <Button
+        className={classnames(style.minimizeButton, 's:d-none')}
+        icon={isMinimized ? 'left_panel_open' : 'left_panel_close'}
+        onClick={onMinimizeToggle}
+        naked
+      />
+      <Button
+        className={classnames(style.minimizeButton, 'd-none', 's:d-flex')}
+        icon="close"
+        onClick={onDrawerCloseClick}
+        naked
+      />
     </div>
   )
 }

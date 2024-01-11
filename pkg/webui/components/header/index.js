@@ -17,7 +17,6 @@ import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
-import Link from '@ttn-lw/components/link'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -34,19 +33,23 @@ const Header = ({
   onMenuClick,
   ...rest
 }) => (
-  // Const isGuest = !Boolean(user)
-
   <header {...rest} className={classnames(className, style.container)}>
-    <div className={classnames('breadcrumbs', 's:d-none')} />
-    <div className="d-none s:d-flex al-center gap-cs-xs">
+    <div className={classnames('breadcrumbs', 'm:d-none')} />
+    <div className="d-none m:d-flex al-center gap-cs-xs">
       <Button secondary icon="menu" onClick={onMenuClick} />
       <Logo className={style.logo} />
     </div>
 
     <div className="d-flex al-center gap-cs-xs">
-      <Button secondary icon="add" dropdownItems={addDropdownItems} />
-      <Button secondary icon="grade" dropdownItems={starDropdownItems} className="s:d-none" />
-      <Button secondary icon="inbox" />
+      <Button secondary icon="add" dropdownItems={addDropdownItems} dropdownPosition="below left" />
+      <Button
+        secondary
+        icon="grade"
+        dropdownItems={starDropdownItems}
+        dropdownPosition="below left"
+        className="xs:d-none"
+      />
+      <Button secondary icon="inbox" dropdownItems={<></>} dropdownPosition="below left" />
       <ProfileDropdown
         brandLogo={brandLogo}
         data-test-id="profile-dropdown"

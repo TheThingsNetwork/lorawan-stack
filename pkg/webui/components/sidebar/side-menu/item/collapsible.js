@@ -39,8 +39,8 @@ const CollapsibleItem = ({
   currentPathName,
 }) => {
   const ref = useRef()
-  const subItems = children
-    .filter(item => Boolean(item) && 'props' in item)
+  const subItems = React.Children.toArray(children)
+    .filter(item => React.isValidElement(item) && item.props)
     .map(item => ({
       title: item.props.title,
       path: item.props.path,
@@ -50,11 +50,10 @@ const CollapsibleItem = ({
   const subItemActive = subItems.some(item => currentPathName.includes(item.path))
 
   return (
-    <div className={classnames('pos-relative', { [style.isMinimized]: isMinimized })} ref={ref}>
+    <div className={classnames(style.container, { [style.isMinimized]: isMinimized })} ref={ref}>
       <Button
         className={classnames(style.link, {
           [style.active]: isMinimized && subItemActive,
-          [style.isMinimized]: isMinimized,
         })}
         onClick={onClick}
       >
@@ -72,7 +71,7 @@ const CollapsibleItem = ({
           className={style.flyOutList}
           onItemsClick={onDropdownItemsClick}
           attachedRef={ref}
-          position="manual"
+          position="right"
           hover
         >
           <Dropdown.HeaderItem title={title.defaultMessage} />
@@ -81,11 +80,7 @@ const CollapsibleItem = ({
           ))}
         </Dropdown.Attached>
       )}
-      <SideNavigationList
-        depth={depth + 1}
-        className={classnames(style.subItemList, { [style.isMinimized]: isMinimized })}
-        isExpanded={isExpanded}
-      >
+      <SideNavigationList depth={depth + 1} className={style.subItemList} isExpanded={isExpanded}>
         {children}
       </SideNavigationList>
     </div>

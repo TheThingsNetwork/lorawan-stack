@@ -13,6 +13,7 @@
 // limitations under the License.
 
 .container
+  --dropdown-offset: $cs.s
   padding: 0 $cs.m
   background: $c['tts-primary-050']
   z-index: $zi.nav
@@ -21,6 +22,10 @@
   justify-content: space-between
   align-items: center
   height: 4rem
+  +media-query($bp.xs)
+    padding: 0 $cs.xs
 
 .logo
   height: $cs.l
+  +media-query($bp.xs)
+    width: 3rem

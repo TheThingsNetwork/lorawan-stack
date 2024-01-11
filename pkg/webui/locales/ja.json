@@ -145,7 +145,6 @@
   "components.key-value-map.index.addEntry": "エントリー追加",
   "components.link.index.glossaryTitle": "用語集「{term}」を参照してください",
   "components.link.index.defaultGlossaryTitle": "用語集を見る",
-  "components.mobile-menu.index.loggedInAs": "<b>{userId}</b>でログインしました",
   "components.notification.details.index.showDetails": "詳細を表示",
   "components.notification.details.index.details": "詳細",
   "components.notification.details.index.errorDetails": "エラー詳細",

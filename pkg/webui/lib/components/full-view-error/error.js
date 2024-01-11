@@ -16,11 +16,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import clipboard from 'clipboard'
 import { Helmet } from 'react-helmet'
-import classnames from 'classnames'
 
 import Footer from '@ttn-lw/components/footer'
-import buttonStyle from '@ttn-lw/components/button/button.styl'
 import Icon from '@ttn-lw/components/icon'
+import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -151,7 +150,6 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
   const errorDetails = JSON.stringify(error, undefined, 2)
   const hasErrorDetails =
     (!isNotFound && Boolean(error) && errorDetails.length > 2) || (isFrontend && error.errorCode)
-  const buttonClasses = classnames(buttonStyle.button, style.actionButton)
 
   // Do not render anything when performing a redirect.
   if (doBlankRender) {
@@ -194,41 +192,44 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
             </div>
             <div className={style.errorActions}>
               {isNotFound && (
-                <a href={appRoot} className={buttonClasses}>
-                  <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
-                  <Message content={sharedMessages.backToOverview} />
-                </a>
+                <Button.AnchorLink
+                  href={appRoot}
+                  className={style.actionButton}
+                  icon="keyboard_arrow_left"
+                  message={sharedMessages.backToOverview}
+                  secondary
+                />
               )}
               {isOAuthCallback && (
-                <a href={appRoot} className={buttonClasses}>
-                  <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
-                  <Message content={sharedMessages.backToLogin} />
-                </a>
+                <Button.AnchorLink
+                  href={appRoot}
+                  className={style.actionButton}
+                  icon="keyboard_arrow_left"
+                  message={sharedMessages.backToLogin}
+                  secondary
+                />
               )}
               {hasAction && (
-                <button
+                <Button
                   type="button"
-                  className={classnames(buttonClasses, buttonStyle.primary)}
+                  primary
+                  className={style.actionButton}
                   onClick={action.action}
-                >
-                  <Icon icon={action.icon} textPaddedRight nudgeDown />
-                  <Message content={action.message} />
-                </button>
+                  icon={action.icon}
+                  message={action.message}
+                  secondary
+                />
               )}
               {hasSupportLink && !isNotFound && (
                 <>
-                  <a
+                  <Button.AnchorLink
                     href={supportLink}
                     target="_blank"
-                    className={classnames(
-                      buttonStyle.button,
-                      buttonStyle.primary,
-                      style.actionButton,
-                    )}
-                  >
-                    <Icon icon="contact_support" textPaddedRight nudgeDown />
-                    <Message content={sharedMessages.getSupport} />
-                  </a>
+                    className={style.actionButton}
+                    icon="contact_support"
+                    message={sharedMessages.getSupport}
+                    secondary
+                  />
                   {hasErrorDetails && (
                     <Message component="span" content={errorMessages.attachToSupportInquiries} />
                   )}
@@ -276,19 +277,17 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                     <Message content={errorMessages.technicalDetails} />
                   </summary>
                   <pre>{errorDetails}</pre>
-                  <button
+                  <Button
                     onClick={handleCopyClick}
-                    className={classnames(buttonClasses)}
+                    className={style.actionButton}
                     data-clipboard-text={errorDetails}
                     ref={copyButton}
-                  >
-                    <Icon icon={copied ? 'done' : 'file_copy'} textPaddedRight />
-                    <Message
-                      content={
-                        copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard
-                      }
-                    />
-                  </button>
+                    icon={copied ? 'done' : 'file_copy'}
+                    message={
+                      copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard
+                    }
+                    secondary
+                  />
                 </details>
               </>
             )}

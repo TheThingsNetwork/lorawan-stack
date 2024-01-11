@@ -145,7 +145,6 @@
   "components.key-value-map.index.addEntry": "Add entry",
   "components.link.index.glossaryTitle": "See \"{term}\" in the glossary",
   "components.link.index.defaultGlossaryTitle": "See in the glossary",
-  "components.mobile-menu.index.loggedInAs": "Logged in as <b>{userId}</b>",
   "components.notification.details.index.showDetails": "Show details",
   "components.notification.details.index.details": "Details",
   "components.notification.details.index.errorDetails": "Error details",

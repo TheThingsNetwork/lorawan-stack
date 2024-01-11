@@ -16,22 +16,44 @@
   border-normal(right)
   line-height: 1
   font-size: $fs.s
-  min-width: 19rem
+  min-width: 22rem
+  max-width: 24rem
+  box-sizing: border-box
   sidebar-transition(min-width)
   +media-query($bp.m)
-    sidebar-transition(left, box-shadow)
-    top: $header-height-mobile
-    left: -60vw
+    transition: left .4s cubic-bezier(0.220, 0.005, 0.295, 1.000)
+    position: absolute
+    top: 0
+    left: -90vw
     bottom: 0
-    width: 60vw
-    max-width: 20rem
-    min-width: 15rem
+    width: 90vw
+    min-width: 18rem
+    height: 100vh
+    z-index: $zi.nav
 
     &-open
-      box-shadow: 0 0 13rem 2rem rgba(0,0,0,.4)
+      transition: left .6s cubic-bezier(0.165, 0.840, 0.440, 1.000)
       left: 0
 
+      & + .sidebar-backdrop
+        opacity: 1
+        visibility: visible
+
+  &-backdrop
+    transition: opacity .4s ease-in-out, visibility .4s ease-in-out
+    opacity: 0
+    visibility: hidden
+    position: fixed
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+    background: rgba(0, 0, 0, .7)
+    z-index: 1
+    cursor: pointer
+
   &-minimized
-    width: 3.5rem
-    min-width: initial
-    max-width: initial
+    +media-query-min($bp.m)
+      width: 4.5rem
+      min-width: initial
+      max-width: initial

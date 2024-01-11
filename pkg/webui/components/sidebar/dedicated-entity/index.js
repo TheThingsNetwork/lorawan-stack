@@ -24,20 +24,16 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './dedicated-entity.styl'
 
-const DedicatedEntity = ({ label, className, buttonMessage, path, backPath, exact }) => (
+const DedicatedEntity = ({ label, className, buttonMessage, path, backPath }) => (
   <div className={classnames(className, style.dedicatedEntity)}>
-    <Link to={backPath} end={exact} className={style.dedicatedEntityCurtain}>
+    <Link to={backPath} className={style.dedicatedEntityCurtain}>
       <Button
         className={style.dedicatedEntityButton}
         icon="arrow_left_alt"
         message={buttonMessage}
       />
     </Link>
-    <Link
-      className={classnames(style.dedicatedEntityItem, 'd-flex', 'al-center')}
-      to={path}
-      end={exact}
-    >
+    <Link className={classnames(style.dedicatedEntityItem, 'd-flex', 'al-center')} to={path}>
       <hr className={style.dedicatedEntityDivider} />
       <Message content={label} className={style.dedicatedEntityLabel} component="p" />
     </Link>
@@ -48,14 +44,12 @@ DedicatedEntity.propTypes = {
   backPath: PropTypes.string.isRequired,
   buttonMessage: PropTypes.message.isRequired,
   className: PropTypes.string,
-  exact: PropTypes.bool,
   label: PropTypes.string.isRequired,
   path: PropTypes.string.isRequired,
 }
 
 DedicatedEntity.defaultProps = {
   className: undefined,
-  exact: false,
 }
 
 export default DedicatedEntity

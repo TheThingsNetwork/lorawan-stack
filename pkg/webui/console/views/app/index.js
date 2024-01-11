@@ -130,7 +130,7 @@ const Layout = () => {
           />
           <div id="modal-container" />
           <div className="d-flex">
-            <Sidebar isDrawerOpen={isDrawerOpen} />
+            <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
             <div className="w-full h-vh">
               <Header onMenuClick={onDrawerExpandClick} />
               <main className={classnames(style.main, 'd-flex', 'flex-column', 'h-full')}>

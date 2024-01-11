@@ -26,104 +26,22 @@
     display: flex
     align-items: center
     line-height: 0
-    height: 2.3rem
-    padding: $cs.m 0
 
     img
       width: 100%
-
-    +media-query($bp.s)
-      width: 9rem
-      height: 2.1rem
 
   .logo
     display: flex
     align-items: center
 
-  .brand-logo
-    display: flex
-    align-items: center
-    justify-content: center
-    flex-direction: column
-    max-width: 9rem
-
-    +media-query-min($bp.s)
-      height: 3rem
-
-    +media-query($bp.s)
-      height: 2rem
-
-    &-container
-      display: flex
-      align-items: center
-      height: 100%
-      width: 100%
-
-  &:not(.vertical)
-    &:not(.custom-branding)
-      .logo-container
-        width: 13rem
-        +media-query($bp.s)
-          width: 12rem
-
-    &.custom-branding .logo
-      display: flex
-      align-items: center
-      padding-left: 'calc(%s - .15rem)' % $ls.xs
-      +media-query($bp.s)
-        padding-left: $cs.s
-
-      .logo-container
-        nudge('down', .15rem)
-        width: 11rem
-        +media-query($bp.s)
-          width: 8rem
-
-    .brand-logo
-      border-dark('right')
-      align-items: center
-      padding-right: $ls.xs
-      +media-query($bp.s)
-        padding-right: $cs.s
-
-      &-container
-        +media-query($bp.s)
-          max-width: 6rem
-          height: 2.5rem
-
-          img
-            width: 100%
-
-        img
-          object-position: left
-
-  &.vertical
-    width: 15rem
-    flex-direction: column
-    margin-bottom: $ls.s
-
-    &.custom-branding .logo
-      border-dark('top')
-      padding-top: $ls.xs
-      margin-top: $ls.xs
-      height: auto
-      width: 100%
-
-      &-container
-        width: 100%
-        height: auto
-
-    .brand-logo
-      margin-left: auto
-      margin-right: auto
-      width: 100%
-
-      &-container
+    +media-query-min($bp.xs)
+      img:first-child
         display: block
-        max-height: 3rem
-        max-width: 10rem
-        width: 100%
+      img:last-child
+        display: none
 
-        img
-          object-position: center
-          width: 100%
+    +media-query($bp.xs)
+      img:first-child
+        display: none
+      img:last-child
+        display: block

@@ -122,7 +122,7 @@ const SideFooter = () => {
   return (
     <div className={sideFooterClassnames}>
       <Button
-        className={classnames(style.sideFooterButton, style.supportButton)}
+        className={style.supportButton}
         secondary
         icon="support"
         dropdownItems={supportDropdownItems}
@@ -136,7 +136,7 @@ const SideFooter = () => {
         </span>
       </Button>
       <Button
-        className={classnames(style.sideFooterButton, style.clusterButton)}
+        className={style.clusterButton}
         secondary
         icon="public"
         message="EU1"

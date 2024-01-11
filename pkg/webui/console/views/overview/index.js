@@ -12,21 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo, useCallback, useRef } from 'react'
+import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
-import AppAnimation from '@assets/animations/illustrations/app.json'
-import GatewayAnimation from '@assets/animations/illustrations/gateway.json'
-
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import Animation from '@ttn-lw/lib/components/animation'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import DeploymentComponentStatus from '@console/containers/deployment-component-status'
@@ -76,82 +71,8 @@ const Overview = () => {
   const mayCreateGtws = useSelector(state => checkFromState(mayCreateGateways, state))
   const supportLink = selectSupportLinkConfig()
   const documentationBaseUrl = selectDocumentationUrlConfig()
-  const appAnimationRef = useRef(null)
-  const gatewayAnimationRef = useRef(null)
 
   useBreadcrumbs('overview', <Breadcrumb path="/" content={sharedMessages.overview} />)
-
-  const handleAppChooserMouseEnter = useCallback(() => {
-    appAnimationRef.current.setDirection(1)
-    appAnimationRef.current.goToAndPlay(0)
-  }, [appAnimationRef])
-
-  const handleAppChooserMouseLeave = useCallback(() => {
-    appAnimationRef.current.setDirection(-1)
-  }, [appAnimationRef])
-
-  const handleGatewayChooserMouseEnter = useCallback(() => {
-    gatewayAnimationRef.current.setDirection(1)
-    gatewayAnimationRef.current.goToAndPlay(0)
-  }, [gatewayAnimationRef])
-
-  const handleGatewayChooserMouseLeave = useCallback(() => {
-    gatewayAnimationRef.current.setDirection(-1)
-  }, [gatewayAnimationRef])
-
-  const chooser = useMemo(() => {
-    const hasEntities = applicationCount + gatewayCount !== 0
-    const appPath = hasEntities ? '/applications' : '/applications/add'
-    const gatewayPath = hasEntities ? '/gateways' : '/gateways/add'
-
-    return (
-      <Row>
-        {mayViewApplications && (
-          <Col lg={mayViewGateways ? 6 : 12}>
-            <Link to={appPath} className={style.chooserNav}>
-              <div
-                onMouseEnter={handleAppChooserMouseEnter}
-                onMouseLeave={handleAppChooserMouseLeave}
-                className={style.chooser}
-              >
-                <Animation animationRef={appAnimationRef} animationData={AppAnimation} />
-                <Message
-                  component="span"
-                  content={hasEntities ? m.gotoApplications : m.createApplication}
-                />
-              </div>
-            </Link>
-          </Col>
-        )}
-        {mayViewGateways && (
-          <Col lg={mayViewApplications ? 6 : 12}>
-            <Link to={gatewayPath} className={style.chooserNav}>
-              <div
-                onMouseEnter={handleGatewayChooserMouseEnter}
-                onMouseLeave={handleGatewayChooserMouseLeave}
-                className={style.chooser}
-              >
-                <Animation animationRef={gatewayAnimationRef} animationData={GatewayAnimation} />
-                <Message
-                  component="span"
-                  content={hasEntities ? m.gotoGateways : m.createGateway}
-                />
-              </div>
-            </Link>
-          </Col>
-        )}
-      </Row>
-    )
-  }, [
-    appAnimationRef,
-    applicationCount,
-    gatewayAnimationRef,
-    gatewayCount,
-    handleAppChooserMouseEnter,
-    handleAppChooserMouseLeave,
-    handleGatewayChooserMouseEnter,
-    handleGatewayChooserMouseLeave,
-  ])
 
   const hasEntities = applicationCount + gatewayCount !== 0
   const mayCreateEntities = mayCreateApps || mayCreateGtws

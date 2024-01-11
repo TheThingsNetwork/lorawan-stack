@@ -48,7 +48,11 @@ const GtwSideNavigation = () => {
   const rights = useSelector(selectGatewayRights)
   const { isMinimized } = useContext(SidebarContext)
 
-  const entityId = gtw ? gtw.name ?? gtwId : gtwId
+  if (!gtw) {
+    return null
+  }
+
+  const entityId = gtw && gtw.name ? gtw.name : gtwId
 
   return (
     <SideNavigation className="mb-cs-m">

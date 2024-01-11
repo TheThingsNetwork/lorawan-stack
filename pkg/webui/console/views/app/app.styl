@@ -15,6 +15,7 @@
 .container
   overflow: hidden
   height: 100%
+  min-width: 340px
 
 .content
   position: relative
@@ -27,15 +28,3 @@
 .stage
   display: flex
   flex-direction: column
-
-.mobile-breadcrumbs
-  +media-query-min($bp.s)
-    display: none
-  +media-query($bp.s)
-    display: block
-
-.desktop-breadcrumbs
-  +media-query-min($bp.s)
-    display: block
-  +media-query($bp.s)
-    display: none

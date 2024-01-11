@@ -25,18 +25,17 @@
     justify-content: space-between
 
   &.is-minimized
-    +media-query-min($bp.m)
-      .cluster-button
-        display: none
+    .cluster-button
+      display: none
 
-      .side-footer-version
-        display: none
+    .side-footer-version
+      display: none
 
-      .support-button button
-        justify-content: center
+    .support-button > button
+      justify-content: center
 
-        span:first-child
-          margin: 0
+      span:first-child
+        margin: 0
 
   .side-footer-dropdown
     width: calc(19rem - 2px)
@@ -46,7 +45,7 @@
   .side-footer-version
     margin-left: $cs.xxs
 
-  .support-button button
+  .support-button > button
     width: 100% !important
     justify-content: flex-start
 

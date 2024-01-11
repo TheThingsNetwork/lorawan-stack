@@ -15,10 +15,8 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
 import Button from '@ttn-lw/components/button'
-import style from '@ttn-lw/components/button/button.styl'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -28,11 +26,12 @@ const ProfileDropdown = props => {
   const { brandLogo, className, children, profilePicture, ...rest } = props
 
   return (
-    <div className="pos-relative">
+    <div className={styles.container}>
       <Button
         secondary
-        className={classnames(styles.container, className, 'pr-0')}
+        className={classnames(styles.profileButton, className, 'pr-0')}
         dropdownItems={children}
+        dropdownPosition="below left"
         {...rest}
       >
         <div className="d-flex gap-cs-xs al-center">

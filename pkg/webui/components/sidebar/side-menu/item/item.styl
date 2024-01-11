@@ -12,6 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+.container
+  position: relative
+
+  &.is-minimized, &.is-minimized .link
+    justify-content: center
+
+    .title
+      display: none
+
+    .expand-icon
+      display: none
+
+    .icon
+      transition: color 50ms linear
+      color: $c.grey-500
+
+    .sub-item-list
+      display: none
+
 .message
   vertical-align: middle
 
@@ -58,37 +77,7 @@
     .icon
       color: inherit
 
-.is-minimized
-  justify-content: center
-
-  .title
-    display: none
-
-  .expand-icon
-    display: none
-
-  .icon
-    transition: color 50ms linear
-    color: $c.grey-500
-
-.sub-item-list
-  &.is-minimized
-    +media-query-min($bp.m)
-      display: none
-
 .fly-out-list
+  --dropdown-offset: $cs.xs
   top: - $cs.xs
-  left: calc(4rem - 3px)
-  position: absolute
-  padding-left: 1rem
   z-index: $zi.dropdown
-
-  // Pseudo element to extend the clickable area
-  // to connect with the parent button.
-  &:before
-    content: ""
-    position: absolute
-    top: 0
-    left: -1rem
-    width: 1rem
-    height: 100%
