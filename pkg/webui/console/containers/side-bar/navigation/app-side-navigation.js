@@ -58,7 +58,11 @@ const AppSideNavigation = () => {
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
   const { isMinimized } = useContext(SidebarContext)
 
-  const entityId = app ? app.name ?? appId : appId
+  if (!app) {
+    return null
+  }
+
+  const entityId = app && app.name ? app.name : appId
 
   return (
     <>

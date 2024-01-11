@@ -181,10 +181,10 @@ const DevicesTableInner = () => {
 
   const importButton = mayImportDevices && (
     <Button.Link
-      secondary
       message={sharedMessages.importDevices}
       icon="import_devices"
       to={`/applications/${appId}/devices/import`}
+      secondary
     />
   )
 

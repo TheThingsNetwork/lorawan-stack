@@ -22,7 +22,7 @@
   &.primary, &.secondary, &.naked
     position: relative
     display: inline-flex
-    transition: 80ms all ease-in-out
+    transition: 80ms background ease-in-out, 80ms color ease-in-out, 80ms border-color ease-in-out, 80ms box-shadow ease-in-out
     border-radius: $br.m
     outline: 0
     cursor: pointer
@@ -35,23 +35,20 @@
     white-space: nowrap
     box-sizing: border-box
 
-  .arrow-icon
-    transform: rotate(0deg)
-    transition: transform .2s ease-in-out
-    margin-right: - $cs.xs
-
-  .arrow-icon-expanded
-    transform: rotate(180deg)
-    transition: transform .2s ease-in-out
-
   .icon
     margin-left: - $cs.xxs
 
     &:only-child
       margin-right: - $cs.xxs
 
+  .expand-icon
+    color: $c.grey-500
+    font-size: 1.285rem
+    margin-right: - $cs.xxs
+
   &.only-icon
     gap: 0
+    padding: 0 $cs.s
 
   &.primary
     color: white

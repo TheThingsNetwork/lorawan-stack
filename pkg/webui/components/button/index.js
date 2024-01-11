@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, forwardRef, useMemo, useState, useRef } from 'react'
+import React, { useCallback, forwardRef, useMemo, useRef } from 'react'
 import classnames from 'classnames'
 import { useIntl } from 'react-intl'
 
@@ -51,7 +51,8 @@ const assembleClassnames = ({
   className,
   error,
 }) =>
-  classnames(style.button, className, {
+  classnames(style.button, {
+    [className]: !Boolean(dropdownItems), // If there are dropdown items, the button is wrapped in a div with the className.
     [style.danger]: danger,
     [style.warning]: warning,
     [style.primary]: primary,
@@ -67,7 +68,7 @@ const assembleClassnames = ({
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, busy, message, expanded, noDropdownIcon, children } = props
+  const { dropdownItems, icon, busy, message, noDropdownIcon, children } = props
 
   const content = (
     <>
@@ -75,16 +76,7 @@ const buttonChildren = props => {
       {message && <Message content={message} className={style.linkButtonMessage} />}
       {children}
       {dropdownItems && (
-        <>
-          {!noDropdownIcon && (
-            <Icon
-              className={classnames(style.arrowIcon, {
-                [style['arrow-icon-expanded']]: expanded,
-              })}
-              icon="expand_more"
-            />
-          )}
-        </>
+        <>{!noDropdownIcon && <Icon className={style.expandIcon} icon="expand_more" />}</>
       )}
     </>
   )
@@ -103,6 +95,7 @@ const Button = forwardRef((props, ref) => {
     disabled,
     dropdownItems,
     dropdownClassName,
+    dropdownPosition,
     name,
     type,
     value,
@@ -111,31 +104,13 @@ const Button = forwardRef((props, ref) => {
     onBlur,
     onClick,
     form,
+    className,
     ...rest
   } = props
-  const [expanded, setExpanded] = useState(false)
   const innerRef = useRef()
   const combinedRef = combineRefs([ref, innerRef])
 
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
-
-  const handleClickOutside = useCallback(
-    e => {
-      if (innerRef.current && !innerRef.current.contains(e.target)) {
-        setExpanded(false)
-      }
-    },
-    [innerRef],
-  )
-
-  const toggleDropdown = useCallback(() => {
-    setExpanded(oldExpanded => {
-      const newState = !oldExpanded
-      if (newState) document.addEventListener('mousedown', handleClickOutside)
-      else document.removeEventListener('mousedown', handleClickOutside)
-      return newState
-    })
-  }, [handleClickOutside])
 
   const handleClick = useCallback(
     evt => {
@@ -143,16 +118,12 @@ const Button = forwardRef((props, ref) => {
         return
       }
 
-      if (dropdownItems) {
-        toggleDropdown()
-        return
-      }
       // Passing a value to the onClick handler is useful for components that
       // are rendered multiple times, e.g. in a list. The value can be used to
       // identify the component that was clicked.
       onClick(evt, value)
     },
-    [busy, disabled, dropdownItems, onClick, toggleDropdown, value],
+    [busy, disabled, onClick, value],
   )
 
   const intl = useIntl()
@@ -169,7 +140,7 @@ const Button = forwardRef((props, ref) => {
     <button
       className={buttonClassNames}
       onClick={handleClick}
-      children={buttonChildren({ ...props, expanded })}
+      children={buttonChildren({ ...props })}
       disabled={busy || disabled}
       ref={combinedRef}
       {...htmlProps}
@@ -178,11 +149,15 @@ const Button = forwardRef((props, ref) => {
 
   if (dropdownItems) {
     return (
-      <div className="pos-relative">
+      <div className={classnames(className, 'pos-relative')}>
         {buttonElement}
-        <Dropdown className={classnames(dropdownClassName)} open={expanded}>
+        <Dropdown.Attached
+          className={dropdownClassName}
+          attachedRef={innerRef}
+          position={dropdownPosition}
+        >
           {dropdownItems}
-        </Dropdown>
+        </Dropdown.Attached>
       </div>
     )
   }
@@ -289,7 +264,6 @@ buttonChildren.propTypes = {
    */
   busy: commonPropTypes.busy,
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-  expanded: PropTypes.bool,
   icon: commonPropTypes.icon,
   message: commonPropTypes.message,
 }
@@ -299,7 +273,6 @@ buttonChildren.defaultProps = {
   icon: undefined,
   message: undefined,
   children: null,
-  expanded: false,
   small: false,
 }
 

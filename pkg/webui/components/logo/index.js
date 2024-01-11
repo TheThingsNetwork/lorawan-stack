@@ -19,16 +19,14 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './logo.styl'
 
-const Logo = ({ className, logo, brandLogo, vertical }) => {
-  const classname = classnames(style.container, className, {
-    [style.vertical]: vertical,
-    [style.customBranding]: Boolean(brandLogo),
-  })
+const Logo = ({ className, logo, miniLogo }) => {
+  const classname = classnames(style.container, className)
 
   return (
     <div className={classname}>
       <div className={style.logo}>
         <img {...logo} />
+        <img {...miniLogo} />
       </div>
     </div>
   )
@@ -43,6 +41,7 @@ Logo.propTypes = {
   brandLogo: imgPropType,
   className: PropTypes.string,
   logo: imgPropType.isRequired,
+  miniLogo: imgPropType.isRequired,
   safe: PropTypes.bool,
   vertical: PropTypes.bool,
 }

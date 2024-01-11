@@ -24,13 +24,13 @@ import SidebarContext from '../context'
 const AppListSideNavigation = () => {
   const { topEntities, isMinimized } = useContext(SidebarContext)
 
-  if (isMinimized) {
+  if (isMinimized || topEntities.length === 0) {
     return null
   }
 
   return (
     <div>
-      <SectionLabel label={sharedMessages.topApplications} icon="add" />
+      <SectionLabel label={sharedMessages.topApplications} icon="add" onClick={() => null} />
       <SideNavigation>
         {topEntities.map(({ path, entity, title }) => (
           <SideNavigation.Item title={title} path={path} icon={entity} key={path} />

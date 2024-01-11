@@ -14,8 +14,6 @@
 
 import React from 'react'
 
-import style from './dropdown.styl'
-
 import Dropdown from '.'
 
 export default {
@@ -25,7 +23,7 @@ export default {
 
 export const Default = () => (
   <div style={{ height: '8rem' }}>
-    <Dropdown className={style.example} open>
+    <Dropdown open>
       <Dropdown.HeaderItem title="dropdown items" />
       <Dropdown.Item title="Profile Settings" path="profile/path" icon="person" />
       <Dropdown.Item title="Admin panel" path="admin/path" icon="admin_panel_settings" />
