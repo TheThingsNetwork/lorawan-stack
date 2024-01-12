@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,107 +12,73 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useCallback } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 
-import hamburgerMenuNormal from '@assets/misc/hamburger-menu-normal.svg'
-import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
-
-import NavigationBar from '@ttn-lw/components/navigation/bar'
+import Button from '@ttn-lw/components/button'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
-import MobileMenu from '@ttn-lw/components/mobile-menu'
-import Input from '@ttn-lw/components/input'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './header.styl'
 
 const Header = ({
+  brandLogo,
+  Logo,
   className,
-  dropdownItems,
-  navigationEntries,
+  addDropdownItems,
+  starDropdownItems,
+  profileDropdownItems,
   user,
-  searchable,
-  logo,
-  mobileDropdownItems,
-  onLogout,
-  onSearchRequest,
+  onMenuClick,
   ...rest
-}) => {
-  const isGuest = !Boolean(user)
+}) => (
+  <header {...rest} className={classnames(className, style.container)}>
+    <div className={classnames('breadcrumbs', 'm:d-none')} />
+    <div className="d-none m:d-flex al-center gap-cs-xs">
+      <Button secondary icon="menu" onClick={onMenuClick} />
+      <Logo className={style.logo} />
+    </div>
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const handleMobileMenuClick = useCallback(() => {
-    setMobileMenuOpen(!mobileMenuOpen)
-  }, [mobileMenuOpen])
+    <div className="d-flex al-center gap-cs-xs">
+      <Button secondary icon="add" dropdownItems={addDropdownItems} dropdownPosition="below left" />
+      <Button
+        secondary
+        icon="grade"
+        dropdownItems={starDropdownItems}
+        dropdownPosition="below left"
+        className="xs:d-none"
+      />
+      <Button secondary icon="inbox" dropdownItems={<></>} dropdownPosition="below left" />
+      <ProfileDropdown
+        brandLogo={brandLogo}
+        data-test-id="profile-dropdown"
+        profilePicture={user?.profile_picture}
+      >
+        {profileDropdownItems}
+      </ProfileDropdown>
+    </div>
+  </header>
+)
 
-  const handleMobileMenuItemsClick = useCallback(() => {
-    setMobileMenuOpen(false)
-  }, [])
-
-  const classNames = classnames(className, style.container, {
-    [style.mobileMenuOpen]: mobileMenuOpen,
-  })
-
-  const hamburgerGraphic = mobileMenuOpen ? hamburgerMenuClose : hamburgerMenuNormal
-
-  return (
-    <header {...rest} className={classNames}>
-      <div className={style.bar}>
-        <div className={style.left}>
-          {logo}
-          {!isGuest && <NavigationBar className={style.navList}>{navigationEntries}</NavigationBar>}
-        </div>
-        {!isGuest && (
-          <div className={style.right}>
-            {searchable && <Input icon="search" onEnter={onSearchRequest} />}
-            <ProfileDropdown
-              className={style.profileDropdown}
-              userName={user.name || user.ids.user_id}
-              data-test-id="profile-dropdown"
-              profilePicture={user.profile_picture}
-            >
-              {dropdownItems}
-            </ProfileDropdown>
-            <button onClick={handleMobileMenuClick} className={style.mobileMenuButton}>
-              <div className={style.hamburger}>
-                <img src={hamburgerGraphic} alt="Open Mobile Menu" />
-              </div>
-            </button>
-          </div>
-        )}
-      </div>
-      {mobileMenuOpen && (
-        <MobileMenu
-          className={style.mobileMenu}
-          onItemsClick={handleMobileMenuItemsClick}
-          onLogout={onLogout}
-          user={user}
-        >
-          {mobileDropdownItems}
-        </MobileMenu>
-      )}
-    </header>
-  )
-}
+const imgPropType = PropTypes.shape({
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired,
+})
 
 Header.propTypes = {
+  Logo: PropTypes.elementType.isRequired,
+  /** The dropdown items when the add button is clicked. */
+  addDropdownItems: PropTypes.node.isRequired,
+  brandLogo: imgPropType,
   /** The classname applied to the component. */
   className: PropTypes.string,
-  /** The child node of the dropdown component. */
-  dropdownItems: PropTypes.node,
-  /** The logo component. */
-  logo: PropTypes.node.isRequired,
-  /** The child node of the mobile dropdown. */
-  mobileDropdownItems: PropTypes.node,
-  /** The Child node of the navigation bar. */
-  navigationEntries: PropTypes.node,
-  /** A handler for when the user used the search input. */
-  onLogout: PropTypes.func,
-  /** Handler of the search function. */
-  onSearchRequest: PropTypes.func,
-  /* A flag indicating whether the header has a search input. */
-  searchable: PropTypes.bool,
+  /** A handler for when the menu button is clicked. */
+  onMenuClick: PropTypes.func.isRequired,
+  /** The dropdown items when the profile button is clicked. */
+  profileDropdownItems: PropTypes.node.isRequired,
+  /** The dropdown items when the star button is clicked. */
+  starDropdownItems: PropTypes.node.isRequired,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
    * guest header is rendered.
@@ -122,13 +88,8 @@ Header.propTypes = {
 
 Header.defaultProps = {
   className: undefined,
-  dropdownItems: undefined,
-  navigationEntries: undefined,
-  mobileDropdownItems: null,
-  onSearchRequest: () => null,
-  onLogout: () => null,
-  searchable: false,
   user: undefined,
+  brandLogo: undefined,
 }
 
 export default Header

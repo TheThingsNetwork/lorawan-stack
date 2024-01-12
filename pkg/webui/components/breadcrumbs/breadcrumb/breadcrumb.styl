@@ -12,27 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.link
-  one-liner()
-  text-decoration: none
-  color: $tc-subtle-gray
-  min-height: 18px
+
+.container
+  display: flex
 
   &:not(:last-child):after
     material-icon()
+    nudge('down', 1px)
     margin: 0 $cs.xxs
     content: 'keyboard_arrow_right'
     color: $tc-subtle-gray
 
+.link
+  one-liner()
+  text-decoration: none
+  color: $tc-subtle-gray
+  display: flex
+  align-items: center
   +focus-visible()
     text-decoration: underline
     color: $tc-deep-gray
 
-
 .last
   one-liner()
+  display: flex
+  align-items: center
   color: $tc-deep-gray
-  min-height: 18px
+  font-weight: $fw.bold
   +media-query($bp.s)
     &:last-child
       padding-right: $ls.xxs

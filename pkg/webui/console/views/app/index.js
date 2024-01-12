@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Route,
@@ -25,9 +25,6 @@ import {
 import classnames from 'classnames'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
-import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
-
-import Footer from '@ttn-lw/containers/footer'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -37,6 +34,7 @@ import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-v
 
 import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
+import Sidebar from '@console/containers/side-bar'
 
 import Overview from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -84,37 +82,75 @@ const Layout = () => {
   const siteTitle = selectApplicationSiteTitle()
   const siteName = selectApplicationSiteName()
 
+  // For the mobile side menu drawer functionality.
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const node = useRef()
+
+  const openDrawer = useCallback(() => {
+    setIsDrawerOpen(true)
+    document.body.classList.add(style.scrollLock)
+  }, [])
+
+  const closeDrawer = useCallback(() => {
+    setIsDrawerOpen(false)
+    document.body.classList.remove(style.scrollLock)
+  }, [])
+
+  useEffect(() => {
+    const onClickOutside = e => {
+      if (isDrawerOpen && node.current && !node.current.contains(e.target)) {
+        closeDrawer()
+      }
+    }
+
+    if (isDrawerOpen) {
+      document.addEventListener('mousedown', onClickOutside)
+      return () => document.removeEventListener('mousedown', onClickOutside)
+    }
+  }, [isDrawerOpen, closeDrawer])
+
+  // Pass this function to the header prop `onMenuClick`.
+  const onDrawerExpandClick = useCallback(() => {
+    if (!isDrawerOpen) {
+      openDrawer()
+    } else {
+      closeDrawer()
+    }
+  }, [isDrawerOpen, openDrawer, closeDrawer])
+  // End of mobile side menu drawer functionality
+
   return (
     <>
       <ScrollRestoration getKey={getScrollRestorationKey} />
       <ErrorView errorRender={errorRender}>
-        <div className="w-full h-full">
+        <div className={style.container}>
           <IntlHelmet
             titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             defaultTitle={siteName}
           />
           <div id="modal-container" />
-          <Header />
-          <main className={style.main}>
-            <WithAuth
-              user={user}
-              fetching={fetching}
-              error={error}
-              errorComponent={FullViewErrorInner}
-              rights={rights}
-              isAdmin={isAdmin}
-            >
-              <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-              <div id="sidebar" className={sidebarStyle.container} />
-              <div className={style.content}>
-                <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
-                <div className={style.stage} id="stage">
-                  <Outlet />
-                </div>
-              </div>
-            </WithAuth>
-          </main>
-          <Footer className={style.footer} />
+          <div className="d-flex">
+            <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
+            <div className="w-full h-vh">
+              <Header onMenuClick={onDrawerExpandClick} />
+              <main className={classnames(style.main, 'd-flex', 'flex-column', 'h-full')}>
+                <WithAuth
+                  user={user}
+                  fetching={fetching}
+                  error={error}
+                  errorComponent={FullViewErrorInner}
+                  rights={rights}
+                  isAdmin={isAdmin}
+                >
+                  <div className={style.content}>
+                    <div className={style.stage} id="stage">
+                      <Outlet />
+                    </div>
+                  </div>
+                </WithAuth>
+              </main>
+            </div>
+          </div>
         </div>
       </ErrorView>
     </>

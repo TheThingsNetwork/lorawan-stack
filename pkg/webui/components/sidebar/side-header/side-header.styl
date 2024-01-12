@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+.header-container
+  display: flex
+  justify-content: space-between
+  align-items: center
+  gap: $cs.m
 
-const SideNavigationContext = React.createContext()
+  &.is-minimized
+    flex-direction: column
+    gap: $cs.xs
 
-export default SideNavigationContext
+    .logo
+      display: none
+
+    .mini-logo
+      display: flex
+
+  .minimize-button
+    transition: none
+
+  &:not(.is-minimized)
+    .minimize-button
+      margin-top: - $cs.xxs
+      margin-right: - $cs.s
+
+  .logo
+    width: 9.57rem
+
+  .mini-logo
+    display: none
+    width: 2.8rem
+    padding: $cs.s 0

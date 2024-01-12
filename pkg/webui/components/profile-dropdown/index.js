@@ -12,55 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useRef, useState } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
+import Button from '@ttn-lw/components/button'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import styles from './profile-dropdown.styl'
 
 const ProfileDropdown = props => {
-  const [expanded, setExpanded] = useState(false)
-  const node = useRef(null)
-  const { userName, className, children, profilePicture, ...rest } = props
-
-  const handleClickOutside = useCallback(e => {
-    if (node.current && !node.current.contains(e.target)) {
-      setExpanded(false)
-    }
-  }, [])
-
-  const toggleDropdown = useCallback(() => {
-    setExpanded(oldExpanded => {
-      const newState = !oldExpanded
-      if (newState) document.addEventListener('mousedown', handleClickOutside)
-      else document.removeEventListener('mousedown', handleClickOutside)
-      return newState
-    })
-  }, [handleClickOutside])
+  const { brandLogo, className, children, profilePicture, ...rest } = props
 
   return (
-    <div
-      className={classnames(styles.container, className)}
-      onClick={toggleDropdown}
-      ref={node}
-      tabIndex="0"
-      role="button"
-      {...rest}
-    >
-      <ProfilePicture profilePicture={profilePicture} className={styles.profilePicture} />
-      <span className={styles.id}>{userName}</span>
-      <Icon className={styles.dropdownIcon} icon={expanded ? 'arrow_drop_up' : 'arrow_drop_down'} />
-      {expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
+    <div className={styles.container}>
+      <Button
+        secondary
+        className={classnames(styles.profileButton, className, 'pr-0')}
+        dropdownItems={children}
+        dropdownPosition="below left"
+        {...rest}
+      >
+        <div className="d-flex gap-cs-xs al-center">
+          {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
+          <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
+        </div>
+      </Button>
     </div>
   )
 }
 
 ProfileDropdown.propTypes = {
+  brandLogo: PropTypes.shape({
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.string.isRequired,
+  }),
   /**
    * A list of items for the dropdown component. See `<Dropdown />`'s `items`
    * proptypes for details.
@@ -69,11 +56,10 @@ ProfileDropdown.propTypes = {
   className: PropTypes.string,
   /** The profile picture of the current user. */
   profilePicture: PropTypes.profilePicture,
-  /** The name/id of the current user. */
-  userName: PropTypes.string.isRequired,
 }
 
 ProfileDropdown.defaultProps = {
+  brandLogo: undefined,
   className: undefined,
   profilePicture: undefined,
 }

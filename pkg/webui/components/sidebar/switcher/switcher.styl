@@ -1,0 +1,71 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.switcher-container
+  border-radius: $br.l
+  border: 1px solid $c.grey-200
+  background: white
+  box-shadow: 0px 2px 7px 1px rgba(0, 0, 0, 0.06)
+  display: flex
+  gap: $cs.xxs
+  justify-content: center
+  padding: $cs.xxs
+
+  .link
+    border-radius: $br.m
+    text-decoration: none
+    color: $c.grey-700
+    display: flex
+    justify-content: center
+    width: 100%
+    transition: background 80ms ease-in-out
+    position: relative
+    padding: $cs.s $cs.xxs
+
+    &.active
+      background: $c.grey-900
+      color: $c.white
+      font-weight: $fw.bold
+
+    &:visited
+      text-decoration: none
+      &:not(.active)
+        color: $c.grey-700
+
+    &:hover
+      text-decoration: none
+      &:not(.active)
+        background: $c.grey-100
+
+  &.is-minimized
+    flex-direction: column
+
+    .link
+      padding: $cs.xs 0
+
+    .caption
+      display: none
+
+  &:not(.is-minimized)
+    .icon
+      display: none
+
+  .icon
+    font-size: $fs.xl
+    font-weight: 300
+
+  .fly-out-list
+    --dropdown-offset: calc(1rem - 2px)
+    top: - $cs.xs
+    color: $c.grey-900

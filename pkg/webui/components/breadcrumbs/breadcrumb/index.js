@@ -29,16 +29,22 @@ const Breadcrumb = ({ className, path, content, isLast }) => {
   let componentProps
   if (!isLast) {
     Component = Link
-    componentProps = { className: classnames(className, style.link), to: path, secondary: true }
+    componentProps = {
+      className: style.link,
+      to: path,
+      secondary: true,
+    }
   } else {
     Component = 'span'
     componentProps = { className: classnames(className, style.last) }
   }
 
   return (
-    <Component {...componentProps}>
-      {isRawText ? <span>{content}</span> : <Message content={content} />}
-    </Component>
+    <span className={classnames(className, style.container)}>
+      <Component {...componentProps}>
+        {isRawText ? content : <Message content={content} />}
+      </Component>
+    </span>
   )
 }
 

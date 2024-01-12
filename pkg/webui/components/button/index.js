@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, forwardRef, useMemo } from 'react'
+import React, { useCallback, forwardRef, useMemo, useRef } from 'react'
 import classnames from 'classnames'
 import { useIntl } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
 import Icon from '@ttn-lw/components/icon'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './button.styl'
@@ -39,46 +41,50 @@ const assembleClassnames = ({
   danger,
   warning,
   primary,
+  secondary,
   naked,
-  unstyled,
+  grey,
   icon,
+  small,
   busy,
+  dropdownItems,
   className,
   error,
-  disabled,
-}) => {
-  if (unstyled) {
-    return className
-  }
-  return classnames(style.button, className, {
+}) =>
+  classnames(style.button, {
+    [className]: !Boolean(dropdownItems), // If there are dropdown items, the button is wrapped in a div with the className.
     [style.danger]: danger,
     [style.warning]: warning,
     [style.primary]: primary,
+    [style.secondary]: secondary,
     [style.naked]: naked,
     [style.busy]: busy,
+    [style.grey]: grey,
+    [style.small]: small,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
+    [style.withDropdown]: Boolean(dropdownItems),
     [style.error]: error && !busy,
-    [style.disabled]: disabled || busy,
   })
-}
 
 const buttonChildren = props => {
-  const { icon, busy, message, children } = props
+  const { dropdownItems, icon, busy, message, noDropdownIcon, children } = props
 
-  const content = Boolean(children) ? (
-    children
-  ) : (
+  const content = (
     <>
-      {icon ? <Icon className={style.icon} icon={icon} /> : null}
-      {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
+      {icon && <Icon className={style.icon} icon={icon} />}
+      {message && <Message content={message} className={style.linkButtonMessage} />}
+      {children}
+      {dropdownItems && (
+        <>{!noDropdownIcon && <Icon className={style.expandIcon} icon="expand_more" />}</>
+      )}
     </>
   )
 
   return (
     <>
       {content}
-      {busy ? <Spinner className={style.spinner} small after={200} /> : null}
+      {busy && <Spinner className={style.spinner} small after={200} />}
     </>
   )
 }
@@ -87,6 +93,9 @@ const Button = forwardRef((props, ref) => {
   const {
     autoFocus,
     disabled,
+    dropdownItems,
+    dropdownClassName,
+    dropdownPosition,
     name,
     type,
     value,
@@ -95,8 +104,11 @@ const Button = forwardRef((props, ref) => {
     onBlur,
     onClick,
     form,
+    className,
     ...rest
   } = props
+  const innerRef = useRef()
+  const combinedRef = combineRefs([ref, innerRef])
 
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
 
@@ -123,16 +135,34 @@ const Button = forwardRef((props, ref) => {
 
   const htmlProps = { autoFocus, name, type, value, title, onBlur, form, ...dataProps }
   const buttonClassNames = assembleClassnames(props)
-  return (
+
+  const buttonElement = (
     <button
       className={buttonClassNames}
       onClick={handleClick}
-      children={buttonChildren(props)}
+      children={buttonChildren({ ...props })}
       disabled={busy || disabled}
-      ref={ref}
+      ref={combinedRef}
       {...htmlProps}
     />
   )
+
+  if (dropdownItems) {
+    return (
+      <div className={classnames(className, 'pos-relative')}>
+        {buttonElement}
+        <Dropdown.Attached
+          className={dropdownClassName}
+          attachedRef={innerRef}
+          position={dropdownPosition}
+        >
+          {dropdownItems}
+        </Dropdown.Attached>
+      </div>
+    )
+  }
+
+  return buttonElement
 })
 
 Button.defaultProps = {
@@ -215,16 +245,16 @@ const commonPropTypes = {
   name: PropTypes.string,
   /** The html `type` prop passed to the <button /> element. */
   type: PropTypes.string,
-  /** A flag specifying whether no additional styles should be
-   * attached to the button. This can helpful to achieve individual stylings.
-   */
-  unstyled: PropTypes.bool,
   /** The html `value` prop passed to the <button /> element. */
   value: PropTypes.string,
   /** The html `autofocus` prop passed to the <button /> element. */
   autoFocus: PropTypes.bool,
   /** A message to be evaluated and passed to the <button /> element. */
   title: PropTypes.message,
+  /** Dropdown items of the button. */
+  dropdownItems: PropTypes.node,
+  /** A flag specifying whether the small styling should applied to the button. */
+  small: PropTypes.bool,
 }
 
 buttonChildren.propTypes = {
@@ -243,6 +273,7 @@ buttonChildren.defaultProps = {
   icon: undefined,
   message: undefined,
   children: null,
+  small: false,
 }
 
 Button.propTypes = {
@@ -253,6 +284,10 @@ Button.propTypes = {
    */
   onClick: PropTypes.func,
   ...commonPropTypes,
+}
+
+Button.defaultProps = {
+  onClick: () => null,
 }
 
 LinkButton.propTypes = {

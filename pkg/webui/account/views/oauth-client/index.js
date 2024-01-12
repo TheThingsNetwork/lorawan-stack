@@ -19,7 +19,7 @@ import { Routes, Route, useParams } from 'react-router-dom'
 import applicationIcon from '@assets/misc/application.svg'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import SideNavigation from '@ttn-lw/components/navigation/side'
+import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 

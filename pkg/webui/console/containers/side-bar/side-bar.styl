@@ -1,0 +1,59 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.sidebar
+  border-normal(right)
+  line-height: 1
+  font-size: $fs.s
+  min-width: 22rem
+  max-width: 24rem
+  box-sizing: border-box
+  sidebar-transition(min-width)
+  +media-query($bp.m)
+    transition: left .4s cubic-bezier(0.220, 0.005, 0.295, 1.000)
+    position: absolute
+    top: 0
+    left: -90vw
+    bottom: 0
+    width: 90vw
+    min-width: 18rem
+    height: 100vh
+    z-index: $zi.nav
+
+    &-open
+      transition: left .6s cubic-bezier(0.165, 0.840, 0.440, 1.000)
+      left: 0
+
+      & + .sidebar-backdrop
+        opacity: 1
+        visibility: visible
+
+  &-backdrop
+    transition: opacity .4s ease-in-out, visibility .4s ease-in-out
+    opacity: 0
+    visibility: hidden
+    position: fixed
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+    background: rgba(0, 0, 0, .7)
+    z-index: 1
+    cursor: pointer
+
+  &-minimized
+    +media-query-min($bp.m)
+      width: 4.5rem
+      min-width: initial
+      max-width: initial
