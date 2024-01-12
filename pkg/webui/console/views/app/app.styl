@@ -12,27 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+.container
+  overflow: hidden
+  height: 100%
+  min-width: 340px
+
 .content
   position: relative
   display: flex
   flex-direction: column
 
+.main
+  overflow-y: auto
+
 .stage
-  &:not(.stage-flex)
-    padding-bottom: $ls.xxs
-  &-flex
-    display: flex
-    flex-direction: column
-    overflow-y: auto
-
-.mobile-breadcrumbs
-  +media-query-min($bp.s)
-    display: none
-  +media-query($bp.s)
-    display: block
-
-.desktop-breadcrumbs
-  +media-query-min($bp.s)
-    display: block
-  +media-query($bp.s)
-    display: none
+  display: flex
+  flex-direction: column

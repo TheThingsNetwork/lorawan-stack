@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -26,40 +27,70 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './switcher.styl'
 
 const Switcher = ({ isMinimized }) => {
+  const overviewRef = useRef(null)
+  const applicationsRef = useRef(null)
+  const gatewaysRef = useRef(null)
   const { pathname } = useLocation()
-  // <NavLink to="/"> effectively ignores the end prop and only matches when you're at the root route.
-  // https://reactrouter.com/en/main/components/nav-link
-  const overviewClassName = classnames(
-    style.link,
-    { [style.active]: !pathname.includes('/applications') && !pathname.includes('/gateways') },
-    'p-vert-cs-s',
-    'p-sides-0',
-  )
 
-  const className = useCallback(
+  const getNavLinkClass = useCallback(
     ({ isActive }) =>
-      classnames(style.link, { [style.active]: isActive }, 'p-vert-cs-s', 'p-sides-0'),
+      classnames(style.link, {
+        [style.active]: isActive,
+      }),
     [],
   )
 
+  const getOverviewNavLinkClass = classnames(style.link, {
+    [style.active]: !pathname.startsWith('/applications') && !pathname.startsWith('/gateways'),
+  })
+
   return (
     <div
-      className={classnames(style.switcherContainer, 'd-flex', 'j-center', 'p-cs-xxs', 'mb-cs-m', {
-        'direction-column': isMinimized,
+      className={classnames(style.switcherContainer, {
+        [style.isMinimized]: isMinimized,
       })}
     >
-      <NavLink to="/" className={overviewClassName}>
-        {isMinimized ? <Icon icon="home" /> : <Message content={sharedMessages.overview} />}
-      </NavLink>
-      <NavLink to="/applications" className={className}>
-        {isMinimized ? (
-          <Icon icon="application" />
-        ) : (
-          <Message content={sharedMessages.applications} />
+      <NavLink to="/" className={getOverviewNavLinkClass} ref={overviewRef}>
+        <Icon icon="home" className={style.icon} />
+        <Message className={style.caption} content={sharedMessages.overview} />
+        {isMinimized && (
+          <Dropdown.Attached
+            attachedRef={overviewRef}
+            className={style.flyOutList}
+            position="right"
+            hover
+          >
+            <Dropdown.HeaderItem title={sharedMessages.overview} />
+          </Dropdown.Attached>
         )}
       </NavLink>
-      <NavLink to="/gateways" className={className}>
-        {isMinimized ? <Icon icon="gateway" /> : <Message content={sharedMessages.gateways} />}
+      <NavLink to="/applications" className={getNavLinkClass} ref={applicationsRef}>
+        <Icon icon="application" className={style.icon} />
+        <Message className={style.caption} content={sharedMessages.applications} />
+        {isMinimized && (
+          <Dropdown.Attached
+            attachedRef={applicationsRef}
+            className={style.flyOutList}
+            position="right"
+            hover
+          >
+            <Dropdown.HeaderItem title={sharedMessages.applications} />
+          </Dropdown.Attached>
+        )}
+      </NavLink>
+      <NavLink to="/gateways" className={getNavLinkClass} ref={gatewaysRef}>
+        <Icon icon="gateway" className={style.icon} />
+        <Message className={style.caption} content={sharedMessages.gateways} />
+        {isMinimized && (
+          <Dropdown.Attached
+            attachedRef={gatewaysRef}
+            className={style.flyOutList}
+            position="right"
+            hover
+          >
+            <Dropdown.HeaderItem title={sharedMessages.gateways} />
+          </Dropdown.Attached>
+        )}
       </NavLink>
     </div>
   )

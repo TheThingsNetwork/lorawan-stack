@@ -139,6 +139,7 @@ const GatewayOverview = () => {
             icon="get_app"
             onClick={handleGlobalConfDownload}
             message={m.downloadGlobalConf}
+            secondary
           />
         ) : (
           <Message content={m.globalConfUnavailable} className="tc-subtle-gray" />

@@ -57,9 +57,7 @@ const SideFooter = () => {
   const clusterButtonRef = useRef(null)
 
   const clusterDropdownItems = (
-    <>
-      <Dropdown.Item title="Cluster selection" icon="public" path="/cluster" />
-    </>
+    <Dropdown.Item title="Cluster selection" icon="public" path="/cluster" />
   )
 
   const languageContext = useContext(LanguageContext)
@@ -72,7 +70,7 @@ const SideFooter = () => {
     [setLocale],
   )
 
-  const submenuItems = supportedLocales
+  const languageItems = supportedLocales
     ? Object.keys(supportedLocales).map(l => (
         <LanguageOption
           locale={l}
@@ -90,19 +88,22 @@ const SideFooter = () => {
         title={sharedMessages.documentation}
         icon="menu_book"
         path={documentationBaseUrl}
+        external
       />
-      <Dropdown.Item title={sharedMessages.support} icon="support" path={supportLink} />
+      <Dropdown.Item title={sharedMessages.support} icon="support" path={supportLink} external />
       <Dropdown.Item
         title={sharedMessages.statusPage}
         icon="monitor_heart"
         path={statusPageBaseUrl}
+        external
       />
       {Boolean(languageContext) && (
         <Dropdown.Item
           title={sharedMessages.language}
           icon="language"
           path="/support"
-          submenuItems={submenuItems}
+          submenuItems={languageItems}
+          external
         />
       )}
     </>
@@ -115,32 +116,36 @@ const SideFooter = () => {
     'al-center',
     'gap-cs-xs',
     'fs-s',
+    { [style.isMinimized]: isMinimized },
   )
 
   return (
     <div className={sideFooterClassnames}>
       <Button
-        className={classnames(style.sideFooterButton, style.sideFooterFullWidth)}
+        className={style.supportButton}
         secondary
         icon="support"
-        message={!isMinimized ? `v${process.env.VERSION} (${process.env.REVISION})` : undefined}
         dropdownItems={supportDropdownItems}
-        dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterSupportDropdown)}
+        dropdownPosition="above"
+        dropdownClassName={style.sideFooterDropdown}
         noDropdownIcon
         ref={supportButtonRef}
+      >
+        <span className={style.sideFooterVersion}>
+          v{process.env.VERSION} ({process.env.REVISION})
+        </span>
+      </Button>
+      <Button
+        className={style.clusterButton}
+        secondary
+        icon="public"
+        message="EU1"
+        noDropdownIcon
+        dropdownItems={clusterDropdownItems}
+        dropdownPosition="above"
+        dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterClusterDropdown)}
+        ref={clusterButtonRef}
       />
-      {!isMinimized && (
-        <Button
-          className={style.sideFooterButton}
-          secondary
-          icon="public"
-          message="EU1"
-          noDropdownIcon
-          dropdownItems={clusterDropdownItems}
-          dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterClusterDropdown)}
-          ref={clusterButtonRef}
-        />
-      )}
     </div>
   )
 }

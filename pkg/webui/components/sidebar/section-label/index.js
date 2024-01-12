@@ -42,7 +42,7 @@ const SectionLabel = ({
     data-test-id={dataTestId}
   >
     <Message content={label} />
-    <Button naked icon={icon} disabled={buttonDisabled} onClick={onClick} />
+    <Button naked small icon={icon} disabled={buttonDisabled} onClick={onClick} />
   </div>
 )
 
@@ -51,7 +51,7 @@ SectionLabel.propTypes = {
   className: PropTypes.string,
   'data-test-id': PropTypes.string,
   icon: PropTypes.string.isRequired,
-  label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+  label: PropTypes.oneOfType([PropTypes.node, PropTypes.message]).isRequired,
   onClick: PropTypes.func.isRequired,
 }
 

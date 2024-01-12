@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React from 'react'
 
 import SideHeader from '@ttn-lw/components/sidebar/side-header'
 
 import { selectApplicationSiteName, selectAssetsRootPath } from '@ttn-lw/lib/selectors/env'
 
-import SidebarContext from '../context'
-
 const Header = () => {
-  const { isMinimized } = useContext(SidebarContext)
-  const logo = {
-    src: isMinimized
-      ? `${selectAssetsRootPath()}/tts-logo-icon.svg`
-      : `${selectAssetsRootPath()}/tts-logo.svg`,
-    alt: `${selectApplicationSiteName()} Logo`,
-  }
-  return <SideHeader logo={logo} />
+  const logoAlt = `${selectApplicationSiteName()} Logo`
+  const logoSrc = `${selectAssetsRootPath()}/tts-logo.svg`
+  const miniLogoSrc = `${selectAssetsRootPath()}/tts-logo-icon.svg`
+
+  return (
+    <SideHeader
+      logo={{ src: logoSrc, alt: logoAlt }}
+      miniLogo={{ src: miniLogoSrc, alt: logoAlt }}
+    />
+  )
 }
 
 export default Header

@@ -20,6 +20,7 @@ import Dropdown from '@ttn-lw/components/dropdown'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectAssetsRootPath, selectBrandingRootPath } from '@ttn-lw/lib/selectors/env'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import selectAccountUrl from '@console/lib/selectors/app-config'
 import {
@@ -37,7 +38,7 @@ import Logo from '../logo'
 
 const accountUrl = selectAccountUrl()
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
   const dispatch = useDispatch()
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
@@ -121,9 +122,14 @@ const Header = () => {
       addDropdownItems={plusDropdownItems}
       starDropdownItems={[]}
       brandLogo={brandLogo}
-      logo={<Logo />}
+      Logo={Logo}
+      onMenuClick={onMenuClick}
     />
   )
+}
+
+Header.propTypes = {
+  onMenuClick: PropTypes.func.isRequired,
 }
 
 export default Header

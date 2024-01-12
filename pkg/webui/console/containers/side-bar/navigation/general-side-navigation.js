@@ -15,7 +15,7 @@
 import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 
-import SideNavigation from '@ttn-lw/components/navigation/side'
+import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -43,7 +43,7 @@ const GeneralSideNavigation = () => {
   )
 
   return (
-    <div>
+    <>
       <SideNavigation className="mt-cs-xs">
         <SideNavigation.Item title={sharedMessages.dashboard} path="/" icon="overview" exact />
         {mayViewOrgs && (
@@ -72,16 +72,16 @@ const GeneralSideNavigation = () => {
             icon="admin_panel_settings"
           />
         )}
-        {!isMinimized && (
-          <>
-            <SectionLabel label={sharedMessages.topEntities} icon="add" className="mt-cs-m" />
-            {topEntities.map(({ path, title, entity }) => (
-              <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
-            ))}
-          </>
-        )}
       </SideNavigation>
-    </div>
+      {!isMinimized && (
+        <SideNavigation className="mt-cs-xs">
+          <SectionLabel label={sharedMessages.topEntities} icon="add" onClick={() => null} />
+          {topEntities.map(({ path, title, entity }) => (
+            <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
+          ))}
+        </SideNavigation>
+      )}
+    </>
   )
 }
 

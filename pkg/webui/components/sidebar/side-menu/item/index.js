@@ -15,16 +15,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import classnames from 'classnames'
 
-import Dropdown from '@ttn-lw/components/dropdown'
-import MenuLink from '@ttn-lw/components/sidebar/side-menu-link'
-import Button from '@ttn-lw/components/button'
-import Icon from '@ttn-lw/components/icon'
-
-import Message from '@ttn-lw/lib/components/message'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import SideNavigationList from '../list'
+import MenuLink from './link'
+import CollapsibleItem from './collapsible'
 
 import style from './item.styl'
 
@@ -63,7 +57,7 @@ const SideNavigationItem = props => {
   return (
     <li className={classnames(className, style.item)}>
       {Boolean(children) ? (
-        <CollapsableItem
+        <CollapsibleItem
           title={title}
           icon={icon}
           onClick={handleExpandCollapsableItem}
@@ -117,95 +111,6 @@ SideNavigationItem.defaultProps = {
   isMinimized: false,
 }
 
-const CollapsableItem = ({
-  children,
-  onClick,
-  isExpanded,
-  isMinimized,
-  title,
-  icon,
-  depth,
-  onDropdownItemsClick,
-  currentPathName,
-}) => {
-  const subItems = children
-    .filter(item => Boolean(item) && 'props' in item)
-    .map(item => ({
-      title: item.props.title,
-      path: item.props.path,
-      icon: item.props.icon,
-    }))
-
-  const subItemActive = subItems.some(item => currentPathName.includes(item.path))
-
-  return (
-    <>
-      <Button
-        className={classnames(style.button, {
-          'j-start': !isMinimized,
-          'j-center': isMinimized,
-          'pl-cs-xs': !isMinimized,
-          'pl-0': !isMinimized,
-          [style.buttonActive]: isMinimized && subItemActive,
-        })}
-        unstyled
-        onClick={onClick}
-      >
-        {icon && <Icon icon={icon} className={style.icon} />}
-        {!isMinimized && (
-          <>
-            <Message content={title} className={style.message} />
-            <Icon
-              icon="keyboard_arrow_down"
-              className={classnames(style.expandIcon, {
-                [style.expandIconOpen]: isExpanded,
-              })}
-            />
-          </>
-        )}
-        {isMinimized && (
-          <div className={style.flyOutListContainer}>
-            <Dropdown open className={style.flyOutList} onItemsClick={onDropdownItemsClick}>
-              <Dropdown.HeaderItem title={title.defaultMessage} />
-              {subItems.map(item => (
-                <Dropdown.Item
-                  key={item.path}
-                  title={item.title}
-                  path={item.path}
-                  icon={item.icon}
-                />
-              ))}
-            </Dropdown>
-          </div>
-        )}
-      </Button>
-      {!isMinimized && (
-        <SideNavigationList depth={depth + 1} isExpanded={isExpanded} className={style.subItems}>
-          {children}
-        </SideNavigationList>
-      )}
-    </>
-  )
-}
-
-CollapsableItem.propTypes = {
-  children: PropTypes.node,
-  currentPathName: PropTypes.string.isRequired,
-  depth: PropTypes.number.isRequired,
-  icon: PropTypes.string,
-  isExpanded: PropTypes.bool.isRequired,
-  isMinimized: PropTypes.bool.isRequired,
-  onClick: PropTypes.func.isRequired,
-  onDropdownItemsClick: PropTypes.func,
-  title: PropTypes.message.isRequired,
-}
-
-CollapsableItem.defaultProps = {
-  children: undefined,
-  icon: undefined,
-  onDropdownItemsClick: () => null,
-}
-
 const LinkItem = ({ onClick, title, icon, exact, path }) => {
   const handleLinkItemClick = useCallback(
     event => {
@@ -216,9 +121,7 @@ const LinkItem = ({ onClick, title, icon, exact, path }) => {
   )
 
   return (
-    <>
-      <MenuLink path={path} title={title} icon={icon} onClick={handleLinkItemClick} exact={exact} />
-    </>
+    <MenuLink path={path} title={title} icon={icon} onClick={handleLinkItemClick} exact={exact} />
   )
 }
 

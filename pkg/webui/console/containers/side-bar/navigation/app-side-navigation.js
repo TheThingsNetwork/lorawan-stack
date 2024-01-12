@@ -16,7 +16,7 @@ import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import SideNavigation from '@ttn-lw/components/navigation/side'
+import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -58,7 +58,11 @@ const AppSideNavigation = () => {
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
   const { isMinimized } = useContext(SidebarContext)
 
-  const entityId = app ? app.name ?? appId : appId
+  if (!app) {
+    return null
+  }
+
+  const entityId = app && app.name ? app.name : appId
 
   return (
     <>
@@ -67,15 +71,15 @@ const AppSideNavigation = () => {
           <DedicatedEntity
             label={entityId}
             buttonMessage={m.buttonMessage}
-            icon="arrow_back"
             className="mt-cs-xs mb-cs-l"
-            path={`/applications`}
+            path={`/applications/${appId}`}
+            backPath="/applications"
           />
         )}
         {mayViewApplicationInfo.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.appOverview}
-            path={`applications/${appId}`}
+            path={`/applications/${appId}`}
             icon="group"
             exact
           />
@@ -83,14 +87,14 @@ const AppSideNavigation = () => {
         {mayViewApplicationDevices.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.devices}
-            path={`applications/${appId}/devices`}
+            path={`/applications/${appId}/devices`}
             icon="device"
           />
         )}
         {mayViewApplicationEvents.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.liveData}
-            path={`applications/${appId}/data`}
+            path={`/applications/${appId}/data`}
             icon="list_alt"
           />
         )}
@@ -103,12 +107,12 @@ const AppSideNavigation = () => {
           >
             <SideNavigation.Item
               title={sharedMessages.uplink}
-              path={`applications/${appId}/payload-formatters/uplink`}
+              path={`/applications/${appId}/payload-formatters/uplink`}
               icon="uplink"
             />
             <SideNavigation.Item
               title={sharedMessages.downlink}
-              path={`applications/${appId}/payload-formatters/downlink`}
+              path={`/applications/${appId}/payload-formatters/downlink`}
               icon="downlink"
             />
           </SideNavigation.Item>
@@ -121,25 +125,25 @@ const AppSideNavigation = () => {
           >
             <SideNavigation.Item
               title={sharedMessages.mqtt}
-              path={`applications/${appId}/integrations/mqtt`}
+              path={`/applications/${appId}/integrations/mqtt`}
               icon="extension"
             />
             <SideNavigation.Item
               title={sharedMessages.webhooks}
-              path={`applications/${appId}/integrations/webhooks`}
+              path={`/applications/${appId}/integrations/webhooks`}
               icon="extension"
             />
             {mayAddPubSubIntegrations.check(natsDisabled, mqttDisabled) && (
               <SideNavigation.Item
                 title={sharedMessages.pubsubs}
-                path={`applications/${appId}/integrations/pubsubs`}
+                path={`/applications/${appId}/integrations/pubsubs`}
                 icon="extension"
               />
             )}
             {mayViewOrEditApplicationPackages.check(rights) && (
               <SideNavigation.Item
                 title={sharedMessages.loraCloud}
-                path={`applications/${appId}/integrations/lora-cloud`}
+                path={`/applications/${appId}/integrations/lora-cloud`}
                 icon="extension"
               />
             )}
@@ -148,21 +152,21 @@ const AppSideNavigation = () => {
         {mayViewOrEditApplicationCollaborators.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.collaborators}
-            path={`applications/${appId}/collaborators`}
+            path={`/applications/${appId}/collaborators`}
             icon="organization"
           />
         )}
         {mayViewOrEditApplicationApiKeys.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.apiKeys}
-            path={`applications/${appId}/api-keys`}
+            path={`/applications/${appId}/api-keys`}
             icon="api_keys"
           />
         )}
         {mayEditBasicApplicationInfo.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.generalSettings}
-            path={`applications/${appId}/general-settings`}
+            path={`/applications/${appId}/general-settings`}
             icon="general_settings"
           />
         )}

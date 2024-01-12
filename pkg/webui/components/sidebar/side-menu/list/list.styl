@@ -22,23 +22,21 @@
   & > li:not(:last-child)
     margin-bottom: 0
 
-  // We need to rely on the child list items for the reveal animation, the
-  // height of the list is variable, making proper slide up transitions
-  // impossible.
-  & > li
-    transition: height $ad.m ease-in-out
-
   &-nested > li
     height: 0px
     transition: height $ad.m ease-in-out
 
-  &-nested:not(.list-expanded) > li
-    visibility: hidden
-
   &-expanded > li
     height: 2.4rem
 
+  &-nested
+    transition: opacity $ad.m ease-in-out
+
+    &:not(.list-expanded)
+      opacity: 0
+
   &-expanded, &-nested
+    opacity: 1
     & li a
       padding-left: $cs.l + $cs.xs
 

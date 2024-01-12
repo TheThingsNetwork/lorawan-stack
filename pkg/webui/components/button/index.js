@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, forwardRef, useMemo, useState } from 'react'
+import React, { useCallback, forwardRef, useMemo, useRef } from 'react'
 import classnames from 'classnames'
 import { useIntl } from 'react-intl'
 
@@ -23,6 +23,7 @@ import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './button.styl'
@@ -42,19 +43,16 @@ const assembleClassnames = ({
   primary,
   secondary,
   naked,
-  unstyled,
   grey,
   icon,
+  small,
   busy,
   dropdownItems,
   className,
   error,
-  disabled,
-}) => {
-  if (unstyled) {
-    return className
-  }
-  return classnames(style.button, className, {
+}) =>
+  classnames(style.button, {
+    [className]: !Boolean(dropdownItems), // If there are dropdown items, the button is wrapped in a div with the className.
     [style.danger]: danger,
     [style.warning]: warning,
     [style.primary]: primary,
@@ -62,54 +60,31 @@ const assembleClassnames = ({
     [style.naked]: naked,
     [style.busy]: busy,
     [style.grey]: grey,
+    [style.small]: small,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
     [style.withDropdown]: Boolean(dropdownItems),
     [style.error]: error && !busy,
-    [style.disabled]: disabled || busy,
   })
-}
 
 const buttonChildren = props => {
-  const {
-    dropdownItems,
-    icon,
-    busy,
-    message,
-    expanded,
-    noDropdownIcon,
-    dropdownClassName,
-    children,
-  } = props
+  const { dropdownItems, icon, busy, message, noDropdownIcon, children } = props
 
-  const content = Boolean(children) ? (
-    children
-  ) : (
+  const content = (
     <>
-      {icon ? <Icon className={style.icon} icon={icon} /> : null}
-      {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
-      {dropdownItems ? (
-        <>
-          {!noDropdownIcon && (
-            <Icon
-              className={classnames(style.arrowIcon, {
-                [style['arrow-icon-expanded']]: expanded,
-              })}
-              icon="expand_more"
-            />
-          )}
-          <Dropdown className={classnames(dropdownClassName)} open={expanded}>
-            {dropdownItems}
-          </Dropdown>
-        </>
-      ) : null}
+      {icon && <Icon className={style.icon} icon={icon} />}
+      {message && <Message content={message} className={style.linkButtonMessage} />}
+      {children}
+      {dropdownItems && (
+        <>{!noDropdownIcon && <Icon className={style.expandIcon} icon="expand_more" />}</>
+      )}
     </>
   )
 
   return (
     <>
       {content}
-      {busy ? <Spinner className={style.spinner} small after={200} /> : null}
+      {busy && <Spinner className={style.spinner} small after={200} />}
     </>
   )
 }
@@ -119,6 +94,8 @@ const Button = forwardRef((props, ref) => {
     autoFocus,
     disabled,
     dropdownItems,
+    dropdownClassName,
+    dropdownPosition,
     name,
     type,
     value,
@@ -127,29 +104,13 @@ const Button = forwardRef((props, ref) => {
     onBlur,
     onClick,
     form,
+    className,
     ...rest
   } = props
-  const [expanded, setExpanded] = useState(false)
+  const innerRef = useRef()
+  const combinedRef = combineRefs([ref, innerRef])
 
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
-
-  const handleClickOutside = useCallback(
-    e => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setExpanded(false)
-      }
-    },
-    [ref],
-  )
-
-  const toggleDropdown = useCallback(() => {
-    setExpanded(oldExpanded => {
-      const newState = !oldExpanded
-      if (newState) document.addEventListener('mousedown', handleClickOutside)
-      else document.removeEventListener('mousedown', handleClickOutside)
-      return newState
-    })
-  }, [handleClickOutside])
 
   const handleClick = useCallback(
     evt => {
@@ -157,16 +118,12 @@ const Button = forwardRef((props, ref) => {
         return
       }
 
-      if (dropdownItems) {
-        toggleDropdown()
-        return
-      }
       // Passing a value to the onClick handler is useful for components that
       // are rendered multiple times, e.g. in a list. The value can be used to
       // identify the component that was clicked.
       onClick(evt, value)
     },
-    [busy, disabled, dropdownItems, onClick, toggleDropdown, value],
+    [busy, disabled, onClick, value],
   )
 
   const intl = useIntl()
@@ -178,16 +135,34 @@ const Button = forwardRef((props, ref) => {
 
   const htmlProps = { autoFocus, name, type, value, title, onBlur, form, ...dataProps }
   const buttonClassNames = assembleClassnames(props)
-  return (
+
+  const buttonElement = (
     <button
       className={buttonClassNames}
       onClick={handleClick}
-      children={buttonChildren({ ...props, expanded })}
+      children={buttonChildren({ ...props })}
       disabled={busy || disabled}
-      ref={ref}
+      ref={combinedRef}
       {...htmlProps}
     />
   )
+
+  if (dropdownItems) {
+    return (
+      <div className={classnames(className, 'pos-relative')}>
+        {buttonElement}
+        <Dropdown.Attached
+          className={dropdownClassName}
+          attachedRef={innerRef}
+          position={dropdownPosition}
+        >
+          {dropdownItems}
+        </Dropdown.Attached>
+      </div>
+    )
+  }
+
+  return buttonElement
 })
 
 Button.defaultProps = {
@@ -270,10 +245,6 @@ const commonPropTypes = {
   name: PropTypes.string,
   /** The html `type` prop passed to the <button /> element. */
   type: PropTypes.string,
-  /** A flag specifying whether no additional styles should be
-   * attached to the button. This can helpful to achieve individual stylings.
-   */
-  unstyled: PropTypes.bool,
   /** The html `value` prop passed to the <button /> element. */
   value: PropTypes.string,
   /** The html `autofocus` prop passed to the <button /> element. */
@@ -282,6 +253,8 @@ const commonPropTypes = {
   title: PropTypes.message,
   /** Dropdown items of the button. */
   dropdownItems: PropTypes.node,
+  /** A flag specifying whether the small styling should applied to the button. */
+  small: PropTypes.bool,
 }
 
 buttonChildren.propTypes = {
@@ -291,7 +264,6 @@ buttonChildren.propTypes = {
    */
   busy: commonPropTypes.busy,
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-  expanded: PropTypes.bool,
   icon: commonPropTypes.icon,
   message: commonPropTypes.message,
 }
@@ -301,7 +273,7 @@ buttonChildren.defaultProps = {
   icon: undefined,
   message: undefined,
   children: null,
-  expanded: false,
+  small: false,
 }
 
 Button.propTypes = {

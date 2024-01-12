@@ -13,9 +13,14 @@
 // limitations under the License.
 
 .container
-  padding: 0 0.25rem 0 0.5rem
+  --dropdown-offset: $cs.s
   position: relative
+
+.profile-dropdown
   gap: 0
+
+  button
+    padding: 0 $cs.s !important
 
 .brand-logo
   height: 1.14rem
@@ -24,5 +29,5 @@
     display: none
 
 .profile-picture
-  height: 1.5rem !important
-  width: 1.5rem !important
+  height: 1.5rem
+  width: 1.5rem

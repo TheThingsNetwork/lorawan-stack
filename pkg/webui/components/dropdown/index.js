@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import classnames from 'classnames'
-import { NavLink } from 'react-router-dom'
 
 import Icon from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
@@ -23,55 +22,67 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import AttachedDropdown from './attached'
+
 import style from './dropdown.styl'
 
-const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
+const Dropdown = ({
+  className,
+  children,
+  larger,
+  onItemsClick,
+  onOutsideClick,
+  open,
+  position,
+  hover,
+}) => {
   const ref = useRef(null)
-  const [isBelow, setIsBelow] = useState(false)
-  const [isOnRight, setIsOnRight] = useState(false)
-
-  const positionDropdown = useCallback(() => {
-    if (ref.current) {
-      const parentRect = ref.current.parentElement.getBoundingClientRect()
-      const spaceBelow = window.innerHeight - parentRect.bottom
-      const spaceAbove = parentRect.top
-      const dropdownHeight = ref.current.clientHeight
-      const dropdownWidth = ref.current.clientWidth
-      const spaceOnLeft = parentRect.left
-
-      setIsBelow(spaceBelow > dropdownHeight || spaceAbove < dropdownHeight)
-
-      setIsOnRight(spaceOnLeft > dropdownWidth)
+  // Attach event listeners to the document to close the dropdown when clicking outside of it.
+  useEffect(() => {
+    const handleClickOutside = e => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        onOutsideClick(e)
+      }
     }
-  }, [])
 
-  useEffect(() => {
-    if (open) positionDropdown()
-  }, [positionDropdown, open])
-
-  useEffect(() => {
-    window.addEventListener('scroll', positionDropdown)
-    window.addEventListener('resize', positionDropdown)
+    document.addEventListener('mousedown', handleClickOutside)
 
     return () => {
-      window.removeEventListener('resize', positionDropdown)
-      window.removeEventListener('scroll', positionDropdown)
+      document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [positionDropdown])
+  }, [onOutsideClick])
+
+  if (!open) {
+    return null
+  }
+
+  const pos = position.split(' ')
+  // Based on the order of the position string, we can determine the vertical and horizontal
+  // placement of the dropdown, which will be different for eg. 'below right' and 'right below'.
+  // The first part of the position string determines the primary axis of the dropdown, which
+  // also decides how the offset is applied (set via --dropdown-offset CSS variable).
+  const verticalPlacement = pos[0] === 'above' || pos[0] === 'below'
+  const manual = pos.includes('manual')
+  const cls = classnames(
+    style.dropdown,
+    className,
+    {
+      [style.larger]: larger,
+      [style.hover]: hover,
+      [style.vertical]: verticalPlacement,
+    },
+    !manual
+      ? {
+          [style.below]: pos.includes('below'),
+          [style.above]: pos.includes('above'),
+          [style.right]: pos.includes('right'),
+          [style.left]: pos.includes('left'),
+        }
+      : {},
+  )
 
   return (
-    <ul
-      onClick={onItemsClick}
-      className={classnames(style.dropdown, className, {
-        [style.larger]: larger,
-        [style.below]: isBelow,
-        [style.above]: !isBelow,
-        [style.right]: isOnRight,
-        [style.left]: !isOnRight,
-        [style.open]: open,
-      })}
-      ref={ref}
-    >
+    <ul onClick={onItemsClick} className={cls} ref={ref}>
       {children}
     </ul>
   )
@@ -80,15 +91,21 @@ const Dropdown = ({ className, children, larger, onItemsClick, open }) => {
 Dropdown.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  hover: PropTypes.bool,
   larger: PropTypes.bool,
   onItemsClick: PropTypes.func,
+  onOutsideClick: PropTypes.func,
   open: PropTypes.bool.isRequired,
+  position: PropTypes.string,
 }
 
 Dropdown.defaultProps = {
   className: undefined,
+  hover: false,
   larger: false,
   onItemsClick: () => null,
+  onOutsideClick: () => null,
+  position: 'below left',
 }
 
 const DropdownItem = ({
@@ -100,74 +117,48 @@ const DropdownItem = ({
   exact,
   showActive,
   tabIndex,
-  external,
   submenuItems,
+  external,
   ...rest
 }) => {
-  const [expandedSubmenu, setExpandedSubmenu] = useState(false)
+  const ref = useRef()
   const iconElement = icon && <Icon className={style.icon} icon={icon} nudgeUp />
-  const activeClassName = classnames({
-    [style.active]: (!Boolean(action) && showActive) || active,
-  })
-  const cls = useCallback(
-    ({ isActive }) => classnames(style.button, { [activeClassName]: isActive }),
-    [activeClassName],
-  )
   const ItemElement = action ? (
     <button
       onClick={action}
       onKeyPress={action}
       role="tab"
       tabIndex={tabIndex}
-      className={classnames(style.button, activeClassName)}
+      className={style.button}
     >
       {iconElement}
       <Message content={title} />
     </button>
-  ) : external ? (
-    <Link.Anchor href={path} external tabIndex={tabIndex} className={style.button}>
+  ) : (
+    <Link to={path} external={external} tabIndex={tabIndex} className={style.button}>
       {Boolean(iconElement) ? iconElement : null}
       <Message content={title} />
-    </Link.Anchor>
-  ) : (
-    <NavLink className={cls} to={path} end={exact} tabIndex={tabIndex}>
-      {iconElement}
-      <Message content={title} />
-    </NavLink>
+    </Link>
   )
 
-  const handleMouseEnter = useCallback(() => {
-    setExpandedSubmenu(true)
-  }, [setExpandedSubmenu])
-
-  const handleMouseLeave = useCallback(() => {
-    setExpandedSubmenu(false)
-  }, [setExpandedSubmenu])
-
-  const withSubmenu = (
-    <button
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className={classnames(style.button, 'd-flex', 'j-between')}
-    >
-      <div>
-        {iconElement}
-        <Message content={title} />
-      </div>
-      <Icon icon="chevron_right" />
-      {expandedSubmenu ? (
-        <div className={style.submenuContainer}>
-          <Dropdown open={expandedSubmenu} className={style.submenuDropdown}>
-            {submenuItems}
-          </Dropdown>
+  const submenu = Boolean(submenuItems) && (
+    <>
+      <button className={classnames(style.button, 'd-flex', 'j-between')}>
+        <div>
+          {iconElement}
+          <Message content={title} />
         </div>
-      ) : null}
-    </button>
+        <Icon className={style.submenuDropdownIcon} icon="chevron_right" />
+      </button>
+      <Dropdown.Attached attachedRef={ref} className={style.submenuDropdown} position="left" hover>
+        {submenuItems}
+      </Dropdown.Attached>
+    </>
   )
 
   return (
-    <li className={style.dropdownItem} key={title.id || title} {...rest}>
-      {Boolean(submenuItems) ? withSubmenu : ItemElement}
+    <li className={style.dropdownItem} key={title.id || title} {...rest} ref={ref}>
+      {submenu || ItemElement}
     </li>
   )
 }
@@ -211,5 +202,6 @@ DropdownHeaderItem.propTypes = {
 
 Dropdown.Item = DropdownItem
 Dropdown.HeaderItem = DropdownHeaderItem
+Dropdown.Attached = AttachedDropdown
 
 export default Dropdown

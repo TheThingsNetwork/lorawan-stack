@@ -20,40 +20,84 @@ ul.dropdown
   background: $c.white
   box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.06)
   position: absolute
-  padding: $cs.s
-  min-width: 14rem
+  padding: $cs.xs
+  width: max-content
+  min-width: 16rem
+  max-width: 24rem
   z-index: $zi.dropdown
-  margin: $cs.xxs 0 0
-  opacity: 0
-  visibility: hidden
-  transition: opacity 0.2s ease-in-out, visibility 0s linear 0.2s
+  margin: 0
 
-  &.open
-    opacity: 1
-    visibility: visible
-    transition: opacity 0.2s ease-in-out, visibility 0s linear
-
-  &.below
-    bottom: auto
-    top: calc(100% + 7px)
+  // Pseudo element to extend the clickable area
+  // to connect with the parent button when using hover.
+  // The offset can be set via --dropdown-offset in the
+  // consuming component.
+  &.hover:before
+    content: ""
+    position: absolute
 
   &.above
     top: auto
-    bottom: calc(100% + 7px)
+
+    &:not(.vertical)
+      bottom: 0
+
+    &.vertical
+      margin-bottom: var(--dropdown-offset, 0)
+      bottom: 100%
+
+      &.hover:before
+        bottom: calc(-1 * var(--dropdown-offset, 0))
+        left: 0
+        height: var(--dropdown-offset, 0)
+        width: 100%
 
   &.left
-    left: 0
-    right: auto
-
-  &.right
-    right: 0
     left: auto
 
-  &.example
+    &.vertical
+      right: 0
+
+    &:not(.vertical)
+      margin-right: var(--dropdown-offset, 0)
+      right: 100%
+
+      &.hover:before
+        top: 0
+        right: calc(-1 * var(--dropdown-offset, 0))
+        width: var(--dropdown-offset, 0)
+        height: 100%
+
+  &.below
     bottom: auto
-    top: 0
-    left: 0
+
+    &:not(.vertical)
+      top: 0
+
+    &.vertical
+      margin-top: var(--dropdown-offset, 0)
+      top: 100%
+
+      &.hover:before
+        top: calc(-1 * var(--dropdown-offset, 0))
+        left: 0
+        height: var(--dropdown-offset, 0)
+        width: 100%
+
+  &.right
     right: auto
+
+    &.vertical
+      left: 0
+
+    &:not(.vertical)
+      margin-left: var(--dropdown-offset, 0)
+      left: 100%
+
+      &.hover:before
+        top: 0
+        left: calc(-1 * var(--dropdown-offset, 0))
+        width: var(--dropdown-offset, 0)
+        height: 100%
 
   &.larger
     li.dropdown-item
@@ -63,6 +107,7 @@ ul.dropdown
   hr
     height: 1px
     background-color: $c.grey-200
+    margin: 2px 0
 
   li.dropdown-header-item
     display: block
@@ -72,14 +117,16 @@ ul.dropdown
     span
       line-height: 1
       display: block
-      padding: $cs.m
+      padding: $cs.s
 
   li.dropdown-item
     margin-bottom: 0
     text-align: left
+    position: relative
 
     button.button
       reset-button()
+      position: relative
 
     & > a.button, & > button.button
       box-sizing: border-box
@@ -89,26 +136,11 @@ ul.dropdown
       text-decoration: none
       padding: $cs.xs
       width: 100%
-      min-height: 2.429rem
-      &:not(.active)
-        color: $c.grey-700
-
-        .icon
-          color: $c.grey-700
-
-      &.active
-        border-radius: $br.m
-        background: $c.tts-primary-150
-        transition: background 0.1s ease-in-out
-        color: $tc-deep-gray
-
-        .icon
-          color: $tc-deep-gray
+      min-height: 2.5rem
 
       &:hover
         color: $tc-deep-gray
         background: $c.tts-primary-150
-        transition: background 0.1s ease-in-out
         border-radius: $br.m
 
         .icon
@@ -121,14 +153,21 @@ ul.dropdown
       color: $tc-deep-gray
       text-decoration: none
 
-  .submenu-container
-    bottom: 0px
-    left: 0px
-    position: absolute
-    width: 180%
-    height: 5rem
-    z-index: 9999
-
   .submenu-dropdown
-    bottom: -0px !important
-    left: calc(100% + -213px) !important
+    bottom: - $cs.xs
+    left: calc(100% + .5rem) // Width plus padding.
+    z-index: $zi.dropdown
+
+    // Pseudo element to extend the clickable area
+    // to connect with the parent button.
+    &:before
+      content: ""
+      position: absolute
+      top: 0
+      left: -1rem
+      width: 1rem
+      height: 100%
+
+    &-icon
+      margin-right: - $cs.xs
+

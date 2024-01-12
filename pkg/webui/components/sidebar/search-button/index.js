@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useContext } from 'react'
+import React, { useCallback, useContext, useRef } from 'react'
 import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -28,6 +29,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './search-button.styl'
 
 const SearchButton = ({ onClick, className }) => {
+  const ref = useRef(null)
   const { isMinimized } = useContext(SidebarContext)
 
   const handleClick = useCallback(() => {
@@ -37,20 +39,21 @@ const SearchButton = ({ onClick, className }) => {
   return (
     <Button
       onClick={handleClick}
-      secondary
+      ref={ref}
       className={classnames(style.searchButton, className, {
-        [style.searchButtonMinimized]: isMinimized,
+        [style.isMinimized]: isMinimized,
       })}
     >
-      <div className="d-flex gap-cs-xxs">
+      <div className="d-flex gap-cs-xxs al-center">
         <Icon icon="search" className={style.icon} />
-        {!isMinimized && <Message content={sharedMessages.search} component="p" className="m-0" />}
+        <Message content={sharedMessages.search} component="p" className="m-0" />
       </div>
-      {!isMinimized && (
-        <div className={style.backslashContainer}>
-          <Message content="/" component="p" className={style.backslash} />
-        </div>
+      {isMinimized && (
+        <Dropdown.Attached attachedRef={ref} position="right" className={style.flyOutList} hover>
+          <Dropdown.HeaderItem title={sharedMessages.search} />
+        </Dropdown.Attached>
       )}
+      <p className={style.backslash}>/</p>
     </Button>
   )
 }

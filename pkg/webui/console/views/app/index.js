@@ -123,19 +123,17 @@ const Layout = () => {
     <>
       <ScrollRestoration getKey={getScrollRestorationKey} />
       <ErrorView errorRender={errorRender}>
-        <div className="h-full">
+        <div className={style.container}>
           <IntlHelmet
             titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             defaultTitle={siteName}
           />
           <div id="modal-container" />
           <div className="d-flex">
-            <div style={{ width: '24.25rem' }}>
-              <Sidebar isDrawerOpen={isDrawerOpen} />
-            </div>
-            <div className="w-90">
+            <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
+            <div className="w-full h-vh">
               <Header onMenuClick={onDrawerExpandClick} />
-              <main className={classnames(style.main, 'd-flex', 'flex-column')}>
+              <main className={classnames(style.main, 'd-flex', 'flex-column', 'h-full')}>
                 <WithAuth
                   user={user}
                   fetching={fetching}

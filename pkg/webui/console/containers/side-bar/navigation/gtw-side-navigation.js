@@ -16,7 +16,7 @@ import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import SideNavigation from '@ttn-lw/components/navigation/side'
+import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -48,7 +48,11 @@ const GtwSideNavigation = () => {
   const rights = useSelector(selectGatewayRights)
   const { isMinimized } = useContext(SidebarContext)
 
-  const entityId = gtw ? gtw.name ?? gtwId : gtwId
+  if (!gtw) {
+    return null
+  }
+
+  const entityId = gtw && gtw.name ? gtw.name : gtwId
 
   return (
     <SideNavigation className="mb-cs-m">
@@ -56,15 +60,15 @@ const GtwSideNavigation = () => {
         <DedicatedEntity
           label={entityId}
           buttonMessage={m.buttonMessage}
-          icon="arrow_back"
           className="mt-cs-xs mb-cs-l"
-          path={`/gateways`}
+          backPath="/gateways"
+          path={`/gateways/${gtwId}`}
         />
       )}
       {mayViewGatewayInfo.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.gatewayOverview}
-          path={`gateways/${gtwId}`}
+          path={`/gateways/${gtwId}`}
           icon="gateway"
           exact
         />
@@ -72,35 +76,35 @@ const GtwSideNavigation = () => {
       {mayViewGatewayEvents.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.liveData}
-          path={`gateways/${gtwId}/data`}
+          path={`/gateways/${gtwId}/data`}
           icon="list_alt"
         />
       )}
       {mayViewOrEditGatewayLocation.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.location}
-          path={`gateways/${gtwId}/location`}
+          path={`/gateways/${gtwId}/location`}
           icon="map"
         />
       )}
       {mayViewOrEditGatewayCollaborators.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.collaborators}
-          path={`gateways/${gtwId}/collaborators`}
+          path={`/gateways/${gtwId}/collaborators`}
           icon="organization"
         />
       )}
       {mayViewOrEditGatewayApiKeys.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.apiKeys}
-          path={`gateways/${gtwId}/api-keys`}
+          path={`/gateways/${gtwId}/api-keys`}
           icon="api_keys"
         />
       )}
       {mayEditBasicGatewayInformation.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.generalSettings}
-          path={`gateways/${gtwId}/general-settings`}
+          path={`/gateways/${gtwId}/general-settings`}
           icon="general_settings"
         />
       )}

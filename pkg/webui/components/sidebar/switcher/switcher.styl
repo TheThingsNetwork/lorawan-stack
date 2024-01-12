@@ -14,24 +14,29 @@
 
 .switcher-container
   border-radius: $br.l
-  border: 1px solid $c.grey-100
+  border: 1px solid $c.grey-200
   background: white
-  box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.05)
-  font-weight: $fw.light
+  box-shadow: 0px 2px 7px 1px rgba(0, 0, 0, 0.06)
+  display: flex
+  gap: $cs.xxs
+  justify-content: center
+  padding: $cs.xxs
 
   .link
-    transition: 0.2s all ease-in-out
     border-radius: $br.m
     text-decoration: none
     color: $c.grey-700
     display: flex
     justify-content: center
     width: 100%
-    font-weight: $fw.bold
+    transition: background 80ms ease-in-out
+    position: relative
+    padding: $cs.s $cs.xxs
 
     &.active
       background: $c.grey-900
       color: $c.white
+      font-weight: $fw.bold
 
     &:visited
       text-decoration: none
@@ -42,3 +47,25 @@
       text-decoration: none
       &:not(.active)
         background: $c.grey-100
+
+  &.is-minimized
+    flex-direction: column
+
+    .link
+      padding: $cs.xs 0
+
+    .caption
+      display: none
+
+  &:not(.is-minimized)
+    .icon
+      display: none
+
+  .icon
+    font-size: $fs.xl
+    font-weight: 300
+
+  .fly-out-list
+    --dropdown-offset: calc(1rem - 2px)
+    top: - $cs.xs
+    color: $c.grey-900

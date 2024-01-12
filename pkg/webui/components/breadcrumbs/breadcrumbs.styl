@@ -14,10 +14,10 @@
 
 .breadcrumbs
   color: $tc-subtle-gray
-  height: $breadcrumbs-bar-height
   display: flex
   align-items: center
   overflow: hidden
+  height: 1rem
 
   +media-query($bp.s)
     overflow: auto
@@ -30,3 +30,5 @@
   &-container
     box-sizing: border-box
     height: $breadcrumbs-bar-height
+    display: flex
+    align-items: center
