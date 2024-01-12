@@ -36,7 +36,7 @@ const m = defineMessages({
   seeAll: 'See all messages',
 })
 
-const pageSize = 5
+const pageSize = 7
 const DEFAULT_PAGE = 1
 
 const Notifications = () => {
@@ -116,7 +116,6 @@ const Notifications = () => {
             selectedNotification={selectedNotification}
             fetchItems={loadNextPage}
             isArchive={showArchived === 'true'}
-            setHasNextPage={setHasNextPage}
             setPage={setPage}
           />
         )}
