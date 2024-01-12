@@ -36,7 +36,7 @@ const m = defineMessages({
   seeAll: 'See all messages',
 })
 
-const pageSize = 7
+const pageSize = 6
 const DEFAULT_PAGE = 1
 
 const Notifications = () => {
@@ -48,6 +48,7 @@ const Notifications = () => {
   const [items, setItems] = useState([])
   const [page, setPage] = useState(DEFAULT_PAGE)
   const [showArchived, setShowArchived] = useQueryState('archived', 'false')
+  const [isArchiving, setIsArchiving] = useState(false)
 
   const loadNextPage = useCallback(
     async filter => {
@@ -97,6 +98,8 @@ const Notifications = () => {
           setSelectedNotification={setSelectedNotification}
           selectedNotification={selectedNotification}
           isArchive={showArchived === 'true'}
+          isArchiving={isArchiving}
+          setIsArchiving={setIsArchiving}
         />
         <Button
           onClick={handleShowArchived}
@@ -117,6 +120,7 @@ const Notifications = () => {
             fetchItems={loadNextPage}
             isArchive={showArchived === 'true'}
             setPage={setPage}
+            setIsArchiving={setIsArchiving}
           />
         )}
       </div>

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
@@ -49,6 +49,8 @@ const NotificationList = ({
   setSelectedNotification,
   selectedNotification,
   isArchive,
+  isArchiving,
+  setIsArchiving,
 }) => {
   const userId = useSelector(selectUserId)
   const unseenIds = useSelector(selectUnseenIds)
@@ -59,6 +61,18 @@ const NotificationList = ({
     [hasNextPage, items],
   )
   const itemCount = hasNextPage ? items.length + 1 : items.length
+
+  const listRef = useRef(null)
+  const hasMountedRef = useRef(false)
+
+  // Each time the archived prop changed we call the method resetloadMoreItemsCache to clear the cache
+  useEffect(() => {
+    if (listRef.current && hasMountedRef.current && isArchiving) {
+      listRef.current.resetloadMoreItemsCache(true)
+      setIsArchiving(false)
+    }
+    hasMountedRef.current = true
+  }, [isArchiving, setIsArchiving])
 
   const handleClick = useCallback(
     async (e, id) => {
@@ -128,13 +142,14 @@ const NotificationList = ({
         )}
       </div>
       <InfiniteLoader
+        ref={listRef}
         loadMoreItems={loadNextPage}
         isItemLoaded={isItemLoaded}
         itemCount={itemCount}
       >
         {({ onItemsRendered, ref }) => (
           <List
-            height={570}
+            height={88 * 5 + 40}
             itemSize={88}
             width={460}
             ref={ref}
@@ -152,11 +167,13 @@ const NotificationList = ({
 NotificationList.propTypes = {
   hasNextPage: PropTypes.bool.isRequired,
   isArchive: PropTypes.bool.isRequired,
+  isArchiving: PropTypes.bool.isRequired,
   items: PropTypes.array.isRequired,
   loadNextPage: PropTypes.func.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string,
   }),
+  setIsArchiving: PropTypes.func.isRequired,
   setSelectedNotification: PropTypes.func.isRequired,
 }
 

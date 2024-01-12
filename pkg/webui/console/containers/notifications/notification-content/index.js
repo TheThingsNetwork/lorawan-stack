@@ -41,19 +41,18 @@ const NotificationContent = ({
   isArchive,
   setSelectedNotification,
   selectedNotification,
-  fetchItems,
+  setIsArchiving,
 }) => {
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
 
   const handleArchive = useCallback(
     async (e, id) => {
+      setIsArchiving(true)
       const updateFilter = isArchive ? 'NOTIFICATION_STATUS_SEEN' : 'NOTIFICATION_STATUS_ARCHIVED'
-      const fetchFilter = isArchive ? ['NOTIFICATION_STATUS_ARCHIVED'] : undefined
       await dispatch(attachPromise(updateNotificationStatus(userId, [id], updateFilter)))
-      setTimeout(async () => await fetchItems(fetchFilter), 300)
     },
-    [dispatch, userId, fetchItems, isArchive],
+    [dispatch, userId, isArchive, setIsArchiving],
   )
 
   const handleBack = useCallback(() => {
@@ -120,7 +119,6 @@ const NotificationContent = ({
 }
 
 NotificationContent.propTypes = {
-  fetchItems: PropTypes.func.isRequired,
   isArchive: PropTypes.bool.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string.isRequired,
@@ -128,6 +126,7 @@ NotificationContent.propTypes = {
     notification_type: PropTypes.string.isRequired,
     status: PropTypes.string,
   }).isRequired,
+  setIsArchiving: PropTypes.func.isRequired,
   setSelectedNotification: PropTypes.func.isRequired,
 }
 
