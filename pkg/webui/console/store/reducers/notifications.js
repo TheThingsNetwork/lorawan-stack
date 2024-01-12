@@ -48,7 +48,8 @@ const notifications = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         unseenIds: state.unseenIds.filter(id => !payload.ids.includes(id)),
-        unseenTotalCount: state.unseenTotalCount - payload.ids.length,
+        unseenTotalCount:
+          state.unseenIds.length > 0 ? state.unseenTotalCount - payload.ids.length : 0,
       }
     default:
       return state

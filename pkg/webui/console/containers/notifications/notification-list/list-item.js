@@ -57,13 +57,12 @@ export const NotificationListItem = ({ notification, selectedNotification, handl
           </div>
         </div>
         <div>
-          <DateTime
-            date={false}
-            dateFormatOptions={{ month: '2-digit', day: '2-digit', year: 'numeric' }}
-            timeFormatOptions={{
-              hour: 'numeric',
-              minute: 'numeric',
-              hourCycle: 'h23',
+          <DateTime.Relative
+            relativeTimeStyle="short"
+            showAbsoluteAfter={2}
+            dateTimeProps={{
+              time: false,
+              dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
             }}
             value={notification.created_at}
             className={style.notificationTime}
@@ -97,4 +96,15 @@ NotificationListItem.defaultProps = {
   selectedNotification: undefined,
 }
 
-export const NotificationListSpinner = () => <Spinner faded small center />
+export const NotificationListSpinner = () => {
+  const classes = classNames(style.notificationPreview, 'm-0')
+  const titleClasses = classNames(style.notificationPreviewTitle)
+
+  return (
+    <div className={classes}>
+      <div className={titleClasses}>
+        <Spinner faded small center />
+      </div>
+    </div>
+  )
+}
