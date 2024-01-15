@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -22,6 +22,14 @@ const useRequest = requestAction => {
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
   const [result, setResult] = useState()
+  const isMounted = useRef(true)
+
+  useEffect(
+    () => () => {
+      isMounted.current = false
+    },
+    [],
+  )
 
   useEffect(() => {
     if (requestAction) {
@@ -33,13 +41,17 @@ const useRequest = requestAction => {
           : dispatch(attachPromise(requestAction))
 
       promise
-        .then(() => {
-          setResult(result)
-          setFetching(false)
+        .then(result => {
+          if (isMounted.current) {
+            setResult(result)
+            setFetching(false)
+          }
         })
         .catch(error => {
-          setError(error)
-          setFetching(false)
+          if (isMounted.current) {
+            setError(error)
+            setFetching(false)
+          }
         })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

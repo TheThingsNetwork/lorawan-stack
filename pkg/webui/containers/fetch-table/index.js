@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import classnames from 'classnames'
@@ -81,6 +81,7 @@ const FetchTable = props => {
     baseDataSelector,
   } = props
 
+  const isMounted = useRef(true)
   const dispatch = useDispatch()
   const defaultTab = tabs.length > 0 ? tabs[0].name : undefined
   const [page, setPage] = useQueryState('page', 1, parseInt)
@@ -119,38 +120,48 @@ const FetchTable = props => {
     filters.order = order
   }
 
-  // Fetch items initially or whenever the filters change.
+  useEffect(
+    () => () => {
+      isMounted.current = false
+    },
+    [],
+  )
+
   useEffect(() => {
     const fetchItems = async () => {
       setFetching(true)
       const f = { query: debouncedQuery || '', page, limit: pageSize }
-      // Validate tab.
       if (tabs.find(t => t.name === tab)) {
         f.tab = tab
       } else {
-        f.tab = undefined
         setTab(defaultTab)
+        f.tab = undefined
       }
 
-      // Validate order.
       if (orderValidator(order)) {
         f.order = order
       } else {
+        if (isMounted.current) {
+          setOrder(defaultOrder)
+        }
         f.order = defaultOrder
-        setOrder(defaultOrder)
       }
 
       try {
         if (f.query && searchItemsAction) {
           await dispatch(attachPromise(searchItemsAction(f)))
+        } else {
+          await dispatch(attachPromise(getItemsAction(f)))
+        }
+        if (isMounted.current) {
+          setFetching(false)
+          setInitialFetch(false)
+        }
+      } catch (error) {
+        if (isMounted.current) {
+          setError(error)
           setFetching(false)
         }
-        await dispatch(attachPromise(getItemsAction(f)))
-        setFetching(false)
-        setInitialFetch(false)
-      } catch (error) {
-        setError(error)
-        setFetching(false)
       }
     }
     fetchItems()
