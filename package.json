@@ -106,7 +106,7 @@
     "react-ace": "^6.6.0",
     "react-display-name": "^0.2.5",
     "react-dom": "^17.0.1",
-    "react-focus-lock": "^2.9.4",
+    "react-focus-lock": "^2.9.6",
     "react-grid-system": "^8.1.9",
     "react-helmet": "^6.1.0",
     "react-intl": "^6.5.5",
