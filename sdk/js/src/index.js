@@ -25,6 +25,7 @@ import Users from './service/users'
 import Auth from './service/auth'
 import Sessions from './service/sessions'
 import ContactInfo from './service/contact-info'
+import EmailValidation from './service/email-validation'
 import PacketBrokerAgent from './service/packet-broker-agent'
 import Clients from './service/clients'
 import Authorizations from './service/authorizations'
@@ -63,6 +64,7 @@ class TTS {
     this.Auth = new Auth(this.api.EntityAccess)
     this.Sessions = new Sessions(this.api)
     this.ContactInfo = new ContactInfo(this.api.ContactInfoRegistry)
+    this.EmailValidation = new EmailValidation(this.api.EmailValidationRegistry)
     this.PacketBrokerAgent = new PacketBrokerAgent(this.api.Pba)
     this.Clients = new Clients(this.api)
     this.Authorizations = new Authorizations(this.api)
