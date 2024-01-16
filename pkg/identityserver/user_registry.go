@@ -297,8 +297,8 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		})
 	}
 
-	if _, err := is.requestContactInfoValidation(ctx, req.User.GetIds().GetEntityIdentifiers()); err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not send contact info validations")
+	if _, err := is.requestEmailValidation(ctx, usr.GetIds()); err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send user's email validation")
 	}
 
 	usr.Password = "" // Create doesn't have a FieldMask, so we need to manually remove the password.
@@ -578,8 +578,8 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	// in a indirect changed to the contact info list. And if not validated the same is reflected on the contact info
 	// and a new validation should be requested.
 	if updatePrimaryEmailAddress && usr.PrimaryEmailAddressValidatedAt == nil {
-		if _, err := is.requestContactInfoValidation(ctx, req.User.GetIds().GetEntityIdentifiers()); err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send contact info validations")
+		if _, err := is.requestEmailValidation(ctx, usr.GetIds()); err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send user's email validation")
 		}
 	}
 
