@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 
@@ -23,10 +23,7 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 
 import Notification from '@console/components/notifications'
 
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
-
-import { updateNotificationStatus } from '@console/store/actions/notifications'
 
 import { selectUserId } from '@console/store/selectors/logout'
 
@@ -38,22 +35,12 @@ const m = defineMessages({
 })
 
 const NotificationContent = ({
+  onArchive,
   isArchive,
   setSelectedNotification,
   selectedNotification,
-  setIsArchiving,
 }) => {
   const userId = useSelector(selectUserId)
-  const dispatch = useDispatch()
-
-  const handleArchive = useCallback(
-    async (e, id) => {
-      setIsArchiving(true)
-      const updateFilter = isArchive ? 'NOTIFICATION_STATUS_SEEN' : 'NOTIFICATION_STATUS_ARCHIVED'
-      await dispatch(attachPromise(updateNotificationStatus(userId, [id], updateFilter)))
-    },
-    [dispatch, userId, isArchive, setIsArchiving],
-  )
 
   const handleBack = useCallback(() => {
     setSelectedNotification(undefined)
@@ -99,7 +86,7 @@ const NotificationContent = ({
             })}
           />
           <Button
-            onClick={handleArchive}
+            onClick={onArchive}
             message={isArchive ? m.unarchive : m.archive}
             icon="archive"
             value={selectedNotification.id}
@@ -120,13 +107,13 @@ const NotificationContent = ({
 
 NotificationContent.propTypes = {
   isArchive: PropTypes.bool.isRequired,
+  onArchive: PropTypes.func.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string.isRequired,
     created_at: PropTypes.string.isRequired,
     notification_type: PropTypes.string.isRequired,
     status: PropTypes.string,
   }).isRequired,
-  setIsArchiving: PropTypes.func.isRequired,
   setSelectedNotification: PropTypes.func.isRequired,
 }
 

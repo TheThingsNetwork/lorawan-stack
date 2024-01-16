@@ -18,6 +18,7 @@ import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
+import AutoSizer from 'react-virtualized-auto-sizer'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -27,6 +28,7 @@ import Message from '@ttn-lw/lib/components/message'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import combineRefs from '@ttn-lw/lib/combine-refs'
 
 import { updateNotificationStatus } from '@console/store/actions/notifications'
 
@@ -49,8 +51,8 @@ const NotificationList = ({
   setSelectedNotification,
   selectedNotification,
   isArchive,
-  isArchiving,
-  setIsArchiving,
+  totalCount,
+  listRef,
 }) => {
   const userId = useSelector(selectUserId)
   const unseenIds = useSelector(selectUnseenIds)
@@ -60,22 +62,10 @@ const NotificationList = ({
     index => !hasNextPage || index < items.length,
     [hasNextPage, items],
   )
-  const itemCount = hasNextPage ? items.length + 1 : items.length
-
-  const listRef = useRef(null)
-  const hasMountedRef = useRef(false)
-
-  // Each time the archived prop changed we call the method resetloadMoreItemsCache to clear the cache
-  useEffect(() => {
-    if (listRef.current && hasMountedRef.current && isArchiving) {
-      listRef.current.resetloadMoreItemsCache(true)
-      setIsArchiving(false)
-    }
-    hasMountedRef.current = true
-  }, [isArchiving, setIsArchiving])
+  const itemCount = totalCount || 100
 
   const handleClick = useCallback(
-    async (e, id) => {
+    async (_, id) => {
       setSelectedNotification(items.find(notification => notification.id === id))
       if (!isArchive && unseenIds.includes(id)) {
         await dispatch(
@@ -141,25 +131,32 @@ const NotificationList = ({
           />
         )}
       </div>
-      <InfiniteLoader
-        ref={listRef}
-        loadMoreItems={loadNextPage}
-        isItemLoaded={isItemLoaded}
-        itemCount={itemCount}
-      >
-        {({ onItemsRendered, ref }) => (
-          <List
-            height={88 * 5 + 40}
-            itemSize={88}
-            width={460}
-            ref={ref}
-            itemCount={itemCount}
-            onItemsRendered={onItemsRendered}
-          >
-            {Item}
-          </List>
-        )}
-      </InfiniteLoader>
+      <div className="flex-grow">
+        <AutoSizer>
+          {({ height, width }) => (
+            <InfiniteLoader
+              ref={listRef}
+              loadMoreItems={loadNextPage}
+              isItemLoaded={isItemLoaded}
+              itemCount={itemCount}
+              minimumBatchSize={50}
+            >
+              {({ onItemsRendered, ref }) => (
+                <List
+                  height={height}
+                  width={width}
+                  itemSize={88}
+                  ref={ref}
+                  itemCount={itemCount}
+                  onItemsRendered={onItemsRendered}
+                >
+                  {Item}
+                </List>
+              )}
+            </InfiniteLoader>
+          )}
+        </AutoSizer>
+      </div>
     </>
   )
 }
@@ -167,14 +164,14 @@ const NotificationList = ({
 NotificationList.propTypes = {
   hasNextPage: PropTypes.bool.isRequired,
   isArchive: PropTypes.bool.isRequired,
-  isArchiving: PropTypes.bool.isRequired,
   items: PropTypes.array.isRequired,
+  listRef: PropTypes.shape({ current: PropTypes.shape({}) }).isRequired,
   loadNextPage: PropTypes.func.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string,
   }),
-  setIsArchiving: PropTypes.func.isRequired,
   setSelectedNotification: PropTypes.func.isRequired,
+  totalCount: PropTypes.number.isRequired,
 }
 
 NotificationList.defaultProps = {
