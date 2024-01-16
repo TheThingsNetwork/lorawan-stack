@@ -73,16 +73,16 @@ const Notifications = () => {
   const [fetching, setFetching] = useState(false)
 
   const loadNextPage = useCallback(
-    async (startIndex, stopIndex) => {
+    async (startIndex, stopIndex, archived) => {
       if (fetching) return
       setFetching(true)
+      const composedArchived =
+        archived === undefined ? showArchived === 'true' : archived === 'true'
 
       // Determine filters based on whether archived notifications should be shown.
-      const filters =
-        showArchived === 'true'
-          ? ['NOTIFICATION_STATUS_ARCHIVED']
-          : ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']
-
+      const filters = composedArchived
+        ? ['NOTIFICATION_STATUS_ARCHIVED']
+        : ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']
       // Calculate the number of items to fetch.
       const limit = Math.max(BATCH_SIZE, stopIndex - startIndex + 1)
       const [startPage, stopPage] = indicesToPage(startIndex, stopIndex, limit)
@@ -121,16 +121,20 @@ const Notifications = () => {
     [fetching, showArchived, dispatch, userId, items, selectedNotification],
   )
 
-  const handleShowArchived = useCallback(() => {
+  const handleShowArchived = useCallback(async () => {
     // Toggle the showArchived state.
-    setShowArchived(showArchived === 'false' ? 'true' : 'false')
-
+    const newShowArchivedValue = showArchived === 'false' ? 'true' : 'false'
+    await setShowArchived(newShowArchivedValue)
     // Reset items and selected notification.
     setItems([])
     setSelectedNotification(undefined)
 
     // Load the first page of archived notifications.
-    loadNextPage(0, BATCH_SIZE)
+    // When handleShowArchived is defined, it captures the current value of showArchived.
+    // Even though showArchived is updated later, the captured value inside handleShowArchived remains the same.
+    // So loadNextPage() is called with the old value of showArchived, showing the same notifications again.
+    // To avoid this, we pass the new value of showArchived to loadNextPage() as an argument.
+    loadNextPage(0, BATCH_SIZE, newShowArchivedValue)
   }, [loadNextPage, setShowArchived, showArchived])
 
   const handleArchive = useCallback(
