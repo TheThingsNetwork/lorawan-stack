@@ -16,15 +16,14 @@
   display: flex
   flex-direction: column
   border-right: 1px solid rgba(0, 0, 0, 0.09)
-  min-width: 10rem
-  max-width: 30rem
   width: 33%
 
   &-change-button
     display: flex
     align-self: center
     width: fit-content
-    margin-top $cs.m
+    margin-top: $cs.m
+    margin-bottom: $cs.m
     color: $c.tts-primary !important
 
   &.notification-selected
@@ -37,7 +36,7 @@
   justify-content: space-between
   align-items: center
   border-bottom: 1px solid rgba(0, 0, 0, 0.09)
-  padding: $cs.m
+  padding: $cs.m $cs.s
 
   &-date
     color: $c.grey-700
@@ -88,7 +87,7 @@
       font-size: 3rem
 
 .notification-preview
-  height: 6.286rem
+  height: 7rem
   width: 100%
   border-bottom: 1px solid rgba(0, 0, 0, 0.09)
   padding: $cs.m
@@ -103,6 +102,9 @@
     justify-content: space-between
     margin-bottom: $cs.xs
     font-weight: 600
+
+    &.notification-read
+      margin-left: 0.857rem
 
     &.notification-selected
       color: $c.white
@@ -122,7 +124,6 @@
       text-overflow: ellipsis
 
   &-content
-    width: 100%
     color: $c.grey-700
     overflow: hidden
     display: -webkit-box
@@ -130,6 +131,9 @@
     -webkit-line-clamp: 2 /* start showing ellipsis when 2nd line is reached */
     white-space: pre-wrap
     font-size: $fs.s
+
+    &.notification-read
+      margin-left: 0.857rem
 
     &.notification-selected
       color: white

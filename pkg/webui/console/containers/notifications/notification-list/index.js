@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
@@ -28,7 +28,6 @@ import Message from '@ttn-lw/lib/components/message'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import combineRefs from '@ttn-lw/lib/combine-refs'
 
 import { updateNotificationStatus } from '@console/store/actions/notifications'
 
@@ -59,7 +58,7 @@ const NotificationList = ({
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const dispatch = useDispatch()
   const isItemLoaded = useCallback(
-    index => !hasNextPage || index < items.length,
+    index => (items.length > 0 ? !hasNextPage || index < items.length : false),
     [hasNextPage, items],
   )
   const itemCount = totalCount || 100
@@ -145,7 +144,7 @@ const NotificationList = ({
                 <List
                   height={height}
                   width={width}
-                  itemSize={88}
+                  itemSize={98}
                   ref={ref}
                   itemCount={itemCount}
                   onItemsRendered={onItemsRendered}

@@ -33,47 +33,49 @@ import style from '../notifications.styl'
 export const NotificationListItem = ({ notification, selectedNotification, handleClick }) => {
   const unseenIds = useSelector(selectUnseenIds)
   const showSelected = selectedNotification?.id === notification.id
-  const classes = classNames(style.notificationPreview, 'm-0', {
+  const showUnseenStatus = unseenIds.includes(notification.id)
+  const classes = classNames(style.notificationPreview, 'm-0 d-flex', {
     [style.notificationSelected]: showSelected,
   })
   const titleClasses = classNames(style.notificationPreviewTitle, {
+    [style.notificationRead]: !showUnseenStatus,
     [style.notificationSelected]: showSelected,
   })
   const previewClasses = classNames(style.notificationPreviewContent, {
+    [style.notificationRead]: !showUnseenStatus,
     [style.notificationSelected]: showSelected,
   })
-  const showUnseenStatus = unseenIds.includes(notification.id)
 
   return (
     <Button key={notification.id} onClick={handleClick} value={notification.id} className={classes}>
-      <div className={titleClasses}>
-        <div className="d-flex">
-          {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
+      {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
+      <div>
+        <div className={titleClasses}>
           <div className={style.notificationPreviewTitleText}>
             <Notification.Title
               data={notification}
               notificationType={notification.notification_type}
             />
           </div>
+          <div>
+            <DateTime.Relative
+              relativeTimeStyle="short"
+              showAbsoluteAfter={2}
+              dateTimeProps={{
+                time: false,
+                dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
+              }}
+              value={notification.created_at}
+              className={style.notificationTime}
+            />
+          </div>
         </div>
-        <div>
-          <DateTime.Relative
-            relativeTimeStyle="short"
-            showAbsoluteAfter={2}
-            dateTimeProps={{
-              time: false,
-              dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
-            }}
-            value={notification.created_at}
-            className={style.notificationTime}
+        <div className={previewClasses}>
+          <Notification.Preview
+            data={notification}
+            notificationType={notification.notification_type}
           />
         </div>
-      </div>
-      <div className={previewClasses}>
-        <Notification.Preview
-          data={notification}
-          notificationType={notification.notification_type}
-        />
       </div>
     </Button>
   )
