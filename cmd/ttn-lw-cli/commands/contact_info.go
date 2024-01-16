@@ -136,8 +136,6 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 var (
 	errContactInfoExists           = errors.DefineAlreadyExists("contact_info_exists", "contact info already exists")
 	errMatchingContactInfoNotFound = errors.DefineAlreadyExists("contact_info_not_found", "matching contact info not found")
-	errNoValidationReference       = errors.DefineInvalidArgument("no_validation_reference", "no validation reference set")
-	errNoValidationToken           = errors.DefineInvalidArgument("no_validation_token", "no validation token set")
 )
 
 func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error)) *cobra.Command {
@@ -228,8 +226,9 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 		},
 	}
 	requestValidation := &cobra.Command{
-		Use:   fmt.Sprintf("request-validation [%s-id]", entity),
-		Short: "Request validation for entity contact info",
+		Use:    fmt.Sprintf("request-validation [%s-id]", entity),
+		Short:  "Request validation for entity contact info (DEPRECATED. Use `user email-validation request` instead.",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := getID(cmd, args)
 			if err != nil {
@@ -247,9 +246,9 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 		},
 	}
 	validate := &cobra.Command{
-		Use:   "validate [reference] [token]",
-		Short: "Validate contact info",
-		Long:  "Validate contact info by providing the reference and the validation token that you received",
+		Use:    "validate [reference] [token]",
+		Short:  "Validate contact info (DEPRECATED. Use `user email-validation validate` instead.",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			reference, _ := cmd.Flags().GetString("reference")
 			token, _ := cmd.Flags().GetString("token")
