@@ -76,7 +76,7 @@ const NotificationsDropdown = () => {
       <li className={style.header}>
         <span>
           <Message content={sharedMessages.notifications} />{' '}
-          <Message className="c-grey-500 fw-normal" content={`(${totalNotifications})`} />
+          <Message className="c-grey-500 fw-normal fs-m" content={`(${totalNotifications})`} />
         </span>
       </li>
       {notificationItems.map(notification => (
@@ -93,7 +93,12 @@ const NotificationsDropdown = () => {
                 notificationType={notification.notification_type}
               />
             </div>
-            <div className={notificationStyle.notificationPreviewContent}>
+            <div
+              className={classnames(
+                notificationStyle.notificationPreviewContent,
+                style.previewContent,
+              )}
+            >
               <Notification.Preview
                 data={notification}
                 notificationType={notification.notification_type}

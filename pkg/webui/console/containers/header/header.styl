@@ -20,7 +20,8 @@
   font-weight: $fw.bold
 
 .link
-  align-items: center
+  align-items: start
+  justify-content: center
   gap: $cs.m
   text-decoration: none
   border-bottom: 1px solid $c.grey-200
@@ -35,9 +36,6 @@
   .icon
     width: 1.29rem
     height: 1.29rem
-    display: flex
-    align-items: center
-    justify-content: center
     border-radius: 8px
     border: 1px solid $c.grey-300
     background: $c.white
@@ -47,6 +45,12 @@
   .title
     overflow: hidden
     text-overflow: ellipsis
+    line-height: normal
+    margin-bottom: $cs.xxs
 
   .notification-container
     overflow: auto
+
+  .preview-content
+    line-height: normal
+    margin-bottom: $cs.xxs
