@@ -121,7 +121,7 @@
   "account.views.validate.index.validateFail": "There was an error and the contact info could not be validated",
   "account.views.validate.index.validatingAccount": "Validating account…",
   "account.views.validate.index.tokenNotFoundTitle": "Token not found",
-  "account.views.validate.index.tokenNotFoundMessage": "The validation token was not found. This could mean that the contact info has already been validated. Otherwise, please contact an administrator.",
+  "account.views.validate.index.tokenNotFoundMessage": "The validation token was not found. This could mean that the contact info has already been validated or the token has been invalidated. Re-request another validation and if the error persists, please contact an administrator.",
   "components.collapse.index.collapse": "Collapse",
   "components.collapse.index.expand": "Expand",
   "components.data-sheet.index.noData": "No data available",
