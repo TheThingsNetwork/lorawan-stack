@@ -31,6 +31,7 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import WithAuth from '@ttn-lw/lib/components/with-auth'
 import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
 import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
@@ -51,6 +52,9 @@ import {
   selectApplicationSiteTitle,
   selectPageData,
 } from '@ttn-lw/lib/selectors/env'
+import { uuid as uuidRegexp } from '@ttn-lw/lib/regexp'
+
+import { getUnseenNotificationsPeriodically } from '@console/store/actions/notifications'
 
 import {
   selectUser,
@@ -82,6 +86,55 @@ const Layout = () => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const siteTitle = selectApplicationSiteTitle()
   const siteName = selectApplicationSiteName()
+  const dispatch = useDispatch()
+
+  // For the mobile side menu drawer functionality.
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const node = useRef()
+
+  const openDrawer = useCallback(() => {
+    setIsDrawerOpen(true)
+    document.body.classList.add(style.scrollLock)
+  }, [])
+
+  const closeDrawer = useCallback(() => {
+    setIsDrawerOpen(false)
+    document.body.classList.remove(style.scrollLock)
+  }, [])
+
+  useEffect(() => {
+    const onClickOutside = e => {
+      if (isDrawerOpen && node.current && !node.current.contains(e.target)) {
+        closeDrawer()
+      }
+    }
+
+    if (isDrawerOpen) {
+      document.addEventListener('mousedown', onClickOutside)
+      return () => document.removeEventListener('mousedown', onClickOutside)
+    }
+  }, [isDrawerOpen, closeDrawer])
+
+  // Pass this function to the header prop `onMenuClick`.
+  const onDrawerExpandClick = useCallback(() => {
+    if (!isDrawerOpen) {
+      openDrawer()
+    } else {
+      closeDrawer()
+    }
+  }, [isDrawerOpen, openDrawer, closeDrawer])
+  // End of mobile side menu drawer functionality
+
+  // Fetch unseen notifications periodically, in order to update the state and
+  // and the new notifications dot in the header.
+  // Using this useEffect because the action to update the state is not dispatched within the
+  // setInterval() in the middleware logic.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      dispatch(getUnseenNotificationsPeriodically())
+    }, 1000 * 60 * 5) // 5 minutes
+    return () => clearInterval(timer)
+  }, [dispatch])
 
   // For the mobile side menu drawer functionality.
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -195,6 +248,16 @@ const ConsoleRoot = () => {
           <Route path="admin-panel/*" Component={AdminPanel} />
           <Route path="user/*" Component={User} />
           <Route path="notifications" Component={Notifications} />
+          <Route
+            path="notifications/:category?/:id?"
+            Component={Notifications}
+            element={
+              <ValidateRouteParam
+                check={{ category: /^inbox|archived$/, id: uuidRegexp }}
+                Component={Notifications}
+              />
+            }
+          />
           <Route path="*" Component={GenericNotFound} />
         </Route>
       </Routes>
