@@ -132,9 +132,11 @@ const Layout = () => {
           <div id="modal-container" />
           <div className="d-flex">
             <Sidebar isDrawerOpen={isDrawerOpen} />
-            <div className="w-full h-vh">
+            <div className="w-full h-vh d-flex direction-column">
               <Header onMenuClick={onDrawerExpandClick} />
-              <main className={classnames(style.main, 'd-flex', 'flex-column', 'h-full')}>
+              <main
+                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+              >
                 <WithAuth
                   user={user}
                   fetching={fetching}

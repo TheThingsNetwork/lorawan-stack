@@ -89,6 +89,7 @@ const ApiKeyCreated = ({ notificationData }) => {
     action: {
       Link: msg => (
         <Link
+          key={msg}
           to={`/applications/${
             entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`]
           }/api-keys`}
