@@ -147,6 +147,16 @@ func (dst *Organization) SetFields(src *Organization, paths ...string) error {
 					dst.TechnicalContact = nil
 				}
 			}
+		case "fanout_notifications":
+			if len(subs) > 0 {
+				return fmt.Errorf("'fanout_notifications' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FanoutNotifications = src.FanoutNotifications
+			} else {
+				var zero bool
+				dst.FanoutNotifications = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

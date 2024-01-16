@@ -42,6 +42,9 @@ For details about compatibility between different releases, see the **Commitment
   - This enables CUPS-enabled gateways to change their LNS before the periodic CUPS lookup occurs.
 - The LoRa Basics Station discovery endpoint now verifies the authorization credentials of the caller.
   - This enables the gateways to migrate to another instance gracefully while using CUPS.
+- Organizations can now opt out from sending administrative and technical notifications to its members.
+  - New organizations do not send administrative and technical notifications to its members by default.
+  - To alter the behavior update the organization's `fanout_notifications` field.
 
 ### Fixed
 

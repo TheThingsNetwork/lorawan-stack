@@ -51,6 +51,8 @@ type Organization struct {
 
 	TechnicalContactID *string  `bun:"technical_contact_id,type:uuid"`
 	TechnicalContact   *Account `bun:"rel:belongs-to,join:technical_contact_id=id"`
+
+	FanoutNotifications bool `bun:"fanout_notifications"`
 }
 
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
@@ -71,8 +73,9 @@ func organizationToPB(m *Organization, fieldMask ...string) (*ttnpb.Organization
 		UpdatedAt: timestamppb.New(m.UpdatedAt),
 		DeletedAt: ttnpb.ProtoTime(m.DeletedAt),
 
-		Name:        m.Name,
-		Description: m.Description,
+		Name:                m.Name,
+		Description:         m.Description,
+		FanoutNotifications: m.FanoutNotifications,
 	}
 
 	if len(m.Attributes) > 0 {
@@ -137,8 +140,9 @@ func (s *organizationStore) CreateOrganization(
 		Account: EmbeddedAccount{
 			UID: pb.GetIds().GetOrganizationId(),
 		},
-		Name:        pb.Name,
-		Description: pb.Description,
+		Name:                pb.Name,
+		Description:         pb.Description,
+		FanoutNotifications: pb.FanoutNotifications,
 	}
 
 	if contact := pb.AdministrativeContact; contact != nil {
@@ -229,7 +233,7 @@ func (*organizationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.F
 				return nil, fmt.Errorf("unknown field %q", f)
 			case "ids", "created_at", "updated_at", "deleted_at":
 				// Always selected.
-			case "name", "description":
+			case "name", "description", "fanout_notifications":
 				// Proto name equals model name.
 				columns = append(columns, f)
 			case "attributes":
@@ -441,6 +445,10 @@ func (s *organizationStore) updateOrganizationModel( //nolint:gocyclo
 				model.TechnicalContactID = nil
 			}
 			columns = append(columns, "technical_contact_id")
+
+		case "fanout_notifications":
+			model.FanoutNotifications = pb.FanoutNotifications
+			columns = append(columns, "fanout_notifications")
 		}
 	}
 

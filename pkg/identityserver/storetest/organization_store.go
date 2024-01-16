@@ -132,6 +132,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 			Attributes:            updatedAttributes,
 			AdministrativeContact: usr2.GetOrganizationOrUserIdentifiers(),
 			TechnicalContact:      usr1.GetOrganizationOrUserIdentifiers(),
+			FanoutNotifications:   true,
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetOrganizationId(), should.Equal, "foo")
@@ -140,6 +141,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 			a.So(updated.Attributes, should.Resemble, updatedAttributes)
 			a.So(updated.AdministrativeContact, should.Resemble, usr2.GetOrganizationOrUserIdentifiers())
 			a.So(updated.TechnicalContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
+			a.So(updated.FanoutNotifications, should.BeTrue)
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}

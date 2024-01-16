@@ -97,6 +97,11 @@ func (x *Organization) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
 		golang.MarshalMessage(s, x.TechnicalContact)
 	}
+	if x.FanoutNotifications || s.HasField("fanout_notifications") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("fanout_notifications")
+		s.WriteBool(x.FanoutNotifications)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -211,6 +216,9 @@ func (x *Organization) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v OrganizationOrUserIdentifiers
 			golang.UnmarshalMessage(s, &v)
 			x.TechnicalContact = &v
+		case "fanout_notifications", "fanoutNotifications":
+			s.AddField("fanout_notifications")
+			x.FanoutNotifications = s.ReadBool()
 		}
 	})
 }
