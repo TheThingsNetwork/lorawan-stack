@@ -163,7 +163,7 @@ const requestEmailValidationLogic = createRequestLogic({
   process: async ({ action }) => {
     const { userId } = action.payload
     try {
-      const result = await tts.ContactInfo.requestValidation({ user_ids: { user_id: userId } })
+      const result = await tts.EmailValidation.requestValidation({ user_id: userId })
       toast({
         type: toast.types.SUCCESS,
         message: m.errEmailValidationActionSuccess,
