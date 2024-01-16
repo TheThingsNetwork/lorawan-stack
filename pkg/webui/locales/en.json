@@ -564,6 +564,7 @@
   "console.containers.gateways-table.index.restoreFail": "There was an error and the gateway could not be restored",
   "console.containers.gateways-table.index.purgeSuccess": "Gateway purged",
   "console.containers.gateways-table.index.purgeFail": "There was an error and the gateway could not be purged",
+  "console.containers.header.notifications-dropdown.description": "Showing last 3 of {totalNotifications} notifications",
   "console.containers.invite-user-form.index.invitationsDescription": "You can invite users to this network by providing an email address. The person will then get an email with instructions on how to join your network.",
   "console.containers.log-back-in-modal.index.modalTitle": "Please sign in again",
   "console.containers.log-back-in-modal.index.modalMessage": "You were signed out of the Console. You can press 'Reload' to log back into the Console again.",

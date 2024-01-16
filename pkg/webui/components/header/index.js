@@ -29,6 +29,7 @@ const Header = ({
   addDropdownItems,
   starDropdownItems,
   profileDropdownItems,
+  notificationsDropdownItems,
   user,
   onMenuClick,
   ...rest
@@ -49,7 +50,13 @@ const Header = ({
         dropdownPosition="below left"
         className="xs:d-none"
       />
-      <Button secondary icon="inbox" dropdownItems={<></>} dropdownPosition="below left" />
+      <Button
+        secondary
+        icon="inbox"
+        dropdownItems={notificationsDropdownItems}
+        dropdownClassName={style.notificationsDropdown}
+        dropdownPosition="below left"
+      />
       <ProfileDropdown
         brandLogo={brandLogo}
         data-test-id="profile-dropdown"
@@ -73,6 +80,8 @@ Header.propTypes = {
   brandLogo: imgPropType,
   /** The classname applied to the component. */
   className: PropTypes.string,
+  /** The dropdown items when the notifications button is clicked. */
+  notificationsDropdownItems: PropTypes.node.isRequired,
   /** A handler for when the menu button is clicked. */
   onMenuClick: PropTypes.func.isRequired,
   /** The dropdown items when the profile button is clicked. */

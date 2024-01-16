@@ -15,6 +15,8 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Icon from '@ttn-lw/components/icon'
+
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -28,6 +30,8 @@ const m = defineMessages({
   body: 'The password of your user <code>{entityId}</code> on your network has just been changed.',
   closing: 'If this was not done by you, please contact your administrators as soon as possible.',
 })
+
+const PasswordChangedIcon = () => <Icon icon="password" className="c-tts-primary" />
 
 const PasswordChangedPreview = ({ notificationData }) => {
   const { entity_ids } = notificationData
@@ -85,5 +89,6 @@ PasswordChanged.propTypes = {
 
 PasswordChanged.Title = PasswordChangedTitle
 PasswordChanged.Preview = PasswordChangedPreview
+PasswordChanged.Icon = PasswordChangedIcon
 
 export default PasswordChanged

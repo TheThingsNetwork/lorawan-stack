@@ -16,6 +16,7 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,6 +33,8 @@ const m = defineMessages({
   preview:
     'A new API key has just been created for your {entityType} {id} on your network. API Key ID: {apiKeyId}',
 })
+
+const ApiKeyCreatedIcon = () => <Icon icon="key" className="c-tts-primary" />
 
 const ApiKeyCreatedPreview = ({ notificationData }) => {
   const { entity_ids, data } = notificationData
@@ -115,5 +118,6 @@ ApiKeyCreated.propTypes = {
 
 ApiKeyCreated.Title = ApiKeyCreatedTitle
 ApiKeyCreated.Preview = ApiKeyCreatedPreview
+ApiKeyCreated.Icon = ApiKeyCreatedIcon
 
 export default ApiKeyCreated
