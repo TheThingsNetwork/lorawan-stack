@@ -36,6 +36,8 @@ import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
 
 import Logo from '../logo'
 
+import NotificationsDropdown from './notifications-dropdown'
+
 const accountUrl = selectAccountUrl()
 
 const Header = ({ onMenuClick }) => {
@@ -121,6 +123,7 @@ const Header = ({ onMenuClick }) => {
       profileDropdownItems={dropdownItems}
       addDropdownItems={plusDropdownItems}
       starDropdownItems={[]}
+      notificationsDropdownItems={<NotificationsDropdown />}
       brandLogo={brandLogo}
       Logo={Logo}
       onMenuClick={onMenuClick}

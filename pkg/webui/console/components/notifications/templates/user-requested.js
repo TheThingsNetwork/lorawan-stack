@@ -16,6 +16,7 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -31,6 +32,8 @@ const m = defineMessages({
   preview:
     'A new user just registered on your network. Since user registration requires admin approval, you need to approve this user before they can login. User ID: {userId}',
 })
+
+const UserRequestedIcon = () => <Icon icon="person_add" className="c-tts-primary" />
 
 const UserRequestedPreview = ({ notificationData }) => {
   const { user } = notificationData.data
@@ -78,5 +81,6 @@ UserRequested.propTypes = {
 
 UserRequested.Title = UserRequestedTitle
 UserRequested.Preview = UserRequestedPreview
+UserRequested.Icon = UserRequestedIcon
 
 export default UserRequested

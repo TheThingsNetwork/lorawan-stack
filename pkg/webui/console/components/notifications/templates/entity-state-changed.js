@@ -16,6 +16,7 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -31,6 +32,8 @@ const m = defineMessages({
   body: 'The state of the {entityType} <code>{entityId}</code> on your network has been changed to "{state}".',
   link: 'You can view this <Link>here</Link>.',
 })
+
+const EntityStateChangedIcon = () => <Icon icon="person_add" className="c-tts-primary" />
 
 const EntityStateChangedPreview = ({ notificationData }) => {
   const { data, entity_ids } = notificationData
@@ -105,5 +108,6 @@ EntityStateChanged.propTypes = {
 
 EntityStateChanged.Title = EntityStateChangedTitle
 EntityStateChanged.Preview = EntityStateChangedPreview
+EntityStateChanged.Icon = EntityStateChangedIcon
 
 export default EntityStateChanged

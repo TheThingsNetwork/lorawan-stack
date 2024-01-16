@@ -36,10 +36,7 @@ const NotificationTitle = ({ notificationType, data }) => {
   return <Notification.Title notificationData={data} />
 }
 
-NotificationTitle.propTypes = {
-  data: PropTypes.shape({}).isRequired,
-  notificationType: PropTypes.string.isRequired,
-}
+NotificationTitle.propTypes = PropTypes.notification
 
 const NotificationPreview = ({ notificationType, data }) => {
   const Notification = useMemo(() => getNotification(notificationType), [notificationType])
@@ -47,13 +44,19 @@ const NotificationPreview = ({ notificationType, data }) => {
   return <Notification.Preview notificationData={data} />
 }
 
-NotificationPreview.propTypes = {
-  data: PropTypes.shape({}).isRequired,
-  notificationType: PropTypes.string.isRequired,
+NotificationPreview.propTypes = PropTypes.notification
+
+const NotificationIcon = ({ notificationType, data }) => {
+  const Notification = useMemo(() => getNotification(notificationType), [notificationType])
+
+  return <Notification.Icon notificationData={data} />
 }
+
+NotificationIcon.propTypes = PropTypes.notification
 
 Notification.Content = NotificationContent
 Notification.Title = NotificationTitle
 Notification.Preview = NotificationPreview
+Notification.Icon = NotificationIcon
 
 export default Notification
