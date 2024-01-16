@@ -224,6 +224,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 			"/ttn.lorawan.v3.EntityRegistrySearch",
 			"/ttn.lorawan.v3.EndDeviceRegistrySearch",
 			"/ttn.lorawan.v3.ContactInfoRegistry",
+			"/ttn.lorawan.v3.EmailValidationRegistry",
 			"/ttn.lorawan.v3.OAuthAuthorizationRegistry",
 		} {
 			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
@@ -261,6 +262,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterEndDeviceRegistrySearchServer(s, &registrySearch{IdentityServer: is})
 	ttnpb.RegisterOAuthAuthorizationRegistryServer(s, &oauthRegistry{IdentityServer: is})
 	ttnpb.RegisterContactInfoRegistryServer(s, &contactInfoRegistry{IdentityServer: is})
+	ttnpb.RegisterEmailValidationRegistryServer(s, &emailValidationRegistry{IdentityServer: is})
 	ttnpb.RegisterNotificationServiceServer(s, &notificationRegistry{IdentityServer: is})
 	ttnpb.RegisterEndDeviceBatchRegistryServer(s, &endDeviceBatchRegistry{IdentityServer: is})
 }
@@ -288,6 +290,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterEndDeviceRegistrySearchHandler(is.Context(), s, conn)
 	ttnpb.RegisterOAuthAuthorizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterContactInfoRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterEmailValidationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterNotificationServiceHandler(is.Context(), s, conn)
 	ttnpb.RegisterEndDeviceBatchRegistryHandler(is.Context(), s, conn) // nolint:errcheck
 }
