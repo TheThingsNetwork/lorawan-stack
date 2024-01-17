@@ -12,45 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.header
-  font-size: $fs.l
-  padding: 1.5rem 1.25rem
-  border-bottom: 1px solid $c.grey-200
-  margin-bottom: 0
-  font-weight: $fw.bold
+.notifications-dropdown
+  &-header
+    font-size: $fs.l
+    padding: $cs.l $cs.m
+    border-bottom: 1px solid $c.grey-200
+    margin-bottom: 0
+    font-weight: $fw.bold
 
-.link
-  align-items: start
-  justify-content: center
-  gap: $cs.m
-  text-decoration: none
-  border-bottom: 1px solid $c.grey-200
-  padding: $cs.m 1.25rem
+  &-link
+    align-items: start
+    justify-content: center
+    gap: $cs.m
+    text-decoration: none
+    border-bottom: 1px solid $c.grey-200
+    padding: $cs.m 1.25rem
 
-  &:visited
-    color: initial
+    &:visited
+      color: initial
 
-  &:hover
-    background: $c.tts-primary-100
+    &:hover
+      background: $c.tts-primary-100
 
-  .icon
-    width: 1.29rem
-    height: 1.29rem
-    border-radius: 8px
-    border: 1px solid $c.grey-300
-    background: $c.white
-    color: $c.tts-primary
-    padding: $cs.m
+    &-icon
+      width: 1.29rem
+      height: 1.29rem
+      border-radius: $br.m
+      border: 1px solid $c.grey-300
+      background: $c.white
+      color: $c.tts-primary
+      padding: $cs.m
 
-  .title
-    overflow: hidden
-    text-overflow: ellipsis
-    line-height: normal
-    margin-bottom: $cs.xxs
+    .title
+      overflow: hidden
+      text-overflow: ellipsis
+      line-height: normal
+      margin-bottom: $cs.xxs
 
-  .notification-container
-    overflow: auto
+    .notification-container
+      overflow: auto
 
-  .preview-content
-    line-height: normal
-    margin-bottom: $cs.xxs
+    .preview-content
+      line-height: normal
+      margin-bottom: $cs.xxs

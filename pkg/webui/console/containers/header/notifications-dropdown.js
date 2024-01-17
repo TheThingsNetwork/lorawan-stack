@@ -73,7 +73,7 @@ const NotificationsDropdown = () => {
 
   return (
     <React.Fragment>
-      <div className={style.header}>
+      <div className={style.notificationsDropdownHeader}>
         <span>
           <Message content={sharedMessages.notifications} />{' '}
           <Message className="c-grey-500 fw-normal fs-m" content={`(${totalNotifications})`} />
@@ -83,9 +83,9 @@ const NotificationsDropdown = () => {
         <Link
           to="/notifications"
           key={notification.id}
-          className={classnames(style.link, 'd-flex')}
+          className={classnames(style.notificationsDropdownLink, 'd-flex')}
         >
-          <Icon icon="key" className={style.icon} />
+          <Icon icon="key" className={style.notificationsDropdownLinkIcon} />
           <div className={style.notificationContainer}>
             <div className={classnames(style.title, 'fw-bold')}>
               <Notification.Title
