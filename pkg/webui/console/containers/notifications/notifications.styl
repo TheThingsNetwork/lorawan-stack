@@ -19,9 +19,6 @@
   width: 33%
 
   &-change-button
-    display: flex
-    align-self: center
-    width: fit-content
     margin-top: $cs.m
     margin-bottom: $cs.m
     color: $c.tts-primary !important
@@ -39,6 +36,7 @@
   padding: $cs.m $cs.s
 
   &-date
+    font-weight: $fwv2.regular
     color: $c.grey-700
 
     &.notification-selected
@@ -75,16 +73,15 @@
     font-weight: $fwv2.semibold
 
     +media-query($bp.s)
+      display: flex
+      gap: $cs.xs
       max-width: 70%
 
   .back-button
+    padding-left: 1.07rem
     display: none
-    height: 100%
     +media-query($bp.s)
       display: block
-
-    .icon
-      font-size: 3rem
 
 .notification-preview
   height: 7rem
@@ -128,7 +125,7 @@
     overflow: hidden
     display: -webkit-box
     -webkit-box-orient: vertical
-    -webkit-line-clamp: 2 /* start showing ellipsis when 2nd line is reached */
+    -webkit-line-clamp: 2 // Start showing ellipsis when 2nd line is reached.
     white-space: pre-wrap
     font-size: $fs.s
 
@@ -160,3 +157,4 @@
   &.notification-selected
     +media-query($bp.s)
       display: block
+      width: 100%
