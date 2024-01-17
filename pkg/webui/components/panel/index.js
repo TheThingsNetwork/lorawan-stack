@@ -37,8 +37,8 @@ const Panel = ({
   <div className={styles.panel}>
     <div className="d-flex j-between mb-cs-xl">
       <div className="d-flex gap-cs-xs al-center">
-        {icon && <Icon icon={icon} className={styles.icon} />}
-        <Message content={title} className={styles.title} />
+        {icon && <Icon icon={icon} className={styles.panelHeaderIcon} />}
+        <Message content={title} className={styles.panelHeaderTitle} />
       </div>
       {toggleOptions ? (
         <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
