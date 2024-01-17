@@ -17,7 +17,7 @@ import React from 'react'
 import ShortcutItem from '.'
 
 export default {
-  title: 'Shortcut/Shortcut Item',
+  title: 'Panel/Shortcut Panel/Shortcut Item',
   component: ShortcutItem,
 }
 
