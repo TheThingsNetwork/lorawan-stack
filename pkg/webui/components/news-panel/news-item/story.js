@@ -19,7 +19,7 @@ import loginVisual from '@assets/img/layout/bg/login-visual.jpg'
 import NewsItem from '.'
 
 export default {
-  title: 'NewsPanel/News Item',
+  title: 'Panel/News Panel/News Item',
   component: NewsItem,
 }
 
