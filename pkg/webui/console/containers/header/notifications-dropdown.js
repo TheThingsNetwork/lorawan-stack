@@ -73,12 +73,12 @@ const NotificationsDropdown = () => {
 
   return (
     <React.Fragment>
-      <li className={style.header}>
+      <div className={style.header}>
         <span>
           <Message content={sharedMessages.notifications} />{' '}
           <Message className="c-grey-500 fw-normal fs-m" content={`(${totalNotifications})`} />
         </span>
-      </li>
+      </div>
       {notificationItems.map(notification => (
         <Link
           to="/notifications"
