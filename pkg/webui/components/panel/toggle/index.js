@@ -24,8 +24,8 @@ import styles from './toggle.styl'
 const Toggle = ({ options, onToggleChange, active }) => (
   <div className={classnames(styles.toggle, 'd-flex j-center al-center gap-cs-xxs p-cs-xxs')}>
     {options.map(({ label, value }) => {
-      const buttonClassName = classnames(styles.button, {
-        [styles.buttonActive]: value === active,
+      const buttonClassName = classnames(styles.toggleButton, {
+        [styles.toggleButtonActive]: value === active,
       })
 
       return (
