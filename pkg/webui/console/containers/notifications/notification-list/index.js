@@ -61,7 +61,10 @@ const NotificationList = ({
     index => (items.length > 0 ? !hasNextPage || index < items.length : false),
     [hasNextPage, items],
   )
-  const itemCount = totalCount || 100
+
+  // If the total count is not known, we assume that there are 100 items.
+  // Otherwise, if totalCount is 0, it means the list is empty and we should not have a total count.
+  const itemCount = totalCount >= 0 ? totalCount : 100
 
   const handleClick = useCallback(
     async (_, id) => {
