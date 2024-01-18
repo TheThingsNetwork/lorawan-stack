@@ -73,7 +73,7 @@ const WebhooksTable = () => {
       displayName: m.templateId,
       width: 12,
       render: value =>
-        value || <Message className="tc-subtle-gray" content={sharedMessages.none} />,
+        value || <Message className="c-text-neutral-light" content={sharedMessages.none} />,
       sortable: true,
     },
   ]

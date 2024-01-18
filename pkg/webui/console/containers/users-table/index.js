@@ -230,7 +230,7 @@ const UsersTable = props => {
                 <span>
                   {userId}{' '}
                   <Message
-                    className="tc-subtle-gray"
+                    className="c-text-neutral-light"
                     content={sharedMessages.currentUserIndicator}
                   />
                 </span>
@@ -283,7 +283,7 @@ const UsersTable = props => {
           width: 7,
           render: isAdmin => {
             if (isAdmin) {
-              return <Icon className="c-active-blue" icon="check" />
+              return <Icon className="c-text-brand-normal" icon="check" />
             }
 
             return null

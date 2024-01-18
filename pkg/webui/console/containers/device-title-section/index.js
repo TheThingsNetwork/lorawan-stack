@@ -73,12 +73,12 @@ const DeviceTitleSection = props => {
           <Content.MessagesCount
             icon="uplink"
             value={showUplinkCount ? uplinkFrameCount : notAvailableElem}
-            iconClassName={showUplinkCount ? 'c-active-blue' : 'tc-subtle-gray'}
+            iconClassName={showUplinkCount ? 'c-text-brand-normal' : 'c-text-neutral-light'}
           />
           <Content.MessagesCount
             icon="downlink"
             value={showDownlinkCount ? downlinkFrameCount : notAvailableElem}
-            iconClassName={showUplinkCount ? 'c-active-blue' : 'tc-subtle-gray'}
+            iconClassName={showUplinkCount ? 'c-text-brand-normal' : 'c-text-neutral-light'}
           />
         </div>
       </Tooltip>
@@ -93,7 +93,7 @@ const DeviceTitleSection = props => {
           }
         >
           <LastSeen lastSeen={lastSeen} flipped noTitle>
-            <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+            <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
           </LastSeen>
         </DocTooltip>
       ) : (
@@ -103,7 +103,7 @@ const DeviceTitleSection = props => {
           content={<Message content={m.noActivityTooltip} />}
         >
           <Status status="mediocre" label={sharedMessages.noActivityYet} flipped>
-            <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+            <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
           </Status>
         </DocTooltip>
       )}

@@ -133,7 +133,7 @@ const GatewaysTable = () => {
         render: gatewayEui =>
           !Boolean(gatewayEui) ? (
             <Message
-              className="tc-subtle-gray"
+              className="c-text-neutral-light"
               component="i"
               content={sharedMessages.none}
               firstToLower

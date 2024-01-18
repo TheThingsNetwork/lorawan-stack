@@ -133,7 +133,7 @@ const UserSessionsTable = () => {
         width: 20,
         render: expires_at => {
           if (expires_at === undefined) {
-            return <Message content={m.noExpiryDate} className="tc-subtle-gray" />
+            return <Message content={m.noExpiryDate} className="c-text-neutral-light" />
           }
 
           return (

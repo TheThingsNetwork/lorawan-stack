@@ -84,7 +84,7 @@ const ApplicationTitleSection = ({ appId }) => {
       content={<Message content={m.lastSeenAvailableTooltip} />}
     >
       <LastSeen lastSeen={lastSeen} flipped>
-        <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+        <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
       </LastSeen>
     </DocTooltip>
   ) : (
@@ -93,7 +93,7 @@ const ApplicationTitleSection = ({ appId }) => {
       docPath="/getting-started/console/troubleshooting"
     >
       <Status status="mediocre" label={sharedMessages.noRecentActivity} className="mr-cs-l" flipped>
-        <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+        <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
       </Status>
     </DocTooltip>
   )

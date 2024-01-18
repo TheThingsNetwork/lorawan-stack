@@ -140,7 +140,7 @@ const RightsGroup = ({
       children={
         Boolean(m[`${right}_DESCRIPTION`]) && (
           <Message
-            className="tc-subtle-gray w-full"
+            className="c-text-neutral-light w-full"
             component="div"
             content={m[`${right}_DESCRIPTION`]}
           />

@@ -68,7 +68,7 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
 
   const sidebarClassnames = classnames(
     style.sidebar,
-    'd-flex direction-column j-between gap-cs-m bg-tts-primary-050',
+    'd-flex direction-column j-between gap-cs-m c-bg-brand-extralight',
     {
       [style.sidebarMinimized]: isMinimized,
       [style.sidebarOpen]: isDrawerOpen,

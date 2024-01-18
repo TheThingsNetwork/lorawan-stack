@@ -69,7 +69,7 @@ const WarningTooltip = props => {
   if (hasDesiredValue && hasCurrentValue && !isEqual(currentValue, desiredValue)) {
     return (
       <Tooltip placement="bottom-start" interactive content={<Content desired={desiredValue} />}>
-        <Icon icon="warning" small className="c-warning" nudgeUp />
+        <Icon icon="warning" small className="c-bg-warning-normal" nudgeUp />
       </Tooltip>
     )
   }
