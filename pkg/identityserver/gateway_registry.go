@@ -230,6 +230,11 @@ func (is *IdentityServer) getGateway( // nolint:gocyclo
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(
 		ttnpb.GatewayFieldPathsNested,
 		req.FieldMask,
@@ -255,8 +260,8 @@ func (is *IdentityServer) getGateway( // nolint:gocyclo
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			gtw.ContactInfo, err = st.GetContactInfo(ctx, gtw.GetIds())
+		if contactInfoInPath {
+			gtw.ContactInfo, err = getContactsFromEntity(ctx, gtw, st)
 			if err != nil {
 				return err
 			}
@@ -351,6 +356,11 @@ func (is *IdentityServer) listGateways( // nolint:gocyclo
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(
 		ttnpb.GatewayFieldPathsNested,
 		req.FieldMask,
@@ -419,6 +429,15 @@ func (is *IdentityServer) listGateways( // nolint:gocyclo
 		gtws.Gateways, err = st.FindGateways(ctx, gtwIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
+		}
+
+		if contactInfoInPath {
+			for _, gtw := range gtws.Gateways {
+				gtw.ContactInfo, err = getContactsFromEntity(ctx, gtw, st)
+				if err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	})
