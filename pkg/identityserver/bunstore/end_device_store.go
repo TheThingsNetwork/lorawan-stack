@@ -328,8 +328,6 @@ func (*endDeviceStore) selectWithFields(q *bun.SelectQuery, fieldMask store.Fiel
 				columns = append(columns, "brand_id", "model_id", "hardware_version", "firmware_version", "band_id")
 			case "attributes":
 				q = q.Relation("Attributes")
-			case "contact_info":
-				q = q.Relation("ContactInfo")
 			case "locations":
 				q = q.Relation("Locations")
 			case "picture":
