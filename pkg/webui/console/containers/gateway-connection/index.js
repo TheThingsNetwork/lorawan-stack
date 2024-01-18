@@ -142,19 +142,19 @@ const GatewayConnection = props => {
           lastSeen={statistics.disconnected_at}
           flipped
         >
-          <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+          <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
         </LastSeen>
       )
     } else if (statusIndicator === 'good' && hasLastSeen) {
       node = (
         <LastSeen lastSeen={lastSeen} flipped>
-          <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+          <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
         </LastSeen>
       )
     } else {
       node = (
         <Status className={style.status} status={statusIndicator} label={message} flipped>
-          <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+          <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
         </Status>
       )
     }

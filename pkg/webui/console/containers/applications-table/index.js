@@ -186,7 +186,7 @@ const ApplicationsTable = props => {
                       textPaddedLeft
                       small
                       nudgeUp
-                      className="tc-subtle-gray"
+                      className="c-text-neutral-light"
                     />
                   </Status>
                 </DocTooltip>

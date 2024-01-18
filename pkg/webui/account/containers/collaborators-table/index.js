@@ -92,7 +92,7 @@ const CollaboratorsTable = props => {
             return (
               <span>
                 {collaboratorId}{' '}
-                <Message className="tc-subtle-gray" content={sharedMessages.currentUserIndicator} />
+                <Message className="c-text-neutral-light" content={sharedMessages.currentUserIndicator} />
               </span>
             )
           }

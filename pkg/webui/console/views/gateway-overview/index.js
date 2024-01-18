@@ -142,7 +142,7 @@ const GatewayOverview = () => {
             secondary
           />
         ) : (
-          <Message content={m.globalConfUnavailable} className="tc-subtle-gray" />
+          <Message content={m.globalConfUnavailable} className="c-text-neutral-light" />
         ),
     })
   }

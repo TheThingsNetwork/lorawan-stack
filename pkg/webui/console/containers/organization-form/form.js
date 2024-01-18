@@ -130,7 +130,7 @@ const OrganizationForm = props => {
           <Message
             content={m.adminContactDescription}
             component="p"
-            className="mt-cs-xs tc-subtle-gray"
+            className="mt-cs-xs c-text-neutral-light"
           />
           <CollaboratorSelect
             name="technical_contact"
@@ -147,7 +147,7 @@ const OrganizationForm = props => {
           <Message
             content={m.techContactDescription}
             component="p"
-            className="mt-cs-xs tc-subtle-gray"
+            className="mt-cs-xs c-text-neutral-light"
           />
           <Form.Field
             title={sharedMessages.gatewayFanoutNotificationsTitle}

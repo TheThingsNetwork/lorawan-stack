@@ -70,7 +70,7 @@ const StatusMessage = props => {
     )
   }
 
-  return <Message className="tc-subtle-gray" content={m.noFileSelected} />
+  return <Message className="c-text-neutral-light" content={m.noFileSelected} />
 }
 
 StatusMessage.propTypes = {

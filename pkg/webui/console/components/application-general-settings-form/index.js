@@ -183,7 +183,7 @@ const ApplicationGeneralSettingsForm = ({
     <Message
       content={m.adminContactDescription}
       component="p"
-      className="mt-cs-xs tc-subtle-gray"
+      className="mt-cs-xs c-text-neutral-light"
     />
     <CollaboratorSelect
       name="technical_contact"
@@ -197,7 +197,7 @@ const ApplicationGeneralSettingsForm = ({
       isResctrictedUser={isResctrictedUser}
       userId={userId}
     />
-    <Message content={m.techContactDescription} component="p" className="mt-cs-xs tc-subtle-gray" />
+    <Message content={m.techContactDescription} component="p" className="mt-cs-xs c-text-neutral-light" />
     <SubmitBar>
       <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       <Require featureCheck={mayDeleteApplication}>
