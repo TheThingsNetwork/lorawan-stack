@@ -17,7 +17,6 @@ package store
 import (
 	"context"
 	"fmt"
-	"sort"
 	"time"
 
 	"github.com/uptrace/bun"
@@ -44,8 +43,6 @@ type User struct {
 	Description string `bun:"description,nullzero"`
 
 	Attributes []*Attribute `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
-
-	ContactInfo []*ContactInfo `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
 
 	PrimaryEmailAddress            string     `bun:"primary_email_address,notnull"`
 	PrimaryEmailAddressValidatedAt *time.Time `bun:"primary_email_address_validated_at"`
@@ -110,14 +107,6 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 		for _, a := range m.Attributes {
 			pb.Attributes[a.Key] = a.Value
 		}
-	}
-
-	if len(m.ContactInfo) > 0 {
-		pb.ContactInfo = make([]*ttnpb.ContactInfo, len(m.ContactInfo))
-		for i, contactInfo := range m.ContactInfo {
-			pb.ContactInfo[i] = contactInfoToPB(contactInfo)
-		}
-		sort.Sort(contactInfoProtoSlice(pb.ContactInfo))
 	}
 
 	if m.ProfilePicture != nil {
@@ -234,15 +223,6 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		}
 	}
 
-	if len(pb.ContactInfo) > 0 {
-		userModel.ContactInfo, err = s.replaceContactInfo(
-			ctx, nil, pb.ContactInfo, "user", userModel.ID,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	pb, err = userToPB(userModel)
 	if err != nil {
 		return nil, err
@@ -279,8 +259,6 @@ func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask
 				columns = append(columns, f)
 			case "attributes":
 				q = q.Relation("Attributes")
-			case "contact_info":
-				q = q.Relation("ContactInfo")
 			case "administrative_contact":
 				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
 					return q.Column("uid", "account_type")
@@ -492,14 +470,6 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 		case "attributes":
 			model.Attributes, err = s.replaceAttributes(
 				ctx, model.Attributes, pb.Attributes, "user", model.ID,
-			)
-			if err != nil {
-				return err
-			}
-
-		case "contact_info":
-			model.ContactInfo, err = s.replaceContactInfo(
-				ctx, model.ContactInfo, pb.ContactInfo, "user", model.ID,
 			)
 			if err != nil {
 				return err
@@ -756,7 +726,7 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 	model, err := s.getUserModelBy(
 		store.WithSoftDeleted(ctx, false),
 		s.selectWithID(ctx, id.GetUserId()),
-		store.FieldMask{"attributes", "contact_info"},
+		store.FieldMask{"attributes"},
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -769,13 +739,6 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) er
 
 	if len(model.Attributes) > 0 {
 		_, err = s.replaceAttributes(ctx, model.Attributes, nil, "user", model.ID)
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(model.ContactInfo) > 0 {
-		_, err = s.replaceContactInfo(ctx, model.ContactInfo, nil, "user", model.ID)
 		if err != nil {
 			return err
 		}
