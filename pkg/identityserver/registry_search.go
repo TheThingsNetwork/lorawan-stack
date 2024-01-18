@@ -380,13 +380,21 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	return res, nil
 }
 
-func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRequest) (*ttnpb.Users, error) {
+func (rs *registrySearch) SearchUsers(
+	ctx context.Context, req *ttnpb.SearchUsersRequest,
+) (*ttnpb.Users, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if !authInfo.IsAdmin {
 		return nil, errSearchForbidden.New()
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address", "primary_email_address_validated_at")
 	}
 
 	var searchFields []string
@@ -446,6 +454,20 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 	if err != nil {
 		return nil, err
 	}
+
+	// Add ContactInfo to the response if its present in the field mask.
+	if contactInfoInPath {
+		for _, usr := range res.Users {
+			usr.ContactInfo = append(usr.ContactInfo, &ttnpb.ContactInfo{
+				ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+				ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+				Value:         usr.PrimaryEmailAddress,
+				ValidatedAt:   usr.PrimaryEmailAddressValidatedAt,
+				Public:        false,
+			})
+		}
+	}
+
 	return res, nil
 }
 
