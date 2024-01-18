@@ -32,7 +32,9 @@ type registrySearch struct {
 
 var errSearchForbidden = errors.DefinePermissionDenied("search_forbidden", "search is forbidden")
 
-func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchApplicationsRequest) (*ttnpb.Applications, error) {
+func (rs *registrySearch) SearchApplications(
+	ctx context.Context, req *ttnpb.SearchApplicationsRequest,
+) (*ttnpb.Applications, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -43,6 +45,12 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	}
 	if authInfo.IsAdmin {
 		member = nil
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact", "technical_contact")
 	}
 
 	var searchFields []string
@@ -98,6 +106,16 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, app := range res.Applications {
+				app.ContactInfo, err = getContactsFromEntity(ctx, app, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
