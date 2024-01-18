@@ -18,13 +18,13 @@ left-border($color)
   background: linear-gradient(left, $color, 5px $color, 5px white)
 
 .notification
-  left-border($c-divider-dark)
-  border-top: 1px solid $c-divider
-  border-right: 1px solid $c-divider
-  border-color: $c-divider-subtle
+  left-border(var(--c-border-neutral-light)-dark)
+  border-top: 1px solid var(--c-border-neutral-light)
+  border-right: 1px solid var(--c-border-neutral-light)
+  border-color: var(--c-border-neutral-light)-subtle
   border-radius: $br.m
   margin-bottom: $ls.xxs
-  box-shadow: 0 1px 1px 0 $c-divider-dark
+  box-shadow: 0 1px 1px 0 var(--c-bg-neutral-light)
   display: flex
   flex-wrap: wrap
   padding: 1px
@@ -44,20 +44,20 @@ left-border($color)
       margin-right: 8rem
 
   &.error
-    left-border($c-error)
-    color: $c-error
+    left-border(var(--c-bg-error-normal))
+    color: var(--c-bg-error-normal)
 
   &.warning
-    left-border($c-warning)
-    color: $tc-warning
+    left-border(var(--c-bg-warning-normal))
+    color: var(--c-text-warning-normal)
 
   &.info
-    left-border($c-active-blue)
-    color: $c-active-blue
+    left-border(var(--c-text-brand-normal))
+    color: var(--c-text-brand-normal)
 
   &.success
-    left-border($c-success)
-    color: $c-success
+    left-border(var(--c-bg-success-normal))
+    color: var(--c-bg-success-normal)
 
   .message
     display: flex
@@ -72,7 +72,7 @@ left-border($color)
 
   .content
     display: inline-block
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
 
   .container
     display: flex

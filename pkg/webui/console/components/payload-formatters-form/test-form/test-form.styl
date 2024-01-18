@@ -23,22 +23,22 @@
 
   .message,
   .icon
-    color: $c-subtle-fill
+    color: $c.grey-500
 
   &-error
     .icon,
     .message
-      color: $c-error
+      color: var(--c-bg-error-normal)
 
   &-warning
     .icon,
     .message
-      color: $tc-warning
+      color: var(--c-text-warning-normal)
 
   &-valid
     .icon,
     .message
-      color: $c-success
+      color: var(--c-bg-success-normal)
 
 .submit-button
   flex-shrink: 0

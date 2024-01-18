@@ -52,52 +52,52 @@
 
   &.primary
     color: white
-    background-color: $c-active-blue
+    background-color: var(--c-text-brand-normal)
 
     &:disabled
-      background-color: $c-divider-dark
+      background-color: var(--c-border-neutral-light)
 
     &:not(:disabled)
       &:hover
-        background-color: hoverize($c-active-blue)
+        background-color: var(--c-text-brand-normal-hover)
 
       +focus-visible()
-        background-color: hoverize($c-active-blue)
+        background-color: var(--c-text-brand-normal-hover)
 
       &:active
-        background-color: activize($c-active-blue)
+        background-color: var(--c-text-brand-normal-active)
 
     &.warning
-      background-color: $c-warning
+      background-color: var(--c-bg-warning-normal)
 
       &:not(:disabled)
         &:hover
-          background-color: hoverize($c-warning)
+          background-color: var(--c-bg-warning-normal-hover)
 
         +focus-visible()
-          background-color: hoverize($c-warning)
+          background-color: var(--c-bg-warning-normal-hover)
 
         &:active
-          background-color: activize($c-warning)
+          background-color: var(--c-bg-warning-normal-active)
 
     &.danger
-      background-color: $c-error
+      background-color: var(--c-bg-error-normal)
 
       &:not(:disabled)
         &:hover
-          background-color: hoverize($c-error)
+          background-color: var(--c-bg-error-normal-hover)
 
         +focus-visible()
-          background-color: hoverize($c-error)
+          background-color: var(--c-bg-error-normal-hover)
 
         &:active
-          background-color: activize($c-error)
+          background-color: var(--c-bg-error-normal-active)
 
       &:disabled
-        background-color: transparentify($c-error, #fff, .25)
+        background-color: var(--c-bg-error-normal-light)
 
   &.secondary
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
     background-color: white
     box-shadow: 0px 2px 2px 0px rgba(0 0 0 4.5%), inset 0px 0px 0px 1px white
     background: linear-gradient(to bottom, white, white) padding-box, linear-gradient(to bottom, #E8E7EC, #D7D7D7) border-box
@@ -114,10 +114,10 @@
       box-shadow: none
 
   &.naked
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
     &:disabled
-      color: transparentify($tc-subtle-gray, #fff, .25) !important
+      color: var(--c-text-neutral-extralight)
 
     &:not(:disabled)
       &:hover
@@ -129,7 +129,7 @@
         color: $c.grey-700
 
       &:active
-        background-color: $c-backdrop
+        background-color: var(--c-bg-neutral-semilight)
 
     &.only-icon
       width: 2.5rem

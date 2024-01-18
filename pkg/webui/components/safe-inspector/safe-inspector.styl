@@ -43,7 +43,7 @@ $height-small = 2rem
     reset-button()
     transition-color()
     height: 100%
-    color: $c-icon-fill
+    color: var(--c-icon)
     flex: none
     padding: 0 .65rem
 
@@ -55,13 +55,13 @@ $height-small = 2rem
         color: black
 
       &:active
-        background-color: $c-backdrop
+        background-color: var(--c-bg-neutral-semilight)
 
   & > span // Byte-order.
     nudge('up', 2px)
     font-size: $fs.s
     line-height: $height
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
     padding-left: $cs.xs
 
 .button-transform
@@ -74,7 +74,7 @@ $height-small = 2rem
   display: flex
 
   &-copied
-    color: $c-success
+    color: var(--c-bg-success-normal)
 
 .button-copy
   position: relative
@@ -116,7 +116,7 @@ $height-small = 2rem
   border-radius: $br.xs
   position: absolute
   background-color: white
-  color: $tc-deep-gray
+  color: var(--c-text-neutral-heavy)
   top: -3rem
   left: -50%
   font-size: $fs.s

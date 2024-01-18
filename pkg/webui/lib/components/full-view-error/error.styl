@@ -43,18 +43,18 @@
     display: block
 
   summary
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
   pre
     width: 100%
     box-sizing: border-box
-    background-color: $c-backdrop
-    color: $tc-black
+    background-color: var(--c-bg-neutral-semilight)
+    color: var(--c-text-neutral-heavy)
     font-size: $fs.s
     overflow-y: auto
     padding: $cs.s
     max-height: 26rem
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
 
 .error-actions
   display: flex
@@ -64,11 +64,11 @@
   margin-top: $cs.m
 
   & > span
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
 .icon
   nudge('up', .1rem)
-  color: $c-error
+  color: var(--c-bg-error-normal)
   +media-query-min($bp.s)
     font-size: 2rem
   +media-query($bp.s)
@@ -79,6 +79,6 @@
   padding-left: $cs.xs
 
 .detail-colophon
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   span
     display: block

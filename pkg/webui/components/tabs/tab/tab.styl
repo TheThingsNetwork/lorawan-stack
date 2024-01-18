@@ -37,8 +37,8 @@
     opacity: .4
 
   &-default:not(.tab-item-active)
-    pseudo-border-animated(3px, $c-divider)
+    pseudo-border-animated(3px, var(--c-border-neutral-light))
 
   &-active
-    pseudo-border(3px, $c-active-blue)
-    color: $tc-active
+    pseudo-border(3px, var(--c-text-brand-normal))
+    color: var(--c-text-brand-normal)

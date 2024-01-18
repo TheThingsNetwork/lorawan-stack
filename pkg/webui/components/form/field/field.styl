@@ -32,7 +32,7 @@
       font-size: $fs.l
       display: inline-block
       line-height: 1
-      color: $c-error
+      color: var(--c-bg-error-normal)
 
   &:not(.has-tooltip)
     &.required
@@ -115,7 +115,7 @@
   display: inline-block
 
   &-icon
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
     padding: .1rem
     height: 1rem
     width: 1rem
@@ -139,7 +139,7 @@
 
 .description
   font-weight: $fw.normal
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
 
 .component-area
   flex-shrink: 0
@@ -181,10 +181,10 @@
     flex-shrink: 0
 
 .err
-  color: $c-error
+  color: var(--c-bg-error-normal)
 
 .warn
-  color: $tc-warning
+  color: var(--c-text-warning-normal)
 
 .disabled .info-area
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)

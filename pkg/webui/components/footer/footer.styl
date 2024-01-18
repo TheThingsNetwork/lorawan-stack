@@ -19,7 +19,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
   display: flex
   justify-content: space-between
   align-items: center
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   flex: none
   background-color: white
   box-sizing: border-box
@@ -52,14 +52,14 @@ $fh = 'calc(%s - 1px)' % $footer-height
           color: white
 
 .link
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   text-decoration: none
 
   &:first-of-type
     margin-left: 0
 
   &:hover
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
 
 .copyright-links
   +media-query($bp.m)
@@ -108,11 +108,11 @@ $fh = 'calc(%s - 1px)' % $footer-height
     border-normal('left')
     background-color: white
     &.interactive:hover
-      background-color: $c-backdrop
+      background-color: var(--c-bg-neutral-semilight)
 
   &.primary
-    background-color: $c-active-blue
+    background-color: var(--c-text-brand-normal)
     color: white
     
     &.interactive:hover
-      background-color: hoverize($c-active-blue)
+      background-color: hoverize(var(--c-text-brand-normal))

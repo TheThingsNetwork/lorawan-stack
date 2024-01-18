@@ -18,24 +18,24 @@
   font-size: $fs.m
   display: inline-flex
   align-items: center
-  color: $tc-deep-gray
+  color: var(--c-text-neutral-heavy)
 
-  pseudo-border-animated(3px, $c-divider)
+  pseudo-border-animated(3px, var(--c-border-neutral-light))
 
   &:not(.link-active):hover
     area-hover()
 
   & > .icon
-    color: $c-icon-fill
+    color: var(--c-icon)
 
   &-active, &-active > .icon
-    color: $tc-active
+    color: var(--c-text-brand-normal)
 
   &-active
     area-active()
-    $hover-color = $tc-active
+    $hover-color = var(--c-text-brand-normal)
 
-    +pseudo-border(3px, $c-active-blue)
+    +pseudo-border(3px, var(--c-text-brand-normal))
       transform: scaleX(1)
 
     &:hover:before

@@ -21,15 +21,15 @@
   margin-top: $cs.xxs
 
   &:not(.disabled):hover .checkmark
-    background-color: $c-backdrop
+    background-color: var(--c-bg-neutral-semilight)
 
   &:not(.disabled):hover input:checked ~ .checkmark, input:checked:focus ~ .checkmark
-    background-color: lighter($c-active-blue)
-    border-color: lighter($c-active-blue)
+    background-color: var(--c-text-brand-light) // TODO: Check if color matches.
+    border-color: var(--c-text-brand-light) // TODO: Check if color matches.
 
 .disabled
   cursor: not-allowed
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
 
   .checkbox
     opacity .4
@@ -57,8 +57,8 @@
       cursor: not-allowed
 
   input:checked ~ .checkmark
-    border-color: $c-active-blue
-    background-color: $c-active-blue
+    border-color: var(--c-text-brand-normal)
+    background-color: var(--c-text-brand-normal)
 
   input:checked ~ .checkmark:after
     opacity: 1
@@ -66,7 +66,7 @@
     transition: all $ad.s cubic-bezier(.12, .4, .29, 1.40) $ad.xs
 
   input:focus ~ .checkmark
-    border-color: $c-active-blue
+    border-color: var(--c-text-brand-normal)
 
 .checkmark
   border-input()
@@ -99,7 +99,7 @@
     left: 50%
     width: 50%
     height: 50%
-    background-color: $c-active-blue
+    background-color: var(--c-text-brand-normal)
     transform: translate(-50%, -50%) scale(1)
     opacity: 1
     transition: none

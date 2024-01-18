@@ -20,12 +20,12 @@
   :global(.select__option)
     padding: $cs.xs $cs.s
   :global(.select__option--is-selected)
-    background-color: $c-active-blue
+    background-color: var(--c-text-brand-normal)
   :global(.select__option--is-focused:not(.select__option--is-selected))
-    background-color: $c-backdrop
+    background-color: var(--c-bg-neutral-semilight)
   :global(.select__control--is-focused)
     box-shadow: none
-    border-color: $c-active-blue
+    border-color: var(--c-text-brand-normal)
     color: black
 
   :global(.select__control)
@@ -47,21 +47,21 @@
 
   &.error
     :global(.select__control)
-      color: $c-error
-      border-color: $c-error
-      background-color: lighten($c-error, 49)
+      color: var(--c-bg-error-normal)
+      border-color: var(--c-bg-error-normal)
+      background-color: var(--c-bg-error-normal) // TODO: Use lighter shade and define in theme.
 
     :global(.select__control--is-focused)
-      box-shadow: 0 0 0 3px alpha($c-error, .2)
+      box-shadow: 0 0 0 3px alpha(#FF0000, .2) // TODO: Define color in theme.
 
   &.warning
     :global(.select__control)
-      color: $c-warning
-      border-color: $c-warning
-      background-color: lighten($c-warning, 42)
+      color: var(--c-bg-warning-normal)
+      border-color: var(--c-bg-warning-normal)
+      background-color: var(--c-bg-warning-normal) // TODO: Use lighter shade and define in theme.
 
     :global(.select__control--is-focused)
-      box-shadow: 0 0 0 3px alpha($c-warning, .3)
+      box-shadow: 0 0 0 3px alpha(#FF9900, .3) // TODO: Define color in theme.
 
   &.selected-options-container
     display: inline-block
