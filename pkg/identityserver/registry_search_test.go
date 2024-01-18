@@ -334,7 +334,6 @@ func TestRegistrySearchDeletedEntities(t *testing.T) { // nolint:gocyclo
 					}
 				}
 			})
-
 		})
 	}, withPrivateTestDatabase(p))
 }

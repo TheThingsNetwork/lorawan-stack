@@ -350,7 +350,9 @@ func (rs *registrySearch) SearchGateways(
 	return res, nil
 }
 
-func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.SearchOrganizationsRequest) (*ttnpb.Organizations, error) {
+func (rs *registrySearch) SearchOrganizations(
+	ctx context.Context, req *ttnpb.SearchOrganizationsRequest,
+) (*ttnpb.Organizations, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -361,6 +363,12 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	}
 	if authInfo.IsAdmin {
 		member = nil
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact", "technical_contact")
 	}
 
 	var searchFields []string
@@ -416,6 +424,16 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, org := range res.Organizations {
+				org.ContactInfo, err = getContactsFromEntity(ctx, org, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
