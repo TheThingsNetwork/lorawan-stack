@@ -135,6 +135,11 @@ func (is *IdentityServer) getOrganization(
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireOrganization(ctx, req.GetOrganizationIds(), ttnpb.Right_RIGHT_ORGANIZATION_INFO); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicOrganizationFields...) {
@@ -147,8 +152,8 @@ func (is *IdentityServer) getOrganization(
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			org.ContactInfo, err = st.GetContactInfo(ctx, org.GetIds())
+		if contactInfoInPath {
+			org.ContactInfo, err = getContactsFromEntity(ctx, org, st)
 			if err != nil {
 				return err
 			}
@@ -165,6 +170,11 @@ func (is *IdentityServer) listOrganizations(
 	ctx context.Context,
 	req *ttnpb.ListOrganizationsRequest,
 ) (orgs *ttnpb.Organizations, err error) {
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 
 	authInfo, err := is.authInfo(ctx)
@@ -228,6 +238,15 @@ func (is *IdentityServer) listOrganizations(
 		orgs.Organizations, err = st.FindOrganizations(ctx, orgIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
+		}
+
+		if contactInfoInPath {
+			for _, org := range orgs.Organizations {
+				org.ContactInfo, err = getContactsFromEntity(ctx, org, st)
+				if err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	})
