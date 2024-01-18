@@ -15,13 +15,13 @@
 $c-string = #f5a623
 $c-number = #57a700
 $c-boolean = $c-number
-$c-invalid = $c-error
+$c-invalid = var(--c-bg-error-normal)
 
 .json-payload
   display: inline-block
   font-family: $font-family-mono
   font-size: $fs.s
-  color: $tc-black
+  color: var(--c-text-neutral-heavy)
 
   &-array
     &:before
@@ -57,7 +57,7 @@ $c-invalid = $c-error
     padding-right: $cs.xs
 
     &:after
-      color: $tc-black
+      color: var(--c-text-neutral-heavy)
       content: ','
 
 .invalid

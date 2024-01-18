@@ -19,26 +19,26 @@
     text-decoration: none
 
   &.primary
-    color: $c-active-blue
+    color: var(--c-text-brand-normal)
 
     &:active,
     &:hover
-      color: $c-active-blue-hover
+      color: var(--c-text-brand-normal-hover)
       text-decoration: underline
 
     &.link-visited
       &:visited
-        color: $c-active-blue-active
+        color: var(--c-text-brand-normal-active)
 
   &.secondary
     color: $c['grey-700']
     &:active,
     &:hover
-      color: $tc-deep-gray
+      color: var(--c-text-neutral-heavy)
 
     &.link-visited
       &:visited
-        color: $tc-deep-gray
+        color: var(--c-text-neutral-heavy)
 
   &.primary, &.secondary
     &.disabled

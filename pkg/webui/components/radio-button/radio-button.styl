@@ -20,14 +20,14 @@
   align-items: center
 
   &:not(.disabled):hover input ~ .dot
-    background-color: $c-backdrop
+    background-color: var(--c-bg-neutral-semilight)
 
   &:not(.disabled):hover input:checked ~ .dot, input:checked:focus ~ .dot
-    border-color: lighter($c-active-blue)
+    border-color: var(--c-text-brand-normal-hover)
 
 .disabled
   cursor: not-allowed
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
 
   .dot
     opacity .4
@@ -56,7 +56,7 @@
       cursor: not-allowed
 
   & input:checked ~ .dot
-    border-color: $c-input-border
+    border-color: var(--c-border-neutral-semibold)
 
   input:checked ~ .dot:after
     opacity: 1
@@ -64,7 +64,7 @@
     transition: all $ad.s cubic-bezier(.12, .4, .29, 1.40) $ad.xs
 
   input:focus ~ .dot
-    border-color: $c-active-blue
+    border-color: var(--c-text-brand-normal)
 
 .dot
   border-input()
@@ -84,7 +84,7 @@
     top: 4px
     width: 7px
     height: 7px
-    background-color: lighter($c-active-blue)
+    background-color: var(--c-text-brand-normal-hover)
     border-radius: 100%
     transform: scale(0)
     transition: all $ad.s ease-out $ad.xs

@@ -77,14 +77,14 @@ $event-container-height = 40px
   .actions
     background-color: white
     display: flex
-  
+
   button
     margin-right: 0 !important
 
 .toggle-container
   display: flex
   align-items: center
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   margin-right: $cs.s
 
 .toggle-label
@@ -105,7 +105,7 @@ $event-container-height = 40px
 
 .body
   overflow: hidden
-  background-color: $c-backdrop-lighter
+  background-color: var(--c-bg-neutral-semilight)-lighter
   flex-grow: 1
   position: relative
 
@@ -120,7 +120,7 @@ $event-container-height = 40px
   align-items: center
   justify-content: center
   font-size: $fs.s
-  color: $tc-warning
+  color: var(--c-text-warning-normal)
   padding: $cs.xxs 0
 
   span
@@ -149,9 +149,9 @@ $event-container-height = 40px
       overflow-y: auto
 
   &.synthetic
-    background-color: lighten($tc-warning, 55)
+    background-color: var(--c-bg-neutral-semilight)
     .cell-time
-      color: $tc-warning
+      color: var(--c-text-warning-normal)
     .cell-type::before
       content: "Console:"
       margin-right: $cs.xs
@@ -161,7 +161,7 @@ $event-container-height = 40px
     transition: background-color ease-in-out $ad.s
 
     &:hover:not(.active)
-      background-color: $c-backdrop
+      background-color: var(--c-bg-neutral-semilight)
 
   .cell-time, .cell-type, .cell-id, .cell-error
     overflow: hidden
@@ -171,7 +171,7 @@ $event-container-height = 40px
     font-size: $fs.s
 
   .cell-time
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
   .cell-type span, .cell-id span
     overflow: hidden
@@ -207,7 +207,7 @@ $event-container-height = 40px
   flex-grow: 1
 
 .cell-error
-  color: $tc-error
+  color: var(--c-text-error-normal)
 
 .event-icon
   margin-right: $cs.xxs
@@ -224,7 +224,7 @@ $event-container-height = 40px
     justify-content: center
 
   &-content
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
     pre
       display: inline
       font-size: $fs.s

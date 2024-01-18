@@ -22,23 +22,23 @@
       margin-right: $cs.xs
 
   .message
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
 
   &.error
     .icon,
     .value,
     .message
-      color: $c-error
+      color: var(--c-bg-error-normal)
 
   &.error .message
     font-weight: $fw.bold
 
 .icon
   nudge('up', 2px)
-  color: $c-icon-fill
+  color: var(--c-icon)
 
 .value
-  color: $tc-deep-gray
+  color: var(--c-text-neutral-heavy)
   font-weight: $fw.bold
   margin-right: $cs.xxs
 

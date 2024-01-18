@@ -36,7 +36,7 @@
     align-items: flex-start
 
   li > span:first-child
-    color: $c-info
+    color: var(--c-bg-info-normal)
     margin-right: $cs.xs
     nudge('down', 3px)
 
@@ -56,12 +56,12 @@
     margin-bottom: $cs.s
 
 .login-info
-  color: $tc-deep-gray
+  color: var(--c-text-neutral-heavy)
 
 .note-text
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
 
 .logout-button
   reset-button()
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   text-decoration: underline
