@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
@@ -125,9 +126,6 @@ func (is *IdentityServer) createGateway( // nolint:gocyclo
 	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Gateway.TechnicalContact); err != nil {
 		return nil, err
 	}
-	if err := validateContactInfo(reqGtw.ContactInfo); err != nil {
-		return nil, err
-	}
 
 	if len(reqGtw.FrequencyPlanIds) == 0 && reqGtw.FrequencyPlanId != "" {
 		reqGtw.FrequencyPlanIds = []string{reqGtw.FrequencyPlanId}
@@ -189,13 +187,6 @@ func (is *IdentityServer) createGateway( // nolint:gocyclo
 			ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL),
 		); err != nil {
 			return err
-		}
-		if len(reqGtw.ContactInfo) > 0 {
-			cleanContactInfo(reqGtw.ContactInfo)
-			gtw.ContactInfo, err = st.SetContactInfo(ctx, gtw.GetIds(), reqGtw.ContactInfo)
-			if err != nil {
-				return err
-			}
 		}
 		return nil
 	})
@@ -545,9 +536,8 @@ func (is *IdentityServer) updateGateway( // nolint:gocyclo
 		req.FieldMask = ttnpb.FieldMask(updatePaths...)
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-		if err := validateContactInfo(reqGtw.ContactInfo); err != nil {
-			return nil, err
-		}
+		warning.Add(ctx, "Contact info is deprecated and will be removed in the next major release")
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
 	}
 	req.FieldMask.Paths = ttnpb.FlattenPaths(
 		req.FieldMask.Paths,
@@ -638,13 +628,6 @@ func (is *IdentityServer) updateGateway( // nolint:gocyclo
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cleanContactInfo(reqGtw.ContactInfo)
-			gtw.ContactInfo, err = st.SetContactInfo(ctx, gtw.GetIds(), reqGtw.ContactInfo)
-			if err != nil {
-				return err
-			}
-		}
 		return nil
 	})
 	if err != nil {
@@ -719,11 +702,6 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 		}
 		// delete related memberships before purging the gateway
 		err = st.DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
-		if err != nil {
-			return err
-		}
-		// delete related contact info before purging the gateway
-		err = st.DeleteEntityContactInfo(ctx, ids)
 		if err != nil {
 			return err
 		}
