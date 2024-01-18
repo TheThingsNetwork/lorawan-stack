@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -104,9 +105,6 @@ func (is *IdentityServer) createClient( //nolint:gocyclo
 	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.TechnicalContact); err != nil {
 		return nil, err
 	}
-	if err := validateContactInfo(req.Client.ContactInfo); err != nil {
-		return nil, err
-	}
 
 	secret := req.Client.Secret
 	if secret == "" {
@@ -140,13 +138,6 @@ func (is *IdentityServer) createClient( //nolint:gocyclo
 			ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL),
 		); err != nil {
 			return err
-		}
-		if len(req.Client.ContactInfo) > 0 {
-			cleanContactInfo(req.Client.ContactInfo)
-			cli.ContactInfo, err = st.SetContactInfo(ctx, cli.GetIds(), req.Client.ContactInfo)
-			if err != nil {
-				return err
-			}
 		}
 		return nil
 	})
@@ -308,9 +299,8 @@ func (is *IdentityServer) updateClient(
 		req.FieldMask = ttnpb.FieldMask(updatePaths...)
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-		if err := validateContactInfo(req.Client.ContactInfo); err != nil {
-			return nil, err
-		}
+		warning.Add(ctx, "Contact info is deprecated and will be removed in the next major release")
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
 	}
 	req.FieldMask.Paths = ttnpb.FlattenPaths(
 		req.FieldMask.Paths,
@@ -350,13 +340,6 @@ func (is *IdentityServer) updateClient(
 		cli, err = st.UpdateClient(ctx, req.Client, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
-		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cleanContactInfo(req.Client.ContactInfo)
-			cli.ContactInfo, err = st.SetContactInfo(ctx, cli.Ids, req.Client.ContactInfo)
-			if err != nil {
-				return err
-			}
 		}
 		return nil
 	})
@@ -432,11 +415,6 @@ func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIden
 		}
 		// delete related memberships before purging the client
 		err = st.DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
-		if err != nil {
-			return err
-		}
-		// delete related contact info before purging the client
-		err = st.DeleteEntityContactInfo(ctx, ids)
 		if err != nil {
 			return err
 		}
