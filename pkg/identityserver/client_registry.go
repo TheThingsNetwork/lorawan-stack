@@ -177,6 +177,11 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_INFO); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicClientFields...) {
@@ -189,8 +194,8 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cli.ContactInfo, err = st.GetContactInfo(ctx, cli.GetIds())
+		if contactInfoInPath {
+			cli.ContactInfo, err = getContactsFromEntity(ctx, cli, st)
 			if err != nil {
 				return err
 			}
@@ -207,6 +212,11 @@ func (is *IdentityServer) listClients(
 	ctx context.Context,
 	req *ttnpb.ListClientsRequest,
 ) (clis *ttnpb.Clients, err error) {
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
 
 	authInfo, err := is.authInfo(ctx)
@@ -270,6 +280,14 @@ func (is *IdentityServer) listClients(
 		clis.Clients, err = st.FindClients(ctx, cliIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
+		}
+		if contactInfoInPath {
+			for _, cli := range clis.Clients {
+				cli.ContactInfo, err = getContactsFromEntity(ctx, cli, st)
+				if err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	})
