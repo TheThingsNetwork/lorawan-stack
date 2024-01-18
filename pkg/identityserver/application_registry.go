@@ -147,6 +147,11 @@ func (is *IdentityServer) getApplication(
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_INFO); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicApplicationFields...) {
@@ -159,8 +164,8 @@ func (is *IdentityServer) getApplication(
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			app.ContactInfo, err = st.GetContactInfo(ctx, app.GetIds())
+		if contactInfoInPath {
+			app.ContactInfo, err = getContactsFromEntity(ctx, app, st)
 			if err != nil {
 				return err
 			}
@@ -177,6 +182,11 @@ func (is *IdentityServer) listApplications( // nolint:gocyclo
 	ctx context.Context,
 	req *ttnpb.ListApplicationsRequest,
 ) (apps *ttnpb.Applications, err error) {
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
 
 	authInfo, err := is.authInfo(ctx)
@@ -261,6 +271,14 @@ func (is *IdentityServer) listApplications( // nolint:gocyclo
 		apps.Applications, err = st.FindApplications(ctx, appIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
+		}
+		if contactInfoInPath {
+			for _, app := range apps.Applications {
+				app.ContactInfo, err = getContactsFromEntity(ctx, app, st)
+				if err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	})
