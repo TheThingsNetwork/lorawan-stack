@@ -235,7 +235,9 @@ func (rs *registrySearch) SearchClients(
 	return res, nil
 }
 
-func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchGatewaysRequest) (*ttnpb.Gateways, error) {
+func (rs *registrySearch) SearchGateways(
+	ctx context.Context, req *ttnpb.SearchGatewaysRequest,
+) (*ttnpb.Gateways, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -246,6 +248,12 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	}
 	if authInfo.IsAdmin {
 		member = nil
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact", "technical_contact")
 	}
 
 	// Backwards compatibility for frequency_plan_id field.
@@ -307,6 +315,16 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, gtw := range res.Gateways {
+				gtw.ContactInfo, err = getContactsFromEntity(ctx, gtw, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
