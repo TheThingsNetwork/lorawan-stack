@@ -142,13 +142,6 @@ func TestMembershipStore(t *testing.T) {
 	st.TestMembershipStorePagination(t)
 }
 
-func TestContactInfoStore(t *testing.T) {
-	t.Parallel()
-
-	st := storetest.New(t, newTestStore)
-	st.TestContactInfoStoreCRUD(t)
-}
-
 func TestEmailValidationStore(t *testing.T) {
 	t.Parallel()
 
