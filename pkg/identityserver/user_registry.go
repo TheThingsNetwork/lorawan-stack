@@ -288,6 +288,13 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 		}
 		defer func() { usr = usr.PublicSafe() }()
 	}
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(
+			req.FieldMask.Paths, "primary_email_address", "primary_email_address_validated_at",
+		)
+	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "profile_picture") {
 		if is.configFromContext(ctx).ProfilePicture.UseGravatar {
@@ -309,10 +316,14 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			usr.ContactInfo, err = st.GetContactInfo(ctx, usr.GetIds())
-			if err != nil {
-				return err
+		if contactInfoInPath {
+			usr.ContactInfo = []*ttnpb.ContactInfo{
+				{
+					ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+					ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+					Value:         usr.PrimaryEmailAddress,
+					ValidatedAt:   usr.PrimaryEmailAddressValidatedAt,
+				},
 			}
 		}
 		return err
@@ -327,6 +338,13 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = is.RequireAdmin(ctx); err != nil {
 		return nil, err
+	}
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(
+			req.FieldMask.Paths, "primary_email_address", "primary_email_address_validated_at",
+		)
 	}
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -349,6 +367,18 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	})
 	if err != nil {
 		return nil, err
+	}
+	if contactInfoInPath {
+		for idx := range users.Users {
+			users.Users[idx].ContactInfo = []*ttnpb.ContactInfo{
+				{
+					ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+					ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+					Value:         users.Users[idx].PrimaryEmailAddress,
+					ValidatedAt:   users.Users[idx].PrimaryEmailAddressValidatedAt,
+				},
+			}
+		}
 	}
 	return users, nil
 }
