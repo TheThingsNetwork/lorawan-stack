@@ -155,15 +155,16 @@ const Notifications = () => {
         index + BATCH_SIZE > items.length - 1 ? items.length - 1 : index + BATCH_SIZE,
       )
 
-      // Update the selected notification to the one above the archived one.
-      setSelectedNotification(items[Math.max(1, index - 1)])
+      // Update the selected notification to the one above the archived one,
+      // unless there is only one item in the list.
+      setSelectedNotification(totalCount === 1 ? undefined : items[Math.max(1, index - 1)])
 
       // Reset the list cache if available so that old items are discarded.
       if (listRef.current && listRef.current.resetloadMoreItemsCache) {
         listRef.current.resetloadMoreItemsCache()
       }
     },
-    [showArchived, dispatch, userId, items, loadNextPage],
+    [showArchived, dispatch, userId, items, loadNextPage, totalCount],
   )
 
   // Load the first page of notifications when the component mounts.

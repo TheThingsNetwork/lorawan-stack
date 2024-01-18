@@ -49,7 +49,14 @@ const notifications = (state = defaultState, { type, payload }) => {
         ...state,
         unseenIds: state.unseenIds.filter(id => !payload.ids.includes(id)),
         unseenTotalCount:
-          state.unseenIds.length > 0 ? state.unseenTotalCount - payload.ids.length : 0,
+          state.unseenIds.length > 0
+            ? // This reducer is also triggered when a notification is archived so we need to make sure
+              // that the unseedIds include the notification that was just updated
+              // (if it was unseen before) and then update the unseenTotalCount accordingly.
+              payload.ids.some(id => state.unseenIds.includes(id))
+              ? state.unseenTotalCount - payload.ids.length
+              : state.unseenTotalCount
+            : 0,
       }
     default:
       return state
