@@ -132,7 +132,9 @@ func (rs *registrySearch) SearchApplications(
 	return res, nil
 }
 
-func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchClientsRequest) (*ttnpb.Clients, error) {
+func (rs *registrySearch) SearchClients(
+	ctx context.Context, req *ttnpb.SearchClientsRequest,
+) (*ttnpb.Clients, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -143,6 +145,12 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 	}
 	if authInfo.IsAdmin {
 		member = nil
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact", "technical_contact")
 	}
 
 	var searchFields []string
@@ -201,6 +209,16 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, clt := range res.Clients {
+				clt.ContactInfo, err = getContactsFromEntity(ctx, clt, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
