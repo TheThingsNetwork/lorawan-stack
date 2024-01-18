@@ -17,7 +17,6 @@ package store
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
@@ -43,8 +42,6 @@ type Organization struct {
 	Description string `bun:"description,nullzero"`
 
 	Attributes []*Attribute `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
-
-	ContactInfo []*ContactInfo `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
 
 	AdministrativeContactID *string  `bun:"administrative_contact_id,type:uuid"`
 	AdministrativeContact   *Account `bun:"rel:belongs-to,join:administrative_contact_id=id"`
@@ -83,14 +80,6 @@ func organizationToPB(m *Organization, fieldMask ...string) (*ttnpb.Organization
 		for _, a := range m.Attributes {
 			pb.Attributes[a.Key] = a.Value
 		}
-	}
-
-	if len(m.ContactInfo) > 0 {
-		pb.ContactInfo = make([]*ttnpb.ContactInfo, len(m.ContactInfo))
-		for i, contactInfo := range m.ContactInfo {
-			pb.ContactInfo[i] = contactInfoToPB(contactInfo)
-		}
-		sort.Sort(contactInfoProtoSlice(pb.ContactInfo))
 	}
 
 	if m.AdministrativeContact != nil {
@@ -198,15 +187,6 @@ func (s *organizationStore) CreateOrganization(
 		}
 	}
 
-	if len(pb.ContactInfo) > 0 {
-		organizationModel.ContactInfo, err = s.replaceContactInfo(
-			ctx, nil, pb.ContactInfo, "organization", organizationModel.ID,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	pb, err = organizationToPB(organizationModel)
 	if err != nil {
 		return nil, err
@@ -238,8 +218,6 @@ func (*organizationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.F
 				columns = append(columns, f)
 			case "attributes":
 				q = q.Relation("Attributes")
-			case "contact_info":
-				q = q.Relation("ContactInfo")
 			case "administrative_contact":
 				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
 					return q.Column("uid", "account_type")
@@ -405,14 +383,6 @@ func (s *organizationStore) updateOrganizationModel( //nolint:gocyclo
 		case "attributes":
 			model.Attributes, err = s.replaceAttributes(
 				ctx, model.Attributes, pb.Attributes, "organization", model.ID,
-			)
-			if err != nil {
-				return err
-			}
-
-		case "contact_info":
-			model.ContactInfo, err = s.replaceContactInfo(
-				ctx, model.ContactInfo, pb.ContactInfo, "organization", model.ID,
 			)
 			if err != nil {
 				return err
@@ -606,7 +576,7 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 	model, err := s.getOrganizationModelBy(
 		store.WithSoftDeleted(ctx, false),
 		s.selectWithID(ctx, id.GetOrganizationId()),
-		store.FieldMask{"attributes", "contact_info"},
+		store.FieldMask{"attributes"},
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -619,13 +589,6 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 
 	if len(model.Attributes) > 0 {
 		_, err = s.replaceAttributes(ctx, model.Attributes, nil, "organization", model.ID)
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(model.ContactInfo) > 0 {
-		_, err = s.replaceContactInfo(ctx, model.ContactInfo, nil, "organization", model.ID)
 		if err != nil {
 			return err
 		}
