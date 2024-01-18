@@ -17,7 +17,6 @@ package store
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strings"
 	"time"
 
@@ -48,8 +47,6 @@ type Gateway struct {
 	Description string `bun:"description,nullzero"`
 
 	Attributes []*Attribute `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
-
-	ContactInfo []*ContactInfo `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
 
 	AdministrativeContactID *string  `bun:"administrative_contact_id,type:uuid"`
 	AdministrativeContact   *Account `bun:"rel:belongs-to,join:administrative_contact_id=id"`
@@ -185,14 +182,6 @@ func gatewayToPB(m *Gateway, fieldMask ...string) (*ttnpb.Gateway, error) {
 		}
 	}
 
-	if len(m.ContactInfo) > 0 {
-		pb.ContactInfo = make([]*ttnpb.ContactInfo, len(m.ContactInfo))
-		for i, contactInfo := range m.ContactInfo {
-			pb.ContactInfo[i] = contactInfoToPB(contactInfo)
-		}
-		sort.Sort(contactInfoProtoSlice(pb.ContactInfo))
-	}
-
 	if m.AdministrativeContact != nil {
 		pb.AdministrativeContact = m.AdministrativeContact.GetOrganizationOrUserIdentifiers()
 	}
@@ -321,15 +310,6 @@ func (s *gatewayStore) CreateGateway(
 		}
 	}
 
-	if len(pb.ContactInfo) > 0 {
-		gatewayModel.ContactInfo, err = s.replaceContactInfo(
-			ctx, nil, pb.ContactInfo, "gateway", gatewayModel.ID,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	if len(pb.Antennas) > 0 {
 		gatewayModel.Antennas, err = s.replaceGatewayAntennas(
 			ctx, nil, pb.Antennas, gatewayModel.ID,
@@ -397,8 +377,6 @@ func (*gatewayStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldM
 				columns = append(columns, "supports_lrfhss")
 			case "attributes":
 				q = q.Relation("Attributes")
-			case "contact_info":
-				q = q.Relation("ContactInfo")
 			case "administrative_contact":
 				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
 					return q.Column("uid", "account_type")
@@ -603,14 +581,6 @@ func (s *gatewayStore) updateGatewayModel( //nolint:gocyclo
 		case "attributes":
 			model.Attributes, err = s.replaceAttributes(
 				ctx, model.Attributes, pb.Attributes, "gateway", model.ID,
-			)
-			if err != nil {
-				return err
-			}
-
-		case "contact_info":
-			model.ContactInfo, err = s.replaceContactInfo(
-				ctx, model.ContactInfo, pb.ContactInfo, "gateway", model.ID,
 			)
 			if err != nil {
 				return err
@@ -921,7 +891,7 @@ func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdenti
 	model, err := s.getGatewayModelBy(
 		store.WithSoftDeleted(ctx, false),
 		s.selectWithID(ctx, id.GetGatewayId()),
-		store.FieldMask{"attributes", "contact_info", "antennas"},
+		store.FieldMask{"attributes", "antennas"},
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -934,13 +904,6 @@ func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdenti
 
 	if len(model.Attributes) > 0 {
 		_, err = s.replaceAttributes(ctx, model.Attributes, nil, "gateway", model.ID)
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(model.ContactInfo) > 0 {
-		_, err = s.replaceContactInfo(ctx, model.ContactInfo, nil, "gateway", model.ID)
 		if err != nil {
 			return err
 		}
