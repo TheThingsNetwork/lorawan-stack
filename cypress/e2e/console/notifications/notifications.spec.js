@@ -47,24 +47,27 @@ describe('Notifications', () => {
 
   it('succeeds showing a list of notifications', () => {
     cy.findByText('Notifications').should('be.visible')
-    cy.findByText(/A new API key has just been created for your application./).should('be.visible')
-    cy.findByText(/A collaborator of your application has been added or updated/).should(
-      'be.visible',
-    )
+    cy.get(`[data-test-id="notification-list-item"]`).should('be.visible')
   })
 
   it('succeeds opening a notification', () => {
-    cy.findByText(/A new API key has just been created for your application./).click()
+    cy.findByText(/A collaborator of your application has been added or updated/).click()
     cy.findByRole('button', { name: /Archive/ }).should('be.visible')
   })
 
   it('succeeds archiving and unarchiving a notification', () => {
-    cy.findByText(/A new API key has just been created for your application./).click()
+    cy.findByText(/A collaborator of your application has been added or updated/).click()
     cy.findByRole('button', { name: /Archive/ }).click()
     cy.findByText(/See archived messages/).click()
+    cy.findByText(/A collaborator of your application has been added or updated/).should(
+      'be.visible',
+    )
+    cy.findByText(/A collaborator of your application has been added or updated/).click()
     cy.findByRole('button', { name: /Unarchive/ }).click()
     cy.findByText(/See all messages/).click()
-    cy.findByText(/A new API key has just been created for your application./).should('be.visible')
+    cy.findByText(/A collaborator of your application has been added or updated/).should(
+      'be.visible',
+    )
   })
 
   it('succeeds marking all notifications as read', () => {

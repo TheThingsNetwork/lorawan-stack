@@ -47,7 +47,13 @@ export const NotificationListItem = ({ notification, selectedNotification, handl
   })
 
   return (
-    <Button key={notification.id} onClick={handleClick} value={notification.id} className={classes}>
+    <Button
+      key={notification.id}
+      onClick={handleClick}
+      value={notification.id}
+      className={classes}
+      data-test-id="notification-list-item"
+    >
       {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
       <div>
         <div className={titleClasses}>
