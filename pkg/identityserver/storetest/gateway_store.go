@@ -47,7 +47,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	defer s.Close()
 
 	start := time.Now().Truncate(time.Second)
-	mask := fieldMask(ttnpb.GatewayFieldPathsTopLevel...)
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.GatewayFieldPathsTopLevel...), "contact_info")
 
 	eui := &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 	antenna := &ttnpb.GatewayAntenna{
@@ -519,6 +519,8 @@ func (st *StoreTest) TestGatewayStorePagination(t *T) {
 	}
 	defer s.Close()
 
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.GatewayFieldPathsTopLevel...), "contact_info")
+
 	t.Run("FindGateways_Paginated", func(t *T) {
 		a, ctx := test.New(t)
 
@@ -526,7 +528,7 @@ func (st *StoreTest) TestGatewayStorePagination(t *T) {
 		for _, page := range []uint32{1, 2, 3, 4} {
 			paginateCtx := store.WithPagination(ctx, 2, page, &total)
 
-			got, err := s.FindGateways(paginateCtx, nil, fieldMask(ttnpb.GatewayFieldPathsTopLevel...))
+			got, err := s.FindGateways(paginateCtx, nil, mask)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 				if page == 4 {
 					a.So(got, should.HaveLength, 1)
