@@ -51,7 +51,7 @@ func local_request_ApplicationPubSubRegistry_GetFormats_0(ctx context.Context, m
 }
 
 var (
-	filter_ApplicationPubSubRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "pub_sub_id": 4, "pubSubId": 5}, Base: []int{1, 1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 4, 6, 5, 7}}
+	filter_ApplicationPubSubRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "pub_sub_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
 func request_ApplicationPubSubRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPubSubRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -141,7 +141,7 @@ func local_request_ApplicationPubSubRegistry_Get_0(ctx context.Context, marshale
 }
 
 var (
-	filter_ApplicationPubSubRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_ApplicationPubSubRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_ApplicationPubSubRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPubSubRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -214,11 +214,7 @@ func request_ApplicationPubSubRegistry_Set_0(ctx context.Context, marshaler runt
 	var protoReq SetApplicationPubSubRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -258,11 +254,7 @@ func local_request_ApplicationPubSubRegistry_Set_0(ctx context.Context, marshale
 	var protoReq SetApplicationPubSubRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -302,11 +294,7 @@ func request_ApplicationPubSubRegistry_Set_1(ctx context.Context, marshaler runt
 	var protoReq SetApplicationPubSubRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -336,11 +324,7 @@ func local_request_ApplicationPubSubRegistry_Set_1(ctx context.Context, marshale
 	var protoReq SetApplicationPubSubRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -367,7 +351,7 @@ func local_request_ApplicationPubSubRegistry_Set_1(ctx context.Context, marshale
 }
 
 var (
-	filter_ApplicationPubSubRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "pub_sub_id": 3, "pubSubId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
+	filter_ApplicationPubSubRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "pub_sub_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_ApplicationPubSubRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPubSubRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {

@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 var (
-	filter_ApplicationUpStorage_GetStoredApplicationUp_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5, "type": 6}, Base: []int{1, 1, 1, 1, 3, 2, 4, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 1, 4, 6, 5, 7, 8, 8}}
+	filter_ApplicationUpStorage_GetStoredApplicationUp_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3, "type": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 3, 2, 1, 4, 5, 6}}
 )
 
 func request_ApplicationUpStorage_GetStoredApplicationUp_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationUpStorageClient, req *http.Request, pathParams map[string]string) (ApplicationUpStorage_GetStoredApplicationUpClient, runtime.ServerMetadata, error) {
@@ -97,7 +97,7 @@ func request_ApplicationUpStorage_GetStoredApplicationUp_0(ctx context.Context, 
 }
 
 var (
-	filter_ApplicationUpStorage_GetStoredApplicationUp_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "type": 3}, Base: []int{1, 1, 1, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 3, 4, 5, 5}}
+	filter_ApplicationUpStorage_GetStoredApplicationUp_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "type": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_ApplicationUpStorage_GetStoredApplicationUp_1(ctx context.Context, marshaler runtime.Marshaler, client ApplicationUpStorageClient, req *http.Request, pathParams map[string]string) (ApplicationUpStorage_GetStoredApplicationUpClient, runtime.ServerMetadata, error) {
@@ -152,7 +152,7 @@ func request_ApplicationUpStorage_GetStoredApplicationUp_1(ctx context.Context, 
 }
 
 var (
-	filter_ApplicationUpStorage_GetStoredApplicationUpCount_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5, "type": 6}, Base: []int{1, 1, 1, 1, 3, 2, 4, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 1, 4, 6, 5, 7, 8, 8}}
+	filter_ApplicationUpStorage_GetStoredApplicationUpCount_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3, "type": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 3, 2, 1, 4, 5, 6}}
 )
 
 func request_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationUpStorageClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -262,7 +262,7 @@ func local_request_ApplicationUpStorage_GetStoredApplicationUpCount_0(ctx contex
 }
 
 var (
-	filter_ApplicationUpStorage_GetStoredApplicationUpCount_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2, "type": 3}, Base: []int{1, 1, 1, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 3, 4, 5, 5}}
+	filter_ApplicationUpStorage_GetStoredApplicationUpCount_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "type": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_ApplicationUpStorage_GetStoredApplicationUpCount_1(ctx context.Context, marshaler runtime.Marshaler, client ApplicationUpStorageClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {

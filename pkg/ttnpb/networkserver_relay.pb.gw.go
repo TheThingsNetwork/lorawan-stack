@@ -35,11 +35,7 @@ func request_NsRelayConfigurationService_CreateRelay_0(ctx context.Context, mars
 	var protoReq CreateRelayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -69,11 +65,7 @@ func local_request_NsRelayConfigurationService_CreateRelay_0(ctx context.Context
 	var protoReq CreateRelayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -100,7 +92,7 @@ func local_request_NsRelayConfigurationService_CreateRelay_0(ctx context.Context
 }
 
 var (
-	filter_NsRelayConfigurationService_GetRelay_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5}, Base: []int{1, 1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 4, 6, 5, 7}}
+	filter_NsRelayConfigurationService_GetRelay_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
 func request_NsRelayConfigurationService_GetRelay_0(ctx context.Context, marshaler runtime.Marshaler, client NsRelayConfigurationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -193,11 +185,7 @@ func request_NsRelayConfigurationService_UpdateRelay_0(ctx context.Context, mars
 	var protoReq UpdateRelayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -237,11 +225,7 @@ func local_request_NsRelayConfigurationService_UpdateRelay_0(ctx context.Context
 	var protoReq UpdateRelayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -278,7 +262,7 @@ func local_request_NsRelayConfigurationService_UpdateRelay_0(ctx context.Context
 }
 
 var (
-	filter_NsRelayConfigurationService_DeleteRelay_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5}, Base: []int{1, 1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 4, 6, 5, 7}}
+	filter_NsRelayConfigurationService_DeleteRelay_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
 func request_NsRelayConfigurationService_DeleteRelay_0(ctx context.Context, marshaler runtime.Marshaler, client NsRelayConfigurationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -371,11 +355,7 @@ func request_NsRelayConfigurationService_CreateRelayUplinkForwardingRule_0(ctx c
 	var protoReq CreateRelayUplinkForwardingRuleRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -415,11 +395,7 @@ func local_request_NsRelayConfigurationService_CreateRelayUplinkForwardingRule_0
 	var protoReq CreateRelayUplinkForwardingRuleRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -456,7 +432,7 @@ func local_request_NsRelayConfigurationService_CreateRelayUplinkForwardingRule_0
 }
 
 var (
-	filter_NsRelayConfigurationService_GetRelayUplinkForwardingRule_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5, "index": 6}, Base: []int{1, 1, 1, 1, 3, 2, 4, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 1, 4, 6, 5, 7, 8, 8}}
+	filter_NsRelayConfigurationService_GetRelayUplinkForwardingRule_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3, "index": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 3, 2, 1, 4, 5, 6}}
 )
 
 func request_NsRelayConfigurationService_GetRelayUplinkForwardingRule_0(ctx context.Context, marshaler runtime.Marshaler, client NsRelayConfigurationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -566,7 +542,7 @@ func local_request_NsRelayConfigurationService_GetRelayUplinkForwardingRule_0(ct
 }
 
 var (
-	filter_NsRelayConfigurationService_ListRelayUplinkForwardingRules_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5}, Base: []int{1, 1, 1, 1, 3, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 4, 6, 5, 7}}
+	filter_NsRelayConfigurationService_ListRelayUplinkForwardingRules_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
 func request_NsRelayConfigurationService_ListRelayUplinkForwardingRules_0(ctx context.Context, marshaler runtime.Marshaler, client NsRelayConfigurationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -659,11 +635,7 @@ func request_NsRelayConfigurationService_UpdateRelayUplinkForwardingRule_0(ctx c
 	var protoReq UpdateRelayUplinkForwardingRuleRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -713,11 +685,7 @@ func local_request_NsRelayConfigurationService_UpdateRelayUplinkForwardingRule_0
 	var protoReq UpdateRelayUplinkForwardingRuleRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -764,7 +732,7 @@ func local_request_NsRelayConfigurationService_UpdateRelayUplinkForwardingRule_0
 }
 
 var (
-	filter_NsRelayConfigurationService_DeleteRelayUplinkForwardingRule_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "applicationId": 3, "device_id": 4, "deviceId": 5, "index": 6}, Base: []int{1, 1, 1, 1, 3, 2, 4, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 2, 1, 1, 4, 6, 5, 7, 8, 8}}
+	filter_NsRelayConfigurationService_DeleteRelayUplinkForwardingRule_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3, "index": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 3, 2, 1, 4, 5, 6}}
 )
 
 func request_NsRelayConfigurationService_DeleteRelayUplinkForwardingRule_0(ctx context.Context, marshaler runtime.Marshaler, client NsRelayConfigurationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {

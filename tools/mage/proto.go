@@ -30,14 +30,14 @@ import (
 
 const (
 	protocOut             = "/out"
-	goProtoImage          = "ghcr.io/thethingsindustries/protoc:22.2-gen-go-1.30.0"
-	goGrpcProtoImage      = "ghcr.io/thethingsindustries/protoc:22.2-gen-go-grpc-1.54.0"
-	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:22.2-gen-go-json-1.5.1"
-	fieldMaskProtoImage   = "ghcr.io/thethingsindustries/protoc:22.2-gen-fieldmask-0.7.3"
-	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:22.0-gen-grpc-gateway-2.15.2"
-	openAPIv2ProtoImage   = "ghcr.io/thethingsindustries/protoc:22.0-gen-grpc-gateway-2.15.2"
+	goProtoImage          = "ghcr.io/thethingsindustries/protoc:25.1-gen-go-1.32.0"
+	goGrpcProtoImage      = "ghcr.io/thethingsindustries/protoc:25.1-gen-go-grpc-1.60.1"
+	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:23.4-gen-go-json-1.6.0"
+	fieldMaskProtoImage   = "ghcr.io/thethingsindustries/protoc:23.4-gen-fieldmask-0.7.4"
+	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:25.1-gen-grpc-gateway-2.19.0"
+	openAPIv2ProtoImage   = "ghcr.io/thethingsindustries/protoc:25.1-gen-grpc-gateway-2.19.0"
 	docProtoImage         = "ghcr.io/thethingsindustries/protoc:3.19.4-gen-doc-1.5.1"
-	flagProtoImage        = "ghcr.io/thethingsindustries/protoc:22.2-gen-go-flags-1.1.0"
+	flagProtoImage        = "ghcr.io/thethingsindustries/protoc:23.4-gen-go-flags-1.2.0"
 )
 
 // Proto namespace.
