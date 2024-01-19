@@ -26,32 +26,32 @@ import (
 	"google.golang.org/grpc"
 )
 
-// TODO: This set of tests have to be updated after (https://github.com/TheThingsNetwork/lorawan-stack/issues/6567) is
-// resolved.
 func TestContactInfoValidation(t *testing.T) {
 	t.Parallel()
 
 	p := &storetest.Population{}
 	usr1 := p.NewUser()
-	usr1.ContactInfo = []*ttnpb.ContactInfo{ // nolint:staticcheck
-		{
-			ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
-			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
-			Value:         "usr@test.com",
-			Public:        false,
-			ValidatedAt:   nil,
-		},
-	}
 	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	usr1Creds := rpcCreds(usr1Key)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewContactInfoRegistryClient(cc)
+		a, ctx := test.New(t)
 
 		retryInterval := test.Delay << 5
 		is.config.UserRegistration.ContactInfoValidation.Required = true
 		is.config.UserRegistration.ContactInfoValidation.TokenTTL = retryInterval * 2
 		is.config.UserRegistration.ContactInfoValidation.RetryInterval = retryInterval
+
+		// Directly insert contact info into database since entities no longer support creating new contact info.
+		c, err := is.store.SetContactInfo(ctx, usr1.GetEntityIdentifiers(), []*ttnpb.ContactInfo{{
+			ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+			Value:         "usr@test.com",
+		}})
+		a.So(c, should.HaveLength, 1)
+		a.So(err, should.BeNil)
+		time.Sleep(3 * retryInterval) // Wait for the validation token to expire.
 
 		t.Run("Request Validation", func(t *testing.T) { // nolint:paralleltest
 			t.Run("Insufficient Rights", func(t *testing.T) { // nolint:paralleltest
