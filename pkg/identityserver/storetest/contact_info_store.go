@@ -139,7 +139,6 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 			t.Run("ListRefreshableValidations", func(t *T) { // nolint:paralleltest
 				t.Run("valid refresh interval", func(t *T) { // nolint:paralleltest
 					a, ctx := test.New(t)
-					// Any validation from now
 					validations, err := s.ListRefreshableValidations(ctx, ids, 0)
 					if a.So(err, should.BeNil) && a.So(validations, should.NotBeNil) {
 						a.So(validations, should.HaveLength, 1)
@@ -159,8 +158,8 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 
 				t.Run("invalid refresh interval", func(t *T) { // nolint:paralleltest
 					a, ctx := test.New(t)
-					invalidRefreshInterval := 2 * time.Since(createAt)
-					validations, err := s.ListRefreshableValidations(ctx, ids, invalidRefreshInterval)
+					bigRefreshInterval := 10 * time.Since(createAt)
+					validations, err := s.ListRefreshableValidations(ctx, ids, bigRefreshInterval)
 					if !a.So(err, should.BeNil) || !a.So(validations, should.HaveLength, 0) {
 						t.Fail()
 					}
