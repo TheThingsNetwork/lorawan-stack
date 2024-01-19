@@ -41,7 +41,7 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 	}
 	defer s.Close()
 
-	mask := fieldMask(ttnpb.ClientFieldPathsTopLevel...)
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.ClientFieldPathsTopLevel...), "contact_info")
 
 	var created *ttnpb.Client
 
@@ -323,6 +323,8 @@ func (st *StoreTest) TestClientStorePagination(t *T) {
 	}
 	defer s.Close()
 
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.ClientFieldPathsTopLevel...), "contact_info")
+
 	t.Run("FindClients_Paginated", func(t *T) {
 		a, ctx := test.New(t)
 
@@ -330,7 +332,7 @@ func (st *StoreTest) TestClientStorePagination(t *T) {
 		for _, page := range []uint32{1, 2, 3, 4} {
 			paginateCtx := store.WithPagination(ctx, 2, page, &total)
 
-			got, err := s.FindClients(paginateCtx, nil, fieldMask(ttnpb.ClientFieldPathsTopLevel...))
+			got, err := s.FindClients(paginateCtx, nil, mask)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 				if page == 4 {
 					a.So(got, should.HaveLength, 1)
