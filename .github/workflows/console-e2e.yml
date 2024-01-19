@@ -18,12 +18,11 @@ on:
       - "yarn.lock"
       - "cypress/**"
       - "docker-compose.yml"
-      - ".github/workflows/e2e.yml"
+      - ".github/workflows/console-e2e.yml"
 env:
   TTN_LW_LOG_LEVEL: debug
   TTN_LW_IS_EMAIL_PROVIDER: dir
   TTN_LW_IS_EMAIL_DIR: .dev/email
-  TTN_LW_EXPERIMENTAL_FEATURES: is.bunstore
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   CYPRESS_FAIL_FAST: true
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,7 +42,7 @@ jobs:
           submodules: false
       - name: Get hash of code files
         id: get-hash
-        run: echo "hash=${{ hashFiles('.github/workflows/e2e.yml', '*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}" >> $GITHUB_OUTPUT
+        run: echo "hash=${{ hashFiles('.github/workflows/console-e2e.yml', '*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}" >> $GITHUB_OUTPUT
       - name: Get the cached result
         id: run-cache
         uses: actions/cache@v3
@@ -81,7 +80,7 @@ jobs:
           path: |
             .env/cache/database.pgdump
             .env/admin_api_key.txt
-          key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go', '.github/workflows/e2e.yml', 'docker-compose.yml') }}
+          key: db-cache-${{ hashFiles('pkg/identityserver/**/*.go', 'pkg/identityserver/**/*.sql', 'cmd/ttn-lw-stack/commands/is_db.go', '.github/workflows/console-e2e.yml', 'docker-compose.yml') }}
       - name: Initialize device repository index cache
         id: dr-index-cache
         uses: actions/cache@v3
@@ -150,7 +149,7 @@ jobs:
         continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          workflow: e2e.yml
+          workflow: console-e2e.yml
           branch: ${{ github.head_ref }}
           workflow_conclusion: completed
           name: cypress-failed-test-spec
