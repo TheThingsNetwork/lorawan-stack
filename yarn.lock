@@ -1754,13 +1754,13 @@
     "@formatjs/intl-localematcher" "0.5.2"
     tslib "^2.4.0"
 
-"@formatjs/intl-relativetimeformat@^11.2.4":
-  version "11.2.4"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-11.2.4.tgz#f648c6ca6505e659e7f7ff91cb3161b710277c19"
-  integrity sha512-AJtPvpF7ub/nlu+PmysW9qho7Bev/v0qBNamY4Olh81P73ayf6JgFhxSxuLI2IxuHbXwqPb0iNBhvEXGBklCbQ==
+"@formatjs/intl-relativetimeformat@^11.2.12":
+  version "11.2.12"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-11.2.12.tgz#dab71d05f47c2358d6ede589141d1f6a300edb4f"
+  integrity sha512-Pdj8DkkiuaInJUs0arW8EyluGaSDq2eHccIi4Oc2JIGEKbMmIj6NapqyjWZUjPOI3mRqV3thhEERC+lfKqJT0w==
   dependencies:
-    "@formatjs/ecma402-abstract" "1.17.0"
-    "@formatjs/intl-localematcher" "0.4.0"
+    "@formatjs/ecma402-abstract" "1.18.2"
+    "@formatjs/intl-localematcher" "0.5.4"
     tslib "^2.4.0"
 
 "@formatjs/intl@2.9.11":
