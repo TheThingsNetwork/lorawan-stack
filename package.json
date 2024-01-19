@@ -119,7 +119,7 @@
     "react-string-replace": "^1.1.1",
     "react-switch": "^7.0.0",
     "react-text-mask": "^5.5.0",
-    "react-toastify": "^9.1.3",
+    "react-toastify": "^10.0.3",
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.9",
     "redux": "^4.2.1",
