@@ -35,11 +35,7 @@ func request_GatewayRegistry_Create_0(ctx context.Context, marshaler runtime.Mar
 	var protoReq CreateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -69,11 +65,7 @@ func local_request_GatewayRegistry_Create_0(ctx context.Context, marshaler runti
 	var protoReq CreateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -103,11 +95,7 @@ func request_GatewayRegistry_Create_1(ctx context.Context, marshaler runtime.Mar
 	var protoReq CreateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -137,11 +125,7 @@ func local_request_GatewayRegistry_Create_1(ctx context.Context, marshaler runti
 	var protoReq CreateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -168,7 +152,7 @@ func local_request_GatewayRegistry_Create_1(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_GatewayRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_GatewayRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_GatewayRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -274,7 +258,7 @@ func local_request_GatewayRegistry_List_0(ctx context.Context, marshaler runtime
 }
 
 var (
-	filter_GatewayRegistry_List_1 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "user_ids": 1, "user_id": 2, "userId": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 1, 4, 5}}
+	filter_GatewayRegistry_List_1 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "user_ids": 1, "user_id": 2}, Base: []int{1, 1, 1, 1, 0}, Check: []int{0, 1, 2, 3, 4}}
 )
 
 func request_GatewayRegistry_List_1(ctx context.Context, marshaler runtime.Marshaler, client GatewayRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -344,7 +328,7 @@ func local_request_GatewayRegistry_List_1(ctx context.Context, marshaler runtime
 }
 
 var (
-	filter_GatewayRegistry_List_2 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "organization_ids": 1, "organization_id": 2, "organizationId": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 1, 4, 5}}
+	filter_GatewayRegistry_List_2 = &utilities.DoubleArray{Encoding: map[string]int{"collaborator": 0, "organization_ids": 1, "organization_id": 2}, Base: []int{1, 1, 1, 1, 0}, Check: []int{0, 1, 2, 3, 4}}
 )
 
 func request_GatewayRegistry_List_2(ctx context.Context, marshaler runtime.Marshaler, client GatewayRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -417,11 +401,7 @@ func request_GatewayRegistry_Update_0(ctx context.Context, marshaler runtime.Mar
 	var protoReq UpdateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -451,11 +431,7 @@ func local_request_GatewayRegistry_Update_0(ctx context.Context, marshaler runti
 	var protoReq UpdateGatewayRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -482,7 +458,7 @@ func local_request_GatewayRegistry_Update_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_GatewayRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_GatewayRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_GatewayRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -552,7 +528,7 @@ func local_request_GatewayRegistry_Delete_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_GatewayRegistry_Restore_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_GatewayRegistry_Restore_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_GatewayRegistry_Restore_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -622,7 +598,7 @@ func local_request_GatewayRegistry_Restore_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_GatewayRegistry_Purge_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_GatewayRegistry_Purge_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_GatewayRegistry_Purge_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -692,7 +668,7 @@ func local_request_GatewayRegistry_Purge_0(ctx context.Context, marshaler runtim
 }
 
 var (
-	filter_GatewayAccess_ListRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_GatewayAccess_ListRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_GatewayAccess_ListRights_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -765,11 +741,7 @@ func request_GatewayAccess_CreateAPIKey_0(ctx context.Context, marshaler runtime
 	var protoReq CreateGatewayAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -799,11 +771,7 @@ func local_request_GatewayAccess_CreateAPIKey_0(ctx context.Context, marshaler r
 	var protoReq CreateGatewayAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -830,7 +798,7 @@ func local_request_GatewayAccess_CreateAPIKey_0(ctx context.Context, marshaler r
 }
 
 var (
-	filter_GatewayAccess_ListAPIKeys_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_GatewayAccess_ListAPIKeys_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_GatewayAccess_ListAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -900,7 +868,7 @@ func local_request_GatewayAccess_ListAPIKeys_0(ctx context.Context, marshaler ru
 }
 
 var (
-	filter_GatewayAccess_GetAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2, "key_id": 3, "keyId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
+	filter_GatewayAccess_GetAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "key_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_GatewayAccess_GetAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -993,11 +961,7 @@ func request_GatewayAccess_UpdateAPIKey_0(ctx context.Context, marshaler runtime
 	var protoReq UpdateGatewayAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1037,11 +1001,7 @@ func local_request_GatewayAccess_UpdateAPIKey_0(ctx context.Context, marshaler r
 	var protoReq UpdateGatewayAPIKeyRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1078,7 +1038,7 @@ func local_request_GatewayAccess_UpdateAPIKey_0(ctx context.Context, marshaler r
 }
 
 var (
-	filter_GatewayAccess_DeleteAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2, "key_id": 3, "keyId": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
+	filter_GatewayAccess_DeleteAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "key_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_GatewayAccess_DeleteAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1168,7 +1128,7 @@ func local_request_GatewayAccess_DeleteAPIKey_0(ctx context.Context, marshaler r
 }
 
 var (
-	filter_GatewayAccess_GetCollaborator_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2, "collaborator": 3, "user_ids": 4, "user_id": 5, "userId": 6}, Base: []int{1, 1, 1, 2, 1, 1, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 6, 1, 3, 4, 7, 8}}
+	filter_GatewayAccess_GetCollaborator_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "collaborator": 2, "user_ids": 3, "user_id": 4}, Base: []int{1, 1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 4, 5, 3, 6}}
 )
 
 func request_GatewayAccess_GetCollaborator_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1258,7 +1218,7 @@ func local_request_GatewayAccess_GetCollaborator_0(ctx context.Context, marshale
 }
 
 var (
-	filter_GatewayAccess_GetCollaborator_1 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2, "collaborator": 3, "organization_ids": 4, "organization_id": 5, "organizationId": 6}, Base: []int{1, 1, 1, 2, 1, 1, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 6, 1, 3, 4, 7, 8}}
+	filter_GatewayAccess_GetCollaborator_1 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "collaborator": 2, "organization_ids": 3, "organization_id": 4}, Base: []int{1, 1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 4, 5, 3, 6}}
 )
 
 func request_GatewayAccess_GetCollaborator_1(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1351,11 +1311,7 @@ func request_GatewayAccess_SetCollaborator_0(ctx context.Context, marshaler runt
 	var protoReq SetGatewayCollaboratorRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1385,11 +1341,7 @@ func local_request_GatewayAccess_SetCollaborator_0(ctx context.Context, marshale
 	var protoReq SetGatewayCollaboratorRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1416,7 +1368,7 @@ func local_request_GatewayAccess_SetCollaborator_0(ctx context.Context, marshale
 }
 
 var (
-	filter_GatewayAccess_ListCollaborators_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_GatewayAccess_ListCollaborators_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_GatewayAccess_ListCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1486,7 +1438,7 @@ func local_request_GatewayAccess_ListCollaborators_0(ctx context.Context, marsha
 }
 
 var (
-	filter_GatewayAccess_DeleteCollaborator_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2, "collaborator_ids": 3, "user_ids": 4, "user_id": 5, "userId": 6}, Base: []int{1, 1, 1, 2, 1, 1, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 6, 1, 3, 4, 7, 8}}
+	filter_GatewayAccess_DeleteCollaborator_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "collaborator_ids": 2, "user_ids": 3, "user_id": 4}, Base: []int{1, 1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 4, 5, 3, 6}}
 )
 
 func request_GatewayAccess_DeleteCollaborator_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1576,7 +1528,7 @@ func local_request_GatewayAccess_DeleteCollaborator_0(ctx context.Context, marsh
 }
 
 var (
-	filter_GatewayAccess_DeleteCollaborator_1 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2, "collaborator_ids": 3, "organization_ids": 4, "organization_id": 5, "organizationId": 6}, Base: []int{1, 1, 1, 2, 1, 1, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 6, 1, 3, 4, 7, 8}}
+	filter_GatewayAccess_DeleteCollaborator_1 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "collaborator_ids": 2, "organization_ids": 3, "organization_id": 4}, Base: []int{1, 1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 4, 5, 3, 6}}
 )
 
 func request_GatewayAccess_DeleteCollaborator_1(ctx context.Context, marshaler runtime.Marshaler, client GatewayAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {

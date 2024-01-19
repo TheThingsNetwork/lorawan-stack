@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 var (
-	filter_OAuthAuthorizationRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_OAuthAuthorizationRegistry_List_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_OAuthAuthorizationRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client OAuthAuthorizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -102,7 +102,7 @@ func local_request_OAuthAuthorizationRegistry_List_0(ctx context.Context, marsha
 }
 
 var (
-	filter_OAuthAuthorizationRegistry_ListTokens_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2, "client_ids": 3, "client_id": 4, "clientId": 5}, Base: []int{1, 1, 1, 2, 1, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 1, 3, 4, 6, 7}}
+	filter_OAuthAuthorizationRegistry_ListTokens_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "client_ids": 2, "client_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 4, 3, 5}}
 )
 
 func request_OAuthAuthorizationRegistry_ListTokens_0(ctx context.Context, marshaler runtime.Marshaler, client OAuthAuthorizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -192,7 +192,7 @@ func local_request_OAuthAuthorizationRegistry_ListTokens_0(ctx context.Context, 
 }
 
 var (
-	filter_OAuthAuthorizationRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2, "client_ids": 3, "client_id": 4, "clientId": 5}, Base: []int{1, 1, 1, 2, 1, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 1, 3, 4, 6, 7}}
+	filter_OAuthAuthorizationRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "client_ids": 2, "client_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 4, 3, 5}}
 )
 
 func request_OAuthAuthorizationRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client OAuthAuthorizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -282,7 +282,7 @@ func local_request_OAuthAuthorizationRegistry_Delete_0(ctx context.Context, mars
 }
 
 var (
-	filter_OAuthAuthorizationRegistry_DeleteToken_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "userId": 2, "client_ids": 3, "client_id": 4, "clientId": 5, "id": 6}, Base: []int{1, 1, 1, 2, 1, 3, 4, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 5, 1, 1, 3, 4, 6, 7, 8, 8}}
+	filter_OAuthAuthorizationRegistry_DeleteToken_0 = &utilities.DoubleArray{Encoding: map[string]int{"user_ids": 0, "user_id": 1, "client_ids": 2, "client_id": 3, "id": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 1, 4, 1, 3, 5, 6}}
 )
 
 func request_OAuthAuthorizationRegistry_DeleteToken_0(ctx context.Context, marshaler runtime.Marshaler, client OAuthAuthorizationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {

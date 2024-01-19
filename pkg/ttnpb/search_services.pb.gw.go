@@ -248,7 +248,7 @@ func local_request_EntityRegistrySearch_SearchAccounts_0(ctx context.Context, ma
 }
 
 var (
-	filter_EntityRegistrySearch_SearchAccounts_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_EntityRegistrySearch_SearchAccounts_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_EntityRegistrySearch_SearchAccounts_1(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -318,7 +318,7 @@ func local_request_EntityRegistrySearch_SearchAccounts_1(ctx context.Context, ma
 }
 
 var (
-	filter_EntityRegistrySearch_SearchAccounts_2 = &utilities.DoubleArray{Encoding: map[string]int{"client_ids": 0, "client_id": 1, "clientId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_EntityRegistrySearch_SearchAccounts_2 = &utilities.DoubleArray{Encoding: map[string]int{"client_ids": 0, "client_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_EntityRegistrySearch_SearchAccounts_2(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -388,7 +388,7 @@ func local_request_EntityRegistrySearch_SearchAccounts_2(ctx context.Context, ma
 }
 
 var (
-	filter_EntityRegistrySearch_SearchAccounts_3 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_EntityRegistrySearch_SearchAccounts_3 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_EntityRegistrySearch_SearchAccounts_3(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -458,7 +458,7 @@ func local_request_EntityRegistrySearch_SearchAccounts_3(ctx context.Context, ma
 }
 
 var (
-	filter_EntityRegistrySearch_SearchAccounts_4 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1, "organizationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_EntityRegistrySearch_SearchAccounts_4 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_EntityRegistrySearch_SearchAccounts_4(ctx context.Context, marshaler runtime.Marshaler, client EntityRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -528,7 +528,7 @@ func local_request_EntityRegistrySearch_SearchAccounts_4(ctx context.Context, ma
 }
 
 var (
-	filter_EndDeviceRegistrySearch_SearchEndDevices_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "applicationId": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_EndDeviceRegistrySearch_SearchEndDevices_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_EndDeviceRegistrySearch_SearchEndDevices_0(ctx context.Context, marshaler runtime.Marshaler, client EndDeviceRegistrySearchClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {

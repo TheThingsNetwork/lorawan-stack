@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 var (
-	filter_GtwGs_GetMQTTConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_GtwGs_GetMQTTConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_GtwGs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler runtime.Marshaler, client GtwGsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -102,7 +102,7 @@ func local_request_GtwGs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler 
 }
 
 var (
-	filter_GtwGs_GetMQTTV2ConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_GtwGs_GetMQTTV2ConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_GtwGs_GetMQTTV2ConnectionInfo_0(ctx context.Context, marshaler runtime.Marshaler, client GtwGsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -172,7 +172,7 @@ func local_request_GtwGs_GetMQTTV2ConnectionInfo_0(ctx context.Context, marshale
 }
 
 var (
-	filter_Gs_GetGatewayConnectionStats_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "gatewayId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_Gs_GetGatewayConnectionStats_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_Gs_GetGatewayConnectionStats_0(ctx context.Context, marshaler runtime.Marshaler, client GsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -245,11 +245,7 @@ func request_Gs_BatchGetGatewayConnectionStats_0(ctx context.Context, marshaler 
 	var protoReq BatchGetGatewayConnectionStatsRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -262,11 +258,7 @@ func local_request_Gs_BatchGetGatewayConnectionStats_0(ctx context.Context, mars
 	var protoReq BatchGetGatewayConnectionStatsRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 

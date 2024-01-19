@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 var (
-	filter_GatewayConfigurationService_GetGatewayConfiguration_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2, "format": 3, "filename": 4}, Base: []int{1, 1, 1, 2, 4, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 5, 6, 6}}
+	filter_GatewayConfigurationService_GetGatewayConfiguration_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "format": 2, "filename": 3}, Base: []int{1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 3, 4, 5}}
 )
 
 func request_GatewayConfigurationService_GetGatewayConfiguration_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayConfigurationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -142,7 +142,7 @@ func local_request_GatewayConfigurationService_GetGatewayConfiguration_0(ctx con
 }
 
 var (
-	filter_GatewayConfigurationService_GetGatewayConfiguration_1 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "gatewayId": 2, "format": 3, "type": 4, "filename": 5}, Base: []int{1, 1, 1, 2, 4, 6, 8, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 1, 3, 4, 5, 5, 6, 6, 7, 7}}
+	filter_GatewayConfigurationService_GetGatewayConfiguration_1 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "format": 2, "type": 3, "filename": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 1, 1, 3, 4, 5, 6}}
 )
 
 func request_GatewayConfigurationService_GetGatewayConfiguration_1(ctx context.Context, marshaler runtime.Marshaler, client GatewayConfigurationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {

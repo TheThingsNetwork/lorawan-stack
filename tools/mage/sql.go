@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	sqlfmtImage = "ghcr.io/tconbeer/sqlfmt:v0.16.0"
+	sqlfmtImage = "ghcr.io/tconbeer/sqlfmt:v0.21.0"
 	lineLength  = "120"
 )
 
