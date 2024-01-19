@@ -202,6 +202,32 @@ func TestOrganizationsCRUD(t *testing.T) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
+		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6804)
+		t.Run("Contact_info fieldmask", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
+			got, err := reg.Get(ctx, &ttnpb.GetOrganizationRequest{
+				OrganizationIds: created.GetIds(),
+				FieldMask:       ttnpb.FieldMask("contact_info"),
+			}, creds)
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				a.So(got.ContactInfo, should.HaveLength, 2)
+				a.So(got.ContactInfo[0].Value, should.Equal, usr1.PrimaryEmailAddress)
+				a.So(got.ContactInfo[0].ContactType, should.Equal, ttnpb.ContactType_CONTACT_TYPE_OTHER)
+				a.So(got.ContactInfo[1].Value, should.Equal, usr1.PrimaryEmailAddress)
+				a.So(got.ContactInfo[1].ContactType, should.Equal, ttnpb.ContactType_CONTACT_TYPE_TECHNICAL)
+			}
+
+			// Testing the `PublicSafe` method, which should not return the contact_info's email address when the caller
+			// does not have the appropriate rights.
+			got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
+				OrganizationIds: created.GetIds(),
+				FieldMask:       ttnpb.FieldMask("contact_info"),
+			}, credsWithoutRights)
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				a.So(got.ContactInfo, should.HaveLength, 0)
+			}
+		})
+
 		updated, err := reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
 			Organization: &ttnpb.Organization{
 				Ids:  created.GetIds(),
