@@ -1895,7 +1895,7 @@
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
-      "file": "contact_info.go"
+      "file": "users_email_validation.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:no_validation_token": {
@@ -1904,7 +1904,7 @@
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
-      "file": "contact_info.go"
+      "file": "users_email_validation.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:no_webhook_id": {
@@ -6360,6 +6360,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:validation_request_forbidden": {
+    "translations": {
+      "en": "validation request forbidden because it was already sent, wait `{retry_interval}` before retrying"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "email_validation_registry.go"
     }
   },
   "error:pkg/identityserver:validations_already_sent": {

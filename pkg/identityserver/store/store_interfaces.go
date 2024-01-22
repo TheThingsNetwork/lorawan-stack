@@ -355,6 +355,19 @@ type ContactInfoStore interface {
 	) ([]*ttnpb.ContactInfoValidation, error)
 }
 
+// EmailValidationStore interface for email validation.
+type EmailValidationStore interface {
+	CreateEmailValidation(ctx context.Context, validation *ttnpb.EmailValidation) (*ttnpb.EmailValidation, error)
+	GetEmailValidation(ctx context.Context, validation *ttnpb.EmailValidation) (*ttnpb.EmailValidation, error)
+	ExpireEmailValidation(ctx context.Context, validation *ttnpb.EmailValidation) error
+	// GetRefreshableEmailValidation returns a not used validation for a given user.
+	GetRefreshableEmailValidation(
+		ctx context.Context, id *ttnpb.UserIdentifiers, refreshInterval time.Duration,
+	) (*ttnpb.EmailValidation, error)
+	// RefreshEmailValidation refreshes a email validation for an user.
+	RefreshEmailValidation(ctx context.Context, validation *ttnpb.EmailValidation) error
+}
+
 // EUIStore interface for assigning DevEUI blocks and addresses.
 type EUIStore interface {
 	CreateEUIBlock(
@@ -399,6 +412,7 @@ type Store interface {
 	EUIStore
 	NotificationStore
 	EntitySearch
+	EmailValidationStore
 }
 
 // TransactionalStore is Store, but with a method that uses a transaction.

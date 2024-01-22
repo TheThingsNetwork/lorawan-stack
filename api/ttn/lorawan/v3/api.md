@@ -228,6 +228,10 @@
   - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
 - [File `ttn/lorawan/v3/email_messages.proto`](#ttn/lorawan/v3/email_messages.proto)
   - [Message `CreateClientEmailMessage`](#ttn.lorawan.v3.CreateClientEmailMessage)
+- [File `ttn/lorawan/v3/email_validation.proto`](#ttn/lorawan/v3/email_validation.proto)
+  - [Message `EmailValidation`](#ttn.lorawan.v3.EmailValidation)
+  - [Message `ValidateEmailRequest`](#ttn.lorawan.v3.ValidateEmailRequest)
+  - [Service `EmailValidationRegistry`](#ttn.lorawan.v3.EmailValidationRegistry)
 - [File `ttn/lorawan/v3/end_device.proto`](#ttn/lorawan/v3/end_device.proto)
   - [Message `ADRSettings`](#ttn.lorawan.v3.ADRSettings)
   - [Message `ADRSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DisabledMode)
@@ -3623,6 +3627,57 @@ CreateClientEmailMessage is used as a wrapper for handling the email regarding t
 | ----- | ---- | ----- | ----------- |
 | `create_client_request` | [`CreateClientRequest`](#ttn.lorawan.v3.CreateClientRequest) |  |  |
 | `api_key` | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |  |
+
+## <a name="ttn/lorawan/v3/email_validation.proto">File `ttn/lorawan/v3/email_validation.proto`</a>
+
+### <a name="ttn.lorawan.v3.EmailValidation">Message `EmailValidation`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  |  |
+| `token` | [`string`](#string) |  |  |
+| `address` | [`string`](#string) |  |  |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `id` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `64`</p> |
+| `token` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `64`</p> |
+| `address` | <p>`string.email`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ValidateEmailRequest">Message `ValidateEmailRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  |  |
+| `token` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `id` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `64`</p> |
+| `token` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `64`</p> |
+
+### <a name="ttn.lorawan.v3.EmailValidationRegistry">Service `EmailValidationRegistry`</a>
+
+The EmailValidationRegistry service, exposed by the Identity Server, is used for validating an user's primary email.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `RequestValidation` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`EmailValidation`](#ttn.lorawan.v3.EmailValidation) | Request validation for the non-validated contact info for the given entity. |
+| `Validate` | [`ValidateEmailRequest`](#ttn.lorawan.v3.ValidateEmailRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Validate confirms a contact info validation. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `RequestValidation` | `POST` | `/api/v3/email/validation` | `*` |
+| `Validate` | `PATCH` | `/api/v3/email/validation` | `*` |
 
 ## <a name="ttn/lorawan/v3/end_device.proto">File `ttn/lorawan/v3/end_device.proto`</a>
 

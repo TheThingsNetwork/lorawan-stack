@@ -149,6 +149,13 @@ func TestContactInfoStore(t *testing.T) {
 	st.TestContactInfoStoreCRUD(t)
 }
 
+func TestEmailValidationStore(t *testing.T) {
+	t.Parallel()
+
+	st := storetest.New(t, newTestStore)
+	st.TestEmailValidationStore(t)
+}
+
 func TestInvitationStore(t *testing.T) {
 	t.Parallel()
 

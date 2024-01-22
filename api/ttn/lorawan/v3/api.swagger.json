@@ -63,6 +63,9 @@
       "name": "DeviceRepository"
     },
     {
+      "name": "EmailValidationRegistry"
+    },
+    {
       "name": "EndDeviceRegistry"
     },
     {
@@ -6467,6 +6470,71 @@
         },
         "tags": [
           "EndDeviceTemplateConverter"
+        ]
+      }
+    },
+    "/email/validation": {
+      "post": {
+        "summary": "Request validation for the non-validated contact info for the given entity.",
+        "operationId": "EmailValidationRegistry_RequestValidation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EmailValidation"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3UserIdentifiers"
+            }
+          }
+        ],
+        "tags": [
+          "EmailValidationRegistry"
+        ]
+      },
+      "patch": {
+        "summary": "Validate confirms a contact info validation.",
+        "operationId": "EmailValidationRegistry_Validate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ValidateEmailRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EmailValidationRegistry"
         ]
       }
     },
@@ -20094,6 +20162,32 @@
       "default": "DOWNLINK_PATH_CONSTRAINT_NONE",
       "description": " - DOWNLINK_PATH_CONSTRAINT_NONE: Indicates that the gateway can be selected for downlink without constraints by the Network Server.\n - DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER: Indicates that the gateway can be selected for downlink only if no other or better gateway can be selected.\n - DOWNLINK_PATH_CONSTRAINT_NEVER: Indicates that this gateway will never be selected for downlink, even if that results in no available downlink path."
     },
+    "v3EmailValidation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v3EncodeDownlinkResponse": {
       "type": "object",
       "properties": {
@@ -26222,6 +26316,17 @@
             "type": "object",
             "$ref": "#/definitions/v3User"
           }
+        }
+      }
+    },
+    "v3ValidateEmailRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
         }
       }
     },

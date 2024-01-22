@@ -117,22 +117,23 @@ func newStore(baseStore *baseStore) *Store {
 	return &Store{
 		baseStore: baseStore,
 
-		applicationStore:  newApplicationStore(baseStore),
-		clientStore:       newClientStore(baseStore),
-		endDeviceStore:    newEndDeviceStore(baseStore),
-		gatewayStore:      newGatewayStore(baseStore),
-		organizationStore: newOrganizationStore(baseStore),
-		userStore:         newUserStore(baseStore),
-		userSessionStore:  newUserSessionStore(baseStore),
-		apiKeyStore:       newAPIKeyStore(baseStore),
-		membershipStore:   newMembershipStore(baseStore),
-		contactInfoStore:  newContactInfoStore(baseStore),
-		invitationStore:   newInvitationStore(baseStore),
-		loginTokenStore:   newLoginTokenStore(baseStore),
-		oauthStore:        newOAuthStore(baseStore),
-		euiStore:          newEUIStore(baseStore),
-		entitySearch:      newEntitySearch(baseStore),
-		notificationStore: newNotificationStore(baseStore),
+		apiKeyStore:          newAPIKeyStore(baseStore),
+		applicationStore:     newApplicationStore(baseStore),
+		clientStore:          newClientStore(baseStore),
+		contactInfoStore:     newContactInfoStore(baseStore),
+		emailValidationStore: newEmailValidationStore(baseStore),
+		endDeviceStore:       newEndDeviceStore(baseStore),
+		entitySearch:         newEntitySearch(baseStore),
+		euiStore:             newEUIStore(baseStore),
+		gatewayStore:         newGatewayStore(baseStore),
+		invitationStore:      newInvitationStore(baseStore),
+		loginTokenStore:      newLoginTokenStore(baseStore),
+		membershipStore:      newMembershipStore(baseStore),
+		notificationStore:    newNotificationStore(baseStore),
+		oauthStore:           newOAuthStore(baseStore),
+		organizationStore:    newOrganizationStore(baseStore),
+		userSessionStore:     newUserSessionStore(baseStore),
+		userStore:            newUserStore(baseStore),
 	}
 }
 
@@ -151,22 +152,23 @@ type Store struct {
 
 	*baseStore
 
+	*apiKeyStore
 	*applicationStore
 	*clientStore
-	*endDeviceStore
-	*gatewayStore
-	*organizationStore
-	*userStore
-	*userSessionStore
-	*apiKeyStore
-	*membershipStore
 	*contactInfoStore
+	*emailValidationStore
+	*endDeviceStore
+	*entitySearch
+	*euiStore
+	*gatewayStore
 	*invitationStore
 	*loginTokenStore
-	*oauthStore
-	*euiStore
-	*entitySearch
+	*membershipStore
 	*notificationStore
+	*oauthStore
+	*organizationStore
+	*userSessionStore
+	*userStore
 }
 
 const (

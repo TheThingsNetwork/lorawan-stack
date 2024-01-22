@@ -2202,6 +2202,7 @@
   "error:pkg/identityserver:user_rejected": "ユーザアカウントが拒否されました",
   "error:pkg/identityserver:user_requested": "ユーザアカウント承認が保留中です",
   "error:pkg/identityserver:user_suspended": "ユーザアカウントが凍結中です",
+  "error:pkg/identityserver:validation_request_forbidden": "",
   "error:pkg/identityserver:validations_already_sent": "この連絡先情報への検証は送信済みです",
   "error:pkg/internal/registry:end_device_euis_taken": "JoinEUI `{join_eui}`およびDevEUI `{dev_eui}`を持つエンドデバイスは、すでにアプリケーション`{application_id}`で`{device_id}`として登録されています",
   "error:pkg/interop:activation": "アクティベーションが許可されません",

@@ -43,7 +43,7 @@ const m = defineMessages({
   validatingAccount: 'Validating account…',
   tokenNotFoundTitle: 'Token not found',
   tokenNotFoundMessage:
-    'The validation token was not found. This could mean that the contact info has already been validated. Otherwise, please contact an administrator.',
+    'The validation token was not found. This could mean that the contact info has already been validated or the token has been invalidated. Re-request another validation and if the error persists, please contact an administrator.',
 })
 
 const siteName = selectApplicationSiteName()
@@ -72,7 +72,7 @@ const Validate = ({ hideTitle }) => {
   const makeRequest = useCallback(async () => {
     if (token && reference) {
       try {
-        await tts.ContactInfo.validate({
+        await tts.EmailValidation.validate({
           token,
           id: reference,
         })

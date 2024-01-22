@@ -65,6 +65,7 @@ lint:
       - ttn/lorawan/v3/contact_info.proto
       - ttn/lorawan/v3/deviceclaimingserver.proto
       - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/email_validation.proto
       - ttn/lorawan/v3/end_device_services.proto
       - ttn/lorawan/v3/gateway_services.proto
       - ttn/lorawan/v3/gatewayserver.proto
@@ -88,6 +89,7 @@ lint:
       - ttn/lorawan/v3/contact_info.proto
       - ttn/lorawan/v3/deviceclaimingserver.proto
       - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/email_validation.proto
       - ttn/lorawan/v3/end_device_services.proto
       - ttn/lorawan/v3/events.proto
       - ttn/lorawan/v3/gateway_services.proto
@@ -112,6 +114,7 @@ lint:
       - ttn/lorawan/v3/contact_info.proto
       - ttn/lorawan/v3/deviceclaimingserver.proto
       - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/email_validation.proto
       - ttn/lorawan/v3/end_device_services.proto
       - ttn/lorawan/v3/events.proto
       - ttn/lorawan/v3/gateway_services.proto
@@ -138,6 +141,7 @@ lint:
       - ttn/lorawan/v3/contact_info.proto
       - ttn/lorawan/v3/deviceclaimingserver.proto
       - ttn/lorawan/v3/devicerepository.proto
+      - ttn/lorawan/v3/email_validation.proto
       - ttn/lorawan/v3/end_device_services.proto
       - ttn/lorawan/v3/events.proto
       - ttn/lorawan/v3/gateway_services.proto

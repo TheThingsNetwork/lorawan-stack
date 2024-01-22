@@ -2650,6 +2650,30 @@
       ]
     }
   },
+  "EmailValidationRegistry": {
+    "RequestValidation": {
+      "file": "ttn/lorawan/v3/email_validation.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/email/validation",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    },
+    "Validate": {
+      "file": "ttn/lorawan/v3/email_validation.proto",
+      "http": [
+        {
+          "method": "patch",
+          "pattern": "/email/validation",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "EndDeviceBatchRegistry": {
     "Get": {
       "file": "ttn/lorawan/v3/end_device_services.proto",
