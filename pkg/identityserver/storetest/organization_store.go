@@ -41,7 +41,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 	}
 	defer s.Close()
 
-	mask := fieldMask(ttnpb.OrganizationFieldPathsTopLevel...)
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.OrganizationFieldPathsTopLevel...), "contact_info")
 
 	var created *ttnpb.Organization
 
@@ -325,6 +325,8 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 	}
 	defer s.Close()
 
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.OrganizationFieldPathsTopLevel...), "contact_info")
+
 	t.Run("FindOrganizations_Paginated", func(t *T) {
 		a, ctx := test.New(t)
 
@@ -332,7 +334,7 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 		for _, page := range []uint32{1, 2, 3, 4} {
 			paginateCtx := store.WithPagination(ctx, 2, page, &total)
 
-			got, err := s.FindOrganizations(paginateCtx, nil, fieldMask(ttnpb.OrganizationFieldPathsTopLevel...))
+			got, err := s.FindOrganizations(paginateCtx, nil, mask)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 				if page == 4 {
 					a.So(got, should.HaveLength, 1)

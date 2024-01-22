@@ -32,7 +32,9 @@ type registrySearch struct {
 
 var errSearchForbidden = errors.DefinePermissionDenied("search_forbidden", "search is forbidden")
 
-func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchApplicationsRequest) (*ttnpb.Applications, error) {
+func (rs *registrySearch) SearchApplications(
+	ctx context.Context, req *ttnpb.SearchApplicationsRequest,
+) (*ttnpb.Applications, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -43,6 +45,12 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	}
 	if authInfo.IsAdmin {
 		member = nil
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact", "technical_contact")
 	}
 
 	var searchFields []string
@@ -98,6 +106,16 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, app := range res.Applications {
+				app.ContactInfo, err = getContactsFromEntity(ctx, app, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -114,7 +132,9 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	return res, nil
 }
 
-func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchClientsRequest) (*ttnpb.Clients, error) {
+func (rs *registrySearch) SearchClients(
+	ctx context.Context, req *ttnpb.SearchClientsRequest,
+) (*ttnpb.Clients, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -125,6 +145,12 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 	}
 	if authInfo.IsAdmin {
 		member = nil
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact", "technical_contact")
 	}
 
 	var searchFields []string
@@ -183,6 +209,16 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, clt := range res.Clients {
+				clt.ContactInfo, err = getContactsFromEntity(ctx, clt, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -199,7 +235,9 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 	return res, nil
 }
 
-func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchGatewaysRequest) (*ttnpb.Gateways, error) {
+func (rs *registrySearch) SearchGateways(
+	ctx context.Context, req *ttnpb.SearchGatewaysRequest,
+) (*ttnpb.Gateways, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -210,6 +248,12 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	}
 	if authInfo.IsAdmin {
 		member = nil
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact", "technical_contact")
 	}
 
 	// Backwards compatibility for frequency_plan_id field.
@@ -271,6 +315,16 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, gtw := range res.Gateways {
+				gtw.ContactInfo, err = getContactsFromEntity(ctx, gtw, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -296,7 +350,9 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	return res, nil
 }
 
-func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.SearchOrganizationsRequest) (*ttnpb.Organizations, error) {
+func (rs *registrySearch) SearchOrganizations(
+	ctx context.Context, req *ttnpb.SearchOrganizationsRequest,
+) (*ttnpb.Organizations, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -307,6 +363,12 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	}
 	if authInfo.IsAdmin {
 		member = nil
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact", "technical_contact")
 	}
 
 	var searchFields []string
@@ -362,6 +424,16 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, org := range res.Organizations {
+				org.ContactInfo, err = getContactsFromEntity(ctx, org, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -380,13 +452,21 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	return res, nil
 }
 
-func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRequest) (*ttnpb.Users, error) {
+func (rs *registrySearch) SearchUsers(
+	ctx context.Context, req *ttnpb.SearchUsersRequest,
+) (*ttnpb.Users, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if !authInfo.IsAdmin {
 		return nil, errSearchForbidden.New()
+	}
+
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address", "primary_email_address_validated_at")
 	}
 
 	var searchFields []string
@@ -446,6 +526,20 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 	if err != nil {
 		return nil, err
 	}
+
+	// Add ContactInfo to the response if its present in the field mask.
+	if contactInfoInPath {
+		for _, usr := range res.Users {
+			usr.ContactInfo = append(usr.ContactInfo, &ttnpb.ContactInfo{
+				ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+				ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+				Value:         usr.PrimaryEmailAddress,
+				ValidatedAt:   usr.PrimaryEmailAddressValidatedAt,
+				Public:        false,
+			})
+		}
+	}
+
 	return res, nil
 }
 

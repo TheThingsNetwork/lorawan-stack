@@ -320,6 +320,20 @@ func TestRegistrySearchDeletedEntities(t *testing.T) { // nolint:gocyclo
 					a.So(got.Users, should.HaveLength, deletedAmount)
 				}
 			})
+			t.Run("Read ContactInfo", func(t *testing.T) { // nolint:paralleltest
+				a, ctx := test.New(t)
+				got, err := cli.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
+					FieldMask: ttnpb.FieldMask("contact_info"),
+				}, adminUsrCreds)
+				if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+					// The `+2` refers to the two non-deleted users created at the beginning of the test.
+					a.So(got.Users, should.HaveLength, (notDeletedAmount + 2))
+					for _, user := range got.Users {
+						a.So(user.ContactInfo, should.HaveLength, 1)
+						a.So(user.ContactInfo[0].Value, should.Equal, user.Ids.UserId+"@example.com")
+					}
+				}
+			})
 		})
 	}, withPrivateTestDatabase(p))
 }

@@ -43,6 +43,65 @@ var (
 	)
 )
 
+// getContactsFromEntity fetches the administrative and technical contacts from the provided entity and returns a slice
+// of ContactInfo pointers. The usage of this function should be restricted to the replacement of read operations
+// related to the deprecated `ContactInfo`.
+func getContactsFromEntity[
+	X interface {
+		GetAdministrativeContact() *ttnpb.OrganizationOrUserIdentifiers
+		GetTechnicalContact() *ttnpb.OrganizationOrUserIdentifiers
+	},
+](
+	ctx context.Context, id X, st store.Store,
+) ([]*ttnpb.ContactInfo, error) {
+	orgMask := []string{"administrative_contact", "technical_contact"}
+	contacts := make([]*ttnpb.ContactInfo, 0, 2)
+
+	fn := func(id *ttnpb.OrganizationOrUserIdentifiers, isAdminContact bool) error {
+		usrID := id.GetUserIds()
+		var contactType ttnpb.ContactType
+		if !isAdminContact {
+			contactType = ttnpb.ContactType_CONTACT_TYPE_TECHNICAL
+		}
+
+		if orgID := id.GetOrganizationIds(); orgID != nil {
+			org, err := st.GetOrganization(ctx, orgID, orgMask)
+			if err != nil {
+				return err
+			}
+
+			if isAdminContact {
+				usrID = org.AdministrativeContact.GetUserIds()
+			} else {
+				usrID = org.TechnicalContact.GetUserIds()
+			}
+		}
+
+		usr, err := st.GetUser(ctx, usrID, []string{"primary_email_address"})
+		if err != nil {
+			return err
+		}
+
+		contacts = append(contacts, &ttnpb.ContactInfo{
+			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
+			ContactType:   contactType,
+			ValidatedAt:   usr.PrimaryEmailAddressValidatedAt,
+			Value:         usr.PrimaryEmailAddress,
+		})
+
+		return nil
+	}
+
+	if err := fn(id.GetAdministrativeContact(), true); err != nil {
+		return nil, err
+	}
+	if err := fn(id.GetTechnicalContact(), false); err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
+}
+
 // validateContactInfoRestrictions fetches the auth info from the context and validates if the caller ID matches the
 // provided `ids` in the parameters. The usage of this function should be restricted to testing the administrative and
 // technical contacts in methods belonging to each entity registry.

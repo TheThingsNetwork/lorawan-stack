@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -104,9 +105,6 @@ func (is *IdentityServer) createOrganization(
 	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Organization.TechnicalContact); err != nil {
 		return nil, err
 	}
-	if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
-		return nil, err
-	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		org, err = st.CreateOrganization(ctx, req.Organization)
@@ -120,13 +118,6 @@ func (is *IdentityServer) createOrganization(
 			ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL),
 		); err != nil {
 			return err
-		}
-		if len(req.Organization.ContactInfo) > 0 {
-			cleanContactInfo(req.Organization.ContactInfo)
-			org.ContactInfo, err = st.SetContactInfo(ctx, org.GetIds(), req.Organization.ContactInfo)
-			if err != nil {
-				return err
-			}
 		}
 		return nil
 	})
@@ -144,6 +135,11 @@ func (is *IdentityServer) getOrganization(
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireOrganization(ctx, req.GetOrganizationIds(), ttnpb.Right_RIGHT_ORGANIZATION_INFO); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicOrganizationFields...) {
@@ -156,8 +152,8 @@ func (is *IdentityServer) getOrganization(
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			org.ContactInfo, err = st.GetContactInfo(ctx, org.GetIds())
+		if contactInfoInPath {
+			org.ContactInfo, err = getContactsFromEntity(ctx, org, st)
 			if err != nil {
 				return err
 			}
@@ -174,6 +170,11 @@ func (is *IdentityServer) listOrganizations(
 	ctx context.Context,
 	req *ttnpb.ListOrganizationsRequest,
 ) (orgs *ttnpb.Organizations, err error) {
+	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
+	if contactInfoInPath {
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
+		req.FieldMask.Paths = ttnpb.AddFields(req.FieldMask.Paths, "administrative_contact", "technical_contact")
+	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 
 	authInfo, err := is.authInfo(ctx)
@@ -238,6 +239,15 @@ func (is *IdentityServer) listOrganizations(
 		if err != nil {
 			return err
 		}
+
+		if contactInfoInPath {
+			for _, org := range orgs.Organizations {
+				org.ContactInfo, err = getContactsFromEntity(ctx, org, st)
+				if err != nil {
+					return err
+				}
+			}
+		}
 		return nil
 	})
 	if err != nil {
@@ -268,9 +278,8 @@ func (is *IdentityServer) updateOrganization(
 		req.FieldMask = ttnpb.FieldMask(updatePaths...)
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-		if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
-			return nil, err
-		}
+		warning.Add(ctx, "Contact info is deprecated and will be removed in the next major release")
+		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
 	}
 
 	if err := is.validateContactInfoRestrictions(
@@ -297,13 +306,6 @@ func (is *IdentityServer) updateOrganization(
 		org, err = st.UpdateOrganization(ctx, req.Organization, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
-		}
-		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cleanContactInfo(req.Organization.ContactInfo)
-			org.ContactInfo, err = st.SetContactInfo(ctx, org.Ids, req.Organization.ContactInfo)
-			if err != nil {
-				return err
-			}
 		}
 		return nil
 	})
@@ -371,12 +373,8 @@ func (is *IdentityServer) purgeOrganization(
 		return nil, errAdminsPurgeOrganizations.New()
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		err := st.DeleteEntityContactInfo(ctx, ids)
-		if err != nil {
-			return err
-		}
 		// Delete related API keys before purging the organization.
-		err = st.DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
+		err := st.DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

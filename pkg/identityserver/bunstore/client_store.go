@@ -17,7 +17,6 @@ package store
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
@@ -43,8 +42,6 @@ type Client struct {
 	Description string `bun:"description,nullzero"`
 
 	Attributes []*Attribute `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
-
-	ContactInfo []*ContactInfo `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
 
 	AdministrativeContactID *string  `bun:"administrative_contact_id,type:uuid"`
 	AdministrativeContact   *Account `bun:"rel:belongs-to,join:administrative_contact_id=id"`
@@ -108,14 +105,6 @@ func clientToPB(m *Client, fieldMask ...string) (*ttnpb.Client, error) {
 		for _, a := range m.Attributes {
 			pb.Attributes[a.Key] = a.Value
 		}
-	}
-
-	if len(m.ContactInfo) > 0 {
-		pb.ContactInfo = make([]*ttnpb.ContactInfo, len(m.ContactInfo))
-		for i, contactInfo := range m.ContactInfo {
-			pb.ContactInfo[i] = contactInfoToPB(contactInfo)
-		}
-		sort.Sort(contactInfoProtoSlice(pb.ContactInfo))
 	}
 
 	if m.AdministrativeContact != nil {
@@ -214,15 +203,6 @@ func (s *clientStore) CreateClient(
 		}
 	}
 
-	if len(pb.ContactInfo) > 0 {
-		clientModel.ContactInfo, err = s.replaceContactInfo(
-			ctx, nil, pb.ContactInfo, "client", clientModel.ID,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	pb, err = clientToPB(clientModel)
 	if err != nil {
 		return nil, err
@@ -259,8 +239,6 @@ func (*clientStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMa
 				columns = append(columns, "client_secret")
 			case "attributes":
 				q = q.Relation("Attributes")
-			case "contact_info":
-				q = q.Relation("ContactInfo")
 			case "administrative_contact":
 				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
 					return q.Column("uid", "account_type")
@@ -426,14 +404,6 @@ func (s *clientStore) updateClientModel( //nolint:gocyclo
 		case "attributes":
 			model.Attributes, err = s.replaceAttributes(
 				ctx, model.Attributes, pb.Attributes, "client", model.ID,
-			)
-			if err != nil {
-				return err
-			}
-
-		case "contact_info":
-			model.ContactInfo, err = s.replaceContactInfo(
-				ctx, model.ContactInfo, pb.ContactInfo, "client", model.ID,
 			)
 			if err != nil {
 				return err
@@ -615,7 +585,7 @@ func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifie
 	model, err := s.getClientModelBy(
 		store.WithSoftDeleted(ctx, false),
 		s.selectWithID(ctx, id.GetClientId()),
-		store.FieldMask{"attributes", "contact_info"},
+		store.FieldMask{"attributes"},
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -628,13 +598,6 @@ func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifie
 
 	if len(model.Attributes) > 0 {
 		_, err = s.replaceAttributes(ctx, model.Attributes, nil, "client", model.ID)
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(model.ContactInfo) > 0 {
-		_, err = s.replaceContactInfo(ctx, model.ContactInfo, nil, "client", model.ID)
 		if err != nil {
 			return err
 		}

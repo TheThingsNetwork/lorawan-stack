@@ -254,13 +254,6 @@ func TestUsersCRUD(t *testing.T) {
 	usr1.PrimaryEmailAddress = "user-1@email.com"
 	validatedAtTime := time.Now().Truncate(time.Millisecond)
 	usr1.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTime(&validatedAtTime)
-	// NOTE: Remove this when the deprecated field is removed.
-	// (https://github.com/TheThingsIndustries/lorawan-stack/issues/3830)
-	usr1.ContactInfo = append(usr1.ContactInfo, &ttnpb.ContactInfo{ // nolint:staticcheck
-		ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
-		Value:         usr1.PrimaryEmailAddress,
-		ValidatedAt:   usr1.PrimaryEmailAddressValidatedAt,
-	})
 
 	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	creds := rpcCreds(key)
@@ -300,6 +293,29 @@ func TestUsersCRUD(t *testing.T) {
 				a.So(errors.IsPermissionDenied(err), should.BeTrue)
 				a.So(got, should.BeNil)
 			}
+
+			// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/6804)
+			t.Run("Contact_info fieldmask", func(t *testing.T) { // nolint:paralleltest
+				a, ctx := test.New(t)
+				got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+					UserIds:   usr1.GetIds(),
+					FieldMask: ttnpb.FieldMask("contact_info"),
+				}, creds)
+				if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+					a.So(got.ContactInfo, should.HaveLength, 1)
+					a.So(got.ContactInfo[0].Value, should.Equal, usr1.PrimaryEmailAddress)
+				}
+
+				// Testing the `PublicSafe` method, which should not return the contact_info's email address when the
+				// caller does not have the appropriate rights.
+				got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+					UserIds:   usr1.GetIds(),
+					FieldMask: ttnpb.FieldMask("contact_info"),
+				}, credsWithoutRights)
+				if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+					a.So(got.ContactInfo, should.HaveLength, 0)
+				}
+			})
 		})
 
 		t.Run("Update", func(t *testing.T) { // nolint:paralleltest
@@ -367,9 +383,6 @@ func TestUsersCRUD(t *testing.T) {
 					if a.So(err, should.BeNil) {
 						a.So(got.PrimaryEmailAddress, should.Equal, "new-user-email@email.com")
 						a.So(got.PrimaryEmailAddressValidatedAt, should.NotBeNil)
-						a.So(got.ContactInfo, should.HaveLength, 1)                              // nolint:staticcheck
-						a.So(got.ContactInfo[0].Value, should.Equal, "new-user-email@email.com") // nolint:staticcheck
-						a.So(got.ContactInfo[0].ValidatedAt, should.NotBeNil)                    // nolint:staticcheck
 					}
 				})
 
@@ -385,9 +398,6 @@ func TestUsersCRUD(t *testing.T) {
 					if a.So(err, should.BeNil) {
 						a.So(got.PrimaryEmailAddress, should.Equal, "second-new-user-email@email.com")
 						a.So(got.PrimaryEmailAddressValidatedAt, should.BeNil)
-						a.So(got.ContactInfo, should.HaveLength, 1)                                     // nolint:staticcheck,lll
-						a.So(got.ContactInfo[0].Value, should.Equal, "second-new-user-email@email.com") // nolint:staticcheck,lll
-						a.So(got.ContactInfo[0].ValidatedAt, should.BeNil)                              // nolint:staticcheck,lll
 					}
 				})
 			})

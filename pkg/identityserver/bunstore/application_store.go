@@ -17,7 +17,6 @@ package store
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/attribute"
@@ -43,8 +42,6 @@ type Application struct {
 	Description string `bun:"description,nullzero"`
 
 	Attributes []*Attribute `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
-
-	ContactInfo []*ContactInfo `bun:"rel:has-many,join:type=entity_type,join:id=entity_id,polymorphic"`
 
 	AdministrativeContactID *string  `bun:"administrative_contact_id,type:uuid"`
 	AdministrativeContact   *Account `bun:"rel:belongs-to,join:administrative_contact_id=id"`
@@ -92,14 +89,6 @@ func applicationToPB(m *Application, fieldMask ...string) (*ttnpb.Application, e
 		for _, a := range m.Attributes {
 			pb.Attributes[a.Key] = a.Value
 		}
-	}
-
-	if len(m.ContactInfo) > 0 {
-		pb.ContactInfo = make([]*ttnpb.ContactInfo, len(m.ContactInfo))
-		for i, contactInfo := range m.ContactInfo {
-			pb.ContactInfo[i] = contactInfoToPB(contactInfo)
-		}
-		sort.Sort(contactInfoProtoSlice(pb.ContactInfo))
 	}
 
 	if m.AdministrativeContact != nil {
@@ -190,15 +179,6 @@ func (s *applicationStore) CreateApplication(
 		}
 	}
 
-	if len(pb.ContactInfo) > 0 {
-		applicationModel.ContactInfo, err = s.replaceContactInfo(
-			ctx, nil, pb.ContactInfo, "application", applicationModel.ID,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	pb, err = applicationToPB(applicationModel)
 	if err != nil {
 		return nil, err
@@ -231,8 +211,6 @@ func (*applicationStore) selectWithFields(q *bun.SelectQuery, fieldMask store.Fi
 				columns = append(columns, f)
 			case "attributes":
 				q = q.Relation("Attributes")
-			case "contact_info":
-				q = q.Relation("ContactInfo")
 			case "administrative_contact":
 				q = q.Relation("AdministrativeContact", func(q *bun.SelectQuery) *bun.SelectQuery {
 					return q.Column("uid", "account_type")
@@ -403,14 +381,6 @@ func (s *applicationStore) updateApplicationModel( //nolint:gocyclo
 				return err
 			}
 
-		case "contact_info":
-			model.ContactInfo, err = s.replaceContactInfo(
-				ctx, model.ContactInfo, pb.ContactInfo, "application", model.ID,
-			)
-			if err != nil {
-				return err
-			}
-
 		case "administrative_contact":
 			if contact := pb.AdministrativeContact; contact != nil {
 				account, err := s.getAccountModel(ctx, contact.EntityType(), contact.IDString())
@@ -570,7 +540,7 @@ func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.Appli
 	model, err := s.getApplicationModelBy(
 		store.WithSoftDeleted(ctx, false),
 		s.selectWithID(ctx, id.GetApplicationId()),
-		store.FieldMask{"attributes", "contact_info"},
+		store.FieldMask{"attributes"},
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -583,13 +553,6 @@ func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.Appli
 
 	if len(model.Attributes) > 0 {
 		_, err = s.replaceAttributes(ctx, model.Attributes, nil, "application", model.ID)
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(model.ContactInfo) > 0 {
-		_, err = s.replaceContactInfo(ctx, model.ContactInfo, nil, "application", model.ID)
 		if err != nil {
 			return err
 		}
