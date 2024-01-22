@@ -80,7 +80,7 @@
     "@formatjs/intl-locale": "^3.4.3",
     "@formatjs/intl-numberformat": "^8.7.0",
     "@formatjs/intl-pluralrules": "^5.2.10",
-    "@formatjs/intl-relativetimeformat": "^11.2.4",
+    "@formatjs/intl-relativetimeformat": "^11.2.12",
     "@sentry/browser": "^7.92.0",
     "@sentry/integrations": "^7.92.0",
     "@tippyjs/react": "^4.2.6",
