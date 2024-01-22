@@ -15,8 +15,8 @@
 const childProcess = require('child_process')
 const fs = require('fs')
 const path = require('path')
-const util = require('util')
 
+const util = require('util')
 const { Client } = require('pg')
 const yaml = require('js-yaml')
 
