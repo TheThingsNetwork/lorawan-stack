@@ -115,7 +115,7 @@
     "react-redux": "^8.1.2",
     "react-remove-scroll": "^2.5.6",
     "react-router-dom": "^6.14.1",
-    "react-select": "^5.7.3",
+    "react-select": "^5.8.0",
     "react-string-replace": "^1.1.1",
     "react-switch": "^7.0.0",
     "react-text-mask": "^5.5.0",
