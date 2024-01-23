@@ -15,13 +15,13 @@
 .notification-list
   display: flex
   flex-direction: column
-  border-right: 1px solid rgba(0, 0, 0, 0.09)
+  border-right: 1px solid var(--c-border-neutral-light)
   width: 33%
 
   &-change-button
     margin-top: $cs.m
     margin-bottom: $cs.m
-    color: $c.tts-primary !important
+    color: var(--c-text-brand-normal) !important
 
   &.notification-selected
     +media-query($bp.s)
@@ -32,12 +32,12 @@
   display: flex
   justify-content: space-between
   align-items: center
-  border-bottom: 1px solid rgba(0, 0, 0, 0.09)
+  border-bottom: 1px solid var(--c-border-neutral-light)
   padding: $cs.m $cs.s
 
   &-date
     font-weight: $fwv2.regular
-    color: $c.grey-700
+    color: var(--c-text-neutral-light)
 
     &.notification-selected
       display: block
@@ -51,8 +51,8 @@
 
   .total-notifications
     border-radius: $br.l
-    background-color: $c.tts-primary
-    color: $c.white
+    background-color: var(--c-bg-brand-normal)
+    color: var(--c-text-neutral-min)
     padding: 0 0.45rem
     margin-left: $cs.xxs
     font-size: $fs.s
@@ -86,17 +86,18 @@
 .notification-preview
   height: 7rem
   width: 100%
-  border-bottom: 1px solid rgba(0, 0, 0, 0.09)
+  border-bottom: 1px solid var(--c-border-neutral-light)
   padding: $cs.m
 
   &.notification-selected
-    background-color: $c.tts-primary
+    background-color: var(--c-bg-brand-normal)
     +media-query($bp.s)
       background-color: unset
 
   &-title
     display: flex
     justify-content: space-between
+    gap: $cs.xxs
     margin-bottom: $cs.xs
     font-weight: 600
 
@@ -104,24 +105,25 @@
       margin-left: 0.857rem
 
     &.notification-selected
-      color: $c.white
+      color: var(--c-text-neutral-min)
       +media-query($bp.s)
-        color: $tc-black
+        color: var(--c-text-neutral-heavy)
 
       .notification-time
-        color: $c.white
+        color: var(--c-text-neutral-min)
 
     .notification-time
       font-size: $fs.s
       font-weight: normal
-      color: $c.grey-700
+      color: var(--c-text-neutral-light)
+      text-wrap: nowrap
 
     &-text
       overflow: hidden
       text-overflow: ellipsis
 
   &-content
-    color: $c.grey-700
+    color: var(--c-text-neutral-light)
     overflow: hidden
     display: -webkit-box
     -webkit-box-orient: vertical
@@ -133,14 +135,14 @@
       margin-left: 0.857rem
 
     &.notification-selected
-      color: white
+      color: var(--c-text-neutral-min)
       +media-query($bp.s)
-        color: $tc-subtle-gray
+        color: var(--c-text-neutral-light)
 
   &.notification-selected
-    color: $c.white
+    color: var(--c-text-neutral-min)
     +media-query($bp.s)
-      color: $tc-subtle-gray
+      color: var(--c-text-neutral-light)
 
   .unseen-mark
     position: relative

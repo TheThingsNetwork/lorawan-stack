@@ -60,7 +60,7 @@ const NotificationContent = ({
             </p>
             <DateTime
               value={selectedNotification.created_at}
-              dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
+              dateFormatOptions={{ day: '2-digit', month: 'long', year: 'numeric' }}
               timeFormatOptions={{
                 hour: 'numeric',
                 minute: 'numeric',
