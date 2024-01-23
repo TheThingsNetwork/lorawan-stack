@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useState, useRef, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
@@ -31,7 +32,6 @@ import NotificationList from './notification-list'
 import NotificationContent from './notification-content'
 
 import style from './notifications.styl'
-import { useParams } from 'react-router-dom'
 
 const BATCH_SIZE = 50
 
@@ -66,9 +66,10 @@ const Notifications = () => {
   const listRef = useRef(null)
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
-  const params = useParams()
-  console.log(params)
-  const [selectedNotification, setSelectedNotification] = useState(undefined)
+  const location = useLocation()
+  const [selectedNotification, setSelectedNotification] = useState(
+    location.state?.notification ?? undefined,
+  )
   const [hasNextPage, setHasNextPage] = useState(true)
   const [items, setItems] = useState(undefined)
   const [showArchived, setShowArchived] = useQueryState('archived', 'false')
@@ -173,6 +174,7 @@ const Notifications = () => {
   // Load the first page of notifications when the component mounts.
   useEffect(() => {
     loadNextPage(0, BATCH_SIZE)
+    setSelectedNotification(location.state?.notification ?? undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
