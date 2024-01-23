@@ -12,30 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
 import Icon from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
-import Spinner from '@ttn-lw/components/spinner'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import Notification from '@console/components/notifications'
 
 import notificationStyle from '@console/containers/notifications/notifications.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getNotifications } from '@console/store/actions/notifications'
+import { getDropdownNotifications } from '@console/store/actions/notifications'
 
 import { selectUserId } from '@console/store/selectors/logout'
-import { selectTotalNotificationsCount } from '@console/store/selectors/notifications'
+import {
+  selectDropdownNotifications,
+  selectTotalNotificationsCount,
+} from '@console/store/selectors/notifications'
 
 import style from './header.styl'
 
@@ -44,42 +46,19 @@ const m = defineMessages({
 })
 
 const NotificationsDropdown = () => {
-  const [notificationItems, setNotificationItems] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
   const userId = useSelector(selectUserId)
-  const dispatch = useDispatch()
+  const dropdownItems = useSelector(selectDropdownNotifications)
   const totalNotifications = useSelector(selectTotalNotificationsCount)
 
-  useEffect(() => {
-    setIsLoading(true)
-    const fetchNotifications = async () => {
-      const response = await dispatch(
-        attachPromise(
-          getNotifications(userId, ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN'], {
-            limit: 3,
-            page: 1,
-          }),
-        ),
-      )
-      setNotificationItems(response.notifications)
-    }
-    fetchNotifications()
-    setIsLoading(false)
-  }, [setNotificationItems, dispatch, userId])
-
-  if (isLoading) {
-    return <Spinner center small faded inline />
-  }
-
   return (
-    <React.Fragment>
+    <RequireRequest requestAction={getDropdownNotifications(userId)}>
       <div className={style.notificationsDropdownHeader}>
         <span>
           <Message content={sharedMessages.notifications} />{' '}
           <Message className="c-grey-500 fw-normal fs-m" content={`(${totalNotifications})`} />
         </span>
       </div>
-      {notificationItems.map(notification => (
+      {dropdownItems.map(notification => (
         <Link
           to="/notifications"
           key={notification.id}
@@ -121,7 +100,7 @@ const NotificationsDropdown = () => {
       <div className="p-cs-l c-grey-700 fs-s text-center bg-tts-primary-050">
         <Message content={m.description} values={{ totalNotifications }} />
       </div>
-    </React.Fragment>
+    </RequireRequest>
   )
 }
 

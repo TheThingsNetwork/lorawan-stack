@@ -16,10 +16,12 @@ import {
   GET_NOTIFICATIONS_SUCCESS,
   GET_UNSEEN_NOTIFICATIONS_SUCCESS,
   UPDATE_NOTIFICATION_STATUS_SUCCESS,
+  GET_DROPDOWN_NOTIFICATIONS_SUCCESS,
 } from '@console/store/actions/notifications'
 
 const defaultState = {
   notifications: {},
+  dropdownNotifications: {},
   unseenIds: [],
   unseenTotalCount: undefined,
   totalCount: undefined,
@@ -31,6 +33,17 @@ const notifications = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         notifications: {
+          ...payload.notifications.reduce((acc, not) => {
+            acc[not.id] = not
+            return acc
+          }, {}),
+        },
+        totalCount: payload.totalCount,
+      }
+    case GET_DROPDOWN_NOTIFICATIONS_SUCCESS:
+      return {
+        ...state,
+        dropdownNotifications: {
           ...payload.notifications.reduce((acc, not) => {
             acc[not.id] = not
             return acc
