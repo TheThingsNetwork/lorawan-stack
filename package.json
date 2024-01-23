@@ -82,7 +82,7 @@
     "@formatjs/intl-pluralrules": "^5.2.10",
     "@formatjs/intl-relativetimeformat": "^11.2.12",
     "@sentry/browser": "^7.92.0",
-    "@sentry/integrations": "^7.92.0",
+    "@sentry/integrations": "^7.94.1",
     "@tippyjs/react": "^4.2.6",
     "autobind-decorator": "^2.4.0",
     "axios": "^1.5.1",
