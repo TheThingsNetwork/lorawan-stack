@@ -30,6 +30,22 @@ export const [
   { request: getNotifications, success: getNotificationsSuccess, failure: getNotificationsFailure },
 ] = createPaginationByParentRequestActions(SHARED_NAME)
 
+export const GET_DROPDOWN_NOTIFICATIONS_BASE = 'GET_DROPDOWN_NOTIFICATIONS'
+export const [
+  {
+    request: GET_DROPDOWN_NOTIFICATIONS,
+    success: GET_DROPDOWN_NOTIFICATIONS_SUCCESS,
+    failure: GET_DROPDOWN_NOTIFICATIONS_FAILURE,
+  },
+  {
+    request: getDropdownNotifications,
+    success: getDropdownNotificationsSuccess,
+    failure: getDropdownNotificationsFailure,
+  },
+] = createRequestActions(GET_DROPDOWN_NOTIFICATIONS_BASE, userId => ({
+  userId,
+}))
+
 export const GET_UNSEEN_NOTIFICATIONS_BASE = 'GET_UNSEEN_NOTIFICATIONS'
 export const [
   {

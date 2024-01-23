@@ -18,6 +18,9 @@ export const selectNotificationsStore = state => state.notifications
 export const selectNotifications = createSelector([selectNotificationsStore], store =>
   Object.values(store.notifications),
 )
+export const selectDropdownNotifications = createSelector([selectNotificationsStore], store =>
+  Object.values(store.dropdownNotifications),
+)
 export const selectTotalNotificationsCount = state => selectNotificationsStore(state).totalCount
 export const selectTotalUnseenCount = state => selectNotificationsStore(state).unseenTotalCount
 export const selectUnseenIds = state => selectNotificationsStore(state).unseenIds

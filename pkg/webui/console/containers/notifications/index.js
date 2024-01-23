@@ -31,6 +31,7 @@ import NotificationList from './notification-list'
 import NotificationContent from './notification-content'
 
 import style from './notifications.styl'
+import { useParams } from 'react-router-dom'
 
 const BATCH_SIZE = 50
 
@@ -65,6 +66,8 @@ const Notifications = () => {
   const listRef = useRef(null)
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
+  const params = useParams()
+  console.log(params)
   const [selectedNotification, setSelectedNotification] = useState(undefined)
   const [hasNextPage, setHasNextPage] = useState(true)
   const [items, setItems] = useState(undefined)
