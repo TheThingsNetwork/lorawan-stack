@@ -16,7 +16,7 @@
   &-header
     font-size: $fs.l
     padding: $cs.l $cs.m
-    border-bottom: 1px solid $c.grey-200
+    border-bottom: 1px solid var(--c-border-neutral-light)
     margin-bottom: 0
     font-weight: $fw.bold
 
@@ -25,22 +25,22 @@
     justify-content: center
     gap: $cs.m
     text-decoration: none
-    border-bottom: 1px solid $c.grey-200
+    border-bottom: 1px solid var(--c-border-neutral-light)
     padding: $cs.m 1.25rem
 
     &:visited
       color: initial
 
     &:hover
-      background: $c.tts-primary-100
+      background: var(--c-bg-neutral-min-hover)
 
     &-icon
       width: 1.29rem
       height: 1.29rem
       border-radius: $br.m
-      border: 1px solid $c.grey-300
-      background: $c.white
-      color: $c.tts-primary
+      border: 1px solid var(--c-border-neutral-light)
+      background: var(--c-bg-neutral-min)
+      color: var(--c-text-brand-normal)
       padding: $cs.m
 
     .title

@@ -55,7 +55,10 @@ const NotificationsDropdown = () => {
       <div className={style.notificationsDropdownHeader}>
         <span>
           <Message content={sharedMessages.notifications} />{' '}
-          <Message className="c-grey-500 fw-normal fs-m" content={`(${totalNotifications})`} />
+          <Message
+            className="c-text-neutral-semilight fw-normal fs-m"
+            content={`(${totalNotifications})`}
+          />
         </span>
       </div>
       {dropdownItems.map(notification => (
@@ -92,12 +95,12 @@ const NotificationsDropdown = () => {
                 dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
               }}
               value={notification.created_at}
-              className="fs-s c-grey-700"
+              className="fs-s c-text-neutral-heavy"
             />
           </div>
         </Link>
       ))}
-      <div className="p-cs-l c-grey-700 fs-s text-center bg-tts-primary-050">
+      <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
         <Message content={m.description} values={{ totalNotifications }} />
       </div>
     </RequireRequest>
