@@ -14,7 +14,7 @@
 
 .switcher-container
   border-radius: $br.l
-  border: 1px solid $c.grey-200
+  border: 1px solid var(--c-border-neutral-light)
   background: var(--c-bg-neutral-min)
   box-shadow: 0px 2px 7px 1px rgba(0, 0, 0, 0.06)
   display: flex
@@ -25,7 +25,7 @@
   .link
     border-radius: $br.m
     text-decoration: none
-    color: $c.grey-700
+    color: var(--c-text-neutral-semilight)
     display: flex
     justify-content: center
     width: 100%
@@ -34,19 +34,14 @@
     padding: $cs.s $cs.xxs
 
     &.active
-      background: $c.grey-900
-      color: $c.white
+      background: var(--c-bg-neutral-heavy)
+      color: var(--c-text-neutral-min)
       font-weight: $fw.bold
-
-    &:visited
-      text-decoration: none
-      &:not(.active)
-        color: $c.grey-700
 
     &:hover
       text-decoration: none
       &:not(.active)
-        background: $c.grey-100
+        background: var(--c-bg-neutral-light)
 
   &.is-minimized
     flex-direction: column
@@ -68,4 +63,4 @@
   .fly-out-list
     --dropdown-offset: calc(1rem - 2px)
     top: - $cs.xs
-    color: $c.grey-900
+    color: var(--c-text-neutral-heavy)
