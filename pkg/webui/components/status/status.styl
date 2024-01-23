@@ -38,16 +38,16 @@
     animation: pulse 2s infinite
 
   &-good
-    background-color: $c-active-blue
+    background-color: var(--c-text-brand-normal)
 
   &-bad
-    background-color: $c-error
+    background-color: var(--c-bg-error-normal)
 
   &-mediocre
-    background-color: $c-warning
+    background-color: var(--c-bg-warning-normal)
 
   &-unknown
-    background-color: $c-icon-fill
+    background-color: var(--c-icon-neutral-normal)
 
 .good-pulse:after
   animation: goodPulse 4s infinite
@@ -86,10 +86,10 @@ triggered-pulse-animation($color, $name)
     100%
       box-shadow: 0 0 0 0 alpha($color, 0)
 
-pulse-animation($c-active-blue, 'goodPulse')
-pulse-animation($c-error, 'badPulse')
-pulse-animation($c-error, 'mediocrePulse')
+pulse-animation($tokens.theme-light.color.icon-info-normal, 'goodPulse')
+pulse-animation($tokens.theme-light.color.icon-error-normal, 'badPulse')
+pulse-animation($tokens.theme-light.color.icon-warning-normal, 'mediocrePulse')
 
-triggered-pulse-animation($c-active-blue, 'triggeredGoodPulse')
-triggered-pulse-animation($c-error, 'triggeredBadPulse')
-triggered-pulse-animation($c-error, 'triggeredMediocrePulse')
+triggered-pulse-animation($tokens.theme-light.color.icon-info-normal, 'triggeredGoodPulse')
+triggered-pulse-animation($tokens.theme-light.color.icon-error-normal, 'triggeredBadPulse')
+triggered-pulse-animation($tokens.theme-light.color.icon-warning-normal, 'triggeredMediocrePulse')

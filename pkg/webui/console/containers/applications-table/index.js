@@ -186,7 +186,7 @@ const ApplicationsTable = props => {
                       textPaddedLeft
                       small
                       nudgeUp
-                      className="tc-subtle-gray"
+                      className="c-text-neutral-light"
                     />
                   </Status>
                 </DocTooltip>
@@ -203,7 +203,7 @@ const ApplicationsTable = props => {
           align: 'center',
           render: deviceCount =>
             typeof deviceCount !== 'number' ? (
-              <Spinner micro center inline after={100} className="c-subtle-gray" />
+              <Spinner micro center inline after={100} className="c-icon" />
             ) : (
               <strong>
                 <FormattedNumber value={deviceCount} />

@@ -22,7 +22,7 @@
 
 .link
   text-decoration: none
-  color: $tc-black
+  color: var(--c-text-neutral-heavy)
   display: flex
   align-items: center
   padding: $cs.s $cs.m
@@ -35,7 +35,7 @@
     left: 0
     width: 3px
     height: 100%
-    background-color: $c-subtle-fill
+    background-color: var(--c-icon-neutral-normal)
     transform: scaleY(0)
     transform-origin: center
     transition: transform $ad.m ease-in-out, background-color $ad.s linear
@@ -45,7 +45,7 @@
 
   &.active
     font-weight: $fw.bold
-    background-color: $c-backdrop-lighter
+    background-color: var(--c-bg-neutral-light)
 
     &::before
       content: ''
@@ -56,12 +56,12 @@
       display: block
       height: 100%
       width: 3px
-      background: $c-active-blue !important
+      background: var(--c-text-brand-normal) !important
 
   &:hover,
   &:visited
-    color: $tc-black
+    color: var(--c-text-neutral-heavy)
     text-decoration: none
 
   &:hover
-    background-color: $c-backdrop
+    background-color: var(--c-bg-neutral-semilight)

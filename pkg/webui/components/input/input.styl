@@ -19,7 +19,7 @@
   border-input()
   input-width-classes()
   box-sizing: border-box
-  background: white
+  background: var(--c-bg-neutral-min)
   border-radius: $br.m
   padding: 0
   position: relative
@@ -33,32 +33,32 @@
     max-height: $default-input-height
 
   &.focus
-    border-color: $c-active-blue
-    color: black
+    border-color: var(--c-text-brand-normal)
+    color: var(--c-bg-neutral-max)
 
   &.error
-    border-color: $c-error
-    background-color: lighten($c-error, 49)
+    border-color: var(--c-bg-error-normal)
 
   &.error.focus
-    box-shadow: 0 0 0 3px alpha($c-error, .2)
+    box-shadow: var(--shadow-box-error-normal)
+    box-shadow: 0 0 0 3px var(--c-bg-error-light)
 
   &.warn
-    border-color: $c-warning
-    background-color: lighten($c-warning, 42)
+    border-color: var(--c-bg-warning-normal)
+    background-color: var(--c-bg-warning-light)
 
   &.warn.focus
-    box-shadow: 0 0 0 3px alpha($c-warning, .3)
+    box-shadow: var(--shadow-box-warning-normal)
 
   &.disabled
-    background-color: $c-backdrop
+    background-color: var(--c-bg-neutral-semilight)
     opacity: .6
 
     .input
       cursor: not-allowed
 
   &.readOnly
-    background-color: $c-backdrop
+    background-color: var(--c-bg-neutral-semilight)
 
   &.actionable
     margin-right: $cs.xs
@@ -66,7 +66,7 @@
 ::placeholder
   font-family: $font-family
   font-weight: $fw.normal
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   letter-spacing: initial
   font-variant: normal
   font-size: 1rem
@@ -114,7 +114,7 @@
     opacity: 1
 
   path
-    fill: $c-active-blue
+    fill: var(--c-text-brand-normal)
 
 .byte, .code, .placeholder
   &:not(.hidden)
@@ -131,7 +131,7 @@
   position: absolute
   left: .7rem
   white-space: pre
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   z-index: 0
   pointer-events: none
 

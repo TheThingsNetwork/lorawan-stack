@@ -1,0 +1,170 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// CONSOLE COLOR PALLETE
+// =====================
+// This file contains the color pallete for the console. It is meant to
+// be used only by the tokens.styl file to define design tokens with it.
+// Do not use these values directly but only through the tokens.styl file.
+
+$c = {
+
+  // Brand colors
+
+  'tts-025': #F7FBFF,
+  'tts-050': #EFF5FF,
+  'tts-075': #E7F0FF,
+  'tts-100': #DAE8FF,
+  'tts-200': #A4C6FF,
+  'tts-300': #78A5FF,
+  'tts-400': #568AFF,
+  'tts-500': #1E5DFF,
+  'tts-600': #1547DB,
+  'tts-700': #0F34B7,
+  'tts-800': #092493,
+  'tts-900': #05187A,
+  'tts-1000': #000E55,
+  'tts-1025': #000B42,
+  'tts-1050': #010832,
+  'tts-1075': #000421,
+
+  // Neutral colors
+
+  'neutral-white': #FFFFFF,
+  'neutral-025': #FAFBFF,
+  'neutral-050': #F5F6FD,
+  'neutral-075': #EEEFF9,
+  'neutral-100': #E7EAF6,
+  'neutral-200': #DDE0ED,
+  'neutral-300': #CFD2E2,
+  'neutral-400': #B4B7CB,
+  'neutral-500': #8B8FA8,
+  'neutral-600': #5E6281,
+  'neutral-700': #40435F,
+  'neutral-800': #2A2C46,
+  'neutral-900': #181A2F,
+  'neutral-1000': #121428,
+  'neutral-1025': #0E1020,
+  'neutral-1050': #0B0C16,
+  'neutral-1075': #09090E,
+  'neutral-black': #000000,
+
+  // Semantic colors
+
+  'information-025': #F7FCFF,
+  'information-050': #EFFAFF,
+  'information-075': #E3F6FF,
+  'information-100': #CCEEFF,
+  'information-200': #99D8FF,
+  'information-300': #66BDFF,
+  'information-400': #3FA4FF,
+  'information-500': #007AFF,
+  'information-600': #005EDB,
+  'information-700': #0046B7,
+  'information-800': #003193,
+  'information-900': #002074,
+  'information-1000': #000F4F,
+  'information-1025': #000B3A,
+  'information-1050': #00082A,
+  'information-1075': #00051F,
+
+  'success-025': #F7FFF7,
+  'success-050': #EAFFEA,
+  'success-075': #DEFFD4,
+  'success-100': #CFFFC2,
+  'success-200': #B3FAA9,
+  'success-300': #7EF07B,
+  'success-400': #58E160,
+  'success-500': #27CD41,
+  'success-600': #1CB041,
+  'success-700': #13933F,
+  'success-800': #0C763B,
+  'success-900': #00572E,
+  'success-1000': #002C17,
+  'success-1025': #001C0E,
+  'success-1050': #00130A,
+  'success-1075': #000D07,
+
+  'warning-025': #FFFCF3,
+  'warning-050': #FFF9E6,
+  'warning-075': #FFF4D4,
+  'warning-100': #FFEEBC,
+  'warning-200': #FFE096,
+  'warning-300': #FFCC66,
+  'warning-400': #FFB73F,
+  'warning-500': #FF9500,
+  'warning-600': #DB7600,
+  'warning-700': #B75B00,
+  'warning-800': #934300,
+  'warning-900': #6E2D00,
+  'warning-1000': #391700,
+  'warning-1025': #210D00,
+  'warning-1050': #160900,
+  'warning-1075': #0D0500,
+
+  'error-025': #FFFAFA,
+  'error-050': #FFF5F5,
+  'error-075': #FFEEEE,
+  'error-100': #FFE2DE,
+  'error-200': #FFD1CA,
+  'error-300': #FFA497,
+  'error-400': #FF6C63,
+  'error-500': #FF3B30,
+  'error-600': #DB2328,
+  'error-700': #B7182A,
+  'error-800': #930F29,
+  'error-900': #6E071B,
+  'error-1000': #45030F,
+  'error-1025': #2D0109,
+  'error-1050': #1D0003,
+  'error-1075': #110002,
+
+
+  // LEGACY COLORS, TO BE REMOVED
+
+  'red-error-600': #EE3F41,
+  'red-error-500': #F9595A,
+  'red-error-100': #FFECEC,
+  'orange-warning-600': #F9AB32,
+  'orange-warning-500': #FFB746,
+  'orange-warning-100': #FFF3E1,
+  'success-01': #25B933,
+  'success-02': #F3FAFF,
+  'success-03': #FAFCFF,
+  'success-04': var(--c-bg-neutral-min),
+  // Neutral colors
+  'black': #000000,
+  'grey-900': #29292B,
+  'grey-700': #616063,
+  'grey-500': #929196,
+  'grey-400': #B7B6BC,
+  'grey-300': #D4D3D9,
+  'grey-200': #E8E7EC,
+  'grey-100': #F5F4F8,
+  'bone': #F7F6F1,
+  'white': #FFFFFF,
+  // Theme colors
+  'tts-primary-050': #FBFCFF,
+  'tts-primary-100': #D2E3FF,
+  'tts-primary-150': #EEF3FF,
+  'tts-primary-200': #A4C6FF,
+  'tts-primary-300': #78A5FF,
+  'tts-primary-400': #568AFF,
+  'tts-primary': #1E5DFF,
+  'tts-primary-600': #1547DB,
+  'tts-primary-700': #0F34B7,
+  'tts-primary-800': #092493,
+  'tts-primary-900': #05187A,
+
+}

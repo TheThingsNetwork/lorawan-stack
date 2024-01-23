@@ -35,7 +35,7 @@ const SectionLabel = ({
       'd-flex',
       'j-between',
       'al-center',
-      'c-grey-500',
+      'c-text-neutral-light',
       'ml-cs-s',
       'fs-s',
     )}

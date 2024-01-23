@@ -21,25 +21,28 @@ border-normal($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: $width solid $c-divider
+  border{$prefix + $side}: $width solid var(--c-border-neutral-light)
 
 border-dark($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: $width solid $c-divider-dark
+  border{$prefix + $side}: $width solid var(--c-border-neutral-normal)
 
 border-input($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: $width solid $c-input-border
+  border{$prefix + $side}: $width solid var(--c-border-neutral-normal)
 
 border-subtle($side = '', $width = 1px)
   $prefix = '-'
   if $side == ''
     $prefix = ''
-  border{$prefix + $side}: $width solid $c-divider-subtle
+  border{$prefix + $side}: $width solid var(--c-border-neutral-extralight)
+
+gradient-border($background-color, $top-color, $bottom-color)
+  background: linear-gradient(to bottom, $background-color, $background-color) padding-box, linear-gradient(to bottom, $top-color, $bottom-color) border-box
 
 pseudo-border($size, $color)
   &:before
@@ -59,41 +62,6 @@ pseudo-border-animated($size, $color)
 
   &:hover:before
     transform: scaleX(1)
-
-
-
-// COLORS
-// ======
-
-// Darker/lighter is used to step through color shadings in a consistent
-// way (using steps). Consider using an already defined color or defining
-// a new one altogether when applicable. Only use with full integer steps.
-darker($color, $step = 1)
-  darken($color, 5 * $step)
-
-lighter($color, $step = 1)
-  lighten($color, 5 * $step)
-
-// Hoverize and activize will return shaded values for active and hover state.
-// This will improve consistency for shaded colors.
-hoverize($color)
-  if ($color == $c-active-blue)
-    $c-active-blue-hover
-  else
-    darker($color, 2)
-
-activize($color)
-  if ($color == $c-active-blue)
-    $c-active-blue-active
-  else
-    darker($color, 3)
-
-// For text colors and lines
-tc-hoverize($color)
-  if ($color == $tc-active)
-    $tc-active-hover
-  else
-    darker($color, 2)
 
 
 // POSITIONING

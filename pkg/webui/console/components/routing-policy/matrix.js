@@ -55,7 +55,7 @@ const RoutingPolicyMatrix = ({ policy }) => {
     <div className="d-flex direction-column">
       <div className="d-flex mb-cs-xxs al-center gap-cs-xxs">
         <Tooltip content={<Message content={m.uplinkPolicies} />} placement="top">
-          <Icon small icon="uplink" className="tc-subtle-gray" />
+          <Icon small icon="uplink" className="c-text-neutral-light" />
         </Tooltip>
         <PolicyPoint
           symbol="J"
@@ -90,7 +90,7 @@ const RoutingPolicyMatrix = ({ policy }) => {
       </div>
       <div className={classnames(style.downlink, 'd-flex', 'al-center', 'gap-cs-xxs')}>
         <Tooltip content={<Message content={m.downlinkPolicies} />} placement="bottom">
-          <Icon small icon="downlink" className="tc-subtle-gray" />
+          <Icon small icon="downlink" className="c-text-neutral-light" />
         </Tooltip>
         <PolicyPoint
           symbol="J"

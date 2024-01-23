@@ -20,13 +20,13 @@
   :global(.select__option)
     padding: $cs.xs $cs.s
   :global(.select__option--is-selected)
-    background-color: $c-active-blue
+    background-color: var(--c-text-brand-normal)
   :global(.select__option--is-focused:not(.select__option--is-selected))
-    background-color: $c-backdrop
+    background-color: var(--c-bg-neutral-semilight)
   :global(.select__control--is-focused)
     box-shadow: none
-    border-color: $c-active-blue
-    color: black
+    border-color: var(--c-text-brand-normal)
+    color: var(--c-bg-neutral-max)
 
   :global(.select__control)
     width: 100%
@@ -47,21 +47,19 @@
 
   &.error
     :global(.select__control)
-      color: $c-error
-      border-color: $c-error
-      background-color: lighten($c-error, 49)
+      color: var(--c-bg-error-normal)
+      border-color: var(--c-bg-error-normal)
 
     :global(.select__control--is-focused)
-      box-shadow: 0 0 0 3px alpha($c-error, .2)
+      box-shadow: var(--shadow-box-error-normal)
 
   &.warning
     :global(.select__control)
-      color: $c-warning
-      border-color: $c-warning
-      background-color: lighten($c-warning, 42)
+      color: var(--c-bg-warning-normal)
+      border-color: var(--c-bg-warning-normal)
 
     :global(.select__control--is-focused)
-      box-shadow: 0 0 0 3px alpha($c-warning, .3)
+      box-shadow: var(--shadow-box-error-normal)
 
   &.selected-options-container
     display: inline-block

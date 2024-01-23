@@ -150,7 +150,7 @@ const DeviceQRScanFormSection = () => {
     <>
       {qrData.approved ? (
         <div className="mb-cs-xs">
-          <Icon icon="check" textPaddedRight className="c-success" />
+          <Icon icon="check" textPaddedRight className="c-bg-success-normal" />
           <Message content={m.scanSuccess} />
         </div>
       ) : (

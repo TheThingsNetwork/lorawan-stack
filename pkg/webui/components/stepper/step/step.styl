@@ -47,7 +47,7 @@
   box-sizing: border-box
 
   &::after
-    background: $c-divider-dark
+    background: var(--c-bg-neutral-semilight)
     width: 1px
     height: 100%
     border-radius: 1px
@@ -61,56 +61,56 @@
 
 .current
   .status
-    color: white
-    background-color: $c-active-blue
+    color: var(--c-bg-neutral-min)
+    background-color: var(--c-text-brand-normal)
 
   .content > .title
-    color: $tc-black
+    color: var(--c-text-neutral-heavy)
 
   .content > .description
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
 
 .wait
   .status
     opacity: .7
-    background-color: white
-    border: 1px solid $tc-subtle-gray
-    color: $tc-subtle-gray
+    background-color: var(--c-bg-neutral-min)
+    border: 1px solid var(--c-text-neutral-light)
+    color: var(--c-text-neutral-light)
 
   .content > .title
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
   .content > .description
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
 .success
   .status
-    background-color: $c-active-blue
-    color: white
+    background-color: var(--c-text-brand-normal)
+    color: var(--c-bg-neutral-min)
 
   .content > .title
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
 
   .content > .description
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
   .content > .title::after,
   .tail::after
-    background: $c-active-blue
+    background: var(--c-text-brand-normal)
 
 .success.transition-failed
   .content > .title::after,
   .tail::after
-    background: $c-error
+    background: var(--c-bg-error-normal)
 
 .failure
   .status
-    background-color: $c-error
-    color: white
+    background-color: var(--c-bg-error-normal)
+    color: var(--c-bg-neutral-min)
 
   .content > .title,
   .content > .description
-    color: $c-error
+    color: var(--c-bg-error-normal)
 
 .status
   height: 2rem
@@ -131,7 +131,7 @@
   .title
     nudge('down', 2.5px)
     white-space: nowrap
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
     padding-right: $cs.l
 
     &::after
@@ -142,12 +142,12 @@
       left: 100%
       width: 9999px
       height: 1px
-      background: $c-divider-dark
+      background: var(--c-bg-neutral-semilight)
       transition: background $ad.s
 
   .description
     font-size: $fs.s
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
     margin-bottom: $cs.m
     margin-top: 0
     max-width: $ls.xxl

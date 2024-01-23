@@ -42,7 +42,7 @@
       margin-right: - $cs.xxs
 
   .expand-icon
-    color: $c.grey-500
+    color: var(--c-icon-neutral-light)
     font-size: 1.285rem
     margin-right: - $cs.xxs
 
@@ -51,85 +51,85 @@
     padding: 0 $cs.s
 
   &.primary
-    color: white
-    background-color: $c-active-blue
+    color: var(--c-bg-neutral-min)
+    background-color: var(--c-text-brand-normal)
 
     &:disabled
-      background-color: $c-divider-dark
+      background-color: var(--c-border-neutral-light)
 
     &:not(:disabled)
       &:hover
-        background-color: hoverize($c-active-blue)
+        background-color: var(--c-text-brand-normal-hover)
 
       +focus-visible()
-        background-color: hoverize($c-active-blue)
+        background-color: var(--c-text-brand-normal-hover)
 
       &:active
-        background-color: activize($c-active-blue)
+        background-color: var(--c-text-brand-normal-active)
 
     &.warning
-      background-color: $c-warning
+      background-color: var(--c-bg-warning-normal)
 
       &:not(:disabled)
         &:hover
-          background-color: hoverize($c-warning)
+          background-color: var(--c-bg-warning-normal-hover)
 
         +focus-visible()
-          background-color: hoverize($c-warning)
+          background-color: var(--c-bg-warning-normal-hover)
 
         &:active
-          background-color: activize($c-warning)
+          background-color: var(--c-bg-warning-normal-active)
 
     &.danger
-      background-color: $c-error
+      background-color: var(--c-bg-error-normal)
 
       &:not(:disabled)
         &:hover
-          background-color: hoverize($c-error)
+          background-color: var(--c-bg-error-normal-hover)
 
         +focus-visible()
-          background-color: hoverize($c-error)
+          background-color: var(--c-bg-error-normal-hover)
 
         &:active
-          background-color: activize($c-error)
+          background-color: var(--c-bg-error-normal-active)
 
       &:disabled
-        background-color: transparentify($c-error, #fff, .25)
+        background-color: var(--c-bg-error-normal-light)
 
   &.secondary
-    color: $tc-deep-gray
-    background-color: white
-    box-shadow: 0px 2px 2px 0px rgba(0 0 0 4.5%), inset 0px 0px 0px 1px white
-    background: linear-gradient(to bottom, white, white) padding-box, linear-gradient(to bottom, #E8E7EC, #D7D7D7) border-box
+    color: var(--c-text-neutral-heavy)
+    background-color: var(--c-bg-neutral-min)
+    box-shadow: 0px 2px 2px 0px rgba(0 0 0 4.5%), inset 0px 0px 0px 1px var(--c-bg-neutral-min)
+    gradient-border(var(--c-bg-neutral-min), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
     border: 1px solid transparent
 
     &:hover
-      background: linear-gradient(to bottom, $c-focus, $c-focus) padding-box, linear-gradient(to bottom, #E8E7EC, #D7D7D7) border-box
+      gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
 
     +focus-visible()
-      background: linear-gradient(to bottom, $c-focus, $c-focus) padding-box, linear-gradient(to bottom, #E8E7EC, #D7D7D7) border-box
+      gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
 
     &:active
-      background: linear-gradient(to bottom, $c-focus, $c-focus) padding-box, linear-gradient(to bottom, #E8E7EC, #D7D7D7) border-box
+      gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
       box-shadow: none
 
   &.naked
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
     &:disabled
-      color: transparentify($tc-subtle-gray, #fff, .25) !important
+      color: var(--c-text-neutral-extralight)
 
     &:not(:disabled)
       &:hover
         background-color: rgba(0,0,0,.04)
-        color: $c.grey-700
+        color: var(--c-text-neutral-heavy)
 
       +focus-visible()
         background-color: rgba(0,0,0,.04)
-        color: $c.grey-700
+        color: var(--c-text-neutral-heavy)
 
       &:active
-        background-color: $c-backdrop
+        background-color: var(--c-bg-neutral-semilight)
 
     &.only-icon
       width: 2.5rem
@@ -141,16 +141,16 @@
       border-radius: $br.s
 
     &.warning
-      color: $c.orange-warning-500
+      color: var(--c-text-warning-normal)
 
       &:hover
-        color: $c.orange-warning-600
+        color: var(--c-text-warning-normal-hover)
 
     &.danger
-      color: $c.red-error-500
+      color: var(--c-text-error-normal)
 
       &:hover
-        color: $c.red-error-600
+        color: var(--c-text-warning-hover)
 
   &.with-dropdown&.only-icon
     width: fit-content

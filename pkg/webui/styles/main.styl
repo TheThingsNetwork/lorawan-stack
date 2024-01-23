@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,10 @@
 // limitations under the License.
 
 @require './fonts.styl'
+@require './variables/css-variables.styl'
+@require './utilities/general.styl'
+@require './utilities/spacing.styl'
+@require './utilities/tokens.styl'
 
 normalize-css()
 
@@ -23,10 +27,10 @@ html, body
 body
   font-family: $font-family
   line-height: $line-height-base
-  color: $tc-deep-gray
+  color: var(--c-text-neutral-heavy)
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
-  background: white
+  background: var(--c-bg-neutral-min)
 
 :global(#app)
   height: 100%
@@ -36,7 +40,7 @@ body
   height: .5rem
 
 ::-webkit-scrollbar-thumb
-  background-color: darker($c-backdrop)
+  background-color: var(--c-bg-neutral-semilight)
 
 ::-webkit-scrollbar-track
   padding: 2px
@@ -59,20 +63,20 @@ ul li
 
   a
     text-decoration: none
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
 
 hr
   border-normal()
-  background-color: $c-divider
+  background-color: var(--c-border-neutral-light)
   border: 0
   height: 1px
 
 code
   font-family: $font-family-mono
   font-size: $fs.s
-  background-color: $c-text-backdrop
+  background-color: var(--c-bg-neutral-semilight)
   padding: 0.1rem $cs.xxs
-  color: $tc-black
+  color: var(--c-text-neutral-heavy)
 
 summary
   display: revert
@@ -92,4 +96,4 @@ summary
 :global
   .panel-title
     padding-bottom: $cs.xs
-    border-bottom: 1px solid $c-divider
+    border-bottom: 1px solid var(--c-border-neutral-light)

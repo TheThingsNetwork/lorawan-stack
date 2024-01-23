@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.overlay
-  visibility: hidden
-  opacity: 0
-  position: absolute
-  min-width: 100%
-  min-height: 100%
-  height: 100%
-  top: 0
-  left: 0
-  background: var(--c-bg-neutral-min)
-  transition: opacity $ad.m ease-in-out, visibility $ad.m ease-in-out
+make-variables($name, $theme)
+  $dict = lookup('$' + $name)
+  for $key, $value in $dict[$theme][color]
+    {'--c-'}{$key}: $value
+  for $key, $value in $dict[$theme][shadow]
+    {'--shadow-'}{$key}: $value
 
-  &-visible
-    visibility: visible
-    opacity: .85
-    z-index: $zi.overlay
+// Generate CSS variables based on token definitions.
 
-  &-wrapper
-    position: relative
+:root, :before, :after
+  make-variables('tokens', 'theme-light')
 
-  &-spinner
-    z-index: $zi.overlay + 1

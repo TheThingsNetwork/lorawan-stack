@@ -21,19 +21,19 @@
 
 .item
   display: inline-block
-  color: $c-active-blue
+  color: var(--c-text-brand-normal)
   font-weight: $fw.bold
   user-select: none
 
   .link:hover
-    background-color: hoverize(white)
+    background-color: hoverize(var(--c-bg-neutral-min))
 
   .link
     +focus-visible()
-      background-color: hoverize(white)
+      background-color: hoverize(var(--c-bg-neutral-min))
 
   .link:active
-    background-color: activize(white)
+    background-color: activize(var(--c-bg-neutral-min))
 
   &-navigation-next
     .link
@@ -51,12 +51,12 @@
 
   &-active
     .link
-      background-color: $c-active-blue
-      border: 1px solid $c-active-blue
-      color: white
+      background-color: var(--c-text-brand-normal)
+      border: 1px solid var(--c-text-brand-normal)
+      color: var(--c-bg-neutral-min)
 
       +focus-visible()
-        background-color: hoverize($c-active-blue)
+        background-color: hoverize(var(--c-text-brand-normal))
 
     & + .item
       a
@@ -66,10 +66,10 @@
       border-left: 0
 
     .link:hover
-      background-color: $c-active-blue
+      background-color: var(--c-text-brand-normal)
 
   &-break
-    color: $c-active-blue
+    color: var(--c-text-brand-normal)
     padding: $cs.xs $cs.m
     border-dark()
     border-right: 0

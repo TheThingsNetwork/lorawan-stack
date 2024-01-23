@@ -63,8 +63,8 @@ const DevEUIComponent = props => {
     },
   }
 
-  const indicatorCls = classnames('ml-cs-s', 'al-center', 'tc-subtle-gray', {
-    'tc-error':
+  const indicatorCls = classnames('ml-cs-s', 'al-center', 'c-text-neutral-light', {
+    'c-text-error-normal':
       applicationDevEUICounter === env.devEUIConfig.applicationLimit || Boolean(errorMessage),
   })
 

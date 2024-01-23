@@ -273,7 +273,7 @@ const LocationForm = props => {
       <Message
         content={updatesDisabled ? m.mapDescriptionDisabled : m.mapDescription}
         component="p"
-        className="p-0 mt-cs-xs mb-cs-l tc-subtle-gray"
+        className="p-0 mt-cs-xs mb-cs-l c-text-neutral-light"
       />
       {updatesDisabled && disabledInfo && <Notification content={disabledInfo} info small />}
       <Form.Field

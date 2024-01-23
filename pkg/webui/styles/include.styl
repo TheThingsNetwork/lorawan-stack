@@ -12,7 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ATTENTION!
+// ==========
+// Includes added here will be applied for every stylus file in the project
+// and is meant for global definitions, such as variables and mixins.
+// Be careful not to include files that include style definitions, as
+// this will result in many duplicate definitions.
+
 @require 'nib'
 
 @require './variables/generic.styl'
+@require './variables/colors.styl'
+@require './variables/tokens.styl'
 @require './mixins.styl'

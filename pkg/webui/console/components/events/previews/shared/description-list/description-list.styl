@@ -25,7 +25,7 @@
     margin-right: $cs.s
 
   .term
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
     &:after
       content: ':'
@@ -41,7 +41,7 @@
     margin-right: $cs.s
 
 .empty-byte
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   font-style: italic
 
   &:before
@@ -51,10 +51,10 @@
 
 .highlight
   line-height: 1.9rem;
-  border: 1px solid $c-divider-dark;
+  border: 1px solid var(--c-border-neutral-semilight);
   font-family: 'IBM Plex Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
   display: inline
-  background-color: white
+  background-color: var(--c-bg-neutral-min)
   height: 100%
   padding: 0 $cs.xs
   border-radius: $br.xs
