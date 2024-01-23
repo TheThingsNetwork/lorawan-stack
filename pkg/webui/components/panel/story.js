@@ -23,7 +23,7 @@ export default {
 
 export const Default = () => (
   <div style={{ width: '32.5rem' }}>
-    <Panel title="Latest news" icon="feed" buttonTitle="Visit our blog →" />
+    <Panel title="Latest news" icon="feed" buttonTitle="Visit our blog" />
   </div>
 )
 

@@ -13,13 +13,13 @@
 // limitations under the License.
 
 .shortcut
-  transition: $ad.m all ease-in-out
+  transition: $ad.m background ease-in, $ad.m display ease-out
   text-decoration: none
   height: 10.7rem
   border-radius: $br.l
-  background: $c.tts-primary
-  color: $c.white
-  font-size: $fs.s
+  background: var(--c-bg-brand-normal)
+  color: var(--c-text-neutral-min)
+  font-size: $fs.m
   font-weight: $fwv2.semibold
 
   span.icon
@@ -34,7 +34,8 @@
     display: block
 
   &:hover
-    background: #194FDA
+    cursor: pointer
+    background: var(--c-bg-brand-normal-hover)
 
     .title
       display: none

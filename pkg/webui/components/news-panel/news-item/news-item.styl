@@ -17,18 +17,19 @@
   border-radius: $br.xl
 
   &:hover
-    background-color: #F4F7FF
+    cursor: pointer
+    background-color: var(--c-bg-neutral-min-hover)
 
   .image
     border-radius: $br.l
-    border: 1px solid $c.grey-200
+    border: 1px solid var(--c-border-neutral-light)
     height: 5rem
     width: auto
 
   .title
     width: 100%
     font-weight: $fwv2.bold
-    color: #181A2F
+    color: var(--c-text-neutral-heavy)
     overflow: hidden
     display: -webkit-box
     -webkit-box-orient: vertical
@@ -36,4 +37,4 @@
     white-space: pre-wrap
 
   .date
-    color: #5E6281
+    color: var(--c-text-neutral-light)
