@@ -21,7 +21,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
   align-items: center
   color: var(--c-text-neutral-light)
   flex: none
-  background-color: white
+  background-color: var(--c-bg-neutral-min)
   box-sizing: border-box
   
   +media-query-min($bp.xs)
@@ -49,7 +49,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
           background-color: rgba(255,255,2555,0.1)
 
       .right
-          color: white
+          color: var(--c-bg-neutral-min)
 
 .link
   color: var(--c-text-neutral-light)
@@ -106,13 +106,13 @@ $fh = 'calc(%s - 1px)' % $footer-height
     
   &:not(.primary)
     border-normal('left')
-    background-color: white
+    background-color: var(--c-bg-neutral-min)
     &.interactive:hover
       background-color: var(--c-bg-neutral-semilight)
 
   &.primary
     background-color: var(--c-text-brand-normal)
-    color: white
+    color: var(--c-bg-neutral-min)
     
     &.interactive:hover
       background-color: hoverize(var(--c-text-brand-normal))

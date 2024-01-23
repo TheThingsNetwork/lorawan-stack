@@ -26,7 +26,7 @@
   :global(.select__control--is-focused)
     box-shadow: none
     border-color: var(--c-text-brand-normal)
-    color: black
+    color: var(--c-bg-neutral-max)
 
   :global(.select__control)
     width: 100%
@@ -49,19 +49,17 @@
     :global(.select__control)
       color: var(--c-bg-error-normal)
       border-color: var(--c-bg-error-normal)
-      background-color: var(--c-bg-error-normal) // TODO: Use lighter shade and define in theme.
 
     :global(.select__control--is-focused)
-      box-shadow: 0 0 0 3px alpha(#FF0000, .2) // TODO: Define color in theme.
+      box-shadow: var(--shadow-box-error-normal)
 
   &.warning
     :global(.select__control)
       color: var(--c-bg-warning-normal)
       border-color: var(--c-bg-warning-normal)
-      background-color: var(--c-bg-warning-normal) // TODO: Use lighter shade and define in theme.
 
     :global(.select__control--is-focused)
-      box-shadow: 0 0 0 3px alpha(#FF9900, .3) // TODO: Define color in theme.
+      box-shadow: var(--shadow-box-error-normal)
 
   &.selected-options-container
     display: inline-block

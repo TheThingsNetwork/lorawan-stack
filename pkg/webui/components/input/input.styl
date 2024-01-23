@@ -19,7 +19,7 @@
   border-input()
   input-width-classes()
   box-sizing: border-box
-  background: white
+  background: var(--c-bg-neutral-min)
   border-radius: $br.m
   padding: 0
   position: relative
@@ -34,13 +34,13 @@
 
   &.focus
     border-color: var(--c-text-brand-normal)
-    color: black
+    color: var(--c-bg-neutral-max)
 
   &.error
     border-color: var(--c-bg-error-normal)
-    background-color: var(--c-bg-error-light) // TODO: Check if color matches.
 
   &.error.focus
+    box-shadow: var(--shadow-box-error-normal)
     box-shadow: 0 0 0 3px var(--c-bg-error-light)
 
   &.warn
@@ -48,7 +48,7 @@
     background-color: var(--c-bg-warning-light)
 
   &.warn.focus
-    box-shadow: 0 0 0 3px var(--c-bg-warning-light) // TODO: Check if color matches.
+    box-shadow: var(--shadow-box-warning-normal)
 
   &.disabled
     background-color: var(--c-bg-neutral-semilight)
