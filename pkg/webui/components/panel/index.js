@@ -13,13 +13,14 @@
 // limitations under the License.
 
 import React from 'react'
+import classnames from 'classnames'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Icon from '../icon'
-import Button from '../button'
+import Link from '../link'
 
 import Toggle from './toggle'
 
@@ -33,17 +34,23 @@ const Panel = ({
   activeToggle,
   onToggleClick,
   buttonTitle,
+  path,
+  className,
+  messageDecorators,
 }) => (
-  <div className={styles.panel}>
-    <div className="d-flex j-between mb-cs-xl">
+  <div className={classnames(styles.panel, className)}>
+    <div className="d-flex j-between mb-cs-m">
       <div className="d-flex gap-cs-xs al-center">
         {icon && <Icon icon={icon} className={styles.panelHeaderIcon} />}
         <Message content={title} className={styles.panelHeaderTitle} />
+        {messageDecorators}
       </div>
       {toggleOptions ? (
         <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
       ) : (
-        <Button message={buttonTitle} unstyled className={styles.button} />
+        <Link primary to={path} className={styles.button}>
+          <Message content={buttonTitle} /> →
+        </Link>
       )}
     </div>
     {children}
@@ -54,8 +61,11 @@ Panel.propTypes = {
   activeToggle: PropTypes.string,
   buttonTitle: PropTypes.string,
   children: PropTypes.node.isRequired,
+  className: PropTypes.string,
   icon: PropTypes.string,
+  messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
+  path: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,
   toggleOptions: PropTypes.arrayOf(PropTypes.shape({})),
 }
@@ -66,6 +76,8 @@ Panel.defaultProps = {
   toggleOptions: undefined,
   activeToggle: undefined,
   onToggleClick: () => null,
+  className: undefined,
+  messageDecorators: undefined,
 }
 
 export default Panel
