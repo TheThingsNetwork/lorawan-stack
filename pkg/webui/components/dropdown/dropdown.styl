@@ -15,9 +15,9 @@
 ul.dropdown
   font-size: $fs.m
   border-radius: $br.l
-  border: 1px solid $c.grey-200
+  border: 1px solid var(--c-border-neutral-normal)
   list-style-type: none
-  background: $c.white
+  background: var(--c-bg-neutral-min)
   box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.06)
   position: absolute
   padding: $cs.xs
@@ -106,7 +106,7 @@ ul.dropdown
 
   hr
     height: 1px
-    background-color: $c.grey-200
+    background-color: var(--c-border-neutral-light)
     margin: 2px 0
 
   li.dropdown-header-item
@@ -140,7 +140,7 @@ ul.dropdown
 
       &:hover
         color: var(--c-text-neutral-heavy)
-        background: $c.tts-primary-150
+        background: var(--c-bg-neutral-light)
         border-radius: $br.m
 
         .icon

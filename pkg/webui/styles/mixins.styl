@@ -41,6 +41,9 @@ border-subtle($side = '', $width = 1px)
     $prefix = ''
   border{$prefix + $side}: $width solid var(--c-border-neutral-extralight)
 
+gradient-border($background-color, $top-color, $bottom-color)
+  background: linear-gradient(to bottom, $background-color, $background-color) padding-box, linear-gradient(to bottom, $top-color, $bottom-color) border-box
+
 pseudo-border($size, $color)
   &:before
     position: absolute

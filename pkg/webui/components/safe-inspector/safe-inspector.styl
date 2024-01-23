@@ -43,7 +43,7 @@ $height-small = 2rem
     reset-button()
     transition-color()
     height: 100%
-    color: var(--c-icon)
+    color: var(--c-icon-neutral-normal)
     flex: none
     padding: 0 .65rem
 
@@ -52,7 +52,7 @@ $height-small = 2rem
 
     &:not(:disabled)
       &:hover
-        color: black
+        color: var(--c-bg-neutral-max)
 
       &:active
         background-color: var(--c-bg-neutral-semilight)
@@ -83,7 +83,7 @@ $height-small = 2rem
   box-sizing: border-box
   font-family: 'IBM Plex Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
   display: inline
-  background-color: white
+  background-color: var(--c-bg-neutral-min)
   align-items: center
   height: 100%
   padding: 0 $cs.xs
@@ -93,7 +93,7 @@ $height-small = 2rem
   border-radius: $br.xs
 
   &:hover
-    background-color: white // Needs to be here for Safari to work.
+    background-color: var(--c-bg-neutral-min) // Needs to be here for Safari to work.
 
   span
     margin-right: .3rem
@@ -115,7 +115,7 @@ $height-small = 2rem
   z-index: $zi.slight
   border-radius: $br.xs
   position: absolute
-  background-color: white
+  background-color: var(--c-bg-neutral-min)
   color: var(--c-text-neutral-heavy)
   top: -3rem
   left: -50%
