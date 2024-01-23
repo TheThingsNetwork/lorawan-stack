@@ -66,6 +66,7 @@ const NotificationsDropdown = () => {
           to="/notifications"
           key={notification.id}
           className={classnames(style.notificationsDropdownLink, 'd-flex')}
+          state={{ notification }}
         >
           <Icon icon="key" className={style.notificationsDropdownLinkIcon} />
           <div className={style.notificationContainer}>
