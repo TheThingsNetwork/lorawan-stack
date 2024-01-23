@@ -18,6 +18,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 
+import LAYOUT from '@ttn-lw/constants/layout'
+
 import Button from '@ttn-lw/components/button'
 import Spinner from '@ttn-lw/components/spinner'
 
@@ -32,6 +34,7 @@ import NotificationList from './notification-list'
 import NotificationContent from './notification-content'
 
 import style from './notifications.styl'
+import { isSafariUserAgent } from '@ttn-lw/lib/navigator'
 
 const BATCH_SIZE = 50
 
@@ -75,6 +78,7 @@ const Notifications = () => {
   const [showArchived, setShowArchived] = useQueryState('archived', 'false')
   const [totalCount, setTotalCount] = useState(0)
   const [fetching, setFetching] = useState(false)
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < LAYOUT.BREAKPOINTS.M)
 
   const loadNextPage = useCallback(
     async (startIndex, stopIndex, archived) => {
@@ -114,7 +118,8 @@ const Notifications = () => {
       setItems(updatedItems)
 
       // Set the first notification as selected if none is currently selected.
-      if (!selectedNotification) {
+      console.log('loadItems', isSmallScreen)
+      if (!selectedNotification && !isSmallScreen) {
         setSelectedNotification(updatedItems[0])
       }
 
@@ -122,7 +127,7 @@ const Notifications = () => {
       setHasNextPage(updatedItems.length < newItems.totalCount)
       setFetching(false)
     },
-    [fetching, showArchived, dispatch, userId, items, selectedNotification],
+    [fetching, showArchived, dispatch, userId, items, selectedNotification, isSmallScreen],
   )
 
   const handleShowArchived = useCallback(async () => {
@@ -161,20 +166,33 @@ const Notifications = () => {
 
       // Update the selected notification to the one above the archived one,
       // unless there is only one item in the list.
-      setSelectedNotification(totalCount === 1 ? undefined : items[Math.max(1, index - 1)])
+      const previousNotification = isSmallScreen
+        ? undefined
+        : totalCount === 1
+        ? undefined
+        : items[Math.max(0, index - 1)]
+      setSelectedNotification(previousNotification)
 
       // Reset the list cache if available so that old items are discarded.
       if (listRef.current && listRef.current.resetloadMoreItemsCache) {
         listRef.current.resetloadMoreItemsCache()
       }
     },
-    [showArchived, dispatch, userId, items, loadNextPage, totalCount],
+    [showArchived, dispatch, userId, items, loadNextPage, totalCount, isSmallScreen],
   )
 
   // Load the first page of notifications when the component mounts.
   useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < LAYOUT.BREAKPOINTS.M) {
+        setIsSmallScreen(true)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+
     loadNextPage(0, BATCH_SIZE)
     setSelectedNotification(location.state?.notification ?? undefined)
+    return () => window.removeEventListener('resize', handleResize)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
