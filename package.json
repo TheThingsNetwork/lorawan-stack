@@ -78,7 +78,7 @@
     "@formatjs/intl-displaynames": "^6.6.6",
     "@formatjs/intl-listformat": "^7.5.3",
     "@formatjs/intl-locale": "^3.4.3",
-    "@formatjs/intl-numberformat": "^8.7.0",
+    "@formatjs/intl-numberformat": "^8.9.2",
     "@formatjs/intl-pluralrules": "^5.2.10",
     "@formatjs/intl-relativetimeformat": "^11.2.12",
     "@sentry/browser": "^7.92.0",
