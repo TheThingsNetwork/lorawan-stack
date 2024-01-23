@@ -48,7 +48,7 @@
   transition: color 50ms linear
   border-radius: $br.m
   text-decoration: none
-  color: $c.grey-700
+  color: var(--c-text-neutral-semilight)
   display: flex
   align-items: center
   gap: $cs.xs
@@ -59,20 +59,20 @@
   padding-left: $cs.xs
 
   &.active
-    background: $c.tts-primary-150
-    color: $c.grey-900
+    background: var(--c-bg-neutral-light)
+    color: var(--c-text-neutral-heavy)
 
     .icon
       color: inherit
 
   &.disabled
-    color: $c.grey-400
+    color: var(--c-text-neutral-extralight)
 
     .icon
       color: inherit
 
   &:hover
-    color: $c.grey-900
+    color: var(--c-text-neutral-heavy)
 
     .icon
       color: inherit

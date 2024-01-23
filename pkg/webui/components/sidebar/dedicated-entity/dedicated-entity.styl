@@ -15,7 +15,7 @@
 .dedicated-entity
   text-decoration: none
   line-height: 1.6rem
-  color: $c.grey-900
+  color: var(--c-text-neutral-heavy)
   position: relative
   height: 2.5rem
 
@@ -39,7 +39,7 @@
 
   &-item
     display: flex
-    color: $c.grey-900
+    color: var(--c-text-neutral-heavy)
     opacity: 1
     position: absolute
     left: 2.5rem
@@ -55,13 +55,13 @@
     display: list-item
     height: 100%
     margin: 0 $cs.xs 0 $cs.s
-    border-left: 1px solid $c.grey-200
-    background-color: $c.grey-200
+    border-left: 1px solid var(--c-border-neutral-semilight)
+    background-color: var(--c-border-neutral-light)
 
   &-button
     border-radius: $br.l
     padding: 0 $cs.xs 0 0.73rem
-    background-color: $c.grey-900
+    background-color: var(--c-bg-neutral-heavy)
     position: relative
     display: inline-flex
     border-radius: $br.l
@@ -84,4 +84,4 @@
 
     &:not(:disabled)
       +focus-visible()
-        background-color: hoverize($c.grey-500)
+        background-color: var(--c-bg-neutral-light)
