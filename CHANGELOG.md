@@ -17,6 +17,9 @@ For details about compatibility between different releases, see the **Commitment
 
 - User's primary email address validation is now decoupled from deprecated `ContactInfo` field.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the new `email_validations` table.
+- Entities' `ContactInfo` field now returns information regarding the administrative and technical contacts instead of the deprecated `ContactInfo` information.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) due to the removal of old information in the `contact_infos` table.
+  - The emails of the administrative and technical contacts are only returned in the `ContactInfo` field if the caller has the appropriate rights.
 
 ### Deprecated
 
