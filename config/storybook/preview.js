@@ -24,7 +24,6 @@ import messages from '@ttn-lw/locales/en.json'
 import backendMessages from '@ttn-lw/locales/.backend/en.json'
 
 import '../../pkg/webui/styles/main.styl'
-import '../../pkg/webui/styles/utilities/color.styl'
 import '../../pkg/webui/styles/utilities/general.styl'
 import '../../pkg/webui/styles/utilities/spacing.styl'
 import 'focus-visible/dist/focus-visible'

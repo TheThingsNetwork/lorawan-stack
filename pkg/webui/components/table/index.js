@@ -104,6 +104,7 @@ const Tabular = ({
               }
               active={header.sortKey ? orderBy === header.sortKey : orderBy === header.name}
               onSort={handleSortRequest}
+              align={header.align}
             />
           ) : null}
         </Table.HeadCell>

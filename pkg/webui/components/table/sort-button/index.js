@@ -23,20 +23,31 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './sort-button.styl'
 
-const SortButton = ({ name, onSort, className, active, direction, title }) => {
+const SortButton = ({ name, onSort, className, active, direction, title, align }) => {
   const handleSort = useCallback(() => {
     onSort(name)
   }, [name, onSort])
 
-  const buttonClassNames = classnames(className, style.button, {
+  const buttonClassNames = classnames(className, style.button, 'pos-relative', {
     [style.buttonActive]: active,
-    [style.buttonDesc]: active && direction === 'desc',
+    [style.buttonCenter]: align === 'center',
   })
 
   return (
     <button className={buttonClassNames} type="button" onClick={handleSort}>
       <Message content={title} />
-      <Icon className={style.icon} icon="sort" nudgeUp />
+      {active ? (
+        <Icon
+          className={style.icon}
+          icon={direction === 'asc' ? 'arrow_drop_down' : 'arrow_drop_up'}
+          nudgeUp
+        />
+      ) : (
+        <div className="d-inline-block" style={{ width: '14px' }}>
+          <Icon className={style.noSort} icon="arrow_drop_up" />
+          <Icon className={style.noSort} icon="arrow_drop_down" />
+        </div>
+      )}
     </button>
   )
 }
@@ -44,6 +55,8 @@ const SortButton = ({ name, onSort, className, active, direction, title }) => {
 SortButton.propTypes = {
   /** A flag identifying whether the button is active. */
   active: PropTypes.bool.isRequired,
+  /** The alignment of the button. */
+  align: PropTypes.string,
   className: PropTypes.string,
   /** The current ordering (ascending/descending/none). */
   direction: PropTypes.string,
@@ -58,6 +71,7 @@ SortButton.propTypes = {
 SortButton.defaultProps = {
   className: undefined,
   direction: undefined,
+  align: undefined,
 }
 
 export default SortButton
