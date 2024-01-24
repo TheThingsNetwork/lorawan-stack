@@ -1311,6 +1311,7 @@
   "lib.shared-messages.macVersion": "LoRaWANバージョン",
   "lib.shared-messages.messageTypes": "メッセージの種類",
   "lib.shared-messages.messages": "メッセージ",
+  "lib.shared-messages.message": "",
   "lib.shared-messages.messaging": "メッセージング",
   "lib.shared-messages.milliseconds": "ミリ秒",
   "lib.shared-messages.minutes": "分",

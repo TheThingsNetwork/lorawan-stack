@@ -345,6 +345,7 @@ export default defineMessages({
   macVersion: 'LoRaWAN version',
   messageTypes: 'Message types',
   messages: 'messages',
+  message: 'Message',
   messaging: 'Messaging',
   milliseconds: 'milliseconds',
   minutes: 'minutes',
