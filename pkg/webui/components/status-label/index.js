@@ -24,16 +24,12 @@ import Icon from '../icon'
 import style from './status-label.styl'
 
 const StatusLabel = ({ success, warning, error, info, content }) => {
-  const statusClassName = classnames(
-    style.label,
-    {
-      [style.success]: success,
-      [style.warning]: warning,
-      [style.error]: error,
-      [style.info]: info,
-    },
-    'd-flex gap-cs-xs al-center j-center p-vert-cs-s p-sides-cs-m',
-  )
+  const statusClassName = classnames(style.label, {
+    'c-bg-success-light c-text-success-bold': success,
+    'c-bg-warning-light c-text-warning-bold': warning,
+    'c-bg-error-light c-text-error-bold': error,
+    'c-bg-info-light c-text-info-bold': info,
+  })
 
   const labelIcon = success ? 'check_circle' : warning ? 'warning' : error ? 'error' : 'info'
 

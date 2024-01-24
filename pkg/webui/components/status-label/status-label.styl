@@ -13,22 +13,11 @@
 // limitations under the License.
 
 .label
+  display: flex
+  gap: $cs.xs
+  align-items: center
+  justify-content: center
+  padding: $cs.s $cs.m
   border-radius: 2rem
   font-weight: $fwv2.semibold
   width: fit-content
-
-  &.success
-    background: var(--c-bg-success-light)
-    color: var(--c-text-success-bold)
-
-  &.warning
-    background: var(--c-bg-warning-light)
-    color: var(--c-text-warning-bold)
-
-  &.error
-    background: var(--c-bg-error-light)
-    color: var(--c-text-error-bold)
-
-  &.info
-    background: var(--c-bg-info-light)
-    color: var(--c-text-info-bold)
