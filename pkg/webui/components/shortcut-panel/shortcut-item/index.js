@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import classNames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -25,13 +24,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './shortcut-item.styl'
 
 const ShortcutItem = ({ icon, title, link }) => (
-  <NavLink
-    to={link}
-    className={classNames(
-      style.shortcut,
-      'd-flex gap-cs-m direction-column al-center j-center p-vert-cs-s p-sides-cs-m',
-    )}
-  >
+  <NavLink to={link} className={style.shortcut}>
     <Icon icon="add" className={style.addIcon} />
     <Icon icon={icon} className={style.icon} />
     <Message content={title} className={style.title} />

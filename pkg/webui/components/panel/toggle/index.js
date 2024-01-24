@@ -22,7 +22,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import styles from './toggle.styl'
 
 const Toggle = ({ options, onToggleChange, active }) => (
-  <div className={classnames(styles.toggle, 'd-flex j-center al-center gap-cs-xxs p-cs-xxs')}>
+  <div className={styles.toggle}>
     {options.map(({ label, value }) => {
       const buttonClassName = classnames(styles.toggleButton, {
         [styles.toggleButtonActive]: value === active,
