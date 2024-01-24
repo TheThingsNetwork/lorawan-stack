@@ -47,6 +47,7 @@ import { selectUserNameOrId } from '@console/store/selectors/logout'
 import HelpLink from './help-link'
 
 import style from './overview.styl'
+import NotificationsDashboardPanel from '@console/containers/notifications-dashboard-panel'
 
 const m = defineMessages({
   createApplication: 'Create an application',
@@ -85,20 +86,7 @@ const Overview = () => {
           <Row>
             <IntlHelmet title={sharedMessages.overview} />
             <Col sm={12} className={style.welcomeTitleSection}>
-              <Message
-                className={style.welcome}
-                content={hasEntities ? m.welcomeBack : m.welcome}
-                values={{ userName }}
-                component="h1"
-              />
-              {!mayNotViewEntities && (
-                <Message
-                  className={style.getStarted}
-                  content={hasEntities || !mayCreateEntities ? m.continueWorking : m.getStarted}
-                  component="h2"
-                />
-              )}
-              <HelpLink supportLink={supportLink} documentationLink={documentationBaseUrl} />
+              <NotificationsDashboardPanel />
             </Col>
           </Row>
         </div>
