@@ -15,6 +15,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- User's primary email address validation is now decoupled from deprecated `ContactInfo` field.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the new `email_validations` table.
+
 ### Deprecated
 
 ### Removed
