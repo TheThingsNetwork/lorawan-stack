@@ -1533,6 +1533,7 @@
   "lib.shared-messages.validateUrl": "有効なURL形式でなければならず、スペースや特殊文字は含まれていません",
   "lib.shared-messages.value": "値",
   "lib.shared-messages.webhookActivated": "Webhookがアクティブになりました",
+  "lib.shared-messages.viewAll": "",
   "lib.shared-messages.viewLink": "",
   "lib.shared-messages.webhookAlreadyExistsModalMessage": "ID \"{id}\" を持つwebhookが既に存在します。このウェブフックを置き換えますか？",
   "lib.shared-messages.webhookBaseUrl": "ベースURL",

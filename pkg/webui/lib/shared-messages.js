@@ -576,6 +576,7 @@ export default defineMessages({
   validateUrl: 'Must be a valid URL format, contain no spaces or special characters',
   value: 'value',
   webhookActivated: 'Webhook activated',
+  viewAll: 'View all',
   viewLink: 'You can view and edit this API key <Link>here</Link>.',
   webhookAlreadyExistsModalMessage:
     'A Webhook with the ID "{id}" already exists. Do you wish to replace this webhook?',

@@ -116,7 +116,7 @@ const NotificationsDashboardPanel = () => {
       title={sharedMessages.notifications}
       path="/notifications"
       icon="inbox"
-      buttonTitle="View all"
+      buttonTitle={sharedMessages.viewAll}
       messageDecorators={totalUnseenNotifications > 0 ? <MessageDecorator /> : undefined}
     >
       <FetchTable

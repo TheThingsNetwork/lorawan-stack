@@ -1533,6 +1533,7 @@
   "lib.shared-messages.validateUrl": "Must be a valid URL format, contain no spaces or special characters",
   "lib.shared-messages.value": "value",
   "lib.shared-messages.webhookActivated": "Webhook activated",
+  "lib.shared-messages.viewAll": "View all",
   "lib.shared-messages.viewLink": "You can view and edit this API key <Link>here</Link>.",
   "lib.shared-messages.webhookAlreadyExistsModalMessage": "A Webhook with the ID \"{id}\" already exists. Do you wish to replace this webhook?",
   "lib.shared-messages.webhookBaseUrl": "Base URL",
