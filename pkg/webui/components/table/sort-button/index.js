@@ -23,14 +23,14 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './sort-button.styl'
 
-const SortButton = ({ name, onSort, className, active, direction, title }) => {
+const SortButton = ({ name, onSort, className, active, direction, title, align }) => {
   const handleSort = useCallback(() => {
     onSort(name)
   }, [name, onSort])
 
-  const buttonClassNames = classnames(className, style.button, {
+  const buttonClassNames = classnames(className, style.button, 'pos-relative', {
     [style.buttonActive]: active,
-    [style.buttonDesc]: active && direction === 'desc',
+    [style.buttonCenter]: align === 'center',
   })
 
   return (
@@ -52,6 +52,8 @@ const SortButton = ({ name, onSort, className, active, direction, title }) => {
 SortButton.propTypes = {
   /** A flag identifying whether the button is active. */
   active: PropTypes.bool.isRequired,
+  /** The alignment of the button. */
+  align: PropTypes.string,
   className: PropTypes.string,
   /** The current ordering (ascending/descending/none). */
   direction: PropTypes.string,
@@ -66,6 +68,7 @@ SortButton.propTypes = {
 SortButton.defaultProps = {
   className: undefined,
   direction: undefined,
+  align: undefined,
 }
 
 export default SortButton
