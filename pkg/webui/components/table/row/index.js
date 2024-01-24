@@ -32,6 +32,7 @@ const Row = ({
   head,
   footer,
   linkTo,
+  linkState,
 }) => {
   const handleClick = useCallback(
     evt => {
@@ -78,6 +79,7 @@ const Row = ({
       tabIndex={tabIndex.toString()}
       to={linkTo}
       role="row"
+      state={linkState}
     >
       {children}
     </Row>
@@ -97,6 +99,8 @@ Row.propTypes = {
   head: PropTypes.bool,
   /** The identifier of the row. */
   id: PropTypes.number,
+  /** The state to be passed as `state` prop to the `<Link />` component that wraps the row. */
+  linkState: PropTypes.shape({}),
   /** The href to be passed as `to` prop to the `<Link />` component that wraps the row. */
   linkTo: PropTypes.string,
   /**
@@ -118,6 +122,7 @@ Row.defaultProps = {
   onMouseDown: () => null,
   id: undefined,
   linkTo: undefined,
+  linkState: undefined,
 }
 
 export default Row

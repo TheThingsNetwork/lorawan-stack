@@ -46,6 +46,7 @@ const Tabular = ({
   clickable,
   disableSorting,
   onSortRequest,
+  rowLinkState,
 }) => {
   const handlePageChange = useCallback(
     page => {
@@ -130,6 +131,7 @@ const Tabular = ({
         onClick={onRowClick}
         clickable={rowClickable}
         linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
+        linkState={rowLinkState ? rowLinkState(row) : undefined}
         body
       >
         {headers.map((header, index) => {
@@ -241,6 +243,8 @@ Tabular.propTypes = {
   rowHrefSelector: PropTypes.func,
   /** A selector to determine the `key` prop of the rendered rows. */
   rowKeySelector: PropTypes.func,
+  /** A state to be passed as `state` prop to the `<Link />` component that wraps the row. */
+  rowLinkState: PropTypes.func,
   /** A flag specifying the height of data cells. */
   small: PropTypes.bool,
   /** The total number of available entries. */
@@ -266,6 +270,7 @@ Tabular.defaultProps = {
   rowKeySelector: undefined,
   rowHrefSelector: undefined,
   disableSorting: false,
+  rowLinkState: undefined,
 }
 
 export { Tabular as default, Table }
