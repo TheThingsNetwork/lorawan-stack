@@ -35,7 +35,7 @@ const NewsItem = ({ articleTitle, articleImage, articleDate }) => (
           month: 'long',
           day: '2-digit',
         }}
-        className={styles.date}
+        className="c-text-neutral-light"
       />
     </div>
   </div>
