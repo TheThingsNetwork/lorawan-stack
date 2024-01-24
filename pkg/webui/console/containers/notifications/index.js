@@ -34,7 +34,6 @@ import NotificationList from './notification-list'
 import NotificationContent from './notification-content'
 
 import style from './notifications.styl'
-import { isSafariUserAgent } from '@ttn-lw/lib/navigator'
 
 const BATCH_SIZE = 50
 
@@ -118,7 +117,6 @@ const Notifications = () => {
       setItems(updatedItems)
 
       // Set the first notification as selected if none is currently selected.
-      console.log('loadItems', isSmallScreen)
       if (!selectedNotification && !isSmallScreen) {
         setSelectedNotification(updatedItems[0])
       }
