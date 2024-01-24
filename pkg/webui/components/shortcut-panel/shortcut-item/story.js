@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tabs
-  box-sizing: border-box
-  list-style-type: none
-  padding: 0
-  display: flex
-  margin: 0
-  scrollbar-width: none
+import React from 'react'
 
-  &::-webkit-scrollbar
-    display: none
+import ShortcutItem from '.'
 
-.divider
-  border-bottom: 1px solid #E8E7EC
+export default {
+  title: 'Panel/Shortcut Panel/Shortcut Item',
+  component: ShortcutItem,
+}
+
+export const Default = () => (
+  <div style={{ width: '192.5px' }}>
+    <ShortcutItem icon="dashboard_customize" title="Add new item" link="/applications" />
+  </div>
+)

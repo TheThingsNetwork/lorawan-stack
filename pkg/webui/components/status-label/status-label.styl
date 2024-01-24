@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tabs
-  box-sizing: border-box
-  list-style-type: none
-  padding: 0
-  display: flex
-  margin: 0
-  scrollbar-width: none
+.label
+  border-radius: 2rem
+  font-weight: $fwv2.semibold
+  width: fit-content
 
-  &::-webkit-scrollbar
-    display: none
+  &.success
+    background: var(--c-bg-success-light)
+    color: var(--c-text-success-bold)
 
-.divider
-  border-bottom: 1px solid #E8E7EC
+  &.warning
+    background: var(--c-bg-warning-light)
+    color: var(--c-text-warning-bold)
+
+  &.error
+    background: var(--c-bg-error-light)
+    color: var(--c-text-error-bold)
+
+  &.info
+    background: var(--c-bg-info-light)
+    color: var(--c-text-info-bold)
