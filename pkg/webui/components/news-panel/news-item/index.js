@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import classnames from 'classnames'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
@@ -23,7 +22,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import styles from './news-item.styl'
 
 const NewsItem = ({ articleTitle, articleImage, articleDate }) => (
-  <div className={classnames(styles.item, 'd-flex p-cs-xs gap-cs-m')}>
+  <div className={styles.item}>
     <img src={articleImage} className={styles.image} />
     <div>
       <Message content={articleTitle} className={styles.title} />
