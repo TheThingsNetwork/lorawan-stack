@@ -1710,13 +1710,13 @@
   dependencies:
     tslib "^2.4.0"
 
-"@formatjs/intl-numberformat@^8.7.0":
-  version "8.7.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-numberformat/-/intl-numberformat-8.7.0.tgz#981bf87c13a08fcf72616f024805c6ecf6f54fd2"
-  integrity sha512-LuJXld4hjVKXUAGjtqz0t4DhZJDI0fkIAUHKrhIyb0qomudd/G0v9GzCnOLt6pQ93OBFTHmqzp1qN5n1tJJ4sg==
+"@formatjs/intl-numberformat@^8.9.2":
+  version "8.9.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-numberformat/-/intl-numberformat-8.9.2.tgz#d41f67b90685972866ae864154044d91e0f1a4c7"
+  integrity sha512-fb4mWN3OFgtTcVD39x+AFc5J1MxRUG/tUFof5A/j8qMXaCiIymRWRYTtMtBjbSCSOLq2vlAu6yXXpQutfdnULA==
   dependencies:
-    "@formatjs/ecma402-abstract" "1.17.0"
-    "@formatjs/intl-localematcher" "0.4.0"
+    "@formatjs/ecma402-abstract" "1.18.2"
+    "@formatjs/intl-localematcher" "0.5.4"
     tslib "^2.4.0"
 
 "@formatjs/intl-pluralrules@^5.2.10":
