@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import Link from '@ttn-lw/components/link'
+
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
 
@@ -22,7 +24,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import styles from './news-item.styl'
 
 const NewsItem = ({ articleTitle, articleImage, articleDate }) => (
-  <div className={styles.item}>
+  <Link className={styles.item}>
     <img src={articleImage} className={styles.image} />
     <div>
       <Message content={articleTitle} className={styles.title} />
@@ -37,7 +39,7 @@ const NewsItem = ({ articleTitle, articleImage, articleDate }) => (
         className="c-text-neutral-light"
       />
     </div>
-  </div>
+  </Link>
 )
 
 NewsItem.propTypes = {
