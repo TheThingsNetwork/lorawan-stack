@@ -28,7 +28,7 @@ const SortButton = ({ name, onSort, className, active, direction, title, align }
     onSort(name)
   }, [name, onSort])
 
-  const buttonClassNames = classnames(className, style.button, 'pos-relative', {
+  const buttonClassNames = classnames(className, style.button, {
     [style.buttonActive]: active,
     [style.buttonCenter]: align === 'center',
   })
@@ -43,7 +43,7 @@ const SortButton = ({ name, onSort, className, active, direction, title, align }
           nudgeUp
         />
       ) : (
-        <div className="d-inline-block" style={{ width: '14px' }}>
+        <div className="pos-relative" style={{ width: '14px' }}>
           <Icon className={style.noSort} icon="arrow_drop_up" />
           <Icon className={style.noSort} icon="arrow_drop_down" />
         </div>
