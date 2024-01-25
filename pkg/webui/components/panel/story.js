@@ -14,6 +14,10 @@
 
 import React from 'react'
 
+import loginVisual from '@assets/img/layout/bg/login-visual.jpg'
+
+import NewsItem from '../news-panel/news-item'
+
 import Panel from '.'
 
 export default {
@@ -23,7 +27,25 @@ export default {
 
 export const Default = () => (
   <div style={{ width: '32.5rem' }}>
-    <Panel title="Latest news" icon="feed" buttonTitle="Visit our blog" />
+    <Panel title="Latest news" icon="feed" buttonTitle="Visit our blog" divider>
+      <div className="d-flex direction-column gap-cs-xs">
+        <NewsItem
+          articleTitle="Long title of the latest post on our blog that will take more that two line to fit in here"
+          articleImage={loginVisual}
+          articleDate="2024-01-01T00:00:00Z"
+        />
+        <NewsItem
+          articleTitle="Long title of the latest post on our blog that will take more that two line to fit in here"
+          articleImage={loginVisual}
+          articleDate="2024-01-01T00:00:00Z"
+        />
+        <NewsItem
+          articleTitle="Long title of the latest post on our blog that will take more that two line to fit in here"
+          articleImage={loginVisual}
+          articleDate="2024-01-01T00:00:00Z"
+        />
+      </div>
+    </Panel>
   </div>
 )
 
