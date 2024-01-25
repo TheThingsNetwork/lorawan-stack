@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { NavLink } from 'react-router-dom'
 
 import Icon from '@ttn-lw/components/icon'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -24,11 +24,11 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './shortcut-item.styl'
 
 const ShortcutItem = ({ icon, title, link }) => (
-  <NavLink to={link} className={style.shortcut}>
+  <Link to={link} className={style.shortcut}>
     <Icon icon="add" className={style.addIcon} />
     <Icon icon={icon} className={style.icon} />
     <Message content={title} className={style.title} />
-  </NavLink>
+  </Link>
 )
 
 ShortcutItem.propTypes = {
