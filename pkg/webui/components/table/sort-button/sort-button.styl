@@ -14,7 +14,8 @@
 
 .button
   reset-button()
-  one-liner()
+  display: flex
+  line-height: 1
   width: 100%
   padding: 1px
   text-align: inherit
@@ -23,6 +24,14 @@
   &:active,
   &-active
     color: var(--c-text-neutral-heavy)
+    margin-bottom: -2.3px
+    .no-sort
+      display: none
+
+  &-center
+    justify-content: center
+    .no-sort
+      left: 0px
 
 .icon
   transition: transform $ad.m ease-in-out

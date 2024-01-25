@@ -36,7 +36,18 @@ const SortButton = ({ name, onSort, className, active, direction, title }) => {
   return (
     <button className={buttonClassNames} type="button" onClick={handleSort}>
       <Message content={title} />
-      <Icon className={style.icon} icon="sort" nudgeUp />
+      {active ? (
+        <Icon
+          className={style.icon}
+          icon={direction === 'asc' ? 'arrow_drop_down' : 'arrow_drop_up'}
+          nudgeUp
+        />
+      ) : (
+        <div className="pos-relative" style={{ width: '14px' }}>
+          <Icon className={style.noSort} icon="arrow_drop_up" />
+          <Icon className={style.noSort} icon="arrow_drop_down" />
+        </div>
+      )}
     </button>
   )
 }
