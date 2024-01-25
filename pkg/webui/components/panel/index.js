@@ -37,6 +37,7 @@ const Panel = ({
   path,
   className,
   messageDecorators,
+  divider,
 }) => (
   <div className={classnames(styles.panel, className)}>
     <div className="d-flex j-between mb-cs-m">
@@ -53,6 +54,7 @@ const Panel = ({
         </Link>
       )}
     </div>
+    {divider && <hr className={styles.panelDivider} />}
     {children}
   </div>
 )
@@ -62,6 +64,7 @@ Panel.propTypes = {
   buttonTitle: PropTypes.string,
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  divider: PropTypes.bool,
   icon: PropTypes.string,
   messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
@@ -78,6 +81,7 @@ Panel.defaultProps = {
   onToggleClick: () => null,
   className: undefined,
   messageDecorators: undefined,
+  divider: false,
 }
 
 export default Panel
