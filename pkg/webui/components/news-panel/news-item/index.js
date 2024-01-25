@@ -26,7 +26,7 @@ import styles from './news-item.styl'
 const NewsItem = ({ articleTitle, articleImage, articleDate }) => (
   <Link className={styles.item}>
     <img src={articleImage} className={styles.image} />
-    <div>
+    <div className="d-flex direction-column j-center">
       <Message content={articleTitle} className={styles.title} />
       <DateTime
         value={articleDate}
