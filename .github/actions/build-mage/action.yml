@@ -5,7 +5,7 @@ runs:
   steps:
     - name: Initialize Mage binary cache
       id: mage-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: tools/bin/mage
         key: ${{ runner.os }}-mage-${{ hashFiles('tools/**') }}
