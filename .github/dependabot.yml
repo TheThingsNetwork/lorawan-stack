@@ -3,41 +3,47 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     commit-message:
       prefix: "dev"
+    open-pull-requests-limit: 8
 
   - package-ecosystem: "npm"
     directory: "/sdk/js"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     commit-message:
       prefix: "dev"
+    open-pull-requests-limit: 8
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     commit-message:
       prefix: "dev"
+    open-pull-requests-limit: 8
 
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     commit-message:
       prefix: "dev"
+    open-pull-requests-limit: 8
 
   - package-ecosystem: "gomod"
     directory: "/tools"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     commit-message:
       prefix: "dev"
+    open-pull-requests-limit: 8
 
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     commit-message:
       prefix: "dev"
+    open-pull-requests-limit: 8
