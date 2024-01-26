@@ -760,10 +760,10 @@ github.com/tinylib/msgp v1.1.0/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDW
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc h1:9lRDQMhESg+zvGYmW5DyG0UqvY96Bu5QYsTLvCHdrgo=
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc/go.mod h1:bciPuU6GHm1iF1pBvUfxfsH0Wmnc2VbpgvbI9ZWuIRs=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
-github.com/uptrace/bun v1.1.16 h1:cn9cgEMFwcyYRsQLfxCRMUxyK1WaHwOVrR3TvzEFZ/A=
-github.com/uptrace/bun v1.1.16/go.mod h1:7HnsMRRvpLFUcquJxp22JO8PsWKpFQO/gNXqqsuGWg8=
-github.com/uptrace/bun/dialect/pgdialect v1.1.16 h1:eUPZ+YCJ69BA+W1X1ZmpOJSkv1oYtinr0zCXf7zCo5g=
-github.com/uptrace/bun/dialect/pgdialect v1.1.16/go.mod h1:KQjfx/r6JM0OXfbv0rFrxAbdkPD7idK8VitnjIV9fZI=
+github.com/uptrace/bun v1.1.17 h1:qxBaEIo0hC/8O3O6GrMDKxqyT+mw5/s0Pn/n6xjyGIk=
+github.com/uptrace/bun v1.1.17/go.mod h1:hATAzivtTIRsSJR4B8AXR+uABqnQxr3myKDKEf5iQ9U=
+github.com/uptrace/bun/dialect/pgdialect v1.1.17 h1:NsvFVHAx1Az6ytlAD/B6ty3cVE6j9Yp82bjqd9R9hOs=
+github.com/uptrace/bun/dialect/pgdialect v1.1.17/go.mod h1:fLBDclNc7nKsZLzNjFL6BqSdgJzbj2HdnyOnLoDvAME=
 github.com/uptrace/bun/driver/pgdriver v1.1.16 h1:b/NiSXk6Ldw7KLfMLbOqIkm4odHd7QiNOCPLqPFJjK4=
 github.com/uptrace/bun/driver/pgdriver v1.1.16/go.mod h1:Rmfbc+7lx1z/umjMyAxkOHK81LgnGj71XC5YpA6k1vU=
 github.com/vitorsalgado/mocha/v2 v2.0.2 h1:wb1QCRzVkp8uhRcUYmb9jJfbMj/qbiqcDyD8rD+Ldfw=

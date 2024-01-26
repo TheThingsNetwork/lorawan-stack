@@ -75,8 +75,8 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/throttled/throttled v2.2.5+incompatible
 	github.com/throttled/throttled/v2 v2.12.0
-	github.com/uptrace/bun v1.1.16
-	github.com/uptrace/bun/dialect/pgdialect v1.1.16
+	github.com/uptrace/bun v1.1.17
+	github.com/uptrace/bun/dialect/pgdialect v1.1.17
 	github.com/uptrace/bun/driver/pgdriver v1.1.16
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opencensus.io v0.24.0
