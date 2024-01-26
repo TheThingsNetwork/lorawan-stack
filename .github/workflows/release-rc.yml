@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/actions/install-node-and-deps
       - name: Initialize device repository index cache
         id: dr-index-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: data/lorawan-devices-index
           key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
