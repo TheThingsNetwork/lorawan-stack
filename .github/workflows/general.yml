@@ -16,11 +16,6 @@ jobs:
         uses: ./.github/actions/build-mage
       - name: Install Node and Dependencies
         uses: ./.github/actions/install-node-and-deps
-      - name: Editor config
-        uses: snow-actions/eclint@v1.0.1
-        # TODO: Fix EditorConfig errors and remove
-        # https://github.com/TheThingsNetwork/lorawan-stack/issues/2723
-        continue-on-error: true
       - name: Check headers
         run: tools/bin/mage headers:check
       - name: Fix common spelling mistakes
