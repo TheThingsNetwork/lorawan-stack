@@ -401,6 +401,64 @@ func TestUsersCRUD(t *testing.T) {
 					}
 				})
 			})
+
+			t.Run("ConsolePreferences", func(t *testing.T) { // nolint:paralleltest
+				a, ctx := test.New(t)
+				got, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
+					User: &ttnpb.User{
+						Ids: usr1.GetIds(),
+						ConsolePreferences: &ttnpb.UserConsolePreferences{
+							ConsoleTheme: ttnpb.ConsoleTheme_CONSOLE_THEME_DARK,
+							SortBy: &ttnpb.UserConsolePreferences_SortBy{
+								ApiKey:       "name",
+								Application:  "name",
+								Gateway:      "name",
+								Organization: "name",
+								User:         "name",
+							},
+							DashboardLayouts: &ttnpb.UserConsolePreferences_DashboardLayouts{
+								ApiKey:       ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+								Application:  ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+								Gateway:      ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+								Organization: ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+								User:         ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+								Overview:     ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+							},
+						},
+					},
+					FieldMask: ttnpb.FieldMask(
+						"console_preferences.console_theme",
+						"console_preferences.dashboard_layouts",
+						"console_preferences.sort_by",
+					),
+				}, creds)
+				if a.So(err, should.BeNil) {
+					a.So(got.ConsolePreferences.ConsoleTheme, should.Equal, ttnpb.ConsoleTheme_CONSOLE_THEME_DARK)
+					a.So(
+						got.ConsolePreferences.GetSortBy(),
+						should.Resemble,
+						&ttnpb.UserConsolePreferences_SortBy{
+							ApiKey:       "name",
+							Application:  "name",
+							Gateway:      "name",
+							Organization: "name",
+							User:         "name",
+						},
+					)
+					a.So(
+						got.ConsolePreferences.GetDashboardLayouts(),
+						should.Resemble,
+						&ttnpb.UserConsolePreferences_DashboardLayouts{
+							ApiKey:       ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+							Application:  ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+							Gateway:      ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+							Organization: ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+							User:         ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+							Overview:     ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+						},
+					)
+				}
+			})
 		})
 
 		t.Run("Update Password", func(t *testing.T) { // nolint:paralleltest
