@@ -33,6 +33,7 @@ import {
 import { logout } from '@console/store/actions/logout'
 
 import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import Logo from '../logo'
 
@@ -53,6 +54,7 @@ const Header = ({ onMenuClick }) => {
     user ? checkFromState(mayViewOrganizationsOfUser, state) : false,
   )
   const isAdmin = useSelector(selectUserIsAdmin)
+  const hasUnseenNotifications = useSelector(selectTotalUnseenCount) > 0
 
   const plusDropdownItems = (
     <>
@@ -127,6 +129,7 @@ const Header = ({ onMenuClick }) => {
       brandLogo={brandLogo}
       Logo={Logo}
       onMenuClick={onMenuClick}
+      showNotificationDot={hasUnseenNotifications}
     />
   )
 }

@@ -32,6 +32,7 @@ const Header = ({
   notificationsDropdownItems,
   user,
   onMenuClick,
+  showNotificationDot,
   ...rest
 }) => (
   <header {...rest} className={classnames(className, style.container)}>
@@ -56,6 +57,7 @@ const Header = ({
         dropdownItems={notificationsDropdownItems}
         dropdownClassName={style.notificationsDropdown}
         dropdownPosition="below left"
+        withAlert={showNotificationDot}
       />
       <ProfileDropdown
         brandLogo={brandLogo}
@@ -86,6 +88,8 @@ Header.propTypes = {
   onMenuClick: PropTypes.func.isRequired,
   /** The dropdown items when the profile button is clicked. */
   profileDropdownItems: PropTypes.node.isRequired,
+  /** Whether to show a notification dot. */
+  showNotificationDot: PropTypes.bool,
   /** The dropdown items when the star button is clicked. */
   starDropdownItems: PropTypes.node.isRequired,
   /**
@@ -99,6 +103,7 @@ Header.defaultProps = {
   className: undefined,
   user: undefined,
   brandLogo: undefined,
+  showNotificationDot: false,
 }
 
 export default Header

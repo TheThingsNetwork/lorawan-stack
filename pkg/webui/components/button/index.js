@@ -19,7 +19,7 @@ import { useIntl } from 'react-intl'
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
 import Icon from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
+import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -68,11 +68,12 @@ const assembleClassnames = ({
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, busy, message, noDropdownIcon, children } = props
+  const { dropdownItems, icon, busy, message, noDropdownIcon, withAlert, children } = props
 
   const content = (
     <>
       {icon && <Icon className={style.icon} icon={icon} />}
+      {withAlert && <Status pulse={false} status="good" flipped className={style.alert} />}
       {message && <Message content={message} className={style.linkButtonMessage} />}
       {children}
       {dropdownItems && (
