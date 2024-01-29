@@ -23,7 +23,6 @@ import Status from '@ttn-lw/components/status'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
-import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import Notification from '@console/components/notifications'
 
@@ -31,9 +30,6 @@ import notificationStyle from '@console/containers/notifications/notifications.s
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getDropdownNotifications } from '@console/store/actions/notifications'
-
-import { selectUserId } from '@console/store/selectors/logout'
 import {
   selectDropdownNotifications,
   selectTotalNotificationsCount,
@@ -46,12 +42,11 @@ const m = defineMessages({
 })
 
 const NotificationsDropdown = () => {
-  const userId = useSelector(selectUserId)
   const dropdownItems = useSelector(selectDropdownNotifications)
   const totalNotifications = useSelector(selectTotalNotificationsCount)
 
   return (
-    <RequireRequest requestAction={getDropdownNotifications(userId)}>
+    <>
       <div className={style.notificationsDropdownHeader}>
         <span>
           <Message content={sharedMessages.notifications} />{' '}
@@ -104,7 +99,7 @@ const NotificationsDropdown = () => {
       <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
         <Message content={m.description} values={{ totalNotifications }} />
       </div>
-    </RequireRequest>
+    </>
   )
 }
 
