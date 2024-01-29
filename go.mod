@@ -52,7 +52,7 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056
 	github.com/json-iterator/go v1.1.12
 	github.com/jtacoma/uritemplates v1.0.0
-	github.com/klauspost/compress v1.17.4
+	github.com/klauspost/compress v1.17.5
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
 	github.com/mileusna/useragent v1.3.4
