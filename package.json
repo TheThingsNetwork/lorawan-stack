@@ -121,7 +121,7 @@
     "react-text-mask": "^5.5.0",
     "react-toastify": "^9.1.3",
     "react-virtualized-auto-sizer": "^1.0.21",
-    "react-window": "^1.8.9",
+    "react-window": "^1.8.10",
     "redux": "^4.2.1",
     "redux-actions": "^2.6.5",
     "redux-logic": "^5.0.1",
