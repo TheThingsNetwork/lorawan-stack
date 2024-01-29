@@ -39,6 +39,7 @@ const NotificationContent = ({
   isArchive,
   setSelectedNotification,
   selectedNotification,
+  isSmallScreen,
 }) => {
   const userId = useSelector(selectUserId)
 
@@ -60,7 +61,11 @@ const NotificationContent = ({
             </p>
             <DateTime
               value={selectedNotification.created_at}
-              dateFormatOptions={{ day: '2-digit', month: 'long', year: 'numeric' }}
+              dateFormatOptions={
+                isSmallScreen
+                  ? { day: '2-digit', month: '2-digit', year: 'numeric' }
+                  : { day: '2-digit', month: 'long', year: 'numeric' }
+              }
               timeFormatOptions={{
                 hour: 'numeric',
                 minute: 'numeric',
@@ -107,6 +112,7 @@ const NotificationContent = ({
 
 NotificationContent.propTypes = {
   isArchive: PropTypes.bool.isRequired,
+  isSmallScreen: PropTypes.bool,
   onArchive: PropTypes.func.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string.isRequired,
@@ -115,6 +121,10 @@ NotificationContent.propTypes = {
     status: PropTypes.string,
   }).isRequired,
   setSelectedNotification: PropTypes.func.isRequired,
+}
+
+NotificationContent.defaultProps = {
+  isSmallScreen: false,
 }
 
 export default NotificationContent

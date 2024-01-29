@@ -239,6 +239,7 @@ const Notifications = () => {
             selectedNotification={selectedNotification}
             isArchive={showArchived === 'true'}
             onArchive={handleArchive}
+            isSmallScreen={isSmallScreen}
           />
         )}
       </div>
