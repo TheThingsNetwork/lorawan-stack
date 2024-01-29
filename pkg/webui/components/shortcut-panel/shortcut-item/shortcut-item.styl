@@ -19,7 +19,7 @@
   align-items: center
   justify-content: center
   padding: $cs.s $cs.m
-  transition: $ad.m background ease-in, $ad.m display ease-out
+  transition: 0.2s background ease-in
   text-decoration: none
   height: 10.7rem
   border-radius: $br.l
@@ -29,14 +29,17 @@
   font-weight: $fwv2.semibold
 
   span.icon
+    transition: 0.2s display ease-out
     font-size: 2rem
     display: block
 
   span.add-icon
+    transition: 0.2s display ease-in
     font-size: 2.5rem
     display: none
 
   .title
+    transition: 0.2s display ease-out
     display: block
 
   &:hover

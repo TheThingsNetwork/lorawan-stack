@@ -29,10 +29,12 @@
   .button
     font-weight: $fwv2.semibold
     text-decoration: none
+    transition: text-decoration 0.2s ease-in-out
 
     &:hover
       color: var(--c-text-brand-normal)
       text-decoration: underline
+      text-underline-offset: $cs.xxs
 
   &-divider
     border-bottom: 1px solid var(--c-border-neutral-light)
