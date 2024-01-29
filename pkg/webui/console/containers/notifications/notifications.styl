@@ -17,6 +17,7 @@
   flex-direction: column
   border-right: 1px solid var(--c-border-neutral-light)
   width: 33%
+  min-width: 25rem
 
   &-change-button
     margin-top: $cs.m
@@ -84,10 +85,9 @@
       display: block
 
 .notification-preview
-  height: 7rem
+  height: 100%
   width: 100%
   border-bottom: 1px solid var(--c-border-neutral-light)
-  padding: $cs.m
 
   &.notification-selected
     background-color: var(--c-bg-brand-normal)
@@ -100,6 +100,7 @@
     gap: $cs.xxs
     margin-bottom: $cs.xs
     font-weight: 600
+    position: relative
 
     &.notification-read
       margin-left: 0.857rem

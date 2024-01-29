@@ -34,7 +34,7 @@ export const NotificationListItem = ({ notification, selectedNotification, handl
   const unseenIds = useSelector(selectUnseenIds)
   const showSelected = selectedNotification?.id === notification.id
   const showUnseenStatus = unseenIds.includes(notification.id)
-  const classes = classNames(style.notificationPreview, 'm-0 d-flex', {
+  const classes = classNames(style.notificationPreview, 'm-0 d-flex p-cs-m', {
     [style.notificationSelected]: showSelected,
   })
   const titleClasses = classNames(style.notificationPreviewTitle, {
@@ -105,14 +105,11 @@ NotificationListItem.defaultProps = {
 }
 
 export const NotificationListSpinner = () => {
-  const classes = classNames(style.notificationPreview, 'm-0')
-  const titleClasses = classNames(style.notificationPreviewTitle)
+  const classes = classNames(style.notificationPreview, 'm-0', 'p-0')
 
   return (
     <div className={classes}>
-      <div className={titleClasses}>
-        <Spinner faded small center />
-      </div>
+      <Spinner faded micro center />
     </div>
   )
 }
