@@ -91,27 +91,40 @@
 
   &.notification-selected
     background-color: var(--c-bg-brand-normal)
+    border-radius: $br.m
+    border: 0
     +media-query($bp.s)
       background-color: unset
 
-  &-title
-    display: flex
-    justify-content: space-between
-    gap: $cs.xxs
-    margin-bottom: $cs.xs
-    font-weight: 600
-    position: relative
-
-    &.notification-read
-      margin-left: 0.857rem
-
-    &.notification-selected
+    .notification-preview-title
       color: var(--c-text-neutral-min)
       +media-query($bp.s)
         color: var(--c-text-neutral-heavy)
 
       .notification-time
         color: var(--c-text-neutral-min)
+
+    .notification-preview-content
+      color: var(--c-text-neutral-min)
+      +media-query($bp.s)
+        color: var(--c-text-neutral-light)
+
+  &.notification-next-selected
+    border: 0
+
+  &-title
+    display: flex
+    justify-content: space-between
+    gap: $cs.xxs
+    margin-bottom: $cs.xxs
+    font-weight: 600
+    position: relative
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+
+    &.notification-read
+      margin-left: 0.857rem
 
     .notification-time
       font-size: $fs.s
@@ -128,17 +141,12 @@
     overflow: hidden
     display: -webkit-box
     -webkit-box-orient: vertical
-    -webkit-line-clamp: 2 // Start showing ellipsis when 2nd line is reached.
+    -webkit-line-clamp: 3 // Start showing ellipsis when 3d line is reached.
     white-space: pre-wrap
     font-size: $fs.s
 
     &.notification-read
       margin-left: 0.857rem
-
-    &.notification-selected
-      color: var(--c-text-neutral-min)
-      +media-query($bp.s)
-        color: var(--c-text-neutral-light)
 
   &.notification-selected
     color: var(--c-text-neutral-min)

@@ -30,20 +30,18 @@ import { selectUnseenIds } from '@console/store/selectors/notifications'
 
 import style from '../notifications.styl'
 
-export const NotificationListItem = ({ notification, selectedNotification, handleClick }) => {
+export const NotificationListItem = ({ notification, isSelected, isNextSelected, handleClick }) => {
   const unseenIds = useSelector(selectUnseenIds)
-  const showSelected = selectedNotification?.id === notification.id
   const showUnseenStatus = unseenIds.includes(notification.id)
   const classes = classNames(style.notificationPreview, 'm-0 d-flex p-cs-m', {
-    [style.notificationSelected]: showSelected,
+    [style.notificationSelected]: isSelected,
+    [style.notificationNextSelected]: isNextSelected,
   })
   const titleClasses = classNames(style.notificationPreviewTitle, {
     [style.notificationRead]: !showUnseenStatus,
-    [style.notificationSelected]: showSelected,
   })
   const previewClasses = classNames(style.notificationPreviewContent, {
     [style.notificationRead]: !showUnseenStatus,
-    [style.notificationSelected]: showSelected,
   })
 
   return (
@@ -55,7 +53,7 @@ export const NotificationListItem = ({ notification, selectedNotification, handl
       data-test-id="notification-list-item"
     >
       {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
-      <div>
+      <div className="w-full">
         <div className={titleClasses}>
           <div className={style.notificationPreviewTitleText}>
             <Notification.Title
@@ -89,19 +87,14 @@ export const NotificationListItem = ({ notification, selectedNotification, handl
 
 NotificationListItem.propTypes = {
   handleClick: PropTypes.func.isRequired,
+  isNextSelected: PropTypes.bool.isRequired,
+  isSelected: PropTypes.bool.isRequired,
   notification: PropTypes.shape({
     id: PropTypes.string,
     created_at: PropTypes.string,
     notification_type: PropTypes.string,
     status: PropTypes.string,
   }).isRequired,
-  selectedNotification: PropTypes.shape({
-    id: PropTypes.string,
-  }),
-}
-
-NotificationListItem.defaultProps = {
-  selectedNotification: undefined,
 }
 
 export const NotificationListSpinner = () => {

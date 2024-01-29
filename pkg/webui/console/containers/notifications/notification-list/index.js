@@ -88,12 +88,20 @@ const NotificationList = ({
 
   const classes = classNames(styles.notificationHeaderIcon)
 
+  const isSelected = notification =>
+    selectedNotification && selectedNotification.id === notification.id
+  const isNextSelected = notification => {
+    const index = items.findIndex(item => item.id === notification.id)
+    return index + 1 < items.length && isSelected(items[index + 1])
+  }
+
   const Item = ({ index, style }) =>
     isItemLoaded(index) ? (
       <div style={style}>
         <NotificationListItem
           notification={items[index]}
-          selectedNotification={selectedNotification}
+          isSelected={isSelected(items[index])}
+          isNextSelected={isNextSelected(items[index])}
           handleClick={handleClick}
         />
       </div>
@@ -133,7 +141,7 @@ const NotificationList = ({
           />
         )}
       </div>
-      <div className="flex-grow">
+      <div className="flex-grow pl-cs-xs">
         <AutoSizer>
           {({ height, width }) => (
             <InfiniteLoader
@@ -145,9 +153,10 @@ const NotificationList = ({
             >
               {({ onItemsRendered, ref }) => (
                 <List
+                  className={styles.notificationListList}
                   height={height}
                   width={width}
-                  itemSize={98}
+                  itemSize={88}
                   ref={ref}
                   itemCount={itemCount}
                   onItemsRendered={onItemsRendered}
