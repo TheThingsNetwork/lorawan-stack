@@ -1668,10 +1668,10 @@
   dependencies:
     tslib "^2.4.0"
 
-"@formatjs/intl-numberformat@^8.9.2":
-  version "8.9.2"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-numberformat/-/intl-numberformat-8.9.2.tgz#d41f67b90685972866ae864154044d91e0f1a4c7"
-  integrity sha512-fb4mWN3OFgtTcVD39x+AFc5J1MxRUG/tUFof5A/j8qMXaCiIymRWRYTtMtBjbSCSOLq2vlAu6yXXpQutfdnULA==
+"@formatjs/intl-numberformat@^8.10.0":
+  version "8.10.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-numberformat/-/intl-numberformat-8.10.0.tgz#f078622e63ebe8d12efee8c12820fe54fe3041d6"
+  integrity sha512-i4Isl+E/ljea9wGwqFSlzOINhSM4GgbXnooI5XB0VGxc5dPEn9QkgadH4XM2wN2halvAxUyIXNq/08QpQDnODQ==
   dependencies:
     "@formatjs/ecma402-abstract" "1.18.2"
     "@formatjs/intl-localematcher" "0.5.4"
