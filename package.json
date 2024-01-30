@@ -109,7 +109,7 @@
     "react-focus-lock": "^2.9.6",
     "react-grid-system": "^8.1.9",
     "react-helmet": "^6.1.0",
-    "react-intl": "^6.6.1",
+    "react-intl": "^6.6.2",
     "react-leaflet": "^4.2.1",
     "react-paginate": "^8.2.0",
     "react-redux": "^8.1.2",
