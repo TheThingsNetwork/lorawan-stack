@@ -26,16 +26,17 @@
       font-size: $fsv2.l
       line-height: 1
 
-  .button
+  a.button
     font-weight: $fwv2.semibold
-    text-decoration: none
-    transition: text-decoration 0.2s ease-in-out
+    text-decoration: none transparent
+    transition: text-decoration $ad.s ease-in-out
 
     &:hover
       color: var(--c-text-brand-normal)
       text-decoration: underline
       text-decoration-thickness: 2px
       text-underline-offset: .4rem
+      text-decoration-color: var(--c-text-brand-normal)
 
   &-divider
     border-bottom: 1px solid var(--c-border-neutral-light)
@@ -45,3 +46,8 @@
 
 span.panel-header-icon
   font-size: 1.5rem
+  font-variation-settings: 'FILL' 1
+  background-color: var(--c-bg-brand-extralight)
+  padding: $cs.xs
+  border-radius: $br.l
+  color: var(--c-bg-brand-normal)
