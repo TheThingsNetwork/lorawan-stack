@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.29.0] - unreleased
+
+### Added
+
 - `relays` command to `ttn-lw-cli`, which enables the management of LoRaWAN relays, including their configuration and uplink forwarding rules.
 
 ### Changed
@@ -21,8 +35,6 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) due to the removal of old information in the `contact_infos` table.
   - The emails of the administrative and technical contacts are only returned in the `ContactInfo` field if the caller has the appropriate rights.
 
-### Deprecated
-
 ### Removed
 
 - The `http.client.transport.compression` and `http.server.transport.compression` experimental flags.
@@ -30,8 +42,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Fix Add collaborator form not validating collaborator on submit in the Console.
-
-### Security
 
 ## [3.28.2] - 2023-12-20
 
@@ -2756,7 +2766,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.2...v3.28
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.0...v3.29
+[3.29.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.2...v3.29.0
 [3.28.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.1...v3.28.2
 [3.28.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.0...v3.28.1
 [3.28.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.27.2...v3.28.0
