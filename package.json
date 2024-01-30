@@ -33,7 +33,7 @@
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.9.1",
-    "cypress": "12.16.0",
+    "cypress": "13.6.3",
     "cypress-browser-permissions": "^1.1.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-log-to-output": "^1.1.2",
