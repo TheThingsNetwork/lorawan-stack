@@ -7,6 +7,9 @@ updates:
     commit-message:
       prefix: "dev"
     open-pull-requests-limit: 8
+    groups:
+      safe:
+        update-types: ["patch", "minor"]
 
   - package-ecosystem: "npm"
     directory: "/sdk/js"
@@ -15,6 +18,9 @@ updates:
     commit-message:
       prefix: "dev"
     open-pull-requests-limit: 8
+    groups:
+      safe:
+        update-types: ["patch", "minor"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -23,6 +29,9 @@ updates:
     commit-message:
       prefix: "dev"
     open-pull-requests-limit: 8
+    groups:
+      all:
+        update-types: ["patch", "minor", "major"]
 
   - package-ecosystem: "gomod"
     directory: "/"
@@ -31,6 +40,9 @@ updates:
     commit-message:
       prefix: "dev"
     open-pull-requests-limit: 8
+    groups:
+      safe:
+        update-types: ["patch", "minor"]
 
   - package-ecosystem: "gomod"
     directory: "/tools"
@@ -39,6 +51,9 @@ updates:
     commit-message:
       prefix: "dev"
     open-pull-requests-limit: 8
+    groups:
+      safe:
+        update-types: ["patch", "minor"]
 
   - package-ecosystem: "docker"
     directory: "/"
