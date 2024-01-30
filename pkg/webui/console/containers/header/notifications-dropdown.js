@@ -58,10 +58,12 @@ const NotificationsDropdown = () => {
       </div>
       {dropdownItems.map(notification => (
         <Link
-          to={`/notifications/${notification.id}`}
+          to={{
+            pathname: `/notifications/${notification.id}`,
+            search: '?archived=false',
+          }}
           key={notification.id}
           className={classnames(style.notificationsDropdownLink, 'd-flex')}
-          state={{ notification }}
         >
           <Icon icon="key" className={style.notificationsDropdownLinkIcon} />
           <div className={style.notificationContainer}>

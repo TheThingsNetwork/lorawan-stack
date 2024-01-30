@@ -61,7 +61,6 @@ const Link = props => {
     primary,
     tabIndex,
     role,
-    state,
   } = props
 
   const { formatMessage } = useIntl()
@@ -91,7 +90,6 @@ const Link = props => {
       onClick={onClick}
       tabIndex={tabIndex}
       role={role}
-      state={state}
     >
       {children}
     </RouterLink>
@@ -109,7 +107,6 @@ Link.propTypes = {
   role: PropTypes.string,
   secondary: PropTypes.bool,
   showVisited: PropTypes.bool,
-  state: PropTypes.shape({}),
   tabIndex: PropTypes.string,
   target: PropTypes.string,
   title: PropTypes.message,
@@ -140,7 +137,6 @@ Link.defaultProps = {
   target: undefined,
   title: undefined,
   titleValues: undefined,
-  state: undefined,
 }
 
 const DocLink = props => {
