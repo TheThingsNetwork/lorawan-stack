@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
-import { redirect, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+
+import LAYOUT from '@ttn-lw/constants/layout'
 
 import Button from '@ttn-lw/components/button'
 
@@ -35,12 +37,33 @@ const m = defineMessages({
   unarchive: 'Unarchive',
 })
 
-const NotificationContent = ({ onArchive, isArchive, selectedNotification, isSmallScreen }) => {
+const NotificationContent = ({ onArchive, isArchive, selectedNotification }) => {
+  const [isMediumScreen, setIsMediumScreen] = React.useState(
+    window.innerWidth < LAYOUT.BREAKPOINTS.L,
+  )
   const userId = useSelector(selectUserId)
   const navigate = useNavigate()
   const handleBack = useCallback(() => {
     navigate('/notifications')
   }, [navigate])
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < LAYOUT.BREAKPOINTS.L) {
+        setIsMediumScreen(true)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const dateFormat = isMediumScreen
+    ? { day: '2-digit', month: '2-digit', year: 'numeric' }
+    : { day: '2-digit', month: 'long', year: 'numeric' }
+
+  const archiveMessage = isMediumScreen ? undefined : isArchive ? m.unarchive : m.archive
 
   return (
     <>
@@ -56,11 +79,7 @@ const NotificationContent = ({ onArchive, isArchive, selectedNotification, isSma
             </p>
             <DateTime
               value={selectedNotification.created_at}
-              dateFormatOptions={
-                isSmallScreen
-                  ? { day: '2-digit', month: '2-digit', year: 'numeric' }
-                  : { day: '2-digit', month: 'long', year: 'numeric' }
-              }
+              dateFormatOptions={dateFormat}
               timeFormatOptions={{
                 hour: 'numeric',
                 minute: 'numeric',
@@ -75,7 +94,7 @@ const NotificationContent = ({ onArchive, isArchive, selectedNotification, isSma
         <div className={style.notificationHeaderAction}>
           <DateTime
             value={selectedNotification.created_at}
-            dateFormatOptions={{ day: 'numeric', month: 'long', year: 'numeric' }}
+            dateFormatOptions={dateFormat}
             timeFormatOptions={{
               hour: 'numeric',
               minute: 'numeric',
@@ -87,7 +106,7 @@ const NotificationContent = ({ onArchive, isArchive, selectedNotification, isSma
           />
           <Button
             onClick={onArchive}
-            message={isArchive ? m.unarchive : m.archive}
+            message={archiveMessage}
             icon="archive"
             value={selectedNotification.id}
             secondary
@@ -107,7 +126,6 @@ const NotificationContent = ({ onArchive, isArchive, selectedNotification, isSma
 
 NotificationContent.propTypes = {
   isArchive: PropTypes.bool.isRequired,
-  isSmallScreen: PropTypes.bool,
   onArchive: PropTypes.func.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string.isRequired,
@@ -115,10 +133,6 @@ NotificationContent.propTypes = {
     notification_type: PropTypes.string.isRequired,
     status: PropTypes.string,
   }).isRequired,
-}
-
-NotificationContent.defaultProps = {
-  isSmallScreen: false,
 }
 
 export default NotificationContent

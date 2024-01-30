@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useState, useRef, useEffect } from 'react'
-import { redirect, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
@@ -134,7 +134,7 @@ const Notifications = () => {
     await setShowArchived(newShowArchivedValue)
     // Reset items and selected notification.
     setItems([])
-    redirect('/notifications')
+    navigate('/notifications')
 
     // Load the first page of archived notifications.
     // When handleShowArchived is defined, it captures the current value of showArchived.
@@ -142,7 +142,7 @@ const Notifications = () => {
     // So loadNextPage() is called with the old value of showArchived, showing the same notifications again.
     // To avoid this, we pass the new value of showArchived to loadNextPage() as an argument.
     loadNextPage(0, BATCH_SIZE, newShowArchivedValue, true)
-  }, [loadNextPage, setShowArchived, showArchived])
+  }, [loadNextPage, setShowArchived, showArchived, navigate])
 
   const handleArchive = useCallback(
     async (_, id) => {

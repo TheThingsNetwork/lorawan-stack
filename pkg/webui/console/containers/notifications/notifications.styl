@@ -35,6 +35,7 @@
   align-items: center
   border-bottom: 1px solid var(--c-border-neutral-light)
   padding: $cs.m $cs.s
+  gap: 0.25rem
 
   &-date
     font-weight: $fwv2.regular
@@ -73,10 +74,21 @@
   &-title
     font-weight: $fwv2.semibold
 
+    +media-query($bp.l)
+      max-width: 64%
+      p
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+
     +media-query($bp.s)
+      max-width: 100%
+      overflow: hidden
       display: flex
-      gap: $cs.xs
-      max-width: 70%
+      gap: $cs.xxs
+      div
+        overflow: hidden
+        text-overflow: ellipsis
 
   .back-button
     padding-left: 1.07rem
