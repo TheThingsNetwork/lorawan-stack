@@ -431,9 +431,4 @@ PropTypes.notificationData = PropTypes.shape({
   entity_ids: PropTypes.shape({}).isRequired,
 })
 
-PropTypes.notification = PropTypes.shape({
-  data: PropTypes.shape({}).isRequired,
-  notificationType: PropTypes.string.isRequired,
-})
-
 export default PropTypes

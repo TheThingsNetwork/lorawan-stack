@@ -46,10 +46,10 @@ const ContentTemplate = ({ messages, values, withList, listTitle, listElement })
             <Message component="b" content={listTitle} />
           </p>
           <ul>
-            {listElement.map(el => (
+            {listElement.map((el, index) => (
               <>
-                <Message component="li" content={el} />
-                <Message content={{ id: `enum:${el}` }} firstToUpper />
+                <Message key={index} component="li" content={el} />
+                <Message key={index + 1} content={{ id: `enum:${el}` }} firstToUpper />
               </>
             ))}
           </ul>

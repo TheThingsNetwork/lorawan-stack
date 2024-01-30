@@ -33,7 +33,7 @@ import style from '../notifications.styl'
 export const NotificationListItem = ({ notification, isSelected, isNextSelected, handleClick }) => {
   const unseenIds = useSelector(selectUnseenIds)
   const showUnseenStatus = unseenIds.includes(notification.id)
-  const classes = classNames(style.notificationPreview, 'm-0 d-flex p-cs-m', {
+  const classes = classNames(style.notificationPreview, {
     [style.notificationSelected]: isSelected,
     [style.notificationNextSelected]: isNextSelected,
   })
@@ -87,14 +87,19 @@ export const NotificationListItem = ({ notification, isSelected, isNextSelected,
 
 NotificationListItem.propTypes = {
   handleClick: PropTypes.func.isRequired,
-  isNextSelected: PropTypes.bool.isRequired,
-  isSelected: PropTypes.bool.isRequired,
+  isNextSelected: PropTypes.bool,
+  isSelected: PropTypes.bool,
   notification: PropTypes.shape({
     id: PropTypes.string,
     created_at: PropTypes.string,
     notification_type: PropTypes.string,
     status: PropTypes.string,
   }).isRequired,
+}
+
+NotificationListItem.defaultProps = {
+  isSelected: false,
+  isNextSelected: false,
 }
 
 export const NotificationListSpinner = () => {

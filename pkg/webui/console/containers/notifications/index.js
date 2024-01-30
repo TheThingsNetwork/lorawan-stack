@@ -160,11 +160,7 @@ const Notifications = () => {
       // unless there is only one item in the list.
       const previousNotification = totalCount === 1 ? undefined : items[Math.max(0, index - 1)]
       const path = `/${previousNotification?.id}`
-      if (isSmallScreen) {
-        navigate('/notifications')
-      } else {
-        navigate(`/notifications${path}`)
-      }
+      navigate(`/notifications${isSmallScreen ? '' : path}`)
 
       // Reload notifications starting from the archived one.
       await loadNextPage(
