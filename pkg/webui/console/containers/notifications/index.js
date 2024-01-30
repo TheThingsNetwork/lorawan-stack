@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useState, useRef, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { redirect, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
@@ -68,10 +68,8 @@ const Notifications = () => {
   const listRef = useRef(null)
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
-  const location = useLocation()
-  const [selectedNotification, setSelectedNotification] = useState(
-    location.state?.notification ?? undefined,
-  )
+  const navigate = useNavigate()
+  const { id: notificationId } = useParams()
   const [hasNextPage, setHasNextPage] = useState(true)
   const [items, setItems] = useState(undefined)
   const [showArchived, setShowArchived] = useQueryState('archived', 'false')
@@ -80,7 +78,7 @@ const Notifications = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < LAYOUT.BREAKPOINTS.M)
 
   const loadNextPage = useCallback(
-    async (startIndex, stopIndex, archived) => {
+    async (startIndex, stopIndex, archived, reset = false) => {
       if (fetching) return
       setFetching(true)
       const composedArchived =
@@ -109,7 +107,7 @@ const Notifications = () => {
 
       // Integrate the new items into the existing list.
       const updatedItems = fillIntoArray(
-        items,
+        reset ? [] : items,
         pageToIndices(startPage, limit)[0],
         newItems.notifications,
         newItems.totalCount,
@@ -117,15 +115,17 @@ const Notifications = () => {
       setItems(updatedItems)
 
       // Set the first notification as selected if none is currently selected.
-      if (!selectedNotification && !isSmallScreen) {
-        setSelectedNotification(updatedItems[0])
+      if ((!notificationId || reset) && !isSmallScreen) {
+        navigate(`/notifications/${updatedItems[0].id}`)
+      } else if (notificationId && isSmallScreen) {
+        navigate(`/notifications/${notificationId}`)
       }
 
       // Determine if there are more pages to load.
       setHasNextPage(updatedItems.length < newItems.totalCount)
       setFetching(false)
     },
-    [fetching, showArchived, dispatch, userId, items, selectedNotification, isSmallScreen],
+    [fetching, showArchived, dispatch, userId, items, notificationId, isSmallScreen, navigate],
   )
 
   const handleShowArchived = useCallback(async () => {
@@ -134,14 +134,14 @@ const Notifications = () => {
     await setShowArchived(newShowArchivedValue)
     // Reset items and selected notification.
     setItems([])
-    setSelectedNotification(undefined)
+    redirect('/notifications')
 
     // Load the first page of archived notifications.
     // When handleShowArchived is defined, it captures the current value of showArchived.
     // Even though showArchived is updated later, the captured value inside handleShowArchived remains the same.
     // So loadNextPage() is called with the old value of showArchived, showing the same notifications again.
     // To avoid this, we pass the new value of showArchived to loadNextPage() as an argument.
-    loadNextPage(0, BATCH_SIZE, newShowArchivedValue)
+    loadNextPage(0, BATCH_SIZE, newShowArchivedValue, true)
   }, [loadNextPage, setShowArchived, showArchived])
 
   const handleArchive = useCallback(
@@ -156,27 +156,28 @@ const Notifications = () => {
       // Find the index of the archived notification.
       const index = items.findIndex(item => item.id === id)
 
+      // Update the selected notification to the one above the archived one,
+      // unless there is only one item in the list.
+      const previousNotification = totalCount === 1 ? undefined : items[Math.max(0, index - 1)]
+      const path = `/${previousNotification?.id}`
+      if (isSmallScreen) {
+        navigate('/notifications')
+      } else {
+        navigate(`/notifications${path}`)
+      }
+
       // Reload notifications starting from the archived one.
       await loadNextPage(
         index,
         index + BATCH_SIZE > items.length - 1 ? items.length - 1 : index + BATCH_SIZE,
       )
 
-      // Update the selected notification to the one above the archived one,
-      // unless there is only one item in the list.
-      const previousNotification = isSmallScreen
-        ? undefined
-        : totalCount === 1
-        ? undefined
-        : items[Math.max(0, index - 1)]
-      setSelectedNotification(previousNotification)
-
       // Reset the list cache if available so that old items are discarded.
       if (listRef.current && listRef.current.resetloadMoreItemsCache) {
         listRef.current.resetloadMoreItemsCache()
       }
     },
-    [showArchived, dispatch, userId, items, loadNextPage, totalCount, isSmallScreen],
+    [showArchived, dispatch, userId, items, loadNextPage, totalCount, isSmallScreen, navigate],
   )
 
   // Load the first page of notifications when the component mounts.
@@ -189,10 +190,11 @@ const Notifications = () => {
     window.addEventListener('resize', handleResize)
 
     loadNextPage(0, BATCH_SIZE)
-    setSelectedNotification(location.state?.notification ?? undefined)
     return () => window.removeEventListener('resize', handleResize)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const selectedNotification = items?.find(item => item.id === notificationId)
 
   if (!items) {
     return (
@@ -214,7 +216,6 @@ const Notifications = () => {
           loadNextPage={loadNextPage}
           items={items}
           totalCount={totalCount}
-          setSelectedNotification={setSelectedNotification}
           selectedNotification={selectedNotification}
           isArchive={showArchived === 'true'}
           listRef={listRef}
@@ -235,7 +236,6 @@ const Notifications = () => {
       >
         {selectedNotification && (
           <NotificationContent
-            setSelectedNotification={setSelectedNotification}
             selectedNotification={selectedNotification}
             isArchive={showArchived === 'true'}
             onArchive={handleArchive}

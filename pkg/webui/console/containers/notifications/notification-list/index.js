@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
@@ -47,7 +48,6 @@ const NotificationList = ({
   items,
   hasNextPage,
   loadNextPage,
-  setSelectedNotification,
   selectedNotification,
   isArchive,
   totalCount,
@@ -61,6 +61,7 @@ const NotificationList = ({
     index => (items.length > 0 ? !hasNextPage || index < items.length : false),
     [hasNextPage, items],
   )
+  const navigate = useNavigate()
 
   // If the total count is not known, we assume that there are 100 items.
   // Otherwise, if totalCount is 0, it means the list is empty and we should not have a total count.
@@ -68,14 +69,15 @@ const NotificationList = ({
 
   const handleClick = useCallback(
     async (_, id) => {
-      setSelectedNotification(items.find(notification => notification.id === id))
+      const selectedNotification = items.find(notification => notification.id === id)
+      navigate(`/notifications/${selectedNotification?.id}`)
       if (!isArchive && unseenIds.includes(id)) {
         await dispatch(
           attachPromise(updateNotificationStatus(userId, [id], 'NOTIFICATION_STATUS_SEEN')),
         )
       }
     },
-    [items, dispatch, userId, setSelectedNotification, isArchive, unseenIds],
+    [items, dispatch, userId, isArchive, unseenIds, navigate],
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
@@ -89,10 +91,10 @@ const NotificationList = ({
   const classes = classNames(styles.notificationHeaderIcon)
 
   const isSelected = notification =>
-    selectedNotification && selectedNotification.id === notification.id
+    notification && selectedNotification && selectedNotification.id === notification.id
   const isNextSelected = notification => {
     const index = items.findIndex(item => item.id === notification.id)
-    return index + 1 < items.length && isSelected(items[index + 1])
+    return notification && index + 1 < items.length && isSelected(items[index + 1])
   }
 
   const Item = ({ index, style }) =>
@@ -181,7 +183,6 @@ NotificationList.propTypes = {
   selectedNotification: PropTypes.shape({
     id: PropTypes.string,
   }),
-  setSelectedNotification: PropTypes.func.isRequired,
   totalCount: PropTypes.number.isRequired,
 }
 

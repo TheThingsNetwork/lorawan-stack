@@ -58,7 +58,7 @@ const NotificationsDropdown = () => {
       </div>
       {dropdownItems.map(notification => (
         <Link
-          to="/notifications"
+          to={`/notifications/${notification.id}`}
           key={notification.id}
           className={classnames(style.notificationsDropdownLink, 'd-flex')}
           state={{ notification }}

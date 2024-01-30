@@ -16,6 +16,7 @@ import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
+import { redirect, useNavigate } from 'react-router-dom'
 
 import Button from '@ttn-lw/components/button'
 
@@ -34,18 +35,12 @@ const m = defineMessages({
   unarchive: 'Unarchive',
 })
 
-const NotificationContent = ({
-  onArchive,
-  isArchive,
-  setSelectedNotification,
-  selectedNotification,
-  isSmallScreen,
-}) => {
+const NotificationContent = ({ onArchive, isArchive, selectedNotification, isSmallScreen }) => {
   const userId = useSelector(selectUserId)
-
+  const navigate = useNavigate()
   const handleBack = useCallback(() => {
-    setSelectedNotification(undefined)
-  }, [setSelectedNotification])
+    navigate('/notifications')
+  }, [navigate])
 
   return (
     <>
@@ -120,7 +115,6 @@ NotificationContent.propTypes = {
     notification_type: PropTypes.string.isRequired,
     status: PropTypes.string,
   }).isRequired,
-  setSelectedNotification: PropTypes.func.isRequired,
 }
 
 NotificationContent.defaultProps = {
