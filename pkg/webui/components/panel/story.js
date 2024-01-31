@@ -15,6 +15,7 @@
 import React from 'react'
 
 import loginVisual from '@assets/img/layout/bg/login-visual.jpg'
+import starIcon from '@assets/misc/favorite-outline.svg'
 
 import NewsItem from '../news-panel/news-item'
 
@@ -71,7 +72,7 @@ export const WithToggle = () => {
 
   return (
     <div style={{ width: '32.5rem' }}>
-      <Example title="Your top entities" icon="star" toggleOptions={options} />
+      <Example title="Your top entities" svg={starIcon} toggleOptions={options} />
     </div>
   )
 }
