@@ -16,7 +16,7 @@ import React from 'react'
 
 import loginVisual from '@assets/img/layout/bg/login-visual.jpg'
 
-import StarIcon from '@ttn-lw/components/icon/star-icon'
+import StarIcon from '@ttn-lw/components/star-icon'
 
 import NewsItem from '../news-panel/news-item'
 
