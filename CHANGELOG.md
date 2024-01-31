@@ -34,6 +34,9 @@ For details about compatibility between different releases, see the **Commitment
 - Entities' `ContactInfo` field now returns information regarding the administrative and technical contacts instead of the deprecated `ContactInfo` information.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) due to the removal of old information in the `contact_infos` table.
   - The emails of the administrative and technical contacts are only returned in the `ContactInfo` field if the caller has the appropriate rights.
+- Organizations can now opt out from sending administrative and technical notifications to all collaborators.
+  - New organizations do not send administrative and technical notifications to all collaborators by default.
+  - To alter the behavior update the organization's `fanout_notifications` field.
 
 ### Removed
 
@@ -58,9 +61,6 @@ For details about compatibility between different releases, see the **Commitment
   - This enables CUPS-enabled gateways to change their LNS before the periodic CUPS lookup occurs.
 - The LoRa Basics Station discovery endpoint now verifies the authorization credentials of the caller.
   - This enables the gateways to migrate to another instance gracefully while using CUPS.
-- Organizations can now opt out from sending administrative and technical notifications to its members.
-  - New organizations do not send administrative and technical notifications to its members by default.
-  - To alter the behavior update the organization's `fanout_notifications` field.
 
 ### Fixed
 
