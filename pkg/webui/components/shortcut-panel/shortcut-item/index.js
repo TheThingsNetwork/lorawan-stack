@@ -25,9 +25,13 @@ import style from './shortcut-item.styl'
 
 const ShortcutItem = ({ icon, title, link }) => (
   <Link to={link} className={style.shortcut}>
-    <Icon icon="add" className={style.addIcon} />
-    <Icon icon={icon} className={style.icon} />
-    <Message content={title} className={style.title} />
+    <div className={style.addIconWrapper}>
+      <Icon icon="add" className={style.addIcon} />
+    </div>
+    <div className={style.shortcutTitleWrapper}>
+      <Icon icon={icon} className={style.icon} />
+      <Message content={title} className={style.title} />
+    </div>
   </Link>
 )
 

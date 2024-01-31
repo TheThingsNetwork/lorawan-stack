@@ -18,8 +18,8 @@
   flex-direction: column
   align-items: center
   justify-content: center
+  position: relative
   padding: $cs.s $cs.m
-  transition: 0.2s background ease-in
   text-decoration: none
   height: 10.7rem
   border-radius: $br.l
@@ -27,32 +27,55 @@
   color: var(--c-text-neutral-min)
   font-size: $fs.m
   font-weight: $fwv2.semibold
+  transition: 0.2s background ease-in-out
+
+  &-title-wrapper
+    position: absolute
+    width: 100%
+    height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    flex-direction: column
+    top: 0
+    opacity: 1
+    transition: $ad.s visibility ease-in-out, $ad.m opacity ease-in-out
+    transition-delay: $ad.s
+
+  .add-icon-wrapper
+    position: absolute
+    width: 100%
+    height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    flex-direction: column
+    top: 0
+    opacity: 0
+    visibility: hidden
+    transition: $ad.s visibility ease-in-out, $ad.m opacity ease-in-out
+    transition-delay: $ad.s
 
   span.icon
-    transition: 0.2s display ease-out
     font-size: 2rem
-    display: block
 
   span.add-icon
-    transition: 0.2s display ease-in
     font-size: 2.5rem
-    display: none
-
-  .title
-    transition: 0.2s display ease-out
-    display: block
 
   &:hover
     cursor: pointer
     background: var(--c-bg-brand-normal-hover)
 
-    .title
-      display: none
+    .shortcut-title-wrapper
+      opacity: 0
+      visibility: hidden
+
+    .add-icon-wrapper
+      opacity: 1
+      visibility: visible
 
     span.icon
       font-size: 2rem
-      display: none
 
     span.add-icon
       font-size: 2.5rem
-      display: block
