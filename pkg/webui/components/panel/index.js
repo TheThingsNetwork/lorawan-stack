@@ -30,7 +30,7 @@ const Panel = ({
   children,
   title,
   icon,
-  svg,
+  svgIcon,
   toggleOptions,
   activeToggle,
   onToggleClick,
@@ -44,7 +44,7 @@ const Panel = ({
     <div className="d-flex j-between al-center mb-cs-m">
       <div className="d-flex gap-cs-xs al-center">
         {icon && <Icon icon={icon} className={styles.panelHeaderIcon} />}
-        {svg && <img src={svg} alt="star" className={styles.panelHeaderSvg} />}
+        {svgIcon}
         <Message content={title} className={styles.panelHeaderTitle} />
         {messageDecorators}
       </div>
@@ -71,7 +71,7 @@ Panel.propTypes = {
   messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
   path: PropTypes.string.isRequired,
-  svg: PropTypes.string,
+  svgIcon: PropTypes.node,
   title: PropTypes.message.isRequired,
   toggleOptions: PropTypes.arrayOf(PropTypes.shape({})),
 }
@@ -85,7 +85,7 @@ Panel.defaultProps = {
   className: undefined,
   messageDecorators: undefined,
   divider: false,
-  svg: undefined,
+  svgIcon: undefined,
 }
 
 export default Panel
