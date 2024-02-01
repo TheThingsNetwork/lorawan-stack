@@ -24,10 +24,14 @@ type NetworkConfig struct {
 	BrandingBaseURL   string `name:"branding-base-url" description:"The base URL to the email branding assets"`
 }
 
+// SenderConfig is the configuration of the sender.
+type SenderConfig struct {
+	SenderName    string `name:"sender-name" description:"The name of the sender"`
+	SenderAddress string `name:"sender-address" description:"The address of the sender"`
+}
+
 // Config is the configuration for sending emails.
 type Config struct {
-	SenderName    string        `name:"sender-name" description:"The name of the sender"`
-	SenderAddress string        `name:"sender-address" description:"The address of the sender"`
-	Provider      string        `name:"provider" description:"Email provider to use"`
-	Network       NetworkConfig `name:"network" description:"The network of the sender"`
+	SenderConfig `name:",squash"`
+	Network      NetworkConfig `name:"network" description:"The network of the sender"`
 }

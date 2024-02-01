@@ -33,8 +33,10 @@ func TestSendGrid(t *testing.T) {
 	sg, err := New(
 		log.NewContext(test.Context(), test.GetLogger(t)),
 		email.Config{
-			SenderName:    "Unit Test",
-			SenderAddress: "unit@test.local",
+			SenderConfig: email.SenderConfig{
+				SenderName:    "Unit Test",
+				SenderAddress: "unit@test.local",
+			},
 		},
 		Config{
 			APIKey:      apiKey,
