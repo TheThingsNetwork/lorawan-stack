@@ -67,18 +67,25 @@ const NotificationList = ({
   const handleClick = useCallback(
     async (_, id) => {
       const clickedNotification = items.find(notification => notification.id === id)
+      const index = items.findIndex(notification => notification.id === id)
       if (!isArchive && !('status' in clickedNotification) && totalUnseenCount > 0) {
         await dispatch(attachPromise(updateNotificationStatus([id], 'NOTIFICATION_STATUS_SEEN')))
+        loadNextPage(index, index + 1)
       }
     },
-    [items, dispatch, isArchive, totalUnseenCount],
+    [items, dispatch, isArchive, totalUnseenCount, loadNextPage],
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
     if (totalUnseenCount > 0) {
-      await dispatch(attachPromise(markAllAsSeen()))
+      const result = await dispatch(attachPromise(markAllAsSeen()))
+      const firstIndex = items.findIndex(notification => notification.id === result[0])
+      const lastIndex = items.findIndex(
+        notification => notification.id === result[result.length - 1],
+      )
+      loadNextPage(firstIndex, lastIndex)
     }
-  }, [dispatch, totalUnseenCount])
+  }, [dispatch, totalUnseenCount, loadNextPage, items])
 
   const classes = classNames(styles.notificationHeaderIcon)
 

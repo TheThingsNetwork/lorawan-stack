@@ -32,7 +32,7 @@ const m = defineMessage({
 const updateThroughPagination = async (totalCount, userId) => {
   let page = 1
   const limit = 100
-  let result
+  let result = []
 
   while ((page - 1) * limit < totalCount) {
     // Get the next page of notifications.
@@ -47,13 +47,13 @@ const updateThroughPagination = async (totalCount, userId) => {
     const notificationIds = notifications.notifications.map(notification => notification.id)
     // Make the update request.
     // eslint-disable-next-line no-await-in-loop
-    const updatedNotifications = await tts.Notifications.updateNotificationStatus(
+    await tts.Notifications.updateNotificationStatus(
       userId,
       notificationIds,
       'NOTIFICATION_STATUS_SEEN',
     )
 
-    result = { ...result, ...updatedNotifications }
+    result = [...result, ...notificationIds]
     page += 1
   }
 
@@ -133,9 +133,8 @@ const markAllAsSeenLogic = createRequestLogic({
   process: async ({ getState }) => {
     const id = selectUserId(getState())
     const totalUnseenCount = selectTotalUnseenCount(getState())
-    const result = updateThroughPagination(totalUnseenCount, id)
 
-    return { ...result, ids: [] }
+    return updateThroughPagination(totalUnseenCount, id)
   },
 })
 
