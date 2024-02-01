@@ -28,7 +28,7 @@ import { getEntity } from '../utils'
 import ContentTemplate from './template'
 
 const m = defineMessages({
-  title: 'An API key of your {entityType} on your network has been changed',
+  title: 'API key of {entityType} has been changed',
   body: 'An API key of your {entityType} <code>{id}</code> on your network has been changed.',
   preview:
     'An API key of your {entityType} "{id}" on your network has been changed. API Key ID: {apiKeyId}',

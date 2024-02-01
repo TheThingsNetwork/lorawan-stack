@@ -28,7 +28,7 @@ import { getEntity } from '../utils'
 import ContentTemplate from './template'
 
 const m = defineMessages({
-  title: 'The state of your {entityType} has been changed.',
+  title: 'State of {entityType} changed',
   body: 'The state of the {entityType} <code>{entityId}</code> on your network has been changed to "{state}".',
   link: 'You can view this <Link>here</Link>.',
 })

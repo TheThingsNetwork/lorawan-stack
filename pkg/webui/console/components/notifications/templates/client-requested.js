@@ -28,7 +28,7 @@ import selectAccountUrl from '@console/lib/selectors/app-config'
 import ContentTemplate from './template'
 
 const m = defineMessages({
-  title: 'Your review is required for a newly registered OAuth client',
+  title: 'Review is required for a new OAuth client',
   body: '{senderType} <code>{id}</code> just registered a new OAuth client under {collaboratorType} <code>{collaboratorId}</code> on your network.{lineBreak}Since {senderTypeMiddle} <code>{id}</code> is not an admin, you need to approve this client before it can be used.',
   clientId: '<b>Client ID:</b> <code>{clientId}</code>',
   link: 'You can approve (or reject) the OAuth client <Link>here</Link>.',

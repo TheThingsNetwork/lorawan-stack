@@ -112,5 +112,3 @@ export const getPacketBrokerHomeNewtorkId = (policy = {}) =>
   combinePacketBrokerIds(policy.home_network_id)
 
 export const getClientId = (client = {}) => getByPath(client, 'ids.client_id')
-
-export const getNotificationId = (notification = {}) => notification.id

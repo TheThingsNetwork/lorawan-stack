@@ -28,7 +28,7 @@ import { getEntity } from '../utils'
 import ContentTemplate from './template'
 
 const m = defineMessages({
-  title: 'A new API key has just been created for your {entityType}',
+  title: 'New API key created for {entityType}',
   body: 'A new API key has just been created for your {entityType} <code>{id}</code> on your network.',
   preview:
     'A new API key has just been created for your {entityType} {id} on your network. API Key ID: {apiKeyId}',

@@ -26,7 +26,7 @@ import { getEntity } from '../utils'
 import ContentTemplate from './template'
 
 const m = defineMessages({
-  title: 'The password of your user "{entityIds}" has just been changed.',
+  title: 'Password of user "{entityIds}" changed',
   body: 'The password of your user <code>{entityId}</code> on your network has just been changed.',
   closing: 'If this was not done by you, please contact your administrators as soon as possible.',
 })

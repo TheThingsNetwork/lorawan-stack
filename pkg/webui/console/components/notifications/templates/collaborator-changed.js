@@ -27,7 +27,7 @@ import { getEntity } from '../utils'
 import ContentTemplate from './template'
 
 const m = defineMessages({
-  title: 'A collaborator of your {entityType} has been added or updated',
+  title: 'Collaborator of {entityType} added or updated',
   body: 'A collaborator of your {entityType} <code>{entityId}</code> on your network has been added or updated.',
   collaborator: '<b>Collaborator:</b> {collaboratorType} <code>{collaboratorId}</code>',
   link: 'You can view and edit this collaborator <Link>here</Link>.',

@@ -25,7 +25,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import ContentTemplate from './template'
 
 const m = defineMessages({
-  title: 'Your review is required for a newly registered user',
+  title: 'Review required for new user',
   body: 'A new user just registered on your network.{lineBreak}Since user registration requires admin approval, you need to approve this user before they can login.',
   closing: 'You can review this user <Link>here</Link>.',
   user: '<b>User ID:</b> <code>{userId}</code>{lineBreak}<b>Name:</b> {userName}{lineBreak}<b>Description:</b> {userDescription}{lineBreak}<b>Email Address:</b> {userPrimaryEmailAddress}',
