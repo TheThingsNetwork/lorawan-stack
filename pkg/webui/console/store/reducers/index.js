@@ -14,7 +14,14 @@
 
 import { combineReducers } from 'redux'
 
-import { APPLICATION, END_DEVICE, GATEWAY, USER, ORGANIZATION } from '@console/constants/entities'
+import {
+  APPLICATION,
+  END_DEVICE,
+  GATEWAY,
+  USER,
+  ORGANIZATION,
+  NOTIFICATION,
+} from '@console/constants/entities'
 
 import {
   getUserId,
@@ -25,6 +32,7 @@ import {
   getApiKeyId,
   getCollaboratorId,
   getPacketBrokerNetworkId,
+  getNotificationId,
 } from '@ttn-lw/lib/selectors/id'
 import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'

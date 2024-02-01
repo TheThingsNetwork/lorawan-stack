@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 import AutoSizer from 'react-virtualized-auto-sizer'
+import { useParams } from 'react-router-dom'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -32,8 +32,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { updateNotificationStatus } from '@console/store/actions/notifications'
 
-import { selectTotalUnseenCount, selectUnseenIds } from '@console/store/selectors/notifications'
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import styles from '../notifications.styl'
 
@@ -49,44 +48,27 @@ const NotificationList = ({
   hasNextPage,
   loadNextPage,
   selectedNotification,
-  isArchive,
   totalCount,
   listRef,
 }) => {
-  const userId = useSelector(selectUserId)
-  const unseenIds = useSelector(selectUnseenIds)
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
+  const { category } = useParams()
+  const isArchive = category === 'archive'
   const dispatch = useDispatch()
   const isItemLoaded = useCallback(
     index => (items.length > 0 ? !hasNextPage || index < items.length : false),
     [hasNextPage, items],
   )
-  const navigate = useNavigate()
 
   // If the total count is not known, we assume that there are 100 items.
   // Otherwise, if totalCount is 0, it means the list is empty and we should not have a total count.
   const itemCount = totalCount >= 0 ? totalCount : 100
 
-  const handleClick = useCallback(
-    async (_, id) => {
-      const selectedNotification = items.find(notification => notification.id === id)
-      navigate(`/notifications/${selectedNotification?.id}`)
-      if (!isArchive && unseenIds.includes(id)) {
-        await dispatch(
-          attachPromise(updateNotificationStatus(userId, [id], 'NOTIFICATION_STATUS_SEEN')),
-        )
-      }
-    },
-    [items, dispatch, userId, isArchive, unseenIds, navigate],
-  )
-
   const handleMarkAllAsSeen = useCallback(async () => {
-    if (unseenIds.length > 0) {
-      await dispatch(
-        attachPromise(updateNotificationStatus(userId, unseenIds, 'NOTIFICATION_STATUS_SEEN')),
-      )
+    if (totalUnseenCount > 0) {
+      await dispatch(attachPromise(updateNotificationStatus([], 'NOTIFICATION_STATUS_SEEN')))
     }
-  }, [dispatch, userId, unseenIds])
+  }, [dispatch, totalUnseenCount])
 
   const classes = classNames(styles.notificationHeaderIcon)
 
@@ -104,7 +86,6 @@ const NotificationList = ({
           notification={items[index]}
           isSelected={isSelected(items[index])}
           isNextSelected={isNextSelected(items[index])}
-          handleClick={handleClick}
         />
       </div>
     ) : (
@@ -143,7 +124,7 @@ const NotificationList = ({
           />
         )}
       </div>
-      <div className="flex-grow pl-cs-xs">
+      <div className="flex-grow">
         <AutoSizer>
           {({ height, width }) => (
             <InfiniteLoader
@@ -176,7 +157,6 @@ const NotificationList = ({
 
 NotificationList.propTypes = {
   hasNextPage: PropTypes.bool.isRequired,
-  isArchive: PropTypes.bool.isRequired,
   items: PropTypes.array.isRequired,
   listRef: PropTypes.shape({ current: PropTypes.shape({}) }).isRequired,
   loadNextPage: PropTypes.func.isRequired,

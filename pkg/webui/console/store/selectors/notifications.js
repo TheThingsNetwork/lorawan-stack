@@ -15,12 +15,16 @@
 import { createSelector } from 'reselect'
 
 export const selectNotificationsStore = state => state.notifications
-export const selectNotifications = createSelector([selectNotificationsStore], store =>
-  Object.values(store.notifications),
-)
+export const selectInboxNotifications = state =>
+  selectNotificationsStore(state).notifications.inbox.entities
+export const selectArchivedNotifications = state =>
+  selectNotificationsStore(state).notifications.archived.entities
+
 export const selectDropdownNotifications = createSelector([selectNotificationsStore], store =>
   Object.values(store.dropdownNotifications),
 )
-export const selectTotalNotificationsCount = state => selectNotificationsStore(state).totalCount
+export const selectInboxNotificationsTotalCount = state =>
+  selectNotificationsStore(state).notifications.inbox.totalCount
+export const selectArchivedNotificationsTotalCount = state =>
+  selectNotificationsStore(state).notifications.archived.totalCount
 export const selectTotalUnseenCount = state => selectNotificationsStore(state).unseenTotalCount
-export const selectUnseenIds = state => selectNotificationsStore(state).unseenIds

@@ -22,47 +22,45 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as notifications from '@console/store/actions/notifications'
 
+import { selectUserId } from '@console/store/selectors/logout'
+
 const m = defineMessage({
   newNotifications: 'You have new notifications',
 })
 
-const getNotificationsLogic = createRequestLogic({
-  type: notifications.GET_NOTIFICATIONS,
-  process: async ({ action }) => {
+const getInboxNotificationsLogic = createRequestLogic({
+  type: notifications.GET_INBOX_NOTIFICATIONS,
+  process: async ({ action, getState }) => {
     const {
-      payload: { parentType, parentId, params },
+      payload: { page, limit },
     } = action
-    const { page, limit } = params
-    const result = await tts.Notifications.getAllNotifications(parentType, parentId, page, limit)
+    const filter = ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']
+    const userId = selectUserId(getState())
+    const result = await tts.Notifications.getAllNotifications(userId, filter, page, limit)
 
-    return { notifications: result.notifications, totalCount: result.totalCount }
+    return { notifications: result.notifications, totalCount: result.totalCount, page, limit }
   },
 })
 
-const getDropdownNotificationsLogic = createRequestLogic({
-  type: notifications.GET_DROPDOWN_NOTIFICATIONS,
-  process: async ({ action }) => {
+const getArchivedNotificationsLogic = createRequestLogic({
+  type: notifications.GET_ARCHIVED_NOTIFICATIONS,
+  process: async ({ action, getState }) => {
     const {
-      payload: { userId },
+      payload: { page, limit },
     } = action
-    const result = await tts.Notifications.getAllNotifications(
-      userId,
-      ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN'],
-      1,
-      3,
-    )
+    const filter = ['NOTIFICATION_STATUS_ARCHIVED']
+    const userId = selectUserId(getState())
+    const result = await tts.Notifications.getAllNotifications(userId, filter, page, limit)
 
-    return { notifications: result.notifications, totalCount: result.totalCount }
+    return { notifications: result.notifications, totalCount: result.totalCount, page, limit }
   },
 })
 
-const getUnseenNotificationsLogic = createRequestLogic({
+const getUnseenNotificationsPeriodicallyLogic = createRequestLogic({
   type: notifications.GET_UNSEEN_NOTIFICATIONS,
-  process: async ({ action }) => {
-    const {
-      payload: { id },
-    } = action
+  process: async ({ getState }) => {
     clearInterval()
+    const id = selectUserId(getState())
     const result = await tts.Notifications.getAllNotifications(id, ['NOTIFICATION_STATUS_UNSEEN'])
     let totalCount = result.totalCount
     setInterval(async () => {
@@ -73,17 +71,18 @@ const getUnseenNotificationsLogic = createRequestLogic({
         toast({ message: m.newNotifications, type: toast.types.INFO })
       }
       totalCount = newResult.totalCount
-    }, [300000]) // 5 minutes
+    }, [1000 * 60 * 5]) // 5 minutes
     return { notifications: result.notifications, totalCount: result.totalCount }
   },
 })
 
 const updateNotificationStatusLogic = createRequestLogic({
   type: notifications.UPDATE_NOTIFICATION_STATUS,
-  process: async ({ action }) => {
+  process: async ({ action, getState }) => {
     const {
-      payload: { id, notificationIds, newStatus },
+      payload: { notificationIds, newStatus },
     } = action
+    const id = selectUserId(getState())
     const result = await tts.Notifications.updateNotificationStatus(id, notificationIds, newStatus)
 
     return { ...result, ids: notificationIds }
@@ -91,8 +90,8 @@ const updateNotificationStatusLogic = createRequestLogic({
 })
 
 export default [
-  getNotificationsLogic,
-  getDropdownNotificationsLogic,
-  getUnseenNotificationsLogic,
+  getInboxNotificationsLogic,
+  getArchivedNotificationsLogic,
+  getUnseenNotificationsPeriodicallyLogic,
   updateNotificationStatusLogic,
 ]

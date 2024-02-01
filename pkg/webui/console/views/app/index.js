@@ -248,7 +248,16 @@ const ConsoleRoot = () => {
           <Route path="admin-panel/*" Component={AdminPanel} />
           <Route path="user/*" Component={User} />
           <Route path="notifications" Component={Notifications} />
-          <Route path="notifications/:id" Component={Notifications} />
+          <Route
+            path="notifications/:category?/:id?"
+            Component={Notifications}
+            element={
+              <ValidateRouteParam
+                check={{ category: /^inbox|archived$/, id: uuidRegexp }}
+                Component={Notifications}
+              />
+            }
+          />
           <Route path="*" Component={GenericNotFound} />
         </Route>
       </Routes>

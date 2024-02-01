@@ -14,7 +14,7 @@
 
 import React from 'react'
 import classNames from 'classnames'
-import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
@@ -26,35 +26,27 @@ import Notification from '@console/components/notifications'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectUnseenIds } from '@console/store/selectors/notifications'
-
 import style from '../notifications.styl'
 
-export const NotificationListItem = ({ notification, isSelected, isNextSelected, handleClick }) => {
-  const unseenIds = useSelector(selectUnseenIds)
-  const showUnseenStatus = unseenIds.includes(notification.id)
+export const NotificationListItem = ({ notification, isSelected, isNextSelected }) => {
+  const { category } = useParams()
+  const showUnseenStatus = notification.status === 'NOTIFICATION_STATUS_UNSEEN'
   const classes = classNames(style.notificationPreview, {
     [style.notificationSelected]: isSelected,
     [style.notificationNextSelected]: isNextSelected,
-  })
-  const titleClasses = classNames(style.notificationPreviewTitle, {
-    [style.notificationRead]: !showUnseenStatus,
-  })
-  const previewClasses = classNames(style.notificationPreviewContent, {
-    [style.notificationRead]: !showUnseenStatus,
+    [style.unseen]: showUnseenStatus,
   })
 
   return (
-    <Button
+    <Button.Link
       key={notification.id}
-      onClick={handleClick}
-      value={notification.id}
+      to={`/notifications/${category}/${notification.id}`}
       className={classes}
       data-test-id="notification-list-item"
     >
       {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
       <div className="w-full">
-        <div className={titleClasses}>
+        <div className={style.notificationPreviewTitle}>
           <div className={style.notificationPreviewTitleText}>
             <Notification.Title
               data={notification}
@@ -74,19 +66,18 @@ export const NotificationListItem = ({ notification, isSelected, isNextSelected,
             />
           </div>
         </div>
-        <div className={previewClasses}>
+        <div className={style.notificationPreviewContent}>
           <Notification.Preview
             data={notification}
             notificationType={notification.notification_type}
           />
         </div>
       </div>
-    </Button>
+    </Button.Link>
   )
 }
 
 NotificationListItem.propTypes = {
-  handleClick: PropTypes.func.isRequired,
   isNextSelected: PropTypes.bool,
   isSelected: PropTypes.bool,
   notification: PropTypes.shape({

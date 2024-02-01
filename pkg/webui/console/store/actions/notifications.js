@@ -13,37 +13,41 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
-import {
-  createPaginationBaseActionType,
-  createPaginationByParentRequestActions,
-} from '@ttn-lw/lib/store/actions/pagination'
 
 export const SHARED_NAME = 'NOTIFICATIONS'
 
-export const GET_NOTIFICATIONS_BASE = createPaginationBaseActionType(SHARED_NAME)
+export const GET_INBOX_NOTIFICATIONS_BASE = 'GET_INBOX_NOTIFICATIONS'
 export const [
   {
-    request: GET_NOTIFICATIONS,
-    success: GET_NOTIFICATIONS_SUCCESS,
-    failure: GET_NOTIFICATIONS_FAILURE,
+    request: GET_INBOX_NOTIFICATIONS,
+    success: GET_INBOX_NOTIFICATIONS_SUCCESS,
+    failure: GET_INBOX_NOTIFICATIONS_FAILURE,
   },
-  { request: getNotifications, success: getNotificationsSuccess, failure: getNotificationsFailure },
-] = createPaginationByParentRequestActions(SHARED_NAME)
+  {
+    request: getInboxNotifications,
+    success: getInboxNotificationsSuccess,
+    failure: getInboxNotificationsFailure,
+  },
+] = createRequestActions(GET_INBOX_NOTIFICATIONS_BASE, ({ page, limit } = {}) => ({
+  page,
+  limit,
+}))
 
-export const GET_DROPDOWN_NOTIFICATIONS_BASE = 'GET_DROPDOWN_NOTIFICATIONS'
+export const GET_ARCHIVED_NOTIFICATIONS_BASE = 'GET_ARCHIVED_NOTIFICATIONS'
 export const [
   {
-    request: GET_DROPDOWN_NOTIFICATIONS,
-    success: GET_DROPDOWN_NOTIFICATIONS_SUCCESS,
-    failure: GET_DROPDOWN_NOTIFICATIONS_FAILURE,
+    request: GET_ARCHIVED_NOTIFICATIONS,
+    success: GET_ARCHIVED_NOTIFICATIONS_SUCCESS,
+    failure: GET_ARCHIVED_NOTIFICATIONS_FAILURE,
   },
   {
-    request: getDropdownNotifications,
-    success: getDropdownNotificationsSuccess,
-    failure: getDropdownNotificationsFailure,
+    request: getArchivedNotifications,
+    success: getArchivedNotificationsSuccess,
+    failure: getArchivedNotificationsFailure,
   },
-] = createRequestActions(GET_DROPDOWN_NOTIFICATIONS_BASE, userId => ({
-  userId,
+] = createRequestActions(GET_ARCHIVED_NOTIFICATIONS_BASE, ({ page, limit } = {}) => ({
+  page,
+  limit,
 }))
 
 export const GET_UNSEEN_NOTIFICATIONS_BASE = 'GET_UNSEEN_NOTIFICATIONS'
@@ -74,8 +78,7 @@ export const [
     success: updateNotificationStatusSuccess,
     failure: updateNotificationStatusFailure,
   },
-] = createRequestActions(UPDATE_NOTIFICATION_STATUS_BASE, (id, notificationIds, newStatus) => ({
-  id,
+] = createRequestActions(UPDATE_NOTIFICATION_STATUS_BASE, (notificationIds, newStatus) => ({
   notificationIds,
   newStatus,
 }))

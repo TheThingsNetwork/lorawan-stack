@@ -17,19 +17,12 @@ import { useDispatch } from 'react-redux'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-const useRequest = requestAction => {
+const useRequest = (requestAction, requestOnChange) => {
   const dispatch = useDispatch()
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
   const [result, setResult] = useState()
-  const isMounted = useRef(true)
-
-  useEffect(
-    () => () => {
-      isMounted.current = false
-    },
-    [],
-  )
+  const deps = requestOnChange ? [dispatch, requestAction] : []
 
   useEffect(() => {
     if (requestAction) {
@@ -37,25 +30,21 @@ const useRequest = requestAction => {
         requestAction instanceof Array
           ? Promise.all(requestAction.map(req => dispatch(attachPromise(req))))
           : typeof requestAction === 'function'
-            ? requestAction(dispatch)
-            : dispatch(attachPromise(requestAction))
+          ? requestAction(dispatch)
+          : dispatch(attachPromise(requestAction))
 
       promise
         .then(result => {
-          if (isMounted.current) {
-            setResult(result)
-            setFetching(false)
-          }
+          setResult(result)
+          setFetching(false)
         })
         .catch(error => {
-          if (isMounted.current) {
-            setError(error)
-            setFetching(false)
-          }
+          setError(error)
+          setFetching(false)
         })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, deps)
 
   return [fetching, error, result]
 }

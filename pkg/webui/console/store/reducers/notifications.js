@@ -13,48 +13,74 @@
 // limitations under the License.
 
 import {
-  GET_NOTIFICATIONS_SUCCESS,
+  GET_ARCHIVED_NOTIFICATIONS_SUCCESS,
+  GET_INBOX_NOTIFICATIONS_SUCCESS,
   GET_UNSEEN_NOTIFICATIONS_SUCCESS,
   UPDATE_NOTIFICATION_STATUS_SUCCESS,
-  GET_DROPDOWN_NOTIFICATIONS_SUCCESS,
 } from '@console/store/actions/notifications'
 
 const defaultState = {
-  notifications: {},
-  dropdownNotifications: {},
-  unseenIds: [],
+  notifications: {
+    inbox: { entities: [], totalCount: 0 },
+    archived: { entities: [], totalCount: 0 },
+    unseen: { entities: [], totalCount: 0 },
+  },
   unseenTotalCount: undefined,
-  totalCount: undefined,
+}
+
+// Update a range of values in an array by using another array and a start index.
+const fillIntoArray = (array, start, values, totalCount) => {
+  const newArray = [...array]
+  const end = Math.min(start + values.length, totalCount)
+  for (let i = start; i < end; i++) {
+    newArray[i] = values[i - start]
+  }
+  return newArray
+}
+
+const pageToIndices = (page, limit) => {
+  const startIndex = (page - 1) * limit
+  const stopIndex = page * limit - 1
+  return [startIndex, stopIndex]
 }
 
 const notifications = (state = defaultState, { type, payload }) => {
   switch (type) {
-    case GET_NOTIFICATIONS_SUCCESS:
+    case GET_INBOX_NOTIFICATIONS_SUCCESS:
       return {
         ...state,
         notifications: {
-          ...payload.notifications.reduce((acc, not) => {
-            acc[not.id] = not
-            return acc
-          }, {}),
+          ...state.notifications,
+          inbox: {
+            entities: fillIntoArray(
+              state.notifications,
+              pageToIndices(payload.page, payload.limit)[0],
+              payload.notifications,
+              payload.totalCount,
+            ),
+            totalCount: payload.totalCount,
+          },
         },
-        totalCount: payload.totalCount,
       }
-    case GET_DROPDOWN_NOTIFICATIONS_SUCCESS:
+    case GET_ARCHIVED_NOTIFICATIONS_SUCCESS:
       return {
         ...state,
-        dropdownNotifications: {
-          ...payload.notifications.reduce((acc, not) => {
-            acc[not.id] = not
-            return acc
-          }, {}),
+        notifications: {
+          ...state.notifications,
+          archived: {
+            entities: fillIntoArray(
+              state.notifications,
+              pageToIndices(payload.page, payload.limit)[0],
+              payload.notifications,
+              payload.totalCount,
+            ),
+            totalCount: payload.totalCount,
+          },
         },
-        totalCount: payload.totalCount,
       }
     case GET_UNSEEN_NOTIFICATIONS_SUCCESS:
       return {
         ...state,
-        unseenIds: payload.notifications.map(not => not.id),
         unseenTotalCount: payload.totalCount,
       }
     case UPDATE_NOTIFICATION_STATUS_SUCCESS:

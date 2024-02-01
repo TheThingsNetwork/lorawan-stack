@@ -37,9 +37,15 @@
   padding: $cs.m $cs.s
   gap: 0.25rem
 
+  +media-query($bp.s)
+    padding: $cs.xs
+
   &-date
     font-weight: $fwv2.regular
     color: var(--c-text-neutral-light)
+
+    +media-query($bp.s)
+      font-size: $fs.s
 
     &.notification-selected
       display: block
@@ -73,6 +79,7 @@
 
   &-title
     font-weight: $fwv2.semibold
+    align-items: center
 
     +media-query($bp.l)
       max-width: 64%
@@ -102,8 +109,17 @@
   margin: 0
   display: flex
   align-items: center
-  padding: $cs.m
   border-bottom: 1px solid var(--c-border-neutral-light)
+  padding: 0 $cs.s 0 $cs.l
+  box-sizing: border-box
+  position: relative
+
+  &.unseen
+    .notification-preview-title
+      color: var(--c-text-neutral-heavy)
+
+    .notification-preview-content
+      color: var(--c-text-neutral-heavy)
 
   &.notification-selected
     background-color: var(--c-bg-brand-normal)
@@ -138,9 +154,7 @@
     overflow: hidden
     text-overflow: ellipsis
     white-space: nowrap
-
-    &.notification-read
-      margin-left: 0.857rem
+    color: var(--c-text-neutral-heavy)
 
     .notification-time
       font-size: $fs.s
@@ -161,18 +175,15 @@
     white-space: pre-wrap
     font-size: $fs.s
 
-    &.notification-read
-      margin-left: 0.857rem
-
   &.notification-selected
     color: var(--c-text-neutral-min)
     +media-query($bp.s)
       color: var(--c-text-neutral-light)
 
   .unseen-mark
-    position: relative
-    top: -1px
-    left: -5px
+    position: absolute
+    top: .9rem
+    left: .2rem
 
 .notification-content
   width: 66%

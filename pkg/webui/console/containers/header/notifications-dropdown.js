@@ -31,8 +31,8 @@ import notificationStyle from '@console/containers/notifications/notifications.s
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
-  selectDropdownNotifications,
-  selectTotalNotificationsCount,
+  selectInboxNotifications,
+  selectInboxNotificationsTotalCount,
 } from '@console/store/selectors/notifications'
 
 import style from './header.styl'
@@ -42,8 +42,8 @@ const m = defineMessages({
 })
 
 const NotificationsDropdown = () => {
-  const dropdownItems = useSelector(selectDropdownNotifications)
-  const totalNotifications = useSelector(selectTotalNotificationsCount)
+  const dropdownItems = useSelector(selectInboxNotifications)
+  const totalNotifications = useSelector(selectInboxNotificationsTotalCount)
 
   return (
     <>
@@ -56,11 +56,10 @@ const NotificationsDropdown = () => {
           />
         </span>
       </div>
-      {dropdownItems.map(notification => (
+      {dropdownItems.slice(0, 3).map(notification => (
         <Link
           to={{
-            pathname: `/notifications/${notification.id}`,
-            search: '?archived=false',
+            pathname: `/notifications/all/${notification.id}`,
           }}
           key={notification.id}
           className={classnames(style.notificationsDropdownLink, 'd-flex')}

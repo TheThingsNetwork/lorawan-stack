@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -25,19 +25,29 @@ import NotificationsContainer from '@console/containers/notifications'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getUnseenNotifications } from '@console/store/actions/notifications'
-
-import { selectUserId } from '@console/store/selectors/logout'
+import {
+  getArchivedNotifications,
+  getInboxNotifications,
+} from '@console/store/actions/notifications'
 
 const NotificationsView = () => {
-  const userId = useSelector(selectUserId)
+  const { category } = useParams()
   useBreadcrumbs(
     'notifications',
-    <Breadcrumb path="/notifications?*" content={sharedMessages.notifications} />,
+    <Breadcrumb path="/notifications" content={sharedMessages.notifications} />,
+  )
+
+  const action = useMemo(
+    () =>
+      (category === 'archived' ? getArchivedNotifications : getInboxNotifications)({
+        page: 1,
+        limit: 25,
+      }),
+    [category],
   )
 
   return (
-    <RequireRequest requestAction={getUnseenNotifications(userId)}>
+    <RequireRequest requestAction={action} requestOnChange>
       <Breadcrumbs />
       <NotificationsContainer />
     </RequireRequest>

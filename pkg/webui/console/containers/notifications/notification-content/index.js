@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import LAYOUT from '@ttn-lw/constants/layout'
 
@@ -37,15 +37,13 @@ const m = defineMessages({
   unarchive: 'Unarchive',
 })
 
-const NotificationContent = ({ onArchive, isArchive, selectedNotification }) => {
+const NotificationContent = ({ onArchive, selectedNotification }) => {
   const [isMediumScreen, setIsMediumScreen] = React.useState(
     window.innerWidth < LAYOUT.BREAKPOINTS.L,
   )
   const userId = useSelector(selectUserId)
-  const navigate = useNavigate()
-  const handleBack = useCallback(() => {
-    navigate('/notifications')
-  }, [navigate])
+  const { category } = useParams()
+  const isArchive = category === 'archive'
 
   useEffect(() => {
     const handleResize = () => {
@@ -69,7 +67,12 @@ const NotificationContent = ({ onArchive, isArchive, selectedNotification }) => 
     <>
       <div className={style.notificationHeader}>
         <div className={style.notificationHeaderTitle}>
-          <Button icon="arrow_back_ios" naked onClick={handleBack} className={style.backButton} />
+          <Button.Link
+            to="/notifications/inbox"
+            icon="chevron_left"
+            className="m:d-flex d-none"
+            naked
+          />
           <div>
             <p className="m-0">
               <Notification.Title
@@ -113,7 +116,7 @@ const NotificationContent = ({ onArchive, isArchive, selectedNotification }) => 
           />
         </div>
       </div>
-      <div className="p-cs-xl">
+      <div className="p-cs-xl s:p-cs-l">
         <Notification.Content
           receiver={userId}
           data={selectedNotification}
@@ -125,7 +128,6 @@ const NotificationContent = ({ onArchive, isArchive, selectedNotification }) => 
 }
 
 NotificationContent.propTypes = {
-  isArchive: PropTypes.bool.isRequired,
   onArchive: PropTypes.func.isRequired,
   selectedNotification: PropTypes.shape({
     id: PropTypes.string.isRequired,

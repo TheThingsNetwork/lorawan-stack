@@ -24,11 +24,19 @@ import Button from '@ttn-lw/components/button'
 import Spinner from '@ttn-lw/components/spinner'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
 
-import { getNotifications, updateNotificationStatus } from '@console/store/actions/notifications'
+import {
+  getArchivedNotifications,
+  getInboxNotifications,
+  updateNotificationStatus,
+} from '@console/store/actions/notifications'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import {
+  selectArchivedNotifications,
+  selectArchivedNotificationsTotalCount,
+  selectInboxNotifications,
+  selectInboxNotificationsTotalCount,
+} from '@console/store/selectors/notifications'
 
 import NotificationList from './notification-list'
 import NotificationContent from './notification-content'
@@ -37,26 +45,10 @@ import style from './notifications.styl'
 
 const BATCH_SIZE = 50
 
-// Update a range of values in an array by using another array and a start index.
-const fillIntoArray = (array, start, values, totalCount) => {
-  const newArray = [...array]
-  const end = Math.min(start + values.length, totalCount)
-  for (let i = start; i < end; i++) {
-    newArray[i] = values[i - start]
-  }
-  return newArray
-}
-
 const indicesToPage = (startIndex, stopIndex, limit) => {
   const startPage = Math.floor(startIndex / limit) + 1
   const stopPage = Math.floor(stopIndex / limit) + 1
   return [startPage, stopPage]
-}
-
-const pageToIndices = (page, limit) => {
-  const startIndex = (page - 1) * limit
-  const stopIndex = page * limit - 1
-  return [startIndex, stopIndex]
 }
 
 const m = defineMessages({
@@ -64,94 +56,56 @@ const m = defineMessages({
   seeAll: 'See all messages',
 })
 
-const Notifications = () => {
+const Notifications = React.memo(() => {
   const listRef = useRef(null)
-  const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { id: notificationId } = useParams()
-  const [hasNextPage, setHasNextPage] = useState(true)
-  const [items, setItems] = useState(undefined)
-  const [showArchived, setShowArchived] = useQueryState('archived', 'false')
-  const [totalCount, setTotalCount] = useState(0)
+  const { id: notificationId, category = 'inbox' } = useParams()
+  const showArchived = category === 'archived'
+  const items = useSelector(showArchived ? selectArchivedNotifications : selectInboxNotifications)
+  const totalCount = useSelector(
+    showArchived ? selectArchivedNotificationsTotalCount : selectInboxNotificationsTotalCount,
+  )
+  const hasNextPage = items.length < totalCount
   const [fetching, setFetching] = useState(false)
+  const [selectionCache, setSelectionCache] = useState({ archived: undefined, inbox: undefined })
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < LAYOUT.BREAKPOINTS.M)
 
   const loadNextPage = useCallback(
-    async (startIndex, stopIndex, archived, reset = false) => {
+    async (startIndex, stopIndex) => {
       if (fetching) return
       setFetching(true)
-      const composedArchived =
-        archived === undefined ? showArchived === 'true' : archived === 'true'
 
-      // Determine filters based on whether archived notifications should be shown.
-      const filters = composedArchived
-        ? ['NOTIFICATION_STATUS_ARCHIVED']
-        : ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']
+      // Determine filter based on whether archived notifications should be shown.
+      const action = showArchived ? getArchivedNotifications : getInboxNotifications
       // Calculate the number of items to fetch.
       const limit = Math.max(BATCH_SIZE, stopIndex - startIndex + 1)
       const [startPage, stopPage] = indicesToPage(startIndex, stopIndex, limit)
 
       // Fetch new notifications with a maximum of 1000 items.
-      const newItems = await dispatch(
+      await dispatch(
         attachPromise(
-          getNotifications(userId, filters, {
+          action({
             limit: Math.min((stopPage - startPage + 1) * BATCH_SIZE, 1000),
             page: startPage,
           }),
         ),
       )
 
-      // Update the total count of notifications.
-      setTotalCount(newItems.totalCount)
-
-      // Integrate the new items into the existing list.
-      const updatedItems = fillIntoArray(
-        reset ? [] : items,
-        pageToIndices(startPage, limit)[0],
-        newItems.notifications,
-        newItems.totalCount,
-      )
-      setItems(updatedItems)
-
-      // Set the first notification as selected if none is currently selected.
-      if ((!notificationId || reset) && !isSmallScreen) {
-        navigate(`/notifications/${updatedItems[0].id}`)
-      } else if (notificationId && isSmallScreen) {
-        navigate(`/notifications/${notificationId}`)
-      }
-
-      // Determine if there are more pages to load.
-      setHasNextPage(updatedItems.length < newItems.totalCount)
       setFetching(false)
     },
-    [fetching, showArchived, dispatch, userId, items, notificationId, isSmallScreen, navigate],
+    [fetching, showArchived, dispatch],
   )
-
-  const handleShowArchived = useCallback(async () => {
-    // Toggle the showArchived state.
-    const newShowArchivedValue = showArchived === 'false' ? 'true' : 'false'
-    await setShowArchived(newShowArchivedValue)
-    // Reset items and selected notification.
-    setItems([])
-    navigate('/notifications')
-
-    // Load the first page of archived notifications.
-    // When handleShowArchived is defined, it captures the current value of showArchived.
-    // Even though showArchived is updated later, the captured value inside handleShowArchived remains the same.
-    // So loadNextPage() is called with the old value of showArchived, showing the same notifications again.
-    // To avoid this, we pass the new value of showArchived to loadNextPage() as an argument.
-    loadNextPage(0, BATCH_SIZE, newShowArchivedValue, true)
-  }, [loadNextPage, setShowArchived, showArchived, navigate])
 
   const handleArchive = useCallback(
     async (_, id) => {
       // Determine the filter to apply based on the showArchived state.
-      const updateFilter =
-        showArchived === 'true' ? 'NOTIFICATION_STATUS_SEEN' : 'NOTIFICATION_STATUS_ARCHIVED'
+      const updateFilter = showArchived
+        ? 'NOTIFICATION_STATUS_SEEN'
+        : 'NOTIFICATION_STATUS_ARCHIVED'
 
       // Update the status of the notification.
-      await dispatch(attachPromise(updateNotificationStatus(userId, [id], updateFilter)))
+      await dispatch(attachPromise(updateNotificationStatus([id], updateFilter)))
 
       // Find the index of the archived notification.
       const index = items.findIndex(item => item.id === id)
@@ -159,8 +113,6 @@ const Notifications = () => {
       // Update the selected notification to the one above the archived one,
       // unless there is only one item in the list.
       const previousNotification = totalCount === 1 ? undefined : items[Math.max(0, index - 1)]
-      const path = `/${previousNotification?.id}`
-      navigate(`/notifications${isSmallScreen ? '' : path}`)
 
       // Reload notifications starting from the archived one.
       await loadNextPage(
@@ -168,15 +120,17 @@ const Notifications = () => {
         index + BATCH_SIZE > items.length - 1 ? items.length - 1 : index + BATCH_SIZE,
       )
 
+      navigate(`/notifications/${category}/${previousNotification.id}`)
+
       // Reset the list cache if available so that old items are discarded.
       if (listRef.current && listRef.current.resetloadMoreItemsCache) {
         listRef.current.resetloadMoreItemsCache()
       }
     },
-    [showArchived, dispatch, userId, items, loadNextPage, totalCount, isSmallScreen, navigate],
+    [showArchived, dispatch, items, totalCount, navigate, category, loadNextPage],
   )
 
-  // Load the first page of notifications when the component mounts.
+  // Add a resize handler to detect mobile experiences.
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < LAYOUT.BREAKPOINTS.M) {
@@ -185,10 +139,26 @@ const Notifications = () => {
     }
     window.addEventListener('resize', handleResize)
 
-    loadNextPage(0, BATCH_SIZE)
     return () => window.removeEventListener('resize', handleResize)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [category, dispatch, showArchived])
+
+  // Update the selection cache when a notification is selected.
+  // This is used to restore the selection when switching between categories.
+  useEffect(() => {
+    setSelectionCache(v => ({ ...v, [category]: notificationId }))
+  }, [category, notificationId])
+
+  // Set the first notification as selected if none is currently selected.
+  useEffect(() => {
+    if (
+      !isSmallScreen &&
+      (!notificationId || !items.find(i => i.id === notificationId)) &&
+      items.length > 0
+    ) {
+      const selectedId = selectionCache[category] || items[0].id
+      navigate(`/notifications/${category}/${selectedId}`)
+    }
+  }, [category, isSmallScreen, items, navigate, notificationId, selectionCache])
 
   const selectedNotification = items?.find(item => item.id === notificationId)
 
@@ -213,15 +183,14 @@ const Notifications = () => {
           items={items}
           totalCount={totalCount}
           selectedNotification={selectedNotification}
-          isArchive={showArchived === 'true'}
           listRef={listRef}
         />
         <div className="d-flex j-center">
-          <Button
-            onClick={handleShowArchived}
-            naked
-            message={showArchived === 'true' ? m.seeAll : m.seeArchived}
+          <Button.Link
+            to={showArchived ? '/notifications/inbox' : '/notifications/archived'}
+            message={showArchived ? m.seeAll : m.seeArchived}
             className={style.notificationListChangeButton}
+            naked
           />
         </div>
       </div>
@@ -233,7 +202,6 @@ const Notifications = () => {
         {selectedNotification && (
           <NotificationContent
             selectedNotification={selectedNotification}
-            isArchive={showArchived === 'true'}
             onArchive={handleArchive}
             isSmallScreen={isSmallScreen}
           />
@@ -241,6 +209,6 @@ const Notifications = () => {
       </div>
     </div>
   )
-}
+})
 
 export default Notifications
