@@ -62,9 +62,7 @@ export const [
     success: getUnseenNotificationsSuccess,
     failure: getUnseenNotificationsFailure,
   },
-] = createRequestActions(GET_UNSEEN_NOTIFICATIONS_BASE, id => ({
-  id,
-}))
+] = createRequestActions(GET_UNSEEN_NOTIFICATIONS_BASE, () => ({}))
 
 export const UPDATE_NOTIFICATION_STATUS_BASE = 'UPDATE_NOTIFICATION_STATUS'
 export const [
@@ -82,3 +80,13 @@ export const [
   notificationIds,
   newStatus,
 }))
+
+export const MARK_ALL_AS_SEEN_BASE = 'MARK_ALL_AS_SEEN'
+export const [
+  {
+    request: MARK_ALL_AS_SEEN,
+    success: MARK_ALL_AS_SEEN_SUCCESS,
+    failure: MARK_ALL_AS_SEEN_FAILURE,
+  },
+  { request: markAllAsSeen, success: markAllAsSeenSuccess, failure: markAllAsSeenFailure },
+] = createRequestActions(MARK_ALL_AS_SEEN_BASE, () => ({}))

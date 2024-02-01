@@ -23,10 +23,42 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import * as notifications from '@console/store/actions/notifications'
 
 import { selectUserId } from '@console/store/selectors/logout'
+import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 const m = defineMessage({
   newNotifications: 'You have new notifications',
 })
+
+const updateThroughPagination = async (totalCount, userId) => {
+  let page = 1
+  const limit = 100
+  let result
+
+  while ((page - 1) * limit < totalCount) {
+    // Get the next page of notifications.
+    // eslint-disable-next-line no-await-in-loop
+    const notifications = await tts.Notifications.getAllNotifications(
+      userId,
+      ['NOTIFICATION_STATUS_UNSEEN'],
+      page,
+      limit,
+    )
+    // Get the notification ids.
+    const notificationIds = notifications.notifications.map(notification => notification.id)
+    // Make the update request.
+    // eslint-disable-next-line no-await-in-loop
+    const updatedNotifications = await tts.Notifications.updateNotificationStatus(
+      userId,
+      notificationIds,
+      'NOTIFICATION_STATUS_SEEN',
+    )
+
+    result = { ...result, ...updatedNotifications }
+    page += 1
+  }
+
+  return result
+}
 
 const getInboxNotificationsLogic = createRequestLogic({
   type: notifications.GET_INBOX_NOTIFICATIONS,
@@ -37,8 +69,15 @@ const getInboxNotificationsLogic = createRequestLogic({
     const filter = ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']
     const userId = selectUserId(getState())
     const result = await tts.Notifications.getAllNotifications(userId, filter, page, limit)
+    const unseen = result.notifications.filter(notification => !('status' in notification)).length
 
-    return { notifications: result.notifications, totalCount: result.totalCount, page, limit }
+    return {
+      notifications: result.notifications,
+      totalCount: result.totalCount,
+      unseenTotalCount: unseen,
+      page,
+      limit,
+    }
   },
 })
 
@@ -83,9 +122,20 @@ const updateNotificationStatusLogic = createRequestLogic({
       payload: { notificationIds, newStatus },
     } = action
     const id = selectUserId(getState())
-    const result = await tts.Notifications.updateNotificationStatus(id, notificationIds, newStatus)
+    await tts.Notifications.updateNotificationStatus(id, notificationIds, newStatus)
 
-    return { ...result, ids: notificationIds }
+    return { ids: notificationIds, status: newStatus }
+  },
+})
+
+const markAllAsSeenLogic = createRequestLogic({
+  type: notifications.MARK_ALL_AS_SEEN,
+  process: async ({ getState }) => {
+    const id = selectUserId(getState())
+    const totalUnseenCount = selectTotalUnseenCount(getState())
+    const result = updateThroughPagination(totalUnseenCount, id)
+
+    return { ...result, ids: [] }
   },
 })
 
@@ -94,4 +144,5 @@ export default [
   getArchivedNotificationsLogic,
   getUnseenNotificationsPeriodicallyLogic,
   updateNotificationStatusLogic,
+  markAllAsSeenLogic,
 ]

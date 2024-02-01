@@ -172,9 +172,20 @@ Button.defaultProps = {
 }
 
 const LinkButton = props => {
-  const { disabled, titleMessage } = props
+  const { disabled, titleMessage, onClick, value } = props
   const buttonClassNames = assembleClassnames(props)
   const { to } = props
+
+  const handleClick = useCallback(
+    evt => {
+      // Passing a value to the onClick handler is useful for components that
+      // are rendered multiple times, e.g. in a list. The value can be used to
+      // identify the component that was clicked.
+      onClick(evt, value)
+    },
+    [onClick, value],
+  )
+
   return (
     <Link
       className={buttonClassNames}
@@ -182,6 +193,7 @@ const LinkButton = props => {
       disabled={disabled}
       title={titleMessage}
       children={buttonChildren(props)}
+      onClick={handleClick}
     />
   )
 }
@@ -292,8 +304,13 @@ Button.defaultProps = {
 }
 
 LinkButton.propTypes = {
+  onClick: PropTypes.func,
   ...commonPropTypes,
   ...Link.propTypes,
+}
+
+LinkButton.defaultProps = {
+  onClick: () => null,
 }
 
 Button.Link = LinkButton

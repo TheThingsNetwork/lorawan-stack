@@ -16,6 +16,7 @@ import {
   GET_ARCHIVED_NOTIFICATIONS_SUCCESS,
   GET_INBOX_NOTIFICATIONS_SUCCESS,
   GET_UNSEEN_NOTIFICATIONS_SUCCESS,
+  MARK_ALL_AS_SEEN_SUCCESS,
   UPDATE_NOTIFICATION_STATUS_SUCCESS,
 } from '@console/store/actions/notifications'
 
@@ -61,6 +62,7 @@ const notifications = (state = defaultState, { type, payload }) => {
             totalCount: payload.totalCount,
           },
         },
+        unseenTotalCount: payload.unseenTotalCount,
       }
     case GET_ARCHIVED_NOTIFICATIONS_SUCCESS:
       return {
@@ -86,16 +88,15 @@ const notifications = (state = defaultState, { type, payload }) => {
     case UPDATE_NOTIFICATION_STATUS_SUCCESS:
       return {
         ...state,
-        unseenIds: state.unseenIds.filter(id => !payload.ids.includes(id)),
         unseenTotalCount:
-          state.unseenIds.length > 0
-            ? // This reducer is also triggered when a notification is archived so we need to make sure
-              // that the unseedIds include the notification that was just updated
-              // (if it was unseen before) and then update the unseenTotalCount accordingly.
-              payload.ids.some(id => state.unseenIds.includes(id))
-              ? state.unseenTotalCount - payload.ids.length
-              : state.unseenTotalCount
-            : 0,
+          payload.status === 'NOTIFICATION_STATUS_SEEN' && state.unseenTotalCount > 0
+            ? state.unseenTotalCount - payload.ids.length
+            : state.unseenTotalCount,
+      }
+    case MARK_ALL_AS_SEEN_SUCCESS:
+      return {
+        ...state,
+        unseenTotalCount: 0,
       }
     default:
       return state

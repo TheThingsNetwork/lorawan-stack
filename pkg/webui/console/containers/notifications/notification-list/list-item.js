@@ -15,6 +15,7 @@
 import React from 'react'
 import classNames from 'classnames'
 import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
@@ -26,11 +27,14 @@ import Notification from '@console/components/notifications'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
+
 import style from '../notifications.styl'
 
-export const NotificationListItem = ({ notification, isSelected, isNextSelected }) => {
+export const NotificationListItem = ({ notification, isSelected, isNextSelected, onClick }) => {
   const { category } = useParams()
-  const showUnseenStatus = notification.status === 'NOTIFICATION_STATUS_UNSEEN'
+  const totalUnseenCount = useSelector(selectTotalUnseenCount)
+  const showUnseenStatus = !notification.status && totalUnseenCount > 0
   const classes = classNames(style.notificationPreview, {
     [style.notificationSelected]: isSelected,
     [style.notificationNextSelected]: isNextSelected,
@@ -43,6 +47,8 @@ export const NotificationListItem = ({ notification, isSelected, isNextSelected 
       to={`/notifications/${category}/${notification.id}`}
       className={classes}
       data-test-id="notification-list-item"
+      onClick={onClick}
+      value={notification.id}
     >
       {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
       <div className="w-full">
@@ -86,6 +92,7 @@ NotificationListItem.propTypes = {
     notification_type: PropTypes.string,
     status: PropTypes.string,
   }).isRequired,
+  onClick: PropTypes.func.isRequired,
 }
 
 NotificationListItem.defaultProps = {
