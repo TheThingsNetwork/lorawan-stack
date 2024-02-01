@@ -53,7 +53,7 @@ const notifications = (state = defaultState, { type, payload }) => {
           ...state.notifications,
           inbox: {
             entities: fillIntoArray(
-              state.notifications,
+              state.notifications.inbox.entities,
               pageToIndices(payload.page, payload.limit)[0],
               payload.notifications,
               payload.totalCount,
@@ -69,7 +69,7 @@ const notifications = (state = defaultState, { type, payload }) => {
           ...state.notifications,
           archived: {
             entities: fillIntoArray(
-              state.notifications,
+              state.notifications.archived.entities,
               pageToIndices(payload.page, payload.limit)[0],
               payload.notifications,
               payload.totalCount,

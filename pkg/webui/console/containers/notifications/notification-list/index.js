@@ -53,7 +53,7 @@ const NotificationList = ({
 }) => {
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const { category } = useParams()
-  const isArchive = category === 'archive'
+  const isArchive = category === 'archived'
   const dispatch = useDispatch()
   const isItemLoaded = useCallback(
     index => (items.length > 0 ? !hasNextPage || index < items.length : false),
