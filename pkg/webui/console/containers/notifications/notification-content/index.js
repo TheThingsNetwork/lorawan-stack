@@ -70,7 +70,7 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
           <Button.Link
             to="/notifications/inbox"
             icon="chevron_left"
-            className="m:d-flex d-none"
+            className="s:d-flex d-none"
             naked
           />
           <div>

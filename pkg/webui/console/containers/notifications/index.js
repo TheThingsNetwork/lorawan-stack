@@ -120,14 +120,18 @@ const Notifications = React.memo(() => {
         index + BATCH_SIZE > items.length - 1 ? items.length - 1 : index + BATCH_SIZE,
       )
 
-      navigate(`/notifications/${category}/${previousNotification.id}`)
+      if (isSmallScreen) {
+        navigate(`/notifications/${category}`)
+      } else {
+        navigate(`/notifications/${category}/${previousNotification.id}`)
+      }
 
       // Reset the list cache if available so that old items are discarded.
       if (listRef.current && listRef.current.resetloadMoreItemsCache) {
         listRef.current.resetloadMoreItemsCache()
       }
     },
-    [showArchived, dispatch, items, totalCount, navigate, category, loadNextPage],
+    [showArchived, dispatch, items, totalCount, navigate, category, loadNextPage, isSmallScreen],
   )
 
   // Add a resize handler to detect mobile experiences.
