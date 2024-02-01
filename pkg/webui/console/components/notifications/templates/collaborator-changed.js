@@ -117,7 +117,7 @@ const CollaboratorChanged = ({ notificationData }) => {
         <Link
           to={`/${getEntity(entity_ids)}s/${
             entity_ids[`${getEntity(entity_ids)}_ids`][`${getEntity(entity_ids)}_id`]
-          }/collaborators/user/${getId(ids)}`}
+          }/collaborators/${getType(ids)}/${getId(ids)}`}
         >
           {msg}
         </Link>
