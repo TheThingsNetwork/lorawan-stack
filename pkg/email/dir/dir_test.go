@@ -29,10 +29,11 @@ func TestMailDir(t *testing.T) {
 	tempDir := t.TempDir()
 
 	mailer, err := New(ctx, email.Config{
-		SenderName:    "Sender Name",
-		SenderAddress: "sender@example.com",
-		Provider:      "dir",
-		Network:       email.NetworkConfig{
+		SenderConfig: email.SenderConfig{
+			SenderName:    "Sender Name",
+			SenderAddress: "sender@example.com",
+		},
+		Network: email.NetworkConfig{
 			// Not used
 		},
 	}, tempDir)

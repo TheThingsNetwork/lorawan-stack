@@ -52,8 +52,10 @@ func TestSMTP(t *testing.T) {
 	smtp, err := New(
 		ctx,
 		email.Config{
-			SenderName:    "Unit Test",
-			SenderAddress: "unit@test.local",
+			SenderConfig: email.SenderConfig{
+				SenderName:    "Unit Test",
+				SenderAddress: "unit@test.local",
+			},
 		},
 		Config{
 			Address: smtpAddress,
