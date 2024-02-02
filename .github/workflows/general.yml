@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+      - name: Fetch base ref
+        run: git fetch origin ${{ github.base_ref }}
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
       - name: Build Mage
@@ -17,7 +19,7 @@ jobs:
       - name: Install Node and Dependencies
         uses: ./.github/actions/install-node-and-deps
       - name: Check headers
-        run: tools/bin/mage headers:check
+        run: tools/bin/mage headers:check headers:checkNewFiles
       - name: Fix common spelling mistakes
         run: tools/bin/mage dev:misspell
       - name: Format SQL files
