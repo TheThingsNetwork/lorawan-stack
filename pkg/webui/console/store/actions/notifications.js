@@ -50,19 +50,19 @@ export const [
   limit,
 }))
 
-export const GET_UNSEEN_NOTIFICATIONS_BASE = 'GET_UNSEEN_NOTIFICATIONS'
+export const GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_BASE = 'GET_UNSEEN_NOTIFICATIONS_PERIODICALLY'
 export const [
   {
-    request: GET_UNSEEN_NOTIFICATIONS,
-    success: GET_UNSEEN_NOTIFICATIONS_SUCCESS,
-    failure: GET_UNSEEN_NOTIFICATIONS_FAILURE,
+    request: GET_UNSEEN_NOTIFICATIONS_PERIODICALLY,
+    success: GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_SUCCESS,
+    failure: GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_FAILURE,
   },
   {
-    request: getUnseenNotifications,
-    success: getUnseenNotificationsSuccess,
-    failure: getUnseenNotificationsFailure,
+    request: getUnseenNotificationsPeriodically,
+    success: getUnseenNotificationsPeriodicallySuccess,
+    failure: getUnseenNotificationsPeriodicallyFailure,
   },
-] = createRequestActions(GET_UNSEEN_NOTIFICATIONS_BASE, () => ({}))
+] = createRequestActions(GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_BASE, () => ({}))
 
 export const UPDATE_NOTIFICATION_STATUS_BASE = 'UPDATE_NOTIFICATION_STATUS'
 export const [

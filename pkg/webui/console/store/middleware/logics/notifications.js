@@ -96,21 +96,34 @@ const getArchivedNotificationsLogic = createRequestLogic({
 })
 
 const getUnseenNotificationsPeriodicallyLogic = createRequestLogic({
-  type: notifications.GET_UNSEEN_NOTIFICATIONS,
-  process: async ({ getState }) => {
+  type: notifications.GET_UNSEEN_NOTIFICATIONS_PERIODICALLY,
+  process: async ({ getState }, dispatch) => {
     clearInterval()
     const id = selectUserId(getState())
     const result = await tts.Notifications.getAllNotifications(id, ['NOTIFICATION_STATUS_UNSEEN'])
-    let totalCount = result.totalCount
+
     setInterval(async () => {
+      const totalCount = selectTotalUnseenCount(getState())
       const newResult = await tts.Notifications.getAllNotifications(id, [
         'NOTIFICATION_STATUS_UNSEEN',
       ])
+
       if (newResult.totalCount > totalCount) {
+        dispatch(
+          notifications.getUnseenNotificationsPeriodicallySuccess({
+            totalCount: newResult.totalCount,
+          }),
+        )
         toast({ message: m.newNotifications, type: toast.types.INFO })
       }
-      totalCount = newResult.totalCount
     }, [1000 * 60 * 5]) // 5 minutes
+
+    dispatch(
+      notifications.getUnseenNotificationsPeriodicallySuccess({
+        totalCount: result.totalCount,
+      }),
+    )
+
     return { notifications: result.notifications, totalCount: result.totalCount }
   },
 })

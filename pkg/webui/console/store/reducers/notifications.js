@@ -15,7 +15,7 @@
 import {
   GET_ARCHIVED_NOTIFICATIONS_SUCCESS,
   GET_INBOX_NOTIFICATIONS_SUCCESS,
-  GET_UNSEEN_NOTIFICATIONS_SUCCESS,
+  GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_SUCCESS,
   MARK_ALL_AS_SEEN_SUCCESS,
   UPDATE_NOTIFICATION_STATUS_SUCCESS,
 } from '@console/store/actions/notifications'
@@ -80,7 +80,7 @@ const notifications = (state = defaultState, { type, payload }) => {
           },
         },
       }
-    case GET_UNSEEN_NOTIFICATIONS_SUCCESS:
+    case GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_SUCCESS:
       return {
         ...state,
         unseenTotalCount: payload.totalCount,
