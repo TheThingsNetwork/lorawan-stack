@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,14 @@ import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const PlusIcon = ({ className }) => (
-  <svg fill="none" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" className={className}>
+const PlusIcon = React.forwardRef(({ className }, ref) => (
+  <svg
+    fill="none"
+    viewBox="0 0 21 21"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    ref={ref}
+  >
     <mask
       id="a"
       x="0"
@@ -36,7 +42,7 @@ const PlusIcon = ({ className }) => (
       />
     </g>
   </svg>
-)
+))
 
 PlusIcon.propTypes = {
   className: PropTypes.string,
