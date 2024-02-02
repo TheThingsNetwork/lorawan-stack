@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.icon
+span.icon
   material-icon()
 
   &.small
@@ -21,6 +21,19 @@
   &.large
     font-size: 2rem
 
+svg.icon
+  height: 1.5rem
+  width: 1.5rem
+
+  &.small
+    height: 1rem
+    width: 1rem
+
+  &.large
+    height: 2rem
+    width: 2rem
+
+.icon
   &.nudgeUp
     position: relative
     top: -1px
@@ -32,6 +45,6 @@
 .text-padded
   &-right
     margin-right: $cs.xxs
-  
+
   &-left
     margin-left: $cs.xxs

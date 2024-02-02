@@ -16,6 +16,9 @@ import React, { forwardRef } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
+import StarIcon from './replacements/star-icon'
+import PlusIcon from './replacements/plus-icon'
+
 import style from './icon.styl'
 
 // A map of hardcoded names to their corresponding icons.
@@ -71,6 +74,11 @@ const hardcoded = {
   valid: 'check_circle',
 }
 
+const replaced = {
+  star: StarIcon,
+  plus: PlusIcon,
+}
+
 const Icon = forwardRef((props, ref) => {
   const {
     icon,
@@ -92,6 +100,12 @@ const Icon = forwardRef((props, ref) => {
     [style.textPaddedLeft]: textPaddedLeft,
     [style.textPaddedRight]: textPaddedRight,
   })
+
+  if (replaced[icon]) {
+    const ReplacedIcon = replaced[icon]
+
+    return <ReplacedIcon className={classname} ref={ref} {...rest} />
+  }
 
   return (
     <span className={classname} ref={ref} {...rest}>
