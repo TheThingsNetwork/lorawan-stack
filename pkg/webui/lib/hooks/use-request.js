@@ -30,8 +30,8 @@ const useRequest = (requestAction, requestOnChange) => {
         requestAction instanceof Array
           ? Promise.all(requestAction.map(req => dispatch(attachPromise(req))))
           : typeof requestAction === 'function'
-          ? requestAction(dispatch)
-          : dispatch(attachPromise(requestAction))
+            ? requestAction(dispatch)
+            : dispatch(attachPromise(requestAction))
 
       promise
         .then(result => {
