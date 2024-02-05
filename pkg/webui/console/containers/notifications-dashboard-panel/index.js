@@ -28,20 +28,18 @@ import Notification from '@console/components/notifications'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getNotifications } from '@console/store/actions/notifications'
+import { getInboxNotifications } from '@console/store/actions/notifications'
 
 import {
-  selectNotifications,
-  selectTotalNotificationsCount,
+  selectInboxNotifications,
+  selectInboxNotificationsTotalCount,
   selectTotalUnseenCount,
 } from '@console/store/selectors/notifications'
-import { selectUserId } from '@console/store/selectors/logout'
 
 import style from './notifications-dashboard-panel.styl'
 
 const NotificationsDashboardPanel = () => {
   const totalUnseenNotifications = useSelector(selectTotalUnseenCount)
-  const userId = useSelector(selectUserId)
 
   const MessageDecorator = () => (
     <span className={style.notificationPanelTotal}>{totalUnseenNotifications}</span>
@@ -84,17 +82,10 @@ const NotificationsDashboardPanel = () => {
     },
   ]
 
-  const getItems = React.useCallback(
-    () =>
-      getNotifications(userId, ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN'], {
-        limit: 5,
-        page: 1,
-      }),
-    [userId],
-  )
+  const getItems = React.useCallback(() => getInboxNotifications({ page: 1, limit: 5 }), [])
 
   const baseDataSelectors = createSelector(
-    [selectNotifications, selectTotalNotificationsCount],
+    [selectInboxNotifications, selectInboxNotificationsTotalCount],
     (notifications, totalCount) => {
       const decoratedNotifications = []
       for (const notification of notifications) {
