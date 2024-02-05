@@ -21,6 +21,12 @@ import NewsItem from '.'
 export default {
   title: 'Panel/News Panel/News Item',
   component: NewsItem,
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/console-redesign?type=design&node-id=1661-5590&mode=design&t=2KlaQGRV9FQm7Nv3-4 ',
+    },
+  },
 }
 
 export const Default = () => (

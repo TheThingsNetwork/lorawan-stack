@@ -34,7 +34,6 @@ const Toggle = ({ options, onToggleChange, active }) => (
           message={label}
           value={value}
           onClick={onToggleChange}
-          unstyled
           className={buttonClassName}
         />
       )
