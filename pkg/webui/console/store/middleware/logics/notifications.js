@@ -31,7 +31,7 @@ const m = defineMessage({
 
 const updateThroughPagination = async (totalCount, userId) => {
   let page = 1
-  const limit = 100
+  const limit = 1000
   let result = []
 
   while ((page - 1) * limit < totalCount) {

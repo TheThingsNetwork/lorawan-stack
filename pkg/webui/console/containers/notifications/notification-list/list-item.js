@@ -31,7 +31,7 @@ import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import style from '../notifications.styl'
 
-export const NotificationListItem = ({ notification, isSelected, isNextSelected, onClick }) => {
+export const NotificationListItem = ({ notification, isSelected, isNextSelected }) => {
   const { category } = useParams()
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const showUnseenStatus = !notification.status && totalUnseenCount > 0
@@ -47,7 +47,6 @@ export const NotificationListItem = ({ notification, isSelected, isNextSelected,
       to={`/notifications/${category}/${notification.id}`}
       className={classes}
       data-test-id="notification-list-item"
-      onClick={onClick}
       value={notification.id}
     >
       {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
@@ -92,7 +91,6 @@ NotificationListItem.propTypes = {
     notification_type: PropTypes.string,
     status: PropTypes.string,
   }).isRequired,
-  onClick: PropTypes.func.isRequired,
 }
 
 NotificationListItem.defaultProps = {

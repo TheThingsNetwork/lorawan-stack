@@ -30,7 +30,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { markAllAsSeen, updateNotificationStatus } from '@console/store/actions/notifications'
+import { markAllAsSeen } from '@console/store/actions/notifications'
 
 import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
@@ -64,18 +64,6 @@ const NotificationList = ({
   // Otherwise, if totalCount is 0, it means the list is empty and we should not have a total count.
   const itemCount = totalCount >= 0 ? totalCount : 100
 
-  const handleClick = useCallback(
-    async (_, id) => {
-      const clickedNotification = items.find(notification => notification.id === id)
-      const index = items.findIndex(notification => notification.id === id)
-      if (!isArchive && !('status' in clickedNotification) && totalUnseenCount > 0) {
-        await dispatch(attachPromise(updateNotificationStatus([id], 'NOTIFICATION_STATUS_SEEN')))
-        loadNextPage(index, index + 1)
-      }
-    },
-    [items, dispatch, isArchive, totalUnseenCount, loadNextPage],
-  )
-
   const handleMarkAllAsSeen = useCallback(async () => {
     if (totalUnseenCount > 0) {
       const result = await dispatch(attachPromise(markAllAsSeen()))
@@ -103,7 +91,6 @@ const NotificationList = ({
           notification={items[index]}
           isSelected={isSelected(items[index])}
           isNextSelected={isNextSelected(items[index])}
-          onClick={handleClick}
         />
       </div>
     ) : (

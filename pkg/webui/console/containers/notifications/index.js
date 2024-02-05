@@ -36,6 +36,7 @@ import {
   selectArchivedNotificationsTotalCount,
   selectInboxNotifications,
   selectInboxNotificationsTotalCount,
+  selectTotalUnseenCount,
 } from '@console/store/selectors/notifications'
 
 import NotificationList from './notification-list'
@@ -66,6 +67,7 @@ const Notifications = React.memo(() => {
   const totalCount = useSelector(
     showArchived ? selectArchivedNotificationsTotalCount : selectInboxNotificationsTotalCount,
   )
+  const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const hasNextPage = items.length < totalCount
   const [fetching, setFetching] = useState(false)
   const [selectionCache, setSelectionCache] = useState({ archived: undefined, inbox: undefined })
@@ -163,6 +165,24 @@ const Notifications = React.memo(() => {
       navigate(`/notifications/${category}/${selectedId}`)
     }
   }, [category, isSmallScreen, items, navigate, notificationId, selectionCache])
+
+  // Update the status of the selected notification to seen.
+  useEffect(() => {
+    const clickedNotification = items.find(notification => notification.id === notificationId)
+    const index = items.findIndex(notification => notification.id === notificationId)
+    const timer = setTimeout(() => {
+      if (category === 'inbox' && !('status' in clickedNotification) && totalUnseenCount > 0) {
+        dispatch(
+          attachPromise(
+            updateNotificationStatus([clickedNotification.id], 'NOTIFICATION_STATUS_SEEN'),
+          ),
+        )
+        loadNextPage(index, index + 1)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [category, items, dispatch, loadNextPage, totalUnseenCount, notificationId])
 
   const selectedNotification = items?.find(item => item.id === notificationId)
 
