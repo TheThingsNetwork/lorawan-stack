@@ -61,8 +61,8 @@ describe('Collaborators', () => {
           entity === 'applications'
             ? applicationRights
             : entity === 'gateways'
-            ? gatewayRights
-            : organizationRights,
+              ? gatewayRights
+              : organizationRights,
       },
     }
   }

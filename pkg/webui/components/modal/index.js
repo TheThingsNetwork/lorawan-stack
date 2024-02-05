@@ -109,8 +109,8 @@ const Modal = props => {
     buttonMessage !== undefined
       ? buttonMessage
       : approval
-      ? sharedMessages.approve
-      : sharedMessages.ok
+        ? sharedMessages.approve
+        : sharedMessages.ok
   let buttons = (
     <div>
       <Button

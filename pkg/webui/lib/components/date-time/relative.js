@@ -57,9 +57,12 @@ const RelativeTime = props => {
     // Show the `just now` message for deltas shorter than the update interval.
     if (absDelta < minInterval) {
       setShowLessThan(true)
-      const timer = setTimeout(() => {
-        setShowLessThan(false)
-      }, (minInterval - absDelta) * 1000)
+      const timer = setTimeout(
+        () => {
+          setShowLessThan(false)
+        },
+        (minInterval - absDelta) * 1000,
+      )
       return () => {
         clearTimeout(timer)
       }

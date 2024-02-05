@@ -61,15 +61,15 @@ const createToast = () => {
         typeof message === 'string'
           ? message.length
           : typeof message === 'object' && message.defaultMessage
-          ? message.defaultMessage.length
-          : 0
+            ? message.defaultMessage.length
+            : 0
       if (title) {
         messageLength +=
           typeof title === 'string'
             ? title.length
             : typeof title === 'object' && title.defaultMessage
-            ? title.defaultMessage.length
-            : 0
+              ? title.defaultMessage.length
+              : 0
       }
       // Calculate the reading time to use as `autoClose` duration.
       autoClose = Math.min(12000, Math.max(5000, messageLength * 150))

@@ -83,8 +83,8 @@ const OfflineStatus = ({ showOfflineOnly, showWarnings, onlineStatus }) => {
   const message = isOnline
     ? sharedMessages.online
     : isChecking
-    ? sharedMessages.connectionIssues
-    : sharedMessages.offline
+      ? sharedMessages.connectionIssues
+      : sharedMessages.offline
   const cls = classnames(style.status, {
     [style.online]: isOnline,
     [style.offline]: isOffline,

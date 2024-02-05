@@ -111,8 +111,8 @@ const RoutingConfigurationView = () => {
       isValidPolicy(defaultRoutingPolicy)
         ? 'all_networks'
         : onlyTtn(routingPolicies) && !isValidPolicy(defaultRoutingPolicy)
-        ? 'ttn'
-        : 'custom',
+          ? 'ttn'
+          : 'custom',
     _use_default_policy: isValidPolicy(defaultRoutingPolicy),
   }
   initialValues.policy = isValidPolicy(defaultRoutingPolicy)

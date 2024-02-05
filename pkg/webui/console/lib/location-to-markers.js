@@ -50,8 +50,8 @@ const createLocationObject = (location, key) => ({
           key === 'user' || location?.source === 'SOURCE_REGISTRY'
             ? sharedMessages.locationMarkerDescriptionUser
             : location.trusted === false
-            ? sharedMessages.locationMarkerDescriptionUntrusted
-            : sharedMessages.locationMarkerDescriptionNonUser
+              ? sharedMessages.locationMarkerDescriptionUntrusted
+              : sharedMessages.locationMarkerDescriptionNonUser
         }
       />
       <br />

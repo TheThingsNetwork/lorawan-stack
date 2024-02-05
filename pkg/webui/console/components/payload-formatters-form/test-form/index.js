@@ -126,8 +126,8 @@ const TestForm = props => {
       showTestError || showTestWarning
         ? JSON.stringify(testResult, null, 2)
         : 'decoded_payload' in testResult && !('frm_payload' in testResult)
-        ? formatMessage(m.emptyPayload)
-        : ''
+          ? formatMessage(m.emptyPayload)
+          : ''
   }
   let infoIcon = 'info'
   let infoMessage = m.noResult

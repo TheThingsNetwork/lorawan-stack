@@ -186,8 +186,8 @@ class SortableExample extends React.Component {
               order === 'asc'
                 ? asc(a[orderBy], b[orderBy])
                 : order === 'desc'
-                ? -asc(a[orderBy], b[orderBy])
-                : 0,
+                  ? -asc(a[orderBy], b[orderBy])
+                  : 0,
             ),
         }),
       800,

@@ -20,10 +20,10 @@ export const getActivationMode = device =>
   device.supports_join === true
     ? ACTIVATION_MODES.OTAA
     : device.multicast === true
-    ? ACTIVATION_MODES.MULTICAST
-    : device.supports_join === false && device.multicast === false
-    ? ACTIVATION_MODES.ABP
-    : ACTIVATION_MODES.NONE
+      ? ACTIVATION_MODES.MULTICAST
+      : device.supports_join === false && device.multicast === false
+        ? ACTIVATION_MODES.ABP
+        : ACTIVATION_MODES.NONE
 
 export const getLorawanVersion = device => device.lorawan_version || '1.1.0'
 

@@ -106,14 +106,14 @@ const activationModeValueSetter = ({ setValues }, { value, value: { multicast } 
         multicast && isClassA
           ? undefined
           : !multicast && supports_class_b === undefined
-          ? false
-          : supports_class_b,
+            ? false
+            : supports_class_b,
       supports_class_c:
         multicast && isClassA
           ? undefined
           : !multicast && supports_class_c === undefined
-          ? false
-          : supports_class_c,
+            ? false
+            : supports_class_c,
       // Reset provisioning data if activation mode changed.
       ...(values.supports_join !== value.supports_join ? provisioningInitialValues : {}),
       // Skip JoinEUI check if the device is ABP/Multicast.

@@ -208,8 +208,8 @@ const NetworkServerForm = React.memo(props => {
   const initialActivationMode = supports_join
     ? ACTIVATION_MODES.OTAA
     : multicast
-    ? ACTIVATION_MODES.MULTICAST
-    : ACTIVATION_MODES.ABP
+      ? ACTIVATION_MODES.MULTICAST
+      : ACTIVATION_MODES.ABP
 
   const initialValues = React.useMemo(
     () =>

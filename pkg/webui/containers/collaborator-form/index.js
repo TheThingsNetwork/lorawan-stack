@@ -217,8 +217,8 @@ const CollaboratorForm = props => {
               deleteDisabled
                 ? sharedMessages.removeCollaboratorLast
                 : isCollaboratorCurrentUser
-                ? sharedMessages.removeCollaboratorSelf
-                : sharedMessages.removeCollaborator
+                  ? sharedMessages.removeCollaboratorSelf
+                  : sharedMessages.removeCollaborator
             }
             modalData={{
               message: isCollaboratorCurrentUser
