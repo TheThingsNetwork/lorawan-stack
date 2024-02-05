@@ -171,7 +171,7 @@ const Notifications = React.memo(() => {
     const clickedNotification = items.find(notification => notification.id === notificationId)
     const index = items.findIndex(notification => notification.id === notificationId)
     const timer = setTimeout(() => {
-      if (category === 'inbox' && !('status' in clickedNotification) && totalUnseenCount > 0) {
+      if (category === 'inbox' && !clickedNotification?.status && totalUnseenCount > 0) {
         dispatch(
           attachPromise(
             updateNotificationStatus([clickedNotification.id], 'NOTIFICATION_STATUS_SEEN'),
