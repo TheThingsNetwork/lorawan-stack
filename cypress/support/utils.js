@@ -158,8 +158,8 @@ const generateCollaborator = (entity, type) => {
         entity === 'applications'
           ? applicationRights
           : entity === 'gateways'
-          ? gatewayRights
-          : organizationRights,
+            ? gatewayRights
+            : organizationRights,
     },
   }
 }

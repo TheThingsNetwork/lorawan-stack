@@ -67,8 +67,8 @@ const IdentityServerForm = React.memo(props => {
     device.join_server_address
       ? device.join_server_address
       : jsConfig.enabled
-      ? getHostnameFromUrl(jsConfig.base_url)
-      : '',
+        ? getHostnameFromUrl(jsConfig.base_url)
+        : '',
   )
 
   const [error, setError] = React.useState('')

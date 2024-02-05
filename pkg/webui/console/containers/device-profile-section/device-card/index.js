@@ -51,13 +51,13 @@ const DeviceCard = props => {
   const modeTitleLabel = device.supports_join
     ? sharedMessages.otaa
     : device.multicast
-    ? sharedMessages.multicast
-    : sharedMessages.abp
+      ? sharedMessages.multicast
+      : sharedMessages.abp
   const deviceClassTitleLabel = device.supports_class_c
     ? m.classC
     : device.supports_class_b
-    ? m.classB
-    : m.classA
+      ? m.classB
+      : m.classA
   const hasLinks = Boolean(product_url || datasheet_url)
 
   return (

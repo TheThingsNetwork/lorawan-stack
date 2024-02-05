@@ -165,8 +165,8 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
       lorawanVersion < 100
         ? sharedMessages.appEUIJoinEUI
         : lorawanVersion >= 104
-        ? sharedMessages.joinEUI
-        : sharedMessages.appEUI
+          ? sharedMessages.joinEUI
+          : sharedMessages.appEUI
 
     activationInfoData.items.push(
       { key: joinEUI, value: ids.join_eui, type: 'byte', sensitive: false },

@@ -199,10 +199,10 @@ const FormField = props => {
   const describedBy = showError
     ? `${name}-field-error`
     : showWarning
-    ? `${name}-field-warning`
-    : showDescription
-    ? `${name}-field-description`
-    : undefined
+      ? `${name}-field-warning`
+      : showDescription
+        ? `${name}-field-description`
+        : undefined
 
   const fieldMessage = showError ? (
     <div className={style.messages}>
