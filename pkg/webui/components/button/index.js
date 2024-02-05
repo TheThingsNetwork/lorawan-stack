@@ -26,6 +26,8 @@ import Message from '@ttn-lw/lib/components/message'
 import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import Dropdown from '../dropdown'
+
 import style from './button.styl'
 
 const filterDataProps = props =>

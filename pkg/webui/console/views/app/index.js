@@ -136,43 +136,6 @@ const Layout = () => {
     return () => clearInterval(timer)
   }, [dispatch])
 
-  // For the mobile side menu drawer functionality.
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const node = useRef()
-
-  const openDrawer = useCallback(() => {
-    setIsDrawerOpen(true)
-    document.body.classList.add(style.scrollLock)
-  }, [])
-
-  const closeDrawer = useCallback(() => {
-    setIsDrawerOpen(false)
-    document.body.classList.remove(style.scrollLock)
-  }, [])
-
-  useEffect(() => {
-    const onClickOutside = e => {
-      if (isDrawerOpen && node.current && !node.current.contains(e.target)) {
-        closeDrawer()
-      }
-    }
-
-    if (isDrawerOpen) {
-      document.addEventListener('mousedown', onClickOutside)
-      return () => document.removeEventListener('mousedown', onClickOutside)
-    }
-  }, [isDrawerOpen, closeDrawer])
-
-  // Pass this function to the header prop `onMenuClick`.
-  const onDrawerExpandClick = useCallback(() => {
-    if (!isDrawerOpen) {
-      openDrawer()
-    } else {
-      closeDrawer()
-    }
-  }, [isDrawerOpen, openDrawer, closeDrawer])
-  // End of mobile side menu drawer functionality
-
   return (
     <>
       <ScrollRestoration getKey={getScrollRestorationKey} />
@@ -185,9 +148,11 @@ const Layout = () => {
           <div id="modal-container" />
           <div className="d-flex">
             <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
-            <div className="w-full h-vh">
+            <div className="w-full h-vh d-flex direction-column">
               <Header onMenuClick={onDrawerExpandClick} />
-              <main className={classnames(style.main, 'd-flex', 'flex-column', 'h-full')}>
+              <main
+                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+              >
                 <WithAuth
                   user={user}
                   fetching={fetching}
