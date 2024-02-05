@@ -19,6 +19,12 @@ import ShortcutItem from '.'
 export default {
   title: 'Panel/Shortcut Panel/Shortcut Item',
   component: ShortcutItem,
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/console-redesign?type=design&node-id=1661-5695&mode=design&t=2KlaQGRV9FQm7Nv3-4',
+    },
+  },
 }
 
 export const Default = () => (

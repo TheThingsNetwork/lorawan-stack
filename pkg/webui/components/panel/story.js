@@ -23,6 +23,12 @@ import Panel from '.'
 export default {
   title: 'Panel',
   component: Panel,
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/console-redesign?type=design&node-id=1529-7836&mode=design&t=2KlaQGRV9FQm7Nv3-4',
+    },
+  },
 }
 
 export const Default = () => (

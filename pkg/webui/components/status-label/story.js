@@ -38,4 +38,10 @@ export const Default = {
       control: 'boolean',
     },
   },
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/console-redesign?type=design&node-id=1599-8145&mode=design&t=2KlaQGRV9FQm7Nv3-4',
+    },
+  },
 }
