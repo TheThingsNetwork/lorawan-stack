@@ -15,32 +15,20 @@
 .button
   reset-button()
   display: flex
+  align-items: center
   line-height: 1
   width: 100%
-  padding: 1px
   text-align: inherit
-  transition: color $ad.s ease-in
   text-transform: uppercase
-
-  &:not(&-active)
-    .no-sort
-      font-size: $fs.m
-      position: absolute
-      top: 2px
-
-    .no-sort:first-child
-      top: -2px
-
-  &:active,
-  &-active
-    color: var(--c-text-neutral-heavy)
-    margin-bottom: -2.3px
-    .no-sort
-      display: none
 
   &-center
     justify-content: center
 
-.icon
-  font-size: 1rem
-  transition: transform $ad.m ease-in-out
+  svg.icon
+    width: 0.75rem
+    height: 1rem
+    margin-left: 3.5px
+
+  .icon
+    font-size: 1rem
+    transition: transform $ad.m ease-in-out

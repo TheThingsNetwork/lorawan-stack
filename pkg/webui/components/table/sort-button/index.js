@@ -28,23 +28,19 @@ const SortButton = ({ name, onSort, className, active, direction, title, align }
     onSort(name)
   }, [name, onSort])
 
-  const buttonClassNames = classnames(className, style.button, 'pos-relative', {
-    [style.buttonActive]: active,
+  const buttonClassNames = classnames(className, style.button, {
     [style.buttonCenter]: align === 'center',
   })
+
+  let icon = 'sort'
+  if (active && direction) {
+    icon += `_order_${direction}`
+  }
 
   return (
     <button className={buttonClassNames} type="button" onClick={handleSort}>
       <Message content={title} />
-      {active ? (
-        <Icon
-          className={style.icon}
-          icon={direction === 'asc' ? 'arrow_drop_down' : 'arrow_drop_up'}
-          nudgeUp
-        />
-      ) : (
-        <Icon className={style.noSort} icon="sort" />
-      )}
+      <Icon className={style.icon} icon={icon} />
     </button>
   )
 }
