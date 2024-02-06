@@ -88,7 +88,8 @@ const NotificationsDashboardPanel = () => {
     [selectInboxNotifications, selectInboxNotificationsTotalCount],
     (notifications, totalCount) => {
       const decoratedNotifications = []
-      for (const notification of notifications) {
+      const firstFiveNotifications = notifications.slice(0, 5)
+      for (const notification of firstFiveNotifications) {
         decoratedNotifications.push({
           notification,
           id: notification.id,
@@ -118,6 +119,7 @@ const NotificationsDashboardPanel = () => {
         getItemsAction={getItems}
         getItemPathPrefix={item => `/notifications/inbox/${item.id}`}
         small
+        paginated={false}
       />
     </Panel>
   )
