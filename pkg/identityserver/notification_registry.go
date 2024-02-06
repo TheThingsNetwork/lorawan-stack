@@ -284,7 +284,8 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 			NotificationType: req.NotificationType,
 			Data:             req.Data,
 			SenderIds:        req.SenderIds,
-			Email:            req.Email,
+			// ReceiverIds are not included in the event, as they are part of the event identifiers.
+			Email: req.Email,
 		}))
 	}
 	events.Publish(evs...)
@@ -373,6 +374,7 @@ func (is *IdentityServer) updateNotificationStatus(ctx context.Context, req *ttn
 	}
 	events.Publish(
 		evtNotificationUpdateStatus.NewWithIdentifiersAndData(ctx, req.ReceiverIds, &ttnpb.UpdateNotificationStatusRequest{
+			// ReceiverIds are not included in the event, as they are part of the event identifiers.
 			Ids:    req.Ids,
 			Status: req.Status,
 		}),
