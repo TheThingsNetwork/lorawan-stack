@@ -33,7 +33,7 @@ var (
 	evtNotificationCreate = events.Define(
 		"user.notification.create", "create notification",
 		events.WithVisibility(ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ),
-		events.WithDataType(&ttnpb.CreateNotificationRequest{}),
+		events.WithDataType(&ttnpb.Notification{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
@@ -279,14 +279,7 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 
 	evs := make([]events.Event, 0, len(receiverUserIDs))
 	for _, ids := range receiverUserIDs {
-		evs = append(evs, evtNotificationCreate.NewWithIdentifiersAndData(ctx, ids, &ttnpb.CreateNotificationRequest{
-			EntityIds:        req.EntityIds,
-			NotificationType: req.NotificationType,
-			Data:             req.Data,
-			SenderIds:        req.SenderIds,
-			// ReceiverIds are not included in the event, as they are part of the event identifiers.
-			Email: req.Email,
-		}))
+		evs = append(evs, evtNotificationCreate.NewWithIdentifiersAndData(ctx, ids, notification))
 	}
 	events.Publish(evs...)
 
@@ -372,13 +365,7 @@ func (is *IdentityServer) updateNotificationStatus(ctx context.Context, req *ttn
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(
-		evtNotificationUpdateStatus.NewWithIdentifiersAndData(ctx, req.ReceiverIds, &ttnpb.UpdateNotificationStatusRequest{
-			// ReceiverIds are not included in the event, as they are part of the event identifiers.
-			Ids:    req.Ids,
-			Status: req.Status,
-		}),
-	)
+	events.Publish(evtNotificationUpdateStatus.NewWithIdentifiersAndData(ctx, req.ReceiverIds, req))
 	return ttnpb.Empty, nil
 }
 
