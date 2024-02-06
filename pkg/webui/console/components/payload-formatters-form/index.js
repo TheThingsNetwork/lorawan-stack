@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { injectIntl, defineMessages } from 'react-intl'
 import { Col, Row } from 'react-grid-system'
-import { unstable_useBlocker } from 'react-router-dom'
+import { useBlocker } from 'react-router-dom'
 
 import TYPES from '@console/constants/formatter-types'
 
@@ -254,7 +254,7 @@ const PayloadFormattersForm = ({
     },
     [formRef],
   )
-  const blocker = unstable_useBlocker(shouldBlock)
+  const blocker = useBlocker(shouldBlock)
 
   useEffect(() => {
     const isDirty = Boolean(
