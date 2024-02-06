@@ -62,7 +62,7 @@ export const [
     success: getUnseenNotificationsPeriodicallySuccess,
     failure: getUnseenNotificationsPeriodicallyFailure,
   },
-] = createRequestActions(GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_BASE, () => ({}))
+] = createRequestActions(GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_BASE)
 
 export const UPDATE_NOTIFICATION_STATUS_BASE = 'UPDATE_NOTIFICATION_STATUS'
 export const [
@@ -89,4 +89,18 @@ export const [
     failure: MARK_ALL_AS_SEEN_FAILURE,
   },
   { request: markAllAsSeen, success: markAllAsSeenSuccess, failure: markAllAsSeenFailure },
-] = createRequestActions(MARK_ALL_AS_SEEN_BASE, () => ({}))
+] = createRequestActions(MARK_ALL_AS_SEEN_BASE)
+
+export const REFRESH_NOTIFICATIONS_BASE = 'REFRESH_NOTIFICATIONS'
+export const [
+  {
+    request: REFRESH_NOTIFICATIONS,
+    success: REFRESH_NOTIFICATIONS_SUCCESS,
+    failure: REFRESH_NOTIFICATIONS_FAILURE,
+  },
+  {
+    request: refreshNotifications,
+    success: refreshNotificationsSuccess,
+    failure: refreshNotificationsFailure,
+  },
+] = createRequestActions(REFRESH_NOTIFICATIONS_BASE)

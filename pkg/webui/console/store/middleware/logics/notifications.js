@@ -13,12 +13,15 @@
 // limitations under the License.
 
 import { defineMessage } from 'react-intl'
+import { createLogic } from 'redux-logic'
 
 import tts from '@console/api/tts'
 
 import toast from '@ttn-lw/components/toast'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 import * as notifications from '@console/store/actions/notifications'
 
@@ -64,20 +67,55 @@ const getInboxNotificationsLogic = createRequestLogic({
   type: notifications.GET_INBOX_NOTIFICATIONS,
   process: async ({ action, getState }) => {
     const {
-      payload: { page, limit },
+      payload: { page = 1, limit = 1000 },
     } = action
     const filter = ['NOTIFICATION_STATUS_UNSEEN', 'NOTIFICATION_STATUS_SEEN']
     const userId = selectUserId(getState())
     const result = await tts.Notifications.getAllNotifications(userId, filter, page, limit)
-    const unseen = result.notifications.filter(notification => !('status' in notification)).length
 
     return {
       notifications: result.notifications,
       totalCount: result.totalCount,
-      unseenTotalCount: unseen,
       page,
       limit,
     }
+  },
+})
+
+const refreshNotificationsLogic = createRequestLogic({
+  type: notifications.REFRESH_NOTIFICATIONS,
+  debounce: 10000, // Set a debounce in case the interval clogs for some reason.
+  validate: ({ getState }, allow, reject) => {
+    // Avoid refreshing notifications while the Console is offline.
+    const isOnline = selectIsOnlineStatus(getState())
+    if (isOnline) {
+      allow()
+    } else {
+      reject()
+    }
+  },
+  process: async ({ getState }, dispatch) => {
+    const state = getState()
+    const userId = selectUserId(state)
+    const prevTotalUnseenCount = selectTotalUnseenCount(state)
+
+    const unseen = await tts.Notifications.getAllNotifications(
+      userId,
+      ['NOTIFICATION_STATUS_UNSEEN'],
+      1,
+      1,
+    )
+
+    // If there are new unseen notifications, show a toast and fetch the notifications.
+    if (unseen && unseen.totalCount > prevTotalUnseenCount) {
+      toast({
+        title: m.newNotifications,
+        type: toast.types.INFO,
+      })
+      await dispatch(attachPromise(notifications.getInboxNotifications()))
+    }
+
+    return { unseenTotalCount: unseen?.totalCount }
   },
 })
 
@@ -95,18 +133,23 @@ const getArchivedNotificationsLogic = createRequestLogic({
   },
 })
 
-const getUnseenNotificationsPeriodicallyLogic = createRequestLogic({
+const getUnseenNotificationsPeriodicallyLogic = createLogic({
   type: notifications.GET_UNSEEN_NOTIFICATIONS_PERIODICALLY,
-  process: async ({ getState }) => {
-    const id = selectUserId(getState())
-    const result = await tts.Notifications.getAllNotifications(id, ['NOTIFICATION_STATUS_UNSEEN'])
-    const totalCount = selectTotalUnseenCount(getState())
+  processOptions: {
+    dispatchMultiple: true,
+  },
+  warnTimeout: 0,
+  process: async (_, dispatch) => {
+    // Fetch once initially.
+    dispatch(notifications.refreshNotifications())
 
-    if (result.totalCount > totalCount) {
-      toast({ message: m.newNotifications, type: toast.types.INFO })
-    }
-
-    return { notifications: result.notifications, totalCount: result.totalCount }
+    setInterval(
+      async () => {
+        dispatch(notifications.refreshNotifications())
+      },
+      // Refresh notifications every 15 minutes.
+      1000 * 10 * 15,
+    )
   },
 })
 
@@ -135,6 +178,7 @@ const markAllAsSeenLogic = createRequestLogic({
 
 export default [
   getInboxNotificationsLogic,
+  refreshNotificationsLogic,
   getArchivedNotificationsLogic,
   getUnseenNotificationsPeriodicallyLogic,
   updateNotificationStatusLogic,

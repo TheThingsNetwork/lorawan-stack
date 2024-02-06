@@ -54,8 +54,6 @@ import {
 } from '@ttn-lw/lib/selectors/env'
 import { uuid as uuidRegexp } from '@ttn-lw/lib/regexp'
 
-import { getUnseenNotificationsPeriodically } from '@console/store/actions/notifications'
-
 import {
   selectUser,
   selectUserFetching,
@@ -124,17 +122,6 @@ const Layout = () => {
     }
   }, [isDrawerOpen, openDrawer, closeDrawer])
   // End of mobile side menu drawer functionality
-
-  // Fetch unseen notifications periodically, in order to update the state and
-  // and the new notifications dot in the header.
-  // Using this useEffect because the action to update the state is not dispatched within the
-  // setInterval() in the middleware logic.
-  useEffect(() => {
-    const timer = setInterval(() => {
-      dispatch(getUnseenNotificationsPeriodically())
-    }, 1000 * 60 * 5) // 5 minutes
-    return () => clearInterval(timer)
-  }, [dispatch])
 
   return (
     <>

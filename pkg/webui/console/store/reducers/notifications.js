@@ -15,8 +15,8 @@
 import {
   GET_ARCHIVED_NOTIFICATIONS_SUCCESS,
   GET_INBOX_NOTIFICATIONS_SUCCESS,
-  GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_SUCCESS,
   MARK_ALL_AS_SEEN_SUCCESS,
+  REFRESH_NOTIFICATIONS_SUCCESS,
   UPDATE_NOTIFICATION_STATUS_SUCCESS,
 } from '@console/store/actions/notifications'
 
@@ -24,7 +24,6 @@ const defaultState = {
   notifications: {
     inbox: { entities: [], totalCount: 0 },
     archived: { entities: [], totalCount: 0 },
-    unseen: { entities: [], totalCount: 0 },
   },
   unseenTotalCount: undefined,
 }
@@ -62,8 +61,19 @@ const notifications = (state = defaultState, { type, payload }) => {
             totalCount: payload.totalCount,
           },
         },
+      }
+    case REFRESH_NOTIFICATIONS_SUCCESS:
+      if (
+        payload.unseenTotalCount === undefined ||
+        payload.unseenTotalCount === state.unseenTotalCount
+      ) {
+        return state
+      }
+      return {
+        ...state,
         unseenTotalCount: payload.unseenTotalCount,
       }
+
     case GET_ARCHIVED_NOTIFICATIONS_SUCCESS:
       return {
         ...state,
@@ -79,11 +89,6 @@ const notifications = (state = defaultState, { type, payload }) => {
             totalCount: payload.totalCount,
           },
         },
-      }
-    case GET_UNSEEN_NOTIFICATIONS_PERIODICALLY_SUCCESS:
-      return {
-        ...state,
-        unseenTotalCount: payload.totalCount,
       }
     case UPDATE_NOTIFICATION_STATUS_SUCCESS:
       return {
