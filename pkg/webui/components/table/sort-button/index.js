@@ -43,10 +43,7 @@ const SortButton = ({ name, onSort, className, active, direction, title }) => {
           nudgeUp
         />
       ) : (
-        <div className="pos-relative" style={{ width: '14px' }}>
-          <Icon className={style.noSort} icon="arrow_drop_up" />
-          <Icon className={style.noSort} icon="arrow_drop_down" />
-        </div>
+        <Icon className={style.noSort} icon="sort" />
       )}
     </button>
   )

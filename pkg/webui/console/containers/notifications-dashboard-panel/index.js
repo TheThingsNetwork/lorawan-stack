@@ -116,10 +116,7 @@ const NotificationsDashboardPanel = () => {
         pageSize={5}
         baseDataSelector={baseDataSelectors}
         getItemsAction={getItems}
-        getItemPathPrefix={() => '/notifications'}
-        rowLinkState={notification => ({
-          notification: notification.notification,
-        })}
+        getItemPathPrefix={item => `/notifications/inbox/${item.id}`}
         small
       />
     </Panel>
