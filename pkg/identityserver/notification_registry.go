@@ -21,11 +21,19 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/protobuf/types/known/emptypb"
+)
+
+var evtNotificationCreate = events.Define(
+	"user.notification.create", "create notification",
+	events.WithVisibility(ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ),
+	events.WithAuthFromContext(),
+	events.WithClientInfoFromContext(),
 )
 
 func receiversContains(receivers []ttnpb.NotificationReceiver, search ttnpb.NotificationReceiver) bool {
@@ -258,6 +266,12 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 			return nil, err
 		}
 	}
+
+	evs := make([]events.Event, 0, len(receiverUserIDs))
+	for _, ids := range receiverUserIDs {
+		evs = append(evs, evtNotificationCreate.NewWithIdentifiersAndData(ctx, ids, notification.Id))
+	}
+	events.Publish(evs...)
 
 	return &ttnpb.CreateNotificationResponse{
 		Id: notification.Id,

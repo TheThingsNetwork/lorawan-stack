@@ -11438,6 +11438,15 @@
       "file": "user_registry.go"
     }
   },
+  "event:user.notification.create": {
+    "translations": {
+      "en": "create notification"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "notification_registry.go"
+    }
+  },
   "event:user.purge": {
     "translations": {
       "en": "purge user"
