@@ -1,0 +1,52 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.panel
+  width: 100%
+  border-radius: $br.xl
+  border: 1px solid var(--c-border-neutral-light)
+  background-color: var(--c-bg-neutral-min)
+  box-shadow: var(--shadow-box-panel-normal)
+  padding: $cs.xl
+
+  &-header
+    &-title
+      font-weight: $fwv2.bold
+      font-size: $fsv2.l
+      line-height: 1
+
+  a.button
+    font-weight: $fwv2.semibold
+    text-decoration: none transparent
+    transition: text-decoration $ad.s ease-in-out
+
+    &:hover
+      color: var(--c-text-brand-normal)
+      text-decoration: underline
+      text-decoration-thickness: 2px
+      text-underline-offset: .4rem
+      text-decoration-color: var(--c-text-brand-normal)
+
+  &-divider
+    border-bottom: 1px solid var(--c-border-neutral-light)
+    margin-top: $cs.l
+    margin-bottom: $cs.l
+    height: 0px
+
+.panel-header-icon
+  font-size: 1.5rem
+  background-color: var(--c-bg-brand-extralight)
+  padding: $cs.xs
+  border-radius: $br.l
+  color: var(--c-bg-brand-normal)

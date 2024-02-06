@@ -1,0 +1,71 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.shortcut
+  display: flex
+  gap: $cs.m
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  position: relative
+  padding: $cs.s $cs.m
+  text-decoration: none
+  height: 10.7rem
+  border-radius: $br.l
+  background: var(--c-bg-brand-normal)
+  color: var(--c-text-neutral-min)
+  font-size: $fs.m
+  font-weight: $fwv2.semibold
+  transition: $ad.s background ease-in-out
+
+  &-title-wrapper,
+  .add-icon-wrapper
+    position: absolute
+    width: 100%
+    height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    flex-direction: column
+    top: 0
+    opacity: 1
+    transition: $ad.s opacity ease-in-out
+
+  &-title-wrapper
+    opacity: 1
+
+  .add-icon-wrapper
+    opacity: 0
+
+  span.icon
+    font-size: 2rem
+
+  span.add-icon
+    font-size: 2.5rem
+
+  &:hover
+    cursor: pointer
+    background: var(--c-bg-brand-normal-hover)
+
+    .shortcut-title-wrapper
+      opacity: 0
+
+    .add-icon-wrapper
+      opacity: 1
+
+    span.icon
+      font-size: 2rem
+
+    span.add-icon
+      font-size: 2.5rem

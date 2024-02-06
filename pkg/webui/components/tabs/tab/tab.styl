@@ -21,13 +21,16 @@
 
 .tab-item
   display: flex
+  align-items: center
   white-space: nowrap
-  padding: $cs.m $cs.l
+  padding: $cs.m
+  gap: $cs.s
   text-align: center
   position: relative
   cursor: pointer
   user-select: none
   transition: color $ad.xs
+  color: var(--c-text-neutral-light)
 
   &-narrow
     padding: $cs.s $cs.m

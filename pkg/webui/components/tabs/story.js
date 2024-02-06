@@ -86,7 +86,7 @@ export const WithIcons = () => {
     { title: 'Data', name: 'data', icon: 'data' },
   ]
 
-  return <Example tabs={tabs} active={tabs[0].name} narrow />
+  return <Example tabs={tabs} active={tabs[0].name} divider />
 }
 
 WithIcons.story = {
