@@ -29,11 +29,19 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var evtNotificationCreate = events.Define(
-	"user.notification.create", "create notification",
-	events.WithVisibility(ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ),
-	events.WithAuthFromContext(),
-	events.WithClientInfoFromContext(),
+var (
+	evtNotificationCreate = events.Define(
+		"user.notification.create", "create notification",
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
+	evtNotificationUpdateStatus = events.Define(
+		"user.notification.update_status", "update notification status",
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 )
 
 func receiversContains(receivers []ttnpb.NotificationReceiver, search ttnpb.NotificationReceiver) bool {
@@ -269,7 +277,13 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 
 	evs := make([]events.Event, 0, len(receiverUserIDs))
 	for _, ids := range receiverUserIDs {
-		evs = append(evs, evtNotificationCreate.NewWithIdentifiersAndData(ctx, ids, notification.Id))
+		evs = append(evs, evtNotificationCreate.NewWithIdentifiersAndData(ctx, ids, &ttnpb.CreateNotificationRequest{
+			EntityIds:        req.EntityIds,
+			NotificationType: req.NotificationType,
+			Data:             req.Data,
+			SenderIds:        req.SenderIds,
+			Email:            req.Email,
+		}))
 	}
 	events.Publish(evs...)
 
@@ -355,6 +369,12 @@ func (is *IdentityServer) updateNotificationStatus(ctx context.Context, req *ttn
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(
+		evtNotificationUpdateStatus.NewWithIdentifiersAndData(ctx, req.ReceiverIds, &ttnpb.UpdateNotificationStatusRequest{
+			Ids:    req.Ids,
+			Status: req.Status,
+		}),
+	)
 	return ttnpb.Empty, nil
 }
 

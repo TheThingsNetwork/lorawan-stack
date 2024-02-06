@@ -2767,6 +2767,7 @@
   "event:user.create": "ユーザ作成",
   "event:user.delete": "ユーザ削除",
   "event:user.notification.create": "",
+  "event:user.notification.update_status": "",
   "event:user.purge": "ユーザ消去",
   "event:user.restore": "ユーザーの復元",
   "event:user.update": "ユーザ更新",

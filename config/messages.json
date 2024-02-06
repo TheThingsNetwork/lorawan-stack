@@ -11447,6 +11447,15 @@
       "file": "notification_registry.go"
     }
   },
+  "event:user.notification.update_status": {
+    "translations": {
+      "en": "update notification status"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "notification_registry.go"
+    }
+  },
   "event:user.purge": {
     "translations": {
       "en": "purge user"
