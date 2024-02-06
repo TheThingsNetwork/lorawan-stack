@@ -33,12 +33,14 @@ var (
 	evtNotificationCreate = events.Define(
 		"user.notification.create", "create notification",
 		events.WithVisibility(ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ),
+		events.WithDataType(&ttnpb.CreateNotificationRequest{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtNotificationUpdateStatus = events.Define(
 		"user.notification.update_status", "update notification status",
 		events.WithVisibility(ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ),
+		events.WithDataType(&ttnpb.UpdateNotificationStatusRequest{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
