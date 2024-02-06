@@ -41,14 +41,16 @@
     &:only-child
       margin-right: - $cs.xxs
 
-  .alert
-    left: 17px
+  &.with-alert:after
+    content: ''
     position: absolute
-    top: 1px
-    background: white
-    width: 7px
-    height: 14px
-    padding-left: $cs.xxs
+    top: 4px
+    left: 17px
+    border: 3px solid var(--c-border-neutral-min)
+    border-radius: 100%
+    size: 13px
+    box-sizing: border-box
+    background-color: var(--c-bg-brand-normal)
 
   .expand-icon
     color: var(--c-icon-neutral-light)

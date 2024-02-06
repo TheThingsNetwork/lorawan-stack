@@ -52,6 +52,7 @@ const assembleClassnames = ({
   dropdownItems,
   className,
   error,
+  withAlert,
 }) =>
   classnames(style.button, {
     [className]: !Boolean(dropdownItems), // If there are dropdown items, the button is wrapped in a div with the className.
@@ -67,15 +68,15 @@ const assembleClassnames = ({
     [style.onlyIcon]: icon !== undefined && !message,
     [style.withDropdown]: Boolean(dropdownItems),
     [style.error]: error && !busy,
+    [style.withAlert]: withAlert,
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, busy, message, noDropdownIcon, withAlert, children } = props
+  const { dropdownItems, icon, busy, message, noDropdownIcon, children } = props
 
   const content = (
     <>
       {icon && <Icon className={style.icon} icon={icon} />}
-      {withAlert && <Status pulse={false} status="good" flipped className={style.alert} />}
       {message && <Message content={message} className={style.linkButtonMessage} />}
       {children}
       {dropdownItems && (
