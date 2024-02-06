@@ -25,13 +25,6 @@ const handleSubmit = (data, { resetForm }) => {
   setTimeout(() => resetForm({ values: data }), 1000)
 }
 
-const info = {
-  inline: true,
-  header: false,
-  source: false,
-  propTables: [Form.Field],
-}
-
 const errorSchema = Yup.string().test('error', 'Something went wrong.', () => false)
 const validationSchema = Yup.object().shape({
   error: errorSchema,
@@ -64,4 +57,4 @@ FieldsWrapperExample.propTypes = {
   initialValues: PropTypes.shape({}).isRequired,
 }
 
-export { info, FieldsWrapperExample }
+export default FieldsWrapperExample
