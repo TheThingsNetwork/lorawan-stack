@@ -39,7 +39,6 @@ const FrontView = () => {
   return (
     <div className={style.container}>
       <section className={style.content}>
-        <Header />
         <div className={style.main}>
           <Routes>
             <Route path="/login" Component={Login} />

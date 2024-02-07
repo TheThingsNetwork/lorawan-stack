@@ -23,12 +23,15 @@ import Status from '@ttn-lw/components/status'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import Notification from '@console/components/notifications'
 
 import notificationStyle from '@console/containers/notifications/notifications.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { getInboxNotifications } from '@console/store/actions/notifications'
 
 import {
   selectInboxNotifications,
@@ -46,7 +49,7 @@ const NotificationsDropdown = () => {
   const totalNotifications = useSelector(selectInboxNotificationsTotalCount)
 
   return (
-    <>
+    <RequireRequest requestAction={getInboxNotifications()}>
       <div className={style.notificationsDropdownHeader}>
         <span>
           <Message content={sharedMessages.notifications} />{' '}
@@ -100,7 +103,7 @@ const NotificationsDropdown = () => {
       <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
         <Message content={m.description} values={{ totalNotifications }} />
       </div>
-    </>
+    </RequireRequest>
   )
 }
 
