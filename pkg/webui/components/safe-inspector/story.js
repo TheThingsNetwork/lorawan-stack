@@ -13,20 +13,11 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import SafeInspector from '.'
 
 export default {
   title: 'Safe Inspector',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      propTables: [SafeInspector],
-    }),
-  ],
 }
 
 export const Default = () => <SafeInspector data="ab01f46d2f" />

@@ -338,7 +338,8 @@ func (js Js) Storybook() error {
 	if mg.Verbose() {
 		fmt.Println("Serving storybook")
 	}
-	return js.runYarnCommandV("start-storybook",
+	return js.runYarnCommandV(
+		"sb", "dev",
 		"--config-dir", "./config/storybook",
 		"--port", "9001",
 	)

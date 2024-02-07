@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import Logo from '@assets/static/logo.svg'
 
@@ -36,15 +35,6 @@ const bottomLine = (
 
 export default {
   title: 'Modal',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      text: 'The modal can be displayed inline or portalled via `<PortalledModal />`',
-      propTables: [Modal],
-    }),
-  ],
 }
 
 export const BasicModal = () => (

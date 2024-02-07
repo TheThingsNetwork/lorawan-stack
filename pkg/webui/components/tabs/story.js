@@ -16,7 +16,6 @@
 
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
-import { withInfo } from '@storybook/addon-info'
 
 import Tabs from '.'
 
@@ -43,16 +42,6 @@ class Example extends Component {
 
 export default {
   title: 'Tabs',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: true,
-      propTables: [Tabs],
-      propTablesExclude: [Example],
-    }),
-  ],
 }
 
 export const Default = () => {

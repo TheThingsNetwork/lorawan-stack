@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import ErrorMessage from '.'
 
@@ -37,14 +36,6 @@ const exampleError = {
 
 export default {
   title: 'Utility Components/ErrorMessage',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      propTables: [ErrorMessage],
-    }),
-  ],
 }
 
 export const Default = () => <ErrorMessage content={exampleError} />

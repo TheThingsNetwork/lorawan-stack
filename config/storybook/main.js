@@ -16,6 +16,15 @@
 
 module.exports = {
   stories: ['../../pkg/webui/**/story.js', '../../pkg/webui/**/*.stories.js'],
-  addons: ['@storybook/addon-actions/register', '@storybook/addon-info'],
+  addons: ['@storybook/addon-actions'],
   staticDirs: ['../../public'],
+
+  framework: {
+    name: '@storybook/react-webpack5',
+    options: {},
+  },
+
+  docs: {
+    autodocs: true,
+  },
 }

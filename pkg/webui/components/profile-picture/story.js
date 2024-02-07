@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { withInfo } from '@storybook/addon-info'
 
 import ProfilePicture from '.'
 
@@ -25,15 +24,6 @@ const pp = {
 
 export default {
   title: 'Profile Picture',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: false,
-      propTables: [ProfilePicture],
-    }),
-  ],
 }
 
 export const Default = () => (

@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { action } from '@storybook/addon-actions'
-import { withInfo } from '@storybook/addon-info'
 
 import Button from '@ttn-lw/components/button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -42,15 +41,6 @@ const containerDefaultStyles = {
 
 export default {
   title: 'Form',
-
-  decorators: [
-    withInfo({
-      inline: true,
-      header: false,
-      source: true,
-      propTables: [Form],
-    }),
-  ],
 }
 
 export const Login = () => (
