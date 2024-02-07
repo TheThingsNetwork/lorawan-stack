@@ -27,77 +27,78 @@ ul.dropdown
   z-index: $zi.dropdown
   margin: 0
 
-  // Pseudo element to extend the clickable area
-  // to connect with the parent button when using hover.
-  // The offset can be set via --dropdown-offset in the
-  // consuming component.
-  &.hover:before
-    content: ""
-    position: absolute
+  &:not(.submenu-dropdown)
+    // Pseudo element to extend the clickable area
+    // to connect with the parent button when using hover.
+    // The offset can be set via --dropdown-offset in the
+    // consuming component.
+    &.hover:before
+      content: ""
+      position: absolute
 
-  &.above
-    top: auto
+    &.above
+      top: auto
 
-    &:not(.vertical)
-      bottom: 0
+      &:not(.vertical)
+        bottom: 0
 
-    &.vertical
-      margin-bottom: var(--dropdown-offset, 0)
-      bottom: 100%
+      &.vertical
+        margin-bottom: var(--dropdown-offset, 0)
+        bottom: 100%
 
-      &.hover:before
-        bottom: calc(-1 * var(--dropdown-offset, 0))
-        left: 0
-        height: var(--dropdown-offset, 0)
-        width: 100%
+        &.hover:before
+          bottom: calc(-1 * var(--dropdown-offset, 0))
+          left: 0
+          height: var(--dropdown-offset, 0)
+          width: 100%
 
-  &.left
-    left: auto
+    &.left
+      left: auto
 
-    &.vertical
-      right: 0
+      &.vertical
+        right: 0
 
-    &:not(.vertical)
-      margin-right: var(--dropdown-offset, 0)
-      right: 100%
+      &:not(.vertical)
+        margin-right: var(--dropdown-offset, 0)
+        right: 100%
 
-      &.hover:before
+        &.hover:before
+          top: 0
+          right: calc(-1 * var(--dropdown-offset, 0))
+          width: var(--dropdown-offset, 0)
+          height: 100%
+
+    &.below
+      bottom: auto
+
+      &:not(.vertical)
         top: 0
-        right: calc(-1 * var(--dropdown-offset, 0))
-        width: var(--dropdown-offset, 0)
-        height: 100%
 
-  &.below
-    bottom: auto
+      &.vertical
+        margin-top: var(--dropdown-offset, 0)
+        top: 100%
 
-    &:not(.vertical)
-      top: 0
+        &.hover:before
+          top: calc(-1 * var(--dropdown-offset, 0))
+          left: 0
+          height: var(--dropdown-offset, 0)
+          width: 100%
 
-    &.vertical
-      margin-top: var(--dropdown-offset, 0)
-      top: 100%
+    &.right
+      right: auto
 
-      &.hover:before
-        top: calc(-1 * var(--dropdown-offset, 0))
+      &.vertical
         left: 0
-        height: var(--dropdown-offset, 0)
-        width: 100%
 
-  &.right
-    right: auto
+      &:not(.vertical)
+        margin-left: var(--dropdown-offset, 0)
+        left: 100%
 
-    &.vertical
-      left: 0
-
-    &:not(.vertical)
-      margin-left: var(--dropdown-offset, 0)
-      left: 100%
-
-      &.hover:before
-        top: 0
-        left: calc(-1 * var(--dropdown-offset, 0))
-        width: var(--dropdown-offset, 0)
-        height: 100%
+        &.hover:before
+          top: 0
+          left: calc(-1 * var(--dropdown-offset, 0))
+          width: var(--dropdown-offset, 0)
+          height: 100%
 
   &.larger
     li.dropdown-item
