@@ -148,7 +148,7 @@ const getUnseenNotificationsPeriodicallyLogic = createLogic({
         dispatch(notifications.refreshNotifications())
       },
       // Refresh notifications every 15 minutes.
-      1000 * 10 * 15,
+      1000 * 60 * 15,
     )
   },
 })
