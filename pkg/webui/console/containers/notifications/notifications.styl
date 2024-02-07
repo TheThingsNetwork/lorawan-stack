@@ -1,0 +1,198 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.notification-list
+  display: flex
+  flex-direction: column
+  border-right: 1px solid var(--c-border-neutral-light)
+  width: 33%
+  min-width: 25rem
+
+  &-change-button
+    margin-top: $cs.m
+    margin-bottom: $cs.m
+    color: var(--c-text-brand-normal) !important
+
+  &.notification-selected
+    +media-query($bp.s)
+      display: none
+
+.notification-header
+  min-height: 2.5rem
+  display: flex
+  justify-content: space-between
+  align-items: center
+  border-bottom: 1px solid var(--c-border-neutral-light)
+  padding: $cs.m $cs.s
+  gap: 0.25rem
+
+  +media-query($bp.s)
+    padding: $cs.xs
+
+  &-date
+    font-weight: $fwv2.regular
+    color: var(--c-text-neutral-light)
+
+    +media-query($bp.s)
+      font-size: $fs.s
+
+    &.notification-selected
+      display: block
+      +media-query($bp.s)
+        display: none
+
+    &.notification-selected-mobile
+      display: none
+      +media-query($bp.s)
+        display: block
+
+  .total-notifications
+    border-radius: $br.l
+    background-color: var(--c-bg-brand-normal)
+    color: var(--c-text-neutral-min)
+    padding: 0 0.45rem
+    margin-left: $cs.xxs
+    font-size: $fs.s
+    position: relative
+    height: 90%
+    line-height: 1.7
+    top: 2px
+
+  &-action
+    display: flex
+    align-items: center
+    gap: $cs.s
+
+    +media-query($bp.s)
+      max-width: fit-content
+
+  &-title
+    font-weight: $fwv2.semibold
+    align-items: center
+
+    +media-query($bp.l)
+      max-width: 64%
+      p
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+
+    +media-query($bp.s)
+      max-width: 100%
+      overflow: hidden
+      display: flex
+      gap: $cs.xxs
+      div
+        overflow: hidden
+        text-overflow: ellipsis
+
+  .back-button
+    padding-left: 1.07rem
+    display: none
+    +media-query($bp.s)
+      display: block
+
+.notification-preview
+  height: 100%
+  width: 100%
+  margin: 0
+  display: flex
+  align-items: center
+  border-bottom: 1px solid var(--c-border-neutral-light)
+  padding: 0 $cs.s 0 $cs.l
+  box-sizing: border-box
+  position: relative
+
+  &.unseen
+    .notification-preview-title
+      color: var(--c-text-neutral-heavy)
+
+    .notification-preview-content
+      color: var(--c-text-neutral-heavy)
+
+  &.notification-selected
+    background-color: var(--c-bg-brand-normal)
+    border-radius: $br.m
+    border: 0
+    +media-query($bp.s)
+      background-color: unset
+
+    .notification-preview-title
+      color: var(--c-text-neutral-min)
+      +media-query($bp.s)
+        color: var(--c-text-neutral-heavy)
+
+      .notification-time
+        color: var(--c-text-neutral-min)
+
+    .notification-preview-content
+      color: var(--c-text-neutral-min)
+      +media-query($bp.s)
+        color: var(--c-text-neutral-light)
+
+  &.notification-next-selected
+    border: 0
+
+  &-title
+    display: flex
+    justify-content: space-between
+    gap: $cs.xxs
+    margin-bottom: $cs.xxs
+    font-weight: 600
+    position: relative
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+    color: var(--c-text-neutral-heavy)
+
+    .notification-time
+      font-size: $fs.s
+      font-weight: normal
+      color: var(--c-text-neutral-light)
+      text-wrap: nowrap
+
+    &-text
+      overflow: hidden
+      text-overflow: ellipsis
+
+  &-content
+    color: var(--c-text-neutral-light)
+    overflow: hidden
+    display: -webkit-box
+    -webkit-box-orient: vertical
+    -webkit-line-clamp: 3 // Start showing ellipsis when 3d line is reached.
+    white-space: pre-wrap
+    font-size: $fs.s
+
+  &.notification-selected
+    color: var(--c-text-neutral-min)
+    +media-query($bp.s)
+      color: var(--c-text-neutral-light)
+
+  .unseen-mark
+    position: absolute
+    top: .9rem
+    left: .2rem
+
+.notification-content
+  width: 66%
+  +media-query($bp.s)
+    display: none
+    height: 88vh
+    margin: 0
+
+  &.notification-selected
+    +media-query($bp.s)
+      display: block
+      width: 100%

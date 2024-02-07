@@ -110,7 +110,13 @@ const headers = [
             placement="top-end"
           >
             <Status status="unknown" label={sharedMessages.otherCluster}>
-              <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+              <Icon
+                icon="help_outline"
+                textPaddedLeft
+                small
+                nudgeUp
+                className="c-text-neutral-light"
+              />
             </Status>
           </DocTooltip>
         )

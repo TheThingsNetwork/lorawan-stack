@@ -197,7 +197,11 @@ const ApplicationGeneralSettingsForm = ({
       isResctrictedUser={isResctrictedUser}
       userId={userId}
     />
-    <Message content={m.techContactDescription} component="p" className="mt-cs-xs c-text-neutral-light" />
+    <Message
+      content={m.techContactDescription}
+      component="p"
+      className="mt-cs-xs c-text-neutral-light"
+    />
     <SubmitBar>
       <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       <Require featureCheck={mayDeleteApplication}>

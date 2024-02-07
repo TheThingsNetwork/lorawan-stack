@@ -19,12 +19,14 @@ import { useIntl } from 'react-intl'
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
 import Icon from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
+import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import Dropdown from '../dropdown'
 
 import style from './button.styl'
 
@@ -50,6 +52,7 @@ const assembleClassnames = ({
   dropdownItems,
   className,
   error,
+  withAlert,
 }) =>
   classnames(style.button, {
     [className]: !Boolean(dropdownItems), // If there are dropdown items, the button is wrapped in a div with the className.
@@ -65,6 +68,7 @@ const assembleClassnames = ({
     [style.onlyIcon]: icon !== undefined && !message,
     [style.withDropdown]: Boolean(dropdownItems),
     [style.error]: error && !busy,
+    [style.withAlert]: withAlert,
   })
 
 const buttonChildren = props => {
@@ -171,9 +175,20 @@ Button.defaultProps = {
 }
 
 const LinkButton = props => {
-  const { disabled, titleMessage } = props
+  const { disabled, titleMessage, onClick, value } = props
   const buttonClassNames = assembleClassnames(props)
   const { to } = props
+
+  const handleClick = useCallback(
+    evt => {
+      // Passing a value to the onClick handler is useful for components that
+      // are rendered multiple times, e.g. in a list. The value can be used to
+      // identify the component that was clicked.
+      onClick(evt, value)
+    },
+    [onClick, value],
+  )
+
   return (
     <Link
       className={buttonClassNames}
@@ -181,6 +196,7 @@ const LinkButton = props => {
       disabled={disabled}
       title={titleMessage}
       children={buttonChildren(props)}
+      onClick={handleClick}
     />
   )
 }
@@ -291,8 +307,13 @@ Button.defaultProps = {
 }
 
 LinkButton.propTypes = {
+  onClick: PropTypes.func,
   ...commonPropTypes,
   ...Link.propTypes,
+}
+
+LinkButton.defaultProps = {
+  onClick: () => null,
 }
 
 Button.Link = LinkButton

@@ -32,7 +32,10 @@ const RoutingPolicy = ({ enabled, message, positiveMessage, negativeMessage }) =
     <span className={style.policy} data-enabled={enabled}>
       <Icon
         icon={enabled ? 'check' : 'clear'}
-        className={classnames('mr-cs-xxs', { 'c-bg-success-normal': enabled, 'c-bg-error-normal': !enabled })}
+        className={classnames('mr-cs-xxs', {
+          'c-bg-success-normal': enabled,
+          'c-bg-error-normal': !enabled,
+        })}
       />
       <Message content={message} />
     </span>

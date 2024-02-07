@@ -21,6 +21,10 @@ import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 
 import * as user from '@console/store/actions/logout'
+import {
+  getInboxNotifications,
+  getUnseenNotificationsPeriodically,
+} from '@console/store/actions/notifications'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
@@ -65,6 +69,8 @@ const consoleAppLogic = createRequestLogic({
         ])
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))
+        dispatch(getInboxNotifications({ page: 1, limit: 3 }))
+        dispatch(getUnseenNotificationsPeriodically())
       } catch (error) {
         dispatch(user.getUserMeFailure(error))
       }

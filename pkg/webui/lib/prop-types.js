@@ -350,4 +350,85 @@ PropTypes.routingPolicy = PropTypes.shape({
 
 PropTypes.entity = PropTypes.oneOf([APPLICATION, GATEWAY, ORGANIZATION, USER, CLIENT])
 
+PropTypes.notificationData = PropTypes.shape({
+  data: PropTypes.oneOfType([
+    PropTypes.shape({
+      state: PropTypes.string,
+    }),
+
+    PropTypes.shape({
+      create_client_request: PropTypes.shape({
+        client: PropTypes.shape({
+          ids: PropTypes.shape({
+            client_id: PropTypes.string,
+          }),
+        }),
+        collaborator: PropTypes.oneOfType([
+          PropTypes.shape({
+            organization_ids: PropTypes.shape({
+              organization_id: PropTypes.string,
+            }),
+          }),
+          PropTypes.shape({
+            user_ids: PropTypes.shape({
+              user_id: PropTypes.string,
+            }),
+          }),
+        ]),
+      }),
+      client: PropTypes.shape({
+        ids: PropTypes.shape({
+          client_id: PropTypes.string,
+        }),
+      }),
+      collaborator: PropTypes.oneOfType([
+        PropTypes.shape({
+          organization_ids: PropTypes.shape({
+            organization_id: PropTypes.string,
+          }),
+        }),
+        PropTypes.shape({
+          user_ids: PropTypes.shape({
+            user_id: PropTypes.string,
+          }),
+        }),
+      ]),
+    }),
+
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      rights: PropTypes.arrayOf(PropTypes.string),
+    }),
+
+    PropTypes.shape({
+      data: PropTypes.shape({
+        ids: PropTypes.oneOfType([
+          PropTypes.shape({
+            organization_ids: PropTypes.shape({
+              organization_id: PropTypes.string.isRequired,
+            }),
+          }),
+          PropTypes.shape({
+            user_ids: PropTypes.shape({
+              user_id: PropTypes.string.isRequired,
+            }),
+          }),
+        ]).isRequired,
+      }).isRequired,
+    }),
+
+    PropTypes.shape({
+      user: PropTypes.shape({
+        ids: PropTypes.shape({
+          user_id: PropTypes.string,
+        }),
+        name: PropTypes.string,
+        description: PropTypes.string,
+        primary_email_address: PropTypes.string,
+      }).isRequired,
+    }),
+  ]).isRequired,
+  entity_ids: PropTypes.shape({}).isRequired,
+})
+
 export default PropTypes

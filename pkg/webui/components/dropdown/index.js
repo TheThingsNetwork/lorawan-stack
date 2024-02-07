@@ -188,8 +188,8 @@ DropdownItem.defaultProps = {
   submenuItems: undefined,
 }
 
-const DropdownHeaderItem = ({ title }) => (
-  <li className={style.dropdownHeaderItem}>
+const DropdownHeaderItem = ({ title, className }) => (
+  <li className={classnames(style.dropdownHeaderItem, className)}>
     <span>
       <Message content={title} />
     </span>
@@ -197,7 +197,12 @@ const DropdownHeaderItem = ({ title }) => (
 )
 
 DropdownHeaderItem.propTypes = {
+  className: PropTypes.string,
   title: PropTypes.message.isRequired,
+}
+
+DropdownHeaderItem.defaultProps = {
+  className: undefined,
 }
 
 Dropdown.Item = DropdownItem

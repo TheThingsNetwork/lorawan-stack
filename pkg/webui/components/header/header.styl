@@ -25,6 +25,11 @@
   +media-query($bp.xs)
     padding: 0 $cs.xs
 
+  .notifications-dropdown
+    max-width: 31rem
+    width: 31rem // Avoids flash of small container when dropdown is opened
+    padding: 0
+
 .logo
   height: $cs.l
   +media-query($bp.xs)

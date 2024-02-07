@@ -31,6 +31,7 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import WithAuth from '@ttn-lw/lib/components/with-auth'
 import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
 import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
@@ -42,6 +43,7 @@ import Gateways from '@console/views/gateways'
 import Organizations from '@console/views/organizations'
 import AdminPanel from '@console/views/admin-panel'
 import User from '@console/views/user'
+import Notifications from '@console/views/notifications'
 
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
@@ -50,6 +52,7 @@ import {
   selectApplicationSiteTitle,
   selectPageData,
 } from '@ttn-lw/lib/selectors/env'
+import { uuid as uuidRegexp } from '@ttn-lw/lib/regexp'
 
 import {
   selectUser,
@@ -81,6 +84,7 @@ const Layout = () => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const siteTitle = selectApplicationSiteTitle()
   const siteName = selectApplicationSiteName()
+  const dispatch = useDispatch()
 
   // For the mobile side menu drawer functionality.
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -131,9 +135,11 @@ const Layout = () => {
           <div id="modal-container" />
           <div className="d-flex">
             <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
-            <div className="w-full h-vh">
+            <div className="w-full h-vh d-flex direction-column">
               <Header onMenuClick={onDrawerExpandClick} />
-              <main className={classnames(style.main, 'd-flex', 'flex-column', 'h-full')}>
+              <main
+                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+              >
                 <WithAuth
                   user={user}
                   fetching={fetching}
@@ -193,6 +199,17 @@ const ConsoleRoot = () => {
           <Route path="organizations/*" Component={Organizations} />
           <Route path="admin-panel/*" Component={AdminPanel} />
           <Route path="user/*" Component={User} />
+          <Route path="notifications" Component={Notifications} />
+          <Route
+            path="notifications/:category?/:id?"
+            Component={Notifications}
+            element={
+              <ValidateRouteParam
+                check={{ category: /^inbox|archived$/, id: uuidRegexp }}
+                Component={Notifications}
+              />
+            }
+          />
           <Route path="*" Component={GenericNotFound} />
         </Route>
       </Routes>

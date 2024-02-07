@@ -1,0 +1,58 @@
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.notifications-dropdown
+  &-header
+    font-size: $fs.l
+    padding: $cs.l $cs.m
+    border-bottom: 1px solid var(--c-border-neutral-light)
+    margin-bottom: 0
+    font-weight: $fw.bold
+
+  &-link
+    align-items: start
+    justify-content: center
+    gap: $cs.m
+    text-decoration: none
+    border-bottom: 1px solid var(--c-border-neutral-light)
+    padding: $cs.m 1.25rem
+    color: var(--c-text-neutral-heavy)
+
+    &:visited
+      color: initial
+
+    &:hover
+      background: var(--c-bg-neutral-min-hover)
+
+    &-icon
+      width: 1.29rem
+      height: 1.29rem
+      border-radius: $br.m
+      border: 1px solid var(--c-border-neutral-light)
+      background: var(--c-bg-neutral-min)
+      color: var(--c-text-brand-normal)
+      padding: $cs.m
+
+    .title
+      overflow: hidden
+      text-overflow: ellipsis
+      line-height: normal
+      margin-bottom: $cs.xxs
+
+    .notification-container
+      overflow: auto
+
+    .preview-content
+      line-height: normal
+      margin-bottom: $cs.xxs
