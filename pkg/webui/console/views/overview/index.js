@@ -13,97 +13,36 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
-import { useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
-import Message from '@ttn-lw/lib/components/message'
-import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
-import DeploymentComponentStatus from '@console/containers/deployment-component-status'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectDocumentationUrlConfig, selectSupportLinkConfig } from '@ttn-lw/lib/selectors/env'
-
-import {
-  mayViewApplications,
-  mayViewGateways,
-  mayCreateApplications,
-  mayCreateGateways,
-} from '@console/lib/feature-checks'
-import { checkFromState } from '@account/lib/feature-checks'
 
 import { getApplicationsList } from '@console/store/actions/applications'
 import { getGatewaysList } from '@console/store/actions/gateways'
 
-import { selectApplicationsTotalCount } from '@console/store/selectors/applications'
-import { selectGatewaysTotalCount } from '@console/store/selectors/gateways'
-import { selectUserNameOrId } from '@console/store/selectors/logout'
-
-import HelpLink from './help-link'
-
-import style from './overview.styl'
-
-const m = defineMessages({
-  createApplication: 'Create an application',
-  createGateway: 'Register a gateway',
-  gotoApplications: 'Go to applications',
-  gotoGateways: 'Go to gateways',
-  welcome: 'Welcome to the Console!',
-  welcomeBack: 'Welcome back, {userName}! 👋',
-  getStarted: 'Get started right away by creating an application or registering a gateway.',
-  continueWorking: 'Walk right through to your applications and/or gateways.',
-  componentStatus: 'Component status',
-  versionInfo: 'Version info',
-})
-
 const Overview = () => {
-  const applicationCount = useSelector(selectApplicationsTotalCount)
-  const gatewayCount = useSelector(selectGatewaysTotalCount)
-  const userName = useSelector(selectUserNameOrId)
-  const mayCreateApps = useSelector(state => checkFromState(mayCreateApplications, state))
-  const mayViewApps = useSelector(state => checkFromState(mayViewApplications, state))
-  const mayViewGtws = useSelector(state => checkFromState(mayViewGateways, state))
-  const mayCreateGtws = useSelector(state => checkFromState(mayCreateGateways, state))
-  const supportLink = selectSupportLinkConfig()
-  const documentationBaseUrl = selectDocumentationUrlConfig()
-
   useBreadcrumbs('overview', <Breadcrumb path="/" content={sharedMessages.overview} />)
-
-  const hasEntities = applicationCount + gatewayCount !== 0
-  const mayCreateEntities = mayCreateApps || mayCreateGtws
-  const mayNotViewEntities = !mayViewApps && !mayViewGtws
 
   return (
     <RequireRequest requestAction={[getApplicationsList(), getGatewaysList()]}>
-      <Container>
-        <div className={style.welcomeSection}>
-          <Row>
-            <IntlHelmet title={sharedMessages.overview} />
-            <Col sm={12} className={style.welcomeTitleSection}>
-              <Message
-                className={style.welcome}
-                content={hasEntities ? m.welcomeBack : m.welcome}
-                values={{ userName }}
-                component="h1"
-              />
-              {!mayNotViewEntities && (
-                <Message
-                  className={style.getStarted}
-                  content={hasEntities || !mayCreateEntities ? m.continueWorking : m.getStarted}
-                  component="h2"
-                />
-              )}
-              <HelpLink supportLink={supportLink} documentationLink={documentationBaseUrl} />
-            </Col>
-          </Row>
+      <div className="grid p-ls-xs3 box-border">
+        <div className="item-6 m:item-6 l:item-12 s:item-12">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
         </div>
-        <DeploymentComponentStatus />
-      </Container>
+        <div className="item-6 m:item-6 l:item-12 s:item-12">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+        </div>
+        <div className="item-6 m:item-6 l:item-12 s:item-12">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+        </div>
+        <div className="item-6 m:item-6 l:item-12 s:item-12">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+        </div>
+      </div>
     </RequireRequest>
   )
 }
