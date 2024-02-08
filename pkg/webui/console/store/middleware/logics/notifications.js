@@ -76,7 +76,6 @@ const getInboxNotificationsLogic = createRequestLogic({
     return {
       notifications: result.notifications,
       totalCount: result.totalCount,
-      unseenTotalCount: result.notifications.filter(notification => !notification.status).length,
       page,
       limit,
     }
