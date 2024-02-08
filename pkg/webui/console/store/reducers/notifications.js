@@ -61,6 +61,7 @@ const notifications = (state = defaultState, { type, payload }) => {
             totalCount: payload.totalCount,
           },
         },
+        unseenTotalCount: payload.unseenTotalCount,
       }
     case REFRESH_NOTIFICATIONS_SUCCESS:
       if (
