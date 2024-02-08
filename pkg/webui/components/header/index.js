@@ -43,10 +43,15 @@ const Header = ({
     </div>
 
     <div className="d-flex al-center gap-cs-xs">
-      <Button secondary icon="add" dropdownItems={addDropdownItems} dropdownPosition="below left" />
       <Button
         secondary
-        icon="grade"
+        icon="add_box"
+        dropdownItems={addDropdownItems}
+        dropdownPosition="below left"
+      />
+      <Button
+        secondary
+        icon="bookmark"
         dropdownItems={starDropdownItems}
         dropdownPosition="below left"
         className="xs:d-none"

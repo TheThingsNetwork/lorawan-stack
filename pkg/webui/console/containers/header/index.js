@@ -67,7 +67,7 @@ const Header = ({ onMenuClick }) => {
       )}
       {mayViewGtws && <Dropdown.Item title="Add new gateway" icon="router" path="/gateways/add" />}
       {mayViewOrgs && (
-        <Dropdown.Item title="Add new organization" icon="support" path="/organizations/add" />
+        <Dropdown.Item title="Add new organization" icon="group" path="/organizations/add" />
       )}
 
       <Dropdown.Item
@@ -89,20 +89,20 @@ const Header = ({ onMenuClick }) => {
       {isAdmin && (
         <Dropdown.Item
           title={sharedMessages.adminPanel}
-          icon="lock"
+          icon="admin_panel_settings"
           path="/admin-panel/network-information"
         />
       )}
       <hr />
       <Dropdown.Item
         title={sharedMessages.getSupport}
-        icon="help"
+        icon="support"
         path="https://thethingsindustries.com/support"
         external
       />
       <Dropdown.Item
         title={sharedMessages.documentation}
-        icon="description"
+        icon="menu_book"
         path="https://thethingsindustries.com/docs"
         external
       />
