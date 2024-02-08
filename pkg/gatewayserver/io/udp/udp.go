@@ -71,7 +71,10 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config
 	if conf.RateLimiting.Enable {
 		firewall = NewRateLimitingFirewall(firewall, conf.RateLimiting.Messages, conf.RateLimiting.Threshold)
 	}
-	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, limitLogsSize)
+	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, ratelimit.StoreConfig{
+		Provider: conf.RateLimiting.Provider,
+		Redis:    ratelimit.NewRedisClient(conf.RateLimiting.Redis.Config),
+	})
 	if err != nil {
 		return err
 	}

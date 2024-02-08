@@ -549,6 +549,11 @@ func (f MQTTConfigProviderFunc) GetMQTTConfig(ctx context.Context) (*MQTT, error
 	return f(ctx)
 }
 
+// RateLimitingRedis represents configuration for the in-Redis rate limiting store.
+type RateLimitingRedis struct {
+	Config redis.Config `name:"config"`
+}
+
 // RateLimitingProfile represents configuration for a rate limiting class.
 type RateLimitingProfile struct {
 	Name         string   `name:"name" description:"Rate limiting class name"`
@@ -569,7 +574,9 @@ type RateLimiting struct {
 	URL          string         `name:"url" description:"URL, which contains rate limiting configuration"`
 	Blob         BlobPathConfig `name:"blob"`
 
+	Provider string                `name:"provider" description:"Rate limiting store provider (memory, redis)"`
 	Memory   RateLimitingMemory    `name:"memory" description:"In-memory rate limiting store configuration"`
+	Redis    RateLimitingRedis     `name:"redis" description:"In-Redis rate limiting store configuration"`
 	Profiles []RateLimitingProfile `name:"profiles" description:"Rate limiting profiles"`
 }
 

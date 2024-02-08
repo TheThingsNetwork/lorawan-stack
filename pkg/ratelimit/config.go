@@ -17,11 +17,13 @@ package ratelimit
 import (
 	"context"
 
-	"github.com/throttled/throttled"
+	"github.com/throttled/throttled/v2"
+	redisstore "github.com/throttled/throttled/v2/store/goredisstore.v9"
 	"github.com/throttled/throttled/v2/store/memstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,6 +31,18 @@ import (
 const defaultMaxSize = 1 << 12
 
 var errRateLimitExceeded = errors.DefineResourceExhausted("rate_limit_exceeded", "rate limit of `{rate}` accesses per minute exceeded for resource `{key}`")
+
+// StoreConfig represents configuration for rate limiting stores.
+type StoreConfig struct {
+	Provider string
+	Memory   config.RateLimitingMemory
+	Redis    *ttnredis.Client
+}
+
+// NewRedisClient creates a new Redis client with rate-limiting namespace.
+func NewRedisClient(conf ttnredis.Config) *ttnredis.Client {
+	return ttnredis.New(conf.WithNamespace("rate-limiting"))
+}
 
 // New creates a new ratelimit.Interface from configuration.
 func New(ctx context.Context, conf config.RateLimiting, blobConf config.BlobConfig, httpClientProvider httpclient.Provider) (Interface, error) {
@@ -64,7 +78,11 @@ func New(ctx context.Context, conf config.RateLimiting, blobConf config.BlobConf
 		if len(profile.Associations) == 0 {
 			continue
 		}
-		limiter, err := NewProfile(ctx, profile, conf.Memory.MaxSize)
+		limiter, err := NewProfile(ctx, profile, StoreConfig{
+			Provider: conf.Provider,
+			Memory:   conf.Memory,
+			Redis:    NewRedisClient(conf.Redis.Config),
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -77,15 +95,25 @@ func New(ctx context.Context, conf config.RateLimiting, blobConf config.BlobConf
 
 var errInvalidRate = errors.DefineInvalidArgument("invalid_rate", "invalid rate `{rate}` for profile `{name}`")
 
+func newStore(conf StoreConfig) (store throttled.GCRAStoreCtx, err error) {
+	switch conf.Provider {
+	case "redis":
+		return redisstore.NewCtx(conf.Redis, conf.Redis.Key(""))
+
+	default:
+		return memstore.NewCtx(int(conf.Memory.MaxSize))
+	}
+}
+
 // NewProfile returns a new ratelimit.Interface from profile configuration.
-func NewProfile(ctx context.Context, conf config.RateLimitingProfile, size uint) (Interface, error) {
-	if size == 0 {
-		size = defaultMaxSize
+func NewProfile(ctx context.Context, conf config.RateLimitingProfile, storeConf StoreConfig) (Interface, error) {
+	if s := &storeConf.Memory.MaxSize; *s == 0 {
+		*s = defaultMaxSize
 	}
 	if conf.MaxPerMin == 0 {
 		return nil, errInvalidRate.WithAttributes("rate", conf.MaxPerMin, "name", conf.Name)
 	}
-	store, err := memstore.New(int(size))
+	store, err := newStore(storeConf)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +124,7 @@ func NewProfile(ctx context.Context, conf config.RateLimitingProfile, size uint)
 		MaxRate:  throttled.PerMin(int(conf.MaxPerMin)),
 		MaxBurst: int(conf.MaxBurst - 1),
 	}
-	limiter, err := throttled.NewGCRARateLimiter(store, quota)
+	limiter, err := throttled.NewGCRARateLimiterCtx(store, quota)
 	if err != nil {
 		return nil, err
 	}
