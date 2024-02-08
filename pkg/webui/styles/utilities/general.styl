@@ -16,11 +16,11 @@
 :global
   .grid
     display: grid
-    row-gap: $grid-row-gap
+    row-gap: var(--grid-row-gap)
     width: 100%
 
     // Prevent column-gaps that are wider than the page width when combined.
-    column-gap: calc(min($grid-column-gap, 100% / 11))
+    column-gap: calc(min(var(--grid-column-gap), 100% / 11))
 
     &:not(.auto-columns)
       grid-template-columns: repeat(12, minmax(0, 1fr))
@@ -40,7 +40,7 @@
 
     // Generate responsive grid item styles.
     for $name, $width in $bp
-      media-query($width)
+      +media-query($width)
         for $num in (1..12)
           // Generate responsive grid item overrides.
           .{$name}\\:item-{$num}
@@ -318,6 +318,14 @@
 
   .td-none
     text-decoration: none
+
+  // Box sizing.
+
+  .box-border
+    box-sizing: border-box
+
+  .box-content
+    box-sizing: content-box
 
   // Cursor.
 

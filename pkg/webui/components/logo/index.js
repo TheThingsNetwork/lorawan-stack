@@ -24,10 +24,8 @@ const Logo = ({ className, logo, miniLogo }) => {
 
   return (
     <div className={classname}>
-      <div className={style.logo}>
-        <img {...logo} />
-        <img {...miniLogo} />
-      </div>
+      <img {...logo} />
+      <img {...miniLogo} />
     </div>
   )
 }

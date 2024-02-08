@@ -13,7 +13,7 @@
 // limitations under the License.
 
 .container
-  --dropdown-offset: $cs.s
+  --dropdown-offset: convert('calc(' + $cs.s + ' - 2px)')
   padding: 0 $cs.m
   background: var(--c-bg-brand-extralight)
   z-index: $zi.nav

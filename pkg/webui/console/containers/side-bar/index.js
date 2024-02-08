@@ -73,8 +73,7 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
       [style.sidebarMinimized]: isMinimized,
       [style.sidebarOpen]: isDrawerOpen,
       'p-cs-m': !isMinimized,
-      'p-vert-cs-s': isMinimized,
-      'p-sides-cs-xs': isMinimized,
+      'p-cs-xs': isMinimized,
     },
   )
 
