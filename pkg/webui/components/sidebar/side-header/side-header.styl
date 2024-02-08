@@ -28,13 +28,15 @@
     .mini-logo
       display: flex
 
-  .minimize-button
+    button.minimize-button
+      width: 100%
+
+  button.minimize-button
     transition: none
 
   &:not(.is-minimized)
     .minimize-button
       margin-top: - $cs.xxs
-      margin-right: - $cs.s
 
   .logo
     width: 9.57rem

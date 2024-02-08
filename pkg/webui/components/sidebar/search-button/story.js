@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import SidebarContext from '@console/containers/side-bar/context'
+import SidebarContext from '@console/containers/sidebar/context'
 
 import SearchButton from '.'
 

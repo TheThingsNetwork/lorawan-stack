@@ -16,7 +16,7 @@ import React, { useContext } from 'react'
 
 import Switcher from '@ttn-lw/components/sidebar/switcher'
 
-import SidebarContext from '@console/containers/side-bar/context'
+import SidebarContext from '@console/containers/sidebar/context'
 
 const SwitcherContainer = () => {
   const { isMinimized } = useContext(SidebarContext)
