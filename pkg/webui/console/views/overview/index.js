@@ -19,6 +19,8 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
+import NotificationsDashboardPanel from '@console/containers/notifications-dashboard-panel'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getApplicationsList } from '@console/store/actions/applications'
@@ -31,7 +33,7 @@ const Overview = () => {
     <RequireRequest requestAction={[getApplicationsList(), getGatewaysList()]}>
       <div className="grid p-ls-xs3 box-border">
         <div className="item-6 m:item-6 l:item-12 s:item-12">
-          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+          <NotificationsDashboardPanel />
         </div>
         <div className="item-6 m:item-6 l:item-12 s:item-12">
           <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
