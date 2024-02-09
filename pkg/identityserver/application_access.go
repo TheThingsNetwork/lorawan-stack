@@ -434,9 +434,23 @@ func (is *IdentityServer) deleteApplicationCollaborator(
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		removedRights, err := st.GetMember(ctx, req.GetCollaboratorIds(), req.GetApplicationIds().GetEntityIdentifiers())
+		removedRights, err := st.GetMember(
+			ctx, req.GetCollaboratorIds(), req.GetApplicationIds().GetEntityIdentifiers(),
+		)
 		if err != nil {
 			return err
+		}
+		app, err := st.GetApplication(
+			ctx,
+			req.GetApplicationIds(),
+			store.FieldMask([]string{"administrative_contact", "technical_contact"}),
+		)
+		if err != nil {
+			return err
+		}
+		if app.GetAdministrativeContact().IDString() == req.GetCollaboratorIds().IDString() ||
+			app.GetTechnicalContact().IDString() == req.GetCollaboratorIds().IDString() {
+			return errCollaboratorIsContact.WithAttributes("collaborator_id", req.GetCollaboratorIds().IDString())
 		}
 		if removedRights.Implied().IncludesAll(ttnpb.Right_RIGHT_APPLICATION_ALL) {
 			memberRights, err := st.FindMembers(ctx, req.GetApplicationIds().GetEntityIdentifiers())

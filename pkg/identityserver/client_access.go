@@ -241,6 +241,18 @@ func (is *IdentityServer) deleteClientCollaborator(
 		if err != nil {
 			return err
 		}
+		clt, err := st.GetClient(
+			ctx,
+			req.GetClientIds(),
+			store.FieldMask([]string{"administrative_contact", "technical_contact"}),
+		)
+		if err != nil {
+			return err
+		}
+		if clt.GetAdministrativeContact().IDString() == req.GetCollaboratorIds().IDString() ||
+			clt.GetTechnicalContact().IDString() == req.GetCollaboratorIds().IDString() {
+			return errCollaboratorIsContact.WithAttributes("collaborator_id", req.GetCollaboratorIds().IDString())
+		}
 		if removedRights.Implied().IncludesAll(ttnpb.Right_RIGHT_CLIENT_ALL) {
 			memberRights, err := st.FindMembers(ctx, req.GetClientIds().GetEntityIdentifiers())
 			if err != nil {

@@ -427,6 +427,18 @@ func (is *IdentityServer) deleteGatewayCollaborator(
 		if err != nil {
 			return err
 		}
+		gtw, err := st.GetGateway(
+			ctx,
+			req.GetGatewayIds(),
+			store.FieldMask([]string{"administrative_contact", "technical_contact"}),
+		)
+		if err != nil {
+			return err
+		}
+		if gtw.GetAdministrativeContact().IDString() == req.GetCollaboratorIds().IDString() ||
+			gtw.GetTechnicalContact().IDString() == req.GetCollaboratorIds().IDString() {
+			return errCollaboratorIsContact.WithAttributes("collaborator_id", req.GetCollaboratorIds().IDString())
+		}
 		if removedRights.Implied().IncludesAll(ttnpb.Right_RIGHT_GATEWAY_ALL) {
 			memberRights, err := st.FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 			if err != nil {
