@@ -313,7 +313,7 @@
   "console.components.notifications.templates.entity-state-changed.title": "State of {entityType} changed",
   "console.components.notifications.templates.entity-state-changed.body": "The state of the {entityType} <code>{entityId}</code> on your network has been changed to \"{state}\".",
   "console.components.notifications.templates.entity-state-changed.link": "You can view this <Link>here</Link>.",
-  "console.components.notifications.templates.password-changed.title": "Password of user \"{entityIds}\" changed.",
+  "console.components.notifications.templates.password-changed.title": "Password of user \"{entityIds}\" changed",
   "console.components.notifications.templates.password-changed.body": "The password of your user <code>{entityId}</code> on your network has just been changed.",
   "console.components.notifications.templates.password-changed.closing": "If this was not done by you, please contact your administrators as soon as possible.",
   "console.components.notifications.templates.user-requested.title": "Review required for new user",

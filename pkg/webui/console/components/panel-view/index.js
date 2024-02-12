@@ -43,7 +43,7 @@ const PanelView = ({ children, className }) => {
   ])
 
   return (
-    <Container className={classNames(className, style.panelView)}>
+    <Container className={classNames(className, style.panelView)} fluid>
       <Row>
         <Col className={style.menu} lg={3} xl={2}>
           {childrenArray.map(child =>
