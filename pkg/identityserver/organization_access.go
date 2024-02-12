@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -448,8 +449,8 @@ func (is *IdentityServer) deleteOrganizationCollaborator(
 		if err != nil {
 			return err
 		}
-		if org.GetAdministrativeContact().IDString() == req.GetCollaboratorIds().IDString() ||
-			org.GetTechnicalContact().IDString() == req.GetCollaboratorIds().IDString() {
+		if proto.Equal(org.GetAdministrativeContact(), req.GetCollaboratorIds()) ||
+			proto.Equal(org.GetTechnicalContact(), req.GetCollaboratorIds()) {
 			return errCollaboratorIsContact.WithAttributes("collaborator_id", req.GetCollaboratorIds().IDString())
 		}
 		if r.Implied().IncludesAll(ttnpb.Right_RIGHT_ORGANIZATION_ALL) {
