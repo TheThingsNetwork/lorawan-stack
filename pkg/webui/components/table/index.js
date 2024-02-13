@@ -92,6 +92,7 @@ const Tabular = ({
           content={header.sortable && !disableSorting ? undefined : header.displayName}
           name={header.name}
           width={header.width}
+          className={header.className}
         >
           {header.sortable && !disableSorting ? (
             <Table.SortButton
@@ -210,6 +211,7 @@ Tabular.propTypes = {
       sortable: PropTypes.bool,
       sortKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
       width: PropTypes.number,
+      className: PropTypes.string,
     }),
   ).isRequired,
   /** A flag specifying whether the table should covered with the loading overlay. */

@@ -79,7 +79,7 @@ const FetchTable = props => {
     searchItemsAction,
     getItemsAction,
     baseDataSelector,
-    small,
+    className,
   } = props
 
   const isMounted = useRef(true)
@@ -317,7 +317,7 @@ const FetchTable = props => {
           orderBy={orderBy}
           clickable={clickable}
           disableSorting={disableSorting}
-          small={small}
+          className={className}
         />
       </Overlay>
     </div>
@@ -354,7 +354,6 @@ FetchTable.propTypes = {
   searchPlaceholderMessage: PropTypes.message,
   searchQueryMaxLength: PropTypes.number,
   searchable: PropTypes.bool,
-  small: PropTypes.bool,
   tableTitle: PropTypes.message,
   tabs: PropTypes.arrayOf(
     PropTypes.shape({
@@ -385,7 +384,6 @@ FetchTable.defaultProps = {
   actionItems: null,
   clickable: true,
   defaultOrder: undefined,
-  small: false,
 }
 
 export default FetchTable

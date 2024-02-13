@@ -15,7 +15,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
-import classnames from 'classnames'
 
 import Panel from '@ttn-lw/components/panel'
 import Status from '@ttn-lw/components/status'
@@ -49,27 +48,21 @@ const NotificationsDashboardPanel = () => {
     {
       name: 'notification',
       displayName: sharedMessages.message,
-      width: 30,
+      className: style.nameHeader,
       render: notification => (
-        <div className="d-flex gap-cs-xs">
-          {!notification.status && <Status pulse status="good" />}
-          <div
-            className={classnames('w-full', {
-              [style.notificationPanelRead]: notification.status === 'NOTIFICATION_STATUS_SEEN',
-            })}
-          >
-            <div className={style.notificationPanelTitle}>
-              <Notification.Title
-                data={notification}
-                notificationType={notification.notification_type}
-              />
-            </div>
-            <div className={style.notificationPanelPreview}>
-              <Notification.Preview
-                data={notification}
-                notificationType={notification.notification_type}
-              />
-            </div>
+        <div className="pos-relative pl-cs-m">
+          {!notification.status && <Status pulse={false} status="good" className={style.status} />}
+          <div className={style.notificationPanelTitle}>
+            <Notification.Title
+              data={notification}
+              notificationType={notification.notification_type}
+            />
+          </div>
+          <div className={style.notificationPanelPreview}>
+            <Notification.Preview
+              data={notification}
+              notificationType={notification.notification_type}
+            />
           </div>
         </div>
       ),
@@ -77,7 +70,7 @@ const NotificationsDashboardPanel = () => {
     {
       name: 'notification.created_at',
       displayName: sharedMessages.time,
-      width: 10,
+      width: '6.5rem',
       render: date => <DateTime.Relative value={date} />,
     },
   ]
@@ -119,7 +112,6 @@ const NotificationsDashboardPanel = () => {
         baseDataSelector={baseDataSelectors}
         getItemsAction={getItems}
         getItemPathPrefix={item => `/notifications/inbox/${item.id}`}
-        small
         paginated={false}
       />
     </Panel>

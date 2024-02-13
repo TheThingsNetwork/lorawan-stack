@@ -57,6 +57,7 @@ const Status = React.forwardRef(
       [style[`${status}-pulse`]]: typeof pulse === 'boolean' ? pulse : status === 'good',
       [style.flipped]: flipped,
       [style[`triggered-${status}-pulse`]]: animate,
+      [style.dotOnly]: !label && !children,
     })
 
     let statusLabel = null

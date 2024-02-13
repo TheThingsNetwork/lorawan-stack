@@ -29,7 +29,8 @@ const Cell = ({ className, align, small, width, children, ...rest }) => {
     [style.cellSmall]: small,
   })
 
-  const widthStyle = width ? { width: `${width}%` } : undefined
+  const widthStyle =
+    typeof width === 'number' ? { width: `${width}%` } : typeof width === 'string' ? { width } : {}
 
   return (
     <div {...rest} style={widthStyle} className={cellClassNames} role="cell">
@@ -48,7 +49,7 @@ Cell.propTypes = {
   /** A flag indicating whether the row take less height. */
   small: PropTypes.bool,
   /** The width of the cell in percentages. */
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 }
 
 Cell.defaultProps = {
