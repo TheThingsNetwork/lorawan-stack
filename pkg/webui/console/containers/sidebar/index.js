@@ -29,7 +29,7 @@ import SidebarContext from './context'
 import SideHeader from './header'
 import SwitcherContainer from './switcher'
 
-import style from './side-bar.styl'
+import style from './sidebar.styl'
 
 const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
   const { pathname } = useLocation()
@@ -46,7 +46,7 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
     window.addEventListener('resize', handleResize)
 
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  }, [setIsMinimized])
 
   // Close the drawer on navigation changes.
   useEffect(() => {
@@ -55,7 +55,7 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
 
   const onMinimizeToggle = useCallback(async () => {
     setIsMinimized(prev => !prev)
-  }, [])
+  }, [setIsMinimized])
 
   const topEntitiesCookie = getCookie('topEntities')
     ? getCookie('topEntities')

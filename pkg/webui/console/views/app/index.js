@@ -35,7 +35,7 @@ import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
 import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
-import Sidebar from '@console/containers/side-bar'
+import Sidebar from '@console/containers/sidebar'
 
 import Overview from '@console/views/overview'
 import Applications from '@console/views/applications'

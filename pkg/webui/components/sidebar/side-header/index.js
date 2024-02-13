@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom'
 
 import Button from '@ttn-lw/components/button'
 
-import SidebarContext from '@console/containers/side-bar/context'
+import SidebarContext from '@console/containers/sidebar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 

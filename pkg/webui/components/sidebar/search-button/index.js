@@ -21,7 +21,7 @@ import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import SidebarContext from '@console/containers/side-bar/context'
+import SidebarContext from '@console/containers/sidebar/context'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
