@@ -148,9 +148,6 @@ var DefaultKeyVaultConfig = config.KeyVault{
 // DefaultRateLimitingConfig is the default config for rate limiting.
 var DefaultRateLimitingConfig = config.RateLimiting{
 	Provider: "memory",
-	Redis: config.RateLimitingRedis{
-		Config: DefaultRedisConfig,
-	},
 }
 
 // DefaultTracingConfig is the default config for telemetry tracing.

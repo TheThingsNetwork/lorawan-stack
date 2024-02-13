@@ -551,7 +551,7 @@ func (f MQTTConfigProviderFunc) GetMQTTConfig(ctx context.Context) (*MQTT, error
 
 // RateLimitingRedis represents configuration for the in-Redis rate limiting store.
 type RateLimitingRedis struct {
-	Config redis.Config `name:"config"`
+	Client *redis.Client `name:"-"`
 }
 
 // RateLimitingProfile represents configuration for a rate limiting class.

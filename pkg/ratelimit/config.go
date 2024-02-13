@@ -39,11 +39,6 @@ type StoreConfig struct {
 	Redis    *ttnredis.Client
 }
 
-// NewRedisClient creates a new Redis client with rate-limiting namespace.
-func NewRedisClient(conf ttnredis.Config) *ttnredis.Client {
-	return ttnredis.New(conf.WithNamespace("rate-limiting"))
-}
-
 // New creates a new ratelimit.Interface from configuration.
 func New(ctx context.Context, conf config.RateLimiting, blobConf config.BlobConfig, httpClientProvider httpclient.Provider) (Interface, error) {
 	defaultLimiter := &NoopRateLimiter{}
@@ -81,7 +76,7 @@ func New(ctx context.Context, conf config.RateLimiting, blobConf config.BlobConf
 		limiter, err := NewProfile(ctx, profile, StoreConfig{
 			Provider: conf.Provider,
 			Memory:   conf.Memory,
-			Redis:    NewRedisClient(conf.Redis.Config),
+			Redis:    conf.Redis.Client,
 		})
 		if err != nil {
 			return nil, err

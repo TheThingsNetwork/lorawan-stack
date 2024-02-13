@@ -73,7 +73,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config
 	}
 	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, ratelimit.StoreConfig{
 		Provider: conf.RateLimiting.Provider,
-		Redis:    ratelimit.NewRedisClient(conf.RateLimiting.Redis.Config),
+		Redis:    conf.RateLimiting.Redis.Client,
 	})
 	if err != nil {
 		return err
