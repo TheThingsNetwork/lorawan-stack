@@ -16,15 +16,31 @@ import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
+import ReactApexChart from 'react-apexcharts'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Tooltip from '@ttn-lw/components/tooltip'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import DeploymentComponentStatus from '@console/containers/deployment-component-status'
+
+import {
+  connectedGatewaysMetrics,
+  formatDate,
+  getConnectedGatewaysSeries,
+  getReceivedUplinksFromGatewaysSeries,
+  getUptime,
+  getUptimePercentage,
+  options,
+  receivedUplinksFromGateways,
+  series,
+  status,
+  uptime,
+} from '@console/views/overview/fake-data'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectDocumentationUrlConfig, selectSupportLinkConfig } from '@ttn-lw/lib/selectors/env'
@@ -84,7 +100,46 @@ const Overview = () => {
         <div className={style.welcomeSection}>
           <Row>
             <IntlHelmet title={sharedMessages.overview} />
-            <Col sm={12} className={style.welcomeTitleSection}>
+            <Col sm={12} className="mb-cs-l">
+              <Message content={status.status.description} component="h1" />
+              <Message content={`${getUptimePercentage()}% uptime`} component="p" />
+              <div className="d-flex gap-cs-xxs j-between">
+                {getUptime().map(u => (
+                  <Tooltip
+                    key={u.date}
+                    content={<Message content={formatDate(u.date)} />}
+                    placement="bottom"
+                  >
+                    <div style={{ backgroundColor: u.color, height: 34, width: 6 }} />
+                  </Tooltip>
+                ))}
+              </div>
+            </Col>
+            <Col sm={4}>
+              <Message
+                content={receivedUplinksFromGateways.metrics[0].metric.name}
+                component="h3"
+              />
+              <ReactApexChart
+                options={options}
+                series={getReceivedUplinksFromGatewaysSeries()}
+                type="area"
+              />
+              <Message
+                content={`${receivedUplinksFromGateways.summary.last} Uplinks per second`}
+                component="p"
+              />
+            </Col>
+            <Col sm={4}>
+              <Message content={connectedGatewaysMetrics.metrics[0].metric.name} component="h3" />
+              <ReactApexChart options={options} series={getConnectedGatewaysSeries()} type="area" />
+              <Message
+                content={`${connectedGatewaysMetrics.summary.last} Connected gateways`}
+                component="p"
+              />
+            </Col>
+
+            {/* <Col sm={12} className={style.welcomeTitleSection}>
               <Message
                 className={style.welcome}
                 content={hasEntities ? m.welcomeBack : m.welcome}
@@ -99,10 +154,10 @@ const Overview = () => {
                 />
               )}
               <HelpLink supportLink={supportLink} documentationLink={documentationBaseUrl} />
-            </Col>
+            </Col>*/}
           </Row>
         </div>
-        <DeploymentComponentStatus />
+        {/* <DeploymentComponentStatus />*/}
       </Container>
     </RequireRequest>
   )

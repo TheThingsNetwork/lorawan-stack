@@ -88,18 +88,7 @@ const Header = ({ handleSearchRequest, searchable }) => {
     </React.Fragment>
   )
 
-  return (
-    <HeaderComponent
-      user={user}
-      dropdownItems={dropdownItems}
-      mobileDropdownItems={mobileDropdownItems}
-      navigationEntries={navigationEntries}
-      searchable={searchable}
-      onSearchRequest={handleSearchRequest}
-      onLogout={handleLogout}
-      logo={<Logo />}
-    />
-  )
+  return null
 }
 
 Header.propTypes = {
