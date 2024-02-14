@@ -147,15 +147,7 @@ const Footer = ({
       <div className={style.left}>
         <div>
           © {year}{' '}
-          <a className={style.link} href="https://www.thethingsindustries.com/docs">
-            The Things Stack
-          </a>{' '}
           <span className={style.copyrightLinks}>
-            by{' '}
-            <a className={style.link} href="https://www.thethingsnetwork.org">
-              The Things Network
-            </a>{' '}
-            and{' '}
             <a className={style.link} href="https://www.thethingsindustries.com">
               The Things Industries
             </a>
