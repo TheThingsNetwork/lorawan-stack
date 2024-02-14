@@ -46,7 +46,8 @@ const Overview = () => {
           <DocumentationDashboardPanel />
         </div>
         <div className="item-4 m:item-6 l:item-12 s:item-12">
-          <Panel title={'New Panel Title'} icon="feed" buttonTitle={'View'} divider />
+          {/* This panel is for grid testing purposes only */}
+          <Panel title="New Panel Title" icon="feed" buttonTitle="View" divider />
         </div>
         <div className="item-4 m:item-6 l:item-12 s:item-12">
           <ShortcutPanel />
