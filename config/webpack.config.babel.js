@@ -26,7 +26,6 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
-import nib from 'nib'
 
 import pjson from '../package.json'
 
@@ -125,7 +124,7 @@ export const styleConfig = {
         modules: {
           exportLocalsConvention: 'camelCase',
           localIdentName: env({
-            production: '[hash:base64:10]',
+            production: '[hash:base64:4]',
             development: '[local]-[hash:base64:4]',
           }),
         },
@@ -136,7 +135,6 @@ export const styleConfig = {
       options: {
         stylusOptions: {
           import: [path.resolve(context, 'pkg/webui/styles/include.styl')],
-          use: nib(),
         },
       },
     },
