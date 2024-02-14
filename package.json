@@ -70,7 +70,7 @@
     "wait-on": "^7.2.0",
     "webpack": "^5.90.1",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1",
+    "webpack-dev-server": "^5.0.0",
     "webpack-shell-plugin": "https://github.com/cdeutsch/webpack-shell-plugin.git#bee537d",
     "yargs": "^17.7.2"
   },
