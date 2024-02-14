@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// stylelint-disable stylus/pythonic
+
 :global {
   .tippy-box {
     border-normal()
@@ -34,7 +36,7 @@
 
 
   .tippy-arrow,
-  .tippy-arrow:before  {
+  .tippy-arrow:before {
     position: absolute
     width: 8px
     height: 8px
@@ -87,6 +89,8 @@
     border-normal('bottom')
   }
 }
+
+// stylelint-enable stylus/pythonic
 
 .small
   padding: $cs.xxs $cs.s

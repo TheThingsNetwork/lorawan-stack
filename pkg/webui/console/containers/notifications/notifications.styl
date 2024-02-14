@@ -22,6 +22,7 @@
   &-change-button
     margin-top: $cs.m
     margin-bottom: $cs.m
+    // stylelint-disable-next-line declaration-no-important
     color: var(--c-text-brand-normal) !important
 
   &.notification-selected
@@ -35,7 +36,7 @@
   align-items: center
   border-bottom: 1px solid var(--c-border-neutral-light)
   padding: $cs.m $cs.s
-  gap: 0.25rem
+  gap: .25rem
 
   +media-query($bp.s)
     padding: $cs.xs
@@ -61,7 +62,7 @@
     border-radius: $br.l
     background-color: var(--c-bg-brand-normal)
     color: var(--c-text-neutral-min)
-    padding: 0 0.45rem
+    padding: 0 .45rem
     margin-left: $cs.xxs
     font-size: $fs.s
     position: relative

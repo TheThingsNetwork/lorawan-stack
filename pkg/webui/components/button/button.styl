@@ -186,6 +186,7 @@
 
   &.busy:not(.naked),
   &.busy
+    // stylelint-disable-next-line declaration-no-important
     color: transparent !important
     position: relative
     svg
@@ -225,5 +226,7 @@
     margin-right: $cs.xs
 
     +media-query($bp.s)
+      // stylelint-disable declaration-no-important
       margin-bottom: $cs.s !important
       margin-right: 0 !important
+      // stylelint-enable declaration-no-important

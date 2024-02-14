@@ -24,13 +24,13 @@
     overflow: hidden
     border-radius: $br.l
     width: 2.5rem
-    transition: 0.3s 0s all cubic-bezier(0.770, 0.000, 0.175, 1.000)
+    transition: .3s 0s all cubic-bezier(.77, , .175, 1)
     top: 0
     left: 0
     z-index: $zi.slight
 
     &:hover
-      transition: 0.3s 0.2s all cubic-bezier(0.770, 0.000, 0.175, 1.000)
+      transition: .3s .2s all cubic-bezier(.77, , .175, 1)
       width: 100%
 
       // Reveal the button label.
@@ -60,7 +60,7 @@
 
   &-button
     border-radius: $br.l
-    padding: 0 $cs.xs 0 0.73rem
+    padding: 0 $cs.xs 0 .73rem
     background-color: var(--c-bg-neutral-heavy)
     position: relative
     display: inline-flex
@@ -79,7 +79,7 @@
     justify-content: flex-start
 
     span:last-child
-      transition: 0.2s 0.2s all ease-in-out
+      transition: .2s .2s all ease-in-out
       opacity: 0
 
     &:not(:disabled)

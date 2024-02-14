@@ -53,12 +53,6 @@
 .good-pulse:after
   animation: goodPulse 4s infinite
 
-.bad-pulse:after
-  animation: badPulse 4s infinite
-
-.mediocre-pulse:after
-  animation: mediocrePulse 4s infinite
-
 .triggered-good-pulse:after
   animation: triggeredGoodPulse 1.5s ease-out
 
@@ -88,9 +82,5 @@ triggered-pulse-animation($color, $name)
       box-shadow: 0 0 0 0 alpha($color, 0)
 
 pulse-animation($tokens.theme-light.color.icon-info-normal, 'goodPulse')
-pulse-animation($tokens.theme-light.color.icon-error-normal, 'badPulse')
-pulse-animation($tokens.theme-light.color.icon-warning-normal, 'mediocrePulse')
 
 triggered-pulse-animation($tokens.theme-light.color.icon-info-normal, 'triggeredGoodPulse')
-triggered-pulse-animation($tokens.theme-light.color.icon-error-normal, 'triggeredBadPulse')
-triggered-pulse-animation($tokens.theme-light.color.icon-warning-normal, 'triggeredMediocrePulse')

@@ -23,14 +23,14 @@ $fh = 'calc(%s - 1px)' % $footer-height
   flex: none
   background-color: var(--c-bg-neutral-min)
   box-sizing: border-box
-  
+
   +media-query-min($bp.xs)
     padding-left: $cs.xs
     height: $footer-height
   +media-query($bp.xs)
     min-height: $footer-height * 2
     flex-direction: column
-  
+
   .language
     position: relative
     height: 100%
@@ -38,7 +38,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
     &-dropdown
       bottom: $fh
       left: 0
-  
+
   &.transparent
     +media-query-min($bp.s)
       .footer-section
@@ -46,10 +46,10 @@ $fh = 'calc(%s - 1px)' % $footer-height
         background-color: transparent
 
         &.interactive:hover
-          background-color: rgba(255,255,2555,0.1)
+          background-color: rgba(255,255,2555,.1)
 
       .right
-          color: var(--c-bg-neutral-min)
+        color: var(--c-bg-neutral-min)
 
 .link
   color: var(--c-text-neutral-light)
@@ -79,7 +79,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
     width: 100%
     justify-content: space-between
     align-items: center
-  
+
 .footer-section
   height: $fh
   display: flex
@@ -91,7 +91,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
 
   &:not(.interactive)
     padding: 0 $cs.s
-  
+
   &-button
     reset-button()
     text-decoration: none
@@ -103,7 +103,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
     & > div
       display: flex
       align-items: center
-    
+
   &:not(.primary)
     border-normal('left')
     background-color: var(--c-bg-neutral-min)
@@ -113,6 +113,6 @@ $fh = 'calc(%s - 1px)' % $footer-height
   &.primary
     background-color: var(--c-text-brand-normal)
     color: var(--c-bg-neutral-min)
-    
+
     &.interactive:hover
       background-color: hoverize(var(--c-text-brand-normal))

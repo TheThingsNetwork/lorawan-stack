@@ -44,7 +44,7 @@
   background-image: url('../../../assets/img/layout/bg/login-visual.jpg')
   background-size: cover
   background-position: left
-  box-shadow: inset 60px 0 60px rgba(0,0,0,0.08)
+  box-shadow: inset 60px 0 60px rgba(0,0,0,.08)
 
 +media-query($bp.l)
   .visual
@@ -82,9 +82,9 @@
 .title
   color: var(--c-text-brand-normal)
   margin-top: 0
-  background: linear-gradient(right, 0% var(--c-text-brand-normal), var(--c-text-brand-normal-active));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(right, 0% var(--c-text-brand-normal), var(--c-text-brand-normal-active))
+  -webkit-background-clip: text
+  -webkit-text-fill-color: transparent
   font-weight: 200
   font-size: $fs.xl3
   +media-query($bp.s)
@@ -110,8 +110,8 @@
     flex-direction: row
   +media-query($bp.s)
     button, a
-      margin-bottom: $cs.s !important
-      margin-right: 0 !important
+      margin-bottom: $cs.s
+      margin-right: 0
 
 .footer
   position: fixed

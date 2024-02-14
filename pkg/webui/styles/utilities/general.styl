@@ -43,11 +43,11 @@
       +media-query($width)
         for $num in (1..12)
           // Generate responsive grid item overrides.
-          .{$name}\\:item-{$num}
+          .{$name}:item-{$num}
             grid-column-end: span $num
 
           // Generate responsive start-colum (offset) item overrides.
-          .{$name}\\:item-start-{$num}
+          .{$name}:item-start-{$num}
             grid-column-start: $num
 
     &--center
@@ -85,17 +85,17 @@
   // Responsive justification styles.
   for $name, $width in $bp
     +media-query($width)
-      .{$name}\\:j-center
-        justify-content: center !important
+      .{$name}:j-center
+        justify-content: center
 
-      .{$name}\\:j-start
-        justify-content: start !important
+      .{$name}:j-start
+        justify-content: start
 
-      .{$name}\\:end
-        justify-content: end !important
+      .{$name}:end
+        justify-content: end
 
-      .{$name}\\:j-between
-        justify-content: space-between !important
+      .{$name}:j-between
+        justify-content: space-between
 
   // Block justification.
 
@@ -133,27 +133,27 @@
 
     for $name, $width in $bp
       +media-query($width)
-        .{$name}\\:w-{$num}0
+        .{$name}:w-{$num}0
           width: $percentage
 
-        .{$name}\\:h-{$num}0
+        .{$name}:h-{$num}0
           height: $percentage
 
   for $name, $width in $bp
     +media-query($width)
-      .{$name}\\:w-full
+      .{$name}:w-full
         width: 100%
 
-      .{$name}\\:w-auto
+      .{$name}:w-auto
         width: auto
 
-      .{$name}\\:w-content
+      .{$name}:w-content
         width: fit-content
 
-      .{$name}\\:h-full
+      .{$name}:h-full
         height: 100%
 
-      .{$name}\\:h-auto
+      .{$name}:h-auto
         height: auto
 
   // Positioning.
@@ -175,19 +175,19 @@
 
   for $name, $width in $bp
     +media-query($width)
-      .{$name}\\:pos-relative
+      .{$name}:pos-relative
         position: relative
-      .{$name}\\:pos-absolute
+      .{$name}:pos-absolute
         position: absolute
-      .{$name}\\:pos-fixed
+      .{$name}:pos-fixed
         position: fixed
-      .{$name}\\:pos-static
+      .{$name}:pos-static
         position: static
-      .{$name}\\:direction-column
+      .{$name}:direction-column
         flex-direction: column
-      .{$name}\\:direction-row
+      .{$name}:direction-row
         flex-direction: row
-      .{$name}\\:flex-wrap
+      .{$name}:flex-wrap
         flex-wrap: wrap
 
   // Layout shorthands.
@@ -222,11 +222,11 @@
 
   for $name, $width in $bp
     +media-query($width)
-      .{$name}\\:direction-column
-        flex-direction: column !important
+      .{$name}:direction-column
+        flex-direction: column
 
-      .{$name}\\:direction-row
-        flex-direction: row !important
+      .{$name}:direction-row
+        flex-direction: row
 
   // Opacity.
   .opacity-0
@@ -347,54 +347,54 @@
   // Responsive typography styles.
   for $name, $width in $bp
     +media-query($width)
-      .{$name}\\:text-center
-        text-align: center !important
+      .{$name}:text-center
+        text-align: center
 
-      .{$name}\\:text-left
-        text-align: left !important
+      .{$name}:text-left
+        text-align: left
 
-      .{$name}\\:text-right
-        text-align: right !important
+      .{$name}:text-right
+        text-align: right
 
   // DISPLAY UTILITIES.
   .d-flex
-    display: flex !important
+    display: flex
 
   .d-inline
-    display: inline !important
+    display: inline
 
   .d-block
-    display: block !important
+    display: block
 
   .d-none
-    display: none !important
+    display: none
 
   .d-inline-block
-    display: inline-block !important
+    display: inline-block
 
   .d-inline-flex
-    display: inline-flex !important
+    display: inline-flex
 
   // Responsive display styles.
   for $name, $width in $bp
     +media-query($width)
-      .{$name}\\:d-flex
-        display: flex !important
+      .{$name}:d-flex
+        display: flex
 
-      .{$name}\\:d-inline
-        display: inline !important
+      .{$name}:d-inline
+        display: inline
 
-      .{$name}\\:d-block
-        display: block !important
+      .{$name}:d-block
+        display: block
 
-      .{$name}\\:d-none
-        display: none !important
+      .{$name}:d-none
+        display: none
 
-      .{$name}\\:d-inline-block
-        display: inline-block !important
+      .{$name}:d-inline-block
+        display: inline-block
 
-      .{$name}\\:d-inline-flex
-        display: inline-flex !important
+      .{$name}:d-inline-flex
+        display: inline-flex
 
   .br-xs
     border-radius: $br.xs

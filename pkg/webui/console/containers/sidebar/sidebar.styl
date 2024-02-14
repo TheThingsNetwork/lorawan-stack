@@ -21,7 +21,7 @@
   box-sizing: border-box
   sidebar-transition(min-width)
   +media-query($bp.m)
-    transition: left .4s cubic-bezier(0.220, 0.005, 0.295, 1.000)
+    transition: left .4s cubic-bezier(.22, .005, .295, 1)
     position: absolute
     top: 0
     left: -90vw
@@ -32,7 +32,7 @@
     z-index: $zi.nav
 
     &-open
-      transition: left .6s cubic-bezier(0.165, 0.840, 0.440, 1.000)
+      transition: left .6s cubic-bezier(.165, .84, .44, 1)
       left: 0
 
       & + .sidebar-backdrop
