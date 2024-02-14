@@ -22,6 +22,11 @@ import ShortcutItem from './shortcut-item'
 const m = defineMessages({
   shortcuts: 'Shortcuts',
   edit: 'Edit shortcuts',
+  addApplication: 'Add a new Application',
+  addGateway: 'Add a new Gateway',
+  addOrganization: 'Add a new Organization',
+  addPersonalApiKey: 'Add a new personal API key',
+  registerDevice: 'Register a device',
 })
 
 const ShortcutPanel = () => (
@@ -36,31 +41,26 @@ const ShortcutPanel = () => (
     <div className="grid">
       <ShortcutItem
         icon="display_settings"
-        title="Add a new Application"
+        title={m.addApplication}
         link="/applications/add"
         className="item-6"
       />
-      <ShortcutItem
-        icon="router"
-        title="Add a new Gateway"
-        link="/gateways/add"
-        className="item-6"
-      />
+      <ShortcutItem icon="router" title={m.addGateway} link="/gateways/add" className="item-6" />
       <ShortcutItem
         icon="group"
-        title="Add a new Organization"
+        title={m.addOrganization}
         link="/organizations/add"
         className="item-4"
       />
       <ShortcutItem
         icon="key"
-        title="Add a new personal API key"
+        title={m.addPersonalApiKey}
         link="/user/api-keys/add"
         className="item-4"
       />
       <ShortcutItem
         icon="settings_remote"
-        title="Register a device"
+        title={m.registerDevice}
         link="/applications"
         className="item-4"
       />

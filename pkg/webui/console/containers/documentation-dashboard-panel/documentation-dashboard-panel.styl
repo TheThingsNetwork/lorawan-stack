@@ -13,20 +13,19 @@
 // limitations under the License.
 
 .docs-link
-    transition: color 50ms linear
-    text-decoration: none
-    color: var(--c-text-neutral-semilight)
-    display: flex
-    justify-content: space-between
-    align-items: center
-    gap: $cs.xs
-    padding: $cs.xs
-    width: 100%
-    padding-left: $cs.xs
-    margin-bottom: $cs.s
+  box-sizing: border-box
+  transition: color 50ms linear
+  text-decoration: none
+  color: var(--c-text-neutral-semilight)
+  display: flex
+  justify-content: space-between
+  align-items: center
+  padding: $cs.xs 0 $cs.xs $cs.xs
+  width: 100%
+  margin-bottom: $cs.s
 
-    &:hover
-      color: var(--c-text-neutral-heavy)
+  &:hover
+    color: var(--c-text-neutral-heavy)
 
-      .icon
-        color: inherit
+    .icon
+      color: inherit

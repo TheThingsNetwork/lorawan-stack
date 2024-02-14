@@ -55,7 +55,7 @@ const DocumentationDashboardPanel = () => (
   <Panel
     title={sharedMessages.documentation}
     path={docBaseUrl}
-    icon="bolt"
+    icon="menu_book"
     buttonTitle={m.view}
     divider
     target="_blank"

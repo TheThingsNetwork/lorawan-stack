@@ -38,18 +38,12 @@ const Panel = ({
   className,
   messageDecorators,
   divider,
-  filledIcon,
   target,
 }) => (
   <div className={classnames(styles.panel, className)}>
     <div className="d-flex j-between al-center mb-cs-m flex-wrap gap-cs-xs">
       <div className="d-flex gap-cs-xs al-center">
-        {icon && (
-          <Icon
-            icon={icon}
-            className={classnames(styles.panelHeaderIcon, { [styles.filledIcon]: filledIcon })}
-          />
-        )}
+        {icon && <Icon icon={icon} className={styles.panelHeaderIcon} />}
         <Message content={title} className={styles.panelHeaderTitle} />
         {messageDecorators}
       </div>
@@ -72,7 +66,6 @@ Panel.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   divider: PropTypes.bool,
-  filledIcon: PropTypes.bool,
   icon: PropTypes.string,
   messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
@@ -91,7 +84,6 @@ Panel.defaultProps = {
   className: undefined,
   messageDecorators: undefined,
   divider: false,
-  filledIcon: false,
   target: undefined,
 }
 

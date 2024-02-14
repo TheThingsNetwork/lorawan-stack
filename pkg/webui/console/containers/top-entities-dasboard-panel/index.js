@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
 import Panel from '@ttn-lw/components/panel'
 
@@ -20,9 +21,13 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './top-entities-dashboard-panel.styl'
 
+const m = defineMessages({
+  topEntities: 'Your top entities',
+})
+
 const TopEntitiesDashboardPanel = () => {
   const options = [
-    { label: 'All', value: 'all' },
+    { label: sharedMessages.all, value: 'all' },
     { label: sharedMessages.applications, value: 'apps' },
     { label: sharedMessages.gateways, value: 'gtws' },
     { label: sharedMessages.devices, value: 'devices' },
@@ -39,7 +44,7 @@ const TopEntitiesDashboardPanel = () => {
 
   return (
     <Panel
-      title={'Your top entities'}
+      title={m.topEntities}
       icon="star"
       toggleOptions={options}
       activeToggle={active}
