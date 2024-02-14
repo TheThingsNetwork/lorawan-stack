@@ -20,10 +20,10 @@
     "@babel/register": "^7.23.7",
     "@babel/runtime-corejs2": "^7.23.9",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
+    "@storybook/addon-actions": "^7.6.12",
     "@storybook/addon-designs": "^7.0.7",
     "@storybook/addon-essentials": "^7.5.3",
     "@storybook/addon-mdx-gfm": "^7.5.3",
-    "@storybook/addon-actions": "^7.6.12",
     "@storybook/cli": "^7.6.12",
     "@storybook/react": "^7.6.12",
     "@storybook/react-webpack5": "^7.6.12",
@@ -67,8 +67,9 @@
     "pg": "^8.11.3",
     "prettier": "^3.2.5",
     "react-refresh": "^0.14.0",
-    "stylint": "^2.0.0",
     "storybook": "^7.6.12",
+    "stylelint": "^16.2.1",
+    "stylelint-stylus": "^1.0.0",
     "stylus": "^0.62.0",
     "stylus-loader": "^8.1.0",
     "wait-on": "^7.2.0",
@@ -164,6 +165,9 @@
   },
   "eslintConfig": {
     "extends": "./config/eslintrc.yaml"
+  },
+  "stylelint": {
+    "extends": "./config/.stylelintrc.yaml"
   },
   "prettier": "./config/.prettierrc.js"
 }
