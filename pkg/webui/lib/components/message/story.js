@@ -15,8 +15,6 @@
 import React from 'react'
 import { IntlProvider } from 'react-intl'
 
-import doc from './message.md'
-
 import Message from '.'
 
 const exampleMessage = {

@@ -19,9 +19,12 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/mg"
 	"gopkg.in/yaml.v2"
@@ -163,14 +166,30 @@ func (errs errorSlice) Error() string {
 	case 0:
 		return ""
 	case 1:
-		return errs[0].Error()
+		// Return the formatted error string for a single error.
+		return formatErrorForGitHub(errs[0])
 	default:
 		var b strings.Builder
 		b.WriteString("multiple errors:\n")
 		for _, err := range errs {
-			b.WriteString("  - " + err.Error() + "\n")
+			formattedError := formatErrorForGitHub(err)
+			b.WriteString(formattedError + "\n")
 		}
 		return b.String()
+	}
+}
+
+// formatErrorForGitHub formats an error for GitHub annotations.
+func formatErrorForGitHub(err error) string {
+	switch e := err.(type) {
+	case *checkErr:
+		// GitHub expects the path to be relative to the repository root.
+		relativePath, _ := filepath.Rel(".", e.Path)
+		// Escape the message to prevent command injection.
+		message := strings.ReplaceAll(e.Reason, "\"", "\\\"")
+		return fmt.Sprintf("::error file=%s::%s", relativePath, message)
+	default:
+		return err.Error()
 	}
 }
 
@@ -197,6 +216,50 @@ func (h Headers) Check() error {
 	if err != nil {
 		return err
 	}
+	if len(checkErrs) > 0 {
+		return checkErrs
+	}
+	return nil
+}
+
+// CheckNewFiles checks that all new files contain the required file header with the correct year.
+func (h Headers) CheckNewFiles() error {
+	mg.Deps(Headers.loadFile)
+	base := "origin/" + os.Getenv("GITHUB_BASE_REF")
+
+	currentYear := time.Now().Year()
+	correctHeader := fmt.Sprintf("// Copyright © %d ", currentYear)
+
+	cmd := exec.Command("git", "diff", "--name-only", "--diff-filter=A", base)
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("failed to get list of new files: %w", err)
+	}
+
+	var checkErrs errorSlice
+	for _, path := range strings.Split(strings.TrimSpace(string(output)), "\n") {
+		// Check if the file matches the HeaderRule before checking its header.
+		if rule := headerConfig.get(path); rule == nil {
+			continue // Skip files that do not match any HeaderRule.
+		}
+
+		fileContent, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("failed to read file %s: %w", path, err)
+		}
+
+		// Check if the first line of the file contains the correct copyright header.
+		scanner := bufio.NewScanner(bytes.NewReader(fileContent))
+		if scanner.Scan() {
+			firstLine := scanner.Text()
+			if !strings.Contains(firstLine, correctHeader) {
+				checkErrs = append(checkErrs, &checkErr{Path: path, Reason: "incorrect year in copyright header; should be " + strconv.Itoa(currentYear)})
+			}
+		} else {
+			checkErrs = append(checkErrs, &checkErr{Path: path, Reason: "empty file or missing header"})
+		}
+	}
+
 	if len(checkErrs) > 0 {
 		return checkErrs
 	}

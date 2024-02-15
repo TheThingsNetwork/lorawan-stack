@@ -41,7 +41,7 @@ func newTimeSyncCommand(
 		return nil, data, errInsufficientLength.WithAttributes(
 			"expected_length", lenBytes,
 			"actual_length", len(data),
-		).New()
+		)
 	}
 
 	cPayload, rest := data[:lenBytes], data[lenBytes:]
@@ -76,7 +76,7 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 				"command_id", cID,
 				"command_payload", cPayload,
 				"remaining_payload", rest,
-			).New()
+			)
 			evts = append(evts, EvtPkgFail.With(events.WithData(err)))
 			return commands, evts, err
 		}
@@ -110,12 +110,12 @@ func makeCommand(
 		return nil, cPayload, errUnsuportedCommand.WithAttributes(
 			"command_id", cID,
 			"command_payload", cPayload,
-		).New()
+		)
 	default:
 		return nil, cPayload, errUnknownCommand.WithAttributes(
 			"command_id", cID,
 			"command_payload", cPayload,
-		).New()
+		)
 	}
 }
 
@@ -128,7 +128,7 @@ func MakeDownlink(results []Result, fPort uint32) (*ttnpb.ApplicationDownlink, e
 		}
 		b, err := result.MarshalBinary()
 		if err != nil {
-			return nil, errDownlinkCreationFailed.WithCause(err).New()
+			return nil, errDownlinkCreationFailed.WithCause(err)
 		}
 		frmPayload = append(frmPayload, b...)
 	}

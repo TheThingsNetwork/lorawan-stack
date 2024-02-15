@@ -2589,7 +2589,7 @@ func TestGetNwkSKeys(t *testing.T) {
 					"nwk_s_enc_key",
 					"s_nwk_s_int_key",
 				})
-				return nil, errTest.New()
+				return nil, errTest
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
@@ -3217,7 +3217,7 @@ func TestGetHomeNetID(t *testing.T) {
 					"net_id",
 					"network_server_address",
 				})
-				return nil, errTest.New()
+				return nil, errTest
 			},
 			JoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},

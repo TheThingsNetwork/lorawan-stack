@@ -49,10 +49,10 @@ func mergePackageData(
 ) (*packageData, uint32, error) {
 	var defaultData, associationData packageData
 	if err := defaultData.fromStruct(def.GetData()); err != nil {
-		return nil, 0, errPkgDataMerge.WithCause(err).New()
+		return nil, 0, errPkgDataMerge.WithCause(err)
 	}
 	if err := associationData.fromStruct(assoc.GetData()); err != nil {
-		return nil, 0, errPkgDataMerge.WithCause(err).New()
+		return nil, 0, errPkgDataMerge.WithCause(err)
 	}
 
 	merged := &packageData{

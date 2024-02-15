@@ -225,19 +225,19 @@ area-hover()
 
 media-query($max)
   @media screen and (max-width: $max)
-    {block} // @stylint ignore
+    {block}
 
 media-query-min($min)
   @media screen and (min-width: $min + 1)
-    {block} // @stylint ignore
+    {block}
 
 media-query-between($min, $max)
   @media screen and (min-width: $min + 1) and (max-width: $max)
-    {block} // @stylint ignore
+    {block}
 
 media-query-height($max)
   @media screen and (max-height: $max)
-    {block} // @stylint ignore
+    {block}
 
 generate-responsive-classes()
   // Base definition.
@@ -254,7 +254,7 @@ generate-responsive-classes()
 // .focus-visible class added automatically on focused elements.
 focus-visible()
   &:global(.focus-visible)
-    {block} // @stylint ignore
+    {block}
 
   &:focus
     outline: 0
