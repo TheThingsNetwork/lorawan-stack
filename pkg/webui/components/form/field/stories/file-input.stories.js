@@ -19,7 +19,7 @@ import React from 'react'
 import FileInput from '@ttn-lw/components/file-input'
 import Form from '@ttn-lw/components/form'
 
-import { FieldsWrapperExample } from './shared'
+import FieldsWrapperExample from './shared'
 
 export default {
   title: 'Fields/FileInput',

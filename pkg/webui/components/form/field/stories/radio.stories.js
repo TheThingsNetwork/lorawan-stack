@@ -19,7 +19,7 @@ import React from 'react'
 import Radio from '@ttn-lw/components/radio-button'
 import Form from '@ttn-lw/components/form'
 
-import { FieldsWrapperExample } from './shared'
+import FieldsWrapperExample from './shared'
 
 export default {
   title: 'Fields/Radio',
