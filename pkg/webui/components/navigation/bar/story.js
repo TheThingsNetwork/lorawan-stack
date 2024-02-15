@@ -19,7 +19,6 @@ import NavigationBar from '.'
 
 export default {
   title: 'Navigation',
-  component: NavigationBar,
 }
 
 export const _NavigationBar = () => (

@@ -36,12 +36,6 @@ const icons = [
   'organization',
 ]
 
-const doc = `Icons can be used using \`display: {flex|inline-block}\`.
-\`inline-block\` is used by default. To use \`flex\` instead, overwrite the
-display value of the wrapping \`<span />\`in your local scoped css. The
-positioning will differ slightly, so the nudge props can be used to fine-tune
-the appearance.`
-
 const iconElement = icons.map(icon => (
   <div className={style.wrapper} key={icon}>
     <Icon icon={icon} />
@@ -51,14 +45,6 @@ const iconElement = icons.map(icon => (
 
 export default {
   title: 'Icon',
-  component: Icon,
-  parameters: {
-    docs: {
-      description: {
-        component: doc,
-      },
-    },
-  },
 }
 
 export const Icons = () => <div>{iconElement}</div>

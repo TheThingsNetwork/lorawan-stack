@@ -19,11 +19,10 @@ import React from 'react'
 import UnitInput from '@ttn-lw/components/unit-input'
 import Form from '@ttn-lw/components/form'
 
-import { FieldsWrapperExample } from './shared'
+import FieldsWrapperExample from './shared'
 
 export default {
   title: 'Fields/UnitInput',
-  component: Form.Field,
 }
 
 export const Default = () => (

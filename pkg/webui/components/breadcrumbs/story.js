@@ -19,7 +19,6 @@ import { Breadcrumbs } from './breadcrumbs'
 
 export default {
   title: 'Breadcrumbs',
-  component: [Breadcrumbs, Breadcrumb],
 }
 
 export const Default = () => {

@@ -19,11 +19,10 @@ import React from 'react'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
 
-import { FieldsWrapperExample } from './shared'
+import FieldsWrapperExample from './shared'
 
 export default {
   title: 'Fields/Checkbox',
-  component: Form.Field,
 }
 
 export const Default = () => (

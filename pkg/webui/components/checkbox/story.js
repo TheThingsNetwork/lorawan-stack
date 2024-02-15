@@ -82,7 +82,6 @@ class IndeterminateCheckboxExample extends React.Component {
 
 export default {
   title: 'Checkbox',
-  component: Checkbox,
 }
 
 export const Default = () => <Checkbox label="Checkbox" name="checkbox" />

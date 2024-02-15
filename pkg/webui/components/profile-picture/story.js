@@ -24,7 +24,6 @@ const pp = {
 
 export default {
   title: 'Profile Picture',
-  component: ProfilePicture,
 }
 
 export const Default = () => (

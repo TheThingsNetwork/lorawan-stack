@@ -18,7 +18,6 @@ import Tab from '.'
 
 export default {
   title: 'Tag',
-  component: Tab,
 }
 
 export const Default = () => <Tab content="Info" />

@@ -41,7 +41,6 @@ const containerDefaultStyles = {
 
 export default {
   title: 'Form',
-  component: Form,
 }
 
 export const Login = () => (

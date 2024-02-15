@@ -72,7 +72,6 @@ const containerStyles = {
 
 export default {
   title: 'Data Sheet',
-  component: DataSheet,
 }
 
 export const Default = () => (

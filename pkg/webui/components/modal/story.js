@@ -35,14 +35,6 @@ const bottomLine = (
 
 export default {
   title: 'Modal',
-  component: Modal,
-  parameters: {
-    docs: {
-      description: {
-        component: `The modal can be displayed inline or portalled via \`<PortalledModal />\``,
-      },
-    },
-  },
 }
 
 export const BasicModal = () => (

@@ -18,7 +18,6 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { action } from '@storybook/addon-actions'
 
-import doc from '../table.md'
 import Tabular from '..'
 
 import examples from './storyData'
@@ -217,14 +216,6 @@ class SortableExample extends React.Component {
 
 export default {
   title: 'Table/Tabular',
-  component: Tabular,
-  parameters: {
-    docs: {
-      description: {
-        component: doc,
-      },
-    },
-  },
 }
 
 export const Default = () => (

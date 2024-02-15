@@ -26,7 +26,6 @@ const handleLogout = () => {
 
 export default {
   title: 'Profile Dropdown V2',
-  component: ProfileDropdown,
 }
 
 export const Default = () => (

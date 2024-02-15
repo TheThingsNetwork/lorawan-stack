@@ -110,3 +110,7 @@ func build(d *Definition, skip int) *Error {
 	}
 	return &e
 }
+
+// New exists in order to prevent accidentally calling Definition.New().
+// If you are sure that you want to create a fresh error, use .Definition.New().
+func (*Error) New() {}

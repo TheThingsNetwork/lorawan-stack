@@ -42,7 +42,6 @@ class Example extends Component {
 
 export default {
   title: 'Tabs',
-  component: Tabs,
 }
 
 export const Default = () => {
@@ -86,7 +85,7 @@ export const WithIcons = () => {
     { title: 'Data', name: 'data', icon: 'data' },
   ]
 
-  return <Example tabs={tabs} active={tabs[0].name} divider />
+  return <Example tabs={tabs} active={tabs[0].name} narrow />
 }
 
 WithIcons.story = {
