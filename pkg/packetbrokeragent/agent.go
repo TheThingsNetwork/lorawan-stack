@@ -273,7 +273,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		switch l := len(a.forwarderConfig.TokenKey); l {
 		case 16, 32:
 		default:
-			return nil, errTokenKey.WithAttributes("length", l).New()
+			return nil, errTokenKey.WithAttributes("length", l)
 		}
 		blockCipher, err := aes.NewCipher(a.forwarderConfig.TokenKey)
 		if err != nil {

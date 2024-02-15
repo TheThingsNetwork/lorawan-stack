@@ -18,7 +18,6 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { action } from '@storybook/addon-actions'
 
-import doc from '../table.md'
 import Tabular from '..'
 
 import examples from './storyData'

@@ -14,15 +14,15 @@
 
 /* eslint-disable react/prop-types */
 
-import crypto from 'crypto'
-
 import React from 'react'
 
 import Input from '..'
 
 import { Example } from './shared'
 
-const generateRandom16Bytes = () => crypto.randomBytes(16).toString('hex').toUpperCase()
+// Chosen by fair dice roll.
+// Guaranteed to be random.
+const generateRandom16Bytes = () => '7d85de9e99c9a2be'
 
 export default {
   title: 'Input/Normal',
