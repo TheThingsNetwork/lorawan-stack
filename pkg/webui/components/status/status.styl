@@ -21,10 +21,11 @@
   border-radius: 50%
   transition: background-color $ad.m
 
-  &:not(.flipped)
-    margin-left: $cs.xs
-  &.flipped
-    margin-right: $cs.xs
+  &:not(.dot-only)
+    &:not(.flipped)
+      margin-left: $cs.xs
+    &.flipped
+      margin-right: $cs.xs
 
   &:after
     content: ''

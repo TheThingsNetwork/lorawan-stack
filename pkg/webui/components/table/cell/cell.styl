@@ -14,25 +14,16 @@
 
 .cell
   display: table-cell
-  padding: $cs.m
+  padding: 0 $cs.s
   vertical-align: middle
-
-  +media-query($bp.s)
-    padding: $cs.m $cs.xs
-
-  &:first-child, &:last-child
-    padding-right: $cs.s
+  line-height: 1.15
 
   &:first-child
-    font-weight: $fw.bold
+    font-weight: 600
 
   &:not(&-centered):not(&-left)
     &:last-child
       text-align: right
-
-  &-small
-    padding-top: $cs.xs
-    padding-bottom: $cs.xs
 
   &-centered
     text-align: center
@@ -44,15 +35,20 @@
     text-align: right
 
   &-head
-    font-weight: normal
-    font-size: $fs.s
+    height: 3rem
+    text-transform: uppercase
+    font-weight: 600
+    font-size: $fsv2.s
     color: var(--c-text-neutral-light)
 
   &-data
+    height: 4rem
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
 
+    .cell-left
+      padding: $cs.l
 
   &-head:not(&-centered):not(&-right)
     text-align: left

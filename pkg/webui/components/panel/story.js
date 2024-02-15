@@ -76,7 +76,7 @@ export const WithToggle = () => {
   ]
 
   return (
-    <div style={{ width: '32.5rem' }}>
+    <div style={{ width: '36rem' }}>
       <Example title="Your top entities" icon="star" toggleOptions={options} />
     </div>
   )

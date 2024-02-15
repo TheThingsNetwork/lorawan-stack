@@ -19,11 +19,12 @@ import Button from '@ttn-lw/components/button'
 const headers = [
   {
     name: 'appId',
-    displayName: 'Application ID',
+    displayName: 'Name and ID',
   },
   {
     name: 'desc',
     displayName: 'Description',
+    align: 'center',
   },
   {
     name: 'devices',
@@ -33,6 +34,7 @@ const headers = [
   {
     name: 'lastActivity',
     displayName: 'Last Activity',
+    align: 'center',
   },
 ]
 

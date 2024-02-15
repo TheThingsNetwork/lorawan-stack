@@ -61,7 +61,7 @@ const Panel = ({
 
 Panel.propTypes = {
   activeToggle: PropTypes.string,
-  buttonTitle: PropTypes.string,
+  buttonTitle: PropTypes.message,
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   divider: PropTypes.bool,
@@ -82,7 +82,6 @@ Panel.defaultProps = {
   className: undefined,
   messageDecorators: undefined,
   divider: false,
-  svgIcon: undefined,
 }
 
 export default Panel

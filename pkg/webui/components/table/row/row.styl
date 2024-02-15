@@ -17,10 +17,10 @@
   color: var(--c-text-neutral-light)
 
   &-head
-    border-dark('bottom')
+    border-bottom: 1px solid var(--c-border-neutral-extralight)
 
-  &-body
-    border-normal('bottom')
+  &-body&:not(:last-child)
+    border-bottom: 1px solid var(--c-border-neutral-extralight)
 
   &-footer
     display: flex

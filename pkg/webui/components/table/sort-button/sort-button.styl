@@ -14,16 +14,21 @@
 
 .button
   reset-button()
-  one-liner()
+  display: flex
+  align-items: center
+  line-height: 1
   width: 100%
-  padding: 1px
   text-align: inherit
-  transition: color $ad.s ease-in
+  text-transform: uppercase
 
-  &:active,
-  &-active
-    color: var(--c-text-neutral-heavy)
+  &-center
+    justify-content: center
 
-.icon
-  transition: transform $ad.m ease-in-out
-  padding-left: $cs.xxs
+  svg.icon
+    width: 0.75rem
+    height: 1rem
+    margin-left: 3.5px
+
+  .icon
+    font-size: 1rem
+    transition: transform $ad.m ease-in-out

@@ -79,6 +79,7 @@ const FetchTable = props => {
     searchItemsAction,
     getItemsAction,
     baseDataSelector,
+    className,
   } = props
 
   const isMounted = useRef(true)
@@ -246,47 +247,49 @@ const FetchTable = props => {
 
   return (
     <div data-test-id={`${entity}-table`}>
-      <div className={filtersCls}>
-        <div className={style.filtersLeft}>
-          {tabs.length > 0 ? (
-            <Tabs active={tab} className={style.tabs} tabs={tabs} onTabChange={onTabChange} />
-          ) : (
-            tableTitle && (
-              <div className={style.tableTitle}>
-                {tableTitle} ({totalCount})
+      {(tabs.length > 0 || tableTitle || actionItems || mayAdd || searchable) && (
+        <div className={filtersCls}>
+          <div className={style.filtersLeft}>
+            {tabs.length > 0 ? (
+              <Tabs active={tab} className={style.tabs} tabs={tabs} onTabChange={onTabChange} />
+            ) : (
+              tableTitle && (
+                <div className={style.tableTitle}>
+                  {tableTitle} ({totalCount})
+                </div>
+              )
+            )}
+          </div>
+          <div className={style.filtersRight}>
+            {searchable && (
+              <Input
+                data-test-id="search-input"
+                value={query}
+                icon="search"
+                onChange={onQueryChange}
+                placeholder={searchPlaceholderMessage}
+                className={style.searchBar}
+                inputWidth="full"
+                maxLength={searchQueryMaxLength}
+              />
+            )}
+            {(Boolean(actionItems) || mayAdd) && (
+              <div className={style.actionItems}>
+                {actionItems}
+                {mayAdd && (
+                  <Button.Link
+                    primary
+                    className={style.addButton}
+                    message={addMessage}
+                    icon="add"
+                    to={`${itemPathPrefix}add`}
+                  />
+                )}
               </div>
-            )
-          )}
+            )}
+          </div>
         </div>
-        <div className={style.filtersRight}>
-          {searchable && (
-            <Input
-              data-test-id="search-input"
-              value={query}
-              icon="search"
-              onChange={onQueryChange}
-              placeholder={searchPlaceholderMessage}
-              className={style.searchBar}
-              inputWidth="full"
-              maxLength={searchQueryMaxLength}
-            />
-          )}
-          {(Boolean(actionItems) || mayAdd) && (
-            <div className={style.actionItems}>
-              {actionItems}
-              {mayAdd && (
-                <Button.Link
-                  primary
-                  className={style.addButton}
-                  message={addMessage}
-                  icon="add"
-                  to={`${itemPathPrefix}add`}
-                />
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+      )}
       <Overlay visible={Boolean(error)}>
         {Boolean(error) && (
           <ErrorNotification
@@ -314,6 +317,7 @@ const FetchTable = props => {
           orderBy={orderBy}
           clickable={clickable}
           disableSorting={disableSorting}
+          className={className}
         />
       </Overlay>
     </div>
