@@ -19,7 +19,7 @@ import React from 'react'
 import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 
-import { FieldsWrapperExample } from './shared'
+import FieldsWrapperExample from './shared'
 
 export default {
   title: 'Fields/TextArea',
