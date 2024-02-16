@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import handleActions from 'redux-actions'
+import { handleActions } from 'redux-actions'
 
 import { GET_IS_CONFIGURATION_SUCCESS } from '@account/store/actions/identity-server'
 

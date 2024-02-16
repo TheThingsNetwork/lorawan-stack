@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import createAction from 'redux-actions'
+import { createAction } from 'redux-actions'
 
 export default (baseType, requestPayloadCreator, requestMetaCreator) => {
   const requestType = `${baseType}_REQUEST`
