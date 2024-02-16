@@ -124,7 +124,7 @@
     "react-virtualized-auto-sizer": "^1.0.22",
     "react-window": "^1.8.10",
     "redux": "^4.2.1",
-    "redux-actions": "^2.6.5",
+    "redux-actions": "^3.0.0",
     "redux-logic": "^5.0.1",
     "redux-sentry-middleware": "^0.2.2",
     "reselect": "^5.1.0",
