@@ -72,7 +72,7 @@ const DocumentationDashboardPanel = () => (
       title={sharedMessages.integrations}
       icon="merge_type"
     />
-    <DocsPanelLink path={`${docBaseUrl}/the-things-stack/`} title={m.tts} icon="group" />
+    <DocsPanelLink path={`${docBaseUrl}/the-things-stack/`} title={m.tts} icon="tts" />
     <DocsPanelLink path={`${docBaseUrl}/reference/`} title={m.reference} icon="book" />
   </Panel>
 )
