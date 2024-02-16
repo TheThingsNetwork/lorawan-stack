@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { handleActions } from 'redux-actions'
+import handleActions from 'redux-actions'
 
 import { GET_DEFAULT_MAC_SETTINGS_SUCCESS } from '@console/store/actions/network-server'
 
