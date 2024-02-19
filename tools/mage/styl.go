@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.details
-  width: 100%
-  display: flex
-  flex-wrap: wrap
-  justify-content: flex-end
-  margin-top: -2rem
+package ttnmage
 
-  &-code
-    width: 100%
-    background-color: var(--c-bg-neutral-semilight)
-    color: var(--c-text-neutral-heavy)
-    font-size: $fs.s
-    padding: $cs.s
-    color: var(--c-text-neutral-heavy)
-    margin: (-1 * $ls.m) 0 0 0
-    box-sizing: border-box
+import (
+	"fmt"
 
-  &-button
-    // stylelint-disable-next-line declaration-no-important
-    margin-right: 0 !important
+	"github.com/magefile/mage/mg"
+)
+
+// Styl namespace.
+type Styl mg.Namespace
+
+// Lint runs stylint over frontend styl files.
+func (styl Styl) Lint() error {
+	if mg.Verbose() {
+		fmt.Println("Running stylelint")
+	}
+	return runYarnV("stylelint",
+		"./pkg/webui/**/*.styl",
+	)
+}

@@ -47,11 +47,11 @@ $event-container-height = 40px
   & > div:not(.cell-preview):not(:last-child)
     font-weight: $fw.bold
     +media-query($bp.s)
-        display: none
+      display: none
 
   .cell-data
     +media-query($bp.l)
-        display: none
+      display: none
 
 .header-cells, .event
   padding: $cs.xxs 0 $cs.xxs $cs.xs
@@ -79,6 +79,7 @@ $event-container-height = 40px
     display: flex
 
   button
+    // stylelint-disable-next-line declaration-no-important
     margin-right: 0 !important
 
 .toggle-container

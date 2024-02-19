@@ -30,7 +30,7 @@
   color: var(--c-text-neutral-light)
 
   .dot
-    opacity .4
+    opacity: .4
 
 .radio
   nudge('up')
@@ -61,7 +61,7 @@
   input:checked ~ .dot:after
     opacity: 1
     transform: scale(1)
-    transition: all $ad.s cubic-bezier(.12, .4, .29, 1.40) $ad.xs
+    transition: all $ad.s cubic-bezier(.12, .4, .29, 1.4) $ad.xs
 
   input:focus ~ .dot
     border-color: var(--c-text-brand-normal)
