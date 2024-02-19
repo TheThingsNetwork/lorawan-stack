@@ -21,13 +21,17 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 const AttachedDropdown = ({ attachedRef, onItemsClick, hover, onOutsideClick, ...rest }) => {
   const [open, setOpen] = React.useState(false)
 
+  // Add event listeners to open the dropdown.
   useEffect(() => {
     if (!attachedRef.current) {
       return
     }
     const openEvent = hover ? 'mouseenter' : 'click'
     const node = attachedRef.current
-    const toggleDropdown = () => setOpen(val => !val)
+    const toggleDropdown = () => {
+      // Add escape key event listener to close the dropdown
+      setOpen(val => !val)
+    }
     const closeDropdown = () => setOpen(false)
 
     node.addEventListener(openEvent, toggleDropdown)
@@ -41,6 +45,22 @@ const AttachedDropdown = ({ attachedRef, onItemsClick, hover, onOutsideClick, ..
       }
     }
   }, [attachedRef, hover, open])
+
+  // Add escape key event listener to close the dropdown.
+  useEffect(() => {
+    if (open) {
+      const closeDropdown = e => {
+        if (e.key === 'Escape') {
+          setOpen(false)
+        }
+      }
+      document.addEventListener('keydown', closeDropdown)
+      return () => {
+        document.removeEventListener('keydown', closeDropdown)
+      }
+    }
+    return
+  }, [open])
 
   const handleItemsClick = useCallback(() => {
     setOpen(false)
