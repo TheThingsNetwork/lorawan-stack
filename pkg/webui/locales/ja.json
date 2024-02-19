@@ -2151,6 +2151,7 @@
   "error:pkg/identityserver:application_server_address_mismatch": "アプリケーションサーバーのアドレス`{address}`が`{expected}`と一致しません",
   "error:pkg/identityserver:claim_authentication_code": "無効なクレーム認証コードです",
   "error:pkg/identityserver:client_needs_collaborator": "すべてのクライアントには、すべての権限を持つ少なくとも1人のコラボレーターが必要です",
+  "error:pkg/identityserver:collaborator_is_contact": "",
   "error:pkg/identityserver:common_password": "あまり一般的であってはなりません",
   "error:pkg/identityserver:contact_no_collaborator": "`{contact}`はコラボレーターではありません",
   "error:pkg/identityserver:db_needs_migration": "このデータベースは移行が必要です",

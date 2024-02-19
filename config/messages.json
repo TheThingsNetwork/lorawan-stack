@@ -5903,6 +5903,15 @@
       "file": "client_access.go"
     }
   },
+  "error:pkg/identityserver:collaborator_is_contact": {
+    "translations": {
+      "en": "collaborator `{collaborator_id}` is used as a contact"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/identityserver:common_password": {
     "translations": {
       "en": "must not be too common"
