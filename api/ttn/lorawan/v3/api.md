@@ -10157,6 +10157,7 @@ Right is the enum that defines all the different rights to do something in the n
 | `client_ids` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| `complement_collaborators` | [`bool`](#bool) |  |  |
 
 #### Field Rules
 

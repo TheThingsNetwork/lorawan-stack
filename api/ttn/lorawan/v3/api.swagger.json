@@ -941,6 +941,12 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "complement_collaborators",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -4242,6 +4248,12 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "complement_collaborators",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -7484,6 +7496,12 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "complement_collaborators",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -10582,6 +10600,12 @@
             "required": false,
             "type": "string",
             "format": "string"
+          },
+          {
+            "name": "complement_collaborators",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -11869,6 +11893,12 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "complement_collaborators",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
