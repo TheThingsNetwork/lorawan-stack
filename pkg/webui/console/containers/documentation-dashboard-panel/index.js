@@ -30,7 +30,7 @@ import styles from './documentation-dashboard-panel.styl'
 const docBaseUrl = selectDocumentationUrlConfig()
 
 const m = defineMessages({
-  view: 'View our documentation',
+  view: 'View',
   tts: 'The Things Stack',
   reference: 'Reference',
   gettingStarted: 'Getting started',

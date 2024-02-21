@@ -626,7 +626,6 @@
   "console.containers.pubsub-formats-select.index.warning": "Pub/Subフォーマットが無効です",
   "console.containers.pubsubs-table.index.host": "サーバーホスト",
   "console.containers.shortcut-panel.index.shortcuts": "",
-  "console.containers.shortcut-panel.index.edit": "",
   "console.containers.shortcut-panel.index.addApplication": "",
   "console.containers.shortcut-panel.index.addGateway": "",
   "console.containers.shortcut-panel.index.addOrganization": "",

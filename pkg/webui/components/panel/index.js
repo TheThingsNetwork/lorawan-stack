@@ -50,9 +50,11 @@ const Panel = ({
       {toggleOptions ? (
         <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
       ) : (
-        <Link primary to={path} className={styles.button} target={target}>
-          <Message content={buttonTitle} /> →
-        </Link>
+        buttonTitle && (
+          <Link primary to={path} className={styles.button} target={target}>
+            <Message content={buttonTitle} /> →
+          </Link>
+        )
       )}
     </div>
     {divider && <hr className={styles.panelDivider} />}

@@ -20,8 +20,7 @@ import Panel from '../../../components/panel'
 import ShortcutItem from './shortcut-item'
 
 const m = defineMessages({
-  shortcuts: 'Shortcuts',
-  edit: 'Edit shortcuts',
+  shortcuts: 'Quick actions',
   addApplication: 'Add a new Application',
   addGateway: 'Add a new Gateway',
   addOrganization: 'Add a new Organization',
@@ -30,14 +29,7 @@ const m = defineMessages({
 })
 
 const ShortcutPanel = () => (
-  <Panel
-    title={m.shortcuts}
-    path="/edit-shortcuts"
-    icon="bolt"
-    buttonTitle={m.edit}
-    filledIcon
-    divider
-  >
+  <Panel title={m.shortcuts} path="/edit-shortcuts" icon="bolt" divider>
     <div className="grid">
       <ShortcutItem
         icon="display_settings"
