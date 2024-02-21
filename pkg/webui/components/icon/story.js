@@ -46,13 +46,6 @@ const iconElement = icons.map(icon => (
 export default {
   title: 'Icon',
   component: Icon,
-  parameters: {
-    docs: {
-      description: {
-        component: doc,
-      },
-    },
-  },
 }
 
 export const Icons = () => <div>{iconElement}</div>

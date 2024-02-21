@@ -84,7 +84,6 @@ const Layout = () => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const siteTitle = selectApplicationSiteTitle()
   const siteName = selectApplicationSiteName()
-  const dispatch = useDispatch()
 
   // For the mobile side menu drawer functionality.
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)

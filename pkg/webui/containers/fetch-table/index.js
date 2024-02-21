@@ -328,6 +328,7 @@ FetchTable.propTypes = {
   actionItems: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   addMessage: PropTypes.message,
   baseDataSelector: PropTypes.func.isRequired,
+  className: PropTypes.string,
   clickable: PropTypes.bool,
   defaultOrder: PropTypes.string,
   entity: PropTypes.string.isRequired,
@@ -366,6 +367,7 @@ FetchTable.propTypes = {
 }
 
 FetchTable.defaultProps = {
+  className: undefined,
   getItemPathPrefix: undefined,
   searchItemsAction: undefined,
   pageSize: PAGE_SIZES.REGULAR,
