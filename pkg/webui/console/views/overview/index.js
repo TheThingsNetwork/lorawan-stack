@@ -16,14 +16,12 @@ import React from 'react'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Panel from '@ttn-lw/components/panel'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import ShortcutPanel from '@console/containers/shortcut-panel'
 import NotificationsDashboardPanel from '@console/containers/notifications-dashboard-panel'
 import DocumentationDashboardPanel from '@console/containers/documentation-dashboard-panel'
-import TopEntitiesDashboardPanel from '@console/containers/top-entities-dasboard-panel'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -36,20 +34,14 @@ const Overview = () => {
   return (
     <RequireRequest requestAction={[getApplicationsList(), getGatewaysList()]}>
       <div className="grid p-ls-xs3 box-border">
-        <div className="item-6 m:item-6 l:item-12 s:item-12">
-          <TopEntitiesDashboardPanel />
-        </div>
+        <div className="item-6 m:item-6 l:item-12 s:item-12" />
         <div className="item-6 m:item-6 l:item-12 s:item-12">
           <NotificationsDashboardPanel />
         </div>
-        <div className="item-4 m:item-6 l:item-12 s:item-12">
+        <div className="item-6 m:item-6 l:item-12 s:item-12">
           <DocumentationDashboardPanel />
         </div>
-        <div className="item-4 m:item-6 l:item-12 s:item-12">
-          {/* This panel is for grid testing purposes only */}
-          <Panel title="New Panel Title" icon="feed" buttonTitle="View" divider />
-        </div>
-        <div className="item-4 m:item-6 l:item-12 s:item-12">
+        <div className="item-6 m:item-6 l:item-12 s:item-12">
           <ShortcutPanel />
         </div>
       </div>
