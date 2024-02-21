@@ -19,7 +19,6 @@ import { useIntl } from 'react-intl'
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
 import Icon from '@ttn-lw/components/icon'
-import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
 

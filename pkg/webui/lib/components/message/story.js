@@ -47,13 +47,6 @@ const IntlDecorator = storyFn => (
 export default {
   title: 'Utility Components/Message',
   component: Message,
-  parameters: {
-    docs: {
-      description: {
-        component: doc,
-      },
-    },
-  },
   decorators: [IntlDecorator],
 }
 
