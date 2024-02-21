@@ -634,7 +634,6 @@
   "console.containers.shortcut-panel.index.registerDevice": "Register a device",
   "console.containers.sidebar.navigation.app-side-navigation.buttonMessage": "Back to Applications list",
   "console.containers.sidebar.navigation.gtw-side-navigation.buttonMessage": "Back to Gateways list",
-  "console.containers.top-entities-dasboard-panel.index.topEntities": "Your top entities",
   "console.containers.user-data-form.edit.deleteWarning": "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong> and <strong>LOCK THE USER ID AND EMAIL FOR RE-REGISTRATION</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
   "console.containers.user-data-form.edit.purgeWarning": "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
   "console.containers.user-data-form.edit.deleteConfirmMessage": "Please type in this user's user ID to confirm.",
