@@ -17,7 +17,7 @@ package ratelimit
 import (
 	"context"
 
-	"github.com/throttled/throttled"
+	"github.com/throttled/throttled/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 

@@ -4,9 +4,6 @@ go 1.21
 
 replace go.thethings.network/lorawan-stack/v3 => ../
 
-// Use our fork of throttled/throttled/v2.
-replace github.com/throttled/throttled/v2 => github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis
-
 require (
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/blang/semver v3.5.1+incompatible
