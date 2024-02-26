@@ -12,14 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Paginate from 'react-paginate'
 
 import Icon from '@ttn-lw/components/icon'
 
+import Message from '@ttn-lw/lib/components/message'
+
+import Select from '../select'
+import Input from '../input'
+import Button from '../button'
+
 import style from './pagination.styl'
+import { defineMessages } from 'react-intl'
+
+const m = defineMessages({
+  itemsPerPage: 'Items per page:',
+  goToPage: 'Go to page:',
+})
 
 const Pagination = ({
   onPageChange,
@@ -29,13 +41,35 @@ const Pagination = ({
   marginPagesDisplayed,
   hideIfOnlyOnePage,
   pageCount,
+  pageSize,
+  setPageSize,
   ...rest
 }) => {
+  const [selectedPage, setSelectedPage] = useState(forcePage)
+
   const handlePageChange = useCallback(
     page => {
+      if (!page) {
+        return onPageChange(selectedPage)
+      }
+
       onPageChange(page.selected + 1)
     },
-    [onPageChange],
+    [onPageChange, selectedPage],
+  )
+
+  const handlePageInputChange = useCallback(
+    val => {
+      setSelectedPage(val)
+    },
+    [setSelectedPage],
+  )
+
+  const handlePageSizeChange = useCallback(
+    val => {
+      setPageSize(val)
+    },
+    [setPageSize],
   )
 
   // Don't show pagination if there is only one page.
@@ -49,26 +83,52 @@ const Pagination = ({
   const navigationPrevClassNames = classnames(style.item, style.itemNavigationPrev)
 
   return (
-    <Paginate
-      previousClassName={navigationPrevClassNames}
-      previousLinkClassName={style.link}
-      previousLabel={<Icon icon="navigate_before" small aria-label="Go to the previous page" />}
-      nextClassName={navigationNextClassNames}
-      nextLinkClassName={style.link}
-      nextLabel={<Icon icon="navigate_next" small aria-label="Go to the next page" />}
-      containerClassName={containerClassNames}
-      pageClassName={style.item}
-      breakClassName={breakClassNames}
-      pageLinkClassName={style.link}
-      disabledClassName={style.itemDisabled}
-      activeClassName={style.itemActive}
-      forcePage={forcePage - 1}
-      pageRangeDisplayed={pageRangeDisplayed}
-      marginPagesDisplayed={marginPagesDisplayed}
-      onPageChange={handlePageChange}
-      pageCount={pageCount}
-      {...rest}
-    />
+    <div className="d-flex al-center gap-cs-l w-full">
+      <Paginate
+        previousClassName={navigationPrevClassNames}
+        previousLinkClassName={style.link}
+        previousLabel={<Icon icon="chevron_left" nudgeUp aria-label="Go to the previous page" />}
+        nextClassName={navigationNextClassNames}
+        nextLinkClassName={style.link}
+        nextLabel={<Icon icon="chevron_right" nudgeUp aria-label="Go to the next page" />}
+        containerClassName={containerClassNames}
+        pageClassName={style.item}
+        breakClassName={breakClassNames}
+        pageLinkClassName={style.link}
+        disabledClassName={style.itemDisabled}
+        activeClassName={style.itemActive}
+        forcePage={forcePage - 1}
+        pageRangeDisplayed={pageRangeDisplayed}
+        marginPagesDisplayed={marginPagesDisplayed}
+        onPageChange={handlePageChange}
+        pageCount={pageCount}
+        {...rest}
+      />
+      <div className="d-flex al-center gap-cs-xs">
+        <Message content={m.itemsPerPage} className={style.sizeMessage} />
+        <Select
+          options={[5, 10, 20, 30, 40, 50].map(value => ({
+            value,
+            label: `${value}`,
+          }))}
+          value={pageSize}
+          onChange={handlePageSizeChange}
+          inputWidth="xxs"
+        />
+      </div>
+      <div className="d-flex al-center gap-cs-xs">
+        <Message content={m.goToPage} className="c-text-neutral-semilight" />
+        <Input
+          min={1}
+          max={pageCount}
+          onChange={handlePageInputChange}
+          inputWidth="3xs"
+          placeholder="1"
+          value={selectedPage}
+        />
+        <Button message="Go" onClick={handlePageChange} secondary />
+      </div>
+    </div>
   )
 }
 
@@ -97,6 +157,10 @@ Pagination.propTypes = {
    * pageCount, then all pages will be displayed without gaps.
    */
   pageRangeDisplayed: PropTypes.number,
+  /** The number of items per page. */
+  pageSize: PropTypes.number,
+  /** A function to be called when the page size changes. */
+  setPageSize: PropTypes.func,
 }
 
 Pagination.defaultProps = {
@@ -106,6 +170,8 @@ Pagination.defaultProps = {
   marginPagesDisplayed: 1,
   onPageChange: () => null,
   pageRangeDisplayed: 1,
+  pageSize: 10,
+  setPageSize: () => null,
 }
 
 export default Pagination

@@ -14,15 +14,18 @@
 
 .pagination
   white-space: nowrap
-  padding: 0
+  padding: $cs.xxs
+  border: 1px solid var(--c-border-neutral-light)
+  border-radius: $br.m
+  width: fit-content
 
   .item
     margin: 0
 
 .item
   display: inline-block
-  color: var(--c-text-brand-normal)
-  font-weight: $fw.bold
+  color: var(--c-text-neutral-heavy)
+  font-weight: $fwv2.semibold
   user-select: none
 
   .link:hover
@@ -37,12 +40,13 @@
 
   &-navigation-next
     .link
-      border-radius: 0 $br.xs $br.xs 0
-      border-dark()
+      padding: $cs.xxs
+      border-radius: 0 $br.m $br.m 0
 
   &-navigation-prev
     .link
-      border-radius: $br.xs 0 0 $br.xs
+      padding: $cs.xxs
+      border-radius: $br.m 0 0 $br.m
 
   &-disabled
     .link
@@ -54,6 +58,7 @@
       background-color: var(--c-text-brand-normal)
       border: 1px solid var(--c-text-brand-normal)
       color: var(--c-bg-neutral-min)
+      border-radius: $br.m
 
       +focus-visible()
         background-color: hoverize(var(--c-text-brand-normal))
@@ -69,17 +74,17 @@
       background-color: var(--c-text-brand-normal)
 
   &-break
-    color: var(--c-text-brand-normal)
     padding: $cs.xs $cs.m
-    border-dark()
     border-right: 0
 
 .link
-  padding: $cs.xs $cs.m
+  padding: $cs.xxs $cs.s
   outline: 0
   text-align: center
   text-decoration: none
   cursor: pointer
   display: inline-block
-  border-dark()
-  border-right: 0
+
+.size-message
+  color: var(--c-text-neutral-semilight)
+  white-space: nowrap

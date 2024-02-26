@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import classnames from 'classnames'
 
 import Overlay from '@ttn-lw/components/overlay'
@@ -29,7 +29,7 @@ const Tabular = ({
   onPageChange,
   order,
   orderBy,
-  pageSize,
+  pageSize: initialPageSize,
   page,
   handlesPagination,
   paginated,
@@ -47,6 +47,7 @@ const Tabular = ({
   disableSorting,
   onSortRequest,
 }) => {
+  const [pageSize, setPageSize] = useState(initialPageSize)
   const handlePageChange = useCallback(
     page => {
       onPageChange(page)
@@ -157,6 +158,8 @@ const Tabular = ({
           disableInitialCallback
           pageRangeDisplayed={2}
           forcePage={page}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
         />
       </Table.DataCell>
     </Table.Row>
