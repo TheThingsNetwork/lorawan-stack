@@ -16,6 +16,7 @@ import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Paginate from 'react-paginate'
+import { defineMessages } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -26,7 +27,6 @@ import Input from '../input'
 import Button from '../button'
 
 import style from './pagination.styl'
-import { defineMessages } from 'react-intl'
 
 const m = defineMessages({
   itemsPerPage: 'Items per page:',
