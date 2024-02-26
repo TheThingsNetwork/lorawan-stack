@@ -6,7 +6,7 @@ You can now go to {{ .Network.IdentityServerURL }}/register?invitation_token={{ 
 
 {{- with .TTL }}
 
-Your invitation expires {{ relTime . }}, so register before then.
+Your invitation expires {{ relDuration . }}, so register before then.
 {{- end }}
 
 After successful registration, you can go to {{ .Network.ConsoleURL }} to start adding devices and gateways.
