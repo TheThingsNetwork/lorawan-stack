@@ -41,7 +41,7 @@ const Panel = ({
   target,
 }) => (
   <div className={classnames(styles.panel, className)}>
-    <div className="d-flex j-between al-center mb-cs-m">
+    <div className="d-flex j-between al-center mb-cs-m flex-wrap gap-cs-m">
       <div className="d-flex gap-cs-xs al-center">
         {icon && <Icon icon={icon} className={styles.panelHeaderIcon} />}
         <Message content={title} className={styles.panelHeaderTitle} />
