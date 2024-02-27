@@ -598,6 +598,8 @@
   "console.containers.network-information-container.registry-totals.gatewaysUsed": "",
   "console.containers.network-information-container.registry-totals.registeredUsers": "",
   "console.containers.network-information-container.registry-totals.endDevicesAdded": "",
+  "console.containers.notifications-dashboard-panel.index.noNotifications": "",
+  "console.containers.notifications-dashboard-panel.index.noNotificationsDescription": "",
   "console.containers.notifications.index.seeArchived": "",
   "console.containers.notifications.index.seeAll": "",
   "console.containers.notifications.notification-content.index.archive": "",
