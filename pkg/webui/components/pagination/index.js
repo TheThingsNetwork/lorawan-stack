@@ -115,6 +115,7 @@ const Pagination = ({
           value={pageSize}
           onChange={handlePageSizeChange}
           inputWidth="xxs"
+          className={style.selectSize}
         />
       </div>
       <div className="d-flex al-center gap-cs-xs">

@@ -16,6 +16,7 @@
   white-space: nowrap
   padding: $cs.xxs
   border: 1px solid var(--c-border-neutral-light)
+  background: var(--c-bg-neutral-min)
   border-radius: $br.m
   width: fit-content
 
@@ -78,7 +79,7 @@
     border-right: 0
 
 .link
-  padding: $cs.xxs $cs.s
+  padding: 0.2rem 0.8rem
   outline: 0
   text-align: center
   text-decoration: none
@@ -88,3 +89,20 @@
 .size-message
   color: var(--c-text-neutral-semilight)
   white-space: nowrap
+
+.select-size
+  :global(.select__value-container)
+    padding: 0 0 0 8px
+  :global(.select__indicator-separator)
+    display: none
+  :global(.select__control)
+    cursor: pointer
+    border-radius: $br.m
+    box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.045), inset 0px 0px 0px 1px var(--c-bg-neutral-min)
+    border: 1px solid transparent
+    background: linear-gradient(to bottom, var(--c-bg-neutral-min), var(--c-bg-neutral-min)) padding-box, linear-gradient(to bottom, var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02)) border-box
+  :global(.select__control)
+    &:hover
+      box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.045), inset 0px 0px 0px 1px var(--c-bg-neutral-min)
+      border-color: transparent
+      background: linear-gradient(to bottom, var(--c-bg-neutral-min-hover), var(--c-bg-neutral-min-hover)) padding-box, linear-gradient(to bottom, var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02)) border-box
