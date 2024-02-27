@@ -11,9 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Option to store rate limits in Redis. When used, the rate limits are applied over the entire cluster instead of per-instance.
-- Field `complement_collaborators` was added to `SearchAccounts`. Allows an user to request the accounts that are not already attached to the entity's collaborator list.
-
 ### Changed
 
 ### Deprecated
@@ -23,6 +20,13 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 ### Security
+
+## [3.29.1] - unreleased
+
+### Added
+
+- Option to store rate limits in Redis. When used, the rate limits are applied over the entire cluster instead of per-instance.
+- Field `complement_collaborators` was added to `SearchAccounts`. Allows an user to request the accounts that are not already attached to the entity's collaborator list.
 
 ## [3.29.0] - 2024-02-06
 
@@ -2769,7 +2773,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.0...v3.29
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.1...v3.29
+[3.29.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.0...v3.29.1
 [3.29.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.2...v3.29.0
 [3.28.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.1...v3.28.2
 [3.28.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.0...v3.28.1
