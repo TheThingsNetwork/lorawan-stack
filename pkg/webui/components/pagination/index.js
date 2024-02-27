@@ -49,10 +49,11 @@ const Pagination = ({
 
   const handlePageChange = useCallback(
     page => {
-      if (!page) {
+      if (!page.selected) {
         return onPageChange(selectedPage)
       }
 
+      setSelectedPage(page.selected + 1)
       onPageChange(page.selected + 1)
     },
     [onPageChange, selectedPage],
@@ -97,7 +98,7 @@ const Pagination = ({
         pageLinkClassName={style.link}
         disabledClassName={style.itemDisabled}
         activeClassName={style.itemActive}
-        forcePage={forcePage - 1}
+        forcePage={selectedPage - 1}
         pageRangeDisplayed={pageRangeDisplayed}
         marginPagesDisplayed={marginPagesDisplayed}
         onPageChange={handlePageChange}
