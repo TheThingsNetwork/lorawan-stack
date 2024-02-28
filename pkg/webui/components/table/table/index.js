@@ -50,7 +50,11 @@ Head.defaultProps = {
   className: undefined,
 }
 
-const Body = ({ className, empty, emptyMessage, ...props }) => {
+const Body = ({ className, empty, loading, emptyMessage, ...props }) => {
+  if (empty && loading) {
+    return null
+  }
+
   if (empty) {
     return <Empty message={emptyMessage} />
   }
@@ -62,24 +66,31 @@ Body.propTypes = {
   className: PropTypes.string,
   empty: PropTypes.bool,
   emptyMessage: PropTypes.message,
+  loading: PropTypes.bool,
 }
 
 Body.defaultProps = {
   className: undefined,
   empty: false,
   emptyMessage: undefined,
+  loading: false,
 }
 
-const Footer = ({ className, ...props }) => (
-  <div {...props} className={classnames(className, style.sectionFooter)} />
-)
+const Footer = ({ className, loading, empty, ...props }) =>
+  empty && loading ? null : (
+    <div {...props} className={classnames(className, style.sectionFooter)} />
+  )
 
 Footer.propTypes = {
   className: PropTypes.string,
+  empty: PropTypes.bool,
+  loading: PropTypes.bool,
 }
 
 Footer.defaultProps = {
   className: undefined,
+  empty: false,
+  loading: false,
 }
 
 const Table = ({ className, children, minWidth, ...rest }) => {

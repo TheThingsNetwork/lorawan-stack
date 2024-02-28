@@ -103,6 +103,14 @@ func NewJoinServerSessionKeyRegistryRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("js", "keys"))
 }
 
+// NewRateLimitingRedis instantiates a new redis client with the Rate Limiting namespace.
+func NewRateLimitingRedis(conf *Config) *redis.Client {
+	if conf.RateLimiting.Provider != "redis" {
+		return nil
+	}
+	return redis.New(conf.Cache.Redis.WithNamespace("rate-limiting"))
+}
+
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
 
 var startCommand = &cobra.Command{
@@ -218,6 +226,7 @@ var startCommand = &cobra.Command{
 			logger.Warn("No cookie block key configured, generated a random one")
 		}
 
+		config.RateLimiting.Redis.Client = NewRateLimitingRedis(config)
 		c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase}, componentOptions...)
 		if err != nil {
 			return shared.ErrInitializeBaseComponent.WithCause(err)

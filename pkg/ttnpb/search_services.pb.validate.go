@@ -1117,6 +1117,8 @@ func (m *SearchAccountsRequest) ValidateFields(paths ...string) error {
 
 		case "only_users":
 			// no validation rules for OnlyUsers
+		case "complement_collaborators":
+			// no validation rules for ComplementCollaborators
 		case "collaborator_of":
 			if len(subs) == 0 {
 				subs = []string{

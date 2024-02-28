@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -62,6 +63,10 @@ var (
 		),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
+	)
+
+	errOrganizationNeedsCollaborator = errors.DefineFailedPrecondition(
+		"organization_needs_collaborator", "every organization needs at least one collaborator with all rights",
 	)
 )
 
@@ -282,10 +287,6 @@ func (is *IdentityServer) getOrganizationCollaborator(
 	return res, nil
 }
 
-var errOrganizationNeedsCollaborator = errors.DefineFailedPrecondition(
-	"organization_needs_collaborator", "every organization needs at least one collaborator with all rights",
-)
-
 func (is *IdentityServer) setOrganizationCollaborator( //nolint:gocyclo
 	ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest,
 ) (_ *emptypb.Empty, err error) {
@@ -439,6 +440,18 @@ func (is *IdentityServer) deleteOrganizationCollaborator(
 		r, err := st.GetMember(ctx, req.GetCollaboratorIds(), req.GetOrganizationIds().GetEntityIdentifiers())
 		if err != nil {
 			return err
+		}
+		org, err := st.GetOrganization(
+			ctx,
+			req.GetOrganizationIds(),
+			store.FieldMask([]string{"administrative_contact", "technical_contact"}),
+		)
+		if err != nil {
+			return err
+		}
+		if proto.Equal(org.GetAdministrativeContact(), req.GetCollaboratorIds()) ||
+			proto.Equal(org.GetTechnicalContact(), req.GetCollaboratorIds()) {
+			return errCollaboratorIsContact.WithAttributes("collaborator_id", req.GetCollaboratorIds().IDString())
 		}
 		if r.Implied().IncludesAll(ttnpb.Right_RIGHT_ORGANIZATION_ALL) {
 			memberRights, err := st.FindMembers(ctx, req.GetOrganizationIds().GetEntityIdentifiers())

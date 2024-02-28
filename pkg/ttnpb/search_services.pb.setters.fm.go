@@ -600,6 +600,16 @@ func (dst *SearchAccountsRequest) SetFields(src *SearchAccountsRequest, paths ..
 				var zero bool
 				dst.OnlyUsers = zero
 			}
+		case "complement_collaborators":
+			if len(subs) > 0 {
+				return fmt.Errorf("'complement_collaborators' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ComplementCollaborators = src.ComplementCollaborators
+			} else {
+				var zero bool
+				dst.ComplementCollaborators = zero
+			}
 
 		case "collaborator_of":
 			if len(subs) == 0 && src == nil {

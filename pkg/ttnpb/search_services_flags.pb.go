@@ -450,6 +450,7 @@ func AddSetFlagsForSearchAccountsRequest(flags *pflag.FlagSet, prefix string, hi
 	AddSetFlagsForClientIdentifiers(flags, flagsplugin.Prefix("collaborator-of.client-ids", prefix), hidden)
 	AddSetFlagsForGatewayIdentifiers(flags, flagsplugin.Prefix("collaborator-of.gateway-ids", prefix), hidden)
 	AddSetFlagsForOrganizationIdentifiers(flags, flagsplugin.Prefix("collaborator-of.organization-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("complement-collaborators", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the SearchAccountsRequest message from flags.
@@ -513,6 +514,12 @@ func (m *SearchAccountsRequest) SetFromFlags(flags *pflag.FlagSet, prefix string
 			paths = append(paths, setPaths...)
 		}
 		m.CollaboratorOf = ov
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("complement_collaborators", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ComplementCollaborators = val
+		paths = append(paths, flagsplugin.Prefix("complement_collaborators", prefix))
 	}
 	return paths, nil
 }

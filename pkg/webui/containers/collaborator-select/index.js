@@ -223,7 +223,7 @@ const CollaboratorSelect = ({ userId, name, entity, entityId, isResctrictedUser,
         initialOptions={collaboratorOptions}
         entity={entity.toLowerCase()}
         entityId={entityId}
-        disabled={isResctrictedUser || collaboratorsList.length === 1}
+        disabled={isResctrictedUser}
         isResctrictedUser={isResctrictedUser}
       />
     </RequireRequest>

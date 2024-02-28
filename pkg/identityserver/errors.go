@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  overflow: auto
-  scrollbar-width: none
+package identityserver
 
-.pagination
-  margin-top: $ls.xxs
-  text-align: center
+import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
-  &-cell
-    padding-top: 0
-    padding-bottom: 0
-
-.overlay
-  min-height: 10rem
+var errCollaboratorIsContact = errors.DefineFailedPrecondition(
+	"collaborator_is_contact", "collaborator `{collaborator_id}` is used as a contact",
+)

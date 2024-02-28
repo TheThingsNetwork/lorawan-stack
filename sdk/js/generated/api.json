@@ -46714,6 +46714,18 @@
               "isoneof": true,
               "oneofdecl": "collaborator_of",
               "defaultValue": ""
+            },
+            {
+              "name": "complement_collaborators",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

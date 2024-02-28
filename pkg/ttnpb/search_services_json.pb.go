@@ -804,6 +804,11 @@ func (x *SearchAccountsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			golang.MarshalMessage(s, ov.OrganizationIds)
 		}
 	}
+	if x.ComplementCollaborators || s.HasField("complement_collaborators") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("complement_collaborators")
+		s.WriteBool(x.ComplementCollaborators)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -872,6 +877,9 @@ func (x *SearchAccountsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			var v OrganizationIdentifiers
 			golang.UnmarshalMessage(s, &v)
 			ov.OrganizationIds = &v
+		case "complement_collaborators", "complementCollaborators":
+			s.AddField("complement_collaborators")
+			x.ComplementCollaborators = s.ReadBool()
 		}
 	})
 }

@@ -162,14 +162,16 @@ const Tabular = ({
 
   return (
     <div className={classnames(style.container, className)}>
-      <Overlay visible={loading} loading={loading}>
+      <Overlay visible={loading} loading={loading} className={style.overlay}>
         <Table minWidth={minWidth}>
           <Table.Head>{columns}</Table.Head>
-          <Table.Body empty={rows.length === 0} emptyMessage={emptyMessage}>
+          <Table.Body loading={loading} empty={rows.length === 0} emptyMessage={emptyMessage}>
             {rows}
           </Table.Body>
         </Table>
-        <Table.Footer>{pagination}</Table.Footer>
+        <Table.Footer loading={loading} empty={rows.length === 0}>
+          {pagination}
+        </Table.Footer>
       </Overlay>
     </div>
   )

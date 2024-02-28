@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -434,9 +435,23 @@ func (is *IdentityServer) deleteApplicationCollaborator(
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		removedRights, err := st.GetMember(ctx, req.GetCollaboratorIds(), req.GetApplicationIds().GetEntityIdentifiers())
+		removedRights, err := st.GetMember(
+			ctx, req.GetCollaboratorIds(), req.GetApplicationIds().GetEntityIdentifiers(),
+		)
 		if err != nil {
 			return err
+		}
+		app, err := st.GetApplication(
+			ctx,
+			req.GetApplicationIds(),
+			store.FieldMask([]string{"administrative_contact", "technical_contact"}),
+		)
+		if err != nil {
+			return err
+		}
+		if proto.Equal(app.GetAdministrativeContact(), req.GetCollaboratorIds()) ||
+			proto.Equal(app.GetTechnicalContact(), req.GetCollaboratorIds()) {
+			return errCollaboratorIsContact.WithAttributes("collaborator_id", req.GetCollaboratorIds().IDString())
 		}
 		if removedRights.Implied().IncludesAll(ttnpb.Right_RIGHT_APPLICATION_ALL) {
 			memberRights, err := st.FindMembers(ctx, req.GetApplicationIds().GetEntityIdentifiers())
