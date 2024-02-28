@@ -39,7 +39,7 @@ require (
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0 // indirect
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0 // indirect
 	github.com/TheThingsNetwork/go-cayenne-lib v1.2.0 // indirect
-	github.com/aws/aws-sdk-go v1.50.26 // indirect
+	github.com/aws/aws-sdk-go v1.50.27 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.24.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.5.4 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.26.1 // indirect
@@ -147,7 +147,6 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
-	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/mileusna/useragent v1.3.4 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -155,7 +154,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	github.com/nats-io/nats.go v1.33.0 // indirect
+	github.com/nats-io/nats.go v1.33.1 // indirect
 	github.com/nats-io/nkeys v0.4.7 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/oklog/ulid/v2 v2.1.0 // indirect
@@ -167,9 +166,9 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/prometheus/client_golang v1.18.0 // indirect
+	github.com/prometheus/client_golang v1.19.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
-	github.com/prometheus/common v0.45.0 // indirect
+	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/prometheus/statsd_exporter v0.26.0 // indirect
 	github.com/redis/go-redis/v9 v9.5.1 // indirect
@@ -245,7 +244,7 @@ require (
 	google.golang.org/genproto v0.0.0-20240125205218-1f4bbc51befe // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240125205218-1f4bbc51befe // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240125205218-1f4bbc51befe // indirect
-	google.golang.org/grpc v1.61.1 // indirect
+	google.golang.org/grpc v1.62.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

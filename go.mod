@@ -13,7 +13,7 @@ require (
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.2.0
-	github.com/aws/aws-sdk-go v1.50.26
+	github.com/aws/aws-sdk-go v1.50.27
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.14
 	github.com/bluele/gcache v0.0.2
@@ -56,12 +56,12 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.10.11
-	github.com/nats-io/nats.go v1.33.0
+	github.com/nats-io/nats.go v1.33.1
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/openshift/osin v1.0.2-0.20220317075346-0f4d38c6e53f
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.18.0
+	github.com/prometheus/client_golang v1.19.0
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
@@ -103,7 +103,7 @@ require (
 	google.golang.org/genproto v0.0.0-20240125205218-1f4bbc51befe
 	google.golang.org/genproto/googleapis/api v0.0.0-20240125205218-1f4bbc51befe
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240125205218-1f4bbc51befe
-	google.golang.org/grpc v1.61.1
+	google.golang.org/grpc v1.62.0
 	google.golang.org/protobuf v1.32.0
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.6.0
@@ -207,7 +207,6 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
@@ -224,7 +223,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
-	github.com/prometheus/common v0.45.0 // indirect
+	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/prometheus/statsd_exporter v0.22.7 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
