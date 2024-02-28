@@ -54,6 +54,7 @@ func (c RedirectConfiguration) build(url *url.URL) (*url.URL, bool) {
 		if c.HostName != nil {
 			hostname = c.HostName(hostname)
 		}
+		originalPortStr := portStr
 		if c.Port != nil {
 			port, _ := strconv.ParseUint(portStr, 10, 0)
 			port = uint64(c.Port(uint(port)))
@@ -62,12 +63,15 @@ func (c RedirectConfiguration) build(url *url.URL) (*url.URL, bool) {
 		host := hostname
 		if portStr != "" {
 			switch {
-			case portStr == "0":
+			case portStr == "0" && originalPortStr == "":
 				// Just use the hostname.
+			case portStr == "0" && originalPortStr != "":
+				// Maintain the original port, in order to avoid loops.
+				host = net.JoinHostPort(host, originalPortStr)
 			case target.Scheme == "http" && portStr == "80":
-				// This is the default. Just use the hostame.
+				// This is the default. Just use the hostname.
 			case target.Scheme == "https" && portStr == "443":
-				// This is the default. Just use the hostame.
+				// This is the default. Just use the hostname.
 			default:
 				host = net.JoinHostPort(host, portStr)
 			}
