@@ -46,8 +46,10 @@ func (c RedirectConfiguration) build(url *url.URL) (*url.URL, bool) {
 			target.Scheme, redirect = s, true
 		}
 	}
+	var urlPortStr string
 	if c.HostName != nil || c.Port != nil {
 		hostname, portStr, err := net.SplitHostPort(url.Host)
+		urlPortStr = portStr
 		if err != nil {
 			hostname, portStr = url.Host, ""
 		}
@@ -63,6 +65,10 @@ func (c RedirectConfiguration) build(url *url.URL) (*url.URL, bool) {
 		if portStr != "" {
 			switch {
 			case portStr == "0":
+				if urlPortStr == "443" {
+					// This is a special case for LoRa Basics Station connections.
+					host = net.JoinHostPort(host, urlPortStr)
+				}
 				// Just use the hostname.
 			case target.Scheme == "http" && portStr == "80":
 				// This is the default. Just use the hostame.
@@ -91,6 +97,7 @@ func Redirect(config RedirectConfiguration) MiddlewareFunc {
 			return next
 		}
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 			if url, redirect := config.build(r.URL); redirect {
 				code := config.Code
 				if code == 0 {
