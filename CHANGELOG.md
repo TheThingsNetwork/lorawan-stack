@@ -28,6 +28,10 @@ For details about compatibility between different releases, see the **Commitment
 - Option to store rate limits in Redis. When used, the rate limits are applied over the entire cluster instead of per-instance.
 - Field `complement_collaborators` was added to `SearchAccounts`. Allows an user to request the accounts that are not already attached to the entity's collaborator list.
 
+### Fixed
+
+- Failing LoRa Basics Station connections when using The Things Stack redirection settings.
+
 ## [3.29.0] - 2024-02-06
 
 ### Added

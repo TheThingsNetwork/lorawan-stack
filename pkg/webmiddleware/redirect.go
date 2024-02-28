@@ -97,7 +97,6 @@ func Redirect(config RedirectConfiguration) MiddlewareFunc {
 			return next
 		}
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 			if url, redirect := config.build(r.URL); redirect {
 				code := config.Code
 				if code == 0 {
