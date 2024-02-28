@@ -27,6 +27,8 @@ import (
 )
 
 func TestRedirect(t *testing.T) {
+	t.Parallel()
+
 	m := Redirect(RedirectConfiguration{
 		Scheme: func(s string) string { return SchemeHTTPS },
 		HostName: func(h string) string {
@@ -47,6 +49,7 @@ func TestRedirect(t *testing.T) {
 	})
 
 	t.Run("None", func(t *testing.T) {
+		t.Parallel()
 		a := assertions.New(t)
 		r := httptest.NewRequest(http.MethodGet, "https://dev.example.com/path?query=true", nil)
 		rec := httptest.NewRecorder()
@@ -86,7 +89,9 @@ func TestRedirect(t *testing.T) {
 			Redirect: "https://dev.example.com/path",
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 			r := httptest.NewRequest(http.MethodGet, tc.URL, nil)
 			rec := httptest.NewRecorder()
@@ -100,4 +105,19 @@ func TestRedirect(t *testing.T) {
 			a.So(res.Header.Get("Location"), should.Equal, tc.Redirect)
 		})
 	}
+
+	t.Run("ExplicitPort", func(t *testing.T) {
+		t.Parallel()
+		a := assertions.New(t)
+		r := httptest.NewRequest(http.MethodGet, "https://dev.example.com:8885/", nil)
+		rec := httptest.NewRecorder()
+		m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK"))
+		})).ServeHTTP(rec, r)
+		res := rec.Result()
+		a.So(res.StatusCode, should.Equal, http.StatusOK)
+		body, _ := io.ReadAll(res.Body)
+		a.So(string(body), should.Equal, "OK")
+	})
 }
