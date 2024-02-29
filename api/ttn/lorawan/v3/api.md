@@ -239,6 +239,8 @@
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings)
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode)
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode)
+  - [Message `ADRSettings.DynamicMode.Overrides`](#ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides)
+  - [Message `ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride)
   - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
   - [Message `BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest)
   - [Message `BatchGetEndDevicesRequest`](#ttn.lorawan.v3.BatchGetEndDevicesRequest)
@@ -3710,6 +3712,7 @@ Configuration options for dynamic ADR.
 | `min_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
 | `max_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
 | `channel_steering` | [`ADRSettings.DynamicMode.ChannelSteeringSettings`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings) |  |  |
+| `overrides` | [`ADRSettings.DynamicMode.Overrides`](#ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides) |  |  |
 
 #### Field Rules
 
@@ -3739,6 +3742,45 @@ to another set of channels.
 Configuration options for LoRa narrow channels steering.
 The narrow mode attempts to steer the end device towards
 using the LoRa modulated, 125kHz bandwidth channels.
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides">Message `ADRSettings.DynamicMode.Overrides`</a>
+
+EXPERIMENTAL: Configuration overrides.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate_0` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_1` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_2` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_3` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_4` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_5` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_6` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_7` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_8` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_9` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_10` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_11` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_12` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_13` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_14` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_15` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride">Message `ADRSettings.DynamicMode.PerDataRateIndexOverride`</a>
+
+EXPERIMENTAL: Data rate index override settings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+| `max_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `min_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
+| `max_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
 
 ### <a name="ttn.lorawan.v3.ADRSettings.StaticMode">Message `ADRSettings.StaticMode`</a>
 

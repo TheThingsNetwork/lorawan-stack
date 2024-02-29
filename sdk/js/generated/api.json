@@ -15091,6 +15091,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "overrides",
+              "description": "",
+              "label": "",
+              "type": "Overrides",
+              "longType": "ADRSettings.DynamicMode.Overrides",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -15151,6 +15163,270 @@
           "hasOneofs": false,
           "extensions": [],
           "fields": []
+        },
+        {
+          "name": "Overrides",
+          "longName": "ADRSettings.DynamicMode.Overrides",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides",
+          "description": "EXPERIMENTAL: Configuration overrides.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "data_rate_0",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_1",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_2",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_3",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_4",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_5",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_6",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_7",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_8",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_9",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_10",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_11",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_12",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_13",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_14",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data_rate_15",
+              "description": "",
+              "label": "",
+              "type": "PerDataRateIndexOverride",
+              "longType": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PerDataRateIndexOverride",
+          "longName": "ADRSettings.DynamicMode.PerDataRateIndexOverride",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride",
+          "description": "EXPERIMENTAL: Data rate index override settings.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "min_nb_trans",
+              "description": "Minimum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 3
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "name": "max_nb_trans",
+              "description": "Maximum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 3
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "StaticMode",
