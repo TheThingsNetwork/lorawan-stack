@@ -87,11 +87,23 @@ const Pagination = ({
     <div className="d-flex al-center gap-cs-l w-full">
       <Paginate
         previousClassName={navigationPrevClassNames}
-        previousLinkClassName={style.link}
-        previousLabel={<Icon icon="chevron_left" nudgeUp aria-label="Go to the previous page" />}
+        previousLabel={
+          <Icon
+            icon="chevron_left"
+            nudgeUp
+            aria-label="Go to the previous page"
+            className="c-text-neutral-semilight"
+          />
+        }
         nextClassName={navigationNextClassNames}
-        nextLinkClassName={style.link}
-        nextLabel={<Icon icon="chevron_right" nudgeUp aria-label="Go to the next page" />}
+        nextLabel={
+          <Icon
+            icon="chevron_right"
+            nudgeUp
+            aria-label="Go to the next page"
+            className="c-text-neutral-semilight"
+          />
+        }
         containerClassName={containerClassNames}
         pageClassName={style.item}
         breakClassName={breakClassNames}
