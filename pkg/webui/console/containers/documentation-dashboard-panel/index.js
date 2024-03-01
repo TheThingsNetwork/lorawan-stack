@@ -30,7 +30,6 @@ import styles from './documentation-dashboard-panel.styl'
 const docBaseUrl = selectDocumentationUrlConfig()
 
 const m = defineMessages({
-  view: 'Documentation',
   tts: 'The Things Stack',
   reference: 'Reference',
   gettingStarted: 'Getting started',
@@ -56,7 +55,7 @@ const DocumentationDashboardPanel = () => (
     title={sharedMessages.documentation}
     path={docBaseUrl}
     icon="menu_book"
-    buttonTitle={m.view}
+    buttonTitle={sharedMessages.documentation}
     divider
     target="_blank"
   >
