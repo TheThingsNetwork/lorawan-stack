@@ -43,11 +43,11 @@
       +media-query($width)
         for $num in (1..12)
           // Generate responsive grid item overrides.
-          .{$name}:item-{$num}
+          .{$name}\\:item-{$num}
             grid-column-end: span $num
 
           // Generate responsive start-colum (offset) item overrides.
-          .{$name}:item-start-{$num}
+          .{$name}\\:item-start-{$num}
             grid-column-start: $num
 
     &--center
@@ -367,43 +367,43 @@
 
   // DISPLAY UTILITIES.
   .d-flex
-    display: flex
+    display: flex !important
 
   .d-inline
-    display: inline
+    display: inline !important
 
   .d-block
-    display: block
+    display: block !important
 
   .d-none
-    display: none
+    display: none !important
 
   .d-inline-block
-    display: inline-block
+    display: inline-block !important
 
   .d-inline-flex
-    display: inline-flex
+    display: inline-flex !important
 
   // Responsive display styles.
   for $name, $width in $bp
     +media-query($width)
-      .{$name}:d-flex
-        display: flex
+      .{$name}\\:d-flex
+        display: flex !important
 
-      .{$name}:d-inline
-        display: inline
+      .{$name}\\:d-inline
+        display: inline !important
 
-      .{$name}:d-block
-        display: block
+      .{$name}\\:d-block
+        display: block !important
 
-      .{$name}:d-none
-        display: none
+      .{$name}\\:d-none
+        display: none !important
 
-      .{$name}:d-inline-block
-        display: inline-block
+      .{$name}\\:d-inline-block
+        display: inline-block !important
 
-      .{$name}:d-inline-flex
-        display: inline-flex
+      .{$name}\\:d-inline-flex
+        display: inline-flex !important
 
   .br-xs
     border-radius: $br.xs
