@@ -22,7 +22,7 @@ Alternatively, you can use the reference <code>{{ .ID }}</code> and confirmation
 </p>
 {{- with .TTL }}
 <p>
-The confirmation token expires {{ relTime . }}, so if you don't confirm your email address before then, you'll have to request a new confirmation if you still want to confirm your email address.
+The confirmation token expires {{ relDuration . }}, so if you don't confirm your email address before then, you'll have to request a new confirmation if you still want to confirm your email address.
 </p>
 {{- end }}
 

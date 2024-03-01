@@ -7,5 +7,5 @@ Alternatively, you can use the login token "{{ .LoginToken }}" directly.
 
 {{- with .TTL }}
 
-Your login token expires {{ relTime . }}, so if you don't log in before then, you'll have to request a new token if you still want to log in.
+Your login token expires {{ relDuration . }}, so if you don't log in before then, you'll have to request a new token if you still want to log in.
 {{- end }}
