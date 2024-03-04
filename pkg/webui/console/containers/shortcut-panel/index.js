@@ -21,10 +21,10 @@ import ShortcutItem from './shortcut-item'
 
 const m = defineMessages({
   shortcuts: 'Quick actions',
-  addApplication: 'Add a new Application',
-  addGateway: 'Add a new Gateway',
-  addOrganization: 'Add a new Organization',
-  addPersonalApiKey: 'Add a new personal API key',
+  addApplication: 'New Application',
+  addGateway: 'New Gateway',
+  addOrganization: 'New Organization',
+  addPersonalApiKey: 'New personal API key',
   registerDevice: 'Register a device',
 })
 
