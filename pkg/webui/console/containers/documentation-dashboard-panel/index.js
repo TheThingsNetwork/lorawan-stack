@@ -58,6 +58,7 @@ const DocumentationDashboardPanel = () => (
     buttonTitle={sharedMessages.documentation}
     divider
     target="_blank"
+    className="h-full"
   >
     <DocsPanelLink path={`${docBaseUrl}/getting-started/`} title={m.gettingStarted} icon="group" />
     <DocsPanelLink path={`${docBaseUrl}/devices/`} title={sharedMessages.devices} icon="device" />

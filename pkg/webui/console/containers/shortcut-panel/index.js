@@ -29,7 +29,7 @@ const m = defineMessages({
 })
 
 const ShortcutPanel = () => (
-  <Panel title={m.shortcuts} path="/edit-shortcuts" icon="bolt" divider>
+  <Panel title={m.shortcuts} path="/edit-shortcuts" icon="bolt" divider className="h-full">
     <div className="grid">
       <ShortcutItem
         icon="display_settings"
