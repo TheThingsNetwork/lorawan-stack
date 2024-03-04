@@ -11622,7 +11622,7 @@ tsutils@^3.21.0:
     axios "^1.4.0"
     proxy-polyfill "^0.3.0"
     traverse "^0.6.6"
-    web-streams-polyfill "^2.0.3"
+    web-streams-polyfill "^4.0.0"
 
 tunnel-agent@^0.6.0:
   version "0.6.0"
@@ -12028,10 +12028,10 @@ web-resource-inliner@^6.0.1:
     node-fetch "^2.6.0"
     valid-data-url "^3.0.0"
 
-web-streams-polyfill@^2.0.3:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-2.1.1.tgz#2c82b6193849ccb9efaa267772c28260ef68d6d2"
-  integrity sha512-dlNpL2aab3g8CKfGz6rl8FNmGaRWLLn2g/DtSc9IjB30mEdE6XxzPfPSig5BwGSzI+oLxHyETrQGKjrVVhbLCg==
+web-streams-polyfill@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-4.0.0.tgz#74cedf168339ee6e709532f76c49313a8c7acdac"
+  integrity sha512-0zJXHRAYEjM2tUfZ2DiSOHAa2aw1tisnnhU3ufD57R8iefL+DcdJyRBRyJpG+NUimDgbTI/lH+gAE1PAvV3Cgw==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
