@@ -5579,6 +5579,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/identityserver/store:invalid_entity_type": {
+    "translations": {
+      "en": "invalid entity type `{entity_type}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/identityserver/store:invitation_already_sent": {
     "translations": {
       "en": "invitation already sent"
@@ -5672,6 +5681,15 @@
   "error:pkg/identityserver/store:organization_not_found": {
     "translations": {
       "en": "organization with id `{organization_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/identityserver/store:user_bookmark_not_found": {
+    "translations": {
+      "en": "user's bookmark not found"
     },
     "description": {
       "package": "pkg/identityserver/store",
