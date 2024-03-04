@@ -84,7 +84,7 @@ const Pagination = ({
   const navigationPrevClassNames = classnames(style.item, style.itemNavigationPrev)
 
   return (
-    <div className="d-flex al-center gap-cs-l w-full">
+    <div className="d-flex al-center gap-cs-l w-full flex-wrap">
       <Paginate
         previousClassName={navigationPrevClassNames}
         previousLabel={

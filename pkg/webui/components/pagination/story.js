@@ -26,13 +26,6 @@ export const Default = () => {
 
   return (
     <div>
-      <Pagination pageCount={1} pageSize={pageSize} setPageSize={setPageSize} />
-      <Pagination
-        pageCount={3}
-        marginPagesDisplayed={2}
-        pageSize={pageSize}
-        setPageSize={setPageSize}
-      />
       <Pagination
         pageCount={3}
         marginPagesDisplayed={2}
