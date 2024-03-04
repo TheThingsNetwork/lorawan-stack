@@ -1538,6 +1538,15 @@
       "file": "use.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:flags_unsupported": {
+    "translations": {
+      "en": "flags are not supported for this command"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users_bookmarks.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:gateway_server_address_mismatch": {
     "translations": {
       "en": "gateway server address mismatch"
