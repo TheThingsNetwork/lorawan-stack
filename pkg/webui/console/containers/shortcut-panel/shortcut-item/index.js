@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
@@ -23,22 +24,29 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './shortcut-item.styl'
 
-const ShortcutItem = ({ icon, title, link }) => (
-  <Link to={link} className={style.shortcut}>
-    <div className={style.addIconWrapper}>
-      <Icon icon="add" className={style.addIcon} />
-    </div>
-    <div className={style.shortcutTitleWrapper}>
-      <Icon icon={icon} className={style.icon} />
-      <Message content={title} className={style.title} />
+const ShortcutItem = ({ icon, title, link, className }) => (
+  <Link to={link} className={classnames(style.shortcut, className)}>
+    <div className="pos-relative w-full">
+      <div className={style.addIconWrapper}>
+        <Icon icon="add" className={style.addIcon} />
+      </div>
+      <div className={style.shortcutTitleWrapper}>
+        <Icon icon={icon} className={style.icon} />
+        <Message content={title} className={style.title} component="span" />
+      </div>
     </div>
   </Link>
 )
 
 ShortcutItem.propTypes = {
+  className: PropTypes.string,
   icon: PropTypes.string.isRequired,
   link: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,
+}
+
+ShortcutItem.defaultProps = {
+  className: undefined,
 }
 
 export default ShortcutItem

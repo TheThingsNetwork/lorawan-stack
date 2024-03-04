@@ -18,10 +18,9 @@
   flex-direction: column
   align-items: center
   justify-content: center
-  position: relative
   padding: $cs.s $cs.m
   text-decoration: none
-  height: 10.7rem
+  height: 9rem
   border-radius: $br.l
   background: var(--c-bg-brand-normal)
   color: var(--c-text-neutral-min)
@@ -38,11 +37,14 @@
     justify-content: center
     align-items: center
     flex-direction: column
+    gap: $cs.m
     top: 0
     opacity: 1
     transition: $ad.s opacity ease-in-out
 
   &-title-wrapper
+    text-wrap: wrap
+    text-align: center
     opacity: 1
 
   .add-icon-wrapper

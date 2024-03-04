@@ -19,6 +19,7 @@ import PropTypes from 'prop-types'
 import StarIcon from './replacements/star-icon'
 import PlusIcon from './replacements/plus-icon'
 import SortIcon from './replacements/sort-icon'
+import TtsIcon from './replacements/tts-icon'
 
 import style from './icon.styl'
 
@@ -79,6 +80,7 @@ const replaced = {
   star: StarIcon,
   plus: PlusIcon,
   sort: SortIcon,
+  tts: TtsIcon,
 }
 
 const Icon = forwardRef((props, ref) => {

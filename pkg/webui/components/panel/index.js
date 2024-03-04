@@ -33,11 +33,12 @@ const Panel = ({
   toggleOptions,
   activeToggle,
   onToggleClick,
-  buttonTitle,
-  path,
+  shortCutLinkTitle,
+  shortCutLinkPath,
   className,
   messageDecorators,
   divider,
+  shortCutLinkTarget,
 }) => (
   <div className={classnames(styles.panel, className)}>
     <div className="d-flex j-between al-center mb-cs-m">
@@ -49,9 +50,11 @@ const Panel = ({
       {toggleOptions ? (
         <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
       ) : (
-        <Link primary to={path} className={styles.button}>
-          <Message content={buttonTitle} /> →
-        </Link>
+        shortCutLinkTitle && (
+          <Link primary to={shortCutLinkPath} className={styles.button} target={shortCutLinkTarget}>
+            <Message content={shortCutLinkTitle} /> →
+          </Link>
+        )
       )}
     </div>
     {divider && <hr className={styles.panelDivider} />}
@@ -61,20 +64,20 @@ const Panel = ({
 
 Panel.propTypes = {
   activeToggle: PropTypes.string,
-  buttonTitle: PropTypes.message,
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   divider: PropTypes.bool,
   icon: PropTypes.string,
   messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
-  path: PropTypes.string.isRequired,
+  shortCutLinkPath: PropTypes.string,
+  shortCutLinkTarget: PropTypes.string,
+  shortCutLinkTitle: PropTypes.message,
   title: PropTypes.message.isRequired,
   toggleOptions: PropTypes.arrayOf(PropTypes.shape({})),
 }
 
 Panel.defaultProps = {
-  buttonTitle: undefined,
   icon: undefined,
   toggleOptions: undefined,
   activeToggle: undefined,
@@ -82,6 +85,9 @@ Panel.defaultProps = {
   className: undefined,
   messageDecorators: undefined,
   divider: false,
+  shortCutLinkPath: undefined,
+  shortCutLinkTitle: undefined,
+  shortCutLinkTarget: undefined,
 }
 
 export default Panel
