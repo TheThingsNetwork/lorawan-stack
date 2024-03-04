@@ -49210,6 +49210,62 @@
       "extensions": [],
       "messages": [
         {
+          "name": "BatchDeleteUserBookmarksRequest",
+          "longName": "BatchDeleteUserBookmarksRequest",
+          "fullName": "ttn.lorawan.v3.BatchDeleteUserBookmarksRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "entity_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "EntityIdentifiers",
+              "longType": "EntityIdentifiers",
+              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "CreateLoginTokenRequest",
           "longName": "CreateLoginTokenRequest",
           "fullName": "ttn.lorawan.v3.CreateLoginTokenRequest",
@@ -49410,6 +49466,58 @@
           ]
         },
         {
+          "name": "CreateUserBookmarkRequest",
+          "longName": "CreateUserBookmarkRequest",
+          "fullName": "ttn.lorawan.v3.CreateUserBookmarkRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "entity_ids",
+              "description": "",
+              "label": "",
+              "type": "EntityIdentifiers",
+              "longType": "EntityIdentifiers",
+              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "CreateUserRequest",
           "longName": "CreateUserRequest",
           "fullName": "ttn.lorawan.v3.CreateUserRequest",
@@ -49526,6 +49634,58 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DeleteUserBookmarkRequest",
+          "longName": "DeleteUserBookmarkRequest",
+          "fullName": "ttn.lorawan.v3.DeleteUserBookmarkRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "entity_ids",
+              "description": "",
+              "label": "",
+              "type": "EntityIdentifiers",
+              "longType": "EntityIdentifiers",
+              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -49876,6 +50036,112 @@
               "type": "uint32",
               "longType": "uint32",
               "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListUserBookmarksRequest",
+          "longName": "ListUserBookmarksRequest",
+          "fullName": "ttn.lorawan.v3.ListUserBookmarksRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "Order the results by this field path.\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "user_id",
+                      "-user_id",
+                      "entity_type",
+                      "-entity_type",
+                      "entity_id",
+                      "-entity_id",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "deleted",
+              "description": "Only return recently deleted bookmarks.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -50783,6 +51049,94 @@
           ]
         },
         {
+          "name": "UserBookmark",
+          "longName": "UserBookmark",
+          "fullName": "ttn.lorawan.v3.UserBookmark",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "entity_ids",
+              "description": "",
+              "label": "",
+              "type": "EntityIdentifiers",
+              "longType": "EntityIdentifiers",
+              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "created_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UserBookmarks",
+          "longName": "UserBookmarks",
+          "fullName": "ttn.lorawan.v3.UserBookmarks",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bookmarks",
+              "description": "",
+              "label": "repeated",
+              "type": "UserBookmark",
+              "longType": "UserBookmark",
+              "fullType": "ttn.lorawan.v3.UserBookmark",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "UserConsolePreferences",
           "longName": "UserConsolePreferences",
           "fullName": "ttn.lorawan.v3.UserConsolePreferences",
@@ -51534,6 +51888,123 @@
                     {
                       "method": "POST",
                       "pattern": "/users/{user_ids.user_id}/login-tokens"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "UserBookmarkRegistry",
+          "longName": "UserBookmarkRegistry",
+          "fullName": "ttn.lorawan.v3.UserBookmarkRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "Create",
+              "description": "Create a bookmark for the given user.",
+              "requestType": "CreateUserBookmarkRequest",
+              "requestLongType": "CreateUserBookmarkRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateUserBookmarkRequest",
+              "requestStreaming": false,
+              "responseType": "UserBookmark",
+              "responseLongType": "UserBookmark",
+              "responseFullType": "ttn.lorawan.v3.UserBookmark",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users/bookmarks",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List",
+              "description": "List the bookmarks for the given user.",
+              "requestType": "ListUserBookmarksRequest",
+              "requestLongType": "ListUserBookmarksRequest",
+              "requestFullType": "ttn.lorawan.v3.ListUserBookmarksRequest",
+              "requestStreaming": false,
+              "responseType": "UserBookmarks",
+              "responseLongType": "UserBookmarks",
+              "responseFullType": "ttn.lorawan.v3.UserBookmarks",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete",
+              "description": "Delete the given user's bookmark.",
+              "requestType": "DeleteUserBookmarkRequest",
+              "requestLongType": "DeleteUserBookmarkRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteUserBookmarkRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.application_ids.application_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks/clients/{entity_ids.client_ids.client_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks/gateways/{entity_ids.gateway_ids.gateway_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks/organizations/{entity_ids.organization_ids.organization_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks/users/{entity_ids.user_ids.user_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.device_ids.application_ids.application_id}/devices/{entity_ids.device_ids.device_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "BatchDelete",
+              "description": "Delete a list of bookmarks of the given user.\nThis operation is atomic; either all bookmarks are deleted or none.\nBookmarks not found are skipped and no error is returned.",
+              "requestType": "BatchDeleteUserBookmarksRequest",
+              "requestLongType": "BatchDeleteUserBookmarksRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchDeleteUserBookmarksRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks/batch"
                     }
                   ]
                 }

@@ -7076,6 +7076,97 @@
       ]
     }
   },
+  "UserBookmarkRegistry": {
+    "Create": {
+      "file": "ttn/lorawan/v3/user_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/users/bookmarks",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    },
+    "List": {
+      "file": "ttn/lorawan/v3/user_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/users/{user_ids.user_id}/bookmarks",
+          "parameters": [
+            "user_ids.user_id"
+          ]
+        }
+      ]
+    },
+    "Delete": {
+      "file": "ttn/lorawan/v3/user_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.application_ids.application_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "entity_ids.application_ids.application_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/bookmarks/clients/{entity_ids.client_ids.client_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "entity_ids.client_ids.client_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/bookmarks/gateways/{entity_ids.gateway_ids.gateway_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "entity_ids.gateway_ids.gateway_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/bookmarks/organizations/{entity_ids.organization_ids.organization_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "entity_ids.organization_ids.organization_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/bookmarks/users/{entity_ids.user_ids.user_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "entity_ids.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.device_ids.application_ids.application_id}/devices/{entity_ids.device_ids.device_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "entity_ids.device_ids.application_ids.application_id",
+            "entity_ids.device_ids.device_id"
+          ]
+        }
+      ]
+    },
+    "BatchDelete": {
+      "file": "ttn/lorawan/v3/user_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/bookmarks/batch",
+          "parameters": [
+            "user_ids.user_id"
+          ]
+        }
+      ]
+    }
+  },
   "UserInvitationRegistry": {
     "Send": {
       "file": "ttn/lorawan/v3/user_services.proto",

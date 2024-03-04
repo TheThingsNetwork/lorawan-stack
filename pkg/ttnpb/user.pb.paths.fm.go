@@ -476,6 +476,136 @@ var CreateLoginTokenResponseFieldPathsNested = []string{
 var CreateLoginTokenResponseFieldPathsTopLevel = []string{
 	"token",
 }
+var UserBookmarkFieldPathsNested = []string{
+	"created_at",
+	"entity_ids",
+	"entity_ids.ids",
+	"entity_ids.ids.application_ids",
+	"entity_ids.ids.application_ids.application_id",
+	"entity_ids.ids.client_ids",
+	"entity_ids.ids.client_ids.client_id",
+	"entity_ids.ids.device_ids",
+	"entity_ids.ids.device_ids.application_ids",
+	"entity_ids.ids.device_ids.application_ids.application_id",
+	"entity_ids.ids.device_ids.dev_addr",
+	"entity_ids.ids.device_ids.dev_eui",
+	"entity_ids.ids.device_ids.device_id",
+	"entity_ids.ids.device_ids.join_eui",
+	"entity_ids.ids.gateway_ids",
+	"entity_ids.ids.gateway_ids.eui",
+	"entity_ids.ids.gateway_ids.gateway_id",
+	"entity_ids.ids.organization_ids",
+	"entity_ids.ids.organization_ids.organization_id",
+	"entity_ids.ids.user_ids",
+	"entity_ids.ids.user_ids.email",
+	"entity_ids.ids.user_ids.user_id",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var UserBookmarkFieldPathsTopLevel = []string{
+	"created_at",
+	"entity_ids",
+	"user_ids",
+}
+var UserBookmarksFieldPathsNested = []string{
+	"bookmarks",
+}
+
+var UserBookmarksFieldPathsTopLevel = []string{
+	"bookmarks",
+}
+var CreateUserBookmarkRequestFieldPathsNested = []string{
+	"entity_ids",
+	"entity_ids.ids",
+	"entity_ids.ids.application_ids",
+	"entity_ids.ids.application_ids.application_id",
+	"entity_ids.ids.client_ids",
+	"entity_ids.ids.client_ids.client_id",
+	"entity_ids.ids.device_ids",
+	"entity_ids.ids.device_ids.application_ids",
+	"entity_ids.ids.device_ids.application_ids.application_id",
+	"entity_ids.ids.device_ids.dev_addr",
+	"entity_ids.ids.device_ids.dev_eui",
+	"entity_ids.ids.device_ids.device_id",
+	"entity_ids.ids.device_ids.join_eui",
+	"entity_ids.ids.gateway_ids",
+	"entity_ids.ids.gateway_ids.eui",
+	"entity_ids.ids.gateway_ids.gateway_id",
+	"entity_ids.ids.organization_ids",
+	"entity_ids.ids.organization_ids.organization_id",
+	"entity_ids.ids.user_ids",
+	"entity_ids.ids.user_ids.email",
+	"entity_ids.ids.user_ids.user_id",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var CreateUserBookmarkRequestFieldPathsTopLevel = []string{
+	"entity_ids",
+	"user_ids",
+}
+var ListUserBookmarksRequestFieldPathsNested = []string{
+	"deleted",
+	"limit",
+	"order",
+	"page",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var ListUserBookmarksRequestFieldPathsTopLevel = []string{
+	"deleted",
+	"limit",
+	"order",
+	"page",
+	"user_ids",
+}
+var DeleteUserBookmarkRequestFieldPathsNested = []string{
+	"entity_ids",
+	"entity_ids.ids",
+	"entity_ids.ids.application_ids",
+	"entity_ids.ids.application_ids.application_id",
+	"entity_ids.ids.client_ids",
+	"entity_ids.ids.client_ids.client_id",
+	"entity_ids.ids.device_ids",
+	"entity_ids.ids.device_ids.application_ids",
+	"entity_ids.ids.device_ids.application_ids.application_id",
+	"entity_ids.ids.device_ids.dev_addr",
+	"entity_ids.ids.device_ids.dev_eui",
+	"entity_ids.ids.device_ids.device_id",
+	"entity_ids.ids.device_ids.join_eui",
+	"entity_ids.ids.gateway_ids",
+	"entity_ids.ids.gateway_ids.eui",
+	"entity_ids.ids.gateway_ids.gateway_id",
+	"entity_ids.ids.organization_ids",
+	"entity_ids.ids.organization_ids.organization_id",
+	"entity_ids.ids.user_ids",
+	"entity_ids.ids.user_ids.email",
+	"entity_ids.ids.user_ids.user_id",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var DeleteUserBookmarkRequestFieldPathsTopLevel = []string{
+	"entity_ids",
+	"user_ids",
+}
+var BatchDeleteUserBookmarksRequestFieldPathsNested = []string{
+	"entity_ids",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var BatchDeleteUserBookmarksRequestFieldPathsTopLevel = []string{
+	"entity_ids",
+	"user_ids",
+}
 var UserConsolePreferences_DashboardLayoutsFieldPathsNested = []string{
 	"api_key",
 	"application",
