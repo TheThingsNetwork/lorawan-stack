@@ -132,6 +132,7 @@ func newStore(baseStore *baseStore) *Store {
 		notificationStore:    newNotificationStore(baseStore),
 		oauthStore:           newOAuthStore(baseStore),
 		organizationStore:    newOrganizationStore(baseStore),
+		userBookmarkStore:    newUserBookmarkStore(baseStore),
 		userSessionStore:     newUserSessionStore(baseStore),
 		userStore:            newUserStore(baseStore),
 	}
@@ -167,6 +168,7 @@ type Store struct {
 	*notificationStore
 	*oauthStore
 	*organizationStore
+	*userBookmarkStore
 	*userSessionStore
 	*userStore
 }
