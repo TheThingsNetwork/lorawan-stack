@@ -2367,6 +2367,11 @@ func (m *SetEndDeviceRequest) FieldIsZero(p string) bool {
 	return m.EndDevice.FieldIsZero(p)
 }
 
+// GetEntityIdentifiers generates EntityIdentifiers from EndDevice.
+func (m *EndDevice) GetEntityIdentifiers() *EntityIdentifiers {
+	return m.GetIds().GetEntityIdentifiers()
+}
+
 // All EntityType methods implement the IDStringer interface.
 
 func (m *ResetAndGetEndDeviceRequest) EntityType() string {
