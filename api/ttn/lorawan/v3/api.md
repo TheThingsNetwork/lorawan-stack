@@ -769,10 +769,15 @@
   - [Message `UpdateUserRequest`](#ttn.lorawan.v3.UpdateUserRequest)
   - [Message `User`](#ttn.lorawan.v3.User)
   - [Message `User.AttributesEntry`](#ttn.lorawan.v3.User.AttributesEntry)
+  - [Message `UserConsolePreferences`](#ttn.lorawan.v3.UserConsolePreferences)
+  - [Message `UserConsolePreferences.DashboardLayouts`](#ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts)
+  - [Message `UserConsolePreferences.SortBy`](#ttn.lorawan.v3.UserConsolePreferences.SortBy)
   - [Message `UserSession`](#ttn.lorawan.v3.UserSession)
   - [Message `UserSessionIdentifiers`](#ttn.lorawan.v3.UserSessionIdentifiers)
   - [Message `UserSessions`](#ttn.lorawan.v3.UserSessions)
   - [Message `Users`](#ttn.lorawan.v3.Users)
+  - [Enum `ConsoleTheme`](#ttn.lorawan.v3.ConsoleTheme)
+  - [Enum `DashboardLayout`](#ttn.lorawan.v3.DashboardLayout)
 - [File `ttn/lorawan/v3/user_services.proto`](#ttn/lorawan/v3/user_services.proto)
   - [Service `UserAccess`](#ttn.lorawan.v3.UserAccess)
   - [Service `UserInvitationRegistry`](#ttn.lorawan.v3.UserInvitationRegistry)
@@ -10835,6 +10840,7 @@ User is the message that defines a user on the network.
 | `temporary_password_created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `temporary_password_expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `profile_picture` | [`Picture`](#ttn.lorawan.v3.Picture) |  | A profile picture for the user. This information is public and can be seen by any authenticated user in the network. |
+| `console_preferences` | [`UserConsolePreferences`](#ttn.lorawan.v3.UserConsolePreferences) |  | Console preferences contains the user's preferences regarding the behavior of the Console. |
 
 #### Field Rules
 
@@ -10857,6 +10863,55 @@ User is the message that defines a user on the network.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.UserConsolePreferences">Message `UserConsolePreferences`</a>
+
+UserConsolePreferences is the message that defines the user preferences for the Console.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `console_theme` | [`ConsoleTheme`](#ttn.lorawan.v3.ConsoleTheme) |  |  |
+| `dashboard_layouts` | [`UserConsolePreferences.DashboardLayouts`](#ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts) |  |  |
+| `sort_by` | [`UserConsolePreferences.SortBy`](#ttn.lorawan.v3.UserConsolePreferences.SortBy) |  |  |
+
+### <a name="ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts">Message `UserConsolePreferences.DashboardLayouts`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `api_key` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `application` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `collaborator` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `end_device` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `gateway` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `organization` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `overview` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `user` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+
+### <a name="ttn.lorawan.v3.UserConsolePreferences.SortBy">Message `UserConsolePreferences.SortBy`</a>
+
+SortBy defines the field to which the Console will sort the display of entities.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `api_key` | [`string`](#string) |  |  |
+| `application` | [`string`](#string) |  |  |
+| `collaborator` | [`string`](#string) |  |  |
+| `end_device` | [`string`](#string) |  |  |
+| `gateway` | [`string`](#string) |  |  |
+| `organization` | [`string`](#string) |  |  |
+| `user` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `api_key` | <p>`string.in`: `[ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]`</p> |
+| `application` | <p>`string.in`: `[ application_id -application_id name -name created_at -created_at]`</p> |
+| `collaborator` | <p>`string.in`: `[ id -id rights -rights]`</p> |
+| `end_device` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]`</p> |
+| `gateway` | <p>`string.in`: `[ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]`</p> |
+| `organization` | <p>`string.in`: `[ organization_id -organization_id name -name created_at -created_at]`</p> |
+| `user` | <p>`string.in`: `[ user_id -user_id name -name primary_email_address -primary_email_address state -state admin -admin created_at -created_at]`</p> |
 
 ### <a name="ttn.lorawan.v3.UserSession">Message `UserSession`</a>
 
@@ -10901,6 +10956,26 @@ User is the message that defines a user on the network.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `users` | [`User`](#ttn.lorawan.v3.User) | repeated |  |
+
+### <a name="ttn.lorawan.v3.ConsoleTheme">Enum `ConsoleTheme`</a>
+
+ConsoleTheme is the theme of the Console.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `CONSOLE_THEME_SYSTEM` | 0 | The user prefers the system mode. |
+| `CONSOLE_THEME_LIGHT` | 1 | The user prefers the light mode. |
+| `CONSOLE_THEME_DARK` | 2 | The user prefers the dark mode. |
+
+### <a name="ttn.lorawan.v3.DashboardLayout">Enum `DashboardLayout`</a>
+
+DashboardLayout is a set of possible layout values to be used in the Console.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `DASHBOARD_LAYOUT_TABLE` | 0 |  |
+| `DASHBOARD_LAYOUT_LIST` | 1 |  |
+| `DASHBOARD_LAYOUT_GRID` | 2 |  |
 
 ## <a name="ttn/lorawan/v3/user_services.proto">File `ttn/lorawan/v3/user_services.proto`</a>
 

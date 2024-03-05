@@ -49155,11 +49155,58 @@
       "name": "ttn/lorawan/v3/user.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
-      "hasEnums": false,
+      "hasEnums": true,
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": false,
-      "enums": [],
+      "enums": [
+        {
+          "name": "ConsoleTheme",
+          "longName": "ConsoleTheme",
+          "fullName": "ttn.lorawan.v3.ConsoleTheme",
+          "description": "ConsoleTheme is the theme of the Console.",
+          "values": [
+            {
+              "name": "CONSOLE_THEME_SYSTEM",
+              "number": "0",
+              "description": "The user prefers the system mode."
+            },
+            {
+              "name": "CONSOLE_THEME_LIGHT",
+              "number": "1",
+              "description": "The user prefers the light mode."
+            },
+            {
+              "name": "CONSOLE_THEME_DARK",
+              "number": "2",
+              "description": "The user prefers the dark mode."
+            }
+          ]
+        },
+        {
+          "name": "DashboardLayout",
+          "longName": "DashboardLayout",
+          "fullName": "ttn.lorawan.v3.DashboardLayout",
+          "description": "DashboardLayout is a set of possible layout values to be used in the Console.",
+          "values": [
+            {
+              "name": "DASHBOARD_LAYOUT_TABLE",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "DASHBOARD_LAYOUT_LIST",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "DASHBOARD_LAYOUT_GRID",
+              "number": "2",
+              "description": ""
+            }
+          ]
+        }
+      ],
       "extensions": [],
       "messages": [
         {
@@ -50684,6 +50731,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "console_preferences",
+              "description": "Console preferences contains the user's preferences regarding the behavior of the Console.",
+              "label": "",
+              "type": "UserConsolePreferences",
+              "longType": "UserConsolePreferences",
+              "fullType": "ttn.lorawan.v3.UserConsolePreferences",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -50720,6 +50779,386 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UserConsolePreferences",
+          "longName": "UserConsolePreferences",
+          "fullName": "ttn.lorawan.v3.UserConsolePreferences",
+          "description": "UserConsolePreferences is the message that defines the user preferences for the Console.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "console_theme",
+              "description": "",
+              "label": "",
+              "type": "ConsoleTheme",
+              "longType": "ConsoleTheme",
+              "fullType": "ttn.lorawan.v3.ConsoleTheme",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "dashboard_layouts",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayouts",
+              "longType": "UserConsolePreferences.DashboardLayouts",
+              "fullType": "ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "sort_by",
+              "description": "",
+              "label": "",
+              "type": "SortBy",
+              "longType": "UserConsolePreferences.SortBy",
+              "fullType": "ttn.lorawan.v3.UserConsolePreferences.SortBy",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DashboardLayouts",
+          "longName": "UserConsolePreferences.DashboardLayouts",
+          "fullName": "ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "api_key",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayout",
+              "longType": "DashboardLayout",
+              "fullType": "ttn.lorawan.v3.DashboardLayout",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "application",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayout",
+              "longType": "DashboardLayout",
+              "fullType": "ttn.lorawan.v3.DashboardLayout",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collaborator",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayout",
+              "longType": "DashboardLayout",
+              "fullType": "ttn.lorawan.v3.DashboardLayout",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayout",
+              "longType": "DashboardLayout",
+              "fullType": "ttn.lorawan.v3.DashboardLayout",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "gateway",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayout",
+              "longType": "DashboardLayout",
+              "fullType": "ttn.lorawan.v3.DashboardLayout",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "organization",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayout",
+              "longType": "DashboardLayout",
+              "fullType": "ttn.lorawan.v3.DashboardLayout",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "overview",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayout",
+              "longType": "DashboardLayout",
+              "fullType": "ttn.lorawan.v3.DashboardLayout",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "user",
+              "description": "",
+              "label": "",
+              "type": "DashboardLayout",
+              "longType": "DashboardLayout",
+              "fullType": "ttn.lorawan.v3.DashboardLayout",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SortBy",
+          "longName": "UserConsolePreferences.SortBy",
+          "fullName": "ttn.lorawan.v3.UserConsolePreferences.SortBy",
+          "description": "SortBy defines the field to which the Console will sort the display of entities.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "api_key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "api_key_id",
+                      "-api_key_id",
+                      "name",
+                      "-name",
+                      "created_at",
+                      "-created_at",
+                      "expires_at",
+                      "-expires_at"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "application",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "application_id",
+                      "-application_id",
+                      "name",
+                      "-name",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "id",
+                      "-id",
+                      "rights",
+                      "-rights"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "end_device",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "device_id",
+                      "-device_id",
+                      "join_eui",
+                      "-join_eui",
+                      "dev_eui",
+                      "-dev_eui",
+                      "name",
+                      "-name",
+                      "description",
+                      "-description",
+                      "created_at",
+                      "-created_at",
+                      "last_seen_at",
+                      "-last_seen_at"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "gateway",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "gateway_id",
+                      "-gateway_id",
+                      "gateway_eui",
+                      "-gateway_eui",
+                      "name",
+                      "-name",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "organization",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "organization_id",
+                      "-organization_id",
+                      "name",
+                      "-name",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "user",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "user_id",
+                      "-user_id",
+                      "name",
+                      "-name",
+                      "primary_email_address",
+                      "-primary_email_address",
+                      "state",
+                      "-state",
+                      "admin",
+                      "-admin",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },

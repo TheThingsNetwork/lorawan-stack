@@ -16565,6 +16565,62 @@
     "UplinkMessageRxMetadataRelayMetadata": {
       "type": "object"
     },
+    "UserConsolePreferencesDashboardLayouts": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "application": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "collaborator": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "end_device": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "gateway": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "organization": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "overview": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "user": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        }
+      }
+    },
+    "UserConsolePreferencesSortBy": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "type": "string"
+        },
+        "application": {
+          "type": "string"
+        },
+        "collaborator": {
+          "type": "string"
+        },
+        "end_device": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        }
+      },
+      "description": "SortBy defines the field to which the Console will sort the display of entities."
+    },
     "UserRegistrationAdminApproval": {
       "type": "object",
       "properties": {
@@ -19859,6 +19915,16 @@
         }
       }
     },
+    "v3ConsoleTheme": {
+      "type": "string",
+      "enum": [
+        "CONSOLE_THEME_SYSTEM",
+        "CONSOLE_THEME_LIGHT",
+        "CONSOLE_THEME_DARK"
+      ],
+      "default": "CONSOLE_THEME_SYSTEM",
+      "description": "ConsoleTheme is the theme of the Console.\n\n - CONSOLE_THEME_SYSTEM: The user prefers the system mode.\n - CONSOLE_THEME_LIGHT: The user prefers the light mode.\n - CONSOLE_THEME_DARK: The user prefers the dark mode."
+    },
     "v3ContactInfo": {
       "type": "object",
       "properties": {
@@ -20014,6 +20080,16 @@
           "description": "OptNeg is set if Network Server implements LoRaWAN 1.1 or greater."
         }
       }
+    },
+    "v3DashboardLayout": {
+      "type": "string",
+      "enum": [
+        "DASHBOARD_LAYOUT_TABLE",
+        "DASHBOARD_LAYOUT_LIST",
+        "DASHBOARD_LAYOUT_GRID"
+      ],
+      "default": "DASHBOARD_LAYOUT_TABLE",
+      "description": "DashboardLayout is a set of possible layout values to be used in the Console."
     },
     "v3DataRate": {
       "type": "object",
@@ -26092,6 +26168,10 @@
         "profile_picture": {
           "$ref": "#/definitions/v3Picture",
           "description": "A profile picture for the user.\nThis information is public and can be seen by any authenticated user in the network."
+        },
+        "console_preferences": {
+          "$ref": "#/definitions/v3UserConsolePreferences",
+          "description": "Console preferences contains the user's preferences regarding the behavior of the Console."
         }
       },
       "description": "User is the message that defines a user on the network."
@@ -26172,6 +26252,21 @@
           "description": "The names of the api key fields that should be updated."
         }
       }
+    },
+    "v3UserConsolePreferences": {
+      "type": "object",
+      "properties": {
+        "console_theme": {
+          "$ref": "#/definitions/v3ConsoleTheme"
+        },
+        "dashboard_layouts": {
+          "$ref": "#/definitions/UserConsolePreferencesDashboardLayouts"
+        },
+        "sort_by": {
+          "$ref": "#/definitions/UserConsolePreferencesSortBy"
+        }
+      },
+      "description": "UserConsolePreferences is the message that defines the user preferences for the Console."
     },
     "v3UserIdentifiers": {
       "type": "object",
@@ -26288,6 +26383,10 @@
             "profile_picture": {
               "$ref": "#/definitions/v3Picture",
               "description": "A profile picture for the user.\nThis information is public and can be seen by any authenticated user in the network."
+            },
+            "console_preferences": {
+              "$ref": "#/definitions/v3UserConsolePreferences",
+              "description": "Console preferences contains the user's preferences regarding the behavior of the Console."
             }
           },
           "description": "User is the message that defines a user on the network."

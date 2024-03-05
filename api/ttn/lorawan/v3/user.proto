@@ -19,6 +19,7 @@ package ttn.lorawan.v3;
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "thethings/flags/annotations.proto";
+import "thethings/json/annotations.proto";
 import "ttn/lorawan/v3/contact_info.proto";
 import "ttn/lorawan/v3/enums.proto";
 import "ttn/lorawan/v3/identifiers.proto";
@@ -27,6 +28,150 @@ import "ttn/lorawan/v3/rights.proto";
 import "validate/validate.proto";
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
+
+// ConsoleTheme is the theme of the Console.
+enum ConsoleTheme {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "CONSOLE_THEME"
+  };
+  // The user prefers the system mode.
+  CONSOLE_THEME_SYSTEM = 0;
+  // The user prefers the light mode.
+  CONSOLE_THEME_LIGHT = 1;
+  // The user prefers the dark mode.
+  CONSOLE_THEME_DARK = 2;
+}
+
+// DashboardLayout is a set of possible layout values to be used in the Console.
+enum DashboardLayout {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "DASHBOARD_LAYOUT"
+  };
+  DASHBOARD_LAYOUT_TABLE = 0;
+  DASHBOARD_LAYOUT_LIST = 1;
+  DASHBOARD_LAYOUT_GRID = 2;
+}
+
+// UserConsolePreferences is the message that defines the user preferences for the Console.
+message UserConsolePreferences {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+  ConsoleTheme console_theme = 1;
+
+  message DashboardLayouts {
+    DashboardLayout api_key = 1;
+    DashboardLayout application = 2;
+    DashboardLayout collaborator = 3;
+    DashboardLayout end_device = 4;
+    DashboardLayout gateway = 5;
+    DashboardLayout organization = 6;
+    DashboardLayout overview = 7;
+    DashboardLayout user = 8;
+  }
+  DashboardLayouts dashboard_layouts = 2;
+
+  // SortBy defines the field to which the Console will sort the display of entities.
+  message SortBy {
+    string api_key = 1 [(validate.rules).string = {
+      in: [
+        "",
+        "api_key_id",
+        "-api_key_id",
+        "name",
+        "-name",
+        "created_at",
+        "-created_at",
+        "expires_at",
+        "-expires_at"
+      ]
+    }];
+    string application = 2 [(validate.rules).string = {
+      in: [
+        "",
+        "application_id",
+        "-application_id",
+        "name",
+        "-name",
+        "created_at",
+        "-created_at"
+      ]
+    }];
+    string collaborator = 3 [(validate.rules).string = {
+      in: [
+        "",
+        "id",
+        "-id",
+        "rights",
+        "-rights"
+      ]
+    }];
+    string end_device = 4 [(validate.rules).string = {
+      in: [
+        "",
+        "device_id",
+        "-device_id",
+        "join_eui",
+        "-join_eui",
+        "dev_eui",
+        "-dev_eui",
+        "name",
+        "-name",
+        "description",
+        "-description",
+        "created_at",
+        "-created_at",
+        "last_seen_at",
+        "-last_seen_at"
+      ]
+    }];
+    string gateway = 5 [(validate.rules).string = {
+      in: [
+        "",
+        "gateway_id",
+        "-gateway_id",
+        "gateway_eui",
+        "-gateway_eui",
+        "name",
+        "-name",
+        "created_at",
+        "-created_at"
+      ]
+    }];
+    string organization = 6 [(validate.rules).string = {
+      in: [
+        "",
+        "organization_id",
+        "-organization_id",
+        "name",
+        "-name",
+        "created_at",
+        "-created_at"
+      ]
+    }];
+    string user = 7 [(validate.rules).string = {
+      in: [
+        "",
+        "user_id",
+        "-user_id",
+        "name",
+        "-name",
+        "primary_email_address",
+        "-primary_email_address",
+        "state",
+        "-state",
+        "admin",
+        "-admin",
+        "created_at",
+        "-created_at"
+      ]
+    }];
+  }
+  SortBy sort_by = 3;
+}
 
 // User is the message that defines a user on the network.
 message User {
@@ -140,7 +285,10 @@ message User {
   reserved 24;
   reserved "organization_limit";
 
-  // next: 25
+  // Console preferences contains the user's preferences regarding the behavior of the Console.
+  UserConsolePreferences console_preferences = 25;
+
+  // next: 26
 }
 
 message Users {
