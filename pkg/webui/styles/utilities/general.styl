@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// stylelint-disable
 // Grid.
 :global
   .grid
@@ -367,7 +368,6 @@
 
   // DISPLAY UTILITIES.
   .d-flex
-    // stylelint-disable declaration-no-important
     display: flex !important
 
   .d-inline
@@ -405,7 +405,6 @@
 
       .{$name}\\:d-inline-flex
         display: inline-flex !important
-        // stylelint-enable declaration-no-important
 
   .br-xs
     border-radius: $br.xs
