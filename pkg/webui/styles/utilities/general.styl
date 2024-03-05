@@ -367,55 +367,45 @@
 
   // DISPLAY UTILITIES.
   .d-flex
-    // stylelint-disable-next-line declaration-no-important
+    // stylelint-disable declaration-no-important
     display: flex !important
 
   .d-inline
-    // stylelint-disable-next-line declaration-no-important
     display: inline !important
 
   .d-block
-    // stylelint-disable-next-line declaration-no-important
     display: block !important
 
   .d-none
-    // stylelint-disable-next-line declaration-no-important
     display: none !important
 
   .d-inline-block
-    // stylelint-disable-next-line declaration-no-important
     display: inline-block !important
 
   .d-inline-flex
-    // stylelint-disable-next-line declaration-no-important
     display: inline-flex !important
 
   // Responsive display styles.
   for $name, $width in $bp
     +media-query($width)
       .{$name}\\:d-flex
-        // stylelint-disable-next-line declaration-no-important
         display: flex !important
 
       .{$name}\\:d-inline
-        // stylelint-disable-next-line declaration-no-important
         display: inline !important
 
       .{$name}\\:d-block
-        // stylelint-disable-next-line declaration-no-important
         display: block !important
 
       .{$name}\\:d-none
-        // stylelint-disable-next-line declaration-no-important
         display: none !important
 
       .{$name}\\:d-inline-block
-        // stylelint-disable-next-line declaration-no-important
         display: inline-block !important
 
       .{$name}\\:d-inline-flex
-        // stylelint-disable-next-line declaration-no-important
         display: inline-flex !important
+        // stylelint-enable declaration-no-important
 
   .br-xs
     border-radius: $br.xs
