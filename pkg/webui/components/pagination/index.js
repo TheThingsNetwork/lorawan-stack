@@ -148,6 +148,7 @@ const Pagination = ({
           inputWidth="3xs"
           placeholder="1"
           value={selectedPage}
+          className="c-text-neutral-heavy"
         />
         <Button message="Go" onClick={handlePageChange} secondary />
       </div>
