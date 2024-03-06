@@ -1938,6 +1938,365 @@ func (x *CreateLoginTokenResponse) GetToken() string {
 	return ""
 }
 
+type UserBookmark struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserIds   *UserIdentifiers       `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	EntityIds *EntityIdentifiers     `protobuf:"bytes,2,opt,name=entity_ids,json=entityIds,proto3" json:"entity_ids,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+}
+
+func (x *UserBookmark) Reset() {
+	*x = UserBookmark{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserBookmark) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserBookmark) ProtoMessage() {}
+
+func (x *UserBookmark) ProtoReflect() protoreflect.Message {
+	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserBookmark.ProtoReflect.Descriptor instead.
+func (*UserBookmark) Descriptor() ([]byte, []int) {
+	return file_ttn_lorawan_v3_user_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *UserBookmark) GetUserIds() *UserIdentifiers {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+func (x *UserBookmark) GetEntityIds() *EntityIdentifiers {
+	if x != nil {
+		return x.EntityIds
+	}
+	return nil
+}
+
+func (x *UserBookmark) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type UserBookmarks struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Bookmarks []*UserBookmark `protobuf:"bytes,1,rep,name=bookmarks,proto3" json:"bookmarks,omitempty"`
+}
+
+func (x *UserBookmarks) Reset() {
+	*x = UserBookmarks{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserBookmarks) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserBookmarks) ProtoMessage() {}
+
+func (x *UserBookmarks) ProtoReflect() protoreflect.Message {
+	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserBookmarks.ProtoReflect.Descriptor instead.
+func (*UserBookmarks) Descriptor() ([]byte, []int) {
+	return file_ttn_lorawan_v3_user_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *UserBookmarks) GetBookmarks() []*UserBookmark {
+	if x != nil {
+		return x.Bookmarks
+	}
+	return nil
+}
+
+type CreateUserBookmarkRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserIds   *UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	EntityIds *EntityIdentifiers `protobuf:"bytes,2,opt,name=entity_ids,json=entityIds,proto3" json:"entity_ids,omitempty"`
+}
+
+func (x *CreateUserBookmarkRequest) Reset() {
+	*x = CreateUserBookmarkRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[28]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateUserBookmarkRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserBookmarkRequest) ProtoMessage() {}
+
+func (x *CreateUserBookmarkRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[28]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserBookmarkRequest.ProtoReflect.Descriptor instead.
+func (*CreateUserBookmarkRequest) Descriptor() ([]byte, []int) {
+	return file_ttn_lorawan_v3_user_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *CreateUserBookmarkRequest) GetUserIds() *UserIdentifiers {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+func (x *CreateUserBookmarkRequest) GetEntityIds() *EntityIdentifiers {
+	if x != nil {
+		return x.EntityIds
+	}
+	return nil
+}
+
+type ListUserBookmarksRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserIds *UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	// Limit the number of results per page.
+	Limit uint32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Page number for pagination. 0 is interpreted as 1.
+	Page uint32 `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	// Order the results by this field path.
+	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+	Order string `protobuf:"bytes,4,opt,name=order,proto3" json:"order,omitempty"`
+	// Only return recently deleted bookmarks.
+	Deleted bool `protobuf:"varint,5,opt,name=deleted,proto3" json:"deleted,omitempty"`
+}
+
+func (x *ListUserBookmarksRequest) Reset() {
+	*x = ListUserBookmarksRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[29]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListUserBookmarksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUserBookmarksRequest) ProtoMessage() {}
+
+func (x *ListUserBookmarksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[29]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUserBookmarksRequest.ProtoReflect.Descriptor instead.
+func (*ListUserBookmarksRequest) Descriptor() ([]byte, []int) {
+	return file_ttn_lorawan_v3_user_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *ListUserBookmarksRequest) GetUserIds() *UserIdentifiers {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+func (x *ListUserBookmarksRequest) GetLimit() uint32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListUserBookmarksRequest) GetPage() uint32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListUserBookmarksRequest) GetOrder() string {
+	if x != nil {
+		return x.Order
+	}
+	return ""
+}
+
+func (x *ListUserBookmarksRequest) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+type DeleteUserBookmarkRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserIds   *UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	EntityIds *EntityIdentifiers `protobuf:"bytes,2,opt,name=entity_ids,json=entityIds,proto3" json:"entity_ids,omitempty"`
+}
+
+func (x *DeleteUserBookmarkRequest) Reset() {
+	*x = DeleteUserBookmarkRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteUserBookmarkRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserBookmarkRequest) ProtoMessage() {}
+
+func (x *DeleteUserBookmarkRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserBookmarkRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserBookmarkRequest) Descriptor() ([]byte, []int) {
+	return file_ttn_lorawan_v3_user_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *DeleteUserBookmarkRequest) GetUserIds() *UserIdentifiers {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+func (x *DeleteUserBookmarkRequest) GetEntityIds() *EntityIdentifiers {
+	if x != nil {
+		return x.EntityIds
+	}
+	return nil
+}
+
+type BatchDeleteUserBookmarksRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserIds   *UserIdentifiers     `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	EntityIds []*EntityIdentifiers `protobuf:"bytes,2,rep,name=entity_ids,json=entityIds,proto3" json:"entity_ids,omitempty"`
+}
+
+func (x *BatchDeleteUserBookmarksRequest) Reset() {
+	*x = BatchDeleteUserBookmarksRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[31]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BatchDeleteUserBookmarksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchDeleteUserBookmarksRequest) ProtoMessage() {}
+
+func (x *BatchDeleteUserBookmarksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[31]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchDeleteUserBookmarksRequest.ProtoReflect.Descriptor instead.
+func (*BatchDeleteUserBookmarksRequest) Descriptor() ([]byte, []int) {
+	return file_ttn_lorawan_v3_user_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *BatchDeleteUserBookmarksRequest) GetUserIds() *UserIdentifiers {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+func (x *BatchDeleteUserBookmarksRequest) GetEntityIds() []*EntityIdentifiers {
+	if x != nil {
+		return x.EntityIds
+	}
+	return nil
+}
+
 type UserConsolePreferences_DashboardLayouts struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1956,7 +2315,7 @@ type UserConsolePreferences_DashboardLayouts struct {
 func (x *UserConsolePreferences_DashboardLayouts) Reset() {
 	*x = UserConsolePreferences_DashboardLayouts{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[26]
+		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1969,7 +2328,7 @@ func (x *UserConsolePreferences_DashboardLayouts) String() string {
 func (*UserConsolePreferences_DashboardLayouts) ProtoMessage() {}
 
 func (x *UserConsolePreferences_DashboardLayouts) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[26]
+	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2059,7 +2418,7 @@ type UserConsolePreferences_SortBy struct {
 func (x *UserConsolePreferences_SortBy) Reset() {
 	*x = UserConsolePreferences_SortBy{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[27]
+		mi := &file_ttn_lorawan_v3_user_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2072,7 +2431,7 @@ func (x *UserConsolePreferences_SortBy) String() string {
 func (*UserConsolePreferences_SortBy) ProtoMessage() {}
 
 func (x *UserConsolePreferences_SortBy) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[27]
+	mi := &file_ttn_lorawan_v3_user_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2619,26 +2978,98 @@ var file_ttn_lorawan_v3_user_proto_rawDesc = []byte{
 	0x09, 0x73, 0x6b, 0x69, 0x70, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x22, 0x30, 0x0a, 0x18, 0x43, 0x72,
 	0x65, 0x61, 0x74, 0x65, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2a, 0x70, 0x0a, 0x0c,
-	0x43, 0x6f, 0x6e, 0x73, 0x6f, 0x6c, 0x65, 0x54, 0x68, 0x65, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x14,
-	0x43, 0x4f, 0x4e, 0x53, 0x4f, 0x4c, 0x45, 0x5f, 0x54, 0x48, 0x45, 0x4d, 0x45, 0x5f, 0x53, 0x59,
-	0x53, 0x54, 0x45, 0x4d, 0x10, 0x00, 0x12, 0x17, 0x0a, 0x13, 0x43, 0x4f, 0x4e, 0x53, 0x4f, 0x4c,
-	0x45, 0x5f, 0x54, 0x48, 0x45, 0x4d, 0x45, 0x5f, 0x4c, 0x49, 0x47, 0x48, 0x54, 0x10, 0x01, 0x12,
-	0x16, 0x0a, 0x12, 0x43, 0x4f, 0x4e, 0x53, 0x4f, 0x4c, 0x45, 0x5f, 0x54, 0x48, 0x45, 0x4d, 0x45,
-	0x5f, 0x44, 0x41, 0x52, 0x4b, 0x10, 0x02, 0x1a, 0x15, 0xea, 0xaa, 0x19, 0x11, 0x18, 0x01, 0x2a,
-	0x0d, 0x43, 0x4f, 0x4e, 0x53, 0x4f, 0x4c, 0x45, 0x5f, 0x54, 0x48, 0x45, 0x4d, 0x45, 0x2a, 0x7d,
-	0x0a, 0x0f, 0x44, 0x61, 0x73, 0x68, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x4c, 0x61, 0x79, 0x6f, 0x75,
-	0x74, 0x12, 0x1a, 0x0a, 0x16, 0x44, 0x41, 0x53, 0x48, 0x42, 0x4f, 0x41, 0x52, 0x44, 0x5f, 0x4c,
-	0x41, 0x59, 0x4f, 0x55, 0x54, 0x5f, 0x54, 0x41, 0x42, 0x4c, 0x45, 0x10, 0x00, 0x12, 0x19, 0x0a,
-	0x15, 0x44, 0x41, 0x53, 0x48, 0x42, 0x4f, 0x41, 0x52, 0x44, 0x5f, 0x4c, 0x41, 0x59, 0x4f, 0x55,
-	0x54, 0x5f, 0x4c, 0x49, 0x53, 0x54, 0x10, 0x01, 0x12, 0x19, 0x0a, 0x15, 0x44, 0x41, 0x53, 0x48,
-	0x42, 0x4f, 0x41, 0x52, 0x44, 0x5f, 0x4c, 0x41, 0x59, 0x4f, 0x55, 0x54, 0x5f, 0x47, 0x52, 0x49,
-	0x44, 0x10, 0x02, 0x1a, 0x18, 0xea, 0xaa, 0x19, 0x14, 0x18, 0x01, 0x2a, 0x10, 0x44, 0x41, 0x53,
-	0x48, 0x42, 0x4f, 0x41, 0x52, 0x44, 0x5f, 0x4c, 0x41, 0x59, 0x4f, 0x55, 0x54, 0x42, 0x31, 0x5a,
-	0x2f, 0x67, 0x6f, 0x2e, 0x74, 0x68, 0x65, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x6e, 0x65,
-	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2d, 0x73, 0x74,
-	0x61, 0x63, 0x6b, 0x2f, 0x76, 0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x74, 0x74, 0x6e, 0x70, 0x62,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0xdb, 0x01, 0x0a,
+	0x0c, 0x55, 0x73, 0x65, 0x72, 0x42, 0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x12, 0x44, 0x0a,
+	0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1f, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33,
+	0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73,
+	0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02, 0x10, 0x01, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72,
+	0x49, 0x64, 0x73, 0x12, 0x4a, 0x0a, 0x0a, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x5f, 0x69, 0x64,
+	0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f,
+	0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x49,
+	0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a,
+	0x01, 0x02, 0x10, 0x01, 0x52, 0x09, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x49, 0x64, 0x73, 0x12,
+	0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x22, 0x4b, 0x0a, 0x0d, 0x55, 0x73,
+	0x65, 0x72, 0x42, 0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x73, 0x12, 0x3a, 0x0a, 0x09, 0x62,
+	0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c,
+	0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e,
+	0x55, 0x73, 0x65, 0x72, 0x42, 0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x52, 0x09, 0x62, 0x6f,
+	0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x73, 0x22, 0xad, 0x01, 0x0a, 0x19, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x42, 0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x44, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64,
+	0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f,
+	0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x65,
+	0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02,
+	0x10, 0x01, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x73, 0x12, 0x4a, 0x0a, 0x0a, 0x65,
+	0x6e, 0x74, 0x69, 0x74, 0x79, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x21, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33,
+	0x2e, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65,
+	0x72, 0x73, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02, 0x10, 0x01, 0x52, 0x09, 0x65, 0x6e,
+	0x74, 0x69, 0x74, 0x79, 0x49, 0x64, 0x73, 0x22, 0xb5, 0x02, 0x0a, 0x18, 0x4c, 0x69, 0x73, 0x74,
+	0x55, 0x73, 0x65, 0x72, 0x42, 0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x44, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x73,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72,
+	0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x65, 0x6e,
+	0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02, 0x10,
+	0x01, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x73, 0x12, 0x1e, 0x0a, 0x05, 0x6c, 0x69,
+	0x6d, 0x69, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x2a, 0x03,
+	0x18, 0xe8, 0x07, 0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61,
+	0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x12, 0x7b,
+	0x0a, 0x05, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x65, 0xfa,
+	0x42, 0x62, 0x72, 0x60, 0x52, 0x00, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x52,
+	0x08, 0x2d, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x52, 0x0b, 0x65, 0x6e, 0x74, 0x69, 0x74,
+	0x79, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x52, 0x0c, 0x2d, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x5f,
+	0x74, 0x79, 0x70, 0x65, 0x52, 0x09, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x5f, 0x69, 0x64, 0x52,
+	0x0a, 0x2d, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x5f, 0x69, 0x64, 0x52, 0x0a, 0x63, 0x72, 0x65,
+	0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x52, 0x0b, 0x2d, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x64, 0x5f, 0x61, 0x74, 0x52, 0x05, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x64,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x64, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x64, 0x3a, 0x08, 0xf2, 0xaa, 0x19, 0x04, 0x08, 0x00, 0x10, 0x01, 0x22,
+	0xad, 0x01, 0x0a, 0x19, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x42, 0x6f,
+	0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x44, 0x0a,
+	0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1f, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33,
+	0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73,
+	0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02, 0x10, 0x01, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72,
+	0x49, 0x64, 0x73, 0x12, 0x4a, 0x0a, 0x0a, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x5f, 0x69, 0x64,
+	0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f,
+	0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x49,
+	0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a,
+	0x01, 0x02, 0x10, 0x01, 0x52, 0x09, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x49, 0x64, 0x73, 0x22,
+	0xb5, 0x01, 0x0a, 0x1f, 0x42, 0x61, 0x74, 0x63, 0x68, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x55,
+	0x73, 0x65, 0x72, 0x42, 0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x44, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x73, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61,
+	0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x65, 0x6e, 0x74,
+	0x69, 0x66, 0x69, 0x65, 0x72, 0x73, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02, 0x10, 0x01,
+	0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x73, 0x12, 0x4c, 0x0a, 0x0a, 0x65, 0x6e, 0x74,
+	0x69, 0x74, 0x79, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x21, 0x2e,
+	0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x45,
+	0x6e, 0x74, 0x69, 0x74, 0x79, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73,
+	0x42, 0x0a, 0xfa, 0x42, 0x07, 0x92, 0x01, 0x04, 0x08, 0x01, 0x10, 0x14, 0x52, 0x09, 0x65, 0x6e,
+	0x74, 0x69, 0x74, 0x79, 0x49, 0x64, 0x73, 0x2a, 0x70, 0x0a, 0x0c, 0x43, 0x6f, 0x6e, 0x73, 0x6f,
+	0x6c, 0x65, 0x54, 0x68, 0x65, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x14, 0x43, 0x4f, 0x4e, 0x53, 0x4f,
+	0x4c, 0x45, 0x5f, 0x54, 0x48, 0x45, 0x4d, 0x45, 0x5f, 0x53, 0x59, 0x53, 0x54, 0x45, 0x4d, 0x10,
+	0x00, 0x12, 0x17, 0x0a, 0x13, 0x43, 0x4f, 0x4e, 0x53, 0x4f, 0x4c, 0x45, 0x5f, 0x54, 0x48, 0x45,
+	0x4d, 0x45, 0x5f, 0x4c, 0x49, 0x47, 0x48, 0x54, 0x10, 0x01, 0x12, 0x16, 0x0a, 0x12, 0x43, 0x4f,
+	0x4e, 0x53, 0x4f, 0x4c, 0x45, 0x5f, 0x54, 0x48, 0x45, 0x4d, 0x45, 0x5f, 0x44, 0x41, 0x52, 0x4b,
+	0x10, 0x02, 0x1a, 0x15, 0xea, 0xaa, 0x19, 0x11, 0x18, 0x01, 0x2a, 0x0d, 0x43, 0x4f, 0x4e, 0x53,
+	0x4f, 0x4c, 0x45, 0x5f, 0x54, 0x48, 0x45, 0x4d, 0x45, 0x2a, 0x7d, 0x0a, 0x0f, 0x44, 0x61, 0x73,
+	0x68, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x4c, 0x61, 0x79, 0x6f, 0x75, 0x74, 0x12, 0x1a, 0x0a, 0x16,
+	0x44, 0x41, 0x53, 0x48, 0x42, 0x4f, 0x41, 0x52, 0x44, 0x5f, 0x4c, 0x41, 0x59, 0x4f, 0x55, 0x54,
+	0x5f, 0x54, 0x41, 0x42, 0x4c, 0x45, 0x10, 0x00, 0x12, 0x19, 0x0a, 0x15, 0x44, 0x41, 0x53, 0x48,
+	0x42, 0x4f, 0x41, 0x52, 0x44, 0x5f, 0x4c, 0x41, 0x59, 0x4f, 0x55, 0x54, 0x5f, 0x4c, 0x49, 0x53,
+	0x54, 0x10, 0x01, 0x12, 0x19, 0x0a, 0x15, 0x44, 0x41, 0x53, 0x48, 0x42, 0x4f, 0x41, 0x52, 0x44,
+	0x5f, 0x4c, 0x41, 0x59, 0x4f, 0x55, 0x54, 0x5f, 0x47, 0x52, 0x49, 0x44, 0x10, 0x02, 0x1a, 0x18,
+	0xea, 0xaa, 0x19, 0x14, 0x18, 0x01, 0x2a, 0x10, 0x44, 0x41, 0x53, 0x48, 0x42, 0x4f, 0x41, 0x52,
+	0x44, 0x5f, 0x4c, 0x41, 0x59, 0x4f, 0x55, 0x54, 0x42, 0x31, 0x5a, 0x2f, 0x67, 0x6f, 0x2e, 0x74,
+	0x68, 0x65, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b,
+	0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2d, 0x73, 0x74, 0x61, 0x63, 0x6b, 0x2f, 0x76,
+	0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x74, 0x74, 0x6e, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2654,7 +3085,7 @@ func file_ttn_lorawan_v3_user_proto_rawDescGZIP() []byte {
 }
 
 var file_ttn_lorawan_v3_user_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_ttn_lorawan_v3_user_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_ttn_lorawan_v3_user_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_ttn_lorawan_v3_user_proto_goTypes = []interface{}{
 	(ConsoleTheme)(0),                               // 0: ttn.lorawan.v3.ConsoleTheme
 	(DashboardLayout)(0),                            // 1: ttn.lorawan.v3.DashboardLayout
@@ -2684,84 +3115,102 @@ var file_ttn_lorawan_v3_user_proto_goTypes = []interface{}{
 	(*LoginToken)(nil),                              // 25: ttn.lorawan.v3.LoginToken
 	(*CreateLoginTokenRequest)(nil),                 // 26: ttn.lorawan.v3.CreateLoginTokenRequest
 	(*CreateLoginTokenResponse)(nil),                // 27: ttn.lorawan.v3.CreateLoginTokenResponse
-	(*UserConsolePreferences_DashboardLayouts)(nil), // 28: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts
-	(*UserConsolePreferences_SortBy)(nil),           // 29: ttn.lorawan.v3.UserConsolePreferences.SortBy
-	nil,                                             // 30: ttn.lorawan.v3.User.AttributesEntry
-	(*UserIdentifiers)(nil),                         // 31: ttn.lorawan.v3.UserIdentifiers
-	(*timestamppb.Timestamp)(nil),                   // 32: google.protobuf.Timestamp
-	(*ContactInfo)(nil),                             // 33: ttn.lorawan.v3.ContactInfo
-	(State)(0),                                      // 34: ttn.lorawan.v3.State
-	(*Picture)(nil),                                 // 35: ttn.lorawan.v3.Picture
-	(*fieldmaskpb.FieldMask)(nil),                   // 36: google.protobuf.FieldMask
-	(Right)(0),                                      // 37: ttn.lorawan.v3.Right
-	(*APIKey)(nil),                                  // 38: ttn.lorawan.v3.APIKey
+	(*UserBookmark)(nil),                            // 28: ttn.lorawan.v3.UserBookmark
+	(*UserBookmarks)(nil),                           // 29: ttn.lorawan.v3.UserBookmarks
+	(*CreateUserBookmarkRequest)(nil),               // 30: ttn.lorawan.v3.CreateUserBookmarkRequest
+	(*ListUserBookmarksRequest)(nil),                // 31: ttn.lorawan.v3.ListUserBookmarksRequest
+	(*DeleteUserBookmarkRequest)(nil),               // 32: ttn.lorawan.v3.DeleteUserBookmarkRequest
+	(*BatchDeleteUserBookmarksRequest)(nil),         // 33: ttn.lorawan.v3.BatchDeleteUserBookmarksRequest
+	(*UserConsolePreferences_DashboardLayouts)(nil), // 34: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts
+	(*UserConsolePreferences_SortBy)(nil),           // 35: ttn.lorawan.v3.UserConsolePreferences.SortBy
+	nil,                                             // 36: ttn.lorawan.v3.User.AttributesEntry
+	(*UserIdentifiers)(nil),                         // 37: ttn.lorawan.v3.UserIdentifiers
+	(*timestamppb.Timestamp)(nil),                   // 38: google.protobuf.Timestamp
+	(*ContactInfo)(nil),                             // 39: ttn.lorawan.v3.ContactInfo
+	(State)(0),                                      // 40: ttn.lorawan.v3.State
+	(*Picture)(nil),                                 // 41: ttn.lorawan.v3.Picture
+	(*fieldmaskpb.FieldMask)(nil),                   // 42: google.protobuf.FieldMask
+	(Right)(0),                                      // 43: ttn.lorawan.v3.Right
+	(*APIKey)(nil),                                  // 44: ttn.lorawan.v3.APIKey
+	(*EntityIdentifiers)(nil),                       // 45: ttn.lorawan.v3.EntityIdentifiers
 }
 var file_ttn_lorawan_v3_user_proto_depIdxs = []int32{
 	0,  // 0: ttn.lorawan.v3.UserConsolePreferences.console_theme:type_name -> ttn.lorawan.v3.ConsoleTheme
-	28, // 1: ttn.lorawan.v3.UserConsolePreferences.dashboard_layouts:type_name -> ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts
-	29, // 2: ttn.lorawan.v3.UserConsolePreferences.sort_by:type_name -> ttn.lorawan.v3.UserConsolePreferences.SortBy
-	31, // 3: ttn.lorawan.v3.User.ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	32, // 4: ttn.lorawan.v3.User.created_at:type_name -> google.protobuf.Timestamp
-	32, // 5: ttn.lorawan.v3.User.updated_at:type_name -> google.protobuf.Timestamp
-	32, // 6: ttn.lorawan.v3.User.deleted_at:type_name -> google.protobuf.Timestamp
-	30, // 7: ttn.lorawan.v3.User.attributes:type_name -> ttn.lorawan.v3.User.AttributesEntry
-	33, // 8: ttn.lorawan.v3.User.contact_info:type_name -> ttn.lorawan.v3.ContactInfo
-	32, // 9: ttn.lorawan.v3.User.primary_email_address_validated_at:type_name -> google.protobuf.Timestamp
-	32, // 10: ttn.lorawan.v3.User.password_updated_at:type_name -> google.protobuf.Timestamp
-	34, // 11: ttn.lorawan.v3.User.state:type_name -> ttn.lorawan.v3.State
-	32, // 12: ttn.lorawan.v3.User.temporary_password_created_at:type_name -> google.protobuf.Timestamp
-	32, // 13: ttn.lorawan.v3.User.temporary_password_expires_at:type_name -> google.protobuf.Timestamp
-	35, // 14: ttn.lorawan.v3.User.profile_picture:type_name -> ttn.lorawan.v3.Picture
+	34, // 1: ttn.lorawan.v3.UserConsolePreferences.dashboard_layouts:type_name -> ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts
+	35, // 2: ttn.lorawan.v3.UserConsolePreferences.sort_by:type_name -> ttn.lorawan.v3.UserConsolePreferences.SortBy
+	37, // 3: ttn.lorawan.v3.User.ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	38, // 4: ttn.lorawan.v3.User.created_at:type_name -> google.protobuf.Timestamp
+	38, // 5: ttn.lorawan.v3.User.updated_at:type_name -> google.protobuf.Timestamp
+	38, // 6: ttn.lorawan.v3.User.deleted_at:type_name -> google.protobuf.Timestamp
+	36, // 7: ttn.lorawan.v3.User.attributes:type_name -> ttn.lorawan.v3.User.AttributesEntry
+	39, // 8: ttn.lorawan.v3.User.contact_info:type_name -> ttn.lorawan.v3.ContactInfo
+	38, // 9: ttn.lorawan.v3.User.primary_email_address_validated_at:type_name -> google.protobuf.Timestamp
+	38, // 10: ttn.lorawan.v3.User.password_updated_at:type_name -> google.protobuf.Timestamp
+	40, // 11: ttn.lorawan.v3.User.state:type_name -> ttn.lorawan.v3.State
+	38, // 12: ttn.lorawan.v3.User.temporary_password_created_at:type_name -> google.protobuf.Timestamp
+	38, // 13: ttn.lorawan.v3.User.temporary_password_expires_at:type_name -> google.protobuf.Timestamp
+	41, // 14: ttn.lorawan.v3.User.profile_picture:type_name -> ttn.lorawan.v3.Picture
 	2,  // 15: ttn.lorawan.v3.User.console_preferences:type_name -> ttn.lorawan.v3.UserConsolePreferences
 	3,  // 16: ttn.lorawan.v3.Users.users:type_name -> ttn.lorawan.v3.User
-	31, // 17: ttn.lorawan.v3.GetUserRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	36, // 18: ttn.lorawan.v3.GetUserRequest.field_mask:type_name -> google.protobuf.FieldMask
-	36, // 19: ttn.lorawan.v3.ListUsersRequest.field_mask:type_name -> google.protobuf.FieldMask
+	37, // 17: ttn.lorawan.v3.GetUserRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	42, // 18: ttn.lorawan.v3.GetUserRequest.field_mask:type_name -> google.protobuf.FieldMask
+	42, // 19: ttn.lorawan.v3.ListUsersRequest.field_mask:type_name -> google.protobuf.FieldMask
 	3,  // 20: ttn.lorawan.v3.CreateUserRequest.user:type_name -> ttn.lorawan.v3.User
 	3,  // 21: ttn.lorawan.v3.UpdateUserRequest.user:type_name -> ttn.lorawan.v3.User
-	36, // 22: ttn.lorawan.v3.UpdateUserRequest.field_mask:type_name -> google.protobuf.FieldMask
-	31, // 23: ttn.lorawan.v3.CreateTemporaryPasswordRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	31, // 24: ttn.lorawan.v3.UpdateUserPasswordRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	31, // 25: ttn.lorawan.v3.ListUserAPIKeysRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	31, // 26: ttn.lorawan.v3.GetUserAPIKeyRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	31, // 27: ttn.lorawan.v3.CreateUserAPIKeyRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	37, // 28: ttn.lorawan.v3.CreateUserAPIKeyRequest.rights:type_name -> ttn.lorawan.v3.Right
-	32, // 29: ttn.lorawan.v3.CreateUserAPIKeyRequest.expires_at:type_name -> google.protobuf.Timestamp
-	31, // 30: ttn.lorawan.v3.UpdateUserAPIKeyRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	38, // 31: ttn.lorawan.v3.UpdateUserAPIKeyRequest.api_key:type_name -> ttn.lorawan.v3.APIKey
-	36, // 32: ttn.lorawan.v3.UpdateUserAPIKeyRequest.field_mask:type_name -> google.protobuf.FieldMask
-	31, // 33: ttn.lorawan.v3.DeleteUserAPIKeyRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	32, // 34: ttn.lorawan.v3.Invitation.expires_at:type_name -> google.protobuf.Timestamp
-	32, // 35: ttn.lorawan.v3.Invitation.created_at:type_name -> google.protobuf.Timestamp
-	32, // 36: ttn.lorawan.v3.Invitation.updated_at:type_name -> google.protobuf.Timestamp
-	32, // 37: ttn.lorawan.v3.Invitation.accepted_at:type_name -> google.protobuf.Timestamp
-	31, // 38: ttn.lorawan.v3.Invitation.accepted_by:type_name -> ttn.lorawan.v3.UserIdentifiers
+	42, // 22: ttn.lorawan.v3.UpdateUserRequest.field_mask:type_name -> google.protobuf.FieldMask
+	37, // 23: ttn.lorawan.v3.CreateTemporaryPasswordRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	37, // 24: ttn.lorawan.v3.UpdateUserPasswordRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	37, // 25: ttn.lorawan.v3.ListUserAPIKeysRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	37, // 26: ttn.lorawan.v3.GetUserAPIKeyRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	37, // 27: ttn.lorawan.v3.CreateUserAPIKeyRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	43, // 28: ttn.lorawan.v3.CreateUserAPIKeyRequest.rights:type_name -> ttn.lorawan.v3.Right
+	38, // 29: ttn.lorawan.v3.CreateUserAPIKeyRequest.expires_at:type_name -> google.protobuf.Timestamp
+	37, // 30: ttn.lorawan.v3.UpdateUserAPIKeyRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	44, // 31: ttn.lorawan.v3.UpdateUserAPIKeyRequest.api_key:type_name -> ttn.lorawan.v3.APIKey
+	42, // 32: ttn.lorawan.v3.UpdateUserAPIKeyRequest.field_mask:type_name -> google.protobuf.FieldMask
+	37, // 33: ttn.lorawan.v3.DeleteUserAPIKeyRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	38, // 34: ttn.lorawan.v3.Invitation.expires_at:type_name -> google.protobuf.Timestamp
+	38, // 35: ttn.lorawan.v3.Invitation.created_at:type_name -> google.protobuf.Timestamp
+	38, // 36: ttn.lorawan.v3.Invitation.updated_at:type_name -> google.protobuf.Timestamp
+	38, // 37: ttn.lorawan.v3.Invitation.accepted_at:type_name -> google.protobuf.Timestamp
+	37, // 38: ttn.lorawan.v3.Invitation.accepted_by:type_name -> ttn.lorawan.v3.UserIdentifiers
 	16, // 39: ttn.lorawan.v3.Invitations.invitations:type_name -> ttn.lorawan.v3.Invitation
-	31, // 40: ttn.lorawan.v3.UserSessionIdentifiers.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	31, // 41: ttn.lorawan.v3.UserSession.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	32, // 42: ttn.lorawan.v3.UserSession.created_at:type_name -> google.protobuf.Timestamp
-	32, // 43: ttn.lorawan.v3.UserSession.updated_at:type_name -> google.protobuf.Timestamp
-	32, // 44: ttn.lorawan.v3.UserSession.expires_at:type_name -> google.protobuf.Timestamp
+	37, // 40: ttn.lorawan.v3.UserSessionIdentifiers.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	37, // 41: ttn.lorawan.v3.UserSession.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	38, // 42: ttn.lorawan.v3.UserSession.created_at:type_name -> google.protobuf.Timestamp
+	38, // 43: ttn.lorawan.v3.UserSession.updated_at:type_name -> google.protobuf.Timestamp
+	38, // 44: ttn.lorawan.v3.UserSession.expires_at:type_name -> google.protobuf.Timestamp
 	22, // 45: ttn.lorawan.v3.UserSessions.sessions:type_name -> ttn.lorawan.v3.UserSession
-	31, // 46: ttn.lorawan.v3.ListUserSessionsRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	31, // 47: ttn.lorawan.v3.LoginToken.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	32, // 48: ttn.lorawan.v3.LoginToken.created_at:type_name -> google.protobuf.Timestamp
-	32, // 49: ttn.lorawan.v3.LoginToken.updated_at:type_name -> google.protobuf.Timestamp
-	32, // 50: ttn.lorawan.v3.LoginToken.expires_at:type_name -> google.protobuf.Timestamp
-	31, // 51: ttn.lorawan.v3.CreateLoginTokenRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
-	1,  // 52: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.api_key:type_name -> ttn.lorawan.v3.DashboardLayout
-	1,  // 53: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.application:type_name -> ttn.lorawan.v3.DashboardLayout
-	1,  // 54: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.collaborator:type_name -> ttn.lorawan.v3.DashboardLayout
-	1,  // 55: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.end_device:type_name -> ttn.lorawan.v3.DashboardLayout
-	1,  // 56: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.gateway:type_name -> ttn.lorawan.v3.DashboardLayout
-	1,  // 57: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.organization:type_name -> ttn.lorawan.v3.DashboardLayout
-	1,  // 58: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.overview:type_name -> ttn.lorawan.v3.DashboardLayout
-	1,  // 59: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.user:type_name -> ttn.lorawan.v3.DashboardLayout
-	60, // [60:60] is the sub-list for method output_type
-	60, // [60:60] is the sub-list for method input_type
-	60, // [60:60] is the sub-list for extension type_name
-	60, // [60:60] is the sub-list for extension extendee
-	0,  // [0:60] is the sub-list for field type_name
+	37, // 46: ttn.lorawan.v3.ListUserSessionsRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	37, // 47: ttn.lorawan.v3.LoginToken.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	38, // 48: ttn.lorawan.v3.LoginToken.created_at:type_name -> google.protobuf.Timestamp
+	38, // 49: ttn.lorawan.v3.LoginToken.updated_at:type_name -> google.protobuf.Timestamp
+	38, // 50: ttn.lorawan.v3.LoginToken.expires_at:type_name -> google.protobuf.Timestamp
+	37, // 51: ttn.lorawan.v3.CreateLoginTokenRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	37, // 52: ttn.lorawan.v3.UserBookmark.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	45, // 53: ttn.lorawan.v3.UserBookmark.entity_ids:type_name -> ttn.lorawan.v3.EntityIdentifiers
+	38, // 54: ttn.lorawan.v3.UserBookmark.created_at:type_name -> google.protobuf.Timestamp
+	28, // 55: ttn.lorawan.v3.UserBookmarks.bookmarks:type_name -> ttn.lorawan.v3.UserBookmark
+	37, // 56: ttn.lorawan.v3.CreateUserBookmarkRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	45, // 57: ttn.lorawan.v3.CreateUserBookmarkRequest.entity_ids:type_name -> ttn.lorawan.v3.EntityIdentifiers
+	37, // 58: ttn.lorawan.v3.ListUserBookmarksRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	37, // 59: ttn.lorawan.v3.DeleteUserBookmarkRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	45, // 60: ttn.lorawan.v3.DeleteUserBookmarkRequest.entity_ids:type_name -> ttn.lorawan.v3.EntityIdentifiers
+	37, // 61: ttn.lorawan.v3.BatchDeleteUserBookmarksRequest.user_ids:type_name -> ttn.lorawan.v3.UserIdentifiers
+	45, // 62: ttn.lorawan.v3.BatchDeleteUserBookmarksRequest.entity_ids:type_name -> ttn.lorawan.v3.EntityIdentifiers
+	1,  // 63: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.api_key:type_name -> ttn.lorawan.v3.DashboardLayout
+	1,  // 64: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.application:type_name -> ttn.lorawan.v3.DashboardLayout
+	1,  // 65: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.collaborator:type_name -> ttn.lorawan.v3.DashboardLayout
+	1,  // 66: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.end_device:type_name -> ttn.lorawan.v3.DashboardLayout
+	1,  // 67: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.gateway:type_name -> ttn.lorawan.v3.DashboardLayout
+	1,  // 68: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.organization:type_name -> ttn.lorawan.v3.DashboardLayout
+	1,  // 69: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.overview:type_name -> ttn.lorawan.v3.DashboardLayout
+	1,  // 70: ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts.user:type_name -> ttn.lorawan.v3.DashboardLayout
+	71, // [71:71] is the sub-list for method output_type
+	71, // [71:71] is the sub-list for method input_type
+	71, // [71:71] is the sub-list for extension type_name
+	71, // [71:71] is the sub-list for extension extendee
+	0,  // [0:71] is the sub-list for field type_name
 }
 
 func init() { file_ttn_lorawan_v3_user_proto_init() }
@@ -3088,7 +3537,7 @@ func file_ttn_lorawan_v3_user_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_user_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserConsolePreferences_DashboardLayouts); i {
+			switch v := v.(*UserBookmark); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3100,6 +3549,78 @@ func file_ttn_lorawan_v3_user_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_user_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserBookmarks); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ttn_lorawan_v3_user_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateUserBookmarkRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ttn_lorawan_v3_user_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListUserBookmarksRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ttn_lorawan_v3_user_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteUserBookmarkRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ttn_lorawan_v3_user_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*BatchDeleteUserBookmarksRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ttn_lorawan_v3_user_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserConsolePreferences_DashboardLayouts); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ttn_lorawan_v3_user_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UserConsolePreferences_SortBy); i {
 			case 0:
 				return &v.state
@@ -3118,7 +3639,7 @@ func file_ttn_lorawan_v3_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_ttn_lorawan_v3_user_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   29,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

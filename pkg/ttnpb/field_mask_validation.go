@@ -1753,6 +1753,12 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		Set:     true,
 	},
 
+	// User Bookmarks:
+	"/ttn.lorawan.v3.UserBookmarkRegistry/List": {
+		All:     UserBookmarkFieldPathsNested,
+		Allowed: UserBookmarkFieldPathsNested,
+	},
+
 	// Storage Integration:
 	"/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp": {
 		All:     ApplicationUpFieldPathsNested,

@@ -508,3 +508,62 @@ message CreateLoginTokenResponse {
   // This field is only present if a token was created by an admin user for a non-admin user.
   string token = 1;
 }
+
+message UserBookmark {
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
+  EntityIdentifiers entity_ids = 2 [(validate.rules).message.required = true];
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message UserBookmarks {
+  repeated UserBookmark bookmarks = 1;
+}
+
+message CreateUserBookmarkRequest {
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
+  EntityIdentifiers entity_ids = 2 [(validate.rules).message.required = true];
+}
+
+message ListUserBookmarksRequest {
+  option (thethings.flags.message) = {
+    select: false,
+    set: true
+  };
+
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
+  // Limit the number of results per page.
+  uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 3;
+  // Order the results by this field path.
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 4 [(validate.rules).string = {
+    in: [
+      "",
+      "user_id",
+      "-user_id",
+      "entity_type",
+      "-entity_type",
+      "entity_id",
+      "-entity_id",
+      "created_at",
+      "-created_at"
+    ]
+  }];
+
+  // Only return recently deleted bookmarks.
+  bool deleted = 5;
+}
+
+message DeleteUserBookmarkRequest {
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
+  EntityIdentifiers entity_ids = 2 [(validate.rules).message.required = true];
+}
+
+message BatchDeleteUserBookmarksRequest {
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
+  repeated EntityIdentifiers entity_ids = 2 [(validate.rules).repeated = {
+    min_items: 1,
+    max_items: 20,
+  }];
+}

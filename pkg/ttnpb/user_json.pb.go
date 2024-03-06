@@ -1134,3 +1134,351 @@ func (x *UpdateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 func (x *UpdateUserAPIKeyRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the UserBookmark message to JSON.
+func (x *UserBookmark) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UserIds != nil || s.HasField("user_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user_ids")
+		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.UserIds)
+	}
+	if x.EntityIds != nil || s.HasField("entity_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_ids")
+		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
+	}
+	if x.CreatedAt != nil || s.HasField("created_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("created_at")
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalTimestamp(s, x.CreatedAt)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UserBookmark to JSON.
+func (x *UserBookmark) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UserBookmark message from JSON.
+func (x *UserBookmark) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "user_ids", "userIds":
+			s.AddField("user_ids")
+			if s.ReadNil() {
+				x.UserIds = nil
+				return
+			}
+			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v UserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.UserIds = &v
+		case "entity_ids", "entityIds":
+			if s.ReadNil() {
+				x.EntityIds = nil
+				return
+			}
+			x.EntityIds = &EntityIdentifiers{}
+			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
+		case "created_at", "createdAt":
+			s.AddField("created_at")
+			if s.ReadNil() {
+				x.CreatedAt = nil
+				return
+			}
+			v := golang.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.CreatedAt = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UserBookmark from JSON.
+func (x *UserBookmark) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UserBookmarks message to JSON.
+func (x *UserBookmarks) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Bookmarks) > 0 || s.HasField("bookmarks") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("bookmarks")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Bookmarks {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("bookmarks"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UserBookmarks to JSON.
+func (x *UserBookmarks) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UserBookmarks message from JSON.
+func (x *UserBookmarks) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "bookmarks":
+			s.AddField("bookmarks")
+			if s.ReadNil() {
+				x.Bookmarks = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Bookmarks = append(x.Bookmarks, nil)
+					return
+				}
+				v := &UserBookmark{}
+				v.UnmarshalProtoJSON(s.WithField("bookmarks", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Bookmarks = append(x.Bookmarks, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UserBookmarks from JSON.
+func (x *UserBookmarks) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the CreateUserBookmarkRequest message to JSON.
+func (x *CreateUserBookmarkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UserIds != nil || s.HasField("user_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user_ids")
+		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.UserIds)
+	}
+	if x.EntityIds != nil || s.HasField("entity_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_ids")
+		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the CreateUserBookmarkRequest to JSON.
+func (x *CreateUserBookmarkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the CreateUserBookmarkRequest message from JSON.
+func (x *CreateUserBookmarkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "user_ids", "userIds":
+			s.AddField("user_ids")
+			if s.ReadNil() {
+				x.UserIds = nil
+				return
+			}
+			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v UserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.UserIds = &v
+		case "entity_ids", "entityIds":
+			if s.ReadNil() {
+				x.EntityIds = nil
+				return
+			}
+			x.EntityIds = &EntityIdentifiers{}
+			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the CreateUserBookmarkRequest from JSON.
+func (x *CreateUserBookmarkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the DeleteUserBookmarkRequest message to JSON.
+func (x *DeleteUserBookmarkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UserIds != nil || s.HasField("user_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user_ids")
+		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.UserIds)
+	}
+	if x.EntityIds != nil || s.HasField("entity_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_ids")
+		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DeleteUserBookmarkRequest to JSON.
+func (x *DeleteUserBookmarkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the DeleteUserBookmarkRequest message from JSON.
+func (x *DeleteUserBookmarkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "user_ids", "userIds":
+			s.AddField("user_ids")
+			if s.ReadNil() {
+				x.UserIds = nil
+				return
+			}
+			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v UserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.UserIds = &v
+		case "entity_ids", "entityIds":
+			if s.ReadNil() {
+				x.EntityIds = nil
+				return
+			}
+			x.EntityIds = &EntityIdentifiers{}
+			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the DeleteUserBookmarkRequest from JSON.
+func (x *DeleteUserBookmarkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BatchDeleteUserBookmarksRequest message to JSON.
+func (x *BatchDeleteUserBookmarksRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UserIds != nil || s.HasField("user_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user_ids")
+		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.UserIds)
+	}
+	if len(x.EntityIds) > 0 || s.HasField("entity_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_ids")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.EntityIds {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("entity_ids"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchDeleteUserBookmarksRequest to JSON.
+func (x *BatchDeleteUserBookmarksRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchDeleteUserBookmarksRequest message from JSON.
+func (x *BatchDeleteUserBookmarksRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "user_ids", "userIds":
+			s.AddField("user_ids")
+			if s.ReadNil() {
+				x.UserIds = nil
+				return
+			}
+			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v UserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.UserIds = &v
+		case "entity_ids", "entityIds":
+			s.AddField("entity_ids")
+			if s.ReadNil() {
+				x.EntityIds = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.EntityIds = append(x.EntityIds, nil)
+					return
+				}
+				v := &EntityIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("entity_ids", false))
+				if s.Err() != nil {
+					return
+				}
+				x.EntityIds = append(x.EntityIds, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchDeleteUserBookmarksRequest from JSON.
+func (x *BatchDeleteUserBookmarksRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

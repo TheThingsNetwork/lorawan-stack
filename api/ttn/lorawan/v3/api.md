@@ -749,19 +749,23 @@
   - [Message `SimulateJoinRequestParams`](#ttn.lorawan.v3.SimulateJoinRequestParams)
   - [Message `SimulateMetadataParams`](#ttn.lorawan.v3.SimulateMetadataParams)
 - [File `ttn/lorawan/v3/user.proto`](#ttn/lorawan/v3/user.proto)
+  - [Message `BatchDeleteUserBookmarksRequest`](#ttn.lorawan.v3.BatchDeleteUserBookmarksRequest)
   - [Message `CreateLoginTokenRequest`](#ttn.lorawan.v3.CreateLoginTokenRequest)
   - [Message `CreateLoginTokenResponse`](#ttn.lorawan.v3.CreateLoginTokenResponse)
   - [Message `CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest)
   - [Message `CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest)
+  - [Message `CreateUserBookmarkRequest`](#ttn.lorawan.v3.CreateUserBookmarkRequest)
   - [Message `CreateUserRequest`](#ttn.lorawan.v3.CreateUserRequest)
   - [Message `DeleteInvitationRequest`](#ttn.lorawan.v3.DeleteInvitationRequest)
   - [Message `DeleteUserAPIKeyRequest`](#ttn.lorawan.v3.DeleteUserAPIKeyRequest)
+  - [Message `DeleteUserBookmarkRequest`](#ttn.lorawan.v3.DeleteUserBookmarkRequest)
   - [Message `GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest)
   - [Message `GetUserRequest`](#ttn.lorawan.v3.GetUserRequest)
   - [Message `Invitation`](#ttn.lorawan.v3.Invitation)
   - [Message `Invitations`](#ttn.lorawan.v3.Invitations)
   - [Message `ListInvitationsRequest`](#ttn.lorawan.v3.ListInvitationsRequest)
   - [Message `ListUserAPIKeysRequest`](#ttn.lorawan.v3.ListUserAPIKeysRequest)
+  - [Message `ListUserBookmarksRequest`](#ttn.lorawan.v3.ListUserBookmarksRequest)
   - [Message `ListUserSessionsRequest`](#ttn.lorawan.v3.ListUserSessionsRequest)
   - [Message `ListUsersRequest`](#ttn.lorawan.v3.ListUsersRequest)
   - [Message `LoginToken`](#ttn.lorawan.v3.LoginToken)
@@ -771,6 +775,8 @@
   - [Message `UpdateUserRequest`](#ttn.lorawan.v3.UpdateUserRequest)
   - [Message `User`](#ttn.lorawan.v3.User)
   - [Message `User.AttributesEntry`](#ttn.lorawan.v3.User.AttributesEntry)
+  - [Message `UserBookmark`](#ttn.lorawan.v3.UserBookmark)
+  - [Message `UserBookmarks`](#ttn.lorawan.v3.UserBookmarks)
   - [Message `UserConsolePreferences`](#ttn.lorawan.v3.UserConsolePreferences)
   - [Message `UserConsolePreferences.DashboardLayouts`](#ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts)
   - [Message `UserConsolePreferences.SortBy`](#ttn.lorawan.v3.UserConsolePreferences.SortBy)
@@ -782,6 +788,7 @@
   - [Enum `DashboardLayout`](#ttn.lorawan.v3.DashboardLayout)
 - [File `ttn/lorawan/v3/user_services.proto`](#ttn/lorawan/v3/user_services.proto)
   - [Service `UserAccess`](#ttn.lorawan.v3.UserAccess)
+  - [Service `UserBookmarkRegistry`](#ttn.lorawan.v3.UserBookmarkRegistry)
   - [Service `UserInvitationRegistry`](#ttn.lorawan.v3.UserInvitationRegistry)
   - [Service `UserRegistry`](#ttn.lorawan.v3.UserRegistry)
   - [Service `UserSessionRegistry`](#ttn.lorawan.v3.UserSessionRegistry)
@@ -10581,6 +10588,20 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 
 ## <a name="ttn/lorawan/v3/user.proto">File `ttn/lorawan/v3/user.proto`</a>
 
+### <a name="ttn.lorawan.v3.BatchDeleteUserBookmarksRequest">Message `BatchDeleteUserBookmarksRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `entity_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
+
 ### <a name="ttn.lorawan.v3.CreateLoginTokenRequest">Message `CreateLoginTokenRequest`</a>
 
 | Field | Type | Label | Description |
@@ -10630,6 +10651,20 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 | `expires_at` | <p>`timestamp.gt_now`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.CreateUserBookmarkRequest">Message `CreateUserBookmarkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `entity_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.CreateUserRequest">Message `CreateUserRequest`</a>
 
 | Field | Type | Label | Description |
@@ -10667,6 +10702,20 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | Field | Validations |
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DeleteUserBookmarkRequest">Message `DeleteUserBookmarkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `entity_ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GetUserAPIKeyRequest">Message `GetUserAPIKeyRequest`</a>
 
@@ -10747,6 +10796,24 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `order` | <p>`string.in`: `[ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.ListUserBookmarksRequest">Message `ListUserBookmarksRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `order` | [`string`](#string) |  | Order the results by this field path. Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted bookmarks. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+| `order` | <p>`string.in`: `[ user_id -user_id entity_type -entity_type entity_id -entity_id created_at -created_at]`</p> |
 
 ### <a name="ttn.lorawan.v3.ListUserSessionsRequest">Message `ListUserSessionsRequest`</a>
 
@@ -10906,6 +10973,27 @@ User is the message that defines a user on the network.
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
 
+### <a name="ttn.lorawan.v3.UserBookmark">Message `UserBookmark`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  |  |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `entity_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UserBookmarks">Message `UserBookmarks`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `bookmarks` | [`UserBookmark`](#ttn.lorawan.v3.UserBookmark) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.UserConsolePreferences">Message `UserConsolePreferences`</a>
 
 UserConsolePreferences is the message that defines the user preferences for the Console.
@@ -11047,6 +11135,29 @@ API keys of users.
 | `UpdateAPIKey` | `PUT` | `/api/v3/users/{user_ids.user_id}/api-keys/{api_key.id}` | `*` |
 | `DeleteAPIKey` | `DELETE` | `/api/v3/users/{user_ids.user_id}/api-keys/{key_id}` |  |
 | `CreateLoginToken` | `POST` | `/api/v3/users/{user_ids.user_id}/login-tokens` |  |
+
+### <a name="ttn.lorawan.v3.UserBookmarkRegistry">Service `UserBookmarkRegistry`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Create` | [`CreateUserBookmarkRequest`](#ttn.lorawan.v3.CreateUserBookmarkRequest) | [`UserBookmark`](#ttn.lorawan.v3.UserBookmark) | Create a bookmark for the given user. |
+| `List` | [`ListUserBookmarksRequest`](#ttn.lorawan.v3.ListUserBookmarksRequest) | [`UserBookmarks`](#ttn.lorawan.v3.UserBookmarks) | List the bookmarks for the given user. |
+| `Delete` | [`DeleteUserBookmarkRequest`](#ttn.lorawan.v3.DeleteUserBookmarkRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the given user's bookmark. |
+| `BatchDelete` | [`BatchDeleteUserBookmarksRequest`](#ttn.lorawan.v3.BatchDeleteUserBookmarksRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a list of bookmarks of the given user. This operation is atomic; either all bookmarks are deleted or none. Bookmarks not found are skipped and no error is returned. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Create` | `POST` | `/api/v3/users/bookmarks` | `*` |
+| `List` | `GET` | `/api/v3/users/{user_ids.user_id}/bookmarks` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.application_ids.application_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/clients/{entity_ids.client_ids.client_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/gateways/{entity_ids.gateway_ids.gateway_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/organizations/{entity_ids.organization_ids.organization_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/users/{entity_ids.user_ids.user_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.device_ids.application_ids.application_id}/devices/{entity_ids.device_ids.device_id}` |  |
+| `BatchDelete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/batch` |  |
 
 ### <a name="ttn.lorawan.v3.UserInvitationRegistry">Service `UserInvitationRegistry`</a>
 

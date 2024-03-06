@@ -326,6 +326,9 @@ func (is *IdentityServer) deleteOrganization(
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		if err := st.DeleteEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		return st.DeleteOrganization(ctx, ids)
 	})
 	if err != nil {
@@ -356,6 +359,9 @@ func (is *IdentityServer) restoreOrganization(
 		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
 		}
+		if err := st.RestoreEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		return st.RestoreOrganization(ctx, ids)
 	})
 	if err != nil {
@@ -380,6 +386,9 @@ func (is *IdentityServer) purgeOrganization(
 		}
 		err = st.DeleteAccountMembers(ctx, ids.GetOrganizationOrUserIdentifiers())
 		if err != nil {
+			return err
+		}
+		if err := st.PurgeEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
 			return err
 		}
 		return st.PurgeOrganization(ctx, ids)

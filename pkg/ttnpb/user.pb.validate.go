@@ -3396,6 +3396,731 @@ var _ interface {
 	ErrorName() string
 } = CreateLoginTokenResponseValidationError{}
 
+// ValidateFields checks the field values on UserBookmark with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UserBookmark) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = UserBookmarkFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if m.GetUserIds() == nil {
+				return UserBookmarkValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UserBookmarkValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "entity_ids":
+
+			if m.GetEntityIds() == nil {
+				return UserBookmarkValidationError{
+					field:  "entity_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEntityIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UserBookmarkValidationError{
+						field:  "entity_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "created_at":
+
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UserBookmarkValidationError{
+						field:  "created_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return UserBookmarkValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// UserBookmarkValidationError is the validation error returned by
+// UserBookmark.ValidateFields if the designated constraints aren't met.
+type UserBookmarkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UserBookmarkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UserBookmarkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UserBookmarkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UserBookmarkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UserBookmarkValidationError) ErrorName() string { return "UserBookmarkValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UserBookmarkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUserBookmark.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UserBookmarkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UserBookmarkValidationError{}
+
+// ValidateFields checks the field values on UserBookmarks with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UserBookmarks) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = UserBookmarksFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "bookmarks":
+
+			for idx, item := range m.GetBookmarks() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return UserBookmarksValidationError{
+							field:  fmt.Sprintf("bookmarks[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return UserBookmarksValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// UserBookmarksValidationError is the validation error returned by
+// UserBookmarks.ValidateFields if the designated constraints aren't met.
+type UserBookmarksValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UserBookmarksValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UserBookmarksValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UserBookmarksValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UserBookmarksValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UserBookmarksValidationError) ErrorName() string { return "UserBookmarksValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UserBookmarksValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUserBookmarks.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UserBookmarksValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UserBookmarksValidationError{}
+
+// ValidateFields checks the field values on CreateUserBookmarkRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateUserBookmarkRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CreateUserBookmarkRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if m.GetUserIds() == nil {
+				return CreateUserBookmarkRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return CreateUserBookmarkRequestValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "entity_ids":
+
+			if m.GetEntityIds() == nil {
+				return CreateUserBookmarkRequestValidationError{
+					field:  "entity_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEntityIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return CreateUserBookmarkRequestValidationError{
+						field:  "entity_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return CreateUserBookmarkRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CreateUserBookmarkRequestValidationError is the validation error returned by
+// CreateUserBookmarkRequest.ValidateFields if the designated constraints
+// aren't met.
+type CreateUserBookmarkRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateUserBookmarkRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateUserBookmarkRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateUserBookmarkRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateUserBookmarkRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateUserBookmarkRequestValidationError) ErrorName() string {
+	return "CreateUserBookmarkRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateUserBookmarkRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateUserBookmarkRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateUserBookmarkRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateUserBookmarkRequestValidationError{}
+
+// ValidateFields checks the field values on ListUserBookmarksRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListUserBookmarksRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListUserBookmarksRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if m.GetUserIds() == nil {
+				return ListUserBookmarksRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListUserBookmarksRequestValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListUserBookmarksRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		case "order":
+
+			if _, ok := _ListUserBookmarksRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListUserBookmarksRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ user_id -user_id entity_type -entity_type entity_id -entity_id created_at -created_at]",
+				}
+			}
+
+		case "deleted":
+			// no validation rules for Deleted
+		default:
+			return ListUserBookmarksRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListUserBookmarksRequestValidationError is the validation error returned by
+// ListUserBookmarksRequest.ValidateFields if the designated constraints
+// aren't met.
+type ListUserBookmarksRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListUserBookmarksRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListUserBookmarksRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListUserBookmarksRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListUserBookmarksRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListUserBookmarksRequestValidationError) ErrorName() string {
+	return "ListUserBookmarksRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListUserBookmarksRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListUserBookmarksRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListUserBookmarksRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListUserBookmarksRequestValidationError{}
+
+var _ListUserBookmarksRequest_Order_InLookup = map[string]struct{}{
+	"":             {},
+	"user_id":      {},
+	"-user_id":     {},
+	"entity_type":  {},
+	"-entity_type": {},
+	"entity_id":    {},
+	"-entity_id":   {},
+	"created_at":   {},
+	"-created_at":  {},
+}
+
+// ValidateFields checks the field values on DeleteUserBookmarkRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DeleteUserBookmarkRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DeleteUserBookmarkRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if m.GetUserIds() == nil {
+				return DeleteUserBookmarkRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteUserBookmarkRequestValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "entity_ids":
+
+			if m.GetEntityIds() == nil {
+				return DeleteUserBookmarkRequestValidationError{
+					field:  "entity_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEntityIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteUserBookmarkRequestValidationError{
+						field:  "entity_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return DeleteUserBookmarkRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DeleteUserBookmarkRequestValidationError is the validation error returned by
+// DeleteUserBookmarkRequest.ValidateFields if the designated constraints
+// aren't met.
+type DeleteUserBookmarkRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteUserBookmarkRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteUserBookmarkRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteUserBookmarkRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteUserBookmarkRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteUserBookmarkRequestValidationError) ErrorName() string {
+	return "DeleteUserBookmarkRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteUserBookmarkRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteUserBookmarkRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteUserBookmarkRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteUserBookmarkRequestValidationError{}
+
+// ValidateFields checks the field values on BatchDeleteUserBookmarksRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *BatchDeleteUserBookmarksRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BatchDeleteUserBookmarksRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if m.GetUserIds() == nil {
+				return BatchDeleteUserBookmarksRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BatchDeleteUserBookmarksRequestValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "entity_ids":
+
+			if l := len(m.GetEntityIds()); l < 1 || l > 20 {
+				return BatchDeleteUserBookmarksRequestValidationError{
+					field:  "entity_ids",
+					reason: "value must contain between 1 and 20 items, inclusive",
+				}
+			}
+
+			for idx, item := range m.GetEntityIds() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return BatchDeleteUserBookmarksRequestValidationError{
+							field:  fmt.Sprintf("entity_ids[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return BatchDeleteUserBookmarksRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BatchDeleteUserBookmarksRequestValidationError is the validation error
+// returned by BatchDeleteUserBookmarksRequest.ValidateFields if the
+// designated constraints aren't met.
+type BatchDeleteUserBookmarksRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BatchDeleteUserBookmarksRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BatchDeleteUserBookmarksRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BatchDeleteUserBookmarksRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BatchDeleteUserBookmarksRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BatchDeleteUserBookmarksRequestValidationError) ErrorName() string {
+	return "BatchDeleteUserBookmarksRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BatchDeleteUserBookmarksRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBatchDeleteUserBookmarksRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BatchDeleteUserBookmarksRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BatchDeleteUserBookmarksRequestValidationError{}
+
 // ValidateFields checks the field values on
 // UserConsolePreferences_DashboardLayouts with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.

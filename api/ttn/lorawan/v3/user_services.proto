@@ -172,3 +172,37 @@ service UserSessionRegistry {
     option (google.api.http) = {delete: "/users/{user_ids.user_id}/sessions/{session_id}"};
   }
 }
+
+service UserBookmarkRegistry {
+  // Create a bookmark for the given user.
+  rpc Create(CreateUserBookmarkRequest) returns (UserBookmark) {
+    option (google.api.http) = {
+      post: "/users/bookmarks"
+      body: "*"
+    };
+  }
+
+  // List the bookmarks for the given user.
+  rpc List(ListUserBookmarksRequest) returns (UserBookmarks) {
+    option (google.api.http) = {get: "/users/{user_ids.user_id}/bookmarks"};
+  }
+
+  // Delete the given user's bookmark.
+  rpc Delete(DeleteUserBookmarkRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.application_ids.application_id}",
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/clients/{entity_ids.client_ids.client_id}"}
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/gateways/{entity_ids.gateway_ids.gateway_id}"}
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/organizations/{entity_ids.organization_ids.organization_id}"}
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/users/{entity_ids.user_ids.user_id}"}
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.device_ids.application_ids.application_id}/devices/{entity_ids.device_ids.device_id}"}
+    };
+  }
+
+  // Delete a list of bookmarks of the given user.
+  // This operation is atomic; either all bookmarks are deleted or none.
+  // Bookmarks not found are skipped and no error is returned.
+  rpc BatchDelete(BatchDeleteUserBookmarksRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/users/{user_ids.user_id}/bookmarks/batch"};
+  }
+}

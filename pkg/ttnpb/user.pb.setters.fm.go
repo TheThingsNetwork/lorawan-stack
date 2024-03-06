@@ -1490,6 +1490,339 @@ func (dst *CreateLoginTokenResponse) SetFields(src *CreateLoginTokenResponse, pa
 	return nil
 }
 
+func (dst *UserBookmark) SetFields(src *UserBookmark, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "entity_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EntityIdentifiers
+				if (src == nil || src.EntityIds == nil) && dst.EntityIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EntityIds
+				}
+				if dst.EntityIds != nil {
+					newDst = dst.EntityIds
+				} else {
+					newDst = &EntityIdentifiers{}
+					dst.EntityIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EntityIds = src.EntityIds
+				} else {
+					dst.EntityIds = nil
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				dst.CreatedAt = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UserBookmarks) SetFields(src *UserBookmarks, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "bookmarks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bookmarks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Bookmarks = src.Bookmarks
+			} else {
+				dst.Bookmarks = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *CreateUserBookmarkRequest) SetFields(src *CreateUserBookmarkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "entity_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EntityIdentifiers
+				if (src == nil || src.EntityIds == nil) && dst.EntityIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EntityIds
+				}
+				if dst.EntityIds != nil {
+					newDst = dst.EntityIds
+				} else {
+					newDst = &EntityIdentifiers{}
+					dst.EntityIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EntityIds = src.EntityIds
+				} else {
+					dst.EntityIds = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListUserBookmarksRequest) SetFields(src *ListUserBookmarksRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Deleted = src.Deleted
+			} else {
+				var zero bool
+				dst.Deleted = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DeleteUserBookmarkRequest) SetFields(src *DeleteUserBookmarkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "entity_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EntityIdentifiers
+				if (src == nil || src.EntityIds == nil) && dst.EntityIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EntityIds
+				}
+				if dst.EntityIds != nil {
+					newDst = dst.EntityIds
+				} else {
+					newDst = &EntityIdentifiers{}
+					dst.EntityIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EntityIds = src.EntityIds
+				} else {
+					dst.EntityIds = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchDeleteUserBookmarksRequest) SetFields(src *BatchDeleteUserBookmarksRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "entity_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'entity_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EntityIds = src.EntityIds
+			} else {
+				dst.EntityIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *UserConsolePreferences_DashboardLayouts) SetFields(src *UserConsolePreferences_DashboardLayouts, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

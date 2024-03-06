@@ -221,6 +221,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	} {
 		for _, filter := range []string{
 			"/ttn.lorawan.v3.UserInvitationRegistry",
+			"/ttn.lorawan.v3.UserBookmarkRegistry",
 			"/ttn.lorawan.v3.EntityRegistrySearch",
 			"/ttn.lorawan.v3.EndDeviceRegistrySearch",
 			"/ttn.lorawan.v3.ContactInfoRegistry",
@@ -254,10 +255,11 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGatewayBatchAccessServer(s, &gatewayBatchAccess{IdentityServer: is})
 	ttnpb.RegisterOrganizationRegistryServer(s, &organizationRegistry{IdentityServer: is})
 	ttnpb.RegisterOrganizationAccessServer(s, &organizationAccess{IdentityServer: is})
-	ttnpb.RegisterUserRegistryServer(s, &userRegistry{IdentityServer: is})
 	ttnpb.RegisterUserAccessServer(s, &userAccess{IdentityServer: is})
-	ttnpb.RegisterUserSessionRegistryServer(s, &userSessionRegistry{IdentityServer: is})
+	ttnpb.RegisterUserBookmarkRegistryServer(s, &userBookmarkRegistry{IdentityServer: is})
 	ttnpb.RegisterUserInvitationRegistryServer(s, &invitationRegistry{IdentityServer: is})
+	ttnpb.RegisterUserRegistryServer(s, &userRegistry{IdentityServer: is})
+	ttnpb.RegisterUserSessionRegistryServer(s, &userSessionRegistry{IdentityServer: is})
 	ttnpb.RegisterEntityRegistrySearchServer(s, &registrySearch{IdentityServer: is})
 	ttnpb.RegisterEndDeviceRegistrySearchServer(s, &registrySearch{IdentityServer: is})
 	ttnpb.RegisterOAuthAuthorizationRegistryServer(s, &oauthRegistry{IdentityServer: is})
@@ -282,10 +284,11 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterGatewayBatchAccessHandler(is.Context(), s, conn)   // nolint:errcheck
 	ttnpb.RegisterOrganizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterOrganizationAccessHandler(is.Context(), s, conn)
-	ttnpb.RegisterUserRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserAccessHandler(is.Context(), s, conn)
-	ttnpb.RegisterUserSessionRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterUserBookmarkRegistryHandler(is.Context(), s, conn) // nolint:errcheck
 	ttnpb.RegisterUserInvitationRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterUserRegistryHandler(is.Context(), s, conn)        // nolint:errcheck
+	ttnpb.RegisterUserSessionRegistryHandler(is.Context(), s, conn) // nolint:errcheck
 	ttnpb.RegisterEntityRegistrySearchHandler(is.Context(), s, conn)
 	ttnpb.RegisterEndDeviceRegistrySearchHandler(is.Context(), s, conn)
 	ttnpb.RegisterOAuthAuthorizationRegistryHandler(is.Context(), s, conn)
