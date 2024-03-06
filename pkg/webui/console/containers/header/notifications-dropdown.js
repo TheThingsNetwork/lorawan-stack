@@ -39,6 +39,8 @@ import style from './header.styl'
 
 const m = defineMessages({
   description: 'Showing last 3 of {totalNotifications} notifications',
+  noNotifications: 'All caught up!',
+  noNotificationsDescription: 'You don’t have any notifications currently',
 })
 
 const NotificationsDropdown = () => {
@@ -56,50 +58,65 @@ const NotificationsDropdown = () => {
           />
         </span>
       </div>
-      {dropdownItems.slice(0, 3).map(notification => (
-        <Link
-          to={{
-            pathname: `/notifications/all/${notification.id}`,
-          }}
-          key={notification.id}
-          className={classnames(style.notificationsDropdownLink, 'd-flex')}
-        >
-          <Icon icon="key" className={style.notificationsDropdownLinkIcon} />
-          <div className={style.notificationContainer}>
-            <div className={classnames(style.title, 'fw-bold')}>
-              <Notification.Title
-                data={notification}
-                notificationType={notification.notification_type}
-              />
-            </div>
-            <div
-              className={classnames(
-                notificationStyle.notificationPreviewContent,
-                style.previewContent,
-              )}
-            >
-              <Notification.Preview
-                data={notification}
-                notificationType={notification.notification_type}
-              />
-            </div>
-            <Status pulse={false} status="good" className="mr-cs-xs" />
-            <DateTime.Relative
-              relativeTimeStyle="short"
-              showAbsoluteAfter={2}
-              dateTimeProps={{
-                time: false,
-                dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
+      {dropdownItems && dropdownItems.length === 0 ? (
+        <div className="flex-grow al-center p-vert-ls-m">
+          <Message
+            content={m.noNotifications}
+            className="d-block text-center fs-l fw-bold c-text-neutral-semilight"
+          />
+          <Message
+            content={m.noNotificationsDescription}
+            className="d-block text-center c-text-neutral-light"
+          />
+        </div>
+      ) : (
+        <>
+          {dropdownItems.slice(0, 3).map(notification => (
+            <Link
+              to={{
+                pathname: `/notifications/all/${notification.id}`,
               }}
-              value={notification.created_at}
-              className="fs-s c-text-neutral-heavy"
-            />
+              key={notification.id}
+              className={classnames(style.notificationsDropdownLink, 'd-flex')}
+            >
+              <Icon icon="key" className={style.notificationsDropdownLinkIcon} />
+              <div className={style.notificationContainer}>
+                <div className={classnames(style.title, 'fw-bold')}>
+                  <Notification.Title
+                    data={notification}
+                    notificationType={notification.notification_type}
+                  />
+                </div>
+                <div
+                  className={classnames(
+                    notificationStyle.notificationPreviewContent,
+                    style.previewContent,
+                  )}
+                >
+                  <Notification.Preview
+                    data={notification}
+                    notificationType={notification.notification_type}
+                  />
+                </div>
+                <Status pulse={false} status="good" className="mr-cs-xs" />
+                <DateTime.Relative
+                  relativeTimeStyle="short"
+                  showAbsoluteAfter={2}
+                  dateTimeProps={{
+                    time: false,
+                    dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
+                  }}
+                  value={notification.created_at}
+                  className="fs-s c-text-neutral-heavy"
+                />
+              </div>
+            </Link>
+          ))}
+          <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
+            <Message content={m.description} values={{ totalNotifications }} />
           </div>
-        </Link>
-      ))}
-      <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
-        <Message content={m.description} values={{ totalNotifications }} />
-      </div>
+        </>
+      )}
     </>
   )
 }
