@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Fine grained NbTrans overrides for the dynamic ADR mode. See the `--mac-settings.adr.mode.dynamic.overrides.data-rate-[index].min-nb-trans` and `--mac-settings.adr.mode.dynamic.overrides.data-rate-[index].max-nb-trans` family of parameters.
+
 ### Changed
 
 ### Deprecated

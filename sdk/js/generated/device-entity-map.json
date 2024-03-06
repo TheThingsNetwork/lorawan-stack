@@ -608,7 +608,237 @@
           "min_tx_power_index": [
             "ns",
             "ns"
-          ]
+          ],
+          "overrides": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "data_rate_0": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_1": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_10": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_11": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_12": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_13": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_14": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_15": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_2": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_3": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_4": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_5": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_6": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_7": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_8": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            },
+            "data_rate_9": {
+              "_root": [
+                "ns",
+                "ns"
+              ],
+              "max_nb_trans": [
+                "ns",
+                "ns"
+              ],
+              "min_nb_trans": [
+                "ns",
+                "ns"
+              ]
+            }
+          }
         },
         "static": {
           "_root": [

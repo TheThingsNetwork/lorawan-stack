@@ -14218,6 +14218,9 @@
         },
         "channel_steering": {
           "$ref": "#/definitions/DynamicModeChannelSteeringSettings"
+        },
+        "overrides": {
+          "$ref": "#/definitions/DynamicModeOverrides"
         }
       },
       "description": "Configuration options for dynamic ADR."
@@ -15001,6 +15004,76 @@
     "DynamicModeChannelSteeringSettingsDisabledMode": {
       "type": "object",
       "description": "Configuration options for cases in which ADR is not supposed to steer the end device\nto another set of channels."
+    },
+    "DynamicModeOverrides": {
+      "type": "object",
+      "properties": {
+        "data_rate_0": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_1": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_2": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_3": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_4": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_5": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_6": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_7": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_8": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_9": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_10": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_11": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_12": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_13": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_14": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_15": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        }
+      },
+      "description": "EXPERIMENTAL: Configuration overrides."
+    },
+    "DynamicModePerDataRateIndexOverride": {
+      "type": "object",
+      "properties": {
+        "min_nb_trans": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Minimum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "max_nb_trans": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Maximum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used."
+        }
+      },
+      "description": "EXPERIMENTAL: Data rate index override settings."
     },
     "EndDeviceClaimingServerAuthorizeApplicationBody": {
       "type": "object",
