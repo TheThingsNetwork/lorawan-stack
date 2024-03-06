@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 
 import Overlay from '@ttn-lw/components/overlay'
@@ -29,7 +29,9 @@ const Tabular = ({
   onPageChange,
   order,
   orderBy,
-  pageSize: initialPageSize,
+  pageSize,
+  setPageSize,
+  setPageSizeCookie,
   page,
   handlesPagination,
   paginated,
@@ -47,7 +49,6 @@ const Tabular = ({
   disableSorting,
   onSortRequest,
 }) => {
-  const [pageSize, setPageSize] = useState(initialPageSize)
   const handlePageChange = useCallback(
     page => {
       onPageChange(page)
@@ -160,6 +161,7 @@ const Tabular = ({
           forcePage={page}
           pageSize={pageSize}
           setPageSize={setPageSize}
+          setPageSizeCookie={setPageSizeCookie}
         />
       </Table.DataCell>
     </Table.Row>
@@ -249,6 +251,8 @@ Tabular.propTypes = {
   /** A selector to determine the `key` prop of the rendered rows. */
   rowKeySelector: PropTypes.func,
   /** A flag specifying the height of data cells. */
+  setPageSize: PropTypes.func,
+  setPageSizeCookie: PropTypes.func,
   small: PropTypes.bool,
   /** The total number of available entries. */
   totalCount: PropTypes.number,
@@ -269,6 +273,8 @@ Tabular.defaultProps = {
   totalCount: 0,
   page: 0,
   pageSize: undefined,
+  setPageSize: () => null,
+  setPageSizeCookie: () => null,
   clickable: true,
   rowKeySelector: undefined,
   rowHrefSelector: undefined,

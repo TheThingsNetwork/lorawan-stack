@@ -43,16 +43,16 @@ const Pagination = ({
   pageCount,
   pageSize,
   setPageSize,
+  setPageSizeCookie,
   ...rest
 }) => {
   const [selectedPage, setSelectedPage] = useState(forcePage)
 
   const handlePageChange = useCallback(
     page => {
-      if (!page.selected) {
+      if (!page || !('selected' in page)) {
         return onPageChange(selectedPage)
       }
-
       setSelectedPage(page.selected + 1)
       onPageChange(page.selected + 1)
     },
@@ -69,40 +69,49 @@ const Pagination = ({
   const handlePageSizeChange = useCallback(
     val => {
       setPageSize(val)
+      setPageSizeCookie(val)
     },
-    [setPageSize],
+    [setPageSize, setPageSizeCookie],
   )
 
-  // Don't show pagination if there is only one page.
+  // Show only page size select if there is only one page.
   if (hideIfOnlyOnePage && pageCount === 1) {
-    return null
+    return (
+      <div className="d-flex al-center gap-cs-xs fw-normal">
+        <Message content={m.itemsPerPage} className={style.sizeMessage} />
+        <Select
+          options={[20, 30, 50, 100].map(value => ({
+            value,
+            label: `${value}`,
+          }))}
+          value={pageSize}
+          onChange={handlePageSizeChange}
+          inputWidth="xxs"
+          className={style.selectSize}
+        />
+      </div>
+    )
   }
 
   const containerClassNames = classnames(style.pagination, className)
   const breakClassNames = classnames(style.item, style.itemBreak)
-  const navigationNextClassNames = classnames(style.item, style.itemNavigationNext)
-  const navigationPrevClassNames = classnames(style.item, style.itemNavigationPrev)
+  const navigationNextClassNames = classnames(style.item)
+  const navigationPrevClassNames = classnames(style.item)
 
   return (
-    <div className="d-flex al-center gap-cs-l w-full flex-wrap">
+    <div className="d-flex al-center gap-cs-l w-full flex-wrap fw-normal">
       <Paginate
         previousClassName={navigationPrevClassNames}
         previousLabel={
           <Icon
             icon="chevron_left"
-            nudgeUp
             aria-label="Go to the previous page"
-            className="c-text-neutral-semilight"
+            className={style.itemIcon}
           />
         }
         nextClassName={navigationNextClassNames}
         nextLabel={
-          <Icon
-            icon="chevron_right"
-            nudgeUp
-            aria-label="Go to the next page"
-            className="c-text-neutral-semilight"
-          />
+          <Icon icon="chevron_right" aria-label="Go to the next page" className={style.itemIcon} />
         }
         containerClassName={containerClassNames}
         pageClassName={style.item}
@@ -120,7 +129,7 @@ const Pagination = ({
       <div className="d-flex al-center gap-cs-xs">
         <Message content={m.itemsPerPage} className={style.sizeMessage} />
         <Select
-          options={[5, 10, 20, 30, 40, 50].map(value => ({
+          options={[20, 30, 50, 100].map(value => ({
             value,
             label: `${value}`,
           }))}
@@ -175,6 +184,7 @@ Pagination.propTypes = {
   pageSize: PropTypes.number,
   /** A function to be called when the page size changes. */
   setPageSize: PropTypes.func,
+  setPageSizeCookie: PropTypes.func,
 }
 
 Pagination.defaultProps = {
@@ -186,6 +196,7 @@ Pagination.defaultProps = {
   pageRangeDisplayed: 1,
   pageSize: 10,
   setPageSize: () => null,
+  setPageSizeCookie: () => null,
 }
 
 export default Pagination

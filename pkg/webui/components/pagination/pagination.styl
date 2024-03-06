@@ -13,23 +13,32 @@
 // limitations under the License.
 
 .pagination
+  height: 2.5rem
   white-space: nowrap
-  padding: $cs.xxs
+  padding: 0
   border: 1px solid var(--c-border-neutral-light)
   background: var(--c-bg-neutral-min)
   border-radius: $br.m
   width: fit-content
   display: flex
+  align-items: center
   gap: $cs.xxs
 
   .item
     margin: 0
 
 .item
+  width: $cs.xl
+  height: $cs.xl
   display: inline-block
   color: var(--c-text-neutral-heavy)
-  font-weight: $fwv2.semibold
   user-select: none
+
+  a
+    display: inline-block
+    cursor: pointer
+    height: 100%
+    width: 100%
 
   .link:hover
     background-color: hoverize(var(--c-bg-neutral-min-hover))
@@ -41,37 +50,17 @@
   .link:active
     background-color: activize(var(--c-bg-neutral-min))
 
-  &-navigation-next
-    .link
-      padding: $cs.xxs
-      border-radius: 0 $br.m $br.m 0
-
-  &-navigation-prev
-    .link
-      padding: $cs.xxs
-      border-radius: $br.m 0 0 $br.m
 
   &-disabled
-    .link
+    a
       opacity: .4
       cursor: not-allowed
 
   &-active
     .link
       background-color: var(--c-text-brand-normal)
-      border: 1px solid var(--c-text-brand-normal)
       color: var(--c-bg-neutral-min)
       border-radius: $br.m
-
-      +focus-visible()
-        background-color: hoverize(var(--c-text-brand-normal))
-
-    & + .item
-      a
-        border-left: 0
-
-    & + .item-break
-      border-left: 0
 
     .link:hover
       background-color: var(--c-text-brand-normal)
@@ -79,13 +68,16 @@
   &-break
     padding: 0 $cs.xxs
 
+  &-icon
+    color: var(--c-text-neutral-semilight)
+    position: relative
+    top: 4px
+
 .link
-  padding: .02rem .6rem
   outline: 0
   text-align: center
   text-decoration: none
-  cursor: pointer
-  display: inline-block
+  line-height: 1.9
 
 .size-message
   color: var(--c-text-neutral-semilight)
