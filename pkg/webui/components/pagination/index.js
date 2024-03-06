@@ -74,23 +74,25 @@ const Pagination = ({
     [setPageSize, setPageSizeCookie],
   )
 
+  const pageSizeSelect = (
+    <div className="d-flex al-center gap-cs-xs fw-normal">
+      <Message content={m.itemsPerPage} className={style.sizeMessage} />
+      <Select
+        options={[20, 30, 50, 100].map(value => ({
+          value,
+          label: `${value}`,
+        }))}
+        value={pageSize}
+        onChange={handlePageSizeChange}
+        inputWidth="xxs"
+        className={style.selectSize}
+      />
+    </div>
+  )
+
   // Show only page size select if there is only one page.
   if (hideIfOnlyOnePage && pageCount === 1) {
-    return (
-      <div className="d-flex al-center gap-cs-xs fw-normal">
-        <Message content={m.itemsPerPage} className={style.sizeMessage} />
-        <Select
-          options={[20, 30, 50, 100].map(value => ({
-            value,
-            label: `${value}`,
-          }))}
-          value={pageSize}
-          onChange={handlePageSizeChange}
-          inputWidth="xxs"
-          className={style.selectSize}
-        />
-      </div>
-    )
+    return pageSizeSelect
   }
 
   const containerClassNames = classnames(style.pagination, className)
@@ -126,19 +128,7 @@ const Pagination = ({
         pageCount={pageCount}
         {...rest}
       />
-      <div className="d-flex al-center gap-cs-xs">
-        <Message content={m.itemsPerPage} className={style.sizeMessage} />
-        <Select
-          options={[20, 30, 50, 100].map(value => ({
-            value,
-            label: `${value}`,
-          }))}
-          value={pageSize}
-          onChange={handlePageSizeChange}
-          inputWidth="xxs"
-          className={style.selectSize}
-        />
-      </div>
+      {pageSizeSelect}
       <div className="d-flex al-center gap-cs-xs">
         <Message content={m.goToPage} className="c-text-neutral-semilight" />
         <Input
