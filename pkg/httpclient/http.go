@@ -25,6 +25,7 @@ import (
 	"github.com/gregjones/httpcache"
 	"github.com/klauspost/compress/gzhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/metric/noop"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
@@ -101,6 +102,7 @@ func (p *provider) HTTPClient(ctx context.Context, opts ...Option) (*http.Client
 	rt = otelhttp.NewTransport(
 		rt,
 		otelhttp.WithTracerProvider(tracing.FromContext(ctx)),
+		otelhttp.WithMeterProvider(noop.MeterProvider{}),
 	)
 	if options.cache {
 		rt = &httpcache.Transport{

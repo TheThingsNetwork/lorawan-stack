@@ -25,8 +25,8 @@ import (
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"go.opencensus.io/plugin/ocgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/metric/noop"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware"
@@ -42,9 +42,16 @@ import (
 
 // DefaultDialOptions for gRPC clients
 func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
+	statsHandler := rpcmiddleware.StatsHandlers{
+		otelgrpc.NewClientHandler(
+			otelgrpc.WithTracerProvider(tracing.FromContext(ctx)),
+			otelgrpc.WithMeterProvider(noop.MeterProvider{}),
+		),
+		metrics.StatsHandler,
+	}
+
 	streamInterceptors := []grpc.StreamClientInterceptor{
 		metrics.StreamClientInterceptor,
-		otelgrpc.StreamClientInterceptor(otelgrpc.WithTracerProvider(tracing.FromContext(ctx))),
 		rpclog.StreamClientInterceptor(ctx), // Gets logger from global context
 		warning.StreamClientInterceptor,
 		errors.StreamClientInterceptor(),
@@ -52,7 +59,6 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
 		metrics.UnaryClientInterceptor,
-		otelgrpc.UnaryClientInterceptor(otelgrpc.WithTracerProvider(tracing.FromContext(ctx))),
 		rpclog.UnaryClientInterceptor(ctx), // Gets logger from global context
 		warning.UnaryClientInterceptor,
 		errors.UnaryClientInterceptor(),
@@ -63,7 +69,7 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 			grpc.MaxCallSendMsgSize(1024*1024*16),
 			grpc.MaxCallRecvMsgSize(1024*1024*16),
 		),
-		grpc.WithStatsHandler(rpcmiddleware.StatsHandlers{new(ocgrpc.ClientHandler), metrics.StatsHandler}),
+		grpc.WithStatsHandler(statsHandler),
 		grpc.WithUserAgent(fmt.Sprintf(
 			"%s go/%s ttn/%s",
 			filepath.Base(os.Args[0]),
