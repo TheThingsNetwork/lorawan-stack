@@ -524,6 +524,57 @@ func TestGatewayAccessClusterAuth(t *testing.T) {
 	}, withPrivateTestDatabase(p))
 }
 
+func TestGatewayContactRestrictions(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	usr1Creds := rpcCreds(usr1Key)
+
+	gtw1 := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+
+	usr2 := p.NewUser()
+	p.NewMembership(
+		usr2.GetOrganizationOrUserIdentifiers(),
+		gtw1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+	)
+	// Set the user as administrative contact for the gateway.
+	gtw1.AdministrativeContact = usr2.GetOrganizationOrUserIdentifiers()
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		regClt := ttnpb.NewGatewayRegistryClient(cc)
+		accessClt := ttnpb.NewGatewayAccessClient(cc)
+
+		// Attempt to delete a collaborator that is an administrative contact.
+		_, err := accessClt.DeleteCollaborator(ctx, &ttnpb.DeleteGatewayCollaboratorRequest{
+			GatewayIds:      gtw1.Ids,
+			CollaboratorIds: usr2.GetOrganizationOrUserIdentifiers(),
+		}, usr1Creds)
+		a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+
+		// Change the administrative contact.
+		_, err = regClt.Update(ctx, &ttnpb.UpdateGatewayRequest{
+			Gateway: &ttnpb.Gateway{
+				Ids:                   gtw1.Ids,
+				AdministrativeContact: usr1.GetOrganizationOrUserIdentifiers(),
+			},
+			FieldMask: ttnpb.FieldMask("administrative_contact"),
+		}, usr1Creds)
+		a.So(err, should.BeNil)
+
+		// Attempt to delete a collaborator that is an administrative contact.
+		_, err = accessClt.DeleteCollaborator(ctx, &ttnpb.DeleteGatewayCollaboratorRequest{
+			GatewayIds:      gtw1.Ids,
+			CollaboratorIds: usr2.GetOrganizationOrUserIdentifiers(),
+		}, usr1Creds)
+		a.So(err, should.BeNil)
+	}, withPrivateTestDatabase(p))
+}
+
 func TestGatewayBatchAccess(t *testing.T) {
 	p := &storetest.Population{}
 

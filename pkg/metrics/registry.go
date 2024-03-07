@@ -17,28 +17,26 @@ package metrics
 import (
 	"net/http"
 
-	ocprom "contrib.go.opencensus.io/exporter/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
-	"go.opencensus.io/stats/view"
+	"github.com/prometheus/client_golang/prometheus/collectors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var registry = prometheus.NewRegistry()
 
-var exporter, _ = ocprom.NewExporter(ocprom.Options{
-	Registry: registry,
-})
-
 // Exporter for the metrics registry.
-var Exporter http.Handler = exporter
+var Exporter http.Handler = promhttp.InstrumentMetricHandler(
+	registry,
+	promhttp.HandlerFor(registry, promhttp.HandlerOpts{}),
+)
 
 // Registry for metrics.
 var Registry prometheus.Registerer = registry
 
 func init() {
-	registry.MustRegister(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}))
-	registry.MustRegister(prometheus.NewGoCollector())
+	registry.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	registry.MustRegister(collectors.NewGoCollector())
 	registry.MustRegister(ttnInfo)
-	view.RegisterExporter(exporter)
 }
 
 // Register registers the given Collector in the registry.

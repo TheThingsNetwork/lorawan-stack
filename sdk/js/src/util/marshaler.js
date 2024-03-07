@@ -69,7 +69,7 @@ class Marshaler {
     if (typeof response !== 'object') {
       throw new Error(`Invalid response type: ${typeof response}`)
     }
-    if ('status' in response && response.status > 400) {
+    if ('status' in response && response.status >= 400) {
       throw new Error(`Response status ${response.status}`)
     }
 

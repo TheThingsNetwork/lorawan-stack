@@ -29,8 +29,8 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"go.opencensus.io/plugin/ocgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/metric/noop"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
@@ -143,7 +143,19 @@ func New(ctx context.Context, opts ...Option) *Server {
 	for _, opt := range opts {
 		opt(options)
 	}
+
 	server := &Server{ctx: ctx, Hooks: &hooks.Hooks{}}
+
+	statsHandler := rpcmiddleware.StatsHandlers{
+		otelgrpc.NewServerHandler(
+			otelgrpc.WithTracerProvider(tracing.FromContext(ctx)),
+			// As pkg/metrics is currently Prometheus based, the OpenTelemetry metrics are unused.
+			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5692.
+			otelgrpc.WithMeterProvider(noop.MeterProvider{}),
+		),
+		metrics.StatsHandler,
+	}
+
 	ctxtagsOpts := []grpc_ctxtags.Option{
 		grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor),
 	}
@@ -167,7 +179,6 @@ func New(ctx context.Context, opts ...Option) *Server {
 		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDStreamServerInterceptor(),
 		proxyHeaders.StreamServerInterceptor(),
-		otelgrpc.StreamServerInterceptor(otelgrpc.WithTracerProvider(tracing.FromContext(ctx))),
 		events.StreamServerInterceptor(options.correlationIDsIgnoreMethods),
 		rpclog.StreamServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
 		metrics.StreamServerInterceptor,
@@ -185,7 +196,6 @@ func New(ctx context.Context, opts ...Option) *Server {
 		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDUnaryServerInterceptor(),
 		proxyHeaders.UnaryServerInterceptor(),
-		otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(tracing.FromContext(ctx))),
 		events.UnaryServerInterceptor(options.correlationIDsIgnoreMethods),
 		rpclog.UnaryServerInterceptor(ctx, rpclog.WithIgnoreMethods(options.logIgnoreMethods)),
 		metrics.UnaryServerInterceptor,
@@ -199,7 +209,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 
 	baseOptions := []grpc.ServerOption{
-		grpc.StatsHandler(rpcmiddleware.StatsHandlers{new(ocgrpc.ServerHandler), metrics.StatsHandler}),
+		grpc.StatsHandler(statsHandler),
 		grpc.MaxConcurrentStreams(math.MaxUint16),
 		grpc.MaxRecvMsgSize(1024 * 1024 * 16),
 		grpc.MaxSendMsgSize(1024 * 1024 * 16),

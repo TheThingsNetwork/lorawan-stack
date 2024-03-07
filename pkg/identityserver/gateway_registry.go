@@ -672,6 +672,9 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		if err := st.DeleteEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		return st.DeleteGateway(ctx, ids)
 	})
 	if err != nil {
@@ -699,6 +702,9 @@ func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.Gateway
 		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
 		}
+		if err := st.RestoreEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		ids = ttnpb.Clone(gtw.Ids)
 		return st.RestoreGateway(ctx, ids)
 	})
@@ -722,6 +728,9 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 		// delete related memberships before purging the gateway
 		err = st.DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
+			return err
+		}
+		if err := st.PurgeEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
 			return err
 		}
 		return st.PurgeGateway(ctx, ids)

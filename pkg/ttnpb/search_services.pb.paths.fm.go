@@ -144,12 +144,14 @@ var SearchAccountsRequestFieldPathsNested = []string{
 	"collaborator_of.gateway_ids.gateway_id",
 	"collaborator_of.organization_ids",
 	"collaborator_of.organization_ids.organization_id",
+	"complement_collaborators",
 	"only_users",
 	"query",
 }
 
 var SearchAccountsRequestFieldPathsTopLevel = []string{
 	"collaborator_of",
+	"complement_collaborators",
 	"only_users",
 	"query",
 }

@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 var demodulationFloor = map[uint32]map[uint32]float32{
@@ -368,10 +369,64 @@ func clampTxPowerRange(
 	}
 }
 
-func clampNbTrans(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, nbTrans uint32) uint32 {
+// DataRateIndexOverridesOf returns the per-data rate index overrides of the given dynamic ADR settings.
+func DataRateIndexOverridesOf(
+	overrides *ttnpb.ADRSettings_DynamicMode_Overrides, drIdx ttnpb.DataRateIndex,
+) *ttnpb.ADRSettings_DynamicMode_PerDataRateIndexOverride {
+	switch drIdx {
+	case ttnpb.DataRateIndex_DATA_RATE_0:
+		return overrides.GetDataRate_0()
+	case ttnpb.DataRateIndex_DATA_RATE_1:
+		return overrides.GetDataRate_1()
+	case ttnpb.DataRateIndex_DATA_RATE_2:
+		return overrides.GetDataRate_2()
+	case ttnpb.DataRateIndex_DATA_RATE_3:
+		return overrides.GetDataRate_3()
+	case ttnpb.DataRateIndex_DATA_RATE_4:
+		return overrides.GetDataRate_4()
+	case ttnpb.DataRateIndex_DATA_RATE_5:
+		return overrides.GetDataRate_5()
+	case ttnpb.DataRateIndex_DATA_RATE_6:
+		return overrides.GetDataRate_6()
+	case ttnpb.DataRateIndex_DATA_RATE_7:
+		return overrides.GetDataRate_7()
+	case ttnpb.DataRateIndex_DATA_RATE_8:
+		return overrides.GetDataRate_8()
+	case ttnpb.DataRateIndex_DATA_RATE_9:
+		return overrides.GetDataRate_9()
+	case ttnpb.DataRateIndex_DATA_RATE_10:
+		return overrides.GetDataRate_10()
+	case ttnpb.DataRateIndex_DATA_RATE_11:
+		return overrides.GetDataRate_11()
+	case ttnpb.DataRateIndex_DATA_RATE_12:
+		return overrides.GetDataRate_12()
+	case ttnpb.DataRateIndex_DATA_RATE_13:
+		return overrides.GetDataRate_13()
+	case ttnpb.DataRateIndex_DATA_RATE_14:
+		return overrides.GetDataRate_14()
+	case ttnpb.DataRateIndex_DATA_RATE_15:
+		return overrides.GetDataRate_15()
+	default:
+		panic("unreachable")
+	}
+}
+
+func nbTransRange(
+	dynamicSettings *ttnpb.ADRSettings_DynamicMode, dataRateIndex ttnpb.DataRateIndex,
+) (min, max *wrapperspb.UInt32Value) {
+	overrides := DataRateIndexOverridesOf(dynamicSettings.Overrides, dataRateIndex)
+	if overrides == nil {
+		return dynamicSettings.MinNbTrans, dynamicSettings.MaxNbTrans
+	}
+	return overrides.MinNbTrans, overrides.MaxNbTrans
+}
+
+func clampNbTrans(
+	dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, nbTrans uint32, dataRateIndex ttnpb.DataRateIndex,
+) uint32 {
 	clamp := func(dynamicSettings *ttnpb.ADRSettings_DynamicMode) uint32 {
 		nbTrans := nbTrans
-		minSetting, maxSetting := dynamicSettings.MinNbTrans, dynamicSettings.MaxNbTrans
+		minSetting, maxSetting := nbTransRange(dynamicSettings, dataRateIndex)
 		if minSetting != nil && minSetting.Value > nbTrans {
 			nbTrans = minSetting.Value
 		}
@@ -601,7 +656,7 @@ func adrAdaptNbTrans(
 ) {
 	macState := dev.MacState
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
-	nbTrans := clampNbTrans(dev, defaults, currentParameters.AdrNbTrans)
+	nbTrans := clampNbTrans(dev, defaults, currentParameters.AdrNbTrans, desiredParameters.AdrDataRateIndex)
 	if len(adrUplinks) >= OptimalADRUplinkCount/2 {
 		switch r := adrLossRate(adrUplinks...); {
 		case r < 0.05:
@@ -613,7 +668,7 @@ func adrAdaptNbTrans(
 			nbTrans = maxNbTrans
 		}
 	}
-	desiredParameters.AdrNbTrans = clampNbTrans(dev, defaults, nbTrans)
+	desiredParameters.AdrNbTrans = clampNbTrans(dev, defaults, nbTrans, desiredParameters.AdrDataRateIndex)
 }
 
 func adaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings) error {

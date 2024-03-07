@@ -19,7 +19,7 @@ Alternatively, you can use the invitation token <code>{{ .InvitationToken }}</co
 </p>
 {{- with .TTL }}
 <p>
-Your invitation expires {{ relTime . }}, so register before then.
+Your invitation expires {{ relDuration . }}, so register before then.
 </p>
 {{- end }}
 <p>

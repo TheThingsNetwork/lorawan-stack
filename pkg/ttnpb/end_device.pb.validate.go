@@ -5860,6 +5860,18 @@ func (m *ADRSettings_DynamicMode) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "overrides":
+
+			if v, ok := interface{}(m.GetOverrides()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicModeValidationError{
+						field:  "overrides",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ADRSettings_DynamicModeValidationError{
 				field:  name,
@@ -6123,6 +6135,396 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ADRSettings_DynamicMode_ChannelSteeringSettingsValidationError{}
+
+// ValidateFields checks the field values on
+// ADRSettings_DynamicMode_PerDataRateIndexOverride with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ADRSettings_DynamicMode_PerDataRateIndexOverride) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ADRSettings_DynamicMode_PerDataRateIndexOverrideFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "min_nb_trans":
+
+			if wrapper := m.GetMinNbTrans(); wrapper != nil {
+
+				if val := wrapper.GetValue(); val < 1 || val > 3 {
+					return ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError{
+						field:  "min_nb_trans",
+						reason: "value must be inside range [1, 3]",
+					}
+				}
+
+			}
+
+		case "max_nb_trans":
+
+			if wrapper := m.GetMaxNbTrans(); wrapper != nil {
+
+				if val := wrapper.GetValue(); val < 1 || val > 3 {
+					return ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError{
+						field:  "max_nb_trans",
+						reason: "value must be inside range [1, 3]",
+					}
+				}
+
+			}
+
+		default:
+			return ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError is the
+// validation error returned by
+// ADRSettings_DynamicMode_PerDataRateIndexOverride.ValidateFields if the
+// designated constraints aren't met.
+type ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError) ErrorName() string {
+	return "ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sADRSettings_DynamicMode_PerDataRateIndexOverride.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ADRSettings_DynamicMode_PerDataRateIndexOverrideValidationError{}
+
+// ValidateFields checks the field values on ADRSettings_DynamicMode_Overrides
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ADRSettings_DynamicMode_Overrides) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ADRSettings_DynamicMode_OverridesFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "data_rate_0":
+
+			if v, ok := interface{}(m.GetDataRate_0()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_0",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_1":
+
+			if v, ok := interface{}(m.GetDataRate_1()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_1",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_2":
+
+			if v, ok := interface{}(m.GetDataRate_2()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_2",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_3":
+
+			if v, ok := interface{}(m.GetDataRate_3()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_3",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_4":
+
+			if v, ok := interface{}(m.GetDataRate_4()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_4",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_5":
+
+			if v, ok := interface{}(m.GetDataRate_5()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_5",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_6":
+
+			if v, ok := interface{}(m.GetDataRate_6()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_6",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_7":
+
+			if v, ok := interface{}(m.GetDataRate_7()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_7",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_8":
+
+			if v, ok := interface{}(m.GetDataRate_8()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_8",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_9":
+
+			if v, ok := interface{}(m.GetDataRate_9()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_9",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_10":
+
+			if v, ok := interface{}(m.GetDataRate_10()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_10",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_11":
+
+			if v, ok := interface{}(m.GetDataRate_11()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_11",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_12":
+
+			if v, ok := interface{}(m.GetDataRate_12()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_12",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_13":
+
+			if v, ok := interface{}(m.GetDataRate_13()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_13",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_14":
+
+			if v, ok := interface{}(m.GetDataRate_14()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_14",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "data_rate_15":
+
+			if v, ok := interface{}(m.GetDataRate_15()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicMode_OverridesValidationError{
+						field:  "data_rate_15",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ADRSettings_DynamicMode_OverridesValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ADRSettings_DynamicMode_OverridesValidationError is the validation error
+// returned by ADRSettings_DynamicMode_Overrides.ValidateFields if the
+// designated constraints aren't met.
+type ADRSettings_DynamicMode_OverridesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ADRSettings_DynamicMode_OverridesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ADRSettings_DynamicMode_OverridesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ADRSettings_DynamicMode_OverridesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ADRSettings_DynamicMode_OverridesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ADRSettings_DynamicMode_OverridesValidationError) ErrorName() string {
+	return "ADRSettings_DynamicMode_OverridesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ADRSettings_DynamicMode_OverridesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sADRSettings_DynamicMode_Overrides.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ADRSettings_DynamicMode_OverridesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ADRSettings_DynamicMode_OverridesValidationError{}
 
 // ValidateFields checks the field values on
 // ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode with the

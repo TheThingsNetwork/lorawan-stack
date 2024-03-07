@@ -77,9 +77,8 @@ const useCollaboratorData = (entity, entityId, collaboratorId, tts) => {
   const currentUserId = useSelector(selectUserId)
   const isCurrentUser = isUser && currentUserId === collaboratorId
   const updateCollaborator = patch => tts[sdkServices[entity]].Collaborators.update(entityId, patch)
-  const removeCollaborator = (isUser, collaboratorIds) => {
+  const removeCollaborator = (isUser, collaboratorIds) =>
     tts[sdkServices[entity]].Collaborators.remove(isUser, entityId, collaboratorIds)
-  }
 
   return {
     collaborator,

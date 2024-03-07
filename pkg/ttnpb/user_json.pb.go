@@ -11,6 +11,268 @@ import (
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 )
 
+// MarshalProtoJSON marshals the ConsoleTheme to JSON.
+func (x ConsoleTheme) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), ConsoleTheme_name)
+}
+
+// MarshalText marshals the ConsoleTheme to text.
+func (x ConsoleTheme) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), ConsoleTheme_name)), nil
+}
+
+// MarshalJSON marshals the ConsoleTheme to JSON.
+func (x ConsoleTheme) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// ConsoleTheme_customvalue contains custom string values that extend ConsoleTheme_value.
+var ConsoleTheme_customvalue = map[string]int32{
+	"SYSTEM": 0,
+	"LIGHT":  1,
+	"DARK":   2,
+}
+
+// UnmarshalProtoJSON unmarshals the ConsoleTheme from JSON.
+func (x *ConsoleTheme) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(ConsoleTheme_value, ConsoleTheme_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read ConsoleTheme enum: %v", err)
+		return
+	}
+	*x = ConsoleTheme(v)
+}
+
+// UnmarshalText unmarshals the ConsoleTheme from text.
+func (x *ConsoleTheme) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), ConsoleTheme_customvalue, ConsoleTheme_value)
+	if err != nil {
+		return err
+	}
+	*x = ConsoleTheme(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the ConsoleTheme from JSON.
+func (x *ConsoleTheme) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the DashboardLayout to JSON.
+func (x DashboardLayout) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), DashboardLayout_name)
+}
+
+// MarshalText marshals the DashboardLayout to text.
+func (x DashboardLayout) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), DashboardLayout_name)), nil
+}
+
+// MarshalJSON marshals the DashboardLayout to JSON.
+func (x DashboardLayout) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// DashboardLayout_customvalue contains custom string values that extend DashboardLayout_value.
+var DashboardLayout_customvalue = map[string]int32{
+	"TABLE": 0,
+	"LIST":  1,
+	"GRID":  2,
+}
+
+// UnmarshalProtoJSON unmarshals the DashboardLayout from JSON.
+func (x *DashboardLayout) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(DashboardLayout_value, DashboardLayout_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read DashboardLayout enum: %v", err)
+		return
+	}
+	*x = DashboardLayout(v)
+}
+
+// UnmarshalText unmarshals the DashboardLayout from text.
+func (x *DashboardLayout) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), DashboardLayout_customvalue, DashboardLayout_value)
+	if err != nil {
+		return err
+	}
+	*x = DashboardLayout(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the DashboardLayout from JSON.
+func (x *DashboardLayout) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UserConsolePreferences_DashboardLayouts message to JSON.
+func (x *UserConsolePreferences_DashboardLayouts) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.ApiKey != 0 || s.HasField("api_key") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("api_key")
+		x.ApiKey.MarshalProtoJSON(s)
+	}
+	if x.Application != 0 || s.HasField("application") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("application")
+		x.Application.MarshalProtoJSON(s)
+	}
+	if x.Collaborator != 0 || s.HasField("collaborator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator")
+		x.Collaborator.MarshalProtoJSON(s)
+	}
+	if x.EndDevice != 0 || s.HasField("end_device") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("end_device")
+		x.EndDevice.MarshalProtoJSON(s)
+	}
+	if x.Gateway != 0 || s.HasField("gateway") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway")
+		x.Gateway.MarshalProtoJSON(s)
+	}
+	if x.Organization != 0 || s.HasField("organization") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("organization")
+		x.Organization.MarshalProtoJSON(s)
+	}
+	if x.Overview != 0 || s.HasField("overview") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("overview")
+		x.Overview.MarshalProtoJSON(s)
+	}
+	if x.User != 0 || s.HasField("user") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user")
+		x.User.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UserConsolePreferences_DashboardLayouts to JSON.
+func (x *UserConsolePreferences_DashboardLayouts) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UserConsolePreferences_DashboardLayouts message from JSON.
+func (x *UserConsolePreferences_DashboardLayouts) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "api_key", "apiKey":
+			s.AddField("api_key")
+			x.ApiKey.UnmarshalProtoJSON(s)
+		case "application":
+			s.AddField("application")
+			x.Application.UnmarshalProtoJSON(s)
+		case "collaborator":
+			s.AddField("collaborator")
+			x.Collaborator.UnmarshalProtoJSON(s)
+		case "end_device", "endDevice":
+			s.AddField("end_device")
+			x.EndDevice.UnmarshalProtoJSON(s)
+		case "gateway":
+			s.AddField("gateway")
+			x.Gateway.UnmarshalProtoJSON(s)
+		case "organization":
+			s.AddField("organization")
+			x.Organization.UnmarshalProtoJSON(s)
+		case "overview":
+			s.AddField("overview")
+			x.Overview.UnmarshalProtoJSON(s)
+		case "user":
+			s.AddField("user")
+			x.User.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UserConsolePreferences_DashboardLayouts from JSON.
+func (x *UserConsolePreferences_DashboardLayouts) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UserConsolePreferences message to JSON.
+func (x *UserConsolePreferences) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.ConsoleTheme != 0 || s.HasField("console_theme") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("console_theme")
+		x.ConsoleTheme.MarshalProtoJSON(s)
+	}
+	if x.DashboardLayouts != nil || s.HasField("dashboard_layouts") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dashboard_layouts")
+		x.DashboardLayouts.MarshalProtoJSON(s.WithField("dashboard_layouts"))
+	}
+	if x.SortBy != nil || s.HasField("sort_by") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("sort_by")
+		// NOTE: UserConsolePreferences_SortBy does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.SortBy)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UserConsolePreferences to JSON.
+func (x *UserConsolePreferences) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UserConsolePreferences message from JSON.
+func (x *UserConsolePreferences) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "console_theme", "consoleTheme":
+			s.AddField("console_theme")
+			x.ConsoleTheme.UnmarshalProtoJSON(s)
+		case "dashboard_layouts", "dashboardLayouts":
+			if s.ReadNil() {
+				x.DashboardLayouts = nil
+				return
+			}
+			x.DashboardLayouts = &UserConsolePreferences_DashboardLayouts{}
+			x.DashboardLayouts.UnmarshalProtoJSON(s.WithField("dashboard_layouts", true))
+		case "sort_by", "sortBy":
+			s.AddField("sort_by")
+			if s.ReadNil() {
+				x.SortBy = nil
+				return
+			}
+			// NOTE: UserConsolePreferences_SortBy does not seem to implement UnmarshalProtoJSON.
+			var v UserConsolePreferences_SortBy
+			golang.UnmarshalMessage(s, &v)
+			x.SortBy = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UserConsolePreferences from JSON.
+func (x *UserConsolePreferences) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the User message to JSON.
 func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -161,6 +423,11 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("profile_picture")
 		// NOTE: Picture does not seem to implement MarshalProtoJSON.
 		golang.MarshalMessage(s, x.ProfilePicture)
+	}
+	if x.ConsolePreferences != nil || s.HasField("console_preferences") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("console_preferences")
+		x.ConsolePreferences.MarshalProtoJSON(s.WithField("console_preferences"))
 	}
 	s.WriteObjectEnd()
 }
@@ -331,6 +598,13 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v Picture
 			golang.UnmarshalMessage(s, &v)
 			x.ProfilePicture = &v
+		case "console_preferences", "consolePreferences":
+			if s.ReadNil() {
+				x.ConsolePreferences = nil
+				return
+			}
+			x.ConsolePreferences = &UserConsolePreferences{}
+			x.ConsolePreferences.UnmarshalProtoJSON(s.WithField("console_preferences", true))
 		}
 	})
 }
@@ -858,5 +1132,353 @@ func (x *UpdateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 
 // UnmarshalJSON unmarshals the UpdateUserAPIKeyRequest from JSON.
 func (x *UpdateUserAPIKeyRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UserBookmark message to JSON.
+func (x *UserBookmark) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UserIds != nil || s.HasField("user_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user_ids")
+		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.UserIds)
+	}
+	if x.EntityIds != nil || s.HasField("entity_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_ids")
+		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
+	}
+	if x.CreatedAt != nil || s.HasField("created_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("created_at")
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalTimestamp(s, x.CreatedAt)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UserBookmark to JSON.
+func (x *UserBookmark) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UserBookmark message from JSON.
+func (x *UserBookmark) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "user_ids", "userIds":
+			s.AddField("user_ids")
+			if s.ReadNil() {
+				x.UserIds = nil
+				return
+			}
+			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v UserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.UserIds = &v
+		case "entity_ids", "entityIds":
+			if s.ReadNil() {
+				x.EntityIds = nil
+				return
+			}
+			x.EntityIds = &EntityIdentifiers{}
+			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
+		case "created_at", "createdAt":
+			s.AddField("created_at")
+			if s.ReadNil() {
+				x.CreatedAt = nil
+				return
+			}
+			v := golang.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.CreatedAt = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UserBookmark from JSON.
+func (x *UserBookmark) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UserBookmarks message to JSON.
+func (x *UserBookmarks) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Bookmarks) > 0 || s.HasField("bookmarks") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("bookmarks")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Bookmarks {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("bookmarks"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UserBookmarks to JSON.
+func (x *UserBookmarks) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UserBookmarks message from JSON.
+func (x *UserBookmarks) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "bookmarks":
+			s.AddField("bookmarks")
+			if s.ReadNil() {
+				x.Bookmarks = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Bookmarks = append(x.Bookmarks, nil)
+					return
+				}
+				v := &UserBookmark{}
+				v.UnmarshalProtoJSON(s.WithField("bookmarks", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Bookmarks = append(x.Bookmarks, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UserBookmarks from JSON.
+func (x *UserBookmarks) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the CreateUserBookmarkRequest message to JSON.
+func (x *CreateUserBookmarkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UserIds != nil || s.HasField("user_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user_ids")
+		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.UserIds)
+	}
+	if x.EntityIds != nil || s.HasField("entity_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_ids")
+		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the CreateUserBookmarkRequest to JSON.
+func (x *CreateUserBookmarkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the CreateUserBookmarkRequest message from JSON.
+func (x *CreateUserBookmarkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "user_ids", "userIds":
+			s.AddField("user_ids")
+			if s.ReadNil() {
+				x.UserIds = nil
+				return
+			}
+			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v UserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.UserIds = &v
+		case "entity_ids", "entityIds":
+			if s.ReadNil() {
+				x.EntityIds = nil
+				return
+			}
+			x.EntityIds = &EntityIdentifiers{}
+			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the CreateUserBookmarkRequest from JSON.
+func (x *CreateUserBookmarkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the DeleteUserBookmarkRequest message to JSON.
+func (x *DeleteUserBookmarkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UserIds != nil || s.HasField("user_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user_ids")
+		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.UserIds)
+	}
+	if x.EntityIds != nil || s.HasField("entity_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_ids")
+		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DeleteUserBookmarkRequest to JSON.
+func (x *DeleteUserBookmarkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the DeleteUserBookmarkRequest message from JSON.
+func (x *DeleteUserBookmarkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "user_ids", "userIds":
+			s.AddField("user_ids")
+			if s.ReadNil() {
+				x.UserIds = nil
+				return
+			}
+			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v UserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.UserIds = &v
+		case "entity_ids", "entityIds":
+			if s.ReadNil() {
+				x.EntityIds = nil
+				return
+			}
+			x.EntityIds = &EntityIdentifiers{}
+			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the DeleteUserBookmarkRequest from JSON.
+func (x *DeleteUserBookmarkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BatchDeleteUserBookmarksRequest message to JSON.
+func (x *BatchDeleteUserBookmarksRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UserIds != nil || s.HasField("user_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("user_ids")
+		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.UserIds)
+	}
+	if len(x.EntityIds) > 0 || s.HasField("entity_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_ids")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.EntityIds {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("entity_ids"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BatchDeleteUserBookmarksRequest to JSON.
+func (x *BatchDeleteUserBookmarksRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BatchDeleteUserBookmarksRequest message from JSON.
+func (x *BatchDeleteUserBookmarksRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "user_ids", "userIds":
+			s.AddField("user_ids")
+			if s.ReadNil() {
+				x.UserIds = nil
+				return
+			}
+			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v UserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.UserIds = &v
+		case "entity_ids", "entityIds":
+			s.AddField("entity_ids")
+			if s.ReadNil() {
+				x.EntityIds = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.EntityIds = append(x.EntityIds, nil)
+					return
+				}
+				v := &EntityIdentifiers{}
+				v.UnmarshalProtoJSON(s.WithField("entity_ids", false))
+				if s.Err() != nil {
+					return
+				}
+				x.EntityIds = append(x.EntityIds, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BatchDeleteUserBookmarksRequest from JSON.
+func (x *BatchDeleteUserBookmarksRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

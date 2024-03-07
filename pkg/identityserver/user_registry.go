@@ -708,6 +708,9 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 		if err != nil {
 			return err
 		}
+		if err := st.DeleteEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		return st.DeleteUser(ctx, ids)
 	})
 	if err != nil {
@@ -732,6 +735,9 @@ func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdenti
 		}
 		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
+		}
+		if err := st.RestoreEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
 		}
 		return st.RestoreUser(ctx, ids)
 	})
@@ -762,6 +768,12 @@ func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifi
 		}
 		err = st.DeleteAllUserSessions(ctx, ids)
 		if err != nil {
+			return err
+		}
+		if err := st.PurgeEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
+		if err := st.PurgeUserBookmarks(ctx, ids); err != nil {
 			return err
 		}
 		return st.PurgeUser(ctx, ids)
