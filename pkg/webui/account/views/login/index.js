@@ -27,6 +27,8 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
+import Logo from '@account/containers/logo'
+
 import style from '@account/views/front/front.styl'
 
 import Yup from '@ttn-lw/lib/yup'
@@ -123,6 +125,7 @@ const Login = () => {
         <br />
         <span className={style.subTitle}>{siteTitle}</span>
       </h1>
+      <Logo className={style.loginLogo} />
       <hr className={style.hRule} />
       <Form
         onSubmit={handleSubmit}
