@@ -59,14 +59,14 @@ const NotificationsDropdown = () => {
         </span>
       </div>
       {dropdownItems && dropdownItems.length === 0 ? (
-        <div className="flex-grow al-center p-vert-ls-m">
+        <div className={style.emptyState}>
           <Message
             content={m.noNotifications}
-            className="d-block text-center fs-l fw-bold c-text-neutral-semilight"
+            className="d-block text-center fw-bold c-text-neutral-semilight"
           />
           <Message
             content={m.noNotificationsDescription}
-            className="d-block text-center c-text-neutral-light"
+            className="d-block text-center fs-s c-text-neutral-light"
           />
         </div>
       ) : (
