@@ -569,6 +569,8 @@
   "console.containers.gateways-table.index.purgeSuccess": "ゲートウェイをパージ",
   "console.containers.gateways-table.index.purgeFail": "エラーが発生したため、ゲートウェイをパージすることができませんでした",
   "console.containers.header.notifications-dropdown.description": "",
+  "console.containers.header.notifications-dropdown.noNotifications": "",
+  "console.containers.header.notifications-dropdown.noNotificationsDescription": "",
   "console.containers.invite-user-form.index.invitationsDescription": "電子メールアドレスを提供することで、このネットワークにユーザーを招待することができます。その後、その人には、あなたのネットワークに参加するための方法が書かれたメールが届きます",
   "console.containers.log-back-in-modal.index.modalTitle": "もう一度サインインしてください",
   "console.containers.log-back-in-modal.index.modalMessage": "コンソールからサインアウトされました。リロードを押して、コンソールに再度ログインすることができます",
