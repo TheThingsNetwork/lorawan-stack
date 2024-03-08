@@ -560,6 +560,14 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
 				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
 			}
+
+			// Exclude app1 collaborator.
+			ids, err = s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				CollaboratorOf:          &ttnpb.SearchAccountsRequest_ApplicationIds{ApplicationIds: app1.GetIds()},
+				ComplementCollaborators: true,
+			})
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 3)
 		})
 
 		t.Run("Client", func(t *T) {
@@ -571,6 +579,14 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
 				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
 			}
+
+			// Exclude cli1 collaborator.
+			ids, err = s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				CollaboratorOf:          &ttnpb.SearchAccountsRequest_ClientIds{ClientIds: cli1.GetIds()},
+				ComplementCollaborators: true,
+			})
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 3)
 		})
 
 		t.Run("Gateway", func(t *T) {
@@ -582,6 +598,14 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
 				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
 			}
+
+			// Exclude gtw1 collaborator.
+			ids, err = s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				CollaboratorOf:          &ttnpb.SearchAccountsRequest_GatewayIds{GatewayIds: gtw1.GetIds()},
+				ComplementCollaborators: true,
+			})
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 3)
 		})
 
 		t.Run("Organization", func(t *T) {
@@ -593,6 +617,14 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
 				a.So(ids[0], should.Resemble, usr1.GetIds().GetOrganizationOrUserIdentifiers())
 			}
+
+			// Exclude org1 collaborator.
+			ids, err = s.SearchAccounts(ctx, &ttnpb.SearchAccountsRequest{
+				CollaboratorOf:          &ttnpb.SearchAccountsRequest_OrganizationIds{OrganizationIds: org1.GetIds()},
+				ComplementCollaborators: true,
+			})
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 3)
 		})
 	})
 }

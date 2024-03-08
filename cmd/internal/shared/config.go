@@ -145,6 +145,11 @@ var DefaultKeyVaultConfig = config.KeyVault{
 	Provider: "static",
 }
 
+// DefaultRateLimitingConfig is the default config for rate limiting.
+var DefaultRateLimitingConfig = config.RateLimiting{
+	Provider: "memory",
+}
+
 // DefaultTracingConfig is the default config for telemetry tracing.
 var DefaultTracingConfig = tracing.Config{
 	Enable:   false,
@@ -184,6 +189,7 @@ var DefaultServiceBase = config.ServiceBase{
 	FrequencyPlans: DefaultFrequencyPlansConfig,
 	Rights:         DefaultRightsConfig,
 	KeyVault:       DefaultKeyVaultConfig,
+	RateLimiting:   DefaultRateLimitingConfig,
 	Tracing:        DefaultTracingConfig,
 	Telemetry:      DefaultTelemetryConfig,
 }

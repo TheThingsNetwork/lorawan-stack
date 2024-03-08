@@ -126,6 +126,14 @@ func TestUserSessionStore(t *testing.T) {
 	st.TestUserSessionStorePagination(t)
 }
 
+func TestUserBookmarkStore(t *testing.T) {
+	t.Parallel()
+
+	st := storetest.New(t, newTestStore)
+	st.TestBasicBookmarkOperations(t)
+	st.TestBookmarksEntityAndUserOperations(t)
+}
+
 func TestAPIKeyStore(t *testing.T) {
 	t.Parallel()
 

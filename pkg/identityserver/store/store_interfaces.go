@@ -186,6 +186,23 @@ type UserSessionStore interface {
 	DeleteAllUserSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error
 }
 
+// UserBookmarkStore interface for storing user bookmarks.
+type UserBookmarkStore interface {
+	CreateBookmark(context.Context, *ttnpb.UserBookmark) (*ttnpb.UserBookmark, error)
+	FindBookmarks(context.Context, *ttnpb.UserIdentifiers) ([]*ttnpb.UserBookmark, error)
+	PurgeBookmark(context.Context, *ttnpb.UserBookmark) error
+	BatchPurgeBookmarks(
+		context.Context, *ttnpb.UserIdentifiers, []*ttnpb.EntityIdentifiers,
+	) ([]*ttnpb.UserBookmark, error)
+
+	DeleteEntityBookmarks(context.Context, *ttnpb.EntityIdentifiers) error
+	RestoreEntityBookmarks(context.Context, *ttnpb.EntityIdentifiers) error
+	PurgeEntityBookmarks(context.Context, *ttnpb.EntityIdentifiers) error
+	DeleteUserBookmarks(context.Context, *ttnpb.UserIdentifiers) error
+	RestoreUserBookmarks(context.Context, *ttnpb.UserIdentifiers) error
+	PurgeUserBookmarks(context.Context, *ttnpb.UserIdentifiers) error
+}
+
 // MembershipStore interface for storing membership (collaboration) relations
 // between accounts (users or organizations) and entities (applications, clients,
 // gateways or organizations).
@@ -401,8 +418,9 @@ type Store interface {
 	EndDeviceStore
 	GatewayStore
 	OrganizationStore
-	UserStore
+	UserBookmarkStore
 	UserSessionStore
+	UserStore
 	MembershipStore
 	APIKeyStore
 	OAuthStore

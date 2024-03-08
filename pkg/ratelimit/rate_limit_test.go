@@ -151,6 +151,7 @@ func TestRateLimit(t *testing.T) {
 		conf := config.RateLimiting{
 			ConfigSource: "directory",
 			Directory:    "testdata",
+			Provider:     "memory",
 			Memory: config.RateLimitingMemory{
 				MaxSize: 1024,
 			},

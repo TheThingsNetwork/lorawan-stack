@@ -370,6 +370,8 @@ func (s *entitySearch) SearchAccounts(
 	defer span.End()
 
 	var selectQuery *bun.SelectQuery
+	var count int
+	var err error
 
 	if entityID := req.GetEntityIdentifiers(); entityID != nil {
 		entityType, entityUUID, err := s.getEntity(ctx, entityID)
@@ -388,23 +390,47 @@ func (s *entitySearch) SearchAccounts(
 		if q := req.GetQuery(); q != "" {
 			selectQuery = selectQuery.Where(ilike("account_friendly_id"), q)
 		}
+
+		count, err = selectQuery.Count(ctx)
+		if err != nil {
+			return nil, storeutil.WrapDriverError(err)
+		}
+		if req.ComplementCollaborators {
+			accountQuery := s.newSelectModel(ctx, &Account{}).
+				Column("account_type").
+				ColumnExpr("uid AS account_friendly_id")
+			if req.OnlyUsers {
+				accountQuery = accountQuery.Where(`account_type = 'user'`)
+			}
+			if q := req.GetQuery(); q != "" {
+				accountQuery = accountQuery.Where(ilike("uid"), q)
+			}
+			// Count the total number of results.
+			c, err := accountQuery.Count(ctx)
+			if err != nil {
+				return nil, storeutil.WrapDriverError(err)
+			}
+
+			count = c - count
+			selectQuery = accountQuery.Except(selectQuery)
+		}
 	} else {
 		selectQuery = s.newSelectModel(ctx, &Account{}).
-			ColumnExpr("account_type, uid AS account_friendly_id").
-			Order("uid")
+			Column("account_type").
+			ColumnExpr("uid AS account_friendly_id")
 		if req.OnlyUsers {
 			selectQuery = selectQuery.Where(`account_type = 'user'`)
 		}
 		if q := req.GetQuery(); q != "" {
 			selectQuery = selectQuery.Where(ilike("uid"), q)
 		}
+		// Count the total number of results.
+		count, err = selectQuery.Count(ctx)
+		if err != nil {
+			return nil, storeutil.WrapDriverError(err)
+		}
 	}
 
-	// Count the total number of results.
-	count, err := selectQuery.Count(ctx)
-	if err != nil {
-		return nil, storeutil.WrapDriverError(err)
-	}
 	store.SetTotal(ctx, uint64(count))
 
 	// Apply paging.

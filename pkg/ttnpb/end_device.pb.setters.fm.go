@@ -4478,6 +4478,31 @@ func (dst *ADRSettings_DynamicMode) SetFields(src *ADRSettings_DynamicMode, path
 					dst.ChannelSteering = nil
 				}
 			}
+		case "overrides":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_Overrides
+				if (src == nil || src.Overrides == nil) && dst.Overrides == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Overrides
+				}
+				if dst.Overrides != nil {
+					newDst = dst.Overrides
+				} else {
+					newDst = &ADRSettings_DynamicMode_Overrides{}
+					dst.Overrides = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Overrides = src.Overrides
+				} else {
+					dst.Overrides = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -4587,6 +4612,446 @@ func (dst *ADRSettings_DynamicMode_ChannelSteeringSettings) SetFields(src *ADRSe
 
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ADRSettings_DynamicMode_PerDataRateIndexOverride) SetFields(src *ADRSettings_DynamicMode_PerDataRateIndexOverride, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "min_nb_trans":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_nb_trans' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinNbTrans = src.MinNbTrans
+			} else {
+				dst.MinNbTrans = nil
+			}
+		case "max_nb_trans":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_nb_trans' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxNbTrans = src.MaxNbTrans
+			} else {
+				dst.MaxNbTrans = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ADRSettings_DynamicMode_Overrides) SetFields(src *ADRSettings_DynamicMode_Overrides, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "data_rate_0":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_0 == nil) && dst.DataRate_0 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_0
+				}
+				if dst.DataRate_0 != nil {
+					newDst = dst.DataRate_0
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_0 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_0 = src.DataRate_0
+				} else {
+					dst.DataRate_0 = nil
+				}
+			}
+		case "data_rate_1":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_1 == nil) && dst.DataRate_1 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_1
+				}
+				if dst.DataRate_1 != nil {
+					newDst = dst.DataRate_1
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_1 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_1 = src.DataRate_1
+				} else {
+					dst.DataRate_1 = nil
+				}
+			}
+		case "data_rate_2":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_2 == nil) && dst.DataRate_2 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_2
+				}
+				if dst.DataRate_2 != nil {
+					newDst = dst.DataRate_2
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_2 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_2 = src.DataRate_2
+				} else {
+					dst.DataRate_2 = nil
+				}
+			}
+		case "data_rate_3":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_3 == nil) && dst.DataRate_3 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_3
+				}
+				if dst.DataRate_3 != nil {
+					newDst = dst.DataRate_3
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_3 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_3 = src.DataRate_3
+				} else {
+					dst.DataRate_3 = nil
+				}
+			}
+		case "data_rate_4":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_4 == nil) && dst.DataRate_4 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_4
+				}
+				if dst.DataRate_4 != nil {
+					newDst = dst.DataRate_4
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_4 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_4 = src.DataRate_4
+				} else {
+					dst.DataRate_4 = nil
+				}
+			}
+		case "data_rate_5":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_5 == nil) && dst.DataRate_5 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_5
+				}
+				if dst.DataRate_5 != nil {
+					newDst = dst.DataRate_5
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_5 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_5 = src.DataRate_5
+				} else {
+					dst.DataRate_5 = nil
+				}
+			}
+		case "data_rate_6":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_6 == nil) && dst.DataRate_6 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_6
+				}
+				if dst.DataRate_6 != nil {
+					newDst = dst.DataRate_6
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_6 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_6 = src.DataRate_6
+				} else {
+					dst.DataRate_6 = nil
+				}
+			}
+		case "data_rate_7":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_7 == nil) && dst.DataRate_7 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_7
+				}
+				if dst.DataRate_7 != nil {
+					newDst = dst.DataRate_7
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_7 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_7 = src.DataRate_7
+				} else {
+					dst.DataRate_7 = nil
+				}
+			}
+		case "data_rate_8":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_8 == nil) && dst.DataRate_8 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_8
+				}
+				if dst.DataRate_8 != nil {
+					newDst = dst.DataRate_8
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_8 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_8 = src.DataRate_8
+				} else {
+					dst.DataRate_8 = nil
+				}
+			}
+		case "data_rate_9":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_9 == nil) && dst.DataRate_9 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_9
+				}
+				if dst.DataRate_9 != nil {
+					newDst = dst.DataRate_9
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_9 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_9 = src.DataRate_9
+				} else {
+					dst.DataRate_9 = nil
+				}
+			}
+		case "data_rate_10":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_10 == nil) && dst.DataRate_10 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_10
+				}
+				if dst.DataRate_10 != nil {
+					newDst = dst.DataRate_10
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_10 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_10 = src.DataRate_10
+				} else {
+					dst.DataRate_10 = nil
+				}
+			}
+		case "data_rate_11":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_11 == nil) && dst.DataRate_11 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_11
+				}
+				if dst.DataRate_11 != nil {
+					newDst = dst.DataRate_11
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_11 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_11 = src.DataRate_11
+				} else {
+					dst.DataRate_11 = nil
+				}
+			}
+		case "data_rate_12":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_12 == nil) && dst.DataRate_12 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_12
+				}
+				if dst.DataRate_12 != nil {
+					newDst = dst.DataRate_12
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_12 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_12 = src.DataRate_12
+				} else {
+					dst.DataRate_12 = nil
+				}
+			}
+		case "data_rate_13":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_13 == nil) && dst.DataRate_13 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_13
+				}
+				if dst.DataRate_13 != nil {
+					newDst = dst.DataRate_13
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_13 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_13 = src.DataRate_13
+				} else {
+					dst.DataRate_13 = nil
+				}
+			}
+		case "data_rate_14":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_14 == nil) && dst.DataRate_14 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_14
+				}
+				if dst.DataRate_14 != nil {
+					newDst = dst.DataRate_14
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_14 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_14 = src.DataRate_14
+				} else {
+					dst.DataRate_14 = nil
+				}
+			}
+		case "data_rate_15":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings_DynamicMode_PerDataRateIndexOverride
+				if (src == nil || src.DataRate_15 == nil) && dst.DataRate_15 == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DataRate_15
+				}
+				if dst.DataRate_15 != nil {
+					newDst = dst.DataRate_15
+				} else {
+					newDst = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+					dst.DataRate_15 = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DataRate_15 = src.DataRate_15
+				} else {
+					dst.DataRate_15 = nil
 				}
 			}
 

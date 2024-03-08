@@ -1538,6 +1538,15 @@
       "file": "use.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:flags_unsupported": {
+    "translations": {
+      "en": "flags are not supported for this command"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users_bookmarks.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:gateway_server_address_mismatch": {
     "translations": {
       "en": "gateway server address mismatch"
@@ -5579,6 +5588,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/identityserver/store:invalid_entity_type": {
+    "translations": {
+      "en": "invalid entity type `{entity_type}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/identityserver/store:invitation_already_sent": {
     "translations": {
       "en": "invitation already sent"
@@ -5672,6 +5690,15 @@
   "error:pkg/identityserver/store:organization_not_found": {
     "translations": {
       "en": "organization with id `{organization_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/identityserver/store:user_bookmark_not_found": {
+    "translations": {
+      "en": "user's bookmark not found"
     },
     "description": {
       "package": "pkg/identityserver/store",
@@ -5901,6 +5928,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "client_access.go"
+    }
+  },
+  "error:pkg/identityserver:collaborator_is_contact": {
+    "translations": {
+      "en": "collaborator `{collaborator_id}` is used as a contact"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "errors.go"
     }
   },
   "error:pkg/identityserver:common_password": {
