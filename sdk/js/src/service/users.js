@@ -202,6 +202,45 @@ class Users {
 
     return Marshaler.unwrapInvitation(response)
   }
+
+  // Preferences - Bookmarks.
+  async getBookmarks(userId, params) {
+    const response = await this._api.UserBookmarkRegistry.List(
+      {
+        routeParams: { 'user_ids.user_id': userId },
+      },
+      {
+        ...params,
+      },
+    )
+
+    return Marshaler.unwrapBookmarks(response)
+  }
+
+  async addBookmark(userId, entity) {
+    const response = await this._api.UserBookmarkRegistry.Create(undefined, {
+      user_ids: { user_id: userId },
+      entity_ids: entity,
+    })
+
+    return Marshaler.unwrapBookmark(response)
+  }
+
+  async deleteBookmark(userId, entity) {
+    const entityIdRoute = `entity_ids.${entity.name}_ids.${entity.name}_id`
+    const routeParams = {
+      'user_ids.user_id': userId,
+      [entityIdRoute]: entity.id,
+    }
+    if (entity === 'device') {
+      routeParams['entity_ids.device_ids.application_ids.application_id'] = entity.applicationId
+    }
+    const response = await this._api.UserBookmarkRegistry.Delete({
+      routeParams,
+    })
+
+    return Marshaler.unwrapBookmark(response)
+  }
 }
 
 export default Users

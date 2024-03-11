@@ -37,6 +37,7 @@ import networkServer from './network-server'
 import qrCodeGenerator from './qr-code-generator'
 import searchAccounts from './search-accounts'
 import notifications from './notifications'
+import userPreferences from './user-preferences'
 
 export default [
   ...status,
@@ -63,4 +64,5 @@ export default [
   ...qrCodeGenerator,
   ...searchAccounts,
   ...notifications,
+  ...userPreferences,
 ]
