@@ -13,12 +13,16 @@
 // limitations under the License.
 
 import { GET_BOOKMARKS_LIST_SUCCESS } from '@console/store/actions/user-preferences'
+import { GET_USER_ME_SUCCESS } from '@console/store/actions/logout'
 
 const initialState = {
   bookmarks: {
     bookmarks: [],
     totalCount: 0,
   },
+  consoleTheme: 'CONSOLE_THEME_SYSTEM',
+  dashboardLayouts: {},
+  sortBy: {},
 }
 
 const userPreferences = (state = initialState, { type, payload }) => {
@@ -28,6 +32,13 @@ const userPreferences = (state = initialState, { type, payload }) => {
         ...state,
         bookmarks: payload.entities,
         totalCount: payload.totalCount,
+      }
+    case GET_USER_ME_SUCCESS:
+      return {
+        ...state,
+        consoleTheme: payload.console_preferences.console_theme || 'CONSOLE_THEME_SYSTEM',
+        dashboardLayouts: payload.console_preferences.dashboard_layout || {},
+        sortBy: payload.console_preferences.sort_by || {},
       }
     default:
       return state
