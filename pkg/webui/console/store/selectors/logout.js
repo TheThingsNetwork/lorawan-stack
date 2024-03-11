@@ -52,9 +52,3 @@ export const selectUserIsAdmin = state => {
 }
 
 export const selectUserRights = state => selectUserStore(state).rights
-
-export const selectUserPreferences = state => {
-  const user = selectUser(state)
-
-  return user ? user.console_preferences : undefined
-}

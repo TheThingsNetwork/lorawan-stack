@@ -20,9 +20,7 @@ const initialState = {
     bookmarks: [],
     totalCount: 0,
   },
-  consoleTheme: 'CONSOLE_THEME_SYSTEM',
-  dashboardLayouts: {},
-  sortBy: {},
+  consolePreferences: {},
 }
 
 const userPreferences = (state = initialState, { type, payload }) => {
@@ -36,9 +34,10 @@ const userPreferences = (state = initialState, { type, payload }) => {
     case GET_USER_ME_SUCCESS:
       return {
         ...state,
-        consoleTheme: payload.console_preferences.console_theme || 'CONSOLE_THEME_SYSTEM',
-        dashboardLayouts: payload.console_preferences.dashboard_layout || {},
-        sortBy: payload.console_preferences.sort_by || {},
+        consolePreferences: {
+          ...state.consolePreferences,
+          ...payload.console_preferences,
+        },
       }
     default:
       return state
