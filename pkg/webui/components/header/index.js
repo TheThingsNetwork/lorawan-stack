@@ -53,6 +53,7 @@ const Header = ({
         secondary
         icon="bookmark"
         dropdownItems={starDropdownItems}
+        dropdownClassName={style.bookmarksDropdown}
         dropdownPosition="below left"
         className="xs:d-none"
       />

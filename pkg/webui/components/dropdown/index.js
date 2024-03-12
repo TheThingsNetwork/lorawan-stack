@@ -119,6 +119,7 @@ const DropdownItem = ({
   tabIndex,
   submenuItems,
   external,
+  messageClassName,
   ...rest
 }) => {
   const ref = useRef()
@@ -137,7 +138,7 @@ const DropdownItem = ({
   ) : (
     <Link to={path} external={external} tabIndex={tabIndex} className={style.button}>
       {Boolean(iconElement) ? iconElement : null}
-      <Message content={title} />
+      <Message content={title} component="span" className={messageClassName} />
     </Link>
   )
 
@@ -169,6 +170,7 @@ DropdownItem.propTypes = {
   exact: PropTypes.bool,
   external: PropTypes.bool,
   icon: PropTypes.string,
+  messageClassName: PropTypes.string,
   path: PropTypes.string,
   showActive: PropTypes.bool,
   submenuItems: PropTypes.arrayOf(PropTypes.node),
@@ -186,6 +188,7 @@ DropdownItem.defaultProps = {
   showActive: true,
   tabIndex: '0',
   submenuItems: undefined,
+  messageClassName: undefined,
 }
 
 const DropdownHeaderItem = ({ title, className }) => (

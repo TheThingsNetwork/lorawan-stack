@@ -14,6 +14,7 @@
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import HeaderComponent from '@ttn-lw/components/header'
 import Dropdown from '@ttn-lw/components/dropdown'
@@ -38,6 +39,13 @@ import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 import Logo from '../logo'
 
 import NotificationsDropdown from './notifications-dropdown'
+import BookmarksDropdown from './bookmarks-dropdown'
+
+const m = defineMessages({
+  addApplication: 'Add new application',
+  addGateway: 'Add new gateway',
+  addOrganization: 'Add new organization',
+})
 
 const accountUrl = selectAccountUrl()
 
@@ -59,22 +67,12 @@ const Header = ({ onMenuClick }) => {
   const plusDropdownItems = (
     <>
       {mayViewApps && (
-        <Dropdown.Item
-          title="Add new application"
-          icon="display_settings"
-          path="/applications/add"
-        />
+        <Dropdown.Item title={m.addApplication} icon="display_settings" path="/applications/add" />
       )}
-      {mayViewGtws && <Dropdown.Item title="Add new gateway" icon="router" path="/gateways/add" />}
+      {mayViewGtws && <Dropdown.Item title={m.addGateway} icon="router" path="/gateways/add" />}
       {mayViewOrgs && (
-        <Dropdown.Item title="Add new organization" icon="group" path="/organizations/add" />
+        <Dropdown.Item title={m.addOrganization} icon="group" path="/organizations/add" />
       )}
-
-      <Dropdown.Item
-        title="Register end device in application"
-        icon="settings_remote"
-        path="/devices/add"
-      />
     </>
   )
 
@@ -124,7 +122,7 @@ const Header = ({ onMenuClick }) => {
       user={user}
       profileDropdownItems={dropdownItems}
       addDropdownItems={plusDropdownItems}
-      starDropdownItems={[]}
+      starDropdownItems={<BookmarksDropdown />}
       notificationsDropdownItems={<NotificationsDropdown />}
       brandLogo={brandLogo}
       Logo={Logo}

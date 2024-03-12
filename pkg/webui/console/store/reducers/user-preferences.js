@@ -28,8 +28,11 @@ const userPreferences = (state = initialState, { type, payload }) => {
     case GET_BOOKMARKS_LIST_SUCCESS:
       return {
         ...state,
-        bookmarks: payload.entities,
-        totalCount: payload.totalCount,
+        bookmarks: {
+          ...state.bookmarks,
+          bookmarks: payload.entities,
+          totalCount: payload.totalCount,
+        },
       }
     case GET_USER_ME_SUCCESS:
       return {
