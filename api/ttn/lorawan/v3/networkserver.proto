@@ -95,6 +95,7 @@ message GetDeviceAdressPrefixesResponse {
 
 // The Ns service manages the Network Server.
 service Ns {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage The Things Stack Network Server."};
   // GenerateDevAddr requests a device address assignment from the Network Server.
   rpc GenerateDevAddr(google.protobuf.Empty) returns (GenerateDevAddrResponse) {
     option (google.api.http) = {get: "/ns/dev_addr"};
@@ -115,6 +116,7 @@ service Ns {
 
 // The AsNs service connects an Application Server to a Network Server.
 service AsNs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The AsNs service connects an Application Server to a Network Server. This is an inter-component service and is not intended to be used by end users."};
   // Replace the entire downlink queue with the specified messages.
   // This can also be used to empty the queue by specifying no messages.
   // Note that this will trigger an immediate downlink if a downlink slot is available.
@@ -128,6 +130,7 @@ service AsNs {
 
 // The GsNs service connects a Gateway Server to a Network Server.
 service GsNs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The GsNS service connects a Gateway Server to a Network Server. This is an inter-component service and is not intended to be used by end users."};
   // Called by the Gateway Server when an uplink message arrives.
   rpc HandleUplink(UplinkMessage) returns (google.protobuf.Empty);
   // Called by the Gateway Server when a Tx acknowledgment arrives.
@@ -136,6 +139,7 @@ service GsNs {
 
 // The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.
 service NsEndDeviceRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage end devices on The Things Stack Network Server."};
   // Get returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {
@@ -171,6 +175,7 @@ service NsEndDeviceRegistry {
 
 // The NsEndDeviceBatchRegistry service allows clients to manage batches of end devices on the Network Server.
 service NsEndDeviceBatchRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage batches of end devices on The Things Stack Network Server."};
   // Delete a list of devices within the same application.
   // This operation is atomic; either all devices are deleted or none.
   // Devices not found are skipped and no error is returned.

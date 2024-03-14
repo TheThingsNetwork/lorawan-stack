@@ -1054,7 +1054,7 @@ Application is the message that defines an Application in the network.
 
 ### <a name="ttn.lorawan.v3.ApplicationAccess">Service `ApplicationAccess`</a>
 
-The ApplicationAcces service, exposed by the Identity Server, is used to manage
+The ApplicationAccess service, exposed by the Identity Server, is used to manage
 API keys and collaborators of applications.
 
 | Method Name | Request Type | Response Type | Description |
@@ -2505,7 +2505,7 @@ The OAuth2 flows an OAuth client can use to get an access token.
 
 ### <a name="ttn.lorawan.v3.ClientAccess">Service `ClientAccess`</a>
 
-The ClientAcces service, exposed by the Identity Server, is used to manage
+The ClientAccess service, exposed by the Identity Server, is used to manage
 collaborators of OAuth clients.
 
 | Method Name | Request Type | Response Type | Description |
@@ -3114,6 +3114,8 @@ in a future version of The Things Stack.
 
 ### <a name="ttn.lorawan.v3.EndDeviceBatchClaimingServer">Service `EndDeviceBatchClaimingServer`</a>
 
+The EndDeviceBatchClaimingServer service support claiming and managing batches of end devices on external Join Servers.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Unclaim` | [`BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest) | [`BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse) | Unclaims multiple end devices on an external Join Server. All devices must have the same application ID. Check the response for devices that could not be unclaimed. |
@@ -3128,8 +3130,7 @@ in a future version of The Things Stack.
 
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 
-The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
-and allows clients to claim end devices.
+The EndDeviceClaimingServer service support claiming and managing end devices on external Join Servers.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -3152,6 +3153,8 @@ and allows clients to claim end devices.
 | `UnauthorizeApplication` | `DELETE` | `/api/v3/edcs/applications/{application_id}/authorize` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayClaimingServer">Service `GatewayClaimingServer`</a>
+
+The GatewayClaimingServer service support claiming and managing gateway claims.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -3679,7 +3682,7 @@ CreateClientEmailMessage is used as a wrapper for handling the email regarding t
 
 ### <a name="ttn.lorawan.v3.EmailValidationRegistry">Service `EmailValidationRegistry`</a>
 
-The EmailValidationRegistry service, exposed by the Identity Server, is used for validating an user's primary email.
+The EmailValidationRegistry service, exposed by the Identity Server, is used for validating a user's primary email.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -4735,6 +4738,8 @@ NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 
 ### <a name="ttn.lorawan.v3.EndDeviceTemplateConverter">Service `EndDeviceTemplateConverter`</a>
 
+The EndDeviceTemplateRegistry service is used to convert end devices information between formats.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ListFormats` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`EndDeviceTemplateFormats`](#ttn.lorawan.v3.EndDeviceTemplateFormats) | Returns the configured formats to convert from. |
@@ -5395,6 +5400,8 @@ Identifies an end device model with version information.
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurationService">Service `GatewayConfigurationService`</a>
 
+The GatewayConfigurationService fetches the configuration of a gateway.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetGatewayConfiguration` | [`GetGatewayConfigurationRequest`](#ttn.lorawan.v3.GetGatewayConfigurationRequest) | [`GetGatewayConfigurationResponse`](#ttn.lorawan.v3.GetGatewayConfigurationResponse) |  |
@@ -5512,6 +5519,8 @@ gateway registrations in batches.
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 
+The GatewayConfigurator service is used to fetch gateway configuration.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `PullConfiguration` | [`PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) _stream_ |  |
@@ -5615,6 +5624,8 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | `delay` | <p>`duration.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.Gs">Service `Gs`</a>
+
+The Gs service returns information about the Gateway Server and gateways connected to it.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -5969,6 +5980,8 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 ### <a name="ttn.lorawan.v3.EntityAccess">Service `EntityAccess`</a>
 
+The EntityAccess service provides information about the access rights of an entity.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `AuthInfo` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`AuthInfoResponse`](#ttn.lorawan.v3.AuthInfoResponse) | AuthInfo returns information about the authentication that is used on the request. |
@@ -5980,6 +5993,8 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `AuthInfo` | `GET` | `/api/v3/auth_info` |  |
 
 ### <a name="ttn.lorawan.v3.Is">Service `Is`</a>
+
+The Is service provides information about the Identity Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -6350,6 +6365,8 @@ The AsJs service connects an Application Server to a Join Server.
 | `GetAppSKey` | [`SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) | Request the application session key for a particular session. |
 
 ### <a name="ttn.lorawan.v3.Js">Service `Js`</a>
+
+The Js service returns configuration for a Join Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -9000,6 +9017,8 @@ The NsRelayConfigurationService provides configuration management capabilities f
 
 ### <a name="ttn.lorawan.v3.NotificationService">Service `NotificationService`</a>
 
+The NotificationService is used to send notifications.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateNotificationRequest`](#ttn.lorawan.v3.CreateNotificationRequest) | [`CreateNotificationResponse`](#ttn.lorawan.v3.CreateNotificationResponse) | Create a new notification. Can only be called by internal services using cluster auth. |
@@ -9998,6 +10017,8 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `value` | [`QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat) |  |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceQRCodeGenerator">Service `EndDeviceQRCodeGenerator`</a>
+
+The EndDeviceQRCodeGenerator service provides functionality to generate and parse QR codes.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -11111,7 +11132,7 @@ DashboardLayout is a set of possible layout values to be used in the Console.
 
 ### <a name="ttn.lorawan.v3.UserAccess">Service `UserAccess`</a>
 
-The UserAcces service, exposed by the Identity Server, is used to manage
+The UserAccess service, exposed by the Identity Server, is used to manage
 API keys of users.
 
 | Method Name | Request Type | Response Type | Description |
@@ -11160,6 +11181,8 @@ API keys of users.
 | `BatchDelete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/batch` |  |
 
 ### <a name="ttn.lorawan.v3.UserInvitationRegistry">Service `UserInvitationRegistry`</a>
+
+The UserOrganizationRegistry service, exposed by the Identity Server, is used to manage user invitations.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|

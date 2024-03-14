@@ -6,193 +6,256 @@
   },
   "tags": [
     {
-      "name": "ApplicationRegistry"
+      "name": "ApplicationRegistry",
+      "description": "Manage applications."
     },
     {
-      "name": "ApplicationAccess"
+      "name": "ApplicationAccess",
+      "description": "Manage access to applications."
     },
     {
-      "name": "As"
+      "name": "As",
+      "description": "Manage an Application Server."
     },
     {
-      "name": "NsAs"
+      "name": "NsAs",
+      "description": "The NsAs service is used by The Things Stack Network Servers to interact with The Things Stack Application Servers. This is an inter-component service and is not meant for end users."
     },
     {
-      "name": "AppAs"
+      "name": "AppAs",
+      "description": "Connect and manage applications or integrations to an Application Server."
     },
     {
-      "name": "AsEndDeviceRegistry"
+      "name": "AsEndDeviceRegistry",
+      "description": "Manage end devices on the Application Server."
     },
     {
-      "name": "AsEndDeviceBatchRegistry"
+      "name": "AsEndDeviceBatchRegistry",
+      "description": "Manage batches of end devices on the Application Server."
     },
     {
-      "name": "ApplicationUpStorage"
+      "name": "ApplicationUpStorage",
+      "description": "Query application upstream messages from the storage integration."
     },
     {
-      "name": "ApplicationPackageRegistry"
+      "name": "ApplicationPackageRegistry",
+      "description": "Manage application packages and their associations."
     },
     {
-      "name": "ApplicationPubSubRegistry"
+      "name": "ApplicationPubSubRegistry",
+      "description": "Manage application pubsubs."
     },
     {
-      "name": "ApplicationWebhookRegistry"
+      "name": "ApplicationWebhookRegistry",
+      "description": "Manage application webhooks."
     },
     {
-      "name": "ClientRegistry"
+      "name": "ClientRegistry",
+      "description": "Manage OAuth client registrations."
     },
     {
-      "name": "ClientAccess"
+      "name": "ClientAccess",
+      "description": "Manage access to OAuth clients."
     },
     {
-      "name": "Configuration"
+      "name": "Configuration",
+      "description": "Retrieve LoRaWAN network configuration options."
     },
     {
-      "name": "ContactInfoRegistry"
+      "name": "ContactInfoRegistry",
+      "description": "DEPRECATED: Validate contact information of registered entities."
     },
     {
-      "name": "EndDeviceClaimingServer"
+      "name": "EndDeviceClaimingServer",
+      "description": "Claim and manage end devices on external Join Servers."
     },
     {
-      "name": "EndDeviceBatchClaimingServer"
+      "name": "EndDeviceBatchClaimingServer",
+      "description": "Claim and manage batches of end devices on external Join Servers."
     },
     {
-      "name": "GatewayClaimingServer"
+      "name": "GatewayClaimingServer",
+      "description": "Claim gateways and manage claims."
     },
     {
-      "name": "DeviceRepository"
+      "name": "DeviceRepository",
+      "description": "Get information on LoRaWAN end device brands, models, and templates from the Device Repository."
     },
     {
-      "name": "EmailValidationRegistry"
+      "name": "EmailValidationRegistry",
+      "description": "Validate a user's primary email."
     },
     {
-      "name": "EndDeviceRegistry"
+      "name": "EndDeviceRegistry",
+      "description": "Manage end devices on The Things Stack Identity Server."
     },
     {
-      "name": "EndDeviceTemplateConverter"
+      "name": "EndDeviceTemplateConverter",
+      "description": "Convert end device information between supported formats."
     },
     {
-      "name": "EndDeviceBatchRegistry"
+      "name": "EndDeviceBatchRegistry",
+      "description": "Manage end devices on The Things Stack Identity Server in batches."
     },
     {
-      "name": "Events"
+      "name": "Events",
+      "description": "Read events served from a The Things Stack cluster."
     },
     {
-      "name": "GatewayConfigurationService"
+      "name": "GatewayConfigurationService",
+      "description": "Fetch configuration for gateways."
     },
     {
-      "name": "GatewayRegistry"
+      "name": "GatewayRegistry",
+      "description": "Manage gateways."
     },
     {
-      "name": "GatewayAccess"
+      "name": "GatewayAccess",
+      "description": "Manage access to gateways."
     },
     {
-      "name": "GatewayConfigurator"
+      "name": "GatewayConfigurator",
+      "description": "Fetch gateway configuration."
     },
     {
-      "name": "GatewayBatchAccess"
+      "name": "GatewayBatchAccess",
+      "description": "Manage access to batches of gateways."
     },
     {
-      "name": "GatewayBatchRegistry"
+      "name": "GatewayBatchRegistry",
+      "description": "Manage batches of gateways."
     },
     {
-      "name": "GtwGs"
+      "name": "GtwGs",
+      "description": "Connect a gRPC gateway to a The Things Stack Gateway Server."
     },
     {
-      "name": "NsGs"
+      "name": "NsGs",
+      "description": "The NsGs service connects a Network Server to a Gateway Server. This is an inter-component service and is not intended for end users."
     },
     {
-      "name": "Gs"
+      "name": "Gs",
+      "description": "Retrieve gateway connection statistics."
     },
     {
-      "name": "EntityAccess"
+      "name": "EntityAccess",
+      "description": "Check the access rights for an entity."
     },
     {
-      "name": "Is"
+      "name": "Is",
+      "description": "Get information about The Things Stack Identity Server."
     },
     {
-      "name": "NsJs"
+      "name": "NsJs",
+      "description": "The NsJs service connects a Network Server to a Join Server. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "AsJs"
+      "name": "AsJs",
+      "description": "The AsJs service connects an Application Server to a Join Server. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "AppJs"
+      "name": "AppJs",
+      "description": "The AppJs service is used by an external AWS integration to connect to a Join Server instance."
     },
     {
-      "name": "NetworkCryptoService"
+      "name": "NetworkCryptoService",
+      "description": "The NetworkCryptoService supports network layer cryptographic operations. This service is not intended to be used by end users."
     },
     {
-      "name": "ApplicationCryptoService"
+      "name": "ApplicationCryptoService",
+      "description": "The ApplicationCryptoService supports application layer cryptographic operations. This service is not intended to be used by end users."
     },
     {
-      "name": "JsEndDeviceRegistry"
+      "name": "JsEndDeviceRegistry",
+      "description": "Manage end devices on The Things Stack Join Server."
     },
     {
-      "name": "JsEndDeviceBatchRegistry"
+      "name": "JsEndDeviceBatchRegistry",
+      "description": "Manage batches of end devices on The Things Stack Join Server."
     },
     {
-      "name": "ApplicationActivationSettingRegistry"
+      "name": "ApplicationActivationSettingRegistry",
+      "description": "Manage application activation settings."
     },
     {
-      "name": "Js"
+      "name": "Js",
+      "description": "Fetch configuration for The Things Stack Join Server."
     },
     {
-      "name": "Ns"
+      "name": "Ns",
+      "description": "Manage The Things Stack Network Server."
     },
     {
-      "name": "AsNs"
+      "name": "AsNs",
+      "description": "The AsNs service connects an Application Server to a Network Server. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "GsNs"
+      "name": "GsNs",
+      "description": "The GsNS service connects a Gateway Server to a Network Server. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "NsEndDeviceRegistry"
+      "name": "NsEndDeviceRegistry",
+      "description": "Manage end devices on The Things Stack Network Server."
     },
     {
-      "name": "NsEndDeviceBatchRegistry"
+      "name": "NsEndDeviceBatchRegistry",
+      "description": "Manage batches of end devices on The Things Stack Network Server."
     },
     {
-      "name": "NsRelayConfigurationService"
+      "name": "NsRelayConfigurationService",
+      "description": "Manage configuration of LoRaWAN® relay devices."
     },
     {
-      "name": "NotificationService"
+      "name": "NotificationService",
+      "description": "Read and manage notifications."
     },
     {
-      "name": "OAuthAuthorizationRegistry"
+      "name": "OAuthAuthorizationRegistry",
+      "description": "Manage OAuth client authorizations for users."
     },
     {
-      "name": "OrganizationRegistry"
+      "name": "OrganizationRegistry",
+      "description": "Manage organizations."
     },
     {
-      "name": "OrganizationAccess"
+      "name": "OrganizationAccess",
+      "description": "Manage access to organizations"
     },
     {
-      "name": "GsPba"
+      "name": "GsPba",
+      "description": "The GsPba service connects a Gateway Server to a Packet Broker Agent. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "NsPba"
+      "name": "NsPba",
+      "description": "The NsPba service connects a Network Server to a Packet Broker Agent. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "Pba"
+      "name": "Pba",
+      "description": "Manage peering via Packet Broker."
     },
     {
-      "name": "EndDeviceQRCodeGenerator"
+      "name": "EndDeviceQRCodeGenerator",
+      "description": "Generate and parse end device QR codes."
     },
     {
-      "name": "EntityRegistrySearch"
+      "name": "EntityRegistrySearch",
+      "description": "Search for entities in the Entity Registry."
     },
     {
-      "name": "EndDeviceRegistrySearch"
+      "name": "EndDeviceRegistrySearch",
+      "description": "Search for end devices in the End Device Registry."
     },
     {
-      "name": "UserRegistry"
+      "name": "UserRegistry",
+      "description": "Manage users."
     },
     {
-      "name": "UserAccess"
+      "name": "UserAccess",
+      "description": "Manage user access."
     },
     {
-      "name": "UserInvitationRegistry"
+      "name": "UserInvitationRegistry",
+      "description": "Manage user sessions."
     },
     {
       "name": "UserSessionRegistry"
