@@ -180,9 +180,9 @@ const DocLink = props => {
       onClick={onClick}
       tabIndex={tabIndex}
     >
-      {!raw && <Icon className={style.docIcon} icon="book" />}
+      {!raw && <Icon className={style.docIcon} icon="book" size={18} />}
       {children}
-      {!raw && <Icon className={style.icon} icon="rocket" />}
+      {!raw && <Icon className={style.icon} icon="external-link" size={14} />}
     </a>
   )
 }
@@ -304,7 +304,7 @@ const AnchorLink = props => {
       {...dataProps}
     >
       {children}
-      {external ? <Icon className={style.icon} icon="rocket" /> : null}
+      {external ? <Icon className={style.icon} icon="external-link" size={14} /> : null}
     </a>
   )
 }
