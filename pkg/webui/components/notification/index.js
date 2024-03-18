@@ -48,11 +48,11 @@ const Notification = ({
     [style.withDetails]: Boolean(details),
   })
 
-  let icon = 'info'
+  let icon = 'info-circle'
   if (error) {
-    icon = 'error'
+    icon = 'exclamation-circle'
   } else if (warning) {
-    icon = 'warning'
+    icon = 'alert-circle'
   }
 
   return (

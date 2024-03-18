@@ -26,4 +26,4 @@ export default {
   },
 }
 
-export const Default = () => <DedicatedEntity label="Adrian's Test Lab" icon="arrow_left" />
+export const Default = () => <DedicatedEntity label="Adrian's Test Lab" icon="arrow-left" />

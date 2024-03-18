@@ -31,7 +31,7 @@ export default {
 const dropdownItems = (
   <React.Fragment>
     <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
-    <Dropdown.Item title="Logout" icon="power_settings_new" path="/logout" />
+    <Dropdown.Item title="Logout" icon="logout" path="/logout" />
   </React.Fragment>
 )
 
@@ -43,13 +43,13 @@ export const Primary = () => (
 
 export const WithIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button primary icon="favorite" message="With Icon" />
+    <Button primary icon="star" message="With Icon" />
   </div>
 )
 
 export const PrimayOnlyIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button primary icon="favorite" />
+    <Button primary icon="star" />
   </div>
 )
 
@@ -58,7 +58,7 @@ export const PrimayDropdown = () => {
 
   return (
     <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
-      <Button primary icon="favorite" message="Dropdown" ref={ref} dropdownItems={dropdownItems} />
+      <Button primary icon="star" message="Dropdown" ref={ref} dropdownItems={dropdownItems} />
     </div>
   )
 }
@@ -68,7 +68,7 @@ export const PrimayOnlyIconDropdown = () => {
 
   return (
     <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
-      <Button primary icon="favorite" dropdownItems={dropdownItems} ref={ref} />
+      <Button primary icon="star" dropdownItems={dropdownItems} ref={ref} />
     </div>
   )
 }
@@ -81,13 +81,13 @@ export const Secondary = () => (
 
 export const SecondaryWithIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button secondary icon="favorite" message="Secondary With Icon" />
+    <Button secondary icon="star" message="Secondary With Icon" />
   </div>
 )
 
 export const SecondaryOnlyIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button secondary icon="favorite" />
+    <Button secondary icon="star" />
   </div>
 )
 
@@ -96,13 +96,7 @@ export const SecondaryDropdown = () => {
 
   return (
     <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
-      <Button
-        secondary
-        icon="favorite"
-        message="Dropdown"
-        dropdownItems={dropdownItems}
-        ref={ref}
-      />
+      <Button secondary icon="star" message="Dropdown" dropdownItems={dropdownItems} ref={ref} />
     </div>
   )
 }
@@ -112,7 +106,7 @@ export const SecondaryOnlyIconDropdown = () => {
 
   return (
     <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
-      <Button secondary icon="favorite" dropdownItems={dropdownItems} ref={ref} />
+      <Button secondary icon="star" dropdownItems={dropdownItems} ref={ref} />
     </div>
   )
 }

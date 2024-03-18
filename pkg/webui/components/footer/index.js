@@ -202,7 +202,7 @@ const Footer = ({
         )}
         {supportLink && (
           <FooterSection link={supportLink} safe={safe} primary>
-            <Icon icon="contact_support" textPaddedRight nudgeDown />
+            <Icon icon="lifebuoy" textPaddedRight nudgeDown />
             <Message content={sharedMessages.getSupport} />
           </FooterSection>
         )}

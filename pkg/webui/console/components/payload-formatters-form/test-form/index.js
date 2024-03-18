@@ -129,13 +129,13 @@ const TestForm = props => {
           ? formatMessage(m.emptyPayload)
           : ''
   }
-  let infoIcon = 'info'
+  let infoIcon = 'info-circle'
   let infoMessage = m.noResult
   if (showTestError) {
-    infoIcon = 'error'
+    infoIcon = 'exclamation-circle'
     infoMessage = hasFatalError ? m.testFatalError : m.testError
   } else if (showTestWarning) {
-    infoIcon = 'warning'
+    infoIcon = 'alert-circle'
     infoMessage = m.testWarning
   } else if (showTestValid) {
     infoIcon = 'valid'

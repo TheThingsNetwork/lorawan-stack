@@ -59,22 +59,14 @@ const Header = ({ onMenuClick }) => {
   const plusDropdownItems = (
     <>
       {mayViewApps && (
-        <Dropdown.Item
-          title="Add new application"
-          icon="display_settings"
-          path="/applications/add"
-        />
+        <Dropdown.Item title="Add new application" icon="application" path="/applications/add" />
       )}
-      {mayViewGtws && <Dropdown.Item title="Add new gateway" icon="router" path="/gateways/add" />}
+      {mayViewGtws && <Dropdown.Item title="Add new gateway" icon="gateway" path="/gateways/add" />}
       {mayViewOrgs && (
-        <Dropdown.Item title="Add new organization" icon="group" path="/organizations/add" />
+        <Dropdown.Item title="Add new organization" icon="organization" path="/organizations/add" />
       )}
 
-      <Dropdown.Item
-        title="Register end device in application"
-        icon="settings_remote"
-        path="/devices/add"
-      />
+      <Dropdown.Item title="Register end device in application" icon="device" path="/devices/add" />
     </>
   )
 
@@ -82,14 +74,14 @@ const Header = ({ onMenuClick }) => {
     <React.Fragment>
       <Dropdown.Item
         title={sharedMessages.profileSettings}
-        icon="user"
+        icon="user-circle"
         path={`${accountUrl}/profile-settings`}
         external
       />
       {isAdmin && (
         <Dropdown.Item
           title={sharedMessages.adminPanel}
-          icon="admin_panel_settings"
+          icon="admin-panel"
           path="/admin-panel/network-information"
         />
       )}
@@ -102,7 +94,7 @@ const Header = ({ onMenuClick }) => {
       />
       <Dropdown.Item
         title={sharedMessages.documentation}
-        icon="menu_book"
+        icon="book"
         path="https://thethingsindustries.com/docs"
         external
       />

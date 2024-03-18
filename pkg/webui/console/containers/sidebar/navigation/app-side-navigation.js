@@ -80,7 +80,7 @@ const AppSideNavigation = () => {
           <SideNavigation.Item
             title={sharedMessages.appOverview}
             path={`/applications/${appId}`}
-            icon="group"
+            icon="layout-dashboard"
             exact
           />
         )}
@@ -95,14 +95,14 @@ const AppSideNavigation = () => {
           <SideNavigation.Item
             title={sharedMessages.liveData}
             path={`/applications/${appId}/data`}
-            icon="list_alt"
+            icon="live-data"
           />
         )}
-        {/* <SideNavigation.Item title={'Network Information Center'} path="/noc" icon="ssid_chart" /> */}
+        {/* <SideNavigation.Item title={'Network Information Center'} path="/noc" icon="graph" /> */}
         {maySetApplicationPayloadFormatters.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.payloadFormatters}
-            icon="developer_mode"
+            icon="payload-format"
             isMinimized={isMinimized}
           >
             <SideNavigation.Item
@@ -126,25 +126,25 @@ const AppSideNavigation = () => {
             <SideNavigation.Item
               title={sharedMessages.mqtt}
               path={`/applications/${appId}/integrations/mqtt`}
-              icon="extension"
+              icon="puzzle"
             />
             <SideNavigation.Item
               title={sharedMessages.webhooks}
               path={`/applications/${appId}/integrations/webhooks`}
-              icon="extension"
+              icon="webhook"
             />
             {mayAddPubSubIntegrations.check(natsDisabled, mqttDisabled) && (
               <SideNavigation.Item
                 title={sharedMessages.pubsubs}
                 path={`/applications/${appId}/integrations/pubsubs`}
-                icon="extension"
+                icon="puzzle"
               />
             )}
             {mayViewOrEditApplicationPackages.check(rights) && (
               <SideNavigation.Item
                 title={sharedMessages.loraCloud}
                 path={`/applications/${appId}/integrations/lora-cloud`}
-                icon="extension"
+                icon="puzzle"
               />
             )}
           </SideNavigation.Item>
@@ -153,21 +153,21 @@ const AppSideNavigation = () => {
           <SideNavigation.Item
             title={sharedMessages.collaborators}
             path={`/applications/${appId}/collaborators`}
-            icon="organization"
+            icon="collaborators"
           />
         )}
         {mayViewOrEditApplicationApiKeys.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.apiKeys}
             path={`/applications/${appId}/api-keys`}
-            icon="api_keys"
+            icon="api-keys"
           />
         )}
         {mayEditBasicApplicationInfo.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.generalSettings}
             path={`/applications/${appId}/general-settings`}
-            icon="general_settings"
+            icon="general-settings"
           />
         )}
       </SideNavigation>

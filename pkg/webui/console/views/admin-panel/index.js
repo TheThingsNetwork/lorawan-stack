@@ -58,7 +58,7 @@ const AdminPanel = () => {
       <PanelView>
         <PanelView.Item
           title={sharedMessages.networkInformation}
-          icon="view_compact"
+          icon="gird-pattern"
           path="network-information"
           Component={NetworkInformation}
           exact
@@ -66,7 +66,7 @@ const AdminPanel = () => {
         {showUserManagement && (
           <PanelView.Item
             title={m.userManagement}
-            icon="user_management"
+            icon="user-management"
             path="user-management"
             Component={UserManagement}
             condition={showUserManagement}
@@ -75,7 +75,7 @@ const AdminPanel = () => {
         {showPacketBroker && (
           <PanelView.Item
             title={m.peeringSettings}
-            icon="packet_broker"
+            icon="packet-broker"
             path="packet-broker"
             Component={PacketBrokerRouter}
             condition={showPacketBroker}

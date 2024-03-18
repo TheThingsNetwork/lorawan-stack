@@ -96,7 +96,7 @@ const Events = React.memo(
                   onClick={onExport}
                   message={sharedMessages.exportJson}
                   naked
-                  icon="file_download"
+                  icon="file-download"
                 />
                 <Button
                   onClick={onPause}
@@ -105,7 +105,7 @@ const Events = React.memo(
                   warning={paused}
                   icon={paused ? 'play_arrow' : 'pause'}
                 />
-                <Button onClick={onClear} message={sharedMessages.clear} naked icon="delete" />
+                <Button onClick={onClear} message={sharedMessages.clear} naked icon="trash" />
               </div>
             </div>
           </div>
@@ -122,7 +122,7 @@ const Events = React.memo(
         </section>
         {truncated && (
           <div className={style.truncated}>
-            <Icon icon="info" />
+            <Icon icon="info-circle" />
             <Message content={m.eventsTruncated} values={{ limit: EVENT_STORE_LIMIT }} />
           </div>
         )}

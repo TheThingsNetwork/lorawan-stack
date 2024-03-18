@@ -38,20 +38,20 @@ const Header = ({
   <header {...rest} className={classnames(className, style.container)}>
     <div className={classnames('breadcrumbs', 'm:d-none')} />
     <div className="d-none m:d-flex al-center gap-cs-xs">
-      <Button secondary icon="menu" onClick={onMenuClick} />
+      <Button secondary icon="book" onClick={onMenuClick} />
       <Logo className={style.logo} />
     </div>
 
     <div className="d-flex al-center gap-cs-xs">
       <Button
         secondary
-        icon="add_box"
+        icon="plus"
         dropdownItems={addDropdownItems}
         dropdownPosition="below left"
       />
       <Button
         secondary
-        icon="bookmark"
+        icon="star"
         dropdownItems={starDropdownItems}
         dropdownPosition="below left"
         className="xs:d-none"

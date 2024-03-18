@@ -28,71 +28,71 @@ import Value from '../previews/value'
 export const eventIconMap = [
   {
     test: /^(ns\.|as\.|js\.)?([a-z0-9](?:[-_]?[a-z0-9]){2,}\.)+create$/,
-    icon: 'event_create',
+    icon: 'event-create',
   },
   {
     test: /^(ns\.|as\.|js\.)?([a-z0-9](?:[-_]?[a-z0-9]){2,}\.)+update$/,
-    icon: 'event_update',
+    icon: 'event-update',
   },
   {
     test: /^(ns\.|as\.|js\.)?([a-z0-9](?:[-_]?[a-z0-9]){2,}\.)+delete$/,
-    icon: 'event_delete',
+    icon: 'event-delete',
   },
   {
     test: /^(ns|as)\.up(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_uplink',
+    icon: 'event-uplink',
   },
   {
     test: /^(ns|as)\.down(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_downlink',
+    icon: 'event-downlink',
   },
   {
     test: /^(js|ns|as)(\.up|\.down)?\.(join|rejoin)(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_join',
+    icon: 'event-join',
   },
   {
     test: /^gs\.up(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_uplink',
+    icon: 'event-uplink',
   },
   {
     test: /^gs\.down(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_downlink',
+    icon: 'event-downlink',
   },
   {
     test: /^gs.gateway.connect$/,
-    icon: 'event_gateway_connect',
+    icon: 'event-gateway-connect',
   },
   {
     test: /^gs.gateway.disconnect$/,
-    icon: 'event_gateway_disconnect',
+    icon: 'event-gateway-disconnect',
   },
   {
     test: /^ns\.mac\.rekey\..*$/,
-    icon: 'event_rekey',
+    icon: 'event-rekey',
   },
   {
     test: /^ns\.mac\.device_mode\..*$/,
-    icon: 'event_mode',
+    icon: 'event-mode',
   },
   {
     test: /^ns\..*\.switch\..*$/,
-    icon: 'event_switch',
+    icon: 'event-switch',
   },
   {
     test: /^ns(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_connection',
+    icon: 'event-connection',
   },
   {
     test: /^gs\.status\..*$/,
-    icon: 'event_status',
+    icon: 'event-status',
   },
   {
     test: /^synthetic\.status\.cleared$/,
-    icon: 'event_clear_all',
+    icon: 'event-clear-all',
   },
   {
     test: /^synthetic\.error\..*$/,
-    icon: 'event_error',
+    icon: 'event-error',
   },
 ]
 

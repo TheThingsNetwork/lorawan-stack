@@ -32,18 +32,18 @@ export default {
 export const Default = () => (
   <div style={{ height: '25rem', marginLeft: '15rem' }}>
     <ProfileDropdown brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}>
-      <Dropdown.Item title="Profile settings" icon="person" path="/profile-settings" />
+      <Dropdown.Item title="Profile settings" icon="user" path="/profile-settings" />
       <Dropdown.Item
         title="Manage cloud subscription"
-        icon="credit_card"
+        icon="credit-card"
         path="/manage-cloud-subs"
       />
-      <Dropdown.Item title="Network Operations Center" icon="bar_chart" path="/network_ops" />
-      <Dropdown.Item title="Admin panel" icon="admin_panel_settings" path="/admin-panel" />
+      <Dropdown.Item title="Network Operations Center" icon="chart-bar" path="/network_ops" />
+      <Dropdown.Item title="Admin panel" icon="admin-shield" path="/admin-panel" />
       <hr />
-      <Dropdown.Item title="Upgrade" icon="stars" path="/upgrade" />
+      <Dropdown.Item title="Upgrade" icon="rocket" path="/upgrade" />
       <Dropdown.Item title="Get support" icon="support" path="/support" />
-      <Dropdown.Item title="Documentation" icon="menu_book" path="/documentation" />
+      <Dropdown.Item title="Documentation" icon="book" path="/documentation" />
       <hr />
       <Dropdown.Item title="Logout" icon="logout" action={handleLogout} />
     </ProfileDropdown>

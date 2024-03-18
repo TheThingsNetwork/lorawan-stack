@@ -33,7 +33,7 @@ const m = defineMessages({
     'A new user just registered on your network. Since user registration requires admin approval, you need to approve this user before they can login. User ID: {userId}',
 })
 
-const UserRequestedIcon = () => <Icon icon="person_add" className="c-tts-primary" />
+const UserRequestedIcon = () => <Icon icon="user-plus" className="c-tts-primary" />
 
 const UserRequestedPreview = ({ notificationData }) => {
   const { user } = notificationData.data

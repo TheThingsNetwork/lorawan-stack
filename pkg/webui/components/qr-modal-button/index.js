@@ -75,7 +75,7 @@ const QRModalButton = props => {
   return (
     <ModalButton
       type="button"
-      icon="camera_alt"
+      icon="camera"
       onCancel={onCancel}
       onApprove={onApprove}
       message={message}

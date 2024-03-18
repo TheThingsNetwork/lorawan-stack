@@ -84,7 +84,7 @@ const OrganizationTitleSection = ({ orgId }) => {
           )}
           {mayViewApiKeys && (
             <Content.EntityCount
-              icon="api_keys"
+              icon="api-keys"
               value={apiKeysTotalCount}
               keyMessage={sharedMessages.apiKeyCounted}
               toAllUrl={`/organizations/${orgId}/api-keys`}

@@ -54,7 +54,7 @@ const GatewayApiKeysModal = ({
           type="button"
           message={m.downloadLns}
           onClick={downloadLns}
-          icon="file_download"
+          icon="file-download"
           secondary
         />
       )}
@@ -63,7 +63,7 @@ const GatewayApiKeysModal = ({
           type="button"
           message={m.downloadCups}
           onClick={downloadCups}
-          icon="file_download"
+          icon="file-download"
           secondary
         />
       )}

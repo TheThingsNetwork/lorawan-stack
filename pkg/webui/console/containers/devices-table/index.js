@@ -110,13 +110,7 @@ const headers = [
             placement="top-end"
           >
             <Status status="unknown" label={sharedMessages.otherCluster}>
-              <Icon
-                icon="help_outline"
-                textPaddedLeft
-                small
-                nudgeUp
-                className="c-text-neutral-light"
-              />
+              <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
             </Status>
           </DocTooltip>
         )
@@ -188,7 +182,7 @@ const DevicesTableInner = () => {
   const importButton = mayImportDevices && (
     <Button.Link
       message={sharedMessages.importDevices}
-      icon="import_devices"
+      icon="import-devices"
       to={`/applications/${appId}/devices/import`}
       secondary
     />

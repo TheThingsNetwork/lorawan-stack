@@ -267,7 +267,7 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
             onApprove={onExport}
             message={m.downloadMacData}
             type="button"
-            icon="file_download"
+            icon="file-download"
           />
         ),
       },

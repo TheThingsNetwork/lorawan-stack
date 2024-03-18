@@ -147,7 +147,7 @@ const FieldTooltip = React.memo(props => {
         />
       }
     >
-      <Icon className={style.tooltipIcon} icon="help_outline" />
+      <Icon className={style.tooltipIcon} icon="help" />
     </Tooltip>
   )
 })

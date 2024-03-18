@@ -23,7 +23,7 @@ const Switch = props => (
   <ReactSwitch
     {...props}
     uncheckedIcon={
-      <Icon icon="close" style={{ color: 'white', marginLeft: '3px', fontSize: '1rem' }} />
+      <Icon icon="x" style={{ color: 'white', marginLeft: '3px', fontSize: '1rem' }} />
     }
     checkedIcon={
       <Icon icon="check" style={{ color: 'white', marginLeft: '5px', fontSize: '1rem' }} />

@@ -60,7 +60,8 @@ const CollapsibleItem = ({
         {icon && <Icon icon={icon} className={style.icon} />}
         <Message content={title} className={style.title} />
         <Icon
-          icon="keyboard_arrow_down"
+          icon="chevron-down"
+          size={14}
           className={classnames(style.expandIcon, {
             [style.expandIconOpen]: isExpanded,
           })}

@@ -65,7 +65,7 @@ const GatewayTitleSection = ({ gtwId }) => {
       )}
       {mayViewApiKeys && (
         <Content.EntityCount
-          icon="api_keys"
+          icon="api-keys"
           value={apiKeysTotalCount}
           keyMessage={sharedMessages.apiKeyCounted}
           toAllUrl={`/gateways/${gtwId}/api-keys`}

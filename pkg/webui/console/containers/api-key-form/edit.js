@@ -125,7 +125,7 @@ const ApiKeyEditForm = ({ entity, entityId }) => {
         <FormSubmit component={SubmitButton} message={sharedMessages.saveChanges} />
         <ModalButton
           type="button"
-          icon="delete"
+          icon="trash"
           danger
           naked
           message={m.deleteKey}

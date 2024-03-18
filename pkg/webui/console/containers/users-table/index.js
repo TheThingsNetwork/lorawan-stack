@@ -209,7 +209,7 @@ const UsersTable = props => {
               type="button"
               onClick={details.delete}
               message={m.revokeInvitation}
-              icon="delete"
+              icon="trash"
               danger
               naked
             />

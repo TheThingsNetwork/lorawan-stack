@@ -79,7 +79,7 @@ const SafeInspector = ({
   const [hidden, setHidden] = useState((hideable && !initiallyVisible) || false)
   const [byteStyle, setByteStyle] = useState(true)
   const [copied, setCopied] = useState(false)
-  const [copyIcon, setCopyIcon] = useState('file_copy')
+  const [copyIcon, setCopyIcon] = useState('clipboard')
   const [representation, setRepresentation] = useState(MSB)
   const [truncated, setTruncated] = useState(false)
 
@@ -143,18 +143,18 @@ const SafeInspector = ({
     }
 
     setCopied(true)
-    setCopyIcon('done')
+    setCopyIcon('clipboard_check')
     if (noCopyPopup) {
       _timer.current = setTimeout(() => {
         setCopied(false)
-        setCopyIcon('file_copy')
+        setCopyIcon('clipboard')
       }, 2000)
     }
   }, [copied, noCopyPopup])
 
   const handleCopyAnimationEnd = useCallback(() => {
     setCopied(false)
-    setCopyIcon('file_copy')
+    setCopyIcon('clipboard')
   }, [])
 
   useEffect(() => {
@@ -251,7 +251,7 @@ const SafeInspector = ({
                 className={style.buttonSwap}
                 onClick={handleSwapToggle}
               >
-                <Icon className={style.buttonIcon} small icon="swap_horiz" />
+                <Icon className={style.buttonIcon} small icon="switch-horizontal" />
               </button>
             </React.Fragment>
           )}
@@ -289,11 +289,7 @@ const SafeInspector = ({
               className={style.buttonVisibility}
               onClick={handleVisibiltyToggle}
             >
-              <Icon
-                className={style.buttonIcon}
-                small
-                icon={hidden ? 'visibility' : 'visibility_off'}
-              />
+              <Icon className={style.buttonIcon} small icon={hidden ? 'eye' : 'eye_off'} />
             </button>
           )}
         </div>

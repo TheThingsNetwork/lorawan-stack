@@ -57,7 +57,7 @@ const SideFooter = () => {
   const clusterButtonRef = useRef(null)
 
   const clusterDropdownItems = (
-    <Dropdown.Item title="Cluster selection" icon="public" path="/cluster" />
+    <Dropdown.Item title="Cluster selection" icon="world" path="/cluster" />
   )
 
   const languageContext = useContext(LanguageContext)
@@ -86,14 +86,14 @@ const SideFooter = () => {
     <>
       <Dropdown.Item
         title={sharedMessages.documentation}
-        icon="menu_book"
+        icon="book"
         path={documentationBaseUrl}
         external
       />
       <Dropdown.Item title={sharedMessages.support} icon="support" path={supportLink} external />
       <Dropdown.Item
         title={sharedMessages.statusPage}
-        icon="monitor_heart"
+        icon="heart-rate-monitor"
         path={statusPageBaseUrl}
         external
       />
@@ -138,7 +138,7 @@ const SideFooter = () => {
       <Button
         className={style.clusterButton}
         secondary
-        icon="public"
+        icon="world"
         message="EU1"
         noDropdownIcon
         dropdownItems={clusterDropdownItems}

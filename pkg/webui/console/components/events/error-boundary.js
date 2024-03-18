@@ -34,7 +34,7 @@ const EventErrorBoundary = ({ children }) => {
   if (hasErrored) {
     return (
       <div className={style.cellError}>
-        <Icon icon="error" className={style.eventIcon} />
+        <Icon icon="exclamation-circle" className={style.eventIcon} />
         <Message content={m.errorOverviewEntry} />
       </div>
     )

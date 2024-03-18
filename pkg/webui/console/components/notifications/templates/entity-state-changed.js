@@ -33,7 +33,7 @@ const m = defineMessages({
   link: 'You can view this <Link>here</Link>.',
 })
 
-const EntityStateChangedIcon = () => <Icon icon="person_add" className="c-tts-primary" />
+const EntityStateChangedIcon = () => <Icon icon="user-plus" className="c-tts-primary" />
 
 const EntityStateChangedPreview = ({ notificationData }) => {
   const { data, entity_ids } = notificationData

@@ -209,7 +209,7 @@ const CollaboratorForm = props => {
         {update && (
           <ModalButton
             type="button"
-            icon="delete"
+            icon="trash"
             disabled={deleteDisabled}
             danger
             naked

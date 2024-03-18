@@ -84,7 +84,7 @@ const ApplicationTitleSection = ({ appId }) => {
       content={<Message content={m.lastSeenAvailableTooltip} />}
     >
       <LastSeen lastSeen={lastSeen} flipped>
-        <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+        <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
       </LastSeen>
     </DocTooltip>
   ) : (
@@ -93,7 +93,7 @@ const ApplicationTitleSection = ({ appId }) => {
       docPath="/getting-started/console/troubleshooting"
     >
       <Status status="mediocre" label={sharedMessages.noRecentActivity} className="mr-cs-l" flipped>
-        <Icon icon="help_outline" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+        <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
       </Status>
     </DocTooltip>
   )
@@ -101,7 +101,7 @@ const ApplicationTitleSection = ({ appId }) => {
     <>
       {mayViewDevices && (
         <Content.EntityCount
-          icon="devices"
+          icon="device"
           value={devicesTotalCount}
           keyMessage={sharedMessages.deviceCounted}
           toAllUrl={`/applications/${appId}/devices`}
@@ -117,7 +117,7 @@ const ApplicationTitleSection = ({ appId }) => {
       )}
       {mayViewApiKeys && (
         <Content.EntityCount
-          icon="api_keys"
+          icon="api-keys"
           value={apiKeysTotalCount}
           keyMessage={sharedMessages.apiKeyCounted}
           toAllUrl={`/applications/${appId}/api-keys`}

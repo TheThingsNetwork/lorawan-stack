@@ -32,14 +32,14 @@ const ShortcutPanel = () => (
   <Panel title={m.shortcuts} path="/edit-shortcuts" icon="bolt" divider className="h-full">
     <div className="grid">
       <ShortcutItem
-        icon="display_settings"
+        icon="application"
         title={m.addApplication}
         link="/applications/add"
         className="item-6"
       />
-      <ShortcutItem icon="router" title={m.addGateway} link="/gateways/add" className="item-6" />
+      <ShortcutItem icon="gateway" title={m.addGateway} link="/gateways/add" className="item-6" />
       <ShortcutItem
-        icon="group"
+        icon="users-group"
         title={m.addOrganization}
         link="/organizations/add"
         className="item-4"
@@ -51,7 +51,7 @@ const ShortcutPanel = () => (
         className="item-4"
       />
       <ShortcutItem
-        icon="settings_remote"
+        icon="device"
         title={m.registerDevice}
         link="/applications"
         className="item-4"

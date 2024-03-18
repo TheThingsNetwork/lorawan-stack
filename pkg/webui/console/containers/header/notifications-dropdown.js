@@ -79,7 +79,9 @@ const NotificationsDropdown = () => {
               key={notification.id}
               className={classnames(style.notificationsDropdownLink, 'd-flex')}
             >
-              <Icon icon="key" className={style.notificationsDropdownLinkIcon} />
+              <div className={style.notificationsDropdownLinkIcon}>
+                <Icon icon="key" />
+              </div>
               <div className={style.notificationContainer}>
                 <div className={classnames(style.title, 'fw-bold')}>
                   <Notification.Title

@@ -25,8 +25,8 @@ export const Default = () => (
   <div style={{ height: '8rem' }}>
     <Dropdown open>
       <Dropdown.HeaderItem title="dropdown items" />
-      <Dropdown.Item title="Profile Settings" path="profile/path" icon="person" />
-      <Dropdown.Item title="Admin panel" path="admin/path" icon="admin_panel_settings" />
+      <Dropdown.Item title="Profile Settings" path="profile/path" icon="user" />
+      <Dropdown.Item title="Admin panel" path="admin/path" icon="admin-shield" />
       <hr />
       <Dropdown.Item title="Logout" path="logout/path" icon="logout" />
     </Dropdown>

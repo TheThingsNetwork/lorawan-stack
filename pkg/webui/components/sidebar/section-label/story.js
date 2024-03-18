@@ -29,6 +29,6 @@ export default {
 
 export const Default = () => (
   <div style={{ maxWidth: '20rem' }}>
-    <SectionLabel label="Top entities" icon="add" />
+    <SectionLabel label="Top entities" icon="plus" />
   </div>
 )

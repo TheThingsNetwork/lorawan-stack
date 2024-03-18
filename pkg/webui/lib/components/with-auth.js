@@ -107,7 +107,7 @@ const Auth = ({ user, fetching, userError, errorComponent, children, rights, isA
       // If the user's email address is not validated, define a rerequest action
       const requestValidationAction = {
         message: m.resendValidationEmail,
-        icon: 'email',
+        icon: 'mail',
         action: () => {
           dispatch(requestEmailValidation(user.ids.user_id))
         },

@@ -29,6 +29,6 @@ export default {
 
 export const Default = () => (
   <div style={{ width: '192.5px' }}>
-    <ShortcutItem icon="dashboard_customize" title="Add new item" link="/applications" />
+    <ShortcutItem icon="table-options" title="Add new item" link="/applications" />
   </div>
 )

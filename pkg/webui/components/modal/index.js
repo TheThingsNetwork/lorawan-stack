@@ -131,7 +131,7 @@ const Modal = props => {
           message={cancelButtonMessage}
           onClick={handleCancel}
           name={formName}
-          icon="clear"
+          icon="clear-all"
           value="false"
           secondary
           {...name}

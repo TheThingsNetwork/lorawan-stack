@@ -35,22 +35,22 @@ export const _SideNavigation = () => (
     <SideNavigation>
       <SideNavigationItem title="Overview" path="/" icon="overview" exact />
       <SideNavigationItem title="Devices" path="/devices" icon="devices" />
-      <SideNavigationItem title="Data" path="/data" icon="data" />
+      <SideNavigationItem title="Data" path="/data" icon="live-data" />
       <SideNavigationItem title="Payload Formatters" icon="code">
         <SideNavigationItem title="Uplink" path="/payload-formatters/uplink" icon="uplink" />
         <SideNavigationItem title="Downlink" path="/payload-formatters/downlink" icon="downlink" />
       </SideNavigationItem>
       <SideNavigationItem title="Integrations" icon="integration">
-        <SideNavigationItem title="MQTT" path="/integrations/mqtt" icon="extension" />
-        <SideNavigationItem title="Webhooks" path="/integrations/webhooks" icon="extension" />
-        <SideNavigationItem title="Pub/Subs" path="/integrations/pubsubs" icon="extension" />
+        <SideNavigationItem title="MQTT" path="/integrations/mqtt" icon="puzzle" />
+        <SideNavigationItem title="Webhooks" path="/integrations/webhooks" icon="puzzle" />
+        <SideNavigationItem title="Pub/Subs" path="/integrations/pubsubs" icon="puzzle" />
       </SideNavigationItem>
       <SideNavigationItem title="Collaborators" path="/collaborators" icon="organization" />
-      <SideNavigationItem title="API keys" path="/api-keys" icon="api_keys" />
+      <SideNavigationItem title="API keys" path="/api-keys" icon="api-keys" />
       <SideNavigationItem
         title="General Settings"
         path="/general-settings"
-        icon="general_settings"
+        icon="general-settings"
       />
     </SideNavigation>
   </div>

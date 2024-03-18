@@ -293,7 +293,7 @@ const IdentityServerForm = React.memo(props => {
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <ModalButton
           type="button"
-          icon="delete"
+          icon="trash"
           message={supportsClaiming ? messages.unclaimAndDeleteDevice : messages.deleteDevice}
           modalData={{
             message: { values: { deviceId: name || ids.device_id }, ...messages.deleteWarning },

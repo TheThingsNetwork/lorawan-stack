@@ -121,12 +121,7 @@ const NotificationList = ({
           )}
         </div>
         {!isArchive && (
-          <Button
-            secondary
-            icon="visibility"
-            onClick={handleMarkAllAsSeen}
-            message={m.markAllAsRead}
-          />
+          <Button secondary icon="eye" onClick={handleMarkAllAsSeen} message={m.markAllAsRead} />
         )}
       </div>
       <div className="flex-grow">

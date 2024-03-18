@@ -52,10 +52,10 @@ const Pagination = ({
     <Paginate
       previousClassName={navigationPrevClassNames}
       previousLinkClassName={style.link}
-      previousLabel={<Icon icon="navigate_before" small aria-label="Go to the previous page" />}
+      previousLabel={<Icon icon="chevron-left" small aria-label="Go to the previous page" />}
       nextClassName={navigationNextClassNames}
       nextLinkClassName={style.link}
-      nextLabel={<Icon icon="navigate_next" small aria-label="Go to the next page" />}
+      nextLabel={<Icon icon="chevron-right" small aria-label="Go to the next page" />}
       containerClassName={containerClassNames}
       pageClassName={style.item}
       breakClassName={breakClassNames}

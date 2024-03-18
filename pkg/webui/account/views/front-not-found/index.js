@@ -46,7 +46,7 @@ const FrontNotFound = () => (
       />
       <Button.Link
         to="/login"
-        icon="keyboard_arrow_left"
+        icon="chevron-left"
         message={{ ...sharedMessages.backTo, values: { siteTitle } }}
       />
     </div>

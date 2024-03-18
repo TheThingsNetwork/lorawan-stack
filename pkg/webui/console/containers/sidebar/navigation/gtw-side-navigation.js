@@ -77,7 +77,7 @@ const GtwSideNavigation = () => {
         <SideNavigation.Item
           title={sharedMessages.liveData}
           path={`/gateways/${gtwId}/data`}
-          icon="list_alt"
+          icon="live-data"
         />
       )}
       {mayViewOrEditGatewayLocation.check(rights) && (
@@ -98,14 +98,14 @@ const GtwSideNavigation = () => {
         <SideNavigation.Item
           title={sharedMessages.apiKeys}
           path={`/gateways/${gtwId}/api-keys`}
-          icon="api_keys"
+          icon="api-keys"
         />
       )}
       {mayEditBasicGatewayInformation.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.generalSettings}
           path={`/gateways/${gtwId}/general-settings`}
-          icon="general_settings"
+          icon="general-settings"
         />
       )}
     </SideNavigation>

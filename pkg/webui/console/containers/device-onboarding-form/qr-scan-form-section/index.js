@@ -162,7 +162,7 @@ const DeviceQRScanFormSection = () => {
         {qrData.approved ? (
           <ModalButton
             type="button"
-            icon="close"
+            icon="x"
             onApprove={handleReset}
             message={m.resetQRCodeData}
             modalData={{
@@ -171,7 +171,7 @@ const DeviceQRScanFormSection = () => {
               buttonMessage: m.resetQRCodeData,
               children: <Message content={m.resetConfirm} component="span" />,
               approveButtonProps: {
-                icon: 'close',
+                icon: 'x',
               },
             }}
           />

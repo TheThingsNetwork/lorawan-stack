@@ -169,7 +169,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
               <IntlHelmet title={errorMessages.error} />
             )}
             <h1>
-              <Icon className={style.icon} textPaddedRight icon="error_outline" />
+              <Icon className={style.icon} textPaddedRight icon="exclamation-circle" />
               <Message content={errorTitle} />
             </h1>
             <div className={style.fullViewErrorSub}>
@@ -195,7 +195,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                 <Button.AnchorLink
                   href={appRoot}
                   className={style.actionButton}
-                  icon="keyboard_arrow_left"
+                  icon="chevron-left"
                   message={sharedMessages.backToOverview}
                   secondary
                 />
@@ -204,7 +204,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                 <Button.AnchorLink
                   href={appRoot}
                   className={style.actionButton}
-                  icon="keyboard_arrow_left"
+                  icon="chevron-left"
                   message={sharedMessages.backToLogin}
                   secondary
                 />
@@ -226,7 +226,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                     href={supportLink}
                     target="_blank"
                     className={style.actionButton}
-                    icon="contact_support"
+                    icon="lifebuoy"
                     message={sharedMessages.getSupport}
                     secondary
                   />

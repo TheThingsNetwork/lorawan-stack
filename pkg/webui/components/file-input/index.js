@@ -47,7 +47,7 @@ const StatusMessage = props => {
   if (hasError) {
     return (
       <React.Fragment>
-        <Icon className={style.errorIcon} icon="error" />
+        <Icon className={style.errorIcon} icon="exclamation-circle" />
         <Message className={style.error} content={error} />
       </React.Fragment>
     )
@@ -61,7 +61,7 @@ const StatusMessage = props => {
             message={m.remove}
             onClick={handleRemoveClick}
             type="button"
-            icon="delete"
+            icon="trash"
             danger
             naked
           />
@@ -199,7 +199,7 @@ const FileInput = props => {
             onClick={handleChooseClick}
             disabled={disabled}
             message={!value ? message : changeMessage}
-            icon="attachment"
+            icon="paperclip"
             className="mr-cs-s"
             secondary
           />

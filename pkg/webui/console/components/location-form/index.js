@@ -312,7 +312,7 @@ const LocationForm = props => {
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <ModalButton
           type="button"
-          icon="delete"
+          icon="trash"
           message={m.deleteLocation}
           modalData={{
             children: (

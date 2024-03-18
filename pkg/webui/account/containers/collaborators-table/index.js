@@ -145,7 +145,7 @@ const CollaboratorsTable = props => {
             type="button"
             onClick={details.delete}
             message={sharedMessages.remove}
-            icon="delete"
+            icon="trash"
             danger
             naked
           />

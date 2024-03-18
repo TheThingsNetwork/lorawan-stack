@@ -35,6 +35,6 @@ export default {
 
 export const Default = () => (
   <div style={{ maxWidth: '20rem' }}>
-    <Link title="Example name" icon="group" path="example-path" exact />
+    <Link title="Example name" icon="users-group" path="example-path" exact />
   </div>
 )

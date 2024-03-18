@@ -109,7 +109,7 @@ const AuthorizationSettings = () => {
                 onApprove={handleDeleteAuthorization}
                 message={m.deleteButton}
                 type="button"
-                icon="delete"
+                icon="trash"
                 danger
               />
             ),

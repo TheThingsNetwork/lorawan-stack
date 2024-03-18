@@ -39,7 +39,7 @@ const GenerateInput = props => {
 
   const generateAction = React.useMemo(
     () => ({
-      icon: 'autorenew',
+      icon: 'refresh',
       type: 'button',
       disabled: !mayGenerateValue,
       onClick: handleGenerateValue,

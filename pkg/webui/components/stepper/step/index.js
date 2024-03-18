@@ -48,9 +48,9 @@ const Step = props => {
 
   let label
   if (isSuccess) {
-    label = <Icon icon="done" nudgeDown />
+    label = <Icon icon="cicle-check" nudgeDown />
   } else if (isFailure) {
-    label = <Icon icon="close" nudgeDown />
+    label = <Icon icon="x" nudgeDown />
   } else {
     label = <span className={style.label}>{stepNumber}</span>
   }

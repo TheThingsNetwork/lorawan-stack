@@ -182,7 +182,7 @@ const ApplicationsTable = props => {
                 >
                   <Status status="unknown" label={sharedMessages.otherCluster}>
                     <Icon
-                      icon="help_outline"
+                      icon="help"
                       textPaddedLeft
                       small
                       nudgeUp

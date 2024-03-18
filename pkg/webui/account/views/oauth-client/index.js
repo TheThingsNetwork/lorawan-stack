@@ -79,7 +79,7 @@ const OAuthClientInner = () => {
           <SideNavigation.Item
             title={sharedMessages.generalSettings}
             path="general-settings"
-            icon="general_settings"
+            icon="general-settings"
           />
         )}
       </SideNavigation>

@@ -165,7 +165,7 @@ const UserSessionsTable = () => {
               type="button"
               onClick={details.delete}
               message={m.removeButtonMessage}
-              icon="delete"
+              icon="trash"
               danger
               naked
             />

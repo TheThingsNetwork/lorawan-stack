@@ -623,7 +623,7 @@ const WebhookForm = props => {
           {update && (
             <ModalButton
               type="button"
-              icon="delete"
+              icon="trash"
               danger
               naked
               message={m.deleteWebhook}

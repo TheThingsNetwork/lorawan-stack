@@ -60,9 +60,9 @@ export const Sensitive = () => <Example sensitive max={5} />
 
 export const WithAction = () => (
   <div>
-    <Example action={{ icon: 'build', secondary: true }} />
-    <Example action={{ icon: 'build', secondary: true }} warning />
-    <Example action={{ icon: 'build', secondary: true }} error />
+    <Example action={{ icon: 'hammer', secondary: true }} />
+    <Example action={{ icon: 'hammer', secondary: true }} warning />
+    <Example action={{ icon: 'hammer', secondary: true }} error />
   </div>
 )
 

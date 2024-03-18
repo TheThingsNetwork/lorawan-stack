@@ -79,7 +79,9 @@ const buttonChildren = props => {
       {message && <Message content={message} className={style.linkButtonMessage} />}
       {children}
       {dropdownItems && (
-        <>{!noDropdownIcon && <Icon className={style.expandIcon} icon="expand_more" />}</>
+        <>
+          {!noDropdownIcon && <Icon className={style.expandIcon} icon="chevron-down" size={18} />}
+        </>
       )}
     </>
   )

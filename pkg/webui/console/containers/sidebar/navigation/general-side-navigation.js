@@ -45,12 +45,17 @@ const GeneralSideNavigation = () => {
   return (
     <>
       <SideNavigation>
-        <SideNavigation.Item title={sharedMessages.dashboard} path="/" icon="overview" exact />
+        <SideNavigation.Item
+          title={sharedMessages.dashboard}
+          path="/"
+          icon="layout-dashboard"
+          exact
+        />
         {mayViewOrgs && (
           <SideNavigation.Item
             title={sharedMessages.organizations}
             path="/organizations"
-            icon="group"
+            icon="users-group"
           />
         )}
         <SideNavigation.Item
@@ -69,13 +74,13 @@ const GeneralSideNavigation = () => {
           <SideNavigation.Item
             title={sharedMessages.adminPanel}
             path="/admin-panel"
-            icon="admin_panel_settings"
+            icon="user-shield"
           />
         )}
       </SideNavigation>
       {!isMinimized && (
         <SideNavigation className="mt-cs-xs">
-          <SectionLabel label={sharedMessages.topEntities} icon="add" onClick={() => null} />
+          <SectionLabel label={sharedMessages.topEntities} icon="plus" onClick={() => null} />
           {topEntities.map(({ path, title, entity }) => (
             <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
           ))}

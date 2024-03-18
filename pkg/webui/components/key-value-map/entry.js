@@ -147,7 +147,7 @@ const Entry = ({
         <Button
           type="button"
           onClick={handleRemoveButtonClick}
-          icon="delete"
+          icon="trash"
           title={m.deleteEntry}
           message={removeMessage}
           disabled={readOnly}

@@ -196,7 +196,7 @@ const LoRaCloudDASForm = () => {
         {Boolean(defaultAssociation) && (
           <ModalButton
             type="button"
-            icon="delete"
+            icon="trash"
             message={sharedMessages.tokenDelete}
             modalData={{
               message: m.deleteWarning,

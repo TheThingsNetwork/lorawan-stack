@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,71 +15,70 @@
 import React, { forwardRef } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
+import * as Icons from '@tabler/icons-react'
 
-import StarIcon from './replacements/star-icon'
-import PlusIcon from './replacements/plus-icon'
-import SortIcon from './replacements/sort-icon'
 import TtsIcon from './replacements/tts-icon'
 
 import style from './icon.styl'
+
+const hyphenCaseToPascalCase = str =>
+  str
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('')
 
 // A map of hardcoded names to their corresponding icons.
 // Keep these sorted alphabetically.
 const hardcoded = {
   access: 'lock',
-  api_keys: 'key',
-  application: 'display_settings',
-  cluster: 'language',
-  collaborators: 'people',
-  data: 'poll',
+  'admin-panel': 'user-shield',
+  'api-keys': 'key',
+  application: 'device-desktop-analytics',
+  cluster: 'world',
+  collaborators: 'users',
   develop: 'code',
-  device: 'settings_remote',
-  devices: 'device_hub',
-  downlink: 'arrow_downward',
+  device: 'cpu',
+  downlink: 'arrow-down',
   event: 'info',
-  event_clear_all: 'clear_all',
-  event_connection: 'settings_ethernet',
-  event_create: 'add_circle',
-  event_delete: 'delete',
-  event_downlink: 'arrow_downward',
-  event_error: 'error',
-  event_gateway_connect: 'flash_on',
-  event_gateway_disconnect: 'flash_off',
-  event_join: 'link',
-  event_mode: 'tune',
-  event_rekey: 'vpn_key',
-  event_status: 'network_check',
-  event_switch: 'tune',
-  event_update: 'edit',
-  event_uplink: 'arrow_upward',
-  expand_down: 'keyboard_arrow_down',
-  expand_up: 'keyboard_arrow_up',
+  'event-clear-all': 'clear-all',
+  'event-connection': 'transfer',
+  'event-create': 'circle-plus',
+  'event-delete': 'trash',
+  'event-downlink': 'arrow-down',
+  'event-error': 'exclamation-circle',
+  'event-gateway-connect': 'bolt',
+  'event-gateway-disconnect': 'bolt-off',
+  'event-join': 'circles-relation',
+  'event-mode': 'adjustments-horizontal',
+  'event-rekey': 'key',
+  'event-status': 'heartbeat',
+  'event-switch': 'switch',
+  'event-update': 'edit',
+  'event-uplink': 'arrow-up',
+  'expand-down': 'arrow-down',
+  'expand-up': 'arrow-up',
   gateway: 'router',
-  general_settings: 'settings',
-  import_devices: 'playlist_add',
-  integration: 'call_merge',
-  join: 'link',
-  link: 'link',
-  location: 'place',
-  logout: 'logout',
-  organization: 'people',
-  overview: 'dashboard',
-  packet_broker: 'camera',
-  payload_formats: 'code',
-  oauth_clients: 'recent_actors',
-  settings: 'tune',
-  sort_order_asc: 'arrow_drop_down',
-  sort_order_desc: 'arrow_drop_up',
-  uplink: 'arrow_upward',
-  user_management: 'how_to_reg',
-  user: 'person',
-  valid: 'check_circle',
+  'general-settings': 'settings',
+  'import-devices': 'playlist-add',
+  integration: 'arrow-merge-alt-right',
+  join: 'circles-relation',
+  'live-data': 'article',
+  location: 'map-pin',
+  organization: 'users-group',
+  overview: 'laoyout-dashboard',
+  'packet-broker': 'aperture',
+  'payload-format': 'source-code',
+  'oauth-clients': 'brand-oauth',
+  support: 'lifebuoy',
+  sort: 'selector',
+  'sort-order-asc': 'sort-ascending',
+  'sort-order-desc': 'sort-descending',
+  uplink: 'arrow-up',
+  'user-management': 'user-cog',
+  valid: 'circle-check',
 }
 
 const replaced = {
-  star: StarIcon,
-  plus: PlusIcon,
-  sort: SortIcon,
   tts: TtsIcon,
 }
 
@@ -93,10 +92,11 @@ const Icon = forwardRef((props, ref) => {
     large,
     textPaddedLeft,
     textPaddedRight,
+    size,
     ...rest
   } = props
 
-  const classname = classnames(style.icon, className, {
+  const classname = classnames(className, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,
     [style.large]: large,
@@ -105,22 +105,21 @@ const Icon = forwardRef((props, ref) => {
     [style.textPaddedRight]: textPaddedRight,
   })
 
-  if (replaced[icon]) {
-    const ReplacedIcon = replaced[icon]
+  const Icon = Icons[`Icon${hyphenCaseToPascalCase(hardcoded[icon] || icon)}`] || replaced[icon]
 
-    return <ReplacedIcon className={classname} ref={ref} {...rest} />
+  if (!Icon) {
+    console.warn(
+      `Icon${hyphenCaseToPascalCase(hardcoded[icon] || icon)} (${icon}) is not available in the tabler icon set`,
+    )
+    return null
   }
 
-  return (
-    <span className={classname} ref={ref} {...rest}>
-      {hardcoded[icon] || icon}
-    </span>
-  )
+  return <Icon className={classname} ref={ref} {...rest} size={small ? 16 : size} />
 })
 
 Icon.propTypes = {
   className: PropTypes.string,
-  /** Which icon to display, using google material icon set. */
+  /** Which icon to display, using tabler icon set. */
   icon: PropTypes.string.isRequired,
   /** Renders a bigger icon. */
   large: PropTypes.bool,
@@ -128,6 +127,8 @@ Icon.propTypes = {
   nudgeDown: PropTypes.bool,
   /** Nudges the icon up by one pixel using position: relative. */
   nudgeUp: PropTypes.bool,
+  /** The size of the icon. */
+  size: PropTypes.number,
   /** Renders a smaller icon. */
   small: PropTypes.bool,
   /** Whether icon should be padded for a text displayed left to it. */
@@ -141,6 +142,7 @@ Icon.defaultProps = {
   large: false,
   nudgeDown: false,
   nudgeUp: false,
+  size: 20,
   small: false,
   textPaddedLeft: false,
   textPaddedRight: false,

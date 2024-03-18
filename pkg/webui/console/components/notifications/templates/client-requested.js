@@ -56,7 +56,7 @@ const getId = entity => {
   return entity.user_id
 }
 
-const ClientRequestedIcon = () => <Icon icon="oauth_clients" className="c-tts-primary" />
+const ClientRequestedIcon = () => <Icon icon="oauth-clients" className="c-tts-primary" />
 
 const ClientRequestedPreview = ({ notificationData }) => {
   const { data, sender_ids } = notificationData

@@ -51,12 +51,12 @@ const Header = ({ handleSearchRequest, searchable }) => {
     },
     {
       title: sharedMessages.sessions,
-      icon: 'vpn_key',
+      icon: 'key',
       path: '/session-management',
     },
     {
       title: sharedMessages.oauthClients,
-      icon: 'oauth_clients',
+      icon: 'oauth-clients',
       path: '/oauth-clients',
     },
     {

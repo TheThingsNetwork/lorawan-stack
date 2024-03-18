@@ -151,7 +151,7 @@ const TokensTable = () => {
             type="button"
             onClick={details.delete}
             message={m.deleteButton}
-            icon="delete"
+            icon="trash"
             danger
             naked
           />
@@ -182,7 +182,7 @@ const TokensTable = () => {
       type="button"
       onClick={handleDeleteAllTokens}
       message={m.deleteAllButton}
-      icon="delete"
+      icon="trash"
       danger
       naked
     />

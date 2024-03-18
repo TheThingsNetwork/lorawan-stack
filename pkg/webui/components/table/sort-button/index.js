@@ -34,8 +34,10 @@ const SortButton = ({ name, onSort, className, active, direction, title, align }
 
   let icon = 'sort'
   if (active && direction) {
-    icon += `_order_${direction}`
+    icon += `-order-${direction}`
   }
+
+  console.log('icon', icon)
 
   return (
     <button className={buttonClassNames} type="button" onClick={handleSort}>

@@ -40,7 +40,7 @@ const DocsPanelLink = ({ path, title, icon }) => (
     <div className="d-flex al-center gap-cs-xs">
       <Icon icon={icon} /> <Message content={title} />
     </div>
-    <Icon icon="arrow_forward" />
+    <Icon icon="arrow-right" />
   </Link>
 )
 
@@ -54,13 +54,17 @@ const DocumentationDashboardPanel = () => (
   <Panel
     title={sharedMessages.documentation}
     path={docBaseUrl}
-    icon="menu_book"
+    icon="book"
     buttonTitle={sharedMessages.documentation}
     divider
     target="_blank"
     className="h-full"
   >
-    <DocsPanelLink path={`${docBaseUrl}/getting-started/`} title={m.gettingStarted} icon="group" />
+    <DocsPanelLink
+      path={`${docBaseUrl}/getting-started/`}
+      title={m.gettingStarted}
+      icon="users-group"
+    />
     <DocsPanelLink path={`${docBaseUrl}/devices/`} title={sharedMessages.devices} icon="device" />
     <DocsPanelLink
       path={`${docBaseUrl}/gateways/`}
@@ -70,7 +74,7 @@ const DocumentationDashboardPanel = () => (
     <DocsPanelLink
       path={`${docBaseUrl}/integrations/`}
       title={sharedMessages.integrations}
-      icon="merge_type"
+      icon="arrow-merge"
     />
     <DocsPanelLink path={`${docBaseUrl}/the-things-stack/`} title={m.tts} icon="tts" />
     <DocsPanelLink path={`${docBaseUrl}/reference/`} title={m.reference} icon="book" />

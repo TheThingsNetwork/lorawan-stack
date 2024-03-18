@@ -136,7 +136,7 @@ const GatewayOverview = () => {
         frequency_plan_ids.length !== 0 ? (
           <Button
             type="button"
-            icon="get_app"
+            icon="file-download"
             onClick={handleGlobalConfDownload}
             message={m.downloadGlobalConf}
             secondary

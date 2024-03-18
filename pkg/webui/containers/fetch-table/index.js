@@ -281,7 +281,7 @@ const FetchTable = props => {
                     primary
                     className={style.addButton}
                     message={addMessage}
-                    icon="add"
+                    icon="plus"
                     to={`${itemPathPrefix}add`}
                   />
                 )}

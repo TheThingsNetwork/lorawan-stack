@@ -44,7 +44,7 @@ const SubViewErrorComponent = ({ error }) => {
       <Row>
         <Col>
           <div className={style.title}>
-            <Icon icon="error_outline" large />
+            <Icon icon="exclamation-circle" large />
             <Message component="h2" content={errorTitleMessage} />
           </div>
           <p>

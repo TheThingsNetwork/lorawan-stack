@@ -28,7 +28,7 @@ const ShortcutItem = ({ icon, title, link, className }) => (
   <Link to={link} className={classnames(style.shortcut, className)}>
     <div className="pos-relative w-full">
       <div className={style.addIconWrapper}>
-        <Icon icon="add" className={style.addIcon} />
+        <Icon icon="plus" className={style.addIcon} />
       </div>
       <div className={style.shortcutTitleWrapper}>
         <Icon icon={icon} className={style.icon} />

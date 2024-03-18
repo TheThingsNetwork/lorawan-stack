@@ -148,7 +148,7 @@ const DropdownItem = ({
           {iconElement}
           <Message content={title} />
         </div>
-        <Icon className={style.submenuDropdownIcon} icon="chevron_right" />
+        <Icon className={style.submenuDropdownIcon} icon="chevron-right" />
       </button>
       <Dropdown.Attached attachedRef={ref} className={style.submenuDropdown} position="left" hover>
         {submenuItems}

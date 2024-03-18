@@ -61,7 +61,7 @@ const Code = () => {
           />
           <Button.Link
             to="/"
-            icon="keyboard_arrow_left"
+            icon="chevron-left"
             message={{ ...sharedMessages.backTo, values: { siteTitle } }}
           />
         </Col>

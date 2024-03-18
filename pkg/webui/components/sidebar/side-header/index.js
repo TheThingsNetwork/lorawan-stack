@@ -40,13 +40,13 @@ const SideHeader = ({ logo, miniLogo }) => {
       </Link>
       <Button
         className={classnames(style.minimizeButton, 's:d-none')}
-        icon={isMinimized ? 'left_panel_open' : 'left_panel_close'}
+        icon={isMinimized ? 'layout_sidebar_left_expand' : 'layout_sidebar_left_collapse'}
         onClick={onMinimizeToggle}
         naked
       />
       <Button
         className={classnames(style.minimizeButton, 'd-none', 's:d-flex')}
-        icon="close"
+        icon="x"
         onClick={onDrawerCloseClick}
         naked
       />

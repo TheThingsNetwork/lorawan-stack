@@ -123,8 +123,13 @@ export default {
       Object.assign({}, r, {
         options: (
           <div>
+<<<<<<< HEAD
             <Button icon="settings" primary />
             <Button danger icon="delete" primary />
+=======
+            <Button icon="settings" />
+            <Button danger icon="trash" />
+>>>>>>> 9677c49d12 (console,account: Replace icons throughout codebase)
           </div>
         ),
       }),

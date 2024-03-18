@@ -116,7 +116,7 @@ const Validate = ({ hideTitle }) => {
         )}
         <Button.Link
           to="/"
-          icon="keyboard_arrow_left"
+          icon="chevron-left"
           message={{ ...m.backToAccount, values: { siteTitle } }}
         />
       </div>
