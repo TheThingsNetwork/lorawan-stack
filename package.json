@@ -64,7 +64,7 @@
     "pg": "^8.11.3",
     "prettier": "^3.2.5",
     "react-refresh": "^0.14.0",
-    "storybook": "^7.6.17",
+    "storybook": "^8.0.0",
     "stylus": "^0.63.0",
     "stylus-loader": "^8.1.0",
     "wait-on": "^7.2.0",
