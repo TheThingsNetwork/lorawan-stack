@@ -19,6 +19,7 @@ import { Container, Col, Row } from 'react-grid-system'
 
 import tts from '@account/api/tts'
 
+import { IconChevronLeft } from '@ttn-lw/components/icon'
 import Spinner from '@ttn-lw/components/spinner'
 import ErrorNotification from '@ttn-lw/components/error-notification'
 import Notification from '@ttn-lw/components/notification'
@@ -116,7 +117,7 @@ const Validate = ({ hideTitle }) => {
         )}
         <Button.Link
           to="/"
-          icon="chevron-left"
+          icon={IconChevronLeft}
           message={{ ...m.backToAccount, values: { siteTitle } }}
         />
       </div>

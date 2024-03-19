@@ -21,7 +21,7 @@ import InfiniteLoader from 'react-window-infinite-loader'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useParams } from 'react-router-dom'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconEye } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -121,7 +121,12 @@ const NotificationList = ({
           )}
         </div>
         {!isArchive && (
-          <Button secondary icon="eye" onClick={handleMarkAllAsSeen} message={m.markAllAsRead} />
+          <Button
+            secondary
+            icon={IconEye}
+            onClick={handleMarkAllAsSeen}
+            message={m.markAllAsRead}
+          />
         )}
       </div>
       <div className="flex-grow">

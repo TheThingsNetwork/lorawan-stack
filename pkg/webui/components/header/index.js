@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import { IconStar, IconPlus, IconInbox, IconMenu2 } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
 
@@ -38,27 +39,27 @@ const Header = ({
   <header {...rest} className={classnames(className, style.container)}>
     <div className={classnames('breadcrumbs', 'm:d-none')} />
     <div className="d-none m:d-flex al-center gap-cs-xs">
-      <Button secondary icon="book" onClick={onMenuClick} />
+      <Button secondary icon={IconMenu2} onClick={onMenuClick} />
       <Logo className={style.logo} />
     </div>
 
     <div className="d-flex al-center gap-cs-xs">
       <Button
         secondary
-        icon="plus"
+        icon={IconPlus}
         dropdownItems={addDropdownItems}
         dropdownPosition="below left"
       />
       <Button
         secondary
-        icon="star"
+        icon={IconStar}
         dropdownItems={starDropdownItems}
         dropdownPosition="below left"
         className="xs:d-none"
       />
       <Button
         secondary
-        icon="inbox"
+        icon={IconInbox}
         dropdownItems={notificationsDropdownItems}
         dropdownClassName={style.notificationsDropdown}
         dropdownPosition="below left"

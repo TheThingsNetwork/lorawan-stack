@@ -16,8 +16,8 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { isNumber } from 'lodash'
 
+import Icon, { IconAlertCircle } from '@ttn-lw/components/icon'
 import Tooltip from '@ttn-lw/components/tooltip'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -69,7 +69,7 @@ const WarningTooltip = props => {
   if (hasDesiredValue && hasCurrentValue && !isEqual(currentValue, desiredValue)) {
     return (
       <Tooltip placement="bottom-start" interactive content={<Content desired={desiredValue} />}>
-        <Icon icon="alert-circle" small className="c-bg-warning-normal" nudgeUp />
+        <Icon icon={IconAlertCircle} small className="c-bg-warning-normal" nudgeUp />
       </Tooltip>
     )
   }

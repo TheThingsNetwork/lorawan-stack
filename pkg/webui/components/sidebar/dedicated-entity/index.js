@@ -16,6 +16,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import classnames from 'classnames'
 
+import { IconArrowLeft } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -27,7 +28,11 @@ import style from './dedicated-entity.styl'
 const DedicatedEntity = ({ label, className, buttonMessage, path, backPath }) => (
   <div className={classnames(className, style.dedicatedEntity)}>
     <Link to={backPath} className={style.dedicatedEntityCurtain}>
-      <Button className={style.dedicatedEntityButton} icon="arrow-left" message={buttonMessage} />
+      <Button
+        className={style.dedicatedEntityButton}
+        icon={IconArrowLeft}
+        message={buttonMessage}
+      />
     </Link>
     <Link className={classnames(style.dedicatedEntityItem, 'd-flex', 'al-center')} to={path}>
       <div className={style.dedicatedEntityDivider} />

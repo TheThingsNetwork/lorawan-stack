@@ -17,8 +17,14 @@ import { Container, Row, Col } from 'react-grid-system'
 import clipboard from 'clipboard'
 import { Helmet } from 'react-helmet'
 
+import Icon, {
+  IconChevronLeft,
+  IconExclamationCircle,
+  IconClipboard,
+  IconClipboardCheck,
+  IconLifebuoy,
+} from '@ttn-lw/components/icon'
 import Footer from '@ttn-lw/components/footer'
-import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -169,7 +175,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
               <IntlHelmet title={errorMessages.error} />
             )}
             <h1>
-              <Icon className={style.icon} textPaddedRight icon="exclamation-circle" />
+              <Icon className={style.icon} textPaddedRight icon={IconExclamationCircle} />
               <Message content={errorTitle} />
             </h1>
             <div className={style.fullViewErrorSub}>
@@ -195,7 +201,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                 <Button.AnchorLink
                   href={appRoot}
                   className={style.actionButton}
-                  icon="chevron-left"
+                  icon={IconChevronLeft}
                   message={sharedMessages.backToOverview}
                   secondary
                 />
@@ -204,7 +210,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                 <Button.AnchorLink
                   href={appRoot}
                   className={style.actionButton}
-                  icon="chevron-left"
+                  icon={IconChevronLeft}
                   message={sharedMessages.backToLogin}
                   secondary
                 />
@@ -226,7 +232,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                     href={supportLink}
                     target="_blank"
                     className={style.actionButton}
-                    icon="lifebuoy"
+                    icon={IconLifebuoy}
                     message={sharedMessages.getSupport}
                     secondary
                   />
@@ -282,7 +288,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                     className={style.actionButton}
                     data-clipboard-text={errorDetails}
                     ref={copyButton}
-                    icon={copied ? 'done' : 'file_copy'}
+                    icon={copied ? IconClipboard : IconClipboardCheck}
                     message={
                       copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard
                     }
@@ -301,7 +307,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
 FullViewErrorInner.propTypes = {
   action: PropTypes.shape({
     action: PropTypes.func.isRequired,
-    icon: PropTypes.string.isRequired,
+    icon: PropTypes.shape({}).isRequired,
     message: PropTypes.message.isRequired,
   }),
   error: PropTypes.error.isRequired,
@@ -318,7 +324,7 @@ FullViewErrorInner.defaultProps = {
 FullViewError.propTypes = {
   action: PropTypes.shape({
     action: PropTypes.func.isRequired,
-    icon: PropTypes.string.isRequired,
+    icon: PropTypes.shape({}).isRequired,
     message: PropTypes.message.isRequired,
   }),
   error: PropTypes.error.isRequired,

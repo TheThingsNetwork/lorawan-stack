@@ -61,7 +61,7 @@ PropTypes.error = PropTypes.oneOfType([
 
 PropTypes.link = PropTypes.shape({
   title: PropTypes.message.isRequired,
-  icon: PropTypes.string,
+  icon: PropTypes.shape({}),
   path: PropTypes.string.isRequired,
   exact: PropTypes.bool,
   hidden: PropTypes.bool,

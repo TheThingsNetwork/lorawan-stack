@@ -15,7 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconPlus } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -28,7 +28,7 @@ const ShortcutItem = ({ icon, title, link, className }) => (
   <Link to={link} className={classnames(style.shortcut, className)}>
     <div className="pos-relative w-full">
       <div className={style.addIconWrapper}>
-        <Icon icon="plus" className={style.addIcon} />
+        <Icon icon={IconPlus} className={style.addIcon} />
       </div>
       <div className={style.shortcutTitleWrapper}>
         <Icon icon={icon} className={style.icon} />
@@ -40,7 +40,7 @@ const ShortcutItem = ({ icon, title, link, className }) => (
 
 ShortcutItem.propTypes = {
   className: PropTypes.string,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.shape({}).isRequired,
   link: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,
 }

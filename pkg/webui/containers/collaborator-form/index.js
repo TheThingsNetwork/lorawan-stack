@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { isEmpty } from 'lodash'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -209,7 +210,7 @@ const CollaboratorForm = props => {
         {update && (
           <ModalButton
             type="button"
-            icon="trash"
+            icon={IconTrash}
             disabled={deleteDisabled}
             danger
             naked

@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import { IconTableOptions } from '@ttn-lw/components/icon'
+
 import ShortcutItem from '.'
 
 export default {
@@ -29,6 +31,6 @@ export default {
 
 export const Default = () => (
   <div style={{ width: '192.5px' }}>
-    <ShortcutItem icon="table-options" title="Add new item" link="/applications" />
+    <ShortcutItem icon={IconTableOptions} title="Add new item" link="/applications" />
   </div>
 )

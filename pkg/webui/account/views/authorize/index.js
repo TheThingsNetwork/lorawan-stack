@@ -17,8 +17,8 @@ import { defineMessages } from 'react-intl'
 import { useDispatch } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
 
+import Icon, { IconCheck } from '@ttn-lw/components/icon'
 import Modal from '@ttn-lw/components/modal'
-import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
@@ -110,7 +110,7 @@ const Authorize = () => {
             <ul>
               {client.rights.map(right => (
                 <li key={right}>
-                  <Icon icon="check" className={style.icon} />
+                  <Icon icon={IconCheck} className={style.icon} />
                   <Message content={{ id: `enum:${right}` }} firstToUpper />
                 </li>
               ))}

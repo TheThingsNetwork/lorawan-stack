@@ -15,7 +15,7 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconExclamationCircle } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
@@ -44,7 +44,7 @@ const SubViewErrorComponent = ({ error }) => {
       <Row>
         <Col>
           <div className={style.title}>
-            <Icon icon="exclamation-circle" large />
+            <Icon icon={IconExclamationCircle} large />
             <Message component="h2" content={errorTitleMessage} />
           </div>
           <p>

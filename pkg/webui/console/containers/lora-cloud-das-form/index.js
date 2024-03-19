@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import LORA_CLOUD_DAS from '@console/constants/lora-cloud-das'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -196,7 +197,7 @@ const LoRaCloudDASForm = () => {
         {Boolean(defaultAssociation) && (
           <ModalButton
             type="button"
-            icon="trash"
+            icon={IconTrash}
             message={sharedMessages.tokenDelete}
             modalData={{
               message: m.deleteWarning,

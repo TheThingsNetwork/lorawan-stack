@@ -16,6 +16,11 @@ import React, { useContext } from 'react'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
 
+import {
+  IconLayoutSidebarLeftCollapse,
+  IconLayoutSidebarLeftExpand,
+  IconX,
+} from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import SidebarContext from '@console/containers/sidebar/context'
@@ -40,13 +45,13 @@ const SideHeader = ({ logo, miniLogo }) => {
       </Link>
       <Button
         className={classnames(style.minimizeButton, 's:d-none')}
-        icon={isMinimized ? 'layout_sidebar_left_expand' : 'layout_sidebar_left_collapse'}
+        icon={isMinimized ? IconLayoutSidebarLeftExpand : IconLayoutSidebarLeftCollapse}
         onClick={onMinimizeToggle}
         naked
       />
       <Button
         className={classnames(style.minimizeButton, 'd-none', 's:d-flex')}
-        icon="x"
+        icon={IconX}
         onClick={onDrawerCloseClick}
         naked
       />

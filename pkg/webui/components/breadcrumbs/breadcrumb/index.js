@@ -15,8 +15,8 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import Icon, { IconChevronRight } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -45,7 +45,7 @@ const Breadcrumb = ({ className, path, content, isLast }) => {
       <Component {...componentProps}>
         {isRawText ? content : <Message content={content} />}
       </Component>
-      {!isLast && <Icon icon="chevron-right" size={14} className="p-sides-cs-xxs" />}
+      {!isLast && <Icon icon={IconChevronRight} size={14} className="p-sides-cs-xxs" />}
     </span>
   )
 }

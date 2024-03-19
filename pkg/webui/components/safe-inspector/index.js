@@ -17,7 +17,14 @@ import classnames from 'classnames'
 import clipboard from 'clipboard'
 import { defineMessages, useIntl } from 'react-intl'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, {
+  IconClipboard,
+  IconClipboardCheck,
+  IconCode,
+  IconEye,
+  IconEyeOff,
+  IconSwitchHorizontal,
+} from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -79,7 +86,7 @@ const SafeInspector = ({
   const [hidden, setHidden] = useState((hideable && !initiallyVisible) || false)
   const [byteStyle, setByteStyle] = useState(true)
   const [copied, setCopied] = useState(false)
-  const [copyIcon, setCopyIcon] = useState('clipboard')
+  const [copyIcon, setCopyIcon] = useState(IconClipboard)
   const [representation, setRepresentation] = useState(MSB)
   const [truncated, setTruncated] = useState(false)
 
@@ -143,18 +150,18 @@ const SafeInspector = ({
     }
 
     setCopied(true)
-    setCopyIcon('clipboard_check')
+    setCopyIcon(IconClipboardCheck)
     if (noCopyPopup) {
       _timer.current = setTimeout(() => {
         setCopied(false)
-        setCopyIcon('clipboard')
+        setCopyIcon(IconClipboard)
       }, 2000)
     }
   }, [copied, noCopyPopup])
 
   const handleCopyAnimationEnd = useCallback(() => {
     setCopied(false)
-    setCopyIcon('clipboard')
+    setCopyIcon(IconClipboard)
   }, [])
 
   useEffect(() => {
@@ -251,7 +258,7 @@ const SafeInspector = ({
                 className={style.buttonSwap}
                 onClick={handleSwapToggle}
               >
-                <Icon className={style.buttonIcon} small icon="switch-horizontal" />
+                <Icon className={style.buttonIcon} small icon={IconSwitchHorizontal} />
               </button>
             </React.Fragment>
           )}
@@ -261,7 +268,7 @@ const SafeInspector = ({
               className={style.buttonTransform}
               onClick={handleTransformToggle}
             >
-              <Icon className={style.buttonIcon} small icon="code" />
+              <Icon className={style.buttonIcon} small icon={IconCode} />
             </button>
           )}
           {!noCopy && (
@@ -289,7 +296,7 @@ const SafeInspector = ({
               className={style.buttonVisibility}
               onClick={handleVisibiltyToggle}
             >
-              <Icon className={style.buttonIcon} small icon={hidden ? 'eye' : 'eye_off'} />
+              <Icon className={style.buttonIcon} small icon={hidden ? IconEye : IconEyeOff} />
             </button>
           )}
         </div>

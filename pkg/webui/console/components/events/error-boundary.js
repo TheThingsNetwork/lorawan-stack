@@ -14,7 +14,7 @@
 
 import React, { useCallback, useState } from 'react'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconExclamationCircle } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -34,7 +34,7 @@ const EventErrorBoundary = ({ children }) => {
   if (hasErrored) {
     return (
       <div className={style.cellError}>
-        <Icon icon="exclamation-circle" className={style.eventIcon} />
+        <Icon icon={IconExclamationCircle} className={style.eventIcon} />
         <Message content={m.errorOverviewEntry} />
       </div>
     )

@@ -16,6 +16,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from '@formatjs/intl'
 
+import { IconGridPattern, IconPacketBroker, IconUserManagement } from '@ttn-lw/components/icon'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
@@ -58,7 +59,7 @@ const AdminPanel = () => {
       <PanelView>
         <PanelView.Item
           title={sharedMessages.networkInformation}
-          icon="gird-pattern"
+          icon={IconGridPattern}
           path="network-information"
           Component={NetworkInformation}
           exact
@@ -66,7 +67,7 @@ const AdminPanel = () => {
         {showUserManagement && (
           <PanelView.Item
             title={m.userManagement}
-            icon="user-management"
+            icon={IconUserManagement}
             path="user-management"
             Component={UserManagement}
             condition={showUserManagement}
@@ -75,7 +76,7 @@ const AdminPanel = () => {
         {showPacketBroker && (
           <PanelView.Item
             title={m.peeringSettings}
-            icon="packet-broker"
+            icon={IconPacketBroker}
             path="packet-broker"
             Component={PacketBrokerRouter}
             condition={showPacketBroker}

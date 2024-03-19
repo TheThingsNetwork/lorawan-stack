@@ -47,7 +47,7 @@ const EntityTitleSection = props => {
 EntityTitleSection.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   className: PropTypes.string,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.shape({}).isRequired,
   iconAlt: PropTypes.message.isRequired,
   id: PropTypes.string.isRequired,
   name: PropTypes.string,

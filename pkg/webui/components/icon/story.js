@@ -14,9 +14,9 @@
 
 import React from 'react'
 
-import style from './story.styl'
+import Icon, { IconDevice } from '@ttn-lw/components/icon'
 
-import Icon from '.'
+import style from './story.styl'
 
 const icons = [
   'device',
@@ -53,12 +53,12 @@ export const Icons = () => <div>{iconElement}</div>
 export const Usage = () => (
   <div className={style.wrapper}>
     <div className={style.block}>
-      <Icon icon="device" />
+      <Icon icon={IconDevice} />
       <span>{'display: inline-block'}</span>
     </div>
     <br />
     <div className={style.flex}>
-      <Icon icon="device" />
+      <Icon icon={IconDevice} />
       <span>{'display: flex'}</span>
     </div>
   </div>

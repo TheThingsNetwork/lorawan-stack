@@ -16,6 +16,7 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { isEqual } from 'lodash'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
@@ -293,7 +294,7 @@ const IdentityServerForm = React.memo(props => {
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <ModalButton
           type="button"
-          icon="trash"
+          icon={IconTrash}
           message={supportsClaiming ? messages.unclaimAndDeleteDevice : messages.deleteDevice}
           modalData={{
             message: { values: { deviceId: name || ids.device_id }, ...messages.deleteWarning },

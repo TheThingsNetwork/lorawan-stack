@@ -15,8 +15,8 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Icon, { IconUserPlus } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -33,7 +33,7 @@ const m = defineMessages({
     'A new user just registered on your network. Since user registration requires admin approval, you need to approve this user before they can login. User ID: {userId}',
 })
 
-const UserRequestedIcon = () => <Icon icon="user-plus" className="c-tts-primary" />
+const UserRequestedIcon = () => <Icon icon={IconUserPlus} className="c-tts-primary" />
 
 const UserRequestedPreview = ({ notificationData }) => {
   const { user } = notificationData.data

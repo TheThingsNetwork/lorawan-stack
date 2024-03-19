@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable react/prop-types */
-
 import React from 'react'
+
+import { IconSearch, IconHammer } from '@ttn-lw/components/icon'
+/* eslint-disable react/prop-types */
 
 import Input from '..'
 
@@ -37,7 +38,7 @@ export const Default = () => (
 )
 
 export const WithPlaceholder = () => <Example placeholder="Placeholder..." />
-export const WithIcon = () => <Example icon="search" />
+export const WithIcon = () => <Example icon={IconSearch} />
 export const WithAppend = () => <Example error append="test" />
 
 WithIcon.story = {
@@ -55,14 +56,14 @@ export const Toggled = () => (
 )
 
 export const Textarea = () => <Example type="textarea" />
-export const WithSpinner = () => <Example icon="search" loading />
+export const WithSpinner = () => <Example icon={IconSearch} loading />
 export const Sensitive = () => <Example sensitive max={5} />
 
 export const WithAction = () => (
   <div>
-    <Example action={{ icon: 'hammer', secondary: true }} />
-    <Example action={{ icon: 'hammer', secondary: true }} warning />
-    <Example action={{ icon: 'hammer', secondary: true }} error />
+    <Example action={{ icon: IconHammer, secondary: true }} />
+    <Example action={{ icon: IconHammer, secondary: true }} warning />
+    <Example action={{ icon: IconHammer, secondary: true }} error />
   </div>
 )
 

@@ -15,8 +15,8 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Icon, { IconHelp } from '@ttn-lw/components/icon'
 import Tooltip from '@ttn-lw/components/tooltip'
-import Icon from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -147,7 +147,7 @@ const FieldTooltip = React.memo(props => {
         />
       }
     >
-      <Icon className={style.tooltipIcon} icon="help" />
+      <Icon className={style.tooltipIcon} icon={IconHelp} />
     </Tooltip>
   )
 })

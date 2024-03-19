@@ -18,9 +18,9 @@ import { useSelector } from 'react-redux'
 
 import applicationIcon from '@assets/misc/application.svg'
 
+import Icon, { IconHelp, IconApiKeys, IconCollaborators, IconDevice } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -84,7 +84,7 @@ const ApplicationTitleSection = ({ appId }) => {
       content={<Message content={m.lastSeenAvailableTooltip} />}
     >
       <LastSeen lastSeen={lastSeen} flipped>
-        <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+        <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
       </LastSeen>
     </DocTooltip>
   ) : (
@@ -93,7 +93,7 @@ const ApplicationTitleSection = ({ appId }) => {
       docPath="/getting-started/console/troubleshooting"
     >
       <Status status="mediocre" label={sharedMessages.noRecentActivity} className="mr-cs-l" flipped>
-        <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+        <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
       </Status>
     </DocTooltip>
   )
@@ -101,7 +101,7 @@ const ApplicationTitleSection = ({ appId }) => {
     <>
       {mayViewDevices && (
         <Content.EntityCount
-          icon="device"
+          icon={IconDevice}
           value={devicesTotalCount}
           keyMessage={sharedMessages.deviceCounted}
           toAllUrl={`/applications/${appId}/devices`}
@@ -109,7 +109,7 @@ const ApplicationTitleSection = ({ appId }) => {
       )}
       {mayViewCollaborators && (
         <Content.EntityCount
-          icon="collaborators"
+          icon={IconCollaborators}
           value={collaboratorsTotalCount}
           keyMessage={sharedMessages.collaboratorCounted}
           toAllUrl={`/applications/${appId}/collaborators`}
@@ -117,7 +117,7 @@ const ApplicationTitleSection = ({ appId }) => {
       )}
       {mayViewApiKeys && (
         <Content.EntityCount
-          icon="api-keys"
+          icon={IconApiKeys}
           value={apiKeysTotalCount}
           keyMessage={sharedMessages.apiKeyCounted}
           toAllUrl={`/applications/${appId}/api-keys`}

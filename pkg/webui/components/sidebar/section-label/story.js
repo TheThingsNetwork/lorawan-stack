@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import { IconPlus } from '@ttn-lw/components/icon'
+
 import SectionLabel from '.'
 
 export default {
@@ -29,6 +31,6 @@ export default {
 
 export const Default = () => (
   <div style={{ maxWidth: '20rem' }}>
-    <SectionLabel label="Top entities" icon="plus" />
+    <SectionLabel label="Top entities" icon={IconPlus} />
   </div>
 )

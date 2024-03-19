@@ -17,6 +17,14 @@ import classnames from 'classnames'
 
 import TtsLogo from '@assets/static/tts-logo.svg'
 
+import {
+  IconData,
+  IconApiKeys,
+  IconGeneralSettings,
+  IconLocation,
+  IconOrganization,
+  IconOverview,
+} from '@ttn-lw/components/icon'
 import Switcher from '@ttn-lw/components/sidebar/switcher'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import SideHeader from '@ttn-lw/components/sidebar/side-header'
@@ -63,15 +71,15 @@ export const Default = () => (
     <Switcher />
     <SearchButton />
     <SideNavigation className="mt-cs-xs">
-      <SideNavigation.Item title="Overview" path="" icon="overview" exact />
-      <SideNavigation.Item title="Live data" path="data" icon="data" />
-      <SideNavigation.Item title="Location" path="location" icon="location" />
-      <SideNavigation.Item title="Collaborators" path="collaborators" icon="organization" />
-      <SideNavigation.Item title="API keys" path="api-keys" icon="api-keys" />
+      <SideNavigation.Item title="Overview" path="" icon={IconOverview} exact />
+      <SideNavigation.Item title="Live data" path="data" icon={IconData} />
+      <SideNavigation.Item title="Location" path="location" icon={IconLocation} />
+      <SideNavigation.Item title="Collaborators" path="collaborators" icon={IconOrganization} />
+      <SideNavigation.Item title="API keys" path="api-keys" icon={IconApiKeys} />
       <SideNavigation.Item
         title="General settings"
         path="general-settings"
-        icon="general-settings"
+        icon={IconGeneralSettings}
       />
     </SideNavigation>
     <SideFooter supportLink="/support" documentationBaseUrl="/docs" statusPageBaseUrl="/status" />

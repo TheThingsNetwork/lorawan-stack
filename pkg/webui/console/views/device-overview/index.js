@@ -20,6 +20,7 @@ import { isPlainObject } from 'lodash'
 
 import tts from '@console/api/tts'
 
+import { IconFileDownload } from '@ttn-lw/components/icon'
 import DataSheet from '@ttn-lw/components/data-sheet'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import toast from '@ttn-lw/components/toast'
@@ -267,7 +268,7 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
             onApprove={onExport}
             message={m.downloadMacData}
             type="button"
-            icon="file-download"
+            icon={IconFileDownload}
           />
         ),
       },

@@ -15,6 +15,13 @@
 import React, { useCallback, useContext, useRef } from 'react'
 import classnames from 'classnames'
 
+import {
+  IconHeartRateMonitor,
+  IconLanguage,
+  IconBook,
+  IconWorld,
+  IconSupport,
+} from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Dropdown from '@ttn-lw/components/dropdown'
 
@@ -57,7 +64,7 @@ const SideFooter = () => {
   const clusterButtonRef = useRef(null)
 
   const clusterDropdownItems = (
-    <Dropdown.Item title="Cluster selection" icon="world" path="/cluster" />
+    <Dropdown.Item title="Cluster selection" icon={IconWorld} path="/cluster" />
   )
 
   const languageContext = useContext(LanguageContext)
@@ -86,21 +93,26 @@ const SideFooter = () => {
     <>
       <Dropdown.Item
         title={sharedMessages.documentation}
-        icon="book"
+        icon={IconBook}
         path={documentationBaseUrl}
         external
       />
-      <Dropdown.Item title={sharedMessages.support} icon="support" path={supportLink} external />
+      <Dropdown.Item
+        title={sharedMessages.support}
+        icon={IconSupport}
+        path={supportLink}
+        external
+      />
       <Dropdown.Item
         title={sharedMessages.statusPage}
-        icon="heart-rate-monitor"
+        icon={IconHeartRateMonitor}
         path={statusPageBaseUrl}
         external
       />
       {Boolean(languageContext) && (
         <Dropdown.Item
           title={sharedMessages.language}
-          icon="language"
+          icon={IconLanguage}
           path="/support"
           submenuItems={languageItems}
           external
@@ -124,7 +136,7 @@ const SideFooter = () => {
       <Button
         className={style.supportButton}
         secondary
-        icon="support"
+        icon={IconSupport}
         dropdownItems={supportDropdownItems}
         dropdownPosition="above"
         dropdownClassName={style.sideFooterDropdown}
@@ -138,7 +150,7 @@ const SideFooter = () => {
       <Button
         className={style.clusterButton}
         secondary
-        icon="world"
+        icon={IconWorld}
         message="EU1"
         noDropdownIcon
         dropdownItems={clusterDropdownItems}

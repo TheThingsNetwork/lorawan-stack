@@ -18,6 +18,7 @@ import { uniq } from 'lodash'
 
 import tts from '@console/api/tts'
 
+import { IconTrash, IconRefresh } from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -388,7 +389,7 @@ const WebhookForm = props => {
           children={
             <Button
               onClick={handleReactivate}
-              icon="refresh"
+              icon={IconRefresh}
               message={m.reactivateButtonMessage}
               className="mt-cs-m"
               secondary
@@ -623,7 +624,7 @@ const WebhookForm = props => {
           {update && (
             <ModalButton
               type="button"
-              icon="trash"
+              icon={IconTrash}
               danger
               naked
               message={m.deleteWebhook}

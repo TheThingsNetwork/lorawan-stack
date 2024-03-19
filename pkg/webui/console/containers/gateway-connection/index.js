@@ -17,8 +17,8 @@ import classnames from 'classnames'
 import { FormattedNumber, defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
+import Icon, { IconHelp, IconDownlink, IconUplink } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
-import Icon from '@ttn-lw/components/icon'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Tooltip from '@ttn-lw/components/tooltip'
 
@@ -142,19 +142,19 @@ const GatewayConnection = props => {
           lastSeen={statistics.disconnected_at}
           flipped
         >
-          <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+          <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
         </LastSeen>
       )
     } else if (statusIndicator === 'good' && hasLastSeen) {
       node = (
         <LastSeen lastSeen={lastSeen} flipped>
-          <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+          <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
         </LastSeen>
       )
     } else {
       node = (
         <Status className={style.status} status={statusIndicator} label={message} flipped>
-          <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+          <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
         </Status>
       )
     }
@@ -188,11 +188,11 @@ const GatewayConnection = props => {
       <Tooltip content={<Message content={m.messageCountTooltip} />}>
         <div className={style.messages}>
           <span className={style.messageCount}>
-            <Icon className={style.icon} icon="uplink" />
+            <Icon className={style.icon} icon={IconUplink} />
             <FormattedNumber value={uplinkCount} />
           </span>
           <span className={style.messageCount}>
-            <Icon className={style.icon} icon="downlink" />
+            <Icon className={style.icon} icon={IconDownlink} />
             <FormattedNumber value={downlinkCount} />
           </span>
         </div>

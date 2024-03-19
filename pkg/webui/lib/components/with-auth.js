@@ -17,6 +17,7 @@ import { useLocation, Navigate, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { useDispatch } from 'react-redux'
 
+import { IconMail } from '@ttn-lw/components/icon'
 import Spinner from '@ttn-lw/components/spinner'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -107,7 +108,7 @@ const Auth = ({ user, fetching, userError, errorComponent, children, rights, isA
       // If the user's email address is not validated, define a rerequest action
       const requestValidationAction = {
         message: m.resendValidationEmail,
-        icon: 'mail',
+        icon: IconMail,
         action: () => {
           dispatch(requestEmailValidation(user.ids.user_id))
         },

@@ -17,6 +17,7 @@ import { Navigate, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 
+import { IconChevronLeft } from '@ttn-lw/components/icon'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Button from '@ttn-lw/components/button'
 import PageTitle from '@ttn-lw/components/page-title'
@@ -61,7 +62,7 @@ const Code = () => {
           />
           <Button.Link
             to="/"
-            icon="chevron-left"
+            icon={IconChevronLeft}
             message={{ ...sharedMessages.backTo, values: { siteTitle } }}
           />
         </Col>

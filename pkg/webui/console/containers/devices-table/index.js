@@ -17,11 +17,11 @@ import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 
+import Icon, { IconHelp, IconImportDevices } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Status from '@ttn-lw/components/status'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
-import Icon from '@ttn-lw/components/icon'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -110,7 +110,7 @@ const headers = [
             placement="top-end"
           >
             <Status status="unknown" label={sharedMessages.otherCluster}>
-              <Icon icon="help" textPaddedLeft small nudgeUp className="c-text-neutral-light" />
+              <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
             </Status>
           </DocTooltip>
         )
@@ -182,7 +182,7 @@ const DevicesTableInner = () => {
   const importButton = mayImportDevices && (
     <Button.Link
       message={sharedMessages.importDevices}
-      icon="import-devices"
+      icon={IconImportDevices}
       to={`/applications/${appId}/devices/import`}
       secondary
     />

@@ -20,6 +20,7 @@ import { useParams } from 'react-router-dom'
 
 import LAYOUT from '@ttn-lw/constants/layout'
 
+import { IconChevronLeft, IconArchive } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -69,7 +70,7 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
         <div className={style.notificationHeaderTitle}>
           <Button.Link
             to="/notifications/inbox"
-            icon="chevron-left"
+            icon={IconChevronLeft}
             className="s:d-flex d-none"
             naked
           />
@@ -110,7 +111,7 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
           <Button
             onClick={onArchive}
             message={archiveMessage}
-            icon="archive"
+            icon={IconArchive}
             value={selectedNotification.id}
             secondary
           />

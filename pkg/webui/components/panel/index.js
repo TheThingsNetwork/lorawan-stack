@@ -67,7 +67,7 @@ Panel.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   divider: PropTypes.bool,
-  icon: PropTypes.string,
+  icon: PropTypes.shape({}),
   messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
   shortCutLinkPath: PropTypes.string,

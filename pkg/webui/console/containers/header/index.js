@@ -15,6 +15,17 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import {
+  IconLogout,
+  IconUserCircle,
+  IconBook,
+  IconAdminPanel,
+  IconApplication,
+  IconDevice,
+  IconGateway,
+  IconOrganization,
+  IconSupport,
+} from '@ttn-lw/components/icon'
 import HeaderComponent from '@ttn-lw/components/header'
 import Dropdown from '@ttn-lw/components/dropdown'
 
@@ -59,14 +70,28 @@ const Header = ({ onMenuClick }) => {
   const plusDropdownItems = (
     <>
       {mayViewApps && (
-        <Dropdown.Item title="Add new application" icon="application" path="/applications/add" />
+        <Dropdown.Item
+          title="Add new application"
+          icon={IconApplication}
+          path="/applications/add"
+        />
       )}
-      {mayViewGtws && <Dropdown.Item title="Add new gateway" icon="gateway" path="/gateways/add" />}
+      {mayViewGtws && (
+        <Dropdown.Item title="Add new gateway" icon={IconGateway} path="/gateways/add" />
+      )}
       {mayViewOrgs && (
-        <Dropdown.Item title="Add new organization" icon="organization" path="/organizations/add" />
+        <Dropdown.Item
+          title="Add new organization"
+          icon={IconOrganization}
+          path="/organizations/add"
+        />
       )}
 
-      <Dropdown.Item title="Register end device in application" icon="device" path="/devices/add" />
+      <Dropdown.Item
+        title="Register end device in application"
+        icon={IconDevice}
+        path="/devices/add"
+      />
     </>
   )
 
@@ -74,32 +99,32 @@ const Header = ({ onMenuClick }) => {
     <React.Fragment>
       <Dropdown.Item
         title={sharedMessages.profileSettings}
-        icon="user-circle"
+        icon={IconUserCircle}
         path={`${accountUrl}/profile-settings`}
         external
       />
       {isAdmin && (
         <Dropdown.Item
           title={sharedMessages.adminPanel}
-          icon="admin-panel"
+          icon={IconAdminPanel}
           path="/admin-panel/network-information"
         />
       )}
       <hr />
       <Dropdown.Item
         title={sharedMessages.getSupport}
-        icon="support"
+        icon={IconSupport}
         path="https://thethingsindustries.com/support"
         external
       />
       <Dropdown.Item
         title={sharedMessages.documentation}
-        icon="book"
+        icon={IconBook}
         path="https://thethingsindustries.com/docs"
         external
       />
       <hr />
-      <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
+      <Dropdown.Item title={sharedMessages.logout} icon={IconLogout} action={handleLogout} />
     </React.Fragment>
   )
 

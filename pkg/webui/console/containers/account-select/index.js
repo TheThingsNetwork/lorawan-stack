@@ -17,9 +17,9 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { components } from 'react-select'
 
+import Icon from '@ttn-lw/components/icon'
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
-import Icon from '@ttn-lw/components/icon'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'

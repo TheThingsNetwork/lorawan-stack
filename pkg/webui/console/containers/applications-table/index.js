@@ -18,7 +18,7 @@ import { defineMessages, FormattedNumber } from 'react-intl'
 import { bindActionCreators } from 'redux'
 import { createSelector } from 'reselect'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconHelp } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import ButtonGroup from '@ttn-lw/components/button/group'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
@@ -182,7 +182,7 @@ const ApplicationsTable = props => {
                 >
                   <Status status="unknown" label={sharedMessages.otherCluster}>
                     <Icon
-                      icon="help"
+                      icon={IconHelp}
                       textPaddedLeft
                       small
                       nudgeUp

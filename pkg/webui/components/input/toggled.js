@@ -83,7 +83,7 @@ Toggled.propTypes = {
   disabled: PropTypes.bool,
   enabledMessage: PropTypes.message,
   error: PropTypes.bool,
-  icon: PropTypes.string,
+  icon: PropTypes.shape({}),
   label: PropTypes.string,
   loading: PropTypes.bool,
   onChange: PropTypes.func.isRequired,

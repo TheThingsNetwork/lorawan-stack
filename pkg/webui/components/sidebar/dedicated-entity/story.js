@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import { IconArrowLeft } from '@ttn-lw/components/icon'
+
 import DedicatedEntity from '.'
 
 export default {
@@ -26,4 +28,4 @@ export default {
   },
 }
 
-export const Default = () => <DedicatedEntity label="Adrian's Test Lab" icon="arrow-left" />
+export const Default = () => <DedicatedEntity label="Adrian's Test Lab" icon={IconArrowLeft} />

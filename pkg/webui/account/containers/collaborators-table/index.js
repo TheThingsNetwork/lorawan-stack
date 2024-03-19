@@ -18,7 +18,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { bindActionCreators } from 'redux'
 import { createSelector } from 'reselect'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 import Tag from '@ttn-lw/components/tag'
@@ -145,7 +145,7 @@ const CollaboratorsTable = props => {
             type="button"
             onClick={details.delete}
             message={sharedMessages.remove}
-            icon="trash"
+            icon={IconTrash}
             danger
             naked
           />

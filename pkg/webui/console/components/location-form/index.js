@@ -16,6 +16,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { isPlainObject } from 'lodash'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -312,7 +313,7 @@ const LocationForm = props => {
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <ModalButton
           type="button"
-          icon="trash"
+          icon={IconTrash}
           message={m.deleteLocation}
           modalData={{
             children: (

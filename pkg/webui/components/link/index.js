@@ -17,7 +17,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import classnames from 'classnames'
 import { defineMessages, useIntl } from 'react-intl'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconExternalLink, IconBook } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -180,9 +180,9 @@ const DocLink = props => {
       onClick={onClick}
       tabIndex={tabIndex}
     >
-      {!raw && <Icon className={style.docIcon} icon="book" size={18} />}
+      {!raw && <Icon className={style.docIcon} icon={IconBook} size={18} />}
       {children}
-      {!raw && <Icon className={style.icon} icon="external-link" size={14} />}
+      {!raw && <Icon className={style.icon} icon={IconExternalLink} size={14} />}
     </a>
   )
 }
@@ -304,7 +304,7 @@ const AnchorLink = props => {
       {...dataProps}
     >
       {children}
-      {external ? <Icon className={style.icon} icon="external-link" size={14} /> : null}
+      {external ? <Icon className={style.icon} icon={IconExternalLink} size={14} /> : null}
     </a>
   )
 }

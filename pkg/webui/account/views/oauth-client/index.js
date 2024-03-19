@@ -18,6 +18,7 @@ import { Routes, Route, useParams } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
+import { IconGeneralSettings, IconOrganization, IconOverview } from '@ttn-lw/components/icon'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -66,20 +67,20 @@ const OAuthClientInner = () => {
         }}
       >
         {mayPerformAllClientActions.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
+          <SideNavigation.Item title={sharedMessages.overview} path="" icon={IconOverview} exact />
         )}
         {mayPerformAllClientActions.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.collaborators}
             path="collaborators"
-            icon="organization"
+            icon={IconOrganization}
           />
         )}
         {mayPerformAllClientActions.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.generalSettings}
             path="general-settings"
-            icon="general-settings"
+            icon={IconGeneralSettings}
           />
         )}
       </SideNavigation>

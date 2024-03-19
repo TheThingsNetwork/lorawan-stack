@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import { IconUser, IconLogout, IconAdminShield } from '@ttn-lw/components/icon'
+
 import Dropdown from '.'
 
 export default {
@@ -25,10 +27,10 @@ export const Default = () => (
   <div style={{ height: '8rem' }}>
     <Dropdown open>
       <Dropdown.HeaderItem title="dropdown items" />
-      <Dropdown.Item title="Profile Settings" path="profile/path" icon="user" />
-      <Dropdown.Item title="Admin panel" path="admin/path" icon="admin-shield" />
+      <Dropdown.Item title="Profile Settings" path="profile/path" icon={IconUser} />
+      <Dropdown.Item title="Admin panel" path="admin/path" icon={IconAdminShield} />
       <hr />
-      <Dropdown.Item title="Logout" path="logout/path" icon="logout" />
+      <Dropdown.Item title="Logout" path="logout/path" icon={IconLogout} />
     </Dropdown>
   </div>
 )

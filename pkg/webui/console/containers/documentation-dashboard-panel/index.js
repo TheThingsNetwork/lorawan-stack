@@ -15,9 +15,17 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Icon, {
+  IconUsersGroup,
+  IconArrowRight,
+  IconArrowMerge,
+  IconBook,
+  IconDevice,
+  IconGateway,
+} from '@ttn-lw/components/icon'
+import IconTts from '@ttn-lw/components/icon/supplemental/tts'
 import Link from '@ttn-lw/components/link'
 import Panel from '@ttn-lw/components/panel'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -40,12 +48,12 @@ const DocsPanelLink = ({ path, title, icon }) => (
     <div className="d-flex al-center gap-cs-xs">
       <Icon icon={icon} /> <Message content={title} />
     </div>
-    <Icon icon="arrow-right" />
+    <Icon icon={IconArrowRight} />
   </Link>
 )
 
 DocsPanelLink.propTypes = {
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.shape({}).isRequired,
   path: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,
 }
@@ -54,7 +62,7 @@ const DocumentationDashboardPanel = () => (
   <Panel
     title={sharedMessages.documentation}
     path={docBaseUrl}
-    icon="book"
+    icon={IconBook}
     buttonTitle={sharedMessages.documentation}
     divider
     target="_blank"
@@ -63,21 +71,25 @@ const DocumentationDashboardPanel = () => (
     <DocsPanelLink
       path={`${docBaseUrl}/getting-started/`}
       title={m.gettingStarted}
-      icon="users-group"
+      icon={IconUsersGroup}
     />
-    <DocsPanelLink path={`${docBaseUrl}/devices/`} title={sharedMessages.devices} icon="device" />
+    <DocsPanelLink
+      path={`${docBaseUrl}/devices/`}
+      title={sharedMessages.devices}
+      icon={IconDevice}
+    />
     <DocsPanelLink
       path={`${docBaseUrl}/gateways/`}
       title={sharedMessages.gateways}
-      icon="gateway"
+      icon={IconGateway}
     />
     <DocsPanelLink
       path={`${docBaseUrl}/integrations/`}
       title={sharedMessages.integrations}
-      icon="arrow-merge"
+      icon={IconArrowMerge}
     />
-    <DocsPanelLink path={`${docBaseUrl}/the-things-stack/`} title={m.tts} icon="tts" />
-    <DocsPanelLink path={`${docBaseUrl}/reference/`} title={m.reference} icon="book" />
+    <DocsPanelLink path={`${docBaseUrl}/the-things-stack/`} title={m.tts} icon={IconTts} />
+    <DocsPanelLink path={`${docBaseUrl}/reference/`} title={m.reference} icon={IconBook} />
   </Panel>
 )
 

@@ -14,6 +14,7 @@
 
 import React, { useRef } from 'react'
 
+import { IconLogout, IconSettings, IconStar } from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 
 import Button from '.'
@@ -30,8 +31,8 @@ export default {
 
 const dropdownItems = (
   <React.Fragment>
-    <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
-    <Dropdown.Item title="Logout" icon="logout" path="/logout" />
+    <Dropdown.Item title="Profile Settings" icon={IconSettings} path="/profile-settings" />
+    <Dropdown.Item title="Logout" icon={IconLogout} path="/logout" />
   </React.Fragment>
 )
 
@@ -43,13 +44,13 @@ export const Primary = () => (
 
 export const WithIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button primary icon="star" message="With Icon" />
+    <Button primary icon={IconStar} message="With Icon" />
   </div>
 )
 
 export const PrimayOnlyIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button primary icon="star" />
+    <Button primary icon={IconStar} />
   </div>
 )
 
@@ -58,7 +59,7 @@ export const PrimayDropdown = () => {
 
   return (
     <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
-      <Button primary icon="star" message="Dropdown" ref={ref} dropdownItems={dropdownItems} />
+      <Button primary icon={IconStar} message="Dropdown" ref={ref} dropdownItems={dropdownItems} />
     </div>
   )
 }
@@ -68,7 +69,7 @@ export const PrimayOnlyIconDropdown = () => {
 
   return (
     <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
-      <Button primary icon="star" dropdownItems={dropdownItems} ref={ref} />
+      <Button primary icon={IconStar} dropdownItems={dropdownItems} ref={ref} />
     </div>
   )
 }
@@ -81,13 +82,13 @@ export const Secondary = () => (
 
 export const SecondaryWithIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button secondary icon="star" message="Secondary With Icon" />
+    <Button secondary icon={IconStar} message="Secondary With Icon" />
   </div>
 )
 
 export const SecondaryOnlyIcon = () => (
   <div style={{ textAlign: 'center' }}>
-    <Button secondary icon="star" />
+    <Button secondary icon={IconStar} />
   </div>
 )
 
@@ -96,7 +97,13 @@ export const SecondaryDropdown = () => {
 
   return (
     <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
-      <Button secondary icon="star" message="Dropdown" dropdownItems={dropdownItems} ref={ref} />
+      <Button
+        secondary
+        icon={IconStar}
+        message="Dropdown"
+        dropdownItems={dropdownItems}
+        ref={ref}
+      />
     </div>
   )
 }
@@ -106,7 +113,7 @@ export const SecondaryOnlyIconDropdown = () => {
 
   return (
     <div style={{ textAlign: 'center', height: '6rem', paddingTop: '4rem' }}>
-      <Button secondary icon="star" dropdownItems={dropdownItems} ref={ref} />
+      <Button secondary icon={IconStar} dropdownItems={dropdownItems} ref={ref} />
     </div>
   )
 }

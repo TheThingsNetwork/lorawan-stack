@@ -15,76 +15,12 @@
 import React, { forwardRef } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import * as Icons from '@tabler/icons-react'
-
-import TtsIcon from './replacements/tts-icon'
 
 import style from './icon.styl'
 
-const hyphenCaseToPascalCase = str =>
-  str
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('')
-
-// A map of hardcoded names to their corresponding icons.
-// Keep these sorted alphabetically.
-const hardcoded = {
-  access: 'lock',
-  'admin-panel': 'user-shield',
-  'api-keys': 'key',
-  application: 'device-desktop-analytics',
-  cluster: 'world',
-  collaborators: 'users',
-  develop: 'code',
-  device: 'cpu',
-  downlink: 'arrow-down',
-  event: 'info',
-  'event-clear-all': 'clear-all',
-  'event-connection': 'transfer',
-  'event-create': 'circle-plus',
-  'event-delete': 'trash',
-  'event-downlink': 'arrow-down',
-  'event-error': 'exclamation-circle',
-  'event-gateway-connect': 'bolt',
-  'event-gateway-disconnect': 'bolt-off',
-  'event-join': 'circles-relation',
-  'event-mode': 'adjustments-horizontal',
-  'event-rekey': 'key',
-  'event-status': 'heartbeat',
-  'event-switch': 'switch',
-  'event-update': 'edit',
-  'event-uplink': 'arrow-up',
-  'expand-down': 'arrow-down',
-  'expand-up': 'arrow-up',
-  gateway: 'router',
-  'general-settings': 'settings',
-  'import-devices': 'playlist-add',
-  integration: 'arrow-merge-alt-right',
-  join: 'circles-relation',
-  'live-data': 'article',
-  location: 'map-pin',
-  organization: 'users-group',
-  overview: 'laoyout-dashboard',
-  'packet-broker': 'aperture',
-  'payload-format': 'source-code',
-  'oauth-clients': 'brand-oauth',
-  support: 'lifebuoy',
-  sort: 'selector',
-  'sort-order-asc': 'sort-ascending',
-  'sort-order-desc': 'sort-descending',
-  uplink: 'arrow-up',
-  'user-management': 'user-cog',
-  valid: 'circle-check',
-}
-
-const replaced = {
-  tts: TtsIcon,
-}
-
 const Icon = forwardRef((props, ref) => {
   const {
-    icon,
+    icon: ActualIcon,
     className,
     nudgeUp,
     nudgeDown,
@@ -105,22 +41,13 @@ const Icon = forwardRef((props, ref) => {
     [style.textPaddedRight]: textPaddedRight,
   })
 
-  const Icon = Icons[`Icon${hyphenCaseToPascalCase(hardcoded[icon] || icon)}`] || replaced[icon]
-
-  if (!Icon) {
-    console.warn(
-      `Icon${hyphenCaseToPascalCase(hardcoded[icon] || icon)} (${icon}) is not available in the tabler icon set`,
-    )
-    return null
-  }
-
-  return <Icon className={classname} ref={ref} {...rest} size={small ? 16 : size} />
+  return <ActualIcon className={classname} ref={ref} size={small ? 16 : size} {...rest} />
 })
 
 Icon.propTypes = {
   className: PropTypes.string,
   /** Which icon to display, using tabler icon set. */
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.shape({}).isRequired,
   /** Renders a bigger icon. */
   large: PropTypes.bool,
   /** Nudges the icon down by one pixel using position: relative. */
@@ -149,3 +76,5 @@ Icon.defaultProps = {
 }
 
 export default Icon
+export * from '@tabler/icons-react'
+export * from './common'

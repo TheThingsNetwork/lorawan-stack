@@ -17,6 +17,7 @@ import classnames from 'classnames'
 import FocusLock from 'react-focus-lock'
 import { RemoveScroll } from 'react-remove-scroll'
 
+import { IconClearAll, IconCheck } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -117,7 +118,7 @@ const Modal = props => {
         primary
         message={approveButtonMessage}
         onClick={handleApprove}
-        icon="check"
+        icon={IconCheck}
         ref={approveButtonRef}
         {...approveButtonProps}
       />
@@ -131,7 +132,7 @@ const Modal = props => {
           message={cancelButtonMessage}
           onClick={handleCancel}
           name={formName}
-          icon="clear-all"
+          icon={IconClearAll}
           value="false"
           secondary
           {...name}
@@ -141,7 +142,7 @@ const Modal = props => {
           message={approveButtonMessage}
           onClick={handleApprove}
           name={formName}
-          icon="check"
+          icon={IconCheck}
           value="true"
           danger={danger}
           ref={approveButtonRef}
