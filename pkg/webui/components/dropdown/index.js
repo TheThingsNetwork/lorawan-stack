@@ -168,7 +168,7 @@ DropdownItem.propTypes = {
   active: PropTypes.bool,
   exact: PropTypes.bool,
   external: PropTypes.bool,
-  icon: PropTypes.shape({}),
+  icon: PropTypes.icon,
   path: PropTypes.string,
   showActive: PropTypes.bool,
   submenuItems: PropTypes.arrayOf(PropTypes.node),

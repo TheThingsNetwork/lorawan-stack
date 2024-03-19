@@ -68,7 +68,7 @@ Tabs.propTypes = {
     PropTypes.shape({
       title: PropTypes.message.isRequired,
       name: PropTypes.string.isRequired,
-      icon: PropTypes.shape({}),
+      icon: PropTypes.icon,
       disabled: PropTypes.bool,
       hidden: PropTypes.bool,
     }),

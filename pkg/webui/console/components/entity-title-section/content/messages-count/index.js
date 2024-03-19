@@ -35,7 +35,7 @@ const MessagesCount = React.forwardRef((props, ref) => {
 
 MessagesCount.propTypes = {
   className: PropTypes.string,
-  icon: PropTypes.shape({}).isRequired,
+  icon: PropTypes.icon.isRequired,
   iconClassName: PropTypes.string,
   value: PropTypes.node.isRequired,
 }

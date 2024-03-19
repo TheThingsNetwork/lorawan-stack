@@ -248,7 +248,7 @@ const commonPropTypes = {
    */
   error: PropTypes.bool,
   /** The name of an icon to be displayed within the button. */
-  icon: PropTypes.shape({}),
+  icon: PropTypes.icon,
   /**
    * A flag specifying whether the button in the `busy` state and the
    * appropriate styling should be applied.

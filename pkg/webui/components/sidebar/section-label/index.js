@@ -50,7 +50,7 @@ SectionLabel.propTypes = {
   buttonDisabled: PropTypes.bool,
   className: PropTypes.string,
   'data-test-id': PropTypes.string,
-  icon: PropTypes.shape({}).isRequired,
+  icon: PropTypes.icon.isRequired,
   label: PropTypes.oneOfType([PropTypes.node, PropTypes.message]).isRequired,
   onClick: PropTypes.func.isRequired,
 }

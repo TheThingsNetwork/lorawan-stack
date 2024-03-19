@@ -53,7 +53,7 @@ const DocsPanelLink = ({ path, title, icon }) => (
 )
 
 DocsPanelLink.propTypes = {
-  icon: PropTypes.shape({}).isRequired,
+  icon: PropTypes.icon.isRequired,
   path: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,
 }

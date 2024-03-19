@@ -26,12 +26,12 @@ import style from './shortcut-item.styl'
 
 const ShortcutItem = ({ icon, title, link, className }) => (
   <Link to={link} className={classnames(style.shortcut, className)}>
-    <div className="pos-relative w-full">
+    <div className="pos-relative w-full h-full">
       <div className={style.addIconWrapper}>
-        <Icon icon={IconPlus} className={style.addIcon} />
+        <Icon icon={IconPlus} className={style.addIcon} size={42} />
       </div>
       <div className={style.shortcutTitleWrapper}>
-        <Icon icon={icon} className={style.icon} />
+        <Icon icon={icon} className={style.icon} size={28} />
         <Message content={title} className={style.title} component="span" />
       </div>
     </div>
@@ -40,7 +40,7 @@ const ShortcutItem = ({ icon, title, link, className }) => (
 
 ShortcutItem.propTypes = {
   className: PropTypes.string,
-  icon: PropTypes.shape({}).isRequired,
+  icon: PropTypes.icon.isRequired,
   link: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,
 }

@@ -49,7 +49,7 @@ const NavigationBarItem = ({ icon, title, className, ...rest }) => (
 
 NavigationBarItem.propTypes = {
   className: PropTypes.string,
-  icon: PropTypes.shape({}).isRequired,
+  icon: PropTypes.icon.isRequired,
   title: PropTypes.message.isRequired,
 }
 

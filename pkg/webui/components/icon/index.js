@@ -14,7 +14,8 @@
 
 import React, { forwardRef } from 'react'
 import classnames from 'classnames'
-import PropTypes from 'prop-types'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './icon.styl'
 
@@ -47,7 +48,7 @@ const Icon = forwardRef((props, ref) => {
 Icon.propTypes = {
   className: PropTypes.string,
   /** Which icon to display, using tabler icon set. */
-  icon: PropTypes.shape({}).isRequired,
+  icon: PropTypes.icon.isRequired,
   /** Renders a bigger icon. */
   large: PropTypes.bool,
   /** Nudges the icon down by one pixel using position: relative. */

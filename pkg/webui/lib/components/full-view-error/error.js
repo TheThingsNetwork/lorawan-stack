@@ -307,7 +307,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
 FullViewErrorInner.propTypes = {
   action: PropTypes.shape({
     action: PropTypes.func.isRequired,
-    icon: PropTypes.shape({}).isRequired,
+    icon: PropTypes.icon.isRequired,
     message: PropTypes.message.isRequired,
   }),
   error: PropTypes.error.isRequired,
@@ -324,7 +324,7 @@ FullViewErrorInner.defaultProps = {
 FullViewError.propTypes = {
   action: PropTypes.shape({
     action: PropTypes.func.isRequired,
-    icon: PropTypes.shape({}).isRequired,
+    icon: PropTypes.icon.isRequired,
     message: PropTypes.message.isRequired,
   }),
   error: PropTypes.error.isRequired,

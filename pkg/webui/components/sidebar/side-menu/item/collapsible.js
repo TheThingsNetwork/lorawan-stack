@@ -92,7 +92,7 @@ CollapsibleItem.propTypes = {
   children: PropTypes.node,
   currentPathName: PropTypes.string.isRequired,
   depth: PropTypes.number.isRequired,
-  icon: PropTypes.shape({}),
+  icon: PropTypes.icon,
   isExpanded: PropTypes.bool.isRequired,
   isMinimized: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,

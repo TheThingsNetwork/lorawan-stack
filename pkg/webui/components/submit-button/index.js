@@ -36,7 +36,7 @@ const SubmitButton = ({ disabled, icon, isSubmitting, isValidating, message, ...
 
 SubmitButton.propTypes = {
   disabled: PropTypes.bool,
-  icon: PropTypes.shape({}),
+  icon: PropTypes.icon,
   isSubmitting: PropTypes.bool.isRequired,
   isValidating: PropTypes.bool.isRequired,
   message: PropTypes.message,

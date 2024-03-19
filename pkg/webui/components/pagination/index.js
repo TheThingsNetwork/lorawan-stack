@@ -13,11 +13,12 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Paginate from 'react-paginate'
 
 import Icon, { IconChevronLeft, IconChevronRight } from '@ttn-lw/components/icon'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './pagination.styl'
 
