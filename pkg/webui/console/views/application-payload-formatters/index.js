@@ -66,17 +66,11 @@ const ApplicationPayloadFormattersInner = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          <Routes>
-            <Route index element={<Navigate to="uplink" replace />} />
-            <Route path="uplink" Component={ApplicationUplinkPayloadFormatters} />
-            <Route path="downlink" Component={ApplicationDownlinkPayloadFormatters} />
-          </Routes>
-        </Col>
-      </Row>
-    </Container>
+    <Routes>
+      <Route index element={<Navigate to="uplink" replace />} />
+      <Route path="uplink" Component={ApplicationUplinkPayloadFormatters} />
+      <Route path="downlink" Component={ApplicationDownlinkPayloadFormatters} />
+    </Routes>
   )
 }
 

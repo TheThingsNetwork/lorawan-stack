@@ -54,14 +54,10 @@ const DeviceAdd = () => {
 
   return (
     <RequireRequest requestAction={requestAction}>
-      <Container>
-        <Row>
-          <Col>
-            <PageTitle tall title={sharedMessages.registerEndDevice} className="mb-cs-m" />
-            <DeviceOnboardingForm />
-          </Col>
-        </Row>
-      </Container>
+      <div className="container container--md">
+        <PageTitle tall title={sharedMessages.registerEndDevice} className="mb-cs-m" />
+        <DeviceOnboardingForm />
+      </div>
     </RequireRequest>
   )
 }

@@ -13,15 +13,15 @@
 // limitations under the License.
 
 // stylelint-disable
-// Grid.
+// Grid system which adheres to the TTUI grid.
 :global
   .grid
     display: grid
-    row-gap: var(--grid-row-gap)
+    row-gap: var(--grid-row-gap, $ls.xs)
     width: 100%
 
     // Prevent column-gaps that are wider than the page width when combined.
-    column-gap: calc(min(var(--grid-column-gap), 100% / 11))
+    column-gap: calc(min(var(--grid-column-gap, $ls.xs), 100% / 11))
 
     &:not(.auto-columns)
       grid-template-columns: repeat(12, minmax(0, 1fr))
@@ -41,7 +41,7 @@
 
     // Generate responsive grid item styles.
     for $name, $width in $bp
-      +media-query($width)
+      +media-query-min($width)
         for $num in (1..12)
           // Generate responsive grid item overrides.
           .{$name}\\:item-{$num}
@@ -53,6 +53,56 @@
 
     &--center
       align-items: center
+
+  // The container element is meant as a all-purpose container that
+  // combines padding and max-width automatically for different breakpoints.
+  // It spans the full width, which means it can also use full-width backgrounds
+  // without extra markup.
+  .container
+    width: 100%
+    max-width: none
+    padding-top: var(--container-vertical-padding, 0)
+    padding-bottom: @padding-top
+    box-sizing: border-box
+
+    // Following is some magic that will automatically calculate the necessary padding to keep
+    // the container content width at the next-smallest breakpoint while keeping the container
+    // full width of the page. This enables versatile layouts without extra markup.
+    $map = ($bp.xxl 'xl') ($bp.xl 'l') ($bp.l 'm') ($bp.m 's') ($bp.s 'xs') ($bp.xs 'xxs') ($bp.xxs 'xs3')
+    $padding = $ls.xxs
+
+    // All sizes above the max-width breakpoint.
+    +media-query-min($bp.xxl)
+      padding-right: convert('calc(max(' + $padding + ', ((100% - var(--container-max-width))/2)))')
+      padding-left: @padding-right
+
+    // Below the smallest breakpoint.
+    +media-query($bp.xs3)
+      padding-left: $ls.xxs
+      padding-right: @padding-left
+      // Prevent downsizing to extremely narrow widths.
+      min-width: calc(249px - $ls.xxs * 2)
+
+    // In between breakpoints.
+    for $pair in $map
+      if $bp[$pair[1]] < $bp.m
+        $padding = $ls.xs
+      +media-query-between($bp[$pair[1]], $pair[0])
+        padding-right: convert('calc(max(' + $padding + ', ((100% - max(var(--container-max-width), ' + $bp[$pair[1]] + ')))/2)))')
+        padding-left: @padding-right
+
+    &--xs
+      --container-max-width: $bp.xs
+    &--sm
+      --container-max-width: $bp.s
+    &--md
+      --container-max-width: $bp.m
+    &--lg
+      --container-max-width: $bp.l
+    &--xl
+      --container-max-width: $bp.xl
+    &--xxl
+      --container-max-width: $bp.xxl
 
   // Content justification.
 

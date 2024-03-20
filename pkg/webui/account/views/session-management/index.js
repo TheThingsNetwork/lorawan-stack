@@ -27,14 +27,10 @@ const m = defineMessages({
 })
 
 const SessionManagement = () => (
-  <Container>
-    <Row>
-      <Col>
-        <PageTitle title={m.sessionManagement} hideHeading />
-        <UserSessionsTable pageSize={PAGE_SIZES.REGULAR} />
-      </Col>
-    </Row>
-  </Container>
+  <div className="container container--md">
+    <PageTitle title={m.sessionManagement} hideHeading />
+    <UserSessionsTable pageSize={PAGE_SIZES.REGULAR} />
+  </div>
 )
 
 export default SessionManagement

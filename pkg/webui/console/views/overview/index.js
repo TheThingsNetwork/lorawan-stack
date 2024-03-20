@@ -33,15 +33,15 @@ const Overview = () => {
 
   return (
     <RequireRequest requestAction={[getApplicationsList(), getGatewaysList()]}>
-      <div className="grid gap-ls-xxs p-ls-xxs box-border">
-        <div className="item-6 m:item-6 l:item-12 s:item-12" />
-        <div className="item-6 m:item-6 l:item-12 s:item-12">
+      <div className="container container--md grid p-vert-ls-xxs">
+        <div className="item-12 m:item-12 l:item-6 s:item-6" />
+        <div className="item-12 m:item-12 l:item-6 s:item-6">
           <NotificationsDashboardPanel />
         </div>
-        <div className="item-6 m:item-6 l:item-12 s:item-12">
+        <div className="item-12 m:item-12 l:item-6 s:item-6">
           <DocumentationDashboardPanel />
         </div>
-        <div className="item-6 m:item-6 l:item-12 s:item-12">
+        <div className="item-12 m:item-12 l:item-6 s:item-6">
           <ShortcutPanel />
         </div>
       </div>
