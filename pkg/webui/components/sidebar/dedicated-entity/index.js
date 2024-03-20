@@ -34,7 +34,7 @@ const DedicatedEntity = ({ label, className, buttonMessage, path, backPath }) =>
       />
     </Link>
     <Link className={classnames(style.dedicatedEntityItem, 'd-flex', 'al-center')} to={path}>
-      <hr className={style.dedicatedEntityDivider} />
+      <div className={style.dedicatedEntityDivider} />
       <Message content={label} className={style.dedicatedEntityLabel} component="p" />
     </Link>
   </div>
