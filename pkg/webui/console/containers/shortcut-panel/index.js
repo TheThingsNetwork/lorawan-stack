@@ -30,7 +30,7 @@ const m = defineMessages({
 
 const ShortcutPanel = () => (
   <Panel title={m.shortcuts} path="/edit-shortcuts" icon="bolt" divider className="h-full">
-    <div className="grid">
+    <div className="grid gap-cs-xs">
       <ShortcutItem
         icon="display_settings"
         title={m.addApplication}

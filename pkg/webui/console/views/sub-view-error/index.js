@@ -40,27 +40,23 @@ const SubViewErrorComponent = ({ error }) => {
   }
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          <div className={style.title}>
-            <Icon icon="error_outline" large />
-            <Message component="h2" content={errorTitleMessage} />
-          </div>
-          <p>
-            <Message component="span" content={errorExplanation} />
-            <br />
-            <Message component="span" content={errorMessages.contactAdministrator} />
-          </p>
-          {isBackend(error) && (
-            <React.Fragment>
-              <hr />
-              <ErrorMessage content={error} />
-            </React.Fragment>
-          )}
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--md">
+      <div className={style.title}>
+        <Icon icon="error_outline" large />
+        <Message component="h2" content={errorTitleMessage} />
+      </div>
+      <p>
+        <Message component="span" content={errorExplanation} />
+        <br />
+        <Message component="span" content={errorMessages.contactAdministrator} />
+      </p>
+      {isBackend(error) && (
+        <React.Fragment>
+          <hr />
+          <ErrorMessage content={error} />
+        </React.Fragment>
+      )}
+    </div>
   )
 }
 

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Col, Row, Container } from 'react-grid-system'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -22,14 +21,12 @@ import DevicesTable from '@console/containers/devices-table'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const ApplicationDeviceList = () => (
-  <Container>
-    <Row>
+  <div className="container container--md grid">
+    <div className="item-12">
       <IntlHelmet title={sharedMessages.devices} />
-      <Col>
-        <DevicesTable />
-      </Col>
-    </Row>
-  </Container>
+      <DevicesTable />
+    </div>
+  </div>
 )
 
 export default ApplicationDeviceList
