@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -38,14 +37,12 @@ const InvitationSend = () => {
 
   return (
     <Require featureCheck={maySendInvites} otherwise={{ redirect: '/' }}>
-      <Container>
+      <div className="container container--lg grid">
         <PageTitle title={sharedMessages.invite} />
-        <Row>
-          <Col>
-            <InviteForm />
-          </Col>
-        </Row>
-      </Container>
+        <div className="item-12">
+          <InviteForm />
+        </div>
+      </div>
     </Require>
   )
 }

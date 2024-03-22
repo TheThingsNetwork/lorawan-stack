@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useState, useCallback } from 'react'
-import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import Form from '@ttn-lw/components/form'
@@ -65,87 +64,85 @@ const RoutingPolicyForm = ({ onSubmit, initialValues, error, defaultPolicy, subm
       error={error}
       validationSchema={validationSchema}
     >
-      <Row>
-        <Col md={12}>
-          <Form.Field
-            component={Radio.Group}
-            className="mb-ls-s"
-            name="_use_default_policy"
-            onChange={handlePolicySourceChange}
-            encode={policySourceEncode}
-            decode={policySourceDecode}
-          >
-            <Radio
-              label={hasDefaultPolicy ? sharedMessages.useDefaultPolicy : m.doNotUseAPolicy}
-              value="default"
+      <div className="item-12">
+        <Form.Field
+          component={Radio.Group}
+          className="mb-ls-s"
+          name="_use_default_policy"
+          onChange={handlePolicySourceChange}
+          encode={policySourceEncode}
+          decode={policySourceDecode}
+        >
+          <Radio
+            label={hasDefaultPolicy ? sharedMessages.useDefaultPolicy : m.doNotUseAPolicy}
+            value="default"
+          />
+          <Radio label={m.useSpecificPolicy} value="specific" />
+        </Form.Field>
+      </div>
+      {showDefaultPolicySheet && (
+        <div className="item-12">
+          <RoutingPolicy.Sheet policy={defaultPolicy} />
+        </div>
+      )}
+      {showPolicyCheckboxes && (
+        <>
+          <div className="item-12 md:item-6">
+            <Message content={sharedMessages.uplink} component="h4" className="mb-cs-xs" />
+            <Form.Field
+              name="policy.uplink.join_request"
+              component={Checkbox}
+              label={policyMessages.joinRequest}
+              description={policyMessages.joinRequestDesc}
             />
-            <Radio label={m.useSpecificPolicy} value="specific" />
-          </Form.Field>
-        </Col>
-        {showDefaultPolicySheet && (
-          <Col md={12}>
-            <RoutingPolicy.Sheet policy={defaultPolicy} />
-          </Col>
-        )}
-        {showPolicyCheckboxes && (
-          <>
-            <Col md={6} xs={12}>
-              <Message content={sharedMessages.uplink} component="h4" className="mb-cs-xs" />
-              <Form.Field
-                name="policy.uplink.join_request"
-                component={Checkbox}
-                label={policyMessages.joinRequest}
-                description={policyMessages.joinRequestDesc}
-              />
-              <Form.Field
-                name="policy.uplink.mac_data"
-                component={Checkbox}
-                label={sharedMessages.macData}
-                description={policyMessages.macDataDesc}
-              />
-              <Form.Field
-                name="policy.uplink.application_data"
-                component={Checkbox}
-                label={sharedMessages.appData}
-                description={policyMessages.applicationDataDesc}
-              />
-              <Form.Field
-                name="policy.uplink.signal_quality"
-                component={Checkbox}
-                label={policyMessages.signalQualityInformation}
-                description={policyMessages.signalQualityInformationDesc}
-              />
-              <Form.Field
-                name="policy.uplink.localization"
-                component={Checkbox}
-                label={policyMessages.localizationInformation}
-                description={policyMessages.localizationInformationDesc}
-              />
-            </Col>
-            <Col sm={6} xs={12}>
-              <Message content={sharedMessages.downlink} component="h4" className="mb-cs-xs" />
-              <Form.Field
-                name="policy.downlink.join_accept"
-                component={Checkbox}
-                label={sharedMessages.joinAccept}
-                description={policyMessages.joinAcceptDesc}
-              />
-              <Form.Field
-                name="policy.downlink.mac_data"
-                component={Checkbox}
-                label={sharedMessages.macData}
-                description={policyMessages.macDataAllowDesc}
-              />
-              <Form.Field
-                name="policy.downlink.application_data"
-                component={Checkbox}
-                label={sharedMessages.appData}
-                description={policyMessages.applicationDataAllowDesc}
-              />
-            </Col>
-          </>
-        )}
-      </Row>
+            <Form.Field
+              name="policy.uplink.mac_data"
+              component={Checkbox}
+              label={sharedMessages.macData}
+              description={policyMessages.macDataDesc}
+            />
+            <Form.Field
+              name="policy.uplink.application_data"
+              component={Checkbox}
+              label={sharedMessages.appData}
+              description={policyMessages.applicationDataDesc}
+            />
+            <Form.Field
+              name="policy.uplink.signal_quality"
+              component={Checkbox}
+              label={policyMessages.signalQualityInformation}
+              description={policyMessages.signalQualityInformationDesc}
+            />
+            <Form.Field
+              name="policy.uplink.localization"
+              component={Checkbox}
+              label={policyMessages.localizationInformation}
+              description={policyMessages.localizationInformationDesc}
+            />
+          </div>
+          <div className="item-12 sm:item-6">
+            <Message content={sharedMessages.downlink} component="h4" className="mb-cs-xs" />
+            <Form.Field
+              name="policy.downlink.join_accept"
+              component={Checkbox}
+              label={sharedMessages.joinAccept}
+              description={policyMessages.joinAcceptDesc}
+            />
+            <Form.Field
+              name="policy.downlink.mac_data"
+              component={Checkbox}
+              label={sharedMessages.macData}
+              description={policyMessages.macDataAllowDesc}
+            />
+            <Form.Field
+              name="policy.downlink.application_data"
+              component={Checkbox}
+              label={sharedMessages.appData}
+              description={policyMessages.applicationDataAllowDesc}
+            />
+          </div>
+        </>
+      )}
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={submitMessage} />
       </SubmitBar>

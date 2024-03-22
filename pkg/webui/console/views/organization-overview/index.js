@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Col, Row, Container } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -61,25 +60,21 @@ const Overview = () => {
   return (
     <Require featureCheck={mayViewOrganizationInformation} otherwise={{ redirect: '/' }}>
       <div className={style.titleSection}>
-        <Container>
-          <Row>
-            <Col sm={12}>
-              <OrganizationTitleSection orgId={ids.organization_id} />
-            </Col>
-          </Row>
-        </Container>
+        <div className="container container--lg grid p-vert-0">
+          <div className="item-12">
+            <OrganizationTitleSection orgId={ids.organization_id} />
+          </div>
+        </div>
       </div>
-      <Container>
+      <div className="container container--lg grid">
         <IntlHelmet title={sharedMessages.overview} />
-        <Row>
-          <Col sm={12} lg={6}>
-            <DataSheet data={sheetData} />
-          </Col>
-          <Col sm={12} lg={6}>
-            <OrganizationEvents orgId={orgId} widget />
-          </Col>
-        </Row>
-      </Container>
+        <div className="item-12 lg:item-6">
+          <DataSheet data={sheetData} />
+        </div>
+        <div className="item-12 lg:item-6">
+          <OrganizationEvents orgId={orgId} widget />
+        </div>
+      </div>
     </Require>
   )
 }

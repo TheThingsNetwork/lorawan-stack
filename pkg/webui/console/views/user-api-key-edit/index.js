@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
@@ -45,14 +44,12 @@ const UserApiKeyEditInner = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle title={sharedMessages.keyEdit} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ApiKeyEditForm entity={USER} entityId={userId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <ApiKeyEditForm entity={USER} entityId={userId} />
+      </div>
+    </div>
   )
 }
 

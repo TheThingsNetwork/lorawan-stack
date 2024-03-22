@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -39,8 +38,8 @@ const DefaultRoutingPolicyForm = () => {
   const handlePolicySourceChange = useCallback(setUseDefault, [setUseDefault])
 
   return (
-    <Row>
-      <Col md={12}>
+    <>
+      <div className="item-12">
         <Form.Field
           component={Radio.Group}
           className="mb-ls-s"
@@ -52,10 +51,10 @@ const DefaultRoutingPolicyForm = () => {
           <Radio label={m.doNotUseADefaultPolicy} value="no-default" />
           <Radio label={sharedMessages.useDefaultPolicy} value="default" />
         </Form.Field>
-      </Col>
+      </div>
       {useDefault && (
         <>
-          <Col md={6} xs={12}>
+          <div className="item-12 md:item-6">
             <Message content={sharedMessages.uplink} component="h4" className="mb-cs-xs" />
             <Form.Field
               name="policy.uplink.join_request"
@@ -87,8 +86,8 @@ const DefaultRoutingPolicyForm = () => {
               label={policyMessages.localizationInformation}
               description={policyMessages.localizationInformationDesc}
             />
-          </Col>
-          <Col sm={6} xs={12}>
+          </div>
+          <div className="item-12 sm:item-6">
             <Message content={sharedMessages.downlink} component="h4" className="mb-cs-xs" />
             <Form.Field
               name="policy.downlink.join_accept"
@@ -108,10 +107,10 @@ const DefaultRoutingPolicyForm = () => {
               label={sharedMessages.appData}
               description={policyMessages.applicationDataAllowDesc}
             />
-          </Col>
+          </div>
         </>
       )}
-    </Row>
+    </>
   )
 }
 

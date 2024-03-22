@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -28,14 +27,10 @@ const GatewaysList = () => {
   useBreadcrumbs('gtws.list', <Breadcrumb path="/gateways" content={sharedMessages.list} />)
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.gateways} />
-        <Col>
-          <GatewaysTable />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg ">
+      <IntlHelmet title={sharedMessages.gateways} />
+      <GatewaysTable />
+    </div>
   )
 }
 

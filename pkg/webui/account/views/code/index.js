@@ -15,7 +15,6 @@
 import React from 'react'
 import { Navigate, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
-import { Container, Col, Row } from 'react-grid-system'
 
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Button from '@ttn-lw/components/button'
@@ -43,30 +42,24 @@ const Code = () => {
   }
 
   return (
-    <Container>
-      <Row>
-        <Col lg={4} md={6} sm={12}>
-          <PageTitle title={sharedMessages.authorizationCode} />
-          <Message
-            content={m.codeDescription}
-            component="label"
-            className={style.codeDescription}
-          />
-          <SafeInspector
-            data={code}
-            initiallyVisible
-            hideable={false}
-            isBytes={false}
-            className={style.code}
-          />
-          <Button.Link
-            to="/"
-            icon="keyboard_arrow_left"
-            message={{ ...sharedMessages.backTo, values: { siteTitle } }}
-          />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg grid">
+      <div className="item-12 md:item-6 lg:item-4">
+        <PageTitle title={sharedMessages.authorizationCode} />
+        <Message content={m.codeDescription} component="label" className={style.codeDescription} />
+        <SafeInspector
+          data={code}
+          initiallyVisible
+          hideable={false}
+          isBytes={false}
+          className={style.code}
+        />
+        <Button.Link
+          to="/"
+          icon="keyboard_arrow_left"
+          message={{ ...sharedMessages.backTo, values: { siteTitle } }}
+        />
+      </div>
+    </div>
   )
 }
 

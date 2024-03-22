@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import { ORGANIZATION } from '@console/constants/entities'
@@ -35,14 +34,12 @@ const OrganizationApiKeyAdd = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle title={sharedMessages.addApiKey} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ApiKeyCreateForm entity={ORGANIZATION} entityId={orgId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <ApiKeyCreateForm entity={ORGANIZATION} entityId={orgId} />
+      </div>
+    </div>
   )
 }
 

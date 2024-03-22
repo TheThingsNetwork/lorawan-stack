@@ -15,7 +15,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { Col, Row, Container } from 'react-grid-system'
 import { Routes, Route, useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
@@ -75,14 +74,12 @@ const AuthorizationOverviewInner = () => {
       <IntlHelmet titleTemplate={`%s - ${clientId} - ${siteName}`} />
       <Breadcrumbs />
       <div className={style.titleSection}>
-        <Container>
-          <Row>
-            <Col sm={12}>
-              <PageTitle title={clientName} className={style.pageTitle} />
-              <Tabs className={style.tabs} narrow tabs={tabs} />
-            </Col>
-          </Row>
-        </Container>
+        <div className="container container--lg grid">
+          <div className="item-12">
+            <PageTitle title={clientName} className={style.pageTitle} />
+            <Tabs className={style.tabs} narrow tabs={tabs} />
+          </div>
+        </div>
       </div>
       <Routes>
         <Route index Component={AuthorizationSettings} />

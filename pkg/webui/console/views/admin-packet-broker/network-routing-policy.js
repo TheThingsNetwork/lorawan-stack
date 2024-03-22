@@ -14,8 +14,8 @@
 
 import React, { useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
+import classNames from 'classnames'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 import PageTitle from '@ttn-lw/components/page-title'
@@ -161,73 +161,69 @@ const NetworkRoutingPolicyViewInner = () => {
   ]
 
   return (
-    <Container>
-      <Row>
-        <Col md={12}>
-          <PageTitle title={m.network} values={{ network: network.name || displayId }}>
-            <Link
-              to="/admin-panel/packet-broker/routing-configuration/networks"
-              secondary
-              className={style.backLink}
-            >
-              ← <Message content={m.backToAllNetworks} />
-            </Link>
-          </PageTitle>
-        </Col>
-        <Col md={6}>
-          <Message content={sharedMessages.generalInformation} component="h3" />
-          <DataSheet data={homeNetworkData} />
-          {hasDevAddrBlocks && (
-            <>
-              <Message content={m.devAddressBlocks} component="h4" />
-              {network.dev_addr_blocks.map(b => (
-                <div
-                  className={style.deviceAddressBlockRow}
-                  key={`${b.dev_addr_prefix.dev_addr}/${b.dev_addr_prefix.length}`}
-                >
-                  <div>
-                    <span>Prefix:</span>
-                    <SafeInspector
-                      data={`${b.dev_addr_prefix.dev_addr}/${b.dev_addr_prefix.length}`}
-                      small
-                      hideable={false}
-                      isBytes={false}
-                      initiallyVisible
-                      disableResize
-                    />
-                  </div>
-                  {b.home_network_cluster_id && (
-                    <div>
-                      <span>
-                        <Message content={m.homeNetworkClusterId} />:
-                      </span>
-                      <span>{b.home_network_cluster_id}</span>
-                    </div>
-                  )}
+    <div className="container container--lg grid">
+      <div className="item-12">
+        <PageTitle title={m.network} values={{ network: network.name || displayId }}>
+          <Link
+            to="/admin-panel/packet-broker/routing-configuration/networks"
+            secondary
+            className={style.backLink}
+          >
+            ← <Message content={m.backToAllNetworks} />
+          </Link>
+        </PageTitle>
+      </div>
+      <div className="item-6">
+        <Message content={sharedMessages.generalInformation} component="h3" />
+        <DataSheet data={homeNetworkData} />
+        {hasDevAddrBlocks && (
+          <>
+            <Message content={m.devAddressBlocks} component="h4" />
+            {network.dev_addr_blocks.map(b => (
+              <div
+                className={style.deviceAddressBlockRow}
+                key={`${b.dev_addr_prefix.dev_addr}/${b.dev_addr_prefix.length}`}
+              >
+                <div>
+                  <span>Prefix:</span>
+                  <SafeInspector
+                    data={`${b.dev_addr_prefix.dev_addr}/${b.dev_addr_prefix.length}`}
+                    small
+                    hideable={false}
+                    isBytes={false}
+                    initiallyVisible
+                    disableResize
+                  />
                 </div>
-              ))}
-            </>
-          )}
-        </Col>
-        <Col md={6}>
-          <Message content={m.routingPolicyFromThisNetwork} component="h3" />
-          <RoutingPolicy.Sheet policy={forwarder} />
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12} lg={8} className={style.setRoutingPolicyContainer}>
-          <Message content={m.routingPolicyToThisNetwork} component="h3" />
-          <RoutingPolicyForm
-            onSubmit={handleRoutingPolicySubmit}
-            defaultPolicy={defaultRoutingPolicy}
-            submitMessage={m.saveRoutingPolicy}
-            initialValues={initialValues}
-            error={formError}
-            networkLevel
-          />
-        </Col>
-      </Row>
-    </Container>
+                {b.home_network_cluster_id && (
+                  <div>
+                    <span>
+                      <Message content={m.homeNetworkClusterId} />:
+                    </span>
+                    <span>{b.home_network_cluster_id}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+      <div className="item-6">
+        <Message content={m.routingPolicyFromThisNetwork} component="h3" />
+        <RoutingPolicy.Sheet policy={forwarder} />
+      </div>
+      <div className={classNames(style.setRoutingPolicyContainer, 'item-12 lg:item-8')}>
+        <Message content={m.routingPolicyToThisNetwork} component="h3" />
+        <RoutingPolicyForm
+          onSubmit={handleRoutingPolicySubmit}
+          defaultPolicy={defaultRoutingPolicy}
+          submitMessage={m.saveRoutingPolicy}
+          initialValues={initialValues}
+          error={formError}
+          networkLevel
+        />
+      </div>
+    </div>
   )
 }
 

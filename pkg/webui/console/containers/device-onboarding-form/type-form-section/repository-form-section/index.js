@@ -14,7 +14,6 @@
 
 import React, { useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Col, Row } from 'react-grid-system'
 import { useFormikContext } from 'formik'
 import { get, set } from 'lodash'
 
@@ -133,25 +132,23 @@ const DeviceTypeRepositoryFormSection = () => {
   ])
 
   return (
-    <Row>
-      <Col>
-        <VersionIdsSection />
-        {showProgressHint && <ProgressHint supportLink={supportLink} />}
-        {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
-        {showDeviceCard && <Card brandId={brand} modelId={model} template={template} />}
-        {showFrequencyPlanSelector && (
-          <FreqPlansSelect
-            required
-            className="mt-ls-xxs"
-            tooltipId={tooltipIds.FREQUENCY_PLAN}
-            name="frequency_plan_id"
-            bandId={band}
-            autoFocus
-          />
-        )}
-        {hasCompleted && <hr />}
-      </Col>
-    </Row>
+    <div className="item-12">
+      <VersionIdsSection />
+      {showProgressHint && <ProgressHint supportLink={supportLink} />}
+      {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
+      {showDeviceCard && <Card brandId={brand} modelId={model} template={template} />}
+      {showFrequencyPlanSelector && (
+        <FreqPlansSelect
+          required
+          className="mt-ls-xxs"
+          tooltipId={tooltipIds.FREQUENCY_PLAN}
+          name="frequency_plan_id"
+          bandId={band}
+          autoFocus
+        />
+      )}
+      {hasCompleted && <hr />}
+    </div>
   )
 }
 
