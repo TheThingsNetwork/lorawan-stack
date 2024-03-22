@@ -57,7 +57,7 @@ const DeviceMessaging = () => {
         <Row>
           {tabs.length > 0 && (
             <Col sm={12}>
-              <Tabs className="mt-0 mb-ls-s s:bg-none s:mr-0" tabs={tabs} divider />
+              <Tabs className="mt-0 mb-ls-s sm:bg-none sm:mr-0" tabs={tabs} divider />
             </Col>
           )}
           <Col lg={8} md={12}>

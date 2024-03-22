@@ -17,12 +17,12 @@
   display: flex
   flex-direction: column
   z-index: $zi.nav
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     left: 0
     top: 0
     position: absolute
     height: 100%
-  +media-query($bp.s)
+  +media-query($bp.sm)
     height: auto
     position: sticky
     top: $header-height-mobile
@@ -63,7 +63,7 @@
     display: flex
     flex-direction: column
     justify-content: space-between
-    +media-query-min($bp.s)
+    +media-query-min($bp.sm)
       width: $sidebar-width-minimized
       display: inline-flex
 
@@ -90,7 +90,7 @@
   background-color: var(--c-bg-neutral-min)
   z-index: $zi.nav
   overflow: auto
-  +media-query($bp.s)
+  +media-query($bp.sm)
     sidebar-transition(left, box-shadow)
     position: fixed
     top: $header-height-mobile
@@ -110,5 +110,5 @@
   text-overflow: ellipsis
 
 .scroll-lock
-  +media-query($bp.s)
+  +media-query($bp.sm)
     overflow: hidden

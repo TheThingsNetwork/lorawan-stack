@@ -68,7 +68,7 @@
     // Following is some magic that will automatically calculate the necessary padding to keep
     // the container content width at the next-smallest breakpoint while keeping the container
     // full width of the page. This enables versatile layouts without extra markup.
-    $map = ($bp.xxl 'xl') ($bp.xl 'l') ($bp.l 'm') ($bp.m 's') ($bp.s 'xs') ($bp.xs 'xxs') ($bp.xxs 'xs3')
+    $map = ($bp.xxl 'xl') ($bp.xl 'lg') ($bp.lg 'md') ($bp.md 'sm') ($bp.sm 'xs') ($bp.xs 'xxs') ($bp.xxs 'xs3')
     $padding = $ls.xxs
 
     // All sizes above the max-width breakpoint.
@@ -85,7 +85,7 @@
 
     // In between breakpoints.
     for $pair in $map
-      if $bp[$pair[1]] < $bp.m
+      if $bp[$pair[1]] < $bp.md
         $padding = $ls.xs
       +media-query-between($bp[$pair[1]], $pair[0])
         padding-right: convert('calc(max(' + $padding + ', ((100% - max(var(--container-max-width), ' + $bp[$pair[1]] + ')))/2)))')
@@ -94,11 +94,11 @@
     &--xs
       --container-max-width: $bp.xs
     &--sm
-      --container-max-width: $bp.s
+      --container-max-width: $bp.sm
     &--md
-      --container-max-width: $bp.m
+      --container-max-width: $bp.md
     &--lg
-      --container-max-width: $bp.l
+      --container-max-width: $bp.lg
     &--xl
       --container-max-width: $bp.xl
     &--xxl

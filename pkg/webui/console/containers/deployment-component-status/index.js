@@ -56,7 +56,7 @@ const componentMap = {
 }
 
 const DeploymentComponentStatus = () => (
-  <Row className="m-vert-ls-l m:mb-ls-xxs">
+  <Row className="m-vert-ls-l md:mb-ls-xxs">
     <Col sm={4} className="d-flex direction-column">
       <Message content={m.versionInfo} component="h3" className="panel-title" />
       <span className={style.versionValue}>TTS v{process.env.VERSION}</span>

@@ -38,8 +38,8 @@ const Header = ({
 }) => (
   <header {...rest} className={classnames(className, style.container)}>
     <div className={classnames('breadcrumbs', 'm:d-none')} />
-    <div className="d-none m:d-flex al-center gap-cs-xs">
-      <Button secondary icon={IconMenu2} onClick={onMenuClick} />
+    <div className="d-none md:d-flex al-center gap-cs-xs">
+      <Button secondary icon="menu" onClick={onMenuClick} />
       <Logo className={style.logo} />
     </div>
 

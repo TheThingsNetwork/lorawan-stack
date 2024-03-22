@@ -159,7 +159,7 @@ const ApplicationMqtt = () => {
       >
         <ErrorView errorRender={SubViewError}>
           <div className="container container--md grid">
-            <div className="item-12 l:item-8">
+            <div className="item-12 lg:item-8">
               <PageTitle title={sharedMessages.mqtt} noGrid />
               <Message content={m.mqttInfoText} className="mt-0" />
               <div>
