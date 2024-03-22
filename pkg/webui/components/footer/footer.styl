@@ -40,7 +40,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
       left: 0
 
   &.transparent
-    +media-query-min($bp.s)
+    +media-query-min($bp.sm)
       .footer-section
         border: 0
         background-color: transparent
@@ -62,7 +62,7 @@ $fh = 'calc(%s - 1px)' % $footer-height
     color: var(--c-text-neutral-heavy)
 
 .copyright-links
-  +media-query($bp.m)
+  +media-query($bp.md)
     display: none
 
 .left

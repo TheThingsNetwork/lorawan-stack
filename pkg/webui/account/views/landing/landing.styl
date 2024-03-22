@@ -24,9 +24,9 @@
   position: relative
   display: flex
   flex-direction: column
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     min-height: "calc(100vh - %s - %s)" % ($header-height $footer-height)
-  +media-query($bp.s)
+  +media-query($bp.sm)
     min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height)
 
 global-sidebar()
