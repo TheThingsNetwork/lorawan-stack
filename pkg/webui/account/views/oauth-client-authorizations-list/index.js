@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col, Container } from 'react-grid-system'
 
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -24,15 +23,13 @@ import OAuthClientAuthorizationsTable from '@account/containers/authorizations-t
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const AuthorizationsList = () => (
-  <Container>
-    <Row>
-      <IntlHelmet title={sharedMessages.oauthClientAuthorizations} />
-      <Col>
-        <PageTitle title={sharedMessages.oauthClientAuthorizations} hideHeading />
-        <OAuthClientAuthorizationsTable />
-      </Col>
-    </Row>
-  </Container>
+  <div className="container container--lg grid">
+    <IntlHelmet title={sharedMessages.oauthClientAuthorizations} />
+    <div className="item-12">
+      <PageTitle title={sharedMessages.oauthClientAuthorizations} hideHeading />
+      <OAuthClientAuthorizationsTable />
+    </div>
+  </div>
 )
 
 export default AuthorizationsList

@@ -15,7 +15,6 @@
 import React, { useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
 import { useIntl } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
@@ -116,87 +115,85 @@ const UserDataFormAdd = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle title={sharedMessages.userAdd} />
-      <Row>
-        <Col>
-          <Form
-            error={error}
-            onSubmit={handleSubmit}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-          >
-            <Form.Field
-              title={sharedMessages.userId}
-              name="ids.user_id"
-              component={Input}
-              autoFocus
-              required
-            />
-            <Form.Field
-              title={sharedMessages.name}
-              name="name"
-              placeholder={sharedMessages.userNamePlaceholder}
-              component={Input}
-            />
-            <Form.Field
-              title={sharedMessages.description}
-              name="description"
-              type="textarea"
-              placeholder={sharedMessages.userDescription}
-              description={sharedMessages.userDescDescription}
-              component={Input}
-            />
-            <Form.Field
-              title={sharedMessages.emailAddress}
-              name="primary_email_address"
-              placeholder={sharedMessages.emailPlaceholder}
-              description={sharedMessages.emailAddressDescription}
-              component={Input}
-              required
-            />
-            <Form.Field
-              title={sharedMessages.state}
-              name="state"
-              component={Select}
-              options={approvalStateOptions}
-              required
-            />
-            <Form.Field
-              name="_validate_email"
-              component={Checkbox}
-              label={sharedMessages.emailAddressValidation}
-              description={sharedMessages.emailAddressValidationDescription}
-            />
-            <Form.Field
-              name="admin"
-              component={Checkbox}
-              label={sharedMessages.grantAdminStatus}
-              description={sharedMessages.adminDescription}
-            />
-            <Form.Field
-              title={sharedMessages.password}
-              component={Input}
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-            />
-            <Form.Field
-              title={sharedMessages.confirmPassword}
-              component={Input}
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-            />
-            <SubmitBar>
-              <Form.Submit message={sharedMessages.userAdd} component={SubmitButton} />
-            </SubmitBar>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12">
+        <Form
+          error={error}
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+        >
+          <Form.Field
+            title={sharedMessages.userId}
+            name="ids.user_id"
+            component={Input}
+            autoFocus
+            required
+          />
+          <Form.Field
+            title={sharedMessages.name}
+            name="name"
+            placeholder={sharedMessages.userNamePlaceholder}
+            component={Input}
+          />
+          <Form.Field
+            title={sharedMessages.description}
+            name="description"
+            type="textarea"
+            placeholder={sharedMessages.userDescription}
+            description={sharedMessages.userDescDescription}
+            component={Input}
+          />
+          <Form.Field
+            title={sharedMessages.emailAddress}
+            name="primary_email_address"
+            placeholder={sharedMessages.emailPlaceholder}
+            description={sharedMessages.emailAddressDescription}
+            component={Input}
+            required
+          />
+          <Form.Field
+            title={sharedMessages.state}
+            name="state"
+            component={Select}
+            options={approvalStateOptions}
+            required
+          />
+          <Form.Field
+            name="_validate_email"
+            component={Checkbox}
+            label={sharedMessages.emailAddressValidation}
+            description={sharedMessages.emailAddressValidationDescription}
+          />
+          <Form.Field
+            name="admin"
+            component={Checkbox}
+            label={sharedMessages.grantAdminStatus}
+            description={sharedMessages.adminDescription}
+          />
+          <Form.Field
+            title={sharedMessages.password}
+            component={Input}
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            required
+          />
+          <Form.Field
+            title={sharedMessages.confirmPassword}
+            component={Input}
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+          />
+          <SubmitBar>
+            <Form.Submit message={sharedMessages.userAdd} component={SubmitButton} />
+          </SubmitBar>
+        </Form>
+      </div>
+    </div>
   )
 }
 

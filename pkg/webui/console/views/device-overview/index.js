@@ -14,9 +14,9 @@
 
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { isPlainObject } from 'lodash'
+import classNames from 'classnames'
 
 import tts from '@console/api/tts'
 
@@ -334,18 +334,16 @@ const DeviceOverview = () => {
   }
   return (
     <Require condition={!shouldRedirect} otherwise={otherwise}>
-      <Container>
+      <div className="container container--lg grid p-vert-0">
         <IntlHelmet title={sharedMessages.overview} />
-        <Row className={style.head}>
-          <Col md={12} lg={6}>
-            <DeviceInfo frequencyPlans={frequencyPlans} device={device} onExport={onExport} />
-          </Col>
-          <Col md={12} lg={6} className={style.latestEvents}>
-            <DeviceEvents devIds={devIds} widget />
-            <DeviceMap device={device} />
-          </Col>
-        </Row>
-      </Container>
+        <div className="item-12 lg:item-6">
+          <DeviceInfo frequencyPlans={frequencyPlans} device={device} onExport={onExport} />
+        </div>
+        <div className={classNames(style.latestEvents, 'item-12 lg:item-6')}>
+          <DeviceEvents devIds={devIds} widget />
+          <DeviceMap device={device} />
+        </div>
+      </div>
     </Require>
   )
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
@@ -63,12 +62,8 @@ const GatewayAdd = () => {
   return (
     <Require featureCheck={mayCreateGateways} otherwise={{ redirect: '/gateways' }}>
       <RequireRequest requestAction={getOrganizationsList()}>
-        <Container>
-          <PageTitle
-            colProps={{ md: 10, lg: 9 }}
-            className="mb-cs-s"
-            title={sharedMessages.registerGateway}
-          >
+        <div className="container container--lg grid">
+          <PageTitle className="mb-cs-s" title={sharedMessages.registerGateway}>
             <Message
               component="p"
               content={m.gtwOnboardingDescription}
@@ -76,12 +71,10 @@ const GatewayAdd = () => {
             />
             <hr className="mb-ls-s" />
           </PageTitle>
-          <Row>
-            <Col md={10} lg={9}>
-              <GatewayOnboardingForm onSuccess={handleSuccess} />
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-12 lg:item-9">
+            <GatewayOnboardingForm onSuccess={handleSuccess} />
+          </div>
+        </div>
       </RequireRequest>
     </Require>
   )

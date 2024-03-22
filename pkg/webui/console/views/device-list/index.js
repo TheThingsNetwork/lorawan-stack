@@ -21,7 +21,7 @@ import DevicesTable from '@console/containers/devices-table'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const ApplicationDeviceList = () => (
-  <div className="container container--md grid">
+  <div className="container container--lg grid">
     <div className="item-12">
       <IntlHelmet title={sharedMessages.devices} />
       <DevicesTable />

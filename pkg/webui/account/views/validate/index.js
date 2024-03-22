@@ -15,7 +15,6 @@
 import React, { useState, useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import { Navigate, useSearchParams } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
 
 import tts from '@account/api/tts'
 
@@ -126,14 +125,12 @@ const Validate = ({ hideTitle }) => {
 }
 
 const ValidateWithAuth = props => (
-  <Container>
-    <Row>
-      <Col lg={8} md={12}>
-        <PageTitle title={m.contactInfoValidation} />
-        <Validate hideTitle {...props} />
-      </Col>
-    </Row>
-  </Container>
+  <div className="container container--lg grid">
+    <div className="item-12 lg:item-8">
+      <PageTitle title={m.contactInfoValidation} />
+      <Validate hideTitle {...props} />
+    </div>
+  </div>
 )
 
 Validate.propTypes = {

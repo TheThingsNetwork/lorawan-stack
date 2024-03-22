@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { Col, Row } from 'react-grid-system'
 
 import ServerIcon from '@assets/auxiliary-icons/server.svg'
 
@@ -56,8 +55,8 @@ const componentMap = {
 }
 
 const DeploymentComponentStatus = () => (
-  <Row className="m-vert-ls-l md:mb-ls-xxs">
-    <Col sm={4} className="d-flex direction-column">
+  <div className="container grid m-vert-ls-l md:mb-ls-xxs">
+    <div className="item-4 d-flex direction-column">
       <Message content={m.versionInfo} component="h3" className="panel-title" />
       <span className={style.versionValue}>TTS v{process.env.VERSION}</span>
       <pre className="mt-0 fs-s mb-cs-s">{process.env.REVISION}</pre>
@@ -71,8 +70,8 @@ const DeploymentComponentStatus = () => (
       >
         <Message content={m.seeChangelog} />
       </Link.Anchor>
-    </Col>
-    <Col sm={8} className="d-flex direction-column">
+    </div>
+    <div className="item-8 d-flex direction-column">
       <Message className="panel-title" content={m.availableComponents} component="h3" />
       <div className="d-flex flex-wrap mt-cs-m">
         {Object.keys(stackConfig).map(componentKey => {
@@ -87,8 +86,8 @@ const DeploymentComponentStatus = () => (
           )
         })}
       </div>
-    </Col>
-  </Row>
+    </div>
+  </div>
 )
 
 const ComponentCard = ({ name, enabled, host }) => (

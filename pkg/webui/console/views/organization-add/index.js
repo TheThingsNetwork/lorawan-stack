@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
@@ -54,7 +53,7 @@ const OrganizationAdd = () => {
 
   return (
     <Require featureCheck={mayCreateOrganizations} otherwise={{ redirect: '/organizations' }}>
-      <Container>
+      <div className="container container--lg grid">
         <PageTitle
           colProps={{ md: 10, lg: 9 }}
           className="mb-cs-s"
@@ -74,12 +73,10 @@ const OrganizationAdd = () => {
           />
           <hr className="mb-ls-s" />
         </PageTitle>
-        <Row>
-          <Col md={10} lg={9}>
-            <OrganizationAddForm onSuccess={handleSuccess} />
-          </Col>
-        </Row>
-      </Container>
+        <div className="item-10 lg:item-9">
+          <OrganizationAddForm onSuccess={handleSuccess} />
+        </div>
+      </div>
     </Require>
   )
 }

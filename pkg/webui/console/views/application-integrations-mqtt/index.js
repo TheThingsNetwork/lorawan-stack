@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
@@ -158,7 +157,7 @@ const ApplicationMqtt = () => {
         otherwise={{ redirect: `/applications/${appId}` }}
       >
         <ErrorView errorRender={SubViewError}>
-          <div className="container container--md grid">
+          <div className="container container--lg grid">
             <div className="item-12 lg:item-8">
               <PageTitle title={sharedMessages.mqtt} noGrid />
               <Message content={m.mqttInfoText} className="mt-0" />

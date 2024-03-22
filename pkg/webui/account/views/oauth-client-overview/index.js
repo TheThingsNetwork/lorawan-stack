@@ -15,7 +15,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
-import { Col, Row, Container } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
@@ -108,29 +107,25 @@ const OAuthClientOverviewInner = () => {
   return (
     <>
       <div className={style.titleSection}>
-        <Container>
+        <div className="container container--lg grid">
           <IntlHelmet title={sharedMessages.overview} />
-          <Row>
-            <Col sm={12}>
-              <EntityTitleSection
-                id={oauthClientId}
-                name={name}
-                icon={applicationIcon}
-                iconAlt={sharedMessages.overview}
-              >
-                <Content fetching={fetching} bottomBarLeft={bottomBarLeft} />
-              </EntityTitleSection>
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-12">
+            <EntityTitleSection
+              id={oauthClientId}
+              name={name}
+              icon={applicationIcon}
+              iconAlt={sharedMessages.overview}
+            >
+              <Content fetching={fetching} bottomBarLeft={bottomBarLeft} />
+            </EntityTitleSection>
+          </div>
+        </div>
       </div>
-      <Container>
-        <Row>
-          <Col sm={12} lg={6}>
-            <DataSheet data={sheetData} />
-          </Col>
-        </Row>
-      </Container>
+      <div className="container container--lg grid">
+        <div className="item-12 lg:item-6">
+          <DataSheet data={sheetData} />
+        </div>
+      </div>
     </>
   )
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 
 import Icon, { IconExclamationCircle } from '@ttn-lw/components/icon'
 
@@ -40,7 +39,7 @@ const SubViewErrorComponent = ({ error }) => {
   }
 
   return (
-    <div className="container container--md">
+    <div className="container container--lg">
       <div className={style.title}>
         <Icon icon={IconExclamationCircle} large />
         <Message component="h2" content={errorTitleMessage} firstToUpper />

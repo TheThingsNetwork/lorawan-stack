@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { Col, Row, Container } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
@@ -190,22 +189,20 @@ const TokensTable = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <Col sm={12} lg={20}>
-          <FetchTable
-            entity="tokens"
-            defaultOrder="-created_at"
-            headers={headers}
-            getItemsAction={getItems}
-            baseDataSelector={baseDataSelector}
-            pageSize={PAGE_SIZES.SMALL}
-            actionItems={deleteAllButton}
-            tableTitle={<Message content={sharedMessages.accessTokens} />}
-          />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg grid">
+      <div className="item-12 lg:item-20">
+        <FetchTable
+          entity="tokens"
+          defaultOrder="-created_at"
+          headers={headers}
+          getItemsAction={getItems}
+          baseDataSelector={baseDataSelector}
+          pageSize={PAGE_SIZES.SMALL}
+          actionItems={deleteAllButton}
+          tableTitle={<Message content={sharedMessages.accessTokens} />}
+        />
+      </div>
+    </div>
   )
 }
 

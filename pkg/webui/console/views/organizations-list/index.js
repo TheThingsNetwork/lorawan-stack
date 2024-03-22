@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col, Container } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
@@ -30,14 +29,10 @@ const List = () => {
   useBreadcrumbs('orgs.list', <Breadcrumb path="/organizations" content={sharedMessages.list} />)
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.organizations} />
-        <Col>
-          <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg ">
+      <IntlHelmet title={sharedMessages.organizations} />
+      <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
+    </div>
   )
 }
 

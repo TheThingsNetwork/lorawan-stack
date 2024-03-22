@@ -33,7 +33,7 @@ const Overview = () => {
 
   return (
     <RequireRequest requestAction={[getApplicationsList(), getGatewaysList()]}>
-      <div className="container container--md grid p-vert-ls-xxs">
+      <div className="container container--xl grid p-ls-s gap-ls-s">
         <div className="item-12 md:item-12 lg:item-6 sm:item-6" />
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <NotificationsDashboardPanel />

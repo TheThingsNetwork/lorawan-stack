@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
@@ -54,7 +53,7 @@ const DeviceAdd = () => {
 
   return (
     <RequireRequest requestAction={requestAction}>
-      <div className="container container--md">
+      <div className="container container--lg">
         <PageTitle tall title={sharedMessages.registerEndDevice} className="mb-cs-m" />
         <DeviceOnboardingForm />
       </div>
