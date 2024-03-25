@@ -33,12 +33,12 @@ import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 const ApplicationData = () => {
   const { appId } = useParams()
 
-  useRootClass(style.stageFlex, 'stage')
-
   useBreadcrumbs(
     'apps.single.data',
     <Breadcrumb path={`/applications/${appId}/data`} content={sharedMessages.appData} />,
   )
+
+  useRootClass(style.stage, 'stage')
 
   return (
     <Require
