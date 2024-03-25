@@ -17,11 +17,11 @@
 :global
   .grid
     display: grid
-    row-gap: var(--grid-row-gap, $ls.xs)
+    row-gap: var(--grid-row-gap, $ls.s)
     width: 100%
 
     // Prevent column-gaps that are wider than the page width when combined.
-    column-gap: calc(min(var(--grid-column-gap, $ls.xs), 100% / 11))
+    column-gap: calc(min(var(--grid-column-gap, $ls.s), 100% / 11))
 
     &:not(.auto-columns)
       grid-template-columns: repeat(12, minmax(0, 1fr))
@@ -60,21 +60,11 @@
   // without extra markup.
   .container
     width: 100%
-    max-width: none
-    padding-top: var(--container-vertical-padding, 0)
-    padding-bottom: @padding-top
+    max-width: var(--container-max-width)
+    padding: var(--container-vertical-padding, 0) $ls.xs
     box-sizing: border-box
-
-    // Following is some magic that will automatically calculate the necessary padding to keep
-    // the container content width at the next-smallest breakpoint while keeping the container
-    // full width of the page. This enables versatile layouts without extra markup.
-    $map = ($bp.xxl 'xl') ($bp.xl 'lg') ($bp.lg 'md') ($bp.md 'sm') ($bp.sm 'xs') ($bp.xs 'xxs') ($bp.xxs 'xs3')
-    $padding = $ls.xxs
-
-    // All sizes above the max-width breakpoint.
-    +media-query-min($bp.xxl)
-      padding-right: convert('calc(max(' + $padding + ', ((100% - var(--container-max-width))/2)))')
-      padding-left: @padding-right
+    margin-left: auto
+    margin-right: auto
 
     // Below the smallest breakpoint.
     +media-query($bp.xs3)
@@ -82,14 +72,6 @@
       padding-right: @padding-left
       // Prevent downsizing to extremely narrow widths.
       min-width: calc(249px - $ls.xxs * 2)
-
-    // In between breakpoints.
-    for $pair in $map
-      if $bp[$pair[1]] < $bp.md
-        $padding = $ls.xs
-      +media-query-between($bp[$pair[1]], $pair[0])
-        padding-right: convert('calc(max(' + $padding + ', ((100% - max(var(--container-max-width), ' + $bp[$pair[1]] + ')))/2)))')
-        padding-left: @padding-right
 
     &--xs
       --container-max-width: $bp.xs
