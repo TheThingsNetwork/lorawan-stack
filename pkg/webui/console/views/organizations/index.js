@@ -17,7 +17,6 @@ import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
@@ -41,7 +40,6 @@ const Organizations = () => {
 
   return (
     <Require featureCheck={mayViewOrganizationsOfUser} otherwise={{ redirect: '/' }}>
-      <Breadcrumbs />
       <Routes>
         <Route index Component={OrganizationsList} />
         <Route path="add" Component={OrganizationAdd} />

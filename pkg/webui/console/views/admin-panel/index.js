@@ -16,7 +16,6 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from '@formatjs/intl'
 
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
@@ -55,7 +54,6 @@ const AdminPanel = () => {
 
   return (
     <Require featureCheck={mayPerformAdminActions} otherwise={{ redirect: '/' }}>
-      <Breadcrumbs />
       <IntlHelmet title={sharedMessages.adminPanel} />
       <PanelView>
         <PanelView.Item
