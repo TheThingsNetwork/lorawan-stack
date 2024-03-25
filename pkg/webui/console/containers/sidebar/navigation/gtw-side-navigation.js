@@ -55,7 +55,7 @@ const GtwSideNavigation = () => {
   const entityId = gtw && gtw.name ? gtw.name : gtwId
 
   return (
-    <SideNavigation className="mb-cs-m">
+    <SideNavigation>
       {!isMinimized && (
         <DedicatedEntity
           label={entityId}

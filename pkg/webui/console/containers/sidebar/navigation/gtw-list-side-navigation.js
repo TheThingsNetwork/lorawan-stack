@@ -24,7 +24,7 @@ import SidebarContext from '../context'
 const GtwListSideNavigation = () => {
   const { topEntities, isMinimized } = useContext(SidebarContext)
   if (isMinimized || topEntities.length === 0) {
-    return null
+    return <div />
   }
 
   return (
