@@ -19,6 +19,7 @@ package ttn.lorawan.v3;
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/wrappers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "thethings/flags/annotations.proto";
 import "ttn/lorawan/v3/lorawan.proto";
 import "validate/validate.proto";
@@ -182,6 +183,7 @@ message ListBandsResponse {
 }
 
 service Configuration {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Retrieve LoRaWAN network configuration options."};
   rpc ListFrequencyPlans(ListFrequencyPlansRequest) returns (ListFrequencyPlansResponse) {
     option (google.api.http) = {get: "/configuration/frequency-plans"};
   }

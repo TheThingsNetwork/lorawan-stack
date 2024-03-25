@@ -18,6 +18,7 @@ package ttn.lorawan.v3;
 
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "thethings/flags/annotations.proto";
 import "ttn/lorawan/v3/application.proto";
 import "ttn/lorawan/v3/client.proto";
@@ -354,6 +355,7 @@ message SearchAccountsResponse {
 // and enables searching for them.
 // This service is not implemented on all deployments.
 service EntityRegistrySearch {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Search for entities in the Entity Registry."};
   // Search for applications that match the conditions specified in the request.
   // Non-admin users will only match applications that they have rights on.
   rpc SearchApplications(SearchApplicationsRequest) returns (Applications) {
@@ -468,6 +470,7 @@ message SearchEndDevicesRequest {
 // and enables searching for them.
 // This service is not implemented on all deployments.
 service EndDeviceRegistrySearch {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Search for end devices in the End Device Registry."};
   // Search for end devices in the given application that match the conditions specified in the request.
   rpc SearchEndDevices(SearchEndDevicesRequest) returns (EndDevices) {
     option (google.api.http) = {get: "/search/applications/{application_ids.application_id}/devices"};

@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "ttn/lorawan/v3/identifiers.proto";
 import "ttn/lorawan/v3/oauth.proto";
 import "ttn/lorawan/v3/rights.proto";
@@ -51,7 +52,9 @@ message AuthInfoResponse {
   bool is_admin = 4;
 }
 
+// The EntityAccess service provides information about the access rights of an entity.
 service EntityAccess {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Check the access rights for an entity."};
   // AuthInfo returns information about the authentication that is used on the request.
   rpc AuthInfo(google.protobuf.Empty) returns (AuthInfoResponse) {
     option (google.api.http) = {get: "/auth_info"};
@@ -142,7 +145,9 @@ message GetIsConfigurationResponse {
   IsConfiguration configuration = 1;
 }
 
+// The Is service provides information about the Identity Server.
 service Is {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Get information about The Things Stack Identity Server."};
   // Get the configuration of the Identity Server. The response is typically used
   // to enable or disable features in a user interface.
   rpc GetConfiguration(GetIsConfigurationRequest) returns (GetIsConfigurationResponse) {

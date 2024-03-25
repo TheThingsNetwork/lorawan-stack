@@ -36,6 +36,7 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 // The GsPba service connects a Gateway Server to a Packet Broker Agent.
 service GsPba {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The GsPba service connects a Gateway Server to a Packet Broker Agent. This is an inter-component service and is not intended to be used by end users."};
   rpc PublishUplink(GatewayUplinkMessage) returns (google.protobuf.Empty);
 
   // Update the gateway, changing the fields specified by the field mask to the provided values.
@@ -117,6 +118,7 @@ message UpdatePacketBrokerGatewayResponse {
 
 // The NsPba service connects a Network Server to a Packet Broker Agent.
 service NsPba {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The NsPba service connects a Network Server to a Packet Broker Agent. This is an inter-component service and is not intended to be used by end users."};
   // PublishDownlink instructs the Packet Broker Agent to publish a downlink
   // message to Packet Broker Router.
   rpc PublishDownlink(DownlinkMessage) returns (google.protobuf.Empty);
@@ -322,6 +324,7 @@ message ListForwarderRoutingPoliciesRequest {
 
 // The Pba service allows clients to manage peering through Packet Broker.
 service Pba {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage peering via Packet Broker."};
   // Get information about the Packet Broker registration.
   // Viewing Packet Packet information requires administrative access.
   rpc GetInfo(google.protobuf.Empty) returns (PacketBrokerInfo) {
