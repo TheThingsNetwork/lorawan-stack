@@ -29,6 +29,12 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+## [3.29.2] - 2024-03-26
+
+### Fixed
+
+- Memory leak in components which heavily use HTTP clients, such as the Application Server.
+
 ## [3.29.1] - 2024-03-05
 
 ### Added
@@ -2781,7 +2787,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.1...v3.29
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.2...v3.29
+[3.29.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.1...v3.29.2
 [3.29.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.0...v3.29.1
 [3.29.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.2...v3.29.0
 [3.28.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.1...v3.28.2
