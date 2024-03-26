@@ -4,6 +4,76 @@ package ttnpb
 
 import fmt "fmt"
 
+func (dst *UserConsolePreferences) SetFields(src *UserConsolePreferences, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "console_theme":
+			if len(subs) > 0 {
+				return fmt.Errorf("'console_theme' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ConsoleTheme = src.ConsoleTheme
+			} else {
+				dst.ConsoleTheme = 0
+			}
+		case "dashboard_layouts":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserConsolePreferences_DashboardLayouts
+				if (src == nil || src.DashboardLayouts == nil) && dst.DashboardLayouts == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DashboardLayouts
+				}
+				if dst.DashboardLayouts != nil {
+					newDst = dst.DashboardLayouts
+				} else {
+					newDst = &UserConsolePreferences_DashboardLayouts{}
+					dst.DashboardLayouts = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DashboardLayouts = src.DashboardLayouts
+				} else {
+					dst.DashboardLayouts = nil
+				}
+			}
+		case "sort_by":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserConsolePreferences_SortBy
+				if (src == nil || src.SortBy == nil) && dst.SortBy == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.SortBy
+				}
+				if dst.SortBy != nil {
+					newDst = dst.SortBy
+				} else {
+					newDst = &UserConsolePreferences_SortBy{}
+					dst.SortBy = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.SortBy = src.SortBy
+				} else {
+					dst.SortBy = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *User) SetFields(src *User, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -225,6 +295,31 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 					dst.ProfilePicture = src.ProfilePicture
 				} else {
 					dst.ProfilePicture = nil
+				}
+			}
+		case "console_preferences":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserConsolePreferences
+				if (src == nil || src.ConsolePreferences == nil) && dst.ConsolePreferences == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ConsolePreferences
+				}
+				if dst.ConsolePreferences != nil {
+					newDst = dst.ConsolePreferences
+				} else {
+					newDst = &UserConsolePreferences{}
+					dst.ConsolePreferences = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ConsolePreferences = src.ConsolePreferences
+				} else {
+					dst.ConsolePreferences = nil
 				}
 			}
 
@@ -1386,6 +1481,503 @@ func (dst *CreateLoginTokenResponse) SetFields(src *CreateLoginTokenResponse, pa
 			} else {
 				var zero string
 				dst.Token = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UserBookmark) SetFields(src *UserBookmark, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "entity_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EntityIdentifiers
+				if (src == nil || src.EntityIds == nil) && dst.EntityIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EntityIds
+				}
+				if dst.EntityIds != nil {
+					newDst = dst.EntityIds
+				} else {
+					newDst = &EntityIdentifiers{}
+					dst.EntityIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EntityIds = src.EntityIds
+				} else {
+					dst.EntityIds = nil
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				dst.CreatedAt = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UserBookmarks) SetFields(src *UserBookmarks, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "bookmarks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bookmarks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Bookmarks = src.Bookmarks
+			} else {
+				dst.Bookmarks = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *CreateUserBookmarkRequest) SetFields(src *CreateUserBookmarkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "entity_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EntityIdentifiers
+				if (src == nil || src.EntityIds == nil) && dst.EntityIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EntityIds
+				}
+				if dst.EntityIds != nil {
+					newDst = dst.EntityIds
+				} else {
+					newDst = &EntityIdentifiers{}
+					dst.EntityIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EntityIds = src.EntityIds
+				} else {
+					dst.EntityIds = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListUserBookmarksRequest) SetFields(src *ListUserBookmarksRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "deleted":
+			if len(subs) > 0 {
+				return fmt.Errorf("'deleted' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Deleted = src.Deleted
+			} else {
+				var zero bool
+				dst.Deleted = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DeleteUserBookmarkRequest) SetFields(src *DeleteUserBookmarkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "entity_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EntityIdentifiers
+				if (src == nil || src.EntityIds == nil) && dst.EntityIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EntityIds
+				}
+				if dst.EntityIds != nil {
+					newDst = dst.EntityIds
+				} else {
+					newDst = &EntityIdentifiers{}
+					dst.EntityIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EntityIds = src.EntityIds
+				} else {
+					dst.EntityIds = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchDeleteUserBookmarksRequest) SetFields(src *BatchDeleteUserBookmarksRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIds = src.UserIds
+				} else {
+					dst.UserIds = nil
+				}
+			}
+		case "entity_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'entity_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EntityIds = src.EntityIds
+			} else {
+				dst.EntityIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UserConsolePreferences_DashboardLayouts) SetFields(src *UserConsolePreferences_DashboardLayouts, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "api_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ApiKey = src.ApiKey
+			} else {
+				dst.ApiKey = 0
+			}
+		case "application":
+			if len(subs) > 0 {
+				return fmt.Errorf("'application' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Application = src.Application
+			} else {
+				dst.Application = 0
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				return fmt.Errorf("'collaborator' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Collaborator = src.Collaborator
+			} else {
+				dst.Collaborator = 0
+			}
+		case "end_device":
+			if len(subs) > 0 {
+				return fmt.Errorf("'end_device' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EndDevice = src.EndDevice
+			} else {
+				dst.EndDevice = 0
+			}
+		case "gateway":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Gateway = src.Gateway
+			} else {
+				dst.Gateway = 0
+			}
+		case "organization":
+			if len(subs) > 0 {
+				return fmt.Errorf("'organization' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Organization = src.Organization
+			} else {
+				dst.Organization = 0
+			}
+		case "overview":
+			if len(subs) > 0 {
+				return fmt.Errorf("'overview' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Overview = src.Overview
+			} else {
+				dst.Overview = 0
+			}
+		case "user":
+			if len(subs) > 0 {
+				return fmt.Errorf("'user' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.User = src.User
+			} else {
+				dst.User = 0
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UserConsolePreferences_SortBy) SetFields(src *UserConsolePreferences_SortBy, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "api_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ApiKey = src.ApiKey
+			} else {
+				var zero string
+				dst.ApiKey = zero
+			}
+		case "application":
+			if len(subs) > 0 {
+				return fmt.Errorf("'application' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Application = src.Application
+			} else {
+				var zero string
+				dst.Application = zero
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				return fmt.Errorf("'collaborator' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Collaborator = src.Collaborator
+			} else {
+				var zero string
+				dst.Collaborator = zero
+			}
+		case "end_device":
+			if len(subs) > 0 {
+				return fmt.Errorf("'end_device' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EndDevice = src.EndDevice
+			} else {
+				var zero string
+				dst.EndDevice = zero
+			}
+		case "gateway":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Gateway = src.Gateway
+			} else {
+				var zero string
+				dst.Gateway = zero
+			}
+		case "organization":
+			if len(subs) > 0 {
+				return fmt.Errorf("'organization' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Organization = src.Organization
+			} else {
+				var zero string
+				dst.Organization = zero
+			}
+		case "user":
+			if len(subs) > 0 {
+				return fmt.Errorf("'user' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.User = src.User
+			} else {
+				var zero string
+				dst.User = zero
 			}
 
 		default:

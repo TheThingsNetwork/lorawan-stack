@@ -149,6 +149,8 @@ func New(ctx context.Context, opts ...Option) *Server {
 	statsHandler := rpcmiddleware.StatsHandlers{
 		otelgrpc.NewServerHandler(
 			otelgrpc.WithTracerProvider(tracing.FromContext(ctx)),
+			// As pkg/metrics is currently Prometheus based, the OpenTelemetry metrics are unused.
+			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5692.
 			otelgrpc.WithMeterProvider(noop.MeterProvider{}),
 		),
 		metrics.StatsHandler,

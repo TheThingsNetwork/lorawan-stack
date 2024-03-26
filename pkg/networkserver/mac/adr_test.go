@@ -1253,7 +1253,8 @@ func TestClampNbTrans(t *testing.T) {
 		Device   *ttnpb.EndDevice
 		Defaults *ttnpb.MACSettings
 
-		InputNbTrans uint32
+		InputNbTrans  uint32
+		DataRateIndex ttnpb.DataRateIndex
 
 		ExpectedNbTrans uint32
 	}{
@@ -1420,6 +1421,64 @@ func TestClampNbTrans(t *testing.T) {
 
 			ExpectedNbTrans: 12,
 		},
+		{
+			Name: "maximum override; left of provided value",
+
+			Device: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								MaxNbTrans: &wrapperspb.UInt32Value{
+									Value: 3,
+								},
+								Overrides: &ttnpb.ADRSettings_DynamicMode_Overrides{
+									DataRate_1: &ttnpb.ADRSettings_DynamicMode_PerDataRateIndexOverride{
+										MaxNbTrans: &wrapperspb.UInt32Value{
+											Value: 2,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			InputNbTrans:  3,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+
+			ExpectedNbTrans: 2,
+		},
+		{
+			Name: "maximum override; right of provided value",
+
+			Device: &ttnpb.EndDevice{
+				MacSettings: &ttnpb.MACSettings{
+					Adr: &ttnpb.ADRSettings{
+						Mode: &ttnpb.ADRSettings_Dynamic{
+							Dynamic: &ttnpb.ADRSettings_DynamicMode{
+								MaxNbTrans: &wrapperspb.UInt32Value{
+									Value: 1,
+								},
+								Overrides: &ttnpb.ADRSettings_DynamicMode_Overrides{
+									DataRate_1: &ttnpb.ADRSettings_DynamicMode_PerDataRateIndexOverride{
+										MaxNbTrans: &wrapperspb.UInt32Value{
+											Value: 2,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			InputNbTrans:  2,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+
+			ExpectedNbTrans: 2,
+		},
 	} {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1427,7 +1486,7 @@ func TestClampNbTrans(t *testing.T) {
 
 			a := assertions.New(t)
 
-			value := ClampNbTrans(tc.Device, tc.Defaults, tc.InputNbTrans)
+			value := ClampNbTrans(tc.Device, tc.Defaults, tc.InputNbTrans, tc.DataRateIndex)
 			a.So(value, should.Equal, tc.ExpectedNbTrans)
 		})
 	}

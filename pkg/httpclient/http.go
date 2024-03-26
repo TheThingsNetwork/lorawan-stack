@@ -102,6 +102,8 @@ func (p *provider) HTTPClient(ctx context.Context, opts ...Option) (*http.Client
 	rt = otelhttp.NewTransport(
 		rt,
 		otelhttp.WithTracerProvider(tracing.FromContext(ctx)),
+		// As pkg/metrics is currently Prometheus based, the OpenTelemetry metrics are unused.
+		// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5692.
 		otelhttp.WithMeterProvider(noop.MeterProvider{}),
 	)
 	if options.cache {

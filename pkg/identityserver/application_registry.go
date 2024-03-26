@@ -370,6 +370,9 @@ func (is *IdentityServer) deleteApplication(
 		if total > 0 {
 			return errApplicationHasDevices.WithAttributes("count", int(total))
 		}
+		if err := st.DeleteEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		return st.DeleteApplication(ctx, ids)
 	})
 	if err != nil {
@@ -399,6 +402,9 @@ func (is *IdentityServer) restoreApplication(
 		}
 		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
+		}
+		if err := st.RestoreEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
 		}
 		return st.RestoreApplication(ctx, ids)
 	})
@@ -432,6 +438,9 @@ func (is *IdentityServer) purgeApplication(
 		// delete related memberships before purging the application
 		err = st.DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
+			return err
+		}
+		if err := st.PurgeEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
 			return err
 		}
 		return st.PurgeApplication(ctx, ids)

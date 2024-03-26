@@ -18,6 +18,7 @@ package ttn.lorawan.v3;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "ttn/lorawan/v3/identifiers.proto";
 import "ttn/lorawan/v3/rights.proto";
 import "ttn/lorawan/v3/user.proto";
@@ -27,6 +28,7 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 // The UserRegistry service, exposed by the Identity Server, is used to manage
 // user registrations.
 service UserRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage users."};
   // Register a new user. This method may be restricted by network settings.
   rpc Create(CreateUserRequest) returns (User) {
     option (google.api.http) = {
@@ -91,9 +93,10 @@ service UserRegistry {
   }
 }
 
-// The UserAcces service, exposed by the Identity Server, is used to manage
+// The UserAccess service, exposed by the Identity Server, is used to manage
 // API keys of users.
 service UserAccess {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage user access."};
   // List the rights the caller has on this user.
   rpc ListRights(UserIdentifiers) returns (Rights) {
     option (google.api.http) = {get: "/users/{user_id}/rights"};
@@ -140,7 +143,9 @@ service UserAccess {
   }
 }
 
+// The UserOrganizationRegistry service, exposed by the Identity Server, is used to manage user invitations.
 service UserInvitationRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage user sessions."};
   // Invite a user to join the network.
   rpc Send(SendInvitationRequest) returns (Invitation) {
     option (google.api.http) = {
@@ -170,5 +175,39 @@ service UserSessionRegistry {
   // Delete (revoke) the given user session.
   rpc Delete(UserSessionIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/users/{user_ids.user_id}/sessions/{session_id}"};
+  }
+}
+
+service UserBookmarkRegistry {
+  // Create a bookmark for the given user.
+  rpc Create(CreateUserBookmarkRequest) returns (UserBookmark) {
+    option (google.api.http) = {
+      post: "/users/bookmarks"
+      body: "*"
+    };
+  }
+
+  // List the bookmarks for the given user.
+  rpc List(ListUserBookmarksRequest) returns (UserBookmarks) {
+    option (google.api.http) = {get: "/users/{user_ids.user_id}/bookmarks"};
+  }
+
+  // Delete the given user's bookmark.
+  rpc Delete(DeleteUserBookmarkRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.application_ids.application_id}",
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/clients/{entity_ids.client_ids.client_id}"}
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/gateways/{entity_ids.gateway_ids.gateway_id}"}
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/organizations/{entity_ids.organization_ids.organization_id}"}
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/users/{entity_ids.user_ids.user_id}"}
+      additional_bindings {delete: "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.device_ids.application_ids.application_id}/devices/{entity_ids.device_ids.device_id}"}
+    };
+  }
+
+  // Delete a list of bookmarks of the given user.
+  // This operation is atomic; either all bookmarks are deleted or none.
+  // Bookmarks not found are skipped and no error is returned.
+  rpc BatchDelete(BatchDeleteUserBookmarksRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/users/{user_ids.user_id}/bookmarks/batch"};
   }
 }

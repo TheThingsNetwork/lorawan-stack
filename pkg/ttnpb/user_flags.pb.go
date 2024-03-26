@@ -12,6 +12,61 @@ import (
 	pflag "github.com/spf13/pflag"
 )
 
+// AddSelectFlagsForUserConsolePreferences adds flags to select fields in UserConsolePreferences.
+func AddSelectFlagsForUserConsolePreferences(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("console-theme", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("console-theme", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("dashboard-layouts", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("dashboard-layouts", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: dashboard_layouts (UserConsolePreferences_DashboardLayouts) does not seem to have select flags.
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("sort-by", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("sort-by", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: sort_by (UserConsolePreferences_SortBy) does not seem to have select flags.
+}
+
+// SelectFromFlags outputs the fieldmask paths forUserConsolePreferences message from select flags.
+func PathsFromSelectFlagsForUserConsolePreferences(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("console_theme", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("console_theme", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("dashboard_layouts", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("dashboard_layouts", prefix))
+	}
+	// NOTE: dashboard_layouts (UserConsolePreferences_DashboardLayouts) does not seem to have select flags.
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("sort_by", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("sort_by", prefix))
+	}
+	// NOTE: sort_by (UserConsolePreferences_SortBy) does not seem to have select flags.
+	return paths, nil
+}
+
+// AddSetFlagsForUserConsolePreferences adds flags to select fields in UserConsolePreferences.
+func AddSetFlagsForUserConsolePreferences(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("console-theme", prefix), flagsplugin.EnumValueDesc(ConsoleTheme_value), flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping DashboardLayouts because it does not seem to implement AddSetFlags.
+	// FIXME: Skipping SortBy because it does not seem to implement AddSetFlags.
+}
+
+// SetFromFlags sets the UserConsolePreferences message from flags.
+func (m *UserConsolePreferences) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("console_theme", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		enumValue, err := flagsplugin.SetEnumString(val, ConsoleTheme_value)
+		if err != nil {
+			return nil, err
+		}
+		m.ConsoleTheme = ConsoleTheme(enumValue)
+		paths = append(paths, flagsplugin.Prefix("console_theme", prefix))
+	}
+	// FIXME: Skipping DashboardLayouts because it does not seem to implement AddSetFlags.
+	// FIXME: Skipping SortBy because it does not seem to implement AddSetFlags.
+	return paths, nil
+}
+
 // AddSelectFlagsForUser adds flags to select fields in User.
 func AddSelectFlagsForUser(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("deleted-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("deleted-at", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -32,6 +87,8 @@ func AddSelectFlagsForUser(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("temporary-password-expires-at", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("temporary-password-expires-at", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-picture", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-picture", prefix), true), flagsplugin.WithHidden(hidden)))
 	// NOTE: profile_picture (Picture) does not seem to have select flags.
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("console-preferences", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("console-preferences", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForUserConsolePreferences(flags, flagsplugin.Prefix("console-preferences", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forUser message from select flags.
@@ -122,6 +179,16 @@ func PathsFromSelectFlagsForUser(flags *pflag.FlagSet, prefix string) (paths []s
 		paths = append(paths, flagsplugin.Prefix("profile_picture", prefix))
 	}
 	// NOTE: profile_picture (Picture) does not seem to have select flags.
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("console_preferences", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("console_preferences", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForUserConsolePreferences(flags, flagsplugin.Prefix("console_preferences", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
 	return paths, nil
 }
 
@@ -141,6 +208,7 @@ func AddSetFlagsForUser(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("admin", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("temporary-password", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping ProfilePicture because it does not seem to implement AddSetFlags.
+	AddSetFlagsForUserConsolePreferences(flags, flagsplugin.Prefix("console-preferences", prefix), hidden)
 }
 
 // SetFromFlags sets the User message from flags.
@@ -227,6 +295,16 @@ func (m *User) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string
 		paths = append(paths, flagsplugin.Prefix("temporary_password", prefix))
 	}
 	// FIXME: Skipping ProfilePicture because it does not seem to implement AddSetFlags.
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("console_preferences", prefix)); changed {
+		if m.ConsolePreferences == nil {
+			m.ConsolePreferences = &UserConsolePreferences{}
+		}
+		if setPaths, err := m.ConsolePreferences.SetFromFlags(flags, flagsplugin.Prefix("console_preferences", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
 	return paths, nil
 }
 
@@ -350,6 +428,54 @@ func (m *ListUserAPIKeysRequest) SetFromFlags(flags *pflag.FlagSet, prefix strin
 	} else if changed {
 		m.Page = val
 		paths = append(paths, flagsplugin.Prefix("page", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForListUserBookmarksRequest adds flags to select fields in ListUserBookmarksRequest.
+func AddSetFlagsForListUserBookmarksRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForUserIdentifiers(flags, flagsplugin.Prefix("user-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("limit", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("page", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("order", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("deleted", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ListUserBookmarksRequest message from flags.
+func (m *ListUserBookmarksRequest) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("user_ids", prefix)); changed {
+		if m.UserIds == nil {
+			m.UserIds = &UserIdentifiers{}
+		}
+		if setPaths, err := m.UserIds.SetFromFlags(flags, flagsplugin.Prefix("user_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("limit", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Limit = val
+		paths = append(paths, flagsplugin.Prefix("limit", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("page", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Page = val
+		paths = append(paths, flagsplugin.Prefix("page", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("order", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Order = val
+		paths = append(paths, flagsplugin.Prefix("order", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("deleted", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Deleted = val
+		paths = append(paths, flagsplugin.Prefix("deleted", prefix))
 	}
 	return paths, nil
 }

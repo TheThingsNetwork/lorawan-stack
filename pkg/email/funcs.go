@@ -33,8 +33,9 @@ var defaultFuncs = template.FuncMap{
 		p := path.Join(elems...)
 		return documentationBaseURL + "/" + strings.TrimPrefix(p, "/")
 	},
-	"relTime":  relTime,
-	"enumDesc": enumDesc,
+	"relDuration": relDuration,
+	"relTime":     relTime,
+	"enumDesc":    enumDesc,
 }
 
 const (
@@ -44,9 +45,17 @@ const (
 	year  = 12 * month
 )
 
-func relTime(d time.Duration) string {
+func relDuration(d time.Duration) string {
 	now := time.Now()
-	return humanize.CustomRelTime(now.Add(d), now, "ago", "from now", []humanize.RelTimeMagnitude{
+	return relativeTime(now.Add(d), now)
+}
+
+func relTime(t time.Time) string {
+	return relativeTime(t, time.Now())
+}
+
+func relativeTime(a, b time.Time) string {
+	return humanize.CustomRelTime(a, b, "ago", "from now", []humanize.RelTimeMagnitude{
 		{D: time.Second, Format: "now", DivBy: time.Second},
 		{D: 2 * time.Second, Format: "a second %s", DivBy: 1},
 

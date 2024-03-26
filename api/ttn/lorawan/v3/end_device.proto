@@ -493,6 +493,56 @@ message ADRSettings {
     }
 
     ChannelSteeringSettings channel_steering = 8;
+
+    // EXPERIMENTAL: Data rate index override settings.
+    message PerDataRateIndexOverride {
+      option (thethings.flags.message) = {
+        select: true,
+        set: true
+      };
+      reserved 1;
+      reserved "min_tx_power_index";
+      reserved 2;
+      reserved "max_tx_power_index";
+      // Minimum number of retransmissions.
+      // If unset, the default value from Network Server configuration will be used.
+      google.protobuf.UInt32Value min_nb_trans = 3 [(validate.rules).uint32 = {
+        gte: 1,
+        lte: 3
+      }];
+      // Maximum number of retransmissions.
+      // If unset, the default value from Network Server configuration will be used.
+      google.protobuf.UInt32Value max_nb_trans = 4 [(validate.rules).uint32 = {
+        gte: 1,
+        lte: 3
+      }];
+    }
+
+    // EXPERIMENTAL: Configuration overrides.
+    message Overrides {
+      option (thethings.flags.message) = {
+        select: true,
+        set: true
+      };
+      PerDataRateIndexOverride data_rate_0 = 1;
+      PerDataRateIndexOverride data_rate_1 = 2;
+      PerDataRateIndexOverride data_rate_2 = 3;
+      PerDataRateIndexOverride data_rate_3 = 4;
+      PerDataRateIndexOverride data_rate_4 = 5;
+      PerDataRateIndexOverride data_rate_5 = 6;
+      PerDataRateIndexOverride data_rate_6 = 7;
+      PerDataRateIndexOverride data_rate_7 = 8;
+      PerDataRateIndexOverride data_rate_8 = 9;
+      PerDataRateIndexOverride data_rate_9 = 10;
+      PerDataRateIndexOverride data_rate_10 = 11;
+      PerDataRateIndexOverride data_rate_11 = 12;
+      PerDataRateIndexOverride data_rate_12 = 13;
+      PerDataRateIndexOverride data_rate_13 = 14;
+      PerDataRateIndexOverride data_rate_14 = 15;
+      PerDataRateIndexOverride data_rate_15 = 16;
+    }
+
+    Overrides overrides = 9;
   }
 
   // Configuration options for cases in which ADR is to be disabled

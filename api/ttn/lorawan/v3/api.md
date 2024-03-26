@@ -239,6 +239,8 @@
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings)
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode)
   - [Message `ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode)
+  - [Message `ADRSettings.DynamicMode.Overrides`](#ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides)
+  - [Message `ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride)
   - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
   - [Message `BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest)
   - [Message `BatchGetEndDevicesRequest`](#ttn.lorawan.v3.BatchGetEndDevicesRequest)
@@ -747,19 +749,23 @@
   - [Message `SimulateJoinRequestParams`](#ttn.lorawan.v3.SimulateJoinRequestParams)
   - [Message `SimulateMetadataParams`](#ttn.lorawan.v3.SimulateMetadataParams)
 - [File `ttn/lorawan/v3/user.proto`](#ttn/lorawan/v3/user.proto)
+  - [Message `BatchDeleteUserBookmarksRequest`](#ttn.lorawan.v3.BatchDeleteUserBookmarksRequest)
   - [Message `CreateLoginTokenRequest`](#ttn.lorawan.v3.CreateLoginTokenRequest)
   - [Message `CreateLoginTokenResponse`](#ttn.lorawan.v3.CreateLoginTokenResponse)
   - [Message `CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest)
   - [Message `CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest)
+  - [Message `CreateUserBookmarkRequest`](#ttn.lorawan.v3.CreateUserBookmarkRequest)
   - [Message `CreateUserRequest`](#ttn.lorawan.v3.CreateUserRequest)
   - [Message `DeleteInvitationRequest`](#ttn.lorawan.v3.DeleteInvitationRequest)
   - [Message `DeleteUserAPIKeyRequest`](#ttn.lorawan.v3.DeleteUserAPIKeyRequest)
+  - [Message `DeleteUserBookmarkRequest`](#ttn.lorawan.v3.DeleteUserBookmarkRequest)
   - [Message `GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest)
   - [Message `GetUserRequest`](#ttn.lorawan.v3.GetUserRequest)
   - [Message `Invitation`](#ttn.lorawan.v3.Invitation)
   - [Message `Invitations`](#ttn.lorawan.v3.Invitations)
   - [Message `ListInvitationsRequest`](#ttn.lorawan.v3.ListInvitationsRequest)
   - [Message `ListUserAPIKeysRequest`](#ttn.lorawan.v3.ListUserAPIKeysRequest)
+  - [Message `ListUserBookmarksRequest`](#ttn.lorawan.v3.ListUserBookmarksRequest)
   - [Message `ListUserSessionsRequest`](#ttn.lorawan.v3.ListUserSessionsRequest)
   - [Message `ListUsersRequest`](#ttn.lorawan.v3.ListUsersRequest)
   - [Message `LoginToken`](#ttn.lorawan.v3.LoginToken)
@@ -769,12 +775,20 @@
   - [Message `UpdateUserRequest`](#ttn.lorawan.v3.UpdateUserRequest)
   - [Message `User`](#ttn.lorawan.v3.User)
   - [Message `User.AttributesEntry`](#ttn.lorawan.v3.User.AttributesEntry)
+  - [Message `UserBookmark`](#ttn.lorawan.v3.UserBookmark)
+  - [Message `UserBookmarks`](#ttn.lorawan.v3.UserBookmarks)
+  - [Message `UserConsolePreferences`](#ttn.lorawan.v3.UserConsolePreferences)
+  - [Message `UserConsolePreferences.DashboardLayouts`](#ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts)
+  - [Message `UserConsolePreferences.SortBy`](#ttn.lorawan.v3.UserConsolePreferences.SortBy)
   - [Message `UserSession`](#ttn.lorawan.v3.UserSession)
   - [Message `UserSessionIdentifiers`](#ttn.lorawan.v3.UserSessionIdentifiers)
   - [Message `UserSessions`](#ttn.lorawan.v3.UserSessions)
   - [Message `Users`](#ttn.lorawan.v3.Users)
+  - [Enum `ConsoleTheme`](#ttn.lorawan.v3.ConsoleTheme)
+  - [Enum `DashboardLayout`](#ttn.lorawan.v3.DashboardLayout)
 - [File `ttn/lorawan/v3/user_services.proto`](#ttn/lorawan/v3/user_services.proto)
   - [Service `UserAccess`](#ttn.lorawan.v3.UserAccess)
+  - [Service `UserBookmarkRegistry`](#ttn.lorawan.v3.UserBookmarkRegistry)
   - [Service `UserInvitationRegistry`](#ttn.lorawan.v3.UserInvitationRegistry)
   - [Service `UserRegistry`](#ttn.lorawan.v3.UserRegistry)
   - [Service `UserSessionRegistry`](#ttn.lorawan.v3.UserSessionRegistry)
@@ -1040,7 +1054,7 @@ Application is the message that defines an Application in the network.
 
 ### <a name="ttn.lorawan.v3.ApplicationAccess">Service `ApplicationAccess`</a>
 
-The ApplicationAcces service, exposed by the Identity Server, is used to manage
+The ApplicationAccess service, exposed by the Identity Server, is used to manage
 API keys and collaborators of applications.
 
 | Method Name | Request Type | Response Type | Description |
@@ -2491,7 +2505,7 @@ The OAuth2 flows an OAuth client can use to get an access token.
 
 ### <a name="ttn.lorawan.v3.ClientAccess">Service `ClientAccess`</a>
 
-The ClientAcces service, exposed by the Identity Server, is used to manage
+The ClientAccess service, exposed by the Identity Server, is used to manage
 collaborators of OAuth clients.
 
 | Method Name | Request Type | Response Type | Description |
@@ -3100,6 +3114,8 @@ in a future version of The Things Stack.
 
 ### <a name="ttn.lorawan.v3.EndDeviceBatchClaimingServer">Service `EndDeviceBatchClaimingServer`</a>
 
+The EndDeviceBatchClaimingServer service support claiming and managing batches of end devices on external Join Servers.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Unclaim` | [`BatchUnclaimEndDevicesRequest`](#ttn.lorawan.v3.BatchUnclaimEndDevicesRequest) | [`BatchUnclaimEndDevicesResponse`](#ttn.lorawan.v3.BatchUnclaimEndDevicesResponse) | Unclaims multiple end devices on an external Join Server. All devices must have the same application ID. Check the response for devices that could not be unclaimed. |
@@ -3114,8 +3130,7 @@ in a future version of The Things Stack.
 
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 
-The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
-and allows clients to claim end devices.
+The EndDeviceClaimingServer service support claiming and managing end devices on external Join Servers.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -3138,6 +3153,8 @@ and allows clients to claim end devices.
 | `UnauthorizeApplication` | `DELETE` | `/api/v3/edcs/applications/{application_id}/authorize` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayClaimingServer">Service `GatewayClaimingServer`</a>
+
+The GatewayClaimingServer service support claiming and managing gateway claims.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -3665,7 +3682,7 @@ CreateClientEmailMessage is used as a wrapper for handling the email regarding t
 
 ### <a name="ttn.lorawan.v3.EmailValidationRegistry">Service `EmailValidationRegistry`</a>
 
-The EmailValidationRegistry service, exposed by the Identity Server, is used for validating an user's primary email.
+The EmailValidationRegistry service, exposed by the Identity Server, is used for validating a user's primary email.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -3710,6 +3727,7 @@ Configuration options for dynamic ADR.
 | `min_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
 | `max_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
 | `channel_steering` | [`ADRSettings.DynamicMode.ChannelSteeringSettings`](#ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings) |  |  |
+| `overrides` | [`ADRSettings.DynamicMode.Overrides`](#ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides) |  |  |
 
 #### Field Rules
 
@@ -3739,6 +3757,45 @@ to another set of channels.
 Configuration options for LoRa narrow channels steering.
 The narrow mode attempts to steer the end device towards
 using the LoRa modulated, 125kHz bandwidth channels.
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides">Message `ADRSettings.DynamicMode.Overrides`</a>
+
+EXPERIMENTAL: Configuration overrides.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate_0` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_1` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_2` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_3` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_4` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_5` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_6` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_7` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_8` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_9` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_10` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_11` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_12` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_13` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_14` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+| `data_rate_15` | [`ADRSettings.DynamicMode.PerDataRateIndexOverride`](#ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride) |  |  |
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride">Message `ADRSettings.DynamicMode.PerDataRateIndexOverride`</a>
+
+EXPERIMENTAL: Data rate index override settings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+| `max_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `min_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
+| `max_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
 
 ### <a name="ttn.lorawan.v3.ADRSettings.StaticMode">Message `ADRSettings.StaticMode`</a>
 
@@ -4681,6 +4738,8 @@ NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 
 ### <a name="ttn.lorawan.v3.EndDeviceTemplateConverter">Service `EndDeviceTemplateConverter`</a>
 
+The EndDeviceTemplateRegistry service is used to convert end devices information between formats.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ListFormats` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`EndDeviceTemplateFormats`](#ttn.lorawan.v3.EndDeviceTemplateFormats) | Returns the configured formats to convert from. |
@@ -5341,6 +5400,8 @@ Identifies an end device model with version information.
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurationService">Service `GatewayConfigurationService`</a>
 
+The GatewayConfigurationService fetches the configuration of a gateway.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetGatewayConfiguration` | [`GetGatewayConfigurationRequest`](#ttn.lorawan.v3.GetGatewayConfigurationRequest) | [`GetGatewayConfigurationResponse`](#ttn.lorawan.v3.GetGatewayConfigurationResponse) |  |
@@ -5458,6 +5519,8 @@ gateway registrations in batches.
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 
+The GatewayConfigurator service is used to fetch gateway configuration.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `PullConfiguration` | [`PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) _stream_ |  |
@@ -5561,6 +5624,8 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | `delay` | <p>`duration.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.Gs">Service `Gs`</a>
+
+The Gs service returns information about the Gateway Server and gateways connected to it.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -5915,6 +5980,8 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 ### <a name="ttn.lorawan.v3.EntityAccess">Service `EntityAccess`</a>
 
+The EntityAccess service provides information about the access rights of an entity.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `AuthInfo` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`AuthInfoResponse`](#ttn.lorawan.v3.AuthInfoResponse) | AuthInfo returns information about the authentication that is used on the request. |
@@ -5926,6 +5993,8 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `AuthInfo` | `GET` | `/api/v3/auth_info` |  |
 
 ### <a name="ttn.lorawan.v3.Is">Service `Is`</a>
+
+The Is service provides information about the Identity Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -6296,6 +6365,8 @@ The AsJs service connects an Application Server to a Join Server.
 | `GetAppSKey` | [`SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) | Request the application session key for a particular session. |
 
 ### <a name="ttn.lorawan.v3.Js">Service `Js`</a>
+
+The Js service returns configuration for a Join Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -8946,6 +9017,8 @@ The NsRelayConfigurationService provides configuration management capabilities f
 
 ### <a name="ttn.lorawan.v3.NotificationService">Service `NotificationService`</a>
 
+The NotificationService is used to send notifications.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateNotificationRequest`](#ttn.lorawan.v3.CreateNotificationRequest) | [`CreateNotificationResponse`](#ttn.lorawan.v3.CreateNotificationResponse) | Create a new notification. Can only be called by internal services using cluster auth. |
@@ -9945,6 +10018,8 @@ The Pba service allows clients to manage peering through Packet Broker.
 
 ### <a name="ttn.lorawan.v3.EndDeviceQRCodeGenerator">Service `EndDeviceQRCodeGenerator`</a>
 
+The EndDeviceQRCodeGenerator service provides functionality to generate and parse QR codes.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetFormat` | [`GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest) | [`QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat) | Return the QR code format. |
@@ -10534,6 +10609,20 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 
 ## <a name="ttn/lorawan/v3/user.proto">File `ttn/lorawan/v3/user.proto`</a>
 
+### <a name="ttn.lorawan.v3.BatchDeleteUserBookmarksRequest">Message `BatchDeleteUserBookmarksRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `entity_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p> |
+
 ### <a name="ttn.lorawan.v3.CreateLoginTokenRequest">Message `CreateLoginTokenRequest`</a>
 
 | Field | Type | Label | Description |
@@ -10583,6 +10672,20 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 | `expires_at` | <p>`timestamp.gt_now`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.CreateUserBookmarkRequest">Message `CreateUserBookmarkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `entity_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.CreateUserRequest">Message `CreateUserRequest`</a>
 
 | Field | Type | Label | Description |
@@ -10620,6 +10723,20 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | Field | Validations |
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DeleteUserBookmarkRequest">Message `DeleteUserBookmarkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `entity_ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GetUserAPIKeyRequest">Message `GetUserAPIKeyRequest`</a>
 
@@ -10700,6 +10817,24 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `order` | <p>`string.in`: `[ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.ListUserBookmarksRequest">Message `ListUserBookmarksRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `order` | [`string`](#string) |  | Order the results by this field path. Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `deleted` | [`bool`](#bool) |  | Only return recently deleted bookmarks. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+| `order` | <p>`string.in`: `[ user_id -user_id entity_type -entity_type entity_id -entity_id created_at -created_at]`</p> |
 
 ### <a name="ttn.lorawan.v3.ListUserSessionsRequest">Message `ListUserSessionsRequest`</a>
 
@@ -10835,6 +10970,7 @@ User is the message that defines a user on the network.
 | `temporary_password_created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `temporary_password_expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `profile_picture` | [`Picture`](#ttn.lorawan.v3.Picture) |  | A profile picture for the user. This information is public and can be seen by any authenticated user in the network. |
+| `console_preferences` | [`UserConsolePreferences`](#ttn.lorawan.v3.UserConsolePreferences) |  | Console preferences contains the user's preferences regarding the behavior of the Console. |
 
 #### Field Rules
 
@@ -10857,6 +10993,76 @@ User is the message that defines a user on the network.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.UserBookmark">Message `UserBookmark`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  |  |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+| `entity_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UserBookmarks">Message `UserBookmarks`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `bookmarks` | [`UserBookmark`](#ttn.lorawan.v3.UserBookmark) | repeated |  |
+
+### <a name="ttn.lorawan.v3.UserConsolePreferences">Message `UserConsolePreferences`</a>
+
+UserConsolePreferences is the message that defines the user preferences for the Console.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `console_theme` | [`ConsoleTheme`](#ttn.lorawan.v3.ConsoleTheme) |  |  |
+| `dashboard_layouts` | [`UserConsolePreferences.DashboardLayouts`](#ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts) |  |  |
+| `sort_by` | [`UserConsolePreferences.SortBy`](#ttn.lorawan.v3.UserConsolePreferences.SortBy) |  |  |
+
+### <a name="ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts">Message `UserConsolePreferences.DashboardLayouts`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `api_key` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `application` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `collaborator` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `end_device` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `gateway` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `organization` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `overview` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+| `user` | [`DashboardLayout`](#ttn.lorawan.v3.DashboardLayout) |  |  |
+
+### <a name="ttn.lorawan.v3.UserConsolePreferences.SortBy">Message `UserConsolePreferences.SortBy`</a>
+
+SortBy defines the field to which the Console will sort the display of entities.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `api_key` | [`string`](#string) |  |  |
+| `application` | [`string`](#string) |  |  |
+| `collaborator` | [`string`](#string) |  |  |
+| `end_device` | [`string`](#string) |  |  |
+| `gateway` | [`string`](#string) |  |  |
+| `organization` | [`string`](#string) |  |  |
+| `user` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `api_key` | <p>`string.in`: `[ api_key_id -api_key_id name -name created_at -created_at expires_at -expires_at]`</p> |
+| `application` | <p>`string.in`: `[ application_id -application_id name -name created_at -created_at]`</p> |
+| `collaborator` | <p>`string.in`: `[ id -id rights -rights]`</p> |
+| `end_device` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]`</p> |
+| `gateway` | <p>`string.in`: `[ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]`</p> |
+| `organization` | <p>`string.in`: `[ organization_id -organization_id name -name created_at -created_at]`</p> |
+| `user` | <p>`string.in`: `[ user_id -user_id name -name primary_email_address -primary_email_address state -state admin -admin created_at -created_at]`</p> |
 
 ### <a name="ttn.lorawan.v3.UserSession">Message `UserSession`</a>
 
@@ -10902,11 +11108,31 @@ User is the message that defines a user on the network.
 | ----- | ---- | ----- | ----------- |
 | `users` | [`User`](#ttn.lorawan.v3.User) | repeated |  |
 
+### <a name="ttn.lorawan.v3.ConsoleTheme">Enum `ConsoleTheme`</a>
+
+ConsoleTheme is the theme of the Console.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `CONSOLE_THEME_SYSTEM` | 0 | The user prefers the system mode. |
+| `CONSOLE_THEME_LIGHT` | 1 | The user prefers the light mode. |
+| `CONSOLE_THEME_DARK` | 2 | The user prefers the dark mode. |
+
+### <a name="ttn.lorawan.v3.DashboardLayout">Enum `DashboardLayout`</a>
+
+DashboardLayout is a set of possible layout values to be used in the Console.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `DASHBOARD_LAYOUT_TABLE` | 0 |  |
+| `DASHBOARD_LAYOUT_LIST` | 1 |  |
+| `DASHBOARD_LAYOUT_GRID` | 2 |  |
+
 ## <a name="ttn/lorawan/v3/user_services.proto">File `ttn/lorawan/v3/user_services.proto`</a>
 
 ### <a name="ttn.lorawan.v3.UserAccess">Service `UserAccess`</a>
 
-The UserAcces service, exposed by the Identity Server, is used to manage
+The UserAccess service, exposed by the Identity Server, is used to manage
 API keys of users.
 
 | Method Name | Request Type | Response Type | Description |
@@ -10931,7 +11157,32 @@ API keys of users.
 | `DeleteAPIKey` | `DELETE` | `/api/v3/users/{user_ids.user_id}/api-keys/{key_id}` |  |
 | `CreateLoginToken` | `POST` | `/api/v3/users/{user_ids.user_id}/login-tokens` |  |
 
+### <a name="ttn.lorawan.v3.UserBookmarkRegistry">Service `UserBookmarkRegistry`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Create` | [`CreateUserBookmarkRequest`](#ttn.lorawan.v3.CreateUserBookmarkRequest) | [`UserBookmark`](#ttn.lorawan.v3.UserBookmark) | Create a bookmark for the given user. |
+| `List` | [`ListUserBookmarksRequest`](#ttn.lorawan.v3.ListUserBookmarksRequest) | [`UserBookmarks`](#ttn.lorawan.v3.UserBookmarks) | List the bookmarks for the given user. |
+| `Delete` | [`DeleteUserBookmarkRequest`](#ttn.lorawan.v3.DeleteUserBookmarkRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the given user's bookmark. |
+| `BatchDelete` | [`BatchDeleteUserBookmarksRequest`](#ttn.lorawan.v3.BatchDeleteUserBookmarksRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a list of bookmarks of the given user. This operation is atomic; either all bookmarks are deleted or none. Bookmarks not found are skipped and no error is returned. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Create` | `POST` | `/api/v3/users/bookmarks` | `*` |
+| `List` | `GET` | `/api/v3/users/{user_ids.user_id}/bookmarks` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.application_ids.application_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/clients/{entity_ids.client_ids.client_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/gateways/{entity_ids.gateway_ids.gateway_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/organizations/{entity_ids.organization_ids.organization_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/users/{entity_ids.user_ids.user_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.device_ids.application_ids.application_id}/devices/{entity_ids.device_ids.device_id}` |  |
+| `BatchDelete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/batch` |  |
+
 ### <a name="ttn.lorawan.v3.UserInvitationRegistry">Service `UserInvitationRegistry`</a>
+
+The UserOrganizationRegistry service, exposed by the Identity Server, is used to manage user invitations.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|

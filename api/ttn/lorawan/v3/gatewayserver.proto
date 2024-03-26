@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "ttn/lorawan/v3/error.proto";
 import "ttn/lorawan/v3/gateway.proto";
 import "ttn/lorawan/v3/identifiers.proto";
@@ -49,6 +50,7 @@ message GatewayDown {
 
 // The GtwGs service connects a gateway to a Gateway Server.
 service GtwGs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Connect a gRPC gateway to a The Things Stack Gateway Server."};
   // Link a gateway to the Gateway Server for streaming upstream messages and downstream messages.
   rpc LinkGateway(stream GatewayUp) returns (stream GatewayDown);
   // Get configuration for the concentrator.
@@ -83,6 +85,7 @@ message ScheduleDownlinkErrorDetails {
 
 // The NsGs service connects a Network Server to a Gateway Server.
 service NsGs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The NsGs service connects a Network Server to a Gateway Server. This is an inter-component service and is not intended for end users."};
   // Instructs the Gateway Server to schedule a downlink message.
   // The Gateway Server may refuse if there are any conflicts in the schedule or
   // if a duty cycle prevents the gateway from transmitting.
@@ -104,7 +107,9 @@ message BatchGetGatewayConnectionStatsResponse {
   map<string, GatewayConnectionStats> entries = 1;
 }
 
+// The Gs service returns information about the Gateway Server and gateways connected to it.
 service Gs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Retrieve gateway connection statistics."};
   // Get statistics about the current gateway connection to the Gateway Server.
   // This is not persisted between reconnects.
   rpc GetGatewayConnectionStats(GatewayIdentifiers) returns (GatewayConnectionStats) {

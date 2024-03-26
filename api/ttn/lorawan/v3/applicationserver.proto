@@ -22,6 +22,7 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "thethings/flags/annotations.proto";
 import "thethings/json/annotations.proto";
 import "ttn/lorawan/v3/end_device.proto";
@@ -113,6 +114,7 @@ message GetAsConfigurationResponse {
 
 // The As service manages the Application Server.
 service As {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage an Application Server."};
   // Get a link configuration from the Application Server to Network Server.
   // This only contains the configuration. Use GetLinkStats to view statistics and any link errors.
   rpc GetLink(GetApplicationLinkRequest) returns (ApplicationLink) {
@@ -154,6 +156,7 @@ message NsAsHandleUplinkRequest {
 
 // The NsAs service connects a Network Server to an Application Server.
 service NsAs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The NsAs service is used by The Things Stack Network Servers to interact with The Things Stack Application Servers. This is an inter-component service and is not meant for end users."};
   // Handle Application uplink messages.
   rpc HandleUplink(NsAsHandleUplinkRequest) returns (google.protobuf.Empty);
 }
@@ -196,6 +199,7 @@ message DecodeDownlinkResponse {
 
 // The AppAs service connects an application or integration to an Application Server.
 service AppAs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Connect and manage applications or integrations to an Application Server."};
   // Subscribe to upstream messages.
   rpc Subscribe(ApplicationIdentifiers) returns (stream ApplicationUp);
   // Push downlink messages to the end of the downlink queue.
@@ -250,6 +254,7 @@ service AppAs {
 
 // The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.
 service AsEndDeviceRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage end devices on the Application Server."};
   // Get returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {
@@ -277,6 +282,7 @@ service AsEndDeviceRegistry {
 
 // The AsEndDeviceBatchRegistry service allows clients to manage batches end devices on the Application Server.
 service AsEndDeviceBatchRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage batches of end devices on the Application Server."};
   // Delete a list of devices within the same application.
   // This operation is atomic; either all devices are deleted or none.
   // Devices not found are skipped and no error is returned.

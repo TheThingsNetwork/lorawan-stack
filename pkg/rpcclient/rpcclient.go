@@ -45,6 +45,8 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	statsHandler := rpcmiddleware.StatsHandlers{
 		otelgrpc.NewClientHandler(
 			otelgrpc.WithTracerProvider(tracing.FromContext(ctx)),
+			// As pkg/metrics is currently Prometheus based, the OpenTelemetry metrics are unused.
+			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5692.
 			otelgrpc.WithMeterProvider(noop.MeterProvider{}),
 		),
 		metrics.StatsHandler,

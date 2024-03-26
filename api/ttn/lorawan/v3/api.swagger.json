@@ -6,196 +6,262 @@
   },
   "tags": [
     {
-      "name": "ApplicationRegistry"
+      "name": "ApplicationRegistry",
+      "description": "Manage applications."
     },
     {
-      "name": "ApplicationAccess"
+      "name": "ApplicationAccess",
+      "description": "Manage access to applications."
     },
     {
-      "name": "As"
+      "name": "As",
+      "description": "Manage an Application Server."
     },
     {
-      "name": "NsAs"
+      "name": "NsAs",
+      "description": "The NsAs service is used by The Things Stack Network Servers to interact with The Things Stack Application Servers. This is an inter-component service and is not meant for end users."
     },
     {
-      "name": "AppAs"
+      "name": "AppAs",
+      "description": "Connect and manage applications or integrations to an Application Server."
     },
     {
-      "name": "AsEndDeviceRegistry"
+      "name": "AsEndDeviceRegistry",
+      "description": "Manage end devices on the Application Server."
     },
     {
-      "name": "AsEndDeviceBatchRegistry"
+      "name": "AsEndDeviceBatchRegistry",
+      "description": "Manage batches of end devices on the Application Server."
     },
     {
-      "name": "ApplicationUpStorage"
+      "name": "ApplicationUpStorage",
+      "description": "Query application upstream messages from the storage integration."
     },
     {
-      "name": "ApplicationPackageRegistry"
+      "name": "ApplicationPackageRegistry",
+      "description": "Manage application packages and their associations."
     },
     {
-      "name": "ApplicationPubSubRegistry"
+      "name": "ApplicationPubSubRegistry",
+      "description": "Manage application pubsubs."
     },
     {
-      "name": "ApplicationWebhookRegistry"
+      "name": "ApplicationWebhookRegistry",
+      "description": "Manage application webhooks."
     },
     {
-      "name": "ClientRegistry"
+      "name": "ClientRegistry",
+      "description": "Manage OAuth client registrations."
     },
     {
-      "name": "ClientAccess"
+      "name": "ClientAccess",
+      "description": "Manage access to OAuth clients."
     },
     {
-      "name": "Configuration"
+      "name": "Configuration",
+      "description": "Retrieve LoRaWAN network configuration options."
     },
     {
-      "name": "ContactInfoRegistry"
+      "name": "ContactInfoRegistry",
+      "description": "DEPRECATED: Validate contact information of registered entities."
     },
     {
-      "name": "EndDeviceClaimingServer"
+      "name": "EndDeviceClaimingServer",
+      "description": "Claim and manage end devices on external Join Servers."
     },
     {
-      "name": "EndDeviceBatchClaimingServer"
+      "name": "EndDeviceBatchClaimingServer",
+      "description": "Claim and manage batches of end devices on external Join Servers."
     },
     {
-      "name": "GatewayClaimingServer"
+      "name": "GatewayClaimingServer",
+      "description": "Claim gateways and manage claims."
     },
     {
-      "name": "DeviceRepository"
+      "name": "DeviceRepository",
+      "description": "Get information on LoRaWAN end device brands, models, and templates from the Device Repository."
     },
     {
-      "name": "EmailValidationRegistry"
+      "name": "EmailValidationRegistry",
+      "description": "Validate a user's primary email."
     },
     {
-      "name": "EndDeviceRegistry"
+      "name": "EndDeviceRegistry",
+      "description": "Manage end devices on The Things Stack Identity Server."
     },
     {
-      "name": "EndDeviceTemplateConverter"
+      "name": "EndDeviceTemplateConverter",
+      "description": "Convert end device information between supported formats."
     },
     {
-      "name": "EndDeviceBatchRegistry"
+      "name": "EndDeviceBatchRegistry",
+      "description": "Manage end devices on The Things Stack Identity Server in batches."
     },
     {
-      "name": "Events"
+      "name": "Events",
+      "description": "Read events served from a The Things Stack cluster."
     },
     {
-      "name": "GatewayConfigurationService"
+      "name": "GatewayConfigurationService",
+      "description": "Fetch configuration for gateways."
     },
     {
-      "name": "GatewayRegistry"
+      "name": "GatewayRegistry",
+      "description": "Manage gateways."
     },
     {
-      "name": "GatewayAccess"
+      "name": "GatewayAccess",
+      "description": "Manage access to gateways."
     },
     {
-      "name": "GatewayConfigurator"
+      "name": "GatewayConfigurator",
+      "description": "Fetch gateway configuration."
     },
     {
-      "name": "GatewayBatchAccess"
+      "name": "GatewayBatchAccess",
+      "description": "Manage access to batches of gateways."
     },
     {
-      "name": "GatewayBatchRegistry"
+      "name": "GatewayBatchRegistry",
+      "description": "Manage batches of gateways."
     },
     {
-      "name": "GtwGs"
+      "name": "GtwGs",
+      "description": "Connect a gRPC gateway to a The Things Stack Gateway Server."
     },
     {
-      "name": "NsGs"
+      "name": "NsGs",
+      "description": "The NsGs service connects a Network Server to a Gateway Server. This is an inter-component service and is not intended for end users."
     },
     {
-      "name": "Gs"
+      "name": "Gs",
+      "description": "Retrieve gateway connection statistics."
     },
     {
-      "name": "EntityAccess"
+      "name": "EntityAccess",
+      "description": "Check the access rights for an entity."
     },
     {
-      "name": "Is"
+      "name": "Is",
+      "description": "Get information about The Things Stack Identity Server."
     },
     {
-      "name": "NsJs"
+      "name": "NsJs",
+      "description": "The NsJs service connects a Network Server to a Join Server. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "AsJs"
+      "name": "AsJs",
+      "description": "The AsJs service connects an Application Server to a Join Server. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "AppJs"
+      "name": "AppJs",
+      "description": "The AppJs service is used by an external AWS integration to connect to a Join Server instance."
     },
     {
-      "name": "NetworkCryptoService"
+      "name": "NetworkCryptoService",
+      "description": "The NetworkCryptoService supports network layer cryptographic operations. This service is not intended to be used by end users."
     },
     {
-      "name": "ApplicationCryptoService"
+      "name": "ApplicationCryptoService",
+      "description": "The ApplicationCryptoService supports application layer cryptographic operations. This service is not intended to be used by end users."
     },
     {
-      "name": "JsEndDeviceRegistry"
+      "name": "JsEndDeviceRegistry",
+      "description": "Manage end devices on The Things Stack Join Server."
     },
     {
-      "name": "JsEndDeviceBatchRegistry"
+      "name": "JsEndDeviceBatchRegistry",
+      "description": "Manage batches of end devices on The Things Stack Join Server."
     },
     {
-      "name": "ApplicationActivationSettingRegistry"
+      "name": "ApplicationActivationSettingRegistry",
+      "description": "Manage application activation settings."
     },
     {
-      "name": "Js"
+      "name": "Js",
+      "description": "Fetch configuration for The Things Stack Join Server."
     },
     {
-      "name": "Ns"
+      "name": "Ns",
+      "description": "Manage The Things Stack Network Server."
     },
     {
-      "name": "AsNs"
+      "name": "AsNs",
+      "description": "The AsNs service connects an Application Server to a Network Server. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "GsNs"
+      "name": "GsNs",
+      "description": "The GsNS service connects a Gateway Server to a Network Server. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "NsEndDeviceRegistry"
+      "name": "NsEndDeviceRegistry",
+      "description": "Manage end devices on The Things Stack Network Server."
     },
     {
-      "name": "NsEndDeviceBatchRegistry"
+      "name": "NsEndDeviceBatchRegistry",
+      "description": "Manage batches of end devices on The Things Stack Network Server."
     },
     {
-      "name": "NsRelayConfigurationService"
+      "name": "NsRelayConfigurationService",
+      "description": "Manage configuration of LoRaWAN® relay devices."
     },
     {
-      "name": "NotificationService"
+      "name": "NotificationService",
+      "description": "Read and manage notifications."
     },
     {
-      "name": "OAuthAuthorizationRegistry"
+      "name": "OAuthAuthorizationRegistry",
+      "description": "Manage OAuth client authorizations for users."
     },
     {
-      "name": "OrganizationRegistry"
+      "name": "OrganizationRegistry",
+      "description": "Manage organizations."
     },
     {
-      "name": "OrganizationAccess"
+      "name": "OrganizationAccess",
+      "description": "Manage access to organizations"
     },
     {
-      "name": "GsPba"
+      "name": "GsPba",
+      "description": "The GsPba service connects a Gateway Server to a Packet Broker Agent. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "NsPba"
+      "name": "NsPba",
+      "description": "The NsPba service connects a Network Server to a Packet Broker Agent. This is an inter-component service and is not intended to be used by end users."
     },
     {
-      "name": "Pba"
+      "name": "Pba",
+      "description": "Manage peering via Packet Broker."
     },
     {
-      "name": "EndDeviceQRCodeGenerator"
+      "name": "EndDeviceQRCodeGenerator",
+      "description": "Generate and parse end device QR codes."
     },
     {
-      "name": "EntityRegistrySearch"
+      "name": "EntityRegistrySearch",
+      "description": "Search for entities in the Entity Registry."
     },
     {
-      "name": "EndDeviceRegistrySearch"
+      "name": "EndDeviceRegistrySearch",
+      "description": "Search for end devices in the End Device Registry."
     },
     {
-      "name": "UserRegistry"
+      "name": "UserRegistry",
+      "description": "Manage users."
     },
     {
-      "name": "UserAccess"
+      "name": "UserAccess",
+      "description": "Manage user access."
     },
     {
-      "name": "UserInvitationRegistry"
+      "name": "UserInvitationRegistry",
+      "description": "Manage user sessions."
     },
     {
       "name": "UserSessionRegistry"
+    },
+    {
+      "name": "UserBookmarkRegistry"
     }
   ],
   "consumes": [
@@ -12638,6 +12704,39 @@
         ]
       }
     },
+    "/users/bookmarks": {
+      "post": {
+        "summary": "Create a bookmark for the given user.",
+        "operationId": "UserBookmarkRegistry_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3UserBookmark"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3CreateUserBookmarkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
     "/users/{collaborator.user_ids.user_id}/applications": {
       "get": {
         "summary": "List applications where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the applications the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
@@ -13783,6 +13882,806 @@
         ]
       }
     },
+    "/users/{user_ids.user_id}/bookmarks": {
+      "get": {
+        "summary": "List the bookmarks for the given user.",
+        "operationId": "UserBookmarkRegistry_List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3UserBookmarks"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order",
+            "description": "Order the results by this field path.\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "deleted",
+            "description": "Only return recently deleted bookmarks.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.application_ids.application_id}": {
+      "delete": {
+        "summary": "Delete the given user's bookmark.",
+        "operationId": "UserBookmarkRegistry_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.device_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.device_ids.application_ids.application_id}/devices/{entity_ids.device_ids.device_id}": {
+      "delete": {
+        "summary": "Delete the given user's bookmark.",
+        "operationId": "UserBookmarkRegistry_Delete6",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/bookmarks/batch": {
+      "delete": {
+        "summary": "Delete a list of bookmarks of the given user.\nThis operation is atomic; either all bookmarks are deleted or none.\nBookmarks not found are skipped and no error is returned.",
+        "operationId": "UserBookmarkRegistry_BatchDelete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/bookmarks/clients/{entity_ids.client_ids.client_id}": {
+      "delete": {
+        "summary": "Delete the given user's bookmark.",
+        "operationId": "UserBookmarkRegistry_Delete2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.device_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/bookmarks/gateways/{entity_ids.gateway_ids.gateway_id}": {
+      "delete": {
+        "summary": "Delete the given user's bookmark.",
+        "operationId": "UserBookmarkRegistry_Delete3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.device_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/bookmarks/organizations/{entity_ids.organization_ids.organization_id}": {
+      "delete": {
+        "summary": "Delete the given user's bookmark.",
+        "operationId": "UserBookmarkRegistry_Delete4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.device_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/bookmarks/users/{entity_ids.user_ids.user_id}": {
+      "delete": {
+        "summary": "Delete the given user's bookmark.",
+        "operationId": "UserBookmarkRegistry_Delete5",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.client_ids.client_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.device_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.application_ids.application_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.gateway_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "entity_ids.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "entity_ids.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      }
+    },
     "/users/{user_ids.user_id}/login-tokens": {
       "post": {
         "summary": "Create a login token that can be used for a one-time login as a user.",
@@ -14218,6 +15117,9 @@
         },
         "channel_steering": {
           "$ref": "#/definitions/DynamicModeChannelSteeringSettings"
+        },
+        "overrides": {
+          "$ref": "#/definitions/DynamicModeOverrides"
         }
       },
       "description": "Configuration options for dynamic ADR."
@@ -15001,6 +15903,76 @@
     "DynamicModeChannelSteeringSettingsDisabledMode": {
       "type": "object",
       "description": "Configuration options for cases in which ADR is not supposed to steer the end device\nto another set of channels."
+    },
+    "DynamicModeOverrides": {
+      "type": "object",
+      "properties": {
+        "data_rate_0": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_1": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_2": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_3": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_4": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_5": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_6": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_7": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_8": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_9": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_10": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_11": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_12": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_13": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_14": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        },
+        "data_rate_15": {
+          "$ref": "#/definitions/DynamicModePerDataRateIndexOverride"
+        }
+      },
+      "description": "EXPERIMENTAL: Configuration overrides."
+    },
+    "DynamicModePerDataRateIndexOverride": {
+      "type": "object",
+      "properties": {
+        "min_nb_trans": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Minimum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "max_nb_trans": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Maximum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used."
+        }
+      },
+      "description": "EXPERIMENTAL: Data rate index override settings."
     },
     "EndDeviceClaimingServerAuthorizeApplicationBody": {
       "type": "object",
@@ -16564,6 +17536,62 @@
     },
     "UplinkMessageRxMetadataRelayMetadata": {
       "type": "object"
+    },
+    "UserConsolePreferencesDashboardLayouts": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "application": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "collaborator": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "end_device": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "gateway": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "organization": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "overview": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        },
+        "user": {
+          "$ref": "#/definitions/v3DashboardLayout"
+        }
+      }
+    },
+    "UserConsolePreferencesSortBy": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "type": "string"
+        },
+        "application": {
+          "type": "string"
+        },
+        "collaborator": {
+          "type": "string"
+        },
+        "end_device": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        }
+      },
+      "description": "SortBy defines the field to which the Console will sort the display of entities."
     },
     "UserRegistrationAdminApproval": {
       "type": "object",
@@ -19859,6 +20887,16 @@
         }
       }
     },
+    "v3ConsoleTheme": {
+      "type": "string",
+      "enum": [
+        "CONSOLE_THEME_SYSTEM",
+        "CONSOLE_THEME_LIGHT",
+        "CONSOLE_THEME_DARK"
+      ],
+      "default": "CONSOLE_THEME_SYSTEM",
+      "description": "ConsoleTheme is the theme of the Console.\n\n - CONSOLE_THEME_SYSTEM: The user prefers the system mode.\n - CONSOLE_THEME_LIGHT: The user prefers the light mode.\n - CONSOLE_THEME_DARK: The user prefers the dark mode."
+    },
     "v3ContactInfo": {
       "type": "object",
       "properties": {
@@ -19952,6 +20990,17 @@
         }
       }
     },
+    "v3CreateUserBookmarkRequest": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "$ref": "#/definitions/v3UserIdentifiers"
+        },
+        "entity_ids": {
+          "$ref": "#/definitions/v3EntityIdentifiers"
+        }
+      }
+    },
     "v3CreateUserRequest": {
       "type": "object",
       "properties": {
@@ -20014,6 +21063,16 @@
           "description": "OptNeg is set if Network Server implements LoRaWAN 1.1 or greater."
         }
       }
+    },
+    "v3DashboardLayout": {
+      "type": "string",
+      "enum": [
+        "DASHBOARD_LAYOUT_TABLE",
+        "DASHBOARD_LAYOUT_LIST",
+        "DASHBOARD_LAYOUT_GRID"
+      ],
+      "default": "DASHBOARD_LAYOUT_TABLE",
+      "description": "DashboardLayout is a set of possible layout values to be used in the Console."
     },
     "v3DataRate": {
       "type": "object",
@@ -26092,6 +27151,10 @@
         "profile_picture": {
           "$ref": "#/definitions/v3Picture",
           "description": "A profile picture for the user.\nThis information is public and can be seen by any authenticated user in the network."
+        },
+        "console_preferences": {
+          "$ref": "#/definitions/v3UserConsolePreferences",
+          "description": "Console preferences contains the user's preferences regarding the behavior of the Console."
         }
       },
       "description": "User is the message that defines a user on the network."
@@ -26172,6 +27235,48 @@
           "description": "The names of the api key fields that should be updated."
         }
       }
+    },
+    "v3UserBookmark": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "$ref": "#/definitions/v3UserIdentifiers"
+        },
+        "entity_ids": {
+          "$ref": "#/definitions/v3EntityIdentifiers"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v3UserBookmarks": {
+      "type": "object",
+      "properties": {
+        "bookmarks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3UserBookmark"
+          }
+        }
+      }
+    },
+    "v3UserConsolePreferences": {
+      "type": "object",
+      "properties": {
+        "console_theme": {
+          "$ref": "#/definitions/v3ConsoleTheme"
+        },
+        "dashboard_layouts": {
+          "$ref": "#/definitions/UserConsolePreferencesDashboardLayouts"
+        },
+        "sort_by": {
+          "$ref": "#/definitions/UserConsolePreferencesSortBy"
+        }
+      },
+      "description": "UserConsolePreferences is the message that defines the user preferences for the Console."
     },
     "v3UserIdentifiers": {
       "type": "object",
@@ -26288,6 +27393,10 @@
             "profile_picture": {
               "$ref": "#/definitions/v3Picture",
               "description": "A profile picture for the user.\nThis information is public and can be seen by any authenticated user in the network."
+            },
+            "console_preferences": {
+              "$ref": "#/definitions/v3UserConsolePreferences",
+              "description": "Console preferences contains the user's preferences regarding the behavior of the Console."
             }
           },
           "description": "User is the message that defines a user on the network."
