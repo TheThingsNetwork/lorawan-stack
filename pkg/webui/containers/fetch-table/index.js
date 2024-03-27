@@ -83,11 +83,7 @@ const FetchTable = props => {
     className,
   } = props
 
-  const [pageSizeCookie, setPageSizeCookie] = useCookieState(
-    `${entity}-list-page-size`,
-    initialPageSize,
-  )
-  const [pageSize, setPageSize] = useState(pageSizeCookie)
+  const [pageSize, setPageSize] = useCookieState(`${entity}-list-page-size`, initialPageSize)
   const isMounted = useRef(true)
   const dispatch = useDispatch()
   const defaultTab = tabs.length > 0 ? tabs[0].name : undefined
@@ -311,7 +307,6 @@ const FetchTable = props => {
           totalCount={totalCount}
           pageSize={pageSize}
           setPageSize={setPageSize}
-          setPageSizeCookie={setPageSizeCookie}
           onPageChange={onPageChange}
           loading={fetching}
           headers={headers}

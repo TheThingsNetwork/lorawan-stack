@@ -43,7 +43,6 @@ const Pagination = ({
   pageCount,
   pageSize,
   setPageSize,
-  setPageSizeCookie,
   ...rest
 }) => {
   const [selectedPage, setSelectedPage] = useState(forcePage)
@@ -69,9 +68,8 @@ const Pagination = ({
   const handlePageSizeChange = useCallback(
     val => {
       setPageSize(val)
-      setPageSizeCookie(val)
     },
-    [setPageSize, setPageSizeCookie],
+    [setPageSize],
   )
 
   const pageSizeSelect = (
@@ -175,7 +173,6 @@ Pagination.propTypes = {
   pageSize: PropTypes.number,
   /** A function to be called when the page size changes. */
   setPageSize: PropTypes.func,
-  setPageSizeCookie: PropTypes.func,
 }
 
 Pagination.defaultProps = {
@@ -187,7 +184,6 @@ Pagination.defaultProps = {
   pageRangeDisplayed: 1,
   pageSize: 10,
   setPageSize: () => null,
-  setPageSizeCookie: () => null,
 }
 
 export default Pagination

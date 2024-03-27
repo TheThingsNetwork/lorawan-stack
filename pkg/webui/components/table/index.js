@@ -31,7 +31,6 @@ const Tabular = ({
   orderBy,
   pageSize,
   setPageSize,
-  setPageSizeCookie,
   page,
   handlesPagination,
   paginated,
@@ -161,7 +160,6 @@ const Tabular = ({
           forcePage={page}
           pageSize={pageSize}
           setPageSize={setPageSize}
-          setPageSizeCookie={setPageSizeCookie}
         />
       </Table.DataCell>
     </Table.Row>
@@ -252,7 +250,6 @@ Tabular.propTypes = {
   rowKeySelector: PropTypes.func,
   /** A flag specifying the height of data cells. */
   setPageSize: PropTypes.func,
-  setPageSizeCookie: PropTypes.func,
   small: PropTypes.bool,
   /** The total number of available entries. */
   totalCount: PropTypes.number,
@@ -274,7 +271,6 @@ Tabular.defaultProps = {
   page: 0,
   pageSize: undefined,
   setPageSize: () => null,
-  setPageSizeCookie: () => null,
   clickable: true,
   rowKeySelector: undefined,
   rowHrefSelector: undefined,
