@@ -43,3 +43,15 @@ export const selectFrequencyPlansFetching = createFetchingSelector([
   GET_NS_FREQUENCY_PLANS_BASE,
   GET_GS_FREQUENCY_PLANS_BASE,
 ])
+
+export const selectBandDefinitions = state => {
+  const store = selectConfigurationStore(state)
+
+  return store?.bandDefinitions || []
+}
+
+export const selectDataRates = (state, bandId, phyVersion) => {
+  const bandDefinitions = selectBandDefinitions(state)
+
+  return bandDefinitions[bandId]?.band[phyVersion]?.data_rates || []
+}
