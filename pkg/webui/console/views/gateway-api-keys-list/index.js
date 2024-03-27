@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 
@@ -49,18 +48,16 @@ const GatewayApiKeysList = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.apiKeys} />
-        <Col>
-          <ApiKeysTable
-            entityId={gtwId}
-            baseDataSelector={baseDataSelector}
-            getItemsAction={getApiKeys}
-          />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg grid">
+      <IntlHelmet title={sharedMessages.apiKeys} />
+      <div className="item-12">
+        <ApiKeysTable
+          entityId={gtwId}
+          baseDataSelector={baseDataSelector}
+          getItemsAction={getApiKeys}
+        />
+      </div>
+    </div>
   )
 }
 

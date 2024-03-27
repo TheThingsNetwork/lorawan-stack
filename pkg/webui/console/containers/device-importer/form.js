@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Col, Row } from 'react-grid-system'
 
 import DeviceImportForm from '@console/components/device-import-form'
 
@@ -41,17 +40,15 @@ const Form = ({ handleSubmit, jsEnabled }) => {
   const largeFile = 10 * 1024 * 1024
 
   return (
-    <Row>
-      <Col md={8}>
-        <DeviceImportForm
-          jsEnabled={jsEnabled}
-          largeFileWarningMessage={m.largeFileWarningMessage}
-          warningSize={largeFile}
-          initialValues={initialValues}
-          onSubmit={handleSubmit}
-        />
-      </Col>
-    </Row>
+    <div className="item-8">
+      <DeviceImportForm
+        jsEnabled={jsEnabled}
+        largeFileWarningMessage={m.largeFileWarningMessage}
+        warningSize={largeFile}
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+      />
+    </div>
   )
 }
 

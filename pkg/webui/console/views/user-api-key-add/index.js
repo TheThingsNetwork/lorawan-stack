@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 
 import { USER } from '@console/constants/entities'
@@ -41,14 +40,12 @@ const UserApiKeyAddInner = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle title={sharedMessages.addApiKey} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ApiKeyCreateForm entity={USER} entityId={userId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <ApiKeyCreateForm entity={USER} entityId={userId} />
+      </div>
+    </div>
   )
 }
 

@@ -16,12 +16,12 @@
   display: flex
   justify-content: center
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     flex-direction: column
     align-items: center
 
 .profile-picture
-  +media-query($bp.s)
+  +media-query($bp.sm)
     margin-bottom: $cs.l
 
 .panel
@@ -30,10 +30,10 @@
   align-items: flex-start
   justify-content: center
 
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     padding-left: $cs.xl
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     align-items: center
 
 .name
@@ -45,7 +45,7 @@
     font-weight: bold
     font-size: $fs.xl
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     text-align: center
 
 .user-id

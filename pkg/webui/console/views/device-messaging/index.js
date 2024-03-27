@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -52,23 +51,21 @@ const DeviceMessaging = () => {
       featureCheck={mayWriteTraffic}
       otherwise={{ redirect: `/applications/${appId}/devices/${devId}` }}
     >
-      <Container>
+      <div className="container container--lg grid">
         <IntlHelmet title={sharedMessages.messaging} />
-        <Row>
-          {tabs.length > 0 && (
-            <Col sm={12}>
-              <Tabs className="mt-0 mb-ls-s s:bg-none s:mr-0" tabs={tabs} divider />
-            </Col>
-          )}
-          <Col lg={8} md={12}>
-            <Routes>
-              {maySendUp && <Route path="uplink" Component={UplinkForm} />}
-              {mayScheduleDown && <Route path="downlink" Component={DownlinkForm} />}
-              <Route index element={<Navigate to="uplink" replace />} />
-            </Routes>
-          </Col>
-        </Row>
-      </Container>
+        {tabs.length > 0 && (
+          <div className="item-12">
+            <Tabs className="mt-0 mb-ls-s sm:bg-none sm:mr-0" tabs={tabs} divider />
+          </div>
+        )}
+        <div className="item-12 lg:item-8">
+          <Routes>
+            {maySendUp && <Route path="uplink" Component={UplinkForm} />}
+            {mayScheduleDown && <Route path="downlink" Component={DownlinkForm} />}
+            <Route index element={<Navigate to="uplink" replace />} />
+          </Routes>
+        </div>
+      </div>
     </Require>
   )
 }

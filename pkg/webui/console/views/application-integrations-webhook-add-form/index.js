@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -80,19 +79,17 @@ const ApplicationWebhookAddForm = () => {
   }
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle title={pageTitle} className="mb-0" hideHeading={Boolean(webhookTemplate)} />
-      <Row>
-        <Col lg={8} md={12}>
-          <WebhookAdd
-            appId={appId}
-            templateId={templateId}
-            webhookTemplate={webhookTemplate}
-            navigateToList={navigateToList}
-          />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <WebhookAdd
+          appId={appId}
+          templateId={templateId}
+          webhookTemplate={webhookTemplate}
+          navigateToList={navigateToList}
+        />
+      </div>
+    </div>
   )
 }
 

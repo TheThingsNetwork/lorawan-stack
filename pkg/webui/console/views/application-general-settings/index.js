@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Col, Row, Container } from 'react-grid-system'
 
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -79,14 +78,12 @@ const ApplicationGeneralSettings = () => {
       {/* The request getApplicationLink returns 404 when there is no `skip_payload_crypto`. */}
       {/* This is expected behavior and should not be treated as an error. */}
       <RequireRequest requestAction={requestsList} handleErrors={false}>
-        <Container>
+        <div className="container container--lg grid">
           <PageTitle title={sharedMessages.generalSettings} />
-          <Row>
-            <Col lg={8} md={12}>
-              <ApplicationGeneralSettingsContainer appId={appId} />
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-12 lg:item-8">
+            <ApplicationGeneralSettingsContainer appId={appId} />
+          </div>
+        </div>
       </RequireRequest>
     </Require>
   )

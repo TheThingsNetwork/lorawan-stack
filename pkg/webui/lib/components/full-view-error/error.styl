@@ -30,13 +30,13 @@
   padding-bottom: $ls.s
   padding-left: 4rem
   padding-right: 4rem
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     padding-top: 20vh
-  +media-query($bp.s)
+  +media-query($bp.sm)
     padding-top: $header-height-mobile + $ls.m
 
   &-header
-    +media-query($bp.s)
+    +media-query($bp.sm)
       font-size: $fs.l
 
   &-sub
@@ -69,9 +69,9 @@
 .icon
   nudge('up', .1rem)
   color: var(--c-bg-error-normal)
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     font-size: 2rem
-  +media-query($bp.s)
+  +media-query($bp.sm)
     font-size: 1.4rem
 
 .action-button

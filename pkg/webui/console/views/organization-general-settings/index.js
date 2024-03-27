@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { Col, Row, Container } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -108,14 +107,12 @@ const GeneralSettings = () => {
       otherwise={{ redirect: `/organizations/${orgId}` }}
     >
       <RequireRequest requestAction={getIsConfiguration()}>
-        <Container>
+        <div className="container container--lg grid">
           <PageTitle title={sharedMessages.generalSettings} />
-          <Row>
-            <Col lg={8} md={12}>
-              <OrganizationUpdateForm onDeleteSuccess={handleDeleteSuccess} />
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-12 lg:item-8">
+            <OrganizationUpdateForm onDeleteSuccess={handleDeleteSuccess} />
+          </div>
+        </div>
       </RequireRequest>
     </Require>
   )

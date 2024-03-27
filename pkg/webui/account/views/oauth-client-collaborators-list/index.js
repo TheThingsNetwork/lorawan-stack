@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
@@ -39,14 +38,10 @@ const OAuthClientCollaboratorsList = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.collaborators} />
-        <Col>
-          <CollaboratorsTable pageSize={PAGE_SIZES.REGULAR} />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg ">
+      <IntlHelmet title={sharedMessages.collaborators} />
+      <CollaboratorsTable pageSize={PAGE_SIZES.REGULAR} />
+    </div>
   )
 }
 

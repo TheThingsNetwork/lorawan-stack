@@ -16,8 +16,9 @@
   display: flex
   justify-content: space-between
   align-items: center
-  padding: $cs.s 0
+  margin-bottom: $cs.s
   flex-wrap: wrap
+  margin-top: - $ls.xs3 // Compensate visual bounding box of tabs.
 
   &.top-rule
     border-normal('bottom')
@@ -39,7 +40,6 @@
 
   &-left
     flex-basis: auto
-    padding: $cs.xxs $cs.s $cs.xxs 0
 
   &-right
     flex: 1
