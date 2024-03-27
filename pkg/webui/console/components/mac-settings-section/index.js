@@ -15,6 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
+import { useSelector } from 'react-redux'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -41,7 +42,6 @@ import {
 } from '@console/lib/device-utils'
 
 import { selectDataRates } from '@console/store/selectors/configuration'
-import { useSelector } from 'react-redux'
 
 const m = defineMessages({
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
