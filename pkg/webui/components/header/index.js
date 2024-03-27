@@ -27,7 +27,7 @@ const Header = ({
   Logo,
   className,
   addDropdownItems,
-  starDropdownItems,
+  bookmarkDropdownItems,
   profileDropdownItems,
   notificationsDropdownItems,
   user,
@@ -52,7 +52,7 @@ const Header = ({
       <Button
         secondary
         icon="bookmark"
-        dropdownItems={starDropdownItems}
+        dropdownItems={bookmarkDropdownItems}
         dropdownClassName={style.bookmarksDropdown}
         dropdownPosition="below left"
         className="xs:d-none"
@@ -85,6 +85,8 @@ Header.propTypes = {
   Logo: PropTypes.elementType.isRequired,
   /** The dropdown items when the add button is clicked. */
   addDropdownItems: PropTypes.node.isRequired,
+  /** The dropdown items when the bookmark button is clicked. */
+  bookmarkDropdownItems: PropTypes.node.isRequired,
   brandLogo: imgPropType,
   /** The classname applied to the component. */
   className: PropTypes.string,
@@ -96,8 +98,6 @@ Header.propTypes = {
   profileDropdownItems: PropTypes.node.isRequired,
   /** Whether to show a notification dot. */
   showNotificationDot: PropTypes.bool,
-  /** The dropdown items when the star button is clicked. */
-  starDropdownItems: PropTypes.node.isRequired,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
    * guest header is rendered.

@@ -28,16 +28,15 @@ import { selectBookmarksList } from '@console/store/selectors/user-preferences'
 import style from './header.styl'
 
 const m = defineMessages({
-  noBookmarks: 'No bookmark yet.',
-  noBookmarksDescription: 'Your bookmarked entities will be listed here.',
+  noBookmarks: 'No bookmarks yet',
+  noBookmarksDescription: 'Your bookmarked entities will be listed here',
+  threshold: 'Only showing latest 15 bookmarks',
 })
 
 const Bookmark = ({ bookmark }) => {
   const { title, path, icon } = useBookmark(bookmark)
 
-  return (
-    <Dropdown.Item title={`${title}`} path={path} icon={icon} messageClassName={style.bookmark} />
-  )
+  return <Dropdown.Item title={title} path={path} icon={icon} messageClassName={style.bookmark} />
 }
 
 Bookmark.propTypes = {
@@ -62,9 +61,14 @@ const BookmarksDropdown = () => {
     </div>
   ) : (
     <>
-      {dropdownItems.slice(0, 6).map((bookmark, i) => (
-        <Bookmark key={i} bookmark={bookmark} />
+      {dropdownItems.slice(0, 15).map(bookmark => (
+        <Bookmark key={bookmark.created_at} bookmark={bookmark} />
       ))}
+      {dropdownItems.length > 15 && (
+        <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
+          <Message content={m.threshold} />
+        </div>
+      )}
     </>
   )
 }

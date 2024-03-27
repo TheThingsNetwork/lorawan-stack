@@ -122,7 +122,7 @@ const Header = ({ onMenuClick }) => {
       user={user}
       profileDropdownItems={dropdownItems}
       addDropdownItems={plusDropdownItems}
-      starDropdownItems={<BookmarksDropdown />}
+      bookmarkDropdownItems={<BookmarksDropdown />}
       notificationsDropdownItems={<NotificationsDropdown />}
       brandLogo={brandLogo}
       Logo={Logo}
