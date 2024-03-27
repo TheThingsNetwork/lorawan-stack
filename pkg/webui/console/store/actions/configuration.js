@@ -41,3 +41,12 @@ export const [
     failure: getGsFrequencyPlansFailure,
   },
 ] = createRequestActions(GET_GS_FREQUENCY_PLANS_BASE)
+
+export const GET_BANDS_LIST_BASE = 'GET_BANDS_LIST'
+export const [
+  { request: GET_BANDS_LIST, success: GET_BANDS_LIST_SUCCESS, failure: GET_BANDS_LIST_FAILURE },
+  { request: getBandsList, success: getBandsListSuccess, failure: getBandsListFailure },
+] = createRequestActions(GET_BANDS_LIST_BASE, (bandId, phyVersion) => ({
+  bandId,
+  phyVersion,
+}))

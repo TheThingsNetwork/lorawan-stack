@@ -57,4 +57,14 @@ const getGsFrequencyPlansLogic = createRequestLogic({
   },
 })
 
-export default [getNsFrequencyPlansLogic, getGsFrequencyPlansLogic]
+const getBandsListLogic = createRequestLogic({
+  type: configuration.GET_BANDS_LIST,
+  process: async ({ action }) => {
+    const { bandId, phyVersion } = action.payload
+    const bands = (await tts.Configuration.listBands(bandId, phyVersion)).descriptions
+
+    return bands
+  },
+})
+
+export default [getNsFrequencyPlansLogic, getGsFrequencyPlansLogic, getBandsListLogic]

@@ -49,6 +49,8 @@ import {
   generate16BytesKey,
 } from '@console/lib/device-utils'
 
+import { getBandsList } from '@console/store/actions/configuration'
+
 import messages from '../messages'
 import {
   isDeviceABP,
@@ -92,6 +94,8 @@ const NetworkServerForm = React.memo(props => {
     supports_class_c = false,
     version_ids = {},
   } = device
+
+  const dispatch = useDispatch()
 
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
@@ -147,6 +151,7 @@ const NetworkServerForm = React.memo(props => {
         setMacSettings(settings)
         if (formRef.current) {
           const { setValues, values } = formRef.current
+          const adrDynamic = values.mac_settings.adr?.dynamic
           setValues(
             validationSchema.cast(
               {
@@ -161,7 +166,17 @@ const NetworkServerForm = React.memo(props => {
                     'dynamic' in values.mac_settings.adr
                       ? {
                           dynamic: {
-                            margin: values.mac_settings.adr.dynamic?.margin ?? settings.adr_margin,
+                            ...adrDynamic,
+                            margin: adrDynamic?.margin ?? settings.adr_margin,
+                            _use_default_nb_trans:
+                              Boolean(adrDynamic?.min_nb_trans) || Boolean(adrDynamic?.max_nb_trans)
+                                ? false
+                                : !(adrDynamic?.overrides.length > 0),
+                            min_nb_trans: adrDynamic?.min_nb_trans ?? 1,
+                            max_nb_trans: adrDynamic?.max_nb_trans ?? 3,
+                            _override_nb_trans_defaults:
+                              Boolean(adrDynamic?.min_nb_trans) &&
+                              Boolean(adrDynamic?.max_nb_trans),
                           },
                         }
                       : values.mac_settings.adr,
@@ -201,9 +216,18 @@ const NetworkServerForm = React.memo(props => {
         phyVersionRef.current = phyVersion
 
         getMacSettings(freqPlan, phyVersion)
+        dispatch(getBandsList(bandId, phyVersion))
       }
     }
-  }, [freqPlan, getDefaultMacSettings, lorawanVersion, phyVersion, validationContext])
+  }, [
+    freqPlan,
+    getDefaultMacSettings,
+    lorawanVersion,
+    phyVersion,
+    validationContext,
+    bandId,
+    dispatch,
+  ])
 
   const initialActivationMode = supports_join
     ? ACTIVATION_MODES.OTAA
@@ -225,6 +249,23 @@ const NetworkServerForm = React.memo(props => {
             ...defaultValues.mac_settings,
             ...macSettings,
             ...device.mac_settings,
+            adr: {
+              dynamic: {
+                ...device.mac_settings.adr?.dynamic,
+                min_nb_trans: device.mac_settings.adr?.dynamic?.min_nb_trans ?? null,
+                max_nb_trans: device.mac_settings.adr?.dynamic?.max_nb_trans ?? null,
+                overrides: device.mac_settings.adr?.dynamic?.overrides
+                  ? Object.keys(device.mac_settings.adr?.dynamic?.overrides).reduce(
+                      (result, key) =>
+                        result.concat({
+                          data_rate: key.replace('data_rate_', ''),
+                          ...device.mac_settings.adr?.dynamic?.overrides[key],
+                        }),
+                      [],
+                    )
+                  : [],
+              },
+            },
           },
         },
         { context: validationContext, stripUnknown: true },
@@ -232,7 +273,6 @@ const NetworkServerForm = React.memo(props => {
     [device, initialActivationMode, isClassB, isClassC, macSettings, validationContext],
   )
 
-  const dispatch = useDispatch()
   const appId = device.ids.application_ids.application_id
   const devId = device.ids.device_id
   const handleMacReset = React.useCallback(async () => {
@@ -252,7 +292,25 @@ const NetworkServerForm = React.memo(props => {
 
   const handleSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      const castedValues = validationSchema.cast(values, {
+      let parsedValues = values
+      // If the nbTrans values are not overridden, remove them from the payload.
+      if (!values.mac_settings.adr.dynamic._override_nb_trans_defaults) {
+        const { max_nb_trans, min_nb_trans, ...rest } = parsedValues.mac_settings.adr.dynamic
+        parsedValues = {
+          ...parsedValues,
+          mac_settings: {
+            ...parsedValues.mac_settings,
+            adr: {
+              ...parsedValues.mac_settings.adr,
+              dynamic: {
+                ...rest,
+              },
+            },
+          },
+        }
+      }
+
+      const castedValues = validationSchema.cast(parsedValues, {
         context: validationContext,
         stripUnknown: true,
       })
@@ -296,6 +354,16 @@ const NetworkServerForm = React.memo(props => {
       if (patch.mac_settings.adr) {
         patch.mac_settings.adr_margin = null
         patch.mac_settings.use_adr = null
+      }
+
+      if (patch.mac_settings.adr.dynamic?.overrides) {
+        patch.mac_settings.adr.dynamic.overrides = patch.mac_settings.adr.dynamic.overrides.reduce(
+          (result, { data_rate, min_nb_trans, max_nb_trans }) => ({
+            ...result,
+            [`data_rate_${data_rate}`]: { min_nb_trans, max_nb_trans },
+          }),
+          {},
+        )
       }
 
       setError('')
@@ -541,6 +609,7 @@ const NetworkServerForm = React.memo(props => {
         lorawanVersion={lorawanVersion}
         isClassB={isClassB}
         isClassC={isClassC}
+        bandId={bandId}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
