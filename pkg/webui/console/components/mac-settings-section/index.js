@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { useSelector } from 'react-redux'
+import { createSelector } from 'reselect'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -41,6 +41,7 @@ import {
 } from '@console/lib/device-utils'
 
 import { selectDataRates } from '@console/store/selectors/configuration'
+import { useSelector } from 'react-redux'
 
 const m = defineMessages({
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
@@ -151,15 +152,21 @@ const MacSettingsSection = props => {
   } = props
 
   const { values, setFieldValue, setFieldTouched } = useFormContext()
-  const dataRates = useSelector(state => selectDataRates(state, bandId, values.lorawan_phy_version))
-  const dataRateOverrideOptions = Object.keys(dataRates).reduce(
-    (result, key) =>
-      result.concat({
-        label: getDataRate(dataRates[key].rate),
-        value: key,
-      }),
-    [],
+  const dataRateOverrideOptions = useSelector(
+    createSelector(
+      state => selectDataRates(state, bandId, values.lorawan_phy_version),
+      dataRates =>
+        Object.keys(dataRates).reduce(
+          (result, key) =>
+            result.concat({
+              label: getDataRate(dataRates[key].rate),
+              value: key,
+            }),
+          [],
+        ),
+    ),
   )
+
   const { mac_settings } = values
   const isNewLorawanVersion = parseLorawanMacVersion(lorawanVersion) >= 110
   const isABP = activationMode === ACTIVATION_MODES.ABP
