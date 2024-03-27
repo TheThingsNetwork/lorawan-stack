@@ -369,6 +369,9 @@ const validationSchema = Yup.object()
             return Yup.object().shape({
               dynamic: Yup.object().shape({
                 margin: Yup.number().nullable(),
+                min_nb_trans: Yup.number().nullable(),
+                max_nb_trans: Yup.number().nullable(),
+                overrides: Yup.array(),
               }),
             })
           }),
