@@ -16,8 +16,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Searching for collaborators displays only accounts that are not already attached to the entity's collaborator list.
-
 ### Deprecated
 
 ### Removed
@@ -25,6 +23,26 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 ### Security
+
+## [3.30.0] - unreleased
+
+### Added
+
+- Fine grained NbTrans overrides for the dynamic ADR mode. See the `--mac-settings.adr.mode.dynamic.overrides.data-rate-[index].min-nb-trans` and `--mac-settings.adr.mode.dynamic.overrides.data-rate-[index].max-nb-trans` family of parameters.
+- Support for storing user's bookmarks in the database.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the new `user_bookmarks` table.
+- Support for storing user's Console Preferences in the database.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the new `console_preferences` column in the `users` table.
+
+### Changed
+
+- Searching for collaborators displays only accounts that are not already attached to the entity's collaborator list.
+
+## [3.29.2] - 2024-03-26
+
+### Fixed
+
+- Memory leak in components which heavily use HTTP clients, such as the Application Server.
 
 ## [3.29.1] - 2024-03-05
 
@@ -2778,7 +2796,9 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.1...v3.29
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.0...v3.30
+[3.30.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.2...v3.30.0
+[3.29.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.1...v3.29.2
 [3.29.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.0...v3.29.1
 [3.29.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.2...v3.29.0
 [3.28.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.28.1...v3.28.2

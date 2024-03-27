@@ -18,6 +18,7 @@ package ttn.lorawan.v3;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "ttn/lorawan/v3/application.proto";
 import "ttn/lorawan/v3/identifiers.proto";
 import "ttn/lorawan/v3/rights.proto";
@@ -27,6 +28,7 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 // The ApplicationRegistry service, exposed by the Identity Server, is used to manage
 // application registrations.
 service ApplicationRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage applications."};
   // Create a new application. This also sets the given organization or user as
   // first collaborator with all possible rights.
   rpc Create(CreateApplicationRequest) returns (Application) {
@@ -97,9 +99,10 @@ service ApplicationRegistry {
   }
 }
 
-// The ApplicationAcces service, exposed by the Identity Server, is used to manage
+// The ApplicationAccess service, exposed by the Identity Server, is used to manage
 // API keys and collaborators of applications.
 service ApplicationAccess {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage access to applications."};
   // List the rights the caller has on this application.
   rpc ListRights(ApplicationIdentifiers) returns (Rights) {
     option (google.api.http) = {get: "/applications/{application_id}/rights"};
