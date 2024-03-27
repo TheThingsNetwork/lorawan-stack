@@ -25,6 +25,7 @@ import {
   getInboxNotifications,
   getUnseenNotificationsPeriodically,
 } from '@console/store/actions/notifications'
+import { getBookmarksList } from '@console/store/actions/user-preferences'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
@@ -66,11 +67,12 @@ const consoleAppLogic = createRequestLogic({
           'name',
           'primary_email_address_validated_at',
           'profile_picture',
-          'console_preferences',
         ])
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))
         dispatch(getInboxNotifications({ page: 1, limit: 3 }))
+        // dispatch(addBookmark(userId, { application_ids: { application_id: 'darya' } }))
+        dispatch(getBookmarksList(userId, { page: 1, limit: 20 }))
         dispatch(getUnseenNotificationsPeriodically())
       } catch (error) {
         dispatch(user.getUserMeFailure(error))
