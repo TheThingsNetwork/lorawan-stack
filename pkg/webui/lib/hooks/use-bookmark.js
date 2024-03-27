@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useCallback } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { getApplication } from '@console/store/actions/applications'
 import { getGateway } from '@console/store/actions/gateways'
@@ -30,45 +33,53 @@ const iconMap = {
   device: 'device',
 }
 
-const getApplicationName = (appId, selectors) => getApplication(appId.id, selectors)
-const getGatewayName = (gatewayId, selectors) => getGateway(gatewayId.id, selectors)
-const getOrganizationName = (organizationId, selectors) =>
-  getOrganization(organizationId.id, selectors)
-const getUserName = (userId, selectors) => getUser(userId.id, selectors)
-const getClientName = (clientId, selectors) => getClient(clientId.id, selectors)
-const getDeviceName = (devId, selectors) => getDevice(devId.appId, devId.id, selectors)
-
-const requestMap = {
-  application: getApplicationName,
-  gateway: getGatewayName,
-  organization: getOrganizationName,
-  user: getUserName,
-  client: getClientName,
-  device: getDeviceName,
+const entityRequestMap = {
+  application: getApplication,
+  gateway: getGateway,
+  organization: getOrganization,
+  user: getUser,
+  client: getClient,
+  device: getDevice,
 }
 
+/**
+ * Module for getting the title, path, and icon corresponding to a bookmark.
+ * Using this because for each bookmark we need to make a request to get the name of the entity, compose the path and find the icon.
+ *
+ * @param {*} bookmark - The bookmark object.
+ * @returns {*} - An object containing the title, path, and icon of the bookmark.
+ */
 const useBookmark = bookmark => {
-  const entityName = Object.keys(bookmark.entity_ids)[0].replace('_ids', '')
-  const icon = iconMap[entityName]
+  const dispatch = useDispatch()
+  const entityIds = bookmark.entity_ids
+  // Get the entity of the bookmark.
+  const entity = Object.keys(entityIds)[0].replace('_ids', '')
+  // Get the entity id.
+  const entityId = {
+    id: entityIds[`${entity}_ids`][`${entity}_id`],
+  }
+  if (entity === 'device') {
+    entityId.appId = entityIds[`${entity}_ids`].application_ids.application_id
+  }
+  const [bookmarkTitle, setBookmarkTitle] = useState('')
+  useEffect(() => {
+    const fetchEntity = async () => {
+      // TODO: Do thios witj selectors checking the selected entity and see if it's already in store.
+      const response = await dispatch(attachPromise(entityRequestMap[entity](entityId.id, 'name')))
+      setBookmarkTitle(response.name || entityIds[`${entity}_ids`][`${entity}_id`])
+    }
+    fetchEntity()
+  }, [entity, entityId, dispatch, entityIds])
+
+  // Get the icon corresponding to the entity.
+  const icon = iconMap[entity]
+  // Get the path corresponding to the entity.
   const path =
-    entityName === 'device'
-      ? `/applications/${bookmark.entity_ids.device_ids.application_ids.application_id}/devices/${bookmark.entity_ids.device_ids.device_id}`
-      : `/${entityName}s/${bookmark.entity_ids[`${entityName}_ids`][`${entityName}_id`]}`
+    entity === 'device'
+      ? `/applications/${entityIds.device_ids.application_ids.application_id}/devices/${entityIds.device_ids.device_id}`
+      : `/${entity}s/${entityIds[`${entity}_ids`][`${entity}_id`]}`
 
-  const funcArgument = {
-    id: bookmark.entity_ids[`${entityName}_ids`][`${entityName}_id`],
-  }
-  if (entityName === 'device') {
-    funcArgument.appId = bookmark.entity_ids[`${entityName}_ids`].application_ids.application_id
-  }
-  const getTitle = useCallback(() => {
-    const entity = requestMap[entityName](funcArgument, 'name')
-    return entity.name
-  }, [entityName, funcArgument])
-
-  const title = getTitle() || bookmark.entity_ids[`${entityName}_ids`][`${entityName}_id`]
-
-  return { title, path, icon }
+  return { title: bookmarkTitle, path, icon }
 }
 
 export default useBookmark
