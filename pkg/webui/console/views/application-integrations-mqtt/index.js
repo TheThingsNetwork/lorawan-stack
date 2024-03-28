@@ -141,6 +141,7 @@ const ApplicationMqtt = () => {
             message={m.generateApiKey}
             onClick={handleGeneratePasswordClick}
             className="mr-cs-s"
+            secondary
           />
           <Link to={`/applications/${appId}/api-keys`} naked secondary>
             <Message content={m.goToApiKeys} />

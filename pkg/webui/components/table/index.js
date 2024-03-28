@@ -215,7 +215,7 @@ Tabular.propTypes = {
       render: PropTypes.func,
       sortable: PropTypes.bool,
       sortKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-      width: PropTypes.number,
+      width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       className: PropTypes.string,
     }),
   ).isRequired,

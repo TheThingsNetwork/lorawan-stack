@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import { IconUsersGroup } from '@ttn-lw/components/icon'
+
 import SidebarContext from '@console/containers/sidebar/context'
 
 import Link from './link'
@@ -35,6 +37,6 @@ export default {
 
 export const Default = () => (
   <div style={{ maxWidth: '20rem' }}>
-    <Link title="Example name" icon="group" path="example-path" exact />
+    <Link title="Example name" icon={IconUsersGroup} path="example-path" exact />
   </div>
 )

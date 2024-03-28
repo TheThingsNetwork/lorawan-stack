@@ -1710,6 +1710,436 @@ func (m *ADRSettings_DynamicMode_ChannelSteeringSettings) SetFromFlags(flags *pf
 	return paths, nil
 }
 
+// AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride adds flags to select fields in ADRSettings_DynamicMode_PerDataRateIndexOverride.
+func AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("min-nb-trans", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("min-nb-trans", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("max-nb-trans", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("max-nb-trans", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode_PerDataRateIndexOverride message from select flags.
+func PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("min_nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("min_nb_trans", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("max_nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("max_nb_trans", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride adds flags to select fields in ADRSettings_DynamicMode_PerDataRateIndexOverride.
+func AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("min-nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("max-nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ADRSettings_DynamicMode_PerDataRateIndexOverride message from flags.
+func (m *ADRSettings_DynamicMode_PerDataRateIndexOverride) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("min_nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.MinNbTrans = &wrapperspb.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("min_nb_trans", prefix))
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("max_nb_trans", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.MaxNbTrans = &wrapperspb.UInt32Value{Value: val}
+		paths = append(paths, flagsplugin.Prefix("max_nb_trans", prefix))
+	}
+	return paths, nil
+}
+
+// AddSelectFlagsForADRSettings_DynamicMode_Overrides adds flags to select fields in ADRSettings_DynamicMode_Overrides.
+func AddSelectFlagsForADRSettings_DynamicMode_Overrides(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-0", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-0", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-0", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-1", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-1", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-1", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-2", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-2", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-2", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-3", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-3", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-3", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-4", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-4", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-4", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-5", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-5", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-5", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-6", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-6", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-6", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-7", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-7", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-7", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-8", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-8", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-8", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-9", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-9", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-9", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-10", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-10", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-10", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-11", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-11", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-11", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-12", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-12", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-12", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-13", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-13", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-13", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-14", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-14", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-14", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("data-rate-15", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("data-rate-15", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-15", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode_Overrides message from select flags.
+func PathsFromSelectFlagsForADRSettings_DynamicMode_Overrides(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_0", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_0", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_0", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_1", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_1", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_1", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_2", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_2", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_2", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_3", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_3", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_3", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_4", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_4", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_4", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_5", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_5", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_5", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_6", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_6", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_6", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_7", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_7", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_7", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_8", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_8", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_8", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_9", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_9", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_9", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_10", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_10", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_10", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_11", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_11", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_11", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_12", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_12", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_12", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_13", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_13", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_13", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_14", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_14", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_14", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("data_rate_15", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("data_rate_15", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data_rate_15", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForADRSettings_DynamicMode_Overrides adds flags to select fields in ADRSettings_DynamicMode_Overrides.
+func AddSetFlagsForADRSettings_DynamicMode_Overrides(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-0", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-1", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-2", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-3", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-4", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-5", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-6", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-7", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-8", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-9", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-10", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-11", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-12", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-13", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-14", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_PerDataRateIndexOverride(flags, flagsplugin.Prefix("data-rate-15", prefix), hidden)
+}
+
+// SetFromFlags sets the ADRSettings_DynamicMode_Overrides message from flags.
+func (m *ADRSettings_DynamicMode_Overrides) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_0", prefix)); changed {
+		if m.DataRate_0 == nil {
+			m.DataRate_0 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_0.SetFromFlags(flags, flagsplugin.Prefix("data_rate_0", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_1", prefix)); changed {
+		if m.DataRate_1 == nil {
+			m.DataRate_1 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_1.SetFromFlags(flags, flagsplugin.Prefix("data_rate_1", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_2", prefix)); changed {
+		if m.DataRate_2 == nil {
+			m.DataRate_2 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_2.SetFromFlags(flags, flagsplugin.Prefix("data_rate_2", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_3", prefix)); changed {
+		if m.DataRate_3 == nil {
+			m.DataRate_3 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_3.SetFromFlags(flags, flagsplugin.Prefix("data_rate_3", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_4", prefix)); changed {
+		if m.DataRate_4 == nil {
+			m.DataRate_4 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_4.SetFromFlags(flags, flagsplugin.Prefix("data_rate_4", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_5", prefix)); changed {
+		if m.DataRate_5 == nil {
+			m.DataRate_5 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_5.SetFromFlags(flags, flagsplugin.Prefix("data_rate_5", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_6", prefix)); changed {
+		if m.DataRate_6 == nil {
+			m.DataRate_6 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_6.SetFromFlags(flags, flagsplugin.Prefix("data_rate_6", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_7", prefix)); changed {
+		if m.DataRate_7 == nil {
+			m.DataRate_7 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_7.SetFromFlags(flags, flagsplugin.Prefix("data_rate_7", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_8", prefix)); changed {
+		if m.DataRate_8 == nil {
+			m.DataRate_8 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_8.SetFromFlags(flags, flagsplugin.Prefix("data_rate_8", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_9", prefix)); changed {
+		if m.DataRate_9 == nil {
+			m.DataRate_9 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_9.SetFromFlags(flags, flagsplugin.Prefix("data_rate_9", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_10", prefix)); changed {
+		if m.DataRate_10 == nil {
+			m.DataRate_10 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_10.SetFromFlags(flags, flagsplugin.Prefix("data_rate_10", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_11", prefix)); changed {
+		if m.DataRate_11 == nil {
+			m.DataRate_11 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_11.SetFromFlags(flags, flagsplugin.Prefix("data_rate_11", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_12", prefix)); changed {
+		if m.DataRate_12 == nil {
+			m.DataRate_12 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_12.SetFromFlags(flags, flagsplugin.Prefix("data_rate_12", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_13", prefix)); changed {
+		if m.DataRate_13 == nil {
+			m.DataRate_13 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_13.SetFromFlags(flags, flagsplugin.Prefix("data_rate_13", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_14", prefix)); changed {
+		if m.DataRate_14 == nil {
+			m.DataRate_14 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_14.SetFromFlags(flags, flagsplugin.Prefix("data_rate_14", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("data_rate_15", prefix)); changed {
+		if m.DataRate_15 == nil {
+			m.DataRate_15 = &ADRSettings_DynamicMode_PerDataRateIndexOverride{}
+		}
+		if setPaths, err := m.DataRate_15.SetFromFlags(flags, flagsplugin.Prefix("data_rate_15", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForADRSettings_DynamicMode adds flags to select fields in ADRSettings_DynamicMode.
 func AddSelectFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("margin", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("margin", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -1723,6 +2153,8 @@ func AddSelectFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix strin
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("max-nb-trans", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("max-nb-trans", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("channel-steering", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("channel-steering", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags, flagsplugin.Prefix("channel-steering", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("overrides", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("overrides", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForADRSettings_DynamicMode_Overrides(flags, flagsplugin.Prefix("overrides", prefix), hidden)
 }
 
 // SelectFromFlags outputs the fieldmask paths forADRSettings_DynamicMode message from select flags.
@@ -1782,6 +2214,16 @@ func PathsFromSelectFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix
 	} else {
 		paths = append(paths, selectPaths...)
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("overrides", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("overrides", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForADRSettings_DynamicMode_Overrides(flags, flagsplugin.Prefix("overrides", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
 	return paths, nil
 }
 
@@ -1797,6 +2239,7 @@ func AddSetFlagsForADRSettings_DynamicMode(flags *pflag.FlagSet, prefix string, 
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("min-nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("max-nb-trans", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForADRSettings_DynamicMode_ChannelSteeringSettings(flags, flagsplugin.Prefix("channel-steering", prefix), hidden)
+	AddSetFlagsForADRSettings_DynamicMode_Overrides(flags, flagsplugin.Prefix("overrides", prefix), hidden)
 }
 
 // SetFromFlags sets the ADRSettings_DynamicMode message from flags.
@@ -1856,6 +2299,16 @@ func (m *ADRSettings_DynamicMode) SetFromFlags(flags *pflag.FlagSet, prefix stri
 			m.ChannelSteering = &ADRSettings_DynamicMode_ChannelSteeringSettings{}
 		}
 		if setPaths, err := m.ChannelSteering.SetFromFlags(flags, flagsplugin.Prefix("channel_steering", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("overrides", prefix)); changed {
+		if m.Overrides == nil {
+			m.Overrides = &ADRSettings_DynamicMode_Overrides{}
+		}
+		if setPaths, err := m.Overrides.SetFromFlags(flags, flagsplugin.Prefix("overrides", prefix)); err != nil {
 			return nil, err
 		} else {
 			paths = append(paths, setPaths...)

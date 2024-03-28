@@ -490,6 +490,126 @@ func (v *ADRSettings_DynamicMode_ChannelSteeringSettings) FieldIsZero(p string) 
 }
 
 // FieldIsZero returns whether path p is zero.
+func (v *ADRSettings_DynamicMode_PerDataRateIndexOverride) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "min_nb_trans":
+		return v.MinNbTrans == nil
+	case "max_nb_trans":
+		return v.MaxNbTrans == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ADRSettings_DynamicMode_Overrides) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "data_rate_0":
+		return v.DataRate_0 == nil
+	case "data_rate_0.min_nb_trans":
+		return v.DataRate_0.FieldIsZero("min_nb_trans")
+	case "data_rate_0.max_nb_trans":
+		return v.DataRate_0.FieldIsZero("max_nb_trans")
+	case "data_rate_1":
+		return v.DataRate_1 == nil
+	case "data_rate_1.min_nb_trans":
+		return v.DataRate_1.FieldIsZero("min_nb_trans")
+	case "data_rate_1.max_nb_trans":
+		return v.DataRate_1.FieldIsZero("max_nb_trans")
+	case "data_rate_2":
+		return v.DataRate_2 == nil
+	case "data_rate_2.min_nb_trans":
+		return v.DataRate_2.FieldIsZero("min_nb_trans")
+	case "data_rate_2.max_nb_trans":
+		return v.DataRate_2.FieldIsZero("max_nb_trans")
+	case "data_rate_3":
+		return v.DataRate_3 == nil
+	case "data_rate_3.min_nb_trans":
+		return v.DataRate_3.FieldIsZero("min_nb_trans")
+	case "data_rate_3.max_nb_trans":
+		return v.DataRate_3.FieldIsZero("max_nb_trans")
+	case "data_rate_4":
+		return v.DataRate_4 == nil
+	case "data_rate_4.min_nb_trans":
+		return v.DataRate_4.FieldIsZero("min_nb_trans")
+	case "data_rate_4.max_nb_trans":
+		return v.DataRate_4.FieldIsZero("max_nb_trans")
+	case "data_rate_5":
+		return v.DataRate_5 == nil
+	case "data_rate_5.min_nb_trans":
+		return v.DataRate_5.FieldIsZero("min_nb_trans")
+	case "data_rate_5.max_nb_trans":
+		return v.DataRate_5.FieldIsZero("max_nb_trans")
+	case "data_rate_6":
+		return v.DataRate_6 == nil
+	case "data_rate_6.min_nb_trans":
+		return v.DataRate_6.FieldIsZero("min_nb_trans")
+	case "data_rate_6.max_nb_trans":
+		return v.DataRate_6.FieldIsZero("max_nb_trans")
+	case "data_rate_7":
+		return v.DataRate_7 == nil
+	case "data_rate_7.min_nb_trans":
+		return v.DataRate_7.FieldIsZero("min_nb_trans")
+	case "data_rate_7.max_nb_trans":
+		return v.DataRate_7.FieldIsZero("max_nb_trans")
+	case "data_rate_8":
+		return v.DataRate_8 == nil
+	case "data_rate_8.min_nb_trans":
+		return v.DataRate_8.FieldIsZero("min_nb_trans")
+	case "data_rate_8.max_nb_trans":
+		return v.DataRate_8.FieldIsZero("max_nb_trans")
+	case "data_rate_9":
+		return v.DataRate_9 == nil
+	case "data_rate_9.min_nb_trans":
+		return v.DataRate_9.FieldIsZero("min_nb_trans")
+	case "data_rate_9.max_nb_trans":
+		return v.DataRate_9.FieldIsZero("max_nb_trans")
+	case "data_rate_10":
+		return v.DataRate_10 == nil
+	case "data_rate_10.min_nb_trans":
+		return v.DataRate_10.FieldIsZero("min_nb_trans")
+	case "data_rate_10.max_nb_trans":
+		return v.DataRate_10.FieldIsZero("max_nb_trans")
+	case "data_rate_11":
+		return v.DataRate_11 == nil
+	case "data_rate_11.min_nb_trans":
+		return v.DataRate_11.FieldIsZero("min_nb_trans")
+	case "data_rate_11.max_nb_trans":
+		return v.DataRate_11.FieldIsZero("max_nb_trans")
+	case "data_rate_12":
+		return v.DataRate_12 == nil
+	case "data_rate_12.min_nb_trans":
+		return v.DataRate_12.FieldIsZero("min_nb_trans")
+	case "data_rate_12.max_nb_trans":
+		return v.DataRate_12.FieldIsZero("max_nb_trans")
+	case "data_rate_13":
+		return v.DataRate_13 == nil
+	case "data_rate_13.min_nb_trans":
+		return v.DataRate_13.FieldIsZero("min_nb_trans")
+	case "data_rate_13.max_nb_trans":
+		return v.DataRate_13.FieldIsZero("max_nb_trans")
+	case "data_rate_14":
+		return v.DataRate_14 == nil
+	case "data_rate_14.min_nb_trans":
+		return v.DataRate_14.FieldIsZero("min_nb_trans")
+	case "data_rate_14.max_nb_trans":
+		return v.DataRate_14.FieldIsZero("max_nb_trans")
+	case "data_rate_15":
+		return v.DataRate_15 == nil
+	case "data_rate_15.min_nb_trans":
+		return v.DataRate_15.FieldIsZero("min_nb_trans")
+	case "data_rate_15.max_nb_trans":
+		return v.DataRate_15.FieldIsZero("max_nb_trans")
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
 func (v *ADRSettings_DynamicMode) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
@@ -521,6 +641,104 @@ func (v *ADRSettings_DynamicMode) FieldIsZero(p string) bool {
 		return v.MinNbTrans == nil
 	case "max_nb_trans":
 		return v.MaxNbTrans == nil
+	case "overrides":
+		return v.Overrides == nil
+	case "overrides.data_rate_0":
+		return v.Overrides.FieldIsZero("data_rate_0")
+	case "overrides.data_rate_0.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_0.min_nb_trans")
+	case "overrides.data_rate_0.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_0.max_nb_trans")
+	case "overrides.data_rate_1":
+		return v.Overrides.FieldIsZero("data_rate_1")
+	case "overrides.data_rate_1.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_1.min_nb_trans")
+	case "overrides.data_rate_1.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_1.max_nb_trans")
+	case "overrides.data_rate_2":
+		return v.Overrides.FieldIsZero("data_rate_2")
+	case "overrides.data_rate_2.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_2.min_nb_trans")
+	case "overrides.data_rate_2.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_2.max_nb_trans")
+	case "overrides.data_rate_3":
+		return v.Overrides.FieldIsZero("data_rate_3")
+	case "overrides.data_rate_3.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_3.min_nb_trans")
+	case "overrides.data_rate_3.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_3.max_nb_trans")
+	case "overrides.data_rate_4":
+		return v.Overrides.FieldIsZero("data_rate_4")
+	case "overrides.data_rate_4.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_4.min_nb_trans")
+	case "overrides.data_rate_4.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_4.max_nb_trans")
+	case "overrides.data_rate_5":
+		return v.Overrides.FieldIsZero("data_rate_5")
+	case "overrides.data_rate_5.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_5.min_nb_trans")
+	case "overrides.data_rate_5.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_5.max_nb_trans")
+	case "overrides.data_rate_6":
+		return v.Overrides.FieldIsZero("data_rate_6")
+	case "overrides.data_rate_6.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_6.min_nb_trans")
+	case "overrides.data_rate_6.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_6.max_nb_trans")
+	case "overrides.data_rate_7":
+		return v.Overrides.FieldIsZero("data_rate_7")
+	case "overrides.data_rate_7.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_7.min_nb_trans")
+	case "overrides.data_rate_7.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_7.max_nb_trans")
+	case "overrides.data_rate_8":
+		return v.Overrides.FieldIsZero("data_rate_8")
+	case "overrides.data_rate_8.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_8.min_nb_trans")
+	case "overrides.data_rate_8.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_8.max_nb_trans")
+	case "overrides.data_rate_9":
+		return v.Overrides.FieldIsZero("data_rate_9")
+	case "overrides.data_rate_9.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_9.min_nb_trans")
+	case "overrides.data_rate_9.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_9.max_nb_trans")
+	case "overrides.data_rate_10":
+		return v.Overrides.FieldIsZero("data_rate_10")
+	case "overrides.data_rate_10.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_10.min_nb_trans")
+	case "overrides.data_rate_10.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_10.max_nb_trans")
+	case "overrides.data_rate_11":
+		return v.Overrides.FieldIsZero("data_rate_11")
+	case "overrides.data_rate_11.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_11.min_nb_trans")
+	case "overrides.data_rate_11.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_11.max_nb_trans")
+	case "overrides.data_rate_12":
+		return v.Overrides.FieldIsZero("data_rate_12")
+	case "overrides.data_rate_12.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_12.min_nb_trans")
+	case "overrides.data_rate_12.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_12.max_nb_trans")
+	case "overrides.data_rate_13":
+		return v.Overrides.FieldIsZero("data_rate_13")
+	case "overrides.data_rate_13.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_13.min_nb_trans")
+	case "overrides.data_rate_13.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_13.max_nb_trans")
+	case "overrides.data_rate_14":
+		return v.Overrides.FieldIsZero("data_rate_14")
+	case "overrides.data_rate_14.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_14.min_nb_trans")
+	case "overrides.data_rate_14.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_14.max_nb_trans")
+	case "overrides.data_rate_15":
+		return v.Overrides.FieldIsZero("data_rate_15")
+	case "overrides.data_rate_15.min_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_15.min_nb_trans")
+	case "overrides.data_rate_15.max_nb_trans":
+		return v.Overrides.FieldIsZero("data_rate_15.max_nb_trans")
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -569,6 +787,104 @@ func (v *ADRSettings) FieldIsZero(p string) bool {
 		return v.GetDynamic().FieldIsZero("min_nb_trans")
 	case "mode.dynamic.max_nb_trans":
 		return v.GetDynamic().FieldIsZero("max_nb_trans")
+	case "mode.dynamic.overrides":
+		return v.GetDynamic().FieldIsZero("overrides")
+	case "mode.dynamic.overrides.data_rate_0":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_0")
+	case "mode.dynamic.overrides.data_rate_0.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_0.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_0.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_0.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_1":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_1")
+	case "mode.dynamic.overrides.data_rate_1.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_1.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_1.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_1.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_2":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_2")
+	case "mode.dynamic.overrides.data_rate_2.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_2.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_2.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_2.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_3":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_3")
+	case "mode.dynamic.overrides.data_rate_3.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_3.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_3.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_3.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_4":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_4")
+	case "mode.dynamic.overrides.data_rate_4.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_4.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_4.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_4.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_5":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_0")
+	case "mode.dynamic.overrides.data_rate_5.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_5.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_5.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_5.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_6":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_6")
+	case "mode.dynamic.overrides.data_rate_6.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_6.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_6.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_6.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_7":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_7")
+	case "mode.dynamic.overrides.data_rate_7.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_7.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_7.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_7.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_8":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_8")
+	case "mode.dynamic.overrides.data_rate_8.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_8.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_8.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_8.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_9":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_9")
+	case "mode.dynamic.overrides.data_rate_9.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_9.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_9.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_9.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_10":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_10")
+	case "mode.dynamic.overrides.data_rate_10.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_10.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_10.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_10.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_11":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_11")
+	case "mode.dynamic.overrides.data_rate_11.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_11.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_11.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_11.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_12":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_12")
+	case "mode.dynamic.overrides.data_rate_12.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_12.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_12.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_12.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_13":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_13")
+	case "mode.dynamic.overrides.data_rate_13.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_13.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_13.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_13.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_14":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_14")
+	case "mode.dynamic.overrides.data_rate_14.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_14.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_14.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_14.max_nb_trans")
+	case "mode.dynamic.overrides.data_rate_15":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_15")
+	case "mode.dynamic.overrides.data_rate_15.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_15.min_nb_trans")
+	case "mode.dynamic.overrides.data_rate_15.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("overrides.data_rate_15.max_nb_trans")
 	case "mode.disabled":
 		return v.GetDisabled() == nil
 	}
@@ -621,6 +937,104 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.Adr.FieldIsZero("mode.dynamic.min_nb_trans")
 	case "adr.mode.dynamic.max_nb_trans":
 		return v.Adr.FieldIsZero("mode.dynamic.max_nb_trans")
+	case "adr.mode.dynamic.overrides":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides")
+	case "adr.mode.dynamic.overrides.data_rate_0":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_0")
+	case "adr.mode.dynamic.overrides.data_rate_0.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_0.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_0.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_0.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_1":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_1")
+	case "adr.mode.dynamic.overrides.data_rate_1.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_1.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_1.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_1.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_2":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_2")
+	case "adr.mode.dynamic.overrides.data_rate_2.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_2.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_2.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_2.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_3":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_3")
+	case "adr.mode.dynamic.overrides.data_rate_3.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_3.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_3.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_3.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_4":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_4")
+	case "adr.mode.dynamic.overrides.data_rate_4.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_4.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_4.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_4.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_5":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_5")
+	case "adr.mode.dynamic.overrides.data_rate_5.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_5.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_5.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_5.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_6":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_6")
+	case "adr.mode.dynamic.overrides.data_rate_6.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_6.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_6.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_6.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_7":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_7")
+	case "adr.mode.dynamic.overrides.data_rate_7.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_7.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_7.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_7.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_8":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_8")
+	case "adr.mode.dynamic.overrides.data_rate_8.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_8.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_8.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_8.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_9":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_9")
+	case "adr.mode.dynamic.overrides.data_rate_9.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_9.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_9.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_9.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_10":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_10")
+	case "adr.mode.dynamic.overrides.data_rate_10.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_10.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_10.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_10.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_11":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_11")
+	case "adr.mode.dynamic.overrides.data_rate_11.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_11.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_11.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_11.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_12":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_12")
+	case "adr.mode.dynamic.overrides.data_rate_12.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_12.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_12.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_12.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_13":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_13")
+	case "adr.mode.dynamic.overrides.data_rate_13.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_13.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_13.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_13.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_14":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_14")
+	case "adr.mode.dynamic.overrides.data_rate_14.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_14.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_14.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_14.max_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_15":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_15")
+	case "adr.mode.dynamic.overrides.data_rate_15.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_15.min_nb_trans")
+	case "adr.mode.dynamic.overrides.data_rate_15.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.overrides.data_rate_15.max_nb_trans")
 	case "adr.mode.disabled":
 		return v.Adr.FieldIsZero("mode.disabled")
 	case "adr_margin":
@@ -1879,6 +2293,104 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MacSettings.FieldIsZero("adr.mode.dynamic.min_nb_trans")
 	case "mac_settings.adr.mode.dynamic.max_nb_trans":
 		return v.MacSettings.FieldIsZero("adr.mode.dynamic.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_0":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_0")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_0.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_0.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_0.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_0.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_1":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_1")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_1.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_1.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_1.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_1.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_2":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_2")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_2.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_2.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_2.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_2.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_3":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_3")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_3.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_3.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_3.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_3.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_4":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_4")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_4.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_4.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_4.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_4.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_5":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_5")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_5.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_5.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_5.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_5.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_6":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_6")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_6.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_6.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_6.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_6.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_7":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_7")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_7.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_7.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_7.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_7.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_8":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_8")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_8.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_8.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_8.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_8.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_9":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_9")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_9.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_9.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_9.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_9.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_10":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_10")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_10.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_10.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_10.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_10.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_11":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_11")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_11.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_11.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_11.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_11.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_12":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_12")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_12.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_12.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_12.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_12.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_13":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_13")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_13.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_13.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_13.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_13.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_14":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_14")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_14.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_14.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_14.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_14.max_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_15":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_15")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_15.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_15.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.overrides.data_rate_15.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.overrides.data_rate_15.max_nb_trans")
 	case "mac_settings.adr.mode.disabled":
 		return v.MacSettings.FieldIsZero("adr.mode.disabled")
 	case "mac_settings.adr_margin":
@@ -2365,6 +2877,11 @@ func (m *SetEndDeviceRequest) FieldIsZero(p string) bool {
 		return true
 	}
 	return m.EndDevice.FieldIsZero(p)
+}
+
+// GetEntityIdentifiers generates EntityIdentifiers from EndDevice.
+func (m *EndDevice) GetEntityIdentifiers() *EntityIdentifiers {
+	return m.GetIds().GetEntityIdentifiers()
 }
 
 // All EntityType methods implement the IDStringer interface.

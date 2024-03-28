@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -24,6 +25,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
@@ -62,6 +64,8 @@ type User struct {
 
 	ProfilePictureID *string  `bun:"profile_picture_id"`
 	ProfilePicture   *Picture `bun:"rel:belongs-to,join:profile_picture_id=id"`
+
+	ConsolePreferences json.RawMessage `bun:"console_preferences"`
 }
 
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
@@ -100,6 +104,8 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 		TemporaryPassword:          m.TemporaryPassword,
 		TemporaryPasswordCreatedAt: ttnpb.ProtoTime(m.TemporaryPasswordCreatedAt),
 		TemporaryPasswordExpiresAt: ttnpb.ProtoTime(m.TemporaryPasswordExpiresAt),
+
+		ConsolePreferences: &ttnpb.UserConsolePreferences{},
 	}
 
 	if len(m.Attributes) > 0 {
@@ -115,6 +121,12 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 			return nil, err
 		}
 		pb.ProfilePicture = picture
+	}
+
+	if len(m.ConsolePreferences) > 0 {
+		if err := jsonpb.TTN().Unmarshal(m.ConsolePreferences, pb.ConsolePreferences); err != nil {
+			return nil, err
+		}
 	}
 
 	if len(fieldMask) == 0 {
@@ -187,6 +199,14 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		userModel.ProfilePictureID = &userModel.ProfilePicture.ID
 	}
 
+	if pb.ConsolePreferences != nil {
+		b, err := jsonpb.TTN().Marshal(pb.ConsolePreferences)
+		if err != nil {
+			return nil, err
+		}
+		userModel.ConsolePreferences = b
+	}
+
 	// Run user+account creation in a transaction if we're not already in one.
 	err := s.transact(ctx, func(ctx context.Context, tx bun.IDB) error {
 		_, err := tx.NewInsert().
@@ -257,6 +277,11 @@ func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask
 				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
 				// Proto name equals model name.
 				columns = append(columns, f)
+			case "console_preferences",
+				"console_preferences.console_theme",
+				"console_preferences.dashboard_layouts",
+				"console_preferences.sort_by":
+				columns = append(columns, "console_preferences")
 			case "attributes":
 				q = q.Relation("Attributes")
 			case "administrative_contact":
@@ -457,6 +482,15 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 ) (err error) {
 	columns := store.FieldMask{"updated_at"}
 
+	consolePreferences := &ttnpb.UserConsolePreferences{}
+	updateConsolePreferences := false
+
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(fieldMask), "console_preferences") && len(model.ConsolePreferences) > 0 {
+		if err := jsonpb.TTN().Unmarshal(model.ConsolePreferences, consolePreferences); err != nil {
+			return err
+		}
+	}
+
 	for _, field := range fieldMask {
 		switch field {
 		case "name":
@@ -549,7 +583,30 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 				model.ProfilePictureID = nil
 				columns = append(columns, "profile_picture_id")
 			}
+
+		case "console_preferences":
+			updateConsolePreferences = true
+			consolePreferences = pb.ConsolePreferences
+		case "console_preferences.console_theme":
+			updateConsolePreferences = true
+			consolePreferences.ConsoleTheme = pb.ConsolePreferences.ConsoleTheme
+		case "console_preferences.dashboard_layouts":
+			updateConsolePreferences = true
+			consolePreferences.DashboardLayouts = pb.ConsolePreferences.GetDashboardLayouts()
+		case "console_preferences.sort_by":
+			updateConsolePreferences = true
+			consolePreferences.SortBy = pb.ConsolePreferences.GetSortBy()
 		}
+	}
+
+	// By separating the update of the console preferences we can allow for partial updates.
+	if updateConsolePreferences {
+		b, err := jsonpb.TTN().Marshal(consolePreferences)
+		if err != nil {
+			return err
+		}
+		model.ConsolePreferences = b
+		columns = append(columns, "console_preferences")
 	}
 
 	_, err = s.DB.NewUpdate().

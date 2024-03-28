@@ -54,11 +54,11 @@ class Example extends React.Component {
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <ToastContainer />
-        <Button onClick={this.showToast} message="Show Default Toast" name="default" />
-        <Button onClick={this.showToast} message="Show Success Toast" name="success" />
-        <Button onClick={this.showToast} message="Show Error Toast" name="error" />
-        <Button onClick={this.showToast} message="Show Warning Toast" name="warning" />
-        <Button onClick={this.showToast} message="Show Info Toast" name="info" />
+        <Button onClick={this.showToast} message="Show Default Toast" name="default" primary />
+        <Button onClick={this.showToast} message="Show Success Toast" name="success" primary />
+        <Button onClick={this.showToast} message="Show Error Toast" name="error" primary />
+        <Button onClick={this.showToast} message="Show Warning Toast" name="warning" primary />
+        <Button onClick={this.showToast} message="Show Info Toast" name="info" primary />
       </div>
     )
   }

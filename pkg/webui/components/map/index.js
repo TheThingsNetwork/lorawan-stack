@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {
   MapContainer,
   Marker,
@@ -29,6 +28,8 @@ import shadowImg from 'leaflet/dist/images/marker-shadow.png'
 
 import MarkerIcon from '@assets/auxiliary-icons/location_pin.svg'
 import COLORS from '@ttn-lw/constants/colors'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './map.styl'
 

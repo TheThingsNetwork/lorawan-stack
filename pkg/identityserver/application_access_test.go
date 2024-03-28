@@ -532,3 +532,54 @@ func TestApplicationAccessClusterAuth(t *testing.T) {
 		}
 	}, withPrivateTestDatabase(p))
 }
+
+func TestApplicationContactRestrictions(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	usr1Creds := rpcCreds(usr1Key)
+
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+
+	usr2 := p.NewUser()
+	p.NewMembership(
+		usr2.GetOrganizationOrUserIdentifiers(),
+		app1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+	)
+	// Set the user as administrative contact for the application.
+	app1.AdministrativeContact = usr2.GetOrganizationOrUserIdentifiers()
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		regClt := ttnpb.NewApplicationRegistryClient(cc)
+		accessClt := ttnpb.NewApplicationAccessClient(cc)
+
+		// Attempt to delete a collaborator that is an administrative contact.
+		_, err := accessClt.DeleteCollaborator(ctx, &ttnpb.DeleteApplicationCollaboratorRequest{
+			ApplicationIds:  app1.Ids,
+			CollaboratorIds: usr2.GetOrganizationOrUserIdentifiers(),
+		}, usr1Creds)
+		a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+
+		// Change the administrative contact.
+		_, err = regClt.Update(ctx, &ttnpb.UpdateApplicationRequest{
+			Application: &ttnpb.Application{
+				Ids:                   app1.Ids,
+				AdministrativeContact: usr1.GetOrganizationOrUserIdentifiers(),
+			},
+			FieldMask: ttnpb.FieldMask("administrative_contact"),
+		}, usr1Creds)
+		a.So(err, should.BeNil)
+
+		// Attempt to delete a collaborator that is an administrative contact.
+		_, err = accessClt.DeleteCollaborator(ctx, &ttnpb.DeleteApplicationCollaboratorRequest{
+			ApplicationIds:  app1.Ids,
+			CollaboratorIds: usr2.GetOrganizationOrUserIdentifiers(),
+		}, usr1Creds)
+		a.So(err, should.BeNil)
+	}, withPrivateTestDatabase(p))
+}

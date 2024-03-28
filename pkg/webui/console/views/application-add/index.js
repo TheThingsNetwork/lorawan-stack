@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Link from '@ttn-lw/components/link'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 import Message from '@ttn-lw/lib/components/message'
@@ -45,6 +47,11 @@ const ApplicationAdd = () => {
       navigate(`/applications/${gtwId}`)
     },
     [navigate],
+  )
+
+  useBreadcrumbs(
+    'apps.add',
+    <Breadcrumb path={`/applications/add`} content={sharedMessages.createApplication} />,
   )
 
   return (

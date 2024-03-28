@@ -60,6 +60,13 @@ var (
 		"last_admin", "user `{user_id}` is the last admin",
 	)
 
+	ErrInvalidEntityType = errors.DefineInvalidArgument(
+		"invalid_entity_type", "invalid entity type `{entity_type}`",
+	)
+	ErrUserBookmarkNotFound = errors.DefineNotFound(
+		"user_bookmark_not_found", "user's bookmark not found",
+	)
+
 	ErrAPIKeyNotFound = errors.DefineNotFound(
 		"api_key_not_found", "api key with id `{api_key_id}` not found", "entity_type", "entity_id",
 	)

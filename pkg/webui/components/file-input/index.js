@@ -16,7 +16,7 @@ import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconExclamationCircle, IconTrash, IconPaperclip } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Notification from '@ttn-lw/components/notification'
 
@@ -47,7 +47,7 @@ const StatusMessage = props => {
   if (hasError) {
     return (
       <React.Fragment>
-        <Icon className={style.errorIcon} icon="error" />
+        <Icon className={style.errorIcon} icon={IconExclamationCircle} />
         <Message className={style.error} content={error} />
       </React.Fragment>
     )
@@ -61,7 +61,7 @@ const StatusMessage = props => {
             message={m.remove}
             onClick={handleRemoveClick}
             type="button"
-            icon="delete"
+            icon={IconTrash}
             danger
             naked
           />
@@ -199,8 +199,9 @@ const FileInput = props => {
             onClick={handleChooseClick}
             disabled={disabled}
             message={!value ? message : changeMessage}
-            icon="attachment"
+            icon={IconPaperclip}
             className="mr-cs-s"
+            secondary
           />
           <StatusMessage
             value={value}

@@ -20,6 +20,7 @@ import { orderBy as lodashOrderBy } from 'lodash'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
+import { IconPlus, IconSearch } from '@ttn-lw/components/icon'
 import Tabular from '@ttn-lw/components/table'
 import Input from '@ttn-lw/components/input'
 import Button from '@ttn-lw/components/button'
@@ -267,7 +268,7 @@ const FetchTable = props => {
               <Input
                 data-test-id="search-input"
                 value={query}
-                icon="search"
+                icon={IconSearch}
                 onChange={onQueryChange}
                 placeholder={searchPlaceholderMessage}
                 className={style.searchBar}
@@ -283,7 +284,7 @@ const FetchTable = props => {
                     primary
                     className={style.addButton}
                     message={addMessage}
-                    icon="add"
+                    icon={IconPlus}
                     to={`${itemPathPrefix}add`}
                   />
                 )}
@@ -363,7 +364,7 @@ FetchTable.propTypes = {
     PropTypes.shape({
       title: PropTypes.message.isRequired,
       name: PropTypes.string.isRequired,
-      icon: PropTypes.string,
+      icon: PropTypes.icon,
       disabled: PropTypes.bool,
     }),
   ),

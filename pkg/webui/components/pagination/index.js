@@ -13,14 +13,15 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Paginate from 'react-paginate'
 import { defineMessages } from 'react-intl'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconChevronLeft, IconChevronRight } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Select from '../select'
 import Input from '../input'
@@ -104,14 +105,18 @@ const Pagination = ({
         previousClassName={navigationPrevClassNames}
         previousLabel={
           <Icon
-            icon="chevron_left"
+            icon={IconChevronLeft}
             aria-label="Go to the previous page"
             className={style.itemIcon}
           />
         }
         nextClassName={navigationNextClassNames}
         nextLabel={
-          <Icon icon="chevron_right" aria-label="Go to the next page" className={style.itemIcon} />
+          <Icon
+            icon={IconChevronRight}
+            aria-label="Go to the next page"
+            className={style.itemIcon}
+          />
         }
         containerClassName={containerClassNames}
         pageClassName={style.item}

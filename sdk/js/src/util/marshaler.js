@@ -69,7 +69,7 @@ class Marshaler {
     if (typeof response !== 'object') {
       throw new Error(`Invalid response type: ${typeof response}`)
     }
-    if ('status' in response && response.status > 400) {
+    if ('status' in response && response.status >= 400) {
       throw new Error(`Response status ${response.status}`)
     }
 
@@ -127,6 +127,14 @@ class Marshaler {
   }
 
   static unwrapInvitation(result) {
+    return this.payloadSingleResponse(result)
+  }
+
+  static unwrapBookmarks(result) {
+    return this.payloadListResponse('bookmarks', result)
+  }
+
+  static unwrapBookmark(result) {
     return this.payloadSingleResponse(result)
   }
 

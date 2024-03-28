@@ -191,7 +191,7 @@ The line-height for `14px` font-size is `25px`, equaling `1.785rem`.
 
 ### Iconography
 
-For the time being, we use [Google Material Icons](https://material.io/resources/icons), but are currently looking into an icon set that suits our needs better.
+We are using [Tabler Icons](https://tablericons.com/) as our primary icon set. It is a free and open source icon set that is designed to be used in web applications.
 
 ![Icons](https://user-images.githubusercontent.com/5710611/77132143-ae040780-6aa1-11ea-9560-de6ae8f4e315.png)
 

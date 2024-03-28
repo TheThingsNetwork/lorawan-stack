@@ -1090,3 +1090,216 @@ var UserSessionRegistry_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "ttn/lorawan/v3/user_services.proto",
 }
+
+const (
+	UserBookmarkRegistry_Create_FullMethodName      = "/ttn.lorawan.v3.UserBookmarkRegistry/Create"
+	UserBookmarkRegistry_List_FullMethodName        = "/ttn.lorawan.v3.UserBookmarkRegistry/List"
+	UserBookmarkRegistry_Delete_FullMethodName      = "/ttn.lorawan.v3.UserBookmarkRegistry/Delete"
+	UserBookmarkRegistry_BatchDelete_FullMethodName = "/ttn.lorawan.v3.UserBookmarkRegistry/BatchDelete"
+)
+
+// UserBookmarkRegistryClient is the client API for UserBookmarkRegistry service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type UserBookmarkRegistryClient interface {
+	// Create a bookmark for the given user.
+	Create(ctx context.Context, in *CreateUserBookmarkRequest, opts ...grpc.CallOption) (*UserBookmark, error)
+	// List the bookmarks for the given user.
+	List(ctx context.Context, in *ListUserBookmarksRequest, opts ...grpc.CallOption) (*UserBookmarks, error)
+	// Delete the given user's bookmark.
+	Delete(ctx context.Context, in *DeleteUserBookmarkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Delete a list of bookmarks of the given user.
+	// This operation is atomic; either all bookmarks are deleted or none.
+	// Bookmarks not found are skipped and no error is returned.
+	BatchDelete(ctx context.Context, in *BatchDeleteUserBookmarksRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type userBookmarkRegistryClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUserBookmarkRegistryClient(cc grpc.ClientConnInterface) UserBookmarkRegistryClient {
+	return &userBookmarkRegistryClient{cc}
+}
+
+func (c *userBookmarkRegistryClient) Create(ctx context.Context, in *CreateUserBookmarkRequest, opts ...grpc.CallOption) (*UserBookmark, error) {
+	out := new(UserBookmark)
+	err := c.cc.Invoke(ctx, UserBookmarkRegistry_Create_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userBookmarkRegistryClient) List(ctx context.Context, in *ListUserBookmarksRequest, opts ...grpc.CallOption) (*UserBookmarks, error) {
+	out := new(UserBookmarks)
+	err := c.cc.Invoke(ctx, UserBookmarkRegistry_List_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userBookmarkRegistryClient) Delete(ctx context.Context, in *DeleteUserBookmarkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, UserBookmarkRegistry_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userBookmarkRegistryClient) BatchDelete(ctx context.Context, in *BatchDeleteUserBookmarksRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, UserBookmarkRegistry_BatchDelete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UserBookmarkRegistryServer is the server API for UserBookmarkRegistry service.
+// All implementations must embed UnimplementedUserBookmarkRegistryServer
+// for forward compatibility
+type UserBookmarkRegistryServer interface {
+	// Create a bookmark for the given user.
+	Create(context.Context, *CreateUserBookmarkRequest) (*UserBookmark, error)
+	// List the bookmarks for the given user.
+	List(context.Context, *ListUserBookmarksRequest) (*UserBookmarks, error)
+	// Delete the given user's bookmark.
+	Delete(context.Context, *DeleteUserBookmarkRequest) (*emptypb.Empty, error)
+	// Delete a list of bookmarks of the given user.
+	// This operation is atomic; either all bookmarks are deleted or none.
+	// Bookmarks not found are skipped and no error is returned.
+	BatchDelete(context.Context, *BatchDeleteUserBookmarksRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedUserBookmarkRegistryServer()
+}
+
+// UnimplementedUserBookmarkRegistryServer must be embedded to have forward compatible implementations.
+type UnimplementedUserBookmarkRegistryServer struct {
+}
+
+func (UnimplementedUserBookmarkRegistryServer) Create(context.Context, *CreateUserBookmarkRequest) (*UserBookmark, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedUserBookmarkRegistryServer) List(context.Context, *ListUserBookmarksRequest) (*UserBookmarks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedUserBookmarkRegistryServer) Delete(context.Context, *DeleteUserBookmarkRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedUserBookmarkRegistryServer) BatchDelete(context.Context, *BatchDeleteUserBookmarksRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BatchDelete not implemented")
+}
+func (UnimplementedUserBookmarkRegistryServer) mustEmbedUnimplementedUserBookmarkRegistryServer() {}
+
+// UnsafeUserBookmarkRegistryServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UserBookmarkRegistryServer will
+// result in compilation errors.
+type UnsafeUserBookmarkRegistryServer interface {
+	mustEmbedUnimplementedUserBookmarkRegistryServer()
+}
+
+func RegisterUserBookmarkRegistryServer(s grpc.ServiceRegistrar, srv UserBookmarkRegistryServer) {
+	s.RegisterService(&UserBookmarkRegistry_ServiceDesc, srv)
+}
+
+func _UserBookmarkRegistry_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserBookmarkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserBookmarkRegistryServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserBookmarkRegistry_Create_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserBookmarkRegistryServer).Create(ctx, req.(*CreateUserBookmarkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserBookmarkRegistry_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserBookmarksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserBookmarkRegistryServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserBookmarkRegistry_List_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserBookmarkRegistryServer).List(ctx, req.(*ListUserBookmarksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserBookmarkRegistry_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserBookmarkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserBookmarkRegistryServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserBookmarkRegistry_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserBookmarkRegistryServer).Delete(ctx, req.(*DeleteUserBookmarkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserBookmarkRegistry_BatchDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchDeleteUserBookmarksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserBookmarkRegistryServer).BatchDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserBookmarkRegistry_BatchDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserBookmarkRegistryServer).BatchDelete(ctx, req.(*BatchDeleteUserBookmarksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// UserBookmarkRegistry_ServiceDesc is the grpc.ServiceDesc for UserBookmarkRegistry service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var UserBookmarkRegistry_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.UserBookmarkRegistry",
+	HandlerType: (*UserBookmarkRegistryServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Create",
+			Handler:    _UserBookmarkRegistry_Create_Handler,
+		},
+		{
+			MethodName: "List",
+			Handler:    _UserBookmarkRegistry_List_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _UserBookmarkRegistry_Delete_Handler,
+		},
+		{
+			MethodName: "BatchDelete",
+			Handler:    _UserBookmarkRegistry_BatchDelete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/user_services.proto",
+}

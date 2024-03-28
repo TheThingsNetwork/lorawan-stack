@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -27,9 +27,50 @@ const SideNavigation = ({ className, children }) => {
 
   const navigationClassNames = classnames(className, style.navigation)
 
+  // Add a scroll gradient to the navigation sidebar.
+  useEffect(() => {
+    const container = node?.current
+    const handleScroll = () => {
+      if (container) {
+        const { scrollTop, scrollHeight, clientHeight } = container
+        const scrollable = scrollHeight - clientHeight
+        const scrollGradientTop = container.querySelector(`.${style.scrollGradientTop}`)
+        const scrollGradientBottom = container.querySelector(`.${style.scrollGradientBottom}`)
+        const fadeHeight = 20 // Height in pixels where the gradient starts to appear.
+
+        if (scrollGradientTop) {
+          const opacity = scrollTop < fadeHeight ? scrollTop / fadeHeight : 1
+          scrollGradientTop.style.opacity = opacity
+        }
+
+        if (scrollGradientBottom) {
+          const scrollEnd = scrollable - fadeHeight
+          const opacity = scrollTop < scrollEnd ? 1 : (scrollable - scrollTop) / fadeHeight
+          scrollGradientBottom.style.opacity = opacity
+        }
+      }
+    }
+
+    handleScroll()
+
+    if (container) {
+      container.addEventListener('scroll', handleScroll)
+      window.addEventListener('resize', handleScroll)
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll)
+        window.removeEventListener('resize', handleScroll)
+      }
+    }
+  }, [node])
+
   return (
     <nav className={navigationClassNames} ref={node} data-test-id="navigation-sidebar">
+      <div className={style.scrollGradientTop} />
       <SideNavigationList className={style.navigationList}>{children}</SideNavigationList>
+      <div className={style.scrollGradientBottom} />
     </nav>
   )
 }

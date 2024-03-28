@@ -1595,6 +1595,12 @@ func (x *ADRSettings_DynamicMode) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: ADRSettings_DynamicMode_ChannelSteeringSettings does not seem to implement MarshalProtoJSON.
 		golang.MarshalMessage(s, x.ChannelSteering)
 	}
+	if x.Overrides != nil || s.HasField("overrides") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("overrides")
+		// NOTE: ADRSettings_DynamicMode_Overrides does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Overrides)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1693,6 +1699,16 @@ func (x *ADRSettings_DynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			var v ADRSettings_DynamicMode_ChannelSteeringSettings
 			golang.UnmarshalMessage(s, &v)
 			x.ChannelSteering = &v
+		case "overrides":
+			s.AddField("overrides")
+			if s.ReadNil() {
+				x.Overrides = nil
+				return
+			}
+			// NOTE: ADRSettings_DynamicMode_Overrides does not seem to implement UnmarshalProtoJSON.
+			var v ADRSettings_DynamicMode_Overrides
+			golang.UnmarshalMessage(s, &v)
+			x.Overrides = &v
 		}
 	})
 }

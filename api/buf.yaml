@@ -48,6 +48,7 @@ lint:
       - ttn/lorawan/v3/metadata.proto
       - ttn/lorawan/v3/notification_service.proto
       - ttn/lorawan/v3/rights.proto
+      - ttn/lorawan/v3/user.proto
     FIELD_LOWER_SNAKE_CASE:
       - ttn/lorawan/v3/applicationserver_integrations_alcsync.proto
     FILE_LOWER_SNAKE_CASE:

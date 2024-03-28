@@ -15,12 +15,15 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
+import { defineMessages } from 'react-intl'
 
+import { IconInbox } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
 import Status from '@ttn-lw/components/status'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
+import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
 import Notification from '@console/components/notifications'
@@ -37,8 +40,14 @@ import {
 
 import style from './notifications-dashboard-panel.styl'
 
+const m = defineMessages({
+  noNotifications: 'No notifications yet',
+  noNotificationsDescription: 'Your latest notifications will appear here',
+})
+
 const NotificationsDashboardPanel = () => {
   const totalUnseenNotifications = useSelector(selectTotalUnseenCount)
+  const notifications = useSelector(selectInboxNotifications)
 
   const MessageDecorator = () => (
     <span className={style.notificationPanelTotal}>{totalUnseenNotifications}</span>
@@ -100,20 +109,30 @@ const NotificationsDashboardPanel = () => {
     <Panel
       title={sharedMessages.notifications}
       path="/notifications"
-      icon="inbox"
+      icon={IconInbox}
       buttonTitle={sharedMessages.viewAll}
       messageDecorators={totalUnseenNotifications > 0 ? <MessageDecorator /> : undefined}
       className={style.notificationPanel}
     >
-      <FetchTable
-        entity="notifications"
-        headers={headers}
-        pageSize={5}
-        baseDataSelector={baseDataSelectors}
-        getItemsAction={getItems}
-        getItemPathPrefix={item => `/notifications/inbox/${item.id}`}
-        paginated={false}
-      />
+      {notifications && notifications.length === 0 ? (
+        <div className="flex-grow j-center">
+          <Message content={m.noNotifications} className="d-block text-center fs-l fw-bold" />
+          <Message
+            content={m.noNotificationsDescription}
+            className="d-block text-center c-text-neutral-light"
+          />
+        </div>
+      ) : (
+        <FetchTable
+          entity="notifications"
+          headers={headers}
+          pageSize={5}
+          baseDataSelector={baseDataSelectors}
+          getItemsAction={getItems}
+          getItemPathPrefix={item => `/notifications/inbox/${item.id}`}
+          paginated={false}
+        />
+      )}
     </Panel>
   )
 }

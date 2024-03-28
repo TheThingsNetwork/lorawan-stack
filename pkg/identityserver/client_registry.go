@@ -387,6 +387,9 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		if err := st.DeleteEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		return st.DeleteClient(ctx, ids)
 	})
 	if err != nil {
@@ -412,6 +415,9 @@ func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientId
 		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
 		}
+		if err := st.RestoreEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		return st.RestoreClient(ctx, ids)
 	})
 	if err != nil {
@@ -434,6 +440,9 @@ func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIden
 		// delete related memberships before purging the client
 		err = st.DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
+			return err
+		}
+		if err := st.PurgeEntityBookmarks(ctx, ids.GetEntityIdentifiers()); err != nil {
 			return err
 		}
 		return st.PurgeClient(ctx, ids)

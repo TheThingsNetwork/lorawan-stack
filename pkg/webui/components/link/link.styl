@@ -31,7 +31,7 @@
         color: var(--c-text-brand-normal-active)
 
   &.secondary
-    color: $c['grey-700']
+    color: var(--c-text-neutral-light)
     &:active,
     &:hover
       color: var(--c-text-neutral-heavy)
@@ -47,6 +47,8 @@
 
 .doc-link
   white-space: nowrap
+  display: flex
+  align-items: center
 
 .icon
   nudge('up', 2px)
@@ -55,4 +57,4 @@
   font-size: .9rem
 
 .doc-icon
-  nudge('up')
+  margin-right: $cs.xxs

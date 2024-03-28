@@ -27,6 +27,7 @@
     border-radius: $br.m
     padding: 0 $cs.s
     height: 2.25rem
+    text-align: center
     transition: background 80ms ease-in-out
 
     &-active
@@ -37,3 +38,10 @@
 
     &:hover:not(.toggle-button-active)
       background: var(--c-bg-neutral-light)
+
+@container panel (max-width: 395px)
+  .toggle
+    width: 100%
+
+  .toggle-button
+    width: 100%
