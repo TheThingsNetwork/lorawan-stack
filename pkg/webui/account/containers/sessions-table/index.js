@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 
@@ -165,8 +166,9 @@ const UserSessionsTable = () => {
               type="button"
               onClick={details.delete}
               message={m.removeButtonMessage}
-              icon="delete"
+              icon={IconTrash}
               danger
+              naked
             />
           )
         },

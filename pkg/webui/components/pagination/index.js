@@ -13,11 +13,12 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Paginate from 'react-paginate'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconChevronLeft, IconChevronRight } from '@ttn-lw/components/icon'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './pagination.styl'
 
@@ -52,10 +53,10 @@ const Pagination = ({
     <Paginate
       previousClassName={navigationPrevClassNames}
       previousLinkClassName={style.link}
-      previousLabel={<Icon icon="navigate_before" small aria-label="Go to the previous page" />}
+      previousLabel={<Icon icon={IconChevronLeft} small aria-label="Go to the previous page" />}
       nextClassName={navigationNextClassNames}
       nextLinkClassName={style.link}
-      nextLabel={<Icon icon="navigate_next" small aria-label="Go to the next page" />}
+      nextLabel={<Icon icon={IconChevronRight} small aria-label="Go to the next page" />}
       containerClassName={containerClassNames}
       pageClassName={style.item}
       breakClassName={breakClassNames}

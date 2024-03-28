@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Link from '@ttn-lw/components/link'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -43,6 +45,11 @@ const OrganizationAdd = () => {
       navigate(`/organizations/${orgId}`)
     },
     [navigate],
+  )
+
+  useBreadcrumbs(
+    'orgs.add',
+    <Breadcrumb path={`/gateways/add`} content={sharedMessages.registerGateway} />,
   )
 
   return (

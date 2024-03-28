@@ -14,6 +14,7 @@
 
 import React, { useContext } from 'react'
 
+import { IconPlus } from '@ttn-lw/components/icon'
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
@@ -25,12 +26,15 @@ const AppListSideNavigation = () => {
   const { topEntities, isMinimized } = useContext(SidebarContext)
 
   if (isMinimized || topEntities.length === 0) {
-    return null
+    // Rendering an empty div to prevent the shadow of the search bar
+    // from being cut off. There will be a default element rendering
+    // here in the future anyway.
+    return <div />
   }
 
   return (
     <div>
-      <SectionLabel label={sharedMessages.topApplications} icon="add" onClick={() => null} />
+      <SectionLabel label={sharedMessages.topApplications} icon={IconPlus} onClick={() => null} />
       <SideNavigation>
         {topEntities.map(({ path, entity, title }) => (
           <SideNavigation.Item title={title} path={path} icon={entity} key={path} />

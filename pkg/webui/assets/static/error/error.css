@@ -20,17 +20,6 @@ html, body {
     url('./source-sans-pro-v13-latin_latin-ext-regular.svg#SourceSansPro') format('svg');
 }
 @font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  font-display: block;
-  src: url('./materialicons.eot');
-  src: url('./materialicons.woff2') format('woff2'),
-      url('./materialicons.woff') format('woff'),
-      url('./materialicons.ttf') format('truetype'),
-      url('./materialicons.svg#MaterialIcons-Regular') format('svg');
-}
-@font-face {
   font-family: 'IBM Plex Mono';
   font-style: normal;
   font-weight: 400;
@@ -180,20 +169,8 @@ pre {
   font-size: 2rem;
   position: relative;
 }
-.logo {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  vertical-align: middle;
-  font-feature-settnngs: 'liga';
-  align-items: center;
+.tabler {
+  color: #40435F;
   margin-right: .25rem;
 }
 .detail-colophon {

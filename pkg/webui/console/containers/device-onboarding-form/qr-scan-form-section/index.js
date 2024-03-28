@@ -15,10 +15,10 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import Icon, { IconCheck, IconX } from '@ttn-lw/components/icon'
 import QRModalButton from '@ttn-lw/components/qr-modal-button'
 import { useFormContext } from '@ttn-lw/components/form'
 import Link from '@ttn-lw/components/link'
-import Icon from '@ttn-lw/components/icon'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import ButtonGroup from '@ttn-lw/components/button/group'
 
@@ -150,7 +150,7 @@ const DeviceQRScanFormSection = () => {
     <>
       {qrData.approved ? (
         <div className="mb-cs-xs">
-          <Icon icon="check" textPaddedRight className="c-bg-success-normal" />
+          <Icon icon={IconCheck} textPaddedRight className="c-bg-success-normal" />
           <Message content={m.scanSuccess} />
         </div>
       ) : (
@@ -162,7 +162,7 @@ const DeviceQRScanFormSection = () => {
         {qrData.approved ? (
           <ModalButton
             type="button"
-            icon="close"
+            icon={IconX}
             onApprove={handleReset}
             message={m.resetQRCodeData}
             modalData={{
@@ -171,7 +171,7 @@ const DeviceQRScanFormSection = () => {
               buttonMessage: m.resetQRCodeData,
               children: <Message content={m.resetConfirm} component="span" />,
               approveButtonProps: {
-                icon: 'close',
+                icon: { IconX },
               },
             }}
           />

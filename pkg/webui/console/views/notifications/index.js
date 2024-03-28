@@ -17,7 +17,6 @@ import { useParams } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -48,7 +47,6 @@ const NotificationsView = () => {
 
   return (
     <RequireRequest requestAction={action} requestOnChange>
-      <Breadcrumbs />
       <NotificationsContainer />
     </RequireRequest>
   )

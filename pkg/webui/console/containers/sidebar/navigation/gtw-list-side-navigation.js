@@ -14,6 +14,7 @@
 
 import React, { useContext } from 'react'
 
+import { IconPlus } from '@ttn-lw/components/icon'
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
@@ -24,12 +25,12 @@ import SidebarContext from '../context'
 const GtwListSideNavigation = () => {
   const { topEntities, isMinimized } = useContext(SidebarContext)
   if (isMinimized || topEntities.length === 0) {
-    return null
+    return <div />
   }
 
   return (
     <div>
-      <SectionLabel label={sharedMessages.topGateways} icon="add" onClick={() => null} />
+      <SectionLabel label={sharedMessages.topGateways} icon={IconPlus} onClick={() => null} />
       <SideNavigation>
         {topEntities.map(({ path, entity, title }) => (
           <SideNavigation.Item title={title} path={path} icon={entity} key={path} />

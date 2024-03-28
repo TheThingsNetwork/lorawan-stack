@@ -16,6 +16,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -147,7 +148,7 @@ const Entry = ({
         <Button
           type="button"
           onClick={handleRemoveButtonClick}
-          icon="delete"
+          icon={IconTrash}
           title={m.deleteEntry}
           message={removeMessage}
           disabled={readOnly}

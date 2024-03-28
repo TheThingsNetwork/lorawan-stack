@@ -18,6 +18,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import toast from '@ttn-lw/components/toast'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import DataSheet from '@ttn-lw/components/data-sheet'
@@ -109,7 +110,7 @@ const AuthorizationSettings = () => {
                 onApprove={handleDeleteAuthorization}
                 message={m.deleteButton}
                 type="button"
-                icon="delete"
+                icon={IconTrash}
                 danger
               />
             ),

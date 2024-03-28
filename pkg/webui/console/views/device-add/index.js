@@ -17,6 +17,8 @@ import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -40,6 +42,14 @@ const DeviceAdd = () => {
       await dispatch(attachPromise(listBrands(appId, {}, ['name', 'lora_alliance_vendor_id'])))
     },
     [appId, jsEnabled],
+  )
+
+  useBreadcrumbs(
+    'apps.single.devices.add',
+    <Breadcrumb
+      path={`/applications/${appId}/devices/add`}
+      content={sharedMessages.registerGateway}
+    />,
   )
 
   return (

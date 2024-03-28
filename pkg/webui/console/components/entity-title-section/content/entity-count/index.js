@@ -51,7 +51,7 @@ const EntityCount = props => {
 
 EntityCount.propTypes = {
   errored: PropTypes.bool,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.icon.isRequired,
   keyMessage: PropTypes.message.isRequired,
   toAllUrl: PropTypes.string.isRequired,
   value: PropTypes.node,

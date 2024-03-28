@@ -15,6 +15,15 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import {
+  IconUsersGroup,
+  IconKey,
+  IconBolt,
+  IconApplication,
+  IconDevice,
+  IconGateway,
+} from '@ttn-lw/components/icon'
+
 import Panel from '../../../components/panel'
 
 import ShortcutItem from './shortcut-item'
@@ -29,29 +38,34 @@ const m = defineMessages({
 })
 
 const ShortcutPanel = () => (
-  <Panel title={m.shortcuts} path="/edit-shortcuts" icon="bolt" divider className="h-full">
+  <Panel title={m.shortcuts} path="/edit-shortcuts" icon={IconBolt} divider className="h-full">
     <div className="grid">
       <ShortcutItem
-        icon="display_settings"
+        icon={IconApplication}
         title={m.addApplication}
         link="/applications/add"
         className="item-6"
       />
-      <ShortcutItem icon="router" title={m.addGateway} link="/gateways/add" className="item-6" />
       <ShortcutItem
-        icon="group"
+        icon={IconGateway}
+        title={m.addGateway}
+        link="/gateways/add"
+        className="item-6"
+      />
+      <ShortcutItem
+        icon={IconUsersGroup}
         title={m.addOrganization}
         link="/organizations/add"
         className="item-4"
       />
       <ShortcutItem
-        icon="key"
+        icon={IconKey}
         title={m.addPersonalApiKey}
         link="/user/api-keys/add"
         className="item-4"
       />
       <ShortcutItem
-        icon="settings_remote"
+        icon={IconDevice}
         title={m.registerDevice}
         link="/applications"
         className="item-4"

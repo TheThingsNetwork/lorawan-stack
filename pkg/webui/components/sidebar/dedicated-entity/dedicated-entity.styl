@@ -18,19 +18,20 @@
   color: var(--c-text-neutral-heavy)
   position: relative
   height: 2.5rem
+  width: 100%
 
   &-curtain
     position: absolute
     overflow: hidden
     border-radius: $br.l
     width: 2.5rem
-    transition: .3s 0s all cubic-bezier(.77, , .175, 1)
+    transition: .3s 0s all cubic-bezier(.77, .2, .175, 1)
     top: 0
     left: 0
     z-index: $zi.slight
 
     &:hover
-      transition: .3s .2s all cubic-bezier(.77, , .175, 1)
+      transition: .3s .2s all cubic-bezier(.77, .2, .175, 1)
       width: 100%
 
       // Reveal the button label.
@@ -53,9 +54,9 @@
 
   &-divider
     display: list-item
-    height: 100%
+    height: 75%
     margin: 0 $cs.xs 0 $cs.s
-    border-left: 1px solid var(--c-border-neutral-semilight)
+    border-left: 1px solid var(--c-border-neutral-light)
     background-color: var(--c-border-neutral-light)
 
   &-button
@@ -74,7 +75,7 @@
     text-decoration: none
     padding: 0 .75rem
     white-space: nowrap
-    color: var(--c-bg-neutral-min)
+    color: var(--c-text-neutral-min)
     width: 100%
     justify-content: flex-start
 

@@ -15,7 +15,7 @@
 import React, { useEffect, useRef } from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconChevronRight } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -149,7 +149,7 @@ const DropdownItem = ({
           {iconElement}
           <Message content={title} />
         </div>
-        <Icon className={style.submenuDropdownIcon} icon="chevron_right" />
+        <Icon className={style.submenuDropdownIcon} icon={IconChevronRight} />
       </button>
       <Dropdown.Attached attachedRef={ref} className={style.submenuDropdown} position="left" hover>
         {submenuItems}

@@ -16,7 +16,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from '@formatjs/intl'
 
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
+import { IconGridPattern, IconPacketBroker, IconUserManagement } from '@ttn-lw/components/icon'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
@@ -55,12 +55,11 @@ const AdminPanel = () => {
 
   return (
     <Require featureCheck={mayPerformAdminActions} otherwise={{ redirect: '/' }}>
-      <Breadcrumbs />
       <IntlHelmet title={sharedMessages.adminPanel} />
       <PanelView>
         <PanelView.Item
           title={sharedMessages.networkInformation}
-          icon="view_compact"
+          icon={IconGridPattern}
           path="network-information"
           Component={NetworkInformation}
           exact
@@ -68,7 +67,7 @@ const AdminPanel = () => {
         {showUserManagement && (
           <PanelView.Item
             title={m.userManagement}
-            icon="user_management"
+            icon={IconUserManagement}
             path="user-management"
             Component={UserManagement}
             condition={showUserManagement}
@@ -77,7 +76,7 @@ const AdminPanel = () => {
         {showPacketBroker && (
           <PanelView.Item
             title={m.peeringSettings}
-            icon="packet_broker"
+            icon={IconPacketBroker}
             path="packet-broker"
             Component={PacketBrokerRouter}
             condition={showPacketBroker}

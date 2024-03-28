@@ -15,8 +15,8 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 
+import Icon, { IconUserPlus } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -33,7 +33,7 @@ const m = defineMessages({
   link: 'You can view this <Link>here</Link>.',
 })
 
-const EntityStateChangedIcon = () => <Icon icon="person_add" className="c-tts-primary" />
+const EntityStateChangedIcon = () => <Icon icon={IconUserPlus} className="c-tts-primary" />
 
 const EntityStateChangedPreview = ({ notificationData }) => {
   const { data, entity_ids } = notificationData

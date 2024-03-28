@@ -16,10 +16,15 @@ import React from 'react'
 import classnames from 'classnames'
 import { defineMessages, useIntl } from 'react-intl'
 
+import Icon, {
+  IconExclamationCircle,
+  IconInfoCircle,
+  IconAlertCircle,
+  IconCheck,
+} from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import CodeEditor from '@ttn-lw/components/code-editor'
-import Icon from '@ttn-lw/components/icon'
 import Input from '@ttn-lw/components/input'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 
@@ -129,16 +134,16 @@ const TestForm = props => {
           ? formatMessage(m.emptyPayload)
           : ''
   }
-  let infoIcon = 'info'
+  let infoIcon = IconInfoCircle
   let infoMessage = m.noResult
   if (showTestError) {
-    infoIcon = 'error'
+    infoIcon = IconExclamationCircle
     infoMessage = hasFatalError ? m.testFatalError : m.testError
   } else if (showTestWarning) {
-    infoIcon = 'warning'
+    infoIcon = IconAlertCircle
     infoMessage = m.testWarning
   } else if (showTestValid) {
-    infoIcon = 'valid'
+    infoIcon = IconCheck
     infoMessage = m.validResult
   }
 

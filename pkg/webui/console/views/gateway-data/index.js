@@ -20,8 +20,6 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import WithRootClass from '@ttn-lw/lib/components/with-root-class'
-
 import GatewayEvents from '@console/containers/gateway-events'
 
 import Require from '@console/lib/components/require'
@@ -29,6 +27,7 @@ import Require from '@console/lib/components/require'
 import style from '@console/views/app/app.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import useRootClass from '@ttn-lw/lib/hooks/use-root-class'
 
 import { mayViewGatewayEvents } from '@console/lib/feature-checks'
 
@@ -44,12 +43,12 @@ const GatewayData = () => {
     <Breadcrumb path={`/gateways/${gtwId}/data`} content={sharedMessages.liveData} />,
   )
 
+  useRootClass(style.stage, 'stage')
+
   return (
     <Require featureCheck={mayViewGatewayEvents} otherwise={{ redirect: `/gateways/${gtwId}` }}>
-      <WithRootClass className={style.stageFlex} id="stage">
-        <PageTitle hideHeading title={m.gtwData} />
-        <GatewayEvents gtwId={gtwId} />
-      </WithRootClass>
+      <PageTitle hideHeading title={m.gtwData} />
+      <GatewayEvents gtwId={gtwId} />
     </Require>
   )
 }

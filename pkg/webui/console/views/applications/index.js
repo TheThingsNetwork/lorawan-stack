@@ -16,7 +16,6 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -38,7 +37,6 @@ const Applications = () => {
 
   return (
     <Require featureCheck={mayViewApplications} otherwise={{ redirect: '/' }}>
-      <Breadcrumbs />
       <Routes>
         <Route index Component={ApplicationsList} />
         <Route path="add" Component={ApplicationAdd} />
