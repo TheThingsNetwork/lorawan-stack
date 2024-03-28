@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
 import { defineMessages } from 'react-intl'
 
+import { IconInbox } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
 import Status from '@ttn-lw/components/status'
 
@@ -108,7 +109,7 @@ const NotificationsDashboardPanel = () => {
     <Panel
       title={sharedMessages.notifications}
       path="/notifications"
-      icon="inbox"
+      icon={IconInbox}
       buttonTitle={sharedMessages.viewAll}
       messageDecorators={totalUnseenNotifications > 0 ? <MessageDecorator /> : undefined}
       className={style.notificationPanel}

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { IconEvent } from '@ttn-lw/components/icon'
+
 import { getDeviceId, getApplicationId } from '@ttn-lw/lib/selectors/id'
 
 import DefaultPreview from '../previews/default'
@@ -24,7 +26,7 @@ export const getEventId = event => event.unique_id
 
 export const getEventIconByName = eventName => {
   const definition = eventIconMap.find(e => e.test.test(eventName))
-  return definition ? definition.icon : 'event'
+  return definition ? definition.icon : IconEvent
 }
 
 export const getPreviewComponentByDataType = dataType => {

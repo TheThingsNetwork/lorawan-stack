@@ -14,8 +14,8 @@
 
 import React, { useEffect, useState } from 'react'
 import classnames from 'classnames'
-import PropTypes from 'prop-types'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import from from '@ttn-lw/lib/from'
 
 import style from './spinner.styl'

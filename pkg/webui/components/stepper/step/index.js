@@ -15,7 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconCicleCheck, IconX } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -48,9 +48,9 @@ const Step = props => {
 
   let label
   if (isSuccess) {
-    label = <Icon icon="done" nudgeDown />
+    label = <Icon icon={IconCicleCheck} nudgeDown />
   } else if (isFailure) {
-    label = <Icon icon="close" nudgeDown />
+    label = <Icon icon={IconX} nudgeDown />
   } else {
     label = <span className={style.label}>{stepNumber}</span>
   }

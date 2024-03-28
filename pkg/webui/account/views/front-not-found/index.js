@@ -14,6 +14,7 @@
 
 import React from 'react'
 
+import { IconChevronLeft } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -46,7 +47,7 @@ const FrontNotFound = () => (
       />
       <Button.Link
         to="/login"
-        icon="keyboard_arrow_left"
+        icon={IconChevronLeft}
         message={{ ...sharedMessages.backTo, values: { siteTitle } }}
       />
     </div>

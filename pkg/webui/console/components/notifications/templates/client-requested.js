@@ -15,8 +15,8 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Icon, { IconOauthClients } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -56,7 +56,7 @@ const getId = entity => {
   return entity.user_id
 }
 
-const ClientRequestedIcon = () => <Icon icon="oauth_clients" className="c-tts-primary" />
+const ClientRequestedIcon = () => <Icon icon={IconOauthClients} className="c-tts-primary" />
 
 const ClientRequestedPreview = ({ notificationData }) => {
   const { data, sender_ids } = notificationData

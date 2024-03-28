@@ -15,7 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconPassword } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -31,7 +31,7 @@ const m = defineMessages({
   closing: 'If this was not done by you, please contact your administrators as soon as possible.',
 })
 
-const PasswordChangedIcon = () => <Icon icon="password" className="c-tts-primary" />
+const PasswordChangedIcon = () => <Icon icon={IconPassword} className="c-tts-primary" />
 
 const PasswordChangedPreview = ({ notificationData }) => {
   const { entity_ids } = notificationData

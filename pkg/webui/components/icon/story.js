@@ -14,12 +14,12 @@
 
 import React from 'react'
 
+import Icon, { IconDevice } from '@ttn-lw/components/icon'
+
 import style from './story.styl'
 
-import Icon from '.'
-
 const icons = [
-  'devices',
+  'device',
   'integration',
   'settings',
   'lock',
@@ -53,12 +53,12 @@ export const Icons = () => <div>{iconElement}</div>
 export const Usage = () => (
   <div className={style.wrapper}>
     <div className={style.block}>
-      <Icon icon="devices" />
+      <Icon icon={IconDevice} />
       <span>{'display: inline-block'}</span>
     </div>
     <br />
     <div className={style.flex}>
-      <Icon icon="devices" />
+      <Icon icon={IconDevice} />
       <span>{'display: flex'}</span>
     </div>
   </div>

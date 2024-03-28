@@ -15,6 +15,14 @@
 import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
+import {
+  IconUser,
+  IconLogout,
+  IconKey,
+  IconAccess,
+  IconOverview,
+  IconOauthClients,
+} from '@ttn-lw/components/icon'
 import HeaderComponent from '@ttn-lw/components/header'
 import NavigationBar from '@ttn-lw/components/navigation/bar'
 import Dropdown from '@ttn-lw/components/dropdown'
@@ -39,29 +47,29 @@ const Header = ({ handleSearchRequest, searchable }) => {
   const navigation = [
     {
       title: sharedMessages.overview,
-      icon: 'overview',
+      icon: IconOverview,
       path: '/',
       exact: true,
       hidden: false,
     },
     {
       title: sharedMessages.profileSettings,
-      icon: 'user',
+      icon: IconUser,
       path: '/profile-settings',
     },
     {
       title: sharedMessages.sessions,
-      icon: 'vpn_key',
+      icon: IconKey,
       path: '/session-management',
     },
     {
       title: sharedMessages.oauthClients,
-      icon: 'oauth_clients',
+      icon: IconOauthClients,
       path: '/oauth-clients',
     },
     {
       title: sharedMessages.authorizations,
-      icon: 'access',
+      icon: IconAccess,
       path: '/client-authorizations',
     },
   ]
@@ -76,7 +84,7 @@ const Header = ({ handleSearchRequest, searchable }) => {
 
   const dropdownItems = (
     <React.Fragment>
-      <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
+      <Dropdown.Item title={sharedMessages.logout} icon={IconLogout} action={handleLogout} />
     </React.Fragment>
   )
 

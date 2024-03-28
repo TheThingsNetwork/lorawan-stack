@@ -15,6 +15,14 @@
 import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 
+import {
+  IconUsersGroup,
+  IconLayoutDashboard,
+  IconUserShield,
+  IconKey,
+  IconPlus,
+  IconInbox,
+} from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 
@@ -45,37 +53,42 @@ const GeneralSideNavigation = () => {
   return (
     <>
       <SideNavigation>
-        <SideNavigation.Item title={sharedMessages.dashboard} path="/" icon="overview" exact />
+        <SideNavigation.Item
+          title={sharedMessages.dashboard}
+          path="/"
+          icon={IconLayoutDashboard}
+          exact
+        />
         {mayViewOrgs && (
           <SideNavigation.Item
             title={sharedMessages.organizations}
             path="/organizations"
-            icon="group"
+            icon={IconUsersGroup}
           />
         )}
         <SideNavigation.Item
           title={sharedMessages.notifications}
           path="/notifications"
-          icon="inbox"
+          icon={IconInbox}
         />
         {mayHandleApiKeys && (
           <SideNavigation.Item
             title={sharedMessages.personalApiKeys}
             path="/user/api-keys"
-            icon="key"
+            icon={IconKey}
           />
         )}
         {isUserAdmin && (
           <SideNavigation.Item
             title={sharedMessages.adminPanel}
             path="/admin-panel"
-            icon="admin_panel_settings"
+            icon={IconUserShield}
           />
         )}
       </SideNavigation>
       {!isMinimized && (
         <SideNavigation className="mt-cs-xs">
-          <SectionLabel label={sharedMessages.topEntities} icon="add" onClick={() => null} />
+          <SectionLabel label={sharedMessages.topEntities} icon={IconPlus} onClick={() => null} />
           {topEntities.map(({ path, title, entity }) => (
             <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
           ))}

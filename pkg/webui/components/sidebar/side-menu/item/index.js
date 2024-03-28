@@ -90,7 +90,7 @@ SideNavigationItem.propTypes = {
   /** A flag specifying whether the path of the linkable item should be matched exactly or not. */
   exact: PropTypes.bool,
   /** The name of the icon for the side navigation item. */
-  icon: PropTypes.string,
+  icon: PropTypes.icon,
   /** A flag specifying whether the side navigation item is active or not. */
   isActive: PropTypes.bool,
   isMinimized: PropTypes.bool,
@@ -127,7 +127,7 @@ const LinkItem = ({ onClick, title, icon, exact, path }) => {
 
 LinkItem.propTypes = {
   exact: PropTypes.bool.isRequired,
-  icon: PropTypes.string,
+  icon: PropTypes.icon,
   onClick: PropTypes.func,
   path: PropTypes.string,
   title: PropTypes.message.isRequired,

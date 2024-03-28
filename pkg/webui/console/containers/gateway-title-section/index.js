@@ -17,6 +17,8 @@ import { useSelector } from 'react-redux'
 
 import gatewayIcon from '@assets/misc/gateway.svg'
 
+import { IconApiKeys, IconCollaborators } from '@ttn-lw/components/icon'
+
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import EntityTitleSection from '@console/components/entity-title-section'
@@ -57,7 +59,7 @@ const GatewayTitleSection = ({ gtwId }) => {
     <>
       {mayViewCollaborators && (
         <Content.EntityCount
-          icon="collaborators"
+          icon={IconCollaborators}
           value={collaboratorsTotalCount}
           keyMessage={sharedMessages.collaboratorCounted}
           toAllUrl={`/gateways/${gtwId}/collaborators`}
@@ -65,7 +67,7 @@ const GatewayTitleSection = ({ gtwId }) => {
       )}
       {mayViewApiKeys && (
         <Content.EntityCount
-          icon="api_keys"
+          icon={IconApiKeys}
           value={apiKeysTotalCount}
           keyMessage={sharedMessages.apiKeyCounted}
           toAllUrl={`/gateways/${gtwId}/api-keys`}

@@ -15,9 +15,9 @@
 import React, { useRef } from 'react'
 import classnames from 'classnames'
 
+import Icon, { IconChevronDown } from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 import Button from '@ttn-lw/components/button'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -60,7 +60,8 @@ const CollapsibleItem = ({
         {icon && <Icon icon={icon} className={style.icon} />}
         <Message content={title} className={style.title} />
         <Icon
-          icon="keyboard_arrow_down"
+          icon={IconChevronDown}
+          size={14}
           className={classnames(style.expandIcon, {
             [style.expandIconOpen]: isExpanded,
           })}
@@ -91,7 +92,7 @@ CollapsibleItem.propTypes = {
   children: PropTypes.node,
   currentPathName: PropTypes.string.isRequired,
   depth: PropTypes.number.isRequired,
-  icon: PropTypes.string,
+  icon: PropTypes.icon,
   isExpanded: PropTypes.bool.isRequired,
   isMinimized: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,

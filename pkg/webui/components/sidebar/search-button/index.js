@@ -15,8 +15,8 @@
 import React, { useCallback, useContext, useRef } from 'react'
 import classnames from 'classnames'
 
+import Icon, { IconSearch } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
-import Icon from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -45,7 +45,7 @@ const SearchButton = ({ onClick, className }) => {
       })}
     >
       <div className="d-flex gap-cs-xxs al-center">
-        <Icon icon="search" className={style.icon} />
+        <Icon icon={IconSearch} className={style.icon} />
         <Message content={sharedMessages.search} component="p" className="m-0" />
       </div>
       {isMinimized && (

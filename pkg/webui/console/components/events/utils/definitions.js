@@ -12,6 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {
+  IconEventClearAll,
+  IconEventConnection,
+  IconEventCreate,
+  IconEventDelete,
+  IconEventDownlink,
+  IconEventError,
+  IconEventGatewayConnect,
+  IconEventGatewayDisconnect,
+  IconEventJoin,
+  IconEventMode,
+  IconEventRekey,
+  IconEventStatus,
+  IconEventSwitch,
+  IconEventUpdate,
+  IconEventUplink,
+} from '@ttn-lw/components/icon'
+
 import DownlinkMessage from '../previews/downlink-message'
 import GatewayUplinkMessage from '../previews/gateway-uplink-message'
 import ApplicationDownlink from '../previews/application-downlink'
@@ -28,71 +46,71 @@ import Value from '../previews/value'
 export const eventIconMap = [
   {
     test: /^(ns\.|as\.|js\.)?([a-z0-9](?:[-_]?[a-z0-9]){2,}\.)+create$/,
-    icon: 'event_create',
+    icon: IconEventCreate,
   },
   {
     test: /^(ns\.|as\.|js\.)?([a-z0-9](?:[-_]?[a-z0-9]){2,}\.)+update$/,
-    icon: 'event_update',
+    icon: IconEventUpdate,
   },
   {
     test: /^(ns\.|as\.|js\.)?([a-z0-9](?:[-_]?[a-z0-9]){2,}\.)+delete$/,
-    icon: 'event_delete',
+    icon: IconEventDelete,
   },
   {
     test: /^(ns|as)\.up(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_uplink',
+    icon: IconEventUplink,
   },
   {
     test: /^(ns|as)\.down(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_downlink',
+    icon: IconEventDownlink,
   },
   {
     test: /^(js|ns|as)(\.up|\.down)?\.(join|rejoin)(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_join',
+    icon: IconEventJoin,
   },
   {
     test: /^gs\.up(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_uplink',
+    icon: IconEventUplink,
   },
   {
     test: /^gs\.down(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_downlink',
+    icon: IconEventDownlink,
   },
   {
     test: /^gs.gateway.connect$/,
-    icon: 'event_gateway_connect',
+    icon: IconEventGatewayConnect,
   },
   {
     test: /^gs.gateway.disconnect$/,
-    icon: 'event_gateway_disconnect',
+    icon: IconEventGatewayDisconnect,
   },
   {
     test: /^ns\.mac\.rekey\..*$/,
-    icon: 'event_rekey',
+    icon: IconEventRekey,
   },
   {
     test: /^ns\.mac\.device_mode\..*$/,
-    icon: 'event_mode',
+    icon: IconEventMode,
   },
   {
     test: /^ns\..*\.switch\..*$/,
-    icon: 'event_switch',
+    icon: IconEventSwitch,
   },
   {
     test: /^ns(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_connection',
+    icon: IconEventConnection,
   },
   {
     test: /^gs\.status\..*$/,
-    icon: 'event_status',
+    icon: IconEventStatus,
   },
   {
     test: /^synthetic\.status\.cleared$/,
-    icon: 'event_clear_all',
+    icon: IconEventClearAll,
   },
   {
     test: /^synthetic\.error\..*$/,
-    icon: 'event_error',
+    icon: IconEventError,
   },
 ]
 

@@ -16,6 +16,7 @@ import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import { IconPlus } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Input from '@ttn-lw/components/input'
 
@@ -108,7 +109,7 @@ const KeyValueMap = ({
           message={addMessage}
           onClick={addEmptyEntry}
           disabled={disabled}
-          icon="add"
+          icon={IconPlus}
           secondary
         />
       </div>

@@ -16,6 +16,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
+import { IconEdit } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
 
@@ -44,7 +45,7 @@ const ProfileCard = () => {
           <h3>{userName || userId}</h3>
           {Boolean(userName) && <span className={style.userId}>{userId}</span>}
         </div>
-        <Button.Link to="/profile-settings" icon="edit" message={m.editProfileSettings} />
+        <Button.Link to="/profile-settings" icon={IconEdit} message={m.editProfileSettings} />
       </div>
     </section>
   )

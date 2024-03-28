@@ -21,6 +21,7 @@ import { createSelector } from 'reselect'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
@@ -151,7 +152,7 @@ const TokensTable = () => {
             type="button"
             onClick={details.delete}
             message={m.deleteButton}
-            icon="delete"
+            icon={IconTrash}
             danger
             naked
           />
@@ -182,7 +183,7 @@ const TokensTable = () => {
       type="button"
       onClick={handleDeleteAllTokens}
       message={m.deleteAllButton}
-      icon="delete"
+      icon={IconTrash}
       danger
       naked
     />

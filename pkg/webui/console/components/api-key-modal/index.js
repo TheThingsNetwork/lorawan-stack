@@ -15,9 +15,9 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Icon, { IconCheck } from '@ttn-lw/components/icon'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -57,7 +57,7 @@ const ApiKeyModal = props => {
         <ul>
           {rights.map(right => (
             <li key={right}>
-              <Icon icon="check" className={style.icon} />
+              <Icon icon={IconCheck} className={style.icon} />
               <Message className={style.rightName} content={{ id: `enum:${right}` }} firstToUpper />
             </li>
           ))}

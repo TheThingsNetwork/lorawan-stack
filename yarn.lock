@@ -3220,6 +3220,18 @@
   resolved "https://registry.yarnpkg.com/@swc/types/-/types-0.1.5.tgz#043b731d4f56a79b4897a3de1af35e75d56bc63a"
   integrity sha512-myfUej5naTBWnqOCc/MdVOLVjXUXtIA+NpDrDBKJtLLg2shUjBu3cZmB/85RyitKc55+lUUyl7oRfLOvkr2hsw==
 
+"@tabler/icons-react@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@tabler/icons-react/-/icons-react-3.0.2.tgz#8c24e9bd8975f4afc014356c1e064c6e485f5bfb"
+  integrity sha512-WpU9yFk3wUpU6yvsOY4eJYuvKgOH3P9llcT1s8sbAxe0LZ5eK4Y6MQEbkk2pSlY5sp9enY3FPfJ3TzUfLfnBug==
+  dependencies:
+    "@tabler/icons" "3.0.2"
+
+"@tabler/icons@3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-3.0.2.tgz#a8e6d978523ef95505fa76de4f952edcd0184030"
+  integrity sha512-JdU4RQ1jySTdhRvrh5OvgxOHdfKgyRCbGpzuwJVpFVDkcOTRySrpoQYRe0cxg62+VSkPMAW5nr3CLtLPm43+sg==
+
 "@testing-library/cypress@^10.0.1":
   version "10.0.1"
   resolved "https://registry.yarnpkg.com/@testing-library/cypress/-/cypress-10.0.1.tgz#15abae0edb83237316ec6d07e152b71a50b38387"

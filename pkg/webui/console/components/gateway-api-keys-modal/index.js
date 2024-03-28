@@ -15,6 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import { IconFileDownload } from '@ttn-lw/components/icon'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import Button from '@ttn-lw/components/button'
 import ButtonGroup from '@ttn-lw/components/button/group'
@@ -54,7 +55,7 @@ const GatewayApiKeysModal = ({
           type="button"
           message={m.downloadLns}
           onClick={downloadLns}
-          icon="file_download"
+          icon={IconFileDownload}
           secondary
         />
       )}
@@ -63,7 +64,7 @@ const GatewayApiKeysModal = ({
           type="button"
           message={m.downloadCups}
           onClick={downloadCups}
-          icon="file_download"
+          icon={IconFileDownload}
           secondary
         />
       )}

@@ -21,7 +21,7 @@ import InfiniteLoader from 'react-window-infinite-loader'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useParams } from 'react-router-dom'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconEye } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -123,7 +123,7 @@ const NotificationList = ({
         {!isArchive && (
           <Button
             secondary
-            icon="visibility"
+            icon={IconEye}
             onClick={handleMarkAllAsSeen}
             message={m.markAllAsRead}
           />

@@ -17,8 +17,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 
+import Icon, { IconTrash, IconCheck } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
-import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 import ButtonGroup from '@ttn-lw/components/button/group'
@@ -209,7 +209,7 @@ const UsersTable = props => {
               type="button"
               onClick={details.delete}
               message={m.revokeInvitation}
-              icon="delete"
+              icon={IconTrash}
               danger
               naked
             />
@@ -284,7 +284,7 @@ const UsersTable = props => {
           width: 7,
           render: isAdmin => {
             if (isAdmin) {
-              return <Icon className="c-text-brand-normal" icon="check" />
+              return <Icon className="c-text-brand-normal" icon={IconCheck} />
             }
 
             return null

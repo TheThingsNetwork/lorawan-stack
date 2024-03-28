@@ -16,7 +16,7 @@ import React, { useCallback, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconHome, IconApplication, IconGateway } from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -51,7 +51,7 @@ const Switcher = ({ isMinimized }) => {
       })}
     >
       <NavLink to="/" className={getOverviewNavLinkClass} ref={overviewRef}>
-        <Icon icon="home" className={style.icon} />
+        <Icon icon={IconHome} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.overview} />
         {isMinimized && (
           <Dropdown.Attached
@@ -65,7 +65,7 @@ const Switcher = ({ isMinimized }) => {
         )}
       </NavLink>
       <NavLink to="/applications" className={getNavLinkClass} ref={applicationsRef}>
-        <Icon icon="application" className={style.icon} />
+        <Icon icon={IconApplication} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.applications} />
         {isMinimized && (
           <Dropdown.Attached
@@ -79,7 +79,7 @@ const Switcher = ({ isMinimized }) => {
         )}
       </NavLink>
       <NavLink to="/gateways" className={getNavLinkClass} ref={gatewaysRef}>
-        <Icon icon="gateway" className={style.icon} />
+        <Icon icon={IconGateway} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.gateways} />
         {isMinimized && (
           <Dropdown.Attached

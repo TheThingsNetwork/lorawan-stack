@@ -18,9 +18,9 @@ import classnames from 'classnames'
 import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
+import Icon, { IconInfoCircle, IconFileDownload, IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Routes from '@ttn-lw/components/switch'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -96,7 +96,7 @@ const Events = React.memo(
                   onClick={onExport}
                   message={sharedMessages.exportJson}
                   naked
-                  icon="file_download"
+                  icon={IconFileDownload}
                 />
                 <Button
                   onClick={onPause}
@@ -105,7 +105,7 @@ const Events = React.memo(
                   warning={paused}
                   icon={paused ? 'play_arrow' : 'pause'}
                 />
-                <Button onClick={onClear} message={sharedMessages.clear} naked icon="delete" />
+                <Button onClick={onClear} message={sharedMessages.clear} naked icon={IconTrash} />
               </div>
             </div>
           </div>
@@ -122,7 +122,7 @@ const Events = React.memo(
         </section>
         {truncated && (
           <div className={style.truncated}>
-            <Icon icon="info" />
+            <Icon icon={IconInfoCircle} />
             <Message content={m.eventsTruncated} values={{ limit: EVENT_STORE_LIMIT }} />
           </div>
         )}

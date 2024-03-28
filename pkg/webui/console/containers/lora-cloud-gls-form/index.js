@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import LORA_CLOUD_GLS from '@console/constants/lora-cloud-gls'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -272,7 +273,7 @@ const LoRaCloudGLSForm = () => {
         {Boolean(defaultAssociation) && (
           <ModalButton
             type="button"
-            icon="delete"
+            icon={IconTrash}
             message={sharedMessages.tokenDelete}
             modalData={{
               message: m.deleteWarning,

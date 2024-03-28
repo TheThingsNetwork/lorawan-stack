@@ -15,7 +15,11 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, {
+  IconExclamationCircle,
+  IconInfoCircle,
+  IconAlertCircle,
+} from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -48,11 +52,11 @@ const Notification = ({
     [style.withDetails]: Boolean(details),
   })
 
-  let icon = 'info'
+  let icon = IconInfoCircle
   if (error) {
-    icon = 'error'
+    icon = IconExclamationCircle
   } else if (warning) {
-    icon = 'warning'
+    icon = IconAlertCircle
   }
 
   return (

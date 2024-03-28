@@ -16,6 +16,14 @@ import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
+import {
+  IconMap,
+  IconApiKeys,
+  IconGateway,
+  IconGeneralSettings,
+  IconLiveData,
+  IconOrganization,
+} from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
 
@@ -69,7 +77,7 @@ const GtwSideNavigation = () => {
         <SideNavigation.Item
           title={sharedMessages.gatewayOverview}
           path={`/gateways/${gtwId}`}
-          icon="gateway"
+          icon={IconGateway}
           exact
         />
       )}
@@ -77,35 +85,35 @@ const GtwSideNavigation = () => {
         <SideNavigation.Item
           title={sharedMessages.liveData}
           path={`/gateways/${gtwId}/data`}
-          icon="list_alt"
+          icon={IconLiveData}
         />
       )}
       {mayViewOrEditGatewayLocation.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.location}
           path={`/gateways/${gtwId}/location`}
-          icon="map"
+          icon={IconMap}
         />
       )}
       {mayViewOrEditGatewayCollaborators.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.collaborators}
           path={`/gateways/${gtwId}/collaborators`}
-          icon="organization"
+          icon={IconOrganization}
         />
       )}
       {mayViewOrEditGatewayApiKeys.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.apiKeys}
           path={`/gateways/${gtwId}/api-keys`}
-          icon="api_keys"
+          icon={IconApiKeys}
         />
       )}
       {mayEditBasicGatewayInformation.check(rights) && (
         <SideNavigation.Item
           title={sharedMessages.generalSettings}
           path={`/gateways/${gtwId}/general-settings`}
-          icon="general_settings"
+          icon={IconGeneralSettings}
         />
       )}
     </SideNavigation>

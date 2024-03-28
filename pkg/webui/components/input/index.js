@@ -300,7 +300,7 @@ Input.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.bool,
   forwardedRef: PropTypes.shape({ current: PropTypes.shape({}) }),
-  icon: PropTypes.string,
+  icon: PropTypes.icon,
   inputRef: PropTypes.shape({ current: PropTypes.shape({}) }),
   inputWidth: PropTypes.inputWidth,
   label: PropTypes.string,

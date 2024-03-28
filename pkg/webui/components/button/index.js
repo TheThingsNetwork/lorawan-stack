@@ -18,7 +18,7 @@ import { useIntl } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconChevronDown } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -79,7 +79,11 @@ const buttonChildren = props => {
       {message && <Message content={message} className={style.linkButtonMessage} />}
       {children}
       {dropdownItems && (
-        <>{!noDropdownIcon && <Icon className={style.expandIcon} icon="expand_more" />}</>
+        <>
+          {!noDropdownIcon && (
+            <Icon className={style.expandIcon} icon={IconChevronDown} size={18} />
+          )}
+        </>
       )}
     </>
   )
@@ -244,7 +248,7 @@ const commonPropTypes = {
    */
   error: PropTypes.bool,
   /** The name of an icon to be displayed within the button. */
-  icon: PropTypes.string,
+  icon: PropTypes.icon,
   /**
    * A flag specifying whether the button in the `busy` state and the
    * appropriate styling should be applied.

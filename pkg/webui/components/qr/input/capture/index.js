@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import { defineMessages } from 'react-intl'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import FileInput from '../../../file-input'
 import style from '../../qr.styl'

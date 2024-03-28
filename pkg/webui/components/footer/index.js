@@ -15,10 +15,10 @@
 import React, { useContext, useCallback, useState, useRef } from 'react'
 import classnames from 'classnames'
 
+import Icon, { IconLanguage, IconLifebuoy } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import OfflineStatus from '@ttn-lw/components/offline-status'
 import Dropdown from '@ttn-lw/components/dropdown'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 import { LanguageContext } from '@ttn-lw/lib/components/with-locale'
@@ -165,8 +165,8 @@ const Footer = ({
         )}
         {Boolean(languageContext) && (
           <div className={style.language} ref={node}>
-            <FooterSection action={handleToggleLanguageDropdown} icon="language">
-              <Icon icon="language" className={style.languageIcon} textPaddedRight />
+            <FooterSection action={handleToggleLanguageDropdown} icon={IconLanguage}>
+              <Icon icon={IconLanguage} className={style.languageIcon} textPaddedRight />
               {locale.split('-')[0].toUpperCase()}
             </FooterSection>
             {languageDropdownVisible && (
@@ -202,7 +202,7 @@ const Footer = ({
         )}
         {supportLink && (
           <FooterSection link={supportLink} safe={safe} primary>
-            <Icon icon="contact_support" textPaddedRight nudgeDown />
+            <Icon icon={IconLifebuoy} textPaddedRight nudgeDown />
             <Message content={sharedMessages.getSupport} />
           </FooterSection>
         )}

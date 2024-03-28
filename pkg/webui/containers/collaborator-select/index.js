@@ -17,9 +17,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages, useIntl } from 'react-intl'
 import { components } from 'react-select'
 
+import Icon, { IconUser } from '@ttn-lw/components/icon'
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
-import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import { useFormContext } from '@ttn-lw/components/form'
 
@@ -64,7 +64,7 @@ const SingleValue = props => (
 
 SingleValue.propTypes = {
   data: PropTypes.shape({
-    icon: PropTypes.string.isRequired,
+    icon: PropTypes.icon.isRequired,
     description: PropTypes.string,
     label: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
@@ -167,7 +167,7 @@ const Suggest = ({
       />
       {isResctrictedUser && (
         <Button
-          icon="user"
+          icon={IconUser}
           onClick={handleSetYourself}
           message={{ ...m.setYourself, values: { name: name.replace('_', ' ') } }}
           secondary

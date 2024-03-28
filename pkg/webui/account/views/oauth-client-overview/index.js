@@ -20,6 +20,7 @@ import { useParams } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
+import { IconCollaborators } from '@ttn-lw/components/icon'
 import DataSheet from '@ttn-lw/components/data-sheet'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -94,7 +95,7 @@ const OAuthClientOverviewInner = () => {
     <>
       {mayPerformAdminActions && (
         <Content.EntityCount
-          icon="collaborators"
+          icon={IconCollaborators}
           value={collaboratorsTotalCount}
           keyMessage={sharedMessages.collaboratorCounted}
           errored={false}

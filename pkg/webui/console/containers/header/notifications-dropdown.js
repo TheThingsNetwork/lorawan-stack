@@ -17,8 +17,8 @@ import { useSelector } from 'react-redux'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
+import Icon, { IconKey } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
-import Icon from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -79,7 +79,9 @@ const NotificationsDropdown = () => {
               key={notification.id}
               className={classnames(style.notificationsDropdownLink, 'd-flex')}
             >
-              <Icon icon="key" className={style.notificationsDropdownLinkIcon} />
+              <div className={style.notificationsDropdownLinkIcon}>
+                <Icon icon={IconKey} />
+              </div>
               <div className={style.notificationContainer}>
                 <div className={classnames(style.title, 'fw-bold')}>
                   <Notification.Title

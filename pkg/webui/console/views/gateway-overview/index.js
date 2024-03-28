@@ -20,6 +20,7 @@ import { useSelector } from 'react-redux'
 
 import tts from '@console/api/tts'
 
+import { IconFileDownload } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import DataSheet from '@ttn-lw/components/data-sheet'
 import toast from '@ttn-lw/components/toast'
@@ -136,7 +137,7 @@ const GatewayOverview = () => {
         frequency_plan_ids.length !== 0 ? (
           <Button
             type="button"
-            icon="get_app"
+            icon={IconFileDownload}
             onClick={handleGlobalConfDownload}
             message={m.downloadGlobalConf}
             secondary

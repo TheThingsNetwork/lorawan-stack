@@ -14,6 +14,7 @@
 
 import React from 'react'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Input from '@ttn-lw/components/input'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import Form from '@ttn-lw/components/form'
@@ -65,7 +66,7 @@ const DeleteModalButton = props => {
   return (
     <ModalButton
       type="button"
-      icon="delete"
+      icon={IconTrash}
       naked
       danger
       onApprove={handleDeleteApprove}
@@ -75,7 +76,8 @@ const DeleteModalButton = props => {
         title: sharedMessages.deleteModalConfirmDeletion,
         approveButtonProps: {
           disabled: shouldConfirm && confirmId !== entityId,
-          icon: 'delete',
+          icon: { IconTrash },
+          primary: true,
           message,
         },
         children: (

@@ -57,7 +57,7 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
 MenuLink.propTypes = {
   disabled: PropTypes.bool,
   exact: PropTypes.bool.isRequired,
-  icon: PropTypes.string,
+  icon: PropTypes.icon,
   onClick: PropTypes.func,
   path: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,

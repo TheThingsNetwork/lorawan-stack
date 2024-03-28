@@ -41,7 +41,7 @@ const customOption = props => {
 
 customOption.propTypes = {
   data: PropTypes.shape({
-    icon: PropTypes.string,
+    icon: PropTypes.icon,
   }).isRequired,
   label: PropTypes.string.isRequired,
 }

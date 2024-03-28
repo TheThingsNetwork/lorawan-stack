@@ -15,6 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import { IconRefresh } from '@ttn-lw/components/icon'
 import Modal from '@ttn-lw/components/modal'
 
 const m = defineMessages({
@@ -35,7 +36,7 @@ const LogBackInModal = () => (
     message={m.modalMessage}
     title={m.modalTitle}
     onComplete={reload}
-    approveButtonProps={{ icon: 'refresh' }}
+    approveButtonProps={{ icon: IconRefresh }}
   />
 )
 
