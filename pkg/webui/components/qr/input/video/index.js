@@ -91,10 +91,10 @@ const Camera = props => {
   return (
     <>
       {hasFrontCamera && hasBackCamera ? (
-        <Button icon="switch_camera" message={m.switchCamera} onClick={handleSwitchCamera} />
+        <Button icon="switch_camera" message={m.switchCamera} onClick={handleSwitchCamera} naked />
       ) : (
         cameras.length > 1 && (
-          <Button icon="switch_camera" message={m.switchCamera} onClick={handleCameraCycle} />
+          <Button icon="switch_camera" message={m.switchCamera} onClick={handleCameraCycle} naked />
         )
       )}
 

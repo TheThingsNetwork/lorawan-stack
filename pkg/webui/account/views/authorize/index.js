@@ -85,7 +85,6 @@ const Authorize = () => {
           type="button"
           onClick={handleLogout}
           className={style.logoutButton}
-          unstyled
         />
       </span>
       <Message content={m.redirectInfo} values={{ redirectUri }} />

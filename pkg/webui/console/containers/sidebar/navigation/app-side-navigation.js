@@ -66,7 +66,7 @@ const AppSideNavigation = () => {
 
   return (
     <>
-      <SideNavigation className="mb-cs-m">
+      <SideNavigation>
         {!isMinimized && (
           <DedicatedEntity
             label={entityId}

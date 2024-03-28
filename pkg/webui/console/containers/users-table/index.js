@@ -211,6 +211,7 @@ const UsersTable = props => {
               message={m.revokeInvitation}
               icon="delete"
               danger
+              naked
             />
           ),
         },

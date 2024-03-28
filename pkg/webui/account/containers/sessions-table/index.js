@@ -167,6 +167,7 @@ const UserSessionsTable = () => {
               message={m.removeButtonMessage}
               icon="delete"
               danger
+              naked
             />
           )
         },

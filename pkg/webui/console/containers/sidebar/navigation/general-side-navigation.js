@@ -44,7 +44,7 @@ const GeneralSideNavigation = () => {
 
   return (
     <>
-      <SideNavigation className="mt-cs-xs">
+      <SideNavigation>
         <SideNavigation.Item title={sharedMessages.dashboard} path="/" icon="overview" exact />
         {mayViewOrgs && (
           <SideNavigation.Item

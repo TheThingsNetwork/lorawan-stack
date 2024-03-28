@@ -147,6 +147,7 @@ const CollaboratorsTable = props => {
             message={sharedMessages.remove}
             icon="delete"
             danger
+            naked
           />
         ),
       },

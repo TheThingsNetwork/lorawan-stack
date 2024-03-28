@@ -201,6 +201,7 @@ const FileInput = props => {
             message={!value ? message : changeMessage}
             icon="attachment"
             className="mr-cs-s"
+            secondary
           />
           <StatusMessage
             value={value}

@@ -123,8 +123,8 @@ export default {
       Object.assign({}, r, {
         options: (
           <div>
-            <Button icon="settings" />
-            <Button danger icon="delete" />
+            <Button icon="settings" primary />
+            <Button danger icon="delete" primary />
           </div>
         ),
       }),

@@ -59,7 +59,7 @@ const FooterSection = ({ className, action, link, children, primary, safe }) => 
     )
   } else if (Boolean(action)) {
     content = (
-      <Button className={style.footerSectionButton} onClick={action} unstyled>
+      <Button className={style.footerSectionButton} onClick={action}>
         {children}
       </Button>
     )
