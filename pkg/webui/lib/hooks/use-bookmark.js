@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
@@ -23,6 +23,13 @@ import { getOrganization } from '@console/store/actions/organizations'
 import { getUser } from '@account/store/actions/user'
 import { getDevice } from '@console/store/actions/devices'
 import { getClient } from '@account/store/actions/clients'
+
+import { selectApplicationById } from '@console/store/selectors/applications'
+import { selectGatewayById } from '@console/store/selectors/gateways'
+import { selectOrganizationById } from '@console/store/selectors/organizations'
+import { selectUserById } from '@console/store/selectors/users'
+import { selectClientById } from '@account/store/selectors/clients'
+import { selectDeviceByIds } from '@console/store/selectors/devices'
 
 const iconMap = {
   application: 'application',
@@ -40,6 +47,14 @@ const entityRequestMap = {
   user: getUser,
   client: getClient,
   device: getDevice,
+}
+
+const selectorMap = {
+  application: selectApplicationById,
+  gateway: selectGatewayById,
+  organization: selectOrganizationById,
+  user: selectUserById,
+  client: selectClientById,
 }
 
 /**
@@ -61,15 +76,31 @@ const useBookmark = bookmark => {
   if (entity === 'device') {
     entityId.appId = entityIds[`${entity}_ids`].application_ids.application_id
   }
-  const [bookmarkTitle, setBookmarkTitle] = useState('')
+  // Find entity in the store.
+  const entityInStore = useSelector(
+    entity === 'device'
+      ? state => selectDeviceByIds(state, entityId.appId, entityId.id)
+      : state => selectorMap[entity](state, entityId.id),
+  )
+  const [bookmarkTitle, setBookmarkTitle] = useState(entityInStore?.name)
   useEffect(() => {
     const fetchEntity = async () => {
-      // TODO: Do thios witj selectors checking the selected entity and see if it's already in store.
-      const response = await dispatch(attachPromise(entityRequestMap[entity](entityId.id, 'name')))
+      let response
+      if (entity === 'device') {
+        response = await dispatch(
+          attachPromise(entityRequestMap[entity](entityId.appId, entityId.id, 'name')),
+        )
+      } else {
+        response = await dispatch(attachPromise(entityRequestMap[entity](entityId.id, 'name')))
+      }
       setBookmarkTitle(response.name || entityIds[`${entity}_ids`][`${entity}_id`])
     }
-    fetchEntity()
-  }, [entity, entityId, dispatch, entityIds])
+
+    // Only fetch the entity if the name is not already in the store.
+    if (!bookmarkTitle) {
+      fetchEntity()
+    }
+  }, [entity, entityId, dispatch, entityIds, bookmarkTitle])
 
   // Get the icon corresponding to the entity.
   const icon = iconMap[entity]
@@ -79,7 +110,7 @@ const useBookmark = bookmark => {
       ? `/applications/${entityIds.device_ids.application_ids.application_id}/devices/${entityIds.device_ids.device_id}`
       : `/${entity}s/${entityIds[`${entity}_ids`][`${entity}_id`]}`
 
-  return { title: bookmarkTitle, path, icon }
+  return { title: bookmarkTitle ?? '', path, icon }
 }
 
 export default useBookmark

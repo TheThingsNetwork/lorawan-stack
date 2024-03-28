@@ -71,7 +71,6 @@ const consoleAppLogic = createRequestLogic({
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))
         dispatch(getInboxNotifications({ page: 1, limit: 3 }))
-        // dispatch(addBookmark(userId, { application_ids: { application_id: 'darya' } }))
         dispatch(getBookmarksList(userId, { page: 1, limit: 20 }))
         dispatch(getUnseenNotificationsPeriodically())
       } catch (error) {
