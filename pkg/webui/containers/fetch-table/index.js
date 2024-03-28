@@ -33,6 +33,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import getByPath from '@ttn-lw/lib/get-by-path'
 import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
 import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
+import useCookieState from '@ttn-lw/lib/hooks/use-cookie-state'
 
 import style from './fetch-table.styl'
 
@@ -58,7 +59,7 @@ const m = defineMessages({
 
 const FetchTable = props => {
   const {
-    pageSize,
+    pageSize: initialPageSize,
     addMessage,
     tableTitle,
     headers,
@@ -82,6 +83,7 @@ const FetchTable = props => {
     className,
   } = props
 
+  const [pageSize, setPageSize] = useCookieState(`${entity}-list-page-size`, initialPageSize)
   const isMounted = useRef(true)
   const dispatch = useDispatch()
   const defaultTab = tabs.length > 0 ? tabs[0].name : undefined
@@ -304,6 +306,7 @@ const FetchTable = props => {
           page={page}
           totalCount={totalCount}
           pageSize={pageSize}
+          setPageSize={setPageSize}
           onPageChange={onPageChange}
           loading={fetching}
           headers={headers}
