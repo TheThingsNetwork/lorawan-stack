@@ -153,6 +153,7 @@ const TokensTable = () => {
             message={m.deleteButton}
             icon="delete"
             danger
+            naked
           />
         ),
       },
@@ -183,6 +184,7 @@ const TokensTable = () => {
       message={m.deleteAllButton}
       icon="delete"
       danger
+      naked
     />
   )
 

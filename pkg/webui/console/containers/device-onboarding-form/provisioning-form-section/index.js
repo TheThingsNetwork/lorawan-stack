@@ -160,6 +160,7 @@ const DeviceProvisioningFormSection = () => {
               onClick={handleJoinEuiConfirm}
               message={sharedMessages.confirm}
               className="ml-cs-xs"
+              secondary
             />
           ) : (
             <Button
@@ -168,6 +169,7 @@ const DeviceProvisioningFormSection = () => {
               message={sharedMessages.reset}
               className="ml-cs-xs"
               disabled={_withQRdata}
+              secondary
             />
           )}
         </Form.Field>

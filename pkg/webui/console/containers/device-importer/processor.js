@@ -204,7 +204,7 @@ const Processor = ({
             </>
           )}
           {status === 'processing' && step === 'creation' && (
-            <Button danger message={m.abort} onClick={handleAbort} />
+            <Button danger message={m.abort} onClick={handleAbort} secondary />
           )}
         </ButtonGroup>
       </SubmitBar>

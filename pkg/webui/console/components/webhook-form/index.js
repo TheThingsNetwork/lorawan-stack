@@ -391,6 +391,7 @@ const WebhookForm = props => {
               icon="refresh"
               message={m.reactivateButtonMessage}
               className="mt-cs-m"
+              secondary
             />
           }
           small

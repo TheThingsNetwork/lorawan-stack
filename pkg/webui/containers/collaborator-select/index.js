@@ -170,6 +170,7 @@ const Suggest = ({
           icon="user"
           onClick={handleSetYourself}
           message={{ ...m.setYourself, values: { name: name.replace('_', ' ') } }}
+          secondary
         />
       )}
     </>

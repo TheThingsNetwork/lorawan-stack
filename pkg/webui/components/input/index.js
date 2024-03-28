@@ -244,7 +244,12 @@ const Input = React.forwardRef((props, ref) => {
       </div>
       {hasAction && (
         <div className={style.actions}>
-          <Button className={style.button} {...action} disabled={disabled || actionDisable} />
+          <Button
+            className={style.button}
+            secondary
+            {...action}
+            disabled={disabled || actionDisable}
+          />
         </div>
       )}
       {children}

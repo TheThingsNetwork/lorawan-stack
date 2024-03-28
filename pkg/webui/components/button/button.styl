@@ -29,7 +29,7 @@
     justify-content: center
     align-items: center
     gap: $cs.xxs
-    height: 2.5rem
+    height: $default-input-height
     text-decoration: none
     padding: 0 $cs.m
     white-space: nowrap
@@ -116,15 +116,29 @@
     gradient-border(var(--c-bg-neutral-min), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
     border: 1px solid transparent
 
-    &:hover
-      gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+    &.warning
+      color: var(--c-text-warning-normal)
+      border-color: var(--c-border-warning-normal)
 
-    +focus-visible()
-      gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+    &.danger
+      color: var(--c-text-error-normal)
+      border-color: var(--c-border-error-normal)
 
-    &:active
-      gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
-      box-shadow: none
+    &:disabled
+      color: var(--c-text-neutral-extralight)
+      background-color: var(--c-bg-neutral-semilight)
+      border-color: var(--c-border-neutral-light)
+
+    &:not(:disabled)
+      &:hover
+        gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+
+      +focus-visible()
+        gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+
+      &:active
+        gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+        box-shadow: none
 
   &.naked
     color: var(--c-text-neutral-light)

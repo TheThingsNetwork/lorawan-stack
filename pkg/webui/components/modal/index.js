@@ -133,11 +133,11 @@ const Modal = props => {
           name={formName}
           icon="clear"
           value="false"
+          secondary
           {...name}
           {...cancelButtonProps}
         />
         <Button
-          primary
           message={approveButtonMessage}
           onClick={handleApprove}
           name={formName}
@@ -145,6 +145,7 @@ const Modal = props => {
           value="true"
           danger={danger}
           ref={approveButtonRef}
+          primary
           {...name}
           {...approveButtonProps}
         />

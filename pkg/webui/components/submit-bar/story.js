@@ -24,14 +24,14 @@ export default {
 
 export const OnlySubmit = () => (
   <SubmitBar>
-    <Button message="Save Changes" icon="done" />
+    <Button message="Save Changes" icon="done" primary />
   </SubmitBar>
 )
 
 export const SubmitAndReset = () => (
   <SubmitBar>
-    <Button message="Save Changes" icon="done" />
-    <Button message="Delete" icon="delete" naked danger />
+    <Button message="Save Changes" icon="done" primary />
+    <Button message="Delete" icon="delete" naked danger primary />
   </SubmitBar>
 )
 
@@ -41,7 +41,7 @@ SubmitAndReset.story = {
 
 export const SubmitAndText = () => (
   <SubmitBar align="start">
-    <Button message="Save Changes" icon="done" />
+    <Button message="Save Changes" icon="done" primary />
     <SubmitBar.Message content="Note: End device level message payload formats take precedence over application level message payload formats" />
   </SubmitBar>
 )
