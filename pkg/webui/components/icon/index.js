@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,78 +14,14 @@
 
 import React, { forwardRef } from 'react'
 import classnames from 'classnames'
-import PropTypes from 'prop-types'
 
-import StarIcon from './replacements/star-icon'
-import PlusIcon from './replacements/plus-icon'
-import SortIcon from './replacements/sort-icon'
-import TtsIcon from './replacements/tts-icon'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './icon.styl'
 
-// A map of hardcoded names to their corresponding icons.
-// Keep these sorted alphabetically.
-const hardcoded = {
-  access: 'lock',
-  api_keys: 'key',
-  application: 'display_settings',
-  cluster: 'language',
-  collaborators: 'people',
-  data: 'poll',
-  develop: 'code',
-  device: 'settings_remote',
-  devices: 'device_hub',
-  downlink: 'arrow_downward',
-  event: 'info',
-  event_clear_all: 'clear_all',
-  event_connection: 'settings_ethernet',
-  event_create: 'add_circle',
-  event_delete: 'delete',
-  event_downlink: 'arrow_downward',
-  event_error: 'error',
-  event_gateway_connect: 'flash_on',
-  event_gateway_disconnect: 'flash_off',
-  event_join: 'link',
-  event_mode: 'tune',
-  event_rekey: 'vpn_key',
-  event_status: 'network_check',
-  event_switch: 'tune',
-  event_update: 'edit',
-  event_uplink: 'arrow_upward',
-  expand_down: 'keyboard_arrow_down',
-  expand_up: 'keyboard_arrow_up',
-  gateway: 'router',
-  general_settings: 'settings',
-  import_devices: 'playlist_add',
-  integration: 'call_merge',
-  join: 'link',
-  link: 'link',
-  location: 'place',
-  logout: 'logout',
-  organization: 'people',
-  overview: 'dashboard',
-  packet_broker: 'camera',
-  payload_formats: 'code',
-  oauth_clients: 'recent_actors',
-  settings: 'tune',
-  sort_order_asc: 'arrow_drop_down',
-  sort_order_desc: 'arrow_drop_up',
-  uplink: 'arrow_upward',
-  user_management: 'how_to_reg',
-  user: 'person',
-  valid: 'check_circle',
-}
-
-const replaced = {
-  star: StarIcon,
-  plus: PlusIcon,
-  sort: SortIcon,
-  tts: TtsIcon,
-}
-
 const Icon = forwardRef((props, ref) => {
   const {
-    icon,
+    icon: ActualIcon,
     className,
     nudgeUp,
     nudgeDown,
@@ -93,10 +29,11 @@ const Icon = forwardRef((props, ref) => {
     large,
     textPaddedLeft,
     textPaddedRight,
+    size,
     ...rest
   } = props
 
-  const classname = classnames(style.icon, className, {
+  const classname = classnames(className, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,
     [style.large]: large,
@@ -105,29 +42,21 @@ const Icon = forwardRef((props, ref) => {
     [style.textPaddedRight]: textPaddedRight,
   })
 
-  if (replaced[icon]) {
-    const ReplacedIcon = replaced[icon]
-
-    return <ReplacedIcon className={classname} ref={ref} {...rest} />
-  }
-
-  return (
-    <span className={classname} ref={ref} {...rest}>
-      {hardcoded[icon] || icon}
-    </span>
-  )
+  return <ActualIcon className={classname} ref={ref} size={small ? 16 : size} {...rest} />
 })
 
 Icon.propTypes = {
   className: PropTypes.string,
-  /** Which icon to display, using google material icon set. */
-  icon: PropTypes.string.isRequired,
+  /** Which icon to display, using tabler icon set. */
+  icon: PropTypes.icon.isRequired,
   /** Renders a bigger icon. */
   large: PropTypes.bool,
   /** Nudges the icon down by one pixel using position: relative. */
   nudgeDown: PropTypes.bool,
   /** Nudges the icon up by one pixel using position: relative. */
   nudgeUp: PropTypes.bool,
+  /** The size of the icon. */
+  size: PropTypes.number,
   /** Renders a smaller icon. */
   small: PropTypes.bool,
   /** Whether icon should be padded for a text displayed left to it. */
@@ -141,9 +70,12 @@ Icon.defaultProps = {
   large: false,
   nudgeDown: false,
   nudgeUp: false,
+  size: 20,
   small: false,
   textPaddedLeft: false,
   textPaddedRight: false,
 }
 
 export default Icon
+export * from '@tabler/icons-react'
+export * from './common'

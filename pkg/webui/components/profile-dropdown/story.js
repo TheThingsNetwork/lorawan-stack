@@ -14,6 +14,16 @@
 
 import React from 'react'
 
+import {
+  IconUser,
+  IconLogout,
+  IconAdminShield,
+  IconCreditCard,
+  IconChartBar,
+  IconBook,
+  IconRocket,
+  IconSupport,
+} from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 import ExampleLogo from '@ttn-lw/components/logo/story-logo-new.svg'
 
@@ -32,20 +42,20 @@ export default {
 export const Default = () => (
   <div style={{ height: '25rem', marginLeft: '15rem' }}>
     <ProfileDropdown brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}>
-      <Dropdown.Item title="Profile settings" icon="person" path="/profile-settings" />
+      <Dropdown.Item title="Profile settings" icon={IconUser} path="/profile-settings" />
       <Dropdown.Item
         title="Manage cloud subscription"
-        icon="credit_card"
+        icon={IconCreditCard}
         path="/manage-cloud-subs"
       />
-      <Dropdown.Item title="Network Operations Center" icon="bar_chart" path="/network_ops" />
-      <Dropdown.Item title="Admin panel" icon="admin_panel_settings" path="/admin-panel" />
+      <Dropdown.Item title="Network Operations Center" icon={IconChartBar} path="/network_ops" />
+      <Dropdown.Item title="Admin panel" icon={IconAdminShield} path="/admin-panel" />
       <hr />
-      <Dropdown.Item title="Upgrade" icon="stars" path="/upgrade" />
-      <Dropdown.Item title="Get support" icon="support" path="/support" />
-      <Dropdown.Item title="Documentation" icon="menu_book" path="/documentation" />
+      <Dropdown.Item title="Upgrade" icon={IconRocket} path="/upgrade" />
+      <Dropdown.Item title="Get support" icon={IconSupport} path="/support" />
+      <Dropdown.Item title="Documentation" icon={IconBook} path="/documentation" />
       <hr />
-      <Dropdown.Item title="Logout" icon="logout" action={handleLogout} />
+      <Dropdown.Item title="Logout" icon={IconLogout} action={handleLogout} />
     </ProfileDropdown>
   </div>
 )

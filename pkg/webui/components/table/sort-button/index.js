@@ -15,7 +15,7 @@
 import React, { useCallback } from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconSort, IconSortOrderAsc, IconSortOrderDesc } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,9 +32,9 @@ const SortButton = ({ name, onSort, className, active, direction, title, align }
     [style.buttonCenter]: align === 'center',
   })
 
-  let icon = 'sort'
+  let icon = IconSort
   if (active && direction) {
-    icon += `_order_${direction}`
+    icon = direction === 'asc' ? IconSortOrderAsc : IconSortOrderDesc
   }
 
   return (

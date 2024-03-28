@@ -18,10 +18,10 @@ import { useSelector } from 'react-redux'
 
 import deviceIcon from '@assets/misc/end-device.svg'
 
+import Icon, { IconHelp, IconDownlink, IconUplink } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
 import Tooltip from '@ttn-lw/components/tooltip'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -71,14 +71,18 @@ const DeviceTitleSection = props => {
       <Tooltip content={<Message content={m.uplinkDownlinkTooltip} />}>
         <div className="d-flex">
           <Content.MessagesCount
-            icon="uplink"
+            icon={IconUplink}
             value={showUplinkCount ? uplinkFrameCount : notAvailableElem}
-            iconClassName={showUplinkCount ? 'c-text-brand-normal' : 'c-text-neutral-light'}
+            iconClassName={
+              showUplinkCount ? 'd-flex c-text-brand-normal' : 'd-flex c-text-neutral-light'
+            }
           />
           <Content.MessagesCount
-            icon="downlink"
+            icon={IconDownlink}
             value={showDownlinkCount ? downlinkFrameCount : notAvailableElem}
-            iconClassName={showUplinkCount ? 'c-text-brand-normal' : 'c-text-neutral-light'}
+            iconClassName={
+              showUplinkCount ? 'd-flex c-text-brand-normal' : 'd-flex c-text-neutral-light'
+            }
           />
         </div>
       </Tooltip>
@@ -93,13 +97,7 @@ const DeviceTitleSection = props => {
           }
         >
           <LastSeen lastSeen={lastSeen} flipped noTitle>
-            <Icon
-              icon="help_outline"
-              textPaddedLeft
-              small
-              nudgeUp
-              className="c-text-neutral-light"
-            />
+            <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
           </LastSeen>
         </DocTooltip>
       ) : (
@@ -109,13 +107,7 @@ const DeviceTitleSection = props => {
           content={<Message content={m.noActivityTooltip} />}
         >
           <Status status="mediocre" label={sharedMessages.noActivityYet} flipped>
-            <Icon
-              icon="help_outline"
-              textPaddedLeft
-              small
-              nudgeUp
-              className="c-text-neutral-light"
-            />
+            <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
           </Status>
         </DocTooltip>
       )}

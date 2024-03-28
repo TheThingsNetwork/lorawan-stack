@@ -15,8 +15,8 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Icon, { IconCollaborators } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
-import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -53,7 +53,7 @@ const getId = entity => {
   return entity.user_id
 }
 
-const CollaboratorChangedIcon = () => <Icon icon="collaborators" className="c-tts-primary" />
+const CollaboratorChangedIcon = () => <Icon icon={IconCollaborators} className="c-tts-primary" />
 
 const CollaboratorChangedPreview = ({ notificationData }) => {
   const { data, entity_ids } = notificationData

@@ -16,6 +16,7 @@ import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import { IconLogout } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Dropdown from '@ttn-lw/components/dropdown'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
@@ -65,7 +66,7 @@ const MobileMenu = ({ className, children, user, onItemsClick, onLogout, bottomA
             <div>
               <Button
                 message={sharedMessages.logout}
-                icon="logout"
+                icon={IconLogout}
                 onClick={handleLogoutClick}
                 naked
               />

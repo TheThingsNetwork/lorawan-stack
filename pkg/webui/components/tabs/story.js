@@ -17,6 +17,8 @@
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 
+import { IconData, IconOrganization } from '@ttn-lw/components/icon'
+
 import Tabs from '.'
 
 class Example extends Component {
@@ -82,8 +84,8 @@ DefaultNarrow.story = {
 
 export const WithIcons = () => {
   const tabs = [
-    { title: 'People', name: 'people', icon: 'organization' },
-    { title: 'Data', name: 'data', icon: 'data' },
+    { title: 'People', name: 'people', icon: IconOrganization },
+    { title: 'Data', name: 'data', icon: IconData },
   ]
 
   return <Example tabs={tabs} active={tabs[0].name} divider />
@@ -95,8 +97,8 @@ WithIcons.story = {
 
 export const WithIconsDisabled = () => {
   const tabs = [
-    { title: 'People', name: 'people', icon: 'organization' },
-    { title: 'Data', name: 'data', icon: 'data', disabled: true },
+    { title: 'People', name: 'people', icon: IconOrganization },
+    { title: 'Data', name: 'data', icon: IconData, disabled: true },
   ]
 
   return <Example tabs={tabs} active={tabs[0].name} />

@@ -40,6 +40,9 @@
 # Icon must end with two \r
 Icon
 
+# Except for everything in the icon component directory
+!/pkg/webui/components/icon/
+
 # Thumbnails
 ._*
 

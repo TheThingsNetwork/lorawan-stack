@@ -13,13 +13,15 @@
 // limitations under the License.
 
 import React, { useCallback, createRef, useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import { defineMessages } from 'react-intl'
 
+import { IconCameraRotate } from '@ttn-lw/components/icon'
 import Spinner from '@ttn-lw/components/spinner'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from '../../qr.styl'
 
@@ -91,10 +93,10 @@ const Camera = props => {
   return (
     <>
       {hasFrontCamera && hasBackCamera ? (
-        <Button icon="switch_camera" message={m.switchCamera} onClick={handleSwitchCamera} naked />
+        <Button icon="camera-rotate" message={m.switchCamera} onClick={handleSwitchCamera} naked />
       ) : (
         cameras.length > 1 && (
-          <Button icon="switch_camera" message={m.switchCamera} onClick={handleCameraCycle} naked />
+          <Button icon="camera-rotate" message={m.switchCamera} onClick={handleCameraCycle} naked />
         )
       )}
 

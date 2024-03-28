@@ -77,7 +77,7 @@ const PanelViewItem = ({ icon, title, path, Component, _isRoute }) => {
 PanelViewItem.propTypes = {
   Component: PropTypes.func.isRequired,
   _isRoute: PropTypes.bool,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.icon.isRequired,
   path: PropTypes.string.isRequired,
   title: PropTypes.message.isRequired,
 }

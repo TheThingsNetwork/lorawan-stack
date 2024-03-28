@@ -37,6 +37,7 @@
 
   .icon
     margin-left: - $cs.xxs
+    flex-shrink: 0
 
     &:only-child
       margin-right: - $cs.xxs
@@ -55,6 +56,7 @@
   .expand-icon
     color: var(--c-icon-neutral-light)
     font-size: 1.285rem
+    margin-left: .2rem
     margin-right: - $cs.xxs
 
   &.only-icon
@@ -80,6 +82,9 @@
       &:active
         background-color: var(--c-text-brand-normal-active)
 
+    &:disabled
+      background-color: var(--c-bg-neutral-min-disabled)
+
     &.warning
       background-color: var(--c-bg-warning-normal)
 
@@ -92,6 +97,9 @@
 
         &:active
           background-color: var(--c-bg-warning-normal-active)
+
+        &:disabled
+          background-color: var(--c-bg-warning-normal-disabled)
 
     &.danger
       background-color: var(--c-bg-error-normal)
@@ -107,7 +115,7 @@
           background-color: var(--c-bg-error-normal-active)
 
       &:disabled
-        background-color: var(--c-bg-error-normal-light)
+        background-color: var(--c-bg-error-normal-disabled)
 
   &.secondary
     color: var(--c-text-neutral-heavy)
@@ -173,7 +181,7 @@
       color: var(--c-text-error-normal)
 
       &:hover
-        color: var(--c-text-warning-hover)
+        color: var(--c-text-error-normal-hover)
 
   &.with-dropdown&.only-icon
     width: fit-content

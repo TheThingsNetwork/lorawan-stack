@@ -17,6 +17,8 @@ import { useSelector } from 'react-redux'
 
 import organizationIcon from '@assets/misc/organization.svg'
 
+import { IconApiKeys, IconCollaborators } from '@ttn-lw/components/icon'
+
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import EntityTitleSection from '@console/components/entity-title-section'
@@ -76,7 +78,7 @@ const OrganizationTitleSection = ({ orgId }) => {
         <Content creationDate={organization.created_at}>
           {mayViewCollaborators && (
             <Content.EntityCount
-              icon="collaborators"
+              icon={IconCollaborators}
               value={collaboratorsTotalCount}
               keyMessage={sharedMessages.collaboratorCounted}
               toAllUrl={`/organizations/${orgId}/collaborators`}
@@ -84,7 +86,7 @@ const OrganizationTitleSection = ({ orgId }) => {
           )}
           {mayViewApiKeys && (
             <Content.EntityCount
-              icon="api_keys"
+              icon={IconApiKeys}
               value={apiKeysTotalCount}
               keyMessage={sharedMessages.apiKeyCounted}
               toAllUrl={`/organizations/${orgId}/api-keys`}

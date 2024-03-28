@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import Link from '@ttn-lw/components/link'
 import LocationMap from '@ttn-lw/components/map'
@@ -21,6 +20,7 @@ import WidgetContainer from '@ttn-lw/components/widget-container'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './widget.styl'

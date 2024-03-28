@@ -46,7 +46,13 @@ const LastSeen = React.forwardRef((props, ref) => {
   } = props
 
   return (
-    <Status status={status} pulseTrigger={lastSeen} flipped={flipped} ref={ref}>
+    <Status
+      status={status}
+      pulseTrigger={lastSeen}
+      flipped={flipped}
+      ref={ref}
+      className="d-flex al-center"
+    >
       <div className={classnames(className, 'd-inline-block')}>
         {!short && <Message className="mr-cs-xxs" content={message} />}
         <DateTime.Relative

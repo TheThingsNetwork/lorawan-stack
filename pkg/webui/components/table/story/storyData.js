@@ -14,6 +14,7 @@
 
 import React from 'react'
 
+import { IconSettings, IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 const headers = [
@@ -123,8 +124,8 @@ export default {
       Object.assign({}, r, {
         options: (
           <div>
-            <Button icon="settings" primary />
-            <Button danger icon="delete" primary />
+            <Button icon={IconSettings} primary />
+            <Button danger icon={IconTrash} primary />
           </div>
         ),
       }),

@@ -37,6 +37,8 @@ PropTypes.message = PropTypes.oneOfType([
   PropTypes.element,
 ])
 
+PropTypes.icon = PropTypes.shape({})
+
 PropTypes.error = PropTypes.oneOfType([
   PropTypes.oneOfType([
     PropTypes.shape({
@@ -61,7 +63,7 @@ PropTypes.error = PropTypes.oneOfType([
 
 PropTypes.link = PropTypes.shape({
   title: PropTypes.message.isRequired,
-  icon: PropTypes.string,
+  icon: PropTypes.icon,
   path: PropTypes.string.isRequired,
   exact: PropTypes.bool,
   hidden: PropTypes.bool,
