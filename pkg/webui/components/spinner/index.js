@@ -31,6 +31,7 @@ const Spinner = ({
   micro = false,
   small,
   inline = false,
+  right = false,
 }) => {
   const [visible, setVisible] = useState(false)
   const visibilityTimeout = setTimeout(() => setVisible(true), after)
@@ -52,6 +53,7 @@ const Spinner = ({
       faded,
       visible,
       inline,
+      right,
     }),
   )
 
@@ -82,6 +84,7 @@ Spinner.propTypes = {
   faded: PropTypes.bool,
   inline: PropTypes.bool,
   micro: PropTypes.bool,
+  right: PropTypes.bool,
   small: PropTypes.bool,
 }
 
@@ -94,6 +97,7 @@ Spinner.defaultProps = {
   inline: false,
   micro: false,
   small: false,
+  right: false,
 }
 
 export default Spinner
