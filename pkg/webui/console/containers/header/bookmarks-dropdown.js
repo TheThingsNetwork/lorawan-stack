@@ -34,9 +34,16 @@ const m = defineMessages({
 })
 
 const Bookmark = ({ bookmark }) => {
-  const { title, path, icon } = useBookmark(bookmark)
+  const { title, ids, path, icon } = useBookmark(bookmark)
 
-  return <Dropdown.Item title={title} path={path} icon={icon} messageClassName={style.bookmark} />
+  return (
+    <Dropdown.Item
+      title={title === '' ? ids.id : title}
+      path={path}
+      icon={icon}
+      messageClassName={style.bookmark}
+    />
+  )
 }
 
 Bookmark.propTypes = {
