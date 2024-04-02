@@ -189,9 +189,9 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/throttled/throttled/v2 v2.12.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
-	github.com/uptrace/bun v1.1.17 // indirect
-	github.com/uptrace/bun/dialect/pgdialect v1.1.17 // indirect
-	github.com/uptrace/bun/driver/pgdriver v1.1.17 // indirect
+	github.com/uptrace/bun v1.2.0 // indirect
+	github.com/uptrace/bun/dialect/pgdialect v1.2.0 // indirect
+	github.com/uptrace/bun/driver/pgdriver v1.2.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/weppos/publicsuffix-go v0.30.0 // indirect
