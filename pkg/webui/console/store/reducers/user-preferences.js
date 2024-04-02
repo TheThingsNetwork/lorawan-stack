@@ -18,7 +18,7 @@ import { GET_USER_ME_SUCCESS } from '@console/store/actions/logout'
 const initialState = {
   bookmarks: {
     bookmarks: [],
-    totalCount: 0,
+    totalCount: {},
   },
   consolePreferences: {},
 }

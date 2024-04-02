@@ -18,6 +18,31 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as userPreferences from '@console/store/actions/user-preferences'
 
+const getPerEntityTotalCountThroughPagination = async (totalCount, userId) => {
+  let page = 1
+  const limit = 1000
+  const result = {}
+
+  while ((page - 1) * limit < totalCount) {
+    // Get the next page of notifications.
+    // eslint-disable-next-line no-await-in-loop
+    const response = await tts.Users.getBookmarks(userId, { page, limit })
+    response.bookmarks.forEach(element => {
+      const entityIds = element.entity_ids
+      const entity = Object.keys(entityIds)[0].replace('_ids', '')
+      if (!result[entity]) {
+        result[entity] = 1
+      } else {
+        result[entity] += 1
+      }
+    })
+
+    page += 1
+  }
+
+  return result
+}
+
 const getBookmarksListLogic = createRequestLogic({
   type: userPreferences.GET_BOOKMARKS_LIST,
   process: async ({ action }) => {
@@ -26,8 +51,14 @@ const getBookmarksListLogic = createRequestLogic({
       params: { page, limit, order, deleted },
     } = action.payload
     const data = await tts.Users.getBookmarks(userId, { page, limit, order, deleted })
-
-    return { entities: data.bookmarks, totalCount: data.totalCount }
+    const perEntityTotalCount = await getPerEntityTotalCountThroughPagination(
+      data.totalCount,
+      userId,
+    )
+    return {
+      entities: data.bookmarks,
+      totalCount: { totalCount: data.totalCount, perEntityTotalCount },
+    }
   },
 })
 
