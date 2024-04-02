@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -51,12 +51,9 @@ const EntitiesList = ({
   const items = useSelector(itemsSelector)
   const itemsTotalCount = useSelector(state => itemsCountSelector(state, entity))
   const hasNextPage = items.length < itemsTotalCount
-  const [isAtBottom, setIsAtBottom] = useState(false)
   const EntitiesItemComponent = EntitiesItemProp ?? EntitiesItem
 
-  // If the total count is not known, we assume that there are 100 items.
-  // Otherwise, if totalCount is 0, it means the list is empty and we should not have a total count.
-  const itemCount = itemsTotalCount >= 0 ? itemsTotalCount : 100
+  const itemCount = itemsTotalCount
 
   const isItemLoaded = useCallback(
     index => (items.length > 0 ? !hasNextPage || index < items.length : false),
@@ -69,9 +66,7 @@ const EntitiesList = ({
         <EntitiesItemComponent
           headers={headers}
           bookmark={items[index]}
-          setIsAtBottom={setIsAtBottom}
-          index={index}
-          itemsTotalCount={itemsTotalCount}
+          last={index === itemsTotalCount - 1}
         />
       </div>
     ) : (
@@ -139,7 +134,7 @@ const EntitiesList = ({
                   >
                     {Item}
                   </List>
-                  {!isAtBottom && <div className={styles.entityListGradient} />}
+                  <div className={styles.entityListGradient} />
                 </>
               )}
             </InfiniteLoader>

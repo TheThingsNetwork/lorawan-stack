@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
+import classNames from 'classnames'
 
 import { Table } from '@ttn-lw/components/table'
 
@@ -28,13 +29,9 @@ import { selectApplicationDeviceCount } from '@console/store/selectors/applicati
 
 import styles from '../top-entities-panel.styl'
 
-const TopApplicationsItem = ({ bookmark, headers, setIsAtBottom, index, itemsTotalCount }) => {
+const TopApplicationsItem = ({ bookmark, headers, last }) => {
   const { title, ids, path } = useBookmark(bookmark)
   const deviceCount = useSelector(state => selectApplicationDeviceCount(state, ids.id))
-
-  useEffect(() => {
-    setIsAtBottom(index + 1 === itemsTotalCount)
-  }, [index, setIsAtBottom, itemsTotalCount])
 
   const loadDeviceCount = useCallback(
     async dispatch => {
@@ -47,7 +44,13 @@ const TopApplicationsItem = ({ bookmark, headers, setIsAtBottom, index, itemsTot
 
   return (
     <RequireRequest requestAction={loadDeviceCount}>
-      <Table.Row id={ids.id} clickable linkTo={path} body className={styles.entityRow}>
+      <Table.Row
+        id={ids.id}
+        clickable
+        linkTo={path}
+        body
+        className={classNames(styles.entityRow, { [styles.lastRow]: last })}
+      >
         {headers.map((header, index) => {
           const value = headers[index].name === 'name' ? title : deviceCount
           const entityID = headers[index].name === 'name' ? ids.id : undefined
@@ -73,9 +76,11 @@ TopApplicationsItem.propTypes = {
       align: PropTypes.string,
     }),
   ).isRequired,
-  index: PropTypes.number.isRequired,
-  itemsTotalCount: PropTypes.number.isRequired,
-  setIsAtBottom: PropTypes.func.isRequired,
+  last: PropTypes.bool,
+}
+
+TopApplicationsItem.defaultProps = {
+  last: false,
 }
 
 export default TopApplicationsItem

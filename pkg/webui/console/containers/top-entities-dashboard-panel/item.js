@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React from 'react'
+import classNames from 'classnames'
 
 import { Table } from '@ttn-lw/components/table'
 
@@ -21,15 +22,17 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import styles from './top-entities-panel.styl'
 
-const EntitiesItem = ({ bookmark, headers, setIsAtBottom, index, itemsTotalCount }) => {
+const EntitiesItem = ({ bookmark, headers, last }) => {
   const { title, ids, path, icon } = useBookmark(bookmark)
 
-  useEffect(() => {
-    setIsAtBottom(index + 1 === itemsTotalCount)
-  }, [index, setIsAtBottom, itemsTotalCount])
-
   return (
-    <Table.Row id={index} clickable linkTo={path} body className={styles.entityRow}>
+    <Table.Row
+      id={ids.id}
+      clickable
+      linkTo={path}
+      body
+      className={classNames(styles.entityRow, { [styles.lastRow]: last })}
+    >
       {headers.map((header, index) => {
         const value =
           headers[index].name === 'name' ? title : headers[index].name === 'icon' ? icon : ''
@@ -55,9 +58,11 @@ EntitiesItem.propTypes = {
       align: PropTypes.string,
     }),
   ).isRequired,
-  index: PropTypes.number.isRequired,
-  itemsTotalCount: PropTypes.number.isRequired,
-  setIsAtBottom: PropTypes.func.isRequired,
+  last: PropTypes.bool,
+}
+
+EntitiesItem.defaultProps = {
+  last: false,
 }
 
 export default EntitiesItem
