@@ -14,7 +14,6 @@
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Col, Row, Container } from 'react-grid-system'
 import { useNavigate, useParams } from 'react-router-dom'
 import { isEqual } from 'lodash'
 
@@ -130,38 +129,36 @@ const GatewayGeneralSettingsInner = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle title={sharedMessages.generalSettings} hideHeading />
-      <Row>
-        <Col lg={8} md={12}>
-          <Collapse
-            title={m.basicTitle}
-            description={m.basicDescription}
-            disabled={false}
-            initialCollapsed={false}
-          >
-            <BasicSettingsForm
-              gtwId={gtwId}
-              gateway={gateway}
-              onSubmit={handleSubmit}
-              onDelete={handleDelete}
-              mayDeleteGateway={mayDeleteGtw}
-              mayEditSecrets={mayEditSecrets}
-              shouldConfirmDelete={shouldConfirmDelete}
-              mayPurge={mayPurgeGtw}
-            />
-          </Collapse>
-          <Collapse
-            title={sharedMessages.lorawanOptions}
-            description={m.lorawanDescription}
-            disabled={false}
-            initialCollapsed
-          >
-            <LorawanSettingsForm gateway={gateway} onSubmit={handleSubmit} />
-          </Collapse>
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <Collapse
+          title={m.basicTitle}
+          description={m.basicDescription}
+          disabled={false}
+          initialCollapsed={false}
+        >
+          <BasicSettingsForm
+            gtwId={gtwId}
+            gateway={gateway}
+            onSubmit={handleSubmit}
+            onDelete={handleDelete}
+            mayDeleteGateway={mayDeleteGtw}
+            mayEditSecrets={mayEditSecrets}
+            shouldConfirmDelete={shouldConfirmDelete}
+            mayPurge={mayPurgeGtw}
+          />
+        </Collapse>
+        <Collapse
+          title={sharedMessages.lorawanOptions}
+          description={m.lorawanDescription}
+          disabled={false}
+          initialCollapsed
+        >
+          <LorawanSettingsForm gateway={gateway} onSubmit={handleSubmit} />
+        </Collapse>
+      </div>
+    </div>
   )
 }
 

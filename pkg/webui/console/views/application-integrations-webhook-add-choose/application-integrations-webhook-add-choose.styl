@@ -34,10 +34,10 @@
   box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .08), inset 0 -1px 0 0 rgba(0, 0, 0, .11)
   border-radius: $br.xl
   transition: box-shadow .4s cubic-bezier(.25, .01, .07, 1), transform .4s cubic-bezier(.25, .01, .07, 1)
-  +media-query($bp.s)
+  +media-query($bp.sm)
     box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .14), inset 0 -1px 0 0 rgba(0, 0, 0, .11)
     padding: 1.5rem .8rem
-  +media-query($bp.m)
+  +media-query($bp.md)
     padding: 2rem 2rem
 
   &:hover
@@ -50,7 +50,7 @@
     font-weight: $fw.bold
     line-height: 1.2
     margin-bottom: $cs.xs
-    +media-query($bp.s)
+    +media-query($bp.sm)
       font-size: $fs.m
 
   .description
@@ -66,6 +66,6 @@
     height: 10rem
     object-fit: contain
     margin-bottom: $cs.m
-    +media-query($bp.s)
+    +media-query($bp.sm)
       padding: 0
       height: 7rem

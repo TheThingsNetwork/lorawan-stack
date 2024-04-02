@@ -11261,7 +11261,7 @@ prompts@^2.0.1, prompts@^2.4.0:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@15.8.1, prop-types@^15, prop-types@^15.5.6, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@^15, prop-types@^15.5.6, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -11520,13 +11520,6 @@ react-focus-lock@^2.11.2:
     react-clientside-effect "^1.2.6"
     use-callback-ref "^1.3.0"
     use-sidecar "^1.1.2"
-
-react-grid-system@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/react-grid-system/-/react-grid-system-8.2.0.tgz#ab1f2c1c10c8609f81028ef179b19220d7f7805a"
-  integrity sha512-bKO52x3KfcHPSjAh+GZ042/qPvxY7WWlS2dGrCN3hhlUTH3TicgLQr4pRyGlmsA6emQ2CoeHmYb/rFc1NCN5YQ==
-  dependencies:
-    prop-types "15.8.1"
 
 react-helmet@^6.1.0:
   version "6.1.0"

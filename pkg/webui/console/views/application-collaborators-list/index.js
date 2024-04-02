@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 
@@ -50,14 +49,10 @@ const ApplicationCollaboratorsList = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.collaborators} />
-        <Col>
-          <CollaboratorsTable baseDataSelector={baseDataSelector} getItemsAction={getItemsAction} />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg ">
+      <IntlHelmet title={sharedMessages.collaborators} />
+      <CollaboratorsTable baseDataSelector={baseDataSelector} getItemsAction={getItemsAction} />
+    </div>
   )
 }
 

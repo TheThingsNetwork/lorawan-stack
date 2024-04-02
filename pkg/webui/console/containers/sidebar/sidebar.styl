@@ -21,7 +21,7 @@
   max-width: 24rem
   box-sizing: border-box
   sidebar-transition(min-width)
-  +media-query($bp.m)
+  +media-query($bp.md)
     transition: left .4s cubic-bezier(.22, .005, .295, 1)
     position: absolute
     top: 0
@@ -54,7 +54,7 @@
     cursor: pointer
 
   &-minimized
-    +media-query-min($bp.m)
+    +media-query-min($bp.md)
       width: 4.5rem
       min-width: initial
       max-width: initial

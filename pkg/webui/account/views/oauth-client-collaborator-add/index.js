@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import { CLIENT } from '@console/constants/entities'
@@ -42,14 +41,12 @@ const OAuthClientCollaboratorAddInner = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle title={sharedMessages.addCollaborator} />
-      <Row>
-        <Col lg={8} md={12}>
-          <AccountCollaboratorsForm entity={CLIENT} entityId={clientId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <AccountCollaboratorsForm entity={CLIENT} entityId={clientId} />
+      </div>
+    </div>
   )
 }
 

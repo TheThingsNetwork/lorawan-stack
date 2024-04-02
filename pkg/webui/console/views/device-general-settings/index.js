@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Col, Row, Container } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import classNames from 'classnames'
 
 import tts from '@console/api/tts'
 
@@ -197,64 +197,63 @@ const DeviceGeneralSettings = () => {
   }
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <IntlHelmet title={sharedMessages.generalSettings} />
-      <Row>
-        <Col lg={8} md={12} className={style.container}>
-          <Collapse
-            title={m.isTitle}
-            description={isDescription}
-            disabled={isDisabled}
-            initialCollapsed={false}
-          >
-            <IdentityServerForm
-              device={device}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              onDelete={handleDelete}
-              onDeleteSuccess={handleDeleteSuccess}
-              onDeleteFailure={handleDeleteFailure}
-              onUnclaim={handleUnclaim}
-              onUnclaimFailure={handleUnclaimFailure}
-              jsConfig={jsConfig}
-              nsConfig={nsConfig}
-              asConfig={asConfig}
-              supportsClaiming={supportsClaiming}
-            />
-          </Collapse>
-          <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
-            <NetworkServerForm
-              device={device}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              onMacReset={resetDevice}
-              mayEditKeys={mayEditKeys}
-              mayReadKeys={mayReadKeys}
-              getDefaultMacSettings={tts.Ns.getDefaultMacSettings}
-            />
-          </Collapse>
-          <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
-            <ApplicationServerForm
-              device={device}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              mayEditKeys={mayEditKeys}
-              mayReadKeys={mayReadKeys}
-            />
-          </Collapse>
-          <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
-            <JoinServerForm
-              device={device}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              mayEditKeys={mayEditKeys}
-              mayReadKeys={mayReadKeys}
-              onUsedDevNoncesReset={resetUsedDevNonces}
-            />
-          </Collapse>
-        </Col>
-      </Row>
-    </Container>
+
+      <div className={classNames(style.container, 'item-12 lg:item-8')}>
+        <Collapse
+          title={m.isTitle}
+          description={isDescription}
+          disabled={isDisabled}
+          initialCollapsed={false}
+        >
+          <IdentityServerForm
+            device={device}
+            onSubmit={handleSubmit}
+            onSubmitSuccess={handleSubmitSuccess}
+            onDelete={handleDelete}
+            onDeleteSuccess={handleDeleteSuccess}
+            onDeleteFailure={handleDeleteFailure}
+            onUnclaim={handleUnclaim}
+            onUnclaimFailure={handleUnclaimFailure}
+            jsConfig={jsConfig}
+            nsConfig={nsConfig}
+            asConfig={asConfig}
+            supportsClaiming={supportsClaiming}
+          />
+        </Collapse>
+        <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
+          <NetworkServerForm
+            device={device}
+            onSubmit={handleSubmit}
+            onSubmitSuccess={handleSubmitSuccess}
+            onMacReset={resetDevice}
+            mayEditKeys={mayEditKeys}
+            mayReadKeys={mayReadKeys}
+            getDefaultMacSettings={tts.Ns.getDefaultMacSettings}
+          />
+        </Collapse>
+        <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
+          <ApplicationServerForm
+            device={device}
+            onSubmit={handleSubmit}
+            onSubmitSuccess={handleSubmitSuccess}
+            mayEditKeys={mayEditKeys}
+            mayReadKeys={mayReadKeys}
+          />
+        </Collapse>
+        <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
+          <JoinServerForm
+            device={device}
+            onSubmit={handleSubmit}
+            onSubmitSuccess={handleSubmitSuccess}
+            mayEditKeys={mayEditKeys}
+            mayReadKeys={mayReadKeys}
+            onUsedDevNoncesReset={resetUsedDevNonces}
+          />
+        </Collapse>
+      </div>
+    </div>
   )
 }
 

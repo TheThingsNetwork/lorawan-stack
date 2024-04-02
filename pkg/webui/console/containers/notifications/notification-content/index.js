@@ -71,7 +71,7 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
           <Button.Link
             to="/notifications/inbox"
             icon={IconChevronLeft}
-            className="s:d-flex d-none"
+            className="sm:d-flex d-none"
             naked
           />
           <div>
@@ -117,7 +117,7 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
           />
         </div>
       </div>
-      <div className="p-cs-xl s:p-cs-l">
+      <div className="p-cs-xl sm:p-cs-l">
         <Notification.Content
           receiver={userId}
           data={selectedNotification}

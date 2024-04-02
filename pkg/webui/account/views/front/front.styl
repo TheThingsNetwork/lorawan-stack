@@ -13,7 +13,7 @@
 // limitations under the License.
 
 .container
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     full-screen()
     horizontalize()
 
@@ -46,14 +46,14 @@
   background-position: left
   box-shadow: inset 60px 0 60px rgba(0,0,0,.08)
 
-+media-query($bp.l)
++media-query($bp.lg)
   .visual
     width: 40%
 
   .content
     width: 60%
 
-+media-query($bp.s)
++media-query($bp.sm)
   .visual
     display: none
 
@@ -61,7 +61,7 @@
     width: 100%
 
 .form
-  +media-query($bp.s)
+  +media-query($bp.sm)
     margin-top: $header-height-mobile
     padding-bottom: 0
   padding-bottom: $ls.s
@@ -70,7 +70,7 @@
   max-width: 30rem
   margin: auto 0
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     min-width: auto
     max-width: none
     width: 100%
@@ -87,14 +87,14 @@
   -webkit-text-fill-color: transparent
   font-weight: 200
   font-size: $fs.xl3
-  +media-query($bp.s)
+  +media-query($bp.sm)
     font-size: $fs.xl
     text-align: center
 
 .sub-title
   font-size: 3rem
   font-weight: 800
-  +media-query($bp.s)
+  +media-query($bp.sm)
     font-size: $fs.xl3
 
 .submit-button
@@ -106,9 +106,9 @@
 .buttons
   display: flex
   flex-direction: column
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     flex-direction: row
-  +media-query($bp.s)
+  +media-query($bp.sm)
     button, a
       margin-bottom: $cs.s
       margin-right: 0
@@ -119,12 +119,12 @@
   left: 0
   right: 0
   z-index: $zi.nav
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     background-color: transparent
     border: 0
 
 .button-break
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     display: static
 
 .error-description

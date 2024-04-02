@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 
 import Icon, { IconExclamationCircle } from '@ttn-lw/components/icon'
 
@@ -40,27 +39,23 @@ const SubViewErrorComponent = ({ error }) => {
   }
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          <div className={style.title}>
-            <Icon icon={IconExclamationCircle} large />
-            <Message component="h2" content={errorTitleMessage} />
-          </div>
-          <p>
-            <Message component="span" content={errorExplanation} />
-            <br />
-            <Message component="span" content={errorMessages.contactAdministrator} />
-          </p>
-          {isBackend(error) && (
-            <React.Fragment>
-              <hr />
-              <ErrorMessage content={error} />
-            </React.Fragment>
-          )}
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg">
+      <div className={style.title}>
+        <Icon icon={IconExclamationCircle} large />
+        <Message component="h2" content={errorTitleMessage} firstToUpper />
+      </div>
+      <p>
+        <Message component="span" content={errorExplanation} />
+        <br />
+        <Message component="span" content={errorMessages.contactAdministrator} />
+      </p>
+      {isBackend(error) && (
+        <React.Fragment>
+          <hr />
+          <ErrorMessage content={error} />
+        </React.Fragment>
+      )}
+    </div>
   )
 }
 
