@@ -5,6 +5,8 @@ go 1.21
 // See https://github.com/mitchellh/mapstructure/pull/278
 replace github.com/mitchellh/mapstructure => github.com/TheThingsIndustries/mapstructure v0.0.0-20230413130846-941bcd1deec3
 
+replace github.com/uptrace/bun => github.com/adriansmares/bun v0.0.0-20240402123620-979287cf47e7
+
 require (
 	github.com/KimMachineGun/automemlimit v0.5.0
 	github.com/Masterminds/sprig/v3 v3.2.3

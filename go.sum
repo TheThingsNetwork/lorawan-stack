@@ -82,6 +82,8 @@ github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0 h1:FTaVxiDPoV9o6k2OFBij
 github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0/go.mod h1:6ourNr6TBk/2SB2V4In+o2eqZd/DIdiBLnoxvQ3UyWk=
 github.com/TheThingsNetwork/go-cayenne-lib v1.2.0 h1:yW4x7mNk2vyNTUYNRhda9oV8caLePMNR7Z5QbaG5Ifs=
 github.com/TheThingsNetwork/go-cayenne-lib v1.2.0/go.mod h1:HTTus7UIBhXKvLIeNGybbG1o7wr4zwwVbbUXwFqrtp0=
+github.com/adriansmares/bun v0.0.0-20240402123620-979287cf47e7 h1:uewhu4UzbAPE33qUASHmCdgeI7fUb7n3QCv0vRticFw=
+github.com/adriansmares/bun v0.0.0-20240402123620-979287cf47e7/go.mod h1:cNg+pWBUMmJ8rHnETgf65CEvn3aIKErrwOD6IA8e+Ec=
 github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6/go.mod h1:grANhF5doyWs3UAsr3K4I6qtAmlQcZDesFNEHPZAzj8=
 github.com/aws/aws-sdk-go v1.51.12 h1:DvuhIHZXwnjaR1/Gu19gUe1EGPw4J0qSJw4Qs/5PA8g=
 github.com/aws/aws-sdk-go v1.51.12/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
@@ -671,8 +673,6 @@ github.com/tinylib/msgp v1.1.0/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDW
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc h1:9lRDQMhESg+zvGYmW5DyG0UqvY96Bu5QYsTLvCHdrgo=
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc/go.mod h1:bciPuU6GHm1iF1pBvUfxfsH0Wmnc2VbpgvbI9ZWuIRs=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
-github.com/uptrace/bun v1.2.0 h1:/TLRa60gXfwHs5yupQFFol+yDeNQl3UKdY8FUax9qRE=
-github.com/uptrace/bun v1.2.0/go.mod h1:cNg+pWBUMmJ8rHnETgf65CEvn3aIKErrwOD6IA8e+Ec=
 github.com/uptrace/bun/dialect/pgdialect v1.2.0 h1:Fbx7n4QagnqENIVoLuYFX8/UuAjEFj7lt/Ox3cXDuh4=
 github.com/uptrace/bun/dialect/pgdialect v1.2.0/go.mod h1:kCd5xMLM4UJRb5tiAYnel8SX4A7ch2xIAy4a+xd7Zzc=
 github.com/uptrace/bun/driver/pgdriver v1.2.0 h1:ZezndfiQvCtF5ygouisQrO1KSOJP3vVy+0ZCEECTkm0=
