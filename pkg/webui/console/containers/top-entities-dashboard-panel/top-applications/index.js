@@ -13,12 +13,13 @@
 // limitations under the License.
 
 import React from 'react'
-import { FormattedNumber } from 'react-intl'
+import { FormattedNumber, defineMessages } from 'react-intl'
 
 import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
@@ -30,11 +31,17 @@ import EntitiesList from '../list'
 
 import TopApplicationsItem from './item'
 
+const m = defineMessages({
+  emptyMessage: 'No top Application yet',
+  emptyDescription: 'Your most visited, and bookmarked Applications will be listed here.',
+  emptyAction: 'Create Application',
+})
+
 const TopApplicationsList = ({ loadNextPage }) => {
   const headers = [
     {
       name: 'name',
-      displayName: 'Name',
+      displayName: sharedMessages.name,
       render: (name, id) => (
         <>
           <Message content={name === '' ? id : name} component="p" className="mt-0 mb-cs-xs p-0" />
@@ -46,7 +53,7 @@ const TopApplicationsList = ({ loadNextPage }) => {
     },
     {
       name: 'deviceCount',
-      displayName: 'Devices',
+      displayName: sharedMessages.devicesShort,
       render: deviceCount =>
         typeof deviceCount !== 'number' ? (
           <Spinner micro right after={100} className="c-icon" />
@@ -65,9 +72,9 @@ const TopApplicationsList = ({ loadNextPage }) => {
       itemsSelector={selectApplicationBookmarks}
       headers={headers}
       EntitiesItemComponent={TopApplicationsItem}
-      emptyMessage={'No top Application yet'}
-      emptyDescription={'Your most visited, and bookmarked Applications will be listed here.'}
-      emptyAction={'Create Application'}
+      emptyMessage={m.emptyMessage}
+      emptyDescription={m.emptyDescription}
+      emptyAction={m.emptyAction}
       emptyPath={'/applications/add'}
       entity={'application'}
     />

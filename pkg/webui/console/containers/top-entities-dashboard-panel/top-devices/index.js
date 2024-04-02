@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -24,6 +25,11 @@ import {
 } from '@console/store/selectors/user-preferences'
 
 import EntitiesList from '../list'
+
+const m = defineMessages({
+  emptyMessage: 'No top Device yet',
+  emptyDescription: 'Your most visited, and bookmarked Devices will be listed here.',
+})
 
 const TopDevicesList = ({ loadNextPage }) => {
   const headers = [
@@ -47,8 +53,8 @@ const TopDevicesList = ({ loadNextPage }) => {
       itemsCountSelector={selectPerEntityTotalCount}
       itemsSelector={selectEndDeviceBookmarks}
       headers={headers}
-      emptyMessage={'No top Device yet'}
-      emptyDescription={'Your most visited, and bookmarked Devices will be listed here.'}
+      emptyMessage={m.emptyMessage}
+      emptyDescription={m.emptyDescription}
       entity={'device'}
     />
   )

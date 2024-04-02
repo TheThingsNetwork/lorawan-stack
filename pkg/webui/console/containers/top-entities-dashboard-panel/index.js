@@ -14,6 +14,7 @@
 
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import { IconStar } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
@@ -37,6 +38,10 @@ const indicesToPage = (startIndex, stopIndex, limit) => {
   const stopPage = Math.floor(stopIndex / limit) + 1
   return [startPage, stopPage]
 }
+
+const m = defineMessages({
+  title: 'Your top entities',
+})
 
 const TopEntitiesDashboardPanel = () => {
   const [active, setActive] = useState('all')
@@ -83,7 +88,7 @@ const TopEntitiesDashboardPanel = () => {
 
   return (
     <Panel
-      title="Your top entities"
+      title={m.title}
       icon={IconStar}
       toggleOptions={options}
       activeToggle={active}

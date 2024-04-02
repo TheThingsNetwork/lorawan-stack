@@ -13,10 +13,12 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   selectGatewayBookmarks,
@@ -25,11 +27,17 @@ import {
 
 import EntitiesList from '../list'
 
+const m = defineMessages({
+  emptyMessage: 'No top Gateway yet',
+  emptyDescription: 'Your most visited, and bookmarked Gateways will be listed here.',
+  emptyAction: 'Create Gateway',
+})
+
 const TopGatewaysList = ({ loadNextPage }) => {
   const headers = [
     {
       name: 'name',
-      displayName: 'Name',
+      displayName: sharedMessages.displayName,
       render: (name, id) => (
         <>
           <Message content={name === '' ? id : name} component="p" className="mt-0 mb-cs-xs p-0" />
@@ -47,9 +55,9 @@ const TopGatewaysList = ({ loadNextPage }) => {
       itemsCountSelector={selectPerEntityTotalCount}
       itemsSelector={selectGatewayBookmarks}
       headers={headers}
-      emptyMessage={'No top Gateway yet'}
-      emptyDescription={'Your most visited, and bookmarked Gateways will be listed here.'}
-      emptyAction={'Create Gateway'}
+      emptyMessage={m.emptyMessage}
+      emptyDescription={m.emptyDescription}
+      emptyAction={m.emptyAction}
       emptyPath={'/gateways/add'}
       entity={'gateway'}
     />

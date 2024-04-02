@@ -17,6 +17,7 @@ import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import Spinner from '@ttn-lw/components/spinner'
 import { Table } from '@ttn-lw/components/table'
@@ -30,6 +31,10 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import EntitiesItem from './item'
 
 import styles from './top-entities-panel.styl'
+
+const m = defineMessages({
+  empty: 'No entities yet',
+})
 
 const EntitiesList = ({
   loadNextPage,
@@ -112,7 +117,7 @@ const EntitiesList = ({
   ) : (
     <Table minWidth={minWidth}>
       <Table.Head>{columns}</Table.Head>
-      <Table.Body className={styles.entityBody} emptyMessage={'empty'}>
+      <Table.Body className={styles.entityBody} emptyMessage={m.empty}>
         <AutoSizer>
           {({ width }) => (
             <InfiniteLoader
