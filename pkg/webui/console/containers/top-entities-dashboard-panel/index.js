@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import classNames from 'classnames'
 
 import { IconStar } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
@@ -23,6 +24,8 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getBookmarksList } from '@console/store/actions/user-preferences'
+
+import { selectBookmarksList } from '@console/store/selectors/user-preferences'
 
 import AllTopEntitiesList from './all-top-entities'
 import TopApplicationsList from './top-applications'
@@ -46,6 +49,8 @@ const m = defineMessages({
 const TopEntitiesDashboardPanel = () => {
   const [active, setActive] = useState('all')
   const [fetching, setFetching] = useState(false)
+  const bookmarks = useSelector(state => selectBookmarksList(state))
+  const hasEntities = bookmarks.length > 0
   const dispatch = useDispatch()
 
   const handleChange = useCallback(
@@ -93,7 +98,9 @@ const TopEntitiesDashboardPanel = () => {
       toggleOptions={options}
       activeToggle={active}
       onToggleClick={handleChange}
-      className={styles.topEntitiesPanel}
+      className={classNames(styles.topEntitiesPanel, {
+        [styles.hasEntities]: hasEntities,
+      })}
     >
       {active === 'all' && <AllTopEntitiesList loadNextPage={loadNextPage} />}
       {active === 'applications' && <TopApplicationsList loadNextPage={loadNextPage} />}

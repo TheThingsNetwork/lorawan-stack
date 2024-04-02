@@ -66,7 +66,7 @@ const EntitiesList = ({
         <EntitiesItemComponent
           headers={headers}
           bookmark={items[index]}
-          last={index === itemsTotalCount - 1}
+          last={index === itemsTotalCount - 1 && itemsTotalCount > 5}
         />
       </div>
     ) : (
@@ -134,7 +134,7 @@ const EntitiesList = ({
                   >
                     {Item}
                   </List>
-                  <div className={styles.entityListGradient} />
+                  {itemsTotalCount > 5 && <div className={styles.entityListGradient} />}
                 </>
               )}
             </InfiniteLoader>
