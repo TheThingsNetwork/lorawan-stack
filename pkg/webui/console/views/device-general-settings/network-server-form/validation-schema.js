@@ -367,12 +367,46 @@ const validationSchema = Yup.object()
             }
 
             return Yup.object().shape({
-              dynamic: Yup.object().shape({
-                margin: Yup.number().nullable(),
-                min_nb_trans: Yup.number().nullable(),
-                max_nb_trans: Yup.number().nullable(),
-                overrides: Yup.array(),
-              }),
+              dynamic: Yup.lazy(value =>
+                Yup.object().shape({
+                  margin: Yup.number().nullable(),
+                  min_nb_trans: Yup.number()
+                    .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+                    .max(value?.max_nb_trans || 3, Yup.passValues(sharedMessages.validateNumberLte))
+                    .nullable(),
+                  max_nb_trans: Yup.number()
+                    .min(value?.min_nb_trans || 1, Yup.passValues(sharedMessages.validateNumberGte))
+                    .max(3, Yup.passValues(sharedMessages.validateNumberLte))
+                    .nullable(),
+                  overrides: Yup.lazy(value =>
+                    Yup.object().shape(
+                      Object.keys(value).reduce((acc, key) => {
+                        acc[key] = Yup.object().shape({
+                          _data_rate_index: Yup.string()
+                            .default(key.startsWith('_') ? null : key)
+                            .required(sharedMessages.validateRequired),
+                          min_nb_trans: Yup.number()
+                            .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+                            .max(
+                              value[key]?.max_nb_trans || 3,
+                              Yup.passValues(sharedMessages.validateNumberLte),
+                            )
+                            .required(sharedMessages.validateRequired),
+                          max_nb_trans: Yup.number()
+                            .min(
+                              value[key]?.min_nb_trans || 1,
+                              Yup.passValues(sharedMessages.validateNumberGte),
+                            )
+                            .max(3, Yup.passValues(sharedMessages.validateNumberLte))
+                            .required(sharedMessages.validateRequired),
+                        })
+
+                        return acc
+                      }, {}),
+                    ),
+                  ),
+                }),
+              ),
             })
           }),
           desired_adr_ack_limit_exponent: Yup.string().when(['adr'], ([adr], schema) => {

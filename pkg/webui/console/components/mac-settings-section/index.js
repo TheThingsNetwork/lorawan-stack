@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 import { useSelector } from 'react-redux'
+import { get, set } from 'lodash'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -152,6 +153,8 @@ const MacSettingsSection = props => {
   } = props
 
   const { values, setFieldValue, setFieldTouched } = useFormContext()
+  const { mac_settings } = values
+  const alreadySelectedDataRates = Object.keys(mac_settings?.adr?.dynamic?.overrides || [])
   const dataRateOverrideOptions = useSelector(
     createSelector(
       state => selectDataRates(state, bandId, values.lorawan_phy_version),
@@ -160,14 +163,18 @@ const MacSettingsSection = props => {
           (result, key) =>
             result.concat({
               label: getDataRate(dataRates[key].rate),
-              value: key,
+              value: `data_rate_${key}`,
             }),
           [],
         ),
     ),
   )
+  // Filter out the already selected data rate indices.
+  const dataRateFilterOption = useCallback(
+    option => !alreadySelectedDataRates.includes(option.value),
+    [alreadySelectedDataRates],
+  )
 
-  const { mac_settings } = values
   const isNewLorawanVersion = parseLorawanMacVersion(lorawanVersion) >= 110
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
@@ -204,34 +211,46 @@ const MacSettingsSection = props => {
   const showEditNbTrans = !values.mac_settings?.adr.dynamic._use_default_nb_trans
   const defaultNbTransDisabled = !values.mac_settings?.adr.dynamic._override_nb_trans_defaults
   const addOverride = React.useCallback(() => {
+    const newOverride = { _data_rate_index: '', min_nb_trans: '', max_nb_trans: '' }
     setFieldValue(
       'mac_settings.adr.dynamic.overrides',
       adrOverrides
-        ? [...adrOverrides, { data_rate: '', min_nb_trans: '', max_nb_trans: '' }]
-        : [{ data_rate: '', min_nb_trans: '', max_nb_trans: '' }],
+        ? { ...adrOverrides, [`_empty-${Date.now()}`]: newOverride }
+        : { [`_empty-${Date.now()}`]: newOverride },
     )
     setFieldTouched('mac_settings.adr.dynamic._overrides', true)
   }, [setFieldValue, adrOverrides, setFieldTouched])
-  const handleRemoveButtonClick = React.useCallback(
-    (_, value) => {
+  const handleRemoveButtonClick = useCallback(
+    (_, index) => {
       setFieldValue(
         'mac_settings.adr.dynamic.overrides',
-        adrOverrides.filter(override => override !== value),
+        Object.keys(adrOverrides)
+          .filter(key => key !== index)
+          .reduce((acc, key) => ({ ...acc, [key]: adrOverrides[key] }), {}),
       )
     },
     [adrOverrides, setFieldValue],
   )
-  const handleOverrideChange = (fieldName, index) => value => {
-    setFieldValue(
-      `mac_settings.adr.dynamic.overrides`,
-      adrOverrides.map((override, i) => {
-        if (index === i) {
-          return { ...override, [fieldName]: value }
-        }
-        return override
-      }),
-    )
-  }
+
+  // Define a value setter for the data rate index field which
+  // handles setting the object keys correctly, since the index
+  // is set as the object key in the API schema.
+  // A similar result could be done without pseudo values, purely
+  // with decoder/encoder, but it would make error mapping
+  // more complex.
+  const dataRateValueSetter = useCallback(
+    ({ setValues }, { name, value }) => {
+      const index = name.split('.').slice(-2)[0] // Would be: data_rate_{x}.
+      const oldOverride = get(values, `mac_settings.adr.dynamic.overrides.${index}`, {})
+      const overrides = { ...get(values, 'mac_settings.adr.dynamic.overrides', {}) }
+      // Empty data rate index objects, are stored with a pseudo key. Remove it.
+      delete overrides[index]
+      // Move the existing values to the new data rate key.
+      overrides[value] = { ...oldOverride, _data_rate_index: value }
+      setValues(values => set(values, 'mac_settings.adr.dynamic.overrides', overrides))
+    },
+    [values],
+  )
 
   return (
     <Form.CollapseSection
@@ -618,43 +637,41 @@ const MacSettingsSection = props => {
                 className="mt-cs-m"
               >
                 {adrOverrides &&
-                  adrOverrides.map((override, index) => (
+                  Object.keys(adrOverrides).map(index => (
                     <Form.FieldContainer horizontal className="al-end" key={index}>
                       <Form.Field
                         title={m.dataRatePlaceholder}
-                        name={`mac_settings.adr.dynamic.overrides.data_rate`}
+                        name={`mac_settings.adr.dynamic.overrides.${index}._data_rate_index`}
+                        valueSetter={dataRateValueSetter}
                         component={Select}
                         options={dataRateOverrideOptions}
+                        filterOption={dataRateFilterOption}
                         inputWidth="s"
                         fieldWidth="xxs"
                         className="d-flex direction-column"
-                        onChange={handleOverrideChange('data_rate', index)}
-                        value={override.data_rate}
                       />
                       <Form.Field
                         title={m.minNbTrans}
-                        name={`mac_settings.adr.dynamic.overrides.min_nb_trans`}
+                        name={`mac_settings.adr.dynamic.overrides.${index}.min_nb_trans`}
                         component={Input}
-                        inputWidth="xs"
+                        fieldWidth="xxs"
                         className="d-flex direction-column"
-                        onChange={handleOverrideChange('min_nb_trans', index)}
-                        value={override.min_nb_trans}
+                        type="number"
                       />
                       <Form.Field
                         title={m.maxNbTrans}
-                        name={`mac_settings.adr.dynamic.overrides.max_nb_trans`}
+                        name={`mac_settings.adr.dynamic.overrides.${index}.max_nb_trans`}
                         component={Input}
-                        inputWidth="xs"
+                        fieldWidth="xxs"
                         className="d-flex direction-column"
-                        onChange={handleOverrideChange('max_nb_trans', index)}
-                        value={override.max_nb_trans}
+                        type="number"
                       />
                       <Button
                         type="button"
                         onClick={handleRemoveButtonClick}
                         icon="delete"
                         message={sharedMessages.remove}
-                        value={override}
+                        value={index}
                       />
                     </Form.FieldContainer>
                   ))}
