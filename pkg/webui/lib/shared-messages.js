@@ -477,6 +477,8 @@ export default defineMessages({
   settings: 'Settings',
   setup: 'Setup',
   shareGatewayInfo: 'Share gateway information',
+  showMore: 'Show more',
+  showLess: 'Show less',
   skipCryptoDescription: 'Skip decryption of uplink payloads and encryption of downlink payloads',
   skipCryptoPlaceholder: 'Encryption/decryption disabled',
   skipCryptoTitle: 'Skip payload encryption and decryption',

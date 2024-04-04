@@ -1455,6 +1455,8 @@
   "lib.shared-messages.settings": "設定",
   "lib.shared-messages.setup": "",
   "lib.shared-messages.shareGatewayInfo": "ゲートウェイ情報を共有",
+  "lib.shared-messages.showMore": "",
+  "lib.shared-messages.showLess": "",
   "lib.shared-messages.skipCryptoDescription": "アップリンクペイロードの復号化とダウンリンクペイロードの暗号化をスキップします",
   "lib.shared-messages.skipCryptoPlaceholder": "暗号化/復号化無効",
   "lib.shared-messages.skipCryptoTitle": "ペイロードの暗号化と復号化をスキップ",

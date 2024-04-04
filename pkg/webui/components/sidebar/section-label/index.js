@@ -36,7 +36,7 @@ const SectionLabel = ({
       'j-between',
       'al-center',
       'c-text-neutral-light',
-      'ml-cs-s',
+      'ml-cs-xs',
       'fs-s',
     )}
     data-test-id={dataTestId}

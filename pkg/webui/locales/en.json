@@ -1455,6 +1455,8 @@
   "lib.shared-messages.settings": "Settings",
   "lib.shared-messages.setup": "Setup",
   "lib.shared-messages.shareGatewayInfo": "Share gateway information",
+  "lib.shared-messages.showMore": "Show more",
+  "lib.shared-messages.showLess": "Show less",
   "lib.shared-messages.skipCryptoDescription": "Skip decryption of uplink payloads and encryption of downlink payloads",
   "lib.shared-messages.skipCryptoPlaceholder": "Encryption/decryption disabled",
   "lib.shared-messages.skipCryptoTitle": "Skip payload encryption and decryption",
