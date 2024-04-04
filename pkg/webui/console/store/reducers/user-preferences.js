@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_BOOKMARKS_LIST_SUCCESS } from '@console/store/actions/user-preferences'
+import {
+  GET_ALL_BOOKMARKS_SUCCESS,
+  GET_BOOKMARKS_LIST_SUCCESS,
+} from '@console/store/actions/user-preferences'
 import { GET_USER_ME_SUCCESS } from '@console/store/actions/logout'
 
 const initialState = {
@@ -25,6 +28,7 @@ const initialState = {
 
 const userPreferences = (state = initialState, { type, payload }) => {
   switch (type) {
+    case GET_ALL_BOOKMARKS_SUCCESS:
     case GET_BOOKMARKS_LIST_SUCCESS:
       return {
         ...state,

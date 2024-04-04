@@ -28,6 +28,16 @@ export const [
   { request: getBookmarksList, success: getBookmarksListSuccess, failure: getBookmarksListFailure },
 ] = createPaginationByIdRequestActions('BOOKMARKS')
 
+export const GET_ALL_BOOKMARKS_BASE = 'GET_ALL_BOOKMARKS'
+export const [
+  {
+    request: GET_ALL_BOOKMARKS,
+    success: GET_ALL_BOOKMARKS_SUCCESS,
+    failure: GET_ALL_BOOKMARKS_FAILURE,
+  },
+  { request: getAllBookmarks, success: getAllBookmarksSuccess, failure: getAllBookmarksFailure },
+] = createRequestActions(GET_ALL_BOOKMARKS_BASE, id => ({ id }))
+
 export const ADD_BOOKMARK_BASE = 'ADD_BOOKMARK'
 export const [
   { request: ADD_BOOKMARK, success: ADD_BOOKMARK_SUCCESS, failure: ADD_BOOKMARK_FAILURE },

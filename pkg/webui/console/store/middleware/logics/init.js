@@ -25,7 +25,7 @@ import {
   getInboxNotifications,
   getUnseenNotificationsPeriodically,
 } from '@console/store/actions/notifications'
-import { getBookmarksList } from '@console/store/actions/user-preferences'
+import { getAllBookmarks } from '@console/store/actions/user-preferences'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
@@ -72,7 +72,7 @@ const consoleAppLogic = createRequestLogic({
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))
         dispatch(getInboxNotifications({ page: 1, limit: 3 }))
-        dispatch(getBookmarksList(userId, { page: 1, limit: 20 }))
+        dispatch(getAllBookmarks(userId))
         dispatch(getUnseenNotificationsPeriodically())
       } catch (error) {
         dispatch(user.getUserMeFailure(error))

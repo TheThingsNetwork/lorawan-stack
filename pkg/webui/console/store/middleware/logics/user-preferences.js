@@ -18,25 +18,40 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as userPreferences from '@console/store/actions/user-preferences'
 
-const getPerEntityTotalCountThroughPagination = async (totalCount, userId) => {
+const getBookmarksThroughPagination = async userId => {
   let page = 1
-  const limit = 1000
-  const result = {}
+  const limit = 100
+  let totalCount = Infinity
+  let result = {
+    bookmarks: [],
+    totalCount: {
+      totalCount: 0,
+      perEntityTotalCount: {},
+    },
+  }
 
   while ((page - 1) * limit < totalCount) {
-    // Get the next page of notifications.
+    // Get the next page of bookmarks.
     // eslint-disable-next-line no-await-in-loop
     const response = await tts.Users.getBookmarks(userId, { page, limit })
-    response.bookmarks.forEach(element => {
+    result = {
+      bookmarks: [...result.bookmarks, ...response.bookmarks],
+      totalCount: {
+        ...result.totalCount,
+        totalCount: response.totalCount,
+        perEntityTotalCount: { ...result.totalCount.perEntityTotalCount },
+      },
+    }
+    totalCount = response.totalCount
+    result.bookmarks.forEach(element => {
       const entityIds = element.entity_ids
       const entity = Object.keys(entityIds)[0].replace('_ids', '')
-      if (!result[entity]) {
-        result[entity] = 1
+      if (!result.totalCount.perEntityTotalCount[entity]) {
+        result.totalCount.perEntityTotalCount[entity] = 1
       } else {
-        result[entity] += 1
+        result.totalCount.perEntityTotalCount[entity] += 1
       }
     })
-
     page += 1
   }
 
@@ -51,13 +66,21 @@ const getBookmarksListLogic = createRequestLogic({
       params: { page, limit, order, deleted },
     } = action.payload
     const data = await tts.Users.getBookmarks(userId, { page, limit, order, deleted })
-    const perEntityTotalCount = await getPerEntityTotalCountThroughPagination(
-      data.totalCount,
-      userId,
-    )
     return {
       entities: data.bookmarks,
-      totalCount: { totalCount: data.totalCount, perEntityTotalCount },
+      totalCount: data.totalCount,
+    }
+  },
+})
+
+const getAllBookmarksLogic = createRequestLogic({
+  type: userPreferences.GET_ALL_BOOKMARKS,
+  process: async ({ action }) => {
+    const { id: userId } = action.payload
+    const data = await getBookmarksThroughPagination(userId)
+    return {
+      entities: data.bookmarks,
+      totalCount: data.totalCount,
     }
   },
 })
@@ -84,4 +107,4 @@ const deleteBookmarkLogic = createRequestLogic({
   },
 })
 
-export default [getBookmarksListLogic, addBookmarkLogic, deleteBookmarkLogic]
+export default [getBookmarksListLogic, getAllBookmarksLogic, addBookmarkLogic, deleteBookmarkLogic]
