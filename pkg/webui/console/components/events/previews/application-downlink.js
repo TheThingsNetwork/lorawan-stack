@@ -29,6 +29,8 @@ const ApplicationDownlinkPreview = React.memo(({ event }) => {
   return (
     <DescriptionList>
       <DescriptionList.Byte title={messages.devAddr} data={deviceIds.dev_addr} />
+      <DescriptionList.Byte title={sharedMessages.joinEUI} data={deviceIds.join_eui} />
+      <DescriptionList.Byte title={sharedMessages.devEUI} data={deviceIds.dev_eui} />
       {'decoded_payload' in data ? (
         <DescriptionList.Item title={sharedMessages.payload}>
           <JSONPayload data={data.decoded_payload} />
