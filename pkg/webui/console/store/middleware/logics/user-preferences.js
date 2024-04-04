@@ -33,7 +33,11 @@ const getBookmarksThroughPagination = async userId => {
   while ((page - 1) * limit < totalCount) {
     // Get the next page of bookmarks.
     // eslint-disable-next-line no-await-in-loop
-    const response = await tts.Users.getBookmarks(userId, { page, limit })
+    const response = await tts.Users.getBookmarks(
+      userId,
+      { page, limit, order: '-created_at' },
+      'created_at',
+    )
     result = {
       bookmarks: [...result.bookmarks, ...response.bookmarks],
       totalCount: {
@@ -63,12 +67,20 @@ const getBookmarksListLogic = createRequestLogic({
   process: async ({ action }) => {
     const {
       id: userId,
-      params: { page, limit, order, deleted },
+      params: { page, limit, deleted },
     } = action.payload
-    const data = await tts.Users.getBookmarks(userId, { page, limit, order, deleted })
+
+    const data = await tts.Users.getBookmarks(userId, {
+      page,
+      limit,
+      order: '-created_at',
+      deleted,
+    })
     return {
       entities: data.bookmarks,
       totalCount: data.totalCount,
+      page,
+      limit,
     }
   },
 })

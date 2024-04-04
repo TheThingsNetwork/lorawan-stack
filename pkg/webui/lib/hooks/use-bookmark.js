@@ -106,10 +106,11 @@ const useBookmark = bookmark => {
     }
 
     // Only fetch the entity if the name is not already in the store.
-    if (typeof bookmarkTitle !== 'string') {
+    if (!bookmarkTitle) {
       fetchEntity()
     }
-  }, [entity, entityId, dispatch, entityIds, bookmarkTitle])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Get the icon corresponding to the entity.
   const icon = iconMap[entity]
@@ -119,7 +120,7 @@ const useBookmark = bookmark => {
       ? `/applications/${entityIds.device_ids.application_ids.application_id}/devices/${entityIds.device_ids.device_id}`
       : `/${entity}s/${entityId.id}`
 
-  return { title: bookmarkTitle ?? '', ids: entityId, path, icon }
+  return { title: bookmarkTitle ?? 'Fetching bookmark...', ids: entityId, path, icon }
 }
 
 export default useBookmark

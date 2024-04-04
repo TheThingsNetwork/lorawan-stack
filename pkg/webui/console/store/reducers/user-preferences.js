@@ -13,10 +13,27 @@
 // limitations under the License.
 
 import {
+  ADD_BOOKMARK_SUCCESS,
   GET_ALL_BOOKMARKS_SUCCESS,
   GET_BOOKMARKS_LIST_SUCCESS,
 } from '@console/store/actions/user-preferences'
 import { GET_USER_ME_SUCCESS } from '@console/store/actions/logout'
+
+// Update a range of values in an array by using another array and a start index.
+const fillIntoArray = (array, start, values, totalCount) => {
+  const newArray = [...array]
+  const end = Math.min(start + values.length, totalCount)
+  for (let i = start; i < end; i++) {
+    newArray[i] = values[i - start]
+  }
+  return newArray
+}
+
+const pageToIndices = (page, limit) => {
+  const startIndex = (page - 1) * limit
+  const stopIndex = page * limit - 1
+  return [startIndex, stopIndex]
+}
 
 const initialState = {
   bookmarks: {
@@ -29,13 +46,40 @@ const initialState = {
 const userPreferences = (state = initialState, { type, payload }) => {
   switch (type) {
     case GET_ALL_BOOKMARKS_SUCCESS:
-    case GET_BOOKMARKS_LIST_SUCCESS:
       return {
         ...state,
         bookmarks: {
           ...state.bookmarks,
           bookmarks: payload.entities,
           totalCount: payload.totalCount,
+        },
+      }
+    case GET_BOOKMARKS_LIST_SUCCESS:
+      return {
+        ...state,
+        bookmarks: {
+          ...state.bookmarks,
+          bookmarks: fillIntoArray(
+            state.bookmarks.bookmarks,
+            pageToIndices(payload.page, payload.limit)[0],
+            payload.entities,
+            payload.totalCount.totalCount,
+          ),
+          totalCount: {
+            ...state.bookmarks.totalCount,
+            totalCount: payload.totalCount,
+          },
+        },
+      }
+    case ADD_BOOKMARK_SUCCESS:
+      return {
+        ...state,
+        bookmarks: {
+          ...state.bookmarks,
+          totalCount: {
+            ...state.bookmarks.totalCount,
+            totalCount: state.bookmarks.totalCount.totalCount + 1,
+          },
         },
       }
     case GET_USER_ME_SUCCESS:

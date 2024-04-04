@@ -50,10 +50,11 @@ const EntitiesList = ({
 }) => {
   const items = useSelector(itemsSelector)
   const itemsTotalCount = useSelector(state => itemsCountSelector(state, entity))
+  const showScrollIndicator = itemsTotalCount > 5
   const hasNextPage = items.length < itemsTotalCount
   const EntitiesItemComponent = EntitiesItemProp ?? EntitiesItem
 
-  const itemCount = itemsTotalCount
+  const itemCount = itemsTotalCount >= 0 ? itemsTotalCount : 100
 
   const isItemLoaded = useCallback(
     index => (items.length > 0 ? !hasNextPage || index < items.length : false),
@@ -66,7 +67,7 @@ const EntitiesList = ({
         <EntitiesItemComponent
           headers={headers}
           bookmark={items[index]}
-          last={index === itemsTotalCount - 1 && itemsTotalCount > 5}
+          last={index === itemsTotalCount - 1 && showScrollIndicator}
         />
       </div>
     ) : (
@@ -134,7 +135,7 @@ const EntitiesList = ({
                   >
                     {Item}
                   </List>
-                  {itemsTotalCount > 5 && <div className={styles.entityListGradient} />}
+                  {showScrollIndicator && <div className={styles.entityListGradient} />}
                 </>
               )}
             </InfiniteLoader>
