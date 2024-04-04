@@ -109,8 +109,7 @@ const useBookmark = bookmark => {
     if (!bookmarkTitle) {
       fetchEntity()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [bookmarkTitle, dispatch, entity, entityId.appId, entityId.id])
 
   // Get the icon corresponding to the entity.
   const icon = iconMap[entity]
