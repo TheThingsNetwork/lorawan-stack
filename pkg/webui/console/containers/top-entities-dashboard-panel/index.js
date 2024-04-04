@@ -23,9 +23,10 @@ import Panel from '@ttn-lw/components/panel'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getBookmarksList } from '@console/store/actions/user-preferences'
+import { getAllBookmarks } from '@console/store/actions/user-preferences'
 
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
+import { selectUserId } from '@console/store/selectors/logout'
 
 import AllTopEntitiesList from './all-top-entities'
 import TopApplicationsList from './top-applications'
@@ -34,14 +35,6 @@ import TopDevicesList from './top-devices'
 
 import styles from './top-entities-panel.styl'
 
-const BATCH_SIZE = 20
-
-const indicesToPage = (startIndex, stopIndex, limit) => {
-  const startPage = Math.floor(startIndex / limit) + 1
-  const stopPage = Math.floor(stopIndex / limit) + 1
-  return [startPage, stopPage]
-}
-
 const m = defineMessages({
   title: 'Your top entities',
 })
@@ -49,6 +42,7 @@ const m = defineMessages({
 const TopEntitiesDashboardPanel = () => {
   const [active, setActive] = useState('all')
   const [fetching, setFetching] = useState(false)
+  const userId = useSelector(state => selectUserId(state))
   const bookmarks = useSelector(state => selectBookmarksList(state))
   const hasEntities = bookmarks.length > 0
   const dispatch = useDispatch()
@@ -67,29 +61,16 @@ const TopEntitiesDashboardPanel = () => {
     { label: sharedMessages.devices, value: 'end-devices' },
   ]
 
-  const loadNextPage = useCallback(
-    async (startIndex, stopIndex) => {
-      if (fetching) return
-      setFetching(true)
+  const loadNextPage = useCallback(async () => {
+    if (fetching) return
+    setFetching(true)
 
-      // Calculate the number of items to fetch.
-      const limit = Math.max(BATCH_SIZE, stopIndex - startIndex + 1)
-      const [startPage, stopPage] = indicesToPage(startIndex, stopIndex, limit)
+    // We need all the bookmarks to be able to calculate per entity totals
+    // used in the indivudual tabs.
+    await dispatch(attachPromise(getAllBookmarks(userId)))
 
-      // Fetch new notifications with a maximum of 1000 items.
-      await dispatch(
-        attachPromise(
-          getBookmarksList({
-            limit: Math.min((stopPage - startPage + 1) * BATCH_SIZE, 1000),
-            page: startPage,
-          }),
-        ),
-      )
-
-      setFetching(false)
-    },
-    [fetching, dispatch],
-  )
+    setFetching(false)
+  }, [fetching, dispatch, userId])
 
   return (
     <Panel

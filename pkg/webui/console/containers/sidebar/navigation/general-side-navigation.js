@@ -27,6 +27,8 @@ import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 import Button from '@ttn-lw/components/button'
 
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
@@ -36,6 +38,8 @@ import {
   mayViewOrEditApiKeys,
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
+
+import { getAllBookmarks } from '@console/store/actions/user-preferences'
 
 import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
@@ -106,24 +110,26 @@ const GeneralSideNavigation = () => {
         )}
       </SideNavigation>
       {!isMinimized && topEntities.length > 0 && (
-        <SideNavigation className="mt-cs-xs">
-          <SectionLabel label={sharedMessages.topEntities} icon={IconPlus} onClick={() => null} />
-          {topEntities.slice(0, 6).map(bookmark => (
-            <Bookmark key={bookmark.created_at} bookmark={bookmark} />
-          ))}
-          {showMore &&
-            topEntities.length > 6 &&
-            topEntities
-              .slice(6, topEntities.length)
-              .map(bookmark => <Bookmark key={bookmark.created_at} bookmark={bookmark} />)}
-          {topEntities.length > 6 && (
-            <Button
-              message={showMore ? sharedMessages.showLess : sharedMessages.showMore}
-              onClick={handleShowMore}
-              className="c-text-neutral-light ml-cs-xs mt-cs-xs fs-s"
-            />
-          )}
-        </SideNavigation>
+        <RequireRequest requestAction={getAllBookmarks(user.ids.user_id)}>
+          <SideNavigation className="mt-cs-xs">
+            <SectionLabel label={sharedMessages.topEntities} icon={IconPlus} onClick={() => null} />
+            {topEntities.slice(0, 6).map((bookmark, index) => (
+              <Bookmark key={index} bookmark={bookmark} />
+            ))}
+            {showMore &&
+              topEntities.length > 6 &&
+              topEntities
+                .slice(6, topEntities.length)
+                .map(bookmark => <Bookmark key={bookmark.created_at} bookmark={bookmark} />)}
+            {topEntities.length > 6 && (
+              <Button
+                message={showMore ? sharedMessages.showLess : sharedMessages.showMore}
+                onClick={handleShowMore}
+                className="c-text-neutral-light ml-cs-xs mt-cs-xs fs-s"
+              />
+            )}
+          </SideNavigation>
+        </RequireRequest>
       )}
     </>
   )

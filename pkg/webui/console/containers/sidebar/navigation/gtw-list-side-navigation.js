@@ -20,11 +20,16 @@ import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import Button from '@ttn-lw/components/button'
 
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { getAllBookmarks } from '@console/store/actions/user-preferences'
+
 import { selectGatewayBookmarks } from '@console/store/selectors/user-preferences'
+import { selectUserId } from '@console/store/selectors/logout'
 
 import SidebarContext from '../context'
 
@@ -42,6 +47,7 @@ const GtwListSideNavigation = () => {
   const [showMore, setShowMore] = useState(false)
   const topEntities = useSelector(state => selectGatewayBookmarks(state))
   const { isMinimized } = useContext(SidebarContext)
+  const userId = useSelector(selectUserId)
 
   const handleShowMore = useCallback(async () => {
     setShowMore(showMore => !showMore)
@@ -52,9 +58,9 @@ const GtwListSideNavigation = () => {
   }
 
   return (
-    <div>
-      <SectionLabel label={sharedMessages.topGateways} icon={IconPlus} onClick={() => null} />
+    <RequireRequest requestAction={getAllBookmarks(userId)}>
       <SideNavigation>
+        <SectionLabel label={sharedMessages.topGateways} icon={IconPlus} onClick={() => null} />
         {topEntities.slice(0, 6).map(bookmark => (
           <Bookmark key={bookmark.created_at} bookmark={bookmark} />
         ))}
@@ -71,7 +77,7 @@ const GtwListSideNavigation = () => {
           />
         )}
       </SideNavigation>
-    </div>
+    </RequireRequest>
   )
 }
 
