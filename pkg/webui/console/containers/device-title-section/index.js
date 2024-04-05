@@ -34,7 +34,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   selectDeviceByIds,
-  selectDeviceDerivedDownlinkFrameCount,
+  selectDeviceDerivedAppDownlinkFrameCount,
+  selectDeviceDerivedNwkDownlinkFrameCount,
   selectDeviceDerivedUplinkFrameCount,
   selectDeviceLastSeen,
 } from '@console/store/selectors/devices'
@@ -43,7 +44,7 @@ import style from './device-title-section.styl'
 
 const m = defineMessages({
   uplinkDownlinkTooltip:
-    'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.',
+    'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.{lineBreak}App: frame counter for application downlinks (`FPort >=1`).{lineBreak}Nwk: frame counter for network downlinks (`FPort = 0`)',
   lastSeenAvailableTooltip:
     'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}',
   noActivityTooltip:
@@ -58,19 +59,39 @@ const DeviceTitleSection = props => {
   const uplinkFrameCount = useSelector(state =>
     selectDeviceDerivedUplinkFrameCount(state, appId, devId),
   )
-  const downlinkFrameCount = useSelector(state =>
-    selectDeviceDerivedDownlinkFrameCount(state, appId, devId),
+  const downlinkAppFrameCount = useSelector(state =>
+    selectDeviceDerivedAppDownlinkFrameCount(state, appId, devId),
+  )
+  const downlinkNwkFrameCount = useSelector(state =>
+    selectDeviceDerivedNwkDownlinkFrameCount(state, appId, devId),
   )
   const lastSeen = useSelector(state => selectDeviceLastSeen(state, appId, devId))
   const showLastSeen = Boolean(lastSeen)
   const showUplinkCount = typeof uplinkFrameCount === 'number'
-  const showDownlinkCount = typeof downlinkFrameCount === 'number'
+  const showAppDownlinkCount = typeof downlinkAppFrameCount === 'number'
+  const showNwkDownlinkCount = typeof downlinkNwkFrameCount === 'number'
   const notAvailableElem = <Message content={sharedMessages.notAvailable} />
+  const downlinkValue =
+    showAppDownlinkCount && showNwkDownlinkCount
+      ? `${downlinkAppFrameCount} (App) / ${downlinkNwkFrameCount} (Nwk)`
+      : showAppDownlinkCount
+        ? `${downlinkAppFrameCount} (App)`
+        : showNwkDownlinkCount
+          ? `${downlinkNwkFrameCount} (Nwk)`
+          : notAvailableElem
   const lastActivityInfo = lastSeen ? <DateTime value={lastSeen} noTitle /> : lastSeen
   const lineBreak = <br />
   const bottomBarLeft = (
     <>
-      <Tooltip content={<Message content={m.uplinkDownlinkTooltip} />}>
+      <Tooltip
+        content={
+          <Message
+            content={m.uplinkDownlinkTooltip}
+            values={{ lineBreak: <br /> }}
+            convertBackticks
+          />
+        }
+      >
         <div className={style.messages}>
           <Content.MessagesCount
             icon="uplink"
@@ -79,8 +100,9 @@ const DeviceTitleSection = props => {
           />
           <Content.MessagesCount
             icon="downlink"
-            value={showDownlinkCount ? downlinkFrameCount : notAvailableElem}
+            value={downlinkValue}
             iconClassName={showUplinkCount ? style.messageIcon : style.notAvailable}
+            helpTooltip
           />
         </div>
       </Tooltip>
