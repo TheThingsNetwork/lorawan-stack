@@ -25,6 +25,7 @@ import (
 
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
@@ -316,7 +317,7 @@ func TestServer(t *testing.T) { //nolint:gocyclo
 
 				pbIssuer, pbToken := makePacketBrokerTokenIssuer(ctx, "test.packetbroker.io")
 
-				s, err := interop.NewServer(&mockComponent{ctx}, nil, config.InteropServer{
+				s, err := interop.NewServer(&mockComponent{ctx}, fillcontext.Noop, config.InteropServer{
 					SenderClientCA: config.SenderClientCA{
 						Source:    "directory",
 						Directory: "testdata/server",
