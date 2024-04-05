@@ -17,5 +17,10 @@ package fillcontext
 
 import "context"
 
-// Filler extends the context
+// Filler extends the context.
 type Filler func(context.Context) context.Context
+
+// Noop is a filler that does nothing.
+func Noop(ctx context.Context) context.Context {
+	return ctx
+}
