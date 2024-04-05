@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Show both AFcntDown and NFcntDown in the Device overview in the Console.
+
 ### Security
 
 ## [3.30.0] - unreleased
