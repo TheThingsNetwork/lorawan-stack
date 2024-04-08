@@ -19,6 +19,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Show both AFcntDown and NFcntDown in the Device overview in the Console.
 - Fixes the keys displayed in the session information section of overview tab of an End Device in the Console - for LW 1.1.x, replaces NwkSKey with FNwkSIntKey. For LX 1.0.x display only the NwkSKey and AppSKey.
 
 ### Security

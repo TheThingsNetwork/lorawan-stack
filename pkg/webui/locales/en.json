@@ -506,7 +506,7 @@
   "console.containers.device-profile-section.hints.progress-hint.hintNoSupportMessage": "Cannot find your exact end device? Try <b>enter end device specifics manually</b> option above.",
   "console.containers.device-template-format-select.index.title": "File format",
   "console.containers.device-template-format-select.index.warning": "End device template formats unavailable",
-  "console.containers.device-title-section.index.uplinkDownlinkTooltip": "The number of sent uplinks and received downlinks of this end device since the last frame counter reset.",
+  "console.containers.device-title-section.index.uplinkDownlinkTooltip": "The number of sent uplinks and received downlinks of this end device since the last frame counter reset.{lineBreak}App: frame counter for application downlinks (`FPort >=1`).{lineBreak}Nwk: frame counter for network downlinks (`FPort = 0`)",
   "console.containers.device-title-section.index.lastSeenAvailableTooltip": "The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}",
   "console.containers.device-title-section.index.noActivityTooltip": "The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.",
   "console.containers.devices-table.index.otherClusterTooltip": "This end device is registered on a different cluster (`{host}`). To access this device, use the Console of the cluster that this end device was registered on.",

@@ -40,7 +40,8 @@ const defaultState = {
 }
 const defaultDerived = {
   uplinkFrameCount: undefined,
-  downlinkFrameCount: undefined,
+  downlinkAppFrameCount: undefined,
+  downlinkNwkFrameCount: undefined,
 }
 
 const heartbeatFilterRegExp = new RegExp(EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP)
@@ -103,10 +104,9 @@ const devices = (state = defaultState, { type, payload, event }) => {
         if (parseLorawanMacVersion(lorawanVersion) < 110) {
           derived.downlinkFrameCount = session.last_n_f_cnt_down
         } else {
-          // For 1.1+ end devices there are two frame counters. Currently, we
-          // display only the application counter.
-          // Also, see https://github.com/TheThingsNetwork/lorawan-stack/issues/2740.
-          derived.downlinkFrameCount = session.last_a_f_cnt_down
+          // For 1.1+ end devices there are two frame counters.
+          derived.downlinkAppFrameCount = session.last_a_f_cnt_down
+          derived.downlinkNwkFrameCount = session.last_n_f_cnt_down
         }
       }
 
@@ -175,13 +175,19 @@ const devices = (state = defaultState, { type, payload, event }) => {
         }
 
         // For 1.1+ end devices there are two frame counters. If `f_port` is equal to 0 - then it's the "network" frame counter,
-        // otherwise it's the "application" frame counter. Currently, we display only the application counter.
-        // Also, see https://github.com/TheThingsNetwork/lorawan-stack/issues/2740.
-        if (getByPath(event, 'data.payload.mac_payload.f_port') > 0) {
+        // otherwise it's the "application" frame counter.
+        if (getByPath(event, 'data.payload.mac_payload.f_port') === 0) {
+          const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.f_cnt')
+          if (typeof downlinkFrameCount === 'number') {
+            return mergeDerived(state, combinedDeviceId, {
+              downlinkNwkFrameCount: downlinkFrameCount,
+            })
+          }
+        } else {
           const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
           if (typeof downlinkFrameCount === 'number') {
             return mergeDerived(state, combinedDeviceId, {
-              downlinkFrameCount,
+              downlinkAppFrameCount: downlinkFrameCount,
             })
           }
         }
