@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Link from '@ttn-lw/components/link'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -48,6 +48,8 @@ import {
   ACTIVATION_MODES,
   generate16BytesKey,
 } from '@console/lib/device-utils'
+
+import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
 
 import messages from '../messages'
 import {
@@ -99,7 +101,9 @@ const NetworkServerForm = React.memo(props => {
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
   const isJoinedOTAA = isDeviceOTAA(device) && isDeviceJoined(device)
-  const bandId = version_ids.band_id
+  const frequencyPlans = useSelector(state => selectNsFrequencyPlans(state))
+  const bandId =
+    version_ids.band_id || frequencyPlans.find(fp => fp.id === device.frequency_plan_id)?.band_id
 
   const validationContext = React.useMemo(
     () => ({

@@ -45,7 +45,7 @@ import {
 
 import { updateDevice, resetDevice, resetUsedDevNonces } from '@console/store/actions/devices'
 import { unclaimDevice } from '@console/store/actions/claim'
-import { getBandsList } from '@console/store/actions/configuration'
+import { getBandsList, getNsFrequencyPlans } from '@console/store/actions/configuration'
 
 import {
   selectSelectedDevice,
@@ -201,10 +201,10 @@ const DeviceGeneralSettings = () => {
   }
 
   const action = useCallback(async () => {
-    if (device.version_ids.band_id && device.lorawan_phy_version) {
-      await dispatch(
-        attachPromise(getBandsList(device.version_ids.band_id, device.lorawan_phy_version)),
-      )
+    if (device.frequency_plan_id && device.lorawan_phy_version) {
+      const frequencyPlans = await dispatch(attachPromise(getNsFrequencyPlans()))
+      const bandId = frequencyPlans.find(fp => fp.id === device.frequency_plan_id).band_id
+      await dispatch(attachPromise(getBandsList(bandId, device.lorawan_phy_version)))
     }
     if (device.lorawan_phy_version && device.frequency_plan_id) {
       try {
@@ -236,36 +236,36 @@ const DeviceGeneralSettings = () => {
         }
       }
     }
-  }, [device.version_ids.band_id, device.lorawan_phy_version, device.frequency_plan_id, dispatch])
+  }, [device.lorawan_phy_version, device.frequency_plan_id, dispatch])
 
   return (
-    <Container>
-      <IntlHelmet title={sharedMessages.generalSettings} />
-      <Row>
-        <Col lg={8} md={12} className={style.container}>
-          <Collapse
-            title={m.isTitle}
-            description={isDescription}
-            disabled={isDisabled}
-            initialCollapsed={false}
-          >
-            <IdentityServerForm
-              device={device}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              onDelete={handleDelete}
-              onDeleteSuccess={handleDeleteSuccess}
-              onDeleteFailure={handleDeleteFailure}
-              onUnclaim={handleUnclaim}
-              onUnclaimFailure={handleUnclaimFailure}
-              jsConfig={jsConfig}
-              nsConfig={nsConfig}
-              asConfig={asConfig}
-              supportsClaiming={supportsClaiming}
-            />
-          </Collapse>
-          <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
-            <RequireRequest requestAction={action}>
+    <RequireRequest requestAction={action}>
+      <Container>
+        <IntlHelmet title={sharedMessages.generalSettings} />
+        <Row>
+          <Col lg={8} md={12} className={style.container}>
+            <Collapse
+              title={m.isTitle}
+              description={isDescription}
+              disabled={isDisabled}
+              initialCollapsed={false}
+            >
+              <IdentityServerForm
+                device={device}
+                onSubmit={handleSubmit}
+                onSubmitSuccess={handleSubmitSuccess}
+                onDelete={handleDelete}
+                onDeleteSuccess={handleDeleteSuccess}
+                onDeleteFailure={handleDeleteFailure}
+                onUnclaim={handleUnclaim}
+                onUnclaimFailure={handleUnclaimFailure}
+                jsConfig={jsConfig}
+                nsConfig={nsConfig}
+                asConfig={asConfig}
+                supportsClaiming={supportsClaiming}
+              />
+            </Collapse>
+            <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
               <NetworkServerForm
                 device={device}
                 defaultMacSettings={defaultMacSettings}
@@ -276,30 +276,30 @@ const DeviceGeneralSettings = () => {
                 mayReadKeys={mayReadKeys}
                 getDefaultMacSettings={tts.Ns.getDefaultMacSettings}
               />
-            </RequireRequest>
-          </Collapse>
-          <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
-            <ApplicationServerForm
-              device={device}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              mayEditKeys={mayEditKeys}
-              mayReadKeys={mayReadKeys}
-            />
-          </Collapse>
-          <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
-            <JoinServerForm
-              device={device}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              mayEditKeys={mayEditKeys}
-              mayReadKeys={mayReadKeys}
-              onUsedDevNoncesReset={resetUsedDevNonces}
-            />
-          </Collapse>
-        </Col>
-      </Row>
-    </Container>
+            </Collapse>
+            <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
+              <ApplicationServerForm
+                device={device}
+                onSubmit={handleSubmit}
+                onSubmitSuccess={handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
+              />
+            </Collapse>
+            <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
+              <JoinServerForm
+                device={device}
+                onSubmit={handleSubmit}
+                onSubmitSuccess={handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
+                onUsedDevNoncesReset={resetUsedDevNonces}
+              />
+            </Collapse>
+          </Col>
+        </Row>
+      </Container>
+    </RequireRequest>
   )
 }
 
