@@ -236,7 +236,7 @@ const DeviceGeneralSettings = () => {
         }
       }
     }
-  }, [device.version_ids.brand_id, device.lorawan_phy_version, device.frequency_plan_id, dispatch])
+  }, [device.version_ids.band_id, device.lorawan_phy_version, device.frequency_plan_id, dispatch])
 
   return (
     <Container>
