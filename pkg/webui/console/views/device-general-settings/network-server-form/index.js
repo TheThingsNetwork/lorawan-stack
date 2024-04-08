@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import Link from '@ttn-lw/components/link'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -48,8 +48,6 @@ import {
   ACTIVATION_MODES,
   generate16BytesKey,
 } from '@console/lib/device-utils'
-
-import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
 
 import messages from '../messages'
 import {
@@ -87,13 +85,13 @@ const NetworkServerForm = React.memo(props => {
     onMacReset,
     defaultMacSettings,
     getDefaultMacSettings,
+    bandId,
   } = props
   const {
     multicast = false,
     supports_join = false,
     supports_class_b = false,
     supports_class_c = false,
-    version_ids = {},
   } = device
 
   const dispatch = useDispatch()
@@ -101,9 +99,6 @@ const NetworkServerForm = React.memo(props => {
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
   const isJoinedOTAA = isDeviceOTAA(device) && isDeviceJoined(device)
-  const frequencyPlans = useSelector(state => selectNsFrequencyPlans(state))
-  const bandId =
-    version_ids.band_id || frequencyPlans.find(fp => fp.id === device.frequency_plan_id)?.band_id
 
   const validationContext = React.useMemo(
     () => ({
@@ -154,7 +149,7 @@ const NetworkServerForm = React.memo(props => {
         setMacSettings(settings)
         if (formRef.current) {
           const { setValues, values } = formRef.current
-          const adrDynamic = values.mac_settings.adr?.dynamic
+          const adrDynamic = values.mac_settings?.adr?.dynamic
           setValues(
             validationSchema.cast(
               {
@@ -166,7 +161,7 @@ const NetworkServerForm = React.memo(props => {
                   // And to make sure that, if there is already a value set for `adr`, it is not overwritten
                   // by the default mac settings.
                   adr:
-                    'dynamic' in values.mac_settings.adr
+                    'dynamic' in values.mac_settings?.adr
                       ? {
                           dynamic: {
                             ...adrDynamic,
@@ -182,7 +177,7 @@ const NetworkServerForm = React.memo(props => {
                               Boolean(adrDynamic?.max_nb_trans),
                           },
                         }
-                      : values.mac_settings.adr,
+                      : values.mac_settings?.adr,
                 },
               },
               { context: validationContext },
@@ -254,9 +249,9 @@ const NetworkServerForm = React.memo(props => {
             ...device.mac_settings,
             adr: {
               dynamic: {
-                ...device.mac_settings.adr?.dynamic,
-                min_nb_trans: device.mac_settings.adr?.dynamic?.min_nb_trans ?? null,
-                max_nb_trans: device.mac_settings.adr?.dynamic?.max_nb_trans ?? null,
+                ...device.mac_settings?.adr?.dynamic,
+                min_nb_trans: device.mac_settings?.adr?.dynamic?.min_nb_trans ?? null,
+                max_nb_trans: device.mac_settings?.adr?.dynamic?.max_nb_trans ?? null,
               },
             },
           },
@@ -287,14 +282,14 @@ const NetworkServerForm = React.memo(props => {
     async (values, { resetForm, setSubmitting }) => {
       let parsedValues = values
       // If the nbTrans values are not overridden, remove them from the payload.
-      if (!values.mac_settings.adr.dynamic._override_nb_trans_defaults) {
-        const { max_nb_trans, min_nb_trans, ...rest } = parsedValues.mac_settings.adr.dynamic
+      if (!values.mac_settings?.adr.dynamic._override_nb_trans_defaults) {
+        const { max_nb_trans, min_nb_trans, ...rest } = parsedValues.mac_settings?.adr.dynamic
         parsedValues = {
           ...parsedValues,
           mac_settings: {
             ...parsedValues.mac_settings,
             adr: {
-              ...parsedValues.mac_settings.adr,
+              ...parsedValues.mac_settings?.adr,
               dynamic: {
                 ...rest,
               },
@@ -344,7 +339,7 @@ const NetworkServerForm = React.memo(props => {
         delete patch.session
       }
 
-      if (patch.mac_settings.adr) {
+      if (patch.mac_settings?.adr) {
         patch.mac_settings.adr_margin = null
         patch.mac_settings.use_adr = null
       }
@@ -602,6 +597,7 @@ const NetworkServerForm = React.memo(props => {
 })
 
 NetworkServerForm.propTypes = {
+  bandId: PropTypes.string.isRequired,
   defaultMacSettings: PropTypes.shape({
     adr_margin: PropTypes.number,
   }).isRequired,

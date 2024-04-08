@@ -51,6 +51,7 @@ import {
   selectSelectedDevice,
   selectSelectedDeviceClaimable,
 } from '@console/store/selectors/devices'
+import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
 
 import IdentityServerForm from './identity-server-form'
 import ApplicationServerForm from './application-server-form'
@@ -77,7 +78,9 @@ const DeviceGeneralSettings = () => {
   const asConfig = selectAsConfig()
   const jsConfig = selectJsConfig()
   const nsConfig = selectNsConfig()
+  const storeFrequencyPlans = useSelector(selectNsFrequencyPlans)
   const [defaultMacSettings, setMacSettings] = useState({})
+  const [bandId, setBandId] = useState(undefined)
 
   useBreadcrumbs(
     'device.general',
@@ -200,43 +203,50 @@ const DeviceGeneralSettings = () => {
     nsDescription = m.notInCluster
   }
 
-  const action = useCallback(async () => {
-    if (device.frequency_plan_id && device.lorawan_phy_version) {
-      const frequencyPlans = await dispatch(attachPromise(getNsFrequencyPlans()))
-      const bandId = frequencyPlans.find(fp => fp.id === device.frequency_plan_id).band_id
-      await dispatch(attachPromise(getBandsList(bandId, device.lorawan_phy_version)))
-    }
-    if (device.lorawan_phy_version && device.frequency_plan_id) {
-      try {
-        const settings = await tts.Ns.getDefaultMacSettings(
-          device.frequency_plan_id,
-          device.lorawan_phy_version,
-        )
-        setMacSettings(settings)
-      } catch (err) {
-        if (isBackend(err) && getBackendErrorName(err) === 'no_band_version') {
-          toast({
-            type: toast.types.ERROR,
-            message: sharedMessages.fpNotFoundError,
-            messageValues: {
-              lorawanVersion: device.lorawan_phy_version,
-              freqPlan: device.frequency_plan_id,
-              code: msg => <code>{msg}</code>,
-            },
-          })
-        } else {
-          toast({
-            type: toast.types.ERROR,
-            message: m.macSettingsError,
-            messageValues: {
-              freqPlan: device.frequency_plan_id,
-              code: msg => <code>{msg}</code>,
-            },
-          })
+  const action = useCallback(
+    async dispatch => {
+      if (device.frequency_plan_id && device.lorawan_phy_version) {
+        let frequencyPlans = storeFrequencyPlans
+        if (frequencyPlans.length === 0) {
+          frequencyPlans = await dispatch(attachPromise(getNsFrequencyPlans()))
+        }
+        const bandId = frequencyPlans.find(fp => fp.id === device.frequency_plan_id).band_id
+        setBandId(bandId)
+        await dispatch(getBandsList(bandId, device.lorawan_phy_version))
+      }
+      if (device.lorawan_phy_version && device.frequency_plan_id) {
+        try {
+          const settings = await tts.Ns.getDefaultMacSettings(
+            device.frequency_plan_id,
+            device.lorawan_phy_version,
+          )
+          setMacSettings(settings)
+        } catch (err) {
+          if (isBackend(err) && getBackendErrorName(err) === 'no_band_version') {
+            toast({
+              type: toast.types.ERROR,
+              message: sharedMessages.fpNotFoundError,
+              messageValues: {
+                lorawanVersion: device.lorawan_phy_version,
+                freqPlan: device.frequency_plan_id,
+                code: msg => <code>{msg}</code>,
+              },
+            })
+          } else {
+            toast({
+              type: toast.types.ERROR,
+              message: m.macSettingsError,
+              messageValues: {
+                freqPlan: device.frequency_plan_id,
+                code: msg => <code>{msg}</code>,
+              },
+            })
+          }
         }
       }
-    }
-  }, [device.lorawan_phy_version, device.frequency_plan_id, dispatch])
+    },
+    [device.lorawan_phy_version, device.frequency_plan_id, storeFrequencyPlans],
+  )
 
   return (
     <RequireRequest requestAction={action}>
@@ -269,6 +279,7 @@ const DeviceGeneralSettings = () => {
               <NetworkServerForm
                 device={device}
                 defaultMacSettings={defaultMacSettings}
+                bandId={bandId}
                 onSubmit={handleSubmit}
                 onSubmitSuccess={handleSubmitSuccess}
                 onMacReset={resetDevice}
