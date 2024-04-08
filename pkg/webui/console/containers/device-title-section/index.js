@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
+import { FormattedNumber, defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
 import deviceIcon from '@assets/misc/end-device.svg'
@@ -72,13 +72,22 @@ const DeviceTitleSection = props => {
   const showNwkDownlinkCount = typeof downlinkNwkFrameCount === 'number'
   const notAvailableElem = <Message content={sharedMessages.notAvailable} />
   const downlinkValue =
-    showAppDownlinkCount && showNwkDownlinkCount
-      ? `${downlinkAppFrameCount} (App) / ${downlinkNwkFrameCount} (Nwk)`
-      : showAppDownlinkCount
-        ? `${downlinkAppFrameCount} (App)`
-        : showNwkDownlinkCount
-          ? `${downlinkNwkFrameCount} (Nwk)`
-          : notAvailableElem
+    showAppDownlinkCount && showNwkDownlinkCount ? (
+      <>
+        <FormattedNumber value={downlinkAppFrameCount} /> {'(App) / '}
+        <FormattedNumber value={downlinkNwkFrameCount} /> {'(Nwk)'},
+      </>
+    ) : showAppDownlinkCount ? (
+      <>
+        <FormattedNumber value={downlinkAppFrameCount} /> {'(App)'}
+      </>
+    ) : showNwkDownlinkCount ? (
+      <>
+        <FormattedNumber value={downlinkNwkFrameCount} /> {'(Nwk)'},
+      </>
+    ) : (
+      notAvailableElem
+    )
   const lastActivityInfo = lastSeen ? <DateTime value={lastSeen} noTitle /> : lastSeen
   const lineBreak = <br />
   const bottomBarLeft = (
