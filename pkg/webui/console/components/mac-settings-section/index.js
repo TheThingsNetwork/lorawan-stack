@@ -596,6 +596,7 @@ const MacSettingsSection = props => {
             label={m.useDefaultNbTrans}
             name="mac_settings.adr.dynamic._use_default_nb_trans"
             component={Checkbox}
+            tooltipId={tooltipIds.USE_DEFAULT_NB_TRANS}
           />
           {showEditNbTrans && (
             <>
@@ -604,13 +605,15 @@ const MacSettingsSection = props => {
                 name="mac_settings.adr.dynamic._override_nb_trans_defaults"
                 component={Checkbox}
                 label={m.overrideNbTrans}
-                tooltipId={tooltipIds.RESET_MAC}
               />
               <Form.FieldContainer horizontal className="al-end mb-cs-xs">
                 <Form.Field
                   title={m.minNbTrans}
                   name="mac_settings.adr.dynamic.min_nb_trans"
                   component={Input}
+                  type="number"
+                  min={1}
+                  max={3}
                   disabled={defaultNbTransDisabled}
                   inputWidth="xs"
                   className="d-flex direction-column"
@@ -619,6 +622,9 @@ const MacSettingsSection = props => {
                   title={m.maxNbTrans}
                   name="mac_settings.adr.dynamic.max_nb_trans"
                   component={Input}
+                  type="number"
+                  min={1}
+                  max={3}
                   disabled={defaultNbTransDisabled}
                   inputWidth="xs"
                   className="d-flex direction-column"
@@ -633,7 +639,7 @@ const MacSettingsSection = props => {
               )}
               <Form.InfoField
                 title={m.specificOverrides}
-                tooltipId={tooltipIds.RESET_MAC}
+                tooltipId={tooltipIds.DATA_RATE_SPECIFIC_OVERRIDES}
                 className="mt-cs-m"
               >
                 {adrOverrides &&
@@ -657,6 +663,8 @@ const MacSettingsSection = props => {
                         fieldWidth="xxs"
                         className="d-flex direction-column"
                         type="number"
+                        min={1}
+                        max={3}
                       />
                       <Form.Field
                         title={m.maxNbTrans}
@@ -665,6 +673,8 @@ const MacSettingsSection = props => {
                         fieldWidth="xxs"
                         className="d-flex direction-column"
                         type="number"
+                        min={1}
+                        max={3}
                       />
                       <Button
                         type="button"

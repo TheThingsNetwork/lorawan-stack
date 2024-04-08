@@ -984,6 +984,8 @@
   "lib.field-description-messages.resetsJoinNoncesDescription": "join noncesのリセットを許可すると、デバイスnoncesとjoin noncesの再利用チェックが無効になります。このオプションを有効にすると、参加リクエストを無限に再生することができます。この動作はLoRaWANの仕様に準拠していないため、開発環境以外では使用しないでください。",
   "lib.field-description-messages.resetUsedDevNoncesDescription": "デバイスのnoncesは、攻撃者によってjoin要求が再生されないことを保証します。デバイスノンスをリセットすると、エンドデバイスは以前に使用したノンスを再利用することができます。このオプションは、noncesを再び使用できるようにすることが確実でない限り、使用しないでください",
   "lib.field-description-messages.alcsyncDescription": "アプリケーション層クロック同期パッケージは、LoRa TS003仕様の一部であり、エンドデバイスのリアルタイムクロックをネットワークの全地球測位システム（GPS）クロックに秒に近い精度で同期させます。これは、他の正確な時間ソースにアクセスできないエンドデバイスに便利です",
+  "lib.field-description-messages.useDefaultNbTransDescription": "",
+  "lib.field-description-messages.dataRateSpecificOverridesDescription": "",
   "lib.payload-formatter-messages.repository": "レポジトリー",
   "lib.payload-formatter-messages.javascript": "Javascript",
   "lib.payload-formatter-messages.cayennelpp": "CayenneLPP",
