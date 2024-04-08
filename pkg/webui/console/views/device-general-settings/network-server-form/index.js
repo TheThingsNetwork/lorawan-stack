@@ -49,8 +49,6 @@ import {
   generate16BytesKey,
 } from '@console/lib/device-utils'
 
-import { getBandsList } from '@console/store/actions/configuration'
-
 import messages from '../messages'
 import {
   isDeviceABP,
@@ -85,6 +83,7 @@ const NetworkServerForm = React.memo(props => {
     mayEditKeys,
     mayReadKeys,
     onMacReset,
+    defaultMacSettings,
     getDefaultMacSettings,
   } = props
   const {
@@ -114,7 +113,7 @@ const NetworkServerForm = React.memo(props => {
 
   const formRef = React.useRef(null)
 
-  const [macSettings, setMacSettings] = React.useState({})
+  const [macSettings, setMacSettings] = React.useState(defaultMacSettings)
 
   const [phyVersion, setPhyVersion] = React.useState(device.lorawan_phy_version)
   const phyVersionRef = React.useRef()
@@ -216,12 +215,12 @@ const NetworkServerForm = React.memo(props => {
         phyVersionRef.current = phyVersion
 
         getMacSettings(freqPlan, phyVersion)
-        dispatch(getBandsList(bandId, phyVersion))
       }
     }
   }, [
     freqPlan,
     getDefaultMacSettings,
+    defaultMacSettings,
     lorawanVersion,
     phyVersion,
     validationContext,
@@ -599,6 +598,9 @@ const NetworkServerForm = React.memo(props => {
 })
 
 NetworkServerForm.propTypes = {
+  defaultMacSettings: PropTypes.shape({
+    adr_margin: PropTypes.number,
+  }).isRequired,
   device: PropTypes.device.isRequired,
   getDefaultMacSettings: PropTypes.func.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,

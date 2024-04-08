@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Col, Row, Container } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -25,6 +25,7 @@ import toast from '@ttn-lw/components/toast'
 import Collapse from '@ttn-lw/components/collapse'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
@@ -35,6 +36,7 @@ import {
   selectJsConfig,
   selectNsConfig,
 } from '@ttn-lw/lib/selectors/env'
+import { isBackend, getBackendErrorName } from '@ttn-lw/lib/errors/utils'
 
 import {
   mayEditApplicationDeviceKeys,
@@ -43,6 +45,7 @@ import {
 
 import { updateDevice, resetDevice, resetUsedDevNonces } from '@console/store/actions/devices'
 import { unclaimDevice } from '@console/store/actions/claim'
+import { getBandsList } from '@console/store/actions/configuration'
 
 import {
   selectSelectedDevice,
@@ -74,6 +77,7 @@ const DeviceGeneralSettings = () => {
   const asConfig = selectAsConfig()
   const jsConfig = selectJsConfig()
   const nsConfig = selectNsConfig()
+  const [defaultMacSettings, setMacSettings] = useState({})
 
   useBreadcrumbs(
     'device.general',
@@ -196,6 +200,44 @@ const DeviceGeneralSettings = () => {
     nsDescription = m.notInCluster
   }
 
+  const action = useCallback(async () => {
+    if (device.version_ids.brand_id && device.lorawan_phy_version) {
+      await dispatch(
+        attachPromise(getBandsList(device.version_ids.brand_id, device.lorawan_phy_version)),
+      )
+    }
+    if (device.lorawan_phy_version && device.frequency_plan_id) {
+      try {
+        const settings = await tts.Ns.getDefaultMacSettings(
+          device.frequency_plan_id,
+          device.lorawan_phy_version,
+        )
+        setMacSettings(settings)
+      } catch (err) {
+        if (isBackend(err) && getBackendErrorName(err) === 'no_band_version') {
+          toast({
+            type: toast.types.ERROR,
+            message: sharedMessages.fpNotFoundError,
+            messageValues: {
+              lorawanVersion: device.lorawan_phy_version,
+              freqPlan: device.frequency_plan_id,
+              code: msg => <code>{msg}</code>,
+            },
+          })
+        } else {
+          toast({
+            type: toast.types.ERROR,
+            message: m.macSettingsError,
+            messageValues: {
+              freqPlan: device.frequency_plan_id,
+              code: msg => <code>{msg}</code>,
+            },
+          })
+        }
+      }
+    }
+  }, [device.version_ids.brand_id, device.lorawan_phy_version, device.frequency_plan_id, dispatch])
+
   return (
     <Container>
       <IntlHelmet title={sharedMessages.generalSettings} />
@@ -223,15 +265,18 @@ const DeviceGeneralSettings = () => {
             />
           </Collapse>
           <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
-            <NetworkServerForm
-              device={device}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              onMacReset={resetDevice}
-              mayEditKeys={mayEditKeys}
-              mayReadKeys={mayReadKeys}
-              getDefaultMacSettings={tts.Ns.getDefaultMacSettings}
-            />
+            <RequireRequest requestAction={action}>
+              <NetworkServerForm
+                device={device}
+                defaultMacSettings={defaultMacSettings}
+                onSubmit={handleSubmit}
+                onSubmitSuccess={handleSubmitSuccess}
+                onMacReset={resetDevice}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
+                getDefaultMacSettings={tts.Ns.getDefaultMacSettings}
+              />
+            </RequireRequest>
           </Collapse>
           <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
             <ApplicationServerForm
