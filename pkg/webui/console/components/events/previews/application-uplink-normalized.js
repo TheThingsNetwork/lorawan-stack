@@ -29,6 +29,7 @@ const ApplicationUplinkNormalizedPreview = React.memo(({ event }) => {
   return (
     <DescriptionList>
       <DescriptionList.Byte title={messages.devAddr} data={deviceIds.dev_addr} />
+      <DescriptionList.Byte title={sharedMessages.joinEUI} data={deviceIds.join_eui} />
       {data.normalized_payload.soil && (
         <DescriptionList.Item title={sharedMessages.normalizedPayloadSoil}>
           <JSONPayload data={data.normalized_payload.soil} />

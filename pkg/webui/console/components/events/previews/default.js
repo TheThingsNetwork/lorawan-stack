@@ -15,6 +15,7 @@
 import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import messages from '../messages'
 
@@ -27,6 +28,14 @@ const DefaultPreview = React.memo(({ event }) => {
     return (
       <DescriptionList>
         <DescriptionList.Byte title={messages.devAddr} data={identifiers[0].device_ids.dev_addr} />
+        <DescriptionList.Byte
+          title={sharedMessages.joinEUI}
+          data={identifiers[0].device_ids.join_eui}
+        />
+        <DescriptionList.Byte
+          title={sharedMessages.devEUI}
+          data={identifiers[0].device_ids.dev_eui}
+        />
       </DescriptionList>
     )
   }

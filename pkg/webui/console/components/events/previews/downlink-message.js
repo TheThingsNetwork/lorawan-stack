@@ -20,6 +20,7 @@ import { getDataRate } from '@console/components/events/utils'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getByPath from '@ttn-lw/lib/get-by-path'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import messages from '../messages'
 
@@ -61,6 +62,8 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
       )
     }
     const devAddr = event.identifiers[0].device_ids.dev_addr
+    const joinEui = event.identifiers[0].device_ids.join_eui
+    const devEui = event.identifiers[0].device_ids.dev_eui
     const frmPayload = getByPath(data, 'payload.mac_payload.frm_payload')
     const rx1Delay = getByPath(data, 'request.rx1_delay')
     const fPort = getByPath(data, 'payload.mac_payload.f_port')
@@ -69,6 +72,8 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
     return (
       <DescriptionList>
         <DescriptionList.Byte title={messages.devAddr} data={devAddr} />
+        <DescriptionList.Byte title={sharedMessages.joinEUI} data={joinEui} />
+        <DescriptionList.Byte title={sharedMessages.devEUI} data={devEui} />
         <DescriptionList.Item title={messages.fPort} data={fPort} />
         {isConfirmed && (
           <DescriptionList.Item>
