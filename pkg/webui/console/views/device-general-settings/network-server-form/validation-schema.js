@@ -378,8 +378,12 @@ const validationSchema = Yup.object()
                     .min(value?.min_nb_trans || 1, Yup.passValues(sharedMessages.validateNumberGte))
                     .max(3, Yup.passValues(sharedMessages.validateNumberLte))
                     .nullable(),
-                  overrides: Yup.lazy(value =>
-                    Yup.object().shape(
+                  overrides: Yup.lazy(value => {
+                    if (!Boolean(value)) {
+                      return Yup.object().nullable()
+                    }
+
+                    return Yup.object().shape(
                       Object.keys(value).reduce((acc, key) => {
                         acc[key] = Yup.object().shape({
                           _data_rate_index: Yup.string()
@@ -403,8 +407,8 @@ const validationSchema = Yup.object()
 
                         return acc
                       }, {}),
-                    ),
-                  ),
+                    )
+                  }),
                 }),
               ),
             })

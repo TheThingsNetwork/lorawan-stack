@@ -201,9 +201,9 @@ const DeviceGeneralSettings = () => {
   }
 
   const action = useCallback(async () => {
-    if (device.version_ids.brand_id && device.lorawan_phy_version) {
+    if (device.version_ids.band_id && device.lorawan_phy_version) {
       await dispatch(
-        attachPromise(getBandsList(device.version_ids.brand_id, device.lorawan_phy_version)),
+        attachPromise(getBandsList(device.version_ids.band_id, device.lorawan_phy_version)),
       )
     }
     if (device.lorawan_phy_version && device.frequency_plan_id) {
