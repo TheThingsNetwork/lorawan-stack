@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
@@ -27,14 +26,10 @@ const m = defineMessages({
 })
 
 const SessionManagement = () => (
-  <Container>
-    <Row>
-      <Col>
-        <PageTitle title={m.sessionManagement} hideHeading />
-        <UserSessionsTable pageSize={PAGE_SIZES.REGULAR} />
-      </Col>
-    </Row>
-  </Container>
+  <div className="container container--lg">
+    <PageTitle title={m.sessionManagement} hideHeading />
+    <UserSessionsTable pageSize={PAGE_SIZES.REGULAR} />
+  </div>
 )
 
 export default SessionManagement

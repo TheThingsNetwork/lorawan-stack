@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
@@ -47,18 +46,16 @@ const OrganizationApiKeysList = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.apiKeys} />
-        <Col>
-          <ApiKeysTable
-            pageSize={PAGE_SIZES.REGULAR}
-            baseDataSelector={baseDataSelector}
-            getItemsAction={getApiKeys}
-          />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg grid">
+      <IntlHelmet title={sharedMessages.apiKeys} />
+      <div className="item-12">
+        <ApiKeysTable
+          pageSize={PAGE_SIZES.REGULAR}
+          baseDataSelector={baseDataSelector}
+          getItemsAction={getApiKeys}
+        />
+      </div>
+    </div>
   )
 }
 

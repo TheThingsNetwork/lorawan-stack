@@ -18,7 +18,7 @@
   overflow-y: scroll
   border-normal('right')
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     flex-basis: 100%
     flex-grow: 0
     margin-bottom: $ls.m
@@ -50,12 +50,12 @@
   .description
     margin: 0
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     flex-grow: 0
 
     .secret-inspector
       width: 100%
 
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     flex-basis: 35%
     padding-left: 3rem

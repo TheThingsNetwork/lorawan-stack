@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
@@ -49,33 +48,29 @@ const Overview = () => {
   } = useSelector(selectUser)
 
   return (
-    <Container>
-      <Row>
-        <Col className={style.top}>
-          <PageTitle title={sharedMessages.overview} hideHeading />
-          <ProfileCard />
-        </Col>
-      </Row>
-      <Row justify="center">
-        <Col sm={6}>
-          <Message
-            component="h1"
-            content={m.accountAppInfoTitle}
-            values={{ userId: userName || userId }}
-          />
-          <Message
-            content={m.accountAppInfoMessage}
-            values={{
-              p: msg => <p key={msg}>{msg}</p>,
-              ul: msg => <ol key="list">{msg}</ol>,
-              li: msg => <li>{msg}</li>,
-            }}
-          />
-          <Message component="p" content={m.accountAppConsoleInfo} />
-          <Button.AnchorLink primary href={consoleUrl} message={m.goToConsole} />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg grid">
+      <div className={style.top}>
+        <PageTitle title={sharedMessages.overview} hideHeading />
+        <ProfileCard />
+      </div>
+      <div className="item-start-3 item-6">
+        <Message
+          component="h1"
+          content={m.accountAppInfoTitle}
+          values={{ userId: userName || userId }}
+        />
+        <Message
+          content={m.accountAppInfoMessage}
+          values={{
+            p: msg => <p key={msg}>{msg}</p>,
+            ul: msg => <ol key="list">{msg}</ol>,
+            li: msg => <li>{msg}</li>,
+          }}
+        />
+        <Message component="p" content={m.accountAppConsoleInfo} />
+        <Button.AnchorLink primary href={consoleUrl} message={m.goToConsole} />
+      </div>
+    </div>
   )
 }
 

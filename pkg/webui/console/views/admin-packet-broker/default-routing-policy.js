@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Col } from 'react-grid-system'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -24,14 +23,14 @@ import m from './messages'
 import style from './admin-packet-broker.styl'
 
 const DefaultRoutingPolicyView = () => (
-  <Col md={12}>
+  <div className="item-12">
     <Message
       content={m.routingPolicyInformation}
       component="p"
       className={style.routingPolicyInformation}
     />
     <DefaultRoutingPolicyForm />
-  </Col>
+  </div>
 )
 
 export default DefaultRoutingPolicyView

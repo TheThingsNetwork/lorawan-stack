@@ -128,14 +128,19 @@ $br = {
 
 // ## Mind the breakpoints also set in lib/components/init.js for the grid.
 
+// ## The order matters as the breakpoints are used to build responsive
+// classes in the grid system. The smaller breakpoints should be first
+// to have a slightly higher specificity.
+
 $bp = {
-  'xl': 1600px,
-  'l': 1340px,
-  'm': 1080px,
-  's': 768px,
-  'xs': 620px,
-  'xxs': 480px,
   'xs3': 376px,
+  'xxs': 480px,
+  'xs': 620px,
+  'sm': 768px,
+  'md': 1080px,
+  'lg': 1340px,
+  'xl': 1600px,
+  'xxl': 1920px,
 }
 
 

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -71,21 +70,19 @@ const ApplicationPubsubAdd = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle title={sharedMessages.addPubsub} className="mb-0" />
-      <Row>
-        <Col lg={8} md={12}>
-          <PubsubForm
-            appId={appId}
-            update={false}
-            onSubmit={handleSubmit}
-            existCheck={existCheck}
-            mqttDisabled={mqttDisabled}
-            natsDisabled={natsDisabled}
-          />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <PubsubForm
+          appId={appId}
+          update={false}
+          onSubmit={handleSubmit}
+          existCheck={existCheck}
+          mqttDisabled={mqttDisabled}
+          natsDisabled={natsDisabled}
+        />
+      </div>
+    </div>
   )
 }
 

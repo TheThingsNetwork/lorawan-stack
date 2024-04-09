@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
@@ -57,7 +56,7 @@ const ApplicationAdd = () => {
   return (
     <Require featureCheck={mayCreateApplications} otherwise={{ redirect: '/applications' }}>
       <RequireRequest requestAction={getOrganizationsList()}>
-        <Container>
+        <div className="container container--lg grid">
           <PageTitle
             colProps={{ md: 10, lg: 9 }}
             className="mb-cs-s"
@@ -77,12 +76,10 @@ const ApplicationAdd = () => {
             />
             <hr className="mb-ls-s" />
           </PageTitle>
-          <Row>
-            <Col md={10} lg={9}>
-              <ApplicationForm onSuccess={handleSuccess} />
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-10 lg:item-9">
+            <ApplicationForm onSuccess={handleSuccess} />
+          </div>
+        </div>
       </RequireRequest>
     </Require>
   )

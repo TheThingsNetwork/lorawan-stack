@@ -14,7 +14,6 @@
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Col, Row } from 'react-grid-system'
 
 import { useFormContext } from '@ttn-lw/components/form'
 
@@ -74,21 +73,19 @@ const FallbackVersionIdsSection = () => {
   ])
 
   return (
-    <Row>
-      <Col>
-        <VersionIdsSection />
-        {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
-        <FreqPlansSelect
-          required
-          disabled={!hasValidType}
-          className="mt-ls-xxs"
-          tooltipId={tooltipIds.FREQUENCY_PLAN}
-          name="frequency_plan_id"
-          bandId={version_ids.band_id}
-          autoFocus
-        />
-      </Col>
-    </Row>
+    <div className="item-12">
+      <VersionIdsSection />
+      {showOtherHint && <OtherHint manualGuideDocsPath="/devices/adding-devices/" />}
+      <FreqPlansSelect
+        required
+        disabled={!hasValidType}
+        className="mt-ls-xxs"
+        tooltipId={tooltipIds.FREQUENCY_PLAN}
+        name="frequency_plan_id"
+        bandId={version_ids.band_id}
+        autoFocus
+      />
+    </div>
   )
 }
 

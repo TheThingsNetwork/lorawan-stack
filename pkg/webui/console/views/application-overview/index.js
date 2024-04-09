@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -73,30 +72,22 @@ const ApplicationOverview = () => {
   return (
     <Require condition={condition} otherwise={otherwise}>
       <div className={style.titleSection}>
-        <Container>
+        <div className="container container--lg p-vert-0">
           <IntlHelmet title={sharedMessages.overview} />
-          <Row>
-            <Col sm={12}>
-              <ApplicationTitleSection appId={appId} />
-            </Col>
-          </Row>
-        </Container>
+          <ApplicationTitleSection appId={appId} />
+        </div>
       </div>
-      <Container>
-        <Row>
-          <Col sm={12} lg={6}>
-            <DataSheet data={sheetData} className={style.generalInformation} />
-          </Col>
-          <Col sm={12} lg={6}>
-            <ApplicationEvents appId={appId} widget />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} className="mt-ls-xl s:mt-ls-xs">
-            <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
-          </Col>
-        </Row>
-      </Container>
+      <div className="container container--lg grid">
+        <div className="item-12 lg:item-6">
+          <DataSheet data={sheetData} className={style.generalInformation} />
+        </div>
+        <div className="item-12 lg:item-6">
+          <ApplicationEvents appId={appId} widget />
+        </div>
+        <div className="item-12 mt-ls-xl sm:mt-ls-xs">
+          <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
+        </div>
+      </div>
     </Require>
   )
 }

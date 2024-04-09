@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { Col } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
 
 import toast from '@ttn-lw/components/toast'
@@ -60,7 +59,7 @@ const DefaultGatewayVisibilityView = () => {
 
   return (
     <RequireRequest requestAction={getHomeNetworkDefaultGatewayVisibility()}>
-      <Col md={12}>
+      <div className="item-12">
         <Message
           content={m.gatewayVisibilityInformation}
           component="p"
@@ -71,7 +70,7 @@ const DefaultGatewayVisibilityView = () => {
           initialValues={initialValues}
           error={formError}
         />
-      </Col>
+      </div>
     </RequireRequest>
   )
 }
