@@ -22,6 +22,7 @@ import Icon, { IconChevronLeft, IconChevronRight } from '@ttn-lw/components/icon
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
 
 import Select from '../select'
 import Input from '../input'
@@ -42,11 +43,12 @@ const Pagination = ({
   marginPagesDisplayed,
   hideIfOnlyOnePage,
   pageCount,
-  pageSize,
+  pageSize: propPageSize,
   setPageSize,
   ...rest
 }) => {
   const [selectedPage, setSelectedPage] = useState(forcePage)
+  const [pageSize, setQueryPageSize] = useQueryState('page-size', propPageSize)
 
   const handlePageChange = useCallback(
     page => {
@@ -69,8 +71,9 @@ const Pagination = ({
   const handlePageSizeChange = useCallback(
     val => {
       setPageSize(val)
+      setQueryPageSize(val)
     },
-    [setPageSize],
+    [setPageSize, setQueryPageSize],
   )
 
   const pageSizeSelect = (
@@ -81,7 +84,7 @@ const Pagination = ({
           value,
           label: `${value}`,
         }))}
-        value={pageSize}
+        value={parseInt(pageSize)}
         onChange={handlePageSizeChange}
         inputWidth="xxs"
         className={style.selectSize}
