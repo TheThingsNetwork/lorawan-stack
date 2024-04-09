@@ -54,7 +54,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 		ctx,
 		registeredWebhookIDs,
 		nil,
-		func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+		func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 			return &ttnpb.ApplicationWebhook{
 				Ids:     registeredWebhookIDs,
 				BaseUrl: "http://example.com",
@@ -66,29 +66,23 @@ func TestHealthStatusRegistry(t *testing.T) {
 		t.FailNow()
 	}
 
-	r, err := http.NewRequestWithContext(
-		web.WithWebhookID(ctx, registeredWebhookIDs), http.MethodPost, "http://foo.bar", nil,
-	)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
+	ctx = web.WithWebhookID(ctx, registeredWebhookIDs)
 	registry := web.NewHealthStatusRegistry(webhookRegistry)
 
 	// Initially no status is stored.
-	health, err := registry.Get(r)
+	health, err := registry.Get(ctx)
 	a.So(err, should.BeNil)
 	a.So(health, should.BeNil)
 
 	// Callback errors are propagated.
-	err = registry.Set(r, func(health *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
+	err = registry.Set(ctx, func(health *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
 		a.So(health, should.BeNil)
 		return nil, fmt.Errorf("internal failure")
 	})
 	a.So(err, should.NotBeNil)
 
 	// Store the health status.
-	err = registry.Set(r, func(health *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
+	err = registry.Set(ctx, func(health *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
 		a.So(health, should.BeNil)
 		return &ttnpb.ApplicationWebhookHealth{
 			Status: &ttnpb.ApplicationWebhookHealth_Healthy{
@@ -99,7 +93,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// Get is consistent with Set.
-	health, err = registry.Get(r)
+	health, err = registry.Get(ctx)
 	a.So(err, should.BeNil)
 	a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 		Status: &ttnpb.ApplicationWebhookHealth_Healthy{
@@ -109,7 +103,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 
 	// Store an unhealthy status.
 	errorDetails := errors.Define("failure", "random failure").New()
-	err = registry.Set(r, func(health *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
+	err = registry.Set(ctx, func(health *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
 		a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 			Status: &ttnpb.ApplicationWebhookHealth_Healthy{
 				Healthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusHealthy{},
@@ -128,7 +122,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// Get is consistent with Set.
-	health, err = registry.Get(r)
+	health, err = registry.Get(ctx)
 	a.So(err, should.BeNil)
 	a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 		Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
@@ -142,7 +136,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 
 	cachedRegistry := web.NewCachedHealthStatusRegistry(registry)
 	// Initially the cached registry just defers to the underlying registry.
-	health, err = cachedRegistry.Get(r)
+	health, err = cachedRegistry.Get(ctx)
 	a.So(err, should.BeNil)
 	a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 		Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
@@ -155,13 +149,13 @@ func TestHealthStatusRegistry(t *testing.T) {
 	})
 
 	// Cache a status inside the context.
-	r = r.WithContext(web.WithCachedHealthStatus(r.Context(), &ttnpb.ApplicationWebhookHealth{
+	ctx = web.WithCachedHealthStatus(ctx, &ttnpb.ApplicationWebhookHealth{
 		Status: &ttnpb.ApplicationWebhookHealth_Healthy{
 			Healthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusHealthy{},
 		},
-	}))
+	})
 	// Expect the status to take precedence to the underlying registry.
-	health, err = cachedRegistry.Get(r)
+	health, err = cachedRegistry.Get(ctx)
 	a.So(err, should.BeNil)
 	a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 		Status: &ttnpb.ApplicationWebhookHealth_Healthy{
@@ -170,7 +164,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 	})
 
 	// Update stored value.
-	err = registry.Set(r, func(health *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
+	err = registry.Set(ctx, func(health *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
 		a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 			Status: &ttnpb.ApplicationWebhookHealth_Unhealthy{
 				Unhealthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{
@@ -193,7 +187,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// The cached value takes precedence to the update in the underlying registry.
-	health, err = cachedRegistry.Get(r)
+	health, err = cachedRegistry.Get(ctx)
 	a.So(err, should.BeNil)
 	a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 		Status: &ttnpb.ApplicationWebhookHealth_Healthy{
@@ -222,7 +216,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 		ctx,
 		registeredWebhookIDs,
 		nil,
-		func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+		func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 			return &ttnpb.ApplicationWebhook{
 				Ids:     registeredWebhookIDs,
 				BaseUrl: "http://example.com",
@@ -241,8 +235,9 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 	registry := web.NewHealthStatusRegistry(webhookRegistry)
 	healthSink := web.NewHealthCheckSink(sink, registry, 4, 8*Timeout)
 
+	ctx = web.WithWebhookID(ctx, registeredWebhookIDs)
 	r, err := http.NewRequestWithContext(
-		web.WithWebhookID(ctx, registeredWebhookIDs), http.MethodPost, "http://foo.bar", nil,
+		ctx, http.MethodPost, "http://foo.bar", nil,
 	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -260,7 +255,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 	}
 
 	// The stored status is now healthy.
-	health, err := registry.Get(r)
+	health, err := registry.Get(ctx)
 	a.So(err, should.BeNil)
 	a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 		Status: &ttnpb.ApplicationWebhookHealth_Healthy{
@@ -286,7 +281,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 		}
 
 		// The errors should be recorded.
-		health, err := registry.Get(r)
+		health, err := registry.Get(ctx)
 		a.So(err, should.BeNil)
 		if unhealthy := health.GetUnhealthy(); a.So(unhealthy, should.NotBeNil) {
 			lastFailedAttemptAt = *ttnpb.StdTime(unhealthy.LastFailedAttemptAt)
@@ -311,7 +306,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 		}
 
 		// The number of attempts should stay the same.
-		health, err := registry.Get(r)
+		health, err := registry.Get(ctx)
 		a.So(err, should.BeNil)
 		if unhealthy := health.GetUnhealthy(); a.So(unhealthy, should.NotBeNil) {
 			a.So(unhealthy.FailedAttempts, should.Equal, 4)
@@ -345,7 +340,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 		}
 
 		// The errors should be recorded.
-		health, err := registry.Get(r)
+		health, err := registry.Get(ctx)
 		a.So(err, should.BeNil)
 		if unhealthy := health.GetUnhealthy(); a.So(unhealthy, should.NotBeNil) {
 			if i == 1 {
@@ -379,7 +374,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 		}
 
 		// The stored status is healthy.
-		health, err = registry.Get(r)
+		health, err = registry.Get(ctx)
 		a.So(err, should.BeNil)
 		a.So(health, should.Resemble, &ttnpb.ApplicationWebhookHealth{
 			Status: &ttnpb.ApplicationWebhookHealth_Healthy{

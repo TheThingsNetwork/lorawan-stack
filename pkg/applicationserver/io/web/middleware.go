@@ -37,8 +37,8 @@ var (
 	webhookIDKey webhookIDKeyType
 )
 
-func withDeviceID(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) context.Context {
-	return context.WithValue(ctx, deviceIDKey, id)
+func withDeviceID(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) context.Context {
+	return context.WithValue(ctx, deviceIDKey, ids)
 }
 
 func deviceIDFromContext(ctx context.Context) *ttnpb.EndDeviceIdentifiers {
@@ -49,8 +49,8 @@ func deviceIDFromContext(ctx context.Context) *ttnpb.EndDeviceIdentifiers {
 	return id
 }
 
-func withWebhookID(ctx context.Context, id *ttnpb.ApplicationWebhookIdentifiers) context.Context {
-	return context.WithValue(ctx, webhookIDKey, id)
+func withWebhookID(ctx context.Context, ids *ttnpb.ApplicationWebhookIdentifiers) context.Context {
+	return context.WithValue(ctx, webhookIDKey, ids)
 }
 
 func webhookIDFromContext(ctx context.Context) *ttnpb.ApplicationWebhookIdentifiers {
@@ -61,7 +61,7 @@ func webhookIDFromContext(ctx context.Context) *ttnpb.ApplicationWebhookIdentifi
 	return id
 }
 
-func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
+func (*webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		vars := mux.Vars(r)
@@ -93,7 +93,7 @@ func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 	})
 }
 
-func (w *webhooks) requireApplicationRights(required ...ttnpb.Right) mux.MiddlewareFunc {
+func (*webhooks) requireApplicationRights(required ...ttnpb.Right) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			ctx := req.Context()

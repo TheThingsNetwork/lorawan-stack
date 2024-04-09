@@ -78,8 +78,7 @@ func requestErrorDetails(req *http.Request, res *http.Response) ([]any, []proto.
 	return attributes, details
 }
 
-// Process uses the HTTP client to perform the request.
-func (s *HTTPClientSink) Process(req *http.Request) error {
+func (s *HTTPClientSink) process(req *http.Request) error {
 	res, err := s.Do(req)
 	if err != nil {
 		attributes, details := requestErrorDetails(req, res)
@@ -94,6 +93,14 @@ func (s *HTTPClientSink) Process(req *http.Request) error {
 	return errRequest.WithAttributes(attributes...).WithDetails(details...)
 }
 
+// Process uses the HTTP client to perform the requests.
+func (s *HTTPClientSink) Process(req *http.Request) error {
+	if err := s.process(req); err != nil {
+		return err
+	}
+	return nil
+}
+
 // pooledSink is a Sink with worker pool.
 type pooledSink struct {
 	pool workerpool.WorkerPool[*http.Request]
@@ -103,7 +110,7 @@ func createPoolHandler(sink Sink) workerpool.Handler[*http.Request] {
 	h := func(ctx context.Context, req *http.Request) {
 		if err := sink.Process(req); err != nil {
 			registerWebhookFailed(ctx, err)
-			log.FromContext(ctx).WithError(err).Warn("Failed to process message")
+			log.FromContext(ctx).WithError(err).Warn("Failed to process requests")
 		} else {
 			registerWebhookSent(ctx)
 		}

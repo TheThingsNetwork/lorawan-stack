@@ -26,8 +26,8 @@ import (
 
 // HealthStatusRegistry is a registry for webhook health status.
 type HealthStatusRegistry interface {
-	Get(r *http.Request) (*ttnpb.ApplicationWebhookHealth, error)
-	Set(r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error)) error
+	Get(context.Context) (*ttnpb.ApplicationWebhookHealth, error)
+	Set(context.Context, func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error)) error
 }
 
 type healthStatusRegistry struct {
@@ -35,8 +35,7 @@ type healthStatusRegistry struct {
 }
 
 // Get implements HealthStatusRegistry.
-func (reg *healthStatusRegistry) Get(r *http.Request) (*ttnpb.ApplicationWebhookHealth, error) {
-	ctx := r.Context()
+func (reg *healthStatusRegistry) Get(ctx context.Context) (*ttnpb.ApplicationWebhookHealth, error) {
 	ids := webhookIDFromContext(ctx)
 	web, err := reg.registry.Get(ctx, ids, []string{"health_status"})
 	if err != nil {
@@ -47,9 +46,8 @@ func (reg *healthStatusRegistry) Get(r *http.Request) (*ttnpb.ApplicationWebhook
 
 // Set implements HealthStatusRegistry.
 func (reg *healthStatusRegistry) Set(
-	r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
+	ctx context.Context, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
 ) error {
-	ctx := r.Context()
 	ids := webhookIDFromContext(ctx)
 	_, err := reg.registry.Set(
 		ctx,
@@ -90,18 +88,18 @@ type cachedHealthStatusRegistry struct {
 }
 
 // Get implements HealthStatusRegistry.
-func (reg *cachedHealthStatusRegistry) Get(r *http.Request) (*ttnpb.ApplicationWebhookHealth, error) {
-	if h, ok := r.Context().Value(cachedHealthStatusRegistryKey).(*ttnpb.ApplicationWebhookHealth); ok {
+func (reg *cachedHealthStatusRegistry) Get(ctx context.Context) (*ttnpb.ApplicationWebhookHealth, error) {
+	if h, ok := ctx.Value(cachedHealthStatusRegistryKey).(*ttnpb.ApplicationWebhookHealth); ok {
 		return h, nil
 	}
-	return reg.registry.Get(r)
+	return reg.registry.Get(ctx)
 }
 
 // Set implements HealthStatusRegistry.
 func (reg *cachedHealthStatusRegistry) Set(
-	r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
+	ctx context.Context, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
 ) error {
-	return reg.registry.Set(r, f)
+	return reg.registry.Set(ctx, f)
 }
 
 // NewCachedHealthStatusRegistry constructs a HealthStatusRegistry which allows the Get response to be cached.
@@ -119,12 +117,13 @@ type healthCheckSink struct {
 
 // Process runs the health checks and sends the request to the underlying sink
 // if they pass.
-func (hcs *healthCheckSink) Process(r *http.Request) error {
-	lastKnownState, err := hcs.preRunCheck(r)
+func (hcs *healthCheckSink) Process(req *http.Request) error {
+	ctx := req.Context()
+	lastKnownState, err := hcs.preRunCheck(ctx)
 	if err != nil {
 		return err
 	}
-	return hcs.executeAndRecord(r, lastKnownState)
+	return hcs.executeAndRecord(ctx, req, lastKnownState)
 }
 
 type healthState int
@@ -140,8 +139,8 @@ const (
 var errWebhookDisabled = errors.DefineAborted("webhook_disabled", "webhook disabled")
 
 // preRunCheck verifies if the webhook should be executed.
-func (hcs *healthCheckSink) preRunCheck(r *http.Request) (healthState, error) {
-	h, err := hcs.registry.Get(r)
+func (hcs *healthCheckSink) preRunCheck(ctx context.Context) (healthState, error) {
+	h, err := hcs.registry.Get(ctx)
 	if err != nil {
 		return healthStateUnknown, err
 	}
@@ -188,8 +187,10 @@ func (hcs *healthCheckSink) preRunCheck(r *http.Request) (healthState, error) {
 }
 
 // executeAndRecord runs the provided request using the underlying sink and records the health status.
-func (hcs *healthCheckSink) executeAndRecord(r *http.Request, lastKnownState healthState) error {
-	sinkErr := hcs.sink.Process(r)
+func (hcs *healthCheckSink) executeAndRecord(
+	ctx context.Context, req *http.Request, lastKnownState healthState,
+) error {
+	sinkErr := hcs.sink.Process(req)
 
 	// Fast path 1: the health status is available, the request did not error, and the webhook is healthy.
 	if sinkErr == nil && lastKnownState == healthStateHealthy {
@@ -226,7 +227,7 @@ func (hcs *healthCheckSink) executeAndRecord(r *http.Request, lastKnownState hea
 			},
 		}, nil
 	}
-	if err := hcs.registry.Set(r, f); err != nil {
+	if err := hcs.registry.Set(ctx, f); err != nil {
 		return err
 	}
 	return sinkErr
