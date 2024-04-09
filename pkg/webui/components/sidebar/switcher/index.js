@@ -49,9 +49,9 @@ const Switcher = ({ isMinimized }) => {
   })
 
   const appPageSize = getCookie('applications-list-page-size')
-  const appParam = `?page-size=${appPageSize}`
+  const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
   const gtwPageSize = getCookie('gateways-list-page-size')
-  const gtwParam = `?page-size=${gtwPageSize}`
+  const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
 
   return (
     <div
@@ -73,11 +73,7 @@ const Switcher = ({ isMinimized }) => {
           </Dropdown.Attached>
         )}
       </NavLink>
-      <NavLink
-        to={`/applications${appPageSize ? appParam : PAGE_SIZES.REGULAR}`}
-        className={getNavLinkClass}
-        ref={applicationsRef}
-      >
+      <NavLink to={`/applications${appParam}`} className={getNavLinkClass} ref={applicationsRef}>
         <Icon icon={IconApplication} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.applications} />
         {isMinimized && (
@@ -91,11 +87,7 @@ const Switcher = ({ isMinimized }) => {
           </Dropdown.Attached>
         )}
       </NavLink>
-      <NavLink
-        to={`/gateways${gtwPageSize ? gtwParam : PAGE_SIZES.REGULAR}`}
-        className={getNavLinkClass}
-        ref={gatewaysRef}
-      >
+      <NavLink to={`/gateways${gtwParam}`} className={getNavLinkClass} ref={gatewaysRef}>
         <Icon icon={IconGateway} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.gateways} />
         {isMinimized && (

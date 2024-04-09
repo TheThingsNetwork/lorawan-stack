@@ -75,7 +75,7 @@ const AppSideNavigation = () => {
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
   const { isMinimized } = useContext(SidebarContext)
   const appPageSize = getCookie('applications-list-page-size')
-  const param = `?page-size=${appPageSize}`
+  const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
 
   if (!app) {
     return null
@@ -92,7 +92,7 @@ const AppSideNavigation = () => {
             buttonMessage={m.buttonMessage}
             className="mt-cs-xs mb-cs-l"
             path={`/applications/${appId}`}
-            backPath={`/applications${appPageSize ? param : PAGE_SIZES.REGULAR}`}
+            backPath={`/applications${appParam}`}
           />
         )}
         {mayViewApplicationInfo.check(rights) && (

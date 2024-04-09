@@ -30,13 +30,10 @@ import getCookie from '@console/lib/table-utils'
 
 const ApplicationsList = () => {
   const appPageSize = getCookie('applications-list-page-size')
-  const param = `?page-size=${appPageSize}`
+  const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
   useBreadcrumbs(
     'apps.list',
-    <Breadcrumb
-      path={`/applications${appPageSize ? param : PAGE_SIZES.REGULAR}`}
-      content={sharedMessages.list}
-    />,
+    <Breadcrumb path={`/applications${appParam}`} content={sharedMessages.list} />,
   )
 
   return (

@@ -26,15 +26,22 @@ import OrganizationsTable from '@console/containers/organizations-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import getCookie from '@console/lib/table-utils'
+
 const List = () => {
-  useBreadcrumbs('orgs.list', <Breadcrumb path="/organizations" content={sharedMessages.list} />)
+  const orgPageSize = getCookie('organizations-list-page-size')
+  const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
+  useBreadcrumbs(
+    'orgs.list',
+    <Breadcrumb path={`/organizations${orgParam}`} content={sharedMessages.list} />,
+  )
 
   return (
     <Container>
       <Row>
         <IntlHelmet title={sharedMessages.organizations} />
         <Col>
-          <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
+          <OrganizationsTable />
         </Col>
       </Row>
     </Container>

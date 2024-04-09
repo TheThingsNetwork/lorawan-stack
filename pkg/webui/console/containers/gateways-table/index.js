@@ -16,6 +16,8 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
+import { useLocation } from 'react-router-dom'
+import Query from 'query-string'
 
 import Status from '@ttn-lw/components/status'
 import toast from '@ttn-lw/components/toast'
@@ -68,6 +70,8 @@ const GatewaysTable = () => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
+  const location = useLocation()
+  const { pageSize } = Query.parse(location.search)
 
   const handleRestore = React.useCallback(
     async id => {
@@ -238,6 +242,7 @@ const GatewaysTable = () => {
 
   return (
     <FetchTable
+      pageSize={pageSize}
       entity="gateways"
       defaultOrder="-created_at"
       addMessage={sharedMessages.registerGateway}

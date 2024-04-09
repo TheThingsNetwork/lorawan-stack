@@ -15,6 +15,8 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
@@ -24,8 +26,15 @@ import GatewaysTable from '@console/containers/gateways-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import getCookie from '@console/lib/table-utils'
+
 const GatewaysList = () => {
-  useBreadcrumbs('gtws.list', <Breadcrumb path="/gateways" content={sharedMessages.list} />)
+  const gtwPageSize = getCookie('gateways-list-page-size')
+  const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
+  useBreadcrumbs(
+    'gtws.list',
+    <Breadcrumb path={`/gateways${gtwParam}`} content={sharedMessages.list} />,
+  )
 
   return (
     <Container>

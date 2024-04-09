@@ -16,6 +16,8 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
+import { useLocation } from 'react-router-dom'
+import Query from 'query-string'
 
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
@@ -73,6 +75,8 @@ const OrganizationsTable = () => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
+  const location = useLocation()
+  const { pageSize } = Query.parse(location.search)
 
   const handleRestore = React.useCallback(
     async id => {
@@ -212,6 +216,7 @@ const OrganizationsTable = () => {
 
   return (
     <FetchTable
+      pageSize={pageSize}
       entity="organizations"
       defaultOrder="-created_at"
       headers={headers}
