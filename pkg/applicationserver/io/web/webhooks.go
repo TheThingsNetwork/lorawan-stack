@@ -89,9 +89,12 @@ func (s *HTTPClientSink) process(req *http.Request) error {
 
 // Process uses the HTTP client to perform the requests.
 func (s *HTTPClientSink) Process(req *http.Request) error {
+	ctx := req.Context()
 	if err := s.process(req); err != nil {
+		registerWebhookFailed(ctx, err, true)
 		return err
 	}
+	registerWebhookSent(ctx)
 	return nil
 }
 
@@ -103,10 +106,7 @@ type pooledSink struct {
 func createPoolHandler(sink Sink) workerpool.Handler[*http.Request] {
 	h := func(ctx context.Context, req *http.Request) {
 		if err := sink.Process(req); err != nil {
-			registerWebhookFailed(ctx, err)
 			log.FromContext(ctx).WithError(err).Warn("Failed to process requests")
-		} else {
-			registerWebhookSent(ctx)
 		}
 	}
 	return h
@@ -130,7 +130,13 @@ func NewPooledSink(ctx context.Context, c workerpool.Component, sink Sink, worke
 // Process sends the request to the workers.
 // This method returns immediately. An error is returned when the workers are too busy.
 func (s *pooledSink) Process(req *http.Request) error {
-	return s.pool.Publish(req.Context(), req)
+	ctx := req.Context()
+	if err := s.pool.Publish(ctx, req); err != nil {
+		registerWebhookFailed(ctx, err, false)
+		return err
+	}
+	// The underlying sink should register the success, or final failure.
+	return nil
 }
 
 // Webhooks is an interface for registering incoming webhooks for downlink and creating a subscription to outgoing
@@ -239,10 +245,9 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			if req == nil {
 				return nil
 			}
-			log.FromContext(ctx).WithField("url", req.URL).Debug("Process message")
+			log.FromContext(ctx).WithField("url", req.URL).Debug("Process request")
 			if err := w.target.Process(req); err != nil {
-				registerWebhookFailed(ctx, err)
-				log.FromContext(ctx).WithError(err).Warn("Failed to process message")
+				log.FromContext(ctx).WithError(err).Warn("Failed to process request")
 				return err
 			}
 			return nil

@@ -121,6 +121,7 @@ func (hcs *healthCheckSink) Process(req *http.Request) error {
 	ctx := req.Context()
 	lastKnownState, err := hcs.preRunCheck(ctx)
 	if err != nil {
+		registerWebhookFailed(ctx, err, true)
 		return err
 	}
 	return hcs.executeAndRecord(ctx, req, lastKnownState)

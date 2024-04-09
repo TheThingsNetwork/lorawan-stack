@@ -15,6 +15,6 @@
 package web
 
 var (
-	WebhookIDFromContext = webhookIDFromContext
-	WithWebhookID        = withWebhookID
+	WithWebhookID = withWebhookID
+	WithDeviceID  = withDeviceID
 )

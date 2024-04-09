@@ -236,6 +236,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 	healthSink := web.NewHealthCheckSink(sink, registry, 4, 8*Timeout)
 
 	ctx = web.WithWebhookID(ctx, registeredWebhookIDs)
+	ctx = web.WithDeviceID(ctx, registeredDeviceID)
 	r, err := http.NewRequestWithContext(
 		ctx, http.MethodPost, "http://foo.bar", nil,
 	)

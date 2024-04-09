@@ -78,7 +78,7 @@ func registerWebhookSent(ctx context.Context) {
 	webhookMetrics.webhooksSent.WithLabelValues(ctx).Inc()
 }
 
-func registerWebhookFailed(ctx context.Context, err error) {
+func registerWebhookFailed(ctx context.Context, err error, _ bool) {
 	errorLabel := unknown
 	if ttnErr, ok := errors.From(err); ok {
 		errorLabel = ttnErr.FullName()
