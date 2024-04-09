@@ -17,8 +17,6 @@ import { connect } from 'react-redux'
 import { defineMessages, FormattedNumber } from 'react-intl'
 import { bindActionCreators } from 'redux'
 import { createSelector } from 'reselect'
-import { useLocation } from 'react-router-dom'
-import Query from 'query-string'
 
 import Icon, { IconHelp } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -80,8 +78,6 @@ const tabs = [
 
 const ApplicationsTable = props => {
   const { isAdmin, restoreApplication, purgeApplication, ...rest } = props
-  const location = useLocation()
-  const { pageSize } = Query.parse(location.search)
 
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
@@ -279,7 +275,6 @@ const ApplicationsTable = props => {
 
   return (
     <FetchTable
-      pageSize={pageSize}
       entity="applications"
       defaultOrder="-created_at"
       headers={headers}

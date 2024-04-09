@@ -14,8 +14,6 @@
 
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useLocation } from 'react-router-dom'
-import Query from 'query-string'
 
 import Tag from '@ttn-lw/components/tag'
 import TagGroup from '@ttn-lw/components/tag/group'
@@ -39,8 +37,6 @@ const RIGHT_TAG_MAX_WIDTH = 160
 const ApiKeysTable = props => {
   const { baseDataSelector, getItemsAction } = props
   const intl = useIntl()
-  const location = useLocation()
-  const { pageSize } = Query.parse(location.search)
 
   const headers = [
     {
@@ -85,7 +81,6 @@ const ApiKeysTable = props => {
 
   return (
     <FetchTable
-      pageSize={pageSize}
       entity="keys"
       defaultOrder="-created_at"
       headers={headers}
