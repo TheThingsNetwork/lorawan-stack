@@ -83,7 +83,7 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
         <SidebarContext.Provider
           value={{ topEntities, onMinimizeToggle, isMinimized, onDrawerCloseClick }}
         >
-          <div className="d-flex direction-column gap-cs-l overflow-auto">
+          <div className="d-flex direction-column gap-cs-l overflow-y-auto overflow-x-hidden">
             <SideHeader />
             <div className="d-flex direction-column gap-cs-m">
               <SwitcherContainer />
