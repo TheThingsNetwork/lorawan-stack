@@ -14,7 +14,6 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { injectIntl, defineMessages } from 'react-intl'
-import { Col, Row } from 'react-grid-system'
 import { useBlocker } from 'react-router-dom'
 
 import TYPES from '@console/constants/formatter-types'
@@ -404,65 +403,65 @@ const PayloadFormattersForm = ({
 
   return (
     <>
-      <Row>
-        <Col sm={12} lg={_showTestSection() ? 6 : 12}>
-          <Form
-            onSubmit={handleSubmit}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            error={error}
-            formikRef={formRef}
-            id="payload-formatter-form"
-          >
-            {() => (
-              <>
-                <Form.SubTitle title={sharedMessages.setup} />
-                <Form.Field
-                  name={FIELD_NAMES.SELECT}
-                  title={m.formatterType}
-                  component={Select}
-                  options={options}
-                  onChange={handleTypeChange}
-                  warning={type === TYPES.DEFAULT ? m.appFormatterWarning : undefined}
-                  inputWidth="m"
-                  required
+      <div className="item-12 md:item-6 lg:item-12 sm:item-12">
+        <Form
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          error={error}
+          formikRef={formRef}
+          id="payload-formatter-form"
+        >
+          {() => (
+            <>
+              <Form.SubTitle title={sharedMessages.setup} />
+              <Form.Field
+                name={FIELD_NAMES.SELECT}
+                title={m.formatterType}
+                component={Select}
+                options={options}
+                onChange={handleTypeChange}
+                warning={type === TYPES.DEFAULT ? m.appFormatterWarning : undefined}
+                inputWidth="m"
+                required
+              />
+              {isDefaultType && (
+                <Notification
+                  small
+                  info
+                  content={m.defaultFormatter}
+                  convertBackticks
+                  messageValues={{
+                    Link: msg => (
+                      <Link
+                        secondary
+                        key="manual-link"
+                        to={`/applications/${appId}/payload-formatters/uplink`}
+                      >
+                        {msg}
+                      </Link>
+                    ),
+                    defaultFormatter,
+                  }}
                 />
-                {isDefaultType && (
-                  <Notification
-                    small
-                    info
-                    content={m.defaultFormatter}
-                    convertBackticks
-                    messageValues={{
-                      Link: msg => (
-                        <Link
-                          secondary
-                          key="manual-link"
-                          to={`/applications/${appId}/payload-formatters/uplink`}
-                        >
-                          {msg}
-                        </Link>
-                      ),
-                      defaultFormatter,
-                    }}
-                  />
-                )}
-                <Formatter
-                  defaultType={defaultType}
-                  repoFormatters={repoFormatters}
-                  type={type}
-                  pasteAppPayloadFormatter={pasteAppPayloadFormatter}
-                  pasteRepoPayloadFormatters={pasteRepoPayloadFormatters}
-                />
-                <MoveAwayModal blocker={blocker} />
-              </>
-            )}
-          </Form>
-        </Col>
+              )}
+              <Formatter
+                defaultType={defaultType}
+                repoFormatters={repoFormatters}
+                type={type}
+                pasteAppPayloadFormatter={pasteAppPayloadFormatter}
+                pasteRepoPayloadFormatters={pasteRepoPayloadFormatters}
+              />
+              <MoveAwayModal blocker={blocker} />
+            </>
+          )}
+        </Form>
+      </div>
+      <div className="item-6 md:item-6 lg:item-12 sm:item-12">
         {_showTestSection() && (
-          <Col sm={12} lg={6}>
+          <>
             <TestForm
-              className="m:mt-ls-s"
+              className="md:mt-ls-s"
               onSubmit={handleTestSubmit}
               uplink={uplink}
               testResult={testResult}
@@ -470,21 +469,19 @@ const PayloadFormattersForm = ({
             <Link.DocLink path="/integrations/payload-formatters" secondary>
               <Message content={m.learnMoreAboutPayloadFormatters} />
             </Link.DocLink>
-          </Col>
+          </>
         )}
-      </Row>
-      <Row>
-        <Col sm={12}>
-          <SubmitBar>
-            <SubmitButton
-              message={sharedMessages.saveChanges}
-              form="payload-formatter-form"
-              isSubmitting={isSubmitting}
-              isValidating={false}
-            />
-          </SubmitBar>
-        </Col>
-      </Row>
+      </div>
+      <div className="item-6 md:item-6 lg:item-12 sm:item-12">
+        <SubmitBar>
+          <SubmitButton
+            message={sharedMessages.saveChanges}
+            form="payload-formatter-form"
+            isSubmitting={isSubmitting}
+            isValidating={false}
+          />
+        </SubmitBar>
+      </div>
     </>
   )
 }

@@ -15,7 +15,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation, useParams, Routes, Route } from 'react-router-dom'
-import { Col, Row, Container } from 'react-grid-system'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -112,15 +111,13 @@ const Device = () => {
     <>
       <IntlHelmet titleTemplate={`%s - ${name || devId} - ${siteName}`} />
       <div className={style.titleSection}>
-        <Container>
-          <Row>
-            <Col sm={12}>
-              <DeviceTitleSection appId={appId} devId={devId}>
-                <Tabs className={style.tabs} narrow tabs={tabs} />
-              </DeviceTitleSection>
-            </Col>
-          </Row>
-        </Container>
+        <div className="container container--lg grid p-vert-0">
+          <div className="item-12">
+            <DeviceTitleSection appId={appId} devId={devId}>
+              <Tabs className={style.tabs} narrow tabs={tabs} />
+            </DeviceTitleSection>
+          </div>
+        </div>
       </div>
       <Routes>
         <Route index Component={DeviceOverview} />

@@ -13,10 +13,9 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import classnames from 'classnames'
+import classNames from 'classnames'
 
 import PacketBrokerLogo from '@assets/misc/packet-broker.svg'
 
@@ -114,124 +113,116 @@ const PacketBroker = () => {
   ]
 
   return (
-    <Container>
-      <Row>
-        <Col md={12}>
-          <PageTitle title={sharedMessages.packetBroker} />
-          <div className={style.introduction}>
-            <Message content={m.packetBrokerInfoText} className={style.info} />
-            <img className={style.logo} src={PacketBrokerLogo} alt="Packet Broker" />
-          </div>
-          <div>
-            <Message component="h4" content={m.learnMore} className={style.furtherResources} />
-            <Link.DocLink path="/reference/packet-broker/" secondary>
-              Packet Broker
-            </Link.DocLink>
-            {' | '}
-            <Link.Anchor href="https://www.packetbroker.net" external secondary>
-              <Message content={m.packetBrokerWebsite} />
-            </Link.Anchor>
-          </div>
-          <hr className={style.hRule} />
-          <Message content={m.whyNetworkPeeringTitle} component="h3" />
-          <Message content={m.whyNetworkPeeringText} className={style.info} component="p" />
-          <Message content={m.enbaling} className={style.info} />
-          <Message content={sharedMessages.setup} component="h3" className="mt-cs-xxl" />
-          {!enabled && <Notification warning small content={m.packetBrokerDisabledDesc} />}
-          {showError && <ErrorNotification small content={infoError} />}
-          {enabled && (
-            <Row gutterWidth={48} className="mb-cs-xl">
-              <Col md={4}>
-                {registerEnabled && (
-                  <label
-                    className={classnames(style.toggleContainer, {
-                      [style.disabled]: !enabled || !registerEnabled,
-                    })}
-                  >
-                    <Message content={m.enablePacketBroker} component="span" />
-                    <Switch
-                      onChange={handleRegisterChange}
-                      checked={registered}
-                      className={style.toggle}
-                      disabled={!enabled}
-                    />
-                  </label>
-                )}
-              </Col>
-              <Col md={8} className={style.switchInfo}>
-                <Message
-                  content={
-                    registerEnabled
-                      ? m.packetBrokerRegistrationDesc
-                      : m.packetBrokerRegistrationDisabledDesc
-                  }
-                  component="span"
-                  className={style.description}
-                />
-              </Col>
-            </Row>
-          )}
-          <PortalledModal
-            visible={deregisterModalVisible}
-            title={m.confirmDeregister}
-            buttonMessage={m.deregisterNetwork}
-            onComplete={handleDeregisterModalComplete}
-            danger
-            approval
-          >
-            <Message
-              content={m.deregisterModal}
-              values={{ lineBreak: <br />, b: chunks => <b>{chunks}</b> }}
-              component="span"
-            />
-          </PortalledModal>
-        </Col>
-        {registered && (
+    <div className="container container--lg grid">
+      <div className="item-12">
+        <PageTitle title={sharedMessages.packetBroker} />
+        <div className={style.introduction}>
+          <Message content={m.packetBrokerInfoText} className={style.info} />
+          <img className={style.logo} src={PacketBrokerLogo} alt="Packet Broker" />
+        </div>
+        <div>
+          <Message component="h4" content={m.learnMore} className={style.furtherResources} />
+          <Link.DocLink path="/reference/packet-broker/" secondary>
+            Packet Broker
+          </Link.DocLink>
+          {' | '}
+          <Link.Anchor href="https://www.packetbroker.net" external secondary>
+            <Message content={m.packetBrokerWebsite} />
+          </Link.Anchor>
+        </div>
+        <hr className={style.hRule} />
+        <Message content={m.whyNetworkPeeringTitle} component="h3" />
+        <Message content={m.whyNetworkPeeringText} className={style.info} component="p" />
+        <Message content={m.enbaling} className={style.info} />
+        <Message content={sharedMessages.setup} component="h3" className="mt-cs-xxl" />
+        {!enabled && <Notification warning small content={m.packetBrokerDisabledDesc} />}
+        {showError && <ErrorNotification small content={infoError} />}
+        {enabled && (
           <>
-            <Col md={12}>
-              <Row gutterWidth={48}>
-                <Col md={4}>
-                  <label className={style.toggleContainer}>
-                    <Message content={m.listNetwork} component="span" />
-                    <Switch
-                      onChange={handleListedChange}
-                      checked={listed}
-                      className={style.toggle}
-                    />
-                  </label>
-                </Col>
-                <Col md={8} className={style.switchInfo}>
-                  <Message className={style.description} content={m.listNetworkDesc} />
-                </Col>
-              </Row>
-              <PortalledModal
-                visible={unlistModalVisible}
-                title={m.confirmUnlist}
-                buttonMessage={m.unlistNetwork}
-                onComplete={handleUnlistModalComplete}
-                danger
-                approval
-              >
-                <Message
-                  content={m.unlistModal}
-                  values={{ lineBreak: <br />, b: chunks => <b>{chunks}</b> }}
-                  component="span"
-                />
-              </PortalledModal>
-            </Col>
-            <Col md={12} style={{ position: 'relative' }} className="mt-cs-xxl">
-              <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
-              <Routes>
-                <Route path="routing-configuration/*" Component={RoutingConfigurationView} />
-                <Route path="default-gateway-visibility" Component={DefaultGatewayVisibilityView} />
-                <Route path="/" element={<Navigate to="routing-configuration" />} />
-                <Route path="*" component={GenericNotFound} />
-              </Routes>
-            </Col>
+            <div className="item-4">
+              {registerEnabled && (
+                <label
+                  className={classNames(style.toggleContainer, {
+                    [style.disabled]: !enabled || !registerEnabled,
+                  })}
+                >
+                  <Message content={m.enablePacketBroker} component="span" />
+                  <Switch
+                    onChange={handleRegisterChange}
+                    checked={registered}
+                    className={style.toggle}
+                    disabled={!enabled}
+                  />
+                </label>
+              )}
+            </div>
+            <div className={classNames(style.switchInfo, 'item-8')}>
+              <Message
+                content={
+                  registerEnabled
+                    ? m.packetBrokerRegistrationDesc
+                    : m.packetBrokerRegistrationDisabledDesc
+                }
+                component="span"
+                className={style.description}
+              />
+            </div>
           </>
         )}
-      </Row>
-    </Container>
+        <PortalledModal
+          visible={deregisterModalVisible}
+          title={m.confirmDeregister}
+          buttonMessage={m.deregisterNetwork}
+          onComplete={handleDeregisterModalComplete}
+          danger
+          approval
+        >
+          <Message
+            content={m.deregisterModal}
+            values={{ lineBreak: <br />, b: chunks => <b>{chunks}</b> }}
+            component="span"
+          />
+        </PortalledModal>
+      </div>
+      {registered && (
+        <>
+          <div className="item-12 gap-ls-m">
+            <div className="item-4">
+              <label className={style.toggleContainer}>
+                <Message content={m.listNetwork} component="span" />
+                <Switch onChange={handleListedChange} checked={listed} className={style.toggle} />
+              </label>
+            </div>
+            <div className={classNames(style.switchInfo, 'item-8')}>
+              <Message className={style.description} content={m.listNetworkDesc} />
+            </div>
+            <PortalledModal
+              visible={unlistModalVisible}
+              title={m.confirmUnlist}
+              buttonMessage={m.unlistNetwork}
+              onComplete={handleUnlistModalComplete}
+              danger
+              approval
+            >
+              <Message
+                content={m.unlistModal}
+                values={{ lineBreak: <br />, b: chunks => <b>{chunks}</b> }}
+                component="span"
+              />
+            </PortalledModal>
+          </div>
+          <div className="item-12 mt-cs-xxl" style={{ position: 'relative' }}>
+            <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
+            <Routes>
+              <Route path="routing-configuration/*" Component={RoutingConfigurationView} />
+              <Route path="default-gateway-visibility" Component={DefaultGatewayVisibilityView} />
+              <Route path="/" element={<Navigate to="routing-configuration" />} />
+              <Route path="*" component={GenericNotFound} />
+            </Routes>
+          </div>
+        </>
+      )}
+    </div>
   )
 }
 

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Col, Container, Row } from 'react-grid-system'
 import { useRoutes, NavLink, Navigate } from 'react-router-dom'
 import classNames from 'classnames'
 
@@ -43,18 +42,16 @@ const PanelView = ({ children, className }) => {
   ])
 
   return (
-    <Container className={classNames(className, style.panelView)} fluid>
-      <Row>
-        <Col className={style.menu} lg={3} xl={2}>
-          {childrenArray.map(child =>
-            React.cloneElement(child, { path: child.props.path, _isRoute: true }),
-          )}
-        </Col>
-        <Col className={style.panelViewMenuItem} lg={9} xl={10}>
-          <ErrorView errorRender={SubViewError}>{routes}</ErrorView>
-        </Col>
-      </Row>
-    </Container>
+    <div className={classNames(className, style.panelView, 'container grid')}>
+      <div className={classNames(style.menu, 'item-3 xl:item-2')}>
+        {childrenArray.map(child =>
+          React.cloneElement(child, { path: child.props.path, _isRoute: true }),
+        )}
+      </div>
+      <div className={classNames(style.panelViewMenuItem, 'item-9 xl:item-10')}>
+        <ErrorView errorRender={SubViewError}>{routes}</ErrorView>
+      </div>
+    </div>
   )
 }
 

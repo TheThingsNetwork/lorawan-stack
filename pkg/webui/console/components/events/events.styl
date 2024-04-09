@@ -24,11 +24,11 @@ $event-container-height = 40px
   overflow: hidden
   min-width: 50rem
 
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     // Ensure at least 18 events to be visible at once on desktop.
     min-height: $event-container-height * 18
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     // Ensure at least 10 events to be visible at once on mobile.
     min-height: $event-container-height * 12
 
@@ -46,11 +46,11 @@ $event-container-height = 40px
 
   & > div:not(.cell-preview):not(:last-child)
     font-weight: $fw.bold
-    +media-query($bp.s)
+    +media-query($bp.sm)
       display: none
 
   .cell-data
-    +media-query($bp.l)
+    +media-query($bp.lg)
       display: none
 
 .header-cells, .event
@@ -191,7 +191,7 @@ $event-container-height = 40px
   min-width: 14rem
   max-width: 20rem
   display: flex
-  +media-query($bp.m)
+  +media-query($bp.md)
     display: none
 
 .cell-preview
@@ -237,7 +237,7 @@ $event-container-height = 40px
     flex-direction: column
     display: flex
 
-    +media-query-min($bp.s)
+    +media-query-min($bp.sm)
       sidebar-transition(right)
       z-index: $zi.slight
       height: 100%
@@ -249,7 +249,7 @@ $event-container-height = 40px
         right: 0
         box-shadow: 0 0 8rem 2rem rgba(0,0,0,.2)
 
-    +media-query($bp.s)
+    +media-query($bp.sm)
       sidebar-transition(left)
       z-index: $zi.nav
       position: fixed

@@ -240,14 +240,14 @@
   &.align-center
     justify-content: center
 
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     flex-direction: row
     align-items: center
 
   .button:not(:last-child)
     margin-right: $cs.xs
 
-    +media-query($bp.s)
+    +media-query($bp.sm)
       // stylelint-disable declaration-no-important
       margin-bottom: $cs.s !important
       margin-right: 0 !important

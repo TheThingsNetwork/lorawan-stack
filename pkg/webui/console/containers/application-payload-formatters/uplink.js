@@ -102,20 +102,22 @@ const ApplicationPayloadFormatters = () => {
   const hasError = Boolean(linkError) && !isNotFoundError(linkError)
 
   return (
-    <>
-      <PageTitle title={m.title} />
-      {hasError && <ErrorNotification content={linkError} small />}
-      {!isNoneType && <Notification className="mb-ls-s" small info content={m.infoText} />}
-      {!mayViewLink && <Notification content={m.uplinkResetWarning} info small />}
-      <PayloadFormattersForm
-        uplink
-        onSubmit={onSubmit}
-        onSubmitSuccess={onSubmitSuccess}
-        initialType={formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE}
-        initialParameter={formatters.up_formatter_parameter || ''}
-        onTypeChange={onTypeChange}
-      />
-    </>
+    <div className="container container--lg grid gap-ls-xxs box-border">
+      <div className="item-12">
+        <PageTitle title={m.title} />
+        {hasError && <ErrorNotification content={linkError} small />}
+        {!isNoneType && <Notification className="mb-ls-s" small info content={m.infoText} />}
+        {!mayViewLink && <Notification content={m.uplinkResetWarning} info small />}
+        <PayloadFormattersForm
+          uplink
+          onSubmit={onSubmit}
+          onSubmitSuccess={onSubmitSuccess}
+          initialType={formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE}
+          initialParameter={formatters.up_formatter_parameter || ''}
+          onTypeChange={onTypeChange}
+        />
+      </div>
+    </div>
   )
 }
 

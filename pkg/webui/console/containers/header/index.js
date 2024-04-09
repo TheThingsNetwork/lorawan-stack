@@ -14,6 +14,7 @@
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import {
   IconLogout,
@@ -49,6 +50,13 @@ import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 import Logo from '../logo'
 
 import NotificationsDropdown from './notifications-dropdown'
+import BookmarksDropdown from './bookmarks-dropdown'
+
+const m = defineMessages({
+  addApplication: 'Add new application',
+  addGateway: 'Add new gateway',
+  addOrganization: 'Add new organization',
+})
 
 const accountUrl = selectAccountUrl()
 
@@ -70,18 +78,14 @@ const Header = ({ onMenuClick }) => {
   const plusDropdownItems = (
     <>
       {mayViewApps && (
-        <Dropdown.Item
-          title="Add new application"
-          icon={IconApplication}
-          path="/applications/add"
-        />
+        <Dropdown.Item title={m.addApplication} icon={IconApplication} path="/applications/add" />
       )}
       {mayViewGtws && (
-        <Dropdown.Item title="Add new gateway" icon={IconGateway} path="/gateways/add" />
+        <Dropdown.Item title={m.addGateway} icon={IconGateway} path="/gateways/add" />
       )}
       {mayViewOrgs && (
         <Dropdown.Item
-          title="Add new organization"
+          title={m.addOrganization}
           icon={IconOrganization}
           path="/organizations/add"
         />
@@ -141,7 +145,7 @@ const Header = ({ onMenuClick }) => {
       user={user}
       profileDropdownItems={dropdownItems}
       addDropdownItems={plusDropdownItems}
-      starDropdownItems={[]}
+      bookmarkDropdownItems={<BookmarksDropdown />}
       notificationsDropdownItems={<NotificationsDropdown />}
       brandLogo={brandLogo}
       Logo={Logo}

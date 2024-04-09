@@ -28,7 +28,7 @@ const Header = ({
   Logo,
   className,
   addDropdownItems,
-  starDropdownItems,
+  bookmarkDropdownItems,
   profileDropdownItems,
   notificationsDropdownItems,
   user,
@@ -37,8 +37,8 @@ const Header = ({
   ...rest
 }) => (
   <header {...rest} className={classnames(className, style.container)}>
-    <div className={classnames('breadcrumbs', 'm:d-none')} />
-    <div className="d-none m:d-flex al-center gap-cs-xs">
+    <div className={classnames('breadcrumbs', 'md:d-none')} />
+    <div className="d-none md:d-flex al-center gap-cs-xs">
       <Button secondary icon={IconMenu2} onClick={onMenuClick} />
       <Logo className={style.logo} />
     </div>
@@ -53,7 +53,8 @@ const Header = ({
       <Button
         secondary
         icon={IconStar}
-        dropdownItems={starDropdownItems}
+        dropdownItems={bookmarkDropdownItems}
+        dropdownClassName={style.bookmarksDropdown}
         dropdownPosition="below left"
         className="xs:d-none"
       />
@@ -85,6 +86,8 @@ Header.propTypes = {
   Logo: PropTypes.elementType.isRequired,
   /** The dropdown items when the add button is clicked. */
   addDropdownItems: PropTypes.node.isRequired,
+  /** The dropdown items when the bookmark button is clicked. */
+  bookmarkDropdownItems: PropTypes.node.isRequired,
   brandLogo: imgPropType,
   /** The classname applied to the component. */
   className: PropTypes.string,
@@ -96,8 +99,6 @@ Header.propTypes = {
   profileDropdownItems: PropTypes.node.isRequired,
   /** Whether to show a notification dot. */
   showNotificationDot: PropTypes.bool,
-  /** The dropdown items when the star button is clicked. */
-  starDropdownItems: PropTypes.node.isRequired,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
    * guest header is rendered.

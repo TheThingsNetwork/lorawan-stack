@@ -22,7 +22,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './breadcrumb.styl'
+import style from '../breadcrumbs.styl'
 
 const Breadcrumb = ({ className, path, content, isLast }) => {
   const isRawText = typeof content === 'string' || typeof content === 'number'
@@ -31,13 +31,13 @@ const Breadcrumb = ({ className, path, content, isLast }) => {
   if (!isLast) {
     Component = Link
     componentProps = {
-      className: style.link,
+      className: classnames(style.breadcrumb, style.link),
       to: path,
       secondary: true,
     }
   } else {
     Component = 'span'
-    componentProps = { className: classnames(className, style.last) }
+    componentProps = { className: classnames(className, style.breadcrumb, style.last) }
   }
 
   return (
@@ -45,7 +45,11 @@ const Breadcrumb = ({ className, path, content, isLast }) => {
       <Component {...componentProps}>
         {isRawText ? content : <Message content={content} />}
       </Component>
-      {!isLast && <Icon icon={IconChevronRight} size={14} className="p-sides-cs-xxs" />}
+      {!isLast && (
+        <div className="d-flex al-center p-sides-cs-xxs">
+          <Icon icon={IconChevronRight} size={14} />
+        </div>
+      )}
     </span>
   )
 }

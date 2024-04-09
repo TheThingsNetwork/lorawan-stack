@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col, Container } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
@@ -35,15 +34,13 @@ const ClientsList = () => {
   const userId = useSelector(selectUserId)
   return (
     <RequireRequest requestAction={getUserRights(userId)}>
-      <Container>
-        <Row>
-          <IntlHelmet title={sharedMessages.oauthClients} />
-          <Col>
-            <PageTitle title={sharedMessages.oauthClients} hideHeading />
-            <ClientsTable pageSize={PAGE_SIZES.REGULAR} />
-          </Col>
-        </Row>
-      </Container>
+      <div className="container container--lg grid">
+        <IntlHelmet title={sharedMessages.oauthClients} />
+        <div className="item-12">
+          <PageTitle title={sharedMessages.oauthClients} hideHeading />
+          <ClientsTable pageSize={PAGE_SIZES.REGULAR} />
+        </div>
+      </div>
     </RequireRequest>
   )
 }

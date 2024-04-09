@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col, Container } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
@@ -38,14 +37,10 @@ const ApplicationsList = () => {
 
   return (
     <>
-      <Container>
-        <Row>
-          <IntlHelmet title={sharedMessages.applications} />
-          <Col>
-            <ApplicationsTable />
-          </Col>
-        </Row>
-      </Container>
+      <div className="container container--lg">
+        <IntlHelmet title={sharedMessages.applications} />
+        <ApplicationsTable />
+      </div>
     </>
   )
 }

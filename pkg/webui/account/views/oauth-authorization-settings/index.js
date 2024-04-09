@@ -15,7 +15,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages, useIntl } from 'react-intl'
-import { Col, Row, Container } from 'react-grid-system'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { IconTrash } from '@ttn-lw/components/icon'
@@ -123,13 +122,11 @@ const AuthorizationSettings = () => {
 
   return (
     <>
-      <Container>
-        <Row>
-          <Col sm={12} lg={6}>
-            <DataSheet data={sheetData} />
-          </Col>
-        </Row>
-      </Container>
+      <div className="container container--lg grid">
+        <div className="item-12 lg:item-6">
+          <DataSheet data={sheetData} />
+        </div>
+      </div>
     </>
   )
 }

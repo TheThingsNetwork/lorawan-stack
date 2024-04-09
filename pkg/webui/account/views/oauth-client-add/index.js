@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Container, Col, Row } from 'react-grid-system'
 
 import PageTitle from '@ttn-lw/components/page-title'
 
@@ -40,19 +39,17 @@ const OAuthClientAddInner = () => {
   const pseudoRights = useSelector(selectUserPseudoRights)
 
   return (
-    <Container>
+    <div className="container container--lg grid">
       <PageTitle tall title={sharedMessages.addOAuthClient} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ClientAdd
-            isAdmin={isAdmin}
-            userId={userId}
-            rights={regularRights}
-            pseudoRights={pseudoRights}
-          />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <ClientAdd
+          isAdmin={isAdmin}
+          userId={userId}
+          rights={regularRights}
+          pseudoRights={pseudoRights}
+        />
+      </div>
+    </div>
   )
 }
 

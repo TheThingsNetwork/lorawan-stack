@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 
@@ -46,18 +45,16 @@ const OrganizationCollaboratorsList = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.collaborators} />
-        <Col>
-          <CollaboratorsTable
-            pageSize={PAGE_SIZES.MAX}
-            baseDataSelector={baseDataSelectors}
-            getItemsAction={getItemsAction}
-          />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg grid">
+      <IntlHelmet title={sharedMessages.collaborators} />
+      <div className="item-12">
+        <CollaboratorsTable
+          pageSize={PAGE_SIZES.MAX}
+          baseDataSelector={baseDataSelectors}
+          getItemsAction={getItemsAction}
+        />
+      </div>
+    </div>
   )
 }
 

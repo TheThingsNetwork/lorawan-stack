@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col, Container } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
@@ -37,14 +36,10 @@ const List = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.organizations} />
-        <Col>
-          <OrganizationsTable />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--lg ">
+      <IntlHelmet title={sharedMessages.organizations} />
+      <OrganizationsTable />
+    </div>
   )
 }
 
