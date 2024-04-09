@@ -17,7 +17,7 @@ import classnames from 'classnames'
 import FocusLock from 'react-focus-lock'
 import { RemoveScroll } from 'react-remove-scroll'
 
-import { IconClearAll, IconCheck } from '@ttn-lw/components/icon'
+import { IconCheck, IconX } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -132,7 +132,7 @@ const Modal = props => {
           message={cancelButtonMessage}
           onClick={handleCancel}
           name={formName}
-          icon={IconClearAll}
+          icon={IconX}
           value="false"
           secondary
           {...name}

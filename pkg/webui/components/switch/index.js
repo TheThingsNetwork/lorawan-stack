@@ -23,10 +23,18 @@ const Switch = props => (
   <ReactSwitch
     {...props}
     uncheckedIcon={
-      <Icon icon={IconX} style={{ color: 'white', marginLeft: '3px', fontSize: '1rem' }} />
+      <Icon
+        icon={IconX}
+        small
+        style={{ color: 'white', marginLeft: '3px', marginTop: '4px', fontSize: '1rem' }}
+      />
     }
     checkedIcon={
-      <Icon icon={IconCheck} style={{ color: 'white', marginLeft: '5px', fontSize: '1rem' }} />
+      <Icon
+        small
+        icon={IconCheck}
+        style={{ color: 'white', marginLeft: '5px', marginTop: '4px', fontSize: '1rem' }}
+      />
     }
     onColor={COLORS.C_ACTIVE_BLUE}
     activeBoxShadow={`"0 0 3px 5px ${COLORS.C_ACTIVE_BLUE}66, inset 0 0 3px 1px #0002"`}
