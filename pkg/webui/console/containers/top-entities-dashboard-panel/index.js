@@ -66,7 +66,7 @@ const TopEntitiesDashboardPanel = () => {
     setFetching(true)
 
     // We need all the bookmarks to be able to calculate per entity totals
-    // used in the indivudual tabs.
+    // used in the individual tabs.
     await dispatch(attachPromise(getAllBookmarks(userId)))
 
     setFetching(false)
