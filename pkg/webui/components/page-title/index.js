@@ -41,7 +41,7 @@ const PageTitle = ({ title, values, tall, hideHeading, children, className, colP
   return hideHeading ? (
     pageTitle
   ) : (
-    <div {...colProps} className={classNames(colProps?.className, className, 'item-12')}>
+    <div {...colProps} className={classNames(colProps?.className, 'item-12')}>
       {pageTitle}
       {!hideHeading && (
         <Message component="h1" className={titleClass} content={title} values={values} />

@@ -138,7 +138,7 @@ const PacketBroker = () => {
         {!enabled && <Notification warning small content={m.packetBrokerDisabledDesc} />}
         {showError && <ErrorNotification small content={infoError} />}
         {enabled && (
-          <>
+          <div className="grid">
             <div className="item-4">
               {registerEnabled && (
                 <label
@@ -167,7 +167,7 @@ const PacketBroker = () => {
                 className={style.description}
               />
             </div>
-          </>
+          </div>
         )}
         <PortalledModal
           visible={deregisterModalVisible}
