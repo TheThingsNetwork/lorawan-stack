@@ -41,6 +41,7 @@ import {
   fCntWidthDecode,
   parseLorawanMacVersion,
 } from '@console/lib/device-utils'
+import getDataRate from '@console/lib/data-rate-utils'
 
 import { selectDataRates } from '@console/store/selectors/configuration'
 
@@ -126,21 +127,6 @@ const maxDutyCycleOptions = [
 const encodeAdrMode = value => ({ [value]: {} })
 const decodeAdrMode = value => (value !== undefined ? Object.keys(value)[0] : null)
 
-const getDataRate = data_rate => {
-  const { lora, fsk, lrfhss } = data_rate
-  // The encoding below mimics the encoding of the `modu` field of the UDP packet forwarder.
-  if (lora) {
-    const { bandwidth, spreading_factor } = lora
-    return `SF${spreading_factor}BW${bandwidth / 1000}`
-  } else if (fsk) {
-    const { bit_rate } = fsk
-    return `${bit_rate}`
-  } else if (lrfhss) {
-    const { modulation_type, operating_channel_width } = lrfhss
-    return `M${modulation_type ?? 0}CW${operating_channel_width / 1000}`
-  }
-}
-
 const MacSettingsSection = props => {
   const {
     activationMode,
@@ -162,7 +148,7 @@ const MacSettingsSection = props => {
         Object.keys(dataRates).reduce(
           (result, key) =>
             result.concat({
-              label: getDataRate(dataRates[key].rate),
+              label: getDataRate({ settings: { data_rate: dataRates[key].rate } }),
               value: `data_rate_${key}`,
             }),
           [],

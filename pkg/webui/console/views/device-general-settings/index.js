@@ -203,7 +203,7 @@ const DeviceGeneralSettings = () => {
     nsDescription = m.notInCluster
   }
 
-  const action = useCallback(
+  const fetchData = useCallback(
     async dispatch => {
       if (device.frequency_plan_id && device.lorawan_phy_version) {
         let frequencyPlans = storeFrequencyPlans
@@ -249,7 +249,7 @@ const DeviceGeneralSettings = () => {
   )
 
   return (
-    <RequireRequest requestAction={action}>
+    <RequireRequest requestAction={fetchData}>
       <Container>
         <IntlHelmet title={sharedMessages.generalSettings} />
         <Row>

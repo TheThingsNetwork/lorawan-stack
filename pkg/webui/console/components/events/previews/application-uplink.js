@@ -14,10 +14,12 @@
 
 import React from 'react'
 
-import { getDataRate, getSignalInformation } from '@console/components/events/utils'
+import { getSignalInformation } from '@console/components/events/utils'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import getDataRate from '@console/lib/data-rate-utils'
 
 import messages from '../messages'
 
