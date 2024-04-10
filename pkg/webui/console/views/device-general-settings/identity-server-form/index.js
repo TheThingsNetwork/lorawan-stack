@@ -319,7 +319,11 @@ IdentityServerForm.propTypes = {
   onSubmitSuccess: PropTypes.func.isRequired,
   onUnclaim: PropTypes.func.isRequired,
   onUnclaimFailure: PropTypes.func.isRequired,
-  supportsClaiming: PropTypes.bool.isRequired,
+  supportsClaiming: PropTypes.bool,
+}
+
+IdentityServerForm.defaultProps = {
+  supportsClaiming: undefined,
 }
 
 export default IdentityServerForm

@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support fine-grained NbTrans controls while using Dynamic ADR mode in the Console.
+
 ### Changed
 
 ### Deprecated

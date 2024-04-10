@@ -38,6 +38,17 @@ class Configuration {
     const result = await this._api.GetPhyVersions()
     return Marshaler.payloadSingleResponse(result)
   }
+
+  async listBands(bandId, phyVersion) {
+    const result = await this._api.ListBands({
+      routeParams: {
+        band_id: bandId,
+        phy_version: phyVersion,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(result)
+  }
 }
 
 export default Configuration

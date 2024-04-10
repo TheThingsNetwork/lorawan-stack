@@ -191,7 +191,10 @@ const FormField = props => {
   const disabled = inputDisabled || formDisabled
   const hasTooltip = Boolean(tooltipId)
   const hasTitle = Boolean(title)
-  const showError = touched && !isEmpty(errors)
+  const showError =
+    touched &&
+    !isEmpty(errors) &&
+    Boolean(errors[0].message?.id || errors[0].id || typeof errors[0] === 'string')
   const showWarning = !showError && Boolean(warning)
   const error = showError && errors[0]
   const showDescription = !showError && !showWarning && Boolean(description)
