@@ -42,6 +42,26 @@ const (
 	maxResponseSize = (1 << 10) // 1 KiB
 )
 
+var webhookFanOutFieldMask = []string{
+	"base_url",
+	"downlink_ack",
+	"downlink_api_key",
+	"downlink_failed",
+	"downlink_nack",
+	"downlink_queue_invalidated",
+	"downlink_queued",
+	"downlink_sent",
+	"field_mask",
+	"format",
+	"headers",
+	"health_status",
+	"join_accept",
+	"location_solved",
+	"service_data",
+	"uplink_message",
+	"uplink_normalized",
+}
+
 // Sink processes HTTP requests.
 type Sink interface {
 	Process(*http.Request) error
@@ -206,27 +226,7 @@ func (w *webhooks) RegisterRoutes(server *ttnweb.Server) {
 
 func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
-	hooks, err := w.registry.List(ctx, msg.EndDeviceIds.ApplicationIds,
-		[]string{
-			"base_url",
-			"downlink_ack",
-			"downlink_api_key",
-			"downlink_failed",
-			"downlink_nack",
-			"downlink_queue_invalidated",
-			"downlink_queued",
-			"downlink_sent",
-			"field_mask",
-			"format",
-			"headers",
-			"health_status",
-			"join_accept",
-			"location_solved",
-			"service_data",
-			"uplink_message",
-			"uplink_normalized",
-		},
-	)
+	hooks, err := w.registry.List(ctx, msg.EndDeviceIds.ApplicationIds, webhookFanOutFieldMask)
 	if err != nil {
 		return err
 	}
