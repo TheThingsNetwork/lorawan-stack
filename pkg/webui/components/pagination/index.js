@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import classnames from 'classnames'
 import Paginate from 'react-paginate'
 import { defineMessages } from 'react-intl'
 
+import toast from '@ttn-lw/components/toast'
 import Icon, { IconChevronLeft, IconChevronRight } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -24,11 +25,15 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
 
+import getCookie from '@console/lib/table-utils'
+
 import Select from '../select'
 import Input from '../input'
 import Button from '../button'
 
 import style from './pagination.styl'
+
+const allowedPageSizes = [20, 30, 50, 100]
 
 const m = defineMessages({
   itemsPerPage: 'Items per page:',
@@ -49,6 +54,18 @@ const Pagination = ({
 }) => {
   const [selectedPage, setSelectedPage] = useState(forcePage)
   const [pageSize, setQueryPageSize] = useQueryState('page-size', propPageSize)
+  const isAllowedPageSize = allowedPageSizes.includes(parseInt(pageSize))
+
+  useEffect(() => {
+    if (!isAllowedPageSize) {
+      const cookiePageSize = getCookie('applications-list-page-size')
+      setQueryPageSize(cookiePageSize)
+      toast({
+        title: 'Invalid page size',
+        type: toast.types.WARNING,
+      })
+    }
+  }, [pageSize, setQueryPageSize, isAllowedPageSize, propPageSize])
 
   const handlePageChange = useCallback(
     page => {
@@ -80,11 +97,11 @@ const Pagination = ({
     <div className="d-flex al-center gap-cs-xs fw-normal">
       <Message content={m.itemsPerPage} className={style.sizeMessage} />
       <Select
-        options={[20, 30, 50, 100].map(value => ({
+        options={allowedPageSizes.map(value => ({
           value,
           label: `${value}`,
         }))}
-        value={parseInt(pageSize)}
+        value={isAllowedPageSize ? parseInt(pageSize) : propPageSize}
         onChange={handlePageSizeChange}
         inputWidth="xxs"
         className={style.selectSize}
