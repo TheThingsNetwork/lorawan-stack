@@ -160,6 +160,7 @@ const Tabular = ({
           forcePage={page}
           pageSize={pageSize}
           setPageSize={setPageSize}
+          totalCount={totalCount}
         />
       </Table.DataCell>
     </Table.Row>

@@ -50,6 +50,7 @@ const Pagination = ({
   pageCount,
   pageSize: propPageSize,
   setPageSize,
+  totalCount,
   ...rest
 }) => {
   const [selectedPage, setSelectedPage] = useState(forcePage)
@@ -94,7 +95,7 @@ const Pagination = ({
   )
 
   const pageSizeSelect = (
-    <div className="d-flex al-center gap-cs-xs fw-normal">
+    <div className="d-flex al-center gap-cs-xs fw-normal m-vert-cs-xl">
       <Message content={m.itemsPerPage} className={style.sizeMessage} />
       <Select
         options={allowedPageSizes.map(value => ({
@@ -109,6 +110,12 @@ const Pagination = ({
     </div>
   )
 
+  // Don't show page size select if there are less than 20 items.
+  // 20 is the smallest amount of items that can be displayed per page.
+  if (totalCount < 20) {
+    return null
+  }
+
   // Show only page size select if there is only one page.
   if (hideIfOnlyOnePage && pageCount === 1) {
     return pageSizeSelect
@@ -120,7 +127,7 @@ const Pagination = ({
   const navigationPrevClassNames = classnames(style.item)
 
   return (
-    <div className="d-flex al-center gap-cs-l w-full flex-wrap fw-normal">
+    <div className="d-flex al-center gap-cs-l w-full flex-wrap fw-normal m-vert-cs-xl">
       <Paginate
         previousClassName={navigationPrevClassNames}
         previousLabel={
@@ -198,6 +205,8 @@ Pagination.propTypes = {
   pageSize: PropTypes.number,
   /** A function to be called when the page size changes. */
   setPageSize: PropTypes.func,
+  /** The total number of items. */
+  totalCount: PropTypes.number.isRequired,
 }
 
 Pagination.defaultProps = {
