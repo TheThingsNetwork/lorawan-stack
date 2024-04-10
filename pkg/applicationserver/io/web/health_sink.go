@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -36,7 +37,7 @@ type healthStatusRegistry struct {
 
 // Get implements HealthStatusRegistry.
 func (reg *healthStatusRegistry) Get(ctx context.Context) (*ttnpb.ApplicationWebhookHealth, error) {
-	ids := webhookIDFromContext(ctx)
+	ids := internal.WebhookIDFromContext(ctx)
 	web, err := reg.registry.Get(ctx, ids, []string{"health_status"})
 	if err != nil {
 		return nil, err
@@ -48,7 +49,7 @@ func (reg *healthStatusRegistry) Get(ctx context.Context) (*ttnpb.ApplicationWeb
 func (reg *healthStatusRegistry) Set(
 	ctx context.Context, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
 ) error {
-	ids := webhookIDFromContext(ctx)
+	ids := internal.WebhookIDFromContext(ctx)
 	_, err := reg.registry.Set(
 		ctx,
 		ids,
@@ -74,22 +75,13 @@ func NewHealthStatusRegistry(registry WebhookRegistry) HealthStatusRegistry {
 	return &healthStatusRegistry{registry}
 }
 
-type cachedHealthStatusRegistryKeyType struct{}
-
-var cachedHealthStatusRegistryKey cachedHealthStatusRegistryKeyType
-
-// WithCachedHealthStatus constructs a context.Context with the provided health status cached.
-func WithCachedHealthStatus(ctx context.Context, h *ttnpb.ApplicationWebhookHealth) context.Context {
-	return context.WithValue(ctx, cachedHealthStatusRegistryKey, h)
-}
-
 type cachedHealthStatusRegistry struct {
 	registry HealthStatusRegistry
 }
 
 // Get implements HealthStatusRegistry.
 func (reg *cachedHealthStatusRegistry) Get(ctx context.Context) (*ttnpb.ApplicationWebhookHealth, error) {
-	if h, ok := ctx.Value(cachedHealthStatusRegistryKey).(*ttnpb.ApplicationWebhookHealth); ok {
+	if h, ok := internal.WebhookHealthFromContext(ctx); ok {
 		return h, nil
 	}
 	return reg.registry.Get(ctx)

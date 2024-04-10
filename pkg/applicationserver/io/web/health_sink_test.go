@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -66,7 +67,7 @@ func TestHealthStatusRegistry(t *testing.T) {
 		t.FailNow()
 	}
 
-	ctx = web.WithWebhookID(ctx, registeredWebhookIDs)
+	ctx = internal.WithWebhookData(ctx, &internal.WebhookData{WebhookIDs: registeredWebhookIDs})
 	registry := web.NewHealthStatusRegistry(webhookRegistry)
 
 	// Initially no status is stored.
@@ -149,9 +150,12 @@ func TestHealthStatusRegistry(t *testing.T) {
 	})
 
 	// Cache a status inside the context.
-	ctx = web.WithCachedHealthStatus(ctx, &ttnpb.ApplicationWebhookHealth{
-		Status: &ttnpb.ApplicationWebhookHealth_Healthy{
-			Healthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusHealthy{},
+	ctx = internal.WithWebhookData(ctx, &internal.WebhookData{
+		WebhookIDs: registeredWebhookIDs,
+		Health: &ttnpb.ApplicationWebhookHealth{
+			Status: &ttnpb.ApplicationWebhookHealth_Healthy{
+				Healthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusHealthy{},
+			},
 		},
 	})
 	// Expect the status to take precedence to the underlying registry.
@@ -235,8 +239,10 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 	registry := web.NewHealthStatusRegistry(webhookRegistry)
 	healthSink := web.NewHealthCheckSink(sink, registry, 4, 8*Timeout)
 
-	ctx = web.WithWebhookID(ctx, registeredWebhookIDs)
-	ctx = web.WithDeviceID(ctx, registeredDeviceID)
+	ctx = internal.WithWebhookData(ctx, &internal.WebhookData{
+		EndDeviceIDs: registeredDeviceID,
+		WebhookIDs:   registeredWebhookIDs,
+	})
 	r, err := http.NewRequestWithContext(
 		ctx, http.MethodPost, "http://foo.bar", nil,
 	)

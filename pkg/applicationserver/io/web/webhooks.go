@@ -23,6 +23,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
@@ -56,7 +57,7 @@ var errRequest = errors.DefineUnavailable("request", "request", "webhook_id", "u
 func requestErrorDetails(req *http.Request, res *http.Response) ([]any, []proto.Message) {
 	ctx := req.Context()
 	attributes, details := []any{
-		"webhook_id", webhookIDFromContext(ctx).WebhookId,
+		"webhook_id", internal.WebhookIDFromContext(ctx).WebhookId,
 		"url", req.URL.String(),
 	}, []proto.Message{}
 	if res != nil {
@@ -229,12 +230,14 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	if err != nil {
 		return err
 	}
-	ctx = withDeviceID(ctx, msg.EndDeviceIds)
 	wg := sync.WaitGroup{}
 	for i := range hooks {
 		hook := hooks[i]
-		ctx := withWebhookID(ctx, hook.Ids)
-		ctx = WithCachedHealthStatus(ctx, hook.HealthStatus)
+		ctx := internal.WithWebhookData(ctx, &internal.WebhookData{
+			EndDeviceIDs: msg.EndDeviceIds,
+			WebhookIDs:   hook.Ids,
+			Health:       hook.HealthStatus,
+		})
 		ctx = log.NewContextWithField(ctx, "hook", hook.Ids.WebhookId)
 		f := func(ctx context.Context) error {
 			req, err := NewRequest(ctx, w.downlinks, msg, hook)
@@ -278,8 +281,8 @@ func (w *webhooks) handleDown(
 ) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
-		devID := deviceIDFromContext(ctx)
-		hookID := webhookIDFromContext(ctx)
+		devID := internal.DeviceIDFromContext(ctx)
+		hookID := internal.WebhookIDFromContext(ctx)
 		logger := log.FromContext(ctx).WithFields(log.Fields(
 			"application_id", devID.ApplicationIds.ApplicationId,
 			"device_id", devID.DeviceId,
