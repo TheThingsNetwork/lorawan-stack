@@ -17,7 +17,7 @@ import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES }  from '@ttn-lw/constants/page-sizes'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 

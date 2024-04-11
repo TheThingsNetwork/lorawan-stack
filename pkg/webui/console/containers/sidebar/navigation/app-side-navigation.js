@@ -16,7 +16,7 @@ import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES }  from '@ttn-lw/constants/page-sizes'
 
 import {
   IconPuzzle,

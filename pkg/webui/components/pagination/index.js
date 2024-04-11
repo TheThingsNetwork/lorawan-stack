@@ -17,6 +17,8 @@ import classnames from 'classnames'
 import Paginate from 'react-paginate'
 import { defineMessages } from 'react-intl'
 
+import { allowedPageSizes } from '@ttn-lw/constants/page-sizes'
+
 import toast from '@ttn-lw/components/toast'
 import Icon, { IconChevronLeft, IconChevronRight } from '@ttn-lw/components/icon'
 
@@ -32,8 +34,6 @@ import Input from '../input'
 import Button from '../button'
 
 import style from './pagination.styl'
-
-const allowedPageSizes = [20, 30, 50, 100]
 
 const m = defineMessages({
   itemsPerPage: 'Items per page:',

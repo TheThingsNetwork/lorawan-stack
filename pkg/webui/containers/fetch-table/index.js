@@ -20,7 +20,7 @@ import { orderBy as lodashOrderBy } from 'lodash'
 import { useLocation } from 'react-router-dom'
 import Query from 'query-string'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES }  from '@ttn-lw/constants/page-sizes'
 
 import { IconPlus, IconSearch } from '@ttn-lw/components/icon'
 import Tabular from '@ttn-lw/components/table'

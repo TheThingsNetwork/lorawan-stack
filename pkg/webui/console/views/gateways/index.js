@@ -15,7 +15,7 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES }  from '@ttn-lw/constants/page-sizes'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
