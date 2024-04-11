@@ -16,7 +16,7 @@ import React, { useCallback, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import classnames from 'classnames'
 
-import { PAGE_SIZES }  from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
 import Icon, { IconHome, IconApplication, IconGateway } from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
