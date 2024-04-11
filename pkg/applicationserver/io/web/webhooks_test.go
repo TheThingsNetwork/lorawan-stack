@@ -29,6 +29,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/sink"
+	mocksink "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/sink/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -52,8 +54,8 @@ func (mockComponent) FromRequestContext(ctx context.Context) context.Context {
 	return ctx
 }
 
-func pooledSink(ctx context.Context, sink web.Sink) web.Sink {
-	return web.NewPooledSink(ctx, mockComponent{}, sink, 1, 4)
+func pooledSink(ctx context.Context, target sink.Sink) sink.Sink {
+	return sink.NewPooledSink(ctx, mockComponent{}, target, 1, 4)
 }
 
 func TestWebhooks(t *testing.T) {
@@ -193,10 +195,9 @@ func TestWebhooks(t *testing.T) {
 				baseURL := fmt.Sprintf(
 					"https://myapp.com/api/ttn/v3/%s/%s", registeredApplicationID.ApplicationId, registeredDeviceID.DeviceId,
 				)
-				testSink := &mockSink{
-					ch: make(chan *http.Request, 1),
-				}
-				for _, sink := range []web.Sink{
+				sinkCh := make(chan *http.Request, 1)
+				testSink := mocksink.New(sinkCh)
+				for _, sink := range []sink.Sink{
 					testSink,
 					pooledSink(ctx, testSink),
 					pooledSink(ctx,
@@ -207,6 +208,8 @@ func TestWebhooks(t *testing.T) {
 						ctx, cancel := context.WithCancel(ctx)
 						defer cancel()
 						c := componenttest.NewComponent(t, &component.Config{})
+						componenttest.StartComponent(t, c)
+						defer c.Close()
 						as := mock.NewServer(c)
 						_, err := web.NewWebhooks(ctx, as, registry, sink, downlinks)
 						if err != nil {
@@ -451,11 +454,11 @@ func TestWebhooks(t *testing.T) {
 								}
 								var req *http.Request
 								select {
-								case req = <-testSink.ch:
+								case req = <-sinkCh:
 									if !tc.OK {
 										t.Fatalf("Did not expect message but received: %v", req)
 									}
-								case <-time.After(Timeout):
+								case <-time.After(timeout):
 									if !tc.OK {
 										return
 									}
@@ -512,7 +515,7 @@ func TestWebhooks(t *testing.T) {
 		}
 		c := componenttest.NewComponent(t, conf)
 		io := mock.NewServer(c)
-		testSink := &mockSink{}
+		testSink := mocksink.New(nil)
 		w, err := web.NewWebhooks(ctx, io, registry, testSink, downlinks)
 		if err != nil {
 			t.Fatalf("Unexpected error %v", err)
@@ -571,18 +574,4 @@ func TestWebhooks(t *testing.T) {
 			}
 		})
 	})
-}
-
-type mockSink struct {
-	ch  chan *http.Request
-	err error
-}
-
-func (s *mockSink) Process(req *http.Request) error {
-	select {
-	case <-req.Context().Done():
-		return req.Context().Err()
-	case s.ch <- req:
-		return s.err
-	}
 }

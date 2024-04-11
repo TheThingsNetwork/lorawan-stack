@@ -19,11 +19,11 @@ import (
 	stdio "io"
 	"net/http"
 	"sync"
-	"unicode/utf8"
 
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/sink"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
@@ -32,15 +32,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
-const (
-	namespace = "applicationserver/io/web"
-
-	maxResponseSize = (1 << 10) // 1 KiB
-)
+const namespace = "applicationserver/io/web"
 
 var webhookFanOutFieldMask = []string{
 	"base_url",
@@ -62,104 +56,6 @@ var webhookFanOutFieldMask = []string{
 	"uplink_normalized",
 }
 
-// Sink processes HTTP requests.
-type Sink interface {
-	Process(*http.Request) error
-}
-
-// HTTPClientSink contains an HTTP client to make outgoing requests.
-type HTTPClientSink struct {
-	*http.Client
-}
-
-var errRequest = errors.DefineUnavailable("request", "request", "webhook_id", "url", "status_code")
-
-func requestErrorDetails(req *http.Request, res *http.Response) ([]any, []proto.Message) {
-	ctx := req.Context()
-	attributes, details := []any{
-		"webhook_id", internal.WebhookIDFromContext(ctx).WebhookId,
-		"url", req.URL.String(),
-	}, []proto.Message{}
-	if res != nil {
-		attributes = append(attributes, "status_code", res.StatusCode)
-		if body, _ := stdio.ReadAll(stdio.LimitReader(res.Body, maxResponseSize)); utf8.Valid(body) {
-			details = append(details, &structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"body": structpb.NewStringValue(string(body)),
-				},
-			})
-		}
-	}
-	return attributes, details
-}
-
-func (s *HTTPClientSink) process(req *http.Request) error {
-	res, err := s.Do(req)
-	if err != nil {
-		attributes, details := requestErrorDetails(req, res)
-		return errRequest.WithAttributes(attributes...).WithDetails(details...).WithCause(err)
-	}
-	defer res.Body.Close()
-	defer stdio.Copy(stdio.Discard, res.Body) //nolint:errcheck
-	if res.StatusCode >= 200 && res.StatusCode <= 299 {
-		return nil
-	}
-	attributes, details := requestErrorDetails(req, res)
-	return errRequest.WithAttributes(attributes...).WithDetails(details...)
-}
-
-// Process uses the HTTP client to perform the requests.
-func (s *HTTPClientSink) Process(req *http.Request) error {
-	ctx := req.Context()
-	if err := s.process(req); err != nil {
-		registerWebhookFailed(ctx, err, true)
-		return err
-	}
-	registerWebhookSent(ctx)
-	return nil
-}
-
-// pooledSink is a Sink with worker pool.
-type pooledSink struct {
-	pool workerpool.WorkerPool[*http.Request]
-}
-
-func createPoolHandler(sink Sink) workerpool.Handler[*http.Request] {
-	h := func(ctx context.Context, req *http.Request) {
-		if err := sink.Process(req); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to process requests")
-		}
-	}
-	return h
-}
-
-// NewPooledSink creates a Sink that queues requests and processes them in parallel workers.
-func NewPooledSink(ctx context.Context, c workerpool.Component, sink Sink, workers int, queueSize int) Sink {
-	wp := workerpool.NewWorkerPool(workerpool.Config[*http.Request]{
-		Component:  c,
-		Context:    ctx,
-		Name:       "webhooks",
-		Handler:    createPoolHandler(sink),
-		MaxWorkers: workers,
-		QueueSize:  queueSize,
-	})
-	return &pooledSink{
-		pool: wp,
-	}
-}
-
-// Process sends the request to the workers.
-// This method returns immediately. An error is returned when the workers are too busy.
-func (s *pooledSink) Process(req *http.Request) error {
-	ctx := req.Context()
-	if err := s.pool.Publish(ctx, req); err != nil {
-		registerWebhookFailed(ctx, err, false)
-		return err
-	}
-	// The underlying sink should register the success, or final failure.
-	return nil
-}
-
 // Webhooks is an interface for registering incoming webhooks for downlink and creating a subscription to outgoing
 // webhooks for upstream data.
 type Webhooks interface {
@@ -171,7 +67,7 @@ type webhooks struct {
 	ctx       context.Context
 	server    io.Server
 	registry  WebhookRegistry
-	target    Sink
+	target    sink.Sink
 	downlinks DownlinksConfig
 }
 
@@ -180,7 +76,7 @@ func NewWebhooks(
 	ctx context.Context,
 	server io.Server,
 	registry WebhookRegistry,
-	target Sink,
+	target sink.Sink,
 	downlinks DownlinksConfig,
 ) (Webhooks, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
