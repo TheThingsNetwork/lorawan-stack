@@ -547,6 +547,11 @@ func (x *ClaimGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("target_frequency_plan_id")
 		s.WriteString(x.TargetFrequencyPlanId)
 	}
+	if len(x.TargetFrequencyPlanIds) > 0 || s.HasField("target_frequency_plan_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("target_frequency_plan_ids")
+		s.WriteStringArray(x.TargetFrequencyPlanIds)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -607,6 +612,13 @@ func (x *ClaimGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "target_frequency_plan_id", "targetFrequencyPlanId":
 			s.AddField("target_frequency_plan_id")
 			x.TargetFrequencyPlanId = s.ReadString()
+		case "target_frequency_plan_ids", "targetFrequencyPlanIds":
+			s.AddField("target_frequency_plan_ids")
+			if s.ReadNil() {
+				x.TargetFrequencyPlanIds = nil
+				return
+			}
+			x.TargetFrequencyPlanIds = s.ReadStringArray()
 		}
 	})
 }

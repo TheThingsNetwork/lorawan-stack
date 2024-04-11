@@ -11326,8 +11326,29 @@
             },
             {
               "name": "target_frequency_plan_id",
-              "description": "Frequency plan ID of the target gateway.\nThis equals the first element of the frequency_plan_ids field.",
+              "description": "Frequency plan ID of the target gateway.\nTODO: Remove this field (https://github.com/TheThingsIndustries/lorawan-stack/issues/4024)\nDEPRECATED: Use target_frequency_plan_ids instead.",
               "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "deprecated": true,
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_frequency_plan_ids",
+              "description": "Frequency plan IDs of the target gateway.",
+              "label": "repeated",
               "type": "string",
               "longType": "string",
               "fullType": "string",
@@ -11338,7 +11359,15 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "string.max_len",
+                    "name": "repeated.min_items",
+                    "value": 0
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 8
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
                     "value": 64
                   }
                 ]

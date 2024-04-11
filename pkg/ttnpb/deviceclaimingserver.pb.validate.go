@@ -1325,6 +1325,27 @@ func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "target_frequency_plan_ids":
+
+			if len(m.GetTargetFrequencyPlanIds()) > 8 {
+				return ClaimGatewayRequestValidationError{
+					field:  "target_frequency_plan_ids",
+					reason: "value must contain no more than 8 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetTargetFrequencyPlanIds() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 64 {
+					return ClaimGatewayRequestValidationError{
+						field:  fmt.Sprintf("target_frequency_plan_ids[%v]", idx),
+						reason: "value length must be at most 64 runes",
+					}
+				}
+
+			}
+
 		case "source_gateway":
 			if m.SourceGateway == nil {
 				return ClaimGatewayRequestValidationError{

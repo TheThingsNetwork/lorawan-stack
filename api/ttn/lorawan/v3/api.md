@@ -2994,7 +2994,8 @@ in a future version of The Things Stack.
 | `target_gateway_id` | [`string`](#string) |  | Gateway ID for the target gateway. This must be a unique value. If this is not set, the target ID for the target gateway will be set to `<gateway-eui>`. |
 | `target_gateway_server_address` | [`string`](#string) |  | Target Gateway Server Address for the target gateway. |
 | `cups_redirection` | [`CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection) |  | Parameters to set CUPS redirection for the gateway. |
-| `target_frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the target gateway. This equals the first element of the frequency_plan_ids field. |
+| `target_frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the target gateway. TODO: Remove this field (https://github.com/TheThingsIndustries/lorawan-stack/issues/4024) DEPRECATED: Use target_frequency_plan_ids instead. |
+| `target_frequency_plan_ids` | [`string`](#string) | repeated | Frequency plan IDs of the target gateway. |
 
 #### Field Rules
 
@@ -3005,6 +3006,7 @@ in a future version of The Things Stack.
 | `target_gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 | `target_gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `target_frequency_plan_id` | <p>`string.max_len`: `64`</p> |
+| `target_frequency_plan_ids` | <p>`repeated.min_items`: `0`</p><p>`repeated.max_items`: `8`</p><p>`repeated.items.string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers">Message `ClaimGatewayRequest.AuthenticatedIdentifiers`</a>
 
