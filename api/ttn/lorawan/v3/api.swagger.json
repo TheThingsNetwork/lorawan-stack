@@ -20503,7 +20503,14 @@
         },
         "target_frequency_plan_id": {
           "type": "string",
-          "description": "Frequency plan ID of the target gateway.\nThis equals the first element of the frequency_plan_ids field."
+          "description": "Frequency plan ID of the target gateway.\nTODO: Remove this field (https://github.com/TheThingsIndustries/lorawan-stack/issues/4024)\nDEPRECATED: Use target_frequency_plan_ids instead."
+        },
+        "target_frequency_plan_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Frequency plan IDs of the target gateway."
         }
       }
     },

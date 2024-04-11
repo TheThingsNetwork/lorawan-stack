@@ -359,8 +359,21 @@ message ClaimGatewayRequest {
   CUPSRedirection cups_redirection = 6;
 
   // Frequency plan ID of the target gateway.
-  // This equals the first element of the frequency_plan_ids field.
-  string target_frequency_plan_id = 7 [(validate.rules).string.max_len = 64];
+  // TODO: Remove this field (https://github.com/TheThingsIndustries/lorawan-stack/issues/4024)
+  // DEPRECATED: Use target_frequency_plan_ids instead.
+  string target_frequency_plan_id = 7 [
+    (validate.rules).string.max_len = 64,
+    deprecated = true
+  ];
+
+  // Frequency plan IDs of the target gateway.
+  repeated string target_frequency_plan_ids = 8 [(validate.rules).repeated = {
+    min_items: 0,
+    max_items: 8,
+    items: {
+      string: {max_len: 64}
+    }
+  }];
 }
 
 message AuthorizeGatewayRequest {
