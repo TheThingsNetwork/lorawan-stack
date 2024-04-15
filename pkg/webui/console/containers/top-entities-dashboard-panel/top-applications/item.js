@@ -53,7 +53,7 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
       >
         {headers.map((header, index) => {
           const value = headers[index].name === 'name' ? title : deviceCount
-          const entityID = headers[index].name === 'name' ? ids.id : undefined
+          const entityID = ids.id
           return (
             <Table.DataCell key={index} align={header.align} className={styles.entityCell}>
               {headers[index].render(value, entityID)}

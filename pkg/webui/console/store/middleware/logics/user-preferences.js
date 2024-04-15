@@ -20,7 +20,7 @@ import * as userPreferences from '@console/store/actions/user-preferences'
 
 const getBookmarksThroughPagination = async userId => {
   let page = 1
-  const limit = 100
+  const limit = 1000
   let totalCount = Infinity
   let result = {
     bookmarks: [],

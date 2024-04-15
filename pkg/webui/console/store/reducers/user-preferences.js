@@ -12,28 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { fillIntoArray, pageToIndices } from '@console/store/utils'
+
 import {
   ADD_BOOKMARK_SUCCESS,
   GET_ALL_BOOKMARKS_SUCCESS,
   GET_BOOKMARKS_LIST_SUCCESS,
 } from '@console/store/actions/user-preferences'
 import { GET_USER_ME_SUCCESS } from '@console/store/actions/logout'
-
-// Update a range of values in an array by using another array and a start index.
-const fillIntoArray = (array, start, values, totalCount) => {
-  const newArray = [...array]
-  const end = Math.min(start + values.length, totalCount)
-  for (let i = start; i < end; i++) {
-    newArray[i] = values[i - start]
-  }
-  return newArray
-}
-
-const pageToIndices = (page, limit) => {
-  const startIndex = (page - 1) * limit
-  const stopIndex = page * limit - 1
-  return [startIndex, stopIndex]
-}
 
 const initialState = {
   bookmarks: {
