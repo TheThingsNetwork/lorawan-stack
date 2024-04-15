@@ -101,6 +101,7 @@ const SectionLabel = ({
         onClick={onClick}
         dropdownItems={plusDropdownItems}
         dropdownPosition="below right"
+        noDropdownIcon
       />
     </div>
   )
