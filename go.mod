@@ -12,7 +12,7 @@ require (
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.2.0
-	github.com/aws/aws-sdk-go v1.51.17
+	github.com/aws/aws-sdk-go v1.51.21
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.14
 	github.com/bluele/gcache v0.0.2
@@ -20,7 +20,7 @@ require (
 	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eclipse/paho.mqtt.golang v1.4.4-0.20230810210351-7b759f1d9ddf
-	github.com/emersion/go-smtp v0.21.0
+	github.com/emersion/go-smtp v0.21.1
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/felixge/httpsnoop v1.0.4
 	github.com/getsentry/sentry-go v0.27.0
@@ -48,13 +48,13 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056
 	github.com/json-iterator/go v1.1.12
 	github.com/jtacoma/uritemplates v1.0.0
-	github.com/klauspost/compress v1.17.7
+	github.com/klauspost/compress v1.17.8
 	github.com/kr/pretty v0.3.1
 	github.com/lib/pq v1.10.9
 	github.com/mileusna/useragent v1.3.4
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/nats-server/v2 v2.10.12
+	github.com/nats-io/nats-server/v2 v2.10.14
 	github.com/nats-io/nats.go v1.34.1
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/openshift/osin v1.0.2-0.20220317075346-0f4d38c6e53f
@@ -96,13 +96,13 @@ require (
 	gocloud.dev/pubsub/natspubsub v0.37.0
 	golang.org/x/crypto v0.22.0
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
-	golang.org/x/net v0.23.0
+	golang.org/x/net v0.24.0
 	golang.org/x/oauth2 v0.19.0
 	golang.org/x/sync v0.7.0
 	google.golang.org/genproto v0.0.0-20240311173647-c811ad7063a7
 	google.golang.org/genproto/googleapis/api v0.0.0-20240311173647-c811ad7063a7
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240401170217-c3f982113cda
-	google.golang.org/grpc v1.63.0
+	google.golang.org/grpc v1.63.2
 	google.golang.org/protobuf v1.33.0
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.6.0
