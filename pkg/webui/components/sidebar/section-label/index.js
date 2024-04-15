@@ -14,12 +14,25 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { useSelector } from 'react-redux'
 
+import { IconApplication, IconDevice, IconGateway, IconOrganization } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import {
+  checkFromState,
+  mayViewApplications,
+  mayViewGateways,
+  mayViewOrganizationsOfUser,
+} from '@console/lib/feature-checks'
+
+import { selectUser } from '@console/store/selectors/logout'
 
 const SectionLabel = ({
   label,
@@ -28,23 +41,70 @@ const SectionLabel = ({
   onClick,
   buttonDisabled,
   'data-test-id': dataTestId,
-}) => (
-  <div
-    className={classnames(
-      className,
-      'd-flex',
-      'j-between',
-      'al-center',
-      'c-text-neutral-light',
-      'ml-cs-xs',
-      'fs-s',
-    )}
-    data-test-id={dataTestId}
-  >
-    <Message content={label} />
-    <Button naked small icon={icon} disabled={buttonDisabled} onClick={onClick} />
-  </div>
-)
+}) => {
+  const user = useSelector(selectUser)
+  const mayViewApps = useSelector(state =>
+    user ? checkFromState(mayViewApplications, state) : false,
+  )
+  const mayViewGtws = useSelector(state => (user ? checkFromState(mayViewGateways, state) : false))
+  const mayViewOrgs = useSelector(state =>
+    user ? checkFromState(mayViewOrganizationsOfUser, state) : false,
+  )
+
+  const plusDropdownItems = (
+    <>
+      {mayViewApps && (
+        <Dropdown.Item
+          title={sharedMessages.addApplication}
+          icon={IconApplication}
+          path="/applications/add"
+        />
+      )}
+      {mayViewGtws && (
+        <Dropdown.Item title={sharedMessages.addGateway} icon={IconGateway} path="/gateways/add" />
+      )}
+      {mayViewOrgs && (
+        <Dropdown.Item
+          title={sharedMessages.addOrganization}
+          icon={IconOrganization}
+          path="/organizations/add"
+        />
+      )}
+
+      <Dropdown.Item
+        title="Register end device in application"
+        icon={IconDevice}
+        path="/devices/add"
+      />
+    </>
+  )
+
+  return (
+    <div
+      className={classnames(
+        className,
+        'd-flex',
+        'j-between',
+        'al-center',
+        'c-text-neutral-light',
+        'ml-cs-xs',
+        'fs-s',
+      )}
+      data-test-id={dataTestId}
+    >
+      <Message content={label} />
+      <Button
+        naked
+        small
+        icon={icon}
+        disabled={buttonDisabled}
+        onClick={onClick}
+        dropdownItems={plusDropdownItems}
+        dropdownPosition="below right"
+      />
+    </div>
+  )
+}
 
 SectionLabel.propTypes = {
   buttonDisabled: PropTypes.bool,

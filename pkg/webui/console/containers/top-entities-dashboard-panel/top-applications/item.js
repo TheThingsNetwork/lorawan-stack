@@ -43,25 +43,25 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
   )
 
   return (
-    <RequireRequest requestAction={loadDeviceCount}>
-      <Table.Row
-        id={ids.id}
-        clickable
-        linkTo={path}
-        body
-        className={classNames(styles.entityRow, { [styles.lastRow]: last })}
-      >
-        {headers.map((header, index) => {
-          const value = headers[index].name === 'name' ? title : deviceCount
-          const entityID = ids.id
-          return (
-            <Table.DataCell key={index} align={header.align} className={styles.entityCell}>
+    <Table.Row
+      id={ids.id}
+      clickable
+      linkTo={path}
+      body
+      className={classNames(styles.entityRow, { [styles.lastRow]: last })}
+    >
+      {headers.map((header, index) => {
+        const value = headers[index].name === 'name' ? title : deviceCount
+        const entityID = ids.id
+        return (
+          <RequireRequest key={index} requestAction={loadDeviceCount}>
+            <Table.DataCell align={header.align} className={styles.entityCell}>
               {headers[index].render(value, entityID)}
             </Table.DataCell>
-          )
-        })}
-      </Table.Row>
-    </RequireRequest>
+          </RequireRequest>
+        )
+      })}
+    </Table.Row>
   )
 }
 

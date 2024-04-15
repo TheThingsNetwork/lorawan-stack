@@ -14,7 +14,6 @@
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { defineMessages } from 'react-intl'
 
 import {
   IconLogout,
@@ -52,12 +51,6 @@ import Logo from '../logo'
 import NotificationsDropdown from './notifications-dropdown'
 import BookmarksDropdown from './bookmarks-dropdown'
 
-const m = defineMessages({
-  addApplication: 'Add new application',
-  addGateway: 'Add new gateway',
-  addOrganization: 'Add new organization',
-})
-
 const accountUrl = selectAccountUrl()
 
 const Header = ({ onMenuClick }) => {
@@ -78,14 +71,18 @@ const Header = ({ onMenuClick }) => {
   const plusDropdownItems = (
     <>
       {mayViewApps && (
-        <Dropdown.Item title={m.addApplication} icon={IconApplication} path="/applications/add" />
+        <Dropdown.Item
+          title={sharedMessages.addApplication}
+          icon={IconApplication}
+          path="/applications/add"
+        />
       )}
       {mayViewGtws && (
-        <Dropdown.Item title={m.addGateway} icon={IconGateway} path="/gateways/add" />
+        <Dropdown.Item title={sharedMessages.addGateway} icon={IconGateway} path="/gateways/add" />
       )}
       {mayViewOrgs && (
         <Dropdown.Item
-          title={m.addOrganization}
+          title={sharedMessages.addOrganization}
           icon={IconOrganization}
           path="/organizations/add"
         />

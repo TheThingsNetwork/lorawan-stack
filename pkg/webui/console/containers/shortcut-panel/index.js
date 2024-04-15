@@ -32,7 +32,7 @@ const m = defineMessages({
   shortcuts: 'Quick actions',
   addApplication: 'New Application',
   addGateway: 'New Gateway',
-  addOrganization: 'New Organization',
+  addNewOrganization: 'New Organization',
   addPersonalApiKey: 'New personal API key',
   registerDevice: 'Register a device',
 })
@@ -54,7 +54,7 @@ const ShortcutPanel = () => (
       />
       <ShortcutItem
         icon={IconUsersGroup}
-        title={m.addOrganization}
+        title={m.addNewOrganization}
         link="/organizations/add"
         className="item-4"
       />

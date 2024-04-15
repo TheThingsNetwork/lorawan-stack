@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -27,15 +28,23 @@ import {
 
 import EntitiesList from '../list'
 
+const m = defineMessages({
+  noTopEntities: 'No top entities yet',
+  noTopEntitiesDescription: 'Your most visited, and bookmarked entities will be listed here.',
+})
+
 const AllTopEntitiesList = ({ loadNextPage }) => {
   const headers = [
     {
-      name: 'icon',
+      name: 'type',
+      displayName: 'Type',
+      width: 7,
       render: icon => <Icon icon={icon} />,
     },
     {
       name: 'name',
       displayName: 'Name',
+      align: 'left',
       render: (name, id) => <Message content={name === '' ? id : name} />,
     },
   ]
@@ -46,8 +55,8 @@ const AllTopEntitiesList = ({ loadNextPage }) => {
       itemsCountSelector={selectBookmarksTotalCount}
       itemsSelector={selectBookmarksList}
       headers={headers}
-      emptyMessage={'No top entities yet'}
-      emptyDescription={'Your most visited, and bookmarked entities will be listed here.'}
+      emptyMessage={m.noTopEntities}
+      emptyDescription={m.noTopEntitiesDescription}
     />
   )
 }
