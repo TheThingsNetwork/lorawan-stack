@@ -35,10 +35,17 @@ const EntitiesItem = ({ bookmark, headers, last }) => {
     >
       {headers.map((header, index) => {
         const value =
-          headers[index].name === 'name' ? title : headers[index].name === 'icon' ? icon : ''
+          headers[index].name === 'name' ? title : headers[index].name === 'type' ? icon : ''
         const entityID = headers[index].name === 'name' ? ids.id : undefined
         return (
-          <Table.DataCell key={index} align={header.align} className={styles.entityCell}>
+          <Table.DataCell
+            key={index}
+            align={header.align}
+            className={classNames(styles.entityCell, {
+              [styles.entityCellExtended]: index === 1 && headers[index].name === 'name',
+              [styles.entityCellSmall]: headers[index].name === 'type',
+            })}
+          >
             {headers[index].render(value, entityID)}
           </Table.DataCell>
         )
