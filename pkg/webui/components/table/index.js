@@ -30,6 +30,7 @@ const Tabular = ({
   order,
   orderBy,
   pageSize,
+  setPageSize,
   page,
   handlesPagination,
   paginated,
@@ -157,6 +158,9 @@ const Tabular = ({
           disableInitialCallback
           pageRangeDisplayed={2}
           forcePage={page}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          totalCount={totalCount}
         />
       </Table.DataCell>
     </Table.Row>
@@ -246,6 +250,7 @@ Tabular.propTypes = {
   /** A selector to determine the `key` prop of the rendered rows. */
   rowKeySelector: PropTypes.func,
   /** A flag specifying the height of data cells. */
+  setPageSize: PropTypes.func,
   small: PropTypes.bool,
   /** The total number of available entries. */
   totalCount: PropTypes.number,
@@ -266,6 +271,7 @@ Tabular.defaultProps = {
   totalCount: 0,
   page: 0,
   pageSize: undefined,
+  setPageSize: () => null,
   clickable: true,
   rowKeySelector: undefined,
   rowHrefSelector: undefined,

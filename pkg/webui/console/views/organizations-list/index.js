@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -25,13 +25,20 @@ import OrganizationsTable from '@console/containers/organizations-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import getCookie from '@console/lib/table-utils'
+
 const List = () => {
-  useBreadcrumbs('orgs.list', <Breadcrumb path="/organizations" content={sharedMessages.list} />)
+  const orgPageSize = getCookie('organizations-list-page-size')
+  const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
+  useBreadcrumbs(
+    'orgs.list',
+    <Breadcrumb path={`/organizations${orgParam}`} content={sharedMessages.list} />,
+  )
 
   return (
     <div className="container container--lg ">
       <IntlHelmet title={sharedMessages.organizations} />
-      <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
+      <OrganizationsTable />
     </div>
   )
 }

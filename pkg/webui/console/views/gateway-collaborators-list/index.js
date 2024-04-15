@@ -16,7 +16,7 @@ import React, { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 

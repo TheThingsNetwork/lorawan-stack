@@ -16,6 +16,8 @@ import React, { useCallback, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import classnames from 'classnames'
 
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+
 import Icon, { IconHome, IconApplication, IconGateway } from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 
@@ -23,6 +25,8 @@ import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import getCookie from '@console/lib/table-utils'
 
 import style from './switcher.styl'
 
@@ -44,6 +48,11 @@ const Switcher = ({ isMinimized }) => {
     [style.active]: !pathname.startsWith('/applications') && !pathname.startsWith('/gateways'),
   })
 
+  const appPageSize = getCookie('applications-list-page-size')
+  const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
+  const gtwPageSize = getCookie('gateways-list-page-size')
+  const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
+
   return (
     <div
       className={classnames(style.switcherContainer, {
@@ -64,7 +73,7 @@ const Switcher = ({ isMinimized }) => {
           </Dropdown.Attached>
         )}
       </NavLink>
-      <NavLink to="/applications" className={getNavLinkClass} ref={applicationsRef}>
+      <NavLink to={`/applications${appParam}`} className={getNavLinkClass} ref={applicationsRef}>
         <Icon icon={IconApplication} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.applications} />
         {isMinimized && (
@@ -78,7 +87,7 @@ const Switcher = ({ isMinimized }) => {
           </Dropdown.Attached>
         )}
       </NavLink>
-      <NavLink to="/gateways" className={getNavLinkClass} ref={gatewaysRef}>
+      <NavLink to={`/gateways${gtwParam}`} className={getNavLinkClass} ref={gatewaysRef}>
         <Icon icon={IconGateway} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.gateways} />
         {isMinimized && (

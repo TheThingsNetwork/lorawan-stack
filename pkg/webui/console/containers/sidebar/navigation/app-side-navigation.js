@@ -16,6 +16,8 @@ import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+
 import {
   IconPuzzle,
   IconWebhook,
@@ -47,6 +49,7 @@ import {
   mayViewOrEditApplicationPackages,
   mayAddPubSubIntegrations,
 } from '@console/lib/feature-checks'
+import getCookie from '@console/lib/table-utils'
 
 import {
   selectSelectedApplication,
@@ -71,6 +74,8 @@ const AppSideNavigation = () => {
   const natsDisabled = useSelector(selectNatsProviderDisabled)
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
   const { isMinimized } = useContext(SidebarContext)
+  const appPageSize = getCookie('applications-list-page-size')
+  const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
 
   if (!app) {
     return null
@@ -87,7 +92,7 @@ const AppSideNavigation = () => {
             buttonMessage={m.buttonMessage}
             className="mt-cs-xs mb-cs-l"
             path={`/applications/${appId}`}
-            backPath="/applications"
+            backPath={`/applications${appParam}`}
           />
         )}
         {mayViewApplicationInfo.check(rights) && (

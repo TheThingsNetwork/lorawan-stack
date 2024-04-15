@@ -16,6 +16,8 @@ import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+
 import {
   IconMap,
   IconApiKeys,
@@ -37,6 +39,7 @@ import {
   mayViewOrEditGatewayApiKeys,
   mayEditBasicGatewayInformation,
 } from '@console/lib/feature-checks'
+import getCookie from '@console/lib/table-utils'
 
 import {
   selectSelectedGateway,
@@ -55,6 +58,8 @@ const GtwSideNavigation = () => {
   const gtwId = useSelector(selectSelectedGatewayId)
   const rights = useSelector(selectGatewayRights)
   const { isMinimized } = useContext(SidebarContext)
+  const gtwPageSize = getCookie('gateways-list-page-size')
+  const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
 
   if (!gtw) {
     return null
@@ -69,7 +74,7 @@ const GtwSideNavigation = () => {
           label={entityId}
           buttonMessage={m.buttonMessage}
           className="mt-cs-xs mb-cs-l"
-          backPath="/gateways"
+          backPath={`/gateways${gtwParam}`}
           path={`/gateways/${gtwId}`}
         />
       )}

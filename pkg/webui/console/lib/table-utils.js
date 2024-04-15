@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  overflow: visible
-  scrollbar-width: none
-
-.pagination
-  margin-top: $ls.xxs
-  text-align: center
-
-  &-cell
-    overflow: visible
-    padding-top: 0
-    padding-bottom: 0
-
-.overlay
-  min-height: 10rem
+export default cookieName =>
+  document.cookie
+    .split('; ')
+    .find(row => row.startsWith(`webui-${cookieName}=`))
+    ?.split('=')[1]

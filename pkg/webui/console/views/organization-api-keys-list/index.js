@@ -15,7 +15,7 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
