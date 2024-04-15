@@ -37,7 +37,7 @@ const TopGatewaysList = ({ loadNextPage }) => {
   const headers = [
     {
       name: 'name',
-      displayName: sharedMessages.displayName,
+      displayName: sharedMessages.name,
       render: (name, id) => (
         <>
           <Message content={name === '' ? id : name} component="p" className="mt-0 mb-cs-xs p-0" />

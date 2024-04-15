@@ -36,7 +36,7 @@ const EntitiesItem = ({ bookmark, headers, last }) => {
       {headers.map((header, index) => {
         const value =
           headers[index].name === 'name' ? title : headers[index].name === 'type' ? icon : ''
-        const entityID = headers[index].name === 'name' ? ids.id : undefined
+        const entityID = ids.id
         return (
           <Table.DataCell
             key={index}

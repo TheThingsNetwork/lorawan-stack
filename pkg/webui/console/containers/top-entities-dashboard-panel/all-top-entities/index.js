@@ -20,6 +20,7 @@ import Icon from '@ttn-lw/components/icon'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   selectBookmarksList,
@@ -37,13 +38,13 @@ const AllTopEntitiesList = ({ loadNextPage }) => {
   const headers = [
     {
       name: 'type',
-      displayName: 'Type',
+      displayName: sharedMessages.type,
       width: 7,
       render: icon => <Icon icon={icon} />,
     },
     {
       name: 'name',
-      displayName: 'Name',
+      displayName: sharedMessages.name,
       align: 'left',
       render: (name, id) => <Message content={name === '' ? id : name} />,
     },

@@ -18,6 +18,7 @@ import { defineMessages } from 'react-intl'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   selectEndDeviceBookmarks,
@@ -35,7 +36,7 @@ const TopDevicesList = ({ loadNextPage }) => {
   const headers = [
     {
       name: 'name',
-      displayName: 'Name',
+      displayName: sharedMessages.name,
       render: (name, id) => (
         <>
           <Message content={name === '' ? id : name} component="p" className="mt-0 mb-cs-xs p-0" />
