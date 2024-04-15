@@ -35,7 +35,7 @@ const m = defineMessages({
 const RIGHT_TAG_MAX_WIDTH = 160
 
 const ApiKeysTable = props => {
-  const { pageSize, baseDataSelector, getItemsAction } = props
+  const { baseDataSelector, getItemsAction } = props
   const intl = useIntl()
 
   const headers = [
@@ -85,7 +85,6 @@ const ApiKeysTable = props => {
       defaultOrder="-created_at"
       headers={headers}
       addMessage={sharedMessages.addApiKey}
-      pageSize={pageSize}
       baseDataSelector={baseDataSelector}
       getItemsAction={getItemsAction}
       tableTitle={<Message content={sharedMessages.apiKeys} />}
@@ -96,11 +95,6 @@ const ApiKeysTable = props => {
 ApiKeysTable.propTypes = {
   baseDataSelector: PropTypes.func.isRequired,
   getItemsAction: PropTypes.func.isRequired,
-  pageSize: PropTypes.number,
-}
-
-ApiKeysTable.defaultProps = {
-  pageSize: undefined,
 }
 
 export default ApiKeysTable

@@ -69,7 +69,7 @@ PropTypes.link = PropTypes.shape({
   hidden: PropTypes.bool,
 })
 
-PropTypes.inputWidth = PropTypes.oneOf(['xxs', 'xs', 's', 'm', 'l', 'full'])
+PropTypes.inputWidth = PropTypes.oneOf(['3xs', 'xxs', 'xs', 's', 'm', 'l', 'full'])
 
 PropTypes.onlineStatus = PropTypes.oneOf(Object.values(ONLINE_STATUS))
 

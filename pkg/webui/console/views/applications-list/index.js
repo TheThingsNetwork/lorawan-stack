@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
@@ -23,8 +25,15 @@ import ApplicationsTable from '@console/containers/applications-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import getCookie from '@console/lib/table-utils'
+
 const ApplicationsList = () => {
-  useBreadcrumbs('apps.list', <Breadcrumb path="/applications" content={sharedMessages.list} />)
+  const appPageSize = getCookie('applications-list-page-size')
+  const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
+  useBreadcrumbs(
+    'apps.list',
+    <Breadcrumb path={`/applications${appParam}`} content={sharedMessages.list} />,
+  )
 
   return (
     <>

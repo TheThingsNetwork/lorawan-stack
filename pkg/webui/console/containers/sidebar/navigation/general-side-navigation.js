@@ -15,6 +15,8 @@
 import React, { useCallback, useContext, useState } from 'react'
 import { useSelector } from 'react-redux'
 
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+
 import {
   IconUsersGroup,
   IconLayoutDashboard,
@@ -38,6 +40,7 @@ import {
   mayViewOrEditApiKeys,
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
+import getCookie from '@console/lib/table-utils'
 
 import { getAllBookmarks } from '@console/store/actions/user-preferences'
 
@@ -73,6 +76,11 @@ const GeneralSideNavigation = () => {
     setShowMore(showMore => !showMore)
   }, [])
 
+  const orgPageSize = getCookie('organizations-list-page-size')
+  const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
+  const keysPageSize = getCookie('keys-list-page-size')
+  const keysParam = `?page-size=${keysPageSize ? keysPageSize : PAGE_SIZES.REGULAR}`
+
   return (
     <>
       <SideNavigation>
@@ -85,7 +93,7 @@ const GeneralSideNavigation = () => {
         {mayViewOrgs && (
           <SideNavigation.Item
             title={sharedMessages.organizations}
-            path="/organizations"
+            path={`/organizations${orgParam}`}
             icon={IconUsersGroup}
           />
         )}
@@ -97,7 +105,7 @@ const GeneralSideNavigation = () => {
         {mayHandleApiKeys && (
           <SideNavigation.Item
             title={sharedMessages.personalApiKeys}
-            path="/user/api-keys"
+            path={`/user/api-keys${keysParam}`}
             icon={IconKey}
           />
         )}
