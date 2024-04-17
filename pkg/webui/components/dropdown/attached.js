@@ -18,7 +18,18 @@ import Dropdown from '@ttn-lw/components/dropdown'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const AttachedDropdown = ({ attachedRef, onItemsClick, hover, onOutsideClick, ...rest }) => {
+import Portal from '../portal'
+
+const AttachedDropdown = ({
+  attachedRef,
+  onItemsClick,
+  hover,
+  onOutsideClick,
+  portalled,
+  positionReferenceId,
+  placeDropdown,
+  ...rest
+}) => {
   const [open, setOpen] = React.useState(false)
 
   // Add event listeners to open the dropdown.
@@ -79,6 +90,24 @@ const AttachedDropdown = ({ attachedRef, onItemsClick, hover, onOutsideClick, ..
     [attachedRef, onOutsideClick],
   )
 
+  if (portalled) {
+    return (
+      <Portal
+        elementId={`${positionReferenceId}-attached-dropdown`}
+        positionReferenceId={positionReferenceId}
+        place={placeDropdown}
+      >
+        <Dropdown
+          open={open}
+          onItemsClick={handleItemsClick}
+          onOutsideClick={handleOutsideClick}
+          hover={hover}
+          {...rest}
+        />
+      </Portal>
+    )
+  }
+
   return (
     <Dropdown
       open={open}
@@ -95,12 +124,18 @@ AttachedDropdown.propTypes = {
   hover: PropTypes.bool,
   onItemsClick: PropTypes.func,
   onOutsideClick: PropTypes.func,
+  placeDropdown: PropTypes.arrayOf(PropTypes.string),
+  portalled: PropTypes.bool,
+  positionReferenceId: PropTypes.string,
 }
 
 AttachedDropdown.defaultProps = {
   onItemsClick: () => null,
   onOutsideClick: () => null,
   hover: false,
+  portalled: false,
+  positionReferenceId: undefined,
+  placeDropdown: [],
 }
 
 export default AttachedDropdown
