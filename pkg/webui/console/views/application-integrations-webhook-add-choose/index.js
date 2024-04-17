@@ -42,10 +42,7 @@ const m = defineMessages({
 })
 
 const WebhookTile = ({ ids, name, description, logo_url }) => (
-  <div
-    className={classNames(style.tileColumn, 'item-6 sm:item-6 lg:item-4 xl:item-3')}
-    key={`tile-${ids.template_id}`}
-  >
+  <div className="item-6 sm:item-6 lg:item-4 xl:item-3" key={`tile-${ids.template_id}`}>
     <Link to={ids.template_id} className={style.webhookTile}>
       <img className={style.logo} alt={name} src={logo_url} />
       <span className={style.name}>{name}</span>

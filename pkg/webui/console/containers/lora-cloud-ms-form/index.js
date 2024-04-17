@@ -16,7 +16,7 @@ import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
-import LORA_CLOUD_DAS from '@console/constants/lora-cloud-das'
+import LORA_CLOUD_MS from '@console/constants/lora-cloud-ms'
 
 import { IconTrash } from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
@@ -94,21 +94,21 @@ const validationSchema = Yup.object()
 const defaultValues = {
   data: {
     token: '',
-    server_url: LORA_CLOUD_DAS.DEFAULT_SERVER_URL,
-    f_port_set: LORA_CLOUD_DAS.DEFAULT_PORT_SET,
+    server_url: LORA_CLOUD_MS.DEFAULT_SERVER_URL,
+    f_port_set: LORA_CLOUD_MS.DEFAULT_PORT_SET,
   },
 }
 
 const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
 const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)
 
-const LoRaCloudDASForm = () => {
+const LoRaCloudModemServicesForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
 
   const dispatch = useDispatch()
   const defaultAssociation = useSelector(state =>
-    selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_DAS.DEFAULT_PORT),
+    selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_MS.DEFAULT_PORT),
   )
   const packageError = useSelector(selectGetApplicationPackagesError)
   const initialValues = validationSchema.cast(
@@ -120,8 +120,8 @@ const LoRaCloudDASForm = () => {
       try {
         values.data.f_port_set = mapFPortInputToNumberArr(values.data.f_port_set)
         await dispatch(
-          promisifiedSetAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
-            package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
+          promisifiedSetAppPkgDefaultAssoc(appId, LORA_CLOUD_MS.DEFAULT_PORT, {
+            package_name: LORA_CLOUD_MS.DEFAULT_PACKAGE_NAME,
             ...values,
           }),
         )
@@ -140,8 +140,8 @@ const LoRaCloudDASForm = () => {
   const handleDelete = useCallback(async () => {
     try {
       await dispatch(
-        promisifiedDeleteAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
-          package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
+        promisifiedDeleteAppPkgDefaultAssoc(appId, LORA_CLOUD_MS.DEFAULT_PORT, {
+          package_name: LORA_CLOUD_MS.DEFAULT_PACKAGE_NAME,
         }),
       )
       toast({
@@ -212,4 +212,4 @@ const LoRaCloudDASForm = () => {
   )
 }
 
-export default LoRaCloudDASForm
+export default LoRaCloudModemServicesForm

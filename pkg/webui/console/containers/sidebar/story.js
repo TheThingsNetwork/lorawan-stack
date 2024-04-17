@@ -21,7 +21,7 @@ import {
   IconData,
   IconApiKeys,
   IconGeneralSettings,
-  IconLocation,
+  IconMap,
   IconOrganization,
   IconOverview,
 } from '@ttn-lw/components/icon'
@@ -73,7 +73,7 @@ export const Default = () => (
     <SideNavigation className="mt-cs-xs">
       <SideNavigation.Item title="Overview" path="" icon={IconOverview} exact />
       <SideNavigation.Item title="Live data" path="data" icon={IconData} />
-      <SideNavigation.Item title="Location" path="location" icon={IconLocation} />
+      <SideNavigation.Item title="Location" path="location" icon={IconMap} />
       <SideNavigation.Item title="Collaborators" path="collaborators" icon={IconOrganization} />
       <SideNavigation.Item title="API keys" path="api-keys" icon={IconApiKeys} />
       <SideNavigation.Item
