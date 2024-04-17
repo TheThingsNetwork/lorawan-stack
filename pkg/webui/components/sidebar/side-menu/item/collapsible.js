@@ -49,6 +49,8 @@ const CollapsibleItem = ({
 
   const subItemActive = subItems.some(item => currentPathName.includes(item.path))
 
+  const portalId = `${currentPathName.split('/').join('-')}-link`
+
   return (
     <div className={classnames(style.container, { [style.isMinimized]: isMinimized })} ref={ref}>
       <Button
@@ -56,6 +58,7 @@ const CollapsibleItem = ({
           [style.active]: isMinimized && subItemActive,
         })}
         onClick={onClick}
+        buttonId={portalId}
       >
         {icon && <Icon icon={icon} className={style.icon} />}
         <Message content={title} className={style.title} />
@@ -74,6 +77,8 @@ const CollapsibleItem = ({
           attachedRef={ref}
           position="right"
           hover
+          portalled
+          positionReferenceId={portalId}
         >
           <Dropdown.HeaderItem title={title.defaultMessage} />
           {subItems.map(item => (

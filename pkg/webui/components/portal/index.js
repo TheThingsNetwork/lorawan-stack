@@ -17,6 +17,7 @@ import DOM from 'react-dom'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+// This component create a portal to render children into a different part of the DOM.
 const Portal = ({ children, positionReferenceId, elementId, place }) => {
   const [portalContainer, setPortalContainer] = React.useState(undefined)
 

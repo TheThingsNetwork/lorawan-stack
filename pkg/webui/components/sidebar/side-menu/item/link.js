@@ -41,12 +41,21 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
     [disabled, isMinimized],
   )
 
+  const id = `${path.split('/').join('-')}-link`
+
   return (
-    <NavLink to={path} className={className} end={exact} onClick={onClick} ref={ref}>
+    <NavLink to={path} className={className} end={exact} onClick={onClick} ref={ref} id={id}>
       {icon && <Icon icon={icon} className={classnames(style.icon)} />}{' '}
       <Message className={style.title} content={title} />
       {isMinimized && (
-        <Dropdown.Attached attachedRef={ref} className={style.flyOutList} position="right" hover>
+        <Dropdown.Attached
+          attachedRef={ref}
+          className={style.flyOutList}
+          position="right"
+          hover
+          portalled
+          positionReferenceId={id}
+        >
           <Dropdown.HeaderItem title={title.defaultMessage} />
         </Dropdown.Attached>
       )}

@@ -34,10 +34,10 @@ const SidebarNavigation = () => {
   return (
     <>
       {!isApplicationsPath && !isGatewaysPath && <GeneralSideNavigation />}
+      {isApplicationsPath && !isSingleAppPath && <AppListSideNavigation />}
       {isSingleAppPath && <AppSideNavigation />}
-      {isApplicationsPath && <AppListSideNavigation />}
+      {isGatewaysPath && !isSingleGatewayPath && <GtwListSideNavigation />}
       {isSingleGatewayPath && <GtwSideNavigation />}
-      {isGatewaysPath && <GtwListSideNavigation />}
     </>
   )
 }

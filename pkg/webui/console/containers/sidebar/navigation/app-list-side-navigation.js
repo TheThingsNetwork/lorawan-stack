@@ -27,7 +27,7 @@ const AppListSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
   const userId = useSelector(selectUserId)
 
-  if (isMinimized || topEntities.length === 0) {
+  if (isMinimized) {
     // Rendering an empty div to prevent the shadow of the search bar
     // from being cut off. There will be a default element rendering
     // here in the future anyway.

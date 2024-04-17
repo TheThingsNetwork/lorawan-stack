@@ -112,6 +112,8 @@ const Button = forwardRef((props, ref) => {
     onClick,
     form,
     className,
+    buttonId,
+    portalledDropdown,
     ...rest
   } = props
   const innerRef = useRef()
@@ -150,6 +152,7 @@ const Button = forwardRef((props, ref) => {
       children={buttonChildren({ ...props })}
       disabled={busy || disabled}
       ref={combinedRef}
+      id={buttonId}
       {...htmlProps}
     />
   )
@@ -162,6 +165,9 @@ const Button = forwardRef((props, ref) => {
           className={dropdownClassName}
           attachedRef={innerRef}
           position={dropdownPosition}
+          portalled={portalledDropdown}
+          positionReferenceId={buttonId}
+          placeDropdown={['under']}
         >
           {dropdownItems}
         </Dropdown.Attached>
@@ -302,11 +308,13 @@ Button.propTypes = {
    * Not called if the button is in the `busy` or `disabled` state.
    */
   onClick: PropTypes.func,
+  portalledDropdown: PropTypes.bool,
   ...commonPropTypes,
 }
 
 Button.defaultProps = {
   onClick: () => null,
+  portalledDropdown: false,
 }
 
 LinkButton.propTypes = {

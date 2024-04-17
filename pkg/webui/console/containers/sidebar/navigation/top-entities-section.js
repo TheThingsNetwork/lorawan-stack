@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { IconPlus } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -39,6 +40,8 @@ Bookmark.propTypes = {
 
 const TopEntitiesSection = ({ topEntities, userId }) => {
   const [showMore, setShowMore] = useState(false)
+  const { pathname } = useLocation()
+  const id = pathname.split('/').join('-')
 
   const handleShowMore = useCallback(async () => {
     setShowMore(showMore => !showMore)
@@ -47,7 +50,12 @@ const TopEntitiesSection = ({ topEntities, userId }) => {
   return (
     <RequireRequest requestAction={getAllBookmarks(userId)}>
       <SideNavigation>
-        <SectionLabel label={sharedMessages.topApplications} icon={IconPlus} onClick={() => null} />
+        <SectionLabel
+          label={sharedMessages.topApplications}
+          icon={IconPlus}
+          onClick={() => null}
+          data-test-id={id}
+        />
         {topEntities.slice(0, 6).map(bookmark => (
           <Bookmark key={bookmark.created_at} bookmark={bookmark} />
         ))}

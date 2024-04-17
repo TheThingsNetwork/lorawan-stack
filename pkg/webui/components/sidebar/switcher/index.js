@@ -59,7 +59,7 @@ const Switcher = ({ isMinimized }) => {
         [style.isMinimized]: isMinimized,
       })}
     >
-      <NavLink to="/" className={getOverviewNavLinkClass} ref={overviewRef}>
+      <NavLink to="/" className={getOverviewNavLinkClass} ref={overviewRef} id="overview-link">
         <Icon icon={IconHome} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.overview} />
         {isMinimized && (
@@ -68,12 +68,19 @@ const Switcher = ({ isMinimized }) => {
             className={style.flyOutList}
             position="right"
             hover
+            portalled
+            positionReferenceId="overview-link"
           >
             <Dropdown.HeaderItem title={sharedMessages.overview} />
           </Dropdown.Attached>
         )}
       </NavLink>
-      <NavLink to={`/applications${appParam}`} className={getNavLinkClass} ref={applicationsRef}>
+      <NavLink
+        to={`/applications${appParam}`}
+        className={getNavLinkClass}
+        ref={applicationsRef}
+        id="applications-link"
+      >
         <Icon icon={IconApplication} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.applications} />
         {isMinimized && (
@@ -82,12 +89,19 @@ const Switcher = ({ isMinimized }) => {
             className={style.flyOutList}
             position="right"
             hover
+            portalled
+            positionReferenceId="applications-link"
           >
             <Dropdown.HeaderItem title={sharedMessages.applications} />
           </Dropdown.Attached>
         )}
       </NavLink>
-      <NavLink to={`/gateways${gtwParam}`} className={getNavLinkClass} ref={gatewaysRef}>
+      <NavLink
+        to={`/gateways${gtwParam}`}
+        className={getNavLinkClass}
+        ref={gatewaysRef}
+        id="gateways-link"
+      >
         <Icon icon={IconGateway} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.gateways} />
         {isMinimized && (
@@ -96,6 +110,8 @@ const Switcher = ({ isMinimized }) => {
             className={style.flyOutList}
             position="right"
             hover
+            portalled
+            positionReferenceId="gateways-link"
           >
             <Dropdown.HeaderItem title={sharedMessages.gateways} />
           </Dropdown.Attached>
