@@ -7,7 +7,9 @@ otherwise we will not be able to process this pull request.
 
 <!--
 A short summary, referencing related issues:
-Closes #0000, References #0000, etc.
+References #0000, etc.
+Pull requests may close issues (using Closes #0000) only for minor changes not needing tests on a staging environment.
+Typically, issues should be closed manually after validation.
 -->
 
 ...
@@ -58,6 +60,7 @@ implementation proposal in the referenced issues.
 - [ ] Scope: The referenced issue is addressed, there are no unrelated changes.
 - [ ] Compatibility: The changes are backwards compatible with existing API, storage, configuration and CLI, according to the compatibility commitments in `README.md` for the chosen target branch.
 - [ ] Documentation: Relevant documentation is added or updated.
-- [ ] The steps/process to test this feature are clearly explained including testing for regressions.
+- [ ] Testing: The steps/process to test this feature are clearly explained including testing for regressions.
+- [ ] Infrastructure: If infrastructural changes (e.g., new RPC, configuration) are needed, a separate issue is created in the infrastructural repositories.
 - [ ] Changelog: Significant features, behavior changes, deprecations and fixes are added to `CHANGELOG.md`.
 - [ ] Commits: Commit messages follow guidelines in `CONTRIBUTING.md`, there are no fixup commits left.
