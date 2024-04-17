@@ -28,9 +28,9 @@ import {
 import EntitiesList from '../list'
 
 const m = defineMessages({
-  emptyMessage: 'No top Gateway yet',
-  emptyDescription: 'Your most visited, and bookmarked Gateways will be listed here.',
-  emptyAction: 'Create Gateway',
+  emptyMessage: 'No top gateway yet',
+  emptyDescription: 'Your most visited, and bookmarked gateways will be listed here',
+  emptyAction: 'Create gateway',
 })
 
 const TopGatewaysList = ({ loadNextPage }) => {

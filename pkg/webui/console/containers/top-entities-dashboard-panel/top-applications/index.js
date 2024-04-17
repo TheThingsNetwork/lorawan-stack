@@ -32,9 +32,8 @@ import EntitiesList from '../list'
 import TopApplicationsItem from './item'
 
 const m = defineMessages({
-  emptyMessage: 'No top Application yet',
-  emptyDescription: 'Your most visited, and bookmarked Applications will be listed here.',
-  emptyAction: 'Create Application',
+  emptyMessage: 'No top application yet',
+  emptyDescription: 'Your most visited, and bookmarked applications will be listed here',
 })
 
 const TopApplicationsList = ({ loadNextPage }) => {
@@ -74,7 +73,7 @@ const TopApplicationsList = ({ loadNextPage }) => {
       EntitiesItemComponent={TopApplicationsItem}
       emptyMessage={m.emptyMessage}
       emptyDescription={m.emptyDescription}
-      emptyAction={m.emptyAction}
+      emptyAction={sharedMessages.createApplication}
       emptyPath={'/applications/add'}
       entity={'application'}
     />

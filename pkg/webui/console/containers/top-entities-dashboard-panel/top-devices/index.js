@@ -28,8 +28,8 @@ import {
 import EntitiesList from '../list'
 
 const m = defineMessages({
-  emptyMessage: 'No top Device yet',
-  emptyDescription: 'Your most visited, and bookmarked Devices will be listed here.',
+  emptyMessage: 'No top device yet',
+  emptyDescription: 'Your most visited, and bookmarked end devices will be listed here',
 })
 
 const TopDevicesList = ({ loadNextPage }) => {
