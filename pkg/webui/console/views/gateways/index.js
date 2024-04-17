@@ -15,6 +15,8 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
@@ -30,9 +32,15 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewGateways } from '@console/lib/feature-checks'
+import getCookie from '@console/lib/table-utils'
 
 const Gateways = () => {
-  useBreadcrumbs('gtws', <Breadcrumb path="/gateways" content={sharedMessages.gateways} />)
+  const gtwPageSize = getCookie('gateways-list-page-size')
+  const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
+  useBreadcrumbs(
+    'gtws',
+    <Breadcrumb path={`/gateways${gtwParam}`} content={sharedMessages.gateways} />,
+  )
   return (
     <Require featureCheck={mayViewGateways} otherwise={{ redirect: '/' }}>
       <Routes>

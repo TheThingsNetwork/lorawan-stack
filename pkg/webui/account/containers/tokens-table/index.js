@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
 import { IconTrash } from '@ttn-lw/components/icon'
 import toast from '@ttn-lw/components/toast'

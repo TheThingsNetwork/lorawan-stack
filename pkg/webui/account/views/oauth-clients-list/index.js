@@ -15,7 +15,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
 import PageTitle from '@ttn-lw/components/page-title'
 

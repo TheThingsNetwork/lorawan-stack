@@ -15,6 +15,8 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
@@ -31,11 +33,14 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
+import getCookie from '@console/lib/table-utils'
 
 const Organizations = () => {
+  const orgPageSize = getCookie('organizations-list-page-size')
+  const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
   useBreadcrumbs(
     'orgs',
-    <Breadcrumb path="/organizations" content={sharedMessages.organizations} />,
+    <Breadcrumb path={`/organizations${orgParam}`} content={sharedMessages.organizations} />,
   )
 
   return (
