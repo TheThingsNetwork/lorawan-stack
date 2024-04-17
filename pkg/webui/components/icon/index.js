@@ -36,13 +36,13 @@ const Icon = forwardRef((props, ref) => {
   const classname = classnames(className, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,
-    [style.large]: large,
-    [style.small]: small,
     [style.textPaddedLeft]: textPaddedLeft,
     [style.textPaddedRight]: textPaddedRight,
   })
 
-  return <ActualIcon className={classname} ref={ref} size={small ? 16 : size} {...rest} />
+  const renderedSize = large ? 24 : small ? 16 : size
+
+  return <ActualIcon className={classname} ref={ref} size={renderedSize} {...rest} />
 })
 
 Icon.propTypes = {

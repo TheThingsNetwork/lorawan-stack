@@ -1,0 +1,126 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.container
+  display: flex
+  flex-direction: column
+  max-width: 45rem
+  border-radius: $br.xl
+  box-shadow: var(--shadow-box-modal-normal)
+  overflow: hidden
+  position: absolute
+  z-index: $zi.modal
+  background-color: var(--c-bg-neutral-min)
+  left: 50%
+  top: 10rem
+  transform: translateX(-50%)
+  min-width: 35rem
+
+  +media-query($bp.sm)
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    width: initial
+    height: initial
+    transform: none
+    min-width: initial
+    max-width: initial
+    border-radius: 0
+
+  .input
+    font-size: $fs.l
+    border: 0
+    outline: none
+    width: 100%
+    height: 3rem
+
+    &:focus::placeholder
+      visibility: hidden
+
+    &::placeholder
+      font-size: $fs.l
+      color: var(--c-text-neutral-extralight)
+
+  .x-out
+    color: var(--c-icon-neutral-normal)
+    margin-right: - $cs.m
+    padding: $cs.m
+    cursor: pointer
+    display: none
+    +media-query($bp.sm)
+      display: block
+
+  .list
+    overflow-y: auto
+    max-height: 25.75rem
+
+  .result-header
+    text-transform: uppercase
+    font-size: $fsv2.s
+    color: var(--c-text-neutral-light)
+    font-weight: $fw.bold
+    padding: $cs.m $cs.xl $cs.xs $cs.xl
+    line-height: 1
+
+  .result-item
+    display: flex
+    padding: $cs.m $cs.xl
+    align-items: center
+    line-height: 1
+    gap: $cs.m
+    color: inherit
+
+    &-focus
+      background-color: var(--c-bg-brand-light)
+
+  .icon
+    color: var(--c-icon-neutral-light)
+    padding: .1rem
+    background-color: var(--c-bg-neutral-light)
+    border-radius: $br.s
+
+  .footer
+    display: flex
+    flex-wrap: wrap
+    padding: $cs.s $cs.m
+    gap: $cs.s
+    color: var(--c-text-neutral-light)
+    font-size: $fs.s
+    align-items: center
+    justify-content: space-evenly
+
+  .loading, .no-results
+    display: flex
+    justify-content: center
+    align-items: center
+    flex-direction: column
+    padding: $ls.m
+    color: var(--c-text-neutral-light)
+    border-top: 1px solid var(--c-border-neutral-light)
+    height: 25.75rem
+    box-sizing: border-box
+
+  .no-results
+    & > div
+      font-size: $fs.s
+      width: 40%
+      margin: 0 auto
+
+    ul
+      padding: 0
+      line-height: 1
+      width: fit-content
+      margin: 0 auto
+
