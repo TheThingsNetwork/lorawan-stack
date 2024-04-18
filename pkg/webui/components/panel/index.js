@@ -26,6 +26,19 @@ import Toggle from './toggle'
 
 import styles from './panel.styl'
 
+const PanelError = ({ className, children }) => (
+  <div className={classnames(className, 'd-flex', 'j-center')}>{children}</div>
+)
+
+PanelError.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+  className: PropTypes.string,
+}
+
+PanelError.defaultProps = {
+  className: undefined,
+}
+
 const Panel = ({
   children,
   title,
@@ -41,8 +54,8 @@ const Panel = ({
   shortCutLinkTarget,
 }) => (
   <div className={classnames(styles.panel, className)}>
-    <div className="d-flex j-between al-center mb-cs-m flex-wrap gap-cs-m">
-      <div className="d-flex gap-cs-xs al-center">
+    <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
+      <div className="d-flex gap-cs-xs al-center overflow-hidden">
         {icon && <Icon icon={icon} className={styles.panelHeaderIcon} />}
         <Message content={title} className={styles.panelHeaderTitle} />
         {messageDecorators}
@@ -90,4 +103,4 @@ Panel.defaultProps = {
   shortCutLinkTarget: undefined,
 }
 
-export default Panel
+export { Panel as default, PanelError }
