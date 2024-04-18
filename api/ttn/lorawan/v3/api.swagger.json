@@ -13944,6 +13944,17 @@
             "in": "query",
             "required": false,
             "type": "boolean"
+          },
+          {
+            "name": "entity_types",
+            "description": "Specifies that only bookmarks that reference the given entity type should be returned. If empty the filter is not\napplied.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [

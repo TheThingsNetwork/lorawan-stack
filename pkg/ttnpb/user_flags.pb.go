@@ -439,6 +439,7 @@ func AddSetFlagsForListUserBookmarksRequest(flags *pflag.FlagSet, prefix string,
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("page", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("order", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("deleted", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("entity-types", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the ListUserBookmarksRequest message from flags.
@@ -476,6 +477,12 @@ func (m *ListUserBookmarksRequest) SetFromFlags(flags *pflag.FlagSet, prefix str
 	} else if changed {
 		m.Deleted = val
 		paths = append(paths, flagsplugin.Prefix("deleted", prefix))
+	}
+	if val, changed, err := flagsplugin.GetStringSlice(flags, flagsplugin.Prefix("entity_types", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.EntityTypes = val
+		paths = append(paths, flagsplugin.Prefix("entity_types", prefix))
 	}
 	return paths, nil
 }

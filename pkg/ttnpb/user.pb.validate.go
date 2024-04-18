@@ -3797,6 +3797,31 @@ func (m *ListUserBookmarksRequest) ValidateFields(paths ...string) error {
 
 		case "deleted":
 			// no validation rules for Deleted
+		case "entity_types":
+
+			_ListUserBookmarksRequest_EntityTypes_Unique := make(map[string]struct{}, len(m.GetEntityTypes()))
+
+			for idx, item := range m.GetEntityTypes() {
+				_, _ = idx, item
+
+				if _, exists := _ListUserBookmarksRequest_EntityTypes_Unique[item]; exists {
+					return ListUserBookmarksRequestValidationError{
+						field:  fmt.Sprintf("entity_types[%v]", idx),
+						reason: "repeated value must contain unique items",
+					}
+				} else {
+					_ListUserBookmarksRequest_EntityTypes_Unique[item] = struct{}{}
+				}
+
+				if _, ok := _ListUserBookmarksRequest_EntityTypes_InLookup[item]; !ok {
+					return ListUserBookmarksRequestValidationError{
+						field:  fmt.Sprintf("entity_types[%v]", idx),
+						reason: "value must be in list [application client end device gateway organization user]",
+					}
+				}
+
+			}
+
 		default:
 			return ListUserBookmarksRequestValidationError{
 				field:  name,
@@ -3874,6 +3899,15 @@ var _ListUserBookmarksRequest_Order_InLookup = map[string]struct{}{
 	"-entity_id":   {},
 	"created_at":   {},
 	"-created_at":  {},
+}
+
+var _ListUserBookmarksRequest_EntityTypes_InLookup = map[string]struct{}{
+	"application":  {},
+	"client":       {},
+	"end device":   {},
+	"gateway":      {},
+	"organization": {},
+	"user":         {},
 }
 
 // ValidateFields checks the field values on DeleteUserBookmarkRequest with the

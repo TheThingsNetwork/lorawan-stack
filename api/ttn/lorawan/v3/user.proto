@@ -553,6 +553,25 @@ message ListUserBookmarksRequest {
 
   // Only return recently deleted bookmarks.
   bool deleted = 5;
+
+  // Specifies that only bookmarks that reference the given entity type should be returned. If empty the filter is not
+  // applied.
+  repeated string entity_types = 6 [(validate.rules).repeated = {
+    unique: true,
+    items: {
+      string: {
+        // These values are the same as what is specified in the pkg/ttnpb/identifiers_polymorphism
+        in: [
+          "application",
+          "client",
+          "end device",
+          "gateway",
+          "organization",
+          "user"
+        ]
+      }
+    }
+  }];
 }
 
 message DeleteUserBookmarkRequest {

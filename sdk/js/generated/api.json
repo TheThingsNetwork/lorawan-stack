@@ -50451,6 +50451,37 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "entity_types",
+              "description": "Specifies that only bookmarks that reference the given entity type should be returned. If empty the filter is not\napplied.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.string.in",
+                    "value": [
+                      "application",
+                      "client",
+                      "end device",
+                      "gateway",
+                      "organization",
+                      "user"
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
