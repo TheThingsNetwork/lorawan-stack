@@ -102,6 +102,9 @@ message AsConfiguration {
   message Webhooks {
     int64 unhealthy_attempts_threshold = 1;
     google.protobuf.Duration unhealthy_retry_interval = 2;
+
+    reserved 3;
+    reserved "queue";
   }
   Webhooks webhooks = 2;
 }
