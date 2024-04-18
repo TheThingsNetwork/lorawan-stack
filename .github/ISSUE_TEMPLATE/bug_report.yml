@@ -89,6 +89,13 @@ body:
         - label: I can help by testing the fix before it's released.
   - type: checkboxes
     attributes:
+      label: Validation
+      description: Please check these boxes to confirm completion before closing the issue, or comment if not applicable.
+      options:
+        - label: The fix is tested in a staging environment.
+        - label: The fix is documented in [The Things Stack Documentation](https://www.thethingsindustries.com/docs/)
+  - type: checkboxes
+    attributes:
       label: Code of Conduct
       description: By submitting this issue, you agree to follow The Things Network's Community Code of Conduct.
       options:
