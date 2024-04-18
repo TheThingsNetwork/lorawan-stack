@@ -17,19 +17,26 @@ import React from 'react'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import { activationEvent } from '@console/lib/regexp'
+
 import messages from '../messages'
 
 import DescriptionList from './shared/description-list'
 import JSONPayload from './shared/json-payload'
 
 const ApplicationUplinkNormalizedPreview = React.memo(({ event }) => {
-  const { data, identifiers } = event
+  const { data, identifiers, name } = event
   const deviceIds = identifiers[0].device_ids
 
   return (
     <DescriptionList>
       <DescriptionList.Byte title={messages.devAddr} data={deviceIds.dev_addr} />
-      <DescriptionList.Byte title={sharedMessages.joinEUI} data={deviceIds.join_eui} />
+      {activationEvent.test(name) && (
+        <>
+          <DescriptionList.Byte title={sharedMessages.joinEUI} data={deviceIds.join_eui} />
+          <DescriptionList.Byte title={sharedMessages.devEUI} data={deviceIds.dev_eui} />
+        </>
+      )}
       {data.normalized_payload.soil && (
         <DescriptionList.Item title={sharedMessages.normalizedPayloadSoil}>
           <JSONPayload data={data.normalized_payload.soil} />
