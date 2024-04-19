@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package web
+package sink
 
 import (
 	"context"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
@@ -78,12 +79,12 @@ func registerWebhookSent(ctx context.Context) {
 	webhookMetrics.webhooksSent.WithLabelValues(ctx).Inc()
 }
 
-func registerWebhookFailed(ctx context.Context, err error) {
+func registerWebhookFailed(ctx context.Context, err error, _ bool) {
 	errorLabel := unknown
 	if ttnErr, ok := errors.From(err); ok {
 		errorLabel = ttnErr.FullName()
 	}
 	webhookMetrics.webhooksFailed.WithLabelValues(ctx, errorLabel).Inc()
-	ids := deviceIDFromContext(ctx)
+	ids := internal.DeviceIDFromContext(ctx)
 	events.Publish(evtWebhookFail.NewWithIdentifiersAndData(ctx, ids, err))
 }

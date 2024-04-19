@@ -22,14 +22,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
 )
 
 var (
 	registeredApplicationID  = &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
-	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey = "secret"
 	registeredDeviceID       = &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: registeredApplicationID,
@@ -45,9 +43,13 @@ var (
 		DeviceId: "bar-device",
 		DevAddr:  types.DevAddr{0x42, 0x42, 0x42, 0x42}.Bytes(),
 	}
-	registeredWebhookID = "foo-hook"
+	registeredWebhookID  = "foo-hook"
+	registeredWebhookIDs = &ttnpb.ApplicationWebhookIdentifiers{
+		ApplicationIds: registeredApplicationID,
+		WebhookId:      registeredWebhookID,
+	}
 
-	Timeout = (1 << 5) * test.Delay
+	timeout = (1 << 5) * test.Delay
 )
 
 type mockRegisterer struct {
@@ -55,7 +57,7 @@ type mockRegisterer struct {
 	ttnpb.ApplicationWebhookRegistryServer
 }
 
-func (m *mockRegisterer) Roles() []ttnpb.ClusterRole {
+func (*mockRegisterer) Roles() []ttnpb.ClusterRole {
 	return nil
 }
 
@@ -64,7 +66,7 @@ func (m *mockRegisterer) RegisterServices(s *grpc.Server) {
 }
 
 func (m *mockRegisterer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterApplicationWebhookRegistryHandler(m.Context, s, conn)
+	ttnpb.RegisterApplicationWebhookRegistryHandler(m.Context, s, conn) // nolint:errcheck
 }
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
