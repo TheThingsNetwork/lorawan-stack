@@ -14,16 +14,16 @@
 
 import React from 'react'
 import { FormattedNumber, defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
-  selectApplicationBookmarks,
+  selectPerEntityBookmarks,
   selectPerEntityTotalCount,
 } from '@console/store/selectors/user-preferences'
 
@@ -36,7 +36,9 @@ const m = defineMessages({
   emptyDescription: 'Your most visited, and bookmarked applications will be listed here',
 })
 
-const TopApplicationsList = ({ loadNextPage }) => {
+const TopApplicationsList = () => {
+  const allBookmarks = useSelector(state => selectPerEntityBookmarks(state, 'application'))
+
   const headers = [
     {
       name: 'name',
@@ -66,9 +68,8 @@ const TopApplicationsList = ({ loadNextPage }) => {
 
   return (
     <EntitiesList
-      loadNextPage={loadNextPage}
       itemsCountSelector={selectPerEntityTotalCount}
-      itemsSelector={selectApplicationBookmarks}
+      allBookmarks={allBookmarks}
       headers={headers}
       EntitiesItemComponent={TopApplicationsItem}
       emptyMessage={m.emptyMessage}
@@ -78,10 +79,6 @@ const TopApplicationsList = ({ loadNextPage }) => {
       entity={'application'}
     />
   )
-}
-
-TopApplicationsList.propTypes = {
-  loadNextPage: PropTypes.func.isRequired,
 }
 
 export default TopApplicationsList

@@ -14,14 +14,14 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
-  selectGatewayBookmarks,
+  selectPerEntityBookmarks,
   selectPerEntityTotalCount,
 } from '@console/store/selectors/user-preferences'
 
@@ -33,7 +33,9 @@ const m = defineMessages({
   emptyAction: 'Create gateway',
 })
 
-const TopGatewaysList = ({ loadNextPage }) => {
+const TopGatewaysList = () => {
+  const allBookmarks = useSelector(state => selectPerEntityBookmarks(state, 'gateway'))
+
   const headers = [
     {
       name: 'name',
@@ -51,9 +53,8 @@ const TopGatewaysList = ({ loadNextPage }) => {
 
   return (
     <EntitiesList
-      loadNextPage={loadNextPage}
+      allBookmarks={allBookmarks}
       itemsCountSelector={selectPerEntityTotalCount}
-      itemsSelector={selectGatewayBookmarks}
       headers={headers}
       emptyMessage={m.emptyMessage}
       emptyDescription={m.emptyDescription}
@@ -62,10 +63,6 @@ const TopGatewaysList = ({ loadNextPage }) => {
       entity={'gateway'}
     />
   )
-}
-
-TopGatewaysList.propTypes = {
-  loadNextPage: PropTypes.func.isRequired,
 }
 
 export default TopGatewaysList

@@ -13,20 +13,16 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import classNames from 'classnames'
 
 import { IconStar } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
 
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getAllBookmarks } from '@console/store/actions/user-preferences'
-
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
-import { selectUserId } from '@console/store/selectors/logout'
 
 import AllTopEntitiesList from './all-top-entities'
 import TopApplicationsList from './top-applications'
@@ -41,11 +37,8 @@ const m = defineMessages({
 
 const TopEntitiesDashboardPanel = () => {
   const [active, setActive] = useState('all')
-  const [fetching, setFetching] = useState(false)
-  const userId = useSelector(state => selectUserId(state))
   const bookmarks = useSelector(state => selectBookmarksList(state))
   const hasEntities = bookmarks.length > 0
-  const dispatch = useDispatch()
 
   const handleChange = useCallback(
     (_, value) => {
@@ -61,17 +54,6 @@ const TopEntitiesDashboardPanel = () => {
     { label: sharedMessages.devices, value: 'end-devices' },
   ]
 
-  const loadNextPage = useCallback(async () => {
-    if (fetching) return
-    setFetching(true)
-
-    // We need all the bookmarks to be able to calculate per entity totals
-    // used in the individual tabs.
-    await dispatch(attachPromise(getAllBookmarks(userId)))
-
-    setFetching(false)
-  }, [fetching, dispatch, userId])
-
   return (
     <Panel
       title={m.title}
@@ -83,10 +65,10 @@ const TopEntitiesDashboardPanel = () => {
         [styles.hasEntities]: hasEntities,
       })}
     >
-      {active === 'all' && <AllTopEntitiesList loadNextPage={loadNextPage} />}
-      {active === 'applications' && <TopApplicationsList loadNextPage={loadNextPage} />}
-      {active === 'gateways' && <TopGatewaysList loadNextPage={loadNextPage} />}
-      {active === 'end-devices' && <TopDevicesList loadNextPage={loadNextPage} />}
+      {active === 'all' && <AllTopEntitiesList />}
+      {active === 'applications' && <TopApplicationsList />}
+      {active === 'gateways' && <TopGatewaysList />}
+      {active === 'end-devices' && <TopDevicesList />}
     </Panel>
   )
 }

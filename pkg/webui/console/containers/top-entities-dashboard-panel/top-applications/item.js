@@ -82,7 +82,7 @@ TopApplicationsItem.propTypes = {
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      displayName: PropTypes.string.isRequired,
+      displayName: PropTypes.shape({}).isRequired,
       render: PropTypes.func,
       getValue: PropTypes.func,
       align: PropTypes.string,

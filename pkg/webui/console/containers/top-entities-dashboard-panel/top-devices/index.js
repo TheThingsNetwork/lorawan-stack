@@ -14,14 +14,14 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
-  selectEndDeviceBookmarks,
+  selectPerEntityBookmarks,
   selectPerEntityTotalCount,
 } from '@console/store/selectors/user-preferences'
 
@@ -32,7 +32,9 @@ const m = defineMessages({
   emptyDescription: 'Your most visited, and bookmarked end devices will be listed here',
 })
 
-const TopDevicesList = ({ loadNextPage }) => {
+const TopDevicesList = () => {
+  const allBookmarks = useSelector(state => selectPerEntityBookmarks(state, 'device'))
+
   const headers = [
     {
       name: 'name',
@@ -50,19 +52,14 @@ const TopDevicesList = ({ loadNextPage }) => {
 
   return (
     <EntitiesList
-      loadNextPage={loadNextPage}
+      allBookmarks={allBookmarks}
       itemsCountSelector={selectPerEntityTotalCount}
-      itemsSelector={selectEndDeviceBookmarks}
       headers={headers}
       emptyMessage={m.emptyMessage}
       emptyDescription={m.emptyDescription}
       entity={'device'}
     />
   )
-}
-
-TopDevicesList.propTypes = {
-  loadNextPage: PropTypes.func.isRequired,
 }
 
 export default TopDevicesList
