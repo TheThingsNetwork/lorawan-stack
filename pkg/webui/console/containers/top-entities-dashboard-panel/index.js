@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import classNames from 'classnames'
 
@@ -21,8 +20,6 @@ import { IconStar } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import { selectBookmarksList } from '@console/store/selectors/user-preferences'
 
 import AllTopEntitiesList from './all-top-entities'
 import TopApplicationsList from './top-applications'
@@ -37,8 +34,6 @@ const m = defineMessages({
 
 const TopEntitiesDashboardPanel = () => {
   const [active, setActive] = useState('all')
-  const bookmarks = useSelector(state => selectBookmarksList(state))
-  const hasEntities = bookmarks.length > 0
 
   const handleChange = useCallback(
     (_, value) => {
@@ -61,9 +56,7 @@ const TopEntitiesDashboardPanel = () => {
       toggleOptions={options}
       activeToggle={active}
       onToggleClick={handleChange}
-      className={classNames(styles.topEntitiesPanel, {
-        [styles.hasEntities]: hasEntities,
-      })}
+      className={classNames(styles.topEntitiesPanel)}
     >
       {active === 'all' && <AllTopEntitiesList />}
       {active === 'applications' && <TopApplicationsList />}

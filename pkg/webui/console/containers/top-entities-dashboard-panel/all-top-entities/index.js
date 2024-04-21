@@ -41,7 +41,7 @@ const AllTopEntitiesList = () => {
     {
       name: 'type',
       displayName: sharedMessages.type,
-      width: '7',
+      width: '35px',
       render: icon => <Icon icon={icon} />,
     },
     {
