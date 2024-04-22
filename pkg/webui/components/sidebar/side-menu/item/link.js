@@ -41,10 +41,8 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
     [disabled, isMinimized],
   )
 
-  const id = `${path.split('/').join('-')}-link`
-
   return (
-    <NavLink to={path} className={className} end={exact} onClick={onClick} ref={ref} id={id}>
+    <NavLink to={path} className={className} end={exact} onClick={onClick} ref={ref}>
       {icon && <Icon icon={icon} className={classnames(style.icon)} />}{' '}
       <Message className={style.title} content={title} />
       {isMinimized && (
@@ -54,7 +52,6 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
           position="right"
           hover
           portalled
-          positionReferenceId={id}
         >
           <Dropdown.HeaderItem title={title.defaultMessage} />
         </Dropdown.Attached>

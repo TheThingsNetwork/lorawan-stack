@@ -18,38 +18,46 @@ import DOM from 'react-dom'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 // This component create a portal to render children into a different part of the DOM.
-const Portal = ({ children, positionReferenceId, elementId, place }) => {
-  const [portalContainer, setPortalContainer] = React.useState(undefined)
-
+const Portal = ({ children, visible, positionReference }) => {
+  const [buttonPosition, setButtonPosition] = React.useState()
   useEffect(() => {
-    const div = document.createElement('div')
-    div.id = elementId
-    document.body.appendChild(div)
-    const element = document.getElementById(elementId)
-    setPortalContainer(element)
-    const triggerButton = document.getElementById(positionReferenceId)
-    const rect = triggerButton.getBoundingClientRect()
-    const elementLeft = rect.left + window.scrollX
-    const elementTop = rect.top + window.scrollY
-    element.style.position = 'absolute'
-    element.style.left = place.includes('under')
-      ? `${elementLeft}px`
-      : `${elementLeft + rect.width}px`
-    element.style.top = `${elementTop + rect.height}px`
-    return () => {
-      document.body.removeChild(document.getElementById(elementId))
-      setPortalContainer(undefined)
+    if (positionReference.current && visible) {
+      const rect = positionReference.current.getBoundingClientRect()
+      setButtonPosition(rect)
+      const elementLeft = rect.left + window.scrollX
+      const elementTop = rect.top + window.scrollY
+      const element = document.getElementById('modal-container')
+      element.style.position = 'absolute'
+      element.style.left = `${elementLeft}px`
+      element.style.top = `${elementTop}px`
+      element.style.minWidth = `${rect.width + elementLeft}px`
+      element.style.minHeight = `${rect.height}px`
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [positionReference, visible])
 
-  return Boolean(portalContainer) && DOM.createPortal(children, document.getElementById(elementId))
+  const recreatedComponent = (
+    <>
+      <div
+        className="pos-absolute"
+        style={{
+          top: 0,
+          left: 0,
+          visibility: 'hidden',
+          width: buttonPosition ? buttonPosition.width : 0,
+          height: buttonPosition ? buttonPosition.height : 0,
+        }}
+      />
+      {children}
+    </>
+  )
+
+  return DOM.createPortal(visible && recreatedComponent, document.getElementById('modal-container'))
 }
 
 Portal.propTypes = {
   children: PropTypes.node.isRequired,
-  elementId: PropTypes.string.isRequired,
-  positionReferenceId: PropTypes.string.isRequired,
+  positionReference: PropTypes.shape({}).isRequired,
+  visible: PropTypes.bool.isRequired,
 }
 
 export default Portal

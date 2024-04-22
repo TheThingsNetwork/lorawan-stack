@@ -166,8 +166,6 @@ const Button = forwardRef((props, ref) => {
           attachedRef={innerRef}
           position={dropdownPosition}
           portalled={portalledDropdown}
-          positionReferenceId={buttonId}
-          placeDropdown={['under']}
         >
           {dropdownItems}
         </Dropdown.Attached>

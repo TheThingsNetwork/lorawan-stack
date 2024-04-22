@@ -43,7 +43,6 @@ const SearchButton = ({ onClick, className }) => {
       className={classnames(style.searchButton, className, {
         [style.isMinimized]: isMinimized,
       })}
-      buttonId="search-button"
     >
       <div className="d-flex gap-cs-xxs al-center">
         <Icon icon={IconSearch} className={style.icon} />
@@ -56,7 +55,6 @@ const SearchButton = ({ onClick, className }) => {
           className={style.flyOutList}
           hover
           portalled
-          positionReferenceId="search-button"
         >
           <Dropdown.HeaderItem title={sharedMessages.search} />
         </Dropdown.Attached>

@@ -26,8 +26,6 @@ const AttachedDropdown = ({
   hover,
   onOutsideClick,
   portalled,
-  positionReferenceId,
-  placeDropdown,
   ...rest
 }) => {
   const [open, setOpen] = React.useState(false)
@@ -92,11 +90,7 @@ const AttachedDropdown = ({
 
   if (portalled) {
     return (
-      <Portal
-        elementId={`${positionReferenceId}-attached-dropdown`}
-        positionReferenceId={positionReferenceId}
-        place={placeDropdown}
-      >
+      <Portal visible={open} positionReference={attachedRef}>
         <Dropdown
           open={open}
           onItemsClick={handleItemsClick}
@@ -124,9 +118,8 @@ AttachedDropdown.propTypes = {
   hover: PropTypes.bool,
   onItemsClick: PropTypes.func,
   onOutsideClick: PropTypes.func,
-  placeDropdown: PropTypes.arrayOf(PropTypes.string),
   portalled: PropTypes.bool,
-  positionReferenceId: PropTypes.string,
+  positionReference: PropTypes.shape({}),
 }
 
 AttachedDropdown.defaultProps = {
@@ -134,8 +127,7 @@ AttachedDropdown.defaultProps = {
   onOutsideClick: () => null,
   hover: false,
   portalled: false,
-  positionReferenceId: undefined,
-  placeDropdown: [],
+  positionReference: undefined,
 }
 
 export default AttachedDropdown
