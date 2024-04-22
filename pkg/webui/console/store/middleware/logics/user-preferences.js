@@ -18,12 +18,29 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as userPreferences from '@console/store/actions/user-preferences'
 
+const addBookmarkToResult = (result, entity, element) => {
+  if (!(entity in result.perEntityBookmarks)) {
+    result.perEntityBookmarks[entity] = []
+    result.perEntityBookmarks[entity].push(element)
+  } else {
+    result.perEntityBookmarks[entity].push(element)
+  }
+  if (!(entity in result.totalCount.perEntityTotalCount)) {
+    result.totalCount.perEntityTotalCount[entity] = 1
+  } else {
+    result.totalCount.perEntityTotalCount[entity] += 1
+  }
+
+  return result
+}
+
 const getBookmarksThroughPagination = async userId => {
   let page = 1
   const limit = 1000
   let totalCount = Infinity
   let result = {
     bookmarks: [],
+    perEntityBookmarks: {},
     totalCount: {
       totalCount: 0,
       perEntityTotalCount: {},
@@ -33,29 +50,67 @@ const getBookmarksThroughPagination = async userId => {
   while ((page - 1) * limit < totalCount) {
     // Get the next page of bookmarks.
     // eslint-disable-next-line no-await-in-loop
-    const response = await tts.Users.getBookmarks(
-      userId,
-      { page, limit, order: '-created_at' },
-      'created_at',
-    )
+    const response = await tts.Users.getBookmarks(userId, { page, limit, order: '-created_at' })
+    response.bookmarks.forEach(element => {
+      const entityIds = element.entity_ids
+      const entity = Object.keys(entityIds)[0].replace('_ids', '')
+      result = addBookmarkToResult(result, entity, element)
+    })
+
     result = {
       bookmarks: [...result.bookmarks, ...response.bookmarks],
+      perEntityBookmarks: { ...result.perEntityBookmarks },
       totalCount: {
         ...result.totalCount,
         totalCount: response.totalCount,
-        perEntityTotalCount: { ...result.totalCount.perEntityTotalCount },
       },
     }
+
     totalCount = response.totalCount
-    result.bookmarks.forEach(element => {
+    page += 1
+  }
+
+  return result
+}
+
+const getBookmarksPerEntityThroughPagination = async (
+  userId,
+  requestedEntity,
+  start,
+  end,
+  limit,
+) => {
+  let page = 1
+  let totalCount = limit
+  const result = {
+    perEntityBookmarks: {
+      [requestedEntity]: [],
+    },
+    perEntityTotalCount: {
+      [requestedEntity]: 0,
+    },
+  }
+
+  while (result.perEntityBookmarks[requestedEntity].length < totalCount) {
+    // eslint-disable-next-line no-await-in-loop
+    const response = await tts.Users.getBookmarks(userId, { page, limit, order: '-created_at' })
+    if (totalCount > response.totalCount) {
+      totalCount = response.totalCount
+    }
+
+    response.bookmarks.forEach(element => {
       const entityIds = element.entity_ids
       const entity = Object.keys(entityIds)[0].replace('_ids', '')
-      if (!result.totalCount.perEntityTotalCount[entity]) {
-        result.totalCount.perEntityTotalCount[entity] = 1
-      } else {
-        result.totalCount.perEntityTotalCount[entity] += 1
+      if (entity === requestedEntity) {
+        result = addBookmarkToResult(result, requestedEntity, element)
       }
     })
+
+    result.perEntityBookmarks[requestedEntity] = result.perEntityBookmarks[requestedEntity].slice(
+      start,
+      end,
+    )
+
     page += 1
   }
 
@@ -66,9 +121,30 @@ const getBookmarksListLogic = createRequestLogic({
   type: userPreferences.GET_BOOKMARKS_LIST,
   process: async ({ action }) => {
     const {
+      meta: { selectors },
+    } = action
+    const {
       id: userId,
       params: { page, limit, deleted },
     } = action.payload
+
+    if ('entity' in selectors && selectors.entity !== 'all') {
+      const data = await getBookmarksPerEntityThroughPagination(
+        userId,
+        selectors.entity,
+        selectors.start,
+        selectors.end,
+        limit,
+      )
+
+      return {
+        perEntityBookmarks: data.perEntityBookmarks,
+        perEntityTotalCount: data.perEntityTotalCount,
+        page,
+        limit,
+        entity: selectors.entity,
+      }
+    }
 
     const data = await tts.Users.getBookmarks(userId, {
       page,
@@ -91,7 +167,8 @@ const getAllBookmarksLogic = createRequestLogic({
     const { id: userId } = action.payload
     const data = await getBookmarksThroughPagination(userId)
     return {
-      entities: data.bookmarks,
+      bookmarks: data.bookmarks,
+      perEntityBookmarks: data.perEntityBookmarks,
       totalCount: data.totalCount,
     }
   },

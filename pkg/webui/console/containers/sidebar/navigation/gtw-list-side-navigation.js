@@ -20,8 +20,8 @@ import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectGatewayBookmarks } from '@console/store/selectors/user-preferences'
 import { selectUserId } from '@console/store/selectors/logout'
+import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
 
 import SidebarContext from '../context'
 
@@ -38,7 +38,7 @@ Bookmark.propTypes = {
 }
 
 const GtwListSideNavigation = () => {
-  const topEntities = useSelector(state => selectGatewayBookmarks(state))
+  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'gateway'))
   const { isMinimized } = useContext(SidebarContext)
   const userId = useSelector(selectUserId)
 
@@ -46,7 +46,7 @@ const GtwListSideNavigation = () => {
     return <div />
   }
 
-  return <TopEntitiesSection topEntities={topEntities} userId={userId} />
+  return <TopEntitiesSection topEntities={topEntities} userId={userId} entity="gateway" />
 }
 
 export default GtwListSideNavigation

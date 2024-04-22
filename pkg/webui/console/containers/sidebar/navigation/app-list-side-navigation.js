@@ -15,15 +15,15 @@
 import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 
-import { selectApplicationBookmarks } from '@console/store/selectors/user-preferences'
 import { selectUserId } from '@console/store/selectors/logout'
+import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
 
 import SidebarContext from '../context'
 
 import TopEntitiesSection from './top-entities-section'
 
 const AppListSideNavigation = () => {
-  const topEntities = useSelector(state => selectApplicationBookmarks(state))
+  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'application'))
   const { isMinimized } = useContext(SidebarContext)
   const userId = useSelector(selectUserId)
 
@@ -34,7 +34,7 @@ const AppListSideNavigation = () => {
     return <div />
   }
 
-  return <TopEntitiesSection topEntities={topEntities} userId={userId} />
+  return <TopEntitiesSection topEntities={topEntities} userId={userId} entity="application" />
 }
 
 export default AppListSideNavigation

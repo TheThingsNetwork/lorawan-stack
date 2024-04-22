@@ -46,7 +46,6 @@ export {
   IconArrowMergeAltRight as IconIntegration,
   IconCirclesRelation as IconJoin,
   IconArticle as IconLiveData,
-  IconMapPin as IconLocation,
   IconUsersGroup as IconOrganization,
   IconLayoutDashboard as IconOverview,
   IconAperture as IconPacketBroker,

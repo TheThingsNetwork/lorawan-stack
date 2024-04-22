@@ -14,8 +14,8 @@
 
 .top-entities-panel
   min-height: 31rem
-  &.has-entities
-    min-height: 34.5rem
+  display: flex
+  flex-direction: column
 
 .entity
   &-list
@@ -30,6 +30,7 @@
       height: 98px
       border-radius: 0px 0px 14px 14px
       background: linear-gradient(180deg, rgba(255, 255, 255, .2) 0%, var(--c-bg-neutral-min) 64.58%)
+      pointer-events: none // Prevents the gradient from blocking the click event
   &-body
     height: 20rem
   &-row

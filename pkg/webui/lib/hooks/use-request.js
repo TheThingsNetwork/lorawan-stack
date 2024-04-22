@@ -33,6 +33,10 @@ const useRequest = (requestAction, requestOnChange) => {
             ? requestAction(dispatch)
             : dispatch(attachPromise(requestAction))
 
+      if (requestOnChange) {
+        setFetching(true)
+      }
+
       promise
         .then(result => {
           setResult(result)

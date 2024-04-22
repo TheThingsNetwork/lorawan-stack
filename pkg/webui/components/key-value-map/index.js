@@ -38,6 +38,7 @@ const KeyValueMap = ({
   inputElement,
   isReadOnly,
   keyPlaceholder,
+  maxItems,
   name,
   onBlur,
   onChange,
@@ -75,6 +76,8 @@ const KeyValueMap = ({
     onChange([...value, entry])
   }, [indexAsKey, onChange, value])
 
+  const disableAddButton = distinctOptions && maxItems !== undefined && maxItems <= value.length
+
   return (
     <div data-test-id={'key-value-map'} className={classnames(className, 'direction-column')}>
       <div>
@@ -108,7 +111,7 @@ const KeyValueMap = ({
           type="button"
           message={addMessage}
           onClick={addEmptyEntry}
-          disabled={disabled}
+          disabled={disabled || disableAddButton}
           icon={IconPlus}
           secondary
         />
@@ -129,6 +132,7 @@ KeyValueMap.propTypes = {
   inputElement: PropTypes.elementType,
   isReadOnly: PropTypes.func,
   keyPlaceholder: PropTypes.message,
+  maxItems: PropTypes.number,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
@@ -154,6 +158,7 @@ KeyValueMap.defaultProps = {
   addMessage: m.addEntry,
   indexAsKey: false,
   keyPlaceholder: '',
+  maxItems: undefined,
   disabled: false,
   isReadOnly: () => null,
   inputElement: Input,

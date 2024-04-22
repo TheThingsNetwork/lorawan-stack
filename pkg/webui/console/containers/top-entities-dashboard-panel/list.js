@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -37,9 +37,8 @@ const m = defineMessages({
 })
 
 const EntitiesList = ({
-  loadNextPage,
   itemsCountSelector,
-  itemsSelector,
+  allBookmarks,
   headers,
   emptyMessage,
   emptyDescription,
@@ -48,13 +47,25 @@ const EntitiesList = ({
   EntitiesItemComponent: EntitiesItemProp,
   entity,
 }) => {
-  const items = useSelector(itemsSelector)
   const itemsTotalCount = useSelector(state => itemsCountSelector(state, entity))
+  const [items, setItems] = useState([])
   const showScrollIndicator = itemsTotalCount > 5
   const hasNextPage = items.length < itemsTotalCount
   const EntitiesItemComponent = EntitiesItemProp ?? EntitiesItem
+  const itemCount = items.length === itemsTotalCount ? itemsTotalCount : items.length + 1
+  const [fetching, setFetching] = useState(false)
 
-  const itemCount = itemsTotalCount >= 0 ? itemsTotalCount : 100
+  const loadNextPage = useCallback(
+    async startIndex => {
+      if (fetching) return
+      setFetching(true)
+      const nextBookmarks = allBookmarks.slice(startIndex, startIndex + 10)
+      setItems([...items, ...nextBookmarks])
+
+      setFetching(false)
+    },
+    [fetching, allBookmarks, items],
+  )
 
   const isItemLoaded = useCallback(
     index => (items.length > 0 ? !hasNextPage || index < items.length : false),
@@ -62,7 +73,7 @@ const EntitiesList = ({
   )
 
   const Item = ({ index, style }) =>
-    isItemLoaded(index) ? (
+    isItemLoaded(index) && items[index] ? (
       <div style={style}>
         <EntitiesItemComponent
           headers={headers}
@@ -99,7 +110,7 @@ const EntitiesList = ({
   const minWidth = `${headers.length * 10 + 5}rem`
 
   return items.length === 0 && itemsTotalCount === 0 ? (
-    <div className="d-flex direction-column j-center pt-cs-xl gap-cs-l">
+    <div className="d-flex direction-column flex-grow j-center gap-cs-l">
       <div>
         <Message content={emptyMessage} className="d-block text-center fs-l fw-bold" />
         <Message content={emptyDescription} className="d-block text-center c-text-neutral-light" />
@@ -119,8 +130,8 @@ const EntitiesList = ({
             <InfiniteLoader
               loadMoreItems={loadNextPage}
               isItemLoaded={isItemLoaded}
-              itemCount={itemCount}
-              minimumBatchSize={20}
+              itemCount={itemsTotalCount}
+              threshold={5}
             >
               {({ onItemsRendered, ref }) => (
                 <>
@@ -148,6 +159,7 @@ const EntitiesList = ({
 
 EntitiesList.propTypes = {
   EntitiesItemComponent: PropTypes.func,
+  allBookmarks: PropTypes.arrayOf(PropTypes.object).isRequired,
   emptyAction: PropTypes.message,
   emptyDescription: PropTypes.message,
   emptyMessage: PropTypes.message,
@@ -163,8 +175,6 @@ EntitiesList.propTypes = {
     }),
   ).isRequired,
   itemsCountSelector: PropTypes.func.isRequired,
-  itemsSelector: PropTypes.func.isRequired,
-  loadNextPage: PropTypes.func.isRequired,
 }
 
 EntitiesList.defaultProps = {

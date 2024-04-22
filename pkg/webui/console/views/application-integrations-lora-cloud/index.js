@@ -16,7 +16,7 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
-import LORA_CLOUD_DAS from '@console/constants/lora-cloud-das'
+import LORA_CLOUD_MS from '@console/constants/lora-cloud-ms'
 import LORA_CLOUD_GLS from '@console/constants/lora-cloud-gls'
 import LoRaCloudImage from '@assets/misc/lora-cloud.png'
 
@@ -30,8 +30,8 @@ import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
-import LoRaCloudDASForm from '@console/containers/lora-cloud-das-form'
-import LoRaCloudGLSForm from '@console/containers/lora-cloud-gls-form'
+import LoRaCloudModemServicesForm from '@console/containers/lora-cloud-ms-form'
+import LoRaCloudGeolocationServicesForm from '@console/containers/lora-cloud-gls-form'
 
 import Require from '@console/lib/components/require'
 
@@ -76,7 +76,7 @@ const LoRaCloud = () => {
     >
       <RequireRequest
         requestAction={[
-          getAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, selector),
+          getAppPkgDefaultAssoc(appId, LORA_CLOUD_MS.DEFAULT_PORT, selector),
           getAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, selector),
         ]}
       >
@@ -106,11 +106,11 @@ const LoRaCloud = () => {
               <hr className="mb-0" />
               <Collapse title="Geolocation" description={m.glsDescription}>
                 <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
-                <LoRaCloudGLSForm />
+                <LoRaCloudGeolocationServicesForm />
               </Collapse>
               <Collapse title="Device & Application Services" description={m.dasDescription}>
                 <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
-                <LoRaCloudDASForm />
+                <LoRaCloudModemServicesForm />
               </Collapse>
             </div>
           </div>

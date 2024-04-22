@@ -25,6 +25,7 @@ const initialState = {
   bookmarks: {
     bookmarks: [],
     totalCount: {},
+    perEntityBookmarks: {},
   },
   consolePreferences: {},
 }
@@ -36,11 +37,34 @@ const userPreferences = (state = initialState, { type, payload }) => {
         ...state,
         bookmarks: {
           ...state.bookmarks,
-          bookmarks: payload.entities,
+          bookmarks: payload.bookmarks,
+          perEntityBookmarks: payload.perEntityBookmarks,
           totalCount: payload.totalCount,
         },
       }
     case GET_BOOKMARKS_LIST_SUCCESS:
+      if ('perEntityBookmarks' in payload) {
+        return {
+          ...state,
+          bookmarks: {
+            ...state.bookmarks,
+            perEntityBookmarks: {
+              ...state.bookmarks.perEntityBookmarks,
+              [payload.entity]: fillIntoArray(
+                state.bookmarks.perEntityBookmarks[payload.entity],
+                pageToIndices(payload.page, payload.limit)[0],
+                payload.perEntityBookmarks[payload.entity],
+                payload.perEntityTotalCount[payload.entity],
+              ),
+            },
+            totalCount: {
+              ...state.bookmarks.totalCount,
+              perEntityTotalCount: payload.perEntityTotalCount,
+            },
+          },
+        }
+      }
+
       return {
         ...state,
         bookmarks: {
@@ -49,7 +73,7 @@ const userPreferences = (state = initialState, { type, payload }) => {
             state.bookmarks.bookmarks,
             pageToIndices(payload.page, payload.limit)[0],
             payload.entities,
-            payload.totalCount.totalCount,
+            payload.totalCount,
           ),
           totalCount: {
             ...state.bookmarks.totalCount,

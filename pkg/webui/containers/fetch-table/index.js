@@ -310,7 +310,7 @@ const FetchTable = props => {
           paginated={paginated}
           page={page}
           totalCount={totalCount}
-          pageSize={queryPageSize ?? pageSize}
+          pageSize={parseInt(queryPageSize ?? pageSize)}
           setPageSize={setPageSize}
           onPageChange={onPageChange}
           loading={fetching}

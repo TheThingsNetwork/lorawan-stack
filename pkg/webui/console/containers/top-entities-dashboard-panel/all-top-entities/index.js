@@ -14,12 +14,12 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
@@ -34,12 +34,14 @@ const m = defineMessages({
   noTopEntitiesDescription: 'Your most visited, and bookmarked entities will be listed here.',
 })
 
-const AllTopEntitiesList = ({ loadNextPage }) => {
+const AllTopEntitiesList = () => {
+  const allBookmarks = useSelector(state => selectBookmarksList(state))
+
   const headers = [
     {
       name: 'type',
       displayName: sharedMessages.type,
-      width: 7,
+      width: '35px',
       render: icon => <Icon icon={icon} />,
     },
     {
@@ -52,18 +54,13 @@ const AllTopEntitiesList = ({ loadNextPage }) => {
 
   return (
     <EntitiesList
-      loadNextPage={loadNextPage}
+      allBookmarks={allBookmarks}
       itemsCountSelector={selectBookmarksTotalCount}
-      itemsSelector={selectBookmarksList}
       headers={headers}
       emptyMessage={m.noTopEntities}
       emptyDescription={m.noTopEntitiesDescription}
     />
   )
-}
-
-AllTopEntitiesList.propTypes = {
-  loadNextPage: PropTypes.func.isRequired,
 }
 
 export default AllTopEntitiesList

@@ -15,10 +15,12 @@
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import classNames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import { Table } from '@ttn-lw/components/table'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
+import Message from '@ttn-lw/lib/components/message'
 
 import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -28,6 +30,10 @@ import { getApplicationDeviceCount } from '@console/store/actions/applications'
 import { selectApplicationDeviceCount } from '@console/store/selectors/applications'
 
 import styles from '../top-entities-panel.styl'
+
+const m = defineMessages({
+  errorMessage: 'Not available',
+})
 
 const TopApplicationsItem = ({ bookmark, headers, last }) => {
   const { title, ids, path } = useBookmark(bookmark)
@@ -42,6 +48,8 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
     [deviceCount, ids.id],
   )
 
+  const errorRenderFunction = () => <Message content={m.errorMessage} />
+
   return (
     <Table.Row
       id={ids.id}
@@ -54,7 +62,11 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
         const value = headers[index].name === 'name' ? title : deviceCount
         const entityID = ids.id
         return (
-          <RequireRequest key={index} requestAction={loadDeviceCount}>
+          <RequireRequest
+            key={index}
+            requestAction={loadDeviceCount}
+            errorRenderFunction={errorRenderFunction}
+          >
             <Table.DataCell align={header.align} className={styles.entityCell}>
               {headers[index].render(value, entityID)}
             </Table.DataCell>
@@ -70,7 +82,7 @@ TopApplicationsItem.propTypes = {
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      displayName: PropTypes.string.isRequired,
+      displayName: PropTypes.shape({}).isRequired,
       render: PropTypes.func,
       getValue: PropTypes.func,
       align: PropTypes.string,

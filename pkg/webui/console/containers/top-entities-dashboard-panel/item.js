@@ -59,7 +59,7 @@ EntitiesItem.propTypes = {
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      displayName: PropTypes.string,
+      displayName: PropTypes.shape({}),
       render: PropTypes.func,
       getValue: PropTypes.func,
       align: PropTypes.string,

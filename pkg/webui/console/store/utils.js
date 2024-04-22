@@ -19,11 +19,13 @@ export const fillIntoArray = (array, start, values, totalCount) => {
   for (let i = start; i < end; i++) {
     newArray[i] = values[i - start]
   }
+
   return newArray
 }
 
 export const pageToIndices = (page, limit) => {
   const startIndex = (page - 1) * limit
   const stopIndex = page * limit - 1
+
   return [startIndex, stopIndex]
 }
