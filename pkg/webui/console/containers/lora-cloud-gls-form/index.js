@@ -117,7 +117,7 @@ const defaultValues = {
   },
 }
 
-const LoRaCloudGLSForm = () => {
+const LoRaCloudGeolocationServicesForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
   const formRef = useRef(null)
@@ -288,4 +288,4 @@ const LoRaCloudGLSForm = () => {
   )
 }
 
-export default LoRaCloudGLSForm
+export default LoRaCloudGeolocationServicesForm

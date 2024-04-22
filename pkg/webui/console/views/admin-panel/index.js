@@ -16,7 +16,11 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from '@formatjs/intl'
 
-import { IconGridPattern, IconPacketBroker, IconUserManagement } from '@ttn-lw/components/icon'
+import {
+  IconAdjustmentsHorizontal,
+  IconPacketBroker,
+  IconUserManagement,
+} from '@ttn-lw/components/icon'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
@@ -59,7 +63,7 @@ const AdminPanel = () => {
       <PanelView>
         <PanelView.Item
           title={sharedMessages.networkInformation}
-          icon={IconGridPattern}
+          icon={IconAdjustmentsHorizontal}
           path="network-information"
           Component={NetworkInformation}
           exact

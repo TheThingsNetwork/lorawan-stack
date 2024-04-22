@@ -21,11 +21,16 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import styles from './toggle.styl'
 
-const Toggle = ({ options, onToggleChange, active }) => (
-  <div className={styles.toggle}>
+const Toggle = ({ className, options, onToggleChange, active, fullWidth }) => (
+  <div
+    className={classnames(styles.toggle, className, {
+      'w-full': fullWidth,
+    })}
+  >
     {options.map(({ label, value }) => {
       const buttonClassName = classnames(styles.toggleButton, {
         [styles.toggleButtonActive]: value === active,
+        'w-full': fullWidth,
       })
 
       return (
@@ -42,14 +47,21 @@ const Toggle = ({ options, onToggleChange, active }) => (
 )
 
 Toggle.propTypes = {
-  active: PropTypes.string.isRequired,
+  active: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  className: PropTypes.string,
+  fullWidth: PropTypes.bool,
   onToggleChange: PropTypes.func.isRequired,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.message.isRequired,
-      value: PropTypes.string.isRequired,
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     }),
   ).isRequired,
+}
+
+Toggle.defaultProps = {
+  className: undefined,
+  fullWidth: false,
 }
 
 export default Toggle
