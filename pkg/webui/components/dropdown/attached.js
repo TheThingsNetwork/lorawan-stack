@@ -18,7 +18,7 @@ import Dropdown from '@ttn-lw/components/dropdown'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import Portal from '../portal'
+import Portal from './portal'
 
 const AttachedDropdown = ({
   attachedRef,
