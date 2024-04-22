@@ -95,7 +95,9 @@ const GeneralSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && <TopEntitiesSection topEntities={topEntities} userId={user.ids.user_id} />}
+      {!isMinimized && topEntities.length > 0 && (
+        <TopEntitiesSection topEntities={topEntities} userId={user.ids.user_id} />
+      )}
     </>
   )
 }

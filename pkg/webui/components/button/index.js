@@ -112,7 +112,6 @@ const Button = forwardRef((props, ref) => {
     onClick,
     form,
     className,
-    buttonId,
     portalledDropdown,
     ...rest
   } = props
@@ -152,7 +151,6 @@ const Button = forwardRef((props, ref) => {
       children={buttonChildren({ ...props })}
       disabled={busy || disabled}
       ref={combinedRef}
-      id={buttonId}
       {...htmlProps}
     />
   )

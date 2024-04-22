@@ -46,7 +46,7 @@ import {
   selectSelectedGatewayId,
   selectGatewayRights,
 } from '@console/store/selectors/gateways'
-import { selectGatewayBookmarks } from '@console/store/selectors/user-preferences'
+import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
 import { selectUserId } from '@console/store/selectors/logout'
 
 import SidebarContext from '../context'
@@ -64,7 +64,7 @@ const GtwSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
   const gtwPageSize = getCookie('gateways-list-page-size')
   const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
-  const topEntities = useSelector(state => selectGatewayBookmarks(state))
+  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'gateway'))
   const userId = useSelector(selectUserId)
 
   if (!gtw) {
@@ -129,7 +129,7 @@ const GtwSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && mayViewGatewayInfo.check(rights) && (
+      {!isMinimized && topEntities.length > 0 && mayViewGatewayInfo.check(rights) && (
         <TopEntitiesSection topEntities={topEntities} userId={userId} />
       )}
     </>

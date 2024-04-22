@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 
 import { IconPlus } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -36,8 +35,6 @@ Bookmark.propTypes = {
 
 const TopEntitiesSection = ({ topEntities, entity }) => {
   const [showMore, setShowMore] = useState(false)
-  const { pathname } = useLocation()
-  const id = pathname.split('/').join('-')
 
   const handleShowMore = useCallback(async () => {
     setShowMore(showMore => !showMore)

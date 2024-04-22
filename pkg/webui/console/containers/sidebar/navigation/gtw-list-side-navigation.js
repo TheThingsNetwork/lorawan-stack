@@ -42,7 +42,7 @@ const GtwListSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
   const userId = useSelector(selectUserId)
 
-  if (isMinimized) {
+  if (isMinimized || topEntities.length === 0) {
     return <div />
   }
 

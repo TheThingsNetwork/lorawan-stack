@@ -60,7 +60,7 @@ import {
   selectMqttProviderDisabled,
   selectNatsProviderDisabled,
 } from '@console/store/selectors/application-server'
-import { selectApplicationBookmarks } from '@console/store/selectors/user-preferences'
+import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
 import { selectUserId } from '@console/store/selectors/logout'
 
 import SidebarContext from '../context'
@@ -80,7 +80,7 @@ const AppSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
   const appPageSize = getCookie('applications-list-page-size')
   const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
-  const topEntities = useSelector(state => selectApplicationBookmarks(state))
+  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'application'))
   const userId = useSelector(selectUserId)
 
   if (!app) {
@@ -196,7 +196,7 @@ const AppSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && mayViewApplicationInfo.check(rights) && (
+      {!isMinimized && topEntities.length > 0 && mayViewApplicationInfo.check(rights) && (
         <TopEntitiesSection topEntities={topEntities} userId={userId} />
       )}
     </>
