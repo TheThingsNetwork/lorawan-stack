@@ -110,7 +110,7 @@ const EntitiesList = ({
   const minWidth = `${headers.length * 10 + 5}rem`
 
   return items.length === 0 && itemsTotalCount === 0 ? (
-    <div className="d-flex direction-column j-center pt-cs-xl gap-cs-l">
+    <div className="d-flex direction-column flex-grow j-center gap-cs-l">
       <div>
         <Message content={emptyMessage} className="d-block text-center fs-l fw-bold" />
         <Message content={emptyDescription} className="d-block text-center c-text-neutral-light" />
