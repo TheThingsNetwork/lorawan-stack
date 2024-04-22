@@ -19,5 +19,11 @@ export const selectConsolePreferences = state =>
 
 export const selectBookmarksList = state => selectUserPreferencesStore(state).bookmarks.bookmarks
 
+export const selectPerEntityBookmarks = (state, entity) =>
+  selectUserPreferencesStore(state).bookmarks?.perEntityBookmarks[entity] || []
+
 export const selectBookmarksTotalCount = state =>
-  selectUserPreferencesStore(state).bookmarks.totalCount
+  selectUserPreferencesStore(state).bookmarks.totalCount.totalCount
+
+export const selectPerEntityTotalCount = (state, entity) =>
+  selectUserPreferencesStore(state).bookmarks.totalCount.perEntityTotalCount[entity] || 0

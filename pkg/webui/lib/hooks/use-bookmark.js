@@ -15,6 +15,15 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import {
+  IconApplication,
+  IconGateway,
+  IconOrganization,
+  IconUser,
+  IconOauthClients,
+  IconDevice,
+} from '@ttn-lw/components/icon'
+
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { getApplication } from '@console/store/actions/applications'
@@ -32,12 +41,12 @@ import { selectClientById } from '@account/store/selectors/clients'
 import { selectDeviceByIds } from '@console/store/selectors/devices'
 
 const iconMap = {
-  application: 'application',
-  gateway: 'gateway',
-  organization: 'organization',
-  user: 'user',
-  client: 'client',
-  device: 'device',
+  application: IconApplication,
+  gateway: IconGateway,
+  organization: IconOrganization,
+  user: IconUser,
+  client: IconOauthClients,
+  device: IconDevice,
 }
 
 const entityRequestMap = {
@@ -93,14 +102,14 @@ const useBookmark = bookmark => {
       } else {
         response = await dispatch(attachPromise(entityRequestMap[entity](entityId.id, 'name')))
       }
-      setBookmarkTitle(response.name || entityIds[`${entity}_ids`][`${entity}_id`])
+      setBookmarkTitle(response.name || '')
     }
 
     // Only fetch the entity if the name is not already in the store.
     if (!bookmarkTitle) {
       fetchEntity()
     }
-  }, [entity, entityId, dispatch, entityIds, bookmarkTitle])
+  }, [bookmarkTitle, dispatch, entity, entityId.appId, entityId.id])
 
   // Get the icon corresponding to the entity.
   const icon = iconMap[entity]
@@ -108,9 +117,9 @@ const useBookmark = bookmark => {
   const path =
     entity === 'device'
       ? `/applications/${entityIds.device_ids.application_ids.application_id}/devices/${entityIds.device_ids.device_id}`
-      : `/${entity}s/${entityIds[`${entity}_ids`][`${entity}_id`]}`
+      : `/${entity}s/${entityId.id}`
 
-  return { title: bookmarkTitle ?? '', path, icon }
+  return { title: bookmarkTitle ?? 'Fetching bookmark...', ids: entityId, path, icon }
 }
 
 export default useBookmark

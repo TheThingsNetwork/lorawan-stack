@@ -22,11 +22,9 @@ import {
   IconLayoutDashboard,
   IconUserShield,
   IconKey,
-  IconPlus,
   IconInbox,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
-import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -38,12 +36,15 @@ import {
 import getCookie from '@console/lib/table-utils'
 
 import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectBookmarksList } from '@console/store/selectors/user-preferences'
 
 import SidebarContext from '../context'
 
-const GeneralSideNavigation = () => {
-  const { topEntities, isMinimized } = useContext(SidebarContext)
+import TopEntitiesSection from './top-entities-section'
 
+const GeneralSideNavigation = () => {
+  const { isMinimized } = useContext(SidebarContext)
+  const topEntities = useSelector(state => selectBookmarksList(state))
   const isUserAdmin = useSelector(selectUserIsAdmin)
   const user = useSelector(selectUser)
   const mayViewOrgs = useSelector(state =>
@@ -94,13 +95,8 @@ const GeneralSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && (
-        <SideNavigation className="mt-cs-xs">
-          <SectionLabel label={sharedMessages.topEntities} icon={IconPlus} onClick={() => null} />
-          {topEntities.map(({ path, title, entity }) => (
-            <SideNavigation.Item key={path} title={title} path={path} icon={entity} />
-          ))}
-        </SideNavigation>
+      {!isMinimized && topEntities.length > 0 && (
+        <TopEntitiesSection topEntities={topEntities} userId={user.ids.user_id} />
       )}
     </>
   )

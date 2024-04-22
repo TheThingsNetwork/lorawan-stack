@@ -96,7 +96,7 @@ Row.propTypes = {
   /** A flag indicating whether the row is wrapping the head of a table. */
   head: PropTypes.bool,
   /** The identifier of the row. */
-  id: PropTypes.number,
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   /** The href to be passed as `to` prop to the `<Link />` component that wraps the row. */
   linkTo: PropTypes.string,
   /**

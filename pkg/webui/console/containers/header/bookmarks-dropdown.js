@@ -34,9 +34,16 @@ const m = defineMessages({
 })
 
 const Bookmark = ({ bookmark }) => {
-  const { title, path, icon } = useBookmark(bookmark)
+  const { title, ids, path, icon } = useBookmark(bookmark)
 
-  return <Dropdown.Item title={title} path={path} icon={icon} messageClassName={style.bookmark} />
+  return (
+    <Dropdown.Item
+      title={title === '' ? ids.id : title}
+      path={path}
+      icon={icon}
+      messageClassName={style.bookmark}
+    />
+  )
 }
 
 Bookmark.propTypes = {
@@ -61,9 +68,11 @@ const BookmarksDropdown = () => {
     </div>
   ) : (
     <>
-      {dropdownItems.slice(0, 15).map(bookmark => (
-        <Bookmark key={bookmark.created_at} bookmark={bookmark} />
-      ))}
+      <div className={style.bookmarkContainer}>
+        {dropdownItems.slice(0, 15).map((bookmark, index) => (
+          <Bookmark key={index} bookmark={bookmark} />
+        ))}
+      </div>
       {dropdownItems.length > 15 && (
         <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
           <Message content={m.threshold} />

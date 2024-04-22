@@ -13,17 +13,19 @@
 // limitations under the License.
 
 import React, { useContext } from 'react'
+import { useSelector } from 'react-redux'
 
-import { IconPlus } from '@ttn-lw/components/icon'
-import SectionLabel from '@ttn-lw/components/sidebar/section-label'
-import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
-
-import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectUserId } from '@console/store/selectors/logout'
+import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
 
 import SidebarContext from '../context'
 
+import TopEntitiesSection from './top-entities-section'
+
 const AppListSideNavigation = () => {
-  const { topEntities, isMinimized } = useContext(SidebarContext)
+  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'application'))
+  const { isMinimized } = useContext(SidebarContext)
+  const userId = useSelector(selectUserId)
 
   if (isMinimized || topEntities.length === 0) {
     // Rendering an empty div to prevent the shadow of the search bar
@@ -32,16 +34,7 @@ const AppListSideNavigation = () => {
     return <div />
   }
 
-  return (
-    <div>
-      <SectionLabel label={sharedMessages.topApplications} icon={IconPlus} onClick={() => null} />
-      <SideNavigation>
-        {topEntities.map(({ path, entity, title }) => (
-          <SideNavigation.Item title={title} path={path} icon={entity} key={path} />
-        ))}
-      </SideNavigation>
-    </div>
-  )
+  return <TopEntitiesSection topEntities={topEntities} userId={userId} entity="application" />
 }
 
 export default AppListSideNavigation

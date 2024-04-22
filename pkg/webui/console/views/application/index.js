@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -56,14 +56,17 @@ import {
 
 const Application = () => {
   const { appId } = useParams()
-  const actions = [
-    getApplication(
-      appId,
-      'name,description,attributes,dev_eui_counter,network_server_address,application_server_address,join_server_address,administrative_contact,technical_contact',
-    ),
-    getApplicationsRightsList(appId),
-    getAsConfiguration(),
-  ]
+  const actions = useMemo(
+    () => [
+      getApplication(
+        appId,
+        'name,description,attributes,dev_eui_counter,network_server_address,application_server_address,join_server_address,administrative_contact,technical_contact',
+      ),
+      getApplicationsRightsList(appId),
+      getAsConfiguration(),
+    ],
+    [appId],
+  )
 
   // Check whether application still exists after it has been possibly deleted.
   const application = useSelector(selectSelectedApplication)
@@ -71,7 +74,7 @@ const Application = () => {
 
   return (
     <Require featureCheck={mayViewApplications} otherwise={{ redirect: '/' }}>
-      <RequireRequest requestAction={actions}>
+      <RequireRequest requestAction={actions} requestOnChange>
         {hasApplication && <ApplicationInner />}
       </RequireRequest>
     </Require>
@@ -90,7 +93,10 @@ const ApplicationInner = () => {
   const stopStream = React.useCallback(id => dispatch(stopApplicationEventsStream(id)), [dispatch])
 
   useEffect(() => () => stopStream(appId), [appId, stopStream])
-  useBreadcrumbs('apps.single', <Breadcrumb path={`/applications/${appId}`} content={name} />)
+  useBreadcrumbs(
+    `apps.single#${appId}`,
+    <Breadcrumb path={`/applications/${appId}`} content={name} />,
+  )
 
   return (
     <>

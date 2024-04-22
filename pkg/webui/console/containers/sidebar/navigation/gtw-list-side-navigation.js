@@ -13,31 +13,40 @@
 // limitations under the License.
 
 import React, { useContext } from 'react'
+import { useSelector } from 'react-redux'
 
-import { IconPlus } from '@ttn-lw/components/icon'
-import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
+import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { selectUserId } from '@console/store/selectors/logout'
+import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
 
 import SidebarContext from '../context'
 
+import TopEntitiesSection from './top-entities-section'
+
+const Bookmark = ({ bookmark }) => {
+  const { title, ids, path, icon } = useBookmark(bookmark)
+
+  return <SideNavigation.Item title={title === '' ? ids.id : title} path={path} icon={icon} />
+}
+
+Bookmark.propTypes = {
+  bookmark: PropTypes.shape({}).isRequired,
+}
+
 const GtwListSideNavigation = () => {
-  const { topEntities, isMinimized } = useContext(SidebarContext)
+  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'gateway'))
+  const { isMinimized } = useContext(SidebarContext)
+  const userId = useSelector(selectUserId)
+
   if (isMinimized || topEntities.length === 0) {
     return <div />
   }
 
-  return (
-    <div>
-      <SectionLabel label={sharedMessages.topGateways} icon={IconPlus} onClick={() => null} />
-      <SideNavigation>
-        {topEntities.map(({ path, entity, title }) => (
-          <SideNavigation.Item title={title} path={path} icon={entity} key={path} />
-        ))}
-      </SideNavigation>
-    </div>
-  )
+  return <TopEntitiesSection topEntities={topEntities} userId={userId} entity="gateway" />
 }
 
 export default GtwListSideNavigation

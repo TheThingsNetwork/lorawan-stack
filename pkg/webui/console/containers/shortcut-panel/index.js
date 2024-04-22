@@ -30,11 +30,11 @@ import ShortcutItem from './shortcut-item'
 
 const m = defineMessages({
   shortcuts: 'Quick actions',
-  addApplication: 'New Application',
-  addGateway: 'New Gateway',
-  addOrganization: 'New Organization',
+  addApplication: 'New application',
+  addGateway: 'New gateway',
+  addNewOrganization: 'New organization',
   addPersonalApiKey: 'New personal API key',
-  registerDevice: 'Register a device',
+  registerDevice: 'Register an end device',
 })
 
 const ShortcutPanel = () => (
@@ -54,7 +54,7 @@ const ShortcutPanel = () => (
       />
       <ShortcutItem
         icon={IconUsersGroup}
-        title={m.addOrganization}
+        title={m.addNewOrganization}
         link="/organizations/add"
         className="item-4"
       />
