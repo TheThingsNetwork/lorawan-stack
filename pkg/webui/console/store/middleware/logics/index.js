@@ -38,6 +38,7 @@ import qrCodeGenerator from './qr-code-generator'
 import searchAccounts from './search-accounts'
 import notifications from './notifications'
 import userPreferences from './user-preferences'
+import search from './search'
 
 export default [
   ...status,
@@ -65,4 +66,5 @@ export default [
   ...searchAccounts,
   ...notifications,
   ...userPreferences,
+  ...search,
 ]
