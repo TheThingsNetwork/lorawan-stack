@@ -24,34 +24,37 @@ const Portal = ({ children, visible, positionReference }) => {
     if (positionReference.current && visible) {
       const rect = positionReference.current.getBoundingClientRect()
       setButtonPosition(rect)
-      const elementLeft = rect.left + window.scrollX
-      const elementTop = rect.top + window.scrollY
-      const element = document.getElementById('modal-container')
-      element.style.position = 'absolute'
-      element.style.left = `${elementLeft}px`
-      element.style.top = `${elementTop}px`
-      element.style.minWidth = `${rect.width + elementLeft}px`
-      element.style.minHeight = `${rect.height}px`
     }
   }, [positionReference, visible])
 
   const recreatedComponent = (
     <>
+      {/* Position component in correct part of the screen */}
       <div
-        className="pos-absolute"
         style={{
-          top: 0,
-          left: 0,
-          visibility: 'hidden',
-          width: buttonPosition ? buttonPosition.width : 0,
-          height: buttonPosition ? buttonPosition.height : 0,
+          position: 'relative',
+          top: buttonPosition ? buttonPosition.top + window.scrollY : 0,
+          left: buttonPosition ? buttonPosition.left + window.scrollX : 0,
+          minWidth: '100%',
+          minHeight: '100%',
         }}
-      />
-      {children}
+      >
+        {/* Simulate button to allow for the dropdown positioning logic to work correctly */}
+        <div
+          style={{
+            width: buttonPosition ? buttonPosition.width : 0,
+            height: buttonPosition ? buttonPosition.height : 0,
+          }}
+        />
+        {children}
+      </div>
     </>
   )
 
-  return DOM.createPortal(visible && recreatedComponent, document.getElementById('modal-container'))
+  return DOM.createPortal(
+    visible && recreatedComponent,
+    document.getElementById('dropdown-container'),
+  )
 }
 
 Portal.propTypes = {

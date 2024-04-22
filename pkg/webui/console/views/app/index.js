@@ -133,6 +133,7 @@ const Layout = () => {
             defaultTitle={siteName}
           />
           <div id="modal-container" />
+          <div id="dropdown-container" className="pos-absolute-container" />
           <div className="d-flex">
             <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
             <div className="w-full h-vh d-flex direction-column">

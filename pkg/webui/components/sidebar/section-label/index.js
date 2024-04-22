@@ -102,7 +102,6 @@ const SectionLabel = ({
         dropdownItems={plusDropdownItems}
         dropdownPosition="below right"
         noDropdownIcon
-        buttonId={`${dataTestId}-label-button`}
         portalledDropdown
       />
     </div>
