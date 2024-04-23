@@ -20,12 +20,17 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 // This component create a portal to render children into a different part of the DOM.
 const Portal = ({ children, visible, positionReference }) => {
   const [buttonPosition, setButtonPosition] = React.useState()
+
   useEffect(() => {
     if (positionReference.current && visible) {
       const rect = positionReference.current.getBoundingClientRect()
       setButtonPosition(rect)
     }
   }, [positionReference, visible])
+
+  if (!buttonPosition) {
+    return null
+  }
 
   const recreatedComponent = (
     <>
@@ -59,7 +64,11 @@ const Portal = ({ children, visible, positionReference }) => {
 
 Portal.propTypes = {
   children: PropTypes.node.isRequired,
-  positionReference: PropTypes.shape({}).isRequired,
+  positionReference: PropTypes.shape({
+    current: PropTypes.shape({
+      getBoundingClientRect: PropTypes.func,
+    }),
+  }).isRequired,
   visible: PropTypes.bool.isRequired,
 }
 
