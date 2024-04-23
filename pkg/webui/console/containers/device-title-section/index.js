@@ -75,7 +75,7 @@ const DeviceTitleSection = props => {
     showAppDownlinkCount && showNwkDownlinkCount ? (
       <>
         <FormattedNumber value={downlinkAppFrameCount} /> {'(App) / '}
-        <FormattedNumber value={downlinkNwkFrameCount} /> {'(Nwk)'},
+        <FormattedNumber value={downlinkNwkFrameCount} /> {'(Nwk)'}
       </>
     ) : showAppDownlinkCount ? (
       <>
