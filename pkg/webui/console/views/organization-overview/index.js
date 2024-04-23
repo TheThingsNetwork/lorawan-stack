@@ -62,7 +62,7 @@ const Overview = () => {
       <div className={style.titleSection}>
         <div className="container container--lg grid p-vert-0">
           <div className="item-12">
-            <OrganizationTitleSection orgId={ids.organization_id} />
+            <OrganizationTitleSection />
           </div>
         </div>
       </div>

@@ -29,15 +29,15 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 import EntityTitleSection from '@console/components/entity-title-section'
 import LastSeen from '@console/components/last-seen'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
-  selectDeviceByIds,
   selectDeviceDerivedAppDownlinkFrameCount,
   selectDeviceDerivedNwkDownlinkFrameCount,
   selectDeviceDerivedUplinkFrameCount,
   selectDeviceLastSeen,
+  selectSelectedCombinedDeviceId,
+  selectSelectedDevice,
 } from '@console/store/selectors/devices'
 
 const m = defineMessages({
@@ -51,9 +51,9 @@ const m = defineMessages({
 
 const { Content } = EntityTitleSection
 
-const DeviceTitleSection = props => {
-  const { appId, devId, fetching, children } = props
-  const device = useSelector(state => selectDeviceByIds(state, appId, devId))
+const DeviceTitleSection = () => {
+  const device = useSelector(selectSelectedDevice)
+  const [appId, devId] = useSelector(selectSelectedCombinedDeviceId).split('/')
   const uplinkFrameCount = useSelector(state =>
     selectDeviceDerivedUplinkFrameCount(state, appId, devId),
   )
@@ -155,24 +155,10 @@ const DeviceTitleSection = props => {
       <Content
         className="m-vert-ls-xxs m-sides-0"
         creationDate={device.created_at}
-        fetching={fetching}
         bottomBarLeft={bottomBarLeft}
       />
-      {children}
     </EntityTitleSection>
   )
-}
-
-DeviceTitleSection.propTypes = {
-  appId: PropTypes.string.isRequired,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-  devId: PropTypes.string.isRequired,
-  fetching: PropTypes.bool,
-}
-
-DeviceTitleSection.defaultProps = {
-  children: null,
-  fetching: false,
 }
 
 export default DeviceTitleSection

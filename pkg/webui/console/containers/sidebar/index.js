@@ -23,6 +23,8 @@ import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import SearchPanelManager from '../search-panel'
+
 import SidebarNavigation from './navigation'
 import SidebarContext from './context'
 import SideHeader from './header'
@@ -81,6 +83,7 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
         </div>
       </SidebarContext.Provider>
       <div className={style.sidebarBackdrop} onClick={onDrawerCloseClick} />
+      <SearchPanelManager />
     </>
   )
 }

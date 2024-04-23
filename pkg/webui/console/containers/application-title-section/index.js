@@ -29,7 +29,6 @@ import LastSeen from '@console/components/last-seen'
 import EntityTitleSection from '@console/components/entity-title-section'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/collaborators'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 
@@ -44,9 +43,10 @@ import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getApplicationDeviceCount } from '@console/store/actions/applications'
 
 import {
-  selectApplicationById,
   selectApplicationDeviceCount,
   selectApplicationDerivedLastSeen,
+  selectSelectedApplication,
+  selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
@@ -59,13 +59,14 @@ const m = defineMessages({
 
 const { Content } = EntityTitleSection
 
-const ApplicationTitleSection = ({ appId }) => {
+const ApplicationTitleSection = () => {
+  const application = useSelector(selectSelectedApplication)
+  const appId = useSelector(selectSelectedApplicationId)
   const apiKeysTotalCount = useSelector(selectApiKeysTotalCount)
   const collaboratorsTotalCount = useSelector(state =>
     selectCollaboratorsTotalCount(state, { id: appId }),
   )
   const devicesTotalCount = useSelector(state => selectApplicationDeviceCount(state, appId))
-  const application = useSelector(state => selectApplicationById(state, appId))
   const lastSeen = useSelector(state => selectApplicationDerivedLastSeen(state, appId))
   const mayViewCollaborators = useSelector(state =>
     checkFromState(mayViewOrEditApplicationCollaborators, state),
@@ -155,10 +156,6 @@ const ApplicationTitleSection = ({ appId }) => {
       </EntityTitleSection>
     </RequireRequest>
   )
-}
-
-ApplicationTitleSection.propTypes = {
-  appId: PropTypes.string.isRequired,
 }
 
 export default ApplicationTitleSection
