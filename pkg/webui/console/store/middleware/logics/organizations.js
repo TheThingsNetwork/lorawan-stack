@@ -17,6 +17,8 @@ import tts from '@console/api/tts'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
+import { trackEntityAccess } from '@console/lib/frequently-visited-entities'
+
 import * as organizations from '@console/store/actions/organizations'
 
 import { selectUserId } from '@console/store/selectors/logout'
@@ -31,6 +33,7 @@ const getOrganizationLogic = createRequestLogic({
       meta: { selector },
     } = action
     const org = await tts.Organizations.getById(id, selector)
+    trackEntityAccess('org', id)
     dispatch(organizations.startOrganizationEventsStream(id))
     return org
   },

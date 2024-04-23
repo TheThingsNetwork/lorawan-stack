@@ -22,6 +22,8 @@ import { getGatewayId } from '@ttn-lw/lib/selectors/id'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
+import { trackEntityAccess } from '@console/lib/frequently-visited-entities'
+
 import * as gateways from '@console/store/actions/gateways'
 
 import {
@@ -47,6 +49,7 @@ const getGatewayLogic = createRequestLogic({
     const { id = {} } = payload
     const selector = meta.selector || ''
     const gtw = await tts.Gateways.getById(id, selector)
+    trackEntityAccess('gtw', id)
     dispatch(gateways.startGatewayEventsStream(id))
 
     return gtw

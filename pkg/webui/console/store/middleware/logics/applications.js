@@ -17,6 +17,8 @@ import tts from '@console/api/tts'
 import { isNotFoundError, isConflictError } from '@ttn-lw/lib/errors/utils'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
+import { trackEntityAccess } from '@console/lib/frequently-visited-entities'
+
 import * as applications from '@console/store/actions/applications'
 import * as link from '@console/store/actions/link'
 
@@ -39,6 +41,7 @@ const getApplicationLogic = createRequestLogic({
       meta: { selector },
     } = action
     const app = await tts.Applications.getById(id, selector)
+    trackEntityAccess('app', id)
     dispatch(applications.startApplicationEventsStream(id))
 
     return app
