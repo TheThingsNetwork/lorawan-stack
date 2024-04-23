@@ -102,6 +102,7 @@ const SectionLabel = ({
         dropdownItems={plusDropdownItems}
         dropdownPosition="below right"
         noDropdownIcon
+        portalledDropdown
       />
     </div>
   )

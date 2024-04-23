@@ -68,6 +68,7 @@ const Switcher = ({ isMinimized }) => {
             className={style.flyOutList}
             position="right"
             hover
+            portalled
           >
             <Dropdown.HeaderItem title={sharedMessages.overview} />
           </Dropdown.Attached>
@@ -82,6 +83,7 @@ const Switcher = ({ isMinimized }) => {
             className={style.flyOutList}
             position="right"
             hover
+            portalled
           >
             <Dropdown.HeaderItem title={sharedMessages.applications} />
           </Dropdown.Attached>
@@ -96,6 +98,7 @@ const Switcher = ({ isMinimized }) => {
             className={style.flyOutList}
             position="right"
             hover
+            portalled
           >
             <Dropdown.HeaderItem title={sharedMessages.gateways} />
           </Dropdown.Attached>

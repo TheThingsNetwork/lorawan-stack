@@ -49,7 +49,13 @@ const SearchButton = ({ onClick, className }) => {
         <Message content={sharedMessages.search} component="p" className="m-0" />
       </div>
       {isMinimized && (
-        <Dropdown.Attached attachedRef={ref} position="right" className={style.flyOutList} hover>
+        <Dropdown.Attached
+          attachedRef={ref}
+          position="right"
+          className={style.flyOutList}
+          hover
+          portalled
+        >
           <Dropdown.HeaderItem title={sharedMessages.search} />
         </Dropdown.Attached>
       )}

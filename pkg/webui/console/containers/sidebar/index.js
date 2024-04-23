@@ -21,7 +21,6 @@ import LAYOUT from '@ttn-lw/constants/layout'
 import SearchButton from '@ttn-lw/components/sidebar/search-button'
 import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 
-import getCookie from '@ttn-lw/lib/cookie'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import SidebarNavigation from './navigation'
@@ -57,15 +56,6 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
     setIsMinimized(prev => !prev)
   }, [setIsMinimized])
 
-  const topEntitiesCookie = getCookie('topEntities')
-    ? getCookie('topEntities')
-        .split('_')
-        .map(cookie => JSON.parse(cookie))
-    : []
-
-  const tag = pathname === '/' ? 'general' : pathname.split('/')[1]
-  const topEntities = topEntitiesCookie?.filter(cookie => cookie.tag === tag)
-
   const sidebarClassnames = classnames(
     style.sidebar,
     'd-flex direction-column j-between gap-cs-m c-bg-brand-extralight',
@@ -80,10 +70,8 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
   return (
     <>
       <div className={sidebarClassnames} id="sidebar">
-        <SidebarContext.Provider
-          value={{ topEntities, onMinimizeToggle, isMinimized, onDrawerCloseClick }}
-        >
-          <div className="d-flex direction-column gap-cs-l overflow-y-auto overflow-x-hidden">
+        <SidebarContext.Provider value={{ onMinimizeToggle, isMinimized, onDrawerCloseClick }}>
+          <div className="d-flex direction-column gap-cs-l overflow-auto">
             <SideHeader />
             <div className="d-flex direction-column gap-cs-m">
               <SwitcherContainer />

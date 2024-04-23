@@ -46,7 +46,13 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
       {icon && <Icon icon={icon} className={classnames(style.icon)} />}{' '}
       <Message className={style.title} content={title} />
       {isMinimized && (
-        <Dropdown.Attached attachedRef={ref} className={style.flyOutList} position="right" hover>
+        <Dropdown.Attached
+          attachedRef={ref}
+          className={style.flyOutList}
+          position="right"
+          hover
+          portalled
+        >
           <Dropdown.HeaderItem title={title.defaultMessage} />
         </Dropdown.Attached>
       )}

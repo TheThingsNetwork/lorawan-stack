@@ -74,6 +74,7 @@ const CollapsibleItem = ({
           attachedRef={ref}
           position="right"
           hover
+          portalled
         >
           <Dropdown.HeaderItem title={title.defaultMessage} />
           {subItems.map(item => (
