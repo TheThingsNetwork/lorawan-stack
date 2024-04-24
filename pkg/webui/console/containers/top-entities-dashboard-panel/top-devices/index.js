@@ -33,7 +33,7 @@ const m = defineMessages({
 })
 
 const TopDevicesList = () => {
-  const allBookmarks = useSelector(state => selectPerEntityBookmarks(state, 'device'))
+  const allBookmarks = useSelector(selectPerEntityBookmarks('device'))
 
   const headers = [
     {

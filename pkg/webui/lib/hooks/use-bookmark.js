@@ -102,12 +102,14 @@ const useBookmark = bookmark => {
       } else {
         response = await dispatch(attachPromise(entityRequestMap[entity](entityId.id, 'name')))
       }
-      setBookmarkTitle(response.name || '')
+
+      return response
     }
 
     // Only fetch the entity if the name is not already in the store.
     if (!bookmarkTitle) {
-      fetchEntity()
+      const response = fetchEntity()
+      setBookmarkTitle(response.name || '')
     }
   }, [bookmarkTitle, dispatch, entity, entityId.appId, entityId.id])
 
