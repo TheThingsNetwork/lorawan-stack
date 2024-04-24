@@ -1709,6 +1709,15 @@ func (dst *ListUserBookmarksRequest) SetFields(src *ListUserBookmarksRequest, pa
 				var zero bool
 				dst.Deleted = zero
 			}
+		case "entity_types":
+			if len(subs) > 0 {
+				return fmt.Errorf("'entity_types' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EntityTypes = src.EntityTypes
+			} else {
+				dst.EntityTypes = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

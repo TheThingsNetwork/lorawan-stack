@@ -62,7 +62,7 @@ func (is *IdentityServer) listUserBookmarks(
 		}
 	}()
 
-	bookmarks, err := is.store.FindBookmarks(ctx, req.UserIds)
+	bookmarks, err := is.store.FindBookmarks(ctx, req.UserIds, req.EntityTypes...)
 	if err != nil {
 		return nil, err
 	}

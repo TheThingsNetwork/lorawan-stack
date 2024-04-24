@@ -10829,6 +10829,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 | `order` | [`string`](#string) |  | Order the results by this field path. Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `deleted` | [`bool`](#bool) |  | Only return recently deleted bookmarks. |
+| `entity_types` | [`string`](#string) | repeated | Specifies that only bookmarks that reference the given entity type should be returned. If empty the filter is not applied. |
 
 #### Field Rules
 
@@ -10837,6 +10838,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 | `order` | <p>`string.in`: `[ user_id -user_id entity_type -entity_type entity_id -entity_id created_at -created_at]`</p> |
+| `entity_types` | <p>`repeated.unique`: `true`</p><p>`repeated.items.string.in`: `[application client end device gateway organization user]`</p> |
 
 ### <a name="ttn.lorawan.v3.ListUserSessionsRequest">Message `ListUserSessionsRequest`</a>
 

@@ -189,7 +189,9 @@ type UserSessionStore interface {
 // UserBookmarkStore interface for storing user bookmarks.
 type UserBookmarkStore interface {
 	CreateBookmark(context.Context, *ttnpb.UserBookmark) (*ttnpb.UserBookmark, error)
-	FindBookmarks(context.Context, *ttnpb.UserIdentifiers) ([]*ttnpb.UserBookmark, error)
+	FindBookmarks(
+		ctx context.Context, usrID *ttnpb.UserIdentifiers, entityTypes ...string,
+	) ([]*ttnpb.UserBookmark, error)
 	PurgeBookmark(context.Context, *ttnpb.UserBookmark) error
 	BatchPurgeBookmarks(
 		context.Context, *ttnpb.UserIdentifiers, []*ttnpb.EntityIdentifiers,
