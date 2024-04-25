@@ -887,6 +887,7 @@
         "up.uplink_message.network_ids.tenant_id",
         "up.uplink_message.normalized_payload",
         "up.uplink_message.normalized_payload_warnings",
+        "up.uplink_message.packet_error_rate",
         "up.uplink_message.received_at",
         "up.uplink_message.rx_metadata",
         "up.uplink_message.session_key_id",

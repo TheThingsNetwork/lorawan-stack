@@ -246,6 +246,10 @@ message ApplicationUplink {
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings.
   google.protobuf.Duration consumed_airtime = 13;
 
+  // Packet error rate of the recent uplinks in the current session.
+  // Calculated by the Network Server. The value is defined in the [0, 1] interval.
+  float packet_error_rate = 19;
+
   // End device location metadata, set by the Application Server while handling the message.
   map<string, Location> locations = 14;
 
@@ -255,7 +259,7 @@ message ApplicationUplink {
   // Network identifiers, set by the Network Server that handles the message.
   NetworkIdentifiers network_ids = 16;
 
-  // next: 19
+  // next: 20
 }
 
 message ApplicationUplinkNormalized {

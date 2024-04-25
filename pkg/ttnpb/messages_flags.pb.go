@@ -32,6 +32,7 @@ func AddSelectFlagsForApplicationUplink(flags *pflag.FlagSet, prefix string, hid
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("last-a-f-cnt-down", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("last-a-f-cnt-down", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("confirmed", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("confirmed", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("consumed-airtime", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("consumed-airtime", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("packet-error-rate", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("packet-error-rate", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("locations", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("locations", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("version-ids", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("version-ids", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForEndDeviceVersionIdentifiers(flags, flagsplugin.Prefix("version-ids", prefix), hidden)
@@ -126,6 +127,11 @@ func PathsFromSelectFlagsForApplicationUplink(flags *pflag.FlagSet, prefix strin
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("consumed_airtime", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("packet_error_rate", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("packet_error_rate", prefix))
+	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("locations", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
@@ -171,6 +177,7 @@ func AddSetFlagsForApplicationUplink(flags *pflag.FlagSet, prefix string, hidden
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("last-a-f-cnt-down", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("confirmed", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewDurationFlag(flagsplugin.Prefix("consumed-airtime", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewFloat32Flag(flagsplugin.Prefix("packet-error-rate", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping Locations because maps with message value types are currently not supported.
 	AddSetFlagsForEndDeviceVersionIdentifiers(flags, flagsplugin.Prefix("version-ids", prefix), hidden)
 	AddSetFlagsForNetworkIdentifiers(flags, flagsplugin.Prefix("network-ids", prefix), hidden)
@@ -260,6 +267,12 @@ func (m *ApplicationUplink) SetFromFlags(flags *pflag.FlagSet, prefix string) (p
 	} else if changed {
 		m.ConsumedAirtime = golang.SetDuration(val)
 		paths = append(paths, flagsplugin.Prefix("consumed_airtime", prefix))
+	}
+	if val, changed, err := flagsplugin.GetFloat32(flags, flagsplugin.Prefix("packet_error_rate", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.PacketErrorRate = val
+		paths = append(paths, flagsplugin.Prefix("packet_error_rate", prefix))
 	}
 	// FIXME: Skipping Locations because maps with message value types are currently not supported.
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("version_ids", prefix)); changed {

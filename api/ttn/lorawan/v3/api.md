@@ -8183,6 +8183,7 @@ Application uplink message.
 | `last_a_f_cnt_down` | [`uint32`](#uint32) |  | The last AFCntDown of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used with app_s_key to encrypt downlink payloads. |
 | `confirmed` | [`bool`](#bool) |  | Indicates whether the end device used confirmed data uplink. |
 | `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings. |
+| `packet_error_rate` | [`float`](#float) |  | Packet error rate of the recent uplinks in the current session. Calculated by the Network Server. The value is defined in the [0, 1] interval. |
 | `locations` | [`ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry) | repeated | End device location metadata, set by the Application Server while handling the message. |
 | `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version identifiers, set by the Application Server while handling the message. |
 | `network_ids` | [`NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers) |  | Network identifiers, set by the Network Server that handles the message. |

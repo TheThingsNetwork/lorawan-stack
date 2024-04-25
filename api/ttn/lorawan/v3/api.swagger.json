@@ -19396,6 +19396,11 @@
           "type": "string",
           "description": "Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the raw payload size and the transmission settings."
         },
+        "packet_error_rate": {
+          "type": "number",
+          "format": "float",
+          "description": "Packet error rate of the recent uplinks in the current session.\nCalculated by the Network Server. The value is defined in the [0, 1] interval."
+        },
         "locations": {
           "type": "object",
           "additionalProperties": {

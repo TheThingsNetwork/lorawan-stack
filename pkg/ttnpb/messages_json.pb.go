@@ -691,6 +691,11 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			golang.MarshalDuration(s, x.ConsumedAirtime)
 		}
 	}
+	if x.PacketErrorRate != 0 || s.HasField("packet_error_rate") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("packet_error_rate")
+		s.WriteFloat32(x.PacketErrorRate)
+	}
 	if x.Locations != nil || s.HasField("locations") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("locations")
@@ -844,6 +849,9 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.ConsumedAirtime = v
+		case "packet_error_rate", "packetErrorRate":
+			s.AddField("packet_error_rate")
+			x.PacketErrorRate = s.ReadFloat32()
 		case "locations":
 			s.AddField("locations")
 			if s.ReadNil() {

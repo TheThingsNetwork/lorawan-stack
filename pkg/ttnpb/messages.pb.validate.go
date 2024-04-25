@@ -871,6 +871,8 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "packet_error_rate":
+			// no validation rules for PacketErrorRate
 		case "locations":
 
 			for key, val := range m.GetLocations() {
