@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import classNames from 'classnames'
@@ -25,6 +25,7 @@ import toast from '@ttn-lw/components/toast'
 import Collapse from '@ttn-lw/components/collapse'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
@@ -35,6 +36,7 @@ import {
   selectJsConfig,
   selectNsConfig,
 } from '@ttn-lw/lib/selectors/env'
+import { isBackend, getBackendErrorName } from '@ttn-lw/lib/errors/utils'
 
 import {
   mayEditApplicationDeviceKeys,
@@ -43,11 +45,13 @@ import {
 
 import { updateDevice, resetDevice, resetUsedDevNonces } from '@console/store/actions/devices'
 import { unclaimDevice } from '@console/store/actions/claim'
+import { getBandsList, getNsFrequencyPlans } from '@console/store/actions/configuration'
 
 import {
   selectSelectedDevice,
   selectSelectedDeviceClaimable,
 } from '@console/store/selectors/devices'
+import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
 
 import IdentityServerForm from './identity-server-form'
 import ApplicationServerForm from './application-server-form'
@@ -74,6 +78,9 @@ const DeviceGeneralSettings = () => {
   const asConfig = selectAsConfig()
   const jsConfig = selectJsConfig()
   const nsConfig = selectNsConfig()
+  const storeFrequencyPlans = useSelector(selectNsFrequencyPlans)
+  const [defaultMacSettings, setMacSettings] = useState({})
+  const [bandId, setBandId] = useState(undefined)
 
   useBreadcrumbs(
     'device.general',
@@ -196,64 +203,113 @@ const DeviceGeneralSettings = () => {
     nsDescription = m.notInCluster
   }
 
-  return (
-    <div className="container container--lg grid">
-      <IntlHelmet title={sharedMessages.generalSettings} />
+  const fetchData = useCallback(
+    async dispatch => {
+      if (device.frequency_plan_id && device.lorawan_phy_version) {
+        let frequencyPlans = storeFrequencyPlans
+        if (frequencyPlans.length === 0) {
+          frequencyPlans = await dispatch(attachPromise(getNsFrequencyPlans()))
+        }
+        const bandId = frequencyPlans.find(fp => fp.id === device.frequency_plan_id).band_id
+        setBandId(bandId)
+        await dispatch(getBandsList(bandId, device.lorawan_phy_version))
+      }
+      if (device.lorawan_phy_version && device.frequency_plan_id) {
+        try {
+          const settings = await tts.Ns.getDefaultMacSettings(
+            device.frequency_plan_id,
+            device.lorawan_phy_version,
+          )
+          setMacSettings(settings)
+        } catch (err) {
+          if (isBackend(err) && getBackendErrorName(err) === 'no_band_version') {
+            toast({
+              type: toast.types.ERROR,
+              message: sharedMessages.fpNotFoundError,
+              messageValues: {
+                lorawanVersion: device.lorawan_phy_version,
+                freqPlan: device.frequency_plan_id,
+                code: msg => <code>{msg}</code>,
+              },
+            })
+          } else {
+            toast({
+              type: toast.types.ERROR,
+              message: m.macSettingsError,
+              messageValues: {
+                freqPlan: device.frequency_plan_id,
+                code: msg => <code>{msg}</code>,
+              },
+            })
+          }
+        }
+      }
+    },
+    [device.lorawan_phy_version, device.frequency_plan_id, storeFrequencyPlans],
+  )
 
-      <div className={classNames(style.container, 'item-12 lg:item-8')}>
-        <Collapse
-          title={m.isTitle}
-          description={isDescription}
-          disabled={isDisabled}
-          initialCollapsed={false}
-        >
-          <IdentityServerForm
-            device={device}
-            onSubmit={handleSubmit}
-            onSubmitSuccess={handleSubmitSuccess}
-            onDelete={handleDelete}
-            onDeleteSuccess={handleDeleteSuccess}
-            onDeleteFailure={handleDeleteFailure}
-            onUnclaim={handleUnclaim}
-            onUnclaimFailure={handleUnclaimFailure}
-            jsConfig={jsConfig}
-            nsConfig={nsConfig}
-            asConfig={asConfig}
-            supportsClaiming={supportsClaiming}
-          />
-        </Collapse>
-        <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
-          <NetworkServerForm
-            device={device}
-            onSubmit={handleSubmit}
-            onSubmitSuccess={handleSubmitSuccess}
-            onMacReset={resetDevice}
-            mayEditKeys={mayEditKeys}
-            mayReadKeys={mayReadKeys}
-            getDefaultMacSettings={tts.Ns.getDefaultMacSettings}
-          />
-        </Collapse>
-        <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
-          <ApplicationServerForm
-            device={device}
-            onSubmit={handleSubmit}
-            onSubmitSuccess={handleSubmitSuccess}
-            mayEditKeys={mayEditKeys}
-            mayReadKeys={mayReadKeys}
-          />
-        </Collapse>
-        <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
-          <JoinServerForm
-            device={device}
-            onSubmit={handleSubmit}
-            onSubmitSuccess={handleSubmitSuccess}
-            mayEditKeys={mayEditKeys}
-            mayReadKeys={mayReadKeys}
-            onUsedDevNoncesReset={resetUsedDevNonces}
-          />
-        </Collapse>
+  return (
+    <RequireRequest requestAction={fetchData}>
+      <div className="container container--lg grid">
+        <IntlHelmet title={sharedMessages.generalSettings} />
+
+        <div className={classNames(style.container, 'item-12 lg:item-8')}>
+          <Collapse
+            title={m.isTitle}
+            description={isDescription}
+            disabled={isDisabled}
+            initialCollapsed={false}
+          >
+            <IdentityServerForm
+              device={device}
+              onSubmit={handleSubmit}
+              onSubmitSuccess={handleSubmitSuccess}
+              onDelete={handleDelete}
+              onDeleteSuccess={handleDeleteSuccess}
+              onDeleteFailure={handleDeleteFailure}
+              onUnclaim={handleUnclaim}
+              onUnclaimFailure={handleUnclaimFailure}
+              jsConfig={jsConfig}
+              nsConfig={nsConfig}
+              asConfig={asConfig}
+              supportsClaiming={supportsClaiming}
+            />
+          </Collapse>
+          <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
+            <NetworkServerForm
+              device={device}
+              defaultMacSettings={defaultMacSettings}
+              bandId={bandId}
+              onSubmit={handleSubmit}
+              onSubmitSuccess={handleSubmitSuccess}
+              onMacReset={resetDevice}
+              mayEditKeys={mayEditKeys}
+              mayReadKeys={mayReadKeys}
+              getDefaultMacSettings={tts.Ns.getDefaultMacSettings}
+            />
+          </Collapse>
+          <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
+            <ApplicationServerForm
+              device={device}
+              onSubmit={handleSubmit}
+              onSubmitSuccess={handleSubmitSuccess}
+              mayEditKeys={mayEditKeys}
+              mayReadKeys={mayReadKeys}
+            />
+          </Collapse>
+          <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
+            <JoinServerForm
+              device={device}
+              onSubmit={handleSubmit}
+              onSubmitSuccess={handleSubmitSuccess}
+              mayEditKeys={mayEditKeys}
+              mayReadKeys={mayReadKeys}
+              onUsedDevNoncesReset={resetUsedDevNonces}
+            />
+          </Collapse>
+        </div>
       </div>
-    </div>
+    </RequireRequest>
   )
 }
 

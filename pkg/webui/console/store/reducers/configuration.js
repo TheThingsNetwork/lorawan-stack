@@ -15,11 +15,13 @@
 import {
   GET_NS_FREQUENCY_PLANS_SUCCESS,
   GET_GS_FREQUENCY_PLANS_SUCCESS,
+  GET_BANDS_LIST_SUCCESS,
 } from '@console/store/actions/configuration'
 
 const defaultState = {
   nsFrequencyPlans: undefined,
   gsFrequencyPlans: undefined,
+  bandDefinitions: undefined,
 }
 
 const configuration = (state = defaultState, { type, payload }) => {
@@ -33,6 +35,11 @@ const configuration = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         gsFrequencyPlans: payload,
+      }
+    case GET_BANDS_LIST_SUCCESS:
+      return {
+        ...state,
+        bandDefinitions: payload,
       }
     default:
       return state

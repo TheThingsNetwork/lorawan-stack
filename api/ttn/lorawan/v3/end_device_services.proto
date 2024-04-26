@@ -18,6 +18,7 @@ package ttn.lorawan.v3;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "ttn/lorawan/v3/end_device.proto";
 import "ttn/lorawan/v3/identifiers.proto";
 
@@ -34,6 +35,7 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 // Before deleting an end device it first needs to be deleted from the
 // NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 service EndDeviceRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage end devices on The Things Stack Identity Server."};
   // Create a new end device within an application.
   //
   // After registering an end device, it also needs to be registered in
@@ -87,7 +89,9 @@ service EndDeviceRegistry {
   }
 }
 
+// The EndDeviceTemplateRegistry service is used to convert end devices information between formats.
 service EndDeviceTemplateConverter {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Convert end device information between supported formats."};
   // Returns the configured formats to convert from.
   rpc ListFormats(google.protobuf.Empty) returns (EndDeviceTemplateFormats) {
     option (google.api.http) = {get: "/edtc/formats"};
@@ -105,6 +109,7 @@ service EndDeviceTemplateConverter {
 // The EndDeviceBatchRegistry service, exposed by the Identity Server, is used to manage
 // end device registrations in batches.
 service EndDeviceBatchRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage end devices on The Things Stack Identity Server in batches."};
   // Get a batch of end devices with the given identifiers, selecting the fields specified
   // in the field mask.
   // More or less fields may be returned, depending on the rights of the caller.

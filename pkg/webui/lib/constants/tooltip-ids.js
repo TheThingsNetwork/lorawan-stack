@@ -83,4 +83,6 @@ export default Object.freeze({
   STATUS_TIME_PERIODICITY: 'status-time-periodicity',
   UPDATE_LOCATION_FROM_STATUS: 'update-location-from-status',
   INPUT_METHOD: 'input-method',
+  USE_DEFAULT_NB_TRANS: 'use-default-nb-trans',
+  DATA_RATE_SPECIFIC_OVERRIDES: 'data-rate-specific-overrides',
 })

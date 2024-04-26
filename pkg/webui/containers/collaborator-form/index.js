@@ -190,6 +190,7 @@ const CollaboratorForm = props => {
         autoFocus={!update}
         disabled={update}
         entity={entity}
+        entityId={entityId}
         encode={encodeCollaborator}
         decode={decodeCollaborator}
       />

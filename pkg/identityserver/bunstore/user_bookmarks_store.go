@@ -97,6 +97,21 @@ func (*userBookmarkStore) selectWithUserID(
 	}
 }
 
+func (*userBookmarkStore) selectWithEntityType(
+	_ context.Context, ids ...string,
+) func(*bun.SelectQuery) *bun.SelectQuery {
+	return func(q *bun.SelectQuery) *bun.SelectQuery {
+		switch len(ids) {
+		case 0:
+			return q
+		case 1:
+			return q.Where("?TableAlias.entity_type = ?", ids[0])
+		default:
+			return q.Where("?TableAlias.entity_type IN (?)", bun.In(ids))
+		}
+	}
+}
+
 func (*userBookmarkStore) selectWithEntityID(
 	ctx context.Context, ids ...ttnpb.IDStringer,
 ) func(*bun.SelectQuery) *bun.SelectQuery {
@@ -213,14 +228,21 @@ func (s *userBookmarkStore) CreateBookmark(
 }
 
 func (s *userBookmarkStore) FindBookmarks(
-	ctx context.Context, id *ttnpb.UserIdentifiers,
+	ctx context.Context, id *ttnpb.UserIdentifiers, entityTypes ...string,
 ) ([]*ttnpb.UserBookmark, error) {
 	ctx, span := tracer.StartFromContext(ctx, "FindBookmarks", trace.WithAttributes(
 		attribute.String("user_id", id.GetUserId()),
 	))
 	defer span.End()
 
-	models, err := s.listUserBookmarksBy(ctx, s.selectWithUserID(ctx, id.GetUserId()))
+	models, err := s.listUserBookmarksBy(
+		ctx,
+		func(sq *bun.SelectQuery) *bun.SelectQuery {
+			sq = s.selectWithUserID(ctx, id.GetUserId())(sq)
+			sq = s.selectWithEntityType(ctx, entityTypes...)(sq)
+			return sq
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

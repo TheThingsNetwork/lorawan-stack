@@ -16,6 +16,7 @@ package web
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
 
@@ -81,4 +82,40 @@ func (c TemplatesConfig) NewTemplateStore(ctx context.Context, httpClientProvide
 type DownlinksConfig struct {
 	PublicAddress    string `name:"public-address" description:"Public address of the HTTP webhooks frontend"`
 	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the HTTPS webhooks frontend"`
+}
+
+// URL returns the URL for the downlink operation.
+func (c DownlinksConfig) URL(
+	_ context.Context,
+	webhookID *ttnpb.ApplicationWebhookIdentifiers,
+	devID *ttnpb.EndDeviceIdentifiers,
+	op string,
+) string {
+	deriv := c
+	baseURL := deriv.PublicTLSAddress
+	if baseURL == "" {
+		baseURL = deriv.PublicAddress
+	}
+	return fmt.Sprintf(
+		"%s/as/applications/%s/webhooks/%s/devices/%s/down/%s",
+		baseURL,
+		webhookID.ApplicationIds.ApplicationId,
+		webhookID.WebhookId,
+		devID.DeviceId,
+		op,
+	)
+}
+
+// Domain returns the domain of the public address.
+func (c DownlinksConfig) Domain(_ context.Context) string {
+	deriv := c
+	baseURL := deriv.PublicTLSAddress
+	if baseURL == "" {
+		baseURL = deriv.PublicAddress
+	}
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return ""
+	}
+	return u.Host
 }

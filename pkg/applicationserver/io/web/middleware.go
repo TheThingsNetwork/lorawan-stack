@@ -15,10 +15,10 @@
 package web
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -27,41 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
-type (
-	deviceIDKeyType  struct{}
-	webhookIDKeyType struct{}
-)
-
-var (
-	deviceIDKey  deviceIDKeyType
-	webhookIDKey webhookIDKeyType
-)
-
-func withDeviceID(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) context.Context {
-	return context.WithValue(ctx, deviceIDKey, id)
-}
-
-func deviceIDFromContext(ctx context.Context) *ttnpb.EndDeviceIdentifiers {
-	id, ok := ctx.Value(deviceIDKey).(*ttnpb.EndDeviceIdentifiers)
-	if !ok {
-		panic("no end device identifiers found in context")
-	}
-	return id
-}
-
-func withWebhookID(ctx context.Context, id *ttnpb.ApplicationWebhookIdentifiers) context.Context {
-	return context.WithValue(ctx, webhookIDKey, id)
-}
-
-func webhookIDFromContext(ctx context.Context) *ttnpb.ApplicationWebhookIdentifiers {
-	id, ok := ctx.Value(webhookIDKey).(*ttnpb.ApplicationWebhookIdentifiers)
-	if !ok {
-		panic("no webhook identifiers found in context")
-	}
-	return id
-}
-
-func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
+func (*webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		vars := mux.Vars(r)
@@ -77,7 +43,6 @@ func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 			webhandlers.Error(w, r, err)
 			return
 		}
-		ctx = withDeviceID(ctx, devID)
 
 		hookID := &ttnpb.ApplicationWebhookIdentifiers{
 			ApplicationIds: &appID,
@@ -87,17 +52,20 @@ func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 			webhandlers.Error(w, r, err)
 			return
 		}
-		ctx = withWebhookID(ctx, hookID)
+		ctx = internal.WithWebhookData(ctx, &internal.WebhookData{
+			EndDeviceIDs: devID,
+			WebhookIDs:   hookID,
+		})
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-func (w *webhooks) requireApplicationRights(required ...ttnpb.Right) mux.MiddlewareFunc {
+func (*webhooks) requireApplicationRights(required ...ttnpb.Right) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			ctx := req.Context()
-			appID := deviceIDFromContext(ctx).ApplicationIds
+			appID := internal.DeviceIDFromContext(ctx).ApplicationIds
 			if err := rights.RequireApplication(ctx, appID, required...); err != nil {
 				webhandlers.Error(res, req, err)
 				return
@@ -119,7 +87,7 @@ func (w *webhooks) requireRateLimits() mux.MiddlewareFunc {
 				authTokenID = v
 			}
 
-			resource := ratelimit.ApplicationWebhooksDownResource(ctx, deviceIDFromContext(ctx), authTokenID)
+			resource := ratelimit.ApplicationWebhooksDownResource(ctx, internal.DeviceIDFromContext(ctx), authTokenID)
 			limit, result := w.server.RateLimiter().RateLimit(resource)
 			result.SetHTTPHeaders(res.Header())
 			if limit {

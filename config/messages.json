@@ -2681,6 +2681,24 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/applicationserver/io/web/sink:request": {
+    "translations": {
+      "en": "request"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web/sink",
+      "file": "http.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web/sink:webhook_disabled": {
+    "translations": {
+      "en": "webhook disabled"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web/sink",
+      "file": "health.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:decode_body": {
     "translations": {
       "en": "decode body"
@@ -2735,15 +2753,6 @@
       "file": "webhooks.go"
     }
   },
-  "error:pkg/applicationserver/io/web:request": {
-    "translations": {
-      "en": "request"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/web",
-      "file": "webhooks.go"
-    }
-  },
   "error:pkg/applicationserver/io/web:template_not_found": {
     "translations": {
       "en": "template `{template_id}` not found"
@@ -2760,15 +2769,6 @@
     "description": {
       "package": "pkg/applicationserver/io/web",
       "file": "webhooks.go"
-    }
-  },
-  "error:pkg/applicationserver/io/web:webhook_disabled": {
-    "translations": {
-      "en": "webhook disabled"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/web",
-      "file": "health_sink.go"
     }
   },
   "error:pkg/applicationserver/io/web:webhook_not_found": {
@@ -9994,7 +9994,7 @@
       "en": "fail to send webhook"
     },
     "description": {
-      "package": "pkg/applicationserver/io/web",
+      "package": "pkg/applicationserver/io/web/sink",
       "file": "observability.go"
     }
   },

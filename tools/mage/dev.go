@@ -71,7 +71,7 @@ var (
 	devDataDir            = ".env/data"
 	devDir                = ".env"
 	devDatabaseName       = "ttn_lorawan_dev"
-	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
+	devDockerComposeFlags = []string{"compose", "-p", "lorawan-stack-dev"}
 	databaseURI           = fmt.Sprintf("postgresql://root:root@localhost:5432/%s?sslmode=disable", devDatabaseName)
 	testDatabaseNames     = []string{"ttn_lorawan_is_test", "ttn_lorawan_is_store_test"}
 )
@@ -81,7 +81,7 @@ func dockerComposeFlags(args ...string) []string {
 }
 
 func execDockerCompose(args ...string) error {
-	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "docker-compose", dockerComposeFlags(args...)...)
+	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "docker", dockerComposeFlags(args...)...)
 	return err
 }
 
@@ -141,7 +141,7 @@ func (Dev) RedisFlush() error {
 		fmt.Println("Deleting all keys from redis")
 	}
 
-	keys, err := sh.Output("docker-compose", dockerComposeFlags("exec", "-T", "redis", "redis-cli", "keys", "ttn:v3:*")...)
+	keys, err := sh.Output("docker", dockerComposeFlags("exec", "-T", "redis", "redis-cli", "keys", "ttn:v3:*")...)
 	if err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func (Dev) RedisFlush() error {
 		return nil
 	}
 	flags := dockerComposeFlags(append([]string{"exec", "-T", "redis", "redis-cli", "del"}, ks...)...)
-	_, err = sh.Exec(nil, nil, os.Stderr, "docker-compose", flags...)
+	_, err = sh.Exec(nil, nil, os.Stderr, "docker", flags...)
 	return err
 }
 
@@ -179,7 +179,7 @@ nextCycle:
 		)
 		for j := 0; j < 30; j++ {
 			time.Sleep(time.Second)
-			_, err := sh.Exec(nil, nil, nil, "docker-compose", flags...)
+			_, err := sh.Exec(nil, nil, nil, "docker", flags...)
 			isReady := err == nil
 			switch {
 			case wasReady && !isReady:

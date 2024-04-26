@@ -1232,7 +1232,7 @@
           "name": "ApplicationAccess",
           "longName": "ApplicationAccess",
           "fullName": "ttn.lorawan.v3.ApplicationAccess",
-          "description": "The ApplicationAcces service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of applications.",
+          "description": "The ApplicationAccess service, exposed by the Identity Server, is used to manage\nAPI keys and collaborators of applications.",
           "methods": [
             {
               "name": "ListRights",
@@ -8661,7 +8661,7 @@
           "name": "ClientAccess",
           "longName": "ClientAccess",
           "fullName": "ttn.lorawan.v3.ClientAccess",
-          "description": "The ClientAcces service, exposed by the Identity Server, is used to manage\ncollaborators of OAuth clients.",
+          "description": "The ClientAccess service, exposed by the Identity Server, is used to manage\ncollaborators of OAuth clients.",
           "methods": [
             {
               "name": "ListRights",
@@ -11326,8 +11326,29 @@
             },
             {
               "name": "target_frequency_plan_id",
-              "description": "Frequency plan ID of the target gateway.\nThis equals the first element of the frequency_plan_ids field.",
+              "description": "Frequency plan ID of the target gateway.\nTODO: Remove this field (https://github.com/TheThingsIndustries/lorawan-stack/issues/4024)\nDEPRECATED: Use target_frequency_plan_ids instead.",
               "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "deprecated": true,
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_frequency_plan_ids",
+              "description": "Frequency plan IDs of the target gateway.",
+              "label": "repeated",
               "type": "string",
               "longType": "string",
               "fullType": "string",
@@ -11338,7 +11359,15 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "string.max_len",
+                    "name": "repeated.min_items",
+                    "value": 0
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 8
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
                     "value": 64
                   }
                 ]
@@ -11732,7 +11761,7 @@
           "name": "EndDeviceBatchClaimingServer",
           "longName": "EndDeviceBatchClaimingServer",
           "fullName": "ttn.lorawan.v3.EndDeviceBatchClaimingServer",
-          "description": "",
+          "description": "The EndDeviceBatchClaimingServer service support claiming and managing batches of end devices on external Join Servers.",
           "methods": [
             {
               "name": "Unclaim",
@@ -11785,7 +11814,7 @@
           "name": "EndDeviceClaimingServer",
           "longName": "EndDeviceClaimingServer",
           "fullName": "ttn.lorawan.v3.EndDeviceClaimingServer",
-          "description": "The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,\nand allows clients to claim end devices.",
+          "description": "The EndDeviceClaimingServer service support claiming and managing end devices on external Join Servers.",
           "methods": [
             {
               "name": "Claim",
@@ -11928,7 +11957,7 @@
           "name": "GatewayClaimingServer",
           "longName": "GatewayClaimingServer",
           "fullName": "ttn.lorawan.v3.GatewayClaimingServer",
-          "description": "",
+          "description": "The GatewayClaimingServer service support claiming and managing gateway claims.",
           "methods": [
             {
               "name": "Claim",
@@ -14800,7 +14829,7 @@
           "name": "EmailValidationRegistry",
           "longName": "EmailValidationRegistry",
           "fullName": "ttn.lorawan.v3.EmailValidationRegistry",
-          "description": "The EmailValidationRegistry service, exposed by the Identity Server, is used for validating an user's primary email.",
+          "description": "The EmailValidationRegistry service, exposed by the Identity Server, is used for validating a user's primary email.",
           "methods": [
             {
               "name": "RequestValidation",
@@ -20684,7 +20713,7 @@
           "name": "EndDeviceTemplateConverter",
           "longName": "EndDeviceTemplateConverter",
           "fullName": "ttn.lorawan.v3.EndDeviceTemplateConverter",
-          "description": "",
+          "description": "The EndDeviceTemplateRegistry service is used to convert end devices information between formats.",
           "methods": [
             {
               "name": "ListFormats",
@@ -24176,7 +24205,7 @@
           "name": "GatewayConfigurationService",
           "longName": "GatewayConfigurationService",
           "fullName": "ttn.lorawan.v3.GatewayConfigurationService",
-          "description": "",
+          "description": "The GatewayConfigurationService fetches the configuration of a gateway.",
           "methods": [
             {
               "name": "GetGatewayConfiguration",
@@ -24664,7 +24693,7 @@
           "name": "GatewayConfigurator",
           "longName": "GatewayConfigurator",
           "fullName": "ttn.lorawan.v3.GatewayConfigurator",
-          "description": "",
+          "description": "The GatewayConfigurator service is used to fetch gateway configuration.",
           "methods": [
             {
               "name": "PullConfiguration",
@@ -25160,7 +25189,7 @@
           "name": "Gs",
           "longName": "Gs",
           "fullName": "ttn.lorawan.v3.Gs",
-          "description": "",
+          "description": "The Gs service returns information about the Gateway Server and gateways connected to it.",
           "methods": [
             {
               "name": "GetGatewayConnectionStats",
@@ -26881,7 +26910,7 @@
           "name": "EntityAccess",
           "longName": "EntityAccess",
           "fullName": "ttn.lorawan.v3.EntityAccess",
-          "description": "",
+          "description": "The EntityAccess service provides information about the access rights of an entity.",
           "methods": [
             {
               "name": "AuthInfo",
@@ -26911,7 +26940,7 @@
           "name": "Is",
           "longName": "Is",
           "fullName": "ttn.lorawan.v3.Is",
-          "description": "",
+          "description": "The Is service provides information about the Identity Server.",
           "methods": [
             {
               "name": "GetConfiguration",
@@ -28540,7 +28569,7 @@
           "name": "Js",
           "longName": "Js",
           "fullName": "ttn.lorawan.v3.Js",
-          "description": "",
+          "description": "The Js service returns configuration for a Join Server.",
           "methods": [
             {
               "name": "GetJoinEUIPrefixes",
@@ -40755,7 +40784,7 @@
           "name": "NotificationService",
           "longName": "NotificationService",
           "fullName": "ttn.lorawan.v3.NotificationService",
-          "description": "",
+          "description": "The NotificationService is used to send notifications.",
           "methods": [
             {
               "name": "Create",
@@ -45868,7 +45897,7 @@
           "name": "EndDeviceQRCodeGenerator",
           "longName": "EndDeviceQRCodeGenerator",
           "fullName": "ttn.lorawan.v3.EndDeviceQRCodeGenerator",
-          "description": "",
+          "description": "The EndDeviceQRCodeGenerator service provides functionality to generate and parse QR codes.",
           "methods": [
             {
               "name": "GetFormat",
@@ -50422,6 +50451,37 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "entity_types",
+              "description": "Specifies that only bookmarks that reference the given entity type should be returned. If empty the filter is not\napplied.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.string.in",
+                    "value": [
+                      "application",
+                      "client",
+                      "end device",
+                      "gateway",
+                      "organization",
+                      "user"
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
@@ -52011,7 +52071,7 @@
           "name": "UserAccess",
           "longName": "UserAccess",
           "fullName": "ttn.lorawan.v3.UserAccess",
-          "description": "The UserAcces service, exposed by the Identity Server, is used to manage\nAPI keys of users.",
+          "description": "The UserAccess service, exposed by the Identity Server, is used to manage\nAPI keys of users.",
           "methods": [
             {
               "name": "ListRights",
@@ -52292,7 +52352,7 @@
           "name": "UserInvitationRegistry",
           "longName": "UserInvitationRegistry",
           "fullName": "ttn.lorawan.v3.UserInvitationRegistry",
-          "description": "",
+          "description": "The UserOrganizationRegistry service, exposed by the Identity Server, is used to manage user invitations.",
           "methods": [
             {
               "name": "Send",

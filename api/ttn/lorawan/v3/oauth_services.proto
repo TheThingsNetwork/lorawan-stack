@@ -18,6 +18,7 @@ package ttn.lorawan.v3;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "ttn/lorawan/v3/oauth.proto";
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
@@ -25,6 +26,7 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 // The OAuthAuthorizationRegistry service, exposed by the Identity Server,
 // is used to manage OAuth client authorizations for users.
 service OAuthAuthorizationRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage OAuth client authorizations for users."};
   // List OAuth clients that are authorized by the user.
   rpc List(ListOAuthClientAuthorizationsRequest) returns (OAuthClientAuthorizations) {
     option (google.api.http) = {get: "/users/{user_ids.user_id}/authorizations"};
