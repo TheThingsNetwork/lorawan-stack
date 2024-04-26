@@ -35,6 +35,7 @@ const computeDeltaInSeconds = (from, to) => {
 const LastSeen = React.forwardRef((props, ref) => {
   const {
     className,
+    statusClassName,
     lastSeen,
     short,
     updateIntervalInSeconds,
@@ -51,7 +52,7 @@ const LastSeen = React.forwardRef((props, ref) => {
       pulseTrigger={lastSeen}
       flipped={flipped}
       ref={ref}
-      className="d-flex al-center"
+      className={classnames(statusClassName, 'd-flex al-center')}
     >
       <div className={classnames(className, 'd-inline-block')}>
         {!short && <Message className="mr-cs-xxs" content={message} />}
@@ -82,6 +83,7 @@ LastSeen.propTypes = {
   noTitle: PropTypes.bool,
   short: PropTypes.bool,
   status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
+  statusClassName: PropTypes.string,
   updateIntervalInSeconds: PropTypes.number,
 }
 
@@ -94,6 +96,7 @@ LastSeen.defaultProps = {
   status: 'good',
   message: sharedMessages.lastSeen,
   noTitle: false,
+  statusClassName: undefined,
 }
 
 export default LastSeen

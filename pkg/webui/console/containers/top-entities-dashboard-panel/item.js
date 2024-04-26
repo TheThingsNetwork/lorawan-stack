@@ -12,18 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import classNames from 'classnames'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { Table } from '@ttn-lw/components/table'
 
 import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { startGatewayStatistics, stopGatewayStatistics } from '@console/store/actions/gateways'
+
+import { selectDeviceLastSeen } from '@console/store/selectors/devices'
+import { selectApplicationDerivedLastSeen } from '@console/store/selectors/applications'
+import { selectGatewayStatistics } from '@console/store/selectors/gateways'
+import { selectGatewayLastSeen } from '@console/store/selectors/gateway-status'
+
 import styles from './top-entities-panel.styl'
 
 const EntitiesItem = ({ bookmark, headers, last }) => {
+  const dispatch = useDispatch()
   const { title, ids, path, icon } = useBookmark(bookmark)
+  const entityIds = bookmark.entity_ids
+  const entity = Object.keys(entityIds)[0].replace('_ids', '')
+  const deviceLastSeen = useSelector(state => selectDeviceLastSeen(state, ids.appId, ids.id))
+  const appLastSeen = useSelector(state => selectApplicationDerivedLastSeen(state, ids.id))
+  const statistics = useSelector(selectGatewayStatistics)
+  const gatewayLastSeen = useSelector(selectGatewayLastSeen)
+
+  useEffect(() => {
+    dispatch(startGatewayStatistics(ids.id))
+    return () => {
+      dispatch(stopGatewayStatistics())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const isDisconnected = Boolean(statistics) && Boolean(statistics.disconnected_at)
+
+  const status = {
+    gatewayLastSeen,
+    isDisconnected,
+    disconnectedAt: statistics?.disconnected_at,
+  }
+
+  const lastSeen =
+    entity === 'device' ? deviceLastSeen : entity === 'gateway' ? status : appLastSeen
 
   return (
     <Table.Row
@@ -35,7 +69,13 @@ const EntitiesItem = ({ bookmark, headers, last }) => {
     >
       {headers.map((header, index) => {
         const value =
-          headers[index].name === 'name' ? title : headers[index].name === 'type' ? icon : ''
+          headers[index].name === 'name'
+            ? title
+            : headers[index].name === 'type'
+              ? icon
+              : headers[index].name === 'lastSeen'
+                ? lastSeen
+                : ''
         const entityID = ids.id
         return (
           <Table.DataCell
@@ -55,7 +95,9 @@ const EntitiesItem = ({ bookmark, headers, last }) => {
 }
 
 EntitiesItem.propTypes = {
-  bookmark: PropTypes.shape({}).isRequired,
+  bookmark: PropTypes.shape({
+    entity_ids: PropTypes.shape({}).isRequired,
+  }).isRequired,
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,

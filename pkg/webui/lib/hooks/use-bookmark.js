@@ -97,7 +97,9 @@ const useBookmark = bookmark => {
       let response
       if (entity === 'device') {
         response = await dispatch(
-          attachPromise(entityRequestMap[entity](entityId.appId, entityId.id, 'name')),
+          attachPromise(
+            entityRequestMap[entity](entityId.appId, entityId.id, ['name', 'last_seen_at']),
+          ),
         )
       } else {
         response = await dispatch(attachPromise(entityRequestMap[entity](entityId.id, 'name')))

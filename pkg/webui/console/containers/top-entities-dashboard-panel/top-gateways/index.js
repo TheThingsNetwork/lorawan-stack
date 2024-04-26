@@ -16,7 +16,11 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
+import Status from '@ttn-lw/components/status'
+
 import Message from '@ttn-lw/lib/components/message'
+
+import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -48,6 +52,29 @@ const TopGatewaysList = () => {
           )}
         </>
       ),
+    },
+    {
+      name: 'lastSeen',
+      displayName: sharedMessages.lastSeen,
+      render: ({ gatewayLastSeen, isDisconnected, disconnectedAt }) => {
+        const showLastSeen = Boolean(gatewayLastSeen)
+        return isDisconnected ? (
+          <LastSeen
+            status="bad"
+            message={sharedMessages.disconnected}
+            lastSeen={disconnectedAt}
+            statusClassName="j-end"
+          />
+        ) : showLastSeen ? (
+          <LastSeen lastSeen={gatewayLastSeen} statusClassName="j-end" />
+        ) : (
+          <Status
+            status="mediocre"
+            label={sharedMessages.noRecentActivity}
+            className="d-flex j-end al-center"
+          />
+        )
+      },
     },
   ]
 

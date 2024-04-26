@@ -17,8 +17,11 @@ import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
 import Icon from '@ttn-lw/components/icon'
+import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
+
+import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -49,6 +52,41 @@ const AllTopEntitiesList = () => {
       displayName: sharedMessages.name,
       align: 'left',
       render: (name, id) => <Message content={name === '' ? id : name} />,
+    },
+    {
+      name: 'lastSeen',
+      displayName: sharedMessages.lastSeen,
+      render: lastSeen => {
+        if (!lastSeen) {
+          return (
+            <Status
+              status="mediocre"
+              label={sharedMessages.noRecentActivity}
+              className="d-flex j-end al-center"
+            />
+          )
+        }
+        if (lastSeen && typeof lastSeen === 'string') {
+          return <LastSeen lastSeen={lastSeen} short statusClassName="j-end" />
+        }
+
+        return lastSeen.isDisconnected ? (
+          <LastSeen
+            status="bad"
+            message={sharedMessages.disconnected}
+            lastSeen={lastSeen.disconnectedAt}
+            statusClassName="j-end"
+          />
+        ) : Boolean(lastSeen.gatewayLastSeen) ? (
+          <LastSeen lastSeen={lastSeen.gatewayLastSeen} statusClassName="j-end" />
+        ) : (
+          <Status
+            status="mediocre"
+            label={sharedMessages.noRecentActivity}
+            className="d-flex j-end al-center"
+          />
+        )
+      },
     },
   ]
 
