@@ -34,7 +34,7 @@ const m = defineMessages({
 })
 
 const TopGatewaysList = () => {
-  const allBookmarks = useSelector(state => selectPerEntityBookmarks(state, 'gateway'))
+  const allBookmarks = useSelector(selectPerEntityBookmarks('gateway'))
 
   const headers = [
     {

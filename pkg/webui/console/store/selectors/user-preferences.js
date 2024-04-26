@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 const selectUserPreferencesStore = state => state.userPreferences
 
 export const selectConsolePreferences = state =>
@@ -19,8 +21,8 @@ export const selectConsolePreferences = state =>
 
 export const selectBookmarksList = state => selectUserPreferencesStore(state).bookmarks.bookmarks
 
-export const selectPerEntityBookmarks = (state, entity) =>
-  selectUserPreferencesStore(state).bookmarks?.perEntityBookmarks[entity] || []
+export const selectPerEntityBookmarks = entity =>
+  createSelector([selectUserPreferencesStore], b => b.bookmarks?.perEntityBookmarks[entity] || [])
 
 export const selectBookmarksTotalCount = state =>
   selectUserPreferencesStore(state).bookmarks.totalCount.totalCount

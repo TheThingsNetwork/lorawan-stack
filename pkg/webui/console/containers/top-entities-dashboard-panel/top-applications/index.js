@@ -37,7 +37,7 @@ const m = defineMessages({
 })
 
 const TopApplicationsList = () => {
-  const allBookmarks = useSelector(state => selectPerEntityBookmarks(state, 'application'))
+  const allBookmarks = useSelector(selectPerEntityBookmarks('application'))
 
   const headers = [
     {
