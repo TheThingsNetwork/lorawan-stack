@@ -11,10 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Support fine-grained NbTrans controls while using Dynamic ADR mode in the Console.
-- User bookmark listing now supports filtering bookmarks by entity type. 
-  - This can be specified by setting `entity_types` field in `ListUserBookmarksRequest`.
-
 ### Changed
 
 ### Deprecated
@@ -23,10 +19,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.30.1] - unreleased
+
+### Added
+
+- Support fine-grained NbTrans controls while using Dynamic ADR mode in the Console.
+- User bookmark listing now supports filtering bookmarks by entity type. 
+  - This can be specified by setting `entity_types` field in `ListUserBookmarksRequest`.
+
+### Fixed
+
 - Show both AFcntDown and NFcntDown in the Device overview in the Console.
 - Fixes the keys displayed in the session information section of overview tab of an End Device in the Console - for LW 1.1.x, replaces NwkSKey with FNwkSIntKey. For LX 1.0.x display only the NwkSKey and AppSKey.
-
-### Security
 
 ## [3.30.0] - 2024-04-11
 
@@ -2800,7 +2806,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.0...v3.30
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.1...v3.30
+[3.30.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.0...v3.30.1
 [3.30.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.2...v3.30.0
 [3.29.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.1...v3.29.2
 [3.29.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.0...v3.29.1
