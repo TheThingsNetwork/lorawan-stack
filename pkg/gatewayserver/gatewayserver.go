@@ -335,9 +335,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					defer lis.Close()
 
 					srv := http.Server{
-						Handler:           web,
-						ReadTimeout:       120 * time.Second,
-						ReadHeaderTimeout: 5 * time.Second,
+						Handler:     web,
+						ReadTimeout: 120 * time.Second,
+						// The ReadHeaderTimeout should be sufficiently long for embedded devices to perform the TLS handshake
+						// before headers can be sent.
+						// For example, The Things Indoor Gateway connecting via HTTPS to The Things Stack presenting a TLS server
+						// certificate using ECDSA, the TLS handshake typically takes up to 10 seconds because there is limited
+						// hardware acceleration as compared to RSA.
+						ReadHeaderTimeout: 30 * time.Second,
 						ErrorLog:          stdlog.New(stdio.Discard, "", 0),
 					}
 					go func() {
