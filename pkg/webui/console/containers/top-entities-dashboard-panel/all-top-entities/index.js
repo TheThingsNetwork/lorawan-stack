@@ -76,9 +76,10 @@ const AllTopEntitiesList = () => {
             message={sharedMessages.disconnected}
             lastSeen={lastSeen.disconnectedAt}
             statusClassName="j-end"
+            short
           />
         ) : Boolean(lastSeen.gatewayLastSeen) ? (
-          <LastSeen lastSeen={lastSeen.gatewayLastSeen} statusClassName="j-end" />
+          <LastSeen lastSeen={lastSeen.gatewayLastSeen} statusClassName="j-end" short />
         ) : (
           <Status
             status="mediocre"
