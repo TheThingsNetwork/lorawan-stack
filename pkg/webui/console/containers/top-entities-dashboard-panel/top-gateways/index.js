@@ -64,9 +64,10 @@ const TopGatewaysList = () => {
             message={sharedMessages.disconnected}
             lastSeen={disconnectedAt}
             statusClassName="j-end"
+            short
           />
         ) : showLastSeen ? (
-          <LastSeen lastSeen={gatewayLastSeen} statusClassName="j-end" />
+          <LastSeen lastSeen={gatewayLastSeen} statusClassName="j-end" short />
         ) : (
           <Status
             status="mediocre"

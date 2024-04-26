@@ -56,13 +56,9 @@ const TopDevicesList = () => {
       name: 'lastSeen',
       displayName: sharedMessages.lastSeen,
       render: lastSeen => {
-        const showLastSeen = Boolean(lastSeen.last_seen_at || lastSeen.updated_at)
+        const showLastSeen = Boolean(lastSeen)
         return showLastSeen ? (
-          <LastSeen
-            lastSeen={lastSeen.last_seen_at ?? lastSeen.updated_at}
-            short
-            statusClassName="j-end"
-          />
+          <LastSeen lastSeen={lastSeen} short statusClassName="j-end" />
         ) : (
           <Status
             status="mediocre"
