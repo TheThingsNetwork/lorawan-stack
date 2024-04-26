@@ -352,7 +352,7 @@ FetchTable.propTypes = {
       render: PropTypes.func,
       align: PropTypes.oneOf(['left', 'right', 'center']),
       sortable: PropTypes.bool,
-      width: PropTypes.number,
+      width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     }),
   ),
   itemPathPrefix: PropTypes.string,
