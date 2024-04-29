@@ -247,20 +247,19 @@ const NetworkServerForm = React.memo(props => {
             ...defaultValues.mac_settings,
             ...macSettings,
             ...device.mac_settings,
-            adr:
-              'dynamic' in device.mac_settings?.adr
-                ? {
-                    dynamic: {
-                      ...device.mac_settings?.adr?.dynamic,
-                      min_nb_trans: device.mac_settings?.adr?.dynamic?.min_nb_trans ?? null,
-                      max_nb_trans: device.mac_settings?.adr?.dynamic?.max_nb_trans ?? null,
-                    },
-                  }
-                : {
-                    ...defaultValues.mac_settings.adr,
-                    ...macSettings.adr,
-                    ...device.mac_settings.adr,
+            adr: Boolean(device.mac_settings?.adr?.dynamic)
+              ? {
+                  dynamic: {
+                    ...device.mac_settings?.adr?.dynamic,
+                    min_nb_trans: device.mac_settings?.adr?.dynamic?.min_nb_trans ?? null,
+                    max_nb_trans: device.mac_settings?.adr?.dynamic?.max_nb_trans ?? null,
                   },
+                }
+              : {
+                  ...defaultValues.mac_settings.adr,
+                  ...macSettings.adr,
+                  ...device.mac_settings?.adr,
+                },
           },
         },
         { context: validationContext, stripUnknown: true },
