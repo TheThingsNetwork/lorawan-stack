@@ -219,6 +219,13 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
     if (lorawanVersion >= 100 && lorawanVersion < 110) {
       sessionInfoData.items.push(
         {
+          key: sharedMessages.devAddr,
+          value: dev_addr,
+          type: 'byte',
+          sensitive: false,
+          enableUint32: true,
+        },
+        {
           key: sharedMessages.nwkSKey,
           value: f_nwk_s_int_key.key,
           type: 'byte',
