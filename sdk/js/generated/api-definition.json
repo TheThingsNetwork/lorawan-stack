@@ -7230,9 +7230,11 @@
       "http": [
         {
           "method": "post",
-          "pattern": "/users/bookmarks",
+          "pattern": "/users/{user_ids.user_id}/bookmarks",
           "body": "*",
-          "parameters": []
+          "parameters": [
+            "user_ids.user_id"
+          ]
         }
       ]
     },

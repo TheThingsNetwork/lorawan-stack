@@ -11175,7 +11175,7 @@ API keys of users.
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
-| `Create` | `POST` | `/api/v3/users/bookmarks` | `*` |
+| `Create` | `POST` | `/api/v3/users/{user_ids.user_id}/bookmarks` | `*` |
 | `List` | `GET` | `/api/v3/users/{user_ids.user_id}/bookmarks` |  |
 | `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/applications/{entity_ids.application_ids.application_id}` |  |
 | `Delete` | `DELETE` | `/api/v3/users/{user_ids.user_id}/bookmarks/clients/{entity_ids.client_ids.client_id}` |  |
