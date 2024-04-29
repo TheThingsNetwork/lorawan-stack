@@ -216,15 +216,13 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
       })
     }
 
-    sessionInfoData.items.push(
-      {
-        key: sharedMessages.devAddr,
-        value: dev_addr,
-        type: 'byte',
-        sensitive: false,
-        enableUint32: true,
-      }
-    )
+    sessionInfoData.items.push({
+      key: sharedMessages.devAddr,
+      value: dev_addr,
+      type: 'byte',
+      sensitive: false,
+      enableUint32: true,
+    })
 
     if (lorawanVersion >= 100 && lorawanVersion < 110) {
       sessionInfoData.items.push(
