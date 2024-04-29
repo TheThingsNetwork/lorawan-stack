@@ -712,3 +712,8 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	}
 	return adaptDataRate(ctx, dev, phy, defaults)
 }
+
+// LossRate calculates the loss rate of the recent uplinks in the provided MAC state.
+func LossRate(macState *ttnpb.MACState, phy *band.Band) float32 {
+	return adrLossRate(adrUplinks(macState, phy)...)
+}
