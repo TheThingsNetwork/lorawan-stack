@@ -12704,39 +12704,6 @@
         ]
       }
     },
-    "/users/bookmarks": {
-      "post": {
-        "summary": "Create a bookmark for the given user.",
-        "operationId": "UserBookmarkRegistry_Create",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3UserBookmark"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v3CreateUserBookmarkRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserBookmarkRegistry"
-        ]
-      }
-    },
     "/users/{collaborator.user_ids.user_id}/applications": {
       "get": {
         "summary": "List applications where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the applications the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
@@ -13955,6 +13922,44 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "UserBookmarkRegistry"
+        ]
+      },
+      "post": {
+        "summary": "Create a bookmark for the given user.",
+        "operationId": "UserBookmarkRegistry_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3UserBookmark"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3UserBookmarkRegistryCreateBody"
+            }
           }
         ],
         "tags": [
@@ -21013,17 +21018,6 @@
         }
       }
     },
-    "v3CreateUserBookmarkRequest": {
-      "type": "object",
-      "properties": {
-        "user_ids": {
-          "$ref": "#/definitions/v3UserIdentifiers"
-        },
-        "entity_ids": {
-          "$ref": "#/definitions/v3EntityIdentifiers"
-        }
-      }
-    },
     "v3CreateUserRequest": {
       "type": "object",
       "properties": {
@@ -27271,6 +27265,23 @@
         "created_at": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v3UserBookmarkRegistryCreateBody": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Secondary identifier, which can only be used in specific requests."
+            }
+          }
+        },
+        "entity_ids": {
+          "$ref": "#/definitions/v3EntityIdentifiers"
         }
       }
     },

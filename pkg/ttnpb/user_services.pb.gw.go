@@ -1359,6 +1359,23 @@ func request_UserBookmarkRegistry_Create_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["user_ids.user_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_ids.user_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
+	}
+
 	msg, err := client.Create(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -1370,6 +1387,23 @@ func local_request_UserBookmarkRegistry_Create_0(ctx context.Context, marshaler 
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["user_ids.user_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_ids.user_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "user_ids.user_id", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_ids.user_id", err)
 	}
 
 	msg, err := server.Create(ctx, &protoReq)
@@ -2652,7 +2686,7 @@ func RegisterUserBookmarkRegistryHandlerServer(ctx context.Context, mux *runtime
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.UserBookmarkRegistry/Create", runtime.WithHTTPPathPattern("/users/bookmarks"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.UserBookmarkRegistry/Create", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/bookmarks"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3642,7 +3676,7 @@ func RegisterUserBookmarkRegistryHandlerClient(ctx context.Context, mux *runtime
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.UserBookmarkRegistry/Create", runtime.WithHTTPPathPattern("/users/bookmarks"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.UserBookmarkRegistry/Create", runtime.WithHTTPPathPattern("/users/{user_ids.user_id}/bookmarks"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3838,7 +3872,7 @@ func RegisterUserBookmarkRegistryHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_UserBookmarkRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "bookmarks"}, ""))
+	pattern_UserBookmarkRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "bookmarks"}, ""))
 
 	pattern_UserBookmarkRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "bookmarks"}, ""))
 

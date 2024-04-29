@@ -52265,7 +52265,7 @@
                   "rules": [
                     {
                       "method": "POST",
-                      "pattern": "/users/bookmarks",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks",
                       "body": "*"
                     }
                   ]
