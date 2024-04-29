@@ -68,11 +68,17 @@ export const selectDeviceDerivedUplinkFrameCount = (state, appId, devId) => {
 
   return derived.uplinkFrameCount
 }
-export const selectDeviceDerivedDownlinkFrameCount = (state, appId, devId) => {
+export const selectDeviceDerivedAppDownlinkFrameCount = (state, appId, devId) => {
   const derived = selectDeviceDerivedById(state, combineDeviceIds(appId, devId))
   if (!Boolean(derived)) return undefined
 
-  return derived.downlinkFrameCount
+  return derived.downlinkAppFrameCount
+}
+export const selectDeviceDerivedNwkDownlinkFrameCount = (state, appId, devId) => {
+  const derived = selectDeviceDerivedById(state, combineDeviceIds(appId, devId))
+  if (!Boolean(derived)) return undefined
+
+  return derived.downlinkNwkFrameCount
 }
 
 export const selectSelectedDeviceClaimable = state =>

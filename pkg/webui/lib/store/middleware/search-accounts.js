@@ -27,6 +27,7 @@ export default tts => {
       }
       if (Boolean(collaboratorOf)) {
         request[collaboratorOf.path] = collaboratorOf.id
+        request.complement_collaborators = true
       }
 
       return await tts.SearchAccounts.searchAccounts(request)

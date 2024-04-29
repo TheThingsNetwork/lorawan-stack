@@ -40,9 +40,9 @@ jobs:
       - name: Check for diff
         run: tools/bin/mage git:diff
       - name: Lint code
-        uses: golangci/golangci-lint-action@3cfe3a4abbb849e10058ce4af15d205b6da42804
+        uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.55.2
+          version: v1.56.2
           only-new-issues: true
           skip-pkg-cache: true # Caching is set up by install-go-and-deps
           skip-build-cache: true # Caching is set up by install-go-and-deps

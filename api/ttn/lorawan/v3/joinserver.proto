@@ -80,6 +80,7 @@ message NwkSKeysResponse {
 
 // The NsJs service connects a Network Server to a Join Server.
 service NsJs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The NsJs service connects a Network Server to a Join Server. This is an inter-component service and is not intended to be used by end users."};
   // Handle a join-request message.
   rpc HandleJoin(JoinRequest) returns (JoinResponse);
   // Request the network session keys for a particular session.
@@ -93,12 +94,14 @@ message AppSKeyResponse {
 
 // The AsJs service connects an Application Server to a Join Server.
 service AsJs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The AsJs service connects an Application Server to a Join Server. This is an inter-component service and is not intended to be used by end users."};
   // Request the application session key for a particular session.
   rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
 }
 
 // The AppJs service connects an Application to a Join Server.
 service AppJs {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The AppJs service is used by an external AWS integration to connect to a Join Server instance."};
   // Request the application session key for a particular session.
   rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
 }
@@ -224,6 +227,7 @@ message GetRootKeysRequest {
 
 // Service for network layer cryptographic operations.
 service NetworkCryptoService {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The NetworkCryptoService supports network layer cryptographic operations. This service is not intended to be used by end users."};
   // Calculate the join-request message MIC.
   rpc JoinRequestMIC(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
   // Calculate the join-accept message MIC.
@@ -240,6 +244,7 @@ service NetworkCryptoService {
 
 // Service for application layer cryptographic operations.
 service ApplicationCryptoService {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "The ApplicationCryptoService supports application layer cryptographic operations. This service is not intended to be used by end users."};
   // Derive the application session key (AppSKey).
   rpc DeriveAppSKey(DeriveSessionKeysRequest) returns (AppSKeyResponse);
   // Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
@@ -344,6 +349,7 @@ message ProvisionEndDevicesRequest {
 
 // The JsEndDeviceRegistry service allows clients to manage their end devices on the Join Server.
 service JsEndDeviceRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage end devices on The Things Stack Join Server."};
   // Get returns the device that matches the given identifiers.
   // If there are multiple matches, an error will be returned.
   rpc Get(GetEndDeviceRequest) returns (EndDevice) {
@@ -381,6 +387,7 @@ service JsEndDeviceRegistry {
 
 // JsEndDeviceBatchRegistry service allows clients to manage batches of end devices on the Join Server.
 service JsEndDeviceBatchRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage batches of end devices on The Things Stack Join Server."};
   // Delete a list of devices within the same application.
   // This operation is atomic; either all devices are deleted or none.
   // Devices not found are skipped and no error is returned.
@@ -443,6 +450,7 @@ message DeleteApplicationActivationSettingsRequest {
 
 // The ApplicationActivationSettingRegistry service allows clients to manage their application activation settings.
 service ApplicationActivationSettingRegistry {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Manage application activation settings."};
   // Get returns application activation settings.
   rpc Get(GetApplicationActivationSettingsRequest) returns (ApplicationActivationSettings) {
     option (google.api.http) = {get: "/js/applications/{application_ids.application_id}/settings"};
@@ -503,7 +511,9 @@ message GetDefaultJoinEUIResponse {
   ];
 }
 
+// The Js service returns configuration for a Join Server.
 service Js {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Fetch configuration for The Things Stack Join Server."};
   // Request the JoinEUI prefixes that are configured for this Join Server.
   rpc GetJoinEUIPrefixes(google.protobuf.Empty) returns (JoinEUIPrefixes) {
     option (google.api.http) = {get: "/js/join_eui_prefixes"};

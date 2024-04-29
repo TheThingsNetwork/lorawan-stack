@@ -30,19 +30,15 @@ import (
 // Go namespace.
 type Go mg.Namespace
 
-var minGoVersion = "1.11.4"
-
-var goModuleEnv = map[string]string{
-	"GO111MODULE": "on",
-}
+var minGoVersion = "1.21.0"
 
 var goTags = os.Getenv("GO_TAGS")
 
 const (
-	gofumpt      = "mvdan.cc/gofumpt@v0.4.0"
-	golangciLint = "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1"
-	goveralls    = "github.com/mattn/goveralls@v0.0.11"
-	bufCLI       = "github.com/bufbuild/buf/cmd/buf@v1.25.1"
+	gofumpt      = "mvdan.cc/gofumpt@v0.6.0"
+	golangciLint = "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.56.2"
+	goveralls    = "github.com/mattn/goveralls@v0.0.12"
+	bufCLI       = "github.com/bufbuild/buf/cmd/buf@v1.30.0"
 )
 
 func buildGoArgs(cmd string, args ...string) []string {
@@ -53,7 +49,7 @@ func buildGoArgs(cmd string, args ...string) []string {
 }
 
 func execGoFrom(dir string, stdout, stderr io.Writer, cmd string, args ...string) error {
-	return execFrom(dir, goModuleEnv, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
+	return execFrom(dir, nil, stdout, stderr, "go", buildGoArgs(cmd, args...)...)
 }
 
 func execGo(stdout, stderr io.Writer, cmd string, args ...string) error {

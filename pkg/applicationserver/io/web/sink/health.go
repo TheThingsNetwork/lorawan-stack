@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package web
+package sink
 
 import (
 	"context"
@@ -26,87 +26,8 @@ import (
 
 // HealthStatusRegistry is a registry for webhook health status.
 type HealthStatusRegistry interface {
-	Get(r *http.Request) (*ttnpb.ApplicationWebhookHealth, error)
-	Set(r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error)) error
-}
-
-type healthStatusRegistry struct {
-	registry WebhookRegistry
-}
-
-// Get implements HealthStatusRegistry.
-func (reg *healthStatusRegistry) Get(r *http.Request) (*ttnpb.ApplicationWebhookHealth, error) {
-	ctx := r.Context()
-	ids := webhookIDFromContext(ctx)
-	web, err := reg.registry.Get(ctx, ids, []string{"health_status"})
-	if err != nil {
-		return nil, err
-	}
-	return web.HealthStatus, nil
-}
-
-// Set implements HealthStatusRegistry.
-func (reg *healthStatusRegistry) Set(
-	r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
-) error {
-	ctx := r.Context()
-	ids := webhookIDFromContext(ctx)
-	_, err := reg.registry.Set(
-		ctx,
-		ids,
-		[]string{"health_status"},
-		func(wh *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
-			if wh == nil {
-				// The webhook has been deleted during execution.
-				return nil, nil, nil
-			}
-			updated, err := f(wh.HealthStatus)
-			if err != nil {
-				return nil, nil, err
-			}
-			wh.HealthStatus = updated
-			return wh, []string{"health_status"}, nil
-		},
-	)
-	return err
-}
-
-// NewHealthStatusRegistry constructs a HealthStatusRegistry on top of the provided WebhookRegistry.
-func NewHealthStatusRegistry(registry WebhookRegistry) HealthStatusRegistry {
-	return &healthStatusRegistry{registry}
-}
-
-type cachedHealthStatusRegistryKeyType struct{}
-
-var cachedHealthStatusRegistryKey cachedHealthStatusRegistryKeyType
-
-// WithCachedHealthStatus constructs a context.Context with the provided health status cached.
-func WithCachedHealthStatus(ctx context.Context, h *ttnpb.ApplicationWebhookHealth) context.Context {
-	return context.WithValue(ctx, cachedHealthStatusRegistryKey, h)
-}
-
-type cachedHealthStatusRegistry struct {
-	registry HealthStatusRegistry
-}
-
-// Get implements HealthStatusRegistry.
-func (reg *cachedHealthStatusRegistry) Get(r *http.Request) (*ttnpb.ApplicationWebhookHealth, error) {
-	if h, ok := r.Context().Value(cachedHealthStatusRegistryKey).(*ttnpb.ApplicationWebhookHealth); ok {
-		return h, nil
-	}
-	return reg.registry.Get(r)
-}
-
-// Set implements HealthStatusRegistry.
-func (reg *cachedHealthStatusRegistry) Set(
-	r *http.Request, f func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error),
-) error {
-	return reg.registry.Set(r, f)
-}
-
-// NewCachedHealthStatusRegistry constructs a HealthStatusRegistry which allows the Get response to be cached.
-func NewCachedHealthStatusRegistry(registry HealthStatusRegistry) HealthStatusRegistry {
-	return &cachedHealthStatusRegistry{registry}
+	Get(context.Context) (*ttnpb.ApplicationWebhookHealth, error)
+	Set(context.Context, func(*ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error)) error
 }
 
 type healthCheckSink struct {
@@ -119,12 +40,14 @@ type healthCheckSink struct {
 
 // Process runs the health checks and sends the request to the underlying sink
 // if they pass.
-func (hcs *healthCheckSink) Process(r *http.Request) error {
-	lastKnownState, err := hcs.preRunCheck(r)
+func (hcs *healthCheckSink) Process(req *http.Request) error {
+	ctx := req.Context()
+	lastKnownState, err := hcs.preRunCheck(ctx)
 	if err != nil {
+		registerWebhookFailed(ctx, err, true)
 		return err
 	}
-	return hcs.executeAndRecord(r, lastKnownState)
+	return hcs.executeAndRecord(ctx, req, lastKnownState)
 }
 
 type healthState int
@@ -140,8 +63,8 @@ const (
 var errWebhookDisabled = errors.DefineAborted("webhook_disabled", "webhook disabled")
 
 // preRunCheck verifies if the webhook should be executed.
-func (hcs *healthCheckSink) preRunCheck(r *http.Request) (healthState, error) {
-	h, err := hcs.registry.Get(r)
+func (hcs *healthCheckSink) preRunCheck(ctx context.Context) (healthState, error) {
+	h, err := hcs.registry.Get(ctx)
 	if err != nil {
 		return healthStateUnknown, err
 	}
@@ -188,8 +111,10 @@ func (hcs *healthCheckSink) preRunCheck(r *http.Request) (healthState, error) {
 }
 
 // executeAndRecord runs the provided request using the underlying sink and records the health status.
-func (hcs *healthCheckSink) executeAndRecord(r *http.Request, lastKnownState healthState) error {
-	sinkErr := hcs.sink.Process(r)
+func (hcs *healthCheckSink) executeAndRecord(
+	ctx context.Context, req *http.Request, lastKnownState healthState,
+) error {
+	sinkErr := hcs.sink.Process(req)
 
 	// Fast path 1: the health status is available, the request did not error, and the webhook is healthy.
 	if sinkErr == nil && lastKnownState == healthStateHealthy {
@@ -226,7 +151,7 @@ func (hcs *healthCheckSink) executeAndRecord(r *http.Request, lastKnownState hea
 			},
 		}, nil
 	}
-	if err := hcs.registry.Set(r, f); err != nil {
+	if err := hcs.registry.Set(ctx, f); err != nil {
 		return err
 	}
 	return sinkErr

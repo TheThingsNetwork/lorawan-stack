@@ -97,17 +97,14 @@ const Suggest = ({
     () => formatMessage(sharedMessages.noMatchingUserFound),
     [formatMessage],
   )
-  const collaboratorOf = {
-    path: `${entity}_ids.${entity}_id`,
-    id: entityId,
-  }
+
   const onlyUsers = entity === 'organization'
 
   const handleLoadingOptions = useCallback(
     async value => {
       if (Boolean(value)) {
         try {
-          await dispatch(attachPromise(searchAccounts(value, onlyUsers, collaboratorOf)))
+          await dispatch(attachPromise(searchAccounts(value, onlyUsers)))
           setShowSuggestions(searchResultsRef?.current?.length !== 0)
           const newOptions = searchResultsRef?.current?.map(account => ({
             value:
@@ -137,7 +134,7 @@ const Suggest = ({
         }
       }
     },
-    [dispatch, onlyUsers, searchResultsRef, collaboratorOf, formatMessage],
+    [dispatch, onlyUsers, searchResultsRef, formatMessage],
   )
 
   const handleSetYourself = useCallback(

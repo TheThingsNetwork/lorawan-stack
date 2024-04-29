@@ -14,10 +14,13 @@
 
 import React from 'react'
 
-import { getDataRate, getSignalInformation } from '@console/components/events/utils'
+import { getSignalInformation } from '@console/components/events/utils'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import getDataRate from '@console/lib/data-rate-utils'
+import { activationEvent } from '@console/lib/regexp'
 
 import messages from '../messages'
 
@@ -25,7 +28,7 @@ import DescriptionList from './shared/description-list'
 import JSONPayload from './shared/json-payload'
 
 const ApplicationUplinkPreview = React.memo(({ event }) => {
-  const { data, identifiers } = event
+  const { data, identifiers, name } = event
   const deviceIds = identifiers[0].device_ids
   const { snr, rssi } = getSignalInformation(data)
   const dataRate = getDataRate(data)
@@ -33,6 +36,12 @@ const ApplicationUplinkPreview = React.memo(({ event }) => {
   return (
     <DescriptionList>
       <DescriptionList.Byte title={messages.devAddr} data={deviceIds.dev_addr} />
+      {activationEvent.test(name) && (
+        <>
+          <DescriptionList.Byte title={sharedMessages.joinEUI} data={deviceIds.join_eui} />
+          <DescriptionList.Byte title={sharedMessages.devEUI} data={deviceIds.dev_eui} />
+        </>
+      )}
       {'decoded_payload' in data ? (
         <DescriptionList.Item title={sharedMessages.payload}>
           <JSONPayload data={data.decoded_payload} />

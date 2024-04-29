@@ -26,6 +26,7 @@ import (
 	loracloudgeolocationv3 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/sink"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/lastseen"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -242,7 +243,7 @@ type ApplicationPackagesConfig struct {
 // NewWebhooks returns a new web.Webhooks based on the configuration.
 // If Target is empty, this method returns nil.
 func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.Webhooks, error) {
-	var sink web.Sink
+	var target sink.Sink
 	switch c.Target {
 	case "":
 		return nil, nil
@@ -252,9 +253,7 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 			return nil, err
 		}
 		client.Timeout = c.Timeout
-		sink = &web.HTTPClientSink{
-			Client: client,
-		}
+		target = sink.NewHTTPClientSink(client)
 	default:
 		return nil, errWebhooksTarget.WithAttributes("target", c.Target)
 	}
@@ -264,12 +263,12 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 	if c.UnhealthyAttemptsThreshold > 0 || c.UnhealthyRetryInterval > 0 {
 		registry := web.NewHealthStatusRegistry(c.Registry)
 		registry = web.NewCachedHealthStatusRegistry(registry)
-		sink = web.NewHealthCheckSink(sink, registry, c.UnhealthyAttemptsThreshold, c.UnhealthyRetryInterval)
+		target = sink.NewHealthCheckSink(target, registry, c.UnhealthyAttemptsThreshold, c.UnhealthyRetryInterval)
 	}
 	if c.QueueSize > 0 || c.Workers > 0 {
-		sink = web.NewPooledSink(ctx, server, sink, c.Workers, c.QueueSize)
+		target = sink.NewPooledSink(ctx, server, target, c.Workers, c.QueueSize)
 	}
-	return web.NewWebhooks(ctx, server, c.Registry, sink, c.Downlinks)
+	return web.NewWebhooks(ctx, server, c.Registry, target, c.Downlinks)
 }
 
 // NewPubSub returns a new pubsub.PubSub based on the configuration.

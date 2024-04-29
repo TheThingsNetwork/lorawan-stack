@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
+import { createSelector } from 'reselect'
+import { useSelector } from 'react-redux'
+import { get, set } from 'lodash'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -22,6 +25,8 @@ import Input from '@ttn-lw/components/input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Radio from '@ttn-lw/components/radio-button'
 import UnitInput from '@ttn-lw/components/unit-input'
+import Button from '@ttn-lw/components/button'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -36,6 +41,9 @@ import {
   fCntWidthDecode,
   parseLorawanMacVersion,
 } from '@console/lib/device-utils'
+import getDataRate from '@console/lib/data-rate-utils'
+
+import { selectDataRates } from '@console/store/selectors/configuration'
 
 const m = defineMessages({
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
@@ -67,6 +75,18 @@ const m = defineMessages({
   adrAckValue: '{count, plural, one {every message} other {every {count} messages}}',
   statusCountPeriodicity: 'Status count periodicity',
   statusTimePeriodicity: 'Status time periodicity',
+  dataRate: 'Data Rate {n}',
+  dataRatePlaceholder: 'Data Rate',
+  minNbTrans: 'Min. NbTrans',
+  maxNbTrans: 'Max. NbTrans',
+  useDefaultNbTrans: 'Use default settings for number of retransmissions',
+  adrNbTrans: 'ADR number of retransmissions (NbTrans)',
+  overrideNbTrans: 'Override server defaults for NbTrans (all data rates)',
+  defaultForAllRates: '(Default for all data rates)',
+  defaultNbTransMessage:
+    'Overriding the default is not required for using data rate overrides (below)',
+  specificOverrides: 'Data rate specific overrides',
+  addSpecificOverride: 'Add data rate specific override',
 })
 
 // 0...7
@@ -115,10 +135,32 @@ const MacSettingsSection = props => {
     lorawanVersion,
     isClassB,
     isClassC,
+    bandId,
   } = props
 
-  const { values } = useFormContext()
+  const { values, setFieldValue, setFieldTouched } = useFormContext()
   const { mac_settings } = values
+  const alreadySelectedDataRates = Object.keys(mac_settings?.adr?.dynamic?.overrides || [])
+  const dataRateOverrideOptions = useSelector(
+    createSelector(
+      state => selectDataRates(state, bandId, values.lorawan_phy_version),
+      dataRates =>
+        Object.keys(dataRates).reduce(
+          (result, key) =>
+            result.concat({
+              label: getDataRate({ settings: { data_rate: dataRates[key].rate } }),
+              value: `data_rate_${key}`,
+            }),
+          [],
+        ),
+    ),
+  )
+  // Filter out the already selected data rate indices.
+  const dataRateFilterOption = useCallback(
+    option => !alreadySelectedDataRates.includes(option.value),
+    [alreadySelectedDataRates],
+  )
+
   const isNewLorawanVersion = parseLorawanMacVersion(lorawanVersion) >= 110
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
@@ -150,6 +192,51 @@ const MacSettingsSection = props => {
       setIsCollapsed(false)
     }
   }, [handleIsCollapsedChange, isABP, isClassB, isCollapsed, isMulticast, pingPeriodicityRequired])
+
+  const adrOverrides = mac_settings.adr.dynamic.overrides
+  const showEditNbTrans = !values.mac_settings?.adr.dynamic._use_default_nb_trans
+  const defaultNbTransDisabled = !values.mac_settings?.adr.dynamic._override_nb_trans_defaults
+  const addOverride = React.useCallback(() => {
+    const newOverride = { _data_rate_index: '', min_nb_trans: '', max_nb_trans: '' }
+    setFieldValue(
+      'mac_settings.adr.dynamic.overrides',
+      adrOverrides
+        ? { ...adrOverrides, [`_empty-${Date.now()}`]: newOverride }
+        : { [`_empty-${Date.now()}`]: newOverride },
+    )
+    setFieldTouched('mac_settings.adr.dynamic._overrides', true)
+  }, [setFieldValue, adrOverrides, setFieldTouched])
+  const handleRemoveButtonClick = useCallback(
+    (_, index) => {
+      setFieldValue(
+        'mac_settings.adr.dynamic.overrides',
+        Object.keys(adrOverrides)
+          .filter(key => key !== index)
+          .reduce((acc, key) => ({ ...acc, [key]: adrOverrides[key] }), {}),
+      )
+    },
+    [adrOverrides, setFieldValue],
+  )
+
+  // Define a value setter for the data rate index field which
+  // handles setting the object keys correctly, since the index
+  // is set as the object key in the API schema.
+  // A similar result could be done without pseudo values, purely
+  // with decoder/encoder, but it would make error mapping
+  // more complex.
+  const dataRateValueSetter = useCallback(
+    ({ setValues }, { name, value }) => {
+      const index = name.split('.').slice(-2)[0] // Would be: data_rate_{x}.
+      const oldOverride = get(values, `mac_settings.adr.dynamic.overrides.${index}`, {})
+      const overrides = { ...get(values, 'mac_settings.adr.dynamic.overrides', {}) }
+      // Empty data rate index objects, are stored with a pseudo key. Remove it.
+      delete overrides[index]
+      // Move the existing values to the new data rate key.
+      overrides[value] = { ...oldOverride, _data_rate_index: value }
+      setValues(values => set(values, 'mac_settings.adr.dynamic.overrides', overrides))
+    },
+    [values],
+  )
 
   return (
     <Form.CollapseSection
@@ -479,17 +566,121 @@ const MacSettingsSection = props => {
         <Radio label={sharedMessages.disabled} value="disabled" />
       </Form.Field>
       {isDynamicAdr && (
-        <Form.Field
-          title={m.adrMargin}
-          name="mac_settings.adr.dynamic.margin"
-          component={Input}
-          type="number"
-          tooltipId={tooltipIds.ADR_MARGIN}
-          min={-100}
-          max={100}
-          inputWidth="xs"
-          append="dB"
-        />
+        <>
+          <Form.Field
+            title={m.adrMargin}
+            name="mac_settings.adr.dynamic.margin"
+            component={Input}
+            type="number"
+            tooltipId={tooltipIds.ADR_MARGIN}
+            min={-100}
+            max={100}
+            inputWidth="xs"
+            append="dB"
+          />
+          <Form.Field
+            label={m.useDefaultNbTrans}
+            name="mac_settings.adr.dynamic._use_default_nb_trans"
+            component={Checkbox}
+            tooltipId={tooltipIds.USE_DEFAULT_NB_TRANS}
+          />
+          {showEditNbTrans && (
+            <>
+              <Form.Field
+                title={m.adrNbTrans}
+                name="mac_settings.adr.dynamic._override_nb_trans_defaults"
+                component={Checkbox}
+                label={m.overrideNbTrans}
+              />
+              <Form.FieldContainer horizontal className="al-end mb-cs-xs">
+                <Form.Field
+                  title={m.minNbTrans}
+                  name="mac_settings.adr.dynamic.min_nb_trans"
+                  component={Input}
+                  type="number"
+                  min={1}
+                  max={3}
+                  disabled={defaultNbTransDisabled}
+                  inputWidth="xs"
+                  className="d-flex direction-column"
+                />
+                <Form.Field
+                  title={m.maxNbTrans}
+                  name="mac_settings.adr.dynamic.max_nb_trans"
+                  component={Input}
+                  type="number"
+                  min={1}
+                  max={3}
+                  disabled={defaultNbTransDisabled}
+                  inputWidth="xs"
+                  className="d-flex direction-column"
+                />
+                <Message content={m.defaultForAllRates} className="mt-cs-xl" />
+              </Form.FieldContainer>
+              {!defaultNbTransDisabled && (
+                <div>
+                  <Icon icon="info" nudgeUp className="mr-cs-xxs" />
+                  <Message content={m.defaultNbTransMessage} />
+                </div>
+              )}
+              <Form.InfoField
+                title={m.specificOverrides}
+                tooltipId={tooltipIds.DATA_RATE_SPECIFIC_OVERRIDES}
+                className="mt-cs-m"
+              >
+                {adrOverrides &&
+                  Object.keys(adrOverrides).map(index => (
+                    <Form.FieldContainer horizontal className="al-end" key={index}>
+                      <Form.Field
+                        title={m.dataRatePlaceholder}
+                        name={`mac_settings.adr.dynamic.overrides.${index}._data_rate_index`}
+                        valueSetter={dataRateValueSetter}
+                        component={Select}
+                        options={dataRateOverrideOptions}
+                        filterOption={dataRateFilterOption}
+                        inputWidth="s"
+                        fieldWidth="xxs"
+                        className="d-flex direction-column"
+                      />
+                      <Form.Field
+                        title={m.minNbTrans}
+                        name={`mac_settings.adr.dynamic.overrides.${index}.min_nb_trans`}
+                        component={Input}
+                        fieldWidth="xxs"
+                        className="d-flex direction-column"
+                        type="number"
+                        min={1}
+                        max={3}
+                      />
+                      <Form.Field
+                        title={m.maxNbTrans}
+                        name={`mac_settings.adr.dynamic.overrides.${index}.max_nb_trans`}
+                        component={Input}
+                        fieldWidth="xxs"
+                        className="d-flex direction-column"
+                        type="number"
+                        min={1}
+                        max={3}
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleRemoveButtonClick}
+                        icon="delete"
+                        message={sharedMessages.remove}
+                        value={index}
+                      />
+                    </Form.FieldContainer>
+                  ))}
+                <Button
+                  type="button"
+                  message={m.addSpecificOverride}
+                  onClick={addOverride}
+                  icon="add"
+                />
+              </Form.InfoField>
+            </>
+          )}
+        </>
       )}
       {isStaticAdr && (
         <>
@@ -542,6 +733,7 @@ const MacSettingsSection = props => {
 
 MacSettingsSection.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
+  bandId: PropTypes.string.isRequired,
   initiallyCollapsed: PropTypes.bool,
   isClassB: PropTypes.bool,
   isClassC: PropTypes.bool,

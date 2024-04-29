@@ -17,11 +17,14 @@ package ttnmage
 import (
 	"context"
 	"fmt"
+	"io/fs"
+	"log"
 	"os"
 	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 const (
@@ -57,8 +60,15 @@ func (SQL) Fmt(context.Context) error {
 
 func walkDir(root string, apply func(path string, filename string) error) error {
 	files, err := os.ReadDir(root)
-	if err != nil {
+	if err != nil && !errors.Is(err, fs.ErrPermission) {
 		return err
+	}
+
+	if errors.Is(err, fs.ErrPermission) {
+		if mg.Verbose() {
+			log.Printf("skipping '%s' file due to permission denied\n", root)
+		}
+		return nil
 	}
 
 	for _, file := range files {

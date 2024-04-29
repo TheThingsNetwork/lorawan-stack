@@ -217,34 +217,46 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
       })
     }
 
-    sessionInfoData.items.push(
-      {
-        key: sharedMessages.devAddr,
-        value: dev_addr,
-        type: 'byte',
-        sensitive: false,
-        enableUint32: true,
-      },
-      {
-        key: sharedMessages.nwkSKey,
-        value: f_nwk_s_int_key.key,
-        type: 'byte',
-        sensitive: true,
-      },
-      {
-        key: sharedMessages.sNwkSIKey,
-        value: s_nwk_s_int_key.key,
-        type: 'byte',
-        sensitive: true,
-      },
-      {
-        key: sharedMessages.nwkSEncKey,
-        value: nwk_s_enc_key.key,
-        type: 'byte',
-        sensitive: true,
-      },
-      { key: sharedMessages.appSKey, value: app_s_key.key, type: 'byte', sensitive: true },
-    )
+    if (lorawanVersion >= 100 && lorawanVersion < 110) {
+      sessionInfoData.items.push(
+        {
+          key: sharedMessages.nwkSKey,
+          value: f_nwk_s_int_key.key,
+          type: 'byte',
+          sensitive: true,
+        },
+        { key: sharedMessages.appSKey, value: app_s_key.key, type: 'byte', sensitive: true },
+      )
+    } else {
+      sessionInfoData.items.push(
+        {
+          key: sharedMessages.devAddr,
+          value: dev_addr,
+          type: 'byte',
+          sensitive: false,
+          enableUint32: true,
+        },
+        {
+          key: lorawanVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey,
+          value: f_nwk_s_int_key.key,
+          type: 'byte',
+          sensitive: true,
+        },
+        {
+          key: sharedMessages.sNwkSIKey,
+          value: s_nwk_s_int_key.key,
+          type: 'byte',
+          sensitive: true,
+        },
+        {
+          key: sharedMessages.nwkSEncKey,
+          value: nwk_s_enc_key.key,
+          type: 'byte',
+          sensitive: true,
+        },
+        { key: sharedMessages.appSKey, value: app_s_key.key, type: 'byte', sensitive: true },
+      )
+    }
   }
 
   sheetData.push(sessionInfoData)

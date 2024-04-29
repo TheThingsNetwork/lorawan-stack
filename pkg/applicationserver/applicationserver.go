@@ -1499,14 +1499,10 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids *tt
 	return as.decryptAndDecodeDownlink(ctx, dev, msg, link.DefaultFormatters)
 }
 
-type ctxConfigKeyType struct{}
-
 // GetConfig returns the Application Server config based on the context.
 func (as *ApplicationServer) GetConfig(ctx context.Context) (*Config, error) {
-	if val, ok := ctx.Value(&ctxConfigKeyType{}).(*Config); ok {
-		return val, nil
-	}
-	return as.config, nil
+	c := *as.config
+	return &c, nil
 }
 
 // GetMQTTConfig returns the MQTT frontend configuration based on the context.

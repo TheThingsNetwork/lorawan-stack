@@ -549,6 +549,7 @@ var CreateUserBookmarkRequestFieldPathsTopLevel = []string{
 }
 var ListUserBookmarksRequestFieldPathsNested = []string{
 	"deleted",
+	"entity_types",
 	"limit",
 	"order",
 	"page",
@@ -559,6 +560,7 @@ var ListUserBookmarksRequestFieldPathsNested = []string{
 
 var ListUserBookmarksRequestFieldPathsTopLevel = []string{
 	"deleted",
+	"entity_types",
 	"limit",
 	"order",
 	"page",

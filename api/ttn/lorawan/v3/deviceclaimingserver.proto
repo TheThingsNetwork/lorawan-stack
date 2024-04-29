@@ -193,9 +193,9 @@ message GetClaimStatusResponse {
   VendorSpecific vendor_specific = 4;
 }
 
-// The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
-// and allows clients to claim end devices.
+// The EndDeviceClaimingServer service support claiming and managing end devices on external Join Servers.
 service EndDeviceClaimingServer {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Claim and manage end devices on external Join Servers."};
   // Claims the end device on a Join Server by claim authentication code or QR code.
   rpc Claim(ClaimEndDeviceRequest) returns (EndDeviceIdentifiers) {
     option (google.api.http) = {
@@ -267,7 +267,9 @@ message BatchUnclaimEndDevicesResponse {
   map<string, ErrorDetails> failed = 2;
 }
 
+// The EndDeviceBatchClaimingServer service support claiming and managing batches of end devices on external Join Servers.
 service EndDeviceBatchClaimingServer {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Claim and manage batches of end devices on external Join Servers."};
   // Unclaims multiple end devices on an external Join Server.
   // All devices must have the same application ID.
   // Check the response for devices that could not be unclaimed.
@@ -357,8 +359,21 @@ message ClaimGatewayRequest {
   CUPSRedirection cups_redirection = 6;
 
   // Frequency plan ID of the target gateway.
-  // This equals the first element of the frequency_plan_ids field.
-  string target_frequency_plan_id = 7 [(validate.rules).string.max_len = 64];
+  // TODO: Remove this field (https://github.com/TheThingsIndustries/lorawan-stack/issues/4024)
+  // DEPRECATED: Use target_frequency_plan_ids instead.
+  string target_frequency_plan_id = 7 [
+    (validate.rules).string.max_len = 64,
+    deprecated = true
+  ];
+
+  // Frequency plan IDs of the target gateway.
+  repeated string target_frequency_plan_ids = 8 [(validate.rules).repeated = {
+    min_items: 0,
+    max_items: 8,
+    items: {
+      string: {max_len: 64}
+    }
+  }];
 }
 
 message AuthorizeGatewayRequest {
@@ -403,7 +418,9 @@ message GetInfoByGatewayEUIResponse {
   bool supports_claiming = 2;
 }
 
+// The GatewayClaimingServer service support claiming and managing gateway claims.
 service GatewayClaimingServer {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Claim gateways and manage claims."};
   // Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user.
   rpc Claim(ClaimGatewayRequest) returns (GatewayIdentifiers) {
     option (google.api.http) = {

@@ -161,7 +161,6 @@ var createOAuthClient = &cobra.Command{
 			}
 			return nil
 		})
-
 		if err != nil {
 			return err
 		}

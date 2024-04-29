@@ -88,6 +88,21 @@ func (st *StoreTest) TestBasicBookmarkOperations(t *testing.T) { // nolint:paral
 		a.So(bookmarks, should.HaveLength, len(entityIDs))
 	})
 
+	t.Run("FindBoomarks_FilterByEntityType", func(t *testing.T) { // nolint:paralleltest
+		a, ctx := test.New(t)
+
+		bookmarks, err := s.FindBookmarks(ctx, usr1.GetIds(), "organization")
+		a.So(err, should.BeNil)
+		// There is one of each entity type, so by filtering the by 'organization' it should return one bookmark.
+		a.So(bookmarks, should.HaveLength, 1)
+
+		bookmarks, err = s.FindBookmarks(ctx, usr1.GetIds(), "application", "end device")
+		a.So(err, should.BeNil)
+		// There is one of each entity type, so by filtering the by ['application','end device'] and it should return
+		// only two bookmarks.
+		a.So(bookmarks, should.HaveLength, 2)
+	})
+
 	t.Run("PurgeBookmark", func(t *testing.T) { // nolint:paralleltest
 		a, ctx := test.New(t)
 		err := s.PurgeBookmark(ctx, &ttnpb.UserBookmark{

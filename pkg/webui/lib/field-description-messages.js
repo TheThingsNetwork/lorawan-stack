@@ -209,6 +209,10 @@ const m = defineMessages({
     'The device nonces ensure that join requests cannot be replayed by attackers. Resetting the device nonces enables the end device to re-use a previously used nonce. Do not use this option unless you are sure that you would like the nonces to be usable again.',
   alcsyncDescription:
     'The Application Layer Clock Synchronization package is part of the LoRa TS003 specification, it synchronizes the real-time clock of an end-device to the network’s Global Positioning System (GPS) clock with near-second accuracy. It is useful for end-devices that do not have access to another accurate time source.',
+  useDefaultNbTransDescription:
+    'The number of retransmissions (NbTrans) controls how many times a frame will be transmitted over the air. The redundancy introduced by retransmissions improves the chances that a packet will be received, at the expense of more power usage. By default, depending on the number of missed frames, the same frame may be transmitted 3 times.',
+  dataRateSpecificOverridesDescription:
+    'Data rate specific overrides allow the number of transmissions to be limited on a per data rate basis. This may be used to limit power usage for low data rates.',
 })
 
 const descriptions = Object.freeze({
@@ -479,6 +483,12 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.ALCSYNC]: {
     description: m.alcsyncDescription,
+  },
+  [TOOLTIP_IDS.USE_DEFAULT_NB_TRANS]: {
+    description: m.useDefaultNbTransDescription,
+  },
+  [TOOLTIP_IDS.DATA_RATE_SPECIFIC_OVERRIDES]: {
+    description: m.dataRateSpecificOverridesDescription,
   },
 })
 

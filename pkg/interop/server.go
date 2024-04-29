@@ -89,7 +89,7 @@ type Component interface {
 }
 
 // NewServer builds a new server.
-func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.InteropServer) (*Server, error) {
+func NewServer(c Component, contextFiller fillcontext.Filler, conf config.InteropServer) (*Server, error) {
 	ctx := log.NewContextWithField(c.Context(), "namespace", "interop")
 	logger := log.FromContext(ctx)
 
@@ -133,7 +133,7 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 	s.router.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
 	s.router.Use(
 		mux.MiddlewareFunc(webmiddleware.Recover()),
-		mux.MiddlewareFunc(webmiddleware.FillContext(contextFillers...)),
+		mux.MiddlewareFunc(webmiddleware.FillContext(contextFiller)),
 		mux.MiddlewareFunc(webmiddleware.RequestURL()),
 		mux.MiddlewareFunc(webmiddleware.RequestID()),
 		mux.MiddlewareFunc(webmiddleware.MaxBody(1<<15)), // 32 kB.

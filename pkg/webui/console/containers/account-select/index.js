@@ -45,7 +45,7 @@ SingleValue.propTypes = {
   }).isRequired,
 }
 
-const Suggest = ({ entity, ...rest }) => {
+const Suggest = ({ entity, entityId, ...rest }) => {
   const dispatch = useDispatch()
   const searchResults = useSelector(selectSearchResultAccountIds)
   const searchResultsRef = useRef()
@@ -55,12 +55,16 @@ const Suggest = ({ entity, ...rest }) => {
     () => formatMessage(sharedMessages.noMatchingUserFound),
     [formatMessage],
   )
+  const collaboratorOf = {
+    path: `${entity}_ids.${entity}_id`,
+    id: entityId,
+  }
   const onlyUsers = entity === 'organization'
 
   const handleLoadingOptions = useCallback(
     async value => {
       if (value.length >= 1) {
-        await dispatch(attachPromise(searchAccounts(value, onlyUsers)))
+        await dispatch(attachPromise(searchAccounts(value, onlyUsers, collaboratorOf)))
         const newOptions = searchResultsRef.current.map(account => ({
           value:
             'user_ids' in account
@@ -85,7 +89,7 @@ const Suggest = ({ entity, ...rest }) => {
         return translatedOptions
       }
     },
-    [dispatch, searchResultsRef, formatMessage, onlyUsers],
+    [dispatch, onlyUsers, collaboratorOf, formatMessage],
   )
 
   return (
@@ -106,14 +110,21 @@ const Suggest = ({ entity, ...rest }) => {
 
 Suggest.propTypes = {
   entity: PropTypes.string.isRequired,
+  entityId: PropTypes.string.isRequired,
 }
 
-const AccountSelect = ({ entity, ...rest }) => (
-  <Suggest {...rest} className={styles.userSelect} entity={entity.toLowerCase()} />
+const AccountSelect = ({ entity, entityId, ...rest }) => (
+  <Suggest
+    {...rest}
+    className={styles.userSelect}
+    entity={entity.toLowerCase()}
+    entityId={entityId}
+  />
 )
 
 AccountSelect.propTypes = {
   entity: PropTypes.string.isRequired,
+  entityId: PropTypes.string.isRequired,
 }
 
 export default AccountSelect

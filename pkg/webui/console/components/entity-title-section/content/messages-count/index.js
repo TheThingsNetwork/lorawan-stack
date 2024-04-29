@@ -23,18 +23,22 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './messages-count.styl'
 
 const MessagesCount = React.forwardRef((props, ref) => {
-  const { className, icon, value, iconClassName } = props
+  const { className, icon, value, iconClassName, helpTooltip } = props
 
   return (
     <div ref={ref} className={classnames(style.container, className)}>
       <Icon className={iconClassName} icon={icon} nudgeUp />
       {typeof value === 'number' ? <FormattedNumber value={value} /> : value}
+      {helpTooltip && (
+        <Icon className="tc-subtle-gray ml-cs-xxs" icon="help_outline" nudgeUp small />
+      )}
     </div>
   )
 })
 
 MessagesCount.propTypes = {
   className: PropTypes.string,
+  helpTooltip: PropTypes.bool,
   icon: PropTypes.icon.isRequired,
   iconClassName: PropTypes.string,
   value: PropTypes.node.isRequired,
@@ -43,6 +47,7 @@ MessagesCount.propTypes = {
 MessagesCount.defaultProps = {
   className: undefined,
   iconClassName: undefined,
+  helpTooltip: false,
 }
 
 export default MessagesCount

@@ -19,6 +19,7 @@ package ttn.lorawan.v3;
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "ttn/lorawan/v3/end_device.proto";
 import "ttn/lorawan/v3/picture.proto";
 import "validate/validate.proto";
@@ -96,7 +97,9 @@ message ParseEndDeviceQRCodeResponse {
   EndDeviceTemplate end_device_template = 2;
 }
 
+// The EndDeviceQRCodeGenerator service provides functionality to generate and parse QR codes.
 service EndDeviceQRCodeGenerator {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Generate and parse end device QR codes."};
   // Return the QR code format.
   rpc GetFormat(GetQRCodeFormatRequest) returns (QRCodeFormat) {
     option (google.api.http) = {get: "/qr-codes/end-devices/formats/{format_id}"};

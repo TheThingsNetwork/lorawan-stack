@@ -107,6 +107,42 @@ func TestUsersBookmarksOperations(t *testing.T) {
 			a.So(got, should.BeNil)
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		})
+		t.Run("FindBookmarks/HasEntityType", func(t *testing.T) { // nolint:paralleltest
+			a, ctx := test.New(t)
+
+			// Invalid entity type.
+			got, err := reg.List(ctx, &ttnpb.ListUserBookmarksRequest{
+				UserIds:     usr1.Ids,
+				EntityTypes: []string{"invalid"},
+			}, creds)
+			a.So(got, should.BeNil)
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+			// Entity type without bookmarks.
+			got, err = reg.List(ctx, &ttnpb.ListUserBookmarksRequest{
+				UserIds:     usr1.Ids,
+				EntityTypes: []string{"organization"},
+			}, creds)
+			a.So(got, should.NotBeNil)
+			a.So(got.GetBookmarks(), should.HaveLength, 0)
+			a.So(err, should.BeNil)
+
+			// Entity type with bookmarks.
+			got, err = reg.List(ctx, &ttnpb.ListUserBookmarksRequest{
+				UserIds:     usr1.Ids,
+				EntityTypes: []string{"application"},
+			}, creds)
+			a.So(got.GetBookmarks(), should.HaveLength, 2)
+			a.So(err, should.BeNil)
+
+			// Multiple entity types in request
+			got, err = reg.List(ctx, &ttnpb.ListUserBookmarksRequest{
+				UserIds:     usr1.Ids,
+				EntityTypes: []string{"application", "organization", "gateway"},
+			}, creds)
+			a.So(got.GetBookmarks(), should.HaveLength, 2)
+			a.So(err, should.BeNil)
+		})
 		t.Run("FindBookmarks", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 			got, err := reg.List(ctx, &ttnpb.ListUserBookmarksRequest{
