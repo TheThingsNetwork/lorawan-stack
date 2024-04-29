@@ -216,15 +216,18 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
       })
     }
 
+    sessionInfoData.items.push(
+      {
+        key: sharedMessages.devAddr,
+        value: dev_addr,
+        type: 'byte',
+        sensitive: false,
+        enableUint32: true,
+      }
+    )
+
     if (lorawanVersion >= 100 && lorawanVersion < 110) {
       sessionInfoData.items.push(
-        {
-          key: sharedMessages.devAddr,
-          value: dev_addr,
-          type: 'byte',
-          sensitive: false,
-          enableUint32: true,
-        },
         {
           key: sharedMessages.nwkSKey,
           value: f_nwk_s_int_key.key,
@@ -235,13 +238,6 @@ const DeviceInfo = ({ frequencyPlans, device, onExport }) => {
       )
     } else {
       sessionInfoData.items.push(
-        {
-          key: sharedMessages.devAddr,
-          value: dev_addr,
-          type: 'byte',
-          sensitive: false,
-          enableUint32: true,
-        },
         {
           key: lorawanVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey,
           value: f_nwk_s_int_key.key,
