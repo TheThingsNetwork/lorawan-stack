@@ -15,6 +15,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormattedNumber, defineMessages } from 'react-intl'
+import classNames from 'classnames'
 
 import Panel from '@ttn-lw/components/panel'
 import Icon, {
@@ -44,14 +45,16 @@ import style from './gateway-status-panel.styl'
 const m = defineMessages({
   statusLabel: 'Up and running for {days} days',
   statusRecieved: 'Status received',
+  frequencyRange: '`{minFreq} - {maxFreq}MHz`',
 })
 
 const GatewayStatusPanel = () => {
+  const dispatch = useDispatch()
   const gatewayStats = useSelector(selectGatewayStatistics)
   const error = useSelector(selectGatewayStatisticsError)
   const fetching = useSelector(selectGatewayStatisticsIsFetching)
   const gtwId = useSelector(selectSelectedGatewayId)
-  const isDisconnected = Boolean(gatewayStats) && Boolean(gatewayStats.disconnected_at)
+  const isDisconnected = !Boolean(gatewayStats) || Boolean(gatewayStats.disconnected_at)
   const isFetching = !Boolean(gatewayStats) && fetching
   const isUnavailable = Boolean(error) && Boolean(error.message) && isTranslated(error.message)
 
@@ -64,8 +67,28 @@ const GatewayStatusPanel = () => {
     }
     return 0
   }, [gatewayStats])
+  const maxRoundTripTime = useMemo(
+    () =>
+      gatewayStats?.round_trip_times && parseFloat(gatewayStats.round_trip_times.max.split('s')[0]),
+    [gatewayStats],
+  )
+  const minRoundTripTime = useMemo(
+    () =>
+      gatewayStats?.round_trip_times && parseFloat(gatewayStats.round_trip_times.min.split('s')[0]),
+    [gatewayStats],
+  )
+  const medianRoundTripTime = useMemo(
+    () =>
+      gatewayStats?.round_trip_times &&
+      parseFloat(gatewayStats.round_trip_times.median.split('s')[0]),
+    [gatewayStats],
+  )
+  const position = useMemo(() => {
+    const barWidth = maxRoundTripTime - minRoundTripTime
+    const mediumPoint = medianRoundTripTime - minRoundTripTime
+    return gatewayStats && (mediumPoint * 100) / barWidth
+  }, [gatewayStats, maxRoundTripTime, medianRoundTripTime, minRoundTripTime])
 
-  const dispatch = useDispatch()
   useEffect(() => {
     dispatch(startGatewayStatistics(gtwId))
     return () => {
@@ -83,16 +106,16 @@ const GatewayStatusPanel = () => {
     >
       <StatusLabel success content={m.statusLabel} contentValues={{ days: connectedDays }} />
       <hr className={style.gtwStatusPanelDivider} />
-      <div>
+      <div className="d-flex">
         <div>
-          <div></div>
-          <Message content="Transmissions" component="h4" className="mb-cs-xs" />
+          <div>Uptime</div>
+          <Message content="Transmissions" component="h4" className="mb-cs-xxs" />
           <div className="d-flex al-center j-between">
             <div className="d-flex al-center gap-cs-xxs">
               <Icon icon={IconUplink} />
-              <FormattedNumber value={gatewayStats?.uplink_count} />
+              <FormattedNumber value={gatewayStats?.uplink_count ?? 0} />
             </div>
-            {gatewayStats?.last_status_received_at && (
+            {gatewayStats?.last_uplink_received_at && (
               <DateTime.Relative
                 value={gatewayStats?.last_uplink_received_at}
                 relativeTimeStyle="short"
@@ -102,7 +125,7 @@ const GatewayStatusPanel = () => {
           <div className="d-flex al-center j-between">
             <div className="d-flex al-center gap-cs-xxs">
               <Icon icon={IconDownlink} />
-              <FormattedNumber value={gatewayStats?.downlink_count} />
+              <FormattedNumber value={gatewayStats?.downlink_count ?? 0} />
               {gatewayStats?.tx_acknowledgment_count && (
                 <>
                   {'('}
@@ -111,7 +134,7 @@ const GatewayStatusPanel = () => {
                 </>
               )}
             </div>
-            {gatewayStats?.last_status_received_at && (
+            {gatewayStats?.last_downlink_received_at && (
               <DateTime.Relative
                 value={gatewayStats?.last_downlink_received_at}
                 relativeTimeStyle="short"
@@ -134,20 +157,89 @@ const GatewayStatusPanel = () => {
         <div>
           <div className="d-flex al-center">
             <div>
-              <Message content={'Connection'} component="h4" className="mb-cs-xs" />
-              {isDisconnected && <Message content={'Disconnected'} className="c-bg-error-normal" />}
-              {isFetching && <Message content={'Fetching'} className="c-bg-warning-normal" />}
-              {isUnavailable && <Message content={'Unavailable'} />}
+              <Message content={'Connection'} component="h4" className="mb-cs-xxs" />
               {!isDisconnected && !isFetching && !isUnavailable && (
-                <Message content={'Connected to network'} className="c-bg-success-normal " />
+                <Message
+                  content={'Connected to network'}
+                  className={classNames(style.gtwStatusPanelTag, 'c-bg-success-normal')}
+                />
               )}
             </div>
             <div>
-              <Message content={'Protocol'} />
+              <Message content={'Protocol'} component="h4" className="mb-cs-xxs" />
+              {gatewayStats?.protocol && (
+                <Message
+                  content={gatewayStats?.protocol.toUpperCase()}
+                  className={classNames(style.gtwStatusPanelTag, 'c-bg-brand-normal')}
+                />
+              )}
             </div>
           </div>
-          <div></div>
-          <div></div>
+          {Boolean(gatewayStats?.round_trip_times) && (
+            <>
+              <div className="d-flex j-between al-center">
+                <Message
+                  content="Round trip times (ms)"
+                  component="h4"
+                  className="mb-cs-xxs mt-0"
+                />
+                <Message
+                  content={`(n=${gatewayStats?.round_trip_times.count})`}
+                  className="mb-cs-xxs mt-0"
+                />
+              </div>
+              <div className={style.gtwStatusPanelRoundTripTimeBar}>
+                <span
+                  className={style.gtwStatusPanelRoundTripTimeBarPointer}
+                  style={{
+                    left: `${position}%`,
+                  }}
+                />
+              </div>
+              <div className="pos-relative d-flex j-between">
+                <span className="fs-s">
+                  <FormattedNumber value={(minRoundTripTime * 1000).toFixed(2)} />
+                </span>
+                <span
+                  className="pos-absolute fs-s fw-bold"
+                  style={{
+                    left: `${position - 6}%`,
+                  }}
+                >
+                  <FormattedNumber value={(medianRoundTripTime * 1000).toFixed(2)} />
+                </span>
+                <span className="fs-s">
+                  <FormattedNumber value={(maxRoundTripTime * 1000).toFixed(2)} />
+                </span>
+              </div>
+            </>
+          )}
+          {Boolean(gatewayStats?.sub_bands) && (
+            <div>
+              <Message content={'Duty cycle utilization'} component="h4" className="mb-cs-xxs" />
+              {gatewayStats.sub_bands.map(band => {
+                const maxFrequency = band.max_frequency / 1e6
+                const minFrequency = band.min_frequency / 1e6
+                const utilization = band.downlink_utilization
+                  ? (band.downlink_utilization * 100) / band.downlink_utilization_limit
+                  : 0
+                return (
+                  <div key={band.id} className="d-flex al-center j-between">
+                    <Message
+                      content={m.frequencyRange}
+                      values={{
+                        minFreq: minFrequency.toFixed(1),
+                        maxFreq: maxFrequency.toFixed(1),
+                      }}
+                      convertBackticks
+                      className={style.gtwStatusPanelSubBand}
+                    />
+                    <div>{utilization.toFixed(2)}%</div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </Panel>

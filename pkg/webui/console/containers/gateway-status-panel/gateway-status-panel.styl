@@ -18,3 +18,29 @@
     margin-top: $cs.l
     margin-bottom: $cs.l
     height: 0px
+
+  &-tag
+    border-radius: $br.xs
+    padding: $cs.xxs $cs.xs
+    color: var(--c-text-neutral-min)
+    font-weight: 600
+
+  &-round-trip-time-bar
+    background: linear-gradient(90deg, #1CB041 0%, #DB7600 50%, #DB2328 100%)
+    height: $cs.m
+    width: 100%
+    border-radius: $br.xl
+    position: relative
+
+    &-pointer
+      width: $cs.xxs
+      height: 100%
+      background: var(--c-bg-neutral-min)
+      position: absolute
+
+  &-sub-band
+    code
+      font-size: $fs.m
+      background-color: var(--c-bg-neutral-min)
+      padding: 0
+      color: var(--c-text-neutral-heavy)
