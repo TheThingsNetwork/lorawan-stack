@@ -612,6 +612,9 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 			return true
 		}
 	}
+	if len(connected.Antennas) > 0 && len(current.Antennas) > 0 && connected.Antennas[0].Gain != current.Antennas[0].Gain {
+		return true
+	}
 	if connected.DownlinkPathConstraint != current.DownlinkPathConstraint ||
 		connected.DisablePacketBrokerForwarding != current.DisablePacketBrokerForwarding ||
 		connected.EnforceDutyCycle != current.EnforceDutyCycle ||
