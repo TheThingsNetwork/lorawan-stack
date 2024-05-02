@@ -82,7 +82,6 @@ const EntitiesItem = ({ bookmark, headers, last }) => {
             key={index}
             align={header.align}
             className={classNames(styles.entityCell, {
-              [styles.entityCellExtended]: index === 1 && headers[index].name === 'name',
               [styles.entityCellSmall]: headers[index].name === 'type',
             })}
           >

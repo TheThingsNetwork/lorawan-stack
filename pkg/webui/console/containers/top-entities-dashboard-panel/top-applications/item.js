@@ -76,7 +76,13 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
             requestAction={loadDeviceCount}
             errorRenderFunction={errorRenderFunction}
           >
-            <Table.DataCell align={header.align} className={styles.entityCell}>
+            <Table.DataCell
+              align={header.align}
+              className={classNames(styles.entityCell, {
+                [styles.entityCellDivided]:
+                  headers[index].name === 'lastSeen' || headers[index].name === 'name',
+              })}
+            >
               {headers[index].render(value, entityID)}
             </Table.DataCell>
           </RequireRequest>
