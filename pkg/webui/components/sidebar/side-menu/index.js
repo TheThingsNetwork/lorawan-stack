@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useContext } from 'react'
 import classnames from 'classnames'
+
+import SidebarContext from '@console/containers/sidebar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -24,8 +26,11 @@ import style from './side.styl'
 
 const SideNavigation = ({ className, children }) => {
   const node = useRef()
+  const { isMinimized } = useContext(SidebarContext)
 
-  const navigationClassNames = classnames(className, style.navigation)
+  const navigationClassNames = classnames(className, style.navigation, {
+    [style.isMinimized]: isMinimized,
+  })
 
   // Add a scroll gradient to the navigation sidebar.
   useEffect(() => {

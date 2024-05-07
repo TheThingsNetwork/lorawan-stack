@@ -31,11 +31,24 @@
     position: static
 
 .navigation
-  box-sizing: border-box
   max-height: 100%
-  width: 100%
-  overflow: auto
+  overflow-y: scroll
   position: relative
+  width: calc(100% + .5rem) // Extra spacing for the scrollbar.
+  padding-right: .35rem
+  margin-right: -.35rem
+  &.is-minimized
+    width: calc(100% + .3rem) // Extra spacing for the scrollbar.
+    padding-left: .1rem
+    padding-right: .2rem
+    margin-right: -.2rem
+
+  &::-webkit-scrollbar-thumb
+    visibility: hidden
+
+  &:hover
+    &::-webkit-scrollbar-thumb
+      visibility: visible
 
   // Add a gradient to the bottom of the sidebar
   // to signify that there is more content below.
@@ -43,19 +56,19 @@
     position: sticky
     left: 0
     right: 0
-    height: 2rem
+    height: 2.5rem
     z-index: $zi.slight
     opacity: 0
     pointer-events: none
 
   .scroll-gradient-top
     top: 0
-    margin-bottom: -2rem
+    margin-bottom: -2.5rem
     background: linear-gradient(0deg, rgba(255, 255, 255, 0), var(--c-bg-brand-extralight))
 
   .scroll-gradient-bottom
     bottom: 0
-    margin-top: -2rem
+    margin-top: -2.5rem
     background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--c-bg-brand-extralight))
 
   &-minimized
