@@ -874,6 +874,72 @@ func TestGatewayServer(t *testing.T) {
 							}
 						})
 					}
+					t.Run("Disconnection", func(t *testing.T) {
+						for _, tc := range []struct {
+							Name     string
+							Antennas []*ttnpb.GatewayAntenna
+						}{
+							{
+								Name: "NoDisconnect",
+								Antennas: []*ttnpb.GatewayAntenna{
+									{
+										Gain: float32(0),
+									},
+								},
+							},
+							{
+								Name: "Disconnect",
+								Antennas: []*ttnpb.GatewayAntenna{
+									{
+										Gain: float32(3),
+									},
+								},
+							},
+						} {
+							t.Run(tc.Name, func(t *testing.T) {
+								a := assertions.New(t)
+
+								gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
+									GatewayIds: ids,
+								})
+								a.So(err, should.BeNil)
+
+								gtw.Antennas[0].Gain = tc.Antennas[0].Gain
+								gtw, err = is.GatewayRegistry().Update(ctx, &ttnpb.UpdateGatewayRequest{
+									Gateway:   gtw,
+									FieldMask: ttnpb.FieldMask("antennas"),
+								})
+								a.So(err, should.BeNil)
+								a.So(gtw.Antennas[0].Gain, should.Equal, tc.Antennas[0].Gain)
+
+								// Wait for gateway disconnection to be processed.
+								time.Sleep(2 * config.ConnectionStatsDisconnectTTL)
+
+								_, err2 := statsClient.GetGatewayConnectionStats(statsCtx, ids)
+								if !a.So(errors.IsNotFound(err2), should.BeTrue) {
+									t.Fatalf("Expected gateway to be disconnected, but it's not")
+								}
+
+								ctx, cancel := context.WithCancel(ctx)
+								upCh := make(chan *ttnpb.GatewayUp)
+								downCh := make(chan *ttnpb.GatewayDown)
+
+								wg := &sync.WaitGroup{}
+								wg.Add(1)
+								var linkErr error
+								go func() {
+									defer wg.Done()
+									linkErr = ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
+								}()
+
+								cancel()
+								wg.Wait()
+								if !errors.IsCanceled(linkErr) {
+									t.Fatalf("Expected context canceled, but have %v", linkErr)
+								}
+							})
+						}
+					})
 
 					if rtc.SupportsLocationUpdate {
 						t.Run("LocationMetadata", func(t *testing.T) {
