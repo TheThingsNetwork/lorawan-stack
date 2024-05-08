@@ -12,52 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import classNames from 'classnames'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { Table } from '@ttn-lw/components/table'
 
 import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { startGatewayStatistics, stopGatewayStatistics } from '@console/store/actions/gateways'
-
 import { selectDeviceLastSeen } from '@console/store/selectors/devices'
 import { selectApplicationDerivedLastSeen } from '@console/store/selectors/applications'
-import { selectGatewayStatistics } from '@console/store/selectors/gateways'
-import { selectGatewayLastSeen } from '@console/store/selectors/gateway-status'
+import { selectGatewayById } from '@console/store/selectors/gateways'
 
 import styles from './top-entities-panel.styl'
 
 const EntitiesItem = ({ bookmark, headers, last }) => {
-  const dispatch = useDispatch()
   const { title, ids, path, icon } = useBookmark(bookmark)
   const entityIds = bookmark.entity_ids
   const entity = Object.keys(entityIds)[0].replace('_ids', '')
-  const deviceLastSeen = useSelector(state => selectDeviceLastSeen(state, ids.appId, ids.id))
-  const appLastSeen = useSelector(state => selectApplicationDerivedLastSeen(state, ids.id))
-  const statistics = useSelector(selectGatewayStatistics)
-  const gatewayLastSeen = useSelector(selectGatewayLastSeen)
 
-  useEffect(() => {
-    dispatch(startGatewayStatistics(ids.id))
-    return () => {
-      dispatch(stopGatewayStatistics())
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const isDisconnected = Boolean(statistics) && Boolean(statistics.disconnected_at)
-
-  const status = {
-    gatewayLastSeen,
-    isDisconnected,
-    disconnectedAt: statistics?.disconnected_at,
+  let lastSeenSelector
+  if (entity === 'application') {
+    lastSeenSelector = state => selectApplicationDerivedLastSeen(state, ids.id)
+  } else if (entity === 'gateway') {
+    lastSeenSelector = state => selectGatewayById(state, ids.id)
+  } else if (entity === 'device') {
+    lastSeenSelector = state => selectDeviceLastSeen(state, ids.appId, ids.id)
   }
 
-  const lastSeen =
-    entity === 'device' ? deviceLastSeen : entity === 'gateway' ? status : appLastSeen
+  const lastSeenSelected = useSelector(lastSeenSelector)
+
+  const lastSeen = entity === 'gateway' ? { status: lastSeenSelected?.status } : lastSeenSelected
 
   return (
     <Table.Row

@@ -66,27 +66,28 @@ const AllTopEntitiesList = () => {
             />
           )
         }
-        if (lastSeen && typeof lastSeen === 'string') {
+        if (typeof lastSeen === 'string') {
           return <LastSeen lastSeen={lastSeen} short statusClassName="j-end" />
         }
 
-        return lastSeen.isDisconnected ? (
-          <LastSeen
-            status="bad"
-            message={sharedMessages.disconnected}
-            lastSeen={lastSeen.disconnectedAt}
-            statusClassName="j-end"
-            short
-          />
-        ) : Boolean(lastSeen.gatewayLastSeen) ? (
-          <LastSeen lastSeen={lastSeen.gatewayLastSeen} statusClassName="j-end" short />
-        ) : (
-          <Status
-            status="mediocre"
-            label={sharedMessages.noRecentActivity}
-            className="d-flex j-end al-center"
-          />
-        )
+        let indicator = 'unknown'
+        let label = sharedMessages.unknown
+
+        if (lastSeen.status === 'connected') {
+          indicator = 'good'
+          label = sharedMessages.connected
+        } else if (lastSeen.status === 'disconnected') {
+          indicator = 'bad'
+          label = sharedMessages.disconnected
+        } else if (lastSeen.status === 'other-cluster') {
+          indicator = 'unknown'
+          label = sharedMessages.otherCluster
+        } else if (lastSeen.status === 'unknown') {
+          indicator = 'mediocre'
+          label = sharedMessages.unknown
+        }
+
+        return <Status status={indicator} label={label} />
       },
     },
   ]

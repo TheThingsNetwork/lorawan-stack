@@ -20,8 +20,6 @@ import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import LastSeen from '@console/components/last-seen'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
@@ -55,26 +53,26 @@ const TopGatewaysList = () => {
     },
     {
       name: 'lastSeen',
-      displayName: sharedMessages.lastSeen,
-      render: ({ gatewayLastSeen, isDisconnected, disconnectedAt }) => {
-        const showLastSeen = Boolean(gatewayLastSeen)
-        return isDisconnected ? (
-          <LastSeen
-            status="bad"
-            message={sharedMessages.disconnected}
-            lastSeen={disconnectedAt}
-            statusClassName="j-end"
-            short
-          />
-        ) : showLastSeen ? (
-          <LastSeen lastSeen={gatewayLastSeen} statusClassName="j-end" short />
-        ) : (
-          <Status
-            status="mediocre"
-            label={sharedMessages.noRecentActivity}
-            className="d-flex j-end al-center"
-          />
-        )
+      displayName: sharedMessages.status,
+      render: lastSeen => {
+        let indicator = 'unknown'
+        let label = sharedMessages.unknown
+
+        if (lastSeen.status === 'connected') {
+          indicator = 'good'
+          label = sharedMessages.connected
+        } else if (lastSeen.status === 'disconnected') {
+          indicator = 'bad'
+          label = sharedMessages.disconnected
+        } else if (lastSeen.status === 'other-cluster') {
+          indicator = 'unknown'
+          label = sharedMessages.otherCluster
+        } else if (lastSeen.status === 'unknown') {
+          indicator = 'mediocre'
+          label = sharedMessages.unknown
+        }
+
+        return <Status status={indicator} label={label} />
       },
     },
   ]
