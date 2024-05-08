@@ -16,19 +16,8 @@ import React from 'react'
 
 import SideHeader from '@ttn-lw/components/sidebar/side-header'
 
-import { selectApplicationSiteName, selectAssetsRootPath } from '@ttn-lw/lib/selectors/env'
+import Logo from '@console/containers/logo'
 
-const Header = () => {
-  const logoAlt = `${selectApplicationSiteName()} Logo`
-  const logoSrc = `${selectAssetsRootPath()}/tts-logo.svg`
-  const miniLogoSrc = `${selectAssetsRootPath()}/tts-logo-icon.svg`
-
-  return (
-    <SideHeader
-      logo={{ src: logoSrc, alt: logoAlt }}
-      miniLogo={{ src: miniLogoSrc, alt: logoAlt }}
-    />
-  )
-}
+const Header = () => <SideHeader Logo={Logo} />
 
 export default Header

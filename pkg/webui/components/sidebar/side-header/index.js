@@ -29,7 +29,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './side-header.styl'
 
-const SideHeader = ({ logo, miniLogo }) => {
+const SideHeader = ({ Logo }) => {
   const { onMinimizeToggle, isMinimized, onDrawerCloseClick } = useContext(SidebarContext)
 
   return (
@@ -38,10 +38,8 @@ const SideHeader = ({ logo, miniLogo }) => {
         [style.isMinimized]: isMinimized,
       })}
     >
-      {/* Render two logos to prevent layout flashes when switching between minimized and maximized states. */}
       <Link to="/">
-        <img {...logo} className={classnames(style.logo)} />
-        <img {...miniLogo} className={classnames(style.miniLogo)} />
+        <Logo className={[style.logo, { [style.minimizedLogo]: isMinimized }]} />
       </Link>
       <Button
         className={classnames(style.minimizeButton, 's:d-none')}
@@ -60,14 +58,7 @@ const SideHeader = ({ logo, miniLogo }) => {
 }
 
 SideHeader.propTypes = {
-  logo: PropTypes.shape({
-    src: PropTypes.string.isRequired,
-    alt: PropTypes.string.isRequired,
-  }).isRequired,
-  miniLogo: PropTypes.shape({
-    src: PropTypes.string.isRequired,
-    alt: PropTypes.string.isRequired,
-  }).isRequired,
+  Logo: PropTypes.elementType.isRequired,
 }
 
 export default SideHeader

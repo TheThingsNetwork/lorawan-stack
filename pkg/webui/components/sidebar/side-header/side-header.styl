@@ -22,11 +22,11 @@
     flex-direction: column
     gap: $cs.xs
 
-    .logo
-      display: none
-
-    .mini-logo
-      display: flex
+    .minimized-logo
+      img:first-child
+        display: none
+      img:last-child
+        display: block
 
     button.minimize-button
       width: 100%
@@ -37,11 +37,13 @@
   &:not(.is-minimized)
     .minimize-button
       margin-top: - $cs.xxs
+      margin-right: - $cs.s
 
   .logo
-    width: 9rem
-
-  .mini-logo
-    display: none
-    width: 3rem
-    padding: $cs.s 0
+    &:not(.is-minimized)
+      width: auto
+      height: 1.8rem
+    &.is-minimized
+      display: none
+      height: 1.58rem
+      padding: $cs.s 0
