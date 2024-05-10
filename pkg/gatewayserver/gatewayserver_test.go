@@ -106,8 +106,8 @@ func TestGatewayServer(t *testing.T) {
 					ConnectionStatsTTL:                (1 << 6) * test.Delay,
 					ConnectionStatsDisconnectTTL:      (1 << 7) * test.Delay,
 					Stats:                             statsRegistry,
-					FetchGatewayInterval:              time.Minute,
-					FetchGatewayJitter:                1,
+					FetchGatewayInterval:              (1 << 7) + test.Delay,
+					FetchGatewayJitter:                0.1,
 					MQTT: config.MQTT{
 						Listen: ":1882",
 					},
@@ -923,7 +923,7 @@ func TestGatewayServer(t *testing.T) {
 								a.So(gtw.Antennas[0].Gain, should.Equal, tc.AntennaGain)
 
 								// Wait for gateway disconnection to be processed.
-								time.Sleep(2 * config.ConnectionStatsDisconnectTTL)
+								time.Sleep(2 * config.FetchGatewayInterval)
 
 								gtw, err = is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 									GatewayIds: ids,
@@ -931,9 +931,9 @@ func TestGatewayServer(t *testing.T) {
 								})
 								a.So(err, should.BeNil)
 
-								stats, err := statsClient.GetGatewayConnectionStats(statsCtx, gtw.Ids)
-								fmt.Println(stats)
-								if !a.So(errors.IsNotFound(err), should.Equal, tc.ExpectDisconnected) {
+								_, connected := gs.GetConnection(ctx, gtw.Ids)
+								t.Logf("connected: %v", connected)
+								if !a.So(connected, should.Equal, !tc.ExpectDisconnected) {
 									t.Fatal("Expected gateway to be disconnected, but it is not")
 								}
 
