@@ -31,7 +31,18 @@ const m = defineMessages({
 
 const Status = React.forwardRef(
   (
-    { className, status, label, pulse, pulseTrigger, labelValues, children, title, flipped },
+    {
+      className,
+      status,
+      label,
+      pulse,
+      pulseTrigger,
+      labelValues,
+      children,
+      title,
+      flipped,
+      displayStatus,
+    },
     ref,
   ) => {
     const intl = useIntl()
@@ -90,10 +101,10 @@ const Status = React.forwardRef(
         onAnimationEnd={handleAnimationEnd}
         ref={ref}
       >
-        {flipped && <span className={classnames(cls)} title={translatedTitle} />}
+        {flipped && displayStatus && <span className={classnames(cls)} title={translatedTitle} />}
         {statusLabel}
         {children}
-        {!flipped && <span className={classnames(cls)} title={translatedTitle} />}
+        {!flipped && displayStatus && <span className={classnames(cls)} title={translatedTitle} />}
       </span>
     )
   },
@@ -102,6 +113,7 @@ const Status = React.forwardRef(
 Status.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
+  displayStatus: PropTypes.bool,
   flipped: PropTypes.bool,
   label: PropTypes.message,
   labelValues: PropTypes.shape({}),
@@ -125,6 +137,7 @@ Status.defaultProps = {
   pulseTrigger: undefined,
   status: 'unknown',
   title: undefined,
+  displayStatus: true,
 }
 
 export default Status

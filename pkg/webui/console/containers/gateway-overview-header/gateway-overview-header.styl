@@ -12,11 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.status
-  color: var(--c-text-neutral-semilight)
+.root
+  position: sticky
+  top: 0
+  z-index: calc($zi.dropdown - 1)
   display: flex
+  justify-content: space-between
+  gap: $cs.xl
   align-items: center
-  white-space: nowrap
+  padding: $cs.m
+  background-color: $c['tts-primary-050']
+  border-bottom: 1px solid var(--c-border-neutral-light)
 
-  .date-time
-    margin-left: $cs.xxs
+  .name
+    line-height: normal
+    white-space: nowrap
+    color: var(--c-text-neutral-heavy)
+    font-weight: $fw.bold
+    font-size: $fsv2.m
+    margin: 0
+
+  .id
+    color: var(--c-text-neutral-semilight)
+    font-size: $fsv2.s
+    font-family: $font-family-mono
+    &-prefix
+      &:after
+        content: ':'
+        padding-right: $cs.xxs
+
+  .divider
+    height: $cs.xl
+    border-left: 1px solid var(--c-border-neutral-light)
+

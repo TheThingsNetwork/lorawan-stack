@@ -28,11 +28,16 @@ import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import GatewayMapPanel from '@console/components/gateway-map-panel'
+import GatewayMap from '@console/components/gateway-map'
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
 
+import GatewayOverviewHeader from '@console/containers/gateway-overview-header'
 import GatewayEvents from '@console/containers/gateway-events'
 import GatewayTitleSection from '@console/containers/gateway-title-section'
+import TopEntitiesDashboardPanel from '@console/containers/top-entities-dashboard-panel'
+import NotificationsDashboardPanel from '@console/containers/notifications-dashboard-panel'
+import DocumentationDashboardPanel from '@console/containers/documentation-dashboard-panel'
+import ShortcutPanel from '@console/containers/shortcut-panel'
 
 import Require from '@console/lib/components/require'
 
@@ -46,8 +51,6 @@ import {
 } from '@console/lib/feature-checks'
 
 import { selectSelectedGateway } from '@console/store/selectors/gateways'
-
-import style from './gateway-overview.styl'
 
 const m = defineMessages({
   downloadGlobalConf: 'Download global_conf.json',
@@ -152,24 +155,24 @@ const GatewayOverview = () => {
 
   return (
     <Require featureCheck={mayViewGatewayInfo} otherwise={{ redirect: '/' }}>
-      <div className={style.titleSection}>
-        <div className="container container--lg p-vert-0">
-          <IntlHelmet title={sharedMessages.overview} />
-          <GatewayTitleSection gtwId={gtwId} />
+      <IntlHelmet title={sharedMessages.overview} />
+      <GatewayOverviewHeader gateway={gateway} />
+      <div className="container container--xl grid p-ls-s gap-ls-s">
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
         </div>
-      </div>
-      <div className="container container--lg grid">
-        <div className="item-12 lg:item-6">
-          <DataSheet data={sheetData} />
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
         </div>
-        <div className="item-12 lg:item-6">
-          <GatewayEvents gtwId={gtwId} widget />
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
         </div>
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+        </div>
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6" />
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <BlurryNetworkActivityPanel />
-        </div>
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <GatewayMapPanel gateway={gateway} />
         </div>
       </div>
     </Require>
