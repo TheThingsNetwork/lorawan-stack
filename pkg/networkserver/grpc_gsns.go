@@ -1150,6 +1150,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					Settings:        up.Settings,
 					ReceivedAt:      up.ReceivedAt,
 					ConsumedAirtime: up.ConsumedAirtime,
+					PacketErrorRate: mac.LossRate(stored.MacState, matched.phy),
 					NetworkIds:      ns.networkIdentifiers(ctx),
 				},
 			},

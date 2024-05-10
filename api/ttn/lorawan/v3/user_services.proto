@@ -182,7 +182,7 @@ service UserBookmarkRegistry {
   // Create a bookmark for the given user.
   rpc Create(CreateUserBookmarkRequest) returns (UserBookmark) {
     option (google.api.http) = {
-      post: "/users/bookmarks"
+      post: "/users/{user_ids.user_id}/bookmarks"
       body: "*"
     };
   }

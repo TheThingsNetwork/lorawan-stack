@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Increased the timeout for Basic Station gateways sending HTTP headers. There should now be enough time for embedded devices with little to no hardware acceleration to perform a TLS handshake. In particular, The Things Indoor Gateway can now connect to The Things Stack presenting a ECDSA certificate.
+
 ### Security
 
 ## [3.30.1] - unreleased
@@ -26,7 +28,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support fine-grained NbTrans controls while using Dynamic ADR mode in the Console.
-- User bookmark listing now supports filtering bookmarks by entity type. 
+- User bookmark listing now supports filtering bookmarks by entity type.
   - This can be specified by setting `entity_types` field in `ListUserBookmarksRequest`.
 
 ### Fixed

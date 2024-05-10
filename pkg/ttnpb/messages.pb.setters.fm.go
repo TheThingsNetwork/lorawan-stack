@@ -645,6 +645,16 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			} else {
 				dst.ConsumedAirtime = nil
 			}
+		case "packet_error_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'packet_error_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PacketErrorRate = src.PacketErrorRate
+			} else {
+				var zero float32
+				dst.PacketErrorRate = zero
+			}
 		case "locations":
 			if len(subs) > 0 {
 				return fmt.Errorf("'locations' has no subfields, but %s were specified", subs)

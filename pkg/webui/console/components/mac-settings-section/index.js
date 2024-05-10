@@ -193,9 +193,9 @@ const MacSettingsSection = props => {
     }
   }, [handleIsCollapsedChange, isABP, isClassB, isCollapsed, isMulticast, pingPeriodicityRequired])
 
-  const adrOverrides = mac_settings.adr.dynamic.overrides
-  const showEditNbTrans = !values.mac_settings?.adr.dynamic._use_default_nb_trans
-  const defaultNbTransDisabled = !values.mac_settings?.adr.dynamic._override_nb_trans_defaults
+  const adrOverrides = mac_settings.adr.dynamic?.overrides
+  const showEditNbTrans = !values.mac_settings.adr.dynamic?._use_default_nb_trans
+  const defaultNbTransDisabled = !values.mac_settings.adr.dynamic?._override_nb_trans_defaults
   const addOverride = React.useCallback(() => {
     const newOverride = { _data_rate_index: '', min_nb_trans: '', max_nb_trans: '' }
     setFieldValue(

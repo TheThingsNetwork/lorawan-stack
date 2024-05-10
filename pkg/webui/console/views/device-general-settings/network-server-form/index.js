@@ -247,13 +247,19 @@ const NetworkServerForm = React.memo(props => {
             ...defaultValues.mac_settings,
             ...macSettings,
             ...device.mac_settings,
-            adr: {
-              dynamic: {
-                ...device.mac_settings?.adr?.dynamic,
-                min_nb_trans: device.mac_settings?.adr?.dynamic?.min_nb_trans ?? null,
-                max_nb_trans: device.mac_settings?.adr?.dynamic?.max_nb_trans ?? null,
-              },
-            },
+            adr: Boolean(device.mac_settings?.adr?.dynamic)
+              ? {
+                  dynamic: {
+                    ...device.mac_settings?.adr?.dynamic,
+                    min_nb_trans: device.mac_settings?.adr?.dynamic?.min_nb_trans ?? null,
+                    max_nb_trans: device.mac_settings?.adr?.dynamic?.max_nb_trans ?? null,
+                  },
+                }
+              : {
+                  ...defaultValues.mac_settings.adr,
+                  ...macSettings.adr,
+                  ...device.mac_settings?.adr,
+                },
           },
         },
         { context: validationContext, stripUnknown: true },
@@ -282,7 +288,10 @@ const NetworkServerForm = React.memo(props => {
     async (values, { resetForm, setSubmitting }) => {
       let parsedValues = values
       // If the nbTrans values are not overridden, remove them from the payload.
-      if (!values.mac_settings?.adr.dynamic._override_nb_trans_defaults) {
+      if (
+        'dynamic' in values.mac_settings?.adr &&
+        !('_override_nb_trans_defaults' in values.mac_settings?.adr.dynamic)
+      ) {
         const { max_nb_trans, min_nb_trans, ...rest } = parsedValues.mac_settings?.adr.dynamic
         parsedValues = {
           ...parsedValues,
