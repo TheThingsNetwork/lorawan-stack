@@ -58,30 +58,28 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
 
   const sidebarClassnames = classnames(
     style.sidebar,
-    'd-flex direction-column j-between gap-cs-m c-bg-brand-extralight',
+    'd-flex direction-column j-between c-bg-brand-extralight gap-cs-l',
     {
       [style.sidebarMinimized]: isMinimized,
       [style.sidebarOpen]: isDrawerOpen,
       'p-cs-m': !isMinimized,
-      'p-cs-xs': isMinimized,
+      'pt-cs-m pb-cs-xs p-sides-cs-xs': isMinimized,
     },
   )
 
   return (
     <>
-      <div className={sidebarClassnames} id="sidebar">
-        <SidebarContext.Provider value={{ onMinimizeToggle, isMinimized, onDrawerCloseClick }}>
-          <div className="d-flex direction-column gap-cs-l overflow-auto">
-            <SideHeader />
-            <div className="d-flex direction-column gap-cs-m">
-              <SwitcherContainer />
-              <SearchButton onClick={() => null} />
-            </div>
-            <SidebarNavigation />
+      <SidebarContext.Provider value={{ onMinimizeToggle, isMinimized, onDrawerCloseClick }}>
+        <div className={sidebarClassnames} id="sidebar">
+          <SideHeader />
+          <div className="d-flex direction-column gap-cs-m">
+            <SwitcherContainer />
+            <SearchButton onClick={() => null} />
           </div>
+          <SidebarNavigation />
           <SideFooter />
-        </SidebarContext.Provider>
-      </div>
+        </div>
+      </SidebarContext.Provider>
       <div className={style.sidebarBackdrop} onClick={onDrawerCloseClick} />
     </>
   )
