@@ -53,11 +53,7 @@ import {
 import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
-  downloadGlobalConf: 'Download global_conf.json',
   globalConf: 'Global configuration',
-  globalConfFailed: 'Failed to download global_conf.json',
-  globalConfFailedMessage:
-    'An unknown error occurred and the global_conf.json could not be downloaded',
   globalConfUnavailable: 'Unavailable for gateways without frequency plan',
 })
 
@@ -75,8 +71,8 @@ const GatewayOverview = () => {
       downloadDataUriAsFile(globalConfDataUri, 'global_conf.json')
     } catch (err) {
       toast({
-        title: m.globalConfFailed,
-        message: m.globalConfFailedMessage,
+        title: sharedMessages.globalConfFailed,
+        message: sharedMessages.globalConfFailedMessage,
         type: toast.types.ERROR,
       })
     }
@@ -142,7 +138,7 @@ const GatewayOverview = () => {
             type="button"
             icon={IconFileDownload}
             onClick={handleGlobalConfDownload}
-            message={m.downloadGlobalConf}
+            message={sharedMessages.downloadGlobalConf}
             secondary
           />
         ) : (

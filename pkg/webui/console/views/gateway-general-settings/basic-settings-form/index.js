@@ -271,7 +271,7 @@ const BasicSettingsForm = React.memo(props => {
           <DeleteModalButton
             entityId={gtwId}
             entityName={gateway.name}
-            message={m.deleteGateway}
+            message={sharedMessages.deleteGateway}
             onApprove={onGatewayDelete}
             shouldConfirm={shouldConfirmDelete}
             mayPurge={mayPurge}

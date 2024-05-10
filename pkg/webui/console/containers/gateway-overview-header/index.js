@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import classnames from 'classnames'
+
+import tts from '@console/api/tts'
 
 import Icon, {
   IconCalendarMonth,
@@ -24,6 +27,7 @@ import Icon, {
 } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -34,15 +38,24 @@ import GatewayConnection from '@console/containers/gateway-connection'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
+import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
-import { addBookmark, deleteBookmark } from '@console/store/actions/user-preferences'
+import {
+  ADD_BOOKMARK_BASE,
+  addBookmark,
+  DELETE_BOOKMARK_BASE,
+  deleteBookmark,
+} from '@console/store/actions/user-preferences'
 
 import { selectUser } from '@console/store/selectors/logout'
+import { selectBookmarksList } from '@console/store/selectors/user-preferences'
 
 import style from './gateway-overview-header.styl'
 
 const m = defineMessages({
   addBookmarkFail: 'There was an error and the gateway could not be bookmarked',
+  duplicateGateway: 'Duplicate gateway',
   removeBookmarkFail: 'There was an error and the gateway could not be removed from bookmarks',
 })
 
@@ -51,13 +64,21 @@ const GatewayOverviewHeader = ({ gateway }) => {
   const { ids, name, created_at } = gateway
   const { gateway_id } = ids
   const user = useSelector(selectUser)
+  const bookmarks = useSelector(selectBookmarksList)
+  const addBookmarkLoading = useSelector(state => selectFetchingEntry(state, ADD_BOOKMARK_BASE))
+  const deleteBookmarkLoading = useSelector(state =>
+    selectFetchingEntry(state, DELETE_BOOKMARK_BASE),
+  )
 
-  const isBookmarked = false
+  const isBookmarked = useMemo(
+    () => bookmarks.map(b => b.entity_ids?.gateway_ids?.gateway_id).some(b => b === gateway_id),
+    [bookmarks, gateway_id],
+  )
 
   const handleAddToBookmark = useCallback(async () => {
     try {
       if (!isBookmarked) {
-        await dispatch(attachPromise(addBookmark(user.ids, ids)))
+        await dispatch(attachPromise(addBookmark(user.ids.user_id, { gateway_ids: ids })))
         return
       }
       await dispatch(
@@ -77,6 +98,28 @@ const GatewayOverviewHeader = ({ gateway }) => {
     }
   }, [dispatch, gateway_id, ids, isBookmarked, user.ids])
 
+  const handleGlobalConfDownload = useCallback(async () => {
+    try {
+      const globalConf = await tts.Gateways.getGlobalConf(gateway_id)
+      const globalConfDataUri = composeDataUri(JSON.stringify(globalConf, undefined, 2))
+      downloadDataUriAsFile(globalConfDataUri, 'global_conf.json')
+    } catch (err) {
+      toast({
+        title: sharedMessages.globalConfFailed,
+        message: sharedMessages.globalConfFailedMessage,
+        type: toast.types.ERROR,
+      })
+    }
+  }, [gateway_id])
+
+  const menuDropdownItems = (
+    <>
+      <Dropdown.Item title={sharedMessages.downloadGlobalConf} action={handleGlobalConfDownload} />
+      <Dropdown.Item title={m.duplicateGateway} action={() => {}} />
+      <Dropdown.Item title={sharedMessages.deleteGateway} action={() => {}} />
+    </>
+  )
+
   return (
     <div className={style.root}>
       <div>
@@ -87,8 +130,8 @@ const GatewayOverviewHeader = ({ gateway }) => {
         </span>
       </div>
       <div className="d-inline-flex h-full al-center gap-cs-m flex-wrap">
-        <GatewayConnection gtwId={gateway_id} />
-        <div className="d-flex al-center gap-cs-xxs">
+        <GatewayConnection className="sm:d-none" gtwId={gateway_id} />
+        <div className="d-flex al-center gap-cs-xxs sm:d-none">
           <Icon small className="c-text-neutral-semilight" icon={IconCalendarMonth} />
           <LastSeen
             displayStatus={false}
@@ -97,14 +140,23 @@ const GatewayOverviewHeader = ({ gateway }) => {
             className="c-text-neutral-semilight"
           />
         </div>
-        <div className={style.divider} />
+        <div className={classnames(style.divider, 'sm:d-none')} />
         <div className="d-inline-flex al-center gap-cs-xxs">
           <Button
             secondary
             icon={!isBookmarked ? IconStar : IconStarFilled}
             onClick={handleAddToBookmark}
+            disabled={
+              (!isBookmarked && addBookmarkLoading) || (isBookmarked && deleteBookmarkLoading)
+            }
           />
-          <Button secondary icon={IconMenu2} />
+          <Button
+            secondary
+            icon={IconMenu2}
+            noDropdownIcon
+            dropdownItems={menuDropdownItems}
+            dropdownPosition="below left"
+          />
         </div>
       </div>
     </div>
