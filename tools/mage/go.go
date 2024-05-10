@@ -36,9 +36,9 @@ var goTags = os.Getenv("GO_TAGS")
 
 const (
 	gofumpt      = "mvdan.cc/gofumpt@v0.6.0"
-	golangciLint = "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.56.2"
+	golangciLint = "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2"
 	goveralls    = "github.com/mattn/goveralls@v0.0.12"
-	bufCLI       = "github.com/bufbuild/buf/cmd/buf@v1.30.0"
+	bufCLI       = "github.com/bufbuild/buf/cmd/buf@v1.31.0"
 )
 
 func buildGoArgs(cmd string, args ...string) []string {

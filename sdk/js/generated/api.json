@@ -36940,6 +36940,18 @@
               "defaultValue": ""
             },
             {
+              "name": "packet_error_rate",
+              "description": "Packet error rate of the recent uplinks in the current session.\nCalculated by the Network Server. The value is defined in the [0, 1] interval.",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "locations",
               "description": "End device location metadata, set by the Application Server while handling the message.",
               "label": "repeated",
@@ -52253,7 +52265,7 @@
                   "rules": [
                     {
                       "method": "POST",
-                      "pattern": "/users/bookmarks",
+                      "pattern": "/users/{user_ids.user_id}/bookmarks",
                       "body": "*"
                     }
                   ]

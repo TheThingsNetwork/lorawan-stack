@@ -23,6 +23,8 @@ Typically, issues should be closed manually after validation.
 
 #### Testing
 
+##### Steps
+
 <!--
 Explain the detailed steps to test this feature.
 Please note that these steps may be used by others to test this feature.
@@ -30,6 +32,12 @@ Describe pre-requisites and/or assumptions made about the testing environment.
 -->
 
 ...
+
+##### Results
+
+<!--
+Please add screenshots, command outputs, and/or relevant screen captures of the tests.
+-->
 
 ##### Regressions
 
