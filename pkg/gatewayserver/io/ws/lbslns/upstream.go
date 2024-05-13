@@ -38,7 +38,6 @@ var (
 	errJoinRequestMessage = errors.Define("join_request_message", "invalid join-request message received")
 	errUplinkDataFrame    = errors.Define("uplink_data_frame", "invalid uplink data frame received")
 	errUplinkMessage      = errors.Define("uplink_message", "invalid uplink message received")
-	errMDHR               = errors.Define("mhdr", "invalid MHDR `{mhdr}` received")
 	errDataRate           = errors.Define("data_rate", "invalid data rate")
 )
 
@@ -185,14 +184,20 @@ func (tsr TimeSyncResponse) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
-func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
-	var up ttnpb.UplinkMessage
+// toUplinkMessage extracts fields from the Basics Station Join Request "jreq"
+// message and converts them into an UplinkMessage for the network server.
+func (req *JoinRequest) toUplinkMessage(
+	ids *ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time,
+) (*ttnpb.UplinkMessage, error) {
+	up := &ttnpb.UplinkMessage{}
 	up.ReceivedAt = timestamppb.New(receivedAt)
 
 	parsedMHDR := &ttnpb.MHDR{}
 	if err := lorawan.UnmarshalMHDR([]byte{byte(req.MHdr)}, parsedMHDR); err != nil {
-		return nil, errMDHR.WithAttributes(`mhdr`, parsedMHDR)
+		return nil, errJoinRequestMessage.WithCause(err)
+	}
+	if err := parsedMHDR.ValidateFields(); err != nil {
+		return nil, errJoinRequestMessage.WithCause(err)
 	}
 
 	micBytes, err := getInt32AsByteSlice(req.MIC)
@@ -246,7 +251,7 @@ func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID st
 		Time:      ttnpb.ProtoTime(tm),
 	}
 
-	return &up, nil
+	return up, nil
 }
 
 // FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the LoRa Basics Station Join Request Frame.
@@ -303,17 +308,20 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	return nil
 }
 
-// toUplinkMessage extracts fields from the LoRa Basics Station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
-func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
-	var up ttnpb.UplinkMessage
+// toUplinkMessage extracts fields from the LoRa Basics Station Uplink Data Frame "updf"
+// message and converts them into an UplinkMessage for the network server.
+func (updf *UplinkDataFrame) toUplinkMessage(
+	ids *ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time,
+) (*ttnpb.UplinkMessage, error) {
+	up := &ttnpb.UplinkMessage{}
 	up.ReceivedAt = timestamppb.New(receivedAt)
 
 	parsedMHDR := &ttnpb.MHDR{}
 	if err := lorawan.UnmarshalMHDR([]byte{byte(updf.MHdr)}, parsedMHDR); err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
-	if parsedMHDR.MType != ttnpb.MType_UNCONFIRMED_UP && parsedMHDR.MType != ttnpb.MType_CONFIRMED_UP {
-		return nil, errMDHR.WithAttributes(`mhdr`, parsedMHDR)
+	if err := parsedMHDR.ValidateFields(); err != nil {
+		return nil, errUplinkDataFrame.WithCause(err)
 	}
 
 	micBytes, err := getInt32AsByteSlice(updf.MIC)
@@ -331,8 +339,11 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 	var devAddr types.DevAddr
 	devAddr.UnmarshalNumber(uint32(updf.DevAddr))
 
-	fctrl := &ttnpb.FCtrl{}
-	if err := lorawan.UnmarshalFCtrl([]byte{byte(updf.FCtrl)}, fctrl, true); err != nil {
+	fCtrl := &ttnpb.FCtrl{}
+	if err := lorawan.UnmarshalFCtrl([]byte{byte(updf.FCtrl)}, fCtrl, true); err != nil {
+		return nil, errUplinkDataFrame.WithCause(err)
+	}
+	if err := fCtrl.ValidateFields(); err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
 
@@ -354,7 +365,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 			FrmPayload: decFRMPayload,
 			FHdr: &ttnpb.FHDR{
 				DevAddr: devAddr.Bytes(),
-				FCtrl:   fctrl,
+				FCtrl:   fCtrl,
 				FCnt:    uint32(updf.FCnt),
 				FOpts:   decFOpts,
 			},
@@ -397,7 +408,8 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, band
 		Timestamp: timestamp,
 		Time:      ttnpb.ProtoTime(tm),
 	}
-	return &up, nil
+
+	return up, nil
 }
 
 func getFCtrlAsUint(fCtrl *ttnpb.FCtrl) uint {

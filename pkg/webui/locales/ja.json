@@ -2058,7 +2058,6 @@
   "error:pkg/gatewayserver/io/ws/lbslns:data_rate": "無効なデータレート",
   "error:pkg/gatewayserver/io/ws/lbslns:empty_gateway_eui": "ゲートウェイEUIが空",
   "error:pkg/gatewayserver/io/ws/lbslns:join_request_message": "無効なジョイン要求メッセージを受信しました",
-  "error:pkg/gatewayserver/io/ws/lbslns:mhdr": "無効なMHDR`{mhdr}`を受信しました",
   "error:pkg/gatewayserver/io/ws/lbslns:session_state_not_found": "セッションステートが見つかりません",
   "error:pkg/gatewayserver/io/ws/lbslns:uplink_data_frame": "無効なアップリンクデータフレームを受信しました",
   "error:pkg/gatewayserver/io/ws/lbslns:uplink_message": "無効なアップリンクメッセージを受信しました",

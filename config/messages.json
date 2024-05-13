@@ -4949,15 +4949,6 @@
       "file": "upstream.go"
     }
   },
-  "error:pkg/gatewayserver/io/ws/lbslns:mhdr": {
-    "translations": {
-      "en": "invalid MHDR `{mhdr}` received"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws/lbslns",
-      "file": "upstream.go"
-    }
-  },
   "error:pkg/gatewayserver/io/ws/lbslns:session_state_not_found": {
     "translations": {
       "en": "session state not found"
