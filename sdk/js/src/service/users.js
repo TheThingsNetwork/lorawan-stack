@@ -218,10 +218,14 @@ class Users {
   }
 
   async addBookmark(userId, entity) {
-    const response = await this._api.UserBookmarkRegistry.Create(undefined, {
-      user_ids: { user_id: userId },
-      entity_ids: entity,
-    })
+    const response = await this._api.UserBookmarkRegistry.Create(
+      {
+        routeParams: { 'user_ids.user_id': userId },
+      },
+      {
+        entity_ids: entity,
+      },
+    )
 
     return Marshaler.unwrapBookmark(response)
   }

@@ -16,7 +16,11 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
+import Status from '@ttn-lw/components/status'
+
 import Message from '@ttn-lw/lib/components/message'
+
+import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -47,6 +51,22 @@ const TopDevicesList = () => {
           )}
         </>
       ),
+    },
+    {
+      name: 'lastSeen',
+      displayName: sharedMessages.lastSeen,
+      render: lastSeen => {
+        const showLastSeen = Boolean(lastSeen)
+        return showLastSeen ? (
+          <LastSeen lastSeen={lastSeen} short statusClassName="j-end" />
+        ) : (
+          <Status
+            status="mediocre"
+            label={sharedMessages.noRecentActivity}
+            className="d-flex j-end al-center"
+          />
+        )
+      },
     },
   ]
 

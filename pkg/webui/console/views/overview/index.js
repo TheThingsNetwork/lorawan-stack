@@ -33,7 +33,14 @@ const Overview = () => {
   useBreadcrumbs('overview', <Breadcrumb path="/" content={sharedMessages.overview} />)
 
   return (
-    <RequireRequest requestAction={[getApplicationsList(), getGatewaysList()]}>
+    <RequireRequest
+      requestAction={[
+        getApplicationsList(),
+        getGatewaysList(undefined, ['name', 'gateway_server_address'], {
+          withStatus: true,
+        }),
+      ]}
+    >
       <div className="container container--xl grid p-ls-s gap-ls-s">
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <TopEntitiesDashboardPanel />

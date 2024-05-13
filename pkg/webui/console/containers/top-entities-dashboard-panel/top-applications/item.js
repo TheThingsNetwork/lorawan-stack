@@ -27,7 +27,10 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getApplicationDeviceCount } from '@console/store/actions/applications'
 
-import { selectApplicationDeviceCount } from '@console/store/selectors/applications'
+import {
+  selectApplicationDerivedLastSeen,
+  selectApplicationDeviceCount,
+} from '@console/store/selectors/applications'
 
 import styles from '../top-entities-panel.styl'
 
@@ -38,6 +41,7 @@ const m = defineMessages({
 const TopApplicationsItem = ({ bookmark, headers, last }) => {
   const { title, ids, path } = useBookmark(bookmark)
   const deviceCount = useSelector(state => selectApplicationDeviceCount(state, ids.id))
+  const lastSeen = useSelector(state => selectApplicationDerivedLastSeen(state, ids.id))
 
   const loadDeviceCount = useCallback(
     async dispatch => {
@@ -59,7 +63,12 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
       className={classNames(styles.entityRow, { [styles.lastRow]: last })}
     >
       {headers.map((header, index) => {
-        const value = headers[index].name === 'name' ? title : deviceCount
+        const value =
+          headers[index].name === 'name'
+            ? title
+            : headers[index].name === 'lastSeen'
+              ? lastSeen
+              : deviceCount
         const entityID = ids.id
         return (
           <RequireRequest
@@ -67,7 +76,13 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
             requestAction={loadDeviceCount}
             errorRenderFunction={errorRenderFunction}
           >
-            <Table.DataCell align={header.align} className={styles.entityCell}>
+            <Table.DataCell
+              align={header.align}
+              className={classNames(styles.entityCell, {
+                [styles.entityCellDivided]:
+                  headers[index].name === 'lastSeen' || headers[index].name === 'name',
+              })}
+            >
               {headers[index].render(value, entityID)}
             </Table.DataCell>
           </RequireRequest>

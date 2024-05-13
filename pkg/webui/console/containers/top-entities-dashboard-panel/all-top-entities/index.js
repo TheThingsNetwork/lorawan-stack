@@ -17,8 +17,11 @@ import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
 import Icon from '@ttn-lw/components/icon'
+import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
+
+import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -41,7 +44,7 @@ const AllTopEntitiesList = () => {
     {
       name: 'type',
       displayName: sharedMessages.type,
-      width: '35px',
+      width: '2.5rem',
       render: icon => <Icon icon={icon} />,
     },
     {
@@ -49,6 +52,43 @@ const AllTopEntitiesList = () => {
       displayName: sharedMessages.name,
       align: 'left',
       render: (name, id) => <Message content={name === '' ? id : name} />,
+    },
+    {
+      name: 'lastSeen',
+      displayName: sharedMessages.lastSeen,
+      render: lastSeen => {
+        if (!lastSeen) {
+          return (
+            <Status
+              status="mediocre"
+              label={sharedMessages.noRecentActivity}
+              className="d-flex j-end al-center"
+            />
+          )
+        }
+        if (typeof lastSeen === 'string') {
+          return <LastSeen lastSeen={lastSeen} short statusClassName="j-end" />
+        }
+
+        let indicator = 'unknown'
+        let label = sharedMessages.unknown
+
+        if (lastSeen.status === 'connected') {
+          indicator = 'good'
+          label = sharedMessages.connected
+        } else if (lastSeen.status === 'disconnected') {
+          indicator = 'bad'
+          label = sharedMessages.disconnected
+        } else if (lastSeen.status === 'other-cluster') {
+          indicator = 'unknown'
+          label = sharedMessages.otherCluster
+        } else if (lastSeen.status === 'unknown') {
+          indicator = 'mediocre'
+          label = sharedMessages.unknown
+        }
+
+        return <Status status={indicator} label={label} />
+      },
     },
   ]
 

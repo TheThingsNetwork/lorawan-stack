@@ -16,6 +16,8 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
+import Status from '@ttn-lw/components/status'
+
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -48,6 +50,30 @@ const TopGatewaysList = () => {
           )}
         </>
       ),
+    },
+    {
+      name: 'lastSeen',
+      displayName: sharedMessages.status,
+      render: lastSeen => {
+        let indicator = 'unknown'
+        let label = sharedMessages.unknown
+
+        if (lastSeen.status === 'connected') {
+          indicator = 'good'
+          label = sharedMessages.connected
+        } else if (lastSeen.status === 'disconnected') {
+          indicator = 'bad'
+          label = sharedMessages.disconnected
+        } else if (lastSeen.status === 'other-cluster') {
+          indicator = 'unknown'
+          label = sharedMessages.otherCluster
+        } else if (lastSeen.status === 'unknown') {
+          indicator = 'mediocre'
+          label = sharedMessages.unknown
+        }
+
+        return <Status status={indicator} label={label} />
+      },
     },
   ]
 

@@ -17,8 +17,11 @@ import { FormattedNumber, defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
 import Spinner from '@ttn-lw/components/spinner'
+import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
+
+import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -55,6 +58,7 @@ const TopApplicationsList = () => {
     {
       name: 'deviceCount',
       displayName: sharedMessages.devicesShort,
+      align: 'center',
       render: deviceCount =>
         typeof deviceCount !== 'number' ? (
           <Spinner micro right after={100} className="c-icon" />
@@ -63,6 +67,22 @@ const TopApplicationsList = () => {
             <FormattedNumber value={deviceCount} />
           </strong>
         ),
+    },
+    {
+      name: 'lastSeen',
+      displayName: sharedMessages.lastSeen,
+      render: lastSeen => {
+        const showLastSeen = Boolean(lastSeen)
+        return showLastSeen ? (
+          <LastSeen lastSeen={lastSeen} short statusClassName="j-end" />
+        ) : (
+          <Status
+            status="mediocre"
+            label={sharedMessages.noRecentActivity}
+            className="d-flex j-end al-center"
+          />
+        )
+      },
     },
   ]
 
