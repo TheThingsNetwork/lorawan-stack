@@ -38,6 +38,12 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type filteringItem struct {
+	now       time.Time
+	packetBuf []byte
+	addr      *net.UDPAddr
+}
+
 type srv struct {
 	ctx    context.Context
 	config Config
@@ -48,6 +54,9 @@ type srv struct {
 	firewall    Firewall
 
 	limitLogs ratelimit.Interface
+
+	filterPool  workerpool.WorkerPool[filteringItem]
+	processPool workerpool.WorkerPool[encoding.Packet]
 }
 
 func (*srv) Protocol() string                          { return "udp" }
@@ -84,11 +93,19 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config
 
 		limitLogs: limitLogs,
 	}
-	wp := workerpool.NewWorkerPool(workerpool.Config[encoding.Packet]{
+	s.processPool = workerpool.NewWorkerPool(workerpool.Config[encoding.Packet]{
 		Component:  server,
 		Context:    ctx,
-		Name:       "udp",
+		Name:       "udp_process",
 		Handler:    s.handlePacket,
+		MaxWorkers: conf.PacketHandlers,
+		QueueSize:  conf.PacketBuffer,
+	})
+	s.filterPool = workerpool.NewWorkerPool(workerpool.Config[filteringItem]{
+		Component:  server,
+		Context:    ctx,
+		Name:       "udp_filter",
+		Handler:    s.filterPacket,
 		MaxWorkers: conf.PacketHandlers,
 		QueueSize:  conf.PacketBuffer,
 	})
@@ -97,12 +114,12 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config
 		<-ctx.Done()
 		s.conn.Close()
 	}()
-	return s.read(wp)
+	return s.read()
 }
 
 var errPacketType = errors.DefineInvalidArgument("packet_type", "invalid packet type")
 
-func (s *srv) read(wp workerpool.WorkerPool[encoding.Packet]) error {
+func (s *srv) read() error {
 	var buf [65507]byte
 	for {
 		n, addr, err := s.conn.ReadFromUDP(buf[:])
@@ -112,50 +129,60 @@ func (s *srv) read(wp workerpool.WorkerPool[encoding.Packet]) error {
 			}
 			return err
 		}
-		now := time.Now()
 		ctx := log.NewContextWithField(s.ctx, "remote_addr", addr.String())
-		logger := log.FromContext(ctx)
-
 		registerMessageReceived(ctx)
-		if err := ratelimit.Require(s.server.RateLimiter(), ratelimit.GatewayUDPTrafficResource(addr)); err != nil {
-			if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(addr.IP.String())) == nil {
-				logger.WithError(err).Warn("Drop packet")
-			}
+		if err := s.filterPool.Publish(ctx, filteringItem{
+			now:       time.Now(),
+			packetBuf: slices.Clone(buf[:n]),
+			addr:      addr,
+		}); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Drop packet")
 			registerMessageDropped(ctx, err)
 			continue
 		}
-
-		packetBuf := slices.Clone(buf[:n])
-
-		packet := encoding.Packet{
-			GatewayAddr: addr,
-			ReceivedAt:  now,
-		}
-		if err := packet.UnmarshalBinary(packetBuf); err != nil {
-			logger.WithError(err).Debug("Failed to unmarshal packet")
-			registerMessageDropped(ctx, err)
-			continue
-		}
-		switch packet.PacketType {
-		case encoding.PullData, encoding.PushData, encoding.TxAck:
-		default:
-			logger.WithField("packet_type", packet.PacketType).Debug("Invalid packet type for uplink")
-			registerMessageDropped(ctx, errPacketType)
-			continue
-		}
-		if packet.GatewayEUI == nil {
-			logger.Debug("No gateway EUI in uplink message")
-			registerMessageDropped(ctx, errNoEUI)
-			continue
-		}
-
-		if err := wp.Publish(ctx, packet); err != nil {
-			logger.WithError(err).Warn("UDP packet publishing failed")
-			registerMessageDropped(ctx, err)
-			continue
-		}
-		registerMessageForwarded(ctx, packet.PacketType)
 	}
+}
+
+func (s *srv) filterPacket(ctx context.Context, item filteringItem) {
+	logger := log.FromContext(ctx)
+	now, packetBuf, addr := item.now, item.packetBuf, item.addr
+
+	if err := ratelimit.Require(s.server.RateLimiter(), ratelimit.GatewayUDPTrafficResource(addr)); err != nil {
+		if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(addr.IP.String())) == nil {
+			logger.WithError(err).Warn("Drop packet")
+		}
+		registerMessageDropped(ctx, err)
+		return
+	}
+
+	packet := encoding.Packet{
+		GatewayAddr: addr,
+		ReceivedAt:  now,
+	}
+	if err := packet.UnmarshalBinary(packetBuf); err != nil {
+		logger.WithError(err).Debug("Failed to unmarshal packet")
+		registerMessageDropped(ctx, err)
+		return
+	}
+	switch packet.PacketType {
+	case encoding.PullData, encoding.PushData, encoding.TxAck:
+	default:
+		logger.WithField("packet_type", packet.PacketType).Debug("Invalid packet type for uplink")
+		registerMessageDropped(ctx, errPacketType)
+		return
+	}
+	if packet.GatewayEUI == nil {
+		logger.Debug("No gateway EUI in uplink message")
+		registerMessageDropped(ctx, errNoEUI)
+		return
+	}
+
+	if err := s.processPool.Publish(ctx, packet); err != nil {
+		logger.WithError(err).Warn("UDP packet publishing failed")
+		registerMessageDropped(ctx, err)
+		return
+	}
+	registerMessageForwarded(ctx, packet.PacketType)
 }
 
 func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
