@@ -16,6 +16,7 @@ package ratelimit
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/throttled/throttled/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -47,11 +48,13 @@ type rateLimiter struct {
 func (l *rateLimiter) RateLimit(resource Resource) (bool, Result) {
 	ok, result, err := l.limiter.RateLimitCtx(l.ctx, resource.Key(), 1)
 	if err != nil {
-		// NOTE: The memstore.MemStore implementation does not fail.
-		log.FromContext(l.ctx).WithError(err).Error("Rate limiter failed")
-		return true, Result{}
+		log.FromContext(l.ctx).
+			WithError(err).
+			WithFields(logFields(resource)).
+			Error("Rate limiter failed")
+		// NOTE: The missing return here is intentional - the underlying implementation
+		// will still return a valid ok and result even on error.
 	}
-
 	return ok, Result{
 		Limit:      result.Limit,
 		Remaining:  result.Remaining,
@@ -93,4 +96,15 @@ func Require(limiter Interface, resource Resource) error {
 // rate limiting.
 type RateLimitKeyer interface {
 	RateLimitKey() string
+}
+
+func logFields(resource Resource) log.Fielder {
+	fields := append(
+		make([]any, 0, 2+2*len(resource.Classes())),
+		"resource_key", resource.Key(),
+	)
+	for i, c := range resource.Classes() {
+		fields = append(fields, fmt.Sprintf("resource_class_%d", i), c)
+	}
+	return log.Fields(fields...)
 }
