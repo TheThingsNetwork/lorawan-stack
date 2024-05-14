@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createAction } from 'redux-actions'
+
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+
+export const SET_SEARCH_OPEN = 'SET_SEARCH_OPEN'
+export const setSearchOpen = createAction(SET_SEARCH_OPEN, searchOpen => ({ searchOpen }))
 
 export const GET_GLOBAL_SEARCH_RESULTS_BASE = 'GET_GLOBAL_SEARCH_RESULTS'
 export const [

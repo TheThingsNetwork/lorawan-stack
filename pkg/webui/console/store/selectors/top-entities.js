@@ -15,3 +15,8 @@
 const selectTopEntitiesStore = state => state.topEntities
 
 export const selectTopEntitiesData = state => selectTopEntitiesStore(state).data
+export const selectConcatenatedTopEntitiesData = state =>
+  selectTopEntitiesData(state).reduce((acc, entity) => acc.concat(entity.items), [])
+export const selectConcatenatedTopEntitiesByType = (state, type) =>
+  selectConcatenatedTopEntitiesData(state).filter(entity => entity.type === type)
+export const selectTopEntitiesLastFetched = state => selectTopEntitiesStore(state).lastFetched

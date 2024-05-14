@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import tts from '@console/api/tts'
+import { APPLICATION } from '@console/constants/entities'
 
 import { isNotFoundError, isConflictError } from '@ttn-lw/lib/errors/utils'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
@@ -41,7 +42,7 @@ const getApplicationLogic = createRequestLogic({
       meta: { selector },
     } = action
     const app = await tts.Applications.getById(id, selector)
-    trackEntityAccess('app', id)
+    trackEntityAccess(APPLICATION, id)
     dispatch(applications.startApplicationEventsStream(id))
 
     return app

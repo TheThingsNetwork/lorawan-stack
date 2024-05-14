@@ -14,15 +14,20 @@
 
 import { handleActions } from 'redux-actions'
 
-import { GET_GLOBAL_SEARCH_RESULTS_SUCCESS } from '@console/store/actions/search'
+import { GET_GLOBAL_SEARCH_RESULTS_SUCCESS, SET_SEARCH_OPEN } from '@console/store/actions/search'
 
 const defaultState = {
+  searchOpen: false,
   results: [],
   query: '',
 }
 
 export default handleActions(
   {
+    [SET_SEARCH_OPEN]: (state, { payload: { searchOpen } }) => ({
+      ...state,
+      searchOpen,
+    }),
     [GET_GLOBAL_SEARCH_RESULTS_SUCCESS]: (state, { payload: { query, results } }) => ({
       ...state,
       results,

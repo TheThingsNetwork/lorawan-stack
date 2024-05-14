@@ -16,3 +16,4 @@ const selectSearchStore = state => state.search
 
 export const selectSearchResults = state => selectSearchStore(state).results
 export const selectSearchQuery = state => selectSearchStore(state).query
+export const selectIsSearchOpen = state => selectSearchStore(state).searchOpen

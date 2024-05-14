@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import tts from '@console/api/tts'
+import { ORGANIZATION } from '@console/constants/entities'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
@@ -33,7 +34,7 @@ const getOrganizationLogic = createRequestLogic({
       meta: { selector },
     } = action
     const org = await tts.Organizations.getById(id, selector)
-    trackEntityAccess('org', id)
+    trackEntityAccess(ORGANIZATION, id)
     dispatch(organizations.startOrganizationEventsStream(id))
     return org
   },

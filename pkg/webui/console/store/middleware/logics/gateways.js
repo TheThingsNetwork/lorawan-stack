@@ -15,6 +15,7 @@
 import { createLogic } from 'redux-logic'
 
 import tts from '@console/api/tts'
+import { GATEWAY } from '@console/constants/entities'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
@@ -49,7 +50,7 @@ const getGatewayLogic = createRequestLogic({
     const { id = {} } = payload
     const selector = meta.selector || ''
     const gtw = await tts.Gateways.getById(id, selector)
-    trackEntityAccess('gtw', id)
+    trackEntityAccess(GATEWAY, id)
     dispatch(gateways.startGatewayEventsStream(id))
 
     return gtw

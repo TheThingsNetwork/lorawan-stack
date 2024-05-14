@@ -18,6 +18,7 @@ import { GET_TOP_ENTITIES_SUCCESS } from '@console/store/actions/top-entities'
 
 const defaultState = {
   data: [],
+  lastFetched: undefined,
 }
 
 export default handleActions(
@@ -25,6 +26,7 @@ export default handleActions(
     [GET_TOP_ENTITIES_SUCCESS]: (state, { payload }) => ({
       ...state,
       data: payload,
+      lastFetched: Date.now(),
     }),
   },
   defaultState,

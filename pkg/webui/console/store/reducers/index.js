@@ -66,7 +66,6 @@ import ns from './network-server'
 import notifications from './notifications'
 import userPreferences from './user-preferences'
 import topEntities from './top-entities'
-
 import search from './search'
 
 export default combineReducers({
@@ -130,5 +129,4 @@ export default combineReducers({
   userPreferences,
   search,
   topEntities,
-
 })
