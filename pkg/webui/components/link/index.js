@@ -57,6 +57,7 @@ const Link = props => {
     target,
     showVisited,
     onClick,
+    onMouseEnter,
     secondary,
     primary,
     tabIndex,
@@ -88,6 +89,7 @@ const Link = props => {
       to={to}
       target={target}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
       tabIndex={tabIndex}
       role={role}
     >
@@ -102,6 +104,7 @@ Link.propTypes = {
   disabled: PropTypes.bool,
   id: PropTypes.string,
   onClick: PropTypes.func,
+  onMouseEnter: PropTypes.func,
   primary: PropTypes.bool,
   replace: PropTypes.bool,
   role: PropTypes.string,
@@ -128,6 +131,7 @@ Link.defaultProps = {
   disabled: false,
   id: undefined,
   onClick: () => null,
+  onMouseEnter: undefined,
   primary: false,
   showVisited: false,
   replace: false,
