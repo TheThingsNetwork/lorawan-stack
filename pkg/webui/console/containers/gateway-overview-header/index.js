@@ -134,7 +134,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
         <div className="d-flex al-center gap-cs-xxs sm:d-none">
           <Icon small className="c-text-neutral-semilight" icon={IconCalendarMonth} />
           <LastSeen
-            displayStatus={false}
+            statusClassName={style.createdAtStatus}
             message={sharedMessages.created}
             lastSeen={created_at}
             className="c-text-neutral-semilight"

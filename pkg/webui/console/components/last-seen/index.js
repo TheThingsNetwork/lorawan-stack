@@ -44,7 +44,6 @@ const LastSeen = React.forwardRef((props, ref) => {
     message,
     status,
     noTitle,
-    displayStatus,
   } = props
 
   return (
@@ -54,7 +53,6 @@ const LastSeen = React.forwardRef((props, ref) => {
       flipped={flipped}
       ref={ref}
       className={classnames(statusClassName, 'd-flex al-center')}
-      displayStatus={displayStatus}
     >
       <div className={classnames(className, 'd-inline-block')}>
         {!short && <Message className="mr-cs-xxs" content={message} />}
@@ -75,7 +73,6 @@ const LastSeen = React.forwardRef((props, ref) => {
 LastSeen.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
-  displayStatus: PropTypes.bool,
   flipped: PropTypes.bool,
   lastSeen: PropTypes.oneOfType([
     PropTypes.string,
@@ -100,7 +97,6 @@ LastSeen.defaultProps = {
   message: sharedMessages.lastSeen,
   noTitle: false,
   statusClassName: undefined,
-  displayStatus: true,
 }
 
 export default LastSeen
