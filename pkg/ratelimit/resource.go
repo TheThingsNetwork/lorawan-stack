@@ -115,7 +115,7 @@ func grpcStreamAcceptResource(ctx context.Context, fullMethod string) Resource {
 // grpcStreamUpResource represents client messages for a gRPC server stream.
 func grpcStreamUpResource(ctx context.Context, fullMethod string) Resource {
 	return &resource{
-		key:     fmt.Sprintf("grpc:stream:up:%s:streamID:%s", fullMethod, events.NewCorrelationID()),
+		key:     fmt.Sprintf("grpc:stream:up:%s:id:%s", fullMethod, events.NewCorrelationID()),
 		classes: []string{fmt.Sprintf("grpc:stream:up:%s", fullMethod), "grpc:stream:up"},
 	}
 }
