@@ -40,15 +40,15 @@ func (*NoopRateLimiter) RateLimit(Resource) (bool, Result) {
 
 type rateLimiter struct {
 	ctx     context.Context
-	limiter throttled.RateLimiter
+	limiter throttled.RateLimiterCtx
 }
 
 // RateLimit implements ratelimit.Interface.
 func (l *rateLimiter) RateLimit(resource Resource) (bool, Result) {
-	ok, result, err := l.limiter.RateLimit(resource.Key(), 1)
+	ok, result, err := l.limiter.RateLimitCtx(l.ctx, resource.Key(), 1)
 	if err != nil {
 		// NOTE: The memstore.MemStore implementation does not fail.
-		log.FromContext(l.ctx).Error("Rate limiter failed")
+		log.FromContext(l.ctx).WithError(err).Error("Rate limiter failed")
 		return true, Result{}
 	}
 
