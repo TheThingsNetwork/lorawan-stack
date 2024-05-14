@@ -17,7 +17,8 @@ import getByPath from '../get-by-path'
 export const getApplicationId = (application = {}) =>
   getByPath(application, 'application_id') ||
   getByPath(application, 'application_ids.application_id') ||
-  getByPath(application, 'ids.application_id')
+  getByPath(application, 'ids.application_id') ||
+  getByPath(application, 'ids.application_ids.application_id')
 
 export const getDeviceId = (device = {}) =>
   getByPath(device, 'device_id') ||
@@ -30,6 +31,15 @@ export const extractDeviceIdFromCombinedId = combinedId => {
     const parts = combinedId.split('/')
     if (parts.length === 2) {
       return parts[1]
+    }
+  }
+  return combinedId
+}
+export const extractApplicationIdFromCombinedId = combinedId => {
+  if (typeof combinedId === 'string') {
+    const parts = combinedId.split('/')
+    if (parts.length === 2) {
+      return parts[0]
     }
   }
   return combinedId
@@ -60,11 +70,11 @@ export const getOrganizationId = (organization = {}) =>
 
 const idSelectors = [
   getApplicationId,
-  getCollaboratorId,
-  getApiKeyId,
   getGatewayId,
   getDeviceId,
   getOrganizationId,
+  getCollaboratorId,
+  getApiKeyId,
 ]
 
 export const getEntityId = entity => {
