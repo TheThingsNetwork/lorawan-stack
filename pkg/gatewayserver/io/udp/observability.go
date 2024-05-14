@@ -27,14 +27,14 @@ import (
 const subsystem = "gs_io_udp"
 
 var udpMetrics = &messageMetrics{
-	messageReceived: prometheus.NewCounter(
+	messageReceived: metrics.NewCounter(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "message_received_total",
 			Help:      "Total number of received UDP messages",
 		},
 	),
-	messageForwarded: prometheus.NewCounterVec(
+	messageForwarded: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "message_forwarded_total",
@@ -42,7 +42,7 @@ var udpMetrics = &messageMetrics{
 		},
 		[]string{"type"},
 	),
-	messageDropped: prometheus.NewCounterVec(
+	messageDropped: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "message_dropped_total",
@@ -51,7 +51,7 @@ var udpMetrics = &messageMetrics{
 		[]string{"error"},
 	),
 
-	unmarshalTypeErrors: prometheus.NewCounterVec(
+	unmarshalTypeErrors: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "unmarshal_type_errors_total",
