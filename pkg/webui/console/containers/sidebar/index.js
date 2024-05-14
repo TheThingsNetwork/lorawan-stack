@@ -15,6 +15,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import classnames from 'classnames'
+import { useDispatch } from 'react-redux'
 
 import LAYOUT from '@ttn-lw/constants/layout'
 
@@ -22,6 +23,8 @@ import SearchButton from '@ttn-lw/components/sidebar/search-button'
 import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { setSearchOpen } from '@console/store/actions/search'
 
 import SearchPanelManager from '../search-panel'
 
@@ -35,6 +38,7 @@ import style from './sidebar.styl'
 const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
   const { pathname } = useLocation()
   const [isMinimized, setIsMinimized] = useState(false)
+  const dispatch = useDispatch()
 
   // Reset minimized state when screen size changes to mobile.
   useEffect(() => {
@@ -58,6 +62,10 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
     setIsMinimized(prev => !prev)
   }, [setIsMinimized])
 
+  const handleSearchClick = useCallback(() => {
+    dispatch(setSearchOpen(true))
+  }, [dispatch])
+
   const sidebarClassnames = classnames(
     style.sidebar,
     'd-flex direction-column j-between c-bg-brand-extralight gap-cs-l',
@@ -76,7 +84,7 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
           <SideHeader />
           <div className="d-flex direction-column gap-cs-m">
             <SwitcherContainer />
-            <SearchButton onClick={() => null} />
+            <SearchButton onClick={handleSearchClick} />
           </div>
           <SidebarNavigation />
           <SideFooter />
