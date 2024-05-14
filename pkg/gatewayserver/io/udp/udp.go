@@ -56,7 +56,7 @@ func (*srv) DutyCycleStyle() scheduling.DutyCycleStyle { return scheduling.Defau
 
 var (
 	limitLogsConfig      = config.RateLimitingProfile{MaxPerMin: 1}
-	limitLogsSize   uint = 1 << 13
+	limitLogsStoreConfig = ratelimit.StoreConfig{Memory: config.RateLimitingMemory{MaxSize: 1 << 13}}
 )
 
 // Serve serves the UDP frontend.
@@ -71,10 +71,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config
 	if conf.RateLimiting.Enable {
 		firewall = NewRateLimitingFirewall(firewall, conf.RateLimiting.Messages, conf.RateLimiting.Threshold)
 	}
-	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, ratelimit.StoreConfig{
-		Provider: conf.RateLimiting.Provider,
-		Redis:    conf.RateLimiting.Redis.Client,
-	})
+	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, limitLogsStoreConfig)
 	if err != nil {
 		return err
 	}
