@@ -177,6 +177,19 @@ func (s *srv) filterPacket(ctx context.Context, item filteringItem) {
 		return
 	}
 
+	if err := s.firewall.Filter(packet); err != nil {
+		registerMessageDropped(ctx, err)
+		if !errors.IsResourceExhausted(err) {
+			goto filtered
+		}
+		if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(packet.GatewayEUI.String())) != nil {
+			return
+		}
+	filtered:
+		logger.WithError(err).Warn("Packet filtered")
+		return
+	}
+
 	if err := s.processPool.Publish(ctx, packet); err != nil {
 		logger.WithError(err).Warn("UDP packet publishing failed")
 		registerMessageDropped(ctx, err)
@@ -195,18 +208,6 @@ func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
 		if err := s.writeAckFor(packet); err != nil {
 			logger.WithError(err).Warn("Failed to write acknowledgment")
 		}
-	}
-
-	if err := s.firewall.Filter(packet); err != nil {
-		if !errors.IsResourceExhausted(err) {
-			goto filtered
-		}
-		if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) != nil {
-			return
-		}
-	filtered:
-		logger.WithError(err).Warn("Packet filtered")
-		return
 	}
 
 	cs, err := s.connect(ctx, eui, packet.GatewayAddr)
