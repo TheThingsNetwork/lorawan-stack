@@ -43,6 +43,7 @@ const Portal = ({ children, visible, positionReference }) => {
           minWidth: '100%',
           minHeight: '100%',
         }}
+        ref={positionReference.current}
       >
         {/* Simulate button to allow for the dropdown positioning logic to work correctly */}
         <div

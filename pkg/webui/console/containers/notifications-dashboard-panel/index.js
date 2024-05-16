@@ -108,14 +108,14 @@ const NotificationsDashboardPanel = () => {
   return (
     <Panel
       title={sharedMessages.notifications}
-      path="/notifications"
       icon={IconInbox}
-      buttonTitle={sharedMessages.viewAll}
+      shortCutLinkPath="/notifications"
+      shortCutLinkTitle={sharedMessages.viewAll}
       messageDecorators={totalUnseenNotifications > 0 ? <MessageDecorator /> : undefined}
       className={style.notificationPanel}
     >
       {notifications && notifications.length === 0 ? (
-        <div className="flex-grow j-center">
+        <div className="d-flex direction-column flex-grow j-center">
           <Message content={m.noNotifications} className="d-block text-center fs-l fw-bold" />
           <Message
             content={m.noNotificationsDescription}

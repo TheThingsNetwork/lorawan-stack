@@ -28,46 +28,24 @@
   font-weight: $fwv2.semibold
   transition: $ad.s background ease-in-out
 
-  &-title-wrapper,
-  .add-icon-wrapper
-    position: absolute
+  &-title-wrapper
     width: 100%
     height: 100%
     display: flex
     justify-content: center
     align-items: center
     flex-direction: column
-    gap: $cs.m
-    top: 0
-    opacity: 1
-    transition: $ad.s opacity ease-in-out
-
-  &-title-wrapper
     text-wrap: wrap
     text-align: center
-    opacity: 1
-
-  .add-icon-wrapper
-    opacity: 0
+    gap: $cs.m
+    transition: $ad.s opacity ease-in-out
 
   span.icon
     font-size: 2rem
-
-  span.add-icon
-    font-size: 2.5rem
 
   &:hover
     cursor: pointer
     background: var(--c-bg-brand-normal-hover)
 
-    .shortcut-title-wrapper
-      opacity: 0
-
-    .add-icon-wrapper
-      opacity: 1
-
     span.icon
       font-size: 2rem
-
-    span.add-icon
-      font-size: 2.5rem
