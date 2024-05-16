@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as Sentry from '@sentry/browser'
-import { createStore, applyMiddleware, compose } from 'redux'
+import * as Sentry from '@sentry/react'
+import { configureStore } from '@reduxjs/toolkit'
 import { createLogicMiddleware } from 'redux-logic'
-import createSentryMiddleware from 'redux-sentry-middleware'
-import { cloneDeepWith } from 'lodash'
 
 import sensitiveFields from '@ttn-lw/constants/sensitive-data'
 
@@ -24,46 +22,41 @@ import omitDeep from '@ttn-lw/lib/omit'
 import env from '@ttn-lw/lib/env'
 import dev from '@ttn-lw/lib/dev'
 import requestPromiseMiddleware from '@ttn-lw/lib/store/middleware/request-promise-middleware'
+import { trimEvents } from '@ttn-lw/lib/store/util'
 
 import { selectUserId } from '@console/store/selectors/logout'
 
 import rootReducer from './reducers'
 import logics from './middleware/logics'
 
-const composeEnhancers = (dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
-let middlewares = [requestPromiseMiddleware, createLogicMiddleware(logics)]
+const logicMiddleware = createLogicMiddleware(logics)
 
-if (env.sentryDsn) {
-  const trimEvents = state => ({
-    ...state,
-    events: cloneDeepWith(state.events, (value, key) => {
-      if (key === 'events' && value instanceof Array) {
-        // Only transfer the last 5 events to Sentry to avoid
-        // `Payload too large` errors.
-        return value.slice(0, 5)
-      }
-    }),
+const middlewares = [requestPromiseMiddleware, logicMiddleware]
+
+const sentryEnhancer = Sentry.createReduxEnhancer({
+  stateTransformer: state => omitDeep(trimEvents(state), sensitiveFields),
+  actionTransformer: action => omitDeep(action, sensitiveFields),
+  configureScopeWithState: (scope, state) => scope.setUser({ id: selectUserId(state) }),
+})
+
+const enhancers = env.sentryDsn ? [sentryEnhancer] : []
+
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActionPaths: ['meta._resolve', 'meta._reject'],
+      },
+    }).concat(middlewares),
+  enhancert: getDefaultEnhancers => getDefaultEnhancers().concat(enhancers),
+  devTools: dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__,
+})
+
+if (dev && module.hot) {
+  module.hot.accept('./reducers', () => {
+    store.replaceReducer(rootReducer)
   })
-
-  middlewares = [
-    createSentryMiddleware(Sentry, {
-      actionTransformer: action => omitDeep(action, sensitiveFields),
-      stateTransformer: state => omitDeep(trimEvents(state), sensitiveFields),
-      getUserContext: state => ({ user_id: selectUserId(state) }),
-    }),
-    ...middlewares,
-  ]
 }
 
-export default () => {
-  const middleware = applyMiddleware(...middlewares)
-
-  const store = createStore(rootReducer, composeEnhancers(middleware))
-  if (dev && module.hot) {
-    module.hot.accept('./reducers', () => {
-      store.replaceReducer(rootReducer)
-    })
-  }
-
-  return store
-}
+export default store
