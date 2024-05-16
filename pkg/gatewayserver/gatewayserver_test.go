@@ -896,6 +896,10 @@ func TestGatewayServer(t *testing.T) {
 						} {
 							tc := tc
 							t.Run(tc.Name, func(t *testing.T) {
+								if !rtc.SupportsLocationUpdate {
+									t.Skip("Antenna update not supported")
+								}
+
 								a := assertions.New(t)
 
 								ctx, cancel := context.WithCancel(ctx)
