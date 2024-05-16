@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Increased the timeout for Basic Station gateways sending HTTP headers. There should now be enough time for embedded devices with little to no hardware acceleration to perform a TLS handshake. In particular, The Things Indoor Gateway can now connect to The Things Stack presenting a ECDSA certificate.
+- Reconnect a gateway when the antenna gain is adjusted.
 
 ### Security
 

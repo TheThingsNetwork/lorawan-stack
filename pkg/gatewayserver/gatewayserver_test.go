@@ -106,8 +106,8 @@ func TestGatewayServer(t *testing.T) {
 					ConnectionStatsTTL:                (1 << 6) * test.Delay,
 					ConnectionStatsDisconnectTTL:      (1 << 7) * test.Delay,
 					Stats:                             statsRegistry,
-					FetchGatewayInterval:              time.Minute,
-					FetchGatewayJitter:                1,
+					FetchGatewayInterval:              (1 << 5) * test.Delay,
+					FetchGatewayJitter:                0.1,
 					MQTT: config.MQTT{
 						Listen: ":1882",
 					},
@@ -160,6 +160,7 @@ func TestGatewayServer(t *testing.T) {
 			SupportsLocationUpdate: true,
 		},
 	} {
+		rtc := rtc
 		t.Run(rtc.Name, func(t *testing.T) {
 			a, ctx := test.New(t)
 
@@ -595,6 +596,7 @@ func TestGatewayServer(t *testing.T) {
 					},
 				},
 			} {
+				ptc := ptc
 				if rtc.SkipProtocols(ptc.Protocol) {
 					continue
 				}
@@ -874,6 +876,72 @@ func TestGatewayServer(t *testing.T) {
 							}
 						})
 					}
+
+					t.Run("Disconnection", func(t *testing.T) {
+						for _, tc := range []struct {
+							Name               string
+							AntennaGain        float32
+							ExpectDisconnected bool
+						}{
+							{
+								Name:               "NoDisconnect",
+								AntennaGain:        0,
+								ExpectDisconnected: false,
+							},
+							{
+								Name:               "Disconnect",
+								AntennaGain:        3,
+								ExpectDisconnected: true,
+							},
+						} {
+							tc := tc
+							t.Run(tc.Name, func(t *testing.T) {
+								a := assertions.New(t)
+
+								ctx, cancel := context.WithCancel(ctx)
+								upCh := make(chan *ttnpb.GatewayUp)
+								downCh := make(chan *ttnpb.GatewayDown)
+
+								wg := &sync.WaitGroup{}
+								wg.Add(1)
+								var linkErr error
+								go func() {
+									defer wg.Done()
+									linkErr = ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
+								}()
+
+								// Wait for gateway connection to be processed.
+								time.Sleep((1 << 2) * test.Delay)
+
+								gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
+									GatewayIds: ids,
+									FieldMask:  ttnpb.FieldMask("antennas"),
+								})
+								a.So(err, should.BeNil)
+								gtw.Antennas[0].Gain = tc.AntennaGain
+								gtw, err = is.GatewayRegistry().Update(ctx, &ttnpb.UpdateGatewayRequest{
+									Gateway:   gtw,
+									FieldMask: ttnpb.FieldMask("antennas"),
+								})
+								a.So(err, should.BeNil)
+								a.So(gtw.Antennas[0].Gain, should.Equal, tc.AntennaGain)
+
+								// Wait for gateway disconnection to be processed.
+								time.Sleep(2 * config.FetchGatewayInterval)
+
+								_, connected := gs.GetConnection(ctx, ids)
+								if !a.So(connected, should.Equal, !tc.ExpectDisconnected) {
+									t.Fatal("Expected gateway to be disconnected, but it is not")
+								}
+
+								cancel()
+								wg.Wait()
+								if !tc.ExpectDisconnected && !errors.IsCanceled(linkErr) {
+									t.Fatalf("Expected context canceled, but have %v", linkErr)
+								}
+							})
+						}
+					})
 
 					if rtc.SupportsLocationUpdate {
 						t.Run("LocationMetadata", func(t *testing.T) {
@@ -1882,11 +1950,9 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	})
 	defer c.Close()
 
-	gatewayFetchInterval := test.Delay
-
 	gsConfig := &gatewayserver.Config{
-		FetchGatewayInterval:   gatewayFetchInterval,
-		FetchGatewayJitter:     1,
+		FetchGatewayInterval:   (1 << 5) * test.Delay,
+		FetchGatewayJitter:     0.1,
 		UpdateVersionInfoDelay: test.Delay,
 		MQTTV2: config.MQTT{
 			Listen: ":1881",
@@ -2024,7 +2090,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 
 	// Delete and wait for fetch interval.
 	is.GatewayRegistry().Delete(ctx, gtwIDs)
-	time.Sleep(gatewayFetchInterval << 7)
+	time.Sleep(2 * gsConfig.FetchGatewayInterval)
 
 	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, gtwIDs)
 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -2073,11 +2139,9 @@ func TestBatchGetStatus(t *testing.T) { // nolint:paralleltest
 			})
 			defer c.Close()
 
-			gatewayFetchInterval := test.Delay
-
 			gsConfig := &gatewayserver.Config{
-				FetchGatewayInterval:   gatewayFetchInterval,
-				FetchGatewayJitter:     1,
+				FetchGatewayInterval:   (1 << 5) * test.Delay,
+				FetchGatewayJitter:     0.1,
 				UpdateVersionInfoDelay: test.Delay,
 				MQTTV2: config.MQTT{
 					Listen: ":1881",

@@ -612,6 +612,9 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 			return true
 		}
 	}
+	if !sameAntennaGain(connected.GetAntennas(), current.GetAntennas()) {
+		return true
+	}
 	if connected.DownlinkPathConstraint != current.DownlinkPathConstraint ||
 		connected.DisablePacketBrokerForwarding != current.DisablePacketBrokerForwarding ||
 		connected.EnforceDutyCycle != current.EnforceDutyCycle ||
@@ -642,50 +645,54 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 		Context: conn.Context(),
 		ID:      fmt.Sprintf("disconnect_on_change_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
 		Func: func(ctx context.Context) error {
-			d := random.Jitter(gs.config.FetchGatewayInterval, gs.config.FetchGatewayJitter)
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case <-time.After(d):
-			}
-
-			gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-				GatewayIds: conn.Gateway().GetIds(),
-				FieldMask: ttnpb.FieldMask(
-					"antennas",
-					"disable_packet_broker_forwarding",
-					"downlink_path_constraint",
-					"enforce_duty_cycle",
-					"frequency_plan_id",
-					"frequency_plan_ids",
-					"gateway_server_address",
-					"location_public",
-					"require_authenticated_connection",
-					"schedule_anytime_delay",
-					"schedule_downlink_late",
-					"status_public",
-					"update_location_from_status",
-				),
-			})
-			if err != nil {
-				if errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err) {
-					// Since there is an active connection, the `Get` request will not return a `NotFound` error as the gateway existed during the connect, since the rights assertion fails first.
-					// Instead,
-					// 1. If the gateway is connected with an API key and is deleted, the IS returns an `Unauthenticated`, since the API Key is also deleted.
-					// 2. If the gateway is connected without an API key (UDP, LBS in unauthenticated mode) and is deleted the IS returns an `PermissionDenied` as there are no rights for these IDs.
-					log.FromContext(ctx).WithError(err).Debug("Gateway was deleted and/or the API key used to link the gateway was invalidated")
-					conn.Disconnect(err)
-				} else {
-					log.FromContext(ctx).WithError(err).Warn("Failed to get gateway")
+			for {
+				d := random.Jitter(gs.config.FetchGatewayInterval, gs.config.FetchGatewayJitter)
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-time.After(d):
 				}
-				return err
-			}
-			if requireDisconnect(conn.Gateway(), gtw) {
-				log.FromContext(ctx).Info("Gateway changed in registry, disconnect")
-				conn.Disconnect(errGatewayChanged.New())
-			}
 
-			return nil
+				gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
+					GatewayIds: conn.Gateway().GetIds(),
+					FieldMask: ttnpb.FieldMask(
+						"antennas",
+						"disable_packet_broker_forwarding",
+						"downlink_path_constraint",
+						"enforce_duty_cycle",
+						"frequency_plan_id",
+						"frequency_plan_ids",
+						"gateway_server_address",
+						"location_public",
+						"require_authenticated_connection",
+						"schedule_anytime_delay",
+						"schedule_downlink_late",
+						"status_public",
+						"update_location_from_status",
+					),
+				})
+				if err != nil {
+					if errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err) {
+						// Since there is an active connection, the `Get` request will not return a `NotFound` error as the
+						// gateway existed during the connect, since the rights assertion fails first.
+						// Instead,
+						// 1. If the gateway is connected with an API key and is deleted, the IS returns an `Unauthenticated`,
+						// since the API Key is also deleted.
+						// 2. If the gateway is connected without an API key (UDP, LBS in unauthenticated mode) and is deleted
+						// the IS returns an `PermissionDenied` as there are no rights for these IDs.
+						log.FromContext(ctx).WithError(err).Debug("Gateway was deleted and/or the API key used to link the gateway was invalidated") // nolint: lll
+						conn.Disconnect(err)
+					} else {
+						log.FromContext(ctx).WithError(err).Warn("Failed to get gateway")
+					}
+					return err
+				}
+				if requireDisconnect(conn.Gateway(), gtw) {
+					log.FromContext(ctx).Info("Gateway changed in registry, disconnect")
+					conn.Disconnect(errGatewayChanged.New())
+					return nil
+				}
+			}
 		},
 		Done:    conn.tasksDone.Done,
 		Restart: task.RestartAlways,
@@ -1102,6 +1109,19 @@ func sameAntennaLocations(a, b []*ttnpb.GatewayAntenna) bool {
 			return false
 		}
 		if (a.Location == nil) != (b.Location == nil) {
+			return false
+		}
+	}
+	return true
+}
+
+func sameAntennaGain(a, b []*ttnpb.GatewayAntenna) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		a, b := a[i], b[i]
+		if a.Gain != b.Gain {
 			return false
 		}
 	}
