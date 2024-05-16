@@ -13,34 +13,54 @@
 // limitations under the License.
 
 .gtw-status-panel
+  &-tooltip
+    width: 1.25rem
+    height: 1.25rem
+    margin-bottom: -4px
+    margin-left: $cs.xxs
+
   &-divider
     border-bottom: 1px solid var(--c-border-neutral-light)
-    margin-top: $cs.l
-    margin-bottom: $cs.l
+    margin-top: $cs.xl
+    margin-bottom: $cs.xl
     height: 0px
 
   &-tag
-    border-radius: $br.xs
-    padding: $cs.xxs $cs.xs
-    color: var(--c-text-neutral-min)
-    font-weight: 600
-
-  &-round-trip-time-bar
-    background: linear-gradient(90deg, #1CB041 0%, #DB7600 50%, #DB2328 100%)
-    height: $cs.m
-    width: 100%
-    border-radius: $br.xl
-    position: relative
-
-    &-pointer
-      width: $cs.xxs
-      height: 100%
-      background: var(--c-bg-neutral-min)
-      position: absolute
-
-  &-sub-band
-    code
-      font-size: $fs.m
-      background-color: var(--c-bg-neutral-min)
-      padding: 0
+    height: 2.5rem
+    margin-top: $cs.xl
+    div
+      border-radius: $br.m
+      padding: $cs.s $cs.m
       color: var(--c-text-neutral-heavy)
+      background-color: var(--c-bg-neutral-light)
+      font-weight: 600
+      width: fit-content
+      line-height: 1
+      position: absolute
+      bottom: 28px
+
+  &-round-trip-time
+    &-bar
+      background: linear-gradient(90deg, #B3FAA9 33%, #FFE096 33%, #FFE096 66%, #FFD1CA 66%, #FFD1CA 100%)
+      height: 1.75rem
+      width: 100%
+      border-radius: $br.xs
+      position: relative
+      padding-top: 2px
+      padding-bottom: 2px
+      margin-top: 1.25rem
+
+      &-pointer
+        border-radius: $br.xl
+        width: 2px
+        height: 86%
+        position: absolute
+
+    &-tag
+      font-size: $fs.l
+      padding: $cs.s
+      font-weight: $fw.bold
+      width: fit-content
+      border-radius: $br.s
+      line-height: 1
+      margin-top: $cs.l
