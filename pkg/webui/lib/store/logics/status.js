@@ -17,10 +17,11 @@ import axios from 'axios'
 
 import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 
-import { selectIsConfig } from '@ttn-lw/lib/selectors/env'
+import { selectIsConfig, selectPageStatusBaseUrlConfig } from '@ttn-lw/lib/selectors/env'
 import { isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
 import * as status from '@ttn-lw/lib/store/actions/status'
 import { selectIsOfflineStatus } from '@ttn-lw/lib/store/selectors/status'
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 const probeUrl = `${selectIsConfig().base_url}/auth_info`
 
@@ -115,4 +116,24 @@ const connectionCheckFailLogic = createLogic({
   },
 })
 
-export default [connectionManagementLogic, connectionCheckLogic, connectionCheckFailLogic]
+const getNetworkStatusSummaryLogic = createRequestLogic({
+  type: status.GET_NETWORK_STATUS_SUMMARY,
+  process: async () => {
+    const baseUrl = selectPageStatusBaseUrlConfig()
+
+    const response = await axios.get(`${baseUrl}/api/v2/summary.json`, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+
+    return { summary: response.data }
+  },
+})
+
+export default [
+  connectionManagementLogic,
+  connectionCheckLogic,
+  connectionCheckFailLogic,
+  getNetworkStatusSummaryLogic,
+]

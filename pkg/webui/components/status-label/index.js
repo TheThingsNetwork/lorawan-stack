@@ -1,4 +1,4 @@
-// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,48 +12,73 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import classnames from 'classnames'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import from from '@ttn-lw/lib/from'
 
-import Icon from '../icon'
+import Icon, {
+  IconCircleCheckFilled,
+  IconAlertTriangleFilled,
+  IconAlertCircleFilled,
+  IconInfoCircleFilled,
+} from '../icon'
 
 import style from './status-label.styl'
 
-const StatusLabel = ({ success, warning, error, info, content }) => {
-  const statusClassName = classnames(style.label, {
-    'c-bg-success-light c-text-success-bold': success,
-    'c-bg-warning-light c-text-warning-bold': warning,
-    'c-bg-error-light c-text-error-bold': error,
-    'c-bg-info-light c-text-info-bold': info,
-  })
-
-  const labelIcon = success ? 'check_circle' : warning ? 'warning' : error ? 'error' : 'info'
-
+const StatusLabel = ({ className, icon, type, content, onClick, contentValues }) => {
+  const statusIcon = useMemo(() => {
+    if (icon) {
+      return icon
+    }
+    if (type === 'success') {
+      return IconCircleCheckFilled
+    }
+    if (type === 'warning') {
+      return IconAlertTriangleFilled
+    }
+    if (type === 'error') {
+      return IconAlertCircleFilled
+    }
+    return IconInfoCircleFilled
+  }, [icon, type])
   return (
-    <div className={statusClassName}>
-      <Icon icon={labelIcon} className={style.labelIcon} />
-      <Message content={content} className={style.labelContent} />
+    <div
+      className={classnames(
+        style.statusLabel,
+        className,
+        style[type],
+        ...from(style, {
+          noContent: !content,
+        }),
+      )}
+      onClick={onClick}
+    >
+      <Icon icon={statusIcon} />
+
+      {!!content && <Message className={style.message} content={content} values={contentValues} />}
     </div>
   )
 }
 
 StatusLabel.propTypes = {
-  content: PropTypes.message.isRequired,
-  error: PropTypes.bool,
-  info: PropTypes.bool,
-  success: PropTypes.bool,
-  warning: PropTypes.bool,
+  className: PropTypes.string,
+  content: PropTypes.message,
+  contentValues: PropTypes.object,
+  icon: PropTypes.icon,
+  onClick: PropTypes.func,
+  type: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
 }
 
 StatusLabel.defaultProps = {
-  success: false,
-  warning: false,
-  error: false,
-  info: false,
+  className: false,
+  icon: undefined,
+  onClick: () => {},
+  content: undefined,
+  contentValues: undefined,
 }
 
 export default StatusLabel

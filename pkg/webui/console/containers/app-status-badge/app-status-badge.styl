@@ -12,22 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-
-import StatusLabel from '.'
-
-export default {
-  title: 'Status Label',
-  component: StatusLabel,
-  parameters: {
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/file/7pBLWK4tsjoAbyJq2viMAQ/console-redesign?type=design&node-id=1599-8145&mode=design&t=2KlaQGRV9FQm7Nv3-4',
-    },
-  },
-}
-
-export const Info = () => <StatusLabel type="info" content="Info" />
-export const Warning = () => <StatusLabel type="warning" content="Warning" />
-export const Error = () => <StatusLabel type="error" content="Error" />
-export const Success = () => <StatusLabel type="success" content="Success" />
+.app-status-badge
+  +media-query($bp.sm)
+    cursor: pointer
+    padding: $cs.xs
+    & > span
+      display: none
