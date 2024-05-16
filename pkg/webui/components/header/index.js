@@ -19,6 +19,8 @@ import { IconStar, IconPlus, IconInbox, IconMenu2 } from '@ttn-lw/components/ico
 import Button from '@ttn-lw/components/button'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
 
+import AppStatusBadge from '@console/containers/app-status-badge'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './header.styl'
@@ -36,7 +38,7 @@ const Header = ({
   showNotificationDot,
   ...rest
 }) => (
-  <header {...rest} className={classnames(className, style.container)}>
+  <header {...rest} className={classnames(className, style.container)} id="header">
     <div className={classnames('breadcrumbs', 'md:d-none')} />
     <div className="d-none md:d-flex al-center gap-cs-xs">
       <Button secondary icon={IconMenu2} onClick={onMenuClick} />
@@ -44,6 +46,7 @@ const Header = ({
     </div>
 
     <div className="d-flex al-center gap-cs-xs">
+      <AppStatusBadge />
       <Button
         secondary
         icon={IconPlus}

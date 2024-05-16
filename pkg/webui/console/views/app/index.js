@@ -26,6 +26,7 @@ import classnames from 'classnames'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
+import { AlertBannerProvider } from '@ttn-lw/components/alert-banner/context'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -135,28 +136,30 @@ const Layout = () => {
           <div id="modal-container" />
           <div id="dropdown-container" className="pos-absolute-container" />
           <div className="d-flex">
-            <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
-            <div className="w-full h-vh d-flex direction-column">
-              <Header onMenuClick={onDrawerExpandClick} />
-              <main
-                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
-              >
-                <WithAuth
-                  user={user}
-                  fetching={fetching}
-                  error={error}
-                  errorComponent={FullViewErrorInner}
-                  rights={rights}
-                  isAdmin={isAdmin}
+            <AlertBannerProvider>
+              <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
+              <div className="w-full h-vh d-flex direction-column">
+                <Header onMenuClick={onDrawerExpandClick} />
+                <main
+                  className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
                 >
-                  <div className={style.content}>
-                    <div className={style.stage} id="stage">
-                      <Outlet />
+                  <WithAuth
+                    user={user}
+                    fetching={fetching}
+                    error={error}
+                    errorComponent={FullViewErrorInner}
+                    rights={rights}
+                    isAdmin={isAdmin}
+                  >
+                    <div className={style.content}>
+                      <div className={style.stage} id="stage">
+                        <Outlet />
+                      </div>
                     </div>
-                  </div>
-                </WithAuth>
-              </main>
-            </div>
+                  </WithAuth>
+                </main>
+              </div>
+            </AlertBannerProvider>
           </div>
         </div>
       </ErrorView>

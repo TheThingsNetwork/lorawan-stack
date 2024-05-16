@@ -12,32 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.status-label
-  display: flex
-  height: fit-content
-  align-items: center
-  padding: $cs.xxs $cs.s $cs.xxs $cs.s
-  width: fit-content
-  border-radius: $br.m
-  justify-content: center
-  gap: $cs.xxs
+.alert-banner
+  position: absolute
+  right: 0
+  left: 0
+  z-index: $zi.slight
+  padding: $cs.m
+  opacity: 0
+  pointer-events: none
+  transition: opacity $ad.m
+  &.visible
+    opacity: 1
+    pointer-events: auto
 
-  &.no-content
-    padding: $cs.xs
-    gap: 0
-
-
-  .message
-    font-weight: $fw.bold
-    white-space: nowrap
   .link > span
     text-decoration: underline
+
+  .title
+    line-height: normal
 
 .error
   background-color: var(--c-bg-error-light)
   color: var(--c-text-error-bold)
-  border: 1px solid var(--c-border-error-light)
-  .link
+  .link, .closeIcon
     color: var(--c-text-error-bold)
     &:hover
       color: var(--c-text-error-normal-hover)
@@ -45,8 +42,7 @@
 .success
   background-color: var(--c-bg-success-light)
   color: var(--c-text-success-bold)
-  border: 1px solid var(--c-border-success-light)
-  .link
+  .link, .closeIcon
     color: var(--c-text-success-bold)
     &:hover
       color: var(--c-text-success-normal-hover)
@@ -54,8 +50,7 @@
 .warning
   background-color: var(--c-bg-warning-light)
   color: var(--c-text-warning-bold)
-  border: 1px solid var(--c-border-warning-light)
-  .link
+  .link, .closeIcon
     color: var(--c-text-warning-bold)
     &:hover
       color: var(--c-text-warning-normal-hover)
@@ -63,8 +58,7 @@
 .info
   background-color: var(--c-bg-info-light)
   color: var(--c-text-info-bold)
-  border: 1px solid var(--c-border-info-light)
-  .link
+  .link, .closeIcon
     color: var(--c-text-info-bold)
     &:hover
       color: var(--c-text-info-normal-hover)
