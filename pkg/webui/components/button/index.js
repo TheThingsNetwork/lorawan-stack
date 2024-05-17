@@ -71,12 +71,14 @@ const assembleClassnames = ({
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, busy, message, noDropdownIcon, children } = props
+  const { dropdownItems, icon, busy, message, messageValues, noDropdownIcon, children } = props
 
   const content = (
     <>
       {icon && <Icon className={style.icon} icon={icon} />}
-      {message && <Message content={message} className={style.linkButtonMessage} />}
+      {message && (
+        <Message content={message} values={messageValues} className={style.linkButtonMessage} />
+      )}
       {children}
       {dropdownItems && (
         <>
@@ -225,6 +227,8 @@ const AnchorLinkButton = props => {
 const commonPropTypes = {
   /** The message to be displayed within the button. */
   message: PropTypes.message,
+  /** The message values. */
+  messageValues: PropTypes.object,
   /**
    * A flag specifying whether the `danger` styling should applied to the
    * button.
@@ -287,12 +291,14 @@ buttonChildren.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   icon: commonPropTypes.icon,
   message: commonPropTypes.message,
+  messageValues: commonPropTypes.messageValues,
 }
 
 buttonChildren.defaultProps = {
   busy: undefined,
   icon: undefined,
   message: undefined,
+  messageValues: undefined,
   children: null,
   small: false,
 }

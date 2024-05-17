@@ -27,7 +27,9 @@ import Toggle from './toggle'
 import styles from './panel.styl'
 
 const PanelError = ({ className, children }) => (
-  <div className={classnames(className, 'd-flex', 'j-center')}>{children}</div>
+  <div className={classnames(className, 'd-flex', 'j-center', 'h-full', 'al-center')}>
+    {children}
+  </div>
 )
 
 PanelError.propTypes = {
@@ -52,6 +54,7 @@ const Panel = ({
   messageDecorators,
   divider,
   shortCutLinkTarget,
+  shortCutLinkDisabled,
 }) => (
   <div className={classnames(styles.panel, className)}>
     <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
@@ -64,7 +67,13 @@ const Panel = ({
         <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
       ) : (
         shortCutLinkTitle && (
-          <Link primary to={shortCutLinkPath} className={styles.button} target={shortCutLinkTarget}>
+          <Link
+            primary
+            to={shortCutLinkPath}
+            className={styles.button}
+            target={shortCutLinkTarget}
+            disabled={shortCutLinkDisabled}
+          >
             <Message content={shortCutLinkTitle} /> →
           </Link>
         )
@@ -83,6 +92,7 @@ Panel.propTypes = {
   icon: PropTypes.icon,
   messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
+  shortCutLinkDisabled: PropTypes.bool,
   shortCutLinkPath: PropTypes.string,
   shortCutLinkTarget: PropTypes.string,
   shortCutLinkTitle: PropTypes.message,
@@ -98,6 +108,7 @@ Panel.defaultProps = {
   className: undefined,
   messageDecorators: undefined,
   divider: false,
+  shortCutLinkDisabled: undefined,
   shortCutLinkPath: undefined,
   shortCutLinkTitle: undefined,
   shortCutLinkTarget: undefined,

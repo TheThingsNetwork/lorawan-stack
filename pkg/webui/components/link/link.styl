@@ -21,8 +21,8 @@
   &.primary
     color: var(--c-text-brand-normal)
 
-    &:active,
-    &:hover
+    &:active:not(.disabled),
+    &:hover:not(.disabled)
       color: var(--c-text-brand-normal-hover)
       text-decoration: underline
 
@@ -32,8 +32,8 @@
 
   &.secondary
     color: var(--c-text-neutral-light)
-    &:active,
-    &:hover
+    &:active:not(.disabled),
+    &:hover:not(.disabled)
       color: var(--c-text-neutral-heavy)
 
     &.link-visited
