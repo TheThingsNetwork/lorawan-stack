@@ -161,14 +161,10 @@ const GatewayOverview = () => {
           <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
-        </div>
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
-        </div>
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6" />
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <BlurryNetworkActivityPanel />
+        </div>
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
         </div>
       </div>
     </Require>
