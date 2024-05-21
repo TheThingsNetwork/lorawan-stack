@@ -16,6 +16,8 @@ import React from 'react'
 import classnames from 'classnames'
 
 import SafeInspector from '@ttn-lw/components/safe-inspector'
+import Tooltip from '@ttn-lw/components/tooltip'
+import Icon, { IconInfoCircle } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -109,7 +111,14 @@ const DataSheetRow = ({ item, sub }) => {
     <tr className={rowStyle}>
       {item.key && (
         <th>
-          <Message content={item.key} />
+          <div className="d-flex al-center gap-cs-xxs">
+            <Message content={item.key} />
+            {item.tooltipMessage && (
+              <Tooltip content={<Message content={item.tooltipMessage} />}>
+                <Icon icon={IconInfoCircle} className="c-text-neutral-semilight" size={17} />
+              </Tooltip>
+            )}
+          </div>
         </th>
       )}
       <td>
@@ -117,7 +126,6 @@ const DataSheetRow = ({ item, sub }) => {
           <SafeInspector
             hideable={false || item.sensitive}
             isBytes={item.type === 'byte'}
-            small
             data={item.value}
             enableUint32={item.enableUint32}
           />
@@ -141,6 +149,7 @@ DataSheetRow.propTypes = {
     value: PropTypes.message,
     /** The type of the item, 'code', 'byte' or 'text' (default). */
     type: PropTypes.string,
+    tooltipMessage: PropTypes.message,
     /** Whether this 'code' or 'byte' item should be hidden by default. */
     sensitive: PropTypes.bool,
     /** Optional subitems of this item (same shape as item, but no deeper hierarchies). */

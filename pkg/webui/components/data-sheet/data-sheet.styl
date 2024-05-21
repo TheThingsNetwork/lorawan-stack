@@ -14,27 +14,27 @@
 
 .table
   width: 100%
-  table-layout: fixed
 
   tr
     height: 3rem
 
   th
     text-align: left
-    font-weight: $fw.normal
-    color: var(--c-text-neutral-light)
-    min-width: 6rem
+    font-weight: 400
+    color: var(--c-text-neutral-semilight)
     padding-right: $cs.xs
+    width: 50%
 
   +media-query($bp.md)
     margin-bottom: $ls.xs
 
 tr.group-heading
-  height: auto
-  vertical-align: bottom
+  height: 2.8rem
+  vertical-align: top
 
   &:not(:first-child)
-    height: 3.5rem
+    height: 5.6rem
+    vertical-align: middle
   th
     color: var(--c-text-neutral-heavy)
     font-weight: $fw.bold
