@@ -61,7 +61,7 @@ const Panel = ({
     <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
       <div className="d-flex gap-cs-xs al-center overflow-hidden">
         {icon && <Icon icon={icon} className={classnames(styles.panelHeaderIcon, iconClassName)} />}
-        <Message content={title} className={styles.panelHeaderTitle} />
+        {title && <Message content={title} className={styles.panelHeaderTitle} />}
         {messageDecorators}
       </div>
       {toggleOptions ? (
@@ -98,7 +98,7 @@ Panel.propTypes = {
   shortCutLinkPath: PropTypes.string,
   shortCutLinkTarget: PropTypes.string,
   shortCutLinkTitle: PropTypes.message,
-  title: PropTypes.message.isRequired,
+  title: PropTypes.message,
   toggleOptions: PropTypes.arrayOf(PropTypes.shape({})),
 }
 
@@ -115,6 +115,7 @@ Panel.defaultProps = {
   shortCutLinkTitle: undefined,
   shortCutLinkTarget: undefined,
   iconClassName: undefined,
+  title: undefined,
 }
 
 export { Panel as default, PanelError }
