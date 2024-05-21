@@ -22,6 +22,7 @@ import GatewayMapPanel from '@console/components/gateway-map-panel'
 
 import GatewayOverviewHeader from '@console/containers/gateway-overview-header'
 import GatewayStatusPanel from '@console/containers/gateway-status-panel'
+import GatewayGeneralInformationPanel from '@console/containers/gateway-general-information-panel'
 
 import Require from '@console/lib/components/require'
 
@@ -40,7 +41,7 @@ const GatewayOverview = () => {
       <GatewayOverviewHeader gateway={gateway} />
       <div className="container container--xl grid p-ls-s gap-ls-s">
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+          <GatewayGeneralInformationPanel />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <GatewayStatusPanel />
