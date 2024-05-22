@@ -12,43 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as Sentry from '@sentry/browser'
-import { createStore, applyMiddleware, compose } from 'redux'
+import * as Sentry from '@sentry/react'
+import { configureStore } from '@reduxjs/toolkit'
 import { createLogicMiddleware } from 'redux-logic'
-import createSentryMiddleware from 'redux-sentry-middleware'
-import { createBrowserHistory } from 'history'
 
 import sensitiveFields from '@ttn-lw/constants/sensitive-data'
 
-import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 import omitDeep from '@ttn-lw/lib/omit'
 import dev from '@ttn-lw/lib/dev'
 import env from '@ttn-lw/lib/env'
 import requestPromiseMiddleware from '@ttn-lw/lib/store/middleware/request-promise-middleware'
+import { trimEvents } from '@ttn-lw/lib/store/util'
 
 import { selectUserId } from '@account/store/selectors/user'
 
 import rootReducer from './reducers'
 import logic from './middleware'
 
-const composeEnhancers = (dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
-let middlewares = [requestPromiseMiddleware, createLogicMiddleware(logic)]
+const logicMiddleware = createLogicMiddleware(logic)
 
-if (env.sentryDsn) {
-  middlewares = [
-    createSentryMiddleware(Sentry, {
-      actionTransformer: action => omitDeep(action, sensitiveFields),
-      stateTransformer: state => omitDeep(state, sensitiveFields),
-      getUserContext: state => ({ user_id: selectUserId(state) }),
-    }),
-    ...middlewares,
-  ]
-}
+const middlewares = [requestPromiseMiddleware, logicMiddleware]
 
-export const history = createBrowserHistory({ basename: `${selectApplicationRootPath()}/` })
+const sentryEnhancer = Sentry.createReduxEnhancer({
+  stateTransformer: state => omitDeep(trimEvents(state), sensitiveFields),
+  actionTransformer: action => omitDeep(action, sensitiveFields),
+  configureScopeWithState: (scope, state) => scope.setUser({ id: selectUserId(state) }),
+})
 
-const middleware = applyMiddleware(...middlewares)
-const store = createStore(rootReducer, composeEnhancers(middleware))
+const enhancers = env.sentryDsn ? [sentryEnhancer] : []
+
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middlewares),
+  enhancers: getDefaultEnhancers => getDefaultEnhancers().concat(enhancers),
+  devTools: dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__,
+})
+
 if (dev && module.hot) {
   module.hot.accept('./reducers', () => {
     store.replaceReducer(rootReducer)

@@ -16,7 +16,7 @@ import React from 'react'
 import DOM from 'react-dom'
 import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 
 import sentryConfig from '@ttn-lw/constants/sentry'
 
@@ -34,7 +34,7 @@ import App from '@console/views/app'
 
 import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
 
-import createStore from './console/store'
+import store from './console/store'
 
 const appRoot = selectApplicationRootPath()
 
@@ -44,7 +44,6 @@ if (selectSentryDsnConfig) {
 }
 
 const history = createBrowserHistory({ basename: `${appRoot}/` })
-const store = createStore(history)
 const rootElement = document.getElementById('app')
 
 // Error renderer for the outermost error boundary.

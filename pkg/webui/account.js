@@ -15,10 +15,11 @@
 import React from 'react'
 import DOM from 'react-dom'
 import { Provider } from 'react-redux'
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
+import { createBrowserHistory } from 'history'
 
 import sentryConfig from '@ttn-lw/constants/sentry'
-import store, { history } from '@account/store'
+import store from '@account/store'
 
 import { BreadcrumbsProvider } from '@ttn-lw/components/breadcrumbs/context'
 import Header from '@ttn-lw/components/header'
@@ -32,7 +33,7 @@ import Logo from '@account/containers/logo'
 
 import App from '@account/views/app'
 
-import { selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
+import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
 
 import '@ttn-lw/lib/yup'
 
@@ -47,6 +48,8 @@ if (selectSentryDsnConfig()) {
 const errorRender = error => (
   <FullViewError error={error} header={<Header logo={<Logo safe />} />} safe />
 )
+
+const history = createBrowserHistory({ basename: `${selectApplicationRootPath()}/` })
 
 DOM.render(
   <ErrorView errorRender={errorRender}>

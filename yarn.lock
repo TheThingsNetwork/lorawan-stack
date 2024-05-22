@@ -2082,6 +2082,16 @@
   resolved "https://registry.yarnpkg.com/@react-leaflet/core/-/core-2.1.0.tgz#383acd31259d7c9ae8fb1b02d5e18fe613c2a13d"
   integrity sha512-Qk7Pfu8BSarKGqILj4x7bCSZ1pjuAPZ+qmRwH5S7mDS91VSbVVsJSrW4qA+GPrro8t69gFYVMWb1Zc4yFmPiVg==
 
+"@reduxjs/toolkit@^2.2.5":
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/@reduxjs/toolkit/-/toolkit-2.2.5.tgz#c0d2d8482ef80722bebe015ff05b06c34bfb6e0d"
+  integrity sha512-aeFA/s5NCG7NoJe/MhmwREJxRkDs0ZaSqt0MxhWUrwCf1UQXpwR87RROJEql0uAkLI6U7snBOYOcKw83ew3FPg==
+  dependencies:
+    immer "^10.0.3"
+    redux "^5.0.1"
+    redux-thunk "^3.1.0"
+    reselect "^5.1.0"
+
 "@remix-run/router@1.15.0":
   version "1.15.0"
   resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.15.0.tgz#461a952c2872dd82c8b2e9b74c4dfaff569123e2"
@@ -2125,7 +2135,7 @@
     "@sentry/types" "8.0.0"
     "@sentry/utils" "8.0.0"
 
-"@sentry/browser@^8.0.0":
+"@sentry/browser@8.0.0":
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-8.0.0.tgz#9c2f2d62f196a5b9b5a7174d0970c4f974722c98"
   integrity sha512-HZt5bjujxz2XJA1iUqD51gEz/h8Ij+BYLu6D+qh6WpVtCSS1cfKoxJj8mQef7j5tIVVofxRtRr9PvAoFnehO0A==
@@ -2163,6 +2173,17 @@
     "@sentry/types" "7.114.0"
     "@sentry/utils" "7.114.0"
     localforage "^1.8.1"
+
+"@sentry/react@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@sentry/react/-/react-8.0.0.tgz#0b23c2abb93557ac623aadee90126f6c6a188e6a"
+  integrity sha512-TbAtOAKY2QKqpuy0uoO/ujL0J5djZjQ2K8iE3/j3+EX/3DaZ3ydUGNdJ0rDQQoJgRUsPidBM+SBco2dI38sCdQ==
+  dependencies:
+    "@sentry/browser" "8.0.0"
+    "@sentry/core" "8.0.0"
+    "@sentry/types" "8.0.0"
+    "@sentry/utils" "8.0.0"
+    hoist-non-react-statics "^3.3.2"
 
 "@sentry/types@7.114.0":
   version "7.114.0"
@@ -7172,6 +7193,11 @@ immediate@~3.0.5:
   resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
   integrity sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==
 
+immer@^10.0.3:
+  version "10.1.1"
+  resolved "https://registry.yarnpkg.com/immer/-/immer-10.1.1.tgz#206f344ea372d8ea176891545ee53ccc062db7bc"
+  integrity sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==
+
 "immutable@^3.8.1 || ^4.0.0":
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.3.5.tgz#f8b436e66d59f99760dc577f5c99a4fd2a5cc5a0"
@@ -10604,10 +10630,10 @@ redux-logic@^5.0.1:
     loose-envify "^1.4.0"
     rxjs "^7.8.1"
 
-redux-sentry-middleware@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/redux-sentry-middleware/-/redux-sentry-middleware-0.2.2.tgz#79140377b4fa6a606797cb2a13cc1b8ab7d68cec"
-  integrity sha512-SOxNkPNgU+zZT6cW4XV1+B2IpWrVXW4yuFHzOJvVjHn4yRV71nAj0Clj6XjhD0K2TKUxvwmjLn01mDL2RarMUQ==
+redux-thunk@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-3.1.0.tgz#94aa6e04977c30e14e892eae84978c1af6058ff3"
+  integrity sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==
 
 redux@^4.2.1:
   version "4.2.1"
@@ -10615,6 +10641,11 @@ redux@^4.2.1:
   integrity sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==
   dependencies:
     "@babel/runtime" "^7.9.2"
+
+redux@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-5.0.1.tgz#97fa26881ce5746500125585d5642c77b6e9447b"
+  integrity sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==
 
 reflect.getprototypeof@^1.0.4:
   version "1.0.5"
