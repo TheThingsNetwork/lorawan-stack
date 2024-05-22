@@ -133,8 +133,7 @@ func unmarshalNBytes(s *jsonplugin.UnmarshalState, n int) []byte {
 
 	switch len(trimmed) {
 	case 0:
-		b := make([]byte, n)
-		return b
+		return nil
 	case hex.EncodedLen(n):
 		b, err := hex.DecodeString(trimmed)
 		if err != nil {
