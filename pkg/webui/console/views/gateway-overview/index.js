@@ -28,7 +28,7 @@ import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import GatewayMap from '@console/components/gateway-map'
+import GatewayMapPanel from '@console/components/gateway-map-panel'
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
 
 import GatewayEvents from '@console/containers/gateway-events'
@@ -164,11 +164,12 @@ const GatewayOverview = () => {
         </div>
         <div className="item-12 lg:item-6">
           <GatewayEvents gtwId={gtwId} widget />
-          <GatewayMap gtwId={gtwId} gateway={gateway} />
         </div>
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6" />
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <BlurryNetworkActivityPanel />
+        </div>
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <GatewayMapPanel gateway={gateway} />
         </div>
       </div>
     </Require>

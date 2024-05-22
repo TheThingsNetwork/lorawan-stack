@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,26 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.wrapper
-  padding-top: $ls.xxs
-
-.header
-  display: flex
-  align-items: center
-  justify-content: space-between
-  margin-bottom: $cs.xs
-
-.title-message
-  font-weight: $fw.bold
-  margin-right: $cs.xs
-
-.change-location
-  text-decoration: none
-
-.map-disabled
+.panel
   height: 100%
   display: flex
   flex-direction: column
-  justify-content: center
-  align-items: center
-  padding: 0 $cs.xl
+  position: relative
+  padding: 0
+  & > :first-child
+    padding: $cs.xl $cs.xl $cs.m $cs.xl
+
+.content
+  position: relative
+  height: 100%
