@@ -18,6 +18,8 @@ import { FormattedNumber, defineMessages } from 'react-intl'
 import classNames from 'classnames'
 import ReactApexChart from 'react-apexcharts'
 
+import uptimeGraph from '@assets/misc/blurry-uptime.png'
+
 import Panel from '@ttn-lw/components/panel'
 import Icon, {
   IconDownlink,
@@ -26,14 +28,19 @@ import Icon, {
   IconHeartRateMonitor,
   IconX,
   IconInfoCircle,
+  IconBolt,
+  IconRouterOff,
 } from '@ttn-lw/components/icon'
 import Tooltip from '@ttn-lw/components/tooltip'
+import Button from '@ttn-lw/components/button'
+import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
 import { isTranslated } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { startGatewayStatistics, stopGatewayStatistics } from '@console/store/actions/gateways'
 
@@ -64,6 +71,8 @@ const m = defineMessages({
   dutyCycleUtilization: 'Duty cycle utilization',
   dutyCycleUtilizationTooltip:
     'In this section you can find the duty cycle utilization of this gateway per sub-band. All network traffic has to be in accordance with local regulations that govern the maximum usage of radio transmissions per frequency in a given time-frame. The listing allows you to inspect how much of this allowance has been exhausted already. Once utilization is exhausted, you are required by law to cease transmissions by this gateway.',
+  uptime: '30 day uptime',
+  uptimeTooltip: 'The uptime of the gateway in the last 30 days.',
 })
 
 const options = {
@@ -114,12 +123,12 @@ const options = {
 }
 
 const SectionTitle = ({ title, tooltip }) => (
-  <>
+  <div>
     <Message content={title} className="fw-bold" />
     <Tooltip content={<Message content={tooltip} />}>
       <Icon icon={IconInfoCircle} className={style.gtwStatusPanelTooltip} />
     </Tooltip>
-  </>
+  </div>
 )
 
 SectionTitle.propTypes = {
@@ -197,18 +206,48 @@ const GatewayStatusPanel = () => {
   return (
     <Panel
       title="Gateway status"
-      icon={IconGateway}
+      icon={isDisconnected ? IconRouterOff : IconGateway}
       shortCutLinkTitle="Network Operation Center"
       shortCutLinkPath="https://www.thethingsindustries.com/stack/features/noc"
       shortCutLinkTarget="_blank"
       divider
       className={style.gtwStatusPanel}
+      iconClassName={isDisconnected ? style.gtwStatusPanelIcon : undefined}
+      messageDecorators={
+        <Status
+          status={isDisconnected ? 'bad' : 'good'}
+          pulse
+          big
+          pulseTrigger={isDisconnected ? gatewayStats?.disconnected_at : gatewayStats?.connected_at}
+        />
+      }
     >
       <div className="d-flex j-between gap-ls-xl">
         <div className="flex-grow">
-          {showRoundTripTimes && (
+          <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
+          <img
+            src={uptimeGraph}
+            alt="Uptime graph"
+            className={style.gtwStatusPanelUnlockUptimeImg}
+          />
+          <Message
+            content={'Unlock uptime graph'}
+            className={style.gtwStatusPanelUnlockUptimeMessage}
+            component="div"
+          />
+          <Button.AnchorLink
+            secondary
+            message={'Upgrade now'}
+            icon={IconBolt}
+            href="https://www.thethingsindustries.com/stack/plans/"
+            target="_blank"
+            className="mt-cs-m"
+          />
+        </div>
+        <div className="d-flex direction-column j-between flex-grow">
+          <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
+          {showRoundTripTimes ? (
             <>
-              <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
               <div className={style.gtwStatusPanelRoundTripTimeBar}>
                 <span
                   className={classNames(style.gtwStatusPanelRoundTripTimeBarPointer, {
@@ -253,15 +292,26 @@ const GatewayStatusPanel = () => {
                 <Message content="ms" />
               </div>
             </>
+          ) : (
+            <div>
+              <Message content={'No data available'} className="fw-bold" component="div" />
+              <Message
+                content={
+                  'This gateway doesn’t have recent downlinks and cannot display the roundtrip time.'
+                }
+                className="fs-s c-text-neutral-light mt-cs-xs"
+                component="div"
+              />
+            </div>
           )}
         </div>
       </div>
       <hr className={style.gtwStatusPanelDivider} />
-      <div className="d-flex j-between al-start gap-ls-xxl">
-        <div className="d-flex direction-column j-between flex-grow">
+      <div className="d-flex j-between gap-ls-xl">
+        <div className="flex-grow">
           <div>
             <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />
-            <div className="d-flex al-center j-between gap-cs-m fs-s mb-cs-m mt-cs-l">
+            <div className="d-flex al-center j-between gap-cs-m mb-cs-m mt-cs-l">
               <div className="d-flex al-center gap-cs-xxs">
                 <Icon icon={IconUplink} className="c-text-neutral-semilight" />
                 {!showUplink ? (
@@ -283,7 +333,7 @@ const GatewayStatusPanel = () => {
                 />
               )}
             </div>
-            <div className="d-flex al-center j-between fs-s mb-cs-m gap-cs-m">
+            <div className="d-flex al-center j-between mb-cs-m gap-cs-m">
               <div className="d-flex al-center gap-cs-xxs">
                 <Icon icon={IconDownlink} className="c-text-neutral-semilight" />
                 {!showDownlink ? (
@@ -314,12 +364,17 @@ const GatewayStatusPanel = () => {
                 />
               )}
             </div>
-            <div className="d-flex al-center j-between fs-s gap-cs-m">
+            <div className="d-flex al-center j-between gap-cs-m">
               <div className="d-flex al-center gap-cs-xxs fw-bold">
                 {showStatus ? (
                   <>
                     <Icon icon={IconHeartRateMonitor} className="c-text-success-normal" />
                     <Message content={m.statusRecieved} className="c-text-success-normal" />
+                  </>
+                ) : isDisconnected ? (
+                  <>
+                    <Icon icon={IconX} className="c-text-error-normal" />
+                    <Message content={'Disconnnected'} className="c-text-error-normal" />
                   </>
                 ) : (
                   <>
@@ -346,10 +401,10 @@ const GatewayStatusPanel = () => {
             )}
           </div>
         </div>
-        {showDutyCycleUtilization && (
-          <div className="flex-grow">
-            <SectionTitle title={m.dutyCycleUtilization} tooltip={m.dutyCycleUtilizationTooltip} />
-            {gatewayStats.sub_bands.map((band, index) => {
+        <div className="flex-grow">
+          <SectionTitle title={m.dutyCycleUtilization} tooltip={m.dutyCycleUtilizationTooltip} />
+          {showDutyCycleUtilization ? (
+            gatewayStats.sub_bands.map((band, index) => {
               const maxFrequency = band.max_frequency / 1e6
               const minFrequency = band.min_frequency / 1e6
               const utilization = band.downlink_utilization
@@ -400,9 +455,20 @@ const GatewayStatusPanel = () => {
                   </div>
                 </div>
               )
-            })}
-          </div>
-        )}
+            })
+          ) : (
+            <div>
+              <Message content={'No data available'} className="fw-bold mt-cs-l" component="div" />
+              <Message
+                content={
+                  'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.'
+                }
+                className="fs-s c-text-neutral-light mt-cs-xs"
+                component="div"
+              />
+            </div>
+          )}
+        </div>
       </div>
     </Panel>
   )
