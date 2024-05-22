@@ -162,6 +162,11 @@ const LocationMap = props => {
           })}
           minZoom={defaultMinZoom}
           center={center}
+          maxBounds={[
+            [-90, -180],
+            [90, 180],
+          ]}
+          maxBoundsViscosity={1.0}
           {...leafletConfig}
         >
           <TileLayer
