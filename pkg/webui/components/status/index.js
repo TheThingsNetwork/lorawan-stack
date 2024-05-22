@@ -31,7 +31,7 @@ const m = defineMessages({
 
 const Status = React.forwardRef(
   (
-    { className, status, label, pulse, pulseTrigger, labelValues, children, title, flipped },
+    { className, status, label, pulse, pulseTrigger, labelValues, children, title, flipped, big },
     ref,
   ) => {
     const intl = useIntl()
@@ -58,6 +58,7 @@ const Status = React.forwardRef(
       [style.flipped]: flipped,
       [style[`triggered-${status}-pulse`]]: animate,
       [style.dotOnly]: !label && !children,
+      [style.statusBig]: big,
     })
 
     let statusLabel = null
