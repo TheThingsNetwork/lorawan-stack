@@ -23,6 +23,7 @@
       margin-top: - $cs.l
 
     &-img
+      margin-top: $cs.xs
       margin-left: - $cs.s
 
   &-tooltip
@@ -54,25 +55,34 @@
   &-round-trip-time
     &-bar
       background: linear-gradient(90deg, #B3FAA9 33%, #FFE096 33%, #FFE096 66%, #FFD1CA 66%, #FFD1CA 100%)
-      height: 1.75rem
+      height: $cs.s
       width: 100%
-      border-radius: $br.xs
+      border-radius: $br.m
       position: relative
       padding-top: 2px
       padding-bottom: 2px
-      margin-top: 1.25rem
+      margin-top: $cs.m
+      margin-bottom: $cs.xxs
 
       &-pointer
-        border-radius: $br.xl
-        width: 2px
-        height: 86%
+        width: $cs.xxs
+        height: 100%
+        top: 0
         position: absolute
 
+      &-median
+        position: absolute
+        font-size: $fs.s
+        font-weight: $fw.bold
+        border: 1px solid var(--c-border-neutral-light)
+        background-color: var(--c-bg-neutral-min-hover)
+        border-radius: $br.xxs
+        padding-left: $cs.xxs
+        padding-right: $cs.xxs
+        top: -1px
+
     &-tag
-      font-size: $fs.l
-      padding: $cs.s
+      font-size: $fs.xxl
       font-weight: $fw.bold
       width: fit-content
       border-radius: $br.s
-      line-height: 1
-      margin-top: $cs.l

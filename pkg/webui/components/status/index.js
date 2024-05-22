@@ -23,6 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './status.styl'
 
 const m = defineMessages({
+  green: 'green',
   good: 'good',
   bad: 'bad',
   mediocre: 'mediocre',
@@ -50,6 +51,7 @@ const Status = React.forwardRef(
     }, [setAnimate])
 
     const cls = classnames(style.status, {
+      [style.statusGreen]: status === 'green',
       [style.statusGood]: status === 'good',
       [style.statusBad]: status === 'bad',
       [style.statusMediocre]: status === 'mediocre',
@@ -101,6 +103,7 @@ const Status = React.forwardRef(
 )
 
 Status.propTypes = {
+  big: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
   flipped: PropTypes.bool,
@@ -112,7 +115,7 @@ Status.propTypes = {
     PropTypes.number,
     PropTypes.instanceOf(Date),
   ]),
-  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
+  status: PropTypes.oneOf(['green', 'good', 'bad', 'mediocre', 'unknown']),
   title: PropTypes.message,
 }
 
@@ -126,6 +129,7 @@ Status.defaultProps = {
   pulseTrigger: undefined,
   status: 'unknown',
   title: undefined,
+  big: false,
 }
 
 export default Status

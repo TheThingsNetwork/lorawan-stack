@@ -91,6 +91,7 @@ Panel.propTypes = {
   className: PropTypes.string,
   divider: PropTypes.bool,
   icon: PropTypes.icon,
+  iconClassName: PropTypes.string,
   messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
   shortCutLinkDisabled: PropTypes.bool,
@@ -113,6 +114,7 @@ Panel.defaultProps = {
   shortCutLinkPath: undefined,
   shortCutLinkTitle: undefined,
   shortCutLinkTarget: undefined,
+  iconClassName: undefined,
 }
 
 export { Panel as default, PanelError }

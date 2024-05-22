@@ -34,6 +34,7 @@ import Icon, {
 import Tooltip from '@ttn-lw/components/tooltip'
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
+import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -109,8 +110,6 @@ const options = {
   },
   plotOptions: {
     radialBar: {
-      startAngle: -360,
-      endAngle: 0,
       track: {
         show: true,
         margin: 1.5,
@@ -142,11 +141,11 @@ const GatewayStatusPanel = () => {
   const error = useSelector(selectGatewayStatisticsError)
   const fetching = useSelector(selectGatewayStatisticsIsFetching)
   const gtwId = useSelector(selectSelectedGatewayId)
-  const isDisconnected = !Boolean(gatewayStats) || Boolean(gatewayStats.disconnected_at)
+  const isDisconnected = Boolean(gatewayStats?.disconnected_at)
   const isFetching = !Boolean(gatewayStats) && fetching
   const isUnavailable = Boolean(error) && Boolean(error.message) && isTranslated(error.message)
 
-  const connectedDays = useMemo(() => {
+  /*   const connectedDays = useMemo(() => {
     if (gatewayStats?.connected_at) {
       const connectedDate = new Date(gatewayStats.connected_at)
       const currentDate = new Date()
@@ -154,7 +153,8 @@ const GatewayStatusPanel = () => {
       return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     }
     return 0
-  }, [gatewayStats])
+  }, [gatewayStats]) */
+
   const maxRoundTripTime = useMemo(
     () =>
       gatewayStats?.round_trip_times && parseFloat(gatewayStats.round_trip_times.max.split('s')[0]),
@@ -215,261 +215,274 @@ const GatewayStatusPanel = () => {
       iconClassName={isDisconnected ? style.gtwStatusPanelIcon : undefined}
       messageDecorators={
         <Status
-          status={isDisconnected ? 'bad' : 'good'}
+          status={isDisconnected || isUnavailable ? 'bad' : isFetching ? 'mediocre' : 'green'}
           pulse
           big
           pulseTrigger={isDisconnected ? gatewayStats?.disconnected_at : gatewayStats?.connected_at}
         />
       }
     >
-      <div className="d-flex j-between gap-ls-xl">
-        <div className="flex-grow">
-          <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
-          <img
-            src={uptimeGraph}
-            alt="Uptime graph"
-            className={style.gtwStatusPanelUnlockUptimeImg}
-          />
-          <Message
-            content={'Unlock uptime graph'}
-            className={style.gtwStatusPanelUnlockUptimeMessage}
-            component="div"
-          />
-          <Button.AnchorLink
-            secondary
-            message={'Upgrade now'}
-            icon={IconBolt}
-            href="https://www.thethingsindustries.com/stack/plans/"
-            target="_blank"
-            className="mt-cs-m"
-          />
-        </div>
-        <div className="d-flex direction-column j-between flex-grow">
-          <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
-          {showRoundTripTimes ? (
-            <>
-              <div className={style.gtwStatusPanelRoundTripTimeBar}>
-                <span
-                  className={classNames(style.gtwStatusPanelRoundTripTimeBarPointer, {
-                    'c-bg-success-normal': greenPointer,
-                    'c-bg-warning-normal': yellowPointer,
-                    'c-bg-error-normal': redPointer,
-                  })}
-                  style={{
-                    left: `${position}%`,
-                  }}
-                />
-              </div>
-              <div className="pos-relative d-flex j-between">
-                <span className="fs-s fw-bold c-text-success-normal">
-                  <FormattedNumber value={(minRoundTripTime * 1000).toFixed(2)} />
-                </span>
-                <span
-                  className={classNames('pos-absolute fs-s fw-bold', {
+      {isFetching ? (
+        <Spinner center inline>
+          <Message content={sharedMessages.fetching} />
+        </Spinner>
+      ) : (
+        <div className="grid">
+          <div className="item-5">
+            <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
+            <img
+              src={uptimeGraph}
+              alt="Uptime graph"
+              className={style.gtwStatusPanelUnlockUptimeImg}
+            />
+            <Message
+              content={'Unlock uptime graph'}
+              className={style.gtwStatusPanelUnlockUptimeMessage}
+              component="div"
+            />
+            <Button.AnchorLink
+              secondary
+              message={'Upgrade now'}
+              icon={IconBolt}
+              href="https://www.thethingsindustries.com/stack/plans/"
+              target="_blank"
+              className="mt-cs-xs"
+            />
+          </div>
+          <div className="item-5 item-start-8 d-flex direction-column j-between">
+            <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
+            {showRoundTripTimes ? (
+              <>
+                <div>
+                  <div className={style.gtwStatusPanelRoundTripTimeBar}>
+                    <span
+                      className={classNames(style.gtwStatusPanelRoundTripTimeBarPointer, {
+                        'c-bg-success-normal': greenPointer,
+                        'c-bg-warning-normal': yellowPointer,
+                        'c-bg-error-normal': redPointer,
+                      })}
+                      style={{
+                        left: `${position}%`,
+                      }}
+                    />
+                  </div>
+                  <div className="pos-relative d-flex j-between">
+                    <span className="fs-s fw-bold">
+                      <FormattedNumber value={(minRoundTripTime * 1000).toFixed(2)} />
+                    </span>
+                    <span
+                      className={style.gtwStatusPanelRoundTripTimeBarMedian}
+                      style={{
+                        left: `${position < 21 ? 14 : position > 78 ? 71 : position - 7}%`,
+                      }}
+                    >
+                      <FormattedNumber value={(medianRoundTripTime * 1000).toFixed(2)} />
+                    </span>
+                    <span className="fs-s fw-bold">
+                      <FormattedNumber value={(maxRoundTripTime * 1000).toFixed(2)} />
+                    </span>
+                  </div>
+                </div>
+                <div
+                  className={classNames(style.gtwStatusPanelRoundTripTimeTag, {
                     'c-text-success-normal': greenPointer,
                     'c-text-warning-normal': yellowPointer,
                     'c-text-error-normal': redPointer,
                   })}
-                  style={{
-                    top: '-24px',
-                    left: `${position + 1}%`,
-                  }}
                 >
                   <FormattedNumber value={(medianRoundTripTime * 1000).toFixed(2)} />
-                </span>
-                <span className="fs-s fw-bold c-text-error-normal">
-                  <FormattedNumber value={(maxRoundTripTime * 1000).toFixed(2)} />
-                </span>
-              </div>
-              <div
-                className={classNames(style.gtwStatusPanelRoundTripTimeTag, {
-                  'c-bg-success-light c-text-success-normal': greenPointer,
-                  'c-bg-warning-light c-text-warning-normal': yellowPointer,
-                  'c-bg-error-light c-text-error-normal': redPointer,
-                })}
-              >
-                <FormattedNumber value={(medianRoundTripTime * 1000).toFixed(2)} />
-                <Message content="ms" />
-              </div>
-            </>
-          ) : (
-            <div>
-              <Message content={'No data available'} className="fw-bold" component="div" />
-              <Message
-                content={
-                  'This gateway doesn’t have recent downlinks and cannot display the roundtrip time.'
-                }
-                className="fs-s c-text-neutral-light mt-cs-xs"
-                component="div"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-      <hr className={style.gtwStatusPanelDivider} />
-      <div className="d-flex j-between gap-ls-xl">
-        <div className="flex-grow">
-          <div>
-            <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />
-            <div className="d-flex al-center j-between gap-cs-m mb-cs-m mt-cs-l">
-              <div className="d-flex al-center gap-cs-xxs">
-                <Icon icon={IconUplink} className="c-text-neutral-semilight" />
-                {!showUplink ? (
-                  <Message content={m.noUplinks} className="fw-bold" />
-                ) : (
-                  <FormattedNumber value={gatewayStats.uplink_count}>
-                    {parts => (
-                      <>
-                        <b>{parts}</b>
-                      </>
-                    )}
-                  </FormattedNumber>
-                )}
-              </div>
-              {showUplinkTime && (
-                <DateTime.Relative
-                  value={gatewayStats.last_uplink_received_at}
-                  relativeTimeStyle="short"
+                  <Message content="ms" />
+                </div>
+              </>
+            ) : (
+              <div>
+                <Message content={'No data available'} className="fw-bold" component="div" />
+                <Message
+                  content={
+                    'This gateway doesn’t have recent downlinks and cannot display the roundtrip time.'
+                  }
+                  className="fs-s c-text-neutral-light mt-cs-xs"
+                  component="div"
                 />
-              )}
-            </div>
-            <div className="d-flex al-center j-between mb-cs-m gap-cs-m">
-              <div className="d-flex al-center gap-cs-xxs">
-                <Icon icon={IconDownlink} className="c-text-neutral-semilight" />
-                {!showDownlink ? (
-                  <Message content={m.noDownlinks} className="fw-bold" />
-                ) : (
-                  <>
-                    <FormattedNumber value={gatewayStats.downlink_count}>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      <hr className={style.gtwStatusPanelDivider} />
+      {isFetching ? (
+        <Spinner center>
+          <Message content={sharedMessages.fetching} />
+        </Spinner>
+      ) : (
+        <div className="grid">
+          <div className="item-5">
+            <div>
+              <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />
+              <div className="d-flex al-center j-between gap-cs-m mb-cs-m mt-cs-l">
+                <div className="d-flex al-center gap-cs-xxs">
+                  <Icon icon={IconUplink} className="c-text-neutral-semilight" />
+                  {!showUplink ? (
+                    <Message content={m.noUplinks} className="fw-bold" />
+                  ) : (
+                    <FormattedNumber value={gatewayStats.uplink_count}>
                       {parts => (
                         <>
                           <b>{parts}</b>
                         </>
                       )}
                     </FormattedNumber>
-                    {gatewayStats?.tx_acknowledgment_count && (
-                      <>
-                        {'('}
-                        <FormattedNumber value={gatewayStats.tx_acknowledgment_count} />
-                        {' Ack’d)'}
-                      </>
-                    )}
-                  </>
+                  )}
+                </div>
+                {showUplinkTime && (
+                  <DateTime.Relative
+                    value={gatewayStats.last_uplink_received_at}
+                    relativeTimeStyle="short"
+                  />
                 )}
               </div>
-              {showDownlinkTime && (
-                <DateTime.Relative
-                  value={gatewayStats.last_downlink_received_at}
-                  relativeTimeStyle="short"
-                />
-              )}
+              <div className="d-flex al-center j-between mb-cs-m gap-cs-m">
+                <div className="d-flex al-center gap-cs-xxs">
+                  <Icon icon={IconDownlink} className="c-text-neutral-semilight" />
+                  {!showDownlink ? (
+                    <Message content={m.noDownlinks} className="fw-bold" />
+                  ) : (
+                    <>
+                      <FormattedNumber value={gatewayStats.downlink_count}>
+                        {parts => (
+                          <>
+                            <b>{parts}</b>
+                          </>
+                        )}
+                      </FormattedNumber>
+                      {gatewayStats?.tx_acknowledgment_count && (
+                        <>
+                          {'('}
+                          <FormattedNumber value={gatewayStats.tx_acknowledgment_count} />
+                          {' Ack’d)'}
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+                {showDownlinkTime && (
+                  <DateTime.Relative
+                    value={gatewayStats.last_downlink_received_at}
+                    relativeTimeStyle="short"
+                  />
+                )}
+              </div>
+              <div className="d-flex al-center j-between gap-cs-m">
+                <div className="d-flex al-center gap-cs-xxs fw-bold">
+                  {showStatus ? (
+                    <>
+                      <Icon icon={IconHeartRateMonitor} className="c-text-success-normal" />
+                      <Message content={m.statusRecieved} className="c-text-success-normal" />
+                    </>
+                  ) : isDisconnected ? (
+                    <>
+                      <Icon icon={IconX} className="c-text-error-normal" />
+                      <Message content={'Disconnnected'} className="c-text-error-normal" />
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon={IconX} className="c-text-error-normal" />
+                      <Message content={m.noStatus} className="c-text-error-normal" />
+                    </>
+                  )}
+                </div>
+                {showStatus && (
+                  <DateTime.Relative
+                    value={gatewayStats.last_status_received_at}
+                    relativeTimeStyle="short"
+                  />
+                )}
+              </div>
             </div>
-            <div className="d-flex al-center j-between gap-cs-m">
-              <div className="d-flex al-center gap-cs-xxs fw-bold">
-                {showStatus ? (
-                  <>
-                    <Icon icon={IconHeartRateMonitor} className="c-text-success-normal" />
-                    <Message content={m.statusRecieved} className="c-text-success-normal" />
-                  </>
-                ) : isDisconnected ? (
-                  <>
-                    <Icon icon={IconX} className="c-text-error-normal" />
-                    <Message content={'Disconnnected'} className="c-text-error-normal" />
-                  </>
-                ) : (
-                  <>
-                    <Icon icon={IconX} className="c-text-error-normal" />
-                    <Message content={m.noStatus} className="c-text-error-normal" />
-                  </>
-                )}
-              </div>
-              {showStatus && (
-                <DateTime.Relative
-                  value={gatewayStats.last_status_received_at}
-                  relativeTimeStyle="short"
+            <div className={style.gtwStatusPanelTag}>
+              {showProtocol && (
+                <Message
+                  content={m.protocol}
+                  values={{ protocol: gatewayStats.protocol.toUpperCase() }}
+                  component="div"
                 />
               )}
             </div>
           </div>
-          <div className={style.gtwStatusPanelTag}>
-            {showProtocol && (
-              <Message
-                content={m.protocol}
-                values={{ protocol: gatewayStats.protocol.toUpperCase() }}
-                component="div"
-              />
+          <div className="item-5 item-start-8">
+            <SectionTitle title={m.dutyCycleUtilization} tooltip={m.dutyCycleUtilizationTooltip} />
+            {showDutyCycleUtilization ? (
+              gatewayStats.sub_bands.map((band, index) => {
+                const maxFrequency = band.max_frequency / 1e6
+                const minFrequency = band.min_frequency / 1e6
+                const utilization = band.downlink_utilization
+                  ? (band.downlink_utilization * 100) / band.downlink_utilization_limit
+                  : 0
+                return (
+                  <div
+                    key={index}
+                    className={classNames('d-flex al-center j-between fs-s', {
+                      'mb-cs-m': index !== gatewayStats.sub_bands.length - 1,
+                      'mt-cs-l': index === 0,
+                    })}
+                  >
+                    <Message
+                      content={m.frequencyRange}
+                      values={{
+                        minFreq: minFrequency.toFixed(1),
+                        maxFreq: maxFrequency.toFixed(1),
+                      }}
+                      className="fs-s"
+                    />
+                    <div className="d-flex al-center j-center gap-cs-xs">
+                      <ReactApexChart
+                        options={options}
+                        series={[utilization.toFixed(2)]}
+                        type="radialBar"
+                        height={20}
+                        width={20}
+                      />
+                      <span
+                        className={classNames('fs-s fw-bold', {
+                          'c-text-success-normal': utilization <= 60,
+                          'c-text-warning-normal': utilization > 60 && utilization < 100,
+                          'c-text-error-normal': utilization === 100,
+                        })}
+                        style={{ minWidth: '39px' }}
+                      >
+                        <FormattedNumber
+                          style="percent"
+                          value={
+                            isNaN(band.downlink_utilization / band.downlink_utilization_limit)
+                              ? 0
+                              : band.downlink_utilization / band.downlink_utilization_limit
+                          }
+                          minimumFractionDigits={2}
+                        />
+                      </span>
+                    </div>
+                  </div>
+                )
+              })
+            ) : (
+              <div>
+                <Message
+                  content={'No data available'}
+                  className="fw-bold mt-cs-l"
+                  component="div"
+                />
+                <Message
+                  content={
+                    'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.'
+                  }
+                  className="fs-s c-text-neutral-light mt-cs-xs"
+                  component="div"
+                />
+              </div>
             )}
           </div>
         </div>
-        <div className="flex-grow">
-          <SectionTitle title={m.dutyCycleUtilization} tooltip={m.dutyCycleUtilizationTooltip} />
-          {showDutyCycleUtilization ? (
-            gatewayStats.sub_bands.map((band, index) => {
-              const maxFrequency = band.max_frequency / 1e6
-              const minFrequency = band.min_frequency / 1e6
-              const utilization = band.downlink_utilization
-                ? (band.downlink_utilization * 100) / band.downlink_utilization_limit
-                : 0
-              return (
-                <div
-                  key={band.id}
-                  className={classNames('d-flex al-center j-between fs-s', {
-                    'mb-cs-m': index !== gatewayStats.sub_bands.length - 1,
-                    'mt-cs-l': index === 0,
-                  })}
-                >
-                  <Message
-                    content={m.frequencyRange}
-                    values={{
-                      minFreq: minFrequency.toFixed(1),
-                      maxFreq: maxFrequency.toFixed(1),
-                    }}
-                    className="fs-s"
-                  />
-                  <div className="d-flex al-center j-center gap-cs-xs">
-                    <ReactApexChart
-                      options={options}
-                      series={[utilization.toFixed(2)]}
-                      type="radialBar"
-                      height={20}
-                      width={20}
-                    />
-                    <span
-                      className={classNames('fs-s fw-bold', {
-                        'c-text-success-normal': utilization <= 60,
-                        'c-text-warning-normal': utilization > 60 && utilization < 100,
-                        'c-text-error-normal': utilization === 100,
-                      })}
-                      style={{ minWidth: '39px' }}
-                    >
-                      <FormattedNumber
-                        style="percent"
-                        value={
-                          isNaN(band.downlink_utilization / band.downlink_utilization_limit)
-                            ? 0
-                            : band.downlink_utilization / band.downlink_utilization_limit
-                        }
-                        minimumFractionDigits={2}
-                      />
-                    </span>
-                  </div>
-                </div>
-              )
-            })
-          ) : (
-            <div>
-              <Message content={'No data available'} className="fw-bold mt-cs-l" component="div" />
-              <Message
-                content={
-                  'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.'
-                }
-                className="fs-s c-text-neutral-light mt-cs-xs"
-                component="div"
-              />
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </Panel>
   )
 }
