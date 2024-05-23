@@ -74,6 +74,9 @@ const m = defineMessages({
     'In this section you can find the duty cycle utilization of this gateway per sub-band. All network traffic has to be in accordance with local regulations that govern the maximum usage of radio transmissions per frequency in a given time-frame. The listing allows you to inspect how much of this allowance has been exhausted already. Once utilization is exhausted, you are required by law to cease transmissions by this gateway.',
   uptime: '30 day uptime',
   uptimeTooltip: 'The uptime of the gateway in the last 30 days.',
+  noRoundtrip: 'This gateway doesn’t have recent downlinks and cannot display the roundtrip time.',
+  noDutyCycle:
+    'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.',
 })
 
 const options = {
@@ -215,10 +218,10 @@ const GatewayStatusPanel = () => {
       iconClassName={isDisconnected ? style.gtwStatusPanelIcon : undefined}
       messageDecorators={
         <Status
-          status={isDisconnected || isUnavailable ? 'bad' : isFetching ? 'mediocre' : 'green'}
+          status={isDisconnected ? 'bad' : isFetching || isUnavailable ? 'mediocre' : 'green'}
           pulse
           big
-          pulseTrigger={isDisconnected ? gatewayStats?.disconnected_at : gatewayStats?.connected_at}
+          pulseTrigger={2}
         />
       }
     >
@@ -249,7 +252,7 @@ const GatewayStatusPanel = () => {
               className="mt-cs-xs"
             />
           </div>
-          <div className="item-5 item-start-8 d-flex direction-column j-between">
+          <div className="item-5 item-start-7 d-flex direction-column j-between">
             <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
             {showRoundTripTimes ? (
               <>
@@ -270,14 +273,6 @@ const GatewayStatusPanel = () => {
                     <span className="fs-s fw-bold">
                       <FormattedNumber value={(minRoundTripTime * 1000).toFixed(2)} />
                     </span>
-                    <span
-                      className={style.gtwStatusPanelRoundTripTimeBarMedian}
-                      style={{
-                        left: `${position < 21 ? 14 : position > 78 ? 71 : position - 7}%`,
-                      }}
-                    >
-                      <FormattedNumber value={(medianRoundTripTime * 1000).toFixed(2)} />
-                    </span>
                     <span className="fs-s fw-bold">
                       <FormattedNumber value={(maxRoundTripTime * 1000).toFixed(2)} />
                     </span>
@@ -296,11 +291,13 @@ const GatewayStatusPanel = () => {
               </>
             ) : (
               <div>
-                <Message content={'No data available'} className="fw-bold" component="div" />
                 <Message
-                  content={
-                    'This gateway doesn’t have recent downlinks and cannot display the roundtrip time.'
-                  }
+                  content={sharedMessages.noData}
+                  className="fw-bold mt-cs-m"
+                  component="div"
+                />
+                <Message
+                  content={m.noRoundtrip}
                   className="fs-s c-text-neutral-light mt-cs-xs"
                   component="div"
                 />
@@ -409,7 +406,7 @@ const GatewayStatusPanel = () => {
               )}
             </div>
           </div>
-          <div className="item-5 item-start-8">
+          <div className="item-5 item-start-7">
             <SectionTitle title={m.dutyCycleUtilization} tooltip={m.dutyCycleUtilizationTooltip} />
             {showDutyCycleUtilization ? (
               gatewayStats.sub_bands.map((band, index) => {
@@ -467,14 +464,12 @@ const GatewayStatusPanel = () => {
             ) : (
               <div>
                 <Message
-                  content={'No data available'}
-                  className="fw-bold mt-cs-l"
+                  content={sharedMessages.noData}
+                  className="fw-bold mt-cs-m"
                   component="div"
                 />
                 <Message
-                  content={
-                    'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.'
-                  }
+                  content={m.noDutyCycle}
                   className="fs-s c-text-neutral-light mt-cs-xs"
                   component="div"
                 />
