@@ -39,7 +39,6 @@ import Spinner from '@ttn-lw/components/spinner'
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
-import { isTranslated } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -78,6 +77,7 @@ const m = defineMessages({
   noDutyCycle:
     'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.',
   unlockGraph: 'Unlock uptime graph',
+  noDataYet: 'No data yet',
 })
 
 const options = {
@@ -147,7 +147,7 @@ const GatewayStatusPanel = () => {
   const gtwId = useSelector(selectSelectedGatewayId)
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
   const isFetching = !Boolean(gatewayStats) && fetching
-  const isUnavailable = Boolean(error) && Boolean(error.message) && isTranslated(error.message)
+  const isUnavailable = Boolean(error) && Boolean(error.message)
 
   /*   const connectedDays = useMemo(() => {
     if (gatewayStats?.connected_at) {
@@ -384,6 +384,11 @@ const GatewayStatusPanel = () => {
                     <>
                       <Icon icon={IconHeartRateMonitor} className="c-text-success-normal" />
                       <Message content={m.statusRecieved} className="c-text-success-normal" />
+                    </>
+                  ) : isUnavailable ? (
+                    <>
+                      <Icon icon={IconX} className="c-text-warning-normal" />
+                      <Message content={m.noDataYet} className="c-text-warning-normal" />
                     </>
                   ) : (
                     <>

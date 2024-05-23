@@ -617,6 +617,7 @@
   "console.containers.gateway-status-panel.index.noRoundtrip": "This gateway doesn’t have recent downlinks and cannot display the roundtrip time.",
   "console.containers.gateway-status-panel.index.noDutyCycle": "This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.",
   "console.containers.gateway-status-panel.index.unlockGraph": "Unlock uptime graph",
+  "console.containers.gateway-status-panel.index.noDataYet": "No data yet",
   "console.containers.gateways-table.index.ownedTabTitle": "Owned gateways",
   "console.containers.gateways-table.index.restoreSuccess": "Gateway restored",
   "console.containers.gateways-table.index.restoreFail": "There was an error and the gateway could not be restored",
