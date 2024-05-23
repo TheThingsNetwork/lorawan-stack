@@ -616,6 +616,7 @@
   "console.containers.gateway-status-panel.index.uptimeTooltip": "",
   "console.containers.gateway-status-panel.index.noRoundtrip": "",
   "console.containers.gateway-status-panel.index.noDutyCycle": "",
+  "console.containers.gateway-status-panel.index.unlockGraph": "",
   "console.containers.gateways-table.index.ownedTabTitle": "所有するゲートウェイ",
   "console.containers.gateways-table.index.restoreSuccess": "ゲートウェイが復旧",
   "console.containers.gateways-table.index.restoreFail": "エラーが発生し、ゲートウェイを復元することができませんでした",

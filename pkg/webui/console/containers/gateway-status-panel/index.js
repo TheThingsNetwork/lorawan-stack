@@ -77,6 +77,7 @@ const m = defineMessages({
   noRoundtrip: 'This gateway doesn’t have recent downlinks and cannot display the roundtrip time.',
   noDutyCycle:
     'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.',
+  unlockGraph: 'Unlock uptime graph',
 })
 
 const options = {
@@ -239,13 +240,13 @@ const GatewayStatusPanel = () => {
               className={style.gtwStatusPanelUnlockUptimeImg}
             />
             <Message
-              content={'Unlock uptime graph'}
+              content={m.unlockGraph}
               className={style.gtwStatusPanelUnlockUptimeMessage}
               component="div"
             />
             <Button.AnchorLink
               secondary
-              message={'Upgrade now'}
+              message={sharedMessages.upgrade}
               icon={IconBolt}
               href="https://www.thethingsindustries.com/stack/plans/"
               target="_blank"
@@ -371,15 +372,18 @@ const GatewayStatusPanel = () => {
               </div>
               <div className="d-flex al-center j-between gap-cs-m">
                 <div className="d-flex al-center gap-cs-xxs fw-bold">
-                  {showStatus ? (
+                  {isDisconnected ? (
+                    <>
+                      <Icon icon={IconX} className="c-text-error-normal" />
+                      <Message
+                        content={sharedMessages.disconnected}
+                        className="c-text-error-normal"
+                      />
+                    </>
+                  ) : showStatus ? (
                     <>
                       <Icon icon={IconHeartRateMonitor} className="c-text-success-normal" />
                       <Message content={m.statusRecieved} className="c-text-success-normal" />
-                    </>
-                  ) : isDisconnected ? (
-                    <>
-                      <Icon icon={IconX} className="c-text-error-normal" />
-                      <Message content={'Disconnnected'} className="c-text-error-normal" />
                     </>
                   ) : (
                     <>
@@ -388,7 +392,7 @@ const GatewayStatusPanel = () => {
                     </>
                   )}
                 </div>
-                {showStatus && (
+                {showStatus && !isDisconnected && (
                   <DateTime.Relative
                     value={gatewayStats.last_status_received_at}
                     relativeTimeStyle="short"
