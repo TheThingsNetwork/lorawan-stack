@@ -19,11 +19,15 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.30.2] - unreleased
+
+### Fixed
+
 - Increased the timeout for Basic Station gateways sending HTTP headers. There should now be enough time for embedded devices with little to no hardware acceleration to perform a TLS handshake. In particular, The Things Indoor Gateway can now connect to The Things Stack presenting a ECDSA certificate.
 - Reconnect a gateway when the antenna gain is adjusted.
 - Fixed length bytes fields, such as EUIs, device addresses or device keys, are no longer considered as being all zero when provided as null values in JSON requests.
-
-### Security
 
 ## [3.30.1] - 2024-05-13
 
@@ -2810,7 +2814,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.1...v3.30
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.2...v3.30
+[3.30.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.1...v3.30.2
 [3.30.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.0...v3.30.1
 [3.30.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.2...v3.30.0
 [3.29.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.1...v3.29.2
