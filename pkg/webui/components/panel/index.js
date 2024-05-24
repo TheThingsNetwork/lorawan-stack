@@ -66,11 +66,11 @@ const Panel = ({
   >
     {title && (
       <div className={styles.panelHeader}>
-        <div className="d-flex gap-cs-xs al-center">
+        <div className="d-flex gap-cs-xs al-center overflow-hidden">
           {icon && (
             <Icon icon={icon} className={classnames(styles.panelHeaderIcon, iconClassName)} />
           )}
-          {title && <Message content={title} className={styles.panelHeaderTitle} />}
+          <Message content={title} className={styles.panelHeaderTitle} />
           {messageDecorators}
         </div>
         {toggleOptions ? (
