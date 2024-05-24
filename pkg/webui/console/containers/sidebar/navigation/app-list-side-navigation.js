@@ -23,7 +23,7 @@ import SidebarContext from '../context'
 import TopEntitiesSection from './top-entities-section'
 
 const AppListSideNavigation = () => {
-  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'application'))
+  const topEntities = useSelector(selectPerEntityBookmarks('application'))
   const { isMinimized } = useContext(SidebarContext)
   const userId = useSelector(selectUserId)
 

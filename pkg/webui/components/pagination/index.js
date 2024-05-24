@@ -98,6 +98,7 @@ const Pagination = ({
     <div className="d-flex al-center gap-cs-xs fw-normal m-vert-cs-xl">
       <Message content={m.itemsPerPage} className={style.sizeMessage} />
       <Select
+        name="page-size-select"
         options={allowedPageSizes.map(value => ({
           value,
           label: `${value}`,

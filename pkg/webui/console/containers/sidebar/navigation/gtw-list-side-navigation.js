@@ -38,7 +38,7 @@ Bookmark.propTypes = {
 }
 
 const GtwListSideNavigation = () => {
-  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'gateway'))
+  const topEntities = useSelector(selectPerEntityBookmarks('gateway'))
   const { isMinimized } = useContext(SidebarContext)
   const userId = useSelector(selectUserId)
 

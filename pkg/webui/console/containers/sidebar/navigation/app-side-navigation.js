@@ -80,7 +80,7 @@ const AppSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
   const appPageSize = getCookie('applications-list-page-size')
   const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
-  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'application'))
+  const topEntities = useSelector(selectPerEntityBookmarks('application'))
   const userId = useSelector(selectUserId)
 
   if (!app) {
