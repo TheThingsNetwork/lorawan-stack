@@ -59,8 +59,8 @@ const Panel = ({
 }) => (
   <div className={classnames(styles.panel, className)}>
     {title && (
-      <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
-        <div className="d-flex gap-cs-xs al-center overflow-hidden">
+      <div className={styles.panelHeader}>
+        <div className="d-flex gap-cs-xs al-center">
           {icon && (
             <Icon icon={icon} className={classnames(styles.panelHeaderIcon, iconClassName)} />
           )}

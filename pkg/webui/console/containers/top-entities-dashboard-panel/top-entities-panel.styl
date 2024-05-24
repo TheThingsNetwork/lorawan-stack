@@ -44,4 +44,15 @@
     &-divided
       width: 33%
     &-small
+      min-width: 2.5rem
       width: 2.5rem
+
+@container panel (max-width: 360px)
+  .entity-cell-content
+    width: 35%
+    overflow: hidden
+    text-overflow: ellipsis
+  .entity-cell-last-column
+    position: absolute
+    top: 20px
+    right: 10px

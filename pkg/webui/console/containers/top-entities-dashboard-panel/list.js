@@ -107,8 +107,6 @@ const EntitiesList = ({
     </Table.Row>
   )
 
-  const minWidth = `${headers.length * 10 + 5}rem`
-
   return items.length === 0 && itemsTotalCount === 0 ? (
     <div className="d-flex direction-column flex-grow j-center gap-cs-l">
       <div>
@@ -122,7 +120,7 @@ const EntitiesList = ({
       )}
     </div>
   ) : (
-    <Table minWidth={minWidth}>
+    <Table>
       <Table.Head>{columns}</Table.Head>
       <Table.Body className={styles.entityBody} emptyMessage={m.empty}>
         <AutoSizer>

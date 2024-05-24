@@ -20,9 +20,14 @@
   box-shadow: var(--shadow-box-panel-normal)
   padding: $cs.xl
   container: panel / inline-size
-  overflow: hidden
 
   &-header
+    display: flex
+    justify-content: space-between
+    align-items: center
+    margin-bottom: $cs.m
+    gap: $cs.m
+
     &-title
       font-weight: $fwv2.bold
       font-size: $fsv2.l
@@ -57,3 +62,8 @@
   border-radius: $br.l
   color: var(--c-bg-brand-normal)
   font-variation-settings: 'FILL' 1
+
+@container panel (max-width: 485px)
+  .panel-header
+    flex-direction: column
+    align-items: flex-start

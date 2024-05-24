@@ -71,7 +71,14 @@ const EntitiesItem = ({ bookmark, headers, last }) => {
               [styles.entityCellSmall]: headers[index].name === 'type',
             })}
           >
-            {headers[index].render(value, entityID)}
+            <div
+              className={classNames({
+                [styles.entityCellContent]: headers[index].name === 'name',
+                [styles.entityCellLastColumn]: headers[index].name === 'lastSeen',
+              })}
+            >
+              {headers[index].render(value, entityID)}
+            </div>
           </Table.DataCell>
         )
       })}
