@@ -29,10 +29,14 @@ import {
 } from '../../actions/gateways'
 
 describe('Gateways reducer', () => {
+  const defaultStatisticsState = {
+    error: undefined,
+    stats: {},
+  }
   const defaultState = {
     entities: {},
     selectedGateway: null,
-    statistics: {},
+    statistics: defaultStatisticsState,
   }
 
   it('returns the initial state', () => {

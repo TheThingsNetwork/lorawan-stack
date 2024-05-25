@@ -20,18 +20,20 @@ import {
   GET_GS_FREQUENCY_PLANS_BASE,
 } from '@console/store/actions/configuration'
 
+const EMPTY_ARRAY = []
+
 const selectConfigurationStore = state => state.configuration
 
 export const selectGsFrequencyPlans = state => {
   const store = selectConfigurationStore(state)
 
-  return store.gsFrequencyPlans || []
+  return store.gsFrequencyPlans
 }
 
 export const selectNsFrequencyPlans = state => {
   const store = selectConfigurationStore(state)
 
-  return store.nsFrequencyPlans || []
+  return store.nsFrequencyPlans
 }
 
 export const selectFrequencyPlansError = createErrorSelector([
@@ -47,11 +49,11 @@ export const selectFrequencyPlansFetching = createFetchingSelector([
 export const selectBandDefinitions = state => {
   const store = selectConfigurationStore(state)
 
-  return store?.bandDefinitions || []
+  return store.bandDefinitions
 }
 
 export const selectDataRates = (state, bandId, phyVersion) => {
   const bandDefinitions = selectBandDefinitions(state)
 
-  return bandDefinitions[bandId]?.band[phyVersion]?.data_rates || []
+  return bandDefinitions[bandId]?.band[phyVersion]?.data_rates || EMPTY_ARRAY
 }

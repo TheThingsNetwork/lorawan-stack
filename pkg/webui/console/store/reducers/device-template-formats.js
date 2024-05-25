@@ -15,7 +15,7 @@
 import { GET_DEVICE_TEMPLATE_FORMATS_SUCCESS } from '@console/store/actions/device-template-formats'
 
 const defaultState = {
-  formats: undefined,
+  formats: {},
 }
 
 const deviceTemplateFormats = (state = defaultState, { type, payload }) => {

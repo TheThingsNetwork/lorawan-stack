@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -54,16 +56,21 @@ const selectOrgsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 const selectOrgsFetching = createFetchingSelector(GET_ORGS_LIST_BASE)
 const selectOrgsError = createErrorSelector(GET_ORGS_LIST_BASE)
 
-export const selectOrganizations = state =>
-  selectOrgsIds(state).map(id => selectOrganizationById(state, id))
+export const selectOrganizations = createSelector(
+  [selectOrgsIds, selectOrganizationEntitiesStore],
+  (ids, entities) => ids.map(id => entities[id]),
+)
 export const selectOrganizationsTotalCount = state => selectOrgsTotalCount(state)
 export const selectOrganizationsFetching = state => selectOrgsFetching(state)
 export const selectOrganizationsError = state => selectOrgsError(state)
-export const selectOrganizationsWithCollaboratorCount = state =>
-  selectOrganizations(state).map(org => ({
-    ...org,
-    _collaboratorCount: selectOrganizationCollaboratorCount(state, getOrganizationId(org)),
-  }))
+export const selectOrganizationsWithCollaboratorCount = createSelector(
+  [selectOrganizations, selectOrganizationCollaboratorCounts],
+  (orgs, collaboratorCounts) =>
+    orgs.map(org => ({
+      ...org,
+      _collaboratorCount: collaboratorCounts[getOrganizationId(org)] || 0,
+    })),
+)
 
 // Rights.
 export const selectOrganizationRights = createRightsSelector(ENTITY)

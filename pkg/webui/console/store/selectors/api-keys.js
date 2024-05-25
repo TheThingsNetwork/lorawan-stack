@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -30,6 +32,8 @@ export const selectSelectedApiKey = state => selectApiKeyById(state, selectSelec
 const createSelectApiKeysIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
 const createSelectApiKeysTotalCountSelector = createPaginationTotalCountSelectorByEntity(ENTITY)
 
-export const selectApiKeys = state =>
-  createSelectApiKeysIdsSelector(state).map(id => selectApiKeyById(state, id))
+export const selectApiKeys = createSelector(
+  [createSelectApiKeysIdsSelector, selectApiKeysEntitiesStore],
+  (ids, entities) => ids.map(id => entities[id]),
+)
 export const selectApiKeysTotalCount = state => createSelectApiKeysTotalCountSelector(state)

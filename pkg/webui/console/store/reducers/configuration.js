@@ -19,9 +19,9 @@ import {
 } from '@console/store/actions/configuration'
 
 const defaultState = {
-  nsFrequencyPlans: undefined,
-  gsFrequencyPlans: undefined,
-  bandDefinitions: undefined,
+  nsFrequencyPlans: [],
+  gsFrequencyPlans: [],
+  bandDefinitions: [],
 }
 
 const configuration = (state = defaultState, { type, payload }) => {

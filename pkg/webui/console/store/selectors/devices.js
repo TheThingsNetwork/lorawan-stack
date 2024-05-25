@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import { combineDeviceIds, extractDeviceIdFromCombinedId } from '@ttn-lw/lib/selectors/id'
 import {
@@ -97,7 +99,10 @@ export const selectDevicesWithLastSeen = state => {
 const selectDevsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectDevsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 
-export const selectDevices = state => selectDevsIds(state).map(id => selectDeviceById(state, id))
+export const selectDevices = createSelector(
+  [selectDevsIds, selectDeviceEntitiesStore],
+  (ids, entities) => ids.map(id => entities[id]),
+)
 export const selectDevicesTotalCount = state => selectDevsTotalCount(state)
 
 // Events.

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 import {
@@ -52,7 +54,10 @@ export const selectSelectedGateway = state =>
 const selectGtwsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectGtwsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 
-export const selectGateways = state => selectGtwsIds(state).map(id => selectGatewayById(state, id))
+export const selectGateways = createSelector(
+  [selectGtwsIds, selectGatewayEntitiesStore],
+  (ids, entities) => ids.map(id => entities[id]),
+)
 export const selectGatewaysTotalCount = state => selectGtwsTotalCount(state)
 
 // Events.
@@ -85,7 +90,7 @@ export const selectGatewayStatisticsIsFetching = createFetchingSelector([
   UPDATE_GTW_STATS_BASE,
 ])
 export const selectGatewayStatistics = state => {
-  const statistics = selectGatewayStatisticsStore(state) || {}
+  const statistics = selectGatewayStatisticsStore(state)
 
   return statistics.stats
 }

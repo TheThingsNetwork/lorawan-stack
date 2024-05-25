@@ -14,12 +14,14 @@
 
 import { get } from 'lodash'
 
+const EMPTY_OBJ = {}
+
 const selectAsStore = state => state.as
 
 export const selectAsConfiguration = state => selectAsStore(state).configuration
 
 export const selectPubSubProviders = state =>
-  get(selectAsConfiguration(state), 'pubsub.providers') || {}
+  get(selectAsConfiguration(state), 'pubsub.providers') || EMPTY_OBJ
 export const selectNatsProviderDisabled = state =>
   selectPubSubProviders(state).nats === 'DISABLED' || false
 export const selectMqttProviderDisabled = state =>

@@ -22,7 +22,7 @@ const selectPubsubFormatsStore = state => state.pubsubFormats
 export const selectPubsubFormats = state => {
   const store = selectPubsubFormatsStore(state)
 
-  return store.formats || {}
+  return store.formats
 }
 
 export const selectPubsubFormatsError = createErrorSelector(GET_PUBSUB_FORMATS_BASE)
