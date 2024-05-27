@@ -195,7 +195,11 @@ const GatewayStatusPanel = () => {
           <div className="w-full">
             <div>
               <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />
-              <Transmissions />
+              <Transmissions
+                isUnavailable={isUnavailable}
+                gatewayStats={gatewayStats}
+                isDisconnected={isDisconnected}
+              />
             </div>
             <div className={style.gtwStatusPanelTag}>
               {showProtocol && (

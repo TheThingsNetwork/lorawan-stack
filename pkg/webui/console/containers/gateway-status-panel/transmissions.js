@@ -104,7 +104,12 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
       </div>
       <div className="d-flex al-center j-between gap-cs-m xs:direction-column xs:al-start xs:gap-cs-xxs fs-s">
         <div className="d-flex al-center gap-cs-xxs fw-bold">
-          {isDisconnected ? (
+          {isUnavailable ? (
+            <>
+              <Icon icon={IconX} className="c-text-warning-normal" />
+              <Message content={m.noDataYet} className="c-text-warning-normal" />
+            </>
+          ) : isDisconnected ? (
             <>
               <Icon icon={IconX} className="c-text-error-normal" />
               <Message content={sharedMessages.disconnected} className="c-text-error-normal" />
@@ -113,11 +118,6 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
             <>
               <Icon icon={IconHeartRateMonitor} className="c-text-success-normal" />
               <Message content={m.statusRecieved} className="c-text-success-normal" />
-            </>
-          ) : isUnavailable ? (
-            <>
-              <Icon icon={IconX} className="c-text-warning-normal" />
-              <Message content={m.noDataYet} className="c-text-warning-normal" />
             </>
           ) : (
             <>
