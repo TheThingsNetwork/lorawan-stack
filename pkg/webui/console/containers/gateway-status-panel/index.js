@@ -167,7 +167,7 @@ const GatewayStatusPanel = () => {
               <Message content={m.unlockGraph} className="fw-bold" component="div" />
               <Button.AnchorLink
                 secondary
-                message={sharedMessages.upgrade}
+                message={sharedMessages.upgradeNow}
                 icon={IconBolt}
                 href="https://www.thethingsindustries.com/stack/plans/"
                 target="_blank"
