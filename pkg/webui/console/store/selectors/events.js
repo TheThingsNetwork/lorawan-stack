@@ -21,7 +21,7 @@ const selectEventsStore = (state, entityId) => state[entityId] || {}
 export const createEventsSelector = entity => (state, entityId) => {
   const store = selectEventsStore(state.events[entity], entityId)
 
-  return store.events || []
+  return store.events
 }
 
 export const createEventsStatusSelector = entity => (state, entityId) => {

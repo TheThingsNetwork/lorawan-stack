@@ -30,7 +30,7 @@ import {
 
 const defaultStatisticsState = {
   error: undefined,
-  stats: undefined,
+  stats: {},
 }
 
 const defaultState = {

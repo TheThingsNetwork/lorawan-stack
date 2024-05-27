@@ -22,7 +22,7 @@ const selectWebhookFormatsStore = state => state.webhookFormats
 export const selectWebhookFormats = state => {
   const store = selectWebhookFormatsStore(state)
 
-  return store.formats || {}
+  return store.formats
 }
 
 export const selectWebhookFormatsError = createErrorSelector(GET_WEBHOOK_FORMATS_BASE)

@@ -15,7 +15,7 @@
 import { GET_WEBHOOK_FORMATS_SUCCESS } from '@console/store/actions/webhook-formats'
 
 const defaultState = {
-  formats: undefined,
+  formats: {},
 }
 
 const webhooks = (state = defaultState, { type, payload }) => {

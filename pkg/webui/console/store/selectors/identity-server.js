@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const EMPTY_OBJ = {}
+
 const selectIsStore = state => state.is
 
 export const selectIsConfiguration = state => selectIsStore(state).configuration
 
-export const selectUserRegistration = state => selectIsConfiguration(state).user_registration || {}
+export const selectUserRegistration = state =>
+  selectIsConfiguration(state).user_registration || EMPTY_OBJ
 export const selectPasswordRequirements = state =>
-  selectUserRegistration(state).password_requirements || {}
+  selectUserRegistration(state).password_requirements || EMPTY_OBJ
