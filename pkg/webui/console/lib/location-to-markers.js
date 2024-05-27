@@ -32,14 +32,15 @@ const sourceMessages = {
   SOURCE_COMBINED_GEOLOCATION: sharedMessages.locationSourceCombined,
 }
 
-const createLocationObject = (location, key) => ({
+const createLocationObject = (location, key, markerType) => ({
   position: {
     latitude: location.latitude || 0,
     longitude: location.longitude || 0,
   },
+  mapPinType: markerType,
   accuracy: location.accuracy,
   children: (
-    <Tooltip direction="top" offset={[-15, -10]} opacity={1}>
+    <Tooltip direction="top" offset={[0, markerType === 'DEFAULT' ? -40 : -20]} opacity={1}>
       <Message
         component="strong"
         content={location?.source ? sourceMessages[location.source] : sourceMessages.SOURCE_UNKNOWN}
@@ -60,15 +61,15 @@ const createLocationObject = (location, key) => ({
   ),
 })
 
-export default locations => {
+export default (locations, markerType = 'DEFAULT') => {
   if (isPlainObject(locations)) {
-    return Object.keys(locations).map(key => createLocationObject(locations[key], key))
+    return Object.keys(locations).map(key => createLocationObject(locations[key], key, markerType))
   }
 
   if (isArray(locations)) {
     return locations
       .filter(l => Boolean(l) && isPlainObject(l) && !isEmpty(l))
-      .map(location => createLocationObject(location))
+      .map(location => createLocationObject(location, undefined, markerType))
   }
 
   return []
