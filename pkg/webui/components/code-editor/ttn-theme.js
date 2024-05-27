@@ -25,8 +25,8 @@ ace.define(
   box-shadow: none;\
 }\
 .ace-ttn .ace_gutter {\
-background: #e8e8e8;\
-color: #AAA;\
+background: #fff;\
+color: #B4B7CB;\
 }\
 .ace-ttn  {\
 background: #fff;\

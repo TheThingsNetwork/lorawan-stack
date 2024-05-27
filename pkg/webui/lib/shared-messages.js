@@ -241,6 +241,7 @@ export default defineMessages({
   eventUplinkMessageDesc: 'An uplink message is received by the application',
   eventUplinkNormalizedDesc: 'A normalized uplink payload',
   eventsCannotShow: 'Cannot show events',
+  expand: 'Expand',
   expiry: 'Expiry',
   exportJson: 'Export as JSON',
   external: 'External',
