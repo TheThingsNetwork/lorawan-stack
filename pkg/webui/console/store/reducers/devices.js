@@ -102,7 +102,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
       if (session) {
         derived.uplinkFrameCount = session.last_f_cnt_up
         if (parseLorawanMacVersion(lorawanVersion) < 110) {
-          derived.downlinkFrameCount = session.last_n_f_cnt_down
+          derived.downlinkNwkFrameCount = session.last_n_f_cnt_down
         } else {
           // For 1.1+ end devices there are two frame counters.
           derived.downlinkAppFrameCount = session.last_a_f_cnt_down
@@ -166,11 +166,20 @@ const devices = (state = defaultState, { type, payload, event }) => {
         const lorawanVersion = getByPath(state.entities, `${combinedDeviceId}.lorawan_version`)
 
         if (parseLorawanMacVersion(lorawanVersion) < 110) {
-          const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
-          if (typeof downlinkFrameCount === 'number') {
-            return mergeDerived(state, combinedDeviceId, {
-              downlinkFrameCount,
-            })
+          if (getByPath(event, 'data.payload.mac_payload.f_port') === undefined) {
+            const downlinkNwkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+            if (typeof downlinkNwkFrameCount === 'number') {
+              return mergeDerived(state, combinedDeviceId, {
+                downlinkNwkFrameCount,
+              })
+            }
+          } else if (getByPath(event, 'data.payload.mac_payload.f_port') > 0) {
+            const downlinkAppFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+            if (typeof downlinkAppFrameCount === 'number') {
+              return mergeDerived(state, combinedDeviceId, {
+                downlinkAppFrameCount,
+              })
+            }
           }
         }
 

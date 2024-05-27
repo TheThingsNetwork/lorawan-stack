@@ -70,6 +70,7 @@ const DeviceTitleSection = props => {
   const showUplinkCount = typeof uplinkFrameCount === 'number'
   const showAppDownlinkCount = typeof downlinkAppFrameCount === 'number'
   const showNwkDownlinkCount = typeof downlinkNwkFrameCount === 'number'
+
   const notAvailableElem = <Message content={sharedMessages.notAvailable} />
   const downlinkValue =
     showAppDownlinkCount && showNwkDownlinkCount ? (
@@ -83,7 +84,7 @@ const DeviceTitleSection = props => {
       </>
     ) : showNwkDownlinkCount ? (
       <>
-        <FormattedNumber value={downlinkNwkFrameCount} /> {'(Nwk)'},
+        <FormattedNumber value={downlinkNwkFrameCount} /> {'(Nwk)'}
       </>
     ) : (
       notAvailableElem
