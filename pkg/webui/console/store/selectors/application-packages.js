@@ -21,7 +21,7 @@ const selectApplicationPackagesStore = state => state.applicationPackages
 export const selectApplicationPackageDefaultAssociations = state => {
   const store = selectApplicationPackagesStore(state)
 
-  return store.default || {}
+  return store.default
 }
 export const selectApplicationPackageDefaultAssociation = (state, fPort) =>
   selectApplicationPackageDefaultAssociations(state)[fPort]

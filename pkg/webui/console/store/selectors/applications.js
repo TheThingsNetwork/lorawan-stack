@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -66,14 +68,19 @@ export const selectApplicationDevEUICount = state =>
 const selectAppsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectAppsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 
-export const selectApplications = state =>
-  selectAppsIds(state).map(id => selectApplicationById(state, id))
+export const selectApplications = createSelector(
+  [selectAppsIds, selectApplicationEntitiesStore],
+  (ids, entities) => ids.map(id => entities[id]),
+)
 export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
-export const selectApplicationsWithDeviceCounts = state =>
-  selectApplications(state).map(app => ({
-    ...app,
-    _devices: selectApplicationDeviceCount(state, app.ids.application_id),
-  }))
+export const selectApplicationsWithDeviceCounts = createSelector(
+  [selectApplications, selectApplicationStore],
+  (applications, store) =>
+    applications.map(app => ({
+      ...app,
+      _devices: store.applicationDeviceCounts[app.ids.application_id],
+    })),
+)
 
 // Events.
 export const selectApplicationEvents = createEventsSelector(ENTITY)

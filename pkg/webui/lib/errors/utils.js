@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import { isPlainObject, isObject } from 'lodash'
 
 import { error as errorLog, warn } from '@ttn-lw/lib/log'

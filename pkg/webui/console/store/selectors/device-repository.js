@@ -17,6 +17,9 @@ import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
 import { LIST_BRANDS_BASE, LIST_MODELS_BASE } from '@console/store/actions/device-repository'
 
+const EMPTY_MODEL = { list: [] }
+const EMPTY_ARRAY = []
+
 const selectDRStore = store => store.deviceRepository
 
 // Brands.
@@ -28,7 +31,7 @@ export const selectDeviceBrandsError = createErrorSelector(LIST_BRANDS_BASE)
 // Models.
 
 export const selectDeviceModelsByBrandId = (state, brandId) => {
-  const models = selectDRStore(state).models[brandId] || { list: [] }
+  const models = selectDRStore(state).models[brandId] || EMPTY_MODEL
 
   return models.list
 }
@@ -42,7 +45,7 @@ export const selectDeviceModelById = (state, brandId, modelId) => {
 export const selectDeviceModelHardwareVersions = (state, brandId, modelId) => {
   const model = selectDeviceModelById(state, brandId, modelId) || {}
   if (!model.hardware_versions) {
-    return []
+    return EMPTY_ARRAY
   }
 
   return model.hardware_versions
@@ -50,7 +53,7 @@ export const selectDeviceModelHardwareVersions = (state, brandId, modelId) => {
 export const selectDeviceModelFirmwareVersions = (state, brandId, modelId) => {
   const model = selectDeviceModelById(state, brandId, modelId) || {}
   if (!model.firmware_versions) {
-    return []
+    return EMPTY_ARRAY
   }
 
   return model.firmware_versions

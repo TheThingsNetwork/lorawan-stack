@@ -38,6 +38,12 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type filteringItem struct {
+	now       time.Time
+	packetBuf []byte
+	addr      *net.UDPAddr
+}
+
 type srv struct {
 	ctx    context.Context
 	config Config
@@ -48,6 +54,10 @@ type srv struct {
 	firewall    Firewall
 
 	limitLogs ratelimit.Interface
+
+	filterQueues sync.Map // netip.AddrPort -> filterQueue
+	filterPool   workerpool.WorkerPool[filteringItem]
+	processPool  workerpool.WorkerPool[encoding.Packet]
 }
 
 func (*srv) Protocol() string                          { return "udp" }
@@ -56,7 +66,7 @@ func (*srv) DutyCycleStyle() scheduling.DutyCycleStyle { return scheduling.Defau
 
 var (
 	limitLogsConfig      = config.RateLimitingProfile{MaxPerMin: 1}
-	limitLogsSize   uint = 1 << 13
+	limitLogsStoreConfig = ratelimit.StoreConfig{Memory: config.RateLimitingMemory{MaxSize: 1 << 13}}
 )
 
 // Serve serves the UDP frontend.
@@ -71,10 +81,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config
 	if conf.RateLimiting.Enable {
 		firewall = NewRateLimitingFirewall(firewall, conf.RateLimiting.Messages, conf.RateLimiting.Threshold)
 	}
-	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, ratelimit.StoreConfig{
-		Provider: conf.RateLimiting.Provider,
-		Redis:    conf.RateLimiting.Redis.Client,
-	})
+	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, limitLogsStoreConfig)
 	if err != nil {
 		return err
 	}
@@ -87,11 +94,19 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config
 
 		limitLogs: limitLogs,
 	}
-	wp := workerpool.NewWorkerPool(workerpool.Config[encoding.Packet]{
+	s.processPool = workerpool.NewWorkerPool(workerpool.Config[encoding.Packet]{
 		Component:  server,
 		Context:    ctx,
-		Name:       "udp",
+		Name:       "udp_process",
 		Handler:    s.handlePacket,
+		MaxWorkers: conf.PacketHandlers,
+		QueueSize:  conf.PacketBuffer,
+	})
+	s.filterPool = workerpool.NewWorkerPool(workerpool.Config[filteringItem]{
+		Component:  server,
+		Context:    ctx,
+		Name:       "udp_filter",
+		Handler:    s.preFilterPacket,
 		MaxWorkers: conf.PacketHandlers,
 		QueueSize:  conf.PacketBuffer,
 	})
@@ -100,12 +115,12 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, conf Config
 		<-ctx.Done()
 		s.conn.Close()
 	}()
-	return s.read(wp)
+	return s.read()
 }
 
 var errPacketType = errors.DefineInvalidArgument("packet_type", "invalid packet type")
 
-func (s *srv) read(wp workerpool.WorkerPool[encoding.Packet]) error {
+func (s *srv) read() error {
 	var buf [65507]byte
 	for {
 		n, addr, err := s.conn.ReadFromUDP(buf[:])
@@ -115,50 +130,132 @@ func (s *srv) read(wp workerpool.WorkerPool[encoding.Packet]) error {
 			}
 			return err
 		}
-		now := time.Now()
 		ctx := log.NewContextWithField(s.ctx, "remote_addr", addr.String())
-		logger := log.FromContext(ctx)
-
 		registerMessageReceived(ctx)
-		if err := ratelimit.Require(s.server.RateLimiter(), ratelimit.GatewayUDPTrafficResource(addr)); err != nil {
-			if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(addr.IP.String())) == nil {
-				logger.WithError(err).Warn("Drop packet")
-			}
+		if err := s.filterPool.Publish(ctx, filteringItem{
+			now:       time.Now(),
+			packetBuf: slices.Clone(buf[:n]),
+			addr:      addr,
+		}); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Drop packet")
 			registerMessageDropped(ctx, err)
 			continue
 		}
-
-		packetBuf := slices.Clone(buf[:n])
-
-		packet := encoding.Packet{
-			GatewayAddr: addr,
-			ReceivedAt:  now,
-		}
-		if err := packet.UnmarshalBinary(packetBuf); err != nil {
-			logger.WithError(err).Debug("Failed to unmarshal packet")
-			registerMessageDropped(ctx, err)
-			continue
-		}
-		switch packet.PacketType {
-		case encoding.PullData, encoding.PushData, encoding.TxAck:
-		default:
-			logger.WithField("packet_type", packet.PacketType).Debug("Invalid packet type for uplink")
-			registerMessageDropped(ctx, errPacketType)
-			continue
-		}
-		if packet.GatewayEUI == nil {
-			logger.Debug("No gateway EUI in uplink message")
-			registerMessageDropped(ctx, errNoEUI)
-			continue
-		}
-
-		if err := wp.Publish(ctx, packet); err != nil {
-			logger.WithError(err).Warn("UDP packet publishing failed")
-			registerMessageDropped(ctx, err)
-			continue
-		}
-		registerMessageForwarded(ctx, packet.PacketType)
 	}
+}
+
+func (s *srv) preFilterPacket(ctx context.Context, item filteringItem) {
+	addrPort := item.addr.AddrPort()
+
+	type filterQueue struct {
+		items  chan filteringItem
+		closed chan struct{}
+	}
+	q := filterQueue{
+		items:  make(chan filteringItem),
+		closed: make(chan struct{}),
+	}
+
+	for {
+		actual, loaded := s.filterQueues.LoadOrStore(addrPort, q)
+		if loaded {
+			// At this point we're not the goroutine which handles this address.
+			// As such, we attempt to send the item to the channel.
+			q := actual.(filterQueue) // nolint: revive
+			select {
+			case <-ctx.Done():
+				return
+			case q.items <- item:
+				// The goroutine which handles this address has received the item.
+				return
+			case <-q.closed:
+				// Between the actual load and store, and the channel write, the channel might have been closed.
+				continue
+			}
+		}
+		break
+	}
+
+	defer func() {
+		if !s.filterQueues.CompareAndDelete(addrPort, q) {
+			panic("unreachable")
+		}
+		close(q.closed)
+	}()
+
+	// At this point we are the goroutine which handles this address.
+	// As such, we start by handling our own item.
+	s.filterPacket(ctx, item)
+	// Clear the item to allow GC to collect it.
+	item = filteringItem{}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case item := <-q.items:
+			// We have received an item from another goroutine which we need to handle.
+			s.filterPacket(ctx, item)
+		default:
+			// We don't have any more work items.
+			return
+		}
+	}
+}
+
+func (s *srv) filterPacket(ctx context.Context, item filteringItem) {
+	logger := log.FromContext(ctx)
+	now, packetBuf, addr := item.now, item.packetBuf, item.addr
+
+	if err := ratelimit.Require(s.server.RateLimiter(), ratelimit.GatewayUDPTrafficResource(addr)); err != nil {
+		if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(addr.IP.String())) == nil {
+			logger.WithError(err).Warn("Drop packet")
+		}
+		registerMessageDropped(ctx, err)
+		return
+	}
+
+	packet := encoding.Packet{
+		GatewayAddr: addr,
+		ReceivedAt:  now,
+	}
+	if err := packet.UnmarshalBinary(packetBuf); err != nil {
+		logger.WithError(err).Debug("Failed to unmarshal packet")
+		registerMessageDropped(ctx, err)
+		return
+	}
+	switch packet.PacketType {
+	case encoding.PullData, encoding.PushData, encoding.TxAck:
+	default:
+		logger.WithField("packet_type", packet.PacketType).Debug("Invalid packet type for uplink")
+		registerMessageDropped(ctx, errPacketType)
+		return
+	}
+	if packet.GatewayEUI == nil {
+		logger.Debug("No gateway EUI in uplink message")
+		registerMessageDropped(ctx, errNoEUI)
+		return
+	}
+
+	if err := s.firewall.Filter(packet); err != nil {
+		registerMessageDropped(ctx, err)
+		if !errors.IsResourceExhausted(err) {
+			goto filtered
+		}
+		if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(packet.GatewayEUI.String())) != nil {
+			return
+		}
+	filtered:
+		logger.WithError(err).Warn("Packet filtered")
+		return
+	}
+
+	if err := s.processPool.Publish(ctx, packet); err != nil {
+		logger.WithError(err).Warn("UDP packet publishing failed")
+		registerMessageDropped(ctx, err)
+		return
+	}
+	registerMessageForwarded(ctx, packet.PacketType)
 }
 
 func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
@@ -171,18 +268,6 @@ func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
 		if err := s.writeAckFor(packet); err != nil {
 			logger.WithError(err).Warn("Failed to write acknowledgment")
 		}
-	}
-
-	if err := s.firewall.Filter(packet); err != nil {
-		if !errors.IsResourceExhausted(err) {
-			goto filtered
-		}
-		if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) != nil {
-			return
-		}
-	filtered:
-		logger.WithError(err).Warn("Packet filtered")
-		return
 	}
 
 	cs, err := s.connect(ctx, eui, packet.GatewayAddr)

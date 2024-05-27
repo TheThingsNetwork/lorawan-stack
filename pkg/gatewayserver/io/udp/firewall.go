@@ -18,6 +18,7 @@ import (
 	"context"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -35,8 +36,8 @@ type noopFirewall struct{}
 func (noopFirewall) Filter(encoding.Packet) error { return nil }
 
 type addrTime struct {
-	net.IP
-	lastSeen time.Time
+	ip       net.IP
+	lastSeen atomic.Pointer[time.Time]
 }
 
 type memoryFirewall struct {
@@ -51,10 +52,10 @@ func NewMemoryFirewall(ctx context.Context, addrChangeBlock time.Duration) Firew
 	}
 	go func() {
 		ticker := time.NewTicker(addrChangeBlock)
+		defer ticker.Stop()
 		for {
 			select {
 			case <-ctx.Done():
-				ticker.Stop()
 				return
 			case <-ticker.C:
 				f.gc()
@@ -79,28 +80,36 @@ func (f *memoryFirewall) Filter(packet encoding.Packet) error {
 	}
 	now := time.Now().UTC()
 	eui := *packet.GatewayEUI
-	val, ok := f.m.Load(eui)
-	if ok {
-		a := val.(addrTime)
-		if !a.IP.Equal(packet.GatewayAddr.IP) && a.lastSeen.Add(f.addrChangeBlock).After(now) {
-			return errAlreadyConnected.WithAttributes(
-				"connected_ip", a.IP.String(),
-				"connecting_ip", packet.GatewayAddr.IP.String(),
-			)
+	entry := &addrTime{
+		ip: packet.GatewayAddr.IP,
+	}
+	entry.lastSeen.Store(&now)
+	actual, loaded := f.m.LoadOrStore(eui, entry)
+	if !loaded {
+		// This is a new entry. There are no checks or updates to be done.
+		return nil
+	}
+	a := actual.(*addrTime) // nolint:revive
+	lastSeen := a.lastSeen.Load()
+	if !a.ip.Equal(packet.GatewayAddr.IP) && lastSeen.Add(f.addrChangeBlock).After(now) {
+		return errAlreadyConnected.WithAttributes(
+			"connected_ip", a.ip.String(),
+			"connecting_ip", packet.GatewayAddr.IP.String(),
+		)
+	}
+	for ; lastSeen.Before(now); lastSeen = a.lastSeen.Load() {
+		if a.lastSeen.CompareAndSwap(lastSeen, &now) {
+			return nil
 		}
 	}
-	f.m.Store(eui, addrTime{
-		IP:       packet.GatewayAddr.IP,
-		lastSeen: now,
-	})
 	return nil
 }
 
 func (f *memoryFirewall) gc() {
 	now := time.Now().UTC()
 	f.m.Range(func(k, val any) bool {
-		a := val.(addrTime)
-		if a.lastSeen.Add(f.addrChangeBlock).Before(now) {
+		a := val.(*addrTime) // nolint:revive
+		if a.lastSeen.Load().Add(f.addrChangeBlock).Before(now) {
 			f.m.Delete(k)
 		}
 		return true

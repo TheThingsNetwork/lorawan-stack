@@ -37,8 +37,10 @@ const selectClientsError = createErrorSelector(GET_CLIENTS_LIST_BASE)
 export const selectClientFetching = createFetchingSelector(GET_CLIENT_BASE)
 export const selectClientError = createErrorSelector(GET_CLIENT_BASE)
 
-export const selectOAuthClients = state =>
-  selectClientsIds(state).map(id => selectClientById(state, id))
+export const selectOAuthClients = createSelector(
+  [selectClientsIds, selectClientEntitiesStore],
+  (ids, entities) => ids.map(id => entities[id]),
+)
 export const selectOAuthClientsTotalCount = state => selectClientsStore(state).totalCount
 export const selectOAuthClientsFetching = state => selectClientsFetching(state)
 export const selectOAuthClientsError = state => selectClientsError(state)

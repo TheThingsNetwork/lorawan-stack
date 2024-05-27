@@ -277,7 +277,7 @@ func TestUplinkDataFrame(t *testing.T) {
 	for _, tc := range []struct {
 		Name                  string
 		UplinkDataFrame       UplinkDataFrame
-		GatewayIds            *ttnpb.GatewayIdentifiers
+		GatewayIDs            *ttnpb.GatewayIdentifiers
 		FrequencyPlanID       string
 		ExpectedUplinkMessage *ttnpb.UplinkMessage
 		ErrorAssertion        func(err error) bool
@@ -285,11 +285,11 @@ func TestUplinkDataFrame(t *testing.T) {
 		{
 			Name:                  "Empty",
 			UplinkDataFrame:       UplinkDataFrame{},
-			GatewayIds:            gtwID,
+			GatewayIDs:            gtwID,
 			FrequencyPlanID:       band.EU_863_870,
 			ExpectedUplinkMessage: &ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
-				return errors.Resemble(err, errMDHR)
+				return errors.Resemble(err, errUplinkDataFrame)
 			},
 		},
 		{
@@ -314,7 +314,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					},
 				},
 			},
-			GatewayIds:      gtwID,
+			GatewayIDs:      gtwID,
 			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkMessage: &ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -378,7 +378,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					},
 				},
 			},
-			GatewayIds:      gtwID,
+			GatewayIDs:      gtwID,
 			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkMessage: &ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -425,7 +425,7 @@ func TestUplinkDataFrame(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
-			msg, err := tc.UplinkDataFrame.toUplinkMessage(tc.GatewayIds, tc.FrequencyPlanID, time.Time{})
+			msg, err := tc.UplinkDataFrame.toUplinkMessage(tc.GatewayIDs, tc.FrequencyPlanID, time.Time{})
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)

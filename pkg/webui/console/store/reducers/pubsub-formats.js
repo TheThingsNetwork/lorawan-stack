@@ -15,7 +15,7 @@
 import { GET_PUBSUB_FORMATS_SUCCESS } from '@console/store/actions/pubsub-formats'
 
 const defaultState = {
-  formats: undefined,
+  formats: {},
 }
 
 const pubsubs = (state = defaultState, { type, payload }) => {

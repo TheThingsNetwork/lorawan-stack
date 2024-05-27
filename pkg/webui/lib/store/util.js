@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_WEBHOOK_FORMATS_SUCCESS } from '@console/store/actions/webhook-formats'
+/* eslint-disable import/prefer-default-export */
 
-const defaultState = {
-  formats: {},
-}
+import { cloneDeepWith } from 'lodash'
 
-const webhooks = (state = defaultState, { type, payload }) => {
-  switch (type) {
-    case GET_WEBHOOK_FORMATS_SUCCESS:
-      return {
-        ...state,
-        formats: payload,
-      }
-    default:
-      return state
-  }
-}
-
-export default webhooks
+export const trimEvents = state => ({
+  ...state,
+  events: cloneDeepWith(state.events, (value, key) => {
+    if (key === 'events' && value instanceof Array) {
+      // Only transfer the last 5 events to Sentry to avoid
+      // `Payload too large` errors.
+      return value.slice(0, 5)
+    }
+  }),
+})

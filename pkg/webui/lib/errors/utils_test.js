@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { withScope, captureException } from '@sentry/browser'
+import { withScope, captureException } from '@sentry/react'
 
 import { getSentryErrorTitle, createFrontendError, ingestError, toMessageProps } from './utils'
 import errorMessages from './error-messages'
 import { TokenError } from './custom-errors'
 
-jest.mock('@sentry/browser')
+jest.mock('@sentry/react')
 jest.mock('@ttn-lw/lib/log')
 
 const setTags = jest.fn()

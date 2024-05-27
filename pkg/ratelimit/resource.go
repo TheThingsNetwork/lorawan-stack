@@ -115,7 +115,7 @@ func grpcStreamAcceptResource(ctx context.Context, fullMethod string) Resource {
 // grpcStreamUpResource represents client messages for a gRPC server stream.
 func grpcStreamUpResource(ctx context.Context, fullMethod string) Resource {
 	return &resource{
-		key:     fmt.Sprintf("grpc:stream:up:%s:streamID:%s", fullMethod, events.NewCorrelationID()),
+		key:     fmt.Sprintf("grpc:stream:up:%s:id:%s", fullMethod, events.NewCorrelationID()),
 		classes: []string{fmt.Sprintf("grpc:stream:up:%s", fullMethod), "grpc:stream:up"},
 	}
 }
@@ -140,10 +140,10 @@ func GatewayAcceptMQTTConnectionResource(remoteAddr string) Resource {
 	}
 }
 
-// GatewayUDPTrafficResource represents UDP gateway traffic from a remote IP address.
+// GatewayUDPTrafficResource represents UDP gateway traffic from a remote address.
 func GatewayUDPTrafficResource(addr *net.UDPAddr) Resource {
 	return &resource{
-		key:     fmt.Sprintf("gs:up:udp:ip:%s", addr.IP.String()),
+		key:     fmt.Sprintf("gs:up:udp:addr:%s", addr.String()),
 		classes: []string{"gs:up:udp", "gs:up"},
 	}
 }

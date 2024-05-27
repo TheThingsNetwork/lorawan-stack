@@ -22,7 +22,7 @@ const selectDeviceTemplateFormatsStore = state => state.deviceTemplateFormats
 export const selectDeviceTemplateFormats = state => {
   const store = selectDeviceTemplateFormatsStore(state)
 
-  return store.formats || {}
+  return store.formats
 }
 
 export const selectDeviceTemplateFormatsError = createErrorSelector(

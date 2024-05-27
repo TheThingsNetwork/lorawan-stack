@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -22,13 +24,14 @@ import { combinePacketBrokerIds } from '@ttn-lw/lib/selectors/id'
 
 import { GET_PACKET_BROKER_INFO_BASE } from '@console/store/actions/packet-broker'
 
+const EMPTY_OBJ = {}
 const ENTITY = 'packetBrokerNetworks'
 
 const selectPacketBrokerStore = state => state.packetBroker
 
 // General.
 export const selectInfo = state => selectPacketBrokerStore(state).info
-export const selectRegistration = state => selectInfo(state).registration || {}
+export const selectRegistration = state => selectInfo(state).registration || EMPTY_OBJ
 export const selectPacketBrokerOwnCombinedId = state =>
   combinePacketBrokerIds(selectRegistration(state).id)
 export const selectInfoFetching = createFetchingSelector(GET_PACKET_BROKER_INFO_BASE)
@@ -55,8 +58,10 @@ export const selectPacketBrokerNetworkById = (state, combinedId) =>
 const selectPBNetworksIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectPBNetworksTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 
-export const selectPacketBrokerNetworks = state =>
-  selectPBNetworksIds(state).map(netId => selectPacketBrokerNetworkById(state, netId))
+export const selectPacketBrokerNetworks = createSelector(
+  [selectPBNetworksIds, state => state],
+  (netIds, state) => netIds.map(netId => selectPacketBrokerNetworkById(state, netId)),
+)
 export const selectPacketBrokerNetworksTotalCount = state => selectPBNetworksTotalCount(state)
 
 // Policies.
