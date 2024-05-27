@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ws
+package semtechws
 
 import (
 	"math"
@@ -33,7 +33,7 @@ func TimeFromUnixSeconds(tf float64) time.Time {
 	return time.Unix(int64(sec), int64(nsec*1e9)).UTC()
 }
 
-// TimeFromUnixSeconds constructs a *time.Time from the provided UNIX fractional timestamp.
+// TimePtrFromUnixSeconds constructs a *time.Time from the provided UNIX fractional timestamp.
 // If the timestamp is 0, this function returns nil.
 func TimePtrFromUnixSeconds(tf float64) *time.Time {
 	if tf == 0.0 {

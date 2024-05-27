@@ -21,8 +21,8 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/id6"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -35,7 +35,7 @@ func (f *lbsLNS) HandleConnectionInfo(
 	ctx context.Context,
 	raw []byte,
 	server io.Server,
-	info ws.ServerInfo,
+	info semtechws.ServerInfo,
 	assertAuth func(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error,
 ) []byte {
 	var req DiscoverQuery

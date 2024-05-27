@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package ws provides common interface for Web Socket front end.
-package ws
+// Package semtechws implements a common interface for Semtech web socket frontends.
+package semtechws
 
 import (
 	"context"
@@ -69,7 +69,7 @@ func (*srv) DutyCycleStyle() scheduling.DutyCycleStyle {
 
 // New creates a new WebSocket frontend.
 func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config) (*web.Server, error) {
-	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/ws")
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/semtechws")
 
 	s := &srv{
 		ctx:    ctx,

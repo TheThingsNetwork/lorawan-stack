@@ -40,9 +40,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 	gsio "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
 	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/mock"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
@@ -126,7 +126,7 @@ func TestGatewayServer(t *testing.T) {
 					},
 					BasicStation: gatewayserver.BasicStationConfig{
 						Listen: ":1887",
-						Config: ws.Config{
+						Config: semtechws.Config{
 							WSPingInterval:       wsPingInterval,
 							MissedPongThreshold:  2,
 							AllowUnauthenticated: true,
