@@ -54,7 +54,7 @@ const RequireRequest = React.memo(
 )
 
 RequireRequest.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   errorRenderFunction: PropTypes.func,
   handleErrors: PropTypes.bool,
   requestAction: PropTypes.oneOfType([
@@ -71,6 +71,7 @@ RequireRequest.defaultProps = {
   handleErrors: true,
   spinnerProps: { center: true },
   requestOnChange: false,
+  children: undefined,
 }
 
 export default RequireRequest
