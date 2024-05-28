@@ -29,6 +29,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectSelectedGateway } from '@console/store/selectors/gateways'
 import { selectGsFrequencyPlans } from '@console/store/selectors/configuration'
 
+import style from './gateway-general-information-panel.styl'
+
 const m = defineMessages({
   networkSettings: 'Network settings',
   autoUpdateDescription: 'When enabled, the gateway can be updated automatically.',
@@ -74,12 +76,12 @@ const GatewayGeneralInformationPanel = () => {
     field =>
       field ? (
         <div className="d-flex al-center gap-cs-xxs">
-          <Icon icon={IconCircleCheck} size={17} />
+          <Icon icon={IconCircleCheck} small />
           <Message content={sharedMessages.enabled} />
         </div>
       ) : (
         <div className="d-flex al-center gap-cs-xxs">
-          <Icon icon={IconExclamationCircle} size={17} className="c-text-error-normal" />
+          <Icon icon={IconExclamationCircle} small className="c-text-error-normal" />
           <Message content={sharedMessages.disabled} />
         </div>
       ),
@@ -158,7 +160,7 @@ const GatewayGeneralInformationPanel = () => {
   ]
 
   return (
-    <Panel>
+    <Panel className={style.infoPanel}>
       <DataSheet data={sheetData} />
     </Panel>
   )

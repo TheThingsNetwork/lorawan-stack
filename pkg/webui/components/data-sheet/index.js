@@ -111,14 +111,12 @@ const DataSheetRow = ({ item, sub }) => {
     <tr className={rowStyle}>
       {item.key && (
         <th>
-          <div className="d-flex al-center gap-cs-xxs">
-            <Message content={item.key} />
-            {item.tooltipMessage && (
-              <Tooltip content={<Message content={item.tooltipMessage} />}>
-                <Icon icon={IconInfoCircle} className="c-text-neutral-semilight" size={17} />
-              </Tooltip>
-            )}
-          </div>
+          <Message content={item.key} />
+          {item.tooltipMessage && (
+            <Tooltip content={<Message content={item.tooltipMessage} />}>
+              <Icon icon={IconInfoCircle} className={style.tooltipIcon} small />
+            </Tooltip>
+          )}
         </th>
       )}
       <td>
