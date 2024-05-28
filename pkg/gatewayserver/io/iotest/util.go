@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gatewayserver_test
+package iotest
 
 import (
 	"context"
 	"crypto/rand"
+	"testing"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -27,48 +28,15 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-var testRights = []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ}
-
-func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
+func mustHavePeer(ctx context.Context, t *testing.T, c *component.Component, role ttnpb.ClusterRole) {
+	t.Helper()
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond)
 		if _, err := c.GetPeer(ctx, role, nil); err == nil {
 			return
 		}
 	}
-	panic("could not connect to peer")
-}
-
-func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
-	var nwkKey types.AES128Key
-	rand.Read(nwkKey[:])
-	var devNonce types.DevNonce
-	rand.Read(devNonce[:])
-
-	msg := &ttnpb.UplinkMessage{
-		Payload: &ttnpb.Message{
-			MHdr: &ttnpb.MHDR{
-				MType: ttnpb.MType_JOIN_REQUEST,
-				Major: ttnpb.Major_LORAWAN_R1,
-			},
-			Payload: &ttnpb.Message_JoinRequestPayload{
-				JoinRequestPayload: &ttnpb.JoinRequestPayload{
-					JoinEui:  joinEUI.Bytes(),
-					DevEui:   devEUI.Bytes(),
-					DevNonce: devNonce.Bytes(),
-				},
-			},
-		},
-	}
-	buf, err := lorawan.MarshalMessage(msg.Payload)
-	if err != nil {
-		panic(err)
-	}
-	mic, err := crypto.ComputeJoinRequestMIC(nwkKey, buf)
-	if err != nil {
-		panic(err)
-	}
-	return append(buf, mic[:]...)
+	t.Fatal("Could not connect to peer")
 }
 
 func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
@@ -107,6 +75,38 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 		panic(err)
 	}
 	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, 0, 5, 0, devAddr, pld.FHdr.FCnt, buf)
+	if err != nil {
+		panic(err)
+	}
+	return append(buf, mic[:]...)
+}
+
+func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
+	var nwkKey types.AES128Key
+	rand.Read(nwkKey[:])
+	var devNonce types.DevNonce
+	rand.Read(devNonce[:])
+
+	msg := &ttnpb.UplinkMessage{
+		Payload: &ttnpb.Message{
+			MHdr: &ttnpb.MHDR{
+				MType: ttnpb.MType_JOIN_REQUEST,
+				Major: ttnpb.Major_LORAWAN_R1,
+			},
+			Payload: &ttnpb.Message_JoinRequestPayload{
+				JoinRequestPayload: &ttnpb.JoinRequestPayload{
+					JoinEui:  joinEUI.Bytes(),
+					DevEui:   devEUI.Bytes(),
+					DevNonce: devNonce.Bytes(),
+				},
+			},
+		},
+	}
+	buf, err := lorawan.MarshalMessage(msg.Payload)
+	if err != nil {
+		panic(err)
+	}
+	mic, err := crypto.ComputeJoinRequestMIC(nwkKey, buf)
 	if err != nil {
 		panic(err)
 	}

@@ -28,12 +28,15 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/iotest"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -41,24 +44,19 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-var (
-	registeredGatewayID = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
-
-	timeout = (1 << 4) * test.Delay
-
-	testConfig = Config{
-		PacketHandlers:      2,
-		PacketBuffer:        10,
-		DownlinkPathExpires: 8 * timeout,
-		ConnectionExpires:   20 * timeout,
-		ScheduleLateTime:    0,
-	}
-)
-
 func TestConnection(t *testing.T) {
-	a := assertions.New(t)
+	var (
+		timeout    = (1 << 4) * test.Delay
+		testConfig = Config{
+			PacketHandlers:      2,
+			PacketBuffer:        10,
+			DownlinkPathExpires: 8 * timeout,
+			ConnectionExpires:   20 * timeout,
+			ScheduleLateTime:    0,
+		}
+	)
 
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	a, ctx := test.New(t)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
@@ -204,10 +202,182 @@ func TestConnection(t *testing.T) {
 	cancelCtx()
 }
 
-func TestTraffic(t *testing.T) {
-	a := assertions.New(t)
+func TestFrontend(t *testing.T) {
+	t.Parallel()
+	iotest.Frontend(t, iotest.FrontendConfig{
+		DetectsInvalidMessages: false,
+		SupportsStatus:         true,
+		DetectsDisconnect:      false,
+		AuthenticatesWithEUI:   true,
+		TimeoutOnInvalidAuth:   false,
+		IsAuthenticated:        false,
+		DeduplicatesUplinks:    true,
+		CustomConfig: func(config *gatewayserver.Config) {
+			config.UDP = gatewayserver.UDPConfig{
+				Config: udp.Config{
+					PacketHandlers:      2,
+					PacketBuffer:        10,
+					DownlinkPathExpires: (1 << 7) * test.Delay,
+					ConnectionExpires:   (1 << 8) * test.Delay,
+					ScheduleLateTime:    0,
+					AddrChangeBlock:     (1 << 7) * test.Delay,
+				},
+				Listeners: map[string]string{
+					":1700": test.EUFrequencyPlanID,
+				},
+			}
+		},
+		Link: func(
+			ctx context.Context,
+			t *testing.T,
+			gs *gatewayserver.GatewayServer,
+			ids *ttnpb.GatewayIdentifiers,
+			key string,
+			upCh <-chan *ttnpb.GatewayUp,
+			downCh chan<- *ttnpb.GatewayDown,
+		) error {
+			if ids.Eui == nil {
+				t.SkipNow()
+			}
+			upConn, err := net.Dial("udp", ":1700")
+			if err != nil {
+				return err
+			}
+			downConn, err := net.Dial("udp", ":1700")
+			if err != nil {
+				return err
+			}
+			ctx, cancel := errorcontext.New(ctx)
+			// Write upstream.
+			go func() {
+				var token byte
+				var readBuf [65507]byte
+				for {
+					select {
+					case <-ctx.Done():
+						return
+					case up := <-upCh:
+						token++
+						packet := encoding.Packet{
+							GatewayEUI:      types.MustEUI64(ids.Eui),
+							ProtocolVersion: encoding.Version1,
+							Token:           [2]byte{0x00, token},
+							PacketType:      encoding.PushData,
+							Data:            &encoding.Data{},
+						}
+						packet.Data.RxPacket, packet.Data.Stat, packet.Data.TxPacketAck = encoding.FromGatewayUp(up)
+						if packet.Data.TxPacketAck != nil {
+							packet.PacketType = encoding.TxAck
+						}
+						writeBuf, err := packet.MarshalBinary()
+						if err != nil {
+							cancel(err)
+							return
+						}
+						switch packet.PacketType {
+						case encoding.PushData:
+							if _, err := upConn.Write(writeBuf); err != nil {
+								cancel(err)
+								return
+							}
+							if _, err := upConn.Read(readBuf[:]); err != nil {
+								cancel(err)
+								return
+							}
+						case encoding.TxAck:
+							if _, err := downConn.Write(writeBuf); err != nil {
+								cancel(err)
+								return
+							}
+						}
+					}
+				}
+			}()
+			// Engage downstream by sending PULL_DATA.
+			go func() {
+				var token byte
+				initial := make(chan struct{}, 1)
+				initial <- struct{}{}
+				ticker := time.NewTicker((1 << 6) * test.Delay)
+				for {
+					select {
+					case <-ctx.Done():
+						ticker.Stop()
+						return
+					case <-ticker.C:
+					case <-initial:
+					}
+					token++
+					pull := encoding.Packet{
+						GatewayEUI:      types.MustEUI64(ids.Eui),
+						ProtocolVersion: encoding.Version1,
+						Token:           [2]byte{0x01, token},
+						PacketType:      encoding.PullData,
+					}
+					buf, err := pull.MarshalBinary()
+					if err != nil {
+						cancel(err)
+						return
+					}
+					if _, err := downConn.Write(buf); err != nil {
+						cancel(err)
+						return
+					}
+				}
+			}()
+			// Read downstream; PULL_RESP and PULL_ACK.
+			go func() {
+				var buf [65507]byte
+				for {
+					n, err := downConn.Read(buf[:])
+					if err != nil {
+						cancel(err)
+						return
+					}
+					packetBuf := make([]byte, n)
+					copy(packetBuf, buf[:])
+					var packet encoding.Packet
+					if err := packet.UnmarshalBinary(packetBuf); err != nil {
+						cancel(err)
+						return
+					}
+					switch packet.PacketType {
+					case encoding.PullResp:
+						msg, err := encoding.ToDownlinkMessage(packet.Data.TxPacket)
+						if err != nil {
+							cancel(err)
+							return
+						}
+						downCh <- &ttnpb.GatewayDown{
+							DownlinkMessage: msg,
+						}
+					}
+				}
+			}()
+			<-ctx.Done()
+			time.Sleep((1 << 9) * test.Delay) // Ensure that connection expires.
+			return ctx.Err()
+		},
+	})
+}
 
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+// TestRawData tests the raw data input and output of the UDP frontend.
+// This includes garbage data, connection state, and the timing of downlink scheduling.
+// This test is complementary to the generic TestFrontend.
+func TestRawData(t *testing.T) {
+	var (
+		registeredGatewayID = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
+		timeout             = (1 << 4) * test.Delay
+		testConfig          = Config{
+			PacketHandlers:      2,
+			PacketBuffer:        10,
+			DownlinkPathExpires: 8 * timeout,
+			ConnectionExpires:   20 * timeout,
+			ScheduleLateTime:    0,
+		}
+	)
+
+	a, ctx := test.New(t)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
