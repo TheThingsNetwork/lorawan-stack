@@ -57,29 +57,33 @@ const Panel = ({
   shortCutLinkTarget,
   shortCutLinkDisabled,
 }) => (
-  <div className={classnames(styles.panel, className)}>
-    <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
-      <div className="d-flex gap-cs-xs al-center overflow-hidden">
-        {icon && <Icon icon={icon} className={classnames(styles.panelHeaderIcon, iconClassName)} />}
-        {title && <Message content={title} className={styles.panelHeaderTitle} />}
-        {messageDecorators}
+  <div className={classnames(styles.panel, { [styles.panelNoTitle]: !title }, className)}>
+    {title && (
+      <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
+        <div className="d-flex gap-cs-xs al-center overflow-hidden">
+          {icon && (
+            <Icon icon={icon} className={classnames(styles.panelHeaderIcon, iconClassName)} />
+          )}
+          {title && <Message content={title} className={styles.panelHeaderTitle} />}
+          {messageDecorators}
+        </div>
+        {toggleOptions ? (
+          <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
+        ) : (
+          shortCutLinkTitle && (
+            <Link
+              primary
+              to={shortCutLinkPath}
+              className={styles.button}
+              target={shortCutLinkTarget}
+              disabled={shortCutLinkDisabled}
+            >
+              <Message content={shortCutLinkTitle} /> →
+            </Link>
+          )
+        )}
       </div>
-      {toggleOptions ? (
-        <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
-      ) : (
-        shortCutLinkTitle && (
-          <Link
-            primary
-            to={shortCutLinkPath}
-            className={styles.button}
-            target={shortCutLinkTarget}
-            disabled={shortCutLinkDisabled}
-          >
-            <Message content={shortCutLinkTitle} /> →
-          </Link>
-        )
-      )}
-    </div>
+    )}
     {divider && <hr className={styles.panelDivider} />}
     {children}
   </div>
