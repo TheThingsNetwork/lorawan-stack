@@ -17,12 +17,7 @@ import classnames from 'classnames'
 import { FormattedNumber, defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
-import Icon, {
-  IconArrowsSort,
-  IconDownlink,
-  IconUplink,
-  IconBroadcast,
-} from '@ttn-lw/components/icon'
+import Icon, { IconArrowsSort, IconBroadcast } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Tooltip from '@ttn-lw/components/tooltip'

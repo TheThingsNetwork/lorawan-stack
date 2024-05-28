@@ -259,6 +259,8 @@ export default defineMessages({
     'Without choosing a frequency plan, packets from the gateway will not be correctly processed',
   furtherResources: 'Further resources',
   gateway: 'Gateway',
+  gatewayDeleted: 'Gateway deleted',
+  gatewayDeleteError: 'Gateway delete error',
   gatewayOverview: 'Gateway overview',
   gatewayDescDescription:
     'Optional gateway description; can also be used to save notes about the gateway',

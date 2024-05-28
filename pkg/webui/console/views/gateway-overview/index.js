@@ -1,4 +1,4 @@
-// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,142 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
-import { defineMessages } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import React from 'react'
 import { useSelector } from 'react-redux'
 
-import tts from '@console/api/tts'
-
-import { IconFileDownload } from '@ttn-lw/components/icon'
-import Button from '@ttn-lw/components/button'
-import DataSheet from '@ttn-lw/components/data-sheet'
-import toast from '@ttn-lw/components/toast'
-
-import Message from '@ttn-lw/lib/components/message'
-import DateTime from '@ttn-lw/lib/components/date-time'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import GatewayMap from '@console/components/gateway-map'
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
+import GatewayMapPanel from '@console/components/gateway-map-panel'
 
 import GatewayOverviewHeader from '@console/containers/gateway-overview-header'
-import GatewayEvents from '@console/containers/gateway-events'
-import GatewayTitleSection from '@console/containers/gateway-title-section'
-import TopEntitiesDashboardPanel from '@console/containers/top-entities-dashboard-panel'
-import NotificationsDashboardPanel from '@console/containers/notifications-dashboard-panel'
-import DocumentationDashboardPanel from '@console/containers/documentation-dashboard-panel'
-import ShortcutPanel from '@console/containers/shortcut-panel'
 
 import Require from '@console/lib/components/require'
 
-import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import {
-  mayViewGatewayInfo,
-  mayViewGatewayConfJson,
-  checkFromState,
-} from '@console/lib/feature-checks'
+import { mayViewGatewayInfo } from '@console/lib/feature-checks'
 
 import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
-const m = defineMessages({
-  globalConf: 'Global configuration',
-  globalConfUnavailable: 'Unavailable for gateways without frequency plan',
-})
-
 const GatewayOverview = () => {
-  const { gtwId } = useParams()
-  const mayViewGatewayConf = useSelector(state => checkFromState(mayViewGatewayConfJson, state))
   const gateway = useSelector(selectSelectedGateway)
-  const { ids, description, created_at, updated_at, frequency_plan_ids, gateway_server_address } =
-    gateway
-
-  const handleGlobalConfDownload = useCallback(async () => {
-    try {
-      const globalConf = await tts.Gateways.getGlobalConf(gtwId)
-      const globalConfDataUri = composeDataUri(JSON.stringify(globalConf, undefined, 2))
-      downloadDataUriAsFile(globalConfDataUri, 'global_conf.json')
-    } catch (err) {
-      toast({
-        title: sharedMessages.globalConfFailed,
-        message: sharedMessages.globalConfFailedMessage,
-        type: toast.types.ERROR,
-      })
-    }
-  }, [gtwId])
-
-  const sheetData = [
-    {
-      header: sharedMessages.generalInformation,
-      items: [
-        {
-          key: sharedMessages.gatewayID,
-          value: gtwId,
-          type: 'code',
-          sensitive: false,
-        },
-        {
-          key: sharedMessages.gatewayEUI,
-          value: ids.eui,
-          type: 'byte',
-          sensitive: false,
-        },
-        {
-          key: sharedMessages.gatewayDescription,
-          value: description || <Message content={sharedMessages.none} />,
-        },
-        {
-          key: sharedMessages.createdAt,
-          value: <DateTime value={created_at} />,
-        },
-        {
-          key: sharedMessages.updatedAt,
-          value: <DateTime value={updated_at} />,
-        },
-        {
-          key: sharedMessages.gatewayServerAddress,
-          value: gateway_server_address,
-          type: 'code',
-          sensitive: false,
-        },
-      ],
-    },
-  ]
-
-  const lorawanInfo = {
-    header: sharedMessages.lorawanInformation,
-    items: [
-      {
-        key: sharedMessages.frequencyPlan,
-        value:
-          frequency_plan_ids.length !== 0 ? (
-            <Message content={frequency_plan_ids.join(' , ')} />
-          ) : undefined,
-      },
-    ],
-  }
-
-  if (mayViewGatewayConf) {
-    lorawanInfo.items.push({
-      key: m.globalConf,
-      value:
-        frequency_plan_ids.length !== 0 ? (
-          <Button
-            type="button"
-            icon={IconFileDownload}
-            onClick={handleGlobalConfDownload}
-            message={sharedMessages.downloadGlobalConf}
-            secondary
-          />
-        ) : (
-          <Message content={m.globalConfUnavailable} className="c-text-neutral-light" />
-        ),
-    })
-  }
-
-  sheetData.push(lorawanInfo)
 
   return (
     <Require featureCheck={mayViewGatewayInfo} otherwise={{ redirect: '/' }}>
@@ -164,7 +48,7 @@ const GatewayOverview = () => {
           <BlurryNetworkActivityPanel />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+          <GatewayMapPanel gateway={gateway} />
         </div>
       </div>
     </Require>

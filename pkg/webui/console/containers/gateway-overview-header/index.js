@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
@@ -34,12 +34,15 @@ import Message from '@ttn-lw/lib/components/message'
 import LastSeen from '@console/components/last-seen'
 
 import GatewayConnection from '@console/containers/gateway-connection'
+import DeleteGatewayModal from '@console/containers/delete-gateway-modal'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
+
+import { checkFromState, mayDeleteGateway } from '@console/lib/feature-checks'
 
 import {
   ADD_BOOKMARK_BASE,
@@ -60,6 +63,8 @@ const m = defineMessages({
 })
 
 const GatewayOverviewHeader = ({ gateway }) => {
+  const [deleteGatewayVisible, setDeleteGatewayVisible] = useState(false)
+
   const dispatch = useDispatch()
   const { ids, name, created_at } = gateway
   const { gateway_id } = ids
@@ -69,6 +74,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
   const deleteBookmarkLoading = useSelector(state =>
     selectFetchingEntry(state, DELETE_BOOKMARK_BASE),
   )
+  const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
 
   const isBookmarked = useMemo(
     () => bookmarks.map(b => b.entity_ids?.gateway_ids?.gateway_id).some(b => b === gateway_id),
@@ -112,11 +118,17 @@ const GatewayOverviewHeader = ({ gateway }) => {
     }
   }, [gateway_id])
 
+  const handleOpenDeleteGatewayModal = useCallback(() => {
+    setDeleteGatewayVisible(true)
+  }, [])
+
   const menuDropdownItems = (
     <>
       <Dropdown.Item title={sharedMessages.downloadGlobalConf} action={handleGlobalConfDownload} />
-      <Dropdown.Item title={m.duplicateGateway} action={() => {}} />
-      <Dropdown.Item title={sharedMessages.deleteGateway} action={() => {}} />
+      {/* <Dropdown.Item title={m.duplicateGateway} action={() => {}} />*/}
+      {mayDeleteGtw && (
+        <Dropdown.Item title={sharedMessages.deleteGateway} action={handleOpenDeleteGatewayModal} />
+      )}
     </>
   )
 
@@ -158,6 +170,12 @@ const GatewayOverviewHeader = ({ gateway }) => {
             dropdownPosition="below left"
           />
         </div>
+        <DeleteGatewayModal
+          gtwId={gateway_id}
+          gtwName={name}
+          setVisible={setDeleteGatewayVisible}
+          visible={deleteGatewayVisible}
+        />
       </div>
     </div>
   )

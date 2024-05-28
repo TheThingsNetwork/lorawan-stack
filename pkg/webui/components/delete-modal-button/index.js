@@ -76,7 +76,7 @@ const DeleteModalButton = props => {
         title: sharedMessages.deleteModalConfirmDeletion,
         approveButtonProps: {
           disabled: shouldConfirm && confirmId !== entityId,
-          icon: { IconTrash },
+          icon: IconTrash,
           primary: true,
           message,
         },
