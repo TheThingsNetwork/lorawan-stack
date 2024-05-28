@@ -331,11 +331,11 @@ func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnp
 	gsMetrics.statusReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerForwardStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string) {
+func registerForwardStatus(ctx context.Context, _ *ttnpb.Gateway, _ *ttnpb.GatewayStatus, host string) {
 	gsMetrics.statusForwarded.WithLabelValues(ctx, host).Inc()
 }
 
-func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string, err error) {
+func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, _ *ttnpb.GatewayStatus, host string, err error) {
 	events.Publish(evtDropStatus.NewWithIdentifiersAndData(ctx, gtw, err))
 	errorLabel := unknown
 	if ttnErr, ok := errors.From(err); ok {
@@ -349,12 +349,12 @@ func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.G
 	gsMetrics.uplinkReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.GatewayUplinkMessage, host string) {
+func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, _ *ttnpb.GatewayUplinkMessage, host string) {
 	events.Publish(evtForwardUp.NewWithIdentifiersAndData(ctx, gtw, host))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, host).Inc()
 }
 
-func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.GatewayUplinkMessage, host string, err error) {
+func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, _ *ttnpb.GatewayUplinkMessage, host string, err error) {
 	events.Publish(evtDropUp.NewWithIdentifiersAndData(ctx, gtw, err))
 	errorLabel := unknown
 	if ttnErr, ok := errors.From(err); ok {
@@ -393,12 +393,12 @@ func registerReceiveTxAck(ctx context.Context, gtw *ttnpb.Gateway, txAck *ttnpb.
 	gsMetrics.txAckReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerForwardTxAck(ctx context.Context, gtw *ttnpb.Gateway, txAck *ttnpb.TxAcknowledgment, host string) {
+func registerForwardTxAck(ctx context.Context, gtw *ttnpb.Gateway, _ *ttnpb.TxAcknowledgment, host string) {
 	events.Publish(evtForwardTxAck.NewWithIdentifiersAndData(ctx, gtw, host))
 	gsMetrics.txAckForwarded.WithLabelValues(ctx, host).Inc()
 }
 
-func registerDropTxAck(ctx context.Context, gtw *ttnpb.Gateway, txAck *ttnpb.TxAcknowledgment, host string, err error) {
+func registerDropTxAck(ctx context.Context, gtw *ttnpb.Gateway, _ *ttnpb.TxAcknowledgment, host string, err error) {
 	events.Publish(evtDropTxAck.NewWithIdentifiersAndData(ctx, gtw, err))
 	errorLabel := unknown
 	if ttnErr, ok := errors.From(err); ok {
