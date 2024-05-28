@@ -56,10 +56,9 @@ type mockISGatewayRegistry struct {
 	ttnpb.UnimplementedGatewayAccessServer
 	ttnpb.UnimplementedGatewayBatchAccessServer
 	gateways      map[string]*ttnpb.Gateway
+	gatewayEUIs   map[types.EUI64]*ttnpb.GatewayIdentifiers
 	gatewayAuths  map[string][]string
 	gatewayRights map[string]authKeyToRights
-
-	registeredGateway *ttnpb.GatewayIdentifiers
 
 	mu sync.Mutex
 }
@@ -67,16 +66,10 @@ type mockISGatewayRegistry struct {
 func newGatewayRegistry() *mockISGatewayRegistry {
 	return &mockISGatewayRegistry{
 		gateways:      make(map[string]*ttnpb.Gateway),
+		gatewayEUIs:   make(map[types.EUI64]*ttnpb.GatewayIdentifiers),
 		gatewayAuths:  make(map[string][]string),
 		gatewayRights: make(map[string]authKeyToRights),
 	}
-}
-
-func (is *mockISGatewayRegistry) SetRegisteredGateway(gtwIDs *ttnpb.GatewayIdentifiers) {
-	is.mu.Lock()
-	defer is.mu.Unlock()
-
-	is.registeredGateway = gtwIDs
 }
 
 func (is *mockISGatewayRegistry) Add(
@@ -91,6 +84,10 @@ func (is *mockISGatewayRegistry) Add(
 
 	uid := unique.ID(ctx, ids)
 	is.gateways[uid] = gtw
+
+	if eui := types.MustEUI64(ids.Eui); eui != nil {
+		is.gatewayEUIs[*eui] = ids
+	}
 
 	var bearerKey string
 	if key != "" {
@@ -226,11 +223,9 @@ func (is *mockISGatewayRegistry) GetIdentifiersForEUI(
 	is.mu.Lock()
 	defer is.mu.Unlock()
 
-	if is.registeredGateway == nil {
+	gtw, ok := is.gatewayEUIs[types.MustEUI64(req.Eui).OrZero()]
+	if !ok {
 		return nil, errNotFound.New()
 	}
-	if types.MustEUI64(req.Eui).OrZero().Equal(types.MustEUI64(is.registeredGateway.Eui).OrZero()) {
-		return is.registeredGateway, nil
-	}
-	return nil, errNotFound.New()
+	return gtw, nil
 }

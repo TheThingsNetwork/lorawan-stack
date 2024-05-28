@@ -68,10 +68,12 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 
 	is, isAddr, closeIS := mockis.New(ctx)
 	defer closeIS()
-	is.GatewayRegistry().SetRegisteredGateway(&ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
 		Eui:       registeredGatewayEUI.Bytes(),
-	})
+	}
+	gtw := mockis.DefaultGateway(ids, true, true)
+	is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, gtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -165,10 +167,6 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	}
 
 	statCh := make(chan *ttnpbv2.StatusMessage)
-	ids := &ttnpb.GatewayIdentifiers{
-		GatewayId: registeredGatewayID,
-		Eui:       registeredGatewayEUI.Bytes(),
-	}
 	go link(ctx, ids, registeredGatewayKey, statCh)
 
 	for _, tc := range []struct {
