@@ -169,7 +169,7 @@ const OrganizationsTable = () => {
           align: 'center',
           render: deviceCount =>
             typeof deviceCount !== 'number' ? (
-              <Spinner micro center inline after={100} className="c-subtle-gray" />
+              <Spinner micro center inline after={100} className="c-text-neutral-light" />
             ) : (
               deviceCount
             ),
