@@ -21,6 +21,8 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import style from './gateway-status-panel.styl'
+
 const m = defineMessages({
   frequencyRange: '{minFreq} - {maxFreq}MHz',
 })
@@ -79,7 +81,7 @@ const DutyCycleUtilization = ({ index, gatewayStats, band }) => {
 
   return (
     <div
-      className={classNames('d-flex al-center j-between fs-s xxs:direction-column xxs:al-start', {
+      className={classNames(style.gtwStatusPanelDutyCycle, {
         'mb-cs-m': index !== gatewayStats.sub_bands.length - 1,
         'mt-cs-l': index === 0,
       })}

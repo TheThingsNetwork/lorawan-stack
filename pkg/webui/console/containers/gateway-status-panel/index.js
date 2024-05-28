@@ -171,7 +171,7 @@ const GatewayStatusPanel = () => {
           <Message content={sharedMessages.fetching} />
         </Spinner>
       ) : (
-        <div className="d-flex gap-ls-xl j-between md:gap-cs-l xs:direction-column xs:j-start">
+        <div className={style.gtwStatusPanelUpperContainer}>
           <div className="d-flex direction-column j-between w-full">
             <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
             <div>
@@ -202,7 +202,7 @@ const GatewayStatusPanel = () => {
           <Message content={sharedMessages.fetching} />
         </Spinner>
       ) : (
-        <div className="d-flex gap-ls-xl j-between md:gap-cs-m">
+        <div className={style.gtwStatusPanelLowerContainer}>
           <div className="w-full">
             <div>
               <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />

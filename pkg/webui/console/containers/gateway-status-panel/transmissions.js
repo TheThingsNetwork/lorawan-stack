@@ -28,6 +28,8 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import style from './gateway-status-panel.styl'
+
 const m = defineMessages({
   statusLabel: 'Up and running for {days} days',
   statusRecieved: 'Status received',
@@ -49,7 +51,7 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
   const showStatus = Boolean(gatewayStats?.last_status_received_at)
   return (
     <>
-      <div className="d-flex al-center j-between gap-cs-m mb-cs-m mt-cs-l xs:direction-column xs:al-start xs:gap-cs-xxs fs-s">
+      <div className={style.gtwStatusPanelTransmissions}>
         <div className="d-flex al-center gap-cs-xxs">
           <Icon icon={IconUplink} className="c-text-neutral-semilight" />
           {!showUplink ? (
@@ -71,7 +73,7 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
           />
         )}
       </div>
-      <div className="d-flex al-center j-between mb-cs-m gap-cs-m xs:direction-column xs:al-start xs:gap-cs-xxs fs-s">
+      <div className={style.gtwStatusPanelTransmissions}>
         <div className="d-flex al-center gap-cs-xxs">
           <Icon icon={IconDownlink} className="c-text-neutral-semilight" />
           {!showDownlink ? (
@@ -102,7 +104,7 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
           />
         )}
       </div>
-      <div className="d-flex al-center j-between gap-cs-m xs:direction-column xs:al-start xs:gap-cs-xxs fs-s">
+      <div className={style.gtwStatusPanelTransmissions}>
         <div className="d-flex al-center gap-cs-xxs fw-bold">
           {isUnavailable ? (
             <>

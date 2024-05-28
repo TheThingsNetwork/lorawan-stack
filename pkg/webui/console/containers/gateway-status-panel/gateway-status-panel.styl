@@ -13,6 +13,25 @@
 // limitations under the License.
 
 .gtw-status-panel
+  &-upper-container
+    display: flex
+    gap: $ls.xl
+    justify-content: space-between
+
+    +media-query($bp.md)
+      gap: $cs.l
+    +media-query($bp.xs)
+      flex-direction: column
+      justify-content: start
+
+  &-lower-container
+    display: flex
+    gap: $ls.xl
+    justify-content: space-between
+
+    +media-query($bp.md)
+      gap: $cs.m
+
   &-icon
     background-color: var(--c-bg-error-light)
     color: var(--c-text-error-normal)
@@ -64,3 +83,54 @@
       font-weight: $fw.bold
       width: fit-content
       border-radius: $br.s
+
+  &-transmissions
+    display: flex
+    align-items: center
+    justify-content: space-between
+    gap: $cs.m
+    margin-bottom: $cs.m
+    margin-top: $cs.l
+    font-size: $fs.s
+
+    &:first-child
+      margin-top: 0
+
+    &:last-child
+      margin-bottom: 0
+
+    +media-query($bp.xs)
+      flex-direction: column
+      align-items: start
+      gap: $cs.xxs
+
+  &-duty-cycle
+    display: flex
+    align-items: center
+    justify-content: space-between
+    gap: $cs.m
+    font-size: $fs.s
+
+    +media-query($bp.xxs)
+      flex-direction: column
+      align-items: start
+
+@container panel (max-width: 485px)
+  .gtw-status-panel-upper-container
+    gap: $cs.l
+    flex-direction: column
+    justify-content: start
+
+  .gtw-status-panel-lower-container
+    gap: $cs.m
+
+  .gtw-status-panel-transmissions
+    flex-direction: column
+    align-items: start
+    gap: $cs.xxs
+
+@container panel (max-width: 385px)
+  .gtw-status-panel-duty-cycle
+    flex-direction: column
+    align-items: start
+    gap: $cs.xs
