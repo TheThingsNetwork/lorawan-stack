@@ -47,15 +47,16 @@ const m = defineMessages({
   protocol: 'Protocol {protocol}',
   roundTripTimes: 'Roundtrip times (ms)',
   roundTripTimesTooltip:
-    'The roundtrip times express the latency between the gateway and The Things Stack. The displayed values show the longest (P95 to account for outliers) and shortest roundtrip durations as well as the median observed in the last 20 downlink operations. The round trip times can give you insight into how well and steady a connection to the gateway is.',
+    '<b>What is this?</b>{lineBreak}The roundtrip times express the latency between the gateway and The Things Stack.{lineBreak}The displayed values show the longest (P95 to account for outliers) and shortest roundtrip durations as well as the median observed in the last 20 downlink operations.{lineBreak}The roundtrip times can give you insight into how well and steady a connection to the gateway is.',
   transmissions: 'Connection stats',
   transmissionsTooltip:
-    'In this section you can find information about the uplink and downlink count since the last reconnect of the gateway. The downlink count also tracks the number of acknowledged downlinks. It also contains information about when the last gateway status has been received, which is sent periodically depending on your gateway type and configuration.',
+    '<b>What is this?</b>{lineBreak}Information about the uplink and downlink count since the last reconnect of the gateway. The downlink count also tracks the number of confirmed downlinks. It also contains information about when the last gateway status has been received, which is sent periodically or once on first connection depending on your gateway type.',
   dutyCycleUtilization: 'Duty cycle utilization',
   dutyCycleUtilizationTooltip:
-    'In this section you can find the duty cycle utilization of this gateway per sub-band. All network traffic has to be in accordance with local regulations that govern the maximum usage of radio transmissions per frequency in a given time-frame. The listing allows you to inspect how much of this allowance has been exhausted already. Once utilization is exhausted, you are required by law to cease transmissions by this gateway.',
+    '<b>What is this?</b>{lineBreak}The utilization of this gateway per sub-band.{lineBreak}All network traffic has to be in accordance with local regulations that govern the maximum usage of radio transmissions per frequency in a given time-frame. The listing allows you to inspect how much of this allowance has been exhausted already. Once utilization is exhausted, transmissions are suspended automatically by the gateway server.',
   uptime: '30 day uptime',
-  uptimeTooltip: 'The uptime of the gateway in the last 30 days.',
+  uptimeTooltip:
+    '<b>What is this?</b>{lineBreak}The 30 day uptime expresses the relative amount of time that the gateway has been connected to the gateway server in the last 30 days.',
   noRoundtrip: 'This gateway doesn’t have recent downlinks and cannot display the roundtrip time.',
   noDutyCycle:
     'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.',
@@ -65,8 +66,18 @@ const m = defineMessages({
 const SectionTitle = ({ title, tooltip }) => (
   <div>
     <Message content={title} className="fw-bold" />
-    <Tooltip content={<Message content={tooltip} />}>
-      <Icon icon={IconInfoCircle} className={style.gtwStatusPanelTooltip} />
+    <Tooltip
+      content={
+        <Message
+          content={tooltip}
+          values={{
+            lineBreak: <br />,
+            b: chunks => <b>{chunks}</b>,
+          }}
+        />
+      }
+    >
+      <Icon icon={IconInfoCircle} small className={style.gtwStatusPanelTooltip} />
     </Tooltip>
   </div>
 )
