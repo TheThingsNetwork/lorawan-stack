@@ -134,7 +134,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		},
 	})
 	gsConfig := &gatewayserver.Config{
-		RequireRegisteredGateways:         false,
+		RequireRegisteredGateways:         true,
 		UpdateGatewayLocationDebounceTime: 0,
 		UpdateConnectionStatsInterval:     (1 << 4) * test.Delay,
 		ConnectionStatsTTL:                (1 << 6) * test.Delay,
