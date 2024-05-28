@@ -18,7 +18,13 @@ import classnames from 'classnames'
 import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
-import Icon, { IconInfoCircle, IconFileDownload, IconTrash } from '@ttn-lw/components/icon'
+import Icon, {
+  IconInfoCircle,
+  IconFileDownload,
+  IconTrash,
+  IconPlayerPlay,
+  IconPlayerPause,
+} from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Routes from '@ttn-lw/components/switch'
 
@@ -103,7 +109,7 @@ const Events = React.memo(
                   message={paused ? sharedMessages.resume : sharedMessages.pause}
                   naked
                   warning={paused}
-                  icon={paused ? 'play_arrow' : 'pause'}
+                  icon={paused ? IconPlayerPlay : IconPlayerPause}
                 />
                 <Button onClick={onClear} message={sharedMessages.clear} naked icon={IconTrash} />
               </div>

@@ -160,7 +160,7 @@ const OrganizationForm = props => {
           <Message
             content={m.gatewayFanoutNotificationsDescription}
             component="p"
-            className="mt-cs-xs tc-subtle-gray"
+            className="mt-cs-xs c-text-neutral-light"
           />
         </>
       )}
