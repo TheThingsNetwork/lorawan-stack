@@ -102,7 +102,7 @@ const Message = ({
     const contentWithMarkdown = formatMessage(content, vals)
     return renderContent(
       reactStringReplace(contentWithMarkdown, /`([^`[]+)`/g, (match, i) => (
-        <code key={i}>{match}</code>
+        <code key={`${match}-${i}`}>{match}</code>
       )),
       component,
       rest,
