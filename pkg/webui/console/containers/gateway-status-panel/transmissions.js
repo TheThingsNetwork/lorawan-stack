@@ -20,6 +20,7 @@ import Icon, {
   IconUplink,
   IconHeartRateMonitor,
   IconX,
+  IconClockCheck,
 } from '@ttn-lw/components/icon'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -37,6 +38,7 @@ const m = defineMessages({
   noDownlinks: 'No downlinks yet',
   noStatus: 'No status',
   noDataYet: 'No data yet',
+  established: 'Established',
 })
 
 const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
@@ -49,6 +51,8 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
     (typeof gatewayStats?.downlink_count === 'string' && gatewayStats?.downlink_count !== 0)
   const showDownlinkTime = Boolean(gatewayStats?.last_downlink_received_at)
   const showStatus = Boolean(gatewayStats?.last_status_received_at)
+  const showConnectionEstablished = Boolean(gatewayStats?.connected_at)
+
   return (
     <>
       <div className={style.gtwStatusPanelTransmissions}>
@@ -135,6 +139,17 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
           />
         )}
       </div>
+      {showConnectionEstablished && (
+        <div className={style.gtwStatusPanelTransmissions}>
+          <div className="d-flex al-center gap-cs-xxs">
+            <Icon icon={IconClockCheck} className="c-text-neutral-semilight" />
+            <Message content={m.established} className="fw-bold" />
+          </div>
+          {showUplinkTime && (
+            <DateTime.Relative value={gatewayStats.connected_at} relativeTimeStyle="short" />
+          )}
+        </div>
+      )}
     </>
   )
 }
@@ -147,6 +162,7 @@ Transmissions.propTypes = {
     last_uplink_received_at: PropTypes.string,
     tx_acknowledgment_count: PropTypes.number,
     uplink_count: PropTypes.number,
+    connected_at: PropTypes.string,
   }),
   isDisconnected: PropTypes.bool.isRequired,
   isUnavailable: PropTypes.bool.isRequired,
