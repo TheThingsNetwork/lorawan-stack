@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -76,7 +76,7 @@ func (*lbsLNS) GetRouterConfig(
 	// In the future, we should disable time transfers permanently
 	// to gateways that signal the presence of a PPS.
 	// References https://github.com/lorabasics/basicstation/issues/135.
-	ws.UpdateSessionTimeSync(ctx, true)
+	semtechws.UpdateSessionTimeSync(ctx, true)
 	cfg, err := pfconfig.GetRouterConfig(ctx, bandID, fps, version, time.Now(), antennaGain)
 	if err != nil {
 		return ctx, nil, nil, err

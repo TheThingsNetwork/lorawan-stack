@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ws_test
+package semtechws_test
 
 import (
 	"context"
@@ -31,8 +31,8 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/lbslns"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -63,12 +63,12 @@ func (c *mockClock) GetTimestamp() uint32 {
 // GetXTime returns the timestamp in the LoRa Basics Station `xtime` format for the given time.
 func (c *mockClock) GetXTimeForTime(t time.Time) int64 {
 	ts := uint32(int64(c.startTimeStamp) + t.Sub(c.startTime).Microseconds())
-	return int64(c.sessionID)<<48 | int64(ts)&ws.XTime48BitLSBMask
+	return int64(c.sessionID)<<48 | int64(ts)&semtechws.XTime48BitLSBMask
 }
 
 // GetXTime returns the timestamp in the LoRa Basics Station `xtime` format for the given timestamp.
 func (c *mockClock) GetXTimeForTimestamp(ts uint32) int64 {
-	return int64(c.sessionID)<<48 | int64(ts)&ws.XTime48BitLSBMask
+	return int64(c.sessionID)<<48 | int64(ts)&semtechws.XTime48BitLSBMask
 }
 
 var testRights = []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO, ttnpb.Right_RIGHT_GATEWAY_LINK}
@@ -83,7 +83,7 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 	panic("could not connect to peer")
 }
 
-func withServer(t *testing.T, wsConfig ws.Config, rateLimitConf config.RateLimiting, f func(t *testing.T, is *mockis.MockDefinition, serverAddress string)) {
+func withServer(t *testing.T, wsConfig semtechws.Config, rateLimitConf config.RateLimiting, f func(t *testing.T, is *mockis.MockDefinition, serverAddress string)) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
@@ -112,7 +112,7 @@ func withServer(t *testing.T, wsConfig ws.Config, rateLimitConf config.RateLimit
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c, is)
 
-	web, err := ws.New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), wsConfig)
+	web, err := semtechws.New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), wsConfig)
 	if err != nil {
 		t.FailNow()
 	}

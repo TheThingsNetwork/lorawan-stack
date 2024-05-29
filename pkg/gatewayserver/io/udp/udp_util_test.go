@@ -35,6 +35,7 @@ import (
 	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -107,7 +108,10 @@ func generateTxAck(eui types.EUI64, err encoding.TxError) encoding.Packet {
 }
 
 func expectAck(t *testing.T, conn net.Conn, expect bool, packetType encoding.PacketType, token [2]byte) {
-	var buf [65507]byte
+	var (
+		timeout = (1 << 4) * test.Delay
+		buf     [65507]byte
+	)
 	conn.SetReadDeadline(time.Now().Add(timeout))
 	n, err := conn.Read(buf[:])
 	if err != nil {
@@ -132,8 +136,12 @@ func expectAck(t *testing.T, conn net.Conn, expect bool, packetType encoding.Pac
 }
 
 func expectConnection(t *testing.T, server mock.Server, connections *sync.Map, eui types.EUI64, expectNew bool) *io.Connection {
-	a := assertions.New(t)
-	var conn *io.Connection
+	t.Helper()
+	var (
+		timeout = (1 << 4) * test.Delay
+		a       = assertions.New(t)
+		conn    *io.Connection
+	)
 	select {
 	case conn = <-server.Connections():
 		if !a.So(expectNew, should.BeTrue) {

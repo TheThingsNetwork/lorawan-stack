@@ -20,8 +20,8 @@ import (
 	"testing"
 
 	"github.com/smarty/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/id6"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -38,7 +38,7 @@ func TestDiscover(t *testing.T) {
 			Eui:       eui.Bytes(),
 		},
 	}
-	info := ws.ServerInfo{
+	info := semtechws.ServerInfo{
 		Scheme:  "wss",
 		Address: "thethings.example.com:8887",
 	}

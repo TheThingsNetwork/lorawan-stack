@@ -18,8 +18,8 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -31,7 +31,7 @@ type UDPConfig struct {
 
 // BasicStationConfig defines the LoRa Basics Station configuration of the Gateway Server.
 type BasicStationConfig struct {
-	ws.Config               `name:",squash"`
+	semtechws.Config        `name:",squash"`
 	MaxValidRoundTripDelay  time.Duration `name:"max-valid-round-trip-delay" description:"Maximum valid round trip delay to qualify for RTT calculations"`
 	FallbackFrequencyPlanID string        `name:"fallback-frequency-plan-id" description:"Fallback frequency plan ID for non-registered gateways"`
 	Listen                  string        `name:"listen" description:"Address for the Basic Station frontend to listen on"`

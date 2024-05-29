@@ -21,8 +21,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/packetbroker"
 )
 
@@ -64,7 +64,7 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 		PublicTLSAddress: fmt.Sprintf("%s:8882", shared.DefaultPublicHost),
 	},
 	BasicStation: gatewayserver.BasicStationConfig{
-		Config:                 ws.DefaultConfig,
+		Config:                 semtechws.DefaultConfig,
 		MaxValidRoundTripDelay: 10 * time.Second,
 		Listen:                 ":1887",
 		ListenTLS:              ":8887",

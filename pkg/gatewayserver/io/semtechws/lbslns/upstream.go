@@ -26,8 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/id6"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -159,8 +159,8 @@ func (tsr TimeSyncRequest) MarshalJSON() ([]byte, error) {
 func (tsr TimeSyncRequest) Response(t time.Time) TimeSyncResponse {
 	return TimeSyncResponse{
 		TxTime:  tsr.TxTime,
-		GPSTime: ws.TimeToGPSTime(t),
-		MuxTime: ws.TimeToUnixSeconds(t),
+		GPSTime: semtechws.TimeToGPSTime(t),
+		MuxTime: semtechws.TimeToUnixSeconds(t),
 	}
 }
 
@@ -219,9 +219,9 @@ func (req *JoinRequest) toUplinkMessage(
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
 
-	timestamp := ws.TimestampFromXTime(req.RadioMetaData.UpInfo.XTime)
-	tm := ws.TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime)
-	gpsTime := ws.TimePtrFromGPSTime(req.UpInfo.GPSTime)
+	timestamp := semtechws.TimestampFromXTime(req.RadioMetaData.UpInfo.XTime)
+	tm := semtechws.TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime)
+	gpsTime := semtechws.TimePtrFromGPSTime(req.UpInfo.GPSTime)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   ids,
@@ -292,7 +292,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 
 	rxMetadata := up.RxMetadata[0]
-	rxTime, gpsTime := ws.TimePtrToUpInfoTime(ttnpb.StdTime(rxMetadata.Time))
+	rxTime, gpsTime := semtechws.TimePtrToUpInfoTime(ttnpb.StdTime(rxMetadata.Time))
 	req.RadioMetaData = RadioMetaData{
 		DataRate:  int(drIdx),
 		Frequency: up.Settings.GetFrequency(),
@@ -377,9 +377,9 @@ func (updf *UplinkDataFrame) toUplinkMessage(
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
 
-	timestamp := ws.TimestampFromXTime(updf.RadioMetaData.UpInfo.XTime)
-	gpsTime := ws.TimePtrFromGPSTime(updf.UpInfo.GPSTime)
-	tm := ws.TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
+	timestamp := semtechws.TimestampFromXTime(updf.RadioMetaData.UpInfo.XTime)
+	gpsTime := semtechws.TimePtrFromGPSTime(updf.UpInfo.GPSTime)
+	tm := semtechws.TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   ids,
@@ -463,7 +463,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	}
 
 	rxMetadata := up.RxMetadata[0]
-	rxTime, gpsTime := ws.TimePtrToUpInfoTime(ttnpb.StdTime(rxMetadata.Time))
+	rxTime, gpsTime := semtechws.TimePtrToUpInfoTime(ttnpb.StdTime(rxMetadata.Time))
 
 	updf.RadioMetaData = RadioMetaData{
 		DataRate:  int(drIdx),
@@ -510,7 +510,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		if refTimeUnix == 0.0 {
 			return
 		}
-		refTime := ws.TimeFromUnixSeconds(refTimeUnix)
+		refTime := semtechws.TimeFromUnixSeconds(refTimeUnix)
 		delta := receivedAt.Sub(refTime)
 		logger := logger.WithFields(log.Fields(
 			"delta", delta,
@@ -532,12 +532,12 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			return nil
 		}
 		return &io.FrontendClockSynchronization{
-			Timestamp:  ws.TimestampFromXTime(xTime),
+			Timestamp:  semtechws.TimestampFromXTime(xTime),
 			ServerTime: receivedAt,
 			// RxTime is an undocumented field with unspecified precision.
 			// Using 0.0 for RxTime here means that the GatewayTime is nil and is not used for syncing the gateway clock.
-			GatewayTime:      ws.TimePtrFromUpInfo(gpsTime, 0.0),
-			ConcentratorTime: ws.ConcentratorTimeFromXTime(xTime),
+			GatewayTime:      semtechws.TimePtrFromUpInfo(gpsTime, 0.0),
+			ConcentratorTime: semtechws.ConcentratorTimeFromXTime(xTime),
 		}
 	}
 	recordTime := func(refTimeUnix float64, xTime int64, gpsTime int64) *io.FrontendClockSynchronization {
@@ -583,7 +583,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			logger.WithError(err).Warn("Failed to parse join request")
 			return nil, err
 		}
-		ws.UpdateSessionID(ctx, ws.SessionIDFromXTime(jreq.UpInfo.XTime))
+		semtechws.UpdateSessionID(ctx, semtechws.SessionIDFromXTime(jreq.UpInfo.XTime))
 		ct := recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime)
 		if err := conn.HandleUp(up, ct); err != nil {
 			logger.WithError(err).Warn("Failed to handle upstream message")
@@ -604,7 +604,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			logger.WithError(err).Warn("Failed to parse uplink message")
 			return nil, err
 		}
-		ws.UpdateSessionID(ctx, ws.SessionIDFromXTime(updf.UpInfo.XTime))
+		semtechws.UpdateSessionID(ctx, semtechws.SessionIDFromXTime(updf.UpInfo.XTime))
 		ct := recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime)
 		if err := conn.HandleUp(up, ct); err != nil {
 			logger.WithError(err).Warn("Failed to handle upstream message")
@@ -623,7 +623,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 			logger.WithError(err).Warn("Failed to handle tx ack message")
 			return nil, err
 		}
-		ws.UpdateSessionID(ctx, ws.SessionIDFromXTime(txConf.XTime))
+		semtechws.UpdateSessionID(ctx, semtechws.SessionIDFromXTime(txConf.XTime))
 		// Transmission confirmation messages do not contain a RefTime, and cannot be used for
 		// RTT computations. The GPS timestamp is present only if the downlink is a class
 		// B downlink. We allow clock synchronization to occur only if GPSTime is present.
@@ -634,7 +634,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		// If the gateway sends a `timesync` request, it means that it has access to a PPS
 		// source. As such, there is no point in doing time transfers with this particular
 		// gateway.
-		ws.UpdateSessionTimeSync(ctx, false)
+		semtechws.UpdateSessionTimeSync(ctx, false)
 		var req TimeSyncRequest
 		if err := json.Unmarshal(raw, &req); err != nil {
 			return nil, err

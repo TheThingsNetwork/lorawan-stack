@@ -27,7 +27,7 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/id6"
 )
 
 var emptyClientCert = []byte{0x00, 0x00, 0x00, 0x00}
