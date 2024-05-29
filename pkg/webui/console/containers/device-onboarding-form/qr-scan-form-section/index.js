@@ -171,7 +171,7 @@ const DeviceQRScanFormSection = () => {
               buttonMessage: m.resetQRCodeData,
               children: <Message content={m.resetConfirm} component="span" />,
               approveButtonProps: {
-                icon: { IconX },
+                icon: IconX,
               },
             }}
           />

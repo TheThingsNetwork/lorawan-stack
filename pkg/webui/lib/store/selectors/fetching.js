@@ -16,7 +16,7 @@
 
 const selectFetchingStore = state => state.ui.fetching
 
-const selectFetchingEntry = (state, id) => selectFetchingStore(state)[id] || false
+export const selectFetchingEntry = (state, id) => selectFetchingStore(state)[id] || false
 
 /**
  * @example

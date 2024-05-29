@@ -19,9 +19,6 @@ const messages = defineMessages({
   basicDescription: 'General settings, gateway updates and metadata',
   lorawanDescription: 'LoRaWAN network-layer settings',
   updateSuccess: 'Gateway updated',
-  deleteSuccess: 'Gateway deleted',
-  deleteFailure: 'Gateway delete error',
-  deleteGateway: 'Delete gateway',
   modalWarning:
     'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID.',
   disablePacketBrokerForwarding:

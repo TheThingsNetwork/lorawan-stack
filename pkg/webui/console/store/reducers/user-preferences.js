@@ -16,6 +16,7 @@ import { fillIntoArray, pageToIndices } from '@console/store/utils'
 
 import {
   ADD_BOOKMARK_SUCCESS,
+  DELETE_BOOKMARK_SUCCESS,
   GET_ALL_BOOKMARKS_SUCCESS,
   GET_BOOKMARKS_LIST_SUCCESS,
 } from '@console/store/actions/user-preferences'
@@ -86,9 +87,24 @@ const userPreferences = (state = initialState, { type, payload }) => {
         ...state,
         bookmarks: {
           ...state.bookmarks,
+          bookmarks: [...state.bookmarks.bookmarks, payload],
           totalCount: {
             ...state.bookmarks.totalCount,
             totalCount: state.bookmarks.totalCount.totalCount + 1,
+          },
+        },
+      }
+    case DELETE_BOOKMARK_SUCCESS:
+      return {
+        ...state,
+        bookmarks: {
+          ...state.bookmarks,
+          bookmarks: [...state.bookmarks.bookmarks].filter(
+            b => b.entity_ids[`${payload.name}_ids`][`${payload.name}_id`] !== payload.id,
+          ),
+          totalCount: {
+            ...state.bookmarks.totalCount,
+            totalCount: state.bookmarks.totalCount.totalCount - 1,
           },
         },
       }

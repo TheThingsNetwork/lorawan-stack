@@ -192,7 +192,9 @@ const deleteBookmarkLogic = createRequestLogic({
       payload: { userId, entity },
     } = action
 
-    return await tts.Users.deleteBookmark(userId, entity)
+    await tts.Users.deleteBookmark(userId, entity)
+
+    return entity
   },
 })
 

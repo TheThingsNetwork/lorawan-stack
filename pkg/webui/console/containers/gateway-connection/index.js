@@ -17,7 +17,7 @@ import classnames from 'classnames'
 import { FormattedNumber, defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
-import Icon, { IconHelp, IconDownlink, IconUplink } from '@ttn-lw/components/icon'
+import Icon, { IconArrowsSort, IconBroadcast } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Tooltip from '@ttn-lw/components/tooltip'
@@ -57,6 +57,7 @@ const m = defineMessages({
     'This gateway is connected to an external Gateway Server that is not handling messages for this cluster. You will hence not be able to see any activity from this gateway.',
   messageCountTooltip:
     'The amount of received uplinks and sent downlinks of this gateway since the last (re)connect. Note that some gateway types reconnect frequently causing the counter to be reset.',
+  upAndDown: '{up} up / {down} down',
 })
 
 const GatewayConnection = props => {
@@ -140,24 +141,23 @@ const GatewayConnection = props => {
           status="bad"
           message={sharedMessages.disconnected}
           lastSeen={statistics.disconnected_at}
-          flipped
-        >
-          <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
-        </LastSeen>
+          className="c-text-neutral-semilight"
+        />
       )
     } else if (statusIndicator === 'good' && hasLastSeen) {
-      node = (
-        <LastSeen lastSeen={lastSeen} flipped>
-          <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
-        </LastSeen>
-      )
+      node = <LastSeen lastSeen={lastSeen} className="c-text-neutral-semilight" />
     } else {
       node = (
-        <Status className={style.status} status={statusIndicator} label={message} flipped>
-          <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
-        </Status>
+        <Status className={classnames(style.status)} status={statusIndicator} label={message} />
       )
     }
+
+    const resultNode = (
+      <div className="d-inline-flex al-center gap-cs-xxs">
+        <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
+        {node}
+      </div>
+    )
 
     if (tooltipMessage) {
       return (
@@ -165,12 +165,12 @@ const GatewayConnection = props => {
           docPath={docPath}
           docTitle={docTitle}
           content={<Message content={tooltipMessage} />}
-          children={node}
+          children={resultNode}
         />
       )
     }
 
-    return node
+    return resultNode
   }, [error, fetching, isOtherCluster, lastSeen, statistics])
 
   const messages = useMemo(() => {
@@ -186,24 +186,26 @@ const GatewayConnection = props => {
 
     return (
       <Tooltip content={<Message content={m.messageCountTooltip} />}>
-        <div className={style.messages}>
-          <span className={style.messageCount}>
-            <Icon className={style.icon} icon={IconUplink} />
-            <FormattedNumber value={uplinkCount} />
-          </span>
-          <span className={style.messageCount}>
-            <Icon className={style.icon} icon={IconDownlink} />
-            <FormattedNumber value={downlinkCount} />
-          </span>
+        <div className="d-flex al-center gap-cs-xxs">
+          <Icon small className="c-text-neutral-semilight" icon={IconArrowsSort} />
+          <Message
+            component="span"
+            content={m.upAndDown}
+            className="c-text-neutral-semilight"
+            values={{
+              up: <FormattedNumber value={uplinkCount} />,
+              down: <FormattedNumber value={downlinkCount} />,
+            }}
+          />
         </div>
       </Tooltip>
     )
   }, [statistics])
 
   return (
-    <div className={classnames(className, style.container)}>
-      {messages}
+    <div className={classnames(className, 'd-flex', 'al-center', 'gap-cs-m')}>
       {status}
+      {messages}
     </div>
   )
 }

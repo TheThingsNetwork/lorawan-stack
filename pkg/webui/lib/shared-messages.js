@@ -161,6 +161,7 @@ export default defineMessages({
   defineRights: 'Define rights',
   delayWarning:
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
+  deleteGateway: 'Delete gateway',
   deleteModalConfirmDeletion: 'Confirm deletion',
   deleteModalConfirmMessage: 'Please enter <pre>{entityId}</pre> to confirm the deletion.',
   deleteModalDefaultMessage:
@@ -199,6 +200,7 @@ export default defineMessages({
   downlinkAck: 'Downlink ack',
   downlinkFailed: 'Downlink failed',
   downlinkFrameCount: 'Downlink frame count',
+  downloadGlobalConf: 'Download global_conf.json',
   downlinkNack: 'Downlink nack',
   downlinkPush: 'Downlink push',
   downlinkQueueInvalidated: 'Downlink queue invalidated',
@@ -258,6 +260,8 @@ export default defineMessages({
     'Without choosing a frequency plan, packets from the gateway will not be correctly processed',
   furtherResources: 'Further resources',
   gateway: 'Gateway',
+  gatewayDeleted: 'Gateway deleted',
+  gatewayDeleteError: 'Gateway delete error',
   gatewayOverview: 'Gateway overview',
   gatewayDescDescription:
     'Optional gateway description; can also be used to save notes about the gateway',
@@ -286,6 +290,9 @@ export default defineMessages({
   generateAPIKeyCups: 'Generate API key for CUPS',
   generateAPIKeyLNS: 'Generate API key for LNS',
   getSupport: 'Get support',
+  globalConfFailed: 'Failed to download global_conf.json',
+  globalConfFailedMessage:
+    'An unknown error occurred and the global_conf.json could not be downloaded',
   grantAdminStatus: 'Grant this user admin status',
   grpcService: 'GRPC service',
   gsServerAddressDescription: 'The address of the Gateway Server to connect to',
