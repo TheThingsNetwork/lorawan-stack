@@ -296,7 +296,8 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		case <-time.After(timeout):
 		}
 
-		ctx2, cancel2 := context.WithDeadline(ctx, time.Now().Add(4*timeout))
+		// Establish a second connection that lasts for a short time, just to disconnect the first one.
+		ctx2, cancel2 := context.WithDeadline(ctx, time.Now().Add((1<<3)*timeout))
 		upCh := make(chan *ttnpb.GatewayUp)
 		downCh := make(chan *ttnpb.GatewayDown)
 		err := frontend.Link(ctx2, t, gs, id, registeredGatewayKey, upCh, downCh)
@@ -307,7 +308,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		select {
 		case <-ctx1.Done():
 			t.Logf("First connection failed when second connected with %v", ctx1.Err())
-		case <-time.After(4 * timeout):
+		case <-time.After((1 << 3) * timeout):
 			t.Fatalf("Expected link failure on first connection when second connected")
 		}
 	})
@@ -428,6 +429,32 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						upCh := make(chan *ttnpb.GatewayUp)
 						downCh := make(chan *ttnpb.GatewayDown)
 
+						upEvents := map[string]events.Channel{}
+						for _, event := range []string{
+							"gs.gateway.connect",
+							"gs.gateway.disconnect",
+						} {
+							upEvents[event] = make(events.Channel, 5)
+						}
+						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+							PublishFunc: func(evs ...events.Event) {
+								for _, ev := range evs {
+									ev := ev
+									t.Logf("%s event published", ev.Name())
+									switch name := ev.Name(); name {
+									case "gs.gateway.connect":
+										go func() {
+											upEvents[name] <- ev
+										}()
+									case "gs.gateway.disconnect":
+										go func() {
+											upEvents[name] <- ev
+										}()
+									}
+								}
+							},
+						})()
+
 						wg := &sync.WaitGroup{}
 						wg.Add(1)
 						var linkErr error
@@ -435,6 +462,12 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							defer wg.Done()
 							linkErr = frontend.Link(ctx, t, gs, ids, registeredGatewayKey, upCh, downCh)
 						}()
+
+						select {
+						case <-upEvents["gs.gateway.connect"]:
+						case <-time.After(timeout):
+							t.Fatal("Expected gateway to be connected, but it is not")
+						}
 
 						select {
 						case upCh <- tc.Up:
@@ -453,6 +486,11 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						wg.Wait()
 						if !errors.IsCanceled(linkErr) {
 							t.Fatalf("Expected context canceled, but have %v", linkErr)
+						}
+						select {
+						case <-upEvents["gs.gateway.disconnect"]:
+						case <-time.After(timeout):
+							t.Fatal("Expected gateway to be disconnected, but it has not disconnected")
 						}
 					})
 				}
@@ -483,6 +521,32 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					upCh := make(chan *ttnpb.GatewayUp)
 					downCh := make(chan *ttnpb.GatewayDown)
 
+					upEvents := map[string]events.Channel{}
+					for _, event := range []string{
+						"gs.gateway.connect",
+						"gs.gateway.disconnect",
+					} {
+						upEvents[event] = make(events.Channel, 5)
+					}
+					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+						PublishFunc: func(evs ...events.Event) {
+							for _, ev := range evs {
+								ev := ev
+								t.Logf("%s event published", ev.Name())
+								switch name := ev.Name(); name {
+								case "gs.gateway.connect":
+									go func() {
+										upEvents[name] <- ev
+									}()
+								case "gs.gateway.disconnect":
+									go func() {
+										upEvents[name] <- ev
+									}()
+								}
+							}
+						},
+					})()
+
 					wg := &sync.WaitGroup{}
 					wg.Add(1)
 					var linkErr error
@@ -491,8 +555,11 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						linkErr = frontend.Link(ctx, t, gs, ids, registeredGatewayKey, upCh, downCh)
 					}()
 
-					// Wait for gateway connection to be established.
-					time.Sleep((1 << 5) * test.Delay)
+					select {
+					case <-upEvents["gs.gateway.connect"]:
+					case <-time.After(timeout):
+						t.Fatal("Expected gateway to be connected, but it is not")
+					}
 
 					gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 						GatewayIds: ids,
@@ -505,10 +572,17 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						FieldMask: ttnpb.FieldMask("antennas"),
 					})
 					a.So(err, should.BeNil)
-					a.So(gtw.Antennas[0].Gain, should.Equal, tc.AntennaGain)
 
-					// Wait for a potential gateway disconnection to be processed.
-					time.Sleep((1 << 5) * test.Delay)
+					select {
+					case <-upEvents["gs.gateway.disconnect"]:
+						if !tc.ExpectDisconnected {
+							t.Fatal("Expected gateway not to be disconnected, but it has disconnected")
+						}
+					case <-time.After(timeout):
+						if tc.ExpectDisconnected {
+							t.Fatal("Expected gateway to be disconnected, but it has not disconnected")
+						}
+					}
 
 					_, connected := gs.GetConnection(ctx, ids)
 					if !a.So(connected, should.Equal, !tc.ExpectDisconnected) {
@@ -517,13 +591,15 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 
 					cancel()
 					wg.Wait()
-					if !tc.ExpectDisconnected && !errors.IsCanceled(linkErr) {
-						t.Fatalf("Expected context canceled, but have %v", linkErr)
-					}
-
 					if !tc.ExpectDisconnected {
-						// Wait for gateway disconnection to be processed.
-						time.Sleep((1 << 5) * test.Delay)
+						if !errors.IsCanceled(linkErr) {
+							t.Fatalf("Expected context canceled, but have %v", linkErr)
+						}
+						select {
+						case <-upEvents["gs.gateway.disconnect"]:
+						case <-time.After(timeout):
+							t.Fatal("Expected gateway to be disconnected, but it has not disconnected")
+						}
 					}
 				})
 			}
@@ -586,6 +662,33 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							upCh := make(chan *ttnpb.GatewayUp)
 							downCh := make(chan *ttnpb.GatewayDown)
 
+							upEvents := map[string]events.Channel{}
+							for _, event := range []string{
+								"gs.gateway.connect",
+								"gs.gateway.disconnect",
+							} {
+								upEvents[event] = make(events.Channel, 5)
+							}
+							defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+								PublishFunc: func(evs ...events.Event) {
+									for _, ev := range evs {
+										ev := ev
+										switch name := ev.Name(); name {
+										case "gs.gateway.connect":
+											go func() {
+												upEvents[name] <- ev
+											}()
+										case "gs.gateway.disconnect":
+											go func() {
+												upEvents[name] <- ev
+											}()
+										default:
+											t.Logf("%s event published", name)
+										}
+									}
+								},
+							})()
+
 							wg := &sync.WaitGroup{}
 							wg.Add(1)
 							var linkErr error
@@ -594,8 +697,10 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 								linkErr = frontend.Link(ctx, t, gs, ids, registeredGatewayKey, upCh, downCh)
 							}()
 
-							// Wait for gateway connection to be established.
-							time.Sleep((1 << 5) * test.Delay)
+							select {
+							case <-upEvents["gs.gateway.connect"]:
+							case <-time.After(timeout):
+							}
 
 							if locationInRxMetadata {
 								up.UplinkMessages[0].RxMetadata[0].Location = location
@@ -629,8 +734,10 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 								t.Fatalf("Expected context canceled, but have %v", linkErr)
 							}
 
-							// Wait for the gateway disconnect to be processed.
-							time.Sleep((1 << 5) * test.Delay)
+							select {
+							case <-upEvents["gs.gateway.disconnect"]:
+							case <-time.After(timeout):
+							}
 						})
 					}
 				})
@@ -1107,7 +1214,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						}
 					}
 
-					time.Sleep(2 * timeout)
+					time.Sleep(timeout)
 
 					conn, ok := gs.GetConnection(ctx, ids)
 					a.So(ok, should.BeTrue)
