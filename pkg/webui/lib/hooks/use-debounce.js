@@ -25,7 +25,7 @@ const useDebounce = (value, delay = 350, sideEffects) => {
     const timer = setTimeout(() => {
       setDebouncedValue(value)
       if (sideEffects) {
-        sideEffects()
+        sideEffects(value)
       }
     }, delay)
 

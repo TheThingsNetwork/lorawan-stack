@@ -83,7 +83,9 @@ const Gateway = () => {
   const hasGateway = Boolean(gateway)
 
   return (
-    <RequireRequest requestAction={initialFetch}>{hasGateway && <GatewayInner />}</RequireRequest>
+    <RequireRequest requestAction={initialFetch} requestOnChange>
+      {hasGateway && <GatewayInner />}
+    </RequireRequest>
   )
 }
 

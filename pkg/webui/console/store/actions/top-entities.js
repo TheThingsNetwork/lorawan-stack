@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.overlay
-  visibility: hidden
-  opacity: 0
-  position: absolute
-  min-width: 100%
-  min-height: 100%
-  height: 100%
-  top: 0
-  left: 0
-  background: var(--c-bg-neutral-min)
-  transition: opacity $ad.m ease-in-out $ad.l, visibility $ad.m ease-in-out
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
-  &-visible
-    visibility: visible
-    opacity: .85
-    z-index: $zi.overlay
-
-  &-wrapper
-    position: relative
-
-  &-spinner
-    z-index: $zi.overlay + 1
+export const GET_TOP_ENTITIES_BASE = 'GET_TOP_ENTITIES'
+export const [
+  {
+    request: GET_TOP_ENTITIES,
+    success: GET_TOP_ENTITIES_SUCCESS,
+    failure: GET_TOP_ENTITIES_FAILURE,
+  },
+  { request: getTopEntities, success: getTopEntitiesSuccess, failure: getTopEntitiesFailure },
+] = createRequestActions(GET_TOP_ENTITIES_BASE, params => ({ ...params }))

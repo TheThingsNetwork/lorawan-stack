@@ -24,7 +24,6 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 import EntityTitleSection from '@console/components/entity-title-section'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/collaborators'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 
@@ -37,11 +36,16 @@ import {
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
-import { selectOrganizationById } from '@console/store/selectors/organizations'
+import {
+  selectSelectedOrganization,
+  selectSelectedOrganizationId,
+} from '@console/store/selectors/organizations'
 
 const { Content } = EntityTitleSection
 
-const OrganizationTitleSection = ({ orgId }) => {
+const OrganizationTitleSection = () => {
+  const organization = useSelector(selectSelectedOrganization)
+  const orgId = useSelector(selectSelectedOrganizationId)
   const apiKeysTotalCount = useSelector(selectApiKeysTotalCount)
   const collaboratorsTotalCount = useSelector(state =>
     selectCollaboratorsTotalCount(state, { id: orgId }),
@@ -52,7 +56,6 @@ const OrganizationTitleSection = ({ orgId }) => {
   const mayViewApiKeys = useSelector(state =>
     checkFromState(mayViewOrEditOrganizationApiKeys, state),
   )
-  const organization = useSelector(state => selectOrganizationById(state, orgId))
 
   const loadData = useCallback(
     async dispatch => {
@@ -96,10 +99,6 @@ const OrganizationTitleSection = ({ orgId }) => {
       </EntityTitleSection>
     </RequireRequest>
   )
-}
-
-OrganizationTitleSection.propTypes = {
-  orgId: PropTypes.string.isRequired,
 }
 
 export default OrganizationTitleSection

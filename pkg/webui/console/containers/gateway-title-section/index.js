@@ -26,7 +26,6 @@ import EntityTitleSection from '@console/components/entity-title-section'
 import GatewayConnection from '@console/containers/gateway-connection'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/collaborators'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 
@@ -39,11 +38,13 @@ import {
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
-import { selectGatewayById } from '@console/store/selectors/gateways'
+import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 const { Content } = EntityTitleSection
 
-const GatewayTitleSection = ({ gtwId }) => {
+const GatewayTitleSection = () => {
+  const gateway = useSelector(selectSelectedGateway)
+  const gtwId = useSelector(selectSelectedGatewayId)
   const apiKeysTotalCount = useSelector(selectApiKeysTotalCount)
   const collaboratorsTotalCount = useSelector(state =>
     selectCollaboratorsTotalCount(state, { id: gtwId }),
@@ -52,7 +53,6 @@ const GatewayTitleSection = ({ gtwId }) => {
     checkFromState(mayViewOrEditGatewayCollaborators, state),
   )
   const mayViewApiKeys = useSelector(state => checkFromState(mayViewOrEditGatewayApiKeys, state))
-  const gateway = useSelector(state => selectGatewayById(state, gtwId))
 
   const bottomBarLeft = <GatewayConnection gtwId={gtwId} />
   const bottomBarRight = (
@@ -105,10 +105,6 @@ const GatewayTitleSection = ({ gtwId }) => {
       </EntityTitleSection>
     </RequireRequest>
   )
-}
-
-GatewayTitleSection.propTypes = {
-  gtwId: PropTypes.string.isRequired,
 }
 
 export default GatewayTitleSection

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,6 +65,8 @@ import packetBroker from './packet-broker'
 import ns from './network-server'
 import notifications from './notifications'
 import userPreferences from './user-preferences'
+import topEntities from './top-entities'
+import search from './search'
 
 export default combineReducers({
   user,
@@ -125,4 +127,6 @@ export default combineReducers({
   searchAccounts,
   notifications,
   userPreferences,
+  search,
+  topEntities,
 })

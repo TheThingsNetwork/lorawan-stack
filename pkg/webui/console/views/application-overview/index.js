@@ -74,7 +74,7 @@ const ApplicationOverview = () => {
       <div className={style.titleSection}>
         <div className="container container--lg p-vert-0">
           <IntlHelmet title={sharedMessages.overview} />
-          <ApplicationTitleSection appId={appId} />
+          <ApplicationTitleSection />
         </div>
       </div>
       <div className="container container--lg grid">

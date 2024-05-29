@@ -16,10 +16,14 @@ import { createLogic } from 'redux-logic'
 import { defineMessage } from 'react-intl'
 
 import tts from '@console/api/tts'
+import { END_DEVICE } from '@console/constants/entities'
 
 import toast from '@ttn-lw/components/toast'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
+
+import { trackEntityAccess } from '@console/lib/frequently-visited-entities'
 
 import * as devices from '@console/store/actions/devices'
 import * as deviceTemplateFormats from '@console/store/actions/device-template-formats'
@@ -49,6 +53,7 @@ const getDeviceLogic = createRequestLogic({
       meta: { selector },
     } = action
     const dev = await tts.Applications.Devices.getById(appId, deviceId, selector)
+    trackEntityAccess(END_DEVICE, combineDeviceIds(appId, deviceId))
     dispatch(devices.startDeviceEventsStream(dev.ids))
 
     return dev

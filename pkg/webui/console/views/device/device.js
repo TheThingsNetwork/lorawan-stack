@@ -113,7 +113,7 @@ const Device = () => {
       <div className={style.titleSection}>
         <div className="container container--lg grid p-vert-0">
           <div className="item-12">
-            <DeviceTitleSection appId={appId} devId={devId}>
+            <DeviceTitleSection>
               <Tabs className={style.tabs} narrow tabs={tabs} />
             </DeviceTitleSection>
           </div>
