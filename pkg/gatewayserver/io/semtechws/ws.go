@@ -96,7 +96,7 @@ func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config)
 
 	router := w.RootRouter()
 	router.Use(
-		ratelimit.HTTPMiddleware(server.RateLimiter(), "gs:accept:ws"),
+		ratelimit.HTTPMiddleware(server.RateLimiter(), "gs:accept:"+s.Protocol()),
 	)
 
 	eps := s.formatter.Endpoints()

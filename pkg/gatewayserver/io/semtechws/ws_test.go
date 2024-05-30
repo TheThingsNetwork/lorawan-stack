@@ -1800,7 +1800,7 @@ func TestRateLimit(t *testing.T) {
 				Name:         "accept connections",
 				MaxPerMin:    maxRate,
 				MaxBurst:     maxRate,
-				Associations: []string{"gs:accept:ws"},
+				Associations: []string{"gs:accept:semtechws/lbslns"},
 			}},
 		}
 		withServer(t, defaultConfig, conf, func(t *testing.T, _ *mockis.MockDefinition, serverAddress string) {
