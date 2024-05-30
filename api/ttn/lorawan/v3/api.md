@@ -371,6 +371,9 @@
   - [Service `Gs`](#ttn.lorawan.v3.Gs)
   - [Service `GtwGs`](#ttn.lorawan.v3.GtwGs)
   - [Service `NsGs`](#ttn.lorawan.v3.NsGs)
+- [File `ttn/lorawan/v3/gatewaytokens.proto`](#ttn/lorawan/v3/gatewaytokens.proto)
+  - [Message `GatewayToken`](#ttn.lorawan.v3.GatewayToken)
+  - [Message `GatewayToken.Payload`](#ttn.lorawan.v3.GatewayToken.Payload)
 - [File `ttn/lorawan/v3/identifiers.proto`](#ttn/lorawan/v3/identifiers.proto)
   - [Message `ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers)
   - [Message `ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers)
@@ -5666,6 +5669,26 @@ The NsGs service connects a Network Server to a Gateway Server.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ScheduleDownlink` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) | [`ScheduleDownlinkResponse`](#ttn.lorawan.v3.ScheduleDownlinkResponse) | Instructs the Gateway Server to schedule a downlink message. The Gateway Server may refuse if there are any conflicts in the schedule or if a duty cycle prevents the gateway from transmitting. |
+
+## <a name="ttn/lorawan/v3/gatewaytokens.proto">File `ttn/lorawan/v3/gatewaytokens.proto`</a>
+
+### <a name="ttn.lorawan.v3.GatewayToken">Message `GatewayToken`</a>
+
+GatewayToken is a special auth token used by cluster components to authenticate on behalf of gateways.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key_id` | [`string`](#string) |  | ID of the key used to hash the token. |
+| `payload` | [`GatewayToken.Payload`](#ttn.lorawan.v3.GatewayToken.Payload) |  |  |
+| `checksum` | [`bytes`](#bytes) |  | Checksum of the payload to verify the authenticity of the caller. |
+
+### <a name="ttn.lorawan.v3.GatewayToken.Payload">Message `GatewayToken.Payload`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `rights` | [`Rights`](#ttn.lorawan.v3.Rights) |  |  |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 ## <a name="ttn/lorawan/v3/identifiers.proto">File `ttn/lorawan/v3/identifiers.proto`</a>
 
