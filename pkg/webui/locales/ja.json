@@ -123,7 +123,6 @@
   "account.views.validate.index.tokenNotFoundTitle": "トークンが見つかりませんでした",
   "account.views.validate.index.tokenNotFoundMessage": "検証トークンが見つかりませんでした。これは、連絡先情報がすでに検証されていることを意味している可能性があります。そうでない場合は、管理者に連絡してください",
   "components.collapse.index.collapse": "折りたたむ",
-  "components.collapse.index.expand": "拡げる",
   "components.file-input.index.selectAFile": "ファイルを選択...",
   "components.file-input.index.changeFile": "ファイルの変更…",
   "components.file-input.index.noFileSelected": "選択されたファイルはありません",

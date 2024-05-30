@@ -123,7 +123,6 @@
   "account.views.validate.index.tokenNotFoundTitle": "Token not found",
   "account.views.validate.index.tokenNotFoundMessage": "The validation token was not found. This could mean that the contact info has already been validated or the token has been invalidated. Re-request another validation and if the error persists, please contact an administrator.",
   "components.collapse.index.collapse": "Collapse",
-  "components.collapse.index.expand": "Expand",
   "components.file-input.index.selectAFile": "Select a file…",
   "components.file-input.index.changeFile": "Change file…",
   "components.file-input.index.noFileSelected": "No file selected",

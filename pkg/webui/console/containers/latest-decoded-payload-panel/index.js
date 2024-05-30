@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { forOwn, isObject, throttle } from 'lodash'
 
-import Icon, { IconCodeDots, IconArrowsMaximize, IconX, IconCopy } from '@ttn-lw/components/icon'
+import Icon, {
+  IconCodeDots,
+  IconArrowsMaximize,
+  IconX,
+  IconCopy,
+  IconCopyCheck,
+} from '@ttn-lw/components/icon'
 import Panel, { PanelError } from '@ttn-lw/components/panel'
 import CodeEditor from '@ttn-lw/components/code-editor'
 import Button from '@ttn-lw/components/button'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
-import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -61,22 +66,33 @@ const findKey = (obj, keyToFind) => {
 const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
   const [latestEvent, setLatestEvent] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
+  const [copied, setCopied] = useState(false)
+
+  const _timer = useRef(null)
 
   const throttledSetLatestEvent = useCallback(
     throttle(newEvent => setLatestEvent(newEvent), 10000),
     [],
   )
 
+  useEffect(
+    () => () => {
+      clearTimeout(_timer.current)
+    },
+    [],
+  )
+
   useEffect(() => {
-    const normalizedEvents = events
-      .map(e => ({
-        eventId: e.unique_id,
-        time: e.time,
-        decodedPayload: findKey(e.data, 'decoded_payload'),
-      }))
-      .filter(e => !!e.decodedPayload)
-    if (normalizedEvents.length > 0) {
-      throttledSetLatestEvent(normalizedEvents[0])
+    if (!events.length) return
+
+    const firstEventWithPayload = events.find(e => findKey(e.data, 'decoded_payload'))
+
+    if (firstEventWithPayload) {
+      throttledSetLatestEvent({
+        eventId: firstEventWithPayload.unique_id,
+        time: firstEventWithPayload.time,
+        decodedPayload: findKey(firstEventWithPayload.data, 'decoded_payload'),
+      })
     }
   }, [events, throttledSetLatestEvent])
 
@@ -88,20 +104,22 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
     setSelectedEvent(null)
   }, [])
 
-  const handleCopy = useCallback(() => {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(JSON.stringify(selectedEvent?.decodedPayload)).then(() => {
-        toast({
-          title: m.success,
-          message: sharedMessages.copiedToClipboard,
-          type: toast.types.SUCCESS,
-        })
-      })
+  const handleCopyClick = useCallback(() => {
+    if (copied) {
+      return
     }
-  }, [selectedEvent])
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(JSON.stringify(selectedEvent?.decodedPayload, null, 2))
+    }
+    setCopied(true)
+
+    _timer.current = setTimeout(() => {
+      setCopied(false)
+    }, 3000)
+  }, [copied, selectedEvent])
 
   const getContent = useCallback(
-    (event, maxLines = 8, minLines = undefined) => (
+    (event, maxLines = 8, minLines = 3) => (
       <>
         <div className="d-flex j-between pt-cs-m pb-cs-m">
           <Message
@@ -136,9 +154,8 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
       title={m.latestDecodedPayload}
       icon={IconCodeDots}
       shortCutLinkTitle={m.seeInLiveData}
-      shortCutLinkPath={`${shortCutLinkPath}?eventId=${latestEvent?.eventId}`}
+      shortCutLinkPath={`${shortCutLinkPath}${latestEvent ? `?eventId=${latestEvent?.eventId}` : ''}`}
       className={style.panel}
-      shortCutLinkDisabled={!latestEvent}
     >
       {latestEvent ? (
         <div className="pos-relative">
@@ -150,7 +167,12 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
             className={style.maximize}
             onClick={handleOpenMaximizeCodeModal}
           />
-          <PortalledModal visible={selectedEvent} noTitleLine noControlLine>
+          <PortalledModal
+            visible={selectedEvent}
+            noTitleLine
+            noControlBar
+            className={style.modalBody}
+          >
             <div className="w-full">
               <div className="d-flex j-between al-center mb-cs-xl gap-cs-m">
                 <div className="d-flex gap-cs-xs al-center overflow-hidden">
@@ -164,9 +186,9 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
               <div className="d-flex j-center al-center gap-cs-m pt-cs-xl">
                 <Button
                   secondary
-                  icon={IconCopy}
-                  message={sharedMessages.copy}
-                  onClick={handleCopy}
+                  icon={copied ? IconCopyCheck : IconCopy}
+                  message={copied ? sharedMessages.copiedToClipboard : sharedMessages.copy}
+                  onClick={handleCopyClick}
                 />
                 <Button
                   secondary
