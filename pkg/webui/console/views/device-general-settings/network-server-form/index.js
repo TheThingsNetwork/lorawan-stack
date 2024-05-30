@@ -290,7 +290,8 @@ const NetworkServerForm = React.memo(props => {
       // If the nbTrans values are not overridden, remove them from the payload.
       if (
         'dynamic' in values.mac_settings?.adr &&
-        !('_override_nb_trans_defaults' in values.mac_settings?.adr.dynamic)
+        (!values.mac_settings?.adr.dynamic._override_nb_trans_defaults ||
+          values.mac_settings?.adr.dynamic._use_default_nb_trans)
       ) {
         const { max_nb_trans, min_nb_trans, ...rest } = parsedValues.mac_settings?.adr.dynamic
         parsedValues = {
