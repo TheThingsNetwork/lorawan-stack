@@ -71,7 +71,10 @@ const ApplicationOverview = () => {
           <BlurryNetworkActivityPanel />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <LatestDecodedPayloadPanel events={events} />
+          <LatestDecodedPayloadPanel
+            events={events}
+            shortCutLinkPath={`/applications/${appId}/data`}
+          />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <RequireRequest

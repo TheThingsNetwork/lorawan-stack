@@ -17,18 +17,40 @@
   display: flex
   flex-direction: column
 
-  .source
-    color: var(--c-text-neutral-light)
-    font-size: $fsv2.s
-    font-weight: $fw.bold
+  .maximize
+    position: absolute
+    right: $cs.s
+    top: $cs.xxl
+    z-index: $zi.slight
 
-  .received
-    color: var(--c-text-neutral-light)
-    font-size: $fsv2.s
-    font-weight: $fw.bold
-    text-transform: uppercase
+.source
+  color: var(--c-text-neutral-light)
+  font-size: $fsv2.s
+  font-weight: $fw.bold
 
-  .received-status > span
-    display: none
+.received
+  color: var(--c-text-neutral-light)
+  font-size: $fsv2.s
+  font-weight: $fw.bold
+  text-transform: uppercase
+
+.received-status > span
+  display: none
 
 
+
+.header-title
+  font-weight: $fwv2.bold
+  font-size: $fsv2.l
+  white-space: nowrap
+  text-overflow: ellipsis
+  overflow: hidden
+
+.header-icon
+  font-size: $fs.xl
+  min-width: $cs.l
+  background-color: var(--c-bg-brand-extralight)
+  padding: $cs.xs
+  border-radius: $br.l
+  color: var(--c-bg-brand-normal)
+  font-variation-settings: 'FILL' 1

@@ -36,6 +36,7 @@ const Modal = props => {
     buttonMessage,
     title,
     subtitle,
+    noControlLine,
     noTitleLine,
     children,
     message,
@@ -179,10 +180,12 @@ const Modal = props => {
           )}
           {title && !noTitleLine && <div className={style.line} />}
           <div className={classnames(className, style.body)}>{children || messageElement}</div>
-          <div className={style.controlBar}>
-            <div>{bottomLineElement}</div>
-            {buttons}
-          </div>
+          {!noControlLine && (
+            <div className={style.controlBar}>
+              <div>{bottomLineElement}</div>
+              {buttons}
+            </div>
+          )}
         </RootComponent>
       </RemoveScroll>
     </FocusLock>
@@ -208,6 +211,7 @@ Modal.propTypes = {
   message: PropTypes.message,
   method: PropTypes.string,
   name: PropTypes.string,
+  noControlLine: PropTypes.bool,
   noTitleLine: PropTypes.bool,
   onComplete: PropTypes.func,
   subtitle: PropTypes.message,
@@ -225,6 +229,7 @@ Modal.defaultProps = {
   logo: undefined,
   message: undefined,
   method: undefined,
+  noControlLine: false,
   noTitleLine: false,
   onComplete: () => null,
   inline: false,

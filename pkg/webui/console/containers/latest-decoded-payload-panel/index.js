@@ -16,9 +16,12 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { forOwn, isObject, throttle } from 'lodash'
 
-import { IconCodeDots } from '@ttn-lw/components/icon'
+import Icon, { IconCodeDots, IconArrowsMaximize, IconX, IconCopy } from '@ttn-lw/components/icon'
 import Panel, { PanelError } from '@ttn-lw/components/panel'
 import CodeEditor from '@ttn-lw/components/code-editor'
+import Button from '@ttn-lw/components/button'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
+import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -33,6 +36,7 @@ const m = defineMessages({
   latestDecodedPayload: 'Latest decoded payload',
   source: 'Source: {source}',
   received: 'Received',
+  seeInLiveData: 'See in live data',
 })
 
 const findKey = (obj, keyToFind) => {
@@ -54,8 +58,9 @@ const findKey = (obj, keyToFind) => {
   return recursiveSearch(obj)
 }
 
-const LatestDecodedPayloadPanel = ({ events }) => {
+const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
   const [latestEvent, setLatestEvent] = useState(null)
+  const [selectedEvent, setSelectedEvent] = useState(null)
 
   const throttledSetLatestEvent = useCallback(
     throttle(newEvent => setLatestEvent(newEvent), 10000),
@@ -64,45 +69,115 @@ const LatestDecodedPayloadPanel = ({ events }) => {
 
   useEffect(() => {
     const normalizedEvents = events
-      .map(e => ({ time: e.time, decodedPayload: findKey(e.data, 'decoded_payload') }))
+      .map(e => ({
+        eventId: e.unique_id,
+        time: e.time,
+        decodedPayload: findKey(e.data, 'decoded_payload'),
+      }))
       .filter(e => !!e.decodedPayload)
     if (normalizedEvents.length > 0) {
       throttledSetLatestEvent(normalizedEvents[0])
     }
   }, [events, throttledSetLatestEvent])
 
+  const handleOpenMaximizeCodeModal = useCallback(() => {
+    setSelectedEvent(latestEvent)
+  }, [latestEvent])
+
+  const handleCloseMaximizeCodeModal = useCallback(() => {
+    setSelectedEvent(null)
+  }, [])
+
+  const handleCopy = useCallback(() => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(JSON.stringify(selectedEvent?.decodedPayload)).then(() => {
+        toast({
+          title: m.success,
+          message: sharedMessages.copiedToClipboard,
+          type: toast.types.SUCCESS,
+        })
+      })
+    }
+  }, [selectedEvent])
+
+  const getContent = useCallback(
+    (event, maxLines = 8, minLines = undefined) => (
+      <>
+        <div className="d-flex j-between pt-cs-m pb-cs-m">
+          <Message
+            uppercase
+            content={m.source}
+            values={{ source: sharedMessages.liveData.defaultMessage }}
+            className={style.source}
+          />
+          <LastSeen
+            statusClassName={style.receivedStatus}
+            message={m.received}
+            lastSeen={event?.time}
+            className={style.received}
+          />
+        </div>
+
+        <CodeEditor
+          value={JSON.stringify(event?.decodedPayload, null, 2)}
+          language="json"
+          name="latest_decoded_payload"
+          maxLines={maxLines}
+          minLines={minLines}
+          readOnly
+        />
+      </>
+    ),
+    [],
+  )
+
   return (
     <Panel
       title={m.latestDecodedPayload}
       icon={IconCodeDots}
-      shortCutLinkTitle={sharedMessages.expand}
+      shortCutLinkTitle={m.seeInLiveData}
+      shortCutLinkPath={`${shortCutLinkPath}?eventId=${latestEvent?.eventId}`}
       className={style.panel}
       shortCutLinkDisabled={!latestEvent}
     >
       {latestEvent ? (
-        <>
-          <div className="d-flex j-between pt-cs-m pb-cs-m">
-            <Message
-              uppercase
-              content={m.source}
-              values={{ source: sharedMessages.liveData.defaultMessage }}
-              className={style.source}
-            />
-            <LastSeen
-              statusClassName={style.receivedStatus}
-              message={m.received}
-              lastSeen={latestEvent.time}
-              className={style.received}
-            />
-          </div>
-          <CodeEditor
-            value={JSON.stringify(latestEvent.decodedPayload, null, 2)}
-            language="json"
-            name="latest_decoded_payload"
-            maxLines={12}
-            readOnly
+        <div className="pos-relative">
+          {getContent(latestEvent)}
+          <Button
+            naked
+            icon={IconArrowsMaximize}
+            small
+            className={style.maximize}
+            onClick={handleOpenMaximizeCodeModal}
           />
-        </>
+          <PortalledModal visible={selectedEvent} noTitleLine noControlLine>
+            <div className="w-full">
+              <div className="d-flex j-between al-center mb-cs-xl gap-cs-m">
+                <div className="d-flex gap-cs-xs al-center overflow-hidden">
+                  <Icon icon={IconCodeDots} className={style.headerIcon} />
+                  <Message content={m.latestDecodedPayload} className={style.headerTitle} />
+                </div>
+                <Button naked icon={IconX} onClick={handleCloseMaximizeCodeModal} />
+              </div>
+
+              {getContent(selectedEvent, 20)}
+              <div className="d-flex j-center al-center gap-cs-m pt-cs-xl">
+                <Button
+                  secondary
+                  icon={IconCopy}
+                  message={sharedMessages.copy}
+                  onClick={handleCopy}
+                />
+                <Button
+                  secondary
+                  icon={IconX}
+                  message={sharedMessages.close}
+                  onClick={handleCloseMaximizeCodeModal}
+                />
+              </div>
+            </div>
+          </PortalledModal>
+        </div>
       ) : (
         <PanelError>
           <Message component="p" content={sharedMessages.noRecentActivity} />
@@ -114,6 +189,7 @@ const LatestDecodedPayloadPanel = ({ events }) => {
 
 LatestDecodedPayloadPanel.propTypes = {
   events: PropTypes.events.isRequired,
+  shortCutLinkPath: PropTypes.string.isRequired,
 }
 
 export default LatestDecodedPayloadPanel

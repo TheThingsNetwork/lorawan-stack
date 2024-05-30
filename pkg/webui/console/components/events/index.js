@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import classnames from 'classnames'
+import { useSearchParams } from 'react-router-dom'
 
 import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
@@ -61,6 +62,15 @@ const Events = React.memo(
       const eventLogData = composeDataUri(JSON.stringify(events, undefined, 2))
       downloadDataUriAsFile(eventLogData, `${entityId}_live_data_${Date.now()}.json`)
     }, [entityId, events])
+    const [searchParams] = useSearchParams()
+
+    useEffect(() => {
+      const eventId = searchParams.get('eventId')
+      if (eventId) {
+        setFocus({ eventId, visible: eventId })
+      }
+    }, [searchParams])
+
     const handleRowClick = useCallback(
       eventId => {
         if (eventId !== focus.eventId) {
