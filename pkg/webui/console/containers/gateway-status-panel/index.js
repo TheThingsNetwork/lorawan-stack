@@ -109,16 +109,6 @@ const GatewayStatusPanel = () => {
   const isFetching = !Boolean(gatewayStats) && fetching
   const isUnavailable = Boolean(error) && Boolean(error.message)
 
-  /*   const connectedDays = useMemo(() => {
-    if (gatewayStats?.connected_at) {
-      const connectedDate = new Date(gatewayStats.connected_at)
-      const currentDate = new Date()
-      const diffTime = Math.abs(currentDate - connectedDate)
-      return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    }
-    return 0
-  }, [gatewayStats]) */
-
   const maxRoundTripTime = useMemo(
     () =>
       gatewayStats?.round_trip_times && parseFloat(gatewayStats.round_trip_times.max.split('s')[0]),
