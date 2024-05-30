@@ -40,6 +40,8 @@ func NewFormatter(maxRoundTripDelay time.Duration) semtechws.Formatter {
 	}
 }
 
+func (f *lbsLNS) ID() string { return "lbslns" }
+
 func (f *lbsLNS) Endpoints() semtechws.Endpoints {
 	return semtechws.Endpoints{
 		ConnectionInfo: "/router-info",

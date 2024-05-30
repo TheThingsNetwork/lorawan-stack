@@ -37,6 +37,8 @@ type Endpoints struct {
 
 // Formatter abstracts messages to/from websocket based gateways.
 type Formatter interface {
+	// ID returns the ID of the formatter.
+	ID() string
 	// Endpoints fetches the connection endpoints for the protocol.
 	Endpoints() Endpoints
 	// HandleConnectionInfo handles connection information requests from web socket based protocols.

@@ -61,7 +61,7 @@ type srv struct {
 	formatter Formatter
 }
 
-func (*srv) Protocol() string            { return "ws" }
+func (s *srv) Protocol() string          { return "semtechws/" + s.formatter.ID() }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 func (*srv) DutyCycleStyle() scheduling.DutyCycleStyle {
 	return scheduling.DutyCycleStyleBlockingWindow
