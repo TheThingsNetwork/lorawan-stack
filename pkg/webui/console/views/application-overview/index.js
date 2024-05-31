@@ -1,4 +1,4 @@
-// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,23 +14,12 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
-
-import DataSheet from '@ttn-lw/components/data-sheet'
-
-import DateTime from '@ttn-lw/lib/components/date-time'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
-import GatewayMapPanel from '@console/components/gateway-map-panel'
 
-import DevicesTable from '@console/containers/devices-table'
-import ApplicationEvents from '@console/containers/application-events'
-import ApplicationTitleSection from '@console/containers/application-title-section'
-import GatewayOverviewHeader from '@console/containers/gateway-overview-header'
 import ApplicationOverviewHeader from '@console/containers/application-overview-header'
 
 import Require from '@console/lib/components/require'
@@ -43,18 +32,14 @@ import { checkFromState } from '@account/lib/feature-checks'
 
 import { selectSelectedApplication } from '@console/store/selectors/applications'
 
-import style from './application-overview.styl'
-
 const m = defineMessages({
   failedAccessOtherHostApplication:
     'The application you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
 })
 
 const ApplicationOverview = () => {
-  const { appId } = useParams()
   const application = useSelector(selectSelectedApplication)
   const may = useSelector(state => checkFromState(mayViewApplicationInfo, state))
-  const { created_at, updated_at } = application
   const shouldRedirect = isOtherClusterApp(application)
   const condition = !shouldRedirect && may
 
