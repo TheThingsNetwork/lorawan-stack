@@ -20,16 +20,18 @@ import {
   GET_NETWORK_STATUS_SUMMARY_SUCCESS,
 } from '@ttn-lw/lib/store/actions/status'
 
+export const initialSummaryState = {
+  scheduled_maintenances: [],
+  status: {
+    indicator: 'none',
+    description: '',
+  },
+}
+
 const defaultState = {
   onlineStatus: ONLINE_STATUS.ONLINE,
   isLoginRequired: false,
-  summary: {
-    scheduled_maintenances: [],
-    status: {
-      indicator: 'none',
-      description: '',
-    },
-  },
+  summary: initialSummaryState,
 }
 
 const status = (state = defaultState, { type, payload }) => {

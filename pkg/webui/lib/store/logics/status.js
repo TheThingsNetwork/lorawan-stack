@@ -22,6 +22,7 @@ import { isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
 import * as status from '@ttn-lw/lib/store/actions/status'
 import { selectIsOfflineStatus } from '@ttn-lw/lib/store/selectors/status'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import { initialSummaryState } from '@ttn-lw/lib/store/reducers/status'
 
 const probeUrl = `${selectIsConfig().base_url}/auth_info`
 
@@ -120,6 +121,9 @@ const getNetworkStatusSummaryLogic = createRequestLogic({
   type: status.GET_NETWORK_STATUS_SUMMARY,
   process: async () => {
     const baseUrl = selectPageStatusBaseUrlConfig()
+    if (!baseUrl?.trim()) {
+      return { summary: initialSummaryState }
+    }
 
     const response = await axios.get(`${baseUrl}/api/v2/summary.json`, {
       headers: {
