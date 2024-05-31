@@ -16,6 +16,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- The rate limit key for LoRa Basics Station has changed from `gs:accept:ws` to `gs:accept:semtechws/lbslns`.
+
 ### Deprecated
 
 ### Removed
