@@ -74,7 +74,7 @@ const Gateway = () => {
         selector.push('lbs_lns_secret')
       }
 
-      await dispatch(attachPromise(getGsFrequencyPlans()))
+      dispatch(getGsFrequencyPlans())
 
       return dispatch(attachPromise(getGateway(gtwId, selector)))
     },

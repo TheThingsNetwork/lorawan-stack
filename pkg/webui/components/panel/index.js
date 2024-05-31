@@ -57,7 +57,7 @@ const Panel = ({
   shortCutLinkTarget,
   shortCutLinkDisabled,
 }) => (
-  <div className={classnames(styles.panel, { [styles.panelNoTitle]: !title }, className)}>
+  <div className={classnames(styles.panel, className)}>
     {title && (
       <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
         <div className="d-flex gap-cs-xs al-center overflow-hidden">
