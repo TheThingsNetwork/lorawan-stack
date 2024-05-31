@@ -518,6 +518,7 @@ type ServiceBase struct {
 	Tracing          tracing.Config       `name:"tracing" yaml:"tracing" description:"Tracing configuration"`
 	SkipVersionCheck bool                 `name:"skip-version-check" yaml:"skip-version-check" description:"Skip version checks"` //nolint:lll
 	Telemetry        telemetry.Config     `name:"telemetry" yaml:"telemetry" description:"Telemetry configuration"`
+	MTLSAuth         MTLSAuthConfig       `name:"mtls-auth" description:"mTLS authentication configuration (EXPERIMENTAL)"`
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.
@@ -594,6 +595,42 @@ func (c RateLimiting) Fetcher(
 			return nil, err
 		}
 		return fetch.FromHTTP(httpClient, c.URL)
+	case "blob":
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
+	default:
+		return nil, nil
+	}
+}
+
+// MTLSAuthConfig contains the configuration for mTLS authentication.
+type MTLSAuthConfig struct {
+	Source    string         `name:"source" description:"Source for the CA store (directory, blob)"`
+	Directory string         `name:"directory" description:"OS filesystem directory, which contains CA certificates in the required format"` //nolint:lll
+	Blob      BlobPathConfig `name:"blob"`
+}
+
+// MTLSAuthCAStoreFetcher returns a fetch.Interface based on the mTLS auth CAStore configuration.
+// If no configuration source is set, this method returns nil, nil.
+func (c ServiceBase) MTLSAuthCAStoreFetcher(
+	ctx context.Context,
+	httpClientProvider httpclient.Provider,
+) (fetch.Interface, error) {
+	return c.MTLSAuth.Fetcher(ctx, c.Blob, httpClientProvider)
+}
+
+// Fetcher returns a fetch.Interface based on the configuration.
+// If no configuration source is set, this method returns nil, nil.
+func (c MTLSAuthConfig) Fetcher(ctx context.Context,
+	blobConf BlobConfig,
+	httpClientProvider httpclient.Provider,
+) (fetch.Interface, error) {
+	switch c.Source {
+	case "directory":
+		return fetch.FromFilesystem(c.Directory), nil
 	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
