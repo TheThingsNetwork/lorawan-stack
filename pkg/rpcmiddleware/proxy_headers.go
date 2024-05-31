@@ -22,6 +22,8 @@ import (
 	"strings"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	mtlsauth "go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
@@ -119,9 +121,14 @@ func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
 	}
 	if h.trustedIP(net.ParseIP(remoteIP)) {
 		// We trust the proxy, so we parse the headers if present.
-		forwardedFor, _, _ := parseForwardedHeaders(md) // ignore forwardedScheme and forwardedHost.
+		forwardedFor, _, _ := parseForwardedHeaders(getLastFromMD(md)) // ignore forwardedScheme and forwardedHost.
 		if forwardedFor != "" {
 			md.Set(headerXRealIP, strings.TrimSpace(strings.Split(forwardedFor, ",")[0]))
+		}
+		if cert, err := mtlsauth.FromProxyHeaders(getLastFromMD(md)); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to parse client certificate from proxy headers")
+		} else if cert != nil {
+			ctx = mtlsauth.NewContextWithClientCertificate(ctx, cert)
 		}
 	} else {
 		// We don't trust the proxy, remove its headers.
@@ -133,24 +140,27 @@ func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
 	return md
 }
 
-func parseForwardedHeaders(h metadata.MD) (forwardedFor, forwardedScheme, forwardedHost string) {
-	if xForwardedFor := h.Get(headerXForwardedFor); len(xForwardedFor) > 0 {
-		forwardedFor = xForwardedFor[len(xForwardedFor)-1]
+type getLastFromMD metadata.MD
+
+func (m getLastFromMD) Get(key string) string {
+	if values, ok := m[key]; ok {
+		return values[len(values)-1]
 	}
-	if xForwardedProto := h.Get(headerXForwardedProto); len(xForwardedProto) > 0 {
-		forwardedScheme = xForwardedProto[len(xForwardedProto)-1]
-	}
-	if xForwardedHost := h.Get(headerXForwardedHost); len(xForwardedHost) > 0 {
-		forwardedHost = xForwardedHost[len(xForwardedHost)-1]
-	}
-	if forwarded := h.Get(headerForwarded); len(forwarded) > 0 {
-		if match := forwardedForRegex.FindStringSubmatch(forwarded[len(forwarded)-1]); len(match) > 1 {
+	return ""
+}
+
+func parseForwardedHeaders(h getLastFromMD) (forwardedFor, forwardedScheme, forwardedHost string) {
+	forwardedFor = h.Get(headerXForwardedFor)
+	forwardedScheme = h.Get(headerXForwardedProto)
+	forwardedHost = h.Get(headerXForwardedHost)
+	if forwarded := h.Get(headerForwarded); forwarded != "" {
+		if match := forwardedForRegex.FindStringSubmatch(forwarded); len(match) > 1 {
 			forwardedFor = strings.ToLower(match[1])
 		}
-		if match := forwardedProtoRegex.FindStringSubmatch(forwarded[len(forwarded)-1]); len(match) > 1 {
+		if match := forwardedProtoRegex.FindStringSubmatch(forwarded); len(match) > 1 {
 			forwardedScheme = strings.ToLower(match[1])
 		}
-		if match := forwardedHostRegex.FindStringSubmatch(forwarded[len(forwarded)-1]); len(match) > 1 {
+		if match := forwardedHostRegex.FindStringSubmatch(forwarded); len(match) > 1 {
 			forwardedHost = strings.ToLower(match[1])
 		}
 	}

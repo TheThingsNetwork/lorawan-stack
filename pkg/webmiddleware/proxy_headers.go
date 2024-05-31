@@ -20,6 +20,9 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+
+	mtlsauth "go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 const (
@@ -98,6 +101,11 @@ func ProxyHeaders(config ProxyConfiguration) MiddlewareFunc {
 				}
 				if forwardedHost != "" {
 					r.URL.Host = forwardedHost
+				}
+				if cert, err := mtlsauth.FromProxyHeaders(r.Header); err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to parse client certificate from proxy headers")
+				} else if cert != nil {
+					ctx = mtlsauth.NewContextWithClientCertificate(ctx, cert)
 				}
 			} else {
 				// We don't trust the proxy, remove its headers.
