@@ -52,9 +52,9 @@ import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
 const m = defineMessages({
   lastSeenAvailableTooltip:
-    'The elapsed time since the network registered activity (sent uplinks, confirmed downlinks or (re)join requests) of the end device(s) in this application.',
+    'The elapsed time since the network registered activity (sent uplinks, confirmed downlinks or (re)join requests) of the end device(s) in this application.(old)',
   noActivityTooltip:
-    'The network has not recently registered any activity (sent uplinks, confirmed downlinks or (re)join requests) of the end device(s) in this application.',
+    'The network has not recently registered any activity (sent uplinks, confirmed downlinks or (re)join requests) of the end device(s) in this application.(old)',
 })
 
 const { Content } = EntityTitleSection

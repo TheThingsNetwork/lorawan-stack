@@ -39,7 +39,7 @@ const Map = ({ id, markers, setupLocationLink }) => {
       : undefined
 
   return (
-    <div className="h-full" data-test-id="map-widget">
+    <div className={style.mapWidget} data-test-id="map-widget">
       {markers.length > 0 ? (
         <LocationMap
           id={id}

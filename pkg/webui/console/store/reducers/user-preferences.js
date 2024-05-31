@@ -100,7 +100,7 @@ const userPreferences = (state = initialState, { type, payload }) => {
         bookmarks: {
           ...state.bookmarks,
           bookmarks: [...state.bookmarks.bookmarks].filter(
-            b => b.entity_ids[`${payload.name}_ids`][`${payload.name}_id`] !== payload.id,
+            b => b.entity_ids?.[`${payload.name}_ids`]?.[`${payload.name}_id`] !== payload.id,
           ),
           totalCount: {
             ...state.bookmarks.totalCount,
