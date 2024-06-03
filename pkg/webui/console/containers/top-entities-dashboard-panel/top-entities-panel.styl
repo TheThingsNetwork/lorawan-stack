@@ -17,42 +17,30 @@
   display: flex
   flex-direction: column
 
-.entity
-  &-list
+  &-outer-table
+    overflow-y: auto
+    height: 23rem
+    width: 100%
+    table-layout: fixed
     scrollbar-width: none
+
     &::-webkit-scrollbar
       display: none
-    &-gradient
-      position:absolute
-      bottom: 0px
-      left: 0px
-      width: 100%
-      height: 98px
-      border-radius: 0px 0px 14px 14px
-      background: linear-gradient(180deg, rgba(255, 255, 255, .2) 0%, var(--c-bg-neutral-min) 64.58%)
-      pointer-events: none // Prevents the gradient from blocking the click event
-  &-body
-    height: 20rem
-  &-row
-    min-width: 100%
-    display: inline-table
-    border-bottom: 1px solid var(--c-border-neutral-extralight)
-    &.last-row
-      margin-bottom: 56px
-  &-cell
-    min-width: 100%
-    &-divided
-      width: 33%
-    &-small
-      min-width: 2.5rem
-      width: 2.5rem
 
-@container panel (max-width: 360px)
-  .entity-cell-content
-    width: 35%
-    overflow: hidden
-    text-overflow: ellipsis
-  .entity-cell-last-column
-    position: absolute
-    top: 20px
-    right: 10px
+    &-header
+      top: 0
+      position: sticky
+      background: var(--c-bg-neutral-min)
+      z-index: 1
+
+.scroll-gradient
+  position: sticky
+  left: 0
+  right: 0
+  bottom: 0
+  height: 3.5rem
+  width: 100%
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--c-bg-neutral-min))
+  opacity: 1
+  pointer-events: none
+  z-index: $zi.slight
