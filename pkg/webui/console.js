@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import DOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
 import * as Sentry from '@sentry/react'
@@ -45,6 +45,7 @@ if (selectSentryDsnConfig) {
 
 const history = createBrowserHistory({ basename: `${appRoot}/` })
 const rootElement = document.getElementById('app')
+const root = createRoot(rootElement)
 
 // Error renderer for the outermost error boundary.
 // Do not use any components that depend on context
@@ -53,7 +54,7 @@ const errorRender = error => (
   <FullViewError error={error} header={<Header logo={<Logo safe />} />} safe />
 )
 
-DOM.render(
+root.render(
   <ErrorView errorRender={errorRender}>
     <Provider store={store}>
       <WithLocale>
@@ -65,5 +66,4 @@ DOM.render(
       </WithLocale>
     </Provider>
   </ErrorView>,
-  rootElement,
 )

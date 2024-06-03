@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import DOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import * as Sentry from '@sentry/react'
 import { createBrowserHistory } from 'history'
@@ -34,10 +34,9 @@ import Logo from '@account/containers/logo'
 import App from '@account/views/app'
 
 import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
-
 import '@ttn-lw/lib/yup'
 
-// Initialize sentry before creating store
+// Initialize sentry before creating store.
 if (selectSentryDsnConfig()) {
   Sentry.init(sentryConfig)
 }
@@ -50,8 +49,10 @@ const errorRender = error => (
 )
 
 const history = createBrowserHistory({ basename: `${selectApplicationRootPath()}/` })
+const container = document.getElementById('app')
+const root = createRoot(container)
 
-DOM.render(
+root.render(
   <ErrorView errorRender={errorRender}>
     <Provider store={store}>
       <WithLocale>
@@ -64,5 +65,4 @@ DOM.render(
       </WithLocale>
     </Provider>
   </ErrorView>,
-  document.getElementById('app'),
 )
