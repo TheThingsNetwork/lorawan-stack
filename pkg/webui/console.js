@@ -48,7 +48,7 @@ const rootElement = document.getElementById('app')
 
 // Error renderer for the outermost error boundary.
 // Do not use any components that depend on context
-// e.g. Intl, Router, Redux store.
+// e.g. Intl, Router, 2 Redux store.
 const errorRender = error => (
   <FullViewError error={error} header={<Header logo={<Logo safe />} />} safe />
 )
