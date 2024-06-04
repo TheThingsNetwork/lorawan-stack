@@ -43,14 +43,14 @@ const RoundtripTimes = ({ maxRoundTripTime, minRoundTripTime, medianRoundTripTim
         ? 0
         : ((100 - minRoundTripTimeInMs) * 100) / barWidthInMs
   const yellowPercentage =
-    minRoundTripTimeInMs > 100 && maxRoundTripTimeInMs < 500
+    minRoundTripTimeInMs > 100 && maxRoundTripTimeInMs <= 500
       ? 100
-      : minRoundTripTimeInMs > 500
+      : minRoundTripTimeInMs > 500 || maxRoundTripTimeInMs <= 100
         ? 0
         : maxRoundTripTimeInMs >= 500
           ? (400 * 100) / barWidthInMs
           : ((maxRoundTripTimeInMs - 100) * 100) / barWidthInMs
-  const hasRed = maxRoundTripTimeInMs >= 500
+  const hasRed = maxRoundTripTimeInMs > 500
 
   return (
     <>

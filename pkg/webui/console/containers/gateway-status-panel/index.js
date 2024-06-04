@@ -59,7 +59,7 @@ const m = defineMessages({
     '<b>What is this?</b>{lineBreak}The 30 day uptime expresses the relative amount of time that the gateway has been connected to the gateway server in the last 30 days.',
   noRoundtrip: 'This gateway doesn’t have recent downlinks and cannot display the roundtrip time.',
   noDutyCycle:
-    'This gateway doesn’t have recent downlinks and cannot display the duty cycle utilization.',
+    'This gateway does not have recent downlinks and cannot display the duty cycle utilization.',
   unlockGraph: 'Unlock uptime graph',
 })
 
@@ -152,7 +152,7 @@ const GatewayStatusPanel = () => {
           status={isDisconnected ? 'bad' : isFetching || isUnavailable ? 'mediocre' : 'green'}
           pulse
           big
-          pulseTrigger={2}
+          pulseTrigger={gatewayStats}
         />
       }
     >
