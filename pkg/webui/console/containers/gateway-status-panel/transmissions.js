@@ -21,6 +21,7 @@ import Icon, {
   IconHeartRateMonitor,
   IconX,
   IconClockCheck,
+  IconClockCancel,
 } from '@ttn-lw/components/icon'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -39,6 +40,7 @@ const m = defineMessages({
   noStatus: 'No status',
   noDataYet: 'No data yet',
   established: 'Established',
+  notEstablished: 'Not established',
 })
 
 const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
@@ -131,17 +133,21 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
           />
         )}
       </div>
-      {showConnectionEstablished && (
-        <div className={style.gtwStatusPanelTransmissions}>
-          <div className="d-flex al-center gap-cs-xxs">
-            <Icon icon={IconClockCheck} className="c-text-neutral-semilight" />
-            <Message content={m.established} className="fw-bold" />
-          </div>
-          {showUplinkTime && (
-            <DateTime.Relative value={gatewayStats.connected_at} relativeTimeStyle="short" />
-          )}
+      <div className={style.gtwStatusPanelTransmissions}>
+        <div className="d-flex al-center gap-cs-xxs">
+          <Icon
+            icon={showConnectionEstablished ? IconClockCheck : IconClockCancel}
+            className="c-text-neutral-semilight"
+          />
+          <Message
+            content={showConnectionEstablished ? m.established : m.notEstablished}
+            className="fw-bold"
+          />
         </div>
-      )}
+        {showUplinkTime && (
+          <DateTime.Relative value={gatewayStats.connected_at} relativeTimeStyle="short" />
+        )}
+      </div>
     </>
   )
 }

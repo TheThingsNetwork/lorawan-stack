@@ -21,6 +21,7 @@ import Icon, { IconGateway, IconInfoCircle, IconBolt, IconRouterOff } from '@ttn
 import Tooltip from '@ttn-lw/components/tooltip'
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
+import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -61,6 +62,9 @@ const m = defineMessages({
   noDutyCycle:
     'This gateway does not have recent downlinks and cannot display the duty cycle utilization.',
   unlockGraph: 'Unlock uptime graph',
+  noConnection: 'This gateway has not made any connection attempts yet.',
+  noConnectionDescription:
+    'If you have recently registered this gateway, please wait for a few moments to allow the gateway to connect. Otherwise please refer to our <Link>gateway troubleshooting documentation</Link>.',
 })
 
 const SectionTitle = ({ title, tooltip }) => (
@@ -107,6 +111,8 @@ const GatewayStatusPanel = () => {
   const gtwId = useSelector(selectSelectedGatewayId)
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
   const isFetching = !Boolean(gatewayStats) && fetching
+  const noConnectionYet =
+    Boolean(error) && Boolean(error.message) && error?.message?.includes('not_connected')
   const isUnavailable = Boolean(error) && Boolean(error.message)
 
   const maxRoundTripTime = useMemo(
@@ -149,7 +155,13 @@ const GatewayStatusPanel = () => {
       iconClassName={isDisconnected ? style.gtwStatusPanelIcon : undefined}
       messageDecorators={
         <Status
-          status={isDisconnected ? 'bad' : isFetching || isUnavailable ? 'mediocre' : 'green'}
+          status={
+            isDisconnected
+              ? 'bad'
+              : isFetching || isUnavailable || noConnectionYet
+                ? 'mediocre'
+                : 'green'
+          }
           pulse
           big
           pulseTrigger={gatewayStats}
@@ -157,77 +169,96 @@ const GatewayStatusPanel = () => {
       }
     >
       {isFetching ? (
-        <Spinner center inline>
-          <Message content={sharedMessages.fetching} />
-        </Spinner>
-      ) : (
-        <div className={style.gtwStatusPanelUpperContainer}>
-          <div className="d-flex direction-column j-between w-full">
-            <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
-            <div>
-              <Message content={m.unlockGraph} className="fw-bold" component="div" />
-              <Button.AnchorLink
-                secondary
-                message={sharedMessages.upgradeNow}
-                icon={IconBolt}
-                href="https://www.thethingsindustries.com/stack/plans/"
-                target="_blank"
-                className="mt-cs-m w-content"
-              />
-            </div>
-          </div>
-          <div className="d-flex direction-column j-between w-full">
-            <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
-            {showRoundTripTimes ? (
-              <RoundtripTimes {...{ maxRoundTripTime, minRoundTripTime, medianRoundTripTime }} />
-            ) : (
-              <EmptyState title={sharedMessages.noData} message={m.noRoundtrip} />
-            )}
-          </div>
-        </div>
-      )}
-      <hr className={style.gtwStatusPanelDivider} />
-      {isFetching ? (
         <Spinner center>
           <Message content={sharedMessages.fetching} />
         </Spinner>
+      ) : noConnectionYet ? (
+        <div className="d-flex direction-column j-center text-center pt-ls-l p-sides-ls-xxl">
+          <Message content={m.noConnection} className="fw-bold" component="div" />
+          <Message
+            content={m.noConnectionDescription}
+            className="fs-s c-text-neutral-light"
+            values={{
+              Link: msg => (
+                <Link.Anchor
+                  primary
+                  href="https://thethingsindustries.com/docs/gateways/troubleshooting/"
+                  target="_blank"
+                  external
+                >
+                  {msg}
+                </Link.Anchor>
+              ),
+            }}
+          />
+        </div>
       ) : (
-        <div className={style.gtwStatusPanelLowerContainer}>
-          <div className="w-full">
-            <div>
-              <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />
-              <Transmissions
-                isUnavailable={isUnavailable}
-                gatewayStats={gatewayStats}
-                isDisconnected={isDisconnected}
-              />
-            </div>
-            <div className={style.gtwStatusPanelTag}>
-              {showProtocol && (
-                <Message
-                  content={m.protocol}
-                  values={{ protocol: gatewayStats.protocol.toUpperCase() }}
-                  component="div"
+        <>
+          <div className={style.gtwStatusPanelUpperContainer}>
+            <div className="d-flex direction-column j-between w-full">
+              <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
+              <div>
+                <Message content={m.unlockGraph} className="fw-bold" component="div" />
+                <Button.AnchorLink
+                  secondary
+                  message={sharedMessages.upgradeNow}
+                  icon={IconBolt}
+                  href="https://www.thethingsindustries.com/stack/plans/"
+                  target="_blank"
+                  className="mt-cs-m w-content"
                 />
+              </div>
+            </div>
+            <div className="d-flex direction-column j-between w-full">
+              <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
+              {showRoundTripTimes ? (
+                <RoundtripTimes {...{ maxRoundTripTime, minRoundTripTime, medianRoundTripTime }} />
+              ) : (
+                <EmptyState title={sharedMessages.noData} message={m.noRoundtrip} />
               )}
             </div>
           </div>
-          <div className="w-full">
-            <SectionTitle title={m.dutyCycleUtilization} tooltip={m.dutyCycleUtilizationTooltip} />
-            {showDutyCycleUtilization ? (
-              gatewayStats.sub_bands.map((band, index) => (
-                <DutyCycleUtilization
-                  key={index}
-                  index={index}
+          <hr className={style.gtwStatusPanelDivider} />
+          <div className={style.gtwStatusPanelLowerContainer}>
+            <div className="w-full">
+              <div>
+                <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />
+                <Transmissions
+                  isUnavailable={isUnavailable}
                   gatewayStats={gatewayStats}
-                  band={band}
+                  isDisconnected={isDisconnected}
                 />
-              ))
-            ) : (
-              <EmptyState title={sharedMessages.noData} message={m.noDutyCycle} />
-            )}
+              </div>
+              <div className={style.gtwStatusPanelTag}>
+                {showProtocol && (
+                  <Message
+                    content={m.protocol}
+                    values={{ protocol: gatewayStats.protocol.toUpperCase() }}
+                    component="div"
+                  />
+                )}
+              </div>
+            </div>
+            <div className="w-full">
+              <SectionTitle
+                title={m.dutyCycleUtilization}
+                tooltip={m.dutyCycleUtilizationTooltip}
+              />
+              {showDutyCycleUtilization ? (
+                gatewayStats.sub_bands.map((band, index) => (
+                  <DutyCycleUtilization
+                    key={index}
+                    index={index}
+                    gatewayStats={gatewayStats}
+                    band={band}
+                  />
+                ))
+              ) : (
+                <EmptyState title={sharedMessages.noData} message={m.noDutyCycle} />
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </Panel>
   )
