@@ -26,8 +26,6 @@ import Icon, {
   IconSwitchHorizontal,
 } from '@ttn-lw/components/icon'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -75,7 +73,6 @@ const SafeInspector = ({
   className,
   isBytes,
   small,
-  noCopyPopup,
   noCopy,
   noTransform,
   truncateAfter,
@@ -151,18 +148,11 @@ const SafeInspector = ({
 
     setCopied(true)
     setCopyIcon(IconClipboardCheck)
-    if (noCopyPopup) {
-      _timer.current = setTimeout(() => {
-        setCopied(false)
-        setCopyIcon(IconClipboard)
-      }, 2000)
-    }
-  }, [copied, noCopyPopup])
-
-  const handleCopyAnimationEnd = useCallback(() => {
-    setCopied(false)
-    setCopyIcon(IconClipboard)
-  }, [])
+    _timer.current = setTimeout(() => {
+      setCopied(false)
+      setCopyIcon(IconClipboard)
+    }, 2000)
+  }, [copied])
 
   useEffect(() => {
     if (copyElem && copyElem.current) {
@@ -281,13 +271,6 @@ const SafeInspector = ({
               disabled={copied}
             >
               <Icon className={copyButtonStyle} onClick={handleCopyClick} small icon={copyIcon} />
-              {copied && !noCopyPopup && (
-                <Message
-                  content={sharedMessages.copiedToClipboard}
-                  onAnimationEnd={handleCopyAnimationEnd}
-                  className={style.copyConfirm}
-                />
-              )}
             </button>
           )}
           {hideable && (
@@ -322,8 +305,6 @@ SafeInspector.propTypes = {
   isBytes: PropTypes.bool,
   /** Whether to hide the copy action. */
   noCopy: PropTypes.bool,
-  /** Whether to hide the copy popup click and just display checkmark. */
-  noCopyPopup: PropTypes.bool,
   /** Whether to hide the data transform action. */
   noTransform: PropTypes.bool,
   /**
@@ -339,7 +320,6 @@ SafeInspector.propTypes = {
 
 SafeInspector.defaultProps = {
   className: undefined,
-  noCopyPopup: false,
   disableResize: false,
   hideable: true,
   initiallyVisible: false,

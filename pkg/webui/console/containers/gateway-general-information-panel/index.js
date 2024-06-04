@@ -38,7 +38,7 @@ const m = defineMessages({
     'When enabled, this gateway may only connect if it uses an authenticated Basic Station or MQTT connection.',
   publicStatus: 'Public status',
   publicStatusDescription:
-    'When enabled, the status of this gateway may be visible to other users.',
+    'When enabled, the status of this gateway may be visible to other users of the network.',
   publicLocation: 'Public location',
   publicLocationDescription:
     'When enabled, the gateway location may be visible to other users of the network.',
