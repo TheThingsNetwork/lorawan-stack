@@ -585,7 +585,7 @@
   "console.containers.gateway-general-information-panel.index.autoUpdateDescription": "When enabled, the gateway can be updated automatically.",
   "console.containers.gateway-general-information-panel.index.requireAuthenticatedConnectionDescription": "When enabled, this gateway may only connect if it uses an authenticated Basic Station or MQTT connection.",
   "console.containers.gateway-general-information-panel.index.publicStatus": "Public status",
-  "console.containers.gateway-general-information-panel.index.publicStatusDescription": "When enabled, the status of this gateway may be visible to other users.",
+  "console.containers.gateway-general-information-panel.index.publicStatusDescription": "When enabled, the status of this gateway may be visible to other users of the network.",
   "console.containers.gateway-general-information-panel.index.publicLocation": "Public location",
   "console.containers.gateway-general-information-panel.index.publicLocationDescription": "When enabled, the gateway location may be visible to other users of the network.",
   "console.containers.gateway-general-information-panel.index.packetBroker": "Packet Broker forwarding",
