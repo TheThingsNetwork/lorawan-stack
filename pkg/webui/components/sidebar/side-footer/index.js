@@ -14,13 +14,14 @@
 
 import React, { useCallback, useContext, useRef } from 'react'
 import classnames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import {
   IconHeartRateMonitor,
   IconLanguage,
   IconBook,
-  IconWorld,
   IconSupport,
+  IconInfoSquareRounded,
 } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Dropdown from '@ttn-lw/components/dropdown'
@@ -38,6 +39,11 @@ import {
 } from '@ttn-lw/lib/selectors/env'
 
 import style from './side-footer.styl'
+
+const m = defineMessages({
+  resources: 'Resources',
+  clusterSelection: 'Cluster selection',
+})
 
 const supportLink = selectSupportLinkConfig()
 const documentationBaseUrl = selectDocumentationUrlConfig()
@@ -61,11 +67,6 @@ LanguageOption.propTypes = {
 const SideFooter = () => {
   const { isMinimized } = useContext(SidebarContext)
   const supportButtonRef = useRef(null)
-  const clusterButtonRef = useRef(null)
-
-  const clusterDropdownItems = (
-    <Dropdown.Item title="Cluster selection" icon={IconWorld} path="/cluster" />
-  )
 
   const languageContext = useContext(LanguageContext)
   const { locale, supportedLocales, setLocale } = languageContext || {}
@@ -121,43 +122,31 @@ const SideFooter = () => {
     </>
   )
 
-  const sideFooterClassnames = classnames(
-    style.sideFooter,
-    'd-flex',
-    'j-center',
-    'al-center',
-    'gap-cs-xs',
-    'fs-s',
-    { [style.isMinimized]: isMinimized },
-  )
+  const sideFooterClassnames = classnames('d-flex', 'j-between', 'al-center', 'gap-cs-m', 'fs-s', {
+    [style.isMinimized]: isMinimized,
+  })
 
   return (
-    <div className={sideFooterClassnames}>
-      <Button
-        className={style.supportButton}
-        secondary
-        icon={IconSupport}
-        dropdownItems={supportDropdownItems}
-        dropdownPosition="above"
-        dropdownClassName={style.sideFooterDropdown}
-        noDropdownIcon
-        ref={supportButtonRef}
-      >
-        <span className={style.sideFooterVersion}>
-          v{process.env.VERSION} ({process.env.REVISION})
-        </span>
-      </Button>
-      <Button
-        className={style.clusterButton}
-        secondary
-        icon={IconWorld}
-        message="EU1"
-        noDropdownIcon
-        dropdownItems={clusterDropdownItems}
-        dropdownPosition="above"
-        dropdownClassName={classnames(style.sideFooterDropdown, style.sideFooterClusterDropdown)}
-        ref={clusterButtonRef}
-      />
+    <div className={style.sideFooter}>
+      <div className={sideFooterClassnames}>
+        <Button
+          className={style.supportButton}
+          secondary
+          message={m.resources}
+          icon={IconInfoSquareRounded}
+          dropdownItems={supportDropdownItems}
+          dropdownPosition="above"
+          dropdownClassName={style.sideFooterDropdown}
+          ref={supportButtonRef}
+        />
+        <Button className={classnames(style.clusterButton)} noDropdownIcon>
+          <span className={style.clusterButtonContent}>
+            <span className={style.sideFooterVersion}>
+              v{process.env.VERSION}.{process.env.REVISION}
+            </span>
+          </span>
+        </Button>
+      </div>
     </div>
   )
 }

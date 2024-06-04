@@ -183,6 +183,8 @@
   "components.search-panel.index.fetchingTopEntities": "Fetching top entities…",
   "components.search-panel.index.noTopEntities": "Seems like you haven’t interacted with any entities yet",
   "components.search-panel.index.noTopEntitiesSuggestion": "Once you created or interacted with entities, they will show up here and you can use this panel to quickly search and navigate to them.",
+  "components.sidebar.side-footer.index.resources": "Resources",
+  "components.sidebar.side-footer.index.clusterSelection": "Cluster selection",
   "console.components.api-key-modal.index.title": "Please copy newly created API key",
   "console.components.api-key-modal.index.subtitle": "You won't be able to view the key afterward",
   "console.components.api-key-modal.index.buttonMessage": "I have copied the key",
