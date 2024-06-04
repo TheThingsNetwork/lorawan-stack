@@ -52,8 +52,6 @@ const Checkbox = props => {
     if (hasValue && value !== checked) {
       setChecked(value)
     }
-
-    return null
   }, [value, hasValue, checked])
 
   const handleChange = useCallback(
