@@ -62,11 +62,7 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
             <Message content={m.noUplinks} className="fw-bold" />
           ) : (
             <FormattedNumber value={gatewayStats.uplink_count}>
-              {parts => (
-                <>
-                  <b>{parts}</b>
-                </>
-              )}
+              {parts => <b>{parts}</b>}
             </FormattedNumber>
           )}
         </div>
@@ -85,11 +81,7 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
           ) : (
             <>
               <FormattedNumber value={gatewayStats.downlink_count}>
-                {parts => (
-                  <>
-                    <b>{parts}</b>
-                  </>
-                )}
+                {parts => <b>{parts}</b>}
               </FormattedNumber>
               {gatewayStats?.tx_acknowledgment_count && (
                 <>
