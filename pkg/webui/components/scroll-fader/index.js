@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useEffect, useRef } from 'react'
+import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import combineRefs from '@ttn-lw/lib/combine-refs'
@@ -24,7 +25,7 @@ import style from './scroll-fader.styl'
 // indication that they are scrollable, but do not have a scrollbar.
 // The indication only shows when the content is scrolled.
 
-const ScrollFader = React.forwardRef(({ children, className, fadeHeight }, ref) => {
+const ScrollFader = React.forwardRef(({ children, className, fadeHeight, light }, ref) => {
   const internalRef = useRef()
   const combinedRef = combineRefs([ref, internalRef])
 
@@ -79,9 +80,15 @@ const ScrollFader = React.forwardRef(({ children, className, fadeHeight }, ref) 
         position: 'relative',
       }}
     >
-      <div className={style.scrollGradientTop} />
+      <div
+        className={classnames(style.scrollGradientTop, { [style.scrollGradientTopLight]: light })}
+      />
       {children}
-      <div className={style.scrollGradientBottom} />
+      <div
+        className={classnames(style.scrollGradientBottom, {
+          [style.scrollGradientBottomLight]: light,
+        })}
+      />
     </div>
   )
 })
@@ -90,11 +97,13 @@ ScrollFader.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   fadeHeight: PropTypes.number,
+  light: PropTypes.bool,
 }
 
 ScrollFader.defaultProps = {
   className: undefined,
   fadeHeight: 40,
+  light: false,
 }
 
 export default ScrollFader

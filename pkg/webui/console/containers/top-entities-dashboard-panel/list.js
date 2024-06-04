@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import { Table } from '@ttn-lw/components/table'
 import { IconPlus } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import ScrollFader from '@ttn-lw/components/scroll-fader'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -43,6 +44,7 @@ const EntitiesList = ({
   EntitiesItemComponent: EntitiesItemProp,
   entity,
 }) => {
+  const listRef = useRef()
   const itemsTotalCount = useSelector(state => itemsCountSelector(state, entity))
   const EntitiesItemComponent = EntitiesItemProp ?? EntitiesItem
 
@@ -81,11 +83,12 @@ const EntitiesList = ({
     </div>
   ) : (
     <div className={styles.topEntitiesPanelOuterTable}>
-      <Table>
-        <Table.Head className={styles.topEntitiesPanelOuterTableHeader}>{columns}</Table.Head>
-        <Table.Body emptyMessage={m.empty}>{rows}</Table.Body>
-      </Table>
-      {allBookmarks.length > 5 && <div className={styles.scrollGradient} />}
+      <ScrollFader className={styles.scrollGradient} ref={listRef} light>
+        <Table>
+          <Table.Head className={styles.topEntitiesPanelOuterTableHeader}>{columns}</Table.Head>
+          <Table.Body emptyMessage={m.empty}>{rows}</Table.Body>
+        </Table>
+      </ScrollFader>
     </div>
   )
 }
