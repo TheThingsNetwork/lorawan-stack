@@ -82,14 +82,18 @@ const EntitiesList = ({
       )}
     </div>
   ) : (
-    <div className={styles.topEntitiesPanelOuterTable}>
-      <ScrollFader className={styles.scrollGradient} ref={listRef} light>
-        <Table>
-          <Table.Head className={styles.topEntitiesPanelOuterTableHeader}>{columns}</Table.Head>
-          <Table.Body emptyMessage={m.empty}>{rows}</Table.Body>
-        </Table>
-      </ScrollFader>
-    </div>
+    <ScrollFader
+      className={styles.scrollFader}
+      ref={listRef}
+      faderHeight="4rem"
+      topFaderOffset="3rem"
+      light
+    >
+      <Table>
+        <Table.Head className={styles.topEntitiesPanelOuterTableHeader}>{columns}</Table.Head>
+        <Table.Body emptyMessage={m.empty}>{rows}</Table.Body>
+      </Table>
+    </ScrollFader>
   )
 }
 

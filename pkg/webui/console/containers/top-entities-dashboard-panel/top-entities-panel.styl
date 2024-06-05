@@ -13,25 +13,18 @@
 // limitations under the License.
 
 .top-entities-panel
-  min-height: 31rem
+  height: 31rem
   display: flex
   flex-direction: column
 
-  &-outer-table
-    overflow-y: auto
-    height: 23rem
-    width: 100%
-    table-layout: fixed
-    scrollbar-width: none
+  &-outer-table-header
+    top: 0
+    position: sticky
+    background: var(--c-bg-neutral-min)
+    z-index: 1
 
-    &::-webkit-scrollbar
-      display: none
-
-    &-header
-      top: 0
-      position: sticky
-      background: var(--c-bg-neutral-min)
-      z-index: 1
-
-.scroll-gradient
-  height: 3.5rem
+.scroll-fader
+  overflow-y: auto
+  width: 100%
+  table-layout: fixed
+  scrollbar-width: none
