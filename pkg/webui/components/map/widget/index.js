@@ -58,12 +58,14 @@ const Map = ({ id, markers, setupLocationLink }) => {
             className="c-text-neutral-light fs-m text-center mb-cs-l"
             content={sharedMessages.connectedDevicesWillAppearHere}
           />
-          <Button.Link
-            secondary
-            message={sharedMessages.setUpALocation}
-            icon={IconPlus}
-            to={setupLocationLink}
-          />
+          {setupLocationLink && (
+            <Button.Link
+              secondary
+              message={sharedMessages.setUpALocation}
+              icon={IconPlus}
+              to={setupLocationLink}
+            />
+          )}
         </div>
       )}
     </div>
