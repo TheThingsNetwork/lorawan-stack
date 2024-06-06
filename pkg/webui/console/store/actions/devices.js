@@ -78,6 +78,20 @@ export const [
   { request: getDevicesList, success: getDevicesListSuccess, failure: getDevicesListFailure },
 ] = createPaginationByIdRequestActions(SHARED_NAME)
 
+export const GET_DEVICES_PERIODICALLY_BASE = 'GET_DEVICES_PERIODICALLY'
+export const [
+  {
+    request: GET_DEVICES_PERIODICALLY,
+    success: GET_DEVICES_PERIODICALLY_SUCCESS,
+    failure: GET_DEVICES_PERIODICALLY_FAILURE,
+  },
+  {
+    request: getDevicesPeriodically,
+    success: getDevicesPeriodicallySuccess,
+    failure: getDevicesPeriodicallyFailure,
+  },
+] = createRequestActions(GET_DEVICES_PERIODICALLY_BASE)
+
 export const RESET_DEV_BASE = 'RESET_END_DEVICE'
 export const [
   { request: RESET_DEV, success: RESET_DEV_SUCCESS, failure: RESET_DEV_FAILURE },
