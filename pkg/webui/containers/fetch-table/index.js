@@ -84,6 +84,8 @@ const FetchTable = props => {
     getItemsAction,
     baseDataSelector,
     className,
+    headerClassName,
+    periodical,
   } = props
 
   const location = useLocation()
@@ -157,6 +159,8 @@ const FetchTable = props => {
       try {
         if (f.query && searchItemsAction) {
           await dispatch(attachPromise(searchItemsAction(f)))
+        } else if (periodical) {
+          dispatch(attachPromise(getItemsAction(f)))
         } else {
           await dispatch(attachPromise(getItemsAction(f)))
         }
@@ -187,6 +191,7 @@ const FetchTable = props => {
     setTab,
     tab,
     tabs,
+    periodical,
   ])
 
   const onPageChange = useCallback(
@@ -326,6 +331,7 @@ const FetchTable = props => {
           clickable={clickable}
           disableSorting={disableSorting}
           className={className}
+          headerClassName={headerClassName}
         />
       </Overlay>
     </div>
@@ -344,6 +350,7 @@ FetchTable.propTypes = {
   getItemsAction: PropTypes.func.isRequired,
   handlesPagination: PropTypes.bool,
   handlesSorting: PropTypes.bool,
+  headerClassName: PropTypes.string,
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       displayName: PropTypes.message.isRequired,
@@ -358,6 +365,7 @@ FetchTable.propTypes = {
   itemPathPrefix: PropTypes.string,
   pageSize: PropTypes.number,
   paginated: PropTypes.bool,
+  periodical: PropTypes.bool,
   rowKeySelector: PropTypes.func,
   searchItemsAction: PropTypes.func,
   searchPlaceholderMessage: PropTypes.message,
@@ -394,6 +402,8 @@ FetchTable.defaultProps = {
   actionItems: null,
   clickable: true,
   defaultOrder: undefined,
+  headerClassName: undefined,
+  periodical: false,
 }
 
 export default FetchTable

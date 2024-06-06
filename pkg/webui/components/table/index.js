@@ -35,6 +35,7 @@ const Tabular = ({
   handlesPagination,
   paginated,
   className,
+  headerClassName,
   loading,
   small,
   onRowClick,
@@ -170,7 +171,7 @@ const Tabular = ({
     <div className={classnames(style.container, className)}>
       <Overlay visible={loading} loading={loading} className={style.overlay}>
         <Table minWidth={minWidth}>
-          <Table.Head>{columns}</Table.Head>
+          <Table.Head className={headerClassName}>{columns}</Table.Head>
           <Table.Body loading={loading} empty={rows.length === 0} emptyMessage={emptyMessage}>
             {rows}
           </Table.Body>
@@ -206,6 +207,8 @@ Tabular.propTypes = {
    * the user is responsible for passing the right number of items.
    */
   handlesPagination: PropTypes.bool,
+  /** A class name to apply to the header row. */
+  headerClassName: PropTypes.string,
   /** A list of head entries to display within the table head. */
   headers: PropTypes.arrayOf(
     PropTypes.shape({
@@ -276,6 +279,7 @@ Tabular.defaultProps = {
   rowKeySelector: undefined,
   rowHrefSelector: undefined,
   disableSorting: false,
+  headerClassName: undefined,
 }
 
 export { Tabular as default, Table }
