@@ -463,8 +463,6 @@
   "console.containers.application-payload-formatters.uplink.title": "デフォルトのアップリンクペイロードフォーマッター",
   "console.containers.application-payload-formatters.uplink.infoText": "これらのペイロードフォーマッタは、このアプリケーション内のすべてのエンドデバイスからのアップリンクメッセージで実行されます。注意：エンドデバイスレベルのペイロードフォーマッタが優先されます",
   "console.containers.application-payload-formatters.uplink.uplinkResetWarning": "個々のエンドデバイスの「Payload formatter」タブを使用して、アップリンクのペイロードフォーマッタをテストし、エンドデバイスごとに個別のペイロードフォーマッタ設定を定義することができます",
-  "console.containers.application-title-section.index.lastSeenAvailableTooltip": "本アプリケーションにおいて、エンドデバイスのネットワーク登録アクティビティ（アップリンク送信、ダウンリンク確認、（再）参加要求）からの経過時間",
-  "console.containers.application-title-section.index.noActivityTooltip": "ネットワークは、このアプリケーションのエンドデバイスのアクティビティ（アップリンクの送信、ダウンリンクの確認、（再）参加要求）を最近登録していません",
   "console.containers.applications-form.index.applicationName": "アプリケーション名",
   "console.containers.applications-form.index.appIdPlaceholder": "my-new-application",
   "console.containers.applications-form.index.appNamePlaceholder": "私の新しいアプリケーション",
