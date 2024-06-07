@@ -38,6 +38,7 @@ import {
   stopGatewayEventsStream,
   getGatewaysRightsList,
 } from '@console/store/actions/gateways'
+import { getGsFrequencyPlans } from '@console/store/actions/configuration'
 
 import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
@@ -72,6 +73,8 @@ const Gateway = () => {
       if (rights.includes('RIGHT_GATEWAY_READ_SECRETS')) {
         selector.push('lbs_lns_secret')
       }
+
+      dispatch(getGsFrequencyPlans())
 
       return dispatch(attachPromise(getGateway(gtwId, selector)))
     },

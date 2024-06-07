@@ -17,12 +17,19 @@ $height-small = 2rem
 .container
   border-input()
   horizontalize()
-  border-radius: $br.xs
+  border-radius: $br.m
   height: $default-input-height
   justify-content: space-between
   position: relative
   box-sizing: border-box
   line-height: @height - .1rem
+
+  &:hover
+    .button-transform
+      display: block
+
+    .button-copy
+      display: block
 
   &-small
     height: $height-small
@@ -65,7 +72,11 @@ $height-small = 2rem
     padding-left: $cs.xs
 
 .button-transform
+  display: none
   border-input('right', 3px)
+
+  +media-query($bp.sm)
+    display: block
 
   & + button
     border: 0
@@ -77,7 +88,11 @@ $height-small = 2rem
     color: var(--c-bg-success-normal)
 
 .button-copy
+  display: none
   position: relative
+
+  +media-query($bp.sm)
+    display: block
 
 .data
   box-sizing: border-box
@@ -90,7 +105,7 @@ $height-small = 2rem
   overflow: hidden
   text-overflow: ellipsis
   white-space: nowrap
-  border-radius: $br.xs
+  border-radius: $br.m
 
   &:hover
     background-color: var(--c-bg-neutral-min) // Needs to be here for Safari to work.

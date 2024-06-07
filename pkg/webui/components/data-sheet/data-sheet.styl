@@ -15,36 +15,38 @@
 .table
   width: 100%
   table-layout: fixed
+  border-collapse: separate
+  border-spacing: 0 $cs.xs
 
   tr
-    height: 3rem
+    height: 2.5rem
 
   th
     text-align: left
-    font-weight: $fw.normal
-    color: var(--c-text-neutral-light)
-    min-width: 6rem
-    padding-right: $cs.xs
+    font-weight: 400
+    color: var(--c-text-neutral-semilight)
+    min-width: 20rem
+    padding-right: $cs.s
 
-  +media-query($bp.md)
-    margin-bottom: $ls.xs
+  tr.group-heading
+    height: 2.2rem
+    vertical-align: top
 
-tr.group-heading
-  height: auto
-  vertical-align: bottom
-
-  &:not(:first-child)
-    height: 3.5rem
-  th
-    color: var(--c-text-neutral-heavy)
-    font-weight: $fw.bold
-    width: 33%
-    white-space: nowrap
-    +media-query($bp.sm)
-      width: 50%
+    &:not(:first-child)
+      height: 3.7rem
+      vertical-align: middle
+    th
+      color: var(--c-text-neutral-heavy)
+      font-weight: $fw.bold
+      white-space: nowrap
 
 .sub th
   padding-left: $cs.l
 
 .not-available
   color: var(--c-text-neutral-light)
+
+.tooltip-icon
+  color: var(--c-text-neutral-semilight)
+  margin-bottom: -4px
+  margin-left: 2px

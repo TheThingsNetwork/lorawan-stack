@@ -58,28 +58,32 @@ const Panel = ({
   shortCutLinkDisabled,
 }) => (
   <div className={classnames(styles.panel, className)}>
-    <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
-      <div className="d-flex gap-cs-xs al-center overflow-hidden">
-        {icon && <Icon icon={icon} className={classnames(styles.panelHeaderIcon, iconClassName)} />}
-        <Message content={title} className={styles.panelHeaderTitle} />
-        {messageDecorators}
+    {title && (
+      <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
+        <div className="d-flex gap-cs-xs al-center overflow-hidden">
+          {icon && (
+            <Icon icon={icon} className={classnames(styles.panelHeaderIcon, iconClassName)} />
+          )}
+          {title && <Message content={title} className={styles.panelHeaderTitle} />}
+          {messageDecorators}
+        </div>
+        {toggleOptions ? (
+          <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
+        ) : (
+          shortCutLinkTitle && (
+            <Link
+              primary
+              to={shortCutLinkPath}
+              className={styles.button}
+              target={shortCutLinkTarget}
+              disabled={shortCutLinkDisabled}
+            >
+              <Message content={shortCutLinkTitle} /> →
+            </Link>
+          )
+        )}
       </div>
-      {toggleOptions ? (
-        <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
-      ) : (
-        shortCutLinkTitle && (
-          <Link
-            primary
-            to={shortCutLinkPath}
-            className={styles.button}
-            target={shortCutLinkTarget}
-            disabled={shortCutLinkDisabled}
-          >
-            <Message content={shortCutLinkTitle} /> →
-          </Link>
-        )
-      )}
-    </div>
+    )}
     {divider && <hr className={styles.panelDivider} />}
     {children}
   </div>
@@ -98,7 +102,7 @@ Panel.propTypes = {
   shortCutLinkPath: PropTypes.string,
   shortCutLinkTarget: PropTypes.string,
   shortCutLinkTitle: PropTypes.message,
-  title: PropTypes.message.isRequired,
+  title: PropTypes.message,
   toggleOptions: PropTypes.arrayOf(PropTypes.shape({})),
 }
 
@@ -115,6 +119,7 @@ Panel.defaultProps = {
   shortCutLinkTitle: undefined,
   shortCutLinkTarget: undefined,
   iconClassName: undefined,
+  title: undefined,
 }
 
 export { Panel as default, PanelError }
