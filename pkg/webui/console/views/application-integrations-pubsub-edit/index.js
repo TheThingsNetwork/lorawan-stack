@@ -106,7 +106,7 @@ const EditPubsubInner = () => {
   return (
     <div className="container container--lg grid">
       <PageTitle title={m.editPubsub} className="mb-0" />
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <PubsubForm
           update
           appId={appId}

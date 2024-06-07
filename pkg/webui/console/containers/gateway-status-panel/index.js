@@ -198,8 +198,8 @@ const GatewayStatusPanel = () => {
           <div className={style.gtwStatusPanelUpperContainer}>
             <div className="d-flex direction-column j-between w-full">
               <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
-              <div>
-                <Message content={m.unlockGraph} className="fw-bold" component="div" />
+              <div className="mt-cs-l">
+                <Message content={m.unlockGraph} component="div" />
                 <Button.AnchorLink
                   secondary
                   message={sharedMessages.upgradeNow}
@@ -210,6 +210,7 @@ const GatewayStatusPanel = () => {
                 />
               </div>
             </div>
+            <hr className={style.gtwStatusPanelDividerMobile} />
             <div className="d-flex direction-column j-between w-full">
               <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
               {showRoundTripTimes ? (
@@ -240,7 +241,8 @@ const GatewayStatusPanel = () => {
                 )}
               </div>
             </div>
-            <div className="w-full d-flex direction-column gap-cs-m">
+            <hr className={style.gtwStatusPanelDividerMobile} />
+            <div className="w-full">
               <SectionTitle
                 title={m.dutyCycleUtilization}
                 tooltip={m.dutyCycleUtilizationTooltip}
@@ -253,6 +255,15 @@ const GatewayStatusPanel = () => {
                 <EmptyState title={sharedMessages.noData} message={m.noDutyCycle} />
               )}
             </div>
+          </div>
+          <div className={style.gtwStatusPanelTagMobile}>
+            {showProtocol && (
+              <Message
+                content={m.protocol}
+                values={{ protocol: gatewayStats.protocol.toUpperCase() }}
+                component="div"
+              />
+            )}
           </div>
         </>
       )}

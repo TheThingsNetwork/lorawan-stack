@@ -85,7 +85,7 @@ const GatewayGeneralSettingsInner = () => {
   return (
     <div className="container container--lg grid">
       <PageTitle title={sharedMessages.generalSettings} hideHeading />
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <Collapse
           title={m.basicTitle}
           description={m.basicDescription}

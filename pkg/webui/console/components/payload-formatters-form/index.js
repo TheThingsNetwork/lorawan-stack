@@ -403,7 +403,7 @@ const PayloadFormattersForm = ({
 
   return (
     <>
-      <div className="item-12 md:item-6 lg:item-12 sm:item-12">
+      <div className="item-12 lg-xl:item-6 xl:item-12 md-lg:item-12">
         <Form
           onSubmit={handleSubmit}
           initialValues={initialValues}
@@ -457,11 +457,11 @@ const PayloadFormattersForm = ({
           )}
         </Form>
       </div>
-      <div className="item-6 md:item-6 lg:item-12 sm:item-12">
+      <div className="item-6 lg-xl:item-6 lg:item-12 md-lg:item-12">
         {_showTestSection() && (
           <>
             <TestForm
-              className="md:mt-ls-s"
+              className="lg-xl:mt-ls-s"
               onSubmit={handleTestSubmit}
               uplink={uplink}
               testResult={testResult}
@@ -472,7 +472,7 @@ const PayloadFormattersForm = ({
           </>
         )}
       </div>
-      <div className="item-6 md:item-6 lg:item-12 sm:item-12">
+      <div className="item-6 lg-xl:item-6 lg:item-12 md-lg:item-12">
         <SubmitBar>
           <SubmitButton
             message={sharedMessages.saveChanges}

@@ -39,8 +39,8 @@ const Header = ({
   ...rest
 }) => (
   <header {...rest} className={classnames(className, style.container)} id="header">
-    <div className={classnames('breadcrumbs', 'md:d-none')} />
-    <div className="d-none md:d-flex al-center gap-cs-xs">
+    <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
+    <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
       <Button secondary icon={IconMenu2} onClick={onMenuClick} />
       <Logo className={style.logo} />
     </div>
@@ -59,7 +59,7 @@ const Header = ({
         dropdownItems={bookmarkDropdownItems}
         dropdownClassName={style.bookmarksDropdown}
         dropdownPosition="below left"
-        className="xs:d-none"
+        className="md-lg:d-none"
       />
       <Button
         secondary

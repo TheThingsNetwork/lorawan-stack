@@ -81,7 +81,7 @@ const ApplicationWebhookAddForm = () => {
   return (
     <div className="container container--lg grid">
       <PageTitle title={pageTitle} className="mb-0" hideHeading={Boolean(webhookTemplate)} />
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <WebhookAdd
           appId={appId}
           templateId={templateId}

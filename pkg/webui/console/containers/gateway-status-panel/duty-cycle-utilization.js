@@ -90,7 +90,7 @@ const DutyCycleUtilization = ({ index, band }) => {
         className="fs-s"
       />
       <div className="d-flex al-center j-center gap-cs-xs">
-        <div className="md:d-none">
+        <div className="sm-md:d-none">
           <ReactApexChart
             options={options}
             series={[utilization.toFixed(2)]}

@@ -55,10 +55,10 @@ const DeviceMessaging = () => {
         <IntlHelmet title={sharedMessages.messaging} />
         {tabs.length > 0 && (
           <div className="item-12">
-            <Tabs className="mt-0 mb-ls-s sm:bg-none sm:mr-0" tabs={tabs} divider />
+            <Tabs className="mt-0 mb-ls-s md-lg:bg-none md-lg:mr-0" tabs={tabs} divider />
           </div>
         )}
-        <div className="item-12 lg:item-8">
+        <div className="item-12 xl:item-8">
           <Routes>
             {maySendUp && <Route path="uplink" Component={UplinkForm} />}
             {mayScheduleDown && <Route path="downlink" Component={DownlinkForm} />}

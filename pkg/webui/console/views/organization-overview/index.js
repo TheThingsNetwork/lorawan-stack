@@ -68,10 +68,10 @@ const Overview = () => {
       </div>
       <div className="container container--lg grid">
         <IntlHelmet title={sharedMessages.overview} />
-        <div className="item-12 lg:item-6">
+        <div className="item-12 xl:item-6">
           <DataSheet data={sheetData} />
         </div>
-        <div className="item-12 lg:item-6">
+        <div className="item-12 xl:item-6">
           <OrganizationEvents orgId={orgId} widget />
         </div>
       </div>

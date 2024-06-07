@@ -32,6 +32,9 @@
 
     +media-query($bp.md)
       gap: $cs.m
+    +media-query($bp.sm)
+      gap: 0
+      flex-direction: column
 
   &-icon
     background-color: var(--c-bg-error-light)
@@ -41,11 +44,8 @@
     margin-bottom: -4px
     margin-left: 2px
 
-  &-divider
-    border-bottom: 1px solid var(--c-border-neutral-light)
-    margin-top: $cs.xl
-    margin-bottom: $cs.xl
-    height: 0px
+  &-tag-mobile
+    display: none
 
   &-tag
     height: 2.5rem
@@ -69,7 +69,7 @@
       position: relative
       padding-top: 2px
       padding-bottom: 2px
-      margin-top: $cs.m
+      margin-top: $cs.l
       margin-bottom: $cs.xxs
       overflow: hidden
 
@@ -100,11 +100,6 @@
     &:last-child
       margin-bottom: 0
 
-    +media-query($bp.xs)
-      flex-direction: column
-      align-items: start
-      gap: $cs.xxs
-
   &-duty-cycle
     display: flex
     align-items: center
@@ -112,26 +107,72 @@
     gap: $cs.m
     font-size: $fs.s
 
-    +media-query($bp.xxs)
-      flex-direction: column
-      align-items: start
+.gtw-status-panel-divider
+  border-bottom: 1px solid var(--c-border-neutral-light)
+  margin-top: $cs.xl
+  margin-bottom: $cs.xl
+  height: 0px
+  width: 100%
 
-@container panel (max-width: 485px)
-  .gtw-status-panel-upper-container
-    gap: $cs.l
-    flex-direction: column
-    justify-content: start
+.gtw-status-panel-divider-mobile
+  display: none
+  border-bottom: 1px solid var(--c-border-neutral-light)
+  margin-top: $cs.xl
+  margin-bottom: $cs.xl
+  height: 0px
+  width: 100%
 
-  .gtw-status-panel-lower-container
-    gap: $cs.m
-
+@container panel (max-width: 420px)
   .gtw-status-panel-transmissions
     flex-direction: column
     align-items: start
     gap: $cs.xxs
 
-@container panel (max-width: 385px)
   .gtw-status-panel-duty-cycle
     flex-direction: column
     align-items: start
     gap: $cs.xs
+
+@container panel (max-width: 385px)
+  .gtw-status-panel-upper-container
+    gap: 0
+    flex-direction: column
+    justify-content: start
+
+  .gtw-status-panel-lower-container
+    gap: 0
+    flex-direction: column
+    justify-content: start
+
+  .gtw-status-panel-divider-mobile
+    display: block
+
+  .gtw-status-panel-transmissions
+    flex-direction: row
+    align-items: center
+    justify-content: space-between
+    gap: $cs.m
+
+  .gtw-status-panel-duty-cycle
+    flex-direction: row
+    align-items: center
+    justify-content: space-between
+    gap: $cs.m
+
+  .gtw-status-panel-tag
+    display: none
+
+  .gtw-status-panel-tag-mobile
+    height: 2.5rem
+    margin-top: $cs.xl
+    display: block
+    div
+      border-radius: $br.m
+      padding: $cs.s $cs.m
+      color: var(--c-text-neutral-heavy)
+      background-color: var(--c-bg-neutral-light)
+      font-weight: 600
+      width: fit-content
+      line-height: 1
+      position: relative
+      bottom: 0

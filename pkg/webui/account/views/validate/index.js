@@ -126,7 +126,7 @@ const Validate = ({ hideTitle }) => {
 
 const ValidateWithAuth = props => (
   <div className="container container--lg grid">
-    <div className="item-12 lg:item-8">
+    <div className="item-12 xl:item-8">
       <PageTitle title={m.contactInfoValidation} />
       <Validate hideTitle {...props} />
     </div>

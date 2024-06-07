@@ -42,7 +42,7 @@ const m = defineMessages({
 })
 
 const WebhookTile = ({ ids, name, description, logo_url }) => (
-  <div className="item-6 sm:item-6 lg:item-4 xl:item-3" key={`tile-${ids.template_id}`}>
+  <div className="item-6 md-lg:item-6 xl:item-4 xxl:item-3" key={`tile-${ids.template_id}`}>
     <Link to={ids.template_id} className={style.webhookTile}>
       <img className={style.logo} alt={name} src={logo_url} />
       <span className={style.name}>{name}</span>
@@ -67,7 +67,7 @@ const WebhookChooser = () => {
 
   return (
     <div className="container container--lg grid">
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <PageTitle title={m.chooseTemplate} />
       </div>
       <div className={classNames(style.tileRow, 'item-12 grid gap-ls-xxs')}>

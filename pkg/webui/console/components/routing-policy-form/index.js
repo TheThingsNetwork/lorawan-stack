@@ -87,7 +87,7 @@ const RoutingPolicyForm = ({ onSubmit, initialValues, error, defaultPolicy, subm
       )}
       {showPolicyCheckboxes && (
         <>
-          <div className="item-12 md:item-6">
+          <div className="item-12 lg-xl:item-6">
             <Message content={sharedMessages.uplink} component="h4" className="mb-cs-xs" />
             <Form.Field
               name="policy.uplink.join_request"
@@ -120,7 +120,7 @@ const RoutingPolicyForm = ({ onSubmit, initialValues, error, defaultPolicy, subm
               description={policyMessages.localizationInformationDesc}
             />
           </div>
-          <div className="item-12 sm:item-6">
+          <div className="item-12 md-lg:item-6">
             <Message content={sharedMessages.downlink} component="h4" className="mb-cs-xs" />
             <Form.Field
               name="policy.downlink.join_accept"

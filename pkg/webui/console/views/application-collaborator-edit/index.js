@@ -35,7 +35,7 @@ const ApplicationCollaboratorEditInner = () => {
   return (
     <div className="container container--lg grid">
       <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <ConsoleCollaboratorsForm
           entity={APPLICATION}
           entityId={appId}

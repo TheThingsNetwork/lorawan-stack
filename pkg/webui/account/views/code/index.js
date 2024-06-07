@@ -44,7 +44,7 @@ const Code = () => {
 
   return (
     <div className="container container--lg grid">
-      <div className="item-12 md:item-6 lg:item-4">
+      <div className="item-12 lg-xl:item-6 xl:item-4">
         <PageTitle title={sharedMessages.authorizationCode} />
         <Message content={m.codeDescription} component="label" className={style.codeDescription} />
         <SafeInspector

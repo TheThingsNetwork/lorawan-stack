@@ -42,7 +42,7 @@ const GatewayLocation = () => {
     >
       <div className="container container--lg grid">
         <PageTitle title={sharedMessages.location} />
-        <div className="item-12 lg:item-8">
+        <div className="item-12 xl:item-8">
           <GatewayLocationForm />
         </div>
       </div>

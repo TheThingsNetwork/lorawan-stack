@@ -44,7 +44,7 @@ const OAuthClientGeneralSettingsInner = () => {
   return (
     <div className="container container--lg grid">
       <PageTitle title={sharedMessages.generalSettings} />
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <OAuthClientEdit
           initialValues={oauthClient}
           isAdmin={isAdmin}
