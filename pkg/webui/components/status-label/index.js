@@ -15,17 +15,17 @@
 import React, { useMemo } from 'react'
 import classnames from 'classnames'
 
-import Message from '@ttn-lw/lib/components/message'
-
-import PropTypes from '@ttn-lw/lib/prop-types'
-import from from '@ttn-lw/lib/from'
-
 import Icon, {
   IconCircleCheckFilled,
   IconAlertTriangleFilled,
   IconAlertCircleFilled,
   IconInfoCircleFilled,
-} from '../icon'
+} from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import from from '@ttn-lw/lib/from'
 
 import style from './status-label.styl'
 

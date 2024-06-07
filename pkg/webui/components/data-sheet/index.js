@@ -14,7 +14,6 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import { defineMessages } from 'react-intl'
 
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 
@@ -24,10 +23,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './data-sheet.styl'
-
-const m = defineMessages({
-  noData: 'No data available',
-})
 
 const DataSheet = ({ className, data }) => (
   <table className={classnames(className, style.table)}>
@@ -61,7 +56,7 @@ const DataSheet = ({ className, data }) => (
           ) : (
             <tr>
               <th colSpan={2}>
-                <Message content={group.emptyMessage || m.noData} />
+                <Message content={group.emptyMessage || sharedMessages.noData} />
               </th>
             </tr>
           )}

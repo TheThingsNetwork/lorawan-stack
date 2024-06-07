@@ -34,7 +34,7 @@
     // Special case for gap
     if $type == 'gap'
       if $direction == ''
-        .gap{$scalesuffix}
+        .{$prefix}gap{$scalesuffix}
           gap: $property
     // Account for all-sides margins/paddings.
     else if $direction == ''

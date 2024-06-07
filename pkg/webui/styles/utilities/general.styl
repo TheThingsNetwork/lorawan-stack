@@ -130,13 +130,13 @@
       .{$name}:j-between
         justify-content: space-between
 
-      .{$name}:al-center
+      .{$name}\\:al-center
         align-items: center
 
-      .{$name}:al-start
+      .{$name}\\:al-start
         align-items: start
 
-      .{$name}:al-end
+      .{$name}\\:al-end
         align-items: end
 
   // Block justification.
@@ -225,9 +225,9 @@
         position: fixed
       .{$name}:pos-static
         position: static
-      .{$name}:direction-column
+      .{$name}\\:direction-column
         flex-direction: column
-      .{$name}:direction-row
+      .{$name}\\:direction-row
         flex-direction: row
       .{$name}:flex-wrap
         flex-wrap: wrap
@@ -269,10 +269,10 @@
 
   for $name, $width in $bp
     +media-query($width)
-      .{$name}:direction-column
+      .{$name}\\:direction-column
         flex-direction: column
 
-      .{$name}:direction-row
+      .{$name}\\:direction-row
         flex-direction: row
 
   // Opacity.

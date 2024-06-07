@@ -1,0 +1,137 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.gtw-status-panel
+  height: 100%
+  &-upper-container
+    display: flex
+    gap: $ls.xl
+    justify-content: space-between
+
+    +media-query($bp.md)
+      gap: $cs.l
+    +media-query($bp.xs)
+      flex-direction: column
+      justify-content: start
+
+  &-lower-container
+    display: flex
+    gap: $ls.xl
+    justify-content: space-between
+
+    +media-query($bp.md)
+      gap: $cs.m
+
+  &-icon
+    background-color: var(--c-bg-error-light)
+    color: var(--c-text-error-normal)
+
+  &-tooltip
+    margin-bottom: -4px
+    margin-left: 2px
+
+  &-divider
+    border-bottom: 1px solid var(--c-border-neutral-light)
+    margin-top: $cs.xl
+    margin-bottom: $cs.xl
+    height: 0px
+
+  &-tag
+    height: 2.5rem
+    margin-top: $cs.xl
+    div
+      border-radius: $br.m
+      padding: $cs.s $cs.m
+      color: var(--c-text-neutral-heavy)
+      background-color: var(--c-bg-neutral-light)
+      font-weight: 600
+      width: fit-content
+      line-height: 1
+      position: absolute
+      bottom: 28px
+
+  &-round-trip-time
+    &-bar
+      height: $cs.s
+      width: 100%
+      border-radius: $br.m
+      position: relative
+      padding-top: 2px
+      padding-bottom: 2px
+      margin-top: $cs.m
+      margin-bottom: $cs.xxs
+      overflow: hidden
+
+      &-pointer
+        width: $cs.xxs
+        height: 100%
+        top: 0
+        position: absolute
+
+    &-tag
+      font-size: $fs.xxl
+      font-weight: $fw.bold
+      width: fit-content
+      border-radius: $br.s
+
+  &-transmissions
+    display: flex
+    align-items: center
+    justify-content: space-between
+    gap: $cs.m
+    margin-bottom: $cs.m
+    margin-top: $cs.l
+    font-size: $fs.s
+
+    &:first-child
+      margin-top: 0
+
+    &:last-child
+      margin-bottom: 0
+
+    +media-query($bp.xs)
+      flex-direction: column
+      align-items: start
+      gap: $cs.xxs
+
+  &-duty-cycle
+    display: flex
+    align-items: center
+    justify-content: space-between
+    gap: $cs.m
+    font-size: $fs.s
+
+    +media-query($bp.xxs)
+      flex-direction: column
+      align-items: start
+
+@container panel (max-width: 485px)
+  .gtw-status-panel-upper-container
+    gap: $cs.l
+    flex-direction: column
+    justify-content: start
+
+  .gtw-status-panel-lower-container
+    gap: $cs.m
+
+  .gtw-status-panel-transmissions
+    flex-direction: column
+    align-items: start
+    gap: $cs.xxs
+
+@container panel (max-width: 385px)
+  .gtw-status-panel-duty-cycle
+    flex-direction: column
+    align-items: start
+    gap: $cs.xs

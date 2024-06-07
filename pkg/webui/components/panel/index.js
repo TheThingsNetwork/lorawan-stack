@@ -45,6 +45,7 @@ const Panel = ({
   children,
   title,
   icon,
+  iconClassName,
   toggleOptions,
   activeToggle,
   onToggleClick,
@@ -59,7 +60,7 @@ const Panel = ({
   <div className={classnames(styles.panel, className)}>
     <div className="d-flex j-between al-center mb-cs-m gap-cs-m">
       <div className="d-flex gap-cs-xs al-center overflow-hidden">
-        {icon && <Icon icon={icon} className={styles.panelHeaderIcon} />}
+        {icon && <Icon icon={icon} className={classnames(styles.panelHeaderIcon, iconClassName)} />}
         <Message content={title} className={styles.panelHeaderTitle} />
         {messageDecorators}
       </div>
@@ -90,6 +91,7 @@ Panel.propTypes = {
   className: PropTypes.string,
   divider: PropTypes.bool,
   icon: PropTypes.icon,
+  iconClassName: PropTypes.string,
   messageDecorators: PropTypes.node,
   onToggleClick: PropTypes.func,
   shortCutLinkDisabled: PropTypes.bool,
@@ -112,6 +114,7 @@ Panel.defaultProps = {
   shortCutLinkPath: undefined,
   shortCutLinkTitle: undefined,
   shortCutLinkTarget: undefined,
+  iconClassName: undefined,
 }
 
 export { Panel as default, PanelError }

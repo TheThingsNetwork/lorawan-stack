@@ -380,6 +380,7 @@ export default defineMessages({
   never: 'Never',
   next: 'Next',
   noActivityYet: 'No activity yet',
+  noData: 'No data available',
   noDesc: 'This end device has no description',
   noEvents: 'Waiting for events from <pre>{entityId}</pre>…',
   noLocationYet: 'No location yet',

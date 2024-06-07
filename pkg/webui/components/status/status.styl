@@ -20,6 +20,10 @@
   border-radius: 50%
   transition: background-color $ad.m
 
+  &-big
+    width: 8px
+    height: 8px
+
   &:not(.dot-only)
     &:not(.flipped)
       margin-left: $cs.xs
@@ -36,6 +40,9 @@
     height: 5px
     opacity: .7
     animation: pulse 2s infinite
+
+  &-green
+    background-color: var(--c-bg-success-normal)
 
   &-good
     background-color: var(--c-text-brand-normal)
