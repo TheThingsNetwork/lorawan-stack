@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
@@ -21,6 +21,7 @@ import Status from '@ttn-lw/components/status'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Button from '@ttn-lw/components/button'
 import { IconPlus } from '@ttn-lw/components/icon'
+import ScrollFader from '@ttn-lw/components/scroll-fader'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -47,6 +48,7 @@ const m = defineMessages({
 })
 
 const RecentEndDevices = () => {
+  const listRef = useRef()
   const devices = useSelector(selectDevicesWithLastSeen)
   const totalCount = useSelector(selectDevicesTotalCount)
   const appId = useSelector(selectSelectedApplicationId)
@@ -132,19 +134,21 @@ const RecentEndDevices = () => {
       </div>
     </div>
   ) : (
-    <FetchTable
-      entity="devices"
-      defaultOrder="-last_seen_at"
-      headers={headers}
-      pageSize={20}
-      baseDataSelector={baseDataSelector}
-      getItemsAction={getItemsAction}
-      itemPathPrefix={`/applications/${appId}/devices/`}
-      paginated={false}
-      className={style.devicesPanelOuterTable}
-      headerClassName={style.devicesPanelOuterTableHeader}
-      periodical
-    />
+    <ScrollFader className={style.scrollGradient} ref={listRef} light>
+      <FetchTable
+        entity="devices"
+        defaultOrder="-last_seen_at"
+        headers={headers}
+        pageSize={20}
+        baseDataSelector={baseDataSelector}
+        getItemsAction={getItemsAction}
+        itemPathPrefix={`/applications/${appId}/devices/`}
+        paginated={false}
+        className={style.devicesPanelOuterTable}
+        headerClassName={style.devicesPanelOuterTableHeader}
+        periodical
+      />
+    </ScrollFader>
   )
 }
 
