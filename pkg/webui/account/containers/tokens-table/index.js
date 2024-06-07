@@ -189,7 +189,7 @@ const TokensTable = () => {
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xl grid">
       <div className="item-12 xl:item-20">
         <FetchTable
           entity="tokens"

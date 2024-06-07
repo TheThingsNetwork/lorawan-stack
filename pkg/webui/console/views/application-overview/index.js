@@ -65,20 +65,20 @@ const ApplicationOverview = () => {
       <IntlHelmet title={sharedMessages.overview} />
       <ApplicationOverviewHeader />
       <div className="container container--xl grid p-ls-s gap-ls-s">
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <DevicesPanel />
         </div>
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <BlurryNetworkActivityPanel />
         </div>
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <LatestDecodedPayloadPanel
             appId={appId}
             events={events}
             shortCutLinkPath={`/applications/${appId}/data`}
           />
         </div>
-        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <RequireRequest
             requestAction={getDevicesList(
               application.ids.application_id,

@@ -93,8 +93,8 @@ SectionTitle.propTypes = {
 }
 
 const EmptyState = ({ title, message }) => (
-  <div>
-    <Message content={title} className="fw-bold" component="div" />
+  <div className="mt-cs-m">
+    <Message content={title} component="div" />
     <Message content={message} className="fs-s c-text-neutral-light mt-cs-s" component="div" />
   </div>
 )
@@ -249,7 +249,7 @@ const GatewayStatusPanel = () => {
               />
               {showDutyCycleUtilization ? (
                 gatewayStats.sub_bands.map((band, index) => (
-                  <DutyCycleUtilization key={index} index={index} band={band} />
+                  <DutyCycleUtilization key={index} band={band} />
                 ))
               ) : (
                 <EmptyState title={sharedMessages.noData} message={m.noDutyCycle} />

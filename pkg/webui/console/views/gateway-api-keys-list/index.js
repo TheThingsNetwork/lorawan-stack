@@ -48,7 +48,7 @@ const GatewayApiKeysList = () => {
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <IntlHelmet title={sharedMessages.apiKeys} />
       <div className="item-12">
         <ApiKeysTable

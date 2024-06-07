@@ -49,7 +49,7 @@ const UserApiKeysList = () => {
   )
 
   return (
-    <div className="container container--lg ">
+    <div className="container container--xxl">
       <IntlHelmet title={sharedMessages.personalApiKeys} />
       <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
     </div>

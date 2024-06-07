@@ -72,7 +72,7 @@ const options = {
   },
 }
 
-const DutyCycleUtilization = ({ index, band }) => {
+const DutyCycleUtilization = ({ band }) => {
   const maxFrequency = band.max_frequency / 1e6
   const minFrequency = band.min_frequency / 1e6
   const utilization = band.downlink_utilization
@@ -129,7 +129,6 @@ DutyCycleUtilization.propTypes = {
     max_frequency: PropTypes.string,
     min_frequency: PropTypes.string,
   }).isRequired,
-  index: PropTypes.number.isRequired,
 }
 
 export default DutyCycleUtilization

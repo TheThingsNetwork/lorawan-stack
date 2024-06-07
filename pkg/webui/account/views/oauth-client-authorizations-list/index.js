@@ -23,7 +23,7 @@ import OAuthClientAuthorizationsTable from '@account/containers/authorizations-t
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const AuthorizationsList = () => (
-  <div className="container container--lg grid">
+  <div className="container container--xxl grid">
     <IntlHelmet title={sharedMessages.oauthClientAuthorizations} />
     <div className="item-12">
       <PageTitle title={sharedMessages.oauthClientAuthorizations} hideHeading />

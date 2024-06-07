@@ -48,7 +48,7 @@ const ApplicationApiKeysList = () => {
   )
 
   return (
-    <div className="container container--lg ">
+    <div className="container container--xxl">
       <IntlHelmet title={sharedMessages.apiKeys} />
       <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
     </div>

@@ -34,7 +34,7 @@ const ClientsList = () => {
   const userId = useSelector(selectUserId)
   return (
     <RequireRequest requestAction={getUserRights(userId)}>
-      <div className="container container--lg grid">
+      <div className="container container--xxl grid">
         <IntlHelmet title={sharedMessages.oauthClients} />
         <div className="item-12">
           <PageTitle title={sharedMessages.oauthClients} hideHeading />

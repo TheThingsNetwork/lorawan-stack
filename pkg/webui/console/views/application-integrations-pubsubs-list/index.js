@@ -25,7 +25,7 @@ const ApplicationPubsubsList = () => {
   const { appId } = useParams()
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.integrations} hideHeading />
       <div className="item-12">
         <PubsubsTable appId={appId} />
