@@ -23,8 +23,11 @@ import Icon, { IconCircleCheck, IconExclamationCircle } from '@ttn-lw/components
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { getGsFrequencyPlans } from '@console/store/actions/configuration'
 
 import { selectSelectedGateway } from '@console/store/selectors/gateways'
 import { selectGsFrequencyPlans } from '@console/store/selectors/configuration'
@@ -160,9 +163,11 @@ const GatewayGeneralInformationPanel = () => {
   ]
 
   return (
-    <Panel className={style.infoPanel}>
-      <DataSheet data={sheetData} />
-    </Panel>
+    <RequireRequest requestAction={getGsFrequencyPlans()}>
+      <Panel className={style.infoPanel}>
+        <DataSheet data={sheetData} />
+      </Panel>
+    </RequireRequest>
   )
 }
 

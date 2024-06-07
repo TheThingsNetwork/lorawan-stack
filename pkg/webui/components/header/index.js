@@ -52,6 +52,7 @@ const Header = ({
         icon={IconPlus}
         dropdownItems={addDropdownItems}
         dropdownPosition="below left"
+        className="md-lg:d-none"
       />
       <Button
         secondary
@@ -68,6 +69,7 @@ const Header = ({
         dropdownClassName={style.notificationsDropdown}
         dropdownPosition="below left"
         withAlert={showNotificationDot}
+        className="md-lg:d-none"
       />
       <ProfileDropdown
         brandLogo={brandLogo}
