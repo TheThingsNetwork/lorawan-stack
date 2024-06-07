@@ -68,6 +68,24 @@ export const [
   (id, selector) => ({ selector }),
 )
 
+export const GET_GTW_BOOKMARK_BASE = 'GET_GATEWAY_BOOKMARK'
+export const [
+  {
+    request: GET_GTW_BOOKMARK,
+    success: GET_GTW_BOOKMARK_SUCCESS,
+    failure: GET_GTW_BOOKMARK_FAILURE,
+  },
+  {
+    request: getGatewayBookmark,
+    success: getGatewayBookmarkSuccess,
+    failure: getGatewayBookmarkFailure,
+  },
+] = createRequestActions(
+  GET_GTW_BOOKMARK_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector }),
+)
+
 export const UPDATE_GTW_BASE = 'UPDATE_GATEWAY'
 export const [
   { request: UPDATE_GTW, success: UPDATE_GTW_SUCCESS, failure: UPDATE_GTW_FAILURE },
