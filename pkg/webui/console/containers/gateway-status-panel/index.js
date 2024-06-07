@@ -15,6 +15,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 
 import Panel from '@ttn-lw/components/panel'
 import Icon, { IconGateway, IconInfoCircle, IconBolt, IconRouterOff } from '@ttn-lw/components/icon'
@@ -36,7 +37,6 @@ import {
   selectGatewayStatistics,
   selectGatewayStatisticsError,
   selectGatewayStatisticsIsFetching,
-  selectSelectedGatewayId,
 } from '@console/store/selectors/gateways'
 
 import Transmissions from './transmissions'
@@ -106,10 +106,10 @@ EmptyState.propTypes = {
 
 const GatewayStatusPanel = () => {
   const dispatch = useDispatch()
+  const { gtwId } = useParams()
   const gatewayStats = useSelector(selectGatewayStatistics)
   const error = useSelector(selectGatewayStatisticsError)
   const fetching = useSelector(selectGatewayStatisticsIsFetching)
-  const gtwId = useSelector(selectSelectedGatewayId)
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
   const isFetching = !Boolean(gatewayStats) && fetching
   const noConnectionYet =
@@ -170,11 +170,11 @@ const GatewayStatusPanel = () => {
       }
     >
       {isFetching ? (
-        <Spinner center>
+        <Spinner center inline>
           <Message content={sharedMessages.fetching} />
         </Spinner>
       ) : noConnectionYet ? (
-        <div className="d-flex direction-column j-center text-center pt-ls-l p-sides-ls-xxl">
+        <div className="d-flex direction-column j-center text-center pt-ls-l p-sides-ls-xxl md-lg:p-sides-cs-xl">
           <Message content={m.noConnection} className="fw-bold" component="div" />
           <Message
             content={m.noConnectionDescription}
