@@ -17,8 +17,10 @@ import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
+import ApplicationMapPanel from '@console/components/application-map-panel'
 
 import ApplicationOverviewHeader from '@console/containers/application-overview-header'
 
@@ -29,6 +31,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isOtherClusterApp } from '@console/lib/application-utils'
 import { mayViewApplicationInfo } from '@console/lib/feature-checks'
 import { checkFromState } from '@account/lib/feature-checks'
+
+import { getDevicesList } from '@console/store/actions/devices'
 
 import { selectSelectedApplication } from '@console/store/selectors/applications'
 
@@ -63,7 +67,15 @@ const ApplicationOverview = () => {
           <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+          <RequireRequest
+            requestAction={getDevicesList(
+              application.ids.application_id,
+              { page: 1, limit: 1000 },
+              'locations',
+            )}
+          >
+            <ApplicationMapPanel />
+          </RequireRequest>
         </div>
       </div>
     </Require>

@@ -16,16 +16,12 @@ import React from 'react'
 
 import { GATEWAY } from '@console/constants/entities'
 
-import { Map } from '@ttn-lw/components/map/widget'
-import { IconMapPin } from '@ttn-lw/components/icon'
-import Panel from '@ttn-lw/components/panel'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import locationToMarkers from '@console/lib/location-to-markers'
 
-import style from './gateway-map-panel.styl'
+import MapPanel from '../map-panel'
 
 const GatewayMapPanel = ({ gateway }) => {
   const { gateway_id } = gateway.ids
@@ -40,17 +36,12 @@ const GatewayMapPanel = ({ gateway }) => {
   const locationLink = `/gateways/${gateway_id}/location`
 
   return (
-    <Panel
-      title={sharedMessages.location}
-      icon={IconMapPin}
-      shortCutLinkTitle={sharedMessages.map}
-      shortCutLinkPath={locationLink}
-      className={style.panel}
-    >
-      <div className={style.content}>
-        <Map id="gateway-map-widget" markers={markers} setupLocationLink={locationLink} />
-      </div>
-    </Panel>
+    <MapPanel
+      panelTitle={sharedMessages.location}
+      markers={markers}
+      entity={GATEWAY}
+      locationLink={locationLink}
+    />
   )
 }
 
