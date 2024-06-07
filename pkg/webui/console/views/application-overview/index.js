@@ -54,30 +54,30 @@ const ApplicationOverview = () => {
 
   return (
     <Require condition={condition} otherwise={otherwise}>
-      <RequireRequest
-        requestAction={getDevicesList(
-          application.ids.application_id,
-          { page: 1, limit: 1000 },
-          'locations',
-        )}
-      >
-        <IntlHelmet title={sharedMessages.overview} />
-        <ApplicationOverviewHeader />
-        <div className="container container--xl grid p-ls-s gap-ls-s">
-          <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-            <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
-          </div>
-          <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-            <BlurryNetworkActivityPanel />
-          </div>
-          <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-            <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
-          </div>
-          <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-            <ApplicationMapPanel />
-          </div>
+      <IntlHelmet title={sharedMessages.overview} />
+      <ApplicationOverviewHeader />
+      <div className="container container--xl grid p-ls-s gap-ls-s">
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
         </div>
-      </RequireRequest>
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <BlurryNetworkActivityPanel />
+        </div>
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+        </div>
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <RequireRequest
+            requestAction={getDevicesList(
+              application.ids.application_id,
+              { page: 1, limit: 1000 },
+              'locations',
+            )}
+          >
+            <ApplicationMapPanel />
+          </RequireRequest>
+        </div>
+      </div>
     </Require>
   )
 }

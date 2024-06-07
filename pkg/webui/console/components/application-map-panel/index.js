@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { isEmpty, isPlainObject } from 'lodash'
 import { defineMessages } from 'react-intl'
@@ -32,16 +32,20 @@ const m = defineMessages({
 const ApplicationMapPanel = () => {
   const devices = useSelector(selectDevices)
 
-  const markers = []
-  devices.forEach(device => {
-    if (
-      Boolean(device.locations) &&
-      isPlainObject(device.locations) &&
-      !isEmpty(device.locations)
-    ) {
-      markers.push(...locationToMarkers(device.locations, END_DEVICE))
-    }
-  })
+  const markers = useMemo(() => {
+    const m = []
+    devices.forEach(device => {
+      if (
+        Boolean(device.locations) &&
+        isPlainObject(device.locations) &&
+        !isEmpty(device.locations)
+      ) {
+        m.push(...locationToMarkers(device.locations, END_DEVICE))
+      }
+    })
+
+    return m
+  }, [devices])
 
   return (
     <MapPanel
