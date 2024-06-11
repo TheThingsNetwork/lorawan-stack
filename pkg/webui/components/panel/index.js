@@ -57,7 +57,7 @@ const Panel = ({
   shortCutLinkTarget,
   shortCutLinkDisabled,
 }) => (
-  <div className={classnames(styles.panel, className)}>
+  <div className={classnames(styles.panel, className, { [styles.divider]: divider })}>
     {title && (
       <div className={styles.panelHeader}>
         <div className="d-flex gap-cs-xs al-center">
@@ -84,7 +84,6 @@ const Panel = ({
         )}
       </div>
     )}
-    {divider && <hr className={styles.panelDivider} />}
     {children}
   </div>
 )

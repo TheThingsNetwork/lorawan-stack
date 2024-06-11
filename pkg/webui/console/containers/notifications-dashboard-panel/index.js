@@ -20,6 +20,7 @@ import { defineMessages } from 'react-intl'
 import { IconInbox } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
 import Status from '@ttn-lw/components/status'
+import ScrollFader from '@ttn-lw/components/scroll-fader'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -123,15 +124,17 @@ const NotificationsDashboardPanel = () => {
           />
         </div>
       ) : (
-        <FetchTable
-          entity="notifications"
-          headers={headers}
-          pageSize={5}
-          baseDataSelector={baseDataSelectors}
-          getItemsAction={getItems}
-          getItemPathPrefix={item => `/notifications/inbox/${item.id}`}
-          paginated={false}
-        />
+        <ScrollFader className={style.scrollFader} faderHeight="4rem" topFaderOffset="3rem" light>
+          <FetchTable
+            entity="notifications"
+            headers={headers}
+            pageSize={5}
+            baseDataSelector={baseDataSelectors}
+            getItemsAction={getItems}
+            getItemPathPrefix={item => `/notifications/inbox/${item.id}`}
+            paginated={false}
+          />
+        </ScrollFader>
       )}
     </Panel>
   )

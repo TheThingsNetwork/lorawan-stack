@@ -26,10 +26,13 @@
 
   &-header
     display: flex
+    flex-wrap: wrap
     justify-content: space-between
-    align-items: center
-    margin-bottom: $cs.m
+    align-items: flex-start
     gap: $cs.m
+    min-height: 2.5rem // Fix the header height to have a uniform look between panels.
+    margin-bottom: $cs.m
+    flex-shrink: 0
 
     &-title
       font-weight: $fwv2.bold
@@ -51,11 +54,11 @@
       text-underline-offset: .4rem
       text-decoration-color: var(--c-text-brand-normal)
 
-  &-divider
-    border-bottom: 1px solid var(--c-border-neutral-light)
-    margin-top: $cs.l
-    margin-bottom: $cs.l
-    height: 0px
+  &.divider
+    .panel-header
+      padding-bottom: $cs.m
+      border-bottom: 1px solid var(--c-border-neutral-light)
+      margin-bottom: $cs.l
 
 .panel-header-icon
   font-size: $fs.xl
@@ -65,8 +68,3 @@
   border-radius: $br.l
   color: var(--c-bg-brand-normal)
   font-variation-settings: 'FILL' 1
-
-@container panel (max-width: 485px)
-  .panel-header
-    flex-direction: column
-    align-items: flex-start

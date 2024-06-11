@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { defineMessages } from 'react-intl'
 import classNames from 'classnames'
 
 import { IconStar } from '@ttn-lw/components/icon'
@@ -27,10 +26,6 @@ import TopGatewaysList from './top-gateways'
 import TopDevicesList from './top-devices'
 
 import styles from './top-entities-panel.styl'
-
-const m = defineMessages({
-  title: 'Your top entities',
-})
 
 const TopEntitiesDashboardPanel = () => {
   const [active, setActive] = useState('all')
@@ -51,7 +46,7 @@ const TopEntitiesDashboardPanel = () => {
 
   return (
     <Panel
-      title={m.title}
+      title={sharedMessages.topEntities}
       icon={IconStar}
       toggleOptions={options}
       activeToggle={active}

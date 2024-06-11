@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
@@ -44,7 +44,6 @@ const EntitiesList = ({
   EntitiesItemComponent: EntitiesItemProp,
   entity,
 }) => {
-  const listRef = useRef()
   const itemsTotalCount = useSelector(state => itemsCountSelector(state, entity))
   const EntitiesItemComponent = EntitiesItemProp ?? EntitiesItem
 
@@ -82,13 +81,7 @@ const EntitiesList = ({
       )}
     </div>
   ) : (
-    <ScrollFader
-      className={styles.scrollFader}
-      ref={listRef}
-      faderHeight="4rem"
-      topFaderOffset="3rem"
-      light
-    >
+    <ScrollFader className={styles.scrollFader} faderHeight="4rem" topFaderOffset="3rem" light>
       <Table>
         <Table.Head className={styles.topEntitiesPanelOuterTableHeader}>{columns}</Table.Head>
         <Table.Body emptyMessage={m.empty}>{rows}</Table.Body>

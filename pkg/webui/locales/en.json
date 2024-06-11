@@ -710,7 +710,6 @@
   "console.containers.sidebar.navigation.gtw-side-navigation.buttonMessage": "Back to Gateways list",
   "console.containers.top-entities-dashboard-panel.all-top-entities.index.noTopEntities": "No top entities yet",
   "console.containers.top-entities-dashboard-panel.all-top-entities.index.noTopEntitiesDescription": "Your most visited, and bookmarked entities will be listed here.",
-  "console.containers.top-entities-dashboard-panel.index.title": "Your top entities",
   "console.containers.top-entities-dashboard-panel.list.empty": "No entities yet",
   "console.containers.top-entities-dashboard-panel.top-applications.index.emptyMessage": "No top application yet",
   "console.containers.top-entities-dashboard-panel.top-applications.index.emptyDescription": "Your most visited, and bookmarked applications will be listed here",
