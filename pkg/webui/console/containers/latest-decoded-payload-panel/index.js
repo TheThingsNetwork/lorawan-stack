@@ -13,8 +13,12 @@
 // limitations under the License.
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { defineMessages } from 'react-intl'
-import { forOwn, isObject, throttle } from 'lodash'
+import { defineMessages, FormattedNumber } from 'react-intl'
+import { throttle } from 'lodash'
+import classnames from 'classnames'
+
+import tts from '@console/api/tts'
+import deviceIcon from '@assets/misc/end-device.svg'
 
 import Icon, {
   IconCodeDots,
@@ -22,6 +26,8 @@ import Icon, {
   IconX,
   IconCopy,
   IconCopyCheck,
+  IconAccessPoint,
+  IconArrowNarrowUp,
 } from '@ttn-lw/components/icon'
 import Panel, { PanelError } from '@ttn-lw/components/panel'
 import CodeEditor from '@ttn-lw/components/code-editor'
@@ -42,28 +48,22 @@ const m = defineMessages({
   source: 'Source: {source}',
   received: 'Received',
   seeInLiveData: 'See in live data',
+  up: '{up} up',
+  rssi: `{rssi}dBm RSSI`,
+  snr: `{snr}dB SNR`,
 })
 
-const findKey = (obj, keyToFind) => {
-  let result
+const hasDecodedPayload = data => {
+  const type = data?.['@type']?.split('.')?.pop()
 
-  const recursiveSearch = obj => {
-    forOwn(obj, (value, key) => {
-      if (key === keyToFind) {
-        result = value
-        return false // Exit early
-      } else if (isObject(value)) {
-        result = recursiveSearch(value)
-        if (result) return false // Exit early if found
-      }
-    })
-    return result
-  }
-
-  return recursiveSearch(obj)
+  return (
+    type === 'ApplicationUplink' ||
+    type === 'ApplicationUplinkNormalized' ||
+    type === 'ApplicationUp'
+  )
 }
 
-const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
+const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
   const [latestEvent, setLatestEvent] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [copied, setCopied] = useState(false)
@@ -71,7 +71,25 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
   const _timer = useRef(null)
 
   const throttledSetLatestEvent = useCallback(
-    throttle(newEvent => setLatestEvent(newEvent), 10000),
+    throttle(async (newEvent, devId) => {
+      const { name, version_ids } = await tts.Applications.Devices.getById(appId, devId, [
+        'name',
+        'version_ids',
+      ])
+      const hasModel = Boolean(version_ids?.brand_id) && Boolean(version_ids?.model_id)
+      let picture = deviceIcon
+      if (hasModel) {
+        const { photos } = await tts.Applications.Devices.Repository.getModel(
+          appId,
+          version_ids.brand_id,
+          version_ids.model_id,
+          ['photos'],
+        )
+        picture = photos.main
+      }
+
+      return setLatestEvent({ ...newEvent, deviceName: name, picture })
+    }, 10000),
     [],
   )
 
@@ -85,14 +103,20 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
   useEffect(() => {
     if (!events.length) return
 
-    const firstEventWithPayload = events.find(e => findKey(e.data, 'decoded_payload'))
+    const firstEventWithPayload = events.find(e => hasDecodedPayload(e.data))
 
     if (firstEventWithPayload) {
-      throttledSetLatestEvent({
-        eventId: firstEventWithPayload.unique_id,
-        time: firstEventWithPayload.time,
-        decodedPayload: findKey(firstEventWithPayload.data, 'decoded_payload'),
-      })
+      throttledSetLatestEvent(
+        {
+          eventId: firstEventWithPayload.unique_id,
+          time: firstEventWithPayload.time,
+          decodedPayload: firstEventWithPayload.data.uplink_message?.decoded_payload ?? {},
+          rssi: firstEventWithPayload.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
+          snr: firstEventWithPayload.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
+          numUplink: firstEventWithPayload.data.uplink_message?.f_cnt ?? 0,
+        },
+        firstEventWithPayload.data.end_device_ids.device_id,
+      )
     }
   }, [events, throttledSetLatestEvent])
 
@@ -121,22 +145,68 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
   const getContent = useCallback(
     (event, maxLines = 8, minLines = 3) => (
       <>
-        <div className="d-flex j-between pt-cs-m pb-cs-m">
-          <Message
-            uppercase
-            content={m.source}
-            values={{ source: sharedMessages.liveData.defaultMessage }}
-            className={style.source}
-          />
-          <LastSeen
-            statusClassName={style.receivedStatus}
-            message={m.received}
-            lastSeen={event?.time}
-            className={style.received}
-          />
+        <div className={classnames(style.header, 'd-flex j-between p-cs-m')}>
+          <div className="d-inline-flex al-center gap-cs-xs">
+            <img className={style.deviceImage} alt={event?.deviceName} src={event?.picture} />
+            <div className="flex-column">
+              <Message content={event?.deviceName} className="fw-bold" />
+              <div className="d-inline-flex al-center gap-cs-xs">
+                <div className="d-inline-flex al-center gap-cs-xxs">
+                  <Icon icon={IconAccessPoint} />
+                  <Message
+                    content={m.rssi}
+                    className="c-text-neutral-semilight"
+                    values={{
+                      rssi: event?.rssi,
+                    }}
+                  />
+                </div>
+                <div className="d-inline-flex al-center gap-cs-xxs">
+                  <Icon icon={IconAccessPoint} />
+                  <Message
+                    content={m.snr}
+                    className="c-text-neutral-semilight"
+                    values={{
+                      snr: event?.snr,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={style.rightHeaderColumn}>
+            <LastSeen
+              statusClassName={style.receivedStatus}
+              message={m.received}
+              lastSeen={event?.time}
+              short
+              displayMessage
+              className="c-text-neutral-semilight"
+            />
+            <div className="d-inline-flex al-center gap-cs-xxs">
+              <Icon icon={IconArrowNarrowUp} />
+              <Message
+                component="span"
+                content={m.up}
+                className="c-text-neutral-semilight"
+                values={{
+                  up: <FormattedNumber value={event?.numUplink} />,
+                }}
+              />
+            </div>
+          </div>
         </div>
-
+        {!selectedEvent && (
+          <Button
+            naked
+            icon={IconArrowsMaximize}
+            small
+            className={style.maximize}
+            onClick={handleOpenMaximizeCodeModal}
+          />
+        )}
         <CodeEditor
+          className={style.codeWrapper}
           value={JSON.stringify(event?.decodedPayload, null, 2)}
           language="json"
           name="latest_decoded_payload"
@@ -146,7 +216,7 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
         />
       </>
     ),
-    [],
+    [handleOpenMaximizeCodeModal, selectedEvent],
   )
 
   return (
@@ -160,15 +230,8 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
       {latestEvent ? (
         <div className="pos-relative">
           {getContent(latestEvent)}
-          <Button
-            naked
-            icon={IconArrowsMaximize}
-            small
-            className={style.maximize}
-            onClick={handleOpenMaximizeCodeModal}
-          />
           <PortalledModal
-            visible={selectedEvent}
+            visible={Boolean(selectedEvent)}
             noTitleLine
             noControlBar
             className={style.modalBody}
@@ -210,6 +273,7 @@ const LatestDecodedPayloadPanel = ({ events, shortCutLinkPath }) => {
 }
 
 LatestDecodedPayloadPanel.propTypes = {
+  appId: PropTypes.string.isRequired,
   events: PropTypes.events.isRequired,
   shortCutLinkPath: PropTypes.string.isRequired,
 }

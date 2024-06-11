@@ -72,6 +72,7 @@ const ApplicationOverview = () => {
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <LatestDecodedPayloadPanel
+            appId={appId}
             events={events}
             shortCutLinkPath={`/applications/${appId}/data`}
           />

@@ -13,14 +13,13 @@
 // limitations under the License.
 
 .panel
-  height: 100%
   display: flex
   flex-direction: column
 
   .maximize
     position: absolute
     right: $cs.s
-    top: $cs.xxl
+    margin-top: $cs.s
     z-index: $zi.slight
 
 .source
@@ -55,3 +54,28 @@
 
 .modal-body
   padding: $cs.xl
+
+.code-wrapper
+  border-top-left-radius: 0
+  border-top-right-radius: 0
+  > .ace-ttn
+    background-color: red !important
+
+.header
+  border: 1px solid var(--c-border-neutral-light)
+  border-bottom: none
+  border-top-left-radius: $br.l
+  border-top-right-radius: $br.l
+  flex-wrap: wrap
+
+.right-header-column
+  display: inline-flex
+  flex-direction: column
+  align-items: flex-end
+  justify-content: center
+
+.device-image
+  height: $ls.l
+  width: $ls.l
+  border-radius: $br.l
+  border: 1px solid var(--c-border-neutral-light)

@@ -98,11 +98,14 @@ const Events = React.memo(
     const handleRowClick = useCallback(
       eventId => {
         if (eventId !== focus.eventId) {
-          setSearchParams({
-            eventId,
-          })
+          setSearchParams(
+            {
+              eventId,
+            },
+            { replace: true },
+          )
         } else {
-          setSearchParams({})
+          setSearchParams({}, { replace: true })
         }
       },
       [focus.eventId, setSearchParams],
@@ -113,7 +116,7 @@ const Events = React.memo(
     }, [onFilterChange, filter])
 
     const handleEventInfoCloseClick = useCallback(() => {
-      setSearchParams({})
+      setSearchParams({}, { replace: true })
     }, [setSearchParams])
 
     return (

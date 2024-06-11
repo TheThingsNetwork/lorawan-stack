@@ -25,11 +25,11 @@ ace.define(
   box-shadow: none;\
 }\
 .ace-ttn .ace_gutter {\
-background: #fff;\
+background: #FAFBFF;\
 color: #B4B7CB;\
 }\
 .ace-ttn  {\
-background: #fff;\
+background: #FAFBFF;\
 color: #000;\
 }\
 // begin language\
