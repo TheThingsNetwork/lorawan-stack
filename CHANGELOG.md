@@ -37,7 +37,7 @@ For details about compatibility between different releases, see the **Commitment
 - Fix potential issue with application event stream stopping after showing initial events.
 - Fix storybook compiling issue.
 
-## [3.30.2] - unreleased
+## [3.30.2] - 2024-06-11
 
 ### Fixed
 
@@ -2876,7 +2876,7 @@ NOTE: These links should respect backports. See https://github.com/TheThingsNetw
 [3.16.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.1...v3.16.2
 [3.16.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16.1
 [3.16.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.16.0
-[3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15.3
+[3.15.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15.3
 [3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15.2
 [3.15.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15.1
 [3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.15.0
