@@ -14,7 +14,6 @@
 
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 
 import { Table } from '@ttn-lw/components/table'
@@ -32,13 +31,11 @@ import {
   selectApplicationDeviceCount,
 } from '@console/store/selectors/applications'
 
-import styles from '../top-entities-panel.styl'
-
 const m = defineMessages({
   errorMessage: 'Not available',
 })
 
-const TopApplicationsItem = ({ bookmark, headers, last }) => {
+const TopApplicationsItem = ({ bookmark, headers }) => {
   const { title, ids, path } = useBookmark(bookmark)
   const deviceCount = useSelector(state => selectApplicationDeviceCount(state, ids.id))
   const lastSeen = useSelector(state => selectApplicationDerivedLastSeen(state, ids.id))
@@ -55,13 +52,7 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
   const errorRenderFunction = () => <Message content={m.errorMessage} />
 
   return (
-    <Table.Row
-      id={ids.id}
-      clickable
-      linkTo={path}
-      body
-      className={classNames(styles.entityRow, { [styles.lastRow]: last })}
-    >
+    <Table.Row id={ids.id} clickable linkTo={path} body>
       {headers.map((header, index) => {
         const value =
           headers[index].name === 'name'
@@ -76,13 +67,7 @@ const TopApplicationsItem = ({ bookmark, headers, last }) => {
             requestAction={loadDeviceCount}
             errorRenderFunction={errorRenderFunction}
           >
-            <Table.DataCell
-              align={header.align}
-              className={classNames(styles.entityCell, {
-                [styles.entityCellDivided]:
-                  headers[index].name === 'lastSeen' || headers[index].name === 'name',
-              })}
-            >
+            <Table.DataCell align={header.align}>
               {headers[index].render(value, entityID)}
             </Table.DataCell>
           </RequireRequest>
@@ -103,11 +88,6 @@ TopApplicationsItem.propTypes = {
       align: PropTypes.string,
     }),
   ).isRequired,
-  last: PropTypes.bool,
-}
-
-TopApplicationsItem.defaultProps = {
-  last: false,
 }
 
 export default TopApplicationsItem

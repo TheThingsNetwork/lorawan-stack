@@ -57,6 +57,8 @@ export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)
 export const selectApplicationError = createErrorSelector(GET_APP_BASE)
 export const selectApplicationDeviceCount = (state, id) =>
   selectApplicationStore(state).applicationDeviceCounts[id]
+export const selectApplicationDeviceCounts = state =>
+  selectApplicationStore(state).applicationDeviceCounts
 export const selectApplicationDeviceCountFetching = createFetchingSelector(GET_APP_DEV_COUNT_BASE)
 export const selectApplicationDeviceCountError = createErrorSelector(GET_APP_DEV_COUNT_BASE)
 export const selectApplicationDerivedLastSeen = (state, id) =>
@@ -74,11 +76,11 @@ export const selectApplications = createSelector(
 )
 export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
 export const selectApplicationsWithDeviceCounts = createSelector(
-  [selectApplications, selectApplicationStore],
-  (applications, store) =>
+  [selectApplications, selectApplicationDeviceCounts],
+  (applications, deviceCounts) =>
     applications.map(app => ({
       ...app,
-      _devices: store.applicationDeviceCounts[app.ids.application_id],
+      _devices: deviceCounts[app.ids.application_id],
     })),
 )
 

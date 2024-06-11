@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
-import { FixedSizeList as List } from 'react-window'
-import InfiniteLoader from 'react-window-infinite-loader'
-import AutoSizer from 'react-virtualized-auto-sizer'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import Spinner from '@ttn-lw/components/spinner'
 import { Table } from '@ttn-lw/components/table'
 import { IconPlus } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import ScrollFader from '@ttn-lw/components/scroll-fader'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -48,49 +45,13 @@ const EntitiesList = ({
   entity,
 }) => {
   const itemsTotalCount = useSelector(state => itemsCountSelector(state, entity))
-  const [items, setItems] = useState([])
-  const showScrollIndicator = itemsTotalCount > 5
-  const hasNextPage = items.length < itemsTotalCount
   const EntitiesItemComponent = EntitiesItemProp ?? EntitiesItem
-  const itemCount = items.length === itemsTotalCount ? itemsTotalCount : items.length + 1
-  const [fetching, setFetching] = useState(false)
 
-  const loadNextPage = useCallback(
-    async startIndex => {
-      if (fetching) return
-      setFetching(true)
-      const nextBookmarks = allBookmarks.slice(startIndex, startIndex + 10)
-      setItems([...items, ...nextBookmarks])
-
-      setFetching(false)
-    },
-    [fetching, allBookmarks, items],
-  )
-
-  const isItemLoaded = useCallback(
-    index => (items.length > 0 ? !hasNextPage || index < items.length : false),
-    [hasNextPage, items],
-  )
-
-  const Item = ({ index, style }) =>
-    isItemLoaded(index) && items[index] ? (
-      <div style={style}>
-        <EntitiesItemComponent
-          headers={headers}
-          bookmark={items[index]}
-          last={index === itemsTotalCount - 1 && showScrollIndicator}
-        />
-      </div>
-    ) : (
-      <div style={style}>
-        <Spinner faded micro center />
-      </div>
-    )
-
-  Item.propTypes = {
-    index: PropTypes.number.isRequired,
-    style: PropTypes.shape({}).isRequired,
-  }
+  const rows = allBookmarks
+    .slice(0, 10)
+    .map((bookmark, index) => (
+      <EntitiesItemComponent key={index} headers={headers} bookmark={bookmark} />
+    ))
 
   const columns = (
     <Table.Row head>
@@ -107,9 +68,7 @@ const EntitiesList = ({
     </Table.Row>
   )
 
-  const minWidth = `${headers.length * 10 + 5}rem`
-
-  return items.length === 0 && itemsTotalCount === 0 ? (
+  return allBookmarks.length === 0 && itemsTotalCount === 0 ? (
     <div className="d-flex direction-column flex-grow j-center gap-cs-l">
       <div>
         <Message content={emptyMessage} className="d-block text-center fs-l fw-bold" />
@@ -122,38 +81,12 @@ const EntitiesList = ({
       )}
     </div>
   ) : (
-    <Table minWidth={minWidth}>
-      <Table.Head>{columns}</Table.Head>
-      <Table.Body className={styles.entityBody} emptyMessage={m.empty}>
-        <AutoSizer>
-          {({ width }) => (
-            <InfiniteLoader
-              loadMoreItems={loadNextPage}
-              isItemLoaded={isItemLoaded}
-              itemCount={itemsTotalCount}
-              threshold={5}
-            >
-              {({ onItemsRendered, ref }) => (
-                <>
-                  <List
-                    height={56 * 5}
-                    width={width}
-                    itemSize={56}
-                    ref={ref}
-                    itemCount={itemCount}
-                    onItemsRendered={onItemsRendered}
-                    className={styles.entityList}
-                  >
-                    {Item}
-                  </List>
-                  {showScrollIndicator && <div className={styles.entityListGradient} />}
-                </>
-              )}
-            </InfiniteLoader>
-          )}
-        </AutoSizer>
-      </Table.Body>
-    </Table>
+    <ScrollFader className={styles.scrollFader} faderHeight="4rem" topFaderOffset="3rem" light>
+      <Table>
+        <Table.Head className={styles.topEntitiesPanelOuterTableHeader}>{columns}</Table.Head>
+        <Table.Body emptyMessage={m.empty}>{rows}</Table.Body>
+      </Table>
+    </ScrollFader>
   )
 }
 

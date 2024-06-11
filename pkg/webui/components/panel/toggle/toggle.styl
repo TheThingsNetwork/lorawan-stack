@@ -29,7 +29,11 @@
     padding: 0 $cs.s
     height: 2.25rem
     text-align: center
+    border: 1px solid transparent
     transition: background 80ms ease-in-out
+
+    +media-query($bp.xxs)
+      padding: 0 $cs.xxs
 
     &-active
       box-shadow: var(--shadow-box-button-normal)
@@ -41,5 +45,8 @@
       background: var(--c-bg-neutral-min-hover)
 
 @container panel (max-width: 485px)
+  .toggle
+    width: 100%
+
   .toggle-button
     width: 100%

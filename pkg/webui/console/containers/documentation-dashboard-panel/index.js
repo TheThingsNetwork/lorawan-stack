@@ -59,15 +59,7 @@ DocsPanelLink.propTypes = {
 }
 
 const DocumentationDashboardPanel = () => (
-  <Panel
-    title={sharedMessages.documentation}
-    icon={IconBook}
-    shortCutLinkPath={docBaseUrl}
-    shortCutLinkTitle={sharedMessages.showMore}
-    shortCutLinkTarget="_blank"
-    divider
-    className="h-full"
-  >
+  <Panel title={sharedMessages.documentation} icon={IconBook} divider className="h-full">
     <DocsPanelLink
       path={`${docBaseUrl}/getting-started/`}
       title={m.gettingStarted}

@@ -20,9 +20,20 @@
   box-shadow: var(--shadow-box-panel-normal)
   padding: $cs.xl
   container: panel / inline-size
-  overflow: hidden
+
+  +media-query($bp.md)
+    padding: $cs.m
 
   &-header
+    display: flex
+    flex-wrap: wrap
+    justify-content: space-between
+    align-items: flex-start
+    gap: $cs.m
+    min-height: 2.5rem // Fix the header height to have a uniform look between panels.
+    margin-bottom: $cs.m
+    flex-shrink: 0
+
     &-title
       font-weight: $fwv2.bold
       font-size: $fsv2.l
@@ -43,11 +54,11 @@
       text-underline-offset: .4rem
       text-decoration-color: var(--c-text-brand-normal)
 
-  &-divider
-    border-bottom: 1px solid var(--c-border-neutral-light)
-    margin-top: $cs.l
-    margin-bottom: $cs.l
-    height: 0px
+  &.divider
+    .panel-header
+      padding-bottom: $cs.m
+      border-bottom: 1px solid var(--c-border-neutral-light)
+      margin-bottom: $cs.l
 
 .panel-header-icon
   font-size: $fs.xl

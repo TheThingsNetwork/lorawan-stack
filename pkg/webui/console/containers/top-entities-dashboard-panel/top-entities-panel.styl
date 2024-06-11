@@ -13,35 +13,18 @@
 // limitations under the License.
 
 .top-entities-panel
-  min-height: 31rem
+  height: 31rem
   display: flex
   flex-direction: column
 
-.entity
-  &-list
-    scrollbar-width: none
-    &::-webkit-scrollbar
-      display: none
-    &-gradient
-      position:absolute
-      bottom: 0px
-      left: 0px
-      width: 100%
-      height: 98px
-      border-radius: 0px 0px 14px 14px
-      background: linear-gradient(180deg, rgba(255, 255, 255, .2) 0%, var(--c-bg-neutral-min) 64.58%)
-      pointer-events: none // Prevents the gradient from blocking the click event
-  &-body
-    height: 20rem
-  &-row
-    min-width: 100%
-    display: inline-table
-    border-bottom: 1px solid var(--c-border-neutral-extralight)
-    &.last-row
-      margin-bottom: 56px
-  &-cell
-    min-width: 100%
-    &-divided
-      width: 33%
-    &-small
-      width: 2.5rem
+  &-outer-table-header
+    top: 0
+    position: sticky
+    background: var(--c-bg-neutral-min)
+    z-index: 1
+
+.scroll-fader
+  overflow-y: auto
+  width: 100%
+  table-layout: fixed
+  scrollbar-width: none

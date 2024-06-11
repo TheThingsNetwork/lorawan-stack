@@ -39,7 +39,7 @@ const SideHeader = ({ Logo }) => {
       })}
     >
       <Link to="/">
-        <Logo className={[style.logo, { [style.minimizedLogo]: isMinimized }]} />
+        <Logo className={classnames(style.logo, { [style.minimizedLogo]: isMinimized })} />
       </Link>
       <Button
         className={classnames(style.minimizeButton, 's:d-none')}

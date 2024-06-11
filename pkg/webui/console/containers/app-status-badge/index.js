@@ -140,24 +140,26 @@ const AppStatusBadge = ({ className }) => {
     })
   }
 
+  if (!status) {
+    return null
+  }
+
   return (
     <RequireRequest requestAction={getNetworkStatusSummary()} handleErrors={false}>
-      {status && (
-        <StatusLabel
-          type={status.type}
-          icon={status.icon}
-          content={status.label}
-          className={classnames(style.appStatusBadge, className)}
-          contentValues={{
-            link: link => (
-              <Link className={statusLabelStyle.link} to={statusPageUrl} target="_blank">
-                <span>{link}</span>
-              </Link>
-            ),
-          }}
-          onClick={handleBadgeClick}
-        />
-      )}
+      <StatusLabel
+        type={status.type}
+        icon={status.icon}
+        content={status.label}
+        className={classnames(style.appStatusBadge, className)}
+        contentValues={{
+          link: link => (
+            <Link className={statusLabelStyle.link} to={statusPageUrl} target="_blank">
+              <span>{link}</span>
+            </Link>
+          ),
+        }}
+        onClick={handleBadgeClick}
+      />
     </RequireRequest>
   )
 }

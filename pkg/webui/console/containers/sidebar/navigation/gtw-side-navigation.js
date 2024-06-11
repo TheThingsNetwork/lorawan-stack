@@ -64,7 +64,7 @@ const GtwSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
   const gtwPageSize = getCookie('gateways-list-page-size')
   const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
-  const topEntities = useSelector(state => selectPerEntityBookmarks(state, 'gateway'))
+  const topEntities = useSelector(selectPerEntityBookmarks('gateway'))
   const userId = useSelector(selectUserId)
 
   if (!gtw) {

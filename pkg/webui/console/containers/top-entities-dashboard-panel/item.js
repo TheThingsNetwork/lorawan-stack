@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import classNames from 'classnames'
 import { useSelector } from 'react-redux'
 
 import { Table } from '@ttn-lw/components/table'
@@ -25,9 +24,7 @@ import { selectDeviceLastSeen } from '@console/store/selectors/devices'
 import { selectApplicationDerivedLastSeen } from '@console/store/selectors/applications'
 import { selectGatewayById } from '@console/store/selectors/gateways'
 
-import styles from './top-entities-panel.styl'
-
-const EntitiesItem = ({ bookmark, headers, last }) => {
+const EntitiesItem = ({ bookmark, headers }) => {
   const { title, ids, path, icon } = useBookmark(bookmark)
   const entityIds = bookmark.entity_ids
   const entity = Object.keys(entityIds)[0].replace('_ids', '')
@@ -46,13 +43,7 @@ const EntitiesItem = ({ bookmark, headers, last }) => {
   const lastSeen = entity === 'gateway' ? { status: lastSeenSelected?.status } : lastSeenSelected
 
   return (
-    <Table.Row
-      id={ids.id}
-      clickable
-      linkTo={path}
-      body
-      className={classNames(styles.entityRow, { [styles.lastRow]: last })}
-    >
+    <Table.Row id={ids.id} clickable linkTo={path} body>
       {headers.map((header, index) => {
         const value =
           headers[index].name === 'name'
@@ -64,13 +55,7 @@ const EntitiesItem = ({ bookmark, headers, last }) => {
                 : ''
         const entityID = ids.id
         return (
-          <Table.DataCell
-            key={index}
-            align={header.align}
-            className={classNames(styles.entityCell, {
-              [styles.entityCellSmall]: headers[index].name === 'type',
-            })}
-          >
+          <Table.DataCell key={index} align={header.align}>
             {headers[index].render(value, entityID)}
           </Table.DataCell>
         )
@@ -92,11 +77,6 @@ EntitiesItem.propTypes = {
       align: PropTypes.string,
     }),
   ).isRequired,
-  last: PropTypes.bool,
-}
-
-EntitiesItem.defaultProps = {
-  last: false,
 }
 
 export default EntitiesItem
