@@ -24,6 +24,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix potential issue with application event stream stopping after showing initial events.
+
 ### Security
 
 ## [3.30.2] - unreleased

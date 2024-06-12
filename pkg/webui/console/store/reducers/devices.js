@@ -209,7 +209,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
         const id = getCombinedDeviceId(event.identifiers[0].device_ids)
         const receivedAt = getByPath(event, 'data.received_at')
         if (receivedAt) {
-          const currentEndDevice = state.entities[id]
+          const currentEndDevice = { ...state.entities[id] }
           if (currentEndDevice) {
             // Only update if the event was actually more recent than the current value.
             if (
@@ -217,6 +217,14 @@ const devices = (state = defaultState, { type, payload, event }) => {
               !currentEndDevice.last_seen_at
             ) {
               currentEndDevice.last_seen_at = receivedAt
+            }
+
+            return {
+              ...state,
+              entities: {
+                ...state.entities,
+                [id]: currentEndDevice,
+              },
             }
           }
         }
