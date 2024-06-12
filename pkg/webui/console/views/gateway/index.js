@@ -33,6 +33,7 @@ import GatewayData from '@console/views/gateway-data'
 import GatewayGeneralSettings from '@console/views/gateway-general-settings'
 import GatewayApiKeys from '@console/views/gateway-api-keys'
 import GatewayOverview from '@console/views/gateway-overview'
+import GatewayTheThingsStation from '@console/views/gateway-the-things-station'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -45,6 +46,7 @@ import {
   mayViewOrEditGatewayCollaborators,
   mayViewOrEditGatewayApiKeys,
   mayEditBasicGatewayInformation,
+  mayViewTheThingsStation,
 } from '@console/lib/feature-checks'
 
 import {
@@ -125,6 +127,20 @@ const GatewayInner = () => {
         {mayViewGatewayInfo.check(rights) && (
           <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
         )}
+        {mayViewTheThingsStation.check(rights) && (
+          <SideNavigation.Item title={sharedMessages.theThingsStation} icon="router">
+            <SideNavigation.Item
+              title={sharedMessages.connectionSettings}
+              path="the-things-station/connection-settings"
+              icon="language"
+            />
+            <SideNavigation.Item
+              title={sharedMessages.connectionProfiles}
+              path="the-things-station/connection-profiles"
+              icon="tune"
+            />
+          </SideNavigation.Item>
+        )}
         {mayViewGatewayEvents.check(rights) && (
           <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="data" />
         )}
@@ -151,6 +167,7 @@ const GatewayInner = () => {
       </SideNavigation>
       <Routes>
         <Route index Component={GatewayOverview} />
+        <Route path="the-things-station/*" Component={GatewayTheThingsStation} />
         <Route path="api-keys/*" Component={GatewayApiKeys} />
         <Route path="collaborators/*" Component={GatewayCollaborators} />
         <Route path="location" Component={GatewayLocation} />
