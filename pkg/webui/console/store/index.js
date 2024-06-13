@@ -49,7 +49,7 @@ const store = configureStore({
         ignoredActionPaths: ['meta._resolve', 'meta._reject'],
       },
     }).concat(middlewares),
-  enhancert: getDefaultEnhancers => getDefaultEnhancers().concat(enhancers),
+  enhancer: getDefaultEnhancers => getDefaultEnhancers().concat(enhancers),
   devTools: dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__,
 })
 
