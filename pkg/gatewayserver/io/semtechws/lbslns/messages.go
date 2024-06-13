@@ -17,7 +17,7 @@ package lbslns
 import (
 	"encoding/json"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/id6"
 )
 
 // MessageType is the type of the message.

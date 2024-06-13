@@ -177,7 +177,7 @@ func (is IS) ValidateGatewayID(ctx context.Context, ids *ttnpb.GatewayIdentifier
 	return ids.ValidateContext(ctx)
 }
 
-func (is IS) newRegistryClient(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
+func (is IS) newRegistryClient(ctx context.Context, _ *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	cc, err := is.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		return nil, err

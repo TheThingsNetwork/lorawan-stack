@@ -21,7 +21,7 @@ import (
 
 	"github.com/smarty/assertions"
 
-	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/id6"
+	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/id6"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"

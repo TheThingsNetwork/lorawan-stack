@@ -11,7 +11,12 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Europe 868.1 MHz single channel frequency plan.
+  - This is experimental and may be removed or hidden in the future.
+
 ### Changed
+
+- The rate limit key for LoRa Basics Station has changed from `gs:accept:ws` to `gs:accept:semtechws/lbslns`.
 
 ### Deprecated
 

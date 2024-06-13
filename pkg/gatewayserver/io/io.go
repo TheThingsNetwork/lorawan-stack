@@ -323,15 +323,13 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"server_time", receivedAt,
 			"gateway_time", gatewayTime,
 		)).Debug("Synchronized server and gateway absolute time")
-	case gpsTime == nil:
+	default:
 		ct = c.scheduler.Sync(up.Settings.Timestamp, receivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
 			"server_time", receivedAt,
 		)).Debug("Synchronized server absolute time only")
-	default:
-		panic("unreachable")
 	}
 
 	receivedAtGateway := receivedAt

@@ -21,7 +21,7 @@ import (
 
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -31,8 +31,8 @@ import (
 
 func TestFromDownlinkMessage(t *testing.T) {
 	_, ctx := test.New(t)
-	ctx = ws.NewContextWithSession(ctx, &ws.Session{})
-	ws.UpdateSessionID(ctx, 0x11)
+	ctx = semtechws.NewContextWithSession(ctx, &semtechws.Session{})
+	semtechws.UpdateSessionID(ctx, 0x11)
 	var lbsLNS lbsLNS
 	for _, tc := range []struct {
 		BandID,
@@ -80,7 +80,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 					RxDelay: 1,
 					Rx1DR:   2,
 					Rx1Freq: 868500000,
-					XTime:   ws.ConcentratorTimeToXTime(0x11, 1553300787) - int64(time.Second/time.Microsecond),
+					XTime:   semtechws.ConcentratorTimeToXTime(0x11, 1553300787) - int64(time.Second/time.Microsecond),
 				},
 			},
 		},
@@ -123,7 +123,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 				AbsoluteTimeDownlinkMessage: &AbsoluteTimeDownlinkMessage{
 					DR:      2,
 					Freq:    869525000,
-					GPSTime: ws.TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
+					GPSTime: semtechws.TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
 				},
 			},
 		},
@@ -201,7 +201,7 @@ func TestToDownlinkMessage(t *testing.T) {
 				AbsoluteTimeDownlinkMessage: &AbsoluteTimeDownlinkMessage{
 					DR:      2,
 					Freq:    869525000,
-					GPSTime: ws.TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
+					GPSTime: semtechws.TimeToGPSTime(time.Unix(0x42424242, 0x42424242)),
 				},
 			},
 			ExpectedDownlinkMessage: &ttnpb.DownlinkMessage{
@@ -243,7 +243,7 @@ func TestToDownlinkMessage(t *testing.T) {
 func TestTransferTime(t *testing.T) {
 	a, ctx := test.New(t)
 
-	ctx = ws.NewContextWithSession(ctx, &ws.Session{})
+	ctx = semtechws.NewContextWithSession(ctx, &semtechws.Session{})
 
 	f := (*lbsLNS)(nil)
 	now := time.Unix(123, 456)
@@ -256,7 +256,7 @@ func TestTransferTime(t *testing.T) {
 	a.So(b, should.BeNil)
 
 	// Enable timesync for the session.
-	ws.UpdateSessionTimeSync(ctx, true)
+	semtechws.UpdateSessionTimeSync(ctx, true)
 
 	// No GPSTime / ConcentratorTime - expect only MuxTime.
 	b, err = f.TransferTime(ctx, now, nil, nil)
@@ -271,11 +271,11 @@ func TestTransferTime(t *testing.T) {
 		a.So(res.TxTime, should.Equal, 0.0)
 		a.So(res.XTime, should.Equal, 0)
 		a.So(res.GPSTime, should.Equal, 0)
-		a.So(res.MuxTime, should.Equal, ws.TimeToUnixSeconds(now))
+		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
 	}
 
 	// Add fictional session ID.
-	ws.UpdateSessionID(ctx, 0x42)
+	semtechws.UpdateSessionID(ctx, 0x42)
 
 	gpsTime := time.Unix(456, 678)
 	concentratorTime := scheduling.ConcentratorTime(890 * time.Microsecond)
@@ -291,9 +291,9 @@ func TestTransferTime(t *testing.T) {
 			t.FailNow()
 		}
 		a.So(res.TxTime, should.Equal, 0.0)
-		a.So(ws.SessionIDFromXTime(res.XTime), should.Equal, 0x42)
-		a.So(ws.ConcentratorTimeFromXTime(res.XTime), should.Equal, 890*time.Microsecond)
-		a.So(res.GPSTime, should.Equal, ws.TimeToGPSTime(gpsTime))
-		a.So(res.MuxTime, should.Equal, ws.TimeToUnixSeconds(now))
+		a.So(semtechws.SessionIDFromXTime(res.XTime), should.Equal, 0x42)
+		a.So(semtechws.ConcentratorTimeFromXTime(res.XTime), should.Equal, 890*time.Microsecond)
+		a.So(res.GPSTime, should.Equal, semtechws.TimeToGPSTime(gpsTime))
+		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
 	}
 }

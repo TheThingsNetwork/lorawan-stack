@@ -39,9 +39,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/ns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/packetbroker"
@@ -275,16 +275,16 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		}
 	}
 
-	// Start Web Socket listeners.
+	// Start Semtech web socket listeners.
 	type listenerConfig struct {
 		fallbackFreqPlanID string
 		listen             string
 		listenTLS          string
-		frontend           ws.Config
+		frontend           semtechws.Config
 	}
 	for _, version := range []struct {
 		Name           string
-		Formatter      ws.Formatter
+		Formatter      semtechws.Formatter
 		listenerConfig listenerConfig
 	}{
 		{
@@ -302,7 +302,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		if version.listenerConfig.fallbackFreqPlanID != "" {
 			ctx = frequencyplans.WithFallbackID(ctx, version.listenerConfig.fallbackFreqPlanID)
 		}
-		web, err := ws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
+		web, err := semtechws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
 		if err != nil {
 			return nil, err
 		}
