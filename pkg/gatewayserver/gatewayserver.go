@@ -17,6 +17,7 @@ package gatewayserver
 
 import (
 	"context"
+	"crypto/x509"
 	"fmt"
 	stdio "io"
 	stdlog "log"
@@ -28,6 +29,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	mtlsauth "go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -45,6 +47,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/ns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/packetbroker"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewaytokens"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
@@ -89,6 +92,8 @@ type GatewayServer struct {
 	connections sync.Map // string to connectionEntry
 
 	statsRegistry GatewayConnectionStatsRegistry
+
+	certVerifier CertificateVerifier
 }
 
 // Option configures GatewayServer.
@@ -104,6 +109,11 @@ func WithRegistry(registry EntityRegistry) Option {
 // Context returns the context of the Gateway Server.
 func (gs *GatewayServer) Context() context.Context {
 	return gs.ctx
+}
+
+// CertificateVerifier abstracts certificate verification functions.
+type CertificateVerifier interface {
+	Verify(ctx context.Context, cn string, cert *x509.Certificate) error
 }
 
 var (
@@ -427,6 +437,23 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 		} else {
 			return nil, nil, err
 		}
+	}
+	if cert := mtlsauth.ClientCertificateFromContext(ctx); cert != nil {
+		// Verify the client certificate.
+		if err := gs.certVerifier.Verify(ctx, types.MustEUI64(ids.Eui).String(), cert); err != nil {
+			return nil, nil, errUnauthenticatedGatewayConnection.WithCause(err)
+		}
+		token := gatewaytokens.New(
+			gs.config.GatewayTokenHashKeyID,
+			ids,
+			&ttnpb.Rights{
+				Rights: []ttnpb.Right{
+					ttnpb.Right_RIGHT_GATEWAY_LINK,
+				},
+			},
+			gs.KeyService(),
+		)
+		ctx = gatewaytokens.NewContext(ctx, token)
 	}
 	return ctx, ids, nil
 }
