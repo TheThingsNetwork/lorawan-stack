@@ -24,7 +24,7 @@ import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { createGateway, updateGateway } from '@console/store/actions/gateways'
+import { createGateway, claimGateway, updateGateway } from '@console/store/actions/gateways'
 import { createGatewayApiKey } from '@console/store/actions/api-keys'
 
 import { selectUserId } from '@console/store/selectors/logout'
@@ -32,6 +32,7 @@ import { selectUserId } from '@console/store/selectors/logout'
 import GatewayProvisioningFormSection from './gateway-provisioning-form'
 import validationSchema from './gateway-provisioning-form/validation-schema'
 import { initialValues as registerInitialValues } from './gateway-provisioning-form/gateway-registration-form-section'
+import { initialValues as claimingInitialValues } from './gateway-provisioning-form/gateway-claim-form-section'
 
 const GatewayOnboardingForm = props => {
   const { onSuccess } = props
@@ -47,17 +48,19 @@ const GatewayOnboardingForm = props => {
     () =>
       merge(
         {
+          _inputMethod: undefined,
           _ownerId: userId,
           enforce_duty_cycle: true,
           schedule_anytime_delay: '0.530s',
         },
         registerInitialValues,
+        claimingInitialValues,
       ),
     [userId],
   )
 
   const generateCUPSApiKey = useCallback(
-    gateway_id => {
+    async gateway_id => {
       const key = {
         name: `cups-api-key-${Date.now()}`,
         rights: [
@@ -73,7 +76,7 @@ const GatewayOnboardingForm = props => {
   )
 
   const generateLNSApiKey = useCallback(
-    gateway_id => {
+    async gateway_id => {
       const key = {
         name: `lns-api-key-${Date.now()}`,
         rights: ['RIGHT_GATEWAY_INFO', 'RIGHT_GATEWAY_LINK'],
@@ -85,7 +88,7 @@ const GatewayOnboardingForm = props => {
   )
 
   const handleRegistrationSubmit = useCallback(
-    async (values, cleanValues) => {
+    async (values, { authenticated_identifiers, ...cleanValues }) => {
       const { _ownerId, _create_api_key_cups, _create_api_key_lns } = values
 
       const isUserOwner = _ownerId ? userId === _ownerId : true
@@ -117,9 +120,40 @@ const GatewayOnboardingForm = props => {
     [dispatch, generateCUPSApiKey, generateLNSApiKey, userId, onSuccess],
   )
 
+  const handleClaimSubmit = useCallback(
+    async ({ _ownerId }, { ids, ...cleanValues }) => {
+      const collaboratorType = _ownerId ? (_ownerId === userId ? 'user' : 'organization') : 'user'
+
+      try {
+        await dispatch(
+          attachPromise(
+            claimGateway({
+              collaborator: {
+                [`${collaboratorType}_ids`]: {
+                  [`${collaboratorType}_id`]: _ownerId ? _ownerId : userId,
+                },
+              },
+              ...cleanValues,
+            }),
+          ),
+        )
+
+        onSuccess(cleanValues.target_gateway_id)
+      } catch (error) {
+        setError(error)
+      }
+    },
+    [dispatch, onSuccess, userId],
+  )
+
   const handleSubmit = useCallback(
-    (values, _, cleanValues) => handleRegistrationSubmit(values, cleanValues),
-    [handleRegistrationSubmit],
+    ({ _inputMethod, ...values }, _, cleanValues) => {
+      if (_inputMethod !== 'register') {
+        return handleClaimSubmit(values, cleanValues)
+      }
+      return handleRegistrationSubmit(values, cleanValues)
+    },
+    [handleClaimSubmit, handleRegistrationSubmit],
   )
 
   const downloadLns = useCallback(() => {
@@ -152,7 +186,7 @@ const GatewayOnboardingForm = props => {
         error={error}
         onSubmit={handleSubmit}
         initialValues={initialValues}
-        hiddenFields={['gateway_server_address', 'enforce_duty_cycle', 'schedule_anytime_delay']}
+        hiddenFields={['_inputMethod']}
         validationSchema={validationSchema}
         validateAgainstCleanedValues
       >

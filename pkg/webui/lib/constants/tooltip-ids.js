@@ -26,6 +26,7 @@ export default Object.freeze({
   CLASS_B_TIMEOUT: 'class-b-timeout',
   CLASS_C_TIMEOUT: 'class-c-timeout',
   CLASSES: 'classes',
+  CLAIM_AUTH_CODE: 'claim-auth-code',
   DATA_RATE_OFFSET: 'data-rate-offset',
   DEV_EUI: 'deveui',
   DEVICE_ADDRESS: 'device-address',
