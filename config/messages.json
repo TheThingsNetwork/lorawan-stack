@@ -3077,6 +3077,78 @@
       "file": "cluster.go"
     }
   },
+  "error:pkg/auth/mtls:certificate_not_verified": {
+    "translations": {
+      "en": "certificate not verified"
+    },
+    "description": {
+      "package": "pkg/auth/mtls",
+      "file": "mtls.go"
+    }
+  },
+  "error:pkg/auth/mtls:common_name_mismatch": {
+    "translations": {
+      "en": "common name mismatch. Expected `{exp}`, got `{got}`"
+    },
+    "description": {
+      "package": "pkg/auth/mtls",
+      "file": "mtls.go"
+    }
+  },
+  "error:pkg/auth/mtls:fetch_file": {
+    "translations": {
+      "en": "fetch file `{path}`"
+    },
+    "description": {
+      "package": "pkg/auth/mtls",
+      "file": "mtls.go"
+    }
+  },
+  "error:pkg/auth/mtls:no_ca_pool": {
+    "translations": {
+      "en": "no CA pool configured"
+    },
+    "description": {
+      "package": "pkg/auth/mtls",
+      "file": "mtls.go"
+    }
+  },
+  "error:pkg/auth/mtls:parse_certificate": {
+    "translations": {
+      "en": "parse certificate"
+    },
+    "description": {
+      "package": "pkg/auth/mtls",
+      "file": "mtls.go"
+    }
+  },
+  "error:pkg/auth/mtls:parse_index_file": {
+    "translations": {
+      "en": "parse index file"
+    },
+    "description": {
+      "package": "pkg/auth/mtls",
+      "file": "mtls.go"
+    }
+  },
+  "error:pkg/auth/mtls:proxy_header_value": {
+    "translations": {
+      "en": "invalid proxy header value"
+    },
+    "description": {
+      "package": "pkg/auth/mtls",
+      "file": "proxy_headers.go"
+    }
+  },
+  "error:pkg/auth/mtls:read_certificate": {
+    "translations": {
+      "en": "read certificate from file `{path}`"
+    },
+    "description": {
+      "package": "pkg/auth/mtls",
+      "file": "mtls.go"
+    }
+  },
   "error:pkg/auth/pbkdf2:invalid_pbkdf2_format": {
     "translations": {
       "en": "password hash has invalid PBKDF2 format"
@@ -5424,6 +5496,24 @@
     "description": {
       "package": "pkg/gatewayserver",
       "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewaytokens:checksum_mismatch": {
+    "translations": {
+      "en": "checksum mismatch"
+    },
+    "description": {
+      "package": "pkg/gatewaytokens",
+      "file": "gatewaytokens.go"
+    }
+  },
+  "error:pkg/gatewaytokens:token_expired": {
+    "translations": {
+      "en": "token expired"
+    },
+    "description": {
+      "package": "pkg/gatewaytokens",
+      "file": "gatewaytokens.go"
     }
   },
   "error:pkg/goproto:stack_depth_exceeded": {
