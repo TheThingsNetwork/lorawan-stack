@@ -105,11 +105,11 @@ func (c *TTJS) httpClient(ctx context.Context) (*http.Client, error) {
 }
 
 var (
-	errBadRequest           = errors.DefineInvalidArgument("bad_request", "bad request", "message")
+	errBadRequest           = errors.DefineInternal("bad_request", "bad request", "message")
 	errDeviceNotProvisioned = errors.DefineNotFound("device_not_provisioned", "device with EUI `{dev_eui}` not provisioned") //nolint:lll
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
-	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
-	errUnauthenticated      = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
+	errDeviceAccessDenied   = errors.DefineInvalidArgument("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
+	errUnauthenticated      = errors.DefineInternal("unauthenticated", "unauthenticated")
 	errUnclaimDevice        = errors.Define("unclaim_device", "unclaim device with EUI `{dev_eui}`", "message")
 	errUnclaimDevices       = errors.Define("unclaim_devices", "unclaim devices")
 )
