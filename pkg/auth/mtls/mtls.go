@@ -45,7 +45,6 @@ var (
 		"read_certificate",
 		"read certificate from file `{path}`",
 	)
-	errParseCertificate       = errors.DefineInvalidArgument("parse_certificate", "parse certificate")
 	errNoCAPool               = errors.DefineInvalidArgument("no_ca_pool", "no CA pool configured")
 	errCertificateNotVerified = errors.DefineInvalidArgument(
 		"certificate_not_verified",

@@ -1854,7 +1854,6 @@
   "error:pkg/auth/mtls:common_name_mismatch": "",
   "error:pkg/auth/mtls:fetch_file": "",
   "error:pkg/auth/mtls:no_ca_pool": "",
-  "error:pkg/auth/mtls:parse_certificate": "",
   "error:pkg/auth/mtls:parse_index_file": "",
   "error:pkg/auth/mtls:proxy_header_value": "",
   "error:pkg/auth/mtls:read_certificate": "",

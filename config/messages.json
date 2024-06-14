@@ -3113,15 +3113,6 @@
       "file": "mtls.go"
     }
   },
-  "error:pkg/auth/mtls:parse_certificate": {
-    "translations": {
-      "en": "parse certificate"
-    },
-    "description": {
-      "package": "pkg/auth/mtls",
-      "file": "mtls.go"
-    }
-  },
   "error:pkg/auth/mtls:parse_index_file": {
     "translations": {
       "en": "parse index file"
