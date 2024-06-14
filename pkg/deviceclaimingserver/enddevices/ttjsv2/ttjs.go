@@ -105,13 +105,14 @@ func (c *TTJS) httpClient(ctx context.Context) (*http.Client, error) {
 }
 
 var (
-	errBadRequest           = errors.DefineInternal("bad_request", "bad request", "message")
+	errBadRequest           = errors.DefineInvalidArgument("bad_request", "bad request", "message")
 	errDeviceNotProvisioned = errors.DefineNotFound("device_not_provisioned", "device with EUI `{dev_eui}` not provisioned") //nolint:lll
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
-	errDeviceAccessDenied   = errors.DefineInvalidArgument("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
+	errDeviceAccessDenied   = errors.DefineInternal("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
 	errUnauthenticated      = errors.DefineInternal("unauthenticated", "unauthenticated")
 	errUnclaimDevice        = errors.Define("unclaim_device", "unclaim device with EUI `{dev_eui}`", "message")
 	errUnclaimDevices       = errors.Define("unclaim_devices", "unclaim devices")
+	errInternalError        = errors.DefineInternal("internal_error", "internal error", "message")
 )
 
 // Claim implements EndDeviceClaimer.
@@ -177,10 +178,13 @@ func (c *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuth
 
 	switch resp.StatusCode {
 	case http.StatusBadRequest:
-		return errBadRequest.WithAttributes("message", errResp.Message)
+		return errInternalError.WithAttributes("message", errResp.Message)
 	case http.StatusNotFound:
 		return errDeviceNotProvisioned.WithAttributes("dev_eui", devEUI)
 	case http.StatusForbidden:
+		if errResp.Message == "claim failed with given owner token" {
+			return errBadRequest.WithAttributes("message", errResp.Message)
+		}
 		return errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
 		return errUnauthenticated.New()
@@ -234,7 +238,7 @@ func (c *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) err
 
 	switch resp.StatusCode {
 	case http.StatusBadRequest:
-		return errBadRequest.WithAttributes("message", errResp.Message)
+		return errInternalError.WithAttributes("message", errResp.Message)
 	case http.StatusNotFound:
 		return errDeviceNotClaimed.WithAttributes("dev_eui", devEUI)
 	case http.StatusForbidden:
@@ -317,7 +321,7 @@ func (c *TTJS) GetClaimStatus(
 
 	switch resp.StatusCode {
 	case http.StatusBadRequest:
-		return nil, errBadRequest.WithAttributes("message", errResp.Message)
+		return nil, errInternalError.WithAttributes("message", errResp.Message)
 	case http.StatusNotFound:
 		return nil, errDeviceNotClaimed.WithAttributes("dev_eui", devEUI)
 	case http.StatusForbidden:
@@ -388,7 +392,7 @@ func (c *TTJS) BatchUnclaim(
 			return errUnclaimDevices.WithCause(err)
 		}
 		if errMsg.Message != "" {
-			return errBadRequest.WithAttributes("message", errMsg.Message)
+			return errInternalError.WithAttributes("message", errMsg.Message)
 		}
 
 		var resp EndDevicesErrors
