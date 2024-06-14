@@ -104,8 +104,8 @@ const GatewayProvisioningFormSection = () => {
 
     try {
       if (!hasEmptyEui) {
-        const { supports_claiming } = await dispatch(attachPromise(getGatewayClaimInfoByEui(eui)))
-
+        // Const { supports_claiming } = await dispatch(attachPromise(getGatewayClaimInfoByEui(eui)))
+        const supports_claiming = false
         const prefillId = `eui-${eui.toLowerCase()}`
         if (supports_claiming) {
           // TODO: Make API request to determine whether it's a The Things Station
@@ -124,10 +124,10 @@ const GatewayProvisioningFormSection = () => {
     } catch (error) {
       setEuiError(error)
     }
-  }, [dispatch, eui, hasEmptyEui, setFieldValue])
+  }, [eui, hasEmptyEui, setFieldValue])
 
   const handleEuiReset = useCallback(async () => {
-    setEuiError()
+    setEuiError(undefined)
     resetForm({ values: { ...initialValues, _ownerId: ownerId } })
   }, [initialValues, ownerId, resetForm])
 

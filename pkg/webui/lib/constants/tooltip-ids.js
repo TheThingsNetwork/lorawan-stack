@@ -55,6 +55,7 @@ export default Object.freeze({
   GATEWAY_STATUS_PUBLIC: 'gateway-status-public',
   GATEWAY_GENERATE_API_KEY_CUPS: 'gateway-generate-api-key-cups',
   GATEWAY_GENERATE_API_KEY_LNS: 'gateway-generate-api-key-lns',
+  GATEWAY_SHOW_PROFILES: 'gateway-show-profiles',
   JOIN_EUI: 'joineui',
   JOIN_SERVER: 'join-server',
   LORA_CLOUD_MODEM_ENCODING: 'lora-cloud-modem-encoding',
