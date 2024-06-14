@@ -1,0 +1,39 @@
+{
+  "name": "tts-frontend-tools",
+  "version": "1.0.0",
+  "description": "Helper tools for The Things Stack frontend",
+  "main": "index.js",
+  "author": "Kevin Schiffer",
+  "license": "MIT",
+  "type": "module",
+  "eslintConfig": {
+    "extends": "../../config/eslintrc.yaml",
+    "parserOptions": {
+      "requireConfigFile": false
+    },
+    "settings": {
+      "import/ignore": [
+        "node_modules"
+      ],
+      "import/resolver": {
+        "webpack": "../../config/webpack.config.babel.js"
+      }
+    },
+    "rules": {
+      "import/named": "off",
+      "import/extensions": "off",
+      "no-console": "off",
+      "no-use-before-define": [
+        "warn",
+        {
+          "functions": false,
+          "classes": false
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "inquirer": "^9.2.19"
+  }
+}
