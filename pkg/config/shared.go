@@ -518,7 +518,7 @@ type ServiceBase struct {
 	Tracing          tracing.Config       `name:"tracing" yaml:"tracing" description:"Tracing configuration"`
 	SkipVersionCheck bool                 `name:"skip-version-check" yaml:"skip-version-check" description:"Skip version checks"` //nolint:lll
 	Telemetry        telemetry.Config     `name:"telemetry" yaml:"telemetry" description:"Telemetry configuration"`
-	MTLSAuth         MTLSAuthConfig       `name:"mtls-auth" description:"mTLS authentication configuration (EXPERIMENTAL)"`
+	MTLSAuth         MTLSAuthConfig       `name:"mtls-auth" description:"mTLS authentication configuration (EXPERIMENTAL)"` //nolint:lll
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.

@@ -74,7 +74,7 @@ func (m *MockCA) GenerateCertificate(euiString string, ca string) ([]byte, error
 		Names:      caName,
 		KeyRequest: csr.NewKeyRequest(),
 	}
-	g := &csr.Generator{Validator: func(req *csr.CertificateRequest) error { return nil }}
+	g := &csr.Generator{Validator: func(*csr.CertificateRequest) error { return nil }}
 	req, _, err := g.ProcessRequest(&certReq)
 	if err != nil {
 		return nil, err

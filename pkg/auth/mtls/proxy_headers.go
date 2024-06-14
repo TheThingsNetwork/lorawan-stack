@@ -34,17 +34,18 @@ var errProxyHeaderValue = errors.DefineCorruption("proxy_header_value", "invalid
 // FromProxyHeaders extracts a client certificate from proxy headers.
 // This function supports Envoy Proxy and Traefik.
 // If a proxy's header is set, it expects the value to contain a client certificate, otherwise an error is returned.
-// If no proxy headers are set, it returns nil, nil.
-func FromProxyHeaders(h HeaderReader) (*x509.Certificate, error) {
+// If no proxy headers are set, it returns nil, false, nil.
+func FromProxyHeaders(h HeaderReader) (*x509.Certificate, bool, error) {
 	for _, proxy := range []struct {
 		key   string
-		parse func(string) (*x509.Certificate, error)
+		parse func(string) (*x509.Certificate, bool, error)
 	}{
 		{
+			//nolint:lll
 			// Envoy Proxy
 			// See https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/headers#x-forwarded-client-cert
 			key: "x-forwarded-client-cert",
-			parse: func(value string) (*x509.Certificate, error) {
+			parse: func(value string) (*x509.Certificate, bool, error) {
 				parts := strings.Split(value, ";")
 				for _, part := range parts {
 					chainPEM, found := strings.CutPrefix(part, "Chain=")
@@ -54,37 +55,37 @@ func FromProxyHeaders(h HeaderReader) (*x509.Certificate, error) {
 					chainPEM = strings.Trim(chainPEM, `\"`)
 					chainPEM, err := url.PathUnescape(chainPEM)
 					if err != nil {
-						return nil, errProxyHeaderValue.WithCause(err)
+						return nil, false, errProxyHeaderValue.WithCause(err)
 					}
 					block, _ := pem.Decode([]byte(chainPEM))
 					if block == nil {
-						return nil, errProxyHeaderValue.New()
+						return nil, false, errProxyHeaderValue.New()
 					}
 					cert, err := x509.ParseCertificate(block.Bytes)
 					if err != nil {
-						return nil, errProxyHeaderValue.WithCause(err)
+						return nil, false, errProxyHeaderValue.WithCause(err)
 					}
-					return cert, nil
+					return cert, true, nil
 				}
-				return nil, errProxyHeaderValue.New()
+				return nil, false, errProxyHeaderValue.New()
 			},
 		},
 		{
 			// Traefik
 			// See https://doc.traefik.io/traefik/middlewares/http/passtlsclientcert/
 			key: "x-forwarded-tls-client-cert",
-			parse: func(value string) (*x509.Certificate, error) {
+			parse: func(value string) (*x509.Certificate, bool, error) {
 				leafPEM := strings.Split(value, ",")[0]
 				leafPEM = fmt.Sprintf("-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----", leafPEM)
 				block, _ := pem.Decode([]byte(leafPEM))
 				if block == nil {
-					return nil, errProxyHeaderValue.New()
+					return nil, false, errProxyHeaderValue.New()
 				}
 				cert, err := x509.ParseCertificate(block.Bytes)
 				if err != nil {
-					return nil, errProxyHeaderValue.WithCause(err)
+					return nil, false, errProxyHeaderValue.WithCause(err)
 				}
-				return cert, nil
+				return cert, true, nil
 			},
 		},
 	} {
@@ -92,5 +93,5 @@ func FromProxyHeaders(h HeaderReader) (*x509.Certificate, error) {
 			return proxy.parse(value)
 		}
 	}
-	return nil, nil
+	return nil, false, nil
 }

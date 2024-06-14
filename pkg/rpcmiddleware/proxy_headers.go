@@ -34,8 +34,9 @@ const (
 
 	headerXForwardedFor   = "x-forwarded-for"
 	headerXForwardedHost  = "x-forwarded-host"
-	headerXForwardedProto = "x-forwarded-proto" // We don't support non-standard headers such as Front-End-Https, X-Forwarded-Ssl, X-Url-Scheme.
+	headerXForwardedProto = "x-forwarded-proto"
 	headerXRealIP         = "x-real-ip"
+	// We don't support non-standard headers such as Front-End-Https, X-Forwarded-Ssl, X-Url-Scheme.
 
 	headerXForwardedClientCert        = "x-forwarded-client-cert"          // Envoy mTLS.
 	headerXForwardedTLSClientCert     = "x-forwarded-tls-client-cert"      // Traefik mTLS.
@@ -72,11 +73,11 @@ func (h *ProxyHeaders) trustedIP(ip net.IP) bool {
 // ParseAndAddTrusted parses a list of CIDRs and adds them to the list of trusted ranges.
 func (h *ProxyHeaders) ParseAndAddTrusted(cidrs ...string) error {
 	for _, cidr := range cidrs {
-		_, net, err := net.ParseCIDR(cidr)
+		_, ipNet, err := net.ParseCIDR(cidr)
 		if err != nil {
 			return err
 		}
-		h.Trusted = append(h.Trusted, net)
+		h.Trusted = append(h.Trusted, ipNet)
 	}
 	return nil
 }
@@ -104,12 +105,12 @@ func (h *ProxyHeaders) StreamServerInterceptor() grpc.StreamServerInterceptor {
 func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
 	md, _ := metadata.FromIncomingContext(ctx)
 
-	peer, ok := peer.FromContext(ctx)
+	p, ok := peer.FromContext(ctx)
 	if !ok {
 		// The gRPC server should always set this.
 		panic(fmt.Errorf("no peer in gRPC context"))
 	}
-	remoteAddr := peer.Addr.String()
+	remoteAddr := p.Addr.String()
 	if remoteAddr == "pipe" {
 		remoteAddr = "127.0.0.0:0"
 	}
@@ -125,9 +126,9 @@ func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
 		if forwardedFor != "" {
 			md.Set(headerXRealIP, strings.TrimSpace(strings.Split(forwardedFor, ",")[0]))
 		}
-		if cert, err := mtlsauth.FromProxyHeaders(getLastFromMD(md)); err != nil {
+		if cert, ok, err := mtlsauth.FromProxyHeaders(getLastFromMD(md)); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to parse client certificate from proxy headers")
-		} else if cert != nil {
+		} else if ok {
 			ctx = mtlsauth.NewContextWithClientCertificate(ctx, cert)
 		}
 	} else {
