@@ -85,7 +85,7 @@ func (h *ProxyHeaders) ParseAndAddTrusted(cidrs ...string) error {
 // UnaryServerInterceptor is the interceptor for unary RPCs.
 func (h *ProxyHeaders) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-		md := h.intercept(ctx)
+		ctx, md := h.intercept(ctx)
 		ctx = metadata.NewIncomingContext(ctx, md)
 		return handler(ctx, req)
 	}
@@ -96,13 +96,13 @@ func (h *ProxyHeaders) StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := stream.Context()
 		wrapped := grpc_middleware.WrapServerStream(stream)
-		md := h.intercept(ctx)
+		ctx, md := h.intercept(ctx)
 		wrapped.WrappedContext = metadata.NewIncomingContext(ctx, md)
 		return handler(srv, wrapped)
 	}
 }
 
-func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
+func (h *ProxyHeaders) intercept(ctx context.Context) (context.Context, metadata.MD) {
 	md, _ := metadata.FromIncomingContext(ctx)
 
 	p, ok := peer.FromContext(ctx)
@@ -138,7 +138,7 @@ func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
 		}
 		md.Set(headerXRealIP, remoteIP)
 	}
-	return md
+	return ctx, md
 }
 
 type getLastFromMD metadata.MD
