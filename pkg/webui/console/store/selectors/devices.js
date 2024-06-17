@@ -21,6 +21,9 @@ import {
   createPaginationTotalCountSelectorByEntity,
 } from '@ttn-lw/lib/store/selectors/pagination'
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+
+import { GET_DEV_BASE } from '../actions/devices'
 
 import {
   createEventsSelector,
@@ -40,6 +43,7 @@ export const selectDeviceEntitiesStore = state => selectDeviceStore(state).entit
 export const selectDeviceDerivedStore = state => selectDeviceStore(state).derived
 export const selectDeviceByIds = (state, appId, devId) =>
   selectDeviceById(state, combineDeviceIds(appId, devId))
+export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectDeviceById = (state, id) => selectDeviceEntitiesStore(state)[id]
 export const selectDeviceDerivedById = (state, id) => selectDeviceDerivedStore(state)[id]
 export const selectSelectedDeviceId = state =>

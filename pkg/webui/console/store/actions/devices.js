@@ -65,7 +65,7 @@ export const [
 ] = createRequestActions(
   UPDATE_DEV_BASE,
   (appId, deviceId, patch) => ({ appId, deviceId, patch }),
-  (appId, deviceId, patch, selector) => ({ selector }),
+  (appId, deviceId, patch, selector, options) => ({ selector, ...options }),
 )
 
 export const GET_DEVICES_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
