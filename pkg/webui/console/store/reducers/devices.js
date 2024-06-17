@@ -146,7 +146,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
       return payload.entities.reduce(
         (acc, dev) => {
           const id = getCombinedDeviceId(dev)
-          acc.entities[id] = dev
+          acc.entities[id] = { ...state.entities[id], ...dev }
 
           return acc
         },
