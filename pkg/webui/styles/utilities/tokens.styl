@@ -25,7 +25,7 @@ make-utilities($name, $theme)
         background-color: $value
       .forcus\\:c-{$key}:focus
         background-color: $value
-    else if split('-', $key)[0] == 'text'
+    else if split('-', $key)[0] == 'text' or split('-', $key)[0] == 'icon'
       .c-{$key}
         color: $value
       .hover\\:c-{$key}:hover

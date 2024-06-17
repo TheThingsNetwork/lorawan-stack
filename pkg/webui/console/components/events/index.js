@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import classnames from 'classnames'
+import { useSearchParams } from 'react-router-dom'
 
 import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
@@ -61,15 +62,53 @@ const Events = React.memo(
       const eventLogData = composeDataUri(JSON.stringify(events, undefined, 2))
       downloadDataUriAsFile(eventLogData, `${entityId}_live_data_${Date.now()}.json`)
     }, [entityId, events])
+    const [searchParams, setSearchParams] = useSearchParams()
+    const firstRender = useRef(true)
+
+    useEffect(
+      () => () => {
+        if (firstRender.current && paused) {
+          onPause()
+        }
+      },
+      [onPause, paused],
+    )
+    useEffect(() => {
+      const eventId = searchParams.get('eventId')
+      if (!eventId) {
+        setFocus({ eventId: undefined, visible: false })
+        if (firstRender.current && paused) {
+          onPause() // Resume stream
+        }
+        firstRender.current = false
+        return
+      }
+      setFocus({ eventId, visible: eventId })
+      if (firstRender.current && !paused) {
+        // Make sure that the element is present in the DOM
+        setTimeout(() => {
+          const element = document.getElementById(eventId)
+          element?.scrollIntoView({ behavior: 'smooth' })
+        }, 200)
+
+        onPause() // Pause stream
+      }
+    }, [onPause, paused, searchParams])
+
     const handleRowClick = useCallback(
       eventId => {
         if (eventId !== focus.eventId) {
-          setFocus({ eventId, visible: eventId })
+          setSearchParams(
+            {
+              eventId,
+            },
+            { replace: true },
+          )
         } else {
-          setFocus({ eventId: undefined, visible: false })
+          setSearchParams({}, { replace: true })
         }
       },
-      [focus],
+      [focus.eventId, setSearchParams],
     )
 
     const handleVerboseFilterChange = useCallback(() => {
@@ -77,8 +116,8 @@ const Events = React.memo(
     }, [onFilterChange, filter])
 
     const handleEventInfoCloseClick = useCallback(() => {
-      setFocus({ eventId: undefined, visible: false })
-    }, [])
+      setSearchParams({}, { replace: true })
+    }, [setSearchParams])
 
     return (
       <div className={style.container}>

@@ -52,7 +52,7 @@ const Event = React.memo(({ event, scoped, widget, rowStyle, onRowClick, eventId
     [style.synthetic]: event.isSynthetic,
   })
   return (
-    <li className={eventClasses} style={rowStyle} onClick={handleRowClick}>
+    <li className={eventClasses} style={rowStyle} onClick={handleRowClick} id={event.unique_id}>
       <ErrorBoundary>
         <div className={style.cellTime} title={`${event.time}: ${typeValue}`}>
           <Icon icon={icon} className={style.eventIcon} />

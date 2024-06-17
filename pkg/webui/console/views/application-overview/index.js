@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -22,6 +23,7 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
 import ApplicationMapPanel from '@console/components/application-map-panel'
 
+import LatestDecodedPayloadPanel from '@console/containers/latest-decoded-payload-panel'
 import ApplicationOverviewHeader from '@console/containers/application-overview-header'
 
 import Require from '@console/lib/components/require'
@@ -34,7 +36,10 @@ import { checkFromState } from '@account/lib/feature-checks'
 
 import { getDevicesList } from '@console/store/actions/devices'
 
-import { selectSelectedApplication } from '@console/store/selectors/applications'
+import {
+  selectApplicationEvents,
+  selectSelectedApplication,
+} from '@console/store/selectors/applications'
 
 const m = defineMessages({
   failedAccessOtherHostApplication:
@@ -42,6 +47,8 @@ const m = defineMessages({
 })
 
 const ApplicationOverview = () => {
+  const { appId } = useParams()
+  const events = useSelector(state => selectApplicationEvents(state, appId))
   const application = useSelector(selectSelectedApplication)
   const may = useSelector(state => checkFromState(mayViewApplicationInfo, state))
   const shouldRedirect = isOtherClusterApp(application)
@@ -64,7 +71,11 @@ const ApplicationOverview = () => {
           <BlurryNetworkActivityPanel />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+          <LatestDecodedPayloadPanel
+            appId={appId}
+            events={events}
+            shortCutLinkPath={`/applications/${appId}/data`}
+          />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <RequireRequest

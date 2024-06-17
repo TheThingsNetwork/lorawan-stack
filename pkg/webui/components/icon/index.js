@@ -33,7 +33,7 @@ const Icon = forwardRef((props, ref) => {
     ...rest
   } = props
 
-  const classname = classnames(className, {
+  const classname = classnames(className, style.icon, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,
     [style.textPaddedLeft]: textPaddedLeft,

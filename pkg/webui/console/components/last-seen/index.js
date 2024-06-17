@@ -44,6 +44,7 @@ const LastSeen = React.forwardRef((props, ref) => {
     message,
     status,
     noTitle,
+    displayMessage,
   } = props
 
   return (
@@ -55,7 +56,7 @@ const LastSeen = React.forwardRef((props, ref) => {
       className={classnames(statusClassName, 'd-flex al-center')}
     >
       <div className={classnames(className, 'd-inline-block')}>
-        {!short && <Message className="mr-cs-xxs" content={message} />}
+        {(!short || displayMessage) && <Message className="mr-cs-xxs" content={message} />}
         <DateTime.Relative
           value={lastSeen}
           computeDelta={computeDeltaInSeconds}
@@ -73,6 +74,7 @@ const LastSeen = React.forwardRef((props, ref) => {
 LastSeen.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
+  displayMessage: PropTypes.string,
   flipped: PropTypes.bool,
   lastSeen: PropTypes.oneOfType([
     PropTypes.string,
@@ -97,6 +99,7 @@ LastSeen.defaultProps = {
   message: sharedMessages.lastSeen,
   noTitle: false,
   statusClassName: undefined,
+  displayMessage: false,
 }
 
 export default LastSeen

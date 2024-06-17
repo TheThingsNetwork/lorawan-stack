@@ -19,6 +19,7 @@ import Button from '@ttn-lw/components/button'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './details.styl'
 
@@ -26,7 +27,6 @@ const m = defineMessages({
   showDetails: 'Show details',
   details: 'Details',
   errorDetails: 'Error details',
-  close: 'Close',
 })
 
 const Details = props => {
@@ -56,7 +56,7 @@ const Details = props => {
         visible={showDetails}
         onComplete={handleModalComplete}
         approval={false}
-        buttonMessage={m.close}
+        buttonMessage={sharedMessages.close}
         approveButtonProps={{ primary: false, icon: undefined }}
         noTitleLine
       >

@@ -1,0 +1,102 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.panel
+  display: flex
+  flex-direction: column
+
+  .maximize
+    svg
+      height: 1.28rem
+
+.corner-icons
+  position: absolute
+  z-index: $zi.slight
+  right: $cs.s
+  top: $cs.s
+
+.source
+  color: var(--c-text-neutral-light)
+  font-size: $fsv2.s
+  font-weight: $fw.bold
+
+.received
+  color: var(--c-text-neutral-light)
+  font-size: $fsv2.s
+  font-weight: $fw.bold
+  text-transform: uppercase
+
+.received-status > span
+  display: none
+
+.header-title
+  font-weight: $fwv2.bold
+  font-size: $fsv2.l
+  white-space: nowrap
+  text-overflow: ellipsis
+  overflow: hidden
+
+.header-icon
+  font-size: $fs.xl
+  min-width: $cs.l
+  background-color: var(--c-bg-brand-extralight)
+  padding: $cs.xs
+  border-radius: $br.l
+  color: var(--c-bg-brand-normal)
+  font-variation-settings: 'FILL' 1
+
+.modal-body
+  padding: $cs.xl
+
+.code-wrapper
+  border-top-left-radius: 0
+  border-top-right-radius: 0
+  background-color: var(--c-bg-neutral-min-hover)
+  padding: $cs.m 0
+  overflow: auto
+  max-height: 30rem
+
+.header
+  border: 1px solid var(--c-border-neutral-light)
+  border-bottom: none
+  border-top-left-radius: $br.l
+  border-top-right-radius: $br.l
+  flex-wrap: wrap
+
+.right-header-column
+  display: inline-flex
+  flex-direction: column
+  align-items: flex-end
+  justify-content: center
+
+.image-wrapper
+  height: $ls.l
+  width: $ls.l
+  position: relative
+  border-radius: $br.l
+  border: 1px solid var(--c-border-neutral-light)
+  padding: $cs.xxs
+  box-sizing: border-box
+
+.device-icon
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  color: var(--c-icon-neutral-light)
+
+.device-image
+  width: 100%
+  height: 100%
+  object-fit: contain

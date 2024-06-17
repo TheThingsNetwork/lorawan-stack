@@ -47,6 +47,7 @@ import {
   stopApplicationEventsStream,
 } from '@console/store/actions/applications'
 import { getAsConfiguration } from '@console/store/actions/application-server'
+import { getDevicesList } from '@console/store/actions/devices'
 
 import { selectSelectedApplication } from '@console/store/selectors/applications'
 import {
@@ -64,6 +65,7 @@ const Application = () => {
       ),
       getApplicationsRightsList(appId),
       getAsConfiguration(),
+      getDevicesList(appId, { page: 1, limit: 1000 }, ['name']),
     ],
     [appId],
   )
