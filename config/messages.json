@@ -3824,6 +3824,15 @@
       "file": "ttjs.go"
     }
   },
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:internal_error": {
+    "translations": {
+      "en": "internal error"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
+      "file": "ttjs.go"
+    }
+  },
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unauthenticated": {
     "translations": {
       "en": "unauthenticated"

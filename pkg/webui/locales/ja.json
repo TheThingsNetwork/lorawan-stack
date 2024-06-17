@@ -1933,6 +1933,7 @@
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_access_denied": "`{dev_eui}`のデバイスへのアクセスが拒否されました: デバイスはすでに主張されているか、所有者トークンが無効です",
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_not_claimed": "EUI `{dev_eui}`のデバイスは主張されていません",
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_not_provisioned": "EUI `{dev_eui}`のデバイスはプロビジョニングされていません",
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:internal_error": "内部エラー",
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unauthenticated": "認証されていません",
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unclaim_device": "EUI `{dev_eui}`のデバイスの主張を取り消す",
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unclaim_devices": "デバイスの主張を取り消す",
