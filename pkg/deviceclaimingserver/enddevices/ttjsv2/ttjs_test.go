@@ -196,13 +196,13 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
-	a.So(errors.IsInternal(err), should.BeTrue)
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 	a.So(ret, should.BeNil)
 	err = client2.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
-	a.So(errors.IsInternal(err), should.BeTrue)
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
 	// Unclaim
 	err = client1.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
