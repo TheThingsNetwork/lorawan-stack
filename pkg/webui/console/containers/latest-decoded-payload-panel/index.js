@@ -14,11 +14,12 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { defineMessages, FormattedNumber } from 'react-intl'
-import { throttle } from 'lodash'
 import classnames from 'classnames'
+import clipboard from 'clipboard'
+import { useDispatch, useSelector } from 'react-redux'
+import { createSelector } from 'reselect'
 
-import tts from '@console/api/tts'
-import deviceIcon from '@assets/misc/end-device.svg'
+import { STACK_COMPONENTS_MAP } from '@ttn-lw/../../sdk/js/dist/util/constants'
 
 import Icon, {
   IconCodeDots,
@@ -28,11 +29,15 @@ import Icon, {
   IconCopyCheck,
   IconAccessPoint,
   IconArrowNarrowUp,
+  IconPlayerPause,
+  IconPhotoOff,
 } from '@ttn-lw/components/icon'
 import Panel, { PanelError } from '@ttn-lw/components/panel'
 import CodeEditor from '@ttn-lw/components/code-editor'
 import Button from '@ttn-lw/components/button'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
+import Link from '@ttn-lw/components/link'
+import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -40,8 +45,31 @@ import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { getDevice } from '@console/store/actions/devices'
+
+import {
+  selectDeviceModelById,
+  selectDeviceModelFetching,
+} from '@console/store/selectors/device-repository'
+import { selectDeviceByIds, selectDeviceFetching } from '@console/store/selectors/devices'
 
 import style from './latest-decoded-payload-panel.styl'
+
+const deviceNameAndImageSelector = createSelector(
+  [
+    (state, appId, devId) => selectDeviceByIds(state, appId, devId)?.name,
+    (state, appId, devId) => {
+      const device = selectDeviceByIds(state, appId, devId)
+      return device
+        ? selectDeviceModelById(state, device.version_ids?.brand_id, device.version_ids?.model_id)
+            ?.photos?.main
+        : undefined
+    },
+  ],
+  (deviceName, image) => ({ deviceName, image }),
+)
 
 const m = defineMessages({
   latestDecodedPayload: 'Latest decoded payload',
@@ -64,34 +92,60 @@ const hasDecodedPayload = data => {
 }
 
 const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
-  const [latestEvent, setLatestEvent] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [copied, setCopied] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+  const [latestEvent, setLatestEvent] = useState(null)
+  const dispatch = useDispatch()
 
   const _timer = useRef(null)
+  const containerElem = useRef(null)
+  const copyElem = useRef(null)
 
-  const throttledSetLatestEvent = useCallback(
-    throttle(async (newEvent, devId) => {
-      const { name, version_ids } = await tts.Applications.Devices.getById(appId, devId, [
-        'name',
-        'version_ids',
-      ])
-      const hasModel = Boolean(version_ids?.brand_id) && Boolean(version_ids?.model_id)
-      let picture = deviceIcon
-      if (hasModel) {
-        const { photos } = await tts.Applications.Devices.Repository.getModel(
-          appId,
-          version_ids.brand_id,
-          version_ids.model_id,
-          ['photos'],
-        )
-        picture = photos.main
-      }
+  const actualLastEvent = events.find(e => hasDecodedPayload(e.data))
+  // Save latestEvent only if it there are 10 seconds between actualLastEvent and lastEvent (throttling).
+  if (
+    actualLastEvent &&
+    (!latestEvent || Date.parse(actualLastEvent.time) - Date.parse(latestEvent.time) > 10000) &&
+    // Do not update latestEvent if it is hovered or selected.
+    !isHovered &&
+    !selectedEvent
+  ) {
+    setLatestEvent(actualLastEvent)
+  }
 
-      return setLatestEvent({ ...newEvent, deviceName: name, picture })
-    }, 10000),
-    [],
+  const formattedPayload = JSON.stringify(
+    latestEvent?.data.uplink_message?.decoded_payload ?? {},
+    null,
+    2,
   )
+
+  const devId = latestEvent ? latestEvent.identifiers[0].device_ids.device_id : null
+
+  const { deviceName, image } = useSelector(state =>
+    deviceNameAndImageSelector(state, appId, devId),
+  )
+  const imageFetching = useSelector(
+    state => selectDeviceModelFetching(state) || selectDeviceFetching(state),
+  )
+
+  // Fetch device data when payload event is received.
+  useEffect(() => {
+    if (devId) {
+      dispatch(
+        attachPromise(
+          getDevice(appId, devId, ['name'], {
+            cache: true,
+            startStream: false,
+            fetchModel: true,
+            // Only fetch from IS and AS, otherwise NS would also be called unnecessarily.
+            components: [STACK_COMPONENTS_MAP.is, STACK_COMPONENTS_MAP.as],
+            modelSelector: ['photos'],
+          }),
+        ),
+      )
+    }
+  }, [appId, devId, dispatch])
 
   useEffect(
     () => () => {
@@ -100,25 +154,13 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
     [],
   )
 
-  useEffect(() => {
-    if (!events.length) return
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true)
+  }, [])
 
-    const firstEventWithPayload = events.find(e => hasDecodedPayload(e.data))
-
-    if (firstEventWithPayload) {
-      throttledSetLatestEvent(
-        {
-          eventId: firstEventWithPayload.unique_id,
-          time: firstEventWithPayload.time,
-          decodedPayload: firstEventWithPayload.data.uplink_message?.decoded_payload ?? {},
-          rssi: firstEventWithPayload.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
-          snr: firstEventWithPayload.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
-          numUplink: firstEventWithPayload.data.uplink_message?.f_cnt ?? 0,
-        },
-        firstEventWithPayload.data.end_device_ids.device_id,
-      )
-    }
-  }, [events, throttledSetLatestEvent])
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false)
+  }, [])
 
   const handleOpenMaximizeCodeModal = useCallback(() => {
     setSelectedEvent(latestEvent)
@@ -132,42 +174,57 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
     if (copied) {
       return
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(JSON.stringify(selectedEvent?.decodedPayload, null, 2))
-    }
     setCopied(true)
 
     _timer.current = setTimeout(() => {
       setCopied(false)
     }, 3000)
-  }, [copied, selectedEvent])
+  }, [copied])
+
+  useEffect(() => {
+    if (copyElem && copyElem.current) {
+      new clipboard(copyElem.current, { container: containerElem.current })
+    }
+  }, [])
 
   const getContent = useCallback(
-    (event, maxLines = 8, minLines = 3) => (
+    (event, minLines = 3) => (
       <>
-        <div className={classnames(style.header, 'd-flex j-between p-cs-m')}>
-          <div className="d-inline-flex al-center gap-cs-xs">
-            <img className={style.deviceImage} alt={event?.deviceName} src={event?.picture} />
+        <Link
+          to={`devices/${devId}`}
+          className={classnames(style.header, 'd-flex j-between p-cs-m')}
+          ref={containerElem}
+        >
+          <div className="d-inline-flex al-center gap-cs-xs c-text-neutral-heavy">
+            <div className={style.imageWrapper}>
+              {imageFetching ? (
+                <Spinner className={style.spinner} after={0} micro center faded />
+              ) : image ? (
+                <img className={style.deviceImage} alt={deviceName} src={image} />
+              ) : (
+                <Icon icon={IconPhotoOff} className={style.deviceIcon} />
+              )}
+            </div>
             <div className="flex-column">
-              <Message content={event?.deviceName} className="fw-bold" />
+              <span className="fw-bold">{deviceName || devId}</span>
               <div className="d-inline-flex al-center gap-cs-xs">
                 <div className="d-inline-flex al-center gap-cs-xxs">
-                  <Icon icon={IconAccessPoint} />
+                  <Icon icon={IconAccessPoint} className="c-icon-neutral-normal" />
                   <Message
                     content={m.rssi}
                     className="c-text-neutral-semilight"
                     values={{
-                      rssi: event?.rssi,
+                      rssi: event?.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
                     }}
                   />
                 </div>
                 <div className="d-inline-flex al-center gap-cs-xxs">
-                  <Icon icon={IconAccessPoint} />
+                  <Icon icon={IconAccessPoint} className="c-icon-neutral-normal" />
                   <Message
                     content={m.snr}
                     className="c-text-neutral-semilight"
                     values={{
-                      snr: event?.snr,
+                      snr: event?.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
                     }}
                   />
                 </div>
@@ -184,48 +241,73 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
               className="c-text-neutral-semilight"
             />
             <div className="d-inline-flex al-center gap-cs-xxs">
-              <Icon icon={IconArrowNarrowUp} />
+              <Icon icon={IconArrowNarrowUp} className="c-icon-neutral-normal" />
               <Message
                 component="span"
                 content={m.up}
                 className="c-text-neutral-semilight"
                 values={{
-                  up: <FormattedNumber value={event?.numUplink} />,
+                  up: <FormattedNumber value={event?.data.uplink_message?.f_cnt ?? 0} />,
                 }}
               />
             </div>
           </div>
-        </div>
-        {!selectedEvent && (
-          <Button
-            naked
-            icon={IconArrowsMaximize}
-            small
-            className={style.maximize}
-            onClick={handleOpenMaximizeCodeModal}
+        </Link>
+        <div className="pos-relative">
+          <div className={style.cornerIcons}>
+            <Button
+              icon={copied ? IconCopyCheck : IconCopy}
+              className={style.maximize}
+              data-clipboard-text={formattedPayload}
+              onClick={handleCopyClick}
+              ref={copyElem}
+              naked
+              small
+            />
+            {!Boolean(selectedEvent) && (
+              <Button
+                naked
+                icon={IconArrowsMaximize}
+                small
+                className={style.maximize}
+                onClick={handleOpenMaximizeCodeModal}
+              />
+            )}
+          </div>
+          <CodeEditor
+            className={style.codeWrapper}
+            value={formattedPayload}
+            language="json"
+            name="latest_decoded_payload"
+            maxLines={Infinity}
+            minLines={minLines}
+            readOnly
           />
-        )}
-        <CodeEditor
-          className={style.codeWrapper}
-          value={JSON.stringify(event?.decodedPayload, null, 2)}
-          language="json"
-          name="latest_decoded_payload"
-          maxLines={maxLines}
-          minLines={minLines}
-          readOnly
-        />
+        </div>
       </>
     ),
-    [handleOpenMaximizeCodeModal, selectedEvent],
+    [
+      copied,
+      devId,
+      deviceName,
+      formattedPayload,
+      handleCopyClick,
+      handleOpenMaximizeCodeModal,
+      image,
+      imageFetching,
+      selectedEvent,
+    ],
   )
 
   return (
     <Panel
       title={m.latestDecodedPayload}
-      icon={IconCodeDots}
+      icon={isHovered ? IconPlayerPause : IconCodeDots}
       shortCutLinkTitle={m.seeInLiveData}
       shortCutLinkPath={`${shortCutLinkPath}${latestEvent ? `?eventId=${latestEvent?.eventId}` : ''}`}
       className={style.panel}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {latestEvent ? (
         <div className="pos-relative">
@@ -245,14 +327,8 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
                 <Button naked icon={IconX} onClick={handleCloseMaximizeCodeModal} />
               </div>
 
-              {getContent(selectedEvent, 20)}
+              {getContent(selectedEvent)}
               <div className="d-flex j-center al-center gap-cs-m pt-cs-xl">
-                <Button
-                  secondary
-                  icon={copied ? IconCopyCheck : IconCopy}
-                  message={copied ? sharedMessages.copiedToClipboard : sharedMessages.copy}
-                  onClick={handleCopyClick}
-                />
                 <Button
                   secondary
                   icon={IconX}

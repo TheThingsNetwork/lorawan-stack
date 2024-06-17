@@ -17,10 +17,14 @@
   flex-direction: column
 
   .maximize
-    position: absolute
-    right: $cs.s
-    margin-top: $cs.s
-    z-index: $zi.slight
+    svg
+      height: 1.28rem
+
+.corner-icons
+  position: absolute
+  z-index: $zi.slight
+  right: $cs.s
+  top: $cs.s
 
 .source
   color: var(--c-text-neutral-light)
@@ -58,6 +62,10 @@
 .code-wrapper
   border-top-left-radius: 0
   border-top-right-radius: 0
+  background-color: var(--c-bg-neutral-min-hover)
+  padding: $cs.m 0
+  overflow: auto
+  max-height: 30rem
 
 .header
   border: 1px solid var(--c-border-neutral-light)
@@ -72,8 +80,23 @@
   align-items: flex-end
   justify-content: center
 
-.device-image
+.image-wrapper
   height: $ls.l
   width: $ls.l
+  position: relative
   border-radius: $br.l
   border: 1px solid var(--c-border-neutral-light)
+  padding: $cs.xxs
+  box-sizing: border-box
+
+.device-icon
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  color: var(--c-icon-neutral-light)
+
+.device-image
+  width: 100%
+  height: 100%
+  object-fit: contain
