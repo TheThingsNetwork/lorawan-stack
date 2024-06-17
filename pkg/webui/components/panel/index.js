@@ -49,6 +49,8 @@ const Panel = ({
   toggleOptions,
   activeToggle,
   onToggleClick,
+  onMouseEnter,
+  onMouseLeave,
   shortCutLinkTitle,
   shortCutLinkPath,
   className,
@@ -57,7 +59,11 @@ const Panel = ({
   shortCutLinkTarget,
   shortCutLinkDisabled,
 }) => (
-  <div className={classnames(styles.panel, className, { [styles.divider]: divider })}>
+  <div
+    className={classnames(styles.panel, className, { [styles.divider]: divider })}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+  >
     {title && (
       <div className={styles.panelHeader}>
         <div className="d-flex gap-cs-xs al-center">
@@ -96,6 +102,8 @@ Panel.propTypes = {
   icon: PropTypes.icon,
   iconClassName: PropTypes.string,
   messageDecorators: PropTypes.node,
+  onMouseEnter: PropTypes.func,
+  onMouseLeave: PropTypes.func,
   onToggleClick: PropTypes.func,
   shortCutLinkDisabled: PropTypes.bool,
   shortCutLinkPath: PropTypes.string,
@@ -110,6 +118,8 @@ Panel.defaultProps = {
   toggleOptions: undefined,
   activeToggle: undefined,
   onToggleClick: () => null,
+  onMouseEnter: () => null,
+  onMouseLeave: () => null,
   className: undefined,
   messageDecorators: undefined,
   divider: false,
