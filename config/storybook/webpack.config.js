@@ -47,7 +47,15 @@ module.exports = async ({ config, mode }) => {
       publicPath: '',
     },
     module: {
-      rules: [...config.module.rules, styleConfig],
+      rules: [
+        ...config.module.rules,
+        {
+          test: /\.jsx?$/,
+          exclude: /node_modules/,
+          use: 'babel-loader',
+        },
+        styleConfig,
+      ],
     },
     plugins: [...config.plugins, ...filteredPlugins],
   }
