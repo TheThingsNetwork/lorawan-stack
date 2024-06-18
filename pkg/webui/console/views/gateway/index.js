@@ -136,7 +136,7 @@ const GatewayInner = () => {
             />
             <SideNavigation.Item
               title={sharedMessages.connectionProfiles}
-              path="the-things-station/connection-profiles"
+              path="the-things-station/connection-profiles/wifi"
               icon="tune"
             />
           </SideNavigation.Item>
