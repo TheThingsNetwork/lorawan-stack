@@ -13,14 +13,10 @@
 // limitations under the License.
 
 import React, { useCallback, useMemo, useState } from 'react'
-import { defineMessages } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { useDispatch } from 'react-redux'
 
-import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Tabs from '@ttn-lw/components/tabs'
 import Link from '@ttn-lw/components/link'
 import Select from '@ttn-lw/components/select'
@@ -29,90 +25,63 @@ import Button from '@ttn-lw/components/button'
 import ButtonGroup from '@ttn-lw/components/button/group'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import toast from '@ttn-lw/components/toast'
+import PageTitle from '@ttn-lw/components/page-title'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import {
+  CONNECTION_TYPES,
+  getFormTypeMessage,
+} from '@console/containers/gateway-the-things-station/connection-profiles/utils'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
-import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getClientsList } from '@account/store/actions/clients'
-import {
-  deleteConnectionProfile,
-  deleteGateway,
-  getConnectionProfilesList,
-  restoreGateway,
-} from '@console/store/actions/gateways'
+import { deleteConnectionProfile, getConnectionProfilesList } from '@console/store/actions/gateways'
 
-import { selectOAuthClients, selectOAuthClientsTotalCount } from '@account/store/selectors/clients'
-import { selectApiKeys, selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 import {
   selectConnectionProfiles,
   selectConnectionProfilesTotalCount,
 } from '@console/store/selectors/gateways'
 
-const m = defineMessages({
-  theThingsStationConnectionProfiles: 'The Things Station connection profiles',
-  wifiProfiles: 'WiFi profiles',
-  ethernetProfiles: 'Ethernet profiles',
-  information:
-    'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.<br></br> <link>Learn more about gateway network connection profiles.</link>',
-  showProfilesOf: 'Show profiles of',
-  yourself: 'Yourself',
-  addWifiProfile: 'Add WiFi profile',
-  addEthernetProfile: 'Add Ethernet profile',
-  profileId: 'Profile ID',
-  accessPoint: 'Access point',
-  deleteSuccess: 'Connection profile deleted',
-  deleteFail: 'There was an error and the connection profile could not be deleted',
-})
+import m from './messages'
 
 const profileOptions = [
   { value: '0', label: m.yourself },
   { value: '1', label: 'TTI' },
 ]
 
-const GatewayConnectionProfiles = () => {
-  const { gtwId } = useParams()
-  const [activeTab, setActiveTab] = useState('wifi')
+const GatewayConnectionProfilesOverview = () => {
+  const { gtwId, type } = useParams()
   const dispatch = useDispatch()
-
-  useBreadcrumbs(
-    'gtws.single.the-things-station.connection-profiles',
-    <Breadcrumb
-      path={`/gateways/${gtwId}/the-things-station/connection-profiles`}
-      content={sharedMessages.connectionProfiles}
-    />,
-  )
+  const navigate = useNavigate()
 
   const tabs = [
     {
       title: m.wifiProfiles,
-      name: 'wifi',
-      exact: false,
+      name: CONNECTION_TYPES.WIFI,
+      link: `/gateways/${gtwId}/the-things-station/connection-profiles/${CONNECTION_TYPES.WIFI}`,
     },
     {
       title: m.ethernetProfiles,
-      name: 'ethernet',
+      name: CONNECTION_TYPES.ETHERNET,
+      link: `/gateways/${gtwId}/the-things-station/connection-profiles/${CONNECTION_TYPES.ETHERNET}`,
     },
   ]
 
-  const onAddProfile = useCallback(() => {}, [])
+  const onAddProfile = useCallback(() => {
+    navigate(`add`)
+  }, [navigate])
 
-  const addProfileMessage = useMemo(() => {
-    if (activeTab === 'wifi') {
-      return m.addWifiProfile
-    }
-    if (activeTab === 'ethernet') {
-      return m.addEthernetProfile
-    }
-    return null
-  }, [activeTab])
-
-  const handleEdit = React.useCallback(() => {}, [])
+  const handleEdit = React.useCallback(
+    profileId => {
+      navigate(`edit/${profileId}`)
+    },
+    [navigate],
+  )
 
   const handleDelete = React.useCallback(
     async id => {
@@ -188,15 +157,12 @@ const GatewayConnectionProfiles = () => {
     }),
   )
 
-  const getItems = React.useCallback(
-    () => getConnectionProfilesList({ type: activeTab }),
-    [activeTab],
-  )
+  const getItems = React.useCallback(() => getConnectionProfilesList({ type }), [type])
 
   return (
     <>
       <PageTitle title={m.theThingsStationConnectionProfiles} />
-      <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
+      <Tabs tabs={tabs} divider />
       <Message
         className="d-block mt-cs-l mb-cs-l"
         content={m.information}
@@ -227,7 +193,7 @@ const GatewayConnectionProfiles = () => {
           className="mb-cs-m"
           primary
           onClick={onAddProfile}
-          message={addProfileMessage}
+          message={getFormTypeMessage(type)}
           icon="add"
         />
       </div>
@@ -244,4 +210,4 @@ const GatewayConnectionProfiles = () => {
   )
 }
 
-export default GatewayConnectionProfiles
+export default GatewayConnectionProfilesOverview

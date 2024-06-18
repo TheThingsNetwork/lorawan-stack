@@ -87,4 +87,5 @@ export default Object.freeze({
   INPUT_METHOD: 'input-method',
   USE_DEFAULT_NB_TRANS: 'use-default-nb-trans',
   DATA_RATE_SPECIFIC_OVERRIDES: 'data-rate-specific-overrides',
+  DEFAULT_NETWORK_INTERFACE: 'default-network-interface',
 })
