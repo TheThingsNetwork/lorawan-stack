@@ -109,7 +109,7 @@ var (
 	errDeviceNotProvisioned = errors.DefineNotFound("device_not_provisioned", "device with EUI `{dev_eui}` not provisioned") //nolint:lll
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
 	errDeviceAccessDenied   = errors.DefineInvalidArgument("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
-	errUnauthenticated      = errors.DefineInternal("unauthenticated", "unauthenticated")
+	errCredentials          = errors.DefineInternal("unauthenticated", "unauthenticated")
 	errUnclaimDevice        = errors.Define("unclaim_device", "unclaim device with EUI `{dev_eui}`", "message")
 	errUnclaimDevices       = errors.Define("unclaim_devices", "unclaim devices")
 	errInternalError        = errors.DefineInternal("internal_error", "internal error", "message")
@@ -187,7 +187,7 @@ func (c *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuth
 		}
 		return errInternalError.WithAttributes("message", errResp.Message)
 	case http.StatusUnauthorized:
-		return errUnauthenticated.New()
+		return errCredentials.New()
 	default:
 		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
@@ -244,7 +244,7 @@ func (c *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) err
 	case http.StatusForbidden:
 		return errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return errUnauthenticated.New()
+		return errCredentials.New()
 	default:
 		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
@@ -327,7 +327,7 @@ func (c *TTJS) GetClaimStatus(
 	case http.StatusForbidden:
 		return nil, errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return nil, errUnauthenticated.New()
+		return nil, errCredentials.New()
 	default:
 		return nil, errors.FromHTTPStatusCode(resp.StatusCode)
 	}
@@ -414,7 +414,7 @@ func (c *TTJS) BatchUnclaim(
 		}
 		return ret
 	case http.StatusUnauthorized:
-		return errUnauthenticated.New()
+		return errCredentials.New()
 	default:
 		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
