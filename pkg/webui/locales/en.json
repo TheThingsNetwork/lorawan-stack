@@ -559,6 +559,8 @@
   "console.containers.gateway-the-things-station.connection-profiles.addEthernetProfile": "Add Ethernet profile",
   "console.containers.gateway-the-things-station.connection-profiles.profileId": "Profile ID",
   "console.containers.gateway-the-things-station.connection-profiles.accessPoint": "Access point",
+  "console.containers.gateway-the-things-station.connection-profiles.deleteSuccess": "Connection profile deleted",
+  "console.containers.gateway-the-things-station.connection-profiles.deleteFail": "There was an error and the connection profile could not be deleted",
   "console.containers.gateway-the-things-station.connection-settings.theThingsStationConnectionSettings": "The Things Station connection settings",
   "console.containers.gateways-table.index.ownedTabTitle": "Owned gateways",
   "console.containers.gateways-table.index.restoreSuccess": "Gateway restored",

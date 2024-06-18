@@ -559,6 +559,8 @@
   "console.containers.gateway-the-things-station.connection-profiles.addEthernetProfile": "",
   "console.containers.gateway-the-things-station.connection-profiles.profileId": "",
   "console.containers.gateway-the-things-station.connection-profiles.accessPoint": "",
+  "console.containers.gateway-the-things-station.connection-profiles.deleteSuccess": "",
+  "console.containers.gateway-the-things-station.connection-profiles.deleteFail": "",
   "console.containers.gateway-the-things-station.connection-settings.theThingsStationConnectionSettings": "",
   "console.containers.gateways-table.index.ownedTabTitle": "所有するゲートウェイ",
   "console.containers.gateways-table.index.restoreSuccess": "ゲートウェイが復旧",

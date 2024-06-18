@@ -16,6 +16,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
+import { useDispatch } from 'react-redux'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -25,6 +26,9 @@ import Link from '@ttn-lw/components/link'
 import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import Button from '@ttn-lw/components/button'
+import ButtonGroup from '@ttn-lw/components/button/group'
+import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
+import toast from '@ttn-lw/components/toast'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -33,8 +37,22 @@ import Message from '@ttn-lw/lib/components/message'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { getClientsList } from '@account/store/actions/clients'
+import {
+  deleteConnectionProfile,
+  deleteGateway,
+  getConnectionProfilesList,
+  restoreGateway,
+} from '@console/store/actions/gateways'
 
 import { selectOAuthClients, selectOAuthClientsTotalCount } from '@account/store/selectors/clients'
+import { selectApiKeys, selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
+import {
+  selectConnectionProfiles,
+  selectConnectionProfilesTotalCount,
+} from '@console/store/selectors/gateways'
 
 const m = defineMessages({
   theThingsStationConnectionProfiles: 'The Things Station connection profiles',
@@ -48,6 +66,8 @@ const m = defineMessages({
   addEthernetProfile: 'Add Ethernet profile',
   profileId: 'Profile ID',
   accessPoint: 'Access point',
+  deleteSuccess: 'Connection profile deleted',
+  deleteFail: 'There was an error and the connection profile could not be deleted',
 })
 
 const profileOptions = [
@@ -58,6 +78,7 @@ const profileOptions = [
 const GatewayConnectionProfiles = () => {
   const { gtwId } = useParams()
   const [activeTab, setActiveTab] = useState('wifi')
+  const dispatch = useDispatch()
 
   useBreadcrumbs(
     'gtws.single.the-things-station.connection-profiles',
@@ -91,6 +112,28 @@ const GatewayConnectionProfiles = () => {
     return null
   }, [activeTab])
 
+  const handleEdit = React.useCallback(() => {}, [])
+
+  const handleDelete = React.useCallback(
+    async id => {
+      try {
+        await dispatch(attachPromise(deleteConnectionProfile(id)))
+        toast({
+          title: id,
+          message: m.deleteSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (err) {
+        toast({
+          title: id,
+          message: m.deleteFail,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [dispatch],
+  )
+
   const headers = React.useMemo(
     () => [
       {
@@ -108,33 +151,46 @@ const GatewayConnectionProfiles = () => {
       {
         name: 'created_at',
         displayName: sharedMessages.created,
-        width: 50,
+        width: 25,
       },
-      // {
-      //   name: 'state',
-      //   displayName: sharedMessages.state,
-      //   width: 50,
-      //   render: state => capitalizeMessage(formatMessage({ id: `enum:${state}` })),
-      // },
+      {
+        name: 'actions',
+        displayName: sharedMessages.actions,
+        width: 25,
+        getValue: row => ({
+          id: row.id,
+          name: row.access_point,
+          edit: handleEdit.bind(null, row.id),
+          delete: handleDelete.bind(null, row.id),
+        }),
+        render: details => (
+          <ButtonGroup align="end">
+            <Button icon="edit" onClick={details.edit} />
+            <DeleteModalButton
+              entityId={details.id}
+              entityName={details.name}
+              onApprove={details.delete}
+            />
+          </ButtonGroup>
+        ),
+      },
     ],
-    [],
+    [handleDelete, handleEdit],
   )
 
-  /* Const baseDataSelector = createSelector(
-    [selectOAuthClients, selectOAuthClientsTotalCount, mayAddSelector],
-    (clients, totalCount, mayAdd) => ({
-      clients,
+  const baseDataSelector = createSelector(
+    [selectConnectionProfiles, selectConnectionProfilesTotalCount],
+    (connectionProfiles, totalCount) => ({
+      connectionProfiles,
       totalCount,
-      mayAdd,
-    }),
-  )*/
-  const baseDataSelector = useCallback(
-    () => ({
-      profiles: [],
-      totalCount: 0,
       mayAdd: false,
+      mayLink: false,
     }),
-    [],
+  )
+
+  const getItems = React.useCallback(
+    () => getConnectionProfilesList({ type: activeTab }),
+    [activeTab],
   )
 
   return (
@@ -177,11 +233,12 @@ const GatewayConnectionProfiles = () => {
       </div>
 
       <FetchTable
-        entity="clients"
+        entity="connectionProfiles"
         defaultOrder="-created_at"
         headers={headers}
-        getItemsAction={() => {}}
+        getItemsAction={getItems}
         baseDataSelector={baseDataSelector}
+        filtersClassName="d-none"
       />
     </>
   )
