@@ -109,7 +109,7 @@ var (
 	errDeviceNotProvisioned = errors.DefineNotFound("device_not_provisioned", "device with EUI `{dev_eui}` not provisioned") //nolint:lll
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
 	errDeviceAccessDenied   = errors.DefineInvalidArgument("device_access_denied", "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid") //nolint:lll
-	errCredentials          = errors.DefineInternal("unauthenticated", "unauthenticated")
+	errCredentials          = errors.DefineInternal("credentials", "invalid credentials")
 	errUnclaimDevice        = errors.Define("unclaim_device", "unclaim device with EUI `{dev_eui}`", "message")
 	errUnclaimDevices       = errors.Define("unclaim_devices", "unclaim devices")
 	errInternalError        = errors.DefineInternal("internal_error", "internal error", "message")

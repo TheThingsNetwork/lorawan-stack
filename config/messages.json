@@ -3797,6 +3797,15 @@
       "file": "ttjs.go"
     }
   },
+  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:credentials": {
+    "translations": {
+      "en": "invalid credentials"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
+      "file": "ttjs.go"
+    }
+  },
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:device_access_denied": {
     "translations": {
       "en": "access to device with `{dev_eui}` denied: device is already claimed or the owner token is invalid"
@@ -3827,15 +3836,6 @@
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:internal_error": {
     "translations": {
       "en": "internal error"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
-      "file": "ttjs.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unauthenticated": {
-    "translations": {
-      "en": "unauthenticated"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices/ttjsv2",
