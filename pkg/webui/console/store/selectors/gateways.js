@@ -96,3 +96,8 @@ export const selectGatewayStatistics = state => {
 
   return statistics.stats
 }
+
+// Connection profiles
+export const selectConnectionProfiles = state => selectGatewayStore(state).connectionProfiles
+export const selectConnectionProfilesTotalCount = state =>
+  selectGatewayStore(state).connectionProfilesTotalCount
