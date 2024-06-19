@@ -38,10 +38,15 @@ const messages = defineMessages({
   subnetMask: 'Subnet mask',
   dnsServers: 'DNS servers',
   addServerAddress: 'Add server address',
-  validateDnsServers: 'There must be at least one selected dns server.',
+  validateDnsServers: 'There must be at least one valid dns server.',
   validateEmptyDnsServer:
     'There must be no empty dns server entries. Please remove such entries before submitting.',
   dnsServerPlaceholder: '0.0.0.0',
+  validateIpAddress: '{field} must contain a valid address.',
+  accessPointAndSsid: 'Access point / SSID',
+  validateNotSelectedAccessPoint: 'There must be at least one access point / SSID selected',
+  wifiPassword: 'WiFi password',
+  ssid: 'SSID',
 })
 
 export default messages
