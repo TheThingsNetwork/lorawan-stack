@@ -450,6 +450,7 @@ export default defineMessages({
   sNwkSIKey: 'SNwkSIntKey',
   sNwkSIKeyDescription: 'Serving network session integrity key',
   saveChanges: 'Save changes',
+  scanAgain: 'Scan again',
   scanEndDevice: 'Scan end device QR code',
   scheduleAnyTimeDelay: 'Schedule any time delay',
   scheduleAnyTimeDescription:

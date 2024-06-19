@@ -17,16 +17,45 @@ import { CONNECTION_TYPES } from '@console/containers/gateway-the-things-station
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import { ipAddress } from '@console/lib/regexp'
+
 import m from './messages'
 
-const wifiValidationSchema = Yup.object().shape({})
+const hasSelectedAccessPoint = value =>
+  (value.ssid !== '' && value._type === 'all') || value._type === 'other'
+
+const wifiValidationSchema = Yup.object().shape({
+  access_point: Yup.object()
+    .shape({
+      _type: Yup.string(),
+      ssid: Yup.string()
+        .default('')
+        .when('_type', {
+          is: 'other',
+          then: schema => schema.required(sharedMessages.validateRequired),
+          otherwise: schema => schema.strip(),
+        }),
+      password: Yup.string().when('_type', {
+        is: 'other',
+        then: schema =>
+          schema
+            .min(8, Yup.passValues(sharedMessages.validateTooShort))
+            .required(sharedMessages.validateRequired),
+        otherwise: schema => schema.strip(),
+      }),
+      security: Yup.string(),
+      signal_strength: Yup.number(),
+      is_active: Yup.bool(),
+    })
+    .test('has access point selected', m.validateNotSelectedAccessPoint, hasSelectedAccessPoint),
+})
 
 const ethernetValidationSchema = Yup.object().shape({})
 
-const hasAtLeastOneEntry = dnsServers =>
+const hasAtLeastOneValidEntry = dnsServers =>
   dnsServers &&
   dnsServers.length > 0 &&
-  dnsServers.some(entry => entry !== '' && entry !== undefined)
+  dnsServers.some(entry => entry !== '' && entry !== undefined && Boolean(ipAddress.test(entry)))
 
 const hasNoEmptyEntry = dnsServers =>
   dnsServers && dnsServers.every(entry => entry !== '' && entry !== undefined)
@@ -42,12 +71,18 @@ export const validationSchema = Yup.object({
   default_network_interface: Yup.boolean(),
   ip_address: Yup.string().when('default_network_interface', {
     is: false,
-    then: schema => schema.required(sharedMessages.validateRequired),
+    then: schema =>
+      schema
+        .required(sharedMessages.validateRequired)
+        .matches(ipAddress, Yup.passValues(m.validateIpAddress)),
     otherwise: schema => schema.strip(),
   }),
   subnet_mask: Yup.string().when('default_network_interface', {
     is: false,
-    then: schema => schema.required(sharedMessages.validateRequired),
+    then: schema =>
+      schema
+        .required(sharedMessages.validateRequired)
+        .matches(ipAddress, Yup.passValues(m.validateIpAddress)),
     otherwise: schema => schema.strip(),
   }),
   dns_servers: Yup.array().when('default_network_interface', {
@@ -55,11 +90,11 @@ export const validationSchema = Yup.object({
     then: schema =>
       schema
         .default([])
-        .test('has at least one entry', m.validateDnsServers, hasAtLeastOneEntry)
+        .test('has at least one entry', m.validateDnsServers, hasAtLeastOneValidEntry)
         .test('has no empty entry', m.validateEmptyDnsServer, hasNoEmptyEntry),
     otherwise: schema => schema.strip(),
   }),
-}).when('_connection_type', {
+}).when('._connection_type', {
   is: CONNECTION_TYPES.WIFI,
   then: schema => schema.concat(wifiValidationSchema),
   otherwise: schema => schema.concat(ethernetValidationSchema),

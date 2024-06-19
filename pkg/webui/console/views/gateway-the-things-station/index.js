@@ -43,7 +43,7 @@ const GatewayTheThingsStation = () => {
     <Require featureCheck={mayViewTheThingsStation} otherwise={{ redirect: `/gateways/${gtwId}` }}>
       <Container>
         <Row>
-          <Col>
+          <Col sm={12} lg={8}>
             <Routes>
               <Route index element={<Navigate to="connection-settings" replace />} />
               <Route path="connection-settings" Component={GatewayConnectionSettings} />
