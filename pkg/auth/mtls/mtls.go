@@ -25,6 +25,15 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ClientType represents the type of the client.
+type ClientType int
+
+// Client types.
+const (
+	ClientTypeUnspecified ClientType = iota
+	ClientTypeGateway
+)
+
 // CAStore is a store of CA Certs.
 type CAStore struct {
 	commonPool *x509.CertPool
@@ -81,17 +90,14 @@ func NewCAStore(_ context.Context, fetcher fetch.Interface) (*CAStore, error) {
 	return s, nil
 }
 
-func (c CAStore) certPools(_ context.Context) []*x509.CertPool {
-	var res []*x509.CertPool
-	if c.commonPool != nil {
-		res = append(res, c.commonPool)
-	}
-	return res
+func (c CAStore) certPool(_ context.Context, _ ClientType) (*x509.CertPool, error) { //nolint:unparam
+	return c.commonPool.Clone(), nil
 }
 
-// Verify verifies the certificate against the list of configured certificate pools.
-// The function also checks that common name in the certificate matches the provided value.
-func (c *CAStore) Verify(ctx context.Context, cn string, cert *x509.Certificate) error {
+// Verify verifies the certificate against the certificate pool for the client type.
+// The common pool is always used. If the client type is unspecified, only the common certificate pool is used.
+// The method also checks that common name in the certificate matches the provided value.
+func (c *CAStore) Verify(ctx context.Context, clientType ClientType, cn string, cert *x509.Certificate) error {
 	if cert.Subject.CommonName != cn {
 		return errCommonNameMismatch.WithAttributes(
 			"exp", cn,
@@ -99,8 +105,11 @@ func (c *CAStore) Verify(ctx context.Context, cn string, cert *x509.Certificate)
 		)
 	}
 
-	certPools := c.certPools(ctx)
-	if len(certPools) == 0 {
+	certPool, err := c.certPool(ctx, clientType)
+	if err != nil {
+		return err
+	}
+	if certPool.Equal(x509.NewCertPool()) {
 		return errNoCAPool.New()
 	}
 	opts := x509.VerifyOptions{

@@ -104,7 +104,7 @@ enSyC2URWEsszHuPDCO9J0KAdbMbyIgq6w7as6ZeE1z90YC8H3Y8OA==
 	a.So(block.Type, should.Equal, "CERTIFICATE")
 	invalidTestCert, err := x509.ParseCertificate(block.Bytes)
 	a.So(err, should.BeNil)
-	err = caStore.Verify(ctx, "1111111111111111", invalidTestCert)
+	err = caStore.Verify(ctx, mtls.ClientTypeUnspecified, "1111111111111111", invalidTestCert)
 	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
 	// Generate a valid certificate
@@ -116,7 +116,7 @@ enSyC2URWEsszHuPDCO9J0KAdbMbyIgq6w7as6ZeE1z90YC8H3Y8OA==
 	a.So(block, should.NotBeNil)
 	validGatewayCertificate, err := x509.ParseCertificate(block.Bytes)
 	a.So(err, should.BeNil)
-	err = caStore.Verify(ctx, "2222222222222222", validGatewayCertificate)
+	err = caStore.Verify(ctx, mtls.ClientTypeUnspecified, "2222222222222222", validGatewayCertificate)
 	a.So(err, should.BeNil)
 
 	// Context
