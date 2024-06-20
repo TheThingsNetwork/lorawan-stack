@@ -16,6 +16,7 @@ package mtls_test
 
 import (
 	"crypto/x509"
+	_ "embed"
 	"encoding/pem"
 	"testing"
 
@@ -27,6 +28,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
+
+//go:embed testdata/2222222222222222.pem
+var validGatewayCertificatePEM []byte
 
 func TestTLSCertVerification(t *testing.T) {
 	t.Parallel()
@@ -77,22 +81,7 @@ fMoN3frX7CfJ+Mz1JARSnKFzD5VH1+9gMtLg7lbRXmnQCOV0yntylb+yCTeTALwD
 enSyC2URWEsszHuPDCO9J0KAdbMbyIgq6w7as6ZeE1z90YC8H3Y8OA==
 -----END CERTIFICATE-----`
 
-	rootDir := "testdata/store"
-	ca := &MockCA{
-		RootDir: rootDir,
-		CAs:     []string{"common"},
-	}
-	err := ca.New()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	t.Cleanup(func() {
-		if err := ca.Clean(); err != nil {
-			t.Error(err)
-		}
-	})
-
-	fetcher := fetch.FromFilesystem(rootDir)
+	fetcher := fetch.FromFilesystem("testdata/store")
 	caStore, err := mtls.NewCAStore(ctx, fetcher)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -107,11 +96,7 @@ enSyC2URWEsszHuPDCO9J0KAdbMbyIgq6w7as6ZeE1z90YC8H3Y8OA==
 	err = caStore.Verify(ctx, mtls.ClientTypeUnspecified, "1111111111111111", invalidTestCert)
 	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
-	// Generate a valid certificate
-	validGatewayCertificatePEM, err := ca.GenerateCertificate("2222222222222222", "common")
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
+	// Valid
 	block, _ = pem.Decode(validGatewayCertificatePEM)
 	a.So(block, should.NotBeNil)
 	validGatewayCertificate, err := x509.ParseCertificate(block.Bytes)

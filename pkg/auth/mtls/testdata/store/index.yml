@@ -1,2 +1,2 @@
 common:
-  - ca.pem
+  - rootCA.pem
