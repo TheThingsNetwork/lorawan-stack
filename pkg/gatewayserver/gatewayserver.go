@@ -29,7 +29,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	mtlsauth "go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -113,7 +113,7 @@ func (gs *GatewayServer) Context() context.Context {
 
 // CertificateVerifier abstracts certificate verification functions.
 type CertificateVerifier interface {
-	Verify(ctx context.Context, clientType mtlsauth.ClientType, cn string, cert *x509.Certificate) error
+	Verify(ctx context.Context, clientType mtls.ClientType, cn string, cert *x509.Certificate) error
 }
 
 var (
@@ -439,9 +439,9 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 			return nil, nil, err
 		}
 	}
-	if cert := mtlsauth.ClientCertificateFromContext(ctx); cert != nil {
+	if cert := mtls.ClientCertificateFromContext(ctx); cert != nil {
 		// Verify the client certificate.
-		err := gs.certVerifier.Verify(ctx, mtlsauth.ClientTypeGateway, types.MustEUI64(ids.Eui).String(), cert)
+		err := gs.certVerifier.Verify(ctx, mtls.ClientTypeGateway, types.MustEUI64(ids.Eui).String(), cert)
 		if err != nil {
 			return nil, nil, errUnauthenticatedGatewayConnection.WithCause(err)
 		}

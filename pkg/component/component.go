@@ -27,7 +27,7 @@ import (
 	"syscall"
 
 	"go.opentelemetry.io/otel/trace"
-	mtlsauth "go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -97,7 +97,7 @@ type Component struct {
 	taskStarter task.Starter
 	taskConfigs []*task.Config
 
-	caStore *mtlsauth.CAStore
+	caStore *mtls.CAStore
 
 	limiter ratelimit.Interface
 }
@@ -207,7 +207,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 	if err != nil {
 		return nil, err
 	}
-	c.caStore, err = mtlsauth.NewCAStore(ctx, caStoreFetcher)
+	c.caStore, err = mtls.NewCAStore(ctx, caStoreFetcher)
 	if err != nil {
 		return nil, err
 	}
@@ -455,6 +455,6 @@ func (c *Component) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // CAStore returns the component's CA Store.
-func (c *Component) CAStore() *mtlsauth.CAStore {
+func (c *Component) CAStore() *mtls.CAStore {
 	return c.caStore
 }

@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	mtlsauth "go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -126,10 +126,10 @@ func (h *ProxyHeaders) intercept(ctx context.Context) (context.Context, metadata
 		if forwardedFor != "" {
 			md.Set(headerXRealIP, strings.TrimSpace(strings.Split(forwardedFor, ",")[0]))
 		}
-		if cert, ok, err := mtlsauth.FromProxyHeaders(getLastFromMD(md)); err != nil {
+		if cert, ok, err := mtls.FromProxyHeaders(getLastFromMD(md)); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to parse client certificate from proxy headers")
 		} else if ok {
-			ctx = mtlsauth.NewContextWithClientCertificate(ctx, cert)
+			ctx = mtls.NewContextWithClientCertificate(ctx, cert)
 		}
 	} else {
 		// We don't trust the proxy, remove its headers.
