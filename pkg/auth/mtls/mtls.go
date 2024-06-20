@@ -118,8 +118,8 @@ func (c *CAStore) Verify(ctx context.Context, clientType ClientType, cn string, 
 			x509.ExtKeyUsageClientAuth,
 		},
 	}
-	if _, err := cert.Verify(opts); err == nil {
-		return nil
+	if _, err := cert.Verify(opts); err != nil {
+		return errCertificateNotVerified.WithCause(err)
 	}
-	return errCertificateNotVerified.New()
+	return nil
 }
