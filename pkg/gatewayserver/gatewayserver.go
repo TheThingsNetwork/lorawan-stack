@@ -113,7 +113,7 @@ func (gs *GatewayServer) Context() context.Context {
 
 // CertificateVerifier abstracts certificate verification functions.
 type CertificateVerifier interface {
-	Verify(ctx context.Context, cn string, cert *x509.Certificate) error
+	Verify(ctx context.Context, clientType mtlsauth.ClientType, cn string, cert *x509.Certificate) error
 }
 
 var (
@@ -152,6 +152,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		upstreamHandlers:          make(map[string]upstream.Handler),
 		statsRegistry:             conf.Stats,
 		entityRegistry:            NewIS(c),
+		certVerifier:              c.CAStore(),
 	}
 	for _, opt := range opts {
 		opt(gs)
@@ -440,7 +441,8 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 	}
 	if cert := mtlsauth.ClientCertificateFromContext(ctx); cert != nil {
 		// Verify the client certificate.
-		if err := gs.certVerifier.Verify(ctx, types.MustEUI64(ids.Eui).String(), cert); err != nil {
+		err := gs.certVerifier.Verify(ctx, mtlsauth.ClientTypeGateway, types.MustEUI64(ids.Eui).String(), cert)
+		if err != nil {
 			return nil, nil, errUnauthenticatedGatewayConnection.WithCause(err)
 		}
 		token := gatewaytokens.New(
