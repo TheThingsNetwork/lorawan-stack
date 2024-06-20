@@ -42,7 +42,7 @@ type emailValidationRegistry struct {
 }
 
 func (is *IdentityServer) refreshEmailValidation(
-	ctx context.Context, usrID *ttnpb.UserIdentifiers,
+	ctx context.Context, usrID *ttnpb.UserIdentifiers, opts ...ttnpb.EmailValidationOverwrite,
 ) (*ttnpb.EmailValidation, error) {
 	ttl := is.configFromContext(ctx).UserRegistration.ContactInfoValidation.TokenTTL
 	expires := time.Now().Add(ttl)
@@ -55,6 +55,11 @@ func (is *IdentityServer) refreshEmailValidation(
 			return err
 		}
 		validation.ExpiresAt = timestamppb.New(expires)
+
+		for _, opt := range opts {
+			opt(validation)
+		}
+
 		if err = st.RefreshEmailValidation(ctx, validation); err != nil {
 			return err
 		}
@@ -67,7 +72,7 @@ func (is *IdentityServer) refreshEmailValidation(
 }
 
 func (is *IdentityServer) requestEmailValidation(
-	ctx context.Context, usrID *ttnpb.UserIdentifiers,
+	ctx context.Context, usrID *ttnpb.UserIdentifiers, opts ...ttnpb.EmailValidationOverwrite,
 ) (*ttnpb.EmailValidation, error) {
 	var validation *ttnpb.EmailValidation
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
@@ -98,6 +103,11 @@ func (is *IdentityServer) requestEmailValidation(
 					time.Now().Add(is.configFromContext(ctx).UserRegistration.ContactInfoValidation.TokenTTL),
 				),
 			}
+
+			for _, opt := range opts {
+				opt(validation)
+			}
+
 			validation, err = st.CreateEmailValidation(ctx, validation)
 			if err != nil {
 				// Only one validation can exist at a time, so if it already exists, return a forbidden error.
