@@ -17,6 +17,9 @@ package mtls
 import (
 	"context"
 	"crypto/x509"
+
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/peer"
 )
 
 type clientCertificateContextKeyType struct{}
@@ -30,9 +33,17 @@ func NewContextWithClientCertificate(parent context.Context, cert *x509.Certific
 }
 
 // ClientCertificateFromContext returns the certificate from the context if present.
+// If the certificate is not present in the context, it tries to extract it from the peer.
 func ClientCertificateFromContext(ctx context.Context) *x509.Certificate {
 	if cert, ok := ctx.Value(clientCertificateContextKey).(*x509.Certificate); ok {
 		return cert
+	}
+	if p, ok := peer.FromContext(ctx); ok {
+		if tlsInfo, ok := p.AuthInfo.(credentials.TLSInfo); ok {
+			if len(tlsInfo.State.PeerCertificates) > 0 {
+				return tlsInfo.State.PeerCertificates[0]
+			}
+		}
 	}
 	return nil
 }
