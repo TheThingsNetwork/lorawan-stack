@@ -15680,20 +15680,6 @@
         }
       }
     },
-    "AuthInfoResponseGatewayToken": {
-      "type": "object",
-      "properties": {
-        "gateway_ids": {
-          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
-        },
-        "rights": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3Right"
-          }
-        }
-      }
-    },
     "BandDescriptionBandDataRate": {
       "type": "object",
       "properties": {
@@ -20193,13 +20179,27 @@
           "description": "Warning: A user authorized by session cookie will be granted all\ncurrent and future rights. When using this auth type, the respective\nhandlers need to ensure thorough CSRF and CORS protection using\nappropriate middleware."
         },
         "gateway_token": {
-          "$ref": "#/definitions/AuthInfoResponseGatewayToken"
+          "$ref": "#/definitions/v3AuthInfoResponseGatewayToken"
         },
         "universal_rights": {
           "$ref": "#/definitions/v3Rights"
         },
         "is_admin": {
           "type": "boolean"
+        }
+      }
+    },
+    "v3AuthInfoResponseGatewayToken": {
+      "type": "object",
+      "properties": {
+        "gateway_ids": {
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+        },
+        "rights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3Right"
+          }
         }
       }
     },

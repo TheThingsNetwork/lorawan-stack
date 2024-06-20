@@ -22,6 +22,8 @@ import (
 	"strings"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
@@ -32,8 +34,9 @@ const (
 
 	headerXForwardedFor   = "x-forwarded-for"
 	headerXForwardedHost  = "x-forwarded-host"
-	headerXForwardedProto = "x-forwarded-proto" // We don't support non-standard headers such as Front-End-Https, X-Forwarded-Ssl, X-Url-Scheme.
+	headerXForwardedProto = "x-forwarded-proto"
 	headerXRealIP         = "x-real-ip"
+	// We don't support non-standard headers such as Front-End-Https, X-Forwarded-Ssl, X-Url-Scheme.
 
 	headerXForwardedClientCert        = "x-forwarded-client-cert"          // Envoy mTLS.
 	headerXForwardedTLSClientCert     = "x-forwarded-tls-client-cert"      // Traefik mTLS.
@@ -70,11 +73,11 @@ func (h *ProxyHeaders) trustedIP(ip net.IP) bool {
 // ParseAndAddTrusted parses a list of CIDRs and adds them to the list of trusted ranges.
 func (h *ProxyHeaders) ParseAndAddTrusted(cidrs ...string) error {
 	for _, cidr := range cidrs {
-		_, net, err := net.ParseCIDR(cidr)
+		_, ipNet, err := net.ParseCIDR(cidr)
 		if err != nil {
 			return err
 		}
-		h.Trusted = append(h.Trusted, net)
+		h.Trusted = append(h.Trusted, ipNet)
 	}
 	return nil
 }
@@ -82,7 +85,7 @@ func (h *ProxyHeaders) ParseAndAddTrusted(cidrs ...string) error {
 // UnaryServerInterceptor is the interceptor for unary RPCs.
 func (h *ProxyHeaders) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-		md := h.intercept(ctx)
+		ctx, md := h.intercept(ctx)
 		ctx = metadata.NewIncomingContext(ctx, md)
 		return handler(ctx, req)
 	}
@@ -93,21 +96,21 @@ func (h *ProxyHeaders) StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := stream.Context()
 		wrapped := grpc_middleware.WrapServerStream(stream)
-		md := h.intercept(ctx)
+		ctx, md := h.intercept(ctx)
 		wrapped.WrappedContext = metadata.NewIncomingContext(ctx, md)
 		return handler(srv, wrapped)
 	}
 }
 
-func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
+func (h *ProxyHeaders) intercept(ctx context.Context) (context.Context, metadata.MD) {
 	md, _ := metadata.FromIncomingContext(ctx)
 
-	peer, ok := peer.FromContext(ctx)
+	p, ok := peer.FromContext(ctx)
 	if !ok {
 		// The gRPC server should always set this.
 		panic(fmt.Errorf("no peer in gRPC context"))
 	}
-	remoteAddr := peer.Addr.String()
+	remoteAddr := p.Addr.String()
 	if remoteAddr == "pipe" {
 		remoteAddr = "127.0.0.0:0"
 	}
@@ -119,9 +122,14 @@ func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
 	}
 	if h.trustedIP(net.ParseIP(remoteIP)) {
 		// We trust the proxy, so we parse the headers if present.
-		forwardedFor, _, _ := parseForwardedHeaders(md) // ignore forwardedScheme and forwardedHost.
+		forwardedFor, _, _ := parseForwardedHeaders(getLastFromMD(md)) // ignore forwardedScheme and forwardedHost.
 		if forwardedFor != "" {
 			md.Set(headerXRealIP, strings.TrimSpace(strings.Split(forwardedFor, ",")[0]))
+		}
+		if cert, ok, err := mtls.FromProxyHeaders(getLastFromMD(md)); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to parse client certificate from proxy headers")
+		} else if ok {
+			ctx = mtls.NewContextWithClientCertificate(ctx, cert)
 		}
 	} else {
 		// We don't trust the proxy, remove its headers.
@@ -130,27 +138,30 @@ func (h *ProxyHeaders) intercept(ctx context.Context) metadata.MD {
 		}
 		md.Set(headerXRealIP, remoteIP)
 	}
-	return md
+	return ctx, md
 }
 
-func parseForwardedHeaders(h metadata.MD) (forwardedFor, forwardedScheme, forwardedHost string) {
-	if xForwardedFor := h.Get(headerXForwardedFor); len(xForwardedFor) > 0 {
-		forwardedFor = xForwardedFor[len(xForwardedFor)-1]
+type getLastFromMD metadata.MD
+
+func (m getLastFromMD) Get(key string) string {
+	if values, ok := m[key]; ok {
+		return values[len(values)-1]
 	}
-	if xForwardedProto := h.Get(headerXForwardedProto); len(xForwardedProto) > 0 {
-		forwardedScheme = xForwardedProto[len(xForwardedProto)-1]
-	}
-	if xForwardedHost := h.Get(headerXForwardedHost); len(xForwardedHost) > 0 {
-		forwardedHost = xForwardedHost[len(xForwardedHost)-1]
-	}
-	if forwarded := h.Get(headerForwarded); len(forwarded) > 0 {
-		if match := forwardedForRegex.FindStringSubmatch(forwarded[len(forwarded)-1]); len(match) > 1 {
+	return ""
+}
+
+func parseForwardedHeaders(h getLastFromMD) (forwardedFor, forwardedScheme, forwardedHost string) {
+	forwardedFor = h.Get(headerXForwardedFor)
+	forwardedScheme = h.Get(headerXForwardedProto)
+	forwardedHost = h.Get(headerXForwardedHost)
+	if forwarded := h.Get(headerForwarded); forwarded != "" {
+		if match := forwardedForRegex.FindStringSubmatch(forwarded); len(match) > 1 {
 			forwardedFor = strings.ToLower(match[1])
 		}
-		if match := forwardedProtoRegex.FindStringSubmatch(forwarded[len(forwarded)-1]); len(match) > 1 {
+		if match := forwardedProtoRegex.FindStringSubmatch(forwarded); len(match) > 1 {
 			forwardedScheme = strings.ToLower(match[1])
 		}
-		if match := forwardedHostRegex.FindStringSubmatch(forwarded[len(forwarded)-1]); len(match) > 1 {
+		if match := forwardedHostRegex.FindStringSubmatch(forwarded); len(match) > 1 {
 			forwardedHost = strings.ToLower(match[1])
 		}
 	}
