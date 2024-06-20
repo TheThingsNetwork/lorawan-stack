@@ -1856,7 +1856,7 @@
   "error:pkg/auth/mtls:no_ca_pool": "",
   "error:pkg/auth/mtls:parse_index_file": "",
   "error:pkg/auth/mtls:proxy_header_value": "",
-  "error:pkg/auth/mtls:read_certificate": "",
+  "error:pkg/auth/mtls:read_certificate_from_file": "",
   "error:pkg/auth/pbkdf2:invalid_pbkdf2_format": "ハッシュ化されたパスワードが無効なPBKDF2フォーマットです",
   "error:pkg/auth/pbkdf2:pbkdf2_iterations": "`{iterations}` から繰り返し回数を定められません",
   "error:pkg/auth/pbkdf2:pbkdf2_key_length": "鍵長を定められません",

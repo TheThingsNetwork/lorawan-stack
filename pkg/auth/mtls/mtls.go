@@ -25,16 +25,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const commonCertPoolKey = "common"
-
-// Index is the unmarshaled contents of the index file.
-type Index struct {
-	Common []string `yaml:"common"`
-}
-
 // CAStore is a store of CA Certs.
 type CAStore struct {
-	Fetcher    fetch.Interface
 	commonPool *x509.CertPool
 }
 
@@ -42,7 +34,7 @@ var (
 	errParseIndexFile   = errors.DefineCorruption("parse_index_file", "parse index file")
 	errFetchFile        = errors.Define("fetch_file", "fetch file `{path}`")
 	errReadCertFromFile = errors.DefineInvalidArgument(
-		"read_certificate",
+		"read_certificate_from_file",
 		"read certificate from file `{path}`",
 	)
 	errNoCAPool               = errors.DefineInvalidArgument("no_ca_pool", "no CA pool configured")
@@ -57,25 +49,27 @@ var (
 )
 
 // NewCAStore creates a new CAStore.
+// If the fetcher is given, the index file must be present. If the index file contains a common pool, it will be loaded.
 func NewCAStore(_ context.Context, fetcher fetch.Interface) (*CAStore, error) {
+	const commonCertPoolKey = "common"
 	s := &CAStore{
-		Fetcher: fetcher,
+		commonPool: x509.NewCertPool(),
 	}
 	if fetcher != nil {
-		var index Index
-		raw, err := s.Fetcher.File("index.yml")
+		raw, err := fetcher.File("index.yml")
 		if err != nil {
 			return nil, errFetchFile.WithAttributes("path", "index.yml").WithCause(err)
+		}
+		var index struct {
+			Common []string `yaml:"common"`
 		}
 		err = yaml.Unmarshal(raw, &index)
 		if err != nil {
 			return nil, errParseIndexFile.WithCause(err)
 		}
-		// Fetch common certificates.
-		s.commonPool = x509.NewCertPool()
 		for _, fileName := range index.Common {
 			pathElements := []string{commonCertPoolKey, fileName}
-			raw, err := s.Fetcher.File(pathElements...)
+			raw, err := fetcher.File(pathElements...)
 			if err != nil {
 				return nil, errFetchFile.WithAttributes("path", strings.Join(pathElements, "/")).WithCause(err)
 			}
@@ -109,16 +103,14 @@ func (c *CAStore) Verify(ctx context.Context, cn string, cert *x509.Certificate)
 	if len(certPools) == 0 {
 		return errNoCAPool.New()
 	}
-	for _, certPool := range certPools {
-		opts := x509.VerifyOptions{
-			Roots: certPool,
-			KeyUsages: []x509.ExtKeyUsage{
-				x509.ExtKeyUsageClientAuth,
-			},
-		}
-		if _, err := cert.Verify(opts); err == nil {
-			return nil
-		}
+	opts := x509.VerifyOptions{
+		Roots: certPool,
+		KeyUsages: []x509.ExtKeyUsage{
+			x509.ExtKeyUsageClientAuth,
+		},
+	}
+	if _, err := cert.Verify(opts); err == nil {
+		return nil
 	}
 	return errCertificateNotVerified.New()
 }

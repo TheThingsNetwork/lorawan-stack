@@ -3131,7 +3131,7 @@
       "file": "proxy_headers.go"
     }
   },
-  "error:pkg/auth/mtls:read_certificate": {
+  "error:pkg/auth/mtls:read_certificate_from_file": {
     "translations": {
       "en": "read certificate from file `{path}`"
     },
