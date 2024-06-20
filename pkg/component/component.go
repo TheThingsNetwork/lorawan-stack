@@ -203,6 +203,15 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 	}
 	c.frequencyPlans = frequencyplans.NewStore(fpsFetcher)
 
+	caStoreFetcher, err := config.MTLSAuthCAStoreFetcher(ctx, c)
+	if err != nil {
+		return nil, err
+	}
+	c.caStore, err = mtlsauth.NewCAStore(ctx, caStoreFetcher)
+	if err != nil {
+		return nil, err
+	}
+
 	if c.clusterNew == nil {
 		c.clusterNew = cluster.New
 	}
