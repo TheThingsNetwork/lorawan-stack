@@ -11,12 +11,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Europe 868.1 MHz single channel frequency plan.
-  - This is experimental and may be removed or hidden in the future.
-
 ### Changed
-
-- The rate limit key for LoRa Basics Station has changed from `gs:accept:ws` to `gs:accept:semtechws/lbslns`.
 
 ### Deprecated
 
@@ -24,10 +19,23 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.31.0] - unreleased
+
+### Added
+
+- Europe 868.1 MHz single channel frequency plan.
+  - This is experimental and may be removed or hidden in the future.
+
+### Changed
+
+- The rate limit key for LoRa Basics Station has changed from `gs:accept:ws` to `gs:accept:semtechws/lbslns`.
+
+### Fixed
+
 - Fix potential issue with application event stream stopping after showing initial events.
 - Fix storybook compiling issue.
-
-### Security
 
 ## [3.30.2] - unreleased
 
@@ -2822,7 +2830,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.2...v3.30
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.0...v3.31
+[3.31.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.2...v3.31.0
 [3.30.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.1...v3.30.2
 [3.30.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.0...v3.30.1
 [3.30.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.29.2...v3.30.0
