@@ -21,21 +21,16 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
-import Checkbox from '@ttn-lw/components/checkbox'
-import Input from '@ttn-lw/components/input'
-import KeyValueMap from '@ttn-lw/components/key-value-map'
 
 import {
   CONNECTION_TYPES,
   getFormTypeMessage,
-} from '@console/containers/gateway-the-things-station/connection-profiles/utils'
+  getInitialProfile,
+} from '@console/containers/gateway-the-things-station/utils'
 import validationSchema from '@console/containers/gateway-the-things-station/connection-profiles/validation-schema'
-import AccessPointList from '@console/containers/access-point-list'
+import GatewayConnectionProfilesFormFields from '@console/containers/gateway-the-things-station/connection-profiles/connection-profiles-form-fields'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
-
-import m from './messages'
 
 const GatewayConnectionProfilesForm = () => {
   const [error, setError] = useState(undefined)
@@ -61,24 +56,7 @@ const GatewayConnectionProfilesForm = () => {
     }
   }, [])
 
-  const initialValues = {
-    _connection_type: type,
-    name: '',
-    ...(type === CONNECTION_TYPES.WIFI && {
-      access_point: {
-        _type: 'all',
-        ssid: '',
-        password: '',
-        security: '',
-        signal_strength: 0,
-        is_active: true,
-      },
-    }),
-    default_network_interface: true,
-    ip_address: '',
-    subnet_mask: '',
-    dns_servers: [''],
-  }
+  const initialValues = getInitialProfile(type)
 
   return (
     <>
@@ -89,61 +67,13 @@ const GatewayConnectionProfilesForm = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
       >
-        {({ values }) => (
-          <>
-            <Form.Field title={m.profileName} name="name" component={Input} required />
-            {values._connection_type === CONNECTION_TYPES.WIFI && (
-              <>
-                <Form.Field
-                  title={m.accessPointAndSsid}
-                  name="access_point"
-                  component={AccessPointList}
-                  required
-                />
-                {values.access_point._type === 'other' && (
-                  <Form.Field title={m.ssid} name="access_point.ssid" component={Input} required />
-                )}
-                {(values.access_point._type === 'other' ||
-                  values.access_point.password.length > 1) && (
-                  <Form.Field
-                    title={m.wifiPassword}
-                    name="access_point.password"
-                    type="password"
-                    component={Input}
-                    required={values.access_point._type !== 'other'}
-                  />
-                )}
-              </>
-            )}
+        <>
+          <GatewayConnectionProfilesFormFields isEdit={isEdit} />
 
-            <Form.Field
-              name="default_network_interface"
-              component={Checkbox}
-              label={m.useDefaultNetworkInterfaceSettings}
-              description={m.uncheckToSetCustomSettings}
-              tooltipId={tooltipIds.DEFAULT_NETWORK_INTERFACE}
-            />
-
-            {!Boolean(values.default_network_interface) && (
-              <>
-                <Form.Field title={m.ipAddress} name="ip_address" component={Input} />
-                <Form.Field title={m.subnetMask} name="subnet_mask" component={Input} />
-                <Form.Field
-                  name="dns_servers"
-                  title={m.dnsServers}
-                  addMessage={m.addServerAddress}
-                  component={KeyValueMap}
-                  indexAsKey
-                  valuePlaceholder={m.dnsServerPlaceholder}
-                />
-              </>
-            )}
-
-            <SubmitBar>
-              <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-            </SubmitBar>
-          </>
-        )}
+          <SubmitBar>
+            <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
+          </SubmitBar>
+        </>
       </Form>
     </>
   )

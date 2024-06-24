@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { CONNECTION_TYPES } from '@console/containers/gateway-the-things-station/connection-profiles/utils'
+import { CONNECTION_TYPES } from '@console/containers/gateway-the-things-station/utils'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -33,10 +33,9 @@ const wifiValidationSchema = Yup.object().shape({
         .when('_type', {
           is: 'other',
           then: schema => schema.required(sharedMessages.validateRequired),
-          otherwise: schema => schema.strip(),
         }),
-      password: Yup.string().when('_type', {
-        is: 'other',
+      password: Yup.string().when('security', {
+        is: 'WPA2',
         then: schema =>
           schema
             .min(8, Yup.passValues(sharedMessages.validateTooShort))

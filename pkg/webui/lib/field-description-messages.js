@@ -503,6 +503,9 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.GATEWAY_SHOW_PROFILES]: {
     description: m.dataRateSpecificOverridesDescription,
   },
+  [TOOLTIP_IDS.GATEWAY_SETTINGS_PROFILE]: {
+    description: m.dataRateSpecificOverridesDescription,
+  },
   [TOOLTIP_IDS.DEFAULT_NETWORK_INTERFACE]: {
     description: m.dataRateSpecificOverridesDescription,
   },

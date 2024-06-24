@@ -14,13 +14,14 @@
 
 import React from 'react'
 import { Navigate, Route, Routes, useParams } from 'react-router-dom'
+import { Col, Container, Row } from 'react-grid-system'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import GatewayConnectionProfilesForm from '@console/containers/gateway-the-things-station/connection-profiles/form'
 import GatewayConnectionProfilesOverview from '@console/containers/gateway-the-things-station/connection-profiles/overview'
-import { CONNECTION_TYPES } from '@console/containers/gateway-the-things-station/connection-profiles/utils'
+import { CONNECTION_TYPES } from '@console/containers/gateway-the-things-station/utils'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -44,12 +45,16 @@ const GatewayConnectionProfiles = () => {
   }
 
   return (
-    <Routes>
-      <Route index Component={GatewayConnectionProfilesOverview} />
-      <Route path="add" Component={GatewayConnectionProfilesForm} />
-      <Route path="edit/:profileId" Component={GatewayConnectionProfilesForm} />
-      <Route path="*" element={<Navigate to="" replace />} />
-    </Routes>
+    <Row>
+      <Col sm={12} lg={8}>
+        <Routes>
+          <Route index Component={GatewayConnectionProfilesOverview} />
+          <Route path="add" Component={GatewayConnectionProfilesForm} />
+          <Route path="edit/:profileId" Component={GatewayConnectionProfilesForm} />
+          <Route path="*" element={<Navigate to="" replace />} />
+        </Routes>
+      </Col>
+    </Row>
   )
 }
 
