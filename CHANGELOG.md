@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fixed an issue where an downlink message was scheduled by the Application Layer Clock Synchronization (ALCS) implementation when there is no answer to send (i.e. `AnsRequired` is not set and the difference with what the end device reports falls within the threshold).
+
 ### Security
 
 ## [3.31.0] - unreleased
