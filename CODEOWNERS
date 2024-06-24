@@ -7,12 +7,14 @@
 # Clear common folders
 /pkg
 
+# Clear package files
+/package.json
+/sdk/js/package.json
+
 # Dependencies
 /go.mod @TheThingsNetwork/stack-reviewers-1
 /go.sum @TheThingsNetwork/stack-reviewers-1
-/package.json @TheThingsNetwork/stack-reviewers-3
 /yarn.lock @TheThingsNetwork/stack-reviewers-3
-/sdk/js/package.json @TheThingsNetwork/stack-reviewers-3
 /sdk/js/yarn.lock @TheThingsNetwork/stack-reviewers-3
 
 # Build pipeline and tooling
