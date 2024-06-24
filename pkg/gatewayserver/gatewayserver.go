@@ -287,39 +287,34 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}
 
 	// Start Semtech web socket listeners.
-	type listenerConfig struct {
-		fallbackFreqPlanID string
-		listen             string
-		listenTLS          string
-		frontend           semtechws.Config
-	}
 	for _, version := range []struct {
-		Name           string
-		Formatter      semtechws.Formatter
-		listenerConfig listenerConfig
+		Name      string
+		Formatter semtechws.Formatter
+		FallbackFreqPlanID,
+		Listen,
+		ListenTLS string
+		Frontend semtechws.Config
 	}{
 		{
-			Name:      "basicstation",
-			Formatter: lbslns.NewFormatter(conf.BasicStation.MaxValidRoundTripDelay),
-			listenerConfig: listenerConfig{
-				fallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
-				listen:             conf.BasicStation.Listen,
-				listenTLS:          conf.BasicStation.ListenTLS,
-				frontend:           conf.BasicStation.Config,
-			},
+			Name:               "basicstation",
+			Formatter:          lbslns.NewFormatter(conf.BasicStation.MaxValidRoundTripDelay),
+			FallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
+			Listen:             conf.BasicStation.Listen,
+			ListenTLS:          conf.BasicStation.ListenTLS,
+			Frontend:           conf.BasicStation.Config,
 		},
 	} {
 		ctx := gs.Context()
-		if version.listenerConfig.fallbackFreqPlanID != "" {
-			ctx = frequencyplans.WithFallbackID(ctx, version.listenerConfig.fallbackFreqPlanID)
+		if version.FallbackFreqPlanID != "" {
+			ctx = frequencyplans.WithFallbackID(ctx, version.FallbackFreqPlanID)
 		}
-		web, err := semtechws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
+		web, err := semtechws.New(ctx, gs, version.Formatter, version.Frontend)
 		if err != nil {
 			return nil, err
 		}
 		for _, endpoint := range []component.Endpoint{
-			component.NewTCPEndpoint(version.listenerConfig.listen, version.Name),
-			component.NewTLSEndpoint(version.listenerConfig.listenTLS, version.Name, tlsconfig.WithNextProtos("h2", "http/1.1")),
+			component.NewTCPEndpoint(version.Listen, version.Name),
+			component.NewTLSEndpoint(version.ListenTLS, version.Name, tlsconfig.WithNextProtos("h2", "http/1.1")),
 		} {
 			endpoint := endpoint
 			if endpoint.Address() == "" {
@@ -367,6 +362,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			})
 		}
 	}
+
 	return gs, nil
 }
 
