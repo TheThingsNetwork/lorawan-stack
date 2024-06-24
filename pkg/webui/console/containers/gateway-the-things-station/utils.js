@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import m from './messages'
+import m from './connection-profiles/messages'
 
 export const CONNECTION_TYPES = Object.freeze({
   WIFI: 'wifi',
@@ -25,3 +25,22 @@ export const getFormTypeMessage = (type, profileId) => {
   }
   return Boolean(profileId) ? m.updateEthernetProfile : m.addEthernetProfile
 }
+
+export const getInitialProfile = type => ({
+  _connection_type: type,
+  name: '',
+  ...(type === CONNECTION_TYPES.WIFI && {
+    access_point: {
+      _type: 'all',
+      ssid: '',
+      password: '',
+      security: '',
+      signal_strength: 0,
+      is_active: true,
+    },
+  }),
+  default_network_interface: true,
+  ip_address: '',
+  subnet_mask: '',
+  dns_servers: [''],
+})

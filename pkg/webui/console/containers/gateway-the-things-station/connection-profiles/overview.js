@@ -34,7 +34,7 @@ import Message from '@ttn-lw/lib/components/message'
 import {
   CONNECTION_TYPES,
   getFormTypeMessage,
-} from '@console/containers/gateway-the-things-station/connection-profiles/utils'
+} from '@console/containers/gateway-the-things-station/utils'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
@@ -50,7 +50,7 @@ import {
 import m from './messages'
 
 const profileOptions = [
-  { value: '0', label: m.yourself },
+  { value: '0', label: sharedMessages.yourself },
   { value: '1', label: 'TTI' },
 ]
 
@@ -183,7 +183,7 @@ const GatewayConnectionProfilesOverview = () => {
         >
           <Form.Field
             name="profiles"
-            title={m.showProfilesOf}
+            title={sharedMessages.showProfilesOf}
             component={Select}
             options={profileOptions}
             tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}

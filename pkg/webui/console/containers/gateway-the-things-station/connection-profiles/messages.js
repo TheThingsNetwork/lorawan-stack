@@ -20,8 +20,6 @@ const messages = defineMessages({
   ethernetProfiles: 'Ethernet profiles',
   information:
     'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.<br></br> <link>Learn more about gateway network connection profiles.</link>',
-  showProfilesOf: 'Show profiles of',
-  yourself: 'Yourself',
   addWifiProfile: 'Add WiFi profile',
   addEthernetProfile: 'Add Ethernet profile',
   updateWifiProfile: 'Update WiFi profile',
@@ -47,6 +45,7 @@ const messages = defineMessages({
   validateNotSelectedAccessPoint: 'There must be at least one access point / SSID selected',
   wifiPassword: 'WiFi password',
   ssid: 'SSID',
+  isSet: '(is set)',
 })
 
 export default messages

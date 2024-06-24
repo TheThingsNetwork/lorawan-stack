@@ -470,6 +470,7 @@ export default defineMessages({
   settings: 'Settings',
   setup: 'Setup',
   shareGatewayInfo: 'Share gateway information',
+  showProfilesOf: 'Show profiles of',
   skipCryptoDescription: 'Skip decryption of uplink payloads and encryption of downlink payloads',
   skipCryptoPlaceholder: 'Encryption/decryption disabled',
   skipCryptoTitle: 'Skip payload encryption and decryption',
@@ -579,4 +580,5 @@ export default defineMessages({
   webhookId: 'Webhook ID',
   webhookUpdated: 'Webhook updated',
   webhooks: 'Webhooks',
+  yourself: 'Yourself',
 })
