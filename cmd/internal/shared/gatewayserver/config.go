@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ttigw"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/packetbroker"
 )
@@ -68,5 +69,10 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 		MaxValidRoundTripDelay: 10 * time.Second,
 		Listen:                 ":1887",
 		ListenTLS:              ":8887",
+	},
+	TheThingsIndustriesGateway: gatewayserver.TheThingsIndustriesGatewayConfig{
+		Config:    ttigw.DefaultConfig,
+		Listen:    ":1888",
+		ListenTLS: ":8888",
 	},
 }

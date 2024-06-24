@@ -17,6 +17,7 @@ package gatewayserver
 
 import (
 	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	stdio "io"
@@ -43,6 +44,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/lbslns"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ttigw"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/ns"
@@ -361,6 +363,65 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 				Backoff: task.DefaultBackoffConfig,
 			})
 		}
+	}
+
+	// Start The Things Industries gateway web socket listeners.
+	ttiGWHandler, err := ttigw.New(ctx, gs, conf.TheThingsIndustriesGateway.Config)
+	if err != nil {
+		return nil, err
+	}
+	for _, endpoint := range []component.Endpoint{
+		component.NewTCPEndpoint(conf.TheThingsIndustriesGateway.Listen, "ttigw"),
+		component.NewTLSEndpoint(conf.TheThingsIndustriesGateway.ListenTLS, "ttigw",
+			tlsconfig.WithTLSClientAuth(tls.RequestClientCert, nil, nil),
+			tlsconfig.WithNextProtos("h2", "http/1.1"),
+		),
+	} {
+		endpoint := endpoint
+		if endpoint.Address() == "" {
+			continue
+		}
+		gs.RegisterTask(&task.Config{
+			Context: gs.Context(),
+			ID:      fmt.Sprintf("serve_ttigw/%s", endpoint.Address()),
+			Func: func(ctx context.Context) error {
+				l, err := gs.ListenTCP(endpoint.Address())
+				if err != nil {
+					return errListenFrontend.WithCause(err).WithAttributes(
+						"address", endpoint.Address(),
+						"protocol", endpoint.Protocol(),
+					)
+				}
+				lis, err := endpoint.Listen(l)
+				if err != nil {
+					return errListenFrontend.WithCause(err).WithAttributes(
+						"address", endpoint.Address(),
+						"protocol", endpoint.Protocol(),
+					)
+				}
+				defer lis.Close()
+				srv := http.Server{
+					Handler:           ttiGWHandler,
+					ReadTimeout:       120 * time.Second,
+					ReadHeaderTimeout: 30 * time.Second,
+					ErrorLog:          stdlog.New(stdio.Discard, "", 0),
+					BaseContext: func(net.Listener) context.Context {
+						ctx := context.Background()
+						if fallbackID := conf.TheThingsIndustriesGateway.FallbackFrequencyPlanID; fallbackID != "" {
+							ctx = frequencyplans.WithFallbackID(ctx, fallbackID)
+						}
+						return ctx
+					},
+				}
+				go func() {
+					<-ctx.Done()
+					srv.Close()
+				}()
+				return srv.Serve(lis)
+			},
+			Restart: task.RestartOnFailure,
+			Backoff: task.DefaultBackoffConfig,
+		})
 	}
 
 	return gs, nil
