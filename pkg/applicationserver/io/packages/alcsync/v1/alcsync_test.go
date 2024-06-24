@@ -209,7 +209,7 @@ func TestMakeCommandValidInput(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cmd, rest, err := makeCommand(tc.In.CID, tc.In.CPayload, uplink, fPort, data)
+			cmd, rest, err := parseCommand(tc.In.CID, tc.In.CPayload, uplink, fPort, data)
 			a.So(err, should.BeNil)
 			a.So(cmd.Code(), should.Resemble, tc.Expected.CID)
 			a.So(rest, should.Resemble, tc.Expected.Rest)
@@ -277,7 +277,7 @@ func TestMakeCommandInvalidInput(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cmd, rest, err := makeCommand(tc.In.CID, tc.In.CPayload, uplink, fPort, data)
+			cmd, rest, err := parseCommand(tc.In.CID, tc.In.CPayload, uplink, fPort, data)
 			a.So(cmd, should.BeNil)
 			a.So(rest, should.Resemble, tc.Expected.Rest)
 			a.So(err, should.Resemble, tc.Expected.Err)
@@ -471,7 +471,7 @@ func TestMakeCommandsValidInput(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			cmds, _, err := MakeCommands(tc.In.Uplink, tc.In.FPort, tc.In.Data)
+			cmds, _, err := parseCommands(tc.In.Uplink, tc.In.FPort, tc.In.Data)
 			a.So(err, should.Resemble, tc.Expected.Err)
 			a.So(cmds, should.Resemble, tc.Expected.Cmds)
 		})
@@ -593,7 +593,7 @@ func TestMakeDownlinkSerializesAppTimeAns(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
-			downlink, err := MakeDownlink(tc.In.Ans, tc.In.FPort)
+			downlink, err := buildDownlink(tc.In.Ans, tc.In.FPort)
 			a.So(err, should.BeNil)
 			a.So(downlink, should.Resemble, tc.Expected.Downlink)
 		})
