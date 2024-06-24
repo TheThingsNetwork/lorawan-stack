@@ -199,7 +199,6 @@ const IdentityServerForm = React.memo(props => {
         title={sharedMessages.devID}
         name="ids.device_id"
         placeholder={sharedMessages.deviceIdPlaceholder}
-        description={sharedMessages.deviceIdDescription}
         required
         disabled
         component={Input}

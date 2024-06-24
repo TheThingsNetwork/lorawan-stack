@@ -22,8 +22,6 @@ import DevEUIComponent from '@console/containers/dev-eui-component'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import m from '../../messages'
-
 const initialValues = {
   authenticated_identifiers: {
     dev_eui: '',
@@ -57,7 +55,6 @@ const DeviceClaimingFormSection = () => {
         component={Input}
         inputRef={idInputRef}
         tooltipId={tooltipIds.DEVICE_ID}
-        description={m.deviceIdDescription}
       />
     </>
   )

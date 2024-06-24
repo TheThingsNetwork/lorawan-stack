@@ -20,6 +20,8 @@ import TOOLTIP_IDS from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from './shared-messages'
 
 const m = defineMessages({
+  idLocation:
+    'Enter a value using lowercase letters, numbers, and dashes. You can choose this freely.',
   freqPlanDescription:
     'A frequency plan defines data rates that your end device or gateway is setup to use. It is important that gateways and end devices within reach use the same frequency plan to be able to communicate.',
   freqPlanLocation:
@@ -43,9 +45,8 @@ const m = defineMessages({
     'An end device specific encryption key used to derive the FNwkSIntKey, SNwkSIntKey, NwkSEncKey in LoRaWAN 1.1. When a LoRaWAN 1.1 capable device connects to a LoRaWAN 1.0x Network Server which does not support dual root keys (NwkKey and AppKey), the NwkKey value is used as the AppKey value.',
   nwkKeyLocation:
     'It is usually pre-provisioned by the end device manufacturer, but some end devices also allow using a user-defined value.',
-  devIdDescription: 'A unique, human-readable identifier for your end device.',
-  devIdLocation:
-    'We prefill this value using the previously entered DevEUI but you can use any other unique value you want. End device IDs can not be reused by multiple end devices within the same application.',
+  devIdDescription:
+    'A mandatory identifier for your end device that must be unique within the application and cannot be changed after creation. It is used to reference your end device e.g. in events, webhooks and API requests.',
   joinServerDescription:
     "The Join Server's role is to store root keys, generate session keys, and to send those securely to the Network Server and Application Server of choice. The device contains the same root keys, which can be provisioned as part of assembly, distribution or upon installation.",
   joinServerLocation:
@@ -109,7 +110,8 @@ const m = defineMessages({
     'The data rate used for the second reception window used by this end device to receive downlinks.',
   rx2FrequencyDescription:
     'The frequency used for the second reception window used by this end device to receive downlinks.',
-  gatewayIdDescription: 'A unique identifier for your gateway.',
+  gatewayIdDescription:
+    'A mandatory identifier for your gateway that must be unique per network and cannot be changed after creation. It is used to reference your end device e.g. in events, webhooks and API requests.',
   gatewayEuiDescription: 'A 64 bit extended unique identifier for your gateway.',
   gatewayEuiLocation:
     'It should be provided to you by the manufacturer, or printed on the gateway packaging.',
@@ -248,7 +250,7 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.DEVICE_ID]: {
     description: m.devIdDescription,
-    location: m.devIdLocation,
+    location: m.idLocation,
     glossaryId: GLOSSARY_IDS.DEVICE_ID,
   },
   [TOOLTIP_IDS.JOIN_SERVER]: {
@@ -338,8 +340,8 @@ const descriptions = Object.freeze({
     absence: sharedMessages.absenceContactManufacturer,
   },
   [TOOLTIP_IDS.GATEWAY_ID]: {
-    description: sharedMessages.absenceContactManufacturer,
-    location: m.gatewayIdLocation,
+    description: m.gatewayIdDescription,
+    location: m.idLocation,
     glossaryId: GLOSSARY_IDS.GATEWAY_ID,
   },
   [TOOLTIP_IDS.GATEWAY_EUI]: {
