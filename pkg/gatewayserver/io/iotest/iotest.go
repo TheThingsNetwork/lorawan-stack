@@ -65,9 +65,12 @@ type FrontendConfig struct {
 	// DeduplicatesUplinks indicates that the frontend deduplicates uplinks that are received at once by using the IO
 	// middleware's UniqueUplinkMessagesByRSSI.
 	DeduplicatesUplinks bool
-	// CustomConfig applies custom configuration for the Gateway Server before it gets started.
+	// CustomComponentConfig applies custom configuration for the component before it gets started.
+	// This is typically used for configuring security credentials.
+	CustomComponentConfig func(config *component.Config)
+	// CustomGatewayServerConfig applies custom configuration for the Gateway Server before it gets started.
 	// This is typically used for configuring frontend listeners.
-	CustomConfig func(gsConfig *gatewayserver.Config)
+	CustomGatewayServerConfig func(gsConfig *gatewayserver.Config)
 	// Link links the gateway.
 	Link func(
 		ctx context.Context,
@@ -114,7 +117,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		statsRegistry = registry
 	}
 
-	c := componenttest.NewComponent(t, &component.Config{
+	componentConfig := &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -129,7 +132,12 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				Static:       test.StaticFrequencyPlans,
 			},
 		},
-	})
+	}
+	if frontend.CustomComponentConfig != nil {
+		frontend.CustomComponentConfig(componentConfig)
+	}
+	c := componenttest.NewComponent(t, componentConfig)
+
 	gsConfig := &gatewayserver.Config{
 		RequireRegisteredGateways:         true,
 		UpdateGatewayLocationDebounceTime: 0,
@@ -140,10 +148,9 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		FetchGatewayInterval:              (1 << 3) * test.Delay,
 		FetchGatewayJitter:                0.1,
 	}
-	if frontend.CustomConfig != nil {
-		frontend.CustomConfig(gsConfig)
+	if frontend.CustomGatewayServerConfig != nil {
+		frontend.CustomGatewayServerConfig(gsConfig)
 	}
-
 	er := gatewayserver.NewIS(c)
 	gs, err := gatewayserver.New(c, gsConfig,
 		gatewayserver.WithRegistry(er),

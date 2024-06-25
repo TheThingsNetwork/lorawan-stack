@@ -137,7 +137,7 @@ func TestFrontend(t *testing.T) {
 		DetectsDisconnect:      true,
 		IsAuthenticated:        true,
 		DeduplicatesUplinks:    false,
-		CustomConfig: func(config *gatewayserver.Config) {
+		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.MQTT.Listen = ":1882"
 		},
 		Link: func(

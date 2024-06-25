@@ -43,7 +43,7 @@ func TestFrontend(t *testing.T) {
 		AuthenticatesWithEUI:   true,
 		IsAuthenticated:        true,
 		DeduplicatesUplinks:    false,
-		CustomConfig: func(config *gatewayserver.Config) {
+		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.BasicStation = gatewayserver.BasicStationConfig{
 				Listen: ":1887",
 				Config: semtechws.Config{

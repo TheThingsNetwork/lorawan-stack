@@ -211,7 +211,7 @@ func TestFrontend(t *testing.T) {
 		AuthenticatesWithEUI:   true,
 		IsAuthenticated:        false,
 		DeduplicatesUplinks:    true,
-		CustomConfig: func(config *gatewayserver.Config) {
+		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.UDP = gatewayserver.UDPConfig{
 				Config: udp.Config{
 					PacketHandlers:      2,
