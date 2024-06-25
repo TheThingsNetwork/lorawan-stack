@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
@@ -87,6 +88,8 @@ type Server interface {
 	RateLimiter() ratelimit.Interface
 	// ValidateGatewayID validates the ID of the gateway.
 	ValidateGatewayID(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error
+
+	httpclient.Provider
 	task.Starter
 }
 

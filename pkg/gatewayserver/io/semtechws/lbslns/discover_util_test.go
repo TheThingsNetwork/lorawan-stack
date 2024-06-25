@@ -16,10 +16,12 @@ package lbslns
 
 import (
 	"context"
+	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -73,4 +75,8 @@ func (srv mockServer) ValidateGatewayID(ctx context.Context, ids *ttnpb.GatewayI
 
 func (srv mockServer) StartTask(cfg *task.Config) {
 	task.DefaultStartTask(cfg)
+}
+
+func (srv mockServer) HTTPClient(context.Context, ...httpclient.Option) (*http.Client, error) {
+	return http.DefaultClient, nil
 }
