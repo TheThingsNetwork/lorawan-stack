@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package iotest implements tests for Gateway Server frontends.
 package iotest
 
 import (
@@ -84,7 +85,7 @@ type FrontendConfig struct {
 }
 
 // Frontend tests a frontend.
-func Frontend(t *testing.T, frontend FrontendConfig) {
+func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 	t.Helper()
 
 	var (
@@ -206,6 +207,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				ID:   &ttnpb.GatewayIdentifiers{Eui: unregisteredGatewayEUI.Bytes()},
 			},
 		} {
+			ctc := ctc
 			t.Run(ctc.Name, func(t *testing.T) {
 				ctx, cancel := context.WithCancel(ctx)
 				upCh := make(chan *ttnpb.GatewayUp)
@@ -215,7 +217,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				for _, event := range []string{"gs.gateway.connect"} {
 					upEvents[event] = make(events.Channel, 5)
 				}
-				defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+				defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 					PublishFunc: func(evs ...events.Event) {
 						for _, ev := range evs {
 							ev := ev
@@ -233,7 +235,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 
 				var validAuth func(*ttnpb.GatewayIdentifiers, string) bool
 				if frontend.AuthenticatesWithEUI {
-					validAuth = func(ids *ttnpb.GatewayIdentifiers, key string) bool {
+					validAuth = func(ids *ttnpb.GatewayIdentifiers, _ string) bool {
 						return bytes.Equal(ids.Eui, registeredGatewayEUI.Bytes())
 					}
 				} else {
@@ -440,7 +442,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						} {
 							upEvents[event] = make(events.Channel, 5)
 						}
-						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 							PublishFunc: func(evs ...events.Event) {
 								for _, ev := range evs {
 									ev := ev
@@ -532,7 +534,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					} {
 						upEvents[event] = make(events.Channel, 5)
 					}
-					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 						PublishFunc: func(evs ...events.Event) {
 							for _, ev := range evs {
 								ev := ev
@@ -571,7 +573,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					})
 					a.So(err, should.BeNil)
 					gtw.Antennas[0].Gain = tc.AntennaGain
-					gtw, err = is.GatewayRegistry().Update(ctx, &ttnpb.UpdateGatewayRequest{
+					_, err = is.GatewayRegistry().Update(ctx, &ttnpb.UpdateGatewayRequest{
 						Gateway:   gtw,
 						FieldMask: ttnpb.FieldMask("antennas"),
 					})
@@ -673,7 +675,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							} {
 								upEvents[event] = make(events.Channel, 5)
 							}
-							defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+							defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 								PublishFunc: func(evs ...events.Event) {
 									for _, ev := range evs {
 										ev := ev
@@ -1100,7 +1102,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					} {
 						upEvents[event] = make(events.Channel, 5)
 					}
-					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 						PublishFunc: func(evs ...events.Event) {
 							for _, ev := range evs {
 								ev := ev
@@ -1182,7 +1184,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						select {
 						case evt := <-upEvents["gs.up.receive"]:
 							a.So(evt.Name(), should.Equal, "gs.up.receive")
-							msg := evt.Data().(*ttnpb.GatewayUplinkMessage)
+							msg := evt.Data().(*ttnpb.GatewayUplinkMessage) //nolint:revive
 							delete(received, msg.Message.Settings.Timestamp)
 						case <-time.After(timeout):
 							t.Fatal("Expected uplink event timeout")
@@ -1465,7 +1467,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				{
 					Name: "ValidClassCWithoutFrequencyPlanInTxRequest",
 					Message: &ttnpb.DownlinkMessage{
-						RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
+						RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 42, 2),
 						Settings: &ttnpb.DownlinkMessage_Request{
 							Request: &ttnpb.TxRequest{
 								Class: ttnpb.Class_CLASS_C,
@@ -1510,7 +1512,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							if !a.So(errors.Details(err), should.HaveLength, 1) {
 								t.FailNow()
 							}
-							details := errors.Details(err)[0].(*ttnpb.ScheduleDownlinkErrorDetails)
+							details := errors.Details(err)[0].(*ttnpb.ScheduleDownlinkErrorDetails) //nolint:revive
 							if !a.So(details, should.NotBeNil) || !a.So(details.PathErrors, should.HaveLength, 1) {
 								t.FailNow()
 							}
@@ -1520,7 +1522,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 								if !a.So(errors.Details(errSchedulePathCause), should.HaveLength, 1) {
 									t.FailNow()
 								}
-								errSchedulePathCauseDetails := errors.Details(errSchedulePathCause)[0].(*ttnpb.ScheduleDownlinkErrorDetails)
+								errSchedulePathCauseDetails := errors.Details(errSchedulePathCause)[0].(*ttnpb.ScheduleDownlinkErrorDetails) //nolint:revive,lll
 								if !a.So(errSchedulePathCauseDetails, should.NotBeNil) {
 									t.FailNow()
 								}
