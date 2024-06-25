@@ -59,9 +59,6 @@ type FrontendConfig struct {
 	DetectsDisconnect bool
 	// AuthenticatesWithEUI indicates that the gateway uses the EUI to authenticate, instead of the ID and key.
 	AuthenticatesWithEUI bool
-	// TimeoutOnInvalidAuth indicates that the frontend does not have a mechanism to convey an authentication failure to
-	// the gateway.
-	TimeoutOnInvalidAuth bool
 	// IsAuthenticated indicates whether the gateway connection provides authentication.
 	// This is typically true for all frontends except UDP which is inherently unauthenticated.
 	IsAuthenticated bool

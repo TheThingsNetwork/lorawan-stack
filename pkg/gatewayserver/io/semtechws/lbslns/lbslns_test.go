@@ -41,7 +41,6 @@ func TestFrontend(t *testing.T) {
 		DetectsInvalidMessages: true,
 		DetectsDisconnect:      true,
 		AuthenticatesWithEUI:   true,
-		TimeoutOnInvalidAuth:   false,
 		IsAuthenticated:        true,
 		DeduplicatesUplinks:    false,
 		CustomConfig: func(config *gatewayserver.Config) {

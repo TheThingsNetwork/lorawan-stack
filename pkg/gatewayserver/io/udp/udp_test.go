@@ -209,7 +209,6 @@ func TestFrontend(t *testing.T) {
 		SupportsStatus:         true,
 		DetectsDisconnect:      false,
 		AuthenticatesWithEUI:   true,
-		TimeoutOnInvalidAuth:   false,
 		IsAuthenticated:        false,
 		DeduplicatesUplinks:    true,
 		CustomConfig: func(config *gatewayserver.Config) {

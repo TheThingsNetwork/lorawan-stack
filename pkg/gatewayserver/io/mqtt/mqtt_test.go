@@ -135,7 +135,6 @@ func TestFrontend(t *testing.T) {
 		DetectsInvalidMessages: false,
 		SupportsStatus:         true,
 		DetectsDisconnect:      true,
-		TimeoutOnInvalidAuth:   true, // The MQTT client keeps reconnecting on invalid auth.
 		IsAuthenticated:        true,
 		DeduplicatesUplinks:    false,
 		CustomConfig: func(config *gatewayserver.Config) {
