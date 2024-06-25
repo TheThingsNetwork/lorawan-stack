@@ -512,7 +512,10 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 			},
 			gs.KeyService(),
 		)
-		ctx = gatewaytokens.NewContext(ctx, token)
+		ctx, err = gatewaytokens.AuthenticatedContext(gatewaytokens.NewContext(ctx, token))
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 	return ctx, ids, nil
 }
