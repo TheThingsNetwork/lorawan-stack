@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import fs from 'fs'
 import path from 'path'
 import child_process from 'child_process'
 
+import { responseInterceptor } from 'http-proxy-middleware'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
@@ -47,12 +48,22 @@ const WEBPACK_DEV_SERVER_DISABLE_HMR = process.env.WEBPACK_DEV_SERVER_DISABLE_HM
 const WEBPACK_DEV_SERVER_USE_TLS = process.env.WEBPACK_DEV_SERVER_USE_TLS === 'true'
 const WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS =
   process.env.WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS === 'true'
+const WEBPACK_DEV_STATIC_ROUTES_PROXY_URL = WEBPACK_DEV_SERVER_USE_TLS
+  ? 'https://localhost:8885'
+  : 'http://localhost:1885'
+const WEBPACK_DEV_BACKEND_API_PROXY_URL =
+  process.env.WEBPACK_DEV_BACKEND_API_PROXY_URL || WEBPACK_DEV_STATIC_ROUTES_PROXY_URL
 const TTN_LW_TLS_CERTIFICATE = process.env.TTN_LW_TLS_CERTIFICATE || './cert.pem'
 const TTN_LW_TLS_KEY = process.env.TTN_LW_TLS_KEY || './key.pem'
 const TTN_LW_TLS_ROOT_CA = process.env.TTN_LW_TLS_ROOT_CA || './ca.pem'
+const WEBPACK_DEV_ADDITIONAL_CONFIG = JSON.parse(
+  process.env.WEBPACK_DEV_ADDITIONAL_CONFIG || '"{}"',
+)
+const ADDITIONAL_CONFIG = JSON.parse(WEBPACK_DEV_ADDITIONAL_CONFIG)
 
 const ASSETS_ROOT = '/assets'
 
+const proxyHost = WEBPACK_DEV_BACKEND_API_PROXY_URL.replace(/https?:\/\//, '')
 const context = path.resolve(CONTEXT)
 const production = NODE_ENV !== 'development'
 
@@ -171,11 +182,27 @@ export default {
     hot: !WEBPACK_DEV_SERVER_DISABLE_HMR,
     proxy: [
       {
-        context: ['/console', '/account', '/oauth', '/api', '/assets/blob'],
-        target: WEBPACK_DEV_SERVER_USE_TLS ? 'https://localhost:8885' : 'http://localhost:1885',
+        context: ['/console', '/account', '/assets/blob'],
+        target: WEBPACK_DEV_STATIC_ROUTES_PROXY_URL,
         changeOrigin: true,
         secure: false,
         ws: true,
+      },
+      {
+        context: ['/api', '/oauth'],
+        target: WEBPACK_DEV_BACKEND_API_PROXY_URL,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        selfHandleResponse: true,
+        onProxyRes: responseInterceptor(async responseBuffer => {
+          // Replace occurrences of the proxyhost with localhost:8080.
+          // Otherwise, many entities will appear as "Other cluster".
+          const response = responseBuffer
+            .toString('utf8')
+            .replace(new RegExp(proxyHost, 'g'), 'localhost')
+          return response
+        }),
       },
     ],
     historyApiFallback: true,
@@ -259,6 +286,7 @@ export default {
         NODE_ENV,
         VERSION: version,
         REVISION: revision,
+        ADDITIONAL_CONFIG: JSON.stringify(ADDITIONAL_CONFIG),
       }),
       new webpack.DefinePlugin({
         'process.predefined.SUPPORTED_LOCALES': JSON.stringify(supportedLocales),

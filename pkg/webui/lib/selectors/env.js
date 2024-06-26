@@ -12,7 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const configSelector = () => window.__ttn_config__
+import log from '../log'
+
+const additionalConfig = JSON.parse(process.env.ADDITIONAL_CONFIG || '{}')
+
+if (process.env.ADDITIONAL_CONFIG !== '{}') {
+  log('Additional config loaded', additionalConfig)
+}
+
+export const configSelector = () => ({
+  ...window.__ttn_config__,
+  ...additionalConfig,
+})
 
 export const selectApplicationRootPath = () => configSelector().APP_ROOT
 
