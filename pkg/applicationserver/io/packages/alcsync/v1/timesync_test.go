@@ -71,7 +71,7 @@ func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 			},
 		},
 		{
-			Name: "NoTimeCorrection",
+			Name: "NoTimeCorrectionWithAnswer",
 			Command: &TimeSyncCommand{
 				req: &ttnpb.ALCSyncCommand_AppTimeReq{
 					DeviceTime:  timestamppb.New(receivedAtTime),
@@ -89,6 +89,20 @@ func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name: "NoTimeCorrectionWithNoAnswer",
+			Command: &TimeSyncCommand{
+				req: &ttnpb.ALCSyncCommand_AppTimeReq{
+					DeviceTime:  timestamppb.New(receivedAtTime),
+					TokenReq:    1,
+					AnsRequired: false,
+				},
+				receivedAt: receivedAtTime,
+				fPort:      202,
+				threshold:  threeSecondsDuration,
+			},
+			Expected: nil,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -97,9 +111,14 @@ func TestTimeSynchronizationCommandCalculatesCorrection(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
 			result, err := tc.Command.Execute()
-			a.So(err, should.BeNil)
-			a.So(result, should.NotBeNil)
-			a.So(result, should.Resemble, tc.Expected)
+			if tc.Expected != nil {
+				a.So(err, should.BeNil)
+				a.So(result, should.NotBeNil)
+				a.So(result, should.Resemble, tc.Expected)
+			} else {
+				a.So(result, should.BeNil)
+				a.So(errors.IsUnavailable(err), should.BeTrue)
+			}
 		})
 	}
 }

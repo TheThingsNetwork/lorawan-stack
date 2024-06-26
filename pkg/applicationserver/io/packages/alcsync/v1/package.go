@@ -87,7 +87,7 @@ func (a *alcsyncpkg) HandleUp(
 		return nil
 	}
 
-	commands, evts, err := MakeCommands(msg, fPort, data)
+	commands, evts, err := parseCommands(msg, fPort, data)
 	eventBuilders = append(eventBuilders, evts...)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to parse frame payload into commands")
@@ -113,10 +113,14 @@ func (a *alcsyncpkg) HandleUp(
 			eventBuilders = append(eventBuilders, result.AnswerEnqueuedEventBuilder())
 		}
 	}
-	downlink, err := MakeDownlink(results, fPort)
+	downlink, err := buildDownlink(results, fPort)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to create downlink from results")
 		return err
+	}
+	if len(downlink.FrmPayload) == 0 {
+		logger.Debug("No downlink to send")
+		return nil
 	}
 	if err := a.server.DownlinkQueuePush(ctx, up.EndDeviceIds, []*ttnpb.ApplicationDownlink{downlink}); err != nil {
 		logger.WithError(err).Debug("Failed to push downlinks to queue")

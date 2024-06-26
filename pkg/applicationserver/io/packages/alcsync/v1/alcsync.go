@@ -64,13 +64,13 @@ func newTimeSyncCommand(
 	return cmd, rest, nil
 }
 
-// MakeCommands parses the uplink payload and returns the commands.
-func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, events.Builders, error) {
+// parseCommands parses the uplink payload and returns the commands.
+func parseCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) ([]Command, events.Builders, error) {
 	cID, cPayload := ttnpb.ALCSyncCommandIdentifier(up.FrmPayload[0]), up.FrmPayload[1:]
 	commands := make([]Command, 0)
 	evts := make(events.Builders, 0)
 	for {
-		cmd, rest, err := makeCommand(cID, cPayload, up, fPort, data)
+		cmd, rest, err := parseCommand(cID, cPayload, up, fPort, data)
 		if err != nil {
 			err := errCommandCreationFailed.WithCause(err).WithAttributes(
 				"command_id", cID,
@@ -91,8 +91,8 @@ func MakeCommands(up *ttnpb.ApplicationUplink, fPort uint32, data *packageData) 
 	return commands, evts, nil
 }
 
-// makeCommand parses the payload based on the command ID.
-func makeCommand(
+// parseCommand parses the payload based on the command ID.
+func parseCommand(
 	cID ttnpb.ALCSyncCommandIdentifier,
 	cPayload []byte,
 	up *ttnpb.ApplicationUplink,
@@ -119,8 +119,8 @@ func makeCommand(
 	}
 }
 
-// MakeDownlink builds a single downlink message from the results.
-func MakeDownlink(results []Result, fPort uint32) (*ttnpb.ApplicationDownlink, error) {
+// buildDownlink builds a single downlink message from the results.
+func buildDownlink(results []Result, fPort uint32) (*ttnpb.ApplicationDownlink, error) {
 	frmPayload := make([]byte, 0)
 	for _, result := range results {
 		if result == nil {
