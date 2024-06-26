@@ -188,104 +188,104 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
   }, [])
 
   const getContent = useCallback(
-    (event, minLines = 3) => (
-      <>
-        <Link
-          to={`devices/${devId}`}
-          className={classnames(style.header, 'd-flex j-between p-cs-m')}
-          ref={containerElem}
-        >
-          <div className="d-inline-flex al-center gap-cs-xs c-text-neutral-heavy">
-            <div className={style.imageWrapper}>
-              {imageFetching ? (
-                <Spinner className={style.spinner} after={0} micro center faded />
-              ) : image ? (
-                <img className={style.deviceImage} alt={deviceName} src={image} />
-              ) : (
-                <Icon icon={IconPhotoOff} className={style.deviceIcon} />
-              )}
-            </div>
-            <div className="flex-column">
-              <span className="fw-bold">{deviceName || devId}</span>
-              <div className="d-inline-flex al-center gap-cs-xs">
-                <div className="d-inline-flex al-center gap-cs-xxs">
-                  <Icon icon={IconAccessPoint} className="c-icon-neutral-normal" />
-                  <Message
-                    content={m.rssi}
-                    className="c-text-neutral-semilight"
-                    values={{
-                      rssi: event?.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
-                    }}
-                  />
-                </div>
-                <div className="d-inline-flex al-center gap-cs-xxs">
-                  <Icon icon={IconAccessPoint} className="c-icon-neutral-normal" />
-                  <Message
-                    content={m.snr}
-                    className="c-text-neutral-semilight"
-                    values={{
-                      snr: event?.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
-                    }}
-                  />
+    (event, minLines = 3) =>
+      event && (
+        <>
+          <Link
+            to={`devices/${devId}`}
+            className={classnames(style.header, 'd-flex j-between p-cs-m')}
+          >
+            <div className="d-inline-flex al-center gap-cs-xs c-text-neutral-heavy">
+              <div className={style.imageWrapper}>
+                {imageFetching ? (
+                  <Spinner className={style.spinner} after={0} micro center faded />
+                ) : image ? (
+                  <img className={style.deviceImage} alt={deviceName} src={image} />
+                ) : (
+                  <Icon icon={IconPhotoOff} className={style.deviceIcon} />
+                )}
+              </div>
+              <div className="flex-column">
+                <span className="fw-bold">{deviceName || devId}</span>
+                <div className="d-inline-flex al-center gap-cs-xs">
+                  <div className="d-inline-flex al-center gap-cs-xxs">
+                    <Icon icon={IconAccessPoint} className="c-icon-neutral-normal" />
+                    <Message
+                      content={m.rssi}
+                      className="c-text-neutral-semilight"
+                      values={{
+                        rssi: event?.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
+                      }}
+                    />
+                  </div>
+                  <div className="d-inline-flex al-center gap-cs-xxs">
+                    <Icon icon={IconAccessPoint} className="c-icon-neutral-normal" />
+                    <Message
+                      content={m.snr}
+                      className="c-text-neutral-semilight"
+                      values={{
+                        snr: event?.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className={style.rightHeaderColumn}>
-            <LastSeen
-              statusClassName={style.receivedStatus}
-              message={m.received}
-              lastSeen={event?.time}
-              short
-              displayMessage
-              className="c-text-neutral-semilight"
-            />
-            <div className="d-inline-flex al-center gap-cs-xxs">
-              <Icon icon={IconArrowNarrowUp} className="c-icon-neutral-normal" />
-              <Message
-                component="span"
-                content={m.up}
+            <div className={style.rightHeaderColumn}>
+              <LastSeen
+                statusClassName={style.receivedStatus}
+                message={m.received}
+                lastSeen={event?.time}
+                short
+                displayMessage
                 className="c-text-neutral-semilight"
-                values={{
-                  up: <FormattedNumber value={event?.data.uplink_message?.f_cnt ?? 0} />,
-                }}
               />
+              <div className="d-inline-flex al-center gap-cs-xxs">
+                <Icon icon={IconArrowNarrowUp} className="c-icon-neutral-normal" />
+                <Message
+                  component="span"
+                  content={m.up}
+                  className="c-text-neutral-semilight"
+                  values={{
+                    up: <FormattedNumber value={event?.data.uplink_message?.f_cnt ?? 0} />,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </Link>
-        <div className="pos-relative">
-          <div className={style.cornerIcons}>
-            <Button
-              icon={copied ? IconCopyCheck : IconCopy}
-              className={style.maximize}
-              data-clipboard-text={formattedPayload}
-              onClick={handleCopyClick}
-              ref={copyElem}
-              naked
-              small
-            />
-            {!Boolean(selectedEvent) && (
+          </Link>
+          <div className="pos-relative">
+            <div className={style.cornerIcons} ref={containerElem}>
               <Button
-                naked
-                icon={IconArrowsMaximize}
-                small
+                icon={copied ? IconCopyCheck : IconCopy}
                 className={style.maximize}
-                onClick={handleOpenMaximizeCodeModal}
+                data-clipboard-text={formattedPayload}
+                onClick={handleCopyClick}
+                ref={copyElem}
+                naked
+                small
               />
-            )}
+              {!Boolean(selectedEvent) && (
+                <Button
+                  naked
+                  icon={IconArrowsMaximize}
+                  small
+                  className={style.maximize}
+                  onClick={handleOpenMaximizeCodeModal}
+                />
+              )}
+            </div>
+            <CodeEditor
+              className={style.codeWrapper}
+              value={formattedPayload}
+              language="json"
+              name="latest_decoded_payload"
+              maxLines={Infinity}
+              minLines={minLines}
+              readOnly
+            />
           </div>
-          <CodeEditor
-            className={style.codeWrapper}
-            value={formattedPayload}
-            language="json"
-            name="latest_decoded_payload"
-            maxLines={Infinity}
-            minLines={minLines}
-            readOnly
-          />
-        </div>
-      </>
-    ),
+        </>
+      ),
     [
       copied,
       devId,

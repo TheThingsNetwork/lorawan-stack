@@ -74,7 +74,7 @@ const LastSeen = React.forwardRef((props, ref) => {
 LastSeen.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
-  displayMessage: PropTypes.string,
+  displayMessage: PropTypes.bool,
   flipped: PropTypes.bool,
   lastSeen: PropTypes.oneOfType([
     PropTypes.string,

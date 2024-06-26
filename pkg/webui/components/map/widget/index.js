@@ -79,7 +79,11 @@ Map.propTypes = {
       position: PropTypes.objectOf(PropTypes.number),
     }),
   ).isRequired,
-  setupLocationLink: PropTypes.string.isRequired,
+  setupLocationLink: PropTypes.string,
+}
+
+Map.defaultProps = {
+  setupLocationLink: undefined,
 }
 
 const MapWidget = ({ id, markers, path }) => (
