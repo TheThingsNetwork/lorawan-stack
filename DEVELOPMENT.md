@@ -4,54 +4,116 @@ The Things Stack components are primarily built in Go, we use React for web fron
 
 ## Table of contents
 
-- [Development Environment](#development-environment)
-- [Cloning the Repository](#cloning-the-repository)
-- [Getting Started](#getting-started)
-- [Running a development build of The Things Stack](#running-a-development-build-of-the-things-stack)
-  - [Pre-requisites](#pre-requisites)
-  - [Steps](#steps)
-- [Using the CLI with the Development Environment](#using-the-cli-with-the-development-environment)
-- [Managing the Development Databases](#managing-the-development-databases)
-  - [PostgreSQL](#PostgreSQL)
-  - [Redis](#redis)
-- [Building the Frontend](#building-the-frontend)
-- [Starting The Things Stack](#starting-the-things-stack)
-- [Project Structure](#project-structure)
-  - [API](#api)
-  - [Documentation](#documentation)
-  - [Web UI](#web-ui)
-- [Code Style](#code-style)
-  - [Code Formatting](#code-formatting)
-  - [Line Length](#line-length)
-  - [Formatting and Linting](#formatting-and-linting)
-  - [Documentation Site](#documentation-site)
-- [Naming Guidelines](#naming-guidelines)
-  - [API Method Naming](#api-method-naming)
-  - [Variable Naming](#variable-naming)
-  - [Event Naming](#event-naming)
-  - [Error Naming](#error-naming)
-  - [Log Field Keys, Event Names, Error Names, Error Attributes and Task Identifiers](#log-field-keys-event-names-error-names-error-attributes-and-task-identifiers)
-  - [Comments](#comments)
-- [JavaScript Code Style](#javascript-code-style)
-  - [Code Formatting](#code-formatting)
-  - [Code Comments](#code-comments)
-  - [Import Statement Order](#import-statement-order)
-  - [React Component Syntax (Functional, Class Components and Hooks)](#react-component-syntax-functional-class-components-and-hooks)
-  - [React Component Types](#react-component-types)
-  - [Frontend Related Pull Requests](#frontend-related-pull-requests)
-- [Translations](#translations)
-  - [Backend Translations](#backend-translations)
-  - [Frontend Translations](#frontend-translations)
-- [Events](#events)
-- [Testing](#testing)
-  - [Unit Tests](#unit-tests)
-  - [End-to-end Tests](#end-to-end-tests)
-- [Building and Running](#building-and-running)
-- [Releasing](#releasing)
-  - [Release From Master](#release-from-master)
-  - [Release Backports](#release-backports)
-- [Troubleshooting](#troubleshooting)
-  - [Console](#console)
+- [The Things Stack for LoRaWAN Development](#the-things-stack-for-lorawan-development)
+  - [Table of contents](#table-of-contents)
+  - [Development Environment](#development-environment)
+  - [Cloning the Repository](#cloning-the-repository)
+  - [Getting Started](#getting-started)
+  - [Running a development build of The Things Stack](#running-a-development-build-of-the-things-stack)
+    - [Pre-requisites](#pre-requisites)
+    - [Steps](#steps)
+  - [Using the CLI with the Development Environment](#using-the-cli-with-the-development-environment)
+  - [Managing the Development Databases](#managing-the-development-databases)
+    - [PostgreSQL](#postgresql)
+    - [Redis](#redis)
+  - [Building the Frontend](#building-the-frontend)
+  - [Starting The Things Stack](#starting-the-things-stack)
+      - [Codec](#codec)
+        - [Examples](#examples)
+          - [Get and Decode](#get-and-decode)
+          - [Get, Decode, Modify, Encode and Set](#get-decode-modify-encode-and-set)
+  - [Project Structure](#project-structure)
+    - [API](#api)
+    - [Documentation](#documentation)
+    - [Web UI](#web-ui)
+      - [Development Configuration](#development-configuration)
+      - [Optional Configuration](#optional-configuration)
+        - [Disable Hot Module Replacement](#disable-hot-module-replacement)
+        - [Enable TLS in `webpack-dev-server`](#enable-tls-in-webpack-dev-server)
+      - [Serving](#serving)
+  - [Code Style](#code-style)
+    - [Code Formatting](#code-formatting)
+    - [Line Length](#line-length)
+    - [Formatting and Linting](#formatting-and-linting)
+    - [Documentation Site](#documentation-site)
+  - [Naming Guidelines](#naming-guidelines)
+    - [API Method Naming](#api-method-naming)
+    - [Variable Naming](#variable-naming)
+      - [Single-word Entities](#single-word-entities)
+      - [2-word Entities](#2-word-entities)
+      - [Well-known Variable Names](#well-known-variable-names)
+    - [Event Naming](#event-naming)
+    - [Error Naming](#error-naming)
+    - [Log Field Keys, Event Names, Error Names, Error Attributes and Task Identifiers](#log-field-keys-event-names-error-names-error-attributes-and-task-identifiers)
+    - [Comments](#comments)
+  - [JavaScript Code Style](#javascript-code-style)
+    - [Code Formatting](#code-formatting-1)
+    - [Code Comments](#code-comments)
+    - [Import Statement Order](#import-statement-order)
+    - [React Component Syntax (Functional, Class Components and Hooks)](#react-component-syntax-functional-class-components-and-hooks)
+      - [A note on decorators and HOCs](#a-note-on-decorators-and-hocs)
+    - [React Component Types](#react-component-types)
+      - [Presentational Components](#presentational-components)
+      - [Container Components](#container-components)
+      - [View components](#view-components)
+        - [View component checklist](#view-component-checklist)
+      - [Utility components](#utility-components)
+      - [Global or Application Scope?](#global-or-application-scope)
+    - [Frontend Related Pull Requests](#frontend-related-pull-requests)
+  - [Translations](#translations)
+    - [Backend Translations](#backend-translations)
+    - [Frontend Translations](#frontend-translations)
+  - [Events](#events)
+  - [Testing](#testing)
+    - [Unit Tests](#unit-tests)
+    - [End-to-end Tests](#end-to-end-tests)
+      - [Running frontend end-to-end tests locally](#running-frontend-end-to-end-tests-locally)
+      - [JavaScript based tests](#javascript-based-tests)
+        - [Pattern](#pattern)
+        - [Grammar and Capitalization](#grammar-and-capitalization)
+        - [React Components](#react-components)
+        - [Structurizing tests](#structurizing-tests)
+        - [Test Driven Development (TDD)](#test-driven-development-tdd)
+      - [Writing End-to-End Tests](#writing-end-to-end-tests)
+        - [Guiding Principle](#guiding-principle)
+        - [Selecting elements](#selecting-elements)
+        - [Test runner globals](#test-runner-globals)
+        - [End-to-end tests file structure](#end-to-end-tests-file-structure)
+        - [Organizing end-to-end tests](#organizing-end-to-end-tests)
+        - [Smoke tests](#smoke-tests)
+  - [Building and Running](#building-and-running)
+  - [Releasing](#releasing)
+    - [Release From Master](#release-from-master)
+    - [Release Backports](#release-backports)
+  - [Troubleshooting](#troubleshooting)
+    - [Console](#console)
+      - [Problem: Assets are not found](#problem-assets-are-not-found)
+      - [Possible causes](#possible-causes)
+        - [Using incorrect or no configs](#using-incorrect-or-no-configs)
+        - [Possible solution](#possible-solution)
+        - [Missing restart](#missing-restart)
+        - [Possible solution](#possible-solution-1)
+        - [Accidentally deleted bundle files](#accidentally-deleted-bundle-files)
+        - [Possible solution](#possible-solution-2)
+        - [Mixing up production and development builds](#mixing-up-production-and-development-builds)
+        - [Possible solution](#possible-solution-3)
+      - [Problem: Console rendering blank page and showing arbitrary error message in console logs, e.g.:](#problem-console-rendering-blank-page-and-showing-arbitrary-error-message-in-console-logs-eg)
+      - [Possible causes](#possible-causes-1)
+        - [Bundle using old JS SDK](#bundle-using-old-js-sdk)
+        - [Possible solutions](#possible-solutions)
+      - [Problem: Console rendering blank page and showing `Module not found` message in console logs, e.g.:](#problem-console-rendering-blank-page-and-showing-module-not-found-message-in-console-logs-eg)
+        - [Possible cause: Broken yarn or npm cache](#possible-cause-broken-yarn-or-npm-cache)
+        - [Possible solution: Clean package manager caches](#possible-solution-clean-package-manager-caches)
+      - [Problem: The build crashes without showing any helpful error message](#problem-the-build-crashes-without-showing-any-helpful-error-message)
+        - [Cause: Not running mage in verbose mode](#cause-not-running-mage-in-verbose-mode)
+        - [Solution](#solution)
+      - [Problem: Browser displays error:](#problem-browser-displays-error)
+        - [Cause: No endpoint is exposed at root](#cause-no-endpoint-is-exposed-at-root)
+        - [Solution:](#solution-1)
+      - [Problem: Browser displays error:](#problem-browser-displays-error-1)
+        - [Cause: Stack is not available or not running](#cause-stack-is-not-available-or-not-running)
+        - [Solution:](#solution-2)
+      - [General advice](#general-advice)
 
 ## Development Environment
 
@@ -130,11 +192,17 @@ This creates a database, migrates tables and creates a user `admin` with passwor
 $ go run ./cmd/ttn-lw-stack -c ./config/stack/ttn-lw-stack.yml start
 ```
 
-5. Login to The Things Stack via the Console
+5. Run the Frontend with
+
+```bash
+$ tools/bin/mage js:serve
+```
+
+6. Login to The Things Stack via the Console
 
 In a web browser, navigate to `http://localhost:1885/` and login using credentials from step 3.
 
-6. Customizing configuration
+7. Customizing configuration
 
 To customize the configuration, copy the configuration file `/config/stack/ttn-lw-stack.yml` to a different location (ex: the `.env` folder in your repo). The configuration is documented in the [Configuration Reference](https://thethingsstack.io/reference/configuration/).
 
@@ -296,15 +364,6 @@ The folder structure of the frontend looks as follows:
 ├── template.go       go template module used to render the frontend HTML
 ```
 
-For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `tools/bin/mage js:build`, it can be served using:
-
-```bash
-$ export NODE_ENV=development
-$ tools/bin/mage js:serve
-```
-
-The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
-
 #### Development Configuration
 
 In order to set up The Things Stack to support running the frontend via `webpack-dev-server`, the following environment setup is needed:
@@ -313,20 +372,68 @@ In order to set up The Things Stack to support running the frontend via `webpack
 # .dev.env
 export NODE_ENV="development"
 export TTN_LW_LOG_LEVEL="debug"
+export TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js account.js"
+export TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js"
 export TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
 export TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="http://localhost:8080/oauth/authorize"
 export TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="http://localhost:8080/oauth/logout"
 export TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
 export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
-export TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth"
+export TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
+export TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 export TTN_LW_IS_EMAIL_PROVIDER="dir"
 export TTN_LW_IS_EMAIL_DIR=".dev/email"
-export TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
-export TTN_LW_IS_OAUTH_UI_CONSOLE_URL="http://localhost:8080/console"
-export TTN_LW_CONSOLE_UI_ACCOUNT_URL="http://localhost:8080/oauth"
+
+export TTN_LW_CONSOLE_UI_IS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_AS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_NS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_JS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_GS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_EDTC_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_GCS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_QRG_BASE_URL="http://localhost:8080/api/v3"
+
+export TTN_LW_IS_OAUTH_UI_IS_BASE_URL="http://localhost:8080/api/v3"
 ```
 
 We recommend saving this configuration as an `.dev.env` file and sourcing it like `source .dev.env`. This allows you to easily apply development configuration when needed.
+
+The development server can also be run with a staging environment (`.staging.env`) with the following set up:
+
+```bash
+# .staging.env
+export NODE_ENV="development"
+export TTN_LW_LOG_LEVEL="debug"
+
+export TTN_LW_AS_WEBHOOKS_TEMPLATES_DIRECTORY="<GOPATH>/src/github.com/TheThingsNetwork/webhook-templates"
+export TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="https://tti.staging1.cloud.thethings.industries/oauth/authorize"
+export TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="https://tti.staging1.cloud.thethings.industries/oauth/logout"
+export TTN_LW_CONSOLE_OAUTH_TOKEN_URL="https://tti.staging1.cloud.thethings.industries/oauth/token"
+export TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
+export TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
+export TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js paint.js"
+export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
+export TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js oauth.js"
+
+export TTN_LW_CONSOLE_UI_SUPPORT_LINK="https://thethingsstack.io"
+
+export TTN_LW_CONSOLE_UI_IS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_AS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_NS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_GS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_JS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_QRG_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_EDTC_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+
+export TTN_LW_CONSOLE_OAUTH_CLIENT_ID="localhost-console"
+export TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET="console"
+
+export TTN_LW_TLS_CERTIFICATE=<GOPATH>/src/github.com/TheThingsNetwork/lorawan-stack/cert.pem
+export TTN_LW_TLS_KEY=<GOPATH>/src/github.com/TheThingsNetwork/lorawan-stack/key.pem
+export TTN_LW_TLS_ROOT_CA=<GOPATH>/src/github.com/TheThingsNetwork/lorawan-stack/cert.pem
+export TTN_LW_TLS_SOURCE="file"
+export TTN_LW_TLS_INSECURE_SKIP_VERIFY="true"
+```
 
 > Note: It is important to **source these environment variables in all terminal sessions** that run The Things Stack or the `tools/bin/mage` commands. Failing to do so will result in erros such as blank page renders. See also [troubleshooting](#troubleshooting).
 
@@ -350,6 +457,18 @@ WEBPACK_DEV_SERVER_USE_TLS="true"
 This option uses the key and certificate set via `TTN_LW_TLS_KEY` and `TTN_LW_TLS_CERTIFICATE` environment variables. Useful when developing functionalities that rely on TLS.
 
 > Note: To use this option, The Things Stack for LoRaWAN must be properly setup for TLS. You can obtain more information about this in the **Getting Started** section of the The Things Stack for LoRaWAN documentation.
+
+#### Serving
+
+For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `tools/bin/mage js:build`, and setting up the correct environment, it can be served using:
+
+```bash
+$ export NODE_ENV=development
+$ tools/bin/mage js:serve
+```
+
+The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
+
 
 ## Code Style
 
