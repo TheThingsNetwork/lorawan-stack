@@ -72,7 +72,7 @@ const options = {
   },
 }
 
-const DutyCycleUtilization = ({ index, gatewayStats, band }) => {
+const DutyCycleUtilization = ({ index, band }) => {
   const maxFrequency = band.max_frequency / 1e6
   const minFrequency = band.min_frequency / 1e6
   const utilization = band.downlink_utilization
@@ -80,12 +80,7 @@ const DutyCycleUtilization = ({ index, gatewayStats, band }) => {
     : 0
 
   return (
-    <div
-      className={classNames(style.gtwStatusPanelDutyCycle, {
-        'mb-cs-m': index !== gatewayStats.sub_bands.length - 1,
-        'mt-cs-l': index === 0,
-      })}
-    >
+    <div className={style.gtwStatusPanelDutyCycle}>
       <Message
         content={m.frequencyRange}
         values={{
@@ -131,18 +126,8 @@ DutyCycleUtilization.propTypes = {
   band: PropTypes.shape({
     downlink_utilization: PropTypes.number,
     downlink_utilization_limit: PropTypes.number,
-    max_frequency: PropTypes.number,
-    min_frequency: PropTypes.number,
-  }).isRequired,
-  gatewayStats: PropTypes.shape({
-    sub_bands: PropTypes.arrayOf(
-      PropTypes.shape({
-        downlink_utilization: PropTypes.number,
-        downlink_utilization_limit: PropTypes.number,
-        max_frequency: PropTypes.number,
-        min_frequency: PropTypes.number,
-      }),
-    ),
+    max_frequency: PropTypes.string,
+    min_frequency: PropTypes.string,
   }).isRequired,
   index: PropTypes.number.isRequired,
 }

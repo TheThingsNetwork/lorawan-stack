@@ -154,12 +154,12 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
 
 Transmissions.propTypes = {
   gatewayStats: PropTypes.shape({
-    downlink_count: PropTypes.number,
+    downlink_count: PropTypes.string,
     last_downlink_received_at: PropTypes.string,
     last_status_received_at: PropTypes.string,
     last_uplink_received_at: PropTypes.string,
-    tx_acknowledgment_count: PropTypes.number,
-    uplink_count: PropTypes.number,
+    tx_acknowledgment_count: PropTypes.string,
+    uplink_count: PropTypes.string,
     connected_at: PropTypes.string,
   }),
   isDisconnected: PropTypes.bool.isRequired,

@@ -28,6 +28,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { getBackendErrorDefaultMessage, isBackend } from '@ttn-lw/lib/errors/utils'
 
 import { startGatewayStatistics, stopGatewayStatistics } from '@console/store/actions/gateways'
 
@@ -112,7 +113,7 @@ const GatewayStatusPanel = () => {
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
   const isFetching = !Boolean(gatewayStats) && fetching
   const noConnectionYet =
-    Boolean(error) && Boolean(error.message) && error?.message?.includes('not_connected')
+    isBackend(error) && getBackendErrorDefaultMessage(error).includes('not_connected')
   const isUnavailable = Boolean(error) && Boolean(error.message)
 
   const maxRoundTripTime = useMemo(
@@ -164,7 +165,7 @@ const GatewayStatusPanel = () => {
           }
           pulse
           big
-          pulseTrigger={gatewayStats}
+          pulseTrigger={gatewayStats?.last_status_received_at}
         />
       }
     >
@@ -239,19 +240,14 @@ const GatewayStatusPanel = () => {
                 )}
               </div>
             </div>
-            <div className="w-full">
+            <div className="w-full d-flex direction-column gap-cs-m">
               <SectionTitle
                 title={m.dutyCycleUtilization}
                 tooltip={m.dutyCycleUtilizationTooltip}
               />
               {showDutyCycleUtilization ? (
                 gatewayStats.sub_bands.map((band, index) => (
-                  <DutyCycleUtilization
-                    key={index}
-                    index={index}
-                    gatewayStats={gatewayStats}
-                    band={band}
-                  />
+                  <DutyCycleUtilization key={index} index={index} band={band} />
                 ))
               ) : (
                 <EmptyState title={sharedMessages.noData} message={m.noDutyCycle} />

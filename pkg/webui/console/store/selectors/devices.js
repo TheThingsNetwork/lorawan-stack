@@ -90,15 +90,6 @@ export const selectDeviceDerivedNwkDownlinkFrameCount = (state, appId, devId) =>
 export const selectSelectedDeviceClaimable = state =>
   selectDeviceStore(state).selectedDeviceClaimable
 
-export const selectDevicesWithLastSeen = state => {
-  const devices = selectDevices(state)
-  const devicesWithLastSeen = devices.map(device => ({
-    ...device,
-    _lastSeen: selectDeviceLastSeen(state, device.application_ids, device.ids.device_id),
-  }))
-  return devicesWithLastSeen
-}
-
 // Devices.
 const selectDevsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectDevsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
@@ -108,6 +99,15 @@ export const selectDevices = createSelector(
   (ids, entities) => ids.map(id => entities[id]),
 )
 export const selectDevicesTotalCount = state => selectDevsTotalCount(state)
+
+export const selectDevicesWithLastSeen = createSelector(
+  [selectDevices, state => state],
+  (devices, state) =>
+    devices.map(device => ({
+      ...device,
+      _lastSeen: selectDeviceLastSeen(state, device.application_ids, device.ids.device_id),
+    })),
+)
 
 // Events.
 export const selectDeviceEvents = createEventsSelector(ENTITY)

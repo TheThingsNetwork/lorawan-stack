@@ -107,9 +107,9 @@ const GatewayGeneralInformationPanel = () => {
         {
           key: sharedMessages.frequencyPlan,
           value:
-            frequencyPlanIdsFormatted?.length !== 0 ? (
-              <Message content={frequencyPlanIdsFormatted.join(' , ')} />
-            ) : undefined,
+            frequencyPlanIdsFormatted?.length !== 0
+              ? frequencyPlanIdsFormatted?.join(' , ')
+              : undefined,
         },
         {
           key: sharedMessages.createdAt,
