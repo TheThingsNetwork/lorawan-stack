@@ -13,19 +13,13 @@
 // limitations under the License.
 
 .devices-panel
-  min-height: 31rem
+  height: 31rem
   display: flex
   flex-direction: column
 
   &-outer-table
-    overflow-y: auto
-    height: 23rem
+    height: 100%
     width: 100%
-    table-layout: fixed
-    scrollbar-width: none
-
-    &::-webkit-scrollbar
-      display: none
 
     &-header
       top: 0
@@ -34,7 +28,9 @@
       z-index: 1
 
 .scroll-gradient
-  max-height: 23rem
+  overflow: scroll
 
-  & > :last-child
-    height: 2rem
+  scrollbar-width: none
+
+  &::-webkit-scrollbar
+    display: none

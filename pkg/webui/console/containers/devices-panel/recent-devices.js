@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
@@ -31,7 +31,7 @@ import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getDevicesPeriodically } from '@console/store/actions/devices'
+import { getDevicesList } from '@console/store/actions/devices'
 
 import {
   selectDevicesWithLastSeen,
@@ -48,12 +48,19 @@ const m = defineMessages({
 })
 
 const RecentEndDevices = () => {
-  const listRef = useRef()
+  const listRef = React.useRef()
   const devices = useSelector(selectDevicesWithLastSeen)
   const totalCount = useSelector(selectDevicesTotalCount)
   const appId = useSelector(selectSelectedApplicationId)
 
-  const getItemsAction = useCallback(() => getDevicesPeriodically(), [])
+  const getItemsAction = useCallback(
+    () =>
+      getDevicesList(appId, { page: 1, limit: 20, order: '-last_seen_at' }, [
+        'name',
+        'last_seen_at',
+      ]),
+    [appId],
+  )
 
   const baseDataSelector = createSelector(
     selectDevicesWithLastSeen,
@@ -69,16 +76,17 @@ const RecentEndDevices = () => {
     {
       name: 'name',
       displayName: sharedMessages.name,
+      width: 40,
       getValue: row => ({
         id: row.ids.device_id,
         name: row.name,
       }),
       render: details => (
-        <>
+        <div className="c-text-neutral-light text-overflow-ellipsis">
           <Message
             content={details.name ?? details.id}
             component="p"
-            className="mt-0 mb-cs-xs p-0"
+            className="mt-0 mb-cs-xs p-0 text-overflow-ellipsis c-text-neutral-heavy"
           />
           {details.name && (
             <Message
@@ -87,12 +95,13 @@ const RecentEndDevices = () => {
               className="c-text-neutral-light fw-normal"
             />
           )}
-        </>
+        </div>
       ),
     },
     {
       name: 'ids.dev_eui',
       displayName: m.devEui,
+      width: 35,
       render: devEui => (
         <SafeInspector data={devEui} noTransform noCopyPopup small hideable={false} />
       ),
@@ -100,6 +109,7 @@ const RecentEndDevices = () => {
     {
       name: 'last_seen_at',
       displayName: sharedMessages.lastSeen,
+      width: 25,
       render: lastSeen => {
         const showLastSeen = Boolean(lastSeen)
         return showLastSeen ? (
@@ -134,7 +144,13 @@ const RecentEndDevices = () => {
       </div>
     </div>
   ) : (
-    <ScrollFader className={style.scrollGradient} ref={listRef} light>
+    <ScrollFader
+      className={style.scrollGradient}
+      faderHeight="4rem"
+      topFaderOffset="3rem"
+      light
+      ref={listRef}
+    >
       <FetchTable
         entity="devices"
         defaultOrder="-last_seen_at"
