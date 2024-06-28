@@ -23,11 +23,16 @@ import styles from './toggle.styl'
 
 const Toggle = ({ className, options, onToggleChange, active, fullWidth }) => (
   <div className={classnames(styles.toggle, className)}>
-    {options.map(({ label, value }) => {
+    {options.map(({ label, value, link }) => {
       const buttonClassName = classnames(styles.toggleButton, {
+        [styles.toggleButtonLink]: Boolean(link),
         [styles.toggleButtonActive]: value === active,
         'w-full': fullWidth,
       })
+
+      if (link) {
+        return <Button.Link key={value} message={label} className={buttonClassName} to={link} />
+      }
 
       return (
         <Button

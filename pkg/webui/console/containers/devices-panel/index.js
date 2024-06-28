@@ -16,7 +16,6 @@ import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import classNames from 'classnames'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 import { IconDevice } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
@@ -35,25 +34,22 @@ const m = defineMessages({
 })
 
 const DevicesPanel = () => {
-  const navigate = useNavigate()
   const [active, setActive] = useState('top')
   const appId = useSelector(selectSelectedApplicationId)
 
   const handleChange = useCallback(
     (_, value) => {
-      if (value === 'all') {
-        navigate(`/applications/${appId}/devices`)
-      } else {
+      if (value !== 'all') {
         setActive(value)
       }
     },
-    [setActive, appId, navigate],
+    [setActive],
   )
 
   const options = [
     { label: m.topDevices, value: 'top' },
     { label: m.recentDevices, value: 'recent' },
-    { label: sharedMessages.all, value: 'all' },
+    { label: sharedMessages.all, value: 'all', link: `/applications/${appId}/devices` },
   ]
 
   return (
