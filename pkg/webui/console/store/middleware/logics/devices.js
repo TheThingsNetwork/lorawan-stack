@@ -32,7 +32,6 @@ import * as deviceTemplateFormats from '@console/store/actions/device-template-f
 
 import { selectDeviceByIds } from '@console/store/selectors/devices'
 import { selectDeviceModelById } from '@console/store/selectors/device-repository'
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import createEventsConnectLogics from './events'
 
@@ -138,38 +137,6 @@ const getDevicesListLogic = createRequestLogic({
   },
 })
 
-const getDevicesPeriodicallyLogic = createLogic({
-  type: devices.GET_DEVICES_PERIODICALLY,
-  processOptions: {
-    dispatchMultiple: true,
-  },
-  warnTimeout: 0,
-  process: async ({ getState }, dispatch) => {
-    const state = getState()
-    const appId = selectSelectedApplicationId(state)
-    // Fetch once initially.
-    dispatch(
-      devices.getDevicesList(appId, { page: 1, limit: 20, order: '-last_seen_at' }, [
-        'name',
-        'last_seen_at',
-      ]),
-    )
-
-    setInterval(
-      async () => {
-        dispatch(
-          devices.getDevicesList(appId, { page: 1, limit: 20, order: '-last_seen_at' }, [
-            'name',
-            'last_seen_at',
-          ]),
-        )
-      },
-
-      1000 * 60 * 5,
-    )
-  },
-})
-
 const resetDeviceLogic = createRequestLogic({
   type: devices.RESET_DEV,
   process: async ({ action }) => {
@@ -260,6 +227,5 @@ export default [
   updateDeviceLogic,
   getDeviceSessionLogic,
   resetUsedDevNoncesLogic,
-  getDevicesPeriodicallyLogic,
   ...createEventsConnectLogics(devices.SHARED_NAME, 'devices', tts.Applications.Devices.openStream),
 ]
