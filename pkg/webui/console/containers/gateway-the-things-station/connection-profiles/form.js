@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -23,7 +23,6 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 
 import {
-  CONNECTION_TYPES,
   getFormTypeMessage,
   getInitialProfile,
 } from '@console/containers/gateway-the-things-station/utils'
@@ -35,6 +34,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 const GatewayConnectionProfilesForm = () => {
   const [error, setError] = useState(undefined)
   const { gtwId, type, profileId } = useParams()
+  const [searchParams] = useSearchParams()
 
   const isEdit = Boolean(profileId)
 
@@ -56,7 +56,7 @@ const GatewayConnectionProfilesForm = () => {
     }
   }, [])
 
-  const initialValues = getInitialProfile(type)
+  const initialValues = getInitialProfile(type, searchParams.get('shared') === 'true')
 
   return (
     <>

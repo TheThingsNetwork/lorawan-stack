@@ -63,34 +63,31 @@ export const validationSchema = Yup.object({
   _connection_type: Yup.string()
     .oneOf(Object.values(CONNECTION_TYPES))
     .default(CONNECTION_TYPES.WIFI),
-  name: Yup.string()
+  profile_name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
+  shared: Yup.boolean(),
   default_network_interface: Yup.boolean(),
-  ip_address: Yup.string().when('default_network_interface', {
+  network_interface_addresses: Yup.object().when('default_network_interface', {
     is: false,
     then: schema =>
-      schema
-        .required(sharedMessages.validateRequired)
-        .matches(ipAddress, Yup.passValues(m.validateIpAddress)),
-    otherwise: schema => schema.strip(),
-  }),
-  subnet_mask: Yup.string().when('default_network_interface', {
-    is: false,
-    then: schema =>
-      schema
-        .required(sharedMessages.validateRequired)
-        .matches(ipAddress, Yup.passValues(m.validateIpAddress)),
-    otherwise: schema => schema.strip(),
-  }),
-  dns_servers: Yup.array().when('default_network_interface', {
-    is: false,
-    then: schema =>
-      schema
-        .default([])
-        .test('has at least one entry', m.validateDnsServers, hasAtLeastOneValidEntry)
-        .test('has no empty entry', m.validateEmptyDnsServer, hasNoEmptyEntry),
+      schema.shape({
+        ip_addresses: Yup.array()
+          .default([])
+          .test('has at least one entry', m.validateIpAddresses, hasAtLeastOneValidEntry)
+          .test('has no empty entry', m.validateEmptyIpAddress, hasNoEmptyEntry),
+        subnet_mask: Yup.string()
+          .required(sharedMessages.validateRequired)
+          .matches(ipAddress, Yup.passValues(m.validateIpAddress)),
+        gateway: Yup.string()
+          .required(sharedMessages.validateRequired)
+          .matches(ipAddress, Yup.passValues(m.validateIpAddress)),
+        dns_servers: Yup.array()
+          .default([])
+          .test('has at least one entry', m.validateDnsServers, hasAtLeastOneValidEntry)
+          .test('has no empty entry', m.validateEmptyDnsServer, hasNoEmptyEntry),
+      }),
     otherwise: schema => schema.strip(),
   }),
 }).when('._connection_type', {

@@ -26,9 +26,10 @@ export const getFormTypeMessage = (type, profileId) => {
   return Boolean(profileId) ? m.updateEthernetProfile : m.addEthernetProfile
 }
 
-export const getInitialProfile = type => ({
+export const getInitialProfile = (type, isShared) => ({
   _connection_type: type,
-  name: '',
+  profile_name: '',
+  shared: isShared,
   ...(type === CONNECTION_TYPES.WIFI && {
     access_point: {
       _type: 'all',
@@ -40,7 +41,10 @@ export const getInitialProfile = type => ({
     },
   }),
   default_network_interface: true,
-  ip_address: '',
-  subnet_mask: '',
-  dns_servers: [''],
+  network_interface_addresses: {
+    ip_addresses: [''],
+    subnet_mask: '',
+    gateway: '',
+    dns_servers: [''],
+  },
 })
