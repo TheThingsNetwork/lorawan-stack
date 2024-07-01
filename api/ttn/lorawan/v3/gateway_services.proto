@@ -177,12 +177,6 @@ message PullGatewayConfigurationRequest {
   google.protobuf.FieldMask field_mask = 2;
 }
 
-// The GatewayConfigurator service is used to fetch gateway configuration.
-service GatewayConfigurator {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Fetch gateway configuration."};
-  rpc PullConfiguration(PullGatewayConfigurationRequest) returns (stream Gateway);
-}
-
 message AssertGatewayRightsRequest {
   repeated GatewayIdentifiers gateway_ids = 1 [
     (validate.rules).repeated.min_items = 1,

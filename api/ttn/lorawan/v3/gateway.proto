@@ -20,6 +20,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "thethings/flags/annotations.proto";
 import "thethings/json/annotations.proto";
@@ -73,6 +74,7 @@ message GatewayVersionIdentifiers {
   }];
   string hardware_version = 3 [(validate.rules).string.max_len = 32];
   string firmware_version = 4 [(validate.rules).string.max_len = 32];
+  string runtime_version = 5 [(validate.rules).string.max_len = 32];
 }
 
 message GatewayRadio {
@@ -247,6 +249,229 @@ message Gateway {
 
 message Gateways {
   repeated Gateway gateways = 1;
+}
+
+message ManagedGateway {
+  option (thethings.flags.message) = {
+    select: true
+    set: true
+  };
+  GatewayIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = {
+      select: false
+      hidden: true
+    }
+  ];
+  GatewayVersionIdentifiers version_ids = 2;
+
+  string cellular_imei = 3 [(validate.rules).string = {
+    pattern: "^[0-9]{15}$"
+    ignore_empty: true
+  }];
+  string cellular_imsi = 4 [(validate.rules).string = {
+    pattern: "^[0-9]{15}$"
+    ignore_empty: true
+  }];
+  bytes wifi_mac_address = 5 [
+    (validate.rules).bytes = {
+      len: 6
+      ignore_empty: true
+    },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal6Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "\"EC656E000100\""
+    }
+  ];
+  bytes ethernet_mac_address = 6 [
+    (validate.rules).bytes = {
+      len: 6
+      ignore_empty: true
+    },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal6Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "\"EC656E000100\""
+    }
+  ];
+
+  string wifi_profile_id = 7 [(validate.rules).string = {
+    uuid: true,
+    ignore_empty: true
+  }];
+  string ethernet_profile_id = 8 [(validate.rules).string = {
+    uuid: true,
+    ignore_empty: true
+  }];
+}
+
+message ManagedGatewayWiFiAccessPoint {
+  string ssid = 1 [(validate.rules).string = {max_len: 32}];
+  bytes bssid = 2 [
+    (validate.rules).bytes = {len: 6},
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal6Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "\"EC656E000100\""
+    }
+  ];
+  uint32 channel = 3 [(validate.rules).uint32 = {gte: 1}];
+  string authentication_mode = 4;
+  float rssi = 5;
+}
+
+message ManagedGatewayWiFiAccessPoints {
+  repeated ManagedGatewayWiFiAccessPoint access_points = 1;
+}
+
+enum ManagedGatewayNetworkInterfaceType {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE"
+  };
+
+  MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_UNSPECIFIED = 0;
+  MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_CELLULAR = 1;
+  MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_WIFI = 2;
+  MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_ETHERNET = 3;
+}
+
+enum ManagedGatewayNetworkInterfaceStatus {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS"
+  };
+
+  MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UNSPECIFIED = 0;
+  MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_DOWN = 1;
+  MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UP = 2;
+  MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_FAILED = 3;
+}
+
+message ManagedGatewayNetworkInterfaceAddresses {
+  repeated string ip_addresses = 1 [
+    (validate.rules).repeated = {
+      max_items: 2,
+      items: {
+        string: {ip: true}
+      }
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "[\"192.0.2.0\",\"2001:db8::1\"]"
+    }
+  ];
+  string subnet_mask = 2 [
+    (validate.rules).string = {
+      ipv4: true
+      ignore_empty: true
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "\"192.0.2.0\""
+    }
+  ];
+  string gateway = 3 [
+    (validate.rules).string = {
+      ipv4: true
+      ignore_empty: true
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "\"192.0.2.0\""
+    }
+  ];
+  repeated string dns_servers = 4 [
+    (validate.rules).repeated = {
+      max_items: 2,
+      items: {
+        string: {ipv4: true}
+      }
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "[\"192.0.2.0\",\"192.0.2.1\"]"
+    }
+  ];
+}
+
+message ManagedGatewaySystemMetrics {
+  google.protobuf.FloatValue temperature = 1;
+}
+
+message ManagedGatewayControllerConnection {
+  ManagedGatewayNetworkInterfaceType network_interface_type = 1 [(validate.rules).enum.defined_only = true];
+}
+
+message ManagedGatewayGatewayServerConnection {
+  ManagedGatewayNetworkInterfaceType network_interface_type = 1 [(validate.rules).enum.defined_only = true];
+  string address = 2;
+}
+
+message ManagedGatewayNetworkInterfaceInfo {
+  ManagedGatewayNetworkInterfaceStatus status = 1 [(validate.rules).enum.defined_only = true];
+  bool dhcp_enabled = 2;
+  ManagedGatewayNetworkInterfaceAddresses addresses = 3;
+}
+
+message ManagedGatewayCellularBackhaul {
+  ManagedGatewayNetworkInterfaceInfo network_interface = 1;
+  string operator = 2 [(validate.rules).string.max_len = 32];
+  google.protobuf.FloatValue rssi = 3;
+}
+
+message ManagedGatewayWiFiBackhaul {
+  ManagedGatewayNetworkInterfaceInfo network_interface = 1;
+  string ssid = 2 [(validate.rules).string.max_len = 32];
+  bytes bssid = 3 [
+    (validate.rules).bytes = {len: 6},
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal6Bytes"
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      type: STRING,
+      format: "string",
+      example: "\"EC656E000100\""
+    }
+  ];
+  uint32 channel = 4 [(validate.rules).uint32 = {gte: 1}];
+  string authentication_mode = 5;
+  google.protobuf.FloatValue rssi = 6;
+}
+
+message ManagedGatewayEthernetBackhaul {
+  ManagedGatewayNetworkInterfaceInfo network_interface = 1;
+}
+
+message ManagedGatewayEventData {
+  oneof data {
+    ManagedGateway entity = 1;
+    Location location = 2;
+    ManagedGatewaySystemMetrics system_metrics = 3;
+    ManagedGatewayControllerConnection controller_connection = 4;
+    ManagedGatewayGatewayServerConnection gateway_server_connection = 5;
+    ManagedGatewayCellularBackhaul cellular_backhaul = 6;
+    ManagedGatewayWiFiBackhaul wifi_backhaul = 7;
+    ManagedGatewayEthernetBackhaul ethernet_backhaul = 8;
+  }
 }
 
 message GetGatewayRequest {
@@ -548,4 +773,10 @@ message GatewayConnectionStats {
   GatewayRemoteAddress gateway_remote_address = 12;
 
   // next: 13
+}
+
+message UpdateManagedGatewayRequest {
+  ManagedGateway gateway = 1 [(validate.rules).message.required = true];
+  // The names of the gateway fields that should be updated.
+  google.protobuf.FieldMask field_mask = 2;
 }

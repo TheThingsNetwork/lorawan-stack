@@ -10,7 +10,104 @@ import (
 	golang "github.com/TheThingsIndustries/protoc-gen-go-json/golang"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	types "go.thethings.network/lorawan-stack/v3/pkg/types"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
+
+// MarshalProtoJSON marshals the ManagedGatewayNetworkInterfaceType to JSON.
+func (x ManagedGatewayNetworkInterfaceType) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), ManagedGatewayNetworkInterfaceType_name)
+}
+
+// MarshalText marshals the ManagedGatewayNetworkInterfaceType to text.
+func (x ManagedGatewayNetworkInterfaceType) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), ManagedGatewayNetworkInterfaceType_name)), nil
+}
+
+// MarshalJSON marshals the ManagedGatewayNetworkInterfaceType to JSON.
+func (x ManagedGatewayNetworkInterfaceType) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// ManagedGatewayNetworkInterfaceType_customvalue contains custom string values that extend ManagedGatewayNetworkInterfaceType_value.
+var ManagedGatewayNetworkInterfaceType_customvalue = map[string]int32{
+	"UNSPECIFIED": 0,
+	"CELLULAR":    1,
+	"WIFI":        2,
+	"ETHERNET":    3,
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayNetworkInterfaceType from JSON.
+func (x *ManagedGatewayNetworkInterfaceType) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(ManagedGatewayNetworkInterfaceType_value, ManagedGatewayNetworkInterfaceType_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read ManagedGatewayNetworkInterfaceType enum: %v", err)
+		return
+	}
+	*x = ManagedGatewayNetworkInterfaceType(v)
+}
+
+// UnmarshalText unmarshals the ManagedGatewayNetworkInterfaceType from text.
+func (x *ManagedGatewayNetworkInterfaceType) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), ManagedGatewayNetworkInterfaceType_customvalue, ManagedGatewayNetworkInterfaceType_value)
+	if err != nil {
+		return err
+	}
+	*x = ManagedGatewayNetworkInterfaceType(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayNetworkInterfaceType from JSON.
+func (x *ManagedGatewayNetworkInterfaceType) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayNetworkInterfaceStatus to JSON.
+func (x ManagedGatewayNetworkInterfaceStatus) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), ManagedGatewayNetworkInterfaceStatus_name)
+}
+
+// MarshalText marshals the ManagedGatewayNetworkInterfaceStatus to text.
+func (x ManagedGatewayNetworkInterfaceStatus) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), ManagedGatewayNetworkInterfaceStatus_name)), nil
+}
+
+// MarshalJSON marshals the ManagedGatewayNetworkInterfaceStatus to JSON.
+func (x ManagedGatewayNetworkInterfaceStatus) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// ManagedGatewayNetworkInterfaceStatus_customvalue contains custom string values that extend ManagedGatewayNetworkInterfaceStatus_value.
+var ManagedGatewayNetworkInterfaceStatus_customvalue = map[string]int32{
+	"UNSPECIFIED": 0,
+	"DOWN":        1,
+	"UP":          2,
+	"FAILED":      3,
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayNetworkInterfaceStatus from JSON.
+func (x *ManagedGatewayNetworkInterfaceStatus) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(ManagedGatewayNetworkInterfaceStatus_value, ManagedGatewayNetworkInterfaceStatus_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read ManagedGatewayNetworkInterfaceStatus enum: %v", err)
+		return
+	}
+	*x = ManagedGatewayNetworkInterfaceStatus(v)
+}
+
+// UnmarshalText unmarshals the ManagedGatewayNetworkInterfaceStatus from text.
+func (x *ManagedGatewayNetworkInterfaceStatus) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), ManagedGatewayNetworkInterfaceStatus_customvalue, ManagedGatewayNetworkInterfaceStatus_value)
+	if err != nil {
+		return err
+	}
+	*x = ManagedGatewayNetworkInterfaceStatus(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayNetworkInterfaceStatus from JSON.
+func (x *ManagedGatewayNetworkInterfaceStatus) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
 
 // MarshalProtoJSON marshals the GatewayAntennaPlacement to JSON.
 func (x GatewayAntennaPlacement) MarshalProtoJSON(s *jsonplugin.MarshalState) {
@@ -567,6 +664,775 @@ func (x *Gateways) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the Gateways from JSON.
 func (x *Gateways) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGateway message to JSON.
+func (x *ManagedGateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Ids != nil || s.HasField("ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ids")
+		x.Ids.MarshalProtoJSON(s.WithField("ids"))
+	}
+	if x.VersionIds != nil || s.HasField("version_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("version_ids")
+		// NOTE: GatewayVersionIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.VersionIds)
+	}
+	if x.CellularImei != "" || s.HasField("cellular_imei") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cellular_imei")
+		s.WriteString(x.CellularImei)
+	}
+	if x.CellularImsi != "" || s.HasField("cellular_imsi") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cellular_imsi")
+		s.WriteString(x.CellularImsi)
+	}
+	if len(x.WifiMacAddress) > 0 || s.HasField("wifi_mac_address") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("wifi_mac_address")
+		types.MarshalHEXBytes(s.WithField("wifi_mac_address"), x.WifiMacAddress)
+	}
+	if len(x.EthernetMacAddress) > 0 || s.HasField("ethernet_mac_address") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ethernet_mac_address")
+		types.MarshalHEXBytes(s.WithField("ethernet_mac_address"), x.EthernetMacAddress)
+	}
+	if x.WifiProfileId != "" || s.HasField("wifi_profile_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("wifi_profile_id")
+		s.WriteString(x.WifiProfileId)
+	}
+	if x.EthernetProfileId != "" || s.HasField("ethernet_profile_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ethernet_profile_id")
+		s.WriteString(x.EthernetProfileId)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGateway to JSON.
+func (x *ManagedGateway) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGateway message from JSON.
+func (x *ManagedGateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ids":
+			if s.ReadNil() {
+				x.Ids = nil
+				return
+			}
+			x.Ids = &GatewayIdentifiers{}
+			x.Ids.UnmarshalProtoJSON(s.WithField("ids", true))
+		case "version_ids", "versionIds":
+			s.AddField("version_ids")
+			if s.ReadNil() {
+				x.VersionIds = nil
+				return
+			}
+			// NOTE: GatewayVersionIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v GatewayVersionIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.VersionIds = &v
+		case "cellular_imei", "cellularImei":
+			s.AddField("cellular_imei")
+			x.CellularImei = s.ReadString()
+		case "cellular_imsi", "cellularImsi":
+			s.AddField("cellular_imsi")
+			x.CellularImsi = s.ReadString()
+		case "wifi_mac_address", "wifiMacAddress":
+			s.AddField("wifi_mac_address")
+			x.WifiMacAddress = types.Unmarshal6Bytes(s.WithField("wifi_mac_address", false))
+		case "ethernet_mac_address", "ethernetMacAddress":
+			s.AddField("ethernet_mac_address")
+			x.EthernetMacAddress = types.Unmarshal6Bytes(s.WithField("ethernet_mac_address", false))
+		case "wifi_profile_id", "wifiProfileId":
+			s.AddField("wifi_profile_id")
+			x.WifiProfileId = s.ReadString()
+		case "ethernet_profile_id", "ethernetProfileId":
+			s.AddField("ethernet_profile_id")
+			x.EthernetProfileId = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGateway from JSON.
+func (x *ManagedGateway) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayWiFiAccessPoint message to JSON.
+func (x *ManagedGatewayWiFiAccessPoint) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Ssid != "" || s.HasField("ssid") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ssid")
+		s.WriteString(x.Ssid)
+	}
+	if len(x.Bssid) > 0 || s.HasField("bssid") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("bssid")
+		types.MarshalHEXBytes(s.WithField("bssid"), x.Bssid)
+	}
+	if x.Channel != 0 || s.HasField("channel") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("channel")
+		s.WriteUint32(x.Channel)
+	}
+	if x.AuthenticationMode != "" || s.HasField("authentication_mode") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("authentication_mode")
+		s.WriteString(x.AuthenticationMode)
+	}
+	if x.Rssi != 0 || s.HasField("rssi") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rssi")
+		s.WriteFloat32(x.Rssi)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayWiFiAccessPoint to JSON.
+func (x *ManagedGatewayWiFiAccessPoint) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayWiFiAccessPoint message from JSON.
+func (x *ManagedGatewayWiFiAccessPoint) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ssid":
+			s.AddField("ssid")
+			x.Ssid = s.ReadString()
+		case "bssid":
+			s.AddField("bssid")
+			x.Bssid = types.Unmarshal6Bytes(s.WithField("bssid", false))
+		case "channel":
+			s.AddField("channel")
+			x.Channel = s.ReadUint32()
+		case "authentication_mode", "authenticationMode":
+			s.AddField("authentication_mode")
+			x.AuthenticationMode = s.ReadString()
+		case "rssi":
+			s.AddField("rssi")
+			x.Rssi = s.ReadFloat32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayWiFiAccessPoint from JSON.
+func (x *ManagedGatewayWiFiAccessPoint) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayWiFiAccessPoints message to JSON.
+func (x *ManagedGatewayWiFiAccessPoints) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.AccessPoints) > 0 || s.HasField("access_points") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("access_points")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.AccessPoints {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("access_points"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayWiFiAccessPoints to JSON.
+func (x *ManagedGatewayWiFiAccessPoints) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayWiFiAccessPoints message from JSON.
+func (x *ManagedGatewayWiFiAccessPoints) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "access_points", "accessPoints":
+			s.AddField("access_points")
+			if s.ReadNil() {
+				x.AccessPoints = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.AccessPoints = append(x.AccessPoints, nil)
+					return
+				}
+				v := &ManagedGatewayWiFiAccessPoint{}
+				v.UnmarshalProtoJSON(s.WithField("access_points", false))
+				if s.Err() != nil {
+					return
+				}
+				x.AccessPoints = append(x.AccessPoints, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayWiFiAccessPoints from JSON.
+func (x *ManagedGatewayWiFiAccessPoints) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayControllerConnection message to JSON.
+func (x *ManagedGatewayControllerConnection) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.NetworkInterfaceType != 0 || s.HasField("network_interface_type") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("network_interface_type")
+		x.NetworkInterfaceType.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayControllerConnection to JSON.
+func (x *ManagedGatewayControllerConnection) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayControllerConnection message from JSON.
+func (x *ManagedGatewayControllerConnection) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "network_interface_type", "networkInterfaceType":
+			s.AddField("network_interface_type")
+			x.NetworkInterfaceType.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayControllerConnection from JSON.
+func (x *ManagedGatewayControllerConnection) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayGatewayServerConnection message to JSON.
+func (x *ManagedGatewayGatewayServerConnection) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.NetworkInterfaceType != 0 || s.HasField("network_interface_type") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("network_interface_type")
+		x.NetworkInterfaceType.MarshalProtoJSON(s)
+	}
+	if x.Address != "" || s.HasField("address") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("address")
+		s.WriteString(x.Address)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayGatewayServerConnection to JSON.
+func (x *ManagedGatewayGatewayServerConnection) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayGatewayServerConnection message from JSON.
+func (x *ManagedGatewayGatewayServerConnection) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "network_interface_type", "networkInterfaceType":
+			s.AddField("network_interface_type")
+			x.NetworkInterfaceType.UnmarshalProtoJSON(s)
+		case "address":
+			s.AddField("address")
+			x.Address = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayGatewayServerConnection from JSON.
+func (x *ManagedGatewayGatewayServerConnection) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayNetworkInterfaceInfo message to JSON.
+func (x *ManagedGatewayNetworkInterfaceInfo) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Status != 0 || s.HasField("status") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("status")
+		x.Status.MarshalProtoJSON(s)
+	}
+	if x.DhcpEnabled || s.HasField("dhcp_enabled") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dhcp_enabled")
+		s.WriteBool(x.DhcpEnabled)
+	}
+	if x.Addresses != nil || s.HasField("addresses") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("addresses")
+		// NOTE: ManagedGatewayNetworkInterfaceAddresses does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Addresses)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayNetworkInterfaceInfo to JSON.
+func (x *ManagedGatewayNetworkInterfaceInfo) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayNetworkInterfaceInfo message from JSON.
+func (x *ManagedGatewayNetworkInterfaceInfo) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "status":
+			s.AddField("status")
+			x.Status.UnmarshalProtoJSON(s)
+		case "dhcp_enabled", "dhcpEnabled":
+			s.AddField("dhcp_enabled")
+			x.DhcpEnabled = s.ReadBool()
+		case "addresses":
+			s.AddField("addresses")
+			if s.ReadNil() {
+				x.Addresses = nil
+				return
+			}
+			// NOTE: ManagedGatewayNetworkInterfaceAddresses does not seem to implement UnmarshalProtoJSON.
+			var v ManagedGatewayNetworkInterfaceAddresses
+			golang.UnmarshalMessage(s, &v)
+			x.Addresses = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayNetworkInterfaceInfo from JSON.
+func (x *ManagedGatewayNetworkInterfaceInfo) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayCellularBackhaul message to JSON.
+func (x *ManagedGatewayCellularBackhaul) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.NetworkInterface != nil || s.HasField("network_interface") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("network_interface")
+		x.NetworkInterface.MarshalProtoJSON(s.WithField("network_interface"))
+	}
+	if x.Operator != "" || s.HasField("operator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("operator")
+		s.WriteString(x.Operator)
+	}
+	if x.Rssi != nil || s.HasField("rssi") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rssi")
+		if x.Rssi == nil {
+			s.WriteNil()
+		} else {
+			s.WriteFloat32(x.Rssi.Value)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayCellularBackhaul to JSON.
+func (x *ManagedGatewayCellularBackhaul) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayCellularBackhaul message from JSON.
+func (x *ManagedGatewayCellularBackhaul) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "network_interface", "networkInterface":
+			if s.ReadNil() {
+				x.NetworkInterface = nil
+				return
+			}
+			x.NetworkInterface = &ManagedGatewayNetworkInterfaceInfo{}
+			x.NetworkInterface.UnmarshalProtoJSON(s.WithField("network_interface", true))
+		case "operator":
+			s.AddField("operator")
+			x.Operator = s.ReadString()
+		case "rssi":
+			s.AddField("rssi")
+			if s.ReadNil() {
+				x.Rssi = nil
+				return
+			}
+			v := s.ReadWrappedFloat32()
+			if s.Err() != nil {
+				return
+			}
+			x.Rssi = &wrapperspb.FloatValue{Value: v}
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayCellularBackhaul from JSON.
+func (x *ManagedGatewayCellularBackhaul) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayWiFiBackhaul message to JSON.
+func (x *ManagedGatewayWiFiBackhaul) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.NetworkInterface != nil || s.HasField("network_interface") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("network_interface")
+		x.NetworkInterface.MarshalProtoJSON(s.WithField("network_interface"))
+	}
+	if x.Ssid != "" || s.HasField("ssid") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ssid")
+		s.WriteString(x.Ssid)
+	}
+	if len(x.Bssid) > 0 || s.HasField("bssid") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("bssid")
+		types.MarshalHEXBytes(s.WithField("bssid"), x.Bssid)
+	}
+	if x.Channel != 0 || s.HasField("channel") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("channel")
+		s.WriteUint32(x.Channel)
+	}
+	if x.AuthenticationMode != "" || s.HasField("authentication_mode") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("authentication_mode")
+		s.WriteString(x.AuthenticationMode)
+	}
+	if x.Rssi != nil || s.HasField("rssi") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rssi")
+		if x.Rssi == nil {
+			s.WriteNil()
+		} else {
+			s.WriteFloat32(x.Rssi.Value)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayWiFiBackhaul to JSON.
+func (x *ManagedGatewayWiFiBackhaul) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayWiFiBackhaul message from JSON.
+func (x *ManagedGatewayWiFiBackhaul) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "network_interface", "networkInterface":
+			if s.ReadNil() {
+				x.NetworkInterface = nil
+				return
+			}
+			x.NetworkInterface = &ManagedGatewayNetworkInterfaceInfo{}
+			x.NetworkInterface.UnmarshalProtoJSON(s.WithField("network_interface", true))
+		case "ssid":
+			s.AddField("ssid")
+			x.Ssid = s.ReadString()
+		case "bssid":
+			s.AddField("bssid")
+			x.Bssid = types.Unmarshal6Bytes(s.WithField("bssid", false))
+		case "channel":
+			s.AddField("channel")
+			x.Channel = s.ReadUint32()
+		case "authentication_mode", "authenticationMode":
+			s.AddField("authentication_mode")
+			x.AuthenticationMode = s.ReadString()
+		case "rssi":
+			s.AddField("rssi")
+			if s.ReadNil() {
+				x.Rssi = nil
+				return
+			}
+			v := s.ReadWrappedFloat32()
+			if s.Err() != nil {
+				return
+			}
+			x.Rssi = &wrapperspb.FloatValue{Value: v}
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayWiFiBackhaul from JSON.
+func (x *ManagedGatewayWiFiBackhaul) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayEthernetBackhaul message to JSON.
+func (x *ManagedGatewayEthernetBackhaul) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.NetworkInterface != nil || s.HasField("network_interface") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("network_interface")
+		x.NetworkInterface.MarshalProtoJSON(s.WithField("network_interface"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayEthernetBackhaul to JSON.
+func (x *ManagedGatewayEthernetBackhaul) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayEthernetBackhaul message from JSON.
+func (x *ManagedGatewayEthernetBackhaul) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "network_interface", "networkInterface":
+			if s.ReadNil() {
+				x.NetworkInterface = nil
+				return
+			}
+			x.NetworkInterface = &ManagedGatewayNetworkInterfaceInfo{}
+			x.NetworkInterface.UnmarshalProtoJSON(s.WithField("network_interface", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayEthernetBackhaul from JSON.
+func (x *ManagedGatewayEthernetBackhaul) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ManagedGatewayEventData message to JSON.
+func (x *ManagedGatewayEventData) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Data != nil {
+		switch ov := x.Data.(type) {
+		case *ManagedGatewayEventData_Entity:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("entity")
+			ov.Entity.MarshalProtoJSON(s.WithField("entity"))
+		case *ManagedGatewayEventData_Location:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("location")
+			ov.Location.MarshalProtoJSON(s.WithField("location"))
+		case *ManagedGatewayEventData_SystemMetrics:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("system_metrics")
+			// NOTE: ManagedGatewaySystemMetrics does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.SystemMetrics)
+		case *ManagedGatewayEventData_ControllerConnection:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("controller_connection")
+			ov.ControllerConnection.MarshalProtoJSON(s.WithField("controller_connection"))
+		case *ManagedGatewayEventData_GatewayServerConnection:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("gateway_server_connection")
+			ov.GatewayServerConnection.MarshalProtoJSON(s.WithField("gateway_server_connection"))
+		case *ManagedGatewayEventData_CellularBackhaul:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("cellular_backhaul")
+			ov.CellularBackhaul.MarshalProtoJSON(s.WithField("cellular_backhaul"))
+		case *ManagedGatewayEventData_WifiBackhaul:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("wifi_backhaul")
+			ov.WifiBackhaul.MarshalProtoJSON(s.WithField("wifi_backhaul"))
+		case *ManagedGatewayEventData_EthernetBackhaul:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("ethernet_backhaul")
+			ov.EthernetBackhaul.MarshalProtoJSON(s.WithField("ethernet_backhaul"))
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ManagedGatewayEventData to JSON.
+func (x *ManagedGatewayEventData) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ManagedGatewayEventData message from JSON.
+func (x *ManagedGatewayEventData) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "entity":
+			ov := &ManagedGatewayEventData_Entity{}
+			x.Data = ov
+			if s.ReadNil() {
+				ov.Entity = nil
+				return
+			}
+			ov.Entity = &ManagedGateway{}
+			ov.Entity.UnmarshalProtoJSON(s.WithField("entity", true))
+		case "location":
+			ov := &ManagedGatewayEventData_Location{}
+			x.Data = ov
+			if s.ReadNil() {
+				ov.Location = nil
+				return
+			}
+			ov.Location = &Location{}
+			ov.Location.UnmarshalProtoJSON(s.WithField("location", true))
+		case "system_metrics", "systemMetrics":
+			s.AddField("system_metrics")
+			ov := &ManagedGatewayEventData_SystemMetrics{}
+			x.Data = ov
+			if s.ReadNil() {
+				ov.SystemMetrics = nil
+				return
+			}
+			// NOTE: ManagedGatewaySystemMetrics does not seem to implement UnmarshalProtoJSON.
+			var v ManagedGatewaySystemMetrics
+			golang.UnmarshalMessage(s, &v)
+			ov.SystemMetrics = &v
+		case "controller_connection", "controllerConnection":
+			ov := &ManagedGatewayEventData_ControllerConnection{}
+			x.Data = ov
+			if s.ReadNil() {
+				ov.ControllerConnection = nil
+				return
+			}
+			ov.ControllerConnection = &ManagedGatewayControllerConnection{}
+			ov.ControllerConnection.UnmarshalProtoJSON(s.WithField("controller_connection", true))
+		case "gateway_server_connection", "gatewayServerConnection":
+			ov := &ManagedGatewayEventData_GatewayServerConnection{}
+			x.Data = ov
+			if s.ReadNil() {
+				ov.GatewayServerConnection = nil
+				return
+			}
+			ov.GatewayServerConnection = &ManagedGatewayGatewayServerConnection{}
+			ov.GatewayServerConnection.UnmarshalProtoJSON(s.WithField("gateway_server_connection", true))
+		case "cellular_backhaul", "cellularBackhaul":
+			ov := &ManagedGatewayEventData_CellularBackhaul{}
+			x.Data = ov
+			if s.ReadNil() {
+				ov.CellularBackhaul = nil
+				return
+			}
+			ov.CellularBackhaul = &ManagedGatewayCellularBackhaul{}
+			ov.CellularBackhaul.UnmarshalProtoJSON(s.WithField("cellular_backhaul", true))
+		case "wifi_backhaul", "wifiBackhaul":
+			ov := &ManagedGatewayEventData_WifiBackhaul{}
+			x.Data = ov
+			if s.ReadNil() {
+				ov.WifiBackhaul = nil
+				return
+			}
+			ov.WifiBackhaul = &ManagedGatewayWiFiBackhaul{}
+			ov.WifiBackhaul.UnmarshalProtoJSON(s.WithField("wifi_backhaul", true))
+		case "ethernet_backhaul", "ethernetBackhaul":
+			ov := &ManagedGatewayEventData_EthernetBackhaul{}
+			x.Data = ov
+			if s.ReadNil() {
+				ov.EthernetBackhaul = nil
+				return
+			}
+			ov.EthernetBackhaul = &ManagedGatewayEthernetBackhaul{}
+			ov.EthernetBackhaul.UnmarshalProtoJSON(s.WithField("ethernet_backhaul", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ManagedGatewayEventData from JSON.
+func (x *ManagedGatewayEventData) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -2026,5 +2892,71 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 
 // UnmarshalJSON unmarshals the GatewayConnectionStats from JSON.
 func (x *GatewayConnectionStats) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UpdateManagedGatewayRequest message to JSON.
+func (x *UpdateManagedGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Gateway != nil || s.HasField("gateway") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway")
+		x.Gateway.MarshalProtoJSON(s.WithField("gateway"))
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UpdateManagedGatewayRequest to JSON.
+func (x *UpdateManagedGatewayRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UpdateManagedGatewayRequest message from JSON.
+func (x *UpdateManagedGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway":
+			if s.ReadNil() {
+				x.Gateway = nil
+				return
+			}
+			x.Gateway = &ManagedGateway{}
+			x.Gateway.UnmarshalProtoJSON(s.WithField("gateway", true))
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UpdateManagedGatewayRequest from JSON.
+func (x *UpdateManagedGatewayRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

@@ -21539,6 +21539,62 @@
               "description": ""
             }
           ]
+        },
+        {
+          "name": "ManagedGatewayNetworkInterfaceStatus",
+          "longName": "ManagedGatewayNetworkInterfaceStatus",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceStatus",
+          "description": "",
+          "values": [
+            {
+              "name": "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UNSPECIFIED",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_DOWN",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UP",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_FAILED",
+              "number": "3",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayNetworkInterfaceType",
+          "longName": "ManagedGatewayNetworkInterfaceType",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceType",
+          "description": "",
+          "values": [
+            {
+              "name": "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_UNSPECIFIED",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_CELLULAR",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_WIFI",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_ETHERNET",
+              "number": "3",
+              "description": ""
+            }
+          ]
         }
       ],
       "extensions": [],
@@ -23434,6 +23490,26 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "runtime_version",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
             }
           ]
         },
@@ -23928,6 +24004,842 @@
           ]
         },
         {
+          "name": "ManagedGateway",
+          "longName": "ManagedGateway",
+          "fullName": "ttn.lorawan.v3.ManagedGateway",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "version_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayVersionIdentifiers",
+              "longType": "GatewayVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayVersionIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cellular_imei",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^[0-9]{15}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cellular_imsi",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^[0-9]{15}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "wifi_mac_address",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 6
+                  }
+                ]
+              }
+            },
+            {
+              "name": "ethernet_mac_address",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 6
+                  }
+                ]
+              }
+            },
+            {
+              "name": "wifi_profile_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uuid",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "ethernet_profile_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uuid",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayCellularBackhaul",
+          "longName": "ManagedGatewayCellularBackhaul",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayCellularBackhaul",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "network_interface",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayNetworkInterfaceInfo",
+              "longType": "ManagedGatewayNetworkInterfaceInfo",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "operator",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
+            },
+            {
+              "name": "rssi",
+              "description": "",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayControllerConnection",
+          "longName": "ManagedGatewayControllerConnection",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayControllerConnection",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "network_interface_type",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayNetworkInterfaceType",
+              "longType": "ManagedGatewayNetworkInterfaceType",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayEthernetBackhaul",
+          "longName": "ManagedGatewayEthernetBackhaul",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayEthernetBackhaul",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "network_interface",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayNetworkInterfaceInfo",
+              "longType": "ManagedGatewayNetworkInterfaceInfo",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayEventData",
+          "longName": "ManagedGatewayEventData",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayEventData",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "entity",
+              "description": "",
+              "label": "",
+              "type": "ManagedGateway",
+              "longType": "ManagedGateway",
+              "fullType": "ttn.lorawan.v3.ManagedGateway",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            },
+            {
+              "name": "location",
+              "description": "",
+              "label": "",
+              "type": "Location",
+              "longType": "Location",
+              "fullType": "ttn.lorawan.v3.Location",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            },
+            {
+              "name": "system_metrics",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewaySystemMetrics",
+              "longType": "ManagedGatewaySystemMetrics",
+              "fullType": "ttn.lorawan.v3.ManagedGatewaySystemMetrics",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            },
+            {
+              "name": "controller_connection",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayControllerConnection",
+              "longType": "ManagedGatewayControllerConnection",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayControllerConnection",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            },
+            {
+              "name": "gateway_server_connection",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayGatewayServerConnection",
+              "longType": "ManagedGatewayGatewayServerConnection",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayGatewayServerConnection",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            },
+            {
+              "name": "cellular_backhaul",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayCellularBackhaul",
+              "longType": "ManagedGatewayCellularBackhaul",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayCellularBackhaul",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            },
+            {
+              "name": "wifi_backhaul",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayWiFiBackhaul",
+              "longType": "ManagedGatewayWiFiBackhaul",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayWiFiBackhaul",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            },
+            {
+              "name": "ethernet_backhaul",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayEthernetBackhaul",
+              "longType": "ManagedGatewayEthernetBackhaul",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayEthernetBackhaul",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayGatewayServerConnection",
+          "longName": "ManagedGatewayGatewayServerConnection",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayGatewayServerConnection",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "network_interface_type",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayNetworkInterfaceType",
+              "longType": "ManagedGatewayNetworkInterfaceType",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayNetworkInterfaceAddresses",
+          "longName": "ManagedGatewayNetworkInterfaceAddresses",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ip_addresses",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 2
+                  },
+                  {
+                    "name": "repeated.items.string.ip",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "subnet_mask",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.ipv4",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "gateway",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.ipv4",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "dns_servers",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 2
+                  },
+                  {
+                    "name": "repeated.items.string.ipv4",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayNetworkInterfaceInfo",
+          "longName": "ManagedGatewayNetworkInterfaceInfo",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "status",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayNetworkInterfaceStatus",
+              "longType": "ManagedGatewayNetworkInterfaceStatus",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "dhcp_enabled",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "addresses",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayNetworkInterfaceAddresses",
+              "longType": "ManagedGatewayNetworkInterfaceAddresses",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewaySystemMetrics",
+          "longName": "ManagedGatewaySystemMetrics",
+          "fullName": "ttn.lorawan.v3.ManagedGatewaySystemMetrics",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "temperature",
+              "description": "",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayWiFiAccessPoint",
+          "longName": "ManagedGatewayWiFiAccessPoint",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayWiFiAccessPoint",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ssid",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
+            },
+            {
+              "name": "bssid",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 6
+                  }
+                ]
+              }
+            },
+            {
+              "name": "channel",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "name": "authentication_mode",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rssi",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayWiFiAccessPoints",
+          "longName": "ManagedGatewayWiFiAccessPoints",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayWiFiAccessPoints",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "access_points",
+              "description": "",
+              "label": "repeated",
+              "type": "ManagedGatewayWiFiAccessPoint",
+              "longType": "ManagedGatewayWiFiAccessPoint",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayWiFiAccessPoint",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayWiFiBackhaul",
+          "longName": "ManagedGatewayWiFiBackhaul",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayWiFiBackhaul",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "network_interface",
+              "description": "",
+              "label": "",
+              "type": "ManagedGatewayNetworkInterfaceInfo",
+              "longType": "ManagedGatewayNetworkInterfaceInfo",
+              "fullType": "ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "ssid",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
+            },
+            {
+              "name": "bssid",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 6
+                  }
+                ]
+              }
+            },
+            {
+              "name": "channel",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "name": "authentication_mode",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rssi",
+              "description": "",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "SetGatewayCollaboratorRequest",
           "longName": "SetGatewayCollaboratorRequest",
           "fullName": "ttn.lorawan.v3.SetGatewayCollaboratorRequest",
@@ -24060,6 +24972,50 @@
               "type": "Gateway",
               "longType": "Gateway",
               "fullType": "ttn.lorawan.v3.Gateway",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the gateway fields that should be updated.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UpdateManagedGatewayRequest",
+          "longName": "UpdateManagedGatewayRequest",
+          "fullName": "ttn.lorawan.v3.UpdateManagedGatewayRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway",
+              "description": "",
+              "label": "",
+              "type": "ManagedGateway",
+              "longType": "ManagedGateway",
+              "fullType": "ttn.lorawan.v3.ManagedGateway",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -24262,6 +25218,105 @@
                     {
                       "method": "GET",
                       "pattern": "/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{type}/{filename}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "ManagedGatewayConfigurationService",
+          "longName": "ManagedGatewayConfigurationService",
+          "fullName": "ttn.lorawan.v3.ManagedGatewayConfigurationService",
+          "description": "",
+          "methods": [
+            {
+              "name": "Get",
+              "description": "",
+              "requestType": "GetGatewayRequest",
+              "requestLongType": "GetGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.GetGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "ManagedGateway",
+              "responseLongType": "ManagedGateway",
+              "responseFullType": "ttn.lorawan.v3.ManagedGateway",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gcs/gateways/managed/{gateway_ids.gateway_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update",
+              "description": "",
+              "requestType": "UpdateManagedGatewayRequest",
+              "requestLongType": "UpdateManagedGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateManagedGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "ManagedGateway",
+              "responseLongType": "ManagedGateway",
+              "responseFullType": "ttn.lorawan.v3.ManagedGateway",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/gcs/gateways/managed/{gateway.ids.gateway_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "StreamEvents",
+              "description": "",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "ManagedGatewayEventData",
+              "responseLongType": "ManagedGatewayEventData",
+              "responseFullType": "ttn.lorawan.v3.ManagedGatewayEventData",
+              "responseStreaming": true,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/gcs/gateways/managed/{gateway_id}/events",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ScanWiFiAccessPoints",
+              "description": "",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "ManagedGatewayWiFiAccessPoints",
+              "responseLongType": "ManagedGatewayWiFiAccessPoints",
+              "responseFullType": "ttn.lorawan.v3.ManagedGatewayWiFiAccessPoints",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/gcs/gateways/managed/{gateway_id}/wifi/scan",
+                      "body": "*"
                     }
                   ]
                 }
@@ -24716,26 +25771,6 @@
                   ]
                 }
               }
-            }
-          ]
-        },
-        {
-          "name": "GatewayConfigurator",
-          "longName": "GatewayConfigurator",
-          "fullName": "ttn.lorawan.v3.GatewayConfigurator",
-          "description": "The GatewayConfigurator service is used to fetch gateway configuration.",
-          "methods": [
-            {
-              "name": "PullConfiguration",
-              "description": "",
-              "requestType": "PullGatewayConfigurationRequest",
-              "requestLongType": "PullGatewayConfigurationRequest",
-              "requestFullType": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
-              "requestStreaming": false,
-              "responseType": "Gateway",
-              "responseLongType": "Gateway",
-              "responseFullType": "ttn.lorawan.v3.Gateway",
-              "responseStreaming": true
             }
           ]
         },

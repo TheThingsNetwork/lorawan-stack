@@ -122,3 +122,233 @@ var GatewayConfigurationService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "ttn/lorawan/v3/gateway_configuration.proto",
 }
+
+const (
+	ManagedGatewayConfigurationService_Get_FullMethodName                  = "/ttn.lorawan.v3.ManagedGatewayConfigurationService/Get"
+	ManagedGatewayConfigurationService_Update_FullMethodName               = "/ttn.lorawan.v3.ManagedGatewayConfigurationService/Update"
+	ManagedGatewayConfigurationService_StreamEvents_FullMethodName         = "/ttn.lorawan.v3.ManagedGatewayConfigurationService/StreamEvents"
+	ManagedGatewayConfigurationService_ScanWiFiAccessPoints_FullMethodName = "/ttn.lorawan.v3.ManagedGatewayConfigurationService/ScanWiFiAccessPoints"
+)
+
+// ManagedGatewayConfigurationServiceClient is the client API for ManagedGatewayConfigurationService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ManagedGatewayConfigurationServiceClient interface {
+	Get(ctx context.Context, in *GetGatewayRequest, opts ...grpc.CallOption) (*ManagedGateway, error)
+	Update(ctx context.Context, in *UpdateManagedGatewayRequest, opts ...grpc.CallOption) (*ManagedGateway, error)
+	StreamEvents(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (ManagedGatewayConfigurationService_StreamEventsClient, error)
+	ScanWiFiAccessPoints(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ManagedGatewayWiFiAccessPoints, error)
+}
+
+type managedGatewayConfigurationServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewManagedGatewayConfigurationServiceClient(cc grpc.ClientConnInterface) ManagedGatewayConfigurationServiceClient {
+	return &managedGatewayConfigurationServiceClient{cc}
+}
+
+func (c *managedGatewayConfigurationServiceClient) Get(ctx context.Context, in *GetGatewayRequest, opts ...grpc.CallOption) (*ManagedGateway, error) {
+	out := new(ManagedGateway)
+	err := c.cc.Invoke(ctx, ManagedGatewayConfigurationService_Get_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayConfigurationServiceClient) Update(ctx context.Context, in *UpdateManagedGatewayRequest, opts ...grpc.CallOption) (*ManagedGateway, error) {
+	out := new(ManagedGateway)
+	err := c.cc.Invoke(ctx, ManagedGatewayConfigurationService_Update_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayConfigurationServiceClient) StreamEvents(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (ManagedGatewayConfigurationService_StreamEventsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ManagedGatewayConfigurationService_ServiceDesc.Streams[0], ManagedGatewayConfigurationService_StreamEvents_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &managedGatewayConfigurationServiceStreamEventsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ManagedGatewayConfigurationService_StreamEventsClient interface {
+	Recv() (*ManagedGatewayEventData, error)
+	grpc.ClientStream
+}
+
+type managedGatewayConfigurationServiceStreamEventsClient struct {
+	grpc.ClientStream
+}
+
+func (x *managedGatewayConfigurationServiceStreamEventsClient) Recv() (*ManagedGatewayEventData, error) {
+	m := new(ManagedGatewayEventData)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *managedGatewayConfigurationServiceClient) ScanWiFiAccessPoints(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ManagedGatewayWiFiAccessPoints, error) {
+	out := new(ManagedGatewayWiFiAccessPoints)
+	err := c.cc.Invoke(ctx, ManagedGatewayConfigurationService_ScanWiFiAccessPoints_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ManagedGatewayConfigurationServiceServer is the server API for ManagedGatewayConfigurationService service.
+// All implementations must embed UnimplementedManagedGatewayConfigurationServiceServer
+// for forward compatibility
+type ManagedGatewayConfigurationServiceServer interface {
+	Get(context.Context, *GetGatewayRequest) (*ManagedGateway, error)
+	Update(context.Context, *UpdateManagedGatewayRequest) (*ManagedGateway, error)
+	StreamEvents(*GatewayIdentifiers, ManagedGatewayConfigurationService_StreamEventsServer) error
+	ScanWiFiAccessPoints(context.Context, *GatewayIdentifiers) (*ManagedGatewayWiFiAccessPoints, error)
+	mustEmbedUnimplementedManagedGatewayConfigurationServiceServer()
+}
+
+// UnimplementedManagedGatewayConfigurationServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedManagedGatewayConfigurationServiceServer struct {
+}
+
+func (UnimplementedManagedGatewayConfigurationServiceServer) Get(context.Context, *GetGatewayRequest) (*ManagedGateway, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedManagedGatewayConfigurationServiceServer) Update(context.Context, *UpdateManagedGatewayRequest) (*ManagedGateway, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (UnimplementedManagedGatewayConfigurationServiceServer) StreamEvents(*GatewayIdentifiers, ManagedGatewayConfigurationService_StreamEventsServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamEvents not implemented")
+}
+func (UnimplementedManagedGatewayConfigurationServiceServer) ScanWiFiAccessPoints(context.Context, *GatewayIdentifiers) (*ManagedGatewayWiFiAccessPoints, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ScanWiFiAccessPoints not implemented")
+}
+func (UnimplementedManagedGatewayConfigurationServiceServer) mustEmbedUnimplementedManagedGatewayConfigurationServiceServer() {
+}
+
+// UnsafeManagedGatewayConfigurationServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ManagedGatewayConfigurationServiceServer will
+// result in compilation errors.
+type UnsafeManagedGatewayConfigurationServiceServer interface {
+	mustEmbedUnimplementedManagedGatewayConfigurationServiceServer()
+}
+
+func RegisterManagedGatewayConfigurationServiceServer(s grpc.ServiceRegistrar, srv ManagedGatewayConfigurationServiceServer) {
+	s.RegisterService(&ManagedGatewayConfigurationService_ServiceDesc, srv)
+}
+
+func _ManagedGatewayConfigurationService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGatewayRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayConfigurationServiceServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayConfigurationService_Get_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayConfigurationServiceServer).Get(ctx, req.(*GetGatewayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayConfigurationService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateManagedGatewayRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayConfigurationServiceServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayConfigurationService_Update_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayConfigurationServiceServer).Update(ctx, req.(*UpdateManagedGatewayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayConfigurationService_StreamEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GatewayIdentifiers)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ManagedGatewayConfigurationServiceServer).StreamEvents(m, &managedGatewayConfigurationServiceStreamEventsServer{stream})
+}
+
+type ManagedGatewayConfigurationService_StreamEventsServer interface {
+	Send(*ManagedGatewayEventData) error
+	grpc.ServerStream
+}
+
+type managedGatewayConfigurationServiceStreamEventsServer struct {
+	grpc.ServerStream
+}
+
+func (x *managedGatewayConfigurationServiceStreamEventsServer) Send(m *ManagedGatewayEventData) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _ManagedGatewayConfigurationService_ScanWiFiAccessPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayConfigurationServiceServer).ScanWiFiAccessPoints(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayConfigurationService_ScanWiFiAccessPoints_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayConfigurationServiceServer).ScanWiFiAccessPoints(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ManagedGatewayConfigurationService_ServiceDesc is the grpc.ServiceDesc for ManagedGatewayConfigurationService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ManagedGatewayConfigurationService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.ManagedGatewayConfigurationService",
+	HandlerType: (*ManagedGatewayConfigurationServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Get",
+			Handler:    _ManagedGatewayConfigurationService_Get_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _ManagedGatewayConfigurationService_Update_Handler,
+		},
+		{
+			MethodName: "ScanWiFiAccessPoints",
+			Handler:    _ManagedGatewayConfigurationService_ScanWiFiAccessPoints_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamEvents",
+			Handler:       _ManagedGatewayConfigurationService_StreamEvents_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "ttn/lorawan/v3/gateway_configuration.proto",
+}
