@@ -144,7 +144,7 @@ const UsersTable = props => {
   const handlePurge = React.useCallback(
     async id => {
       try {
-        await dispatch(attachPromise(deleteUser(id)), { purge: true })
+        await dispatch(attachPromise(deleteUser(id, { purge: true })))
         toast({
           title: id,
           message: m.purgeSuccess,
