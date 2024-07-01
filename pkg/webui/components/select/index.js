@@ -165,13 +165,13 @@ Select.propTypes = {
   onFocus: PropTypes.func,
   options: PropTypes.arrayOf(
     PropTypes.shape({
-      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
       label: PropTypes.message,
     }),
   ),
   placeholder: PropTypes.message,
   showOptionIcon: PropTypes.bool,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.shape({})]),
   warning: PropTypes.bool,
 }
 

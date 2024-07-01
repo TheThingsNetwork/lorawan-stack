@@ -32,14 +32,18 @@ const messages = defineMessages({
   useDefaultNetworkInterfaceSettings: 'Use default network interface settings',
   uncheckToSetCustomSettings:
     'Uncheck if you need to set custom IP addresses, subnet mask and DNS server',
-  ipAddress: 'IP address',
+  ipAddresses: 'IP addresses',
   subnetMask: 'Subnet mask',
   dnsServers: 'DNS servers',
   addServerAddress: 'Add server address',
+  addIpAddress: 'Add IP address',
   validateDnsServers: 'There must be at least one valid dns server.',
+  validateIpAddresses: 'There must be at least one valid IP address.',
   validateEmptyDnsServer:
     'There must be no empty dns server entries. Please remove such entries before submitting.',
-  dnsServerPlaceholder: '0.0.0.0',
+  validateEmptyIpAddress:
+    'There must be no empty IP address entries. Please remove such entries before submitting.',
+  ipAddressPlaceholder: '0.0.0.0',
   validateIpAddress: '{field} must contain a valid address.',
   accessPointAndSsid: 'Access point / SSID',
   validateNotSelectedAccessPoint: 'There must be at least one access point / SSID selected',

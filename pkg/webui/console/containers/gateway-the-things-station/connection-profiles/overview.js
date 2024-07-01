@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { useDispatch } from 'react-redux'
 
 import Tabs from '@ttn-lw/components/tabs'
 import Link from '@ttn-lw/components/link'
-import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import Button from '@ttn-lw/components/button'
 import ButtonGroup from '@ttn-lw/components/button/group'
@@ -35,9 +34,9 @@ import {
   CONNECTION_TYPES,
   getFormTypeMessage,
 } from '@console/containers/gateway-the-things-station/utils'
+import ShowProfilesSelect from '@console/containers/gateway-the-things-station/show-profiles-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { deleteConnectionProfile, getConnectionProfilesList } from '@console/store/actions/gateways'
@@ -49,11 +48,6 @@ import {
 
 import m from './messages'
 
-const profileOptions = [
-  { value: '0', label: sharedMessages.yourself },
-  { value: '1', label: 'TTI' },
-]
-
 const GatewayConnectionProfilesOverview = () => {
   const { gtwId, type } = useParams()
   const dispatch = useDispatch()
@@ -63,7 +57,7 @@ const GatewayConnectionProfilesOverview = () => {
     {
       title: m.wifiProfiles,
       name: CONNECTION_TYPES.WIFI,
-      link: `/gateways/${gtwId}/the-things-station/connection-profiles/${CONNECTION_TYPES.WIFI}`,
+      link: `/gateways/${gtwId}/the-things-station/connection-profiles/${CONNECTION_TYPES.WIFI}?shared=`,
     },
     {
       title: m.ethernetProfiles,
@@ -72,13 +66,16 @@ const GatewayConnectionProfilesOverview = () => {
     },
   ]
 
-  const onAddProfile = useCallback(() => {
-    navigate(`add`)
-  }, [navigate])
+  const onAddProfile = useCallback(
+    shared => {
+      navigate(`add?shared=${shared}`)
+    },
+    [navigate],
+  )
 
   const handleEdit = React.useCallback(
-    profileId => {
-      navigate(`edit/${profileId}`)
+    (profileId, shared) => {
+      navigate(`edit/${profileId}?shared=${shared}`)
     },
     [navigate],
   )
@@ -175,37 +172,34 @@ const GatewayConnectionProfilesOverview = () => {
           br: () => <br />,
         }}
       />
-      <div className="d-flex j-between al-end">
-        <Form
-          initialValues={{
-            profiles: '0',
-          }}
-        >
-          <Form.Field
-            name="profiles"
-            title={sharedMessages.showProfilesOf}
-            component={Select}
-            options={profileOptions}
-            tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
-          />
-        </Form>
-        <Button
-          className="mb-cs-m"
-          primary
-          onClick={onAddProfile}
-          message={getFormTypeMessage(type)}
-          icon="add"
-        />
-      </div>
-
-      <FetchTable
-        entity="connectionProfiles"
-        defaultOrder="-created_at"
-        headers={headers}
-        getItemsAction={getItems}
-        baseDataSelector={baseDataSelector}
-        filtersClassName="d-none"
-      />
+      <Form
+        initialValues={{
+          shared: false,
+        }}
+      >
+        {({ values }) => (
+          <>
+            <div className="d-flex j-between al-end">
+              <ShowProfilesSelect name="shared" />
+              <Button
+                className="mb-cs-m"
+                primary
+                onClick={() => onAddProfile(values.shared)}
+                message={getFormTypeMessage(type)}
+                icon="add"
+              />
+            </div>
+            <FetchTable
+              entity="connectionProfiles"
+              defaultOrder="-created_at"
+              headers={headers}
+              getItemsAction={getItems}
+              baseDataSelector={baseDataSelector}
+              filtersClassName="d-none"
+            />
+          </>
+        )}
+      </Form>
     </>
   )
 }

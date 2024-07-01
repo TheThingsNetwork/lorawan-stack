@@ -54,7 +54,12 @@ const GatewayConnectionProfilesFormFields = ({ isEdit, namePrefix }) => {
 
   return (
     <>
-      <Form.Field title={m.profileName} name={`${namePrefix}name`} component={Input} required />
+      <Form.Field
+        title={m.profileName}
+        name={`${namePrefix}profile_name`}
+        component={Input}
+        required
+      />
       {valuesNormalized._connection_type === CONNECTION_TYPES.WIFI && (
         <>
           <Form.Field
@@ -108,24 +113,33 @@ const GatewayConnectionProfilesFormFields = ({ isEdit, namePrefix }) => {
       {!Boolean(valuesNormalized.default_network_interface) && (
         <>
           <Form.Field
-            title={m.ipAddress}
-            name={`${namePrefix}ip_address`}
-            component={Input}
+            name={`${namePrefix}network_interface_addresses.ip_addresses`}
+            title={m.ipAddresses}
+            addMessage={m.addIpAddress}
+            component={KeyValueMap}
+            indexAsKey
+            valuePlaceholder={m.ipAddressPlaceholder}
             required
           />
           <Form.Field
             title={m.subnetMask}
-            name={`${namePrefix}subnet_mask`}
+            name={`${namePrefix}network_interface_addresses.subnet_mask`}
             component={Input}
             required
           />
           <Form.Field
-            name={`${namePrefix}dns_servers`}
+            title={sharedMessages.gateway}
+            name={`${namePrefix}network_interface_addresses.gateway`}
+            component={Input}
+            required
+          />
+          <Form.Field
+            name={`${namePrefix}network_interface_addresses.dns_servers`}
             title={m.dnsServers}
             addMessage={m.addServerAddress}
             component={KeyValueMap}
             indexAsKey
-            valuePlaceholder={m.dnsServerPlaceholder}
+            valuePlaceholder={m.ipAddressPlaceholder}
             required
           />
         </>

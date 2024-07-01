@@ -20,7 +20,6 @@ import { Col, Row } from 'react-grid-system'
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Link from '@ttn-lw/components/link'
 import Notification from '@ttn-lw/components/notification'
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -65,7 +64,10 @@ const GatewayConnectionSettings = () => {
 
   const initialValues = useMemo(
     () => ({
-      settings: Object.values(CONNECTION_TYPES).map(getInitialProfile),
+      settings: Object.values(CONNECTION_TYPES).map(type => ({
+        profile: '',
+        ...getInitialProfile(type, false),
+      })),
     }),
     [],
   )
@@ -93,7 +95,7 @@ const GatewayConnectionSettings = () => {
           </Form>
         </Col>
         <Col lg={4} md={6} sm={12}>
-          <div>Pavel</div>
+          <div />
         </Col>
       </Row>
     </>
