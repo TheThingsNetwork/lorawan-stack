@@ -2,119 +2,6 @@
 
 The Things Stack components are primarily built in Go, we use React for web front-ends. It is assumed that you have decent knowledge and experience with these technologies. If you want to get more familiar with Go, we strongly recommend to take [A Tour of Go](https://tour.golang.org/).
 
-## Table of contents
-
-- [The Things Stack for LoRaWAN Development](#the-things-stack-for-lorawan-development)
-  - [Table of contents](#table-of-contents)
-  - [Development Environment](#development-environment)
-  - [Cloning the Repository](#cloning-the-repository)
-  - [Getting Started](#getting-started)
-  - [Running a development build of The Things Stack](#running-a-development-build-of-the-things-stack)
-    - [Pre-requisites](#pre-requisites)
-    - [Steps](#steps)
-  - [Using the CLI with the Development Environment](#using-the-cli-with-the-development-environment)
-  - [Managing the Development Databases](#managing-the-development-databases)
-    - [PostgreSQL](#postgresql)
-    - [Redis](#redis)
-  - [Building the Frontend](#building-the-frontend)
-  - [Starting The Things Stack](#starting-the-things-stack)
-      - [Codec](#codec)
-        - [Examples](#examples)
-          - [Get and Decode](#get-and-decode)
-          - [Get, Decode, Modify, Encode and Set](#get-decode-modify-encode-and-set)
-  - [Project Structure](#project-structure)
-    - [API](#api)
-    - [Documentation](#documentation)
-    - [Web UI](#web-ui)
-      - [Development Configuration](#development-configuration)
-      - [Optional Configuration](#optional-configuration)
-        - [Disable Hot Module Replacement](#disable-hot-module-replacement)
-        - [Enable TLS in `webpack-dev-server`](#enable-tls-in-webpack-dev-server)
-      - [Serving](#serving)
-  - [Code Style](#code-style)
-    - [Code Formatting](#code-formatting)
-    - [Line Length](#line-length)
-    - [Formatting and Linting](#formatting-and-linting)
-    - [Documentation Site](#documentation-site)
-  - [Naming Guidelines](#naming-guidelines)
-    - [API Method Naming](#api-method-naming)
-    - [Variable Naming](#variable-naming)
-      - [Single-word Entities](#single-word-entities)
-      - [2-word Entities](#2-word-entities)
-      - [Well-known Variable Names](#well-known-variable-names)
-    - [Event Naming](#event-naming)
-    - [Error Naming](#error-naming)
-    - [Log Field Keys, Event Names, Error Names, Error Attributes and Task Identifiers](#log-field-keys-event-names-error-names-error-attributes-and-task-identifiers)
-    - [Comments](#comments)
-  - [JavaScript Code Style](#javascript-code-style)
-    - [Code Formatting](#code-formatting-1)
-    - [Code Comments](#code-comments)
-    - [Import Statement Order](#import-statement-order)
-    - [React Component Syntax (Functional, Class Components and Hooks)](#react-component-syntax-functional-class-components-and-hooks)
-      - [A note on decorators and HOCs](#a-note-on-decorators-and-hocs)
-    - [React Component Types](#react-component-types)
-      - [Presentational Components](#presentational-components)
-      - [Container Components](#container-components)
-      - [View components](#view-components)
-        - [View component checklist](#view-component-checklist)
-      - [Utility components](#utility-components)
-      - [Global or Application Scope?](#global-or-application-scope)
-    - [Frontend Related Pull Requests](#frontend-related-pull-requests)
-  - [Translations](#translations)
-    - [Backend Translations](#backend-translations)
-    - [Frontend Translations](#frontend-translations)
-  - [Events](#events)
-  - [Testing](#testing)
-    - [Unit Tests](#unit-tests)
-    - [End-to-end Tests](#end-to-end-tests)
-      - [Running frontend end-to-end tests locally](#running-frontend-end-to-end-tests-locally)
-      - [JavaScript based tests](#javascript-based-tests)
-        - [Pattern](#pattern)
-        - [Grammar and Capitalization](#grammar-and-capitalization)
-        - [React Components](#react-components)
-        - [Structurizing tests](#structurizing-tests)
-        - [Test Driven Development (TDD)](#test-driven-development-tdd)
-      - [Writing End-to-End Tests](#writing-end-to-end-tests)
-        - [Guiding Principle](#guiding-principle)
-        - [Selecting elements](#selecting-elements)
-        - [Test runner globals](#test-runner-globals)
-        - [End-to-end tests file structure](#end-to-end-tests-file-structure)
-        - [Organizing end-to-end tests](#organizing-end-to-end-tests)
-        - [Smoke tests](#smoke-tests)
-  - [Building and Running](#building-and-running)
-  - [Releasing](#releasing)
-    - [Release From Master](#release-from-master)
-    - [Release Backports](#release-backports)
-  - [Troubleshooting](#troubleshooting)
-    - [Console](#console)
-      - [Problem: Assets are not found](#problem-assets-are-not-found)
-      - [Possible causes](#possible-causes)
-        - [Using incorrect or no configs](#using-incorrect-or-no-configs)
-        - [Possible solution](#possible-solution)
-        - [Missing restart](#missing-restart)
-        - [Possible solution](#possible-solution-1)
-        - [Accidentally deleted bundle files](#accidentally-deleted-bundle-files)
-        - [Possible solution](#possible-solution-2)
-        - [Mixing up production and development builds](#mixing-up-production-and-development-builds)
-        - [Possible solution](#possible-solution-3)
-      - [Problem: Console rendering blank page and showing arbitrary error message in console logs, e.g.:](#problem-console-rendering-blank-page-and-showing-arbitrary-error-message-in-console-logs-eg)
-      - [Possible causes](#possible-causes-1)
-        - [Bundle using old JS SDK](#bundle-using-old-js-sdk)
-        - [Possible solutions](#possible-solutions)
-      - [Problem: Console rendering blank page and showing `Module not found` message in console logs, e.g.:](#problem-console-rendering-blank-page-and-showing-module-not-found-message-in-console-logs-eg)
-        - [Possible cause: Broken yarn or npm cache](#possible-cause-broken-yarn-or-npm-cache)
-        - [Possible solution: Clean package manager caches](#possible-solution-clean-package-manager-caches)
-      - [Problem: The build crashes without showing any helpful error message](#problem-the-build-crashes-without-showing-any-helpful-error-message)
-        - [Cause: Not running mage in verbose mode](#cause-not-running-mage-in-verbose-mode)
-        - [Solution](#solution)
-      - [Problem: Browser displays error:](#problem-browser-displays-error)
-        - [Cause: No endpoint is exposed at root](#cause-no-endpoint-is-exposed-at-root)
-        - [Solution:](#solution-1)
-      - [Problem: Browser displays error:](#problem-browser-displays-error-1)
-        - [Cause: Stack is not available or not running](#cause-stack-is-not-available-or-not-running)
-        - [Solution:](#solution-2)
-      - [General advice](#general-advice)
-
 ## Development Environment
 
 The Things Network's development tooling uses [Mage](https://magefile.org/). Under the hood, `mage` calls other tools such as `git`, `go`, `yarn`, `docker` etc. Recent versions are supported; Node v20.x and Go v1.21.x.
@@ -366,6 +253,8 @@ The folder structure of the frontend looks as follows:
 
 #### Development Configuration
 
+> To use a convenient interactive launcher for the development environments without any further setup required, please see the (interactive development stack launcher tool)[#interactive-development-stack-launcher-tool]
+
 In order to set up The Things Stack to support running the frontend via `webpack-dev-server`, the following environment setup is needed:
 
 ```bash
@@ -467,8 +356,17 @@ $ export NODE_ENV=development
 $ tools/bin/mage js:serve
 ```
 
-The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
+The development server runs on `http://localhost:8080` and will proxy all API calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
 
+#### Interactive development stack launcher tool
+
+In order to easily launch development environments in different deployment contexts, this script configures and starts a development environment for The Things Stack, allowing users to choose between local and staging environments, enable branding, and configure cloud-hosted mock setups. You can launch it via:
+
+```bash
+$ node tools/js/serve-dev-stack.js
+```
+
+It will interactively guide you through the desired setup and launches the The Things Stack Enterprise as well as a frontend development server wia webpack.
 
 ## Code Style
 
