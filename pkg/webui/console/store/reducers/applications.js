@@ -27,6 +27,7 @@ import {
   DELETE_APP_SUCCESS,
   GET_APP_EVENT_MESSAGE_SUCCESS,
   GET_MQTT_INFO_SUCCESS,
+  GET_APP_BOOKMARK_NAME_SUCCESS,
 } from '@console/store/actions/applications'
 
 const application = (state = {}, application) => ({
@@ -73,6 +74,7 @@ const applications = (state = defaultState, { type, payload, event }) => {
         },
       }
     case GET_APP_SUCCESS:
+    case GET_APP_BOOKMARK_NAME_SUCCESS:
     case UPDATE_APP_SUCCESS:
       const id = getApplicationId(payload)
 

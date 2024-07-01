@@ -26,8 +26,8 @@ import {
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getApplication } from '@console/store/actions/applications'
-import { getGateway } from '@console/store/actions/gateways'
+import { getApplicationBookmarkName } from '@console/store/actions/applications'
+import { getGatewayBookmarkName } from '@console/store/actions/gateways'
 import { getOrganization } from '@console/store/actions/organizations'
 import { getUser } from '@account/store/actions/user'
 import { getDevice } from '@console/store/actions/devices'
@@ -50,8 +50,8 @@ const iconMap = {
 }
 
 const entityRequestMap = {
-  application: getApplication,
-  gateway: getGateway,
+  application: getApplicationBookmarkName,
+  gateway: getGatewayBookmarkName,
   organization: getOrganization,
   user: getUser,
   client: getClient,

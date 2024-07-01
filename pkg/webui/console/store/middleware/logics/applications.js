@@ -49,6 +49,19 @@ const getApplicationLogic = createRequestLogic({
   },
 })
 
+const getApplicationBookmarkNameLogic = createRequestLogic({
+  type: applications.GET_APP_BOOKMARK_NAME,
+  process: async ({ action }) => {
+    const {
+      payload: { id },
+    } = action
+    const app = await tts.Applications.getById(id, 'name')
+    trackEntityAccess(APPLICATION, id)
+
+    return app
+  },
+})
+
 const issueDevEUILogic = createRequestLogic({
   type: applications.ISSUE_DEV_EUI,
   process: async ({ action }) => {
@@ -228,6 +241,7 @@ export default [
   issueDevEUILogic,
   getApplicationDevEUICountLogic,
   getMqttConnectionInfoLogic,
+  getApplicationBookmarkNameLogic,
   ...createEventsConnectLogics(
     applications.SHARED_NAME,
     'applications',

@@ -67,6 +67,20 @@ export const [
   (id, selector) => ({ selector }),
 )
 
+export const GET_APP_BOOKMARK_NAME_BASE = 'GET_APPLICATION_BOOKMARK_NAME'
+export const [
+  {
+    request: GET_APP_BOOKMARK_NAME,
+    success: GET_APP_BOOKMARK_NAME_SUCCESS,
+    failure: GET_APP_BOOKMARK_NAME_FAILURE,
+  },
+  {
+    request: getApplicationBookmarkName,
+    success: getApplicationBookmarkNameSuccess,
+    failure: getApplicationBookmarkNameFailure,
+  },
+] = createRequestActions(GET_APP_BOOKMARK_NAME_BASE, id => ({ id }))
+
 export const ISSUE_DEV_EUI_BASE = 'ISSUE_DEV_EUI'
 export const [
   { request: ISSUE_DEV_EUI, success: ISSUE_DEV_EUI_SUCCESS, failure: ISSUE_DEV_EUI_FAILURE },

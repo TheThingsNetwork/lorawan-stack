@@ -26,6 +26,7 @@ import {
   UPDATE_GTW_STATS_FAILURE,
   START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
+  GET_GTW_BOOKMARK_NAME_SUCCESS,
 } from '@console/store/actions/gateways'
 
 const defaultStatisticsState = {
@@ -81,6 +82,7 @@ const gateways = (state = defaultState, action) => {
         selectedGateway: payload.id,
       }
     case GET_GTW_SUCCESS:
+    case GET_GTW_BOOKMARK_NAME_SUCCESS:
     case UPDATE_GTW_SUCCESS:
       const id = getGatewayId(payload)
 

@@ -57,6 +57,18 @@ const getGatewayLogic = createRequestLogic({
   },
 })
 
+const getGatewayBookmarkNameLogic = createRequestLogic({
+  type: gateways.GET_GTW_BOOKMARK_NAME,
+  process: async ({ action }) => {
+    const { payload } = action
+    const { id = {} } = payload
+    const gtw = await tts.Gateways.getById(id, 'name')
+    trackEntityAccess(GATEWAY, id)
+
+    return gtw
+  },
+})
+
 const updateGatewayLogic = createRequestLogic({
   type: gateways.UPDATE_GTW,
   process: async ({ action }) => {
@@ -280,5 +292,6 @@ export default [
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
   getGatewayEventLocationLogic,
+  getGatewayBookmarkNameLogic,
   ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', tts.Gateways.openStream),
 ]
