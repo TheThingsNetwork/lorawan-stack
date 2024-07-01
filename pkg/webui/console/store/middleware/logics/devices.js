@@ -56,12 +56,12 @@ const getDeviceLogic = createRequestLogic({
   process: async ({ action, getState }, dispatch) => {
     const {
       payload: { appId, deviceId },
-      meta: {
-        selector,
-        options: { fetchModel, modelSelector, cache = false, startStream = true, components },
-      },
+      meta: { selector, options },
     } = action
-    const composedSelector = fetchModel ? [...selector, 'version_ids'] : selector
+
+    const cache = options?.cache ?? false
+    const startStream = options?.startStream ?? true
+    const composedSelector = options?.fetchModel ? [...selector, 'version_ids'] : selector
     const state = getState()
     let dev
     let model
@@ -69,11 +69,16 @@ const getDeviceLogic = createRequestLogic({
     if (cache) {
       dev = selectDeviceByIds(state, appId, deviceId)
       if (dev && fullfillsSelector(dev, composedSelector)) {
-        if (fetchModel && dev.version_ids?.brand_id && dev.version_ids?.model_id) {
+        if (options?.fetchModel && dev.version_ids?.brand_id && dev.version_ids?.model_id) {
           model = selectDeviceModelById(state, dev.version_ids?.brand_id, dev.version_ids?.model_id)
           if (!model) {
             model = await dispatch(
-              getModel(appId, dev.version_ids?.brand_id, dev.version_ids?.model_id, modelSelector),
+              getModel(
+                appId,
+                dev.version_ids?.brand_id,
+                dev.version_ids?.model_id,
+                options?.modelSelector,
+              ),
             )
           }
         }
@@ -81,10 +86,20 @@ const getDeviceLogic = createRequestLogic({
       }
     }
 
-    dev = await tts.Applications.Devices.getById(appId, deviceId, composedSelector, components)
-    if (fetchModel && dev.version_ids?.brand_id && dev.version_ids?.model_id) {
+    dev = await tts.Applications.Devices.getById(
+      appId,
+      deviceId,
+      composedSelector,
+      options?.components,
+    )
+    if (options?.fetchModel && dev.version_ids?.brand_id && dev.version_ids?.model_id) {
       model = await dispatch(
-        getModel(appId, dev.version_ids?.brand_id, dev.version_ids?.model_id, modelSelector),
+        getModel(
+          appId,
+          dev.version_ids?.brand_id,
+          dev.version_ids?.model_id,
+          options?.modelSelector,
+        ),
       )
     }
     trackEntityAccess(END_DEVICE, combineDeviceIds(appId, deviceId))
