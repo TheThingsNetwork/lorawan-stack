@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gatewayconfigurationserver
+package ttkg
 
 import (
 	"testing"
@@ -24,8 +24,8 @@ import (
 )
 
 func TestSetTTKGFirmwareURL(t *testing.T) {
-	buildConfig := func(firmwareURL, channel string) TheThingsGatewayConfig {
-		var c TheThingsGatewayConfig
+	buildConfig := func(firmwareURL, channel string) Config {
+		var c Config
 		c.Default.FirmwareURL = firmwareURL
 		c.Default.UpdateChannel = channel
 		return c
@@ -33,7 +33,7 @@ func TestSetTTKGFirmwareURL(t *testing.T) {
 
 	for _, tt := range []struct {
 		Name          string
-		Config        TheThingsGatewayConfig
+		Config        Config
 		UpdateChannel string
 		ExpectedURL   string
 	}{
@@ -67,7 +67,7 @@ func TestSetTTKGFirmwareURL(t *testing.T) {
 	} {
 		t.Run(tt.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			s := New(componenttest.NewComponent(t, &component.Config{}), WithTheThingsGatewayConfig(tt.Config))
+			s := New(componenttest.NewComponent(t, &component.Config{}), WithConfig(tt.Config))
 			url := s.ttkgFirmwareURL(tt.UpdateChannel)
 			a.So(url, should.Equal, tt.ExpectedURL)
 		})
@@ -78,7 +78,7 @@ func TestInferMQTTAddress(t *testing.T) {
 	for _, tt := range []struct {
 		Name    string
 		Address string
-		Config  TheThingsGatewayConfig
+		Config  Config
 		Assert  func(*assertions.Assertion, string, error)
 	}{
 		{
@@ -148,7 +148,7 @@ func TestInferMQTTAddress(t *testing.T) {
 	} {
 		t.Run(tt.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			s := New(componenttest.NewComponent(t, &component.Config{}), WithTheThingsGatewayConfig(tt.Config))
+			s := New(componenttest.NewComponent(t, &component.Config{}), WithConfig(tt.Config))
 			address, err := s.inferMQTTAddress(tt.Address)
 			tt.Assert(a, address, err)
 		})

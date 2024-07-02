@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gatewayconfigurationserver
+package ttkg
 
 import (
 	"context"
@@ -30,7 +30,7 @@ import (
 type Server struct {
 	component *component.Component
 
-	ttgConfig TheThingsGatewayConfig
+	ttgConfig Config
 
 	registry ttnpb.GatewayRegistryClient
 	auth     func(context.Context) grpc.CallOption
@@ -71,8 +71,8 @@ func WithAuth(auth func(ctx context.Context) grpc.CallOption) Option {
 	}
 }
 
-// WithTheThingsGatewayConfig overrides the Server's configuration for The Things Gateway.
-func WithTheThingsGatewayConfig(config TheThingsGatewayConfig) Option {
+// WithConfig overrides the Server's configuration for The Things Gateway.
+func WithConfig(config Config) Option {
 	return func(s *Server) {
 		s.ttgConfig = config
 	}
@@ -83,7 +83,7 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 	router := server.APIRouter()
 
 	middleware := []webmiddleware.MiddlewareFunc{
-		webmiddleware.Namespace("gatewayconfigurationserver/v2"),
+		webmiddleware.Namespace("gatewayconfigurationserver/ttkg"),
 		rewriteAuthorization,
 		webmiddleware.Metadata("Authorization"),
 		ratelimit.HTTPMiddleware(s.component.RateLimiter(), "http:gcs"),

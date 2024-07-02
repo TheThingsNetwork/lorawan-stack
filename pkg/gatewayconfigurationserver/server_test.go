@@ -475,6 +475,6 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 }
 
 func init() {
-	testConfig.TheThingsGateway.Default.FirmwareURL = "http://example.com"
-	testConfig.TheThingsGateway.Default.UpdateChannel = "stable"
+	testConfig.TheThingsKickstarterGateway.Default.FirmwareURL = "http://example.com"
+	testConfig.TheThingsKickstarterGateway.Default.UpdateChannel = "stable"
 }
