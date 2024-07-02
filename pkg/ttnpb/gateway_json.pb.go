@@ -1308,11 +1308,11 @@ func (x *ManagedGatewayEventData) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("location")
 			ov.Location.MarshalProtoJSON(s.WithField("location"))
-		case *ManagedGatewayEventData_SystemMetrics:
+		case *ManagedGatewayEventData_SystemStatus:
 			s.WriteMoreIf(&wroteField)
-			s.WriteObjectField("system_metrics")
-			// NOTE: ManagedGatewaySystemMetrics does not seem to implement MarshalProtoJSON.
-			golang.MarshalMessage(s, ov.SystemMetrics)
+			s.WriteObjectField("system_status")
+			// NOTE: ManagedGatewaySystemStatus does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, ov.SystemStatus)
 		case *ManagedGatewayEventData_ControllerConnection:
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("controller_connection")
@@ -1370,18 +1370,18 @@ func (x *ManagedGatewayEventData) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			}
 			ov.Location = &Location{}
 			ov.Location.UnmarshalProtoJSON(s.WithField("location", true))
-		case "system_metrics", "systemMetrics":
-			s.AddField("system_metrics")
-			ov := &ManagedGatewayEventData_SystemMetrics{}
+		case "system_status", "systemStatus":
+			s.AddField("system_status")
+			ov := &ManagedGatewayEventData_SystemStatus{}
 			x.Data = ov
 			if s.ReadNil() {
-				ov.SystemMetrics = nil
+				ov.SystemStatus = nil
 				return
 			}
-			// NOTE: ManagedGatewaySystemMetrics does not seem to implement UnmarshalProtoJSON.
-			var v ManagedGatewaySystemMetrics
+			// NOTE: ManagedGatewaySystemStatus does not seem to implement UnmarshalProtoJSON.
+			var v ManagedGatewaySystemStatus
 			golang.UnmarshalMessage(s, &v)
-			ov.SystemMetrics = &v
+			ov.SystemStatus = &v
 		case "controller_connection", "controllerConnection":
 			ov := &ManagedGatewayEventData_ControllerConnection{}
 			x.Data = ov
@@ -2892,71 +2892,5 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 
 // UnmarshalJSON unmarshals the GatewayConnectionStats from JSON.
 func (x *GatewayConnectionStats) UnmarshalJSON(b []byte) error {
-	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the UpdateManagedGatewayRequest message to JSON.
-func (x *UpdateManagedGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.Gateway != nil || s.HasField("gateway") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("gateway")
-		x.Gateway.MarshalProtoJSON(s.WithField("gateway"))
-	}
-	if x.FieldMask != nil || s.HasField("field_mask") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("field_mask")
-		if x.FieldMask == nil {
-			s.WriteNil()
-		} else {
-			golang.MarshalLegacyFieldMask(s, x.FieldMask)
-		}
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the UpdateManagedGatewayRequest to JSON.
-func (x *UpdateManagedGatewayRequest) MarshalJSON() ([]byte, error) {
-	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the UpdateManagedGatewayRequest message from JSON.
-func (x *UpdateManagedGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.ReadAny() // ignore unknown field
-		case "gateway":
-			if s.ReadNil() {
-				x.Gateway = nil
-				return
-			}
-			x.Gateway = &ManagedGateway{}
-			x.Gateway.UnmarshalProtoJSON(s.WithField("gateway", true))
-		case "field_mask", "fieldMask":
-			s.AddField("field_mask")
-			if s.ReadNil() {
-				x.FieldMask = nil
-				return
-			}
-			v := golang.UnmarshalFieldMask(s)
-			if s.Err() != nil {
-				return
-			}
-			x.FieldMask = v
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the UpdateManagedGatewayRequest from JSON.
-func (x *UpdateManagedGatewayRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

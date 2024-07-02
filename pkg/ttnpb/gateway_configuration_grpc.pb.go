@@ -25,6 +25,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -350,5 +351,483 @@ var ManagedGatewayConfigurationService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
+	Metadata: "ttn/lorawan/v3/gateway_configuration.proto",
+}
+
+const (
+	ManagedGatewayWiFiProfileConfigurationService_Create_FullMethodName = "/ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService/Create"
+	ManagedGatewayWiFiProfileConfigurationService_Update_FullMethodName = "/ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService/Update"
+	ManagedGatewayWiFiProfileConfigurationService_List_FullMethodName   = "/ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService/List"
+	ManagedGatewayWiFiProfileConfigurationService_Get_FullMethodName    = "/ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService/Get"
+	ManagedGatewayWiFiProfileConfigurationService_Delete_FullMethodName = "/ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService/Delete"
+)
+
+// ManagedGatewayWiFiProfileConfigurationServiceClient is the client API for ManagedGatewayWiFiProfileConfigurationService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ManagedGatewayWiFiProfileConfigurationServiceClient interface {
+	Create(ctx context.Context, in *CreateManagedGatewayWiFiProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayWiFiProfile, error)
+	Update(ctx context.Context, in *UpdateManagedGatewayWiFiProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayWiFiProfile, error)
+	List(ctx context.Context, in *ListManagedGatewayWiFiProfilesRequest, opts ...grpc.CallOption) (*ManagedGatewayWiFiProfiles, error)
+	Get(ctx context.Context, in *GetManagedGatewayWiFiProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayWiFiProfile, error)
+	Delete(ctx context.Context, in *DeleteManagedGatewayWiFiProfileRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type managedGatewayWiFiProfileConfigurationServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewManagedGatewayWiFiProfileConfigurationServiceClient(cc grpc.ClientConnInterface) ManagedGatewayWiFiProfileConfigurationServiceClient {
+	return &managedGatewayWiFiProfileConfigurationServiceClient{cc}
+}
+
+func (c *managedGatewayWiFiProfileConfigurationServiceClient) Create(ctx context.Context, in *CreateManagedGatewayWiFiProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayWiFiProfile, error) {
+	out := new(ManagedGatewayWiFiProfile)
+	err := c.cc.Invoke(ctx, ManagedGatewayWiFiProfileConfigurationService_Create_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayWiFiProfileConfigurationServiceClient) Update(ctx context.Context, in *UpdateManagedGatewayWiFiProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayWiFiProfile, error) {
+	out := new(ManagedGatewayWiFiProfile)
+	err := c.cc.Invoke(ctx, ManagedGatewayWiFiProfileConfigurationService_Update_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayWiFiProfileConfigurationServiceClient) List(ctx context.Context, in *ListManagedGatewayWiFiProfilesRequest, opts ...grpc.CallOption) (*ManagedGatewayWiFiProfiles, error) {
+	out := new(ManagedGatewayWiFiProfiles)
+	err := c.cc.Invoke(ctx, ManagedGatewayWiFiProfileConfigurationService_List_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayWiFiProfileConfigurationServiceClient) Get(ctx context.Context, in *GetManagedGatewayWiFiProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayWiFiProfile, error) {
+	out := new(ManagedGatewayWiFiProfile)
+	err := c.cc.Invoke(ctx, ManagedGatewayWiFiProfileConfigurationService_Get_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayWiFiProfileConfigurationServiceClient) Delete(ctx context.Context, in *DeleteManagedGatewayWiFiProfileRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ManagedGatewayWiFiProfileConfigurationService_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ManagedGatewayWiFiProfileConfigurationServiceServer is the server API for ManagedGatewayWiFiProfileConfigurationService service.
+// All implementations must embed UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer
+// for forward compatibility
+type ManagedGatewayWiFiProfileConfigurationServiceServer interface {
+	Create(context.Context, *CreateManagedGatewayWiFiProfileRequest) (*ManagedGatewayWiFiProfile, error)
+	Update(context.Context, *UpdateManagedGatewayWiFiProfileRequest) (*ManagedGatewayWiFiProfile, error)
+	List(context.Context, *ListManagedGatewayWiFiProfilesRequest) (*ManagedGatewayWiFiProfiles, error)
+	Get(context.Context, *GetManagedGatewayWiFiProfileRequest) (*ManagedGatewayWiFiProfile, error)
+	Delete(context.Context, *DeleteManagedGatewayWiFiProfileRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedManagedGatewayWiFiProfileConfigurationServiceServer()
+}
+
+// UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer struct {
+}
+
+func (UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer) Create(context.Context, *CreateManagedGatewayWiFiProfileRequest) (*ManagedGatewayWiFiProfile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer) Update(context.Context, *UpdateManagedGatewayWiFiProfileRequest) (*ManagedGatewayWiFiProfile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer) List(context.Context, *ListManagedGatewayWiFiProfilesRequest) (*ManagedGatewayWiFiProfiles, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer) Get(context.Context, *GetManagedGatewayWiFiProfileRequest) (*ManagedGatewayWiFiProfile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer) Delete(context.Context, *DeleteManagedGatewayWiFiProfileRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedManagedGatewayWiFiProfileConfigurationServiceServer) mustEmbedUnimplementedManagedGatewayWiFiProfileConfigurationServiceServer() {
+}
+
+// UnsafeManagedGatewayWiFiProfileConfigurationServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ManagedGatewayWiFiProfileConfigurationServiceServer will
+// result in compilation errors.
+type UnsafeManagedGatewayWiFiProfileConfigurationServiceServer interface {
+	mustEmbedUnimplementedManagedGatewayWiFiProfileConfigurationServiceServer()
+}
+
+func RegisterManagedGatewayWiFiProfileConfigurationServiceServer(s grpc.ServiceRegistrar, srv ManagedGatewayWiFiProfileConfigurationServiceServer) {
+	s.RegisterService(&ManagedGatewayWiFiProfileConfigurationService_ServiceDesc, srv)
+}
+
+func _ManagedGatewayWiFiProfileConfigurationService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateManagedGatewayWiFiProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayWiFiProfileConfigurationService_Create_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).Create(ctx, req.(*CreateManagedGatewayWiFiProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayWiFiProfileConfigurationService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateManagedGatewayWiFiProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayWiFiProfileConfigurationService_Update_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).Update(ctx, req.(*UpdateManagedGatewayWiFiProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayWiFiProfileConfigurationService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListManagedGatewayWiFiProfilesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayWiFiProfileConfigurationService_List_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).List(ctx, req.(*ListManagedGatewayWiFiProfilesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayWiFiProfileConfigurationService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetManagedGatewayWiFiProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayWiFiProfileConfigurationService_Get_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).Get(ctx, req.(*GetManagedGatewayWiFiProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayWiFiProfileConfigurationService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteManagedGatewayWiFiProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayWiFiProfileConfigurationService_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayWiFiProfileConfigurationServiceServer).Delete(ctx, req.(*DeleteManagedGatewayWiFiProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ManagedGatewayWiFiProfileConfigurationService_ServiceDesc is the grpc.ServiceDesc for ManagedGatewayWiFiProfileConfigurationService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ManagedGatewayWiFiProfileConfigurationService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService",
+	HandlerType: (*ManagedGatewayWiFiProfileConfigurationServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Create",
+			Handler:    _ManagedGatewayWiFiProfileConfigurationService_Create_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _ManagedGatewayWiFiProfileConfigurationService_Update_Handler,
+		},
+		{
+			MethodName: "List",
+			Handler:    _ManagedGatewayWiFiProfileConfigurationService_List_Handler,
+		},
+		{
+			MethodName: "Get",
+			Handler:    _ManagedGatewayWiFiProfileConfigurationService_Get_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _ManagedGatewayWiFiProfileConfigurationService_Delete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/gateway_configuration.proto",
+}
+
+const (
+	ManagedGatewayEthernetProfileConfigurationService_Create_FullMethodName = "/ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService/Create"
+	ManagedGatewayEthernetProfileConfigurationService_Update_FullMethodName = "/ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService/Update"
+	ManagedGatewayEthernetProfileConfigurationService_List_FullMethodName   = "/ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService/List"
+	ManagedGatewayEthernetProfileConfigurationService_Get_FullMethodName    = "/ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService/Get"
+	ManagedGatewayEthernetProfileConfigurationService_Delete_FullMethodName = "/ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService/Delete"
+)
+
+// ManagedGatewayEthernetProfileConfigurationServiceClient is the client API for ManagedGatewayEthernetProfileConfigurationService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ManagedGatewayEthernetProfileConfigurationServiceClient interface {
+	Create(ctx context.Context, in *CreateManagedGatewayEthernetProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayEthernetProfile, error)
+	Update(ctx context.Context, in *UpdateManagedGatewayEthernetProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayEthernetProfile, error)
+	List(ctx context.Context, in *ListManagedGatewayEthernetProfilesRequest, opts ...grpc.CallOption) (*ManagedGatewayEthernetProfiles, error)
+	Get(ctx context.Context, in *GetManagedGatewayEthernetProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayEthernetProfile, error)
+	Delete(ctx context.Context, in *DeleteManagedGatewayEthernetProfileRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type managedGatewayEthernetProfileConfigurationServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewManagedGatewayEthernetProfileConfigurationServiceClient(cc grpc.ClientConnInterface) ManagedGatewayEthernetProfileConfigurationServiceClient {
+	return &managedGatewayEthernetProfileConfigurationServiceClient{cc}
+}
+
+func (c *managedGatewayEthernetProfileConfigurationServiceClient) Create(ctx context.Context, in *CreateManagedGatewayEthernetProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayEthernetProfile, error) {
+	out := new(ManagedGatewayEthernetProfile)
+	err := c.cc.Invoke(ctx, ManagedGatewayEthernetProfileConfigurationService_Create_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayEthernetProfileConfigurationServiceClient) Update(ctx context.Context, in *UpdateManagedGatewayEthernetProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayEthernetProfile, error) {
+	out := new(ManagedGatewayEthernetProfile)
+	err := c.cc.Invoke(ctx, ManagedGatewayEthernetProfileConfigurationService_Update_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayEthernetProfileConfigurationServiceClient) List(ctx context.Context, in *ListManagedGatewayEthernetProfilesRequest, opts ...grpc.CallOption) (*ManagedGatewayEthernetProfiles, error) {
+	out := new(ManagedGatewayEthernetProfiles)
+	err := c.cc.Invoke(ctx, ManagedGatewayEthernetProfileConfigurationService_List_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayEthernetProfileConfigurationServiceClient) Get(ctx context.Context, in *GetManagedGatewayEthernetProfileRequest, opts ...grpc.CallOption) (*ManagedGatewayEthernetProfile, error) {
+	out := new(ManagedGatewayEthernetProfile)
+	err := c.cc.Invoke(ctx, ManagedGatewayEthernetProfileConfigurationService_Get_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managedGatewayEthernetProfileConfigurationServiceClient) Delete(ctx context.Context, in *DeleteManagedGatewayEthernetProfileRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ManagedGatewayEthernetProfileConfigurationService_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ManagedGatewayEthernetProfileConfigurationServiceServer is the server API for ManagedGatewayEthernetProfileConfigurationService service.
+// All implementations must embed UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer
+// for forward compatibility
+type ManagedGatewayEthernetProfileConfigurationServiceServer interface {
+	Create(context.Context, *CreateManagedGatewayEthernetProfileRequest) (*ManagedGatewayEthernetProfile, error)
+	Update(context.Context, *UpdateManagedGatewayEthernetProfileRequest) (*ManagedGatewayEthernetProfile, error)
+	List(context.Context, *ListManagedGatewayEthernetProfilesRequest) (*ManagedGatewayEthernetProfiles, error)
+	Get(context.Context, *GetManagedGatewayEthernetProfileRequest) (*ManagedGatewayEthernetProfile, error)
+	Delete(context.Context, *DeleteManagedGatewayEthernetProfileRequest) (*emptypb.Empty, error)
+	mustEmbedUnimplementedManagedGatewayEthernetProfileConfigurationServiceServer()
+}
+
+// UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer struct {
+}
+
+func (UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer) Create(context.Context, *CreateManagedGatewayEthernetProfileRequest) (*ManagedGatewayEthernetProfile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer) Update(context.Context, *UpdateManagedGatewayEthernetProfileRequest) (*ManagedGatewayEthernetProfile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer) List(context.Context, *ListManagedGatewayEthernetProfilesRequest) (*ManagedGatewayEthernetProfiles, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer) Get(context.Context, *GetManagedGatewayEthernetProfileRequest) (*ManagedGatewayEthernetProfile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer) Delete(context.Context, *DeleteManagedGatewayEthernetProfileRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedManagedGatewayEthernetProfileConfigurationServiceServer) mustEmbedUnimplementedManagedGatewayEthernetProfileConfigurationServiceServer() {
+}
+
+// UnsafeManagedGatewayEthernetProfileConfigurationServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ManagedGatewayEthernetProfileConfigurationServiceServer will
+// result in compilation errors.
+type UnsafeManagedGatewayEthernetProfileConfigurationServiceServer interface {
+	mustEmbedUnimplementedManagedGatewayEthernetProfileConfigurationServiceServer()
+}
+
+func RegisterManagedGatewayEthernetProfileConfigurationServiceServer(s grpc.ServiceRegistrar, srv ManagedGatewayEthernetProfileConfigurationServiceServer) {
+	s.RegisterService(&ManagedGatewayEthernetProfileConfigurationService_ServiceDesc, srv)
+}
+
+func _ManagedGatewayEthernetProfileConfigurationService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateManagedGatewayEthernetProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayEthernetProfileConfigurationService_Create_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).Create(ctx, req.(*CreateManagedGatewayEthernetProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayEthernetProfileConfigurationService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateManagedGatewayEthernetProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayEthernetProfileConfigurationService_Update_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).Update(ctx, req.(*UpdateManagedGatewayEthernetProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayEthernetProfileConfigurationService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListManagedGatewayEthernetProfilesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayEthernetProfileConfigurationService_List_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).List(ctx, req.(*ListManagedGatewayEthernetProfilesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayEthernetProfileConfigurationService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetManagedGatewayEthernetProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayEthernetProfileConfigurationService_Get_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).Get(ctx, req.(*GetManagedGatewayEthernetProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagedGatewayEthernetProfileConfigurationService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteManagedGatewayEthernetProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ManagedGatewayEthernetProfileConfigurationService_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagedGatewayEthernetProfileConfigurationServiceServer).Delete(ctx, req.(*DeleteManagedGatewayEthernetProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ManagedGatewayEthernetProfileConfigurationService_ServiceDesc is the grpc.ServiceDesc for ManagedGatewayEthernetProfileConfigurationService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ManagedGatewayEthernetProfileConfigurationService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService",
+	HandlerType: (*ManagedGatewayEthernetProfileConfigurationServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Create",
+			Handler:    _ManagedGatewayEthernetProfileConfigurationService_Create_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _ManagedGatewayEthernetProfileConfigurationService_Update_Handler,
+		},
+		{
+			MethodName: "List",
+			Handler:    _ManagedGatewayEthernetProfileConfigurationService_List_Handler,
+		},
+		{
+			MethodName: "Get",
+			Handler:    _ManagedGatewayEthernetProfileConfigurationService_Get_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _ManagedGatewayEthernetProfileConfigurationService_Delete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "ttn/lorawan/v3/gateway_configuration.proto",
 }

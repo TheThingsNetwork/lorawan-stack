@@ -17,7 +17,10 @@ syntax = "proto3";
 package ttn.lorawan.v3;
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "thethings/flags/annotations.proto";
 import "ttn/lorawan/v3/gateway.proto";
 import "ttn/lorawan/v3/identifiers.proto";
 import "validate/validate.proto";
@@ -55,6 +58,88 @@ service GatewayConfigurationService {
   }
 }
 
+message UpdateManagedGatewayRequest {
+  ManagedGateway gateway = 1 [(validate.rules).message.required = true];
+  // The names of the gateway fields that should be updated.
+  google.protobuf.FieldMask field_mask = 2;
+}
+
+message CreateManagedGatewayWiFiProfileRequest {
+  ManagedGatewayWiFiProfile profile = 1 [(validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateManagedGatewayWiFiProfileRequest {
+  ManagedGatewayWiFiProfile profile = 1 [(validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
+  // The names of the gateway fields that should be updated.
+  google.protobuf.FieldMask field_mask = 3;
+}
+
+message ListManagedGatewayWiFiProfilesRequest {
+  option (thethings.flags.message) = {
+    select: false
+    set: true
+  };
+  OrganizationOrUserIdentifiers collaborator = 1 [(validate.rules).message.required = true];
+  // The names of the gateway fields that should be returned.
+  google.protobuf.FieldMask field_mask = 2;
+  // Limit the number of results per page.
+  uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 5;
+}
+
+message GetManagedGatewayWiFiProfileRequest {
+  OrganizationOrUserIdentifiers collaborator = 1 [(validate.rules).message.required = true];
+  string profile_id = 2 [(validate.rules).string.uuid = true];
+  // The names of the gateway fields that should be returned.
+  google.protobuf.FieldMask field_mask = 3;
+}
+
+message DeleteManagedGatewayWiFiProfileRequest {
+  OrganizationOrUserIdentifiers collaborator = 1 [(validate.rules).message.required = true];
+  string profile_id = 2 [(validate.rules).string.uuid = true];
+}
+
+message CreateManagedGatewayEthernetProfileRequest {
+  ManagedGatewayEthernetProfile profile = 1 [(validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
+}
+
+message UpdateManagedGatewayEthernetProfileRequest {
+  ManagedGatewayEthernetProfile profile = 1 [(validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
+  // The names of the gateway fields that should be updated.
+  google.protobuf.FieldMask field_mask = 3;
+}
+
+message ListManagedGatewayEthernetProfilesRequest {
+  option (thethings.flags.message) = {
+    select: false
+    set: true
+  };
+  OrganizationOrUserIdentifiers collaborator = 1 [(validate.rules).message.required = true];
+  // The names of the gateway fields that should be returned.
+  google.protobuf.FieldMask field_mask = 2;
+  // Limit the number of results per page.
+  uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 5;
+}
+
+message GetManagedGatewayEthernetProfileRequest {
+  OrganizationOrUserIdentifiers collaborator = 1 [(validate.rules).message.required = true];
+  string profile_id = 2 [(validate.rules).string.uuid = true];
+  // The names of the gateway fields that should be returned.
+  google.protobuf.FieldMask field_mask = 3;
+}
+
+message DeleteManagedGatewayEthernetProfileRequest {
+  OrganizationOrUserIdentifiers collaborator = 1 [(validate.rules).message.required = true];
+  string profile_id = 2 [(validate.rules).string.uuid = true];
+}
+
 service ManagedGatewayConfigurationService {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Configure managed gateways."};
 
@@ -80,6 +165,108 @@ service ManagedGatewayConfigurationService {
     option (google.api.http) = {
       post: "/gcs/gateways/managed/{gateway_id}/wifi/scan"
       body: "*"
+    };
+  }
+}
+
+service ManagedGatewayWiFiProfileConfigurationService {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Configure WiFi profiles for managed gateways."};
+
+  rpc Create(CreateManagedGatewayWiFiProfileRequest) returns (ManagedGatewayWiFiProfile) {
+    option (google.api.http) = {
+      additional_bindings: {
+        post: "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}"
+        body: "*"
+      }
+      additional_bindings: {
+        post: "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}"
+        body: "*"
+      }
+    };
+  }
+
+  rpc Update(UpdateManagedGatewayWiFiProfileRequest) returns (ManagedGatewayWiFiProfile) {
+    option (google.api.http) = {
+      additional_bindings: {
+        put: "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile.profile_id}"
+        body: "*"
+      }
+      additional_bindings: {
+        put: "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile.profile_id}"
+        body: "*"
+      }
+    };
+  }
+
+  rpc List(ListManagedGatewayWiFiProfilesRequest) returns (ManagedGatewayWiFiProfiles) {
+    option (google.api.http) = {
+      additional_bindings: {get: "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}"}
+      additional_bindings: {get: "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}"}
+    };
+  }
+
+  rpc Get(GetManagedGatewayWiFiProfileRequest) returns (ManagedGatewayWiFiProfile) {
+    option (google.api.http) = {
+      additional_bindings: {get: "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile_id}"}
+      additional_bindings: {get: "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile_id}"}
+    };
+  }
+
+  rpc Delete(DeleteManagedGatewayWiFiProfileRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      additional_bindings: {delete: "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile_id}"}
+      additional_bindings: {delete: "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile_id}"}
+    };
+  }
+}
+
+service ManagedGatewayEthernetProfileConfigurationService {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {description: "Configure Ethernet profiles for managed gateways."};
+
+  rpc Create(CreateManagedGatewayEthernetProfileRequest) returns (ManagedGatewayEthernetProfile) {
+    option (google.api.http) = {
+      additional_bindings: {
+        post: "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}"
+        body: "*"
+      }
+      additional_bindings: {
+        post: "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}"
+        body: "*"
+      }
+    };
+  }
+
+  rpc Update(UpdateManagedGatewayEthernetProfileRequest) returns (ManagedGatewayEthernetProfile) {
+    option (google.api.http) = {
+      additional_bindings: {
+        put: "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile.profile_id}"
+        body: "*"
+      }
+      additional_bindings: {
+        put: "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile.profile_id}"
+        body: "*"
+      }
+    };
+  }
+
+  rpc List(ListManagedGatewayEthernetProfilesRequest) returns (ManagedGatewayEthernetProfiles) {
+    option (google.api.http) = {
+      additional_bindings: {get: "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}"}
+      additional_bindings: {get: "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}"}
+    };
+  }
+
+  rpc Get(GetManagedGatewayEthernetProfileRequest) returns (ManagedGatewayEthernetProfile) {
+    option (google.api.http) = {
+      additional_bindings: {get: "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile_id}"}
+      additional_bindings: {get: "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile_id}"}
+    };
+  }
+
+  rpc Delete(DeleteManagedGatewayEthernetProfileRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      additional_bindings: {delete: "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile_id}"}
+      additional_bindings: {delete: "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile_id}"}
     };
   }
 }

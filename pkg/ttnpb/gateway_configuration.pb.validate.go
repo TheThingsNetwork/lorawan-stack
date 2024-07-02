@@ -32,6 +32,9 @@ var (
 	_ = anypb.Any{}
 )
 
+// define the regex for a UUID once up-front
+var _gateway_configuration_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
 // ValidateFields checks the field values on GetGatewayConfigurationRequest
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.
@@ -270,3 +273,1368 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetGatewayConfigurationResponseValidationError{}
+
+// ValidateFields checks the field values on UpdateManagedGatewayRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *UpdateManagedGatewayRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = UpdateManagedGatewayRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway":
+
+			if m.GetGateway() == nil {
+				return UpdateManagedGatewayRequestValidationError{
+					field:  "gateway",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGateway()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateManagedGatewayRequestValidationError{
+						field:  "gateway",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateManagedGatewayRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return UpdateManagedGatewayRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// UpdateManagedGatewayRequestValidationError is the validation error returned
+// by UpdateManagedGatewayRequest.ValidateFields if the designated constraints
+// aren't met.
+type UpdateManagedGatewayRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateManagedGatewayRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateManagedGatewayRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateManagedGatewayRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateManagedGatewayRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateManagedGatewayRequestValidationError) ErrorName() string {
+	return "UpdateManagedGatewayRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateManagedGatewayRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateManagedGatewayRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateManagedGatewayRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateManagedGatewayRequestValidationError{}
+
+// ValidateFields checks the field values on
+// CreateManagedGatewayWiFiProfileRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *CreateManagedGatewayWiFiProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CreateManagedGatewayWiFiProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "profile":
+
+			if m.GetProfile() == nil {
+				return CreateManagedGatewayWiFiProfileRequestValidationError{
+					field:  "profile",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetProfile()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return CreateManagedGatewayWiFiProfileRequestValidationError{
+						field:  "profile",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return CreateManagedGatewayWiFiProfileRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return CreateManagedGatewayWiFiProfileRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return CreateManagedGatewayWiFiProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CreateManagedGatewayWiFiProfileRequestValidationError is the validation
+// error returned by CreateManagedGatewayWiFiProfileRequest.ValidateFields if
+// the designated constraints aren't met.
+type CreateManagedGatewayWiFiProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateManagedGatewayWiFiProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateManagedGatewayWiFiProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateManagedGatewayWiFiProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateManagedGatewayWiFiProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateManagedGatewayWiFiProfileRequestValidationError) ErrorName() string {
+	return "CreateManagedGatewayWiFiProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateManagedGatewayWiFiProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateManagedGatewayWiFiProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateManagedGatewayWiFiProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateManagedGatewayWiFiProfileRequestValidationError{}
+
+// ValidateFields checks the field values on
+// UpdateManagedGatewayWiFiProfileRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *UpdateManagedGatewayWiFiProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = UpdateManagedGatewayWiFiProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "profile":
+
+			if m.GetProfile() == nil {
+				return UpdateManagedGatewayWiFiProfileRequestValidationError{
+					field:  "profile",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetProfile()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateManagedGatewayWiFiProfileRequestValidationError{
+						field:  "profile",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return UpdateManagedGatewayWiFiProfileRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateManagedGatewayWiFiProfileRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateManagedGatewayWiFiProfileRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return UpdateManagedGatewayWiFiProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// UpdateManagedGatewayWiFiProfileRequestValidationError is the validation
+// error returned by UpdateManagedGatewayWiFiProfileRequest.ValidateFields if
+// the designated constraints aren't met.
+type UpdateManagedGatewayWiFiProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateManagedGatewayWiFiProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateManagedGatewayWiFiProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateManagedGatewayWiFiProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateManagedGatewayWiFiProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateManagedGatewayWiFiProfileRequestValidationError) ErrorName() string {
+	return "UpdateManagedGatewayWiFiProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateManagedGatewayWiFiProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateManagedGatewayWiFiProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateManagedGatewayWiFiProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateManagedGatewayWiFiProfileRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ListManagedGatewayWiFiProfilesRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ListManagedGatewayWiFiProfilesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListManagedGatewayWiFiProfilesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return ListManagedGatewayWiFiProfilesRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListManagedGatewayWiFiProfilesRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListManagedGatewayWiFiProfilesRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListManagedGatewayWiFiProfilesRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		default:
+			return ListManagedGatewayWiFiProfilesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListManagedGatewayWiFiProfilesRequestValidationError is the validation error
+// returned by ListManagedGatewayWiFiProfilesRequest.ValidateFields if the
+// designated constraints aren't met.
+type ListManagedGatewayWiFiProfilesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListManagedGatewayWiFiProfilesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListManagedGatewayWiFiProfilesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListManagedGatewayWiFiProfilesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListManagedGatewayWiFiProfilesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListManagedGatewayWiFiProfilesRequestValidationError) ErrorName() string {
+	return "ListManagedGatewayWiFiProfilesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListManagedGatewayWiFiProfilesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListManagedGatewayWiFiProfilesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListManagedGatewayWiFiProfilesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListManagedGatewayWiFiProfilesRequestValidationError{}
+
+// ValidateFields checks the field values on
+// GetManagedGatewayWiFiProfileRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *GetManagedGatewayWiFiProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetManagedGatewayWiFiProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return GetManagedGatewayWiFiProfileRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetManagedGatewayWiFiProfileRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "profile_id":
+
+			if err := m._validateUuid(m.GetProfileId()); err != nil {
+				return GetManagedGatewayWiFiProfileRequestValidationError{
+					field:  "profile_id",
+					reason: "value must be a valid UUID",
+					cause:  err,
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetManagedGatewayWiFiProfileRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetManagedGatewayWiFiProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+func (m *GetManagedGatewayWiFiProfileRequest) _validateUuid(uuid string) error {
+	if matched := _gateway_configuration_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// GetManagedGatewayWiFiProfileRequestValidationError is the validation error
+// returned by GetManagedGatewayWiFiProfileRequest.ValidateFields if the
+// designated constraints aren't met.
+type GetManagedGatewayWiFiProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetManagedGatewayWiFiProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetManagedGatewayWiFiProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetManagedGatewayWiFiProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetManagedGatewayWiFiProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetManagedGatewayWiFiProfileRequestValidationError) ErrorName() string {
+	return "GetManagedGatewayWiFiProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetManagedGatewayWiFiProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetManagedGatewayWiFiProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetManagedGatewayWiFiProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetManagedGatewayWiFiProfileRequestValidationError{}
+
+// ValidateFields checks the field values on
+// DeleteManagedGatewayWiFiProfileRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *DeleteManagedGatewayWiFiProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DeleteManagedGatewayWiFiProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return DeleteManagedGatewayWiFiProfileRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteManagedGatewayWiFiProfileRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "profile_id":
+
+			if err := m._validateUuid(m.GetProfileId()); err != nil {
+				return DeleteManagedGatewayWiFiProfileRequestValidationError{
+					field:  "profile_id",
+					reason: "value must be a valid UUID",
+					cause:  err,
+				}
+			}
+
+		default:
+			return DeleteManagedGatewayWiFiProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+func (m *DeleteManagedGatewayWiFiProfileRequest) _validateUuid(uuid string) error {
+	if matched := _gateway_configuration_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// DeleteManagedGatewayWiFiProfileRequestValidationError is the validation
+// error returned by DeleteManagedGatewayWiFiProfileRequest.ValidateFields if
+// the designated constraints aren't met.
+type DeleteManagedGatewayWiFiProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteManagedGatewayWiFiProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteManagedGatewayWiFiProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteManagedGatewayWiFiProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteManagedGatewayWiFiProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteManagedGatewayWiFiProfileRequestValidationError) ErrorName() string {
+	return "DeleteManagedGatewayWiFiProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteManagedGatewayWiFiProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteManagedGatewayWiFiProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteManagedGatewayWiFiProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteManagedGatewayWiFiProfileRequestValidationError{}
+
+// ValidateFields checks the field values on
+// CreateManagedGatewayEthernetProfileRequest with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *CreateManagedGatewayEthernetProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CreateManagedGatewayEthernetProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "profile":
+
+			if m.GetProfile() == nil {
+				return CreateManagedGatewayEthernetProfileRequestValidationError{
+					field:  "profile",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetProfile()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return CreateManagedGatewayEthernetProfileRequestValidationError{
+						field:  "profile",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return CreateManagedGatewayEthernetProfileRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return CreateManagedGatewayEthernetProfileRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return CreateManagedGatewayEthernetProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CreateManagedGatewayEthernetProfileRequestValidationError is the validation
+// error returned by CreateManagedGatewayEthernetProfileRequest.ValidateFields
+// if the designated constraints aren't met.
+type CreateManagedGatewayEthernetProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateManagedGatewayEthernetProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateManagedGatewayEthernetProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateManagedGatewayEthernetProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateManagedGatewayEthernetProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateManagedGatewayEthernetProfileRequestValidationError) ErrorName() string {
+	return "CreateManagedGatewayEthernetProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateManagedGatewayEthernetProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateManagedGatewayEthernetProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateManagedGatewayEthernetProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateManagedGatewayEthernetProfileRequestValidationError{}
+
+// ValidateFields checks the field values on
+// UpdateManagedGatewayEthernetProfileRequest with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *UpdateManagedGatewayEthernetProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = UpdateManagedGatewayEthernetProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "profile":
+
+			if m.GetProfile() == nil {
+				return UpdateManagedGatewayEthernetProfileRequestValidationError{
+					field:  "profile",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetProfile()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateManagedGatewayEthernetProfileRequestValidationError{
+						field:  "profile",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return UpdateManagedGatewayEthernetProfileRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateManagedGatewayEthernetProfileRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateManagedGatewayEthernetProfileRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return UpdateManagedGatewayEthernetProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// UpdateManagedGatewayEthernetProfileRequestValidationError is the validation
+// error returned by UpdateManagedGatewayEthernetProfileRequest.ValidateFields
+// if the designated constraints aren't met.
+type UpdateManagedGatewayEthernetProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateManagedGatewayEthernetProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateManagedGatewayEthernetProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateManagedGatewayEthernetProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateManagedGatewayEthernetProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateManagedGatewayEthernetProfileRequestValidationError) ErrorName() string {
+	return "UpdateManagedGatewayEthernetProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateManagedGatewayEthernetProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateManagedGatewayEthernetProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateManagedGatewayEthernetProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateManagedGatewayEthernetProfileRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ListManagedGatewayEthernetProfilesRequest with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *ListManagedGatewayEthernetProfilesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListManagedGatewayEthernetProfilesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return ListManagedGatewayEthernetProfilesRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListManagedGatewayEthernetProfilesRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListManagedGatewayEthernetProfilesRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListManagedGatewayEthernetProfilesRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		default:
+			return ListManagedGatewayEthernetProfilesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListManagedGatewayEthernetProfilesRequestValidationError is the validation
+// error returned by ListManagedGatewayEthernetProfilesRequest.ValidateFields
+// if the designated constraints aren't met.
+type ListManagedGatewayEthernetProfilesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListManagedGatewayEthernetProfilesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListManagedGatewayEthernetProfilesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListManagedGatewayEthernetProfilesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListManagedGatewayEthernetProfilesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListManagedGatewayEthernetProfilesRequestValidationError) ErrorName() string {
+	return "ListManagedGatewayEthernetProfilesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListManagedGatewayEthernetProfilesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListManagedGatewayEthernetProfilesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListManagedGatewayEthernetProfilesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListManagedGatewayEthernetProfilesRequestValidationError{}
+
+// ValidateFields checks the field values on
+// GetManagedGatewayEthernetProfileRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *GetManagedGatewayEthernetProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetManagedGatewayEthernetProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return GetManagedGatewayEthernetProfileRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetManagedGatewayEthernetProfileRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "profile_id":
+
+			if err := m._validateUuid(m.GetProfileId()); err != nil {
+				return GetManagedGatewayEthernetProfileRequestValidationError{
+					field:  "profile_id",
+					reason: "value must be a valid UUID",
+					cause:  err,
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetManagedGatewayEthernetProfileRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetManagedGatewayEthernetProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+func (m *GetManagedGatewayEthernetProfileRequest) _validateUuid(uuid string) error {
+	if matched := _gateway_configuration_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// GetManagedGatewayEthernetProfileRequestValidationError is the validation
+// error returned by GetManagedGatewayEthernetProfileRequest.ValidateFields if
+// the designated constraints aren't met.
+type GetManagedGatewayEthernetProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetManagedGatewayEthernetProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetManagedGatewayEthernetProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetManagedGatewayEthernetProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetManagedGatewayEthernetProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetManagedGatewayEthernetProfileRequestValidationError) ErrorName() string {
+	return "GetManagedGatewayEthernetProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetManagedGatewayEthernetProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetManagedGatewayEthernetProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetManagedGatewayEthernetProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetManagedGatewayEthernetProfileRequestValidationError{}
+
+// ValidateFields checks the field values on
+// DeleteManagedGatewayEthernetProfileRequest with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *DeleteManagedGatewayEthernetProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DeleteManagedGatewayEthernetProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "collaborator":
+
+			if m.GetCollaborator() == nil {
+				return DeleteManagedGatewayEthernetProfileRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DeleteManagedGatewayEthernetProfileRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "profile_id":
+
+			if err := m._validateUuid(m.GetProfileId()); err != nil {
+				return DeleteManagedGatewayEthernetProfileRequestValidationError{
+					field:  "profile_id",
+					reason: "value must be a valid UUID",
+					cause:  err,
+				}
+			}
+
+		default:
+			return DeleteManagedGatewayEthernetProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+func (m *DeleteManagedGatewayEthernetProfileRequest) _validateUuid(uuid string) error {
+	if matched := _gateway_configuration_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// DeleteManagedGatewayEthernetProfileRequestValidationError is the validation
+// error returned by DeleteManagedGatewayEthernetProfileRequest.ValidateFields
+// if the designated constraints aren't met.
+type DeleteManagedGatewayEthernetProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteManagedGatewayEthernetProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteManagedGatewayEthernetProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteManagedGatewayEthernetProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteManagedGatewayEthernetProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteManagedGatewayEthernetProfileRequestValidationError) ErrorName() string {
+	return "DeleteManagedGatewayEthernetProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteManagedGatewayEthernetProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteManagedGatewayEthernetProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteManagedGatewayEthernetProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteManagedGatewayEthernetProfileRequestValidationError{}

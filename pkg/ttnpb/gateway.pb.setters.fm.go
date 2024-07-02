@@ -986,17 +986,17 @@ func (dst *ManagedGatewayNetworkInterfaceAddresses) SetFields(src *ManagedGatewa
 	return nil
 }
 
-func (dst *ManagedGatewaySystemMetrics) SetFields(src *ManagedGatewaySystemMetrics, paths ...string) error {
+func (dst *ManagedGatewaySystemStatus) SetFields(src *ManagedGatewaySystemStatus, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "temperature":
+		case "cpu_temperature":
 			if len(subs) > 0 {
-				return fmt.Errorf("'temperature' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'cpu_temperature' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Temperature = src.Temperature
+				dst.CpuTemperature = src.CpuTemperature
 			} else {
-				dst.Temperature = nil
+				dst.CpuTemperature = nil
 			}
 
 		default:
@@ -1377,28 +1377,28 @@ func (dst *ManagedGatewayEventData) SetFields(src *ManagedGatewayEventData, path
 							dst.Data = nil
 						}
 					}
-				case "system_metrics":
+				case "system_status":
 					var srcTypeOk bool
 					if src != nil {
-						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_SystemMetrics)
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_SystemStatus)
 					}
 					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
-						return fmt.Errorf("attempt to set oneof 'system_metrics', while different oneof is set in source")
+						return fmt.Errorf("attempt to set oneof 'system_status', while different oneof is set in source")
 					}
-					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_SystemMetrics)
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_SystemStatus)
 					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
-						return fmt.Errorf("attempt to set oneof 'system_metrics', while different oneof is set in destination")
+						return fmt.Errorf("attempt to set oneof 'system_status', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						var newDst, newSrc *ManagedGatewaySystemMetrics
+						var newDst, newSrc *ManagedGatewaySystemStatus
 						if srcTypeOk {
-							newSrc = src.Data.(*ManagedGatewayEventData_SystemMetrics).SystemMetrics
+							newSrc = src.Data.(*ManagedGatewayEventData_SystemStatus).SystemStatus
 						}
 						if dstTypeOk {
-							newDst = dst.Data.(*ManagedGatewayEventData_SystemMetrics).SystemMetrics
+							newDst = dst.Data.(*ManagedGatewayEventData_SystemStatus).SystemStatus
 						} else if srcTypeOk {
-							newDst = &ManagedGatewaySystemMetrics{}
-							dst.Data = &ManagedGatewayEventData_SystemMetrics{SystemMetrics: newDst}
+							newDst = &ManagedGatewaySystemStatus{}
+							dst.Data = &ManagedGatewayEventData_SystemStatus{SystemStatus: newDst}
 						} else {
 							dst.Data = nil
 							continue
@@ -1597,6 +1597,178 @@ func (dst *ManagedGatewayEventData) SetFields(src *ManagedGatewayEventData, path
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
 				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayWiFiProfile) SetFields(src *ManagedGatewayWiFiProfile, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+		case "profile_name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileName = src.ProfileName
+			} else {
+				var zero string
+				dst.ProfileName = zero
+			}
+		case "ssid":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ssid' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Ssid = src.Ssid
+			} else {
+				var zero string
+				dst.Ssid = zero
+			}
+		case "password":
+			if len(subs) > 0 {
+				return fmt.Errorf("'password' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Password = src.Password
+			} else {
+				var zero string
+				dst.Password = zero
+			}
+		case "network_interface_addresses":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayNetworkInterfaceAddresses
+				if (src == nil || src.NetworkInterfaceAddresses == nil) && dst.NetworkInterfaceAddresses == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkInterfaceAddresses
+				}
+				if dst.NetworkInterfaceAddresses != nil {
+					newDst = dst.NetworkInterfaceAddresses
+				} else {
+					newDst = &ManagedGatewayNetworkInterfaceAddresses{}
+					dst.NetworkInterfaceAddresses = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkInterfaceAddresses = src.NetworkInterfaceAddresses
+				} else {
+					dst.NetworkInterfaceAddresses = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayWiFiProfiles) SetFields(src *ManagedGatewayWiFiProfiles, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profiles":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profiles' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Profiles = src.Profiles
+			} else {
+				dst.Profiles = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayEthernetProfile) SetFields(src *ManagedGatewayEthernetProfile, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+		case "profile_name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileName = src.ProfileName
+			} else {
+				var zero string
+				dst.ProfileName = zero
+			}
+		case "network_interface_addresses":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayNetworkInterfaceAddresses
+				if (src == nil || src.NetworkInterfaceAddresses == nil) && dst.NetworkInterfaceAddresses == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkInterfaceAddresses
+				}
+				if dst.NetworkInterfaceAddresses != nil {
+					newDst = dst.NetworkInterfaceAddresses
+				} else {
+					newDst = &ManagedGatewayNetworkInterfaceAddresses{}
+					dst.NetworkInterfaceAddresses = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkInterfaceAddresses = src.NetworkInterfaceAddresses
+				} else {
+					dst.NetworkInterfaceAddresses = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayEthernetProfiles) SetFields(src *ManagedGatewayEthernetProfiles, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profiles":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profiles' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Profiles = src.Profiles
+			} else {
+				dst.Profiles = nil
 			}
 
 		default:
@@ -2742,51 +2914,6 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 				} else {
 					dst.GatewayRemoteAddress = nil
 				}
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *UpdateManagedGatewayRequest) SetFields(src *UpdateManagedGatewayRequest, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "gateway":
-			if len(subs) > 0 {
-				var newDst, newSrc *ManagedGateway
-				if (src == nil || src.Gateway == nil) && dst.Gateway == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.Gateway
-				}
-				if dst.Gateway != nil {
-					newDst = dst.Gateway
-				} else {
-					newDst = &ManagedGateway{}
-					dst.Gateway = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.Gateway = src.Gateway
-				} else {
-					dst.Gateway = nil
-				}
-			}
-		case "field_mask":
-			if len(subs) > 0 {
-				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.FieldMask = src.FieldMask
-			} else {
-				dst.FieldMask = nil
 			}
 
 		default:

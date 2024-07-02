@@ -773,6 +773,140 @@ func (m *ManagedGateway) SetFromFlags(flags *pflag.FlagSet, prefix string) (path
 	return paths, nil
 }
 
+// AddSelectFlagsForManagedGatewayWiFiProfile adds flags to select fields in ManagedGatewayWiFiProfile.
+func AddSelectFlagsForManagedGatewayWiFiProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-name", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-name", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("ssid", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("ssid", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("password", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("password", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("network-interface-addresses", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("network-interface-addresses", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: network_interface_addresses (ManagedGatewayNetworkInterfaceAddresses) does not seem to have select flags.
+}
+
+// SelectFromFlags outputs the fieldmask paths forManagedGatewayWiFiProfile message from select flags.
+func PathsFromSelectFlagsForManagedGatewayWiFiProfile(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("profile_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("profile_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("profile_name", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("profile_name", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("ssid", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("ssid", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("password", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("password", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("network_interface_addresses", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("network_interface_addresses", prefix))
+	}
+	// NOTE: network_interface_addresses (ManagedGatewayNetworkInterfaceAddresses) does not seem to have select flags.
+	return paths, nil
+}
+
+// AddSetFlagsForManagedGatewayWiFiProfile adds flags to select fields in ManagedGatewayWiFiProfile.
+func AddSetFlagsForManagedGatewayWiFiProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-name", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("ssid", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("password", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping NetworkInterfaceAddresses because it does not seem to implement AddSetFlags.
+}
+
+// SetFromFlags sets the ManagedGatewayWiFiProfile message from flags.
+func (m *ManagedGatewayWiFiProfile) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("profile_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ProfileId = val
+		paths = append(paths, flagsplugin.Prefix("profile_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("profile_name", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ProfileName = val
+		paths = append(paths, flagsplugin.Prefix("profile_name", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("ssid", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Ssid = val
+		paths = append(paths, flagsplugin.Prefix("ssid", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("password", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Password = val
+		paths = append(paths, flagsplugin.Prefix("password", prefix))
+	}
+	// FIXME: Skipping NetworkInterfaceAddresses because it does not seem to implement AddSetFlags.
+	return paths, nil
+}
+
+// AddSelectFlagsForManagedGatewayEthernetProfile adds flags to select fields in ManagedGatewayEthernetProfile.
+func AddSelectFlagsForManagedGatewayEthernetProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-id", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-name", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-name", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("network-interface-addresses", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("network-interface-addresses", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: network_interface_addresses (ManagedGatewayNetworkInterfaceAddresses) does not seem to have select flags.
+}
+
+// SelectFromFlags outputs the fieldmask paths forManagedGatewayEthernetProfile message from select flags.
+func PathsFromSelectFlagsForManagedGatewayEthernetProfile(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("profile_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("profile_id", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("profile_name", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("profile_name", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("network_interface_addresses", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("network_interface_addresses", prefix))
+	}
+	// NOTE: network_interface_addresses (ManagedGatewayNetworkInterfaceAddresses) does not seem to have select flags.
+	return paths, nil
+}
+
+// AddSetFlagsForManagedGatewayEthernetProfile adds flags to select fields in ManagedGatewayEthernetProfile.
+func AddSetFlagsForManagedGatewayEthernetProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-name", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping NetworkInterfaceAddresses because it does not seem to implement AddSetFlags.
+}
+
+// SetFromFlags sets the ManagedGatewayEthernetProfile message from flags.
+func (m *ManagedGatewayEthernetProfile) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("profile_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ProfileId = val
+		paths = append(paths, flagsplugin.Prefix("profile_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("profile_name", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ProfileName = val
+		paths = append(paths, flagsplugin.Prefix("profile_name", prefix))
+	}
+	// FIXME: Skipping NetworkInterfaceAddresses because it does not seem to implement AddSetFlags.
+	return paths, nil
+}
+
 // AddSetFlagsForListGatewaysRequest adds flags to select fields in ListGatewaysRequest.
 func AddSetFlagsForListGatewaysRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
 	AddSetFlagsForOrganizationOrUserIdentifiers(flags, flagsplugin.Prefix("collaborator", prefix), true)
