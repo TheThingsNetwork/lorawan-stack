@@ -25,7 +25,16 @@ import Tab from './tab'
 
 import style from './tabs.styl'
 
-const Tabs = ({ className, active, tabs, onTabChange, divider, narrow }) => (
+const Tabs = ({
+  className,
+  individualTabClassName,
+  tabItemClassName,
+  active,
+  tabs,
+  onTabChange,
+  divider,
+  narrow,
+}) => (
   <ul
     className={classnames(className, style.tabs, { [style.divider]: divider })}
     data-test-id="tabs"
@@ -42,6 +51,8 @@ const Tabs = ({ className, active, tabs, onTabChange, divider, narrow }) => (
             narrow={nrw || narrow}
             link={link}
             exact={exact}
+            tabClassName={individualTabClassName}
+            className={tabItemClassName}
           >
             {icon && <Icon icon={icon} className={style.icon} />}
             <Message content={title} />
@@ -57,6 +68,7 @@ Tabs.propTypes = {
   className: PropTypes.string,
   /** Flag specifying whether the tab should render a bottom divider. */
   divider: PropTypes.bool,
+  individualTabClassName: PropTypes.string,
   /**
    * A click handler to be called when the selected tab changes. Passes
    * the name of the new active tab as an argument.
@@ -64,6 +76,7 @@ Tabs.propTypes = {
   narrow: PropTypes.bool,
   /** A list of tabs. */
   onTabChange: PropTypes.func,
+  tabItemClassName: PropTypes.string,
   tabs: PropTypes.arrayOf(
     PropTypes.shape({
       title: PropTypes.message.isRequired,
@@ -78,6 +91,8 @@ Tabs.propTypes = {
 Tabs.defaultProps = {
   active: undefined,
   className: undefined,
+  individualTabClassName: undefined,
+  tabItemClassName: undefined,
   onTabChange: () => null,
   divider: false,
   narrow: false,
