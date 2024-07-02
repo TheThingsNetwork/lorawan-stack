@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.34.2-20240508200655-46a4cf4ba109.2 // indirect
 	cloud.google.com/go v0.112.1 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/iam v1.1.6 // indirect
@@ -215,6 +216,7 @@ require (
 	go.packetbroker.org/api/mapping/v2 v2.3.2 // indirect
 	go.packetbroker.org/api/routing v1.9.2 // indirect
 	go.packetbroker.org/api/v3 v3.17.1 // indirect
+	go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240723094213-b40a14f3b543 // indirect
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e // indirect
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0 // indirect
 	go.uber.org/automaxprocs v1.5.3 // indirect
@@ -238,7 +240,7 @@ require (
 	google.golang.org/api v0.171.0 // indirect
 	google.golang.org/genproto v0.0.0-20240311173647-c811ad7063a7 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240701130421-f6361c86f094 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240711142825-46eb208f015d // indirect
 	google.golang.org/grpc v1.65.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
