@@ -42,11 +42,11 @@ import {
 
 const m = defineMessages({
   uplinkDownlinkTooltip:
-    'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.{lineBreak}App: frame counter for application downlinks (`FPort >=1`).{lineBreak}Nwk: frame counter for network downlinks (`FPort = 0`)',
+    'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.{lineBreak}App: frame counter for application downlinks (`FPort >=1`).{lineBreak}Nwk: frame counter for network downlinks (`FPort = 0`)(old)',
   lastSeenAvailableTooltip:
-    'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}',
+    'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}(old)',
   noActivityTooltip:
-    'The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.',
+    'The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.(old)',
 })
 
 const { Content } = EntityTitleSection
