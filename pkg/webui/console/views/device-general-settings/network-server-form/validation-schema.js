@@ -389,20 +389,32 @@ const validationSchema = Yup.object()
                           _data_rate_index: Yup.string()
                             .default(key.startsWith('_') ? null : key)
                             .required(sharedMessages.validateRequired),
-                          min_nb_trans: Yup.number()
-                            .min(1, Yup.passValues(sharedMessages.validateNumberGte))
-                            .max(
-                              value[key]?.max_nb_trans || 3,
-                              Yup.passValues(sharedMessages.validateNumberLte),
-                            )
-                            .required(sharedMessages.validateRequired),
-                          max_nb_trans: Yup.number()
-                            .min(
-                              value[key]?.min_nb_trans || 1,
-                              Yup.passValues(sharedMessages.validateNumberGte),
-                            )
-                            .max(3, Yup.passValues(sharedMessages.validateNumberLte))
-                            .required(sharedMessages.validateRequired),
+                          min_nb_trans: Yup.lazy(value => {
+                            if (value === undefined) {
+                              return Yup.number().strip()
+                            }
+
+                            return Yup.number()
+                              .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+                              .max(
+                                value[key]?.max_nb_trans || 3,
+                                Yup.passValues(sharedMessages.validateNumberLte),
+                              )
+                              .required(sharedMessages.validateRequired)
+                          }),
+                          max_nb_trans: Yup.lazy(value => {
+                            if (value === undefined) {
+                              return Yup.number().strip()
+                            }
+
+                            return Yup.number()
+                              .min(
+                                value[key]?.min_nb_trans || 1,
+                                Yup.passValues(sharedMessages.validateNumberGte),
+                              )
+                              .max(3, Yup.passValues(sharedMessages.validateNumberLte))
+                              .required(sharedMessages.validateRequired)
+                          }),
                         })
 
                         return acc
