@@ -16,6 +16,7 @@ import React, { useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { useDispatch } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
 import Form from '@ttn-lw/components/form'
@@ -29,7 +30,7 @@ import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/show-profiles-select'
+import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shared/show-profiles-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -41,9 +42,16 @@ import {
   selectConnectionProfilesTotalCount,
 } from '@console/store/selectors/gateways'
 
-import m from './messages'
+const m = defineMessages({
+  information:
+    'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.<br></br> <link>Learn more about gateway network connection profiles.</link>',
+  profileId: 'Profile ID',
+  accessPoint: 'Access point',
+  deleteSuccess: 'Connection profile deleted',
+  deleteFail: 'There was an error and the connection profile could not be deleted',
+})
 
-const GatewayConnectionProfilesOverview = () => {
+const GatewayWifiProfilesOverview = () => {
   const { type } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -166,7 +174,7 @@ const GatewayConnectionProfilesOverview = () => {
                 className="mb-cs-m"
                 primary
                 onClick={() => onAddProfile(values.shared)}
-                message={m.addWifiProfile}
+                message={sharedMessages.addWifiProfile}
                 icon="add"
               />
             </div>
@@ -185,4 +193,4 @@ const GatewayConnectionProfilesOverview = () => {
   )
 }
 
-export default GatewayConnectionProfilesOverview
+export default GatewayWifiProfilesOverview

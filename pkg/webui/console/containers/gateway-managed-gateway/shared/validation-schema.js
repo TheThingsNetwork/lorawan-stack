@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { defineMessages } from 'react-intl'
+
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { ipAddress } from '@console/lib/regexp'
 
-import m from './messages'
+const m = defineMessages({
+  validateDnsServers: 'There are some not valid dns servers.',
+  validateIpAddresses: 'There are some not valid IP addresses.',
+  validateIpAddress: '{field} must contain a valid address.',
+  validateNotSelectedAccessPoint: 'There must be at least one access point / SSID selected',
+})
 
 const hasSelectedAccessPoint = value =>
   (value.ssid !== '' && value._type === 'all') || value._type === 'other'

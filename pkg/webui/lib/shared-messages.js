@@ -37,6 +37,7 @@ export default defineMessages({
   addOAuthClient: 'Add OAuth client',
   addPubsub: 'Add Pub/Sub',
   addWebhook: 'Add webhook',
+  addWifiProfile: 'Add WiFi profile',
   address: 'Address',
   addressPlaceholder: 'host',
   admin: 'Admin',

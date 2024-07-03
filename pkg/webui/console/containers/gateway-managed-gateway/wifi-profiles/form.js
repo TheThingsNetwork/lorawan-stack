@@ -14,6 +14,7 @@
 
 import React, { useCallback, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
+import { defineMessages } from 'react-intl'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -22,13 +23,15 @@ import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 
-import { getInitialWifiProfile } from '@console/containers/gateway-managed-gateway/utils'
-import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/wifi-profiles/wifi-profiles-form-fields'
-import { wifiValidationSchema } from '@console/containers/gateway-managed-gateway/wifi-profiles/validation-schema'
+import { getInitialWifiProfile } from '@console/containers/gateway-managed-gateway/shared/utils'
+import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/shared/wifi-profiles-form-fields'
+import { wifiValidationSchema } from '@console/containers/gateway-managed-gateway/shared/validation-schema'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import m from './messages'
+const m = defineMessages({
+  updateWifiProfile: 'Update WiFi profile',
+})
 
 const GatewayWifiProfilesForm = () => {
   const [error, setError] = useState(undefined)
@@ -43,7 +46,7 @@ const GatewayWifiProfilesForm = () => {
     'gtws.single.managed-gateway.wifi-profiles.form',
     <Breadcrumb
       path={isEdit ? `${baseUrl}/edit/${profileId}` : `${baseUrl}/add`}
-      content={isEdit ? m.updateWifiProfile : m.addWifiProfile}
+      content={isEdit ? m.updateWifiProfile : sharedMessages.addWifiProfile}
     />,
   )
 
@@ -59,7 +62,7 @@ const GatewayWifiProfilesForm = () => {
 
   return (
     <>
-      <PageTitle title={isEdit ? m.updateWifiProfile : m.addWifiProfile} />
+      <PageTitle title={isEdit ? m.updateWifiProfile : sharedMessages.addWifiProfile} />
       <Form
         error={error}
         onSubmit={handleSubmit}
