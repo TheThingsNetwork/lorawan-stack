@@ -28,7 +28,8 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import validationSchema from '@console/containers/gateway-managed-gateway/connection-settings/validation-schema'
 import {
   CONNECTION_TYPES,
-  getInitialProfile,
+  getInitialWifiProfile,
+  initialEthernetProfile,
 } from '@console/containers/gateway-managed-gateway/utils'
 import GatewayConnectionSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/connection-settings-form-fields'
 
@@ -63,10 +64,17 @@ const GatewayConnectionSettings = () => {
 
   const initialValues = useMemo(
     () => ({
-      settings: Object.values(CONNECTION_TYPES).map(type => ({
-        profile: '',
-        ...getInitialProfile(type, false),
-      })),
+      settings: [
+        {
+          _connection_type: CONNECTION_TYPES.WIFI,
+          profile: '',
+          ...getInitialWifiProfile(false),
+        },
+        {
+          _connection_type: CONNECTION_TYPES.ETHERNET,
+          ...initialEthernetProfile,
+        },
+      ],
     }),
     [],
   )
@@ -84,9 +92,8 @@ const GatewayConnectionSettings = () => {
             validationSchema={validationSchema}
           >
             <>
-              {Object.values(CONNECTION_TYPES).map((c, index) => (
-                <GatewayConnectionSettingsFormFields key={c} index={index} />
-              ))}
+              <GatewayConnectionSettingsFormFields />
+
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
               </SubmitBar>

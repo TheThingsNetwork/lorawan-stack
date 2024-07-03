@@ -17,7 +17,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { useDispatch } from 'react-redux'
 
-import Tabs from '@ttn-lw/components/tabs'
 import Link from '@ttn-lw/components/link'
 import Form from '@ttn-lw/components/form'
 import Button from '@ttn-lw/components/button'
@@ -30,10 +29,6 @@ import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import {
-  CONNECTION_TYPES,
-  getFormTypeMessage,
-} from '@console/containers/gateway-managed-gateway/utils'
 import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/show-profiles-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -49,22 +44,9 @@ import {
 import m from './messages'
 
 const GatewayConnectionProfilesOverview = () => {
-  const { gtwId, type } = useParams()
+  const { type } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
-
-  const tabs = [
-    {
-      title: m.wifiProfiles,
-      name: CONNECTION_TYPES.WIFI,
-      link: `/gateways/${gtwId}/managed-gateway/connection-profiles/${CONNECTION_TYPES.WIFI}`,
-    },
-    {
-      title: m.ethernetProfiles,
-      name: CONNECTION_TYPES.ETHERNET,
-      link: `/gateways/${gtwId}/managed-gateway/connection-profiles/${CONNECTION_TYPES.ETHERNET}`,
-    },
-  ]
 
   const onAddProfile = useCallback(
     shared => {
@@ -158,10 +140,9 @@ const GatewayConnectionProfilesOverview = () => {
 
   return (
     <>
-      <PageTitle title={sharedMessages.connectionProfiles} />
-      <Tabs tabs={tabs} divider />
+      <PageTitle title={sharedMessages.wifiProfiles} />
       <Message
-        className="d-block mt-cs-l mb-cs-l"
+        className="d-block mb-cs-l"
         content={m.information}
         values={{
           link: txt => (
@@ -179,13 +160,13 @@ const GatewayConnectionProfilesOverview = () => {
       >
         {({ values }) => (
           <>
-            <div className="d-flex j-between al-end">
+            <div className="d-flex j-between al-end gap-cs-m">
               <ShowProfilesSelect name="shared" />
               <Button
                 className="mb-cs-m"
                 primary
                 onClick={() => onAddProfile(values.shared)}
-                message={getFormTypeMessage(type)}
+                message={m.addWifiProfile}
                 icon="add"
               />
             </div>

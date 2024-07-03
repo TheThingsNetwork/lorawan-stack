@@ -12,39 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import m from './connection-profiles/messages'
-
 export const CONNECTION_TYPES = Object.freeze({
   WIFI: 'wifi',
   ETHERNET: 'ethernet',
 })
 
-export const getFormTypeMessage = (type, profileId) => {
-  if (type === CONNECTION_TYPES.WIFI) {
-    return Boolean(profileId) ? m.updateWifiProfile : m.addWifiProfile
-  }
-  return Boolean(profileId) ? m.updateEthernetProfile : m.addEthernetProfile
-}
-
-export const getInitialProfile = (type, isShared) => ({
-  _connection_type: type,
+export const getInitialWifiProfile = isShared => ({
   profile_name: '',
   shared: isShared,
-  ...(type === CONNECTION_TYPES.WIFI && {
-    access_point: {
-      _type: 'all',
-      ssid: '',
-      password: '',
-      security: '',
-      signal_strength: 0,
-      is_active: true,
-    },
-  }),
+  access_point: {
+    _type: 'all',
+    ssid: '',
+    password: '',
+    security: '',
+    signal_strength: 0,
+    is_active: true,
+  },
   default_network_interface: true,
   network_interface_addresses: {
     ip_addresses: [''],
     subnet_mask: '',
     gateway: '',
-    dns_servers: [''],
+    dns_servers: [],
   },
 })
+
+export const initialEthernetProfile = {
+  enable_ethernet_connection: false,
+  use_static_ip: false,
+  network_interface_addresses: {
+    ip_addresses: [''],
+    subnet_mask: '',
+    gateway: '',
+    dns_servers: [],
+  },
+}

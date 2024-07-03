@@ -22,29 +22,28 @@ import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 
-import {
-  getFormTypeMessage,
-  getInitialProfile,
-} from '@console/containers/gateway-managed-gateway/utils'
-import validationSchema from '@console/containers/gateway-managed-gateway/connection-profiles/validation-schema'
-import GatewayConnectionProfilesFormFields from '@console/containers/gateway-managed-gateway/connection-profiles/connection-profiles-form-fields'
+import { getInitialWifiProfile } from '@console/containers/gateway-managed-gateway/utils'
+import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/wifi-profiles/wifi-profiles-form-fields'
+import { wifiValidationSchema } from '@console/containers/gateway-managed-gateway/wifi-profiles/validation-schema'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const GatewayConnectionProfilesForm = () => {
+import m from './messages'
+
+const GatewayWifiProfilesForm = () => {
   const [error, setError] = useState(undefined)
-  const { gtwId, type, profileId } = useParams()
+  const { gtwId, profileId } = useParams()
   const [searchParams] = useSearchParams()
 
   const isEdit = Boolean(profileId)
 
-  const baseUrl = `/gateways/${gtwId}/managed-gateway/connection-profiles/${type}`
+  const baseUrl = `/gateways/${gtwId}/managed-gateway/wifi-profiles`
 
   useBreadcrumbs(
-    'gtws.single.managed-gateway.connection-profiles.form',
+    'gtws.single.managed-gateway.wifi-profiles.form',
     <Breadcrumb
       path={isEdit ? `${baseUrl}/edit/${profileId}` : `${baseUrl}/add`}
-      content={getFormTypeMessage(type, profileId)}
+      content={isEdit ? m.updateWifiProfile : m.addWifiProfile}
     />,
   )
 
@@ -56,27 +55,25 @@ const GatewayConnectionProfilesForm = () => {
     }
   }, [])
 
-  const initialValues = getInitialProfile(type, searchParams.get('shared') === 'true')
+  const initialValues = getInitialWifiProfile(searchParams.get('shared') === 'true')
 
   return (
     <>
-      <PageTitle title={getFormTypeMessage(type, profileId)} />
+      <PageTitle title={isEdit ? m.updateWifiProfile : m.addWifiProfile} />
       <Form
         error={error}
         onSubmit={handleSubmit}
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        validationSchema={wifiValidationSchema}
       >
-        <>
-          <GatewayConnectionProfilesFormFields isEdit={isEdit} />
+        <GatewayWifiProfilesFormFields isEdit={isEdit} />
 
-          <SubmitBar>
-            <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-          </SubmitBar>
-        </>
+        <SubmitBar>
+          <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
+        </SubmitBar>
       </Form>
     </>
   )
 }
 
-export default GatewayConnectionProfilesForm
+export default GatewayWifiProfilesForm
