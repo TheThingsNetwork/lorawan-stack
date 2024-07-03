@@ -30,8 +30,9 @@ import {
   CONNECTION_TYPES,
   getInitialWifiProfile,
   initialEthernetProfile,
-} from '@console/containers/gateway-managed-gateway/utils'
-import GatewayConnectionSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/connection-settings-form-fields'
+} from '@console/containers/gateway-managed-gateway/shared/utils'
+import WifiSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/wifi-settings-form-fields'
+import EthernetSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/ethernet-settings-form-fields'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -92,7 +93,8 @@ const GatewayConnectionSettings = () => {
             validationSchema={validationSchema}
           >
             <>
-              <GatewayConnectionSettingsFormFields />
+              <WifiSettingsFormFields index={0} />
+              <EthernetSettingsFormFields index={1} />
 
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

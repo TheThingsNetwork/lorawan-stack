@@ -14,6 +14,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { defineMessages } from 'react-intl'
 
 import Form from '@ttn-lw/components/form'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
@@ -21,7 +22,13 @@ import Input from '@ttn-lw/components/input'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import m from './wifi-profiles/messages'
+const m = defineMessages({
+  ipAddresses: 'IP addresses',
+  subnetMask: 'Subnet mask',
+  dnsServers: 'DNS servers',
+  addServerAddress: 'Add server address',
+  addressPlaceholder: '0.0.0.0',
+})
 
 const NetworkInterfaceAddressesFormFields = ({ namePrefix, showOnlyDns }) => (
   <>
@@ -30,10 +37,10 @@ const NetworkInterfaceAddressesFormFields = ({ namePrefix, showOnlyDns }) => (
         <Form.Field
           name={`${namePrefix}network_interface_addresses.ip_addresses`}
           title={m.ipAddresses}
-          addMessage={m.addIpAddress}
+          addMessage={m.addServerAddress}
           component={KeyValueMap}
           indexAsKey
-          valuePlaceholder={m.ipAddressPlaceholder}
+          valuePlaceholder={m.addressPlaceholder}
           required
         />
         <Form.Field
@@ -57,7 +64,7 @@ const NetworkInterfaceAddressesFormFields = ({ namePrefix, showOnlyDns }) => (
       addMessage={m.addServerAddress}
       component={KeyValueMap}
       indexAsKey
-      valuePlaceholder={m.ipAddressPlaceholder}
+      valuePlaceholder={m.addressPlaceholder}
     />
   </>
 )

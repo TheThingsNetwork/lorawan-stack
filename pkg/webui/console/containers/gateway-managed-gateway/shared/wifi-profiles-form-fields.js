@@ -15,6 +15,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { parseInt } from 'lodash'
+import { defineMessages } from 'react-intl'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -22,12 +23,21 @@ import Input from '@ttn-lw/components/input'
 import Button from '@ttn-lw/components/button'
 
 import AccessPointList from '@console/containers/access-point-list'
-import NetworkInterfaceAddressesFormFields from '@console/containers/gateway-managed-gateway/network-interface-addresses-form-fields'
+import NetworkInterfaceAddressesFormFields from '@console/containers/gateway-managed-gateway/shared/network-interface-addresses-form-fields'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import m from './messages'
+const m = defineMessages({
+  profileName: 'Profile name',
+  useDefaultNetworkInterfaceSettings: 'Use default network interface settings',
+  uncheckToSetCustomSettings:
+    'Uncheck if you need to set custom IP addresses, subnet mask and DNS server',
+  accessPointAndSsid: 'Access point / SSID',
+  wifiPassword: 'WiFi password',
+  ssid: 'SSID',
+  isSet: '(is set)',
+})
 
 const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
   const { values } = useFormContext()

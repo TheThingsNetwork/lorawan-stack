@@ -20,7 +20,7 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import GatewayWifiProfilesForm from '@console/containers/gateway-managed-gateway/wifi-profiles/form'
-import GatewayConnectionProfilesOverview from '@console/containers/gateway-managed-gateway/wifi-profiles/overview'
+import GatewayWifiProfilesOverview from '@console/containers/gateway-managed-gateway/wifi-profiles/overview'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -38,7 +38,7 @@ const GatewayWifiProfiles = () => {
     <Row>
       <Col sm={12} lg={8}>
         <Routes>
-          <Route index Component={GatewayConnectionProfilesOverview} />
+          <Route index Component={GatewayWifiProfilesOverview} />
           <Route path="add" Component={GatewayWifiProfilesForm} />
           <Route path="edit/:profileId" Component={GatewayWifiProfilesForm} />
           <Route path="*" element={<Navigate to="" replace />} />

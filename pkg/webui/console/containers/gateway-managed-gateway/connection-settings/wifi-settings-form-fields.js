@@ -19,24 +19,19 @@ import { defineMessages } from 'react-intl'
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
 import Icon from '@ttn-lw/components/icon'
-import Checkbox from '@ttn-lw/components/checkbox'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/utils'
-import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/wifi-profiles/wifi-profiles-form-fields'
-import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/show-profiles-select'
-import NetworkInterfaceAddressesFormFields from '@console/containers/gateway-managed-gateway/network-interface-addresses-form-fields'
+import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/shared/wifi-profiles-form-fields'
+import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shared/show-profiles-select'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 const m = defineMessages({
-  ethernet: 'Ethernet',
   wifi: 'WiFi',
   settingsProfile: 'Settings profile',
   profileDescription: 'Connection settings profiles can be shared within the same organization',
   wifiConnection: 'WiFi connection',
-  ethernetConnection: 'Ethernet connection',
   selectAProfile: 'Select a profile',
   connected: 'The gateway {connection} successfully connected using this profile',
   unableToConnect: 'The gateway {connection} is currently unable to connect using this profile',
@@ -44,18 +39,7 @@ const m = defineMessages({
     'The gateway {connection} is currently attempting to connect using this profile',
   saveToConnect:
     'Please click "Save changes" to start using this {connection} profile for the gateway',
-  enableEthernetConnection: 'Enable ethernet connection',
-  useStaticIp: 'Use a static IP address',
 })
-
-const getTitle = type => {
-  switch (type) {
-    case CONNECTION_TYPES.WIFI:
-      return m.wifiConnection
-    default:
-      return m.ethernetConnection
-  }
-}
 
 const WifiSettingsFormFields = ({ index }) => {
   const { values } = useFormContext()
@@ -85,7 +69,7 @@ const WifiSettingsFormFields = ({ index }) => {
 
   return (
     <>
-      <Message component="h3" content={getTitle(values.settings[index]._connection_type)} />
+      <Message component="h3" content={m.wifiConnection} />
       <div className="d-flex al-center gap-cs-m">
         <ShowProfilesSelect name={`settings.${index}.shared`} />
         <Form.Field
@@ -120,43 +104,4 @@ WifiSettingsFormFields.propTypes = {
   index: PropTypes.number.isRequired,
 }
 
-const EthernetSettingsFormFields = ({ index }) => {
-  const { values } = useFormContext()
-
-  return (
-    <>
-      <Message component="h3" content={getTitle(values.settings[index]._connection_type)} />
-      <Form.Field
-        name={`settings.${index}.enable_ethernet_connection`}
-        component={Checkbox}
-        label={m.enableEthernetConnection}
-      />
-      {values.settings[index].enable_ethernet_connection && (
-        <>
-          <Form.Field
-            name={`settings.${index}.use_static_ip`}
-            component={Checkbox}
-            label={m.useStaticIp}
-          />
-          <NetworkInterfaceAddressesFormFields
-            namePrefix={`settings.${index}.`}
-            showOnlyDns={!values.settings[index].use_static_ip}
-          />
-        </>
-      )}
-    </>
-  )
-}
-
-EthernetSettingsFormFields.propTypes = {
-  index: PropTypes.number.isRequired,
-}
-
-const GatewayConnectionSettingsFormFields = () => (
-  <>
-    <WifiSettingsFormFields index={0} />
-    <EthernetSettingsFormFields index={1} />
-  </>
-)
-
-export default GatewayConnectionSettingsFormFields
+export default WifiSettingsFormFields

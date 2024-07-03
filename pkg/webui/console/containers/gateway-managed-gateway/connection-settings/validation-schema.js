@@ -15,8 +15,8 @@
 import {
   ethernetValidationSchema,
   wifiValidationSchema,
-} from '@console/containers/gateway-managed-gateway/wifi-profiles/validation-schema'
-import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/utils'
+} from '@console/containers/gateway-managed-gateway/shared/validation-schema'
+import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
