@@ -30,6 +30,7 @@ import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
 import DeviceMap from '@console/components/device-map'
+import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
 
 import DeviceEvents from '@console/containers/device-events'
 
@@ -347,6 +348,12 @@ const DeviceOverview = () => {
   }
   return (
     <Require condition={!shouldRedirect} otherwise={otherwise}>
+      <div className="container container--lg grid">
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6" />
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <BlurryNetworkActivityPanel />
+        </div>
+      </div>
       <div className="container container--lg grid p-vert-0">
         <IntlHelmet title={sharedMessages.overview} />
         <div className="item-12 lg:item-6">
