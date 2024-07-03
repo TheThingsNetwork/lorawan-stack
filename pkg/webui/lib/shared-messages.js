@@ -343,6 +343,7 @@ export default defineMessages({
   macSettingsError:
     'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
   macVersion: 'LoRaWAN version',
+  managedGateway: 'Managed gateway',
   messageTypes: 'Message types',
   messages: 'messages',
   messaging: 'Messaging',
@@ -496,7 +497,6 @@ export default defineMessages({
   technicalContact: 'Technical contact',
   tenantId: 'Tenant ID',
   termsAndCondition: 'Terms and conditions',
-  theThingsStation: 'The Things Station',
   time: 'Time',
   token: 'Token',
   tokenDelete: 'Token delete',

@@ -138,7 +138,7 @@ export const mayViewGatewayInfo = {
   rightsSelector: selectGatewayRights,
   check: rights => rights.includes('RIGHT_GATEWAY_INFO'),
 }
-export const mayViewTheThingsStation = {
+export const mayViewManagedGateway = {
   rightsSelector: selectGatewayRights,
   check: rights => rights.includes('RIGHT_GATEWAY_INFO'), // TODO: Change right
 }

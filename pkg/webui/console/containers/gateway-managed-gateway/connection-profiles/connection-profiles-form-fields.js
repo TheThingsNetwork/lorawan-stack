@@ -22,7 +22,7 @@ import Input from '@ttn-lw/components/input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Button from '@ttn-lw/components/button'
 
-import { CONNECTION_TYPES } from '@console/containers/gateway-the-things-station/utils'
+import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/utils'
 import AccessPointList from '@console/containers/access-point-list'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'

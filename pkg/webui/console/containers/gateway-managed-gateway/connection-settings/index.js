@@ -25,19 +25,18 @@ import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 
-import validationSchema from '@console/containers/gateway-the-things-station/connection-settings/validation-schema'
+import validationSchema from '@console/containers/gateway-managed-gateway/connection-settings/validation-schema'
 import {
   CONNECTION_TYPES,
   getInitialProfile,
-} from '@console/containers/gateway-the-things-station/utils'
-import GatewayConnectionSettingsFormFields from '@console/containers/gateway-the-things-station/connection-settings/connection-settings-form-fields'
+} from '@console/containers/gateway-managed-gateway/utils'
+import GatewayConnectionSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/connection-settings-form-fields'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
-  theThingsStationConnectionSettings: 'The Things Station connection settings',
   firstNotification:
-    'You have just claimed a The Things Station. To connect it to WiFi or ethernet you can configure those connections here. The preprovisioned cellular backhaul typically connects automatically.',
+    'You have just claimed a managed gateway. To connect it to WiFi or ethernet you can configure those connections here. The preprovisioned cellular backhaul typically connects automatically.',
 })
 
 const GatewayConnectionSettings = () => {
@@ -47,9 +46,9 @@ const GatewayConnectionSettings = () => {
   const [error, setError] = useState(undefined)
 
   useBreadcrumbs(
-    'gtws.single.the-things-station.connection-settings',
+    'gtws.single.managed-gateway.connection-settings',
     <Breadcrumb
-      path={`/gateways/${gtwId}/the-things-station/connection-settings`}
+      path={`/gateways/${gtwId}/managed-gateway/connection-settings`}
       content={sharedMessages.connectionSettings}
     />,
   )
@@ -74,7 +73,7 @@ const GatewayConnectionSettings = () => {
 
   return (
     <>
-      <PageTitle title={m.theThingsStationConnectionSettings} />
+      <PageTitle title={sharedMessages.connectionSettings} />
       <Row>
         <Col lg={8} md={6} sm={12}>
           {isFirstClaim && <Notification info small content={m.firstNotification} />}

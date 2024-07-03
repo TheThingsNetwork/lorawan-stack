@@ -19,28 +19,28 @@ import { Container, Col, Row } from 'react-grid-system'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
-import GatewayConnectionSettings from '@console/containers/gateway-the-things-station/connection-settings'
-import GatewayConnectionProfiles from '@console/containers/gateway-the-things-station/connection-profiles'
+import GatewayConnectionSettings from '@console/containers/gateway-managed-gateway/connection-settings'
+import GatewayConnectionProfiles from '@console/containers/gateway-managed-gateway/connection-profiles'
 
 import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { mayViewTheThingsStation } from '@console/lib/feature-checks'
+import { mayViewManagedGateway } from '@console/lib/feature-checks'
 
-const GatewayTheThingsStation = () => {
+const GatewayManagedGateway = () => {
   const { gtwId } = useParams()
 
   useBreadcrumbs(
-    'gtws.single.the-things-station',
+    'gtws.single.managed-gateway',
     <Breadcrumb
-      path={`/gateways/${gtwId}/the-things-station`}
-      content={sharedMessages.theThingsStation}
+      path={`/gateways/${gtwId}/managed-gateway`}
+      content={sharedMessages.managedGateway}
     />,
   )
 
   return (
-    <Require featureCheck={mayViewTheThingsStation} otherwise={{ redirect: `/gateways/${gtwId}` }}>
+    <Require featureCheck={mayViewManagedGateway} otherwise={{ redirect: `/gateways/${gtwId}` }}>
       <Container>
         <Routes>
           <Route index element={<Navigate to="connection-settings" replace />} />
@@ -53,4 +53,4 @@ const GatewayTheThingsStation = () => {
   )
 }
 
-export default GatewayTheThingsStation
+export default GatewayManagedGateway

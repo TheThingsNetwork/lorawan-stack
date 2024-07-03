@@ -25,9 +25,9 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import {
   getFormTypeMessage,
   getInitialProfile,
-} from '@console/containers/gateway-the-things-station/utils'
-import validationSchema from '@console/containers/gateway-the-things-station/connection-profiles/validation-schema'
-import GatewayConnectionProfilesFormFields from '@console/containers/gateway-the-things-station/connection-profiles/connection-profiles-form-fields'
+} from '@console/containers/gateway-managed-gateway/utils'
+import validationSchema from '@console/containers/gateway-managed-gateway/connection-profiles/validation-schema'
+import GatewayConnectionProfilesFormFields from '@console/containers/gateway-managed-gateway/connection-profiles/connection-profiles-form-fields'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -38,10 +38,10 @@ const GatewayConnectionProfilesForm = () => {
 
   const isEdit = Boolean(profileId)
 
-  const baseUrl = `/gateways/${gtwId}/the-things-station/connection-profiles/${type}`
+  const baseUrl = `/gateways/${gtwId}/managed-gateway/connection-profiles/${type}`
 
   useBreadcrumbs(
-    'gtws.single.the-things-station.connection-profiles.form',
+    'gtws.single.managed-gateway.connection-profiles.form',
     <Breadcrumb
       path={isEdit ? `${baseUrl}/edit/${profileId}` : `${baseUrl}/add`}
       content={getFormTypeMessage(type, profileId)}

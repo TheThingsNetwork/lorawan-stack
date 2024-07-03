@@ -22,9 +22,9 @@ import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import { CONNECTION_TYPES } from '@console/containers/gateway-the-things-station/utils'
-import GatewayConnectionProfilesFormFields from '@console/containers/gateway-the-things-station/connection-profiles/connection-profiles-form-fields'
-import ShowProfilesSelect from '@console/containers/gateway-the-things-station/show-profiles-select'
+import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/utils'
+import GatewayConnectionProfilesFormFields from '@console/containers/gateway-managed-gateway/connection-profiles/connection-profiles-form-fields'
+import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/show-profiles-select'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 

@@ -19,18 +19,18 @@ import { Col, Container, Row } from 'react-grid-system'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import GatewayConnectionProfilesForm from '@console/containers/gateway-the-things-station/connection-profiles/form'
-import GatewayConnectionProfilesOverview from '@console/containers/gateway-the-things-station/connection-profiles/overview'
-import { CONNECTION_TYPES } from '@console/containers/gateway-the-things-station/utils'
+import GatewayConnectionProfilesForm from '@console/containers/gateway-managed-gateway/connection-profiles/form'
+import GatewayConnectionProfilesOverview from '@console/containers/gateway-managed-gateway/connection-profiles/overview'
+import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/utils'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const GatewayConnectionProfiles = () => {
   const { gtwId, type } = useParams()
   useBreadcrumbs(
-    'gtws.single.the-things-station.connection-profiles',
+    'gtws.single.managed-gateway.connection-profiles',
     <Breadcrumb
-      path={`/gateways/${gtwId}/the-things-station/connection-profiles/${type}`}
+      path={`/gateways/${gtwId}/managed-gateway/connection-profiles/${type}`}
       content={sharedMessages.connectionProfiles}
     />,
   )
@@ -38,7 +38,7 @@ const GatewayConnectionProfiles = () => {
   if (!Object.values(CONNECTION_TYPES).includes(type)) {
     return (
       <Navigate
-        to={`/gateways/${gtwId}/the-things-station/connection-profiles/${CONNECTION_TYPES.WIFI}`}
+        to={`/gateways/${gtwId}/managed-gateway/connection-profiles/${CONNECTION_TYPES.WIFI}`}
         replace
       />
     )

@@ -15,7 +15,6 @@
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
-  theThingsStationConnectionProfiles: 'The Things Station connection profiles',
   wifiProfiles: 'WiFi profiles',
   ethernetProfiles: 'Ethernet profiles',
   information:
