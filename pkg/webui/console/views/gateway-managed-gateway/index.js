@@ -14,13 +14,13 @@
 
 import React from 'react'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
+import { Container } from 'react-grid-system'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import GatewayConnectionSettings from '@console/containers/gateway-managed-gateway/connection-settings'
-import GatewayConnectionProfiles from '@console/containers/gateway-managed-gateway/connection-profiles'
+import GatewayWifiProfiles from '@console/containers/gateway-managed-gateway/wifi-profiles'
 
 import Require from '@console/lib/components/require'
 
@@ -45,7 +45,7 @@ const GatewayManagedGateway = () => {
         <Routes>
           <Route index element={<Navigate to="connection-settings" replace />} />
           <Route path="connection-settings" Component={GatewayConnectionSettings} />
-          <Route path="connection-profiles/:type/*" Component={GatewayConnectionProfiles} />
+          <Route path="wifi-profiles/*" Component={GatewayWifiProfiles} />
           <Route path="*" element={<Navigate to="connection-settings" replace />} />
         </Routes>
       </Container>

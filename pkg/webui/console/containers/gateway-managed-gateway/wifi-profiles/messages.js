@@ -15,14 +15,11 @@
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
-  wifiProfiles: 'WiFi profiles',
   ethernetProfiles: 'Ethernet profiles',
   information:
     'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.<br></br> <link>Learn more about gateway network connection profiles.</link>',
   addWifiProfile: 'Add WiFi profile',
-  addEthernetProfile: 'Add Ethernet profile',
   updateWifiProfile: 'Update WiFi profile',
-  updateEthernetProfile: 'Update Ethernet profile',
   profileId: 'Profile ID',
   accessPoint: 'Access point',
   deleteSuccess: 'Connection profile deleted',
@@ -36,12 +33,8 @@ const messages = defineMessages({
   dnsServers: 'DNS servers',
   addServerAddress: 'Add server address',
   addIpAddress: 'Add IP address',
-  validateDnsServers: 'There must be at least one valid dns server.',
-  validateIpAddresses: 'There must be at least one valid IP address.',
-  validateEmptyDnsServer:
-    'There must be no empty dns server entries. Please remove such entries before submitting.',
-  validateEmptyIpAddress:
-    'There must be no empty IP address entries. Please remove such entries before submitting.',
+  validateDnsServers: 'There are some not valid dns servers.',
+  validateIpAddresses: 'There are some not valid IP addresses.',
   ipAddressPlaceholder: '0.0.0.0',
   validateIpAddress: '{field} must contain a valid address.',
   accessPointAndSsid: 'Access point / SSID',

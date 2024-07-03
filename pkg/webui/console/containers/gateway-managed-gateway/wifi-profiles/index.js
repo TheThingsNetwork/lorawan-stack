@@ -14,43 +14,33 @@
 
 import React from 'react'
 import { Navigate, Route, Routes, useParams } from 'react-router-dom'
-import { Col, Container, Row } from 'react-grid-system'
+import { Col, Row } from 'react-grid-system'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import GatewayConnectionProfilesForm from '@console/containers/gateway-managed-gateway/connection-profiles/form'
-import GatewayConnectionProfilesOverview from '@console/containers/gateway-managed-gateway/connection-profiles/overview'
-import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/utils'
+import GatewayWifiProfilesForm from '@console/containers/gateway-managed-gateway/wifi-profiles/form'
+import GatewayConnectionProfilesOverview from '@console/containers/gateway-managed-gateway/wifi-profiles/overview'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const GatewayConnectionProfiles = () => {
-  const { gtwId, type } = useParams()
+const GatewayWifiProfiles = () => {
+  const { gtwId } = useParams()
   useBreadcrumbs(
-    'gtws.single.managed-gateway.connection-profiles',
+    'gtws.single.managed-gateway.wifi-profiles',
     <Breadcrumb
-      path={`/gateways/${gtwId}/managed-gateway/connection-profiles/${type}`}
-      content={sharedMessages.connectionProfiles}
+      path={`/gateways/${gtwId}/managed-gateway/wifi-profiles`}
+      content={sharedMessages.wifiProfiles}
     />,
   )
-
-  if (!Object.values(CONNECTION_TYPES).includes(type)) {
-    return (
-      <Navigate
-        to={`/gateways/${gtwId}/managed-gateway/connection-profiles/${CONNECTION_TYPES.WIFI}`}
-        replace
-      />
-    )
-  }
 
   return (
     <Row>
       <Col sm={12} lg={8}>
         <Routes>
           <Route index Component={GatewayConnectionProfilesOverview} />
-          <Route path="add" Component={GatewayConnectionProfilesForm} />
-          <Route path="edit/:profileId" Component={GatewayConnectionProfilesForm} />
+          <Route path="add" Component={GatewayWifiProfilesForm} />
+          <Route path="edit/:profileId" Component={GatewayWifiProfilesForm} />
           <Route path="*" element={<Navigate to="" replace />} />
         </Routes>
       </Col>
@@ -58,4 +48,4 @@ const GatewayConnectionProfiles = () => {
   )
 }
 
-export default GatewayConnectionProfiles
+export default GatewayWifiProfiles

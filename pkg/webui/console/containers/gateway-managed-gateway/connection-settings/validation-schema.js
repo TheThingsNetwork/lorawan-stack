@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import connectionProfileValidationSchema from '@console/containers/gateway-managed-gateway/connection-profiles/validation-schema'
+import {
+  ethernetValidationSchema,
+  wifiValidationSchema,
+} from '@console/containers/gateway-managed-gateway/wifi-profiles/validation-schema'
+import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/utils'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -21,9 +25,22 @@ export const validationSchema = Yup.object().shape({
   settings: Yup.array().of(
     Yup.object()
       .shape({
-        profile: Yup.string().required(sharedMessages.validateRequired),
+        _connection_type: Yup.string()
+          .oneOf(Object.values(CONNECTION_TYPES))
+          .default(CONNECTION_TYPES.WIFI),
       })
-      .concat(connectionProfileValidationSchema),
+      .when('._connection_type', {
+        is: CONNECTION_TYPES.WIFI,
+        then: schema =>
+          schema
+            .concat(
+              Yup.object().shape({
+                profile: Yup.string().required(sharedMessages.validateRequired),
+              }),
+            )
+            .concat(wifiValidationSchema),
+        otherwise: schema => schema.concat(ethernetValidationSchema),
+      }),
   ),
 })
 

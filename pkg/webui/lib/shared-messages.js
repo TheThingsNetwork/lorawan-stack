@@ -138,7 +138,6 @@ export default defineMessages({
   connected: 'Connected',
   connecting: 'Connecting',
   connectionIssues: 'Connection issues',
-  connectionProfiles: 'Connection profiles',
   connectionSettings: 'Connection settings',
   contactFieldPlaceholder: 'Type or choose a collaborator',
   contactInformation: 'Contact information',
@@ -579,4 +578,5 @@ export default defineMessages({
   webhookId: 'Webhook ID',
   webhookUpdated: 'Webhook updated',
   webhooks: 'Webhooks',
+  wifiProfiles: 'WiFi profiles',
 })

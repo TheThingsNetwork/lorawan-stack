@@ -135,8 +135,8 @@ const GatewayInner = () => {
               icon="language"
             />
             <SideNavigation.Item
-              title={sharedMessages.connectionProfiles}
-              path="managed-gateway/connection-profiles/wifi"
+              title={sharedMessages.wifiProfiles}
+              path="managed-gateway/wifi-profiles"
               icon="tune"
             />
           </SideNavigation.Item>
