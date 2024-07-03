@@ -37,7 +37,7 @@ const { enabled: gsEnabled, base_url: gsBaseURL } = selectGsConfig()
 
 const m = defineMessages({
   claimWarning:
-    'We detected that your gateway is a <strong>The Things Station</strong>. To claim this gateway, please use the claim authentication code printed on the <link1>inside of the mounting lid</link1> or <link2>scan the QR code</link2> to claim instantly.',
+    'We detected that your gateway is a <strong>Managed Gateway</strong>. To claim this gateway, please use the claim authentication code printed on the <link1>inside of the mounting lid</link1> or <link2>scan the QR code</link2> to claim instantly.',
   preselectCommonOption:
     'We preselect a common option for the region you are in. Please verify the gateway operates on the selected frequency plan.',
 })

@@ -108,7 +108,7 @@ const GatewayProvisioningFormSection = () => {
         const supports_claiming = false
         const prefillId = `eui-${eui.toLowerCase()}`
         if (supports_claiming) {
-          // TODO: Make API request to determine whether it's a The Things Station
+          // TODO: Make API request to determine whether it's a Managed gateway
           // TODO: Preselect frequency plan based on the region
           const isTTIG = false
           setFieldValue('_inputMethod', isTTIG ? 'claim' : 'tts')

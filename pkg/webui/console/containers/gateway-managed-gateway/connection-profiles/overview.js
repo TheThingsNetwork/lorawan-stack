@@ -33,8 +33,8 @@ import Message from '@ttn-lw/lib/components/message'
 import {
   CONNECTION_TYPES,
   getFormTypeMessage,
-} from '@console/containers/gateway-the-things-station/utils'
-import ShowProfilesSelect from '@console/containers/gateway-the-things-station/show-profiles-select'
+} from '@console/containers/gateway-managed-gateway/utils'
+import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/show-profiles-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -57,12 +57,12 @@ const GatewayConnectionProfilesOverview = () => {
     {
       title: m.wifiProfiles,
       name: CONNECTION_TYPES.WIFI,
-      link: `/gateways/${gtwId}/the-things-station/connection-profiles/${CONNECTION_TYPES.WIFI}?shared=`,
+      link: `/gateways/${gtwId}/managed-gateway/connection-profiles/${CONNECTION_TYPES.WIFI}`,
     },
     {
       title: m.ethernetProfiles,
       name: CONNECTION_TYPES.ETHERNET,
-      link: `/gateways/${gtwId}/the-things-station/connection-profiles/${CONNECTION_TYPES.ETHERNET}`,
+      link: `/gateways/${gtwId}/managed-gateway/connection-profiles/${CONNECTION_TYPES.ETHERNET}`,
     },
   ]
 
@@ -158,7 +158,7 @@ const GatewayConnectionProfilesOverview = () => {
 
   return (
     <>
-      <PageTitle title={m.theThingsStationConnectionProfiles} />
+      <PageTitle title={sharedMessages.connectionProfiles} />
       <Tabs tabs={tabs} divider />
       <Message
         className="d-block mt-cs-l mb-cs-l"

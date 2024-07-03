@@ -33,7 +33,7 @@ import GatewayData from '@console/views/gateway-data'
 import GatewayGeneralSettings from '@console/views/gateway-general-settings'
 import GatewayApiKeys from '@console/views/gateway-api-keys'
 import GatewayOverview from '@console/views/gateway-overview'
-import GatewayTheThingsStation from '@console/views/gateway-the-things-station'
+import GatewayManagedGateway from '@console/views/gateway-managed-gateway'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -46,7 +46,7 @@ import {
   mayViewOrEditGatewayCollaborators,
   mayViewOrEditGatewayApiKeys,
   mayEditBasicGatewayInformation,
-  mayViewTheThingsStation,
+  mayViewManagedGateway,
 } from '@console/lib/feature-checks'
 
 import {
@@ -127,16 +127,16 @@ const GatewayInner = () => {
         {mayViewGatewayInfo.check(rights) && (
           <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
         )}
-        {mayViewTheThingsStation.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.theThingsStation} icon="router">
+        {mayViewManagedGateway.check(rights) && (
+          <SideNavigation.Item title={sharedMessages.managedGateway} icon="router">
             <SideNavigation.Item
               title={sharedMessages.connectionSettings}
-              path="the-things-station/connection-settings"
+              path="managed-gateway/connection-settings"
               icon="language"
             />
             <SideNavigation.Item
               title={sharedMessages.connectionProfiles}
-              path="the-things-station/connection-profiles/wifi"
+              path="managed-gateway/connection-profiles/wifi"
               icon="tune"
             />
           </SideNavigation.Item>
@@ -167,7 +167,7 @@ const GatewayInner = () => {
       </SideNavigation>
       <Routes>
         <Route index Component={GatewayOverview} />
-        <Route path="the-things-station/*" Component={GatewayTheThingsStation} />
+        <Route path="managed-gateway/*" Component={GatewayManagedGateway} />
         <Route path="api-keys/*" Component={GatewayApiKeys} />
         <Route path="collaborators/*" Component={GatewayCollaborators} />
         <Route path="location" Component={GatewayLocation} />
