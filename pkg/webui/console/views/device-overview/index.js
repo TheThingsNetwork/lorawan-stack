@@ -108,6 +108,7 @@ const DeviceOverview = () => {
             events={events}
             shortCutLinkPath={`/applications/${appId}/devices/${device.ids.device_id}/data`}
             className="h-full"
+            isDevice
           />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
