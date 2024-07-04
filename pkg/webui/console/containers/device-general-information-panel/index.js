@@ -41,7 +41,6 @@ const m = defineMessages({
   activationInfo: 'Activation information',
   sessionInfo: 'Session information',
   pendingSessionInfo: 'Session information (pending)',
-  macStateError: 'There was an error and MAC state could not be included in the MAC data.',
   sessionStartedAt: 'Session start',
   noSession: 'This device has not joined the network yet',
 })
