@@ -18,7 +18,6 @@ import { defineMessages, FormattedNumber } from 'react-intl'
 import classnames from 'classnames'
 
 import Icon, {
-  IconCalendarMonth,
   IconMenu2,
   IconStar,
   IconStarFilled,
@@ -73,7 +72,7 @@ const m = defineMessages({
 
 const DeviceOverviewHeader = ({ device }) => {
   const dispatch = useDispatch()
-  const { ids, name, created_at } = device
+  const { ids, name } = device
   const { device_id } = ids
   const [appId, devId] = useSelector(selectSelectedCombinedDeviceId).split('/')
   const uplinkFrameCount = useSelector(state =>
@@ -213,15 +212,6 @@ const DeviceOverviewHeader = ({ device }) => {
               />
             </div>
           </Tooltip>
-        </div>
-        <div className="d-flex al-center gap-cs-xxs sm:d-none">
-          <Icon small className="c-text-neutral-semilight" icon={IconCalendarMonth} />
-          <LastSeen
-            statusClassName={style.createdAtStatus}
-            message={sharedMessages.created}
-            lastSeen={created_at}
-            className="c-text-neutral-semilight"
-          />
         </div>
         <div className={classnames(style.divider, 'sm:d-none')} />
         <div className="d-inline-flex al-center gap-cs-xxs">

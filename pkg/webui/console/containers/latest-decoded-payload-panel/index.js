@@ -91,7 +91,7 @@ const hasDecodedPayload = data => {
   )
 }
 
-const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
+const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className }) => {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [copied, setCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -305,7 +305,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
       icon={isHovered ? IconPlayerPause : IconCodeDots}
       shortCutLinkTitle={m.seeInLiveData}
       shortCutLinkPath={`${shortCutLinkPath}${latestEvent ? `?eventId=${latestEvent?.eventId}` : ''}`}
-      className={style.panel}
+      className={classnames(style.panel, className)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -350,8 +350,13 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath }) => {
 
 LatestDecodedPayloadPanel.propTypes = {
   appId: PropTypes.string.isRequired,
+  className: PropTypes.string,
   events: PropTypes.events.isRequired,
   shortCutLinkPath: PropTypes.string.isRequired,
+}
+
+LatestDecodedPayloadPanel.defaultProps = {
+  className: undefined,
 }
 
 export default LatestDecodedPayloadPanel
