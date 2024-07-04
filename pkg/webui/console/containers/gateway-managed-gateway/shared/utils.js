@@ -13,6 +13,7 @@
 // limitations under the License.
 
 export const CONNECTION_TYPES = Object.freeze({
+  CELLULAR: 'cellular',
   WIFI: 'wifi',
   ETHERNET: 'ethernet',
 })

@@ -33,6 +33,7 @@ import {
 } from '@console/containers/gateway-managed-gateway/shared/utils'
 import WifiSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/wifi-settings-form-fields'
 import EthernetSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/ethernet-settings-form-fields'
+import ManagedGatewayConnections from '@console/containers/gateway-managed-gateway/connection-settings/connections'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -96,14 +97,14 @@ const GatewayConnectionSettings = () => {
               <WifiSettingsFormFields index={0} />
               <EthernetSettingsFormFields index={1} />
 
-              <SubmitBar>
+              <SubmitBar className="mb-cs-l">
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
               </SubmitBar>
             </>
           </Form>
         </Col>
         <Col lg={4} md={6} sm={12}>
-          <div />
+          <ManagedGatewayConnections />
         </Col>
       </Row>
     </>
