@@ -135,10 +135,7 @@ describe('End device repository manual registration', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui.toLocaleLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${devEui.toLocaleLowerCase()}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -193,10 +190,7 @@ describe('End device repository manual registration', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui.toLocaleLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${devEui.toLocaleLowerCase()}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -222,10 +216,7 @@ describe('End device repository manual registration', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui.toLocaleLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${devEui.toLocaleLowerCase()}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -288,10 +279,7 @@ describe('End device repository manual registration', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui.toLocaleLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${devEui.toLocaleLowerCase()}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -340,10 +328,7 @@ describe('End device repository manual registration', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui.toLocaleLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${devEui.toLocaleLowerCase()}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -369,10 +354,8 @@ describe('End device repository manual registration', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(devEui1)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui1.toLocaleLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${devEui1.toLocaleLowerCase()}`)
+
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -386,10 +369,8 @@ describe('End device repository manual registration', () => {
         // End device registration.
         cy.findByLabelText('DevEUI').type(devEui2)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${devEui2.toLocaleLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${devEui2.toLocaleLowerCase()}`)
+
         cy.findByLabelText('View registered end device').check()
 
         cy.findByRole('button', { name: 'Register end device' }).click()

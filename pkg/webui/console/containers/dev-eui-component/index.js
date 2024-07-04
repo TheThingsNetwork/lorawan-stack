@@ -18,7 +18,7 @@ import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
 import Input from '@ttn-lw/components/input'
-import Form, { useFormContext } from '@ttn-lw/components/form'
+import Form from '@ttn-lw/components/form'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -44,7 +44,6 @@ const m = defineMessages({
 
 const DevEUIComponent = props => {
   const { name, required, disabled, autoFocus } = props
-  const { values, setFieldValue, touched } = useFormContext()
 
   const dispatch = useDispatch()
   const appId = useSelector(selectSelectedApplicationId)
@@ -53,9 +52,6 @@ const DevEUIComponent = props => {
   const [devEUIGenerated, setDevEUIGenerated] = useState(false)
   const [errorMessage, setErrorMessage] = useState(undefined)
   const applicationDevEUICounter = useSelector(selectApplicationDevEUICount)
-  const idTouched = touched?.ids?.device_id || touched?.target_device_id
-  const hasEuiId =
-    /eui-\d{16}/.test(values?.target_device_id) || /eui-\d{16}/.test(values?.ids?.device_id)
 
   const indicatorContent = errorMessage || {
     ...sharedMessages.used,
@@ -76,24 +72,11 @@ const DevEUIComponent = props => {
     return result.dev_eui
   }, [appId, dispatch, fetchDevEUICounter, promisifiedIssueDevEUI])
 
-  const handleIdPrefill = useCallback(
-    eventOrEui => {
-      const value = typeof eventOrEui === 'string' ? eventOrEui : eventOrEui.target.value
-      if (value.length === 16 && (!idTouched || hasEuiId)) {
-        const generatedId = `eui-${value.toLowerCase()}`
-        setFieldValue('target_device_id', generatedId)
-        setFieldValue('ids.device_id', generatedId)
-      }
-    },
-    [hasEuiId, idTouched, setFieldValue],
-  )
-
   const handleGenerate = useCallback(async () => {
     try {
       const result = await handleDevEUIRequest()
       setDevEUIGenerated(true)
       setErrorMessage(undefined)
-      handleIdPrefill(result)
       return result
     } catch (error) {
       if (getBackendErrorName(error) === 'global_eui_limit_reached') {
@@ -101,7 +84,7 @@ const DevEUIComponent = props => {
       } else setErrorMessage(m.unknownError)
       setDevEUIGenerated(true)
     }
-  }, [handleDevEUIRequest, handleIdPrefill])
+  }, [handleDevEUIRequest])
 
   const devEUIGenerateDisabled =
     applicationDevEUICounter === env.devEUIConfig.applicationLimit ||
@@ -117,7 +100,6 @@ const DevEUIComponent = props => {
       max={8}
       component={Input.Generate}
       tooltipId={tooltipIds.DEV_EUI}
-      onBlur={handleIdPrefill}
       onGenerateValue={handleGenerate}
       actionDisable={devEUIGenerateDisabled}
       required={required}
@@ -136,7 +118,6 @@ const DevEUIComponent = props => {
       required={required}
       component={Input}
       tooltipId={tooltipIds.DEV_EUI}
-      onBlur={handleIdPrefill}
       disabled={disabled}
       autoFocus={autoFocus}
     />

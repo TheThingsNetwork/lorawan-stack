@@ -37,7 +37,6 @@ export default defineMessages({
   singleRegistration: 'View registered end device',
   multipleRegistration: 'Register another end device of this type',
   createSuccess: 'End device registered',
-  deviceIdDescription: 'This value is automatically prefilled using the DevEUI',
   onboardingDisabled:
     'Device onboarding can only be performed on deployments that have Network Server, Application Server and Join Server activated. Please use the CLI to register devices on individual components.',
   pingSlotDataRateTitle: 'Ping slot data rate',

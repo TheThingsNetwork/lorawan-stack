@@ -52,7 +52,7 @@ describe('Gateway create', () => {
 
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
     cy.findByLabelText('Gateway EUI').blur()
-    cy.findByLabelText('Gateway ID').should('have.value', `eui-${gateway.eui}`)
+    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByLabelText('Gateway name').type('Test Gateway')
     cy.findByText('Frequency plan')
       .parents('div[data-test-id="form-field"]')
@@ -78,7 +78,7 @@ describe('Gateway create', () => {
     cy.contains('Convert MAC to EUI').should('not.exist')
 
     const gatewayEui = `${gatewayMac.substring(0, 6)}fffe${gatewayMac.substring(6)}`
-    cy.findByLabelText('Gateway ID').should('have.value', `eui-${gatewayEui}`)
+    cy.findByLabelText('Gateway ID').type(`eui-${gatewayEui}`)
   })
 
   it('succeeds showing modal when generating API keys for CUPS and LNS', () => {
@@ -89,7 +89,7 @@ describe('Gateway create', () => {
 
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
     cy.findByLabelText('Gateway EUI').blur()
-    cy.findByLabelText('Gateway ID').should('have.value', `eui-${gateway.eui}`)
+    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByLabelText('Gateway name').type('Test Gateway')
     cy.findByText('Frequency plan')
       .parents('div[data-test-id="form-field"]')
@@ -129,6 +129,7 @@ describe('Gateway create', () => {
     }
 
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByText('Frequency plan')
       .parents('div[data-test-id="form-field"]')
       .find('input')
@@ -153,6 +154,7 @@ describe('Gateway create', () => {
     }
 
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByText('Frequency plan')
       .parents('div[data-test-id="form-field"]')
       .find('input')
@@ -192,6 +194,7 @@ describe('Gateway create', () => {
       }
 
       cy.findByLabelText('Gateway EUI').type(gateway.eui)
+      cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
 
       cy.findByTestId('key-value-map').should('not.exist')
       cy.findByRole('button', { name: 'Register gateway' }).click()

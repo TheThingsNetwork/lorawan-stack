@@ -272,6 +272,7 @@ const BasicSettingsForm = React.memo(props => {
             entityId={gtwId}
             entityName={gateway.name}
             message={m.deleteGateway}
+            defaultMessage={m.deleteGatewayDefaultMessage}
             onApprove={onGatewayDelete}
             shouldConfirm={shouldConfirmDelete}
             mayPurge={mayPurge}

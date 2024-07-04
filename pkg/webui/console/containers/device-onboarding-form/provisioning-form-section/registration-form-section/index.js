@@ -27,8 +27,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
-import messages from '../../messages'
-
 import { initialValues } from './validation-schema'
 
 const devAddrEncoder = dev_addr => ({ ids: { dev_addr }, session: { dev_addr } })
@@ -177,7 +175,6 @@ const DeviceRegistrationFormSection = () => {
         component={Input}
         inputRef={idInputRef}
         tooltipId={tooltipIds.DEVICE_ID}
-        description={messages.deviceIdDescription}
       />
     </div>
   )
