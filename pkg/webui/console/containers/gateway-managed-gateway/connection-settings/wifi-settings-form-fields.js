@@ -28,7 +28,6 @@ import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shar
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 const m = defineMessages({
-  wifi: 'WiFi',
   settingsProfile: 'Settings profile',
   profileDescription: 'Connection settings profiles can be shared within the same organization',
   wifiConnection: 'WiFi connection',

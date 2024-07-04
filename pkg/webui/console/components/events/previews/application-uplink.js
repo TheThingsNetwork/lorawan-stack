@@ -55,7 +55,7 @@ const ApplicationUplinkPreview = React.memo(({ event }) => {
       <DescriptionList.Item title={messages.fPort} data={data.f_port} />
       <DescriptionList.Item title={messages.dataRate} data={dataRate} />
       <DescriptionList.Item title={messages.snr} data={snr} />
-      <DescriptionList.Item title={messages.rssi} data={rssi} />
+      <DescriptionList.Item title={sharedMessages.rssi} data={rssi} />
     </DescriptionList>
   )
 })

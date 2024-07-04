@@ -24,7 +24,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
   ipAddresses: 'IP addresses',
-  subnetMask: 'Subnet mask',
   dnsServers: 'DNS servers',
   addServerAddress: 'Add server address',
   addressPlaceholder: '0.0.0.0',
@@ -44,7 +43,7 @@ const NetworkInterfaceAddressesFormFields = ({ namePrefix, showOnlyDns }) => (
           required
         />
         <Form.Field
-          title={m.subnetMask}
+          title={sharedMessages.subnetMask}
           name={`${namePrefix}network_interface_addresses.subnet_mask`}
           component={Input}
           required
