@@ -161,7 +161,7 @@ describe('Device onboarding with QR scan', () => {
     cy.findByLabelText('DevEUI').should('have.value', devEui).should('be.disabled')
     cy.findByRole('button', { name: 'Reset' }).should('be.disabled')
     cy.findByLabelText('AppKey').type(generateHexValue(32))
-    cy.findByLabelText('End device ID').should('have.value', `eui-${device.devEui}`)
+    cy.findByLabelText('End device ID').type(`eui-${device.devEui.toLocaleLowerCase()}`)
 
     // Reset QR data.
     cy.findByRole('button', { name: /Reset QR code data/g }).click()

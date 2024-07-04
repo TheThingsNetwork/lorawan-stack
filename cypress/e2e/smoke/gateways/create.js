@@ -40,6 +40,7 @@ const gatewayCreate = defineSmokeTest('succeeds creating gateway', () => {
   cy.findByRole('link', { name: /Register gateway/ }).click()
   cy.findByLabelText('Gateway EUI').type(gateway.eui)
   cy.findByLabelText('Gateway name').type(gateway.name)
+  cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
   cy.findByText('Frequency plan')
     .parents('div[data-test-id="form-field"]')
     .find('input')

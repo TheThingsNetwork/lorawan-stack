@@ -124,6 +124,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByLabelText('JoinEUI').type(`${device.join_eui}{enter}`)
         cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLowerCase()}`)
         cy.findByLabelText('AppKey')
           .parents('[data-test-id="form-field"]')
           .findByRole('button', { name: /Generate/ })
@@ -165,10 +166,7 @@ describe('End device manual create', () => {
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${device.dev_eui.toLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLocaleLowerCase()}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -201,6 +199,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLowerCase()}`)
         cy.findByLabelText('AppKey').type(device.app_key)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -234,6 +233,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLowerCase()}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -265,6 +265,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLowerCase()}`)
         cy.findByLabelText('AppKey').type(device.app_key)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -300,6 +301,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLowerCase()}`)
         cy.findByLabelText('AppKey').type(device.app_key)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -332,6 +334,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLowerCase()}`)
         cy.findByLabelText('AppKey').type(device.app_key)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -366,6 +369,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLowerCase()}`)
         cy.findByLabelText('AppKey').type(device.app_key)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -402,6 +406,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('JoinEUI').type(device.join_eui)
         cy.findByRole('button', { name: 'Confirm' }).click()
         cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLowerCase()}`)
         cy.findByLabelText('AppKey').type(device.app_key)
         cy.findByLabelText('NwkKey').type(device.nwk_key)
 
@@ -592,10 +597,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('FNwkSIntKey').type(device.f_nwk_s_int_key)
         cy.findByLabelText('SNwkSIntKey').type(device.f_nwk_s_int_key)
         cy.findByLabelText('NwkSEncKey').type(device.f_nwk_s_int_key)
-        cy.findByLabelText('End device ID').should(
-          'have.value',
-          `eui-${device.dev_eui.toLowerCase()}`,
-        )
+        cy.findByLabelText('End device ID').type(`eui-${device.dev_eui.toLocaleLowerCase()}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
