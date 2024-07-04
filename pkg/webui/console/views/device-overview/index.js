@@ -23,6 +23,7 @@ import toast from '@ttn-lw/components/toast'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
+import DeviceMapPanel from '@console/components/device-map-panel'
 
 import DeviceGeneralInformationPanel from '@console/containers/device-general-information-panel'
 import DeviceInfoPanel from '@console/containers/device-info-panel'
@@ -116,6 +117,9 @@ const DeviceOverview = () => {
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <BlurryNetworkActivityPanel />
+        </div>
+        <div className="item-12 md:item-12 lg:item-6 sm:item-6">
+          <DeviceMapPanel />
         </div>
       </div>
     </Require>
