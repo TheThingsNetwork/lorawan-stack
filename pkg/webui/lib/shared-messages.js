@@ -160,6 +160,7 @@ export default defineMessages({
   currentUserIndicator: '(This is you)',
   dashboard: 'Dashboard',
   data: 'Data',
+  dataSheet: 'Data sheet',
   defineRights: 'Define rights',
   delayWarning:
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
