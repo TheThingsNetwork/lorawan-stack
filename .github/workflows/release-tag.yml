@@ -154,12 +154,19 @@ jobs:
           buf_token: ${{ secrets.BUF_TOKEN }}
       - name: Prepare merge PR
         run: |
+          export PR_URL=$(mktemp)
+
           gh pr create \
               --assignee '${{ github.actor }}' \
               --base "$(echo ${{ steps.version.outputs.result }} | grep -Po 'v3\.\d+')" \
               --body "This pull request merges back changes from the v${{ steps.version.outputs.result }} release." \
               --label "release" \
+              --title "Release v${{ steps.version.outputs.result }}" \
+              | tee "${PR_URL}"
+
+          # Try adding a milestone but ignore errors
+          gh pr edit < "${PR_URL}" \
               --milestone "v${{ steps.version.outputs.result }}" \
-              --title "Release v${{ steps.version.outputs.result }}"
+              || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
