@@ -16,46 +16,64 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
-import Icon from '@ttn-lw/components/icon'
-import Status from '@ttn-lw/components/status'
+import { APPLICATION, END_DEVICE, GATEWAY } from '@console/constants/entities'
 
-import Message from '@ttn-lw/lib/components/message'
+import Icon, { entityIcons } from '@ttn-lw/components/icon'
+import Status from '@ttn-lw/components/status'
 
 import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import {
-  selectBookmarksList,
-  selectBookmarksTotalCount,
-} from '@console/store/selectors/user-preferences'
+import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
 
 import EntitiesList from '../list'
 
 const m = defineMessages({
-  noTopEntities: 'No top entities yet',
-  noTopEntitiesDescription: 'Your most visited, and bookmarked entities will be listed here.',
+  noTopEntitiesDescription: 'Your most visited and bookmarked entities will be listed here.',
+  statusLastSeen: 'Status / Last seen',
 })
 
 const AllTopEntitiesList = () => {
-  const allBookmarks = useSelector(state => selectBookmarksList(state))
+  const items = useSelector(selectTopEntitiesAll)
 
   const headers = [
     {
       name: 'type',
       displayName: sharedMessages.type,
       width: '2.5rem',
-      render: icon => <Icon icon={icon} />,
+      render: type => <Icon icon={entityIcons[type]} />,
     },
     {
       name: 'name',
       displayName: sharedMessages.name,
       align: 'left',
-      render: (name, id) => <Message content={name === '' ? id : name} />,
+      getValue: entity => entity,
+      render: ({ entity, id }) =>
+        Boolean(entity?.name) ? (
+          <>
+            <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{entity.name}</span>
+            <span className="c-text-neutral-light d-block">{id}</span>
+          </>
+        ) : (
+          <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{id}</span>
+        ),
     },
     {
-      name: 'lastSeen',
-      displayName: sharedMessages.lastSeen,
+      name: 'status',
+      displayName: m.statusLastSeen,
+      width: '9rem',
+      className: 'overflow-visible',
+      getValue: entity => {
+        if (entity.type === GATEWAY) {
+          return entity.entity.status
+        } else if (entity.type === END_DEVICE) {
+          return entity?.entity?.last_seen_at
+        } else if (entity.type === APPLICATION) {
+          return entity?.entity?.lastSeen
+        }
+        return null
+      },
       render: lastSeen => {
         if (!lastSeen) {
           return (
@@ -66,25 +84,23 @@ const AllTopEntitiesList = () => {
             />
           )
         }
-        if (typeof lastSeen === 'string') {
-          return <LastSeen lastSeen={lastSeen} short statusClassName="j-end" />
-        }
-
         let indicator = 'unknown'
         let label = sharedMessages.unknown
 
-        if (lastSeen.status === 'connected') {
+        if (lastSeen === 'connected') {
           indicator = 'good'
           label = sharedMessages.connected
-        } else if (lastSeen.status === 'disconnected') {
+        } else if (lastSeen === 'disconnected') {
           indicator = 'bad'
           label = sharedMessages.disconnected
-        } else if (lastSeen.status === 'other-cluster') {
+        } else if (lastSeen === 'other-cluster') {
           indicator = 'unknown'
           label = sharedMessages.otherCluster
-        } else if (lastSeen.status === 'unknown') {
+        } else if (lastSeen === 'unknown') {
           indicator = 'mediocre'
           label = sharedMessages.unknown
+        } else if (typeof lastSeen === 'string') {
+          return <LastSeen lastSeen={lastSeen} short statusClassName="j-end" />
         }
 
         return <Status status={indicator} label={label} />
@@ -94,10 +110,9 @@ const AllTopEntitiesList = () => {
 
   return (
     <EntitiesList
-      allBookmarks={allBookmarks}
-      itemsCountSelector={selectBookmarksTotalCount}
+      entities={items}
       headers={headers}
-      emptyMessage={m.noTopEntities}
+      emptyMessage={sharedMessages.noTopEntities}
       emptyDescription={m.noTopEntitiesDescription}
     />
   )

@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { handleActions } from 'redux-actions'
+/* eslint-disable import/prefer-default-export */
 
-const defaultState = {
-  lastFetched: undefined,
+/**
+ * Extracts the entity type and ID from the key.
+ *
+ * @param {object} item - The item to extract the entity type and ID from.
+ * @param {string} item.key - The key of the entity.
+ *
+ * @returns {object} - The entity type and ID.
+ */
+export const getTypeAndId = item => {
+  const [entityType, entityId] = item.key.split(':')
+
+  return { entityType, entityId }
 }
-
-export default handleActions(
-  {
-    GET_TOP_ENTITIES_SUCCESS: state => ({
-      ...state,
-      lastFetched: Date.now(),
-    }),
-  },
-  defaultState,
-)

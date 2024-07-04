@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+import { END_DEVICE } from '@console/constants/entities'
 
 import {
   IconPuzzle,
@@ -60,8 +61,7 @@ import {
   selectMqttProviderDisabled,
   selectNatsProviderDisabled,
 } from '@console/store/selectors/application-server'
-import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectEndDeviceTopEntities } from '@console/store/selectors/top-entities'
 
 import SidebarContext from '../context'
 
@@ -80,8 +80,8 @@ const AppSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
   const appPageSize = getCookie('applications-list-page-size')
   const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
-  const topEntities = useSelector(selectPerEntityBookmarks('application'))
-  const userId = useSelector(selectUserId)
+  const topEntityFilter = useCallback(e => e.id.startsWith(appId), [appId])
+  const topEntities = useSelector(state => selectEndDeviceTopEntities(state, topEntityFilter))
 
   if (!app) {
     return null
@@ -196,8 +196,8 @@ const AppSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && topEntities.length > 0 && mayViewApplicationInfo.check(rights) && (
-        <TopEntitiesSection topEntities={topEntities} userId={userId} />
+      {!isMinimized && mayViewApplicationInfo.check(rights) && (
+        <TopEntitiesSection topEntities={topEntities} type={END_DEVICE} />
       )}
     </>
   )

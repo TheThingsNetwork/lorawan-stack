@@ -19,20 +19,13 @@ import { useSelector } from 'react-redux'
 import Spinner from '@ttn-lw/components/spinner'
 import Status from '@ttn-lw/components/status'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import {
-  selectPerEntityBookmarks,
-  selectPerEntityTotalCount,
-} from '@console/store/selectors/user-preferences'
+import { selectApplicationTopEntities } from '@console/store/selectors/top-entities'
 
 import EntitiesList from '../list'
-
-import TopApplicationsItem from './item'
 
 const m = defineMessages({
   emptyMessage: 'No top application yet',
@@ -40,36 +33,40 @@ const m = defineMessages({
 })
 
 const TopApplicationsList = () => {
-  const allBookmarks = useSelector(selectPerEntityBookmarks('application'))
+  const items = useSelector(selectApplicationTopEntities)
 
   const headers = [
     {
       name: 'name',
       displayName: sharedMessages.name,
-      render: (name, id) => (
-        <>
-          <Message content={name === '' ? id : name} component="p" className="mt-0 mb-cs-xs p-0" />
-          {name && (
-            <Message content={id} component="span" className="c-text-neutral-light fw-normal" />
-          )}
-        </>
-      ),
+      getValue: entity => entity,
+      render: ({ entity: { name }, id }) =>
+        Boolean(name) ? (
+          <>
+            <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{name}</span>
+            <span className="c-text-neutral-light d-block">{id}</span>
+          </>
+        ) : (
+          <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{id}</span>
+        ),
     },
     {
       name: 'deviceCount',
       displayName: sharedMessages.devicesShort,
+      width: '4rem',
       align: 'center',
+      getValue: entity => entity?.entity?.deviceCount,
       render: deviceCount =>
         typeof deviceCount !== 'number' ? (
-          <Spinner micro right after={100} className="c-icon" />
+          <Spinner micro center after={0} faded inline />
         ) : (
-          <strong>
-            <FormattedNumber value={deviceCount} />
-          </strong>
+          <FormattedNumber value={deviceCount} />
         ),
     },
     {
       name: 'lastSeen',
+      width: '9rem',
+      getValue: entity => entity?.entity?.lastSeen,
       displayName: sharedMessages.lastSeen,
       render: lastSeen => {
         const showLastSeen = Boolean(lastSeen)
@@ -88,15 +85,13 @@ const TopApplicationsList = () => {
 
   return (
     <EntitiesList
-      itemsCountSelector={selectPerEntityTotalCount}
-      allBookmarks={allBookmarks}
+      itemsCount={items.length}
+      entities={items}
       headers={headers}
-      EntitiesItemComponent={TopApplicationsItem}
       emptyMessage={m.emptyMessage}
       emptyDescription={m.emptyDescription}
       emptyAction={sharedMessages.createApplication}
       emptyPath={'/applications/add'}
-      entity={'application'}
     />
   )
 }

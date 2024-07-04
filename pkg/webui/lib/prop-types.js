@@ -352,6 +352,16 @@ PropTypes.routingPolicy = PropTypes.shape({
 
 PropTypes.entity = PropTypes.oneOf([APPLICATION, GATEWAY, ORGANIZATION, USER, CLIENT])
 
+PropTypes.unifiedEntity = PropTypes.shape({
+  entity: PropTypes.shape({
+    name: PropTypes.string,
+  }),
+  id: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+})
+PropTypes.unifiedEntities = PropTypes.arrayOf(PropTypes.unifiedEntity)
+
 PropTypes.notificationData = PropTypes.shape({
   data: PropTypes.oneOfType([
     PropTypes.shape({

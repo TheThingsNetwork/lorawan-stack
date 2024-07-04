@@ -38,13 +38,15 @@ const defaultState = {
   entities: {},
   derived: {},
   selectedApplication: null,
-  applicationDeviceCounts: {},
   mqtt: {},
 }
 
-const applications = (state = defaultState, { type, payload, event }) => {
+const applications = (state = defaultState, { type, payload, event, meta }) => {
   switch (type) {
     case GET_APP:
+      if (meta.options.noSelect) {
+        return state
+      }
       return {
         ...state,
         selectedApplication: payload.id,
@@ -67,9 +69,12 @@ const applications = (state = defaultState, { type, payload, event }) => {
     case GET_APP_DEV_COUNT_SUCCESS:
       return {
         ...state,
-        applicationDeviceCounts: {
-          ...state.applicationDeviceCounts,
-          [payload.id]: payload.applicationDeviceCount,
+        derived: {
+          ...state.derived,
+          [payload.id]: {
+            ...state.derived[payload.id],
+            deviceCount: payload.applicationDeviceCount,
+          },
         },
       }
     case GET_APP_SUCCESS:

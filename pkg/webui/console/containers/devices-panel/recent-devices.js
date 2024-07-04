@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
 
@@ -40,12 +39,6 @@ import {
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import style from './devices-panel.styl'
-
-const m = defineMessages({
-  emptyMessage: 'No end devices yet',
-  emptyDescription: 'Your recently active end devices will be listed here',
-  devEui: 'Dev EUI',
-})
 
 const RecentEndDevices = () => {
   const listRef = React.useRef()
@@ -82,7 +75,7 @@ const RecentEndDevices = () => {
         name: row.name,
       }),
       render: details => (
-        <div className="c-text-neutral-light text-overflow-ellipsis">
+        <div className="c-text-neutral-light fw-bold">
           <Message
             content={details.name ?? details.id}
             component="p"
@@ -100,8 +93,8 @@ const RecentEndDevices = () => {
     },
     {
       name: 'ids.dev_eui',
-      displayName: m.devEui,
-      width: 35,
+      displayName: sharedMessages.devEUI,
+      width: '6rem',
       render: devEui => (
         <SafeInspector data={devEui} noTransform noCopyPopup small hideable={false} />
       ),
@@ -109,7 +102,7 @@ const RecentEndDevices = () => {
     {
       name: 'last_seen_at',
       displayName: sharedMessages.lastSeen,
-      width: 25,
+      width: '3rem',
       render: lastSeen => {
         const showLastSeen = Boolean(lastSeen)
         return showLastSeen ? (
@@ -128,9 +121,12 @@ const RecentEndDevices = () => {
   return devices.length === 0 && totalCount === 0 ? (
     <div className="d-flex direction-column flex-grow j-center gap-cs-l">
       <div>
-        <Message content={m.emptyMessage} className="d-block text-center fs-l fw-bold" />
         <Message
-          content={m.emptyDescription}
+          content={sharedMessages.noRecentEndDevices}
+          className="d-block text-center fs-l fw-bold"
+        />
+        <Message
+          content={sharedMessages.noRecentEndDevicesDescription}
           className="d-block text-center c-text-neutral-light"
         />
       </div>

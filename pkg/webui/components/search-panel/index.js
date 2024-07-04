@@ -20,14 +20,11 @@ import { APPLICATION, END_DEVICE, GATEWAY, ORGANIZATION } from '@console/constan
 
 import Icon, {
   IconSearch,
-  IconApplication,
   IconArrowUp,
   IconArrowDown,
   IconArrowBack,
-  IconGateway,
-  IconOrganization,
-  IconDevice,
   IconX,
+  entityIcons,
 } from '@ttn-lw/components/icon'
 import ScrollFader from '@ttn-lw/components/scroll-fader'
 
@@ -73,16 +70,9 @@ const categoryMap = {
   bookmarks: {
     title: sharedMessages.bookmarks,
   },
-  recency: {
+  'top-entities': {
     title: sharedMessages.topEntities,
   },
-}
-
-const iconMap = {
-  [APPLICATION]: IconApplication,
-  [GATEWAY]: IconGateway,
-  [ORGANIZATION]: IconOrganization,
-  [END_DEVICE]: IconDevice,
 }
 
 const SearchPanel = ({
@@ -211,7 +201,7 @@ const SearchPanel = ({
               </Spinner>
             </div>
           )}
-          {!topEntitiesFetching && noTopEntities && isTopEntitiesMode && (
+          {!topEntitiesFetching && noTopEntities && (
             <div className={style.noResults}>
               <LookingLuke className="d-block block-center" />
               <p className="c-text-neutral-heavy mt-0 mb-0 fs-l text-center">
@@ -224,7 +214,7 @@ const SearchPanel = ({
               </div>
             </div>
           )}
-          {!topEntitiesFetching && itemCount === 0 && !isTopEntitiesMode && (
+          {!topEntitiesFetching && itemCount === 0 && (
             <div className={style.noResults}>
               <LookingLuke className="d-block block-center" />
               <p className="c-text-neutral-heavy mt-0 mb-0 fs-l text-center">
@@ -261,8 +251,8 @@ const SearchPanel = ({
               item.items.forEach(subitem => {
                 acc.push(
                   <PanelItem
-                    icon={iconMap[subitem.type]}
-                    title={subitem.name || subitem.id}
+                    icon={entityIcons[subitem.type]}
+                    title={subitem?.entity?.name || subitem.id}
                     subtitle={subitem.id}
                     key={subitem.id}
                     isFocused={i === selectedIndex}
@@ -310,12 +300,7 @@ SearchPanel.propTypes = {
   searchResults: PropTypes.arrayOf(
     PropTypes.shape({
       category: PropTypes.string.isRequired,
-      items: PropTypes.arrayOf(
-        PropTypes.shape({
-          name: PropTypes.string,
-          id: PropTypes.string.isRequired,
-        }),
-      ),
+      items: PropTypes.arrayOf(PropTypes.unifiedEntity),
     }),
   ).isRequired,
   searchResultsFetching: PropTypes.bool.isRequired,
@@ -323,14 +308,7 @@ SearchPanel.propTypes = {
     PropTypes.shape({
       category: PropTypes.string.isRequired,
       source: PropTypes.string.isRequired,
-      items: PropTypes.arrayOf(
-        PropTypes.shape({
-          name: PropTypes.string,
-          id: PropTypes.string.isRequired,
-          type: PropTypes.string.isRequired,
-          path: PropTypes.string.isRequired,
-        }),
-      ),
+      items: PropTypes.arrayOf(PropTypes.unifiedEntity),
     }),
   ).isRequired,
   topEntitiesFetching: PropTypes.bool.isRequired,

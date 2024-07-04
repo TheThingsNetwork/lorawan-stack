@@ -20,7 +20,6 @@
 
   &:first-child
     padding: 0 'calc(%s / 2)' % $cs.s 0 $cs.s
-    font-weight: $fwv2.semibold
 
   &:last-child
     padding: 0 $cs.s 0 'calc(%s / 2)' % $cs.s
@@ -51,7 +50,10 @@
     height: 4rem
     white-space: nowrap
     overflow: hidden
-    text-overflow: ellipsis
+
+    & > *
+      overflow: inherit
+      text-overflow: ellipsis
 
     .cell-left
       padding: $cs.l

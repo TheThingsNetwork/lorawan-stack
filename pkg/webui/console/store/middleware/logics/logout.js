@@ -23,6 +23,10 @@ import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
 import * as user from '@console/store/actions/logout'
 
+import { validateRecencyFrequencyEntities } from '@console/store/reducers/recency-frequency-items'
+
+import { loadStateFromLocalStorage } from '../local-storage'
+
 const logoutSequence = async () => {
   const response = await api.console.logout()
   accessToken.clear()
@@ -54,6 +58,25 @@ export default [
           throw err
         }
       }
+    },
+  }),
+  createRequestLogic({
+    type: user.APPLY_PERSISTED_STATE,
+    validate: ({ action }, allow, reject) => {
+      const userId = action.payload
+      if (!userId) {
+        reject()
+      }
+
+      allow()
+    },
+    process: async ({ action }) => {
+      const userId = action.payload
+      const persistedState = loadStateFromLocalStorage(userId, {
+        recencyFrequencyItems: validateRecencyFrequencyEntities,
+      })
+
+      return persistedState
     },
   }),
 ]

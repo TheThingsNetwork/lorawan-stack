@@ -34,14 +34,7 @@ import {
 
 import { selectUser } from '@console/store/selectors/logout'
 
-const SectionLabel = ({
-  label,
-  icon,
-  className,
-  onClick,
-  buttonDisabled,
-  'data-test-id': dataTestId,
-}) => {
+const SectionLabel = ({ label, icon, className, buttonDisabled, 'data-test-id': dataTestId }) => {
   const user = useSelector(selectUser)
   const mayViewApps = useSelector(state =>
     user ? checkFromState(mayViewApplications, state) : false,
@@ -98,7 +91,6 @@ const SectionLabel = ({
         small
         icon={icon}
         disabled={buttonDisabled}
-        onClick={onClick}
         dropdownItems={plusDropdownItems}
         dropdownPosition="below right"
         noDropdownIcon
@@ -114,7 +106,6 @@ SectionLabel.propTypes = {
   'data-test-id': PropTypes.string,
   icon: PropTypes.icon.isRequired,
   label: PropTypes.oneOfType([PropTypes.node, PropTypes.message]).isRequired,
-  onClick: PropTypes.func.isRequired,
 }
 
 SectionLabel.defaultProps = {

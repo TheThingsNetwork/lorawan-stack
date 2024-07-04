@@ -13,68 +13,112 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
+import { defineMessages } from 'react-intl'
 
-import { IconPlus } from '@ttn-lw/components/icon'
+import { APPLICATION, END_DEVICE, GATEWAY } from '@console/constants/entities'
+
+import { IconPlus, entityIcons } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import SectionLabel from '@ttn-lw/components/sidebar/section-label'
 
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+import Message from '@ttn-lw/lib/components/message'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 
-const Bookmark = ({ bookmark }) => {
-  const { title, ids, path, icon } = useBookmark(bookmark)
+import { getTopEntities } from '@console/store/actions/top-entities'
 
-  return <SideNavigation.Item title={title === '' ? ids.id : title} path={path} icon={icon} />
+const m = defineMessages({
+  topGateways: 'Top gateways',
+  topApplications: 'Top applications',
+  topDevices: 'Top devices',
+  noTopEntities: 'No top entities yet',
+  noTopGateways: 'No top gateways yet',
+  noTopApplications: 'No top applications yet',
+  noTopDevices: 'No top end devices yet',
+})
+
+const SectionError = () => (
+  <Message
+    className="text-center fs-s c-text-neutral-light"
+    content={sharedMessages.topEntitiesError}
+  />
+)
+
+const TopEntityItem = ({ id, entity = {}, path, type }) => (
+  <SideNavigation.Item title={entity?.name || id} icon={entityIcons[type]} path={path} />
+)
+
+TopEntityItem.propTypes = {
+  entity: PropTypes.shape({
+    name: PropTypes.string,
+  }),
+  id: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
 }
 
-Bookmark.propTypes = {
-  bookmark: PropTypes.shape({}).isRequired,
+TopEntityItem.defaultProps = {
+  entity: undefined,
 }
 
-const TopEntitiesSection = ({ topEntities, entity }) => {
+const TopEntitiesSection = ({ topEntities, type }) => {
   const [showMore, setShowMore] = useState(false)
 
   const handleShowMore = useCallback(async () => {
     setShowMore(showMore => !showMore)
   }, [])
 
-  const label = entity
-    ? entity === 'gateway'
-      ? sharedMessages.topGateways
-      : sharedMessages.topApplications
-    : sharedMessages.topEntities
-
+  let label = sharedMessages.topEntities
+  let noneLabel = m.noTopEntities
+  if (type === GATEWAY) {
+    label = m.topGateways
+    noneLabel = m.noTopGateways
+  } else if (type === APPLICATION) {
+    label = m.topApplications
+    noneLabel = m.noTopApplications
+  } else if (type === END_DEVICE) {
+    label = m.topDevices
+    noneLabel = m.noTopDevices
+  }
   return (
     <SideNavigation>
-      <SectionLabel label={label} icon={IconPlus} onClick={() => null} />
-      {topEntities.slice(0, 6).map((bookmark, index) => (
-        <Bookmark key={index} bookmark={bookmark} />
-      ))}
-      {showMore &&
-        topEntities.length > 6 &&
-        topEntities
-          .slice(6, topEntities.length)
-          .map((bookmark, index) => <Bookmark key={index} bookmark={bookmark} />)}
-      {topEntities.length > 6 && (
-        <Button
-          message={showMore ? sharedMessages.showLess : sharedMessages.showMore}
-          onClick={handleShowMore}
-          className="c-text-neutral-light ml-cs-xs mt-cs-xs fs-s"
-        />
-      )}
+      <SectionLabel label={topEntities.length === 0 ? noneLabel : label} icon={IconPlus} />
+      <RequireRequest
+        requestAction={getTopEntities()}
+        spinnerProps={{ inline: true, micro: true, center: true, className: 'mt-ls-s' }}
+        errorRenderFunction={SectionError}
+      >
+        {topEntities.slice(0, 6).map((topEntity, index) => (
+          <TopEntityItem key={index} {...topEntity} />
+        ))}
+        {showMore &&
+          topEntities.length > 6 &&
+          topEntities
+            .slice(6, topEntities.length)
+            .map((topEntity, index) => <TopEntityItem key={index} {...topEntity} />)}
+        {topEntities.length > 6 && (
+          <Button
+            message={showMore ? sharedMessages.showLess : sharedMessages.showMore}
+            onClick={handleShowMore}
+            className="c-text-neutral-light ml-cs-xs mt-cs-xs fs-s"
+          />
+        )}
+      </RequireRequest>
     </SideNavigation>
   )
 }
 
 TopEntitiesSection.propTypes = {
-  entity: PropTypes.string,
-  topEntities: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  topEntities: PropTypes.unifiedEntities,
+  type: PropTypes.string,
 }
 
 TopEntitiesSection.defaultProps = {
-  entity: undefined,
+  topEntities: [],
+  type: undefined,
 }
 
 export default TopEntitiesSection

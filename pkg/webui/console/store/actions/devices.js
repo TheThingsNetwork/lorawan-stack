@@ -55,7 +55,7 @@ export const [
 ] = createRequestActions(
   GET_DEV_BASE,
   (appId, deviceId) => ({ appId, deviceId }),
-  (appId, deviceId, selector, options) => ({ selector, options }),
+  (appId, deviceId, selector, options = {}) => ({ selector, options }),
 )
 
 export const UPDATE_DEV_BASE = 'UPDATE_END_DEVICE'
@@ -67,6 +67,12 @@ export const [
   (appId, deviceId, patch) => ({ appId, deviceId, patch }),
   (appId, deviceId, patch, selector, options) => ({ selector, ...options }),
 )
+
+export const DELETE_DEV_BASE = 'DELETE_DEV_BASE'
+export const [
+  { request: DELETE_DEV, success: DELETE_DEV_SUCCESS, failure: DELETE_DEV_FAILURE },
+  { request: deleteDevice, success: deleteDeviceSuccess, failure: deleteDeviceFailure },
+] = createRequestActions(DELETE_DEV_BASE, (appId, deviceId) => ({ appId, deviceId }))
 
 export const GET_DEVICES_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [

@@ -65,7 +65,7 @@ export const [
 ] = createRequestActions(
   GET_GTW_BASE,
   id => ({ id }),
-  (id, selector) => ({ selector }),
+  (id, selector, options = {}) => ({ selector, options }),
 )
 
 export const UPDATE_GTW_BASE = 'UPDATE_GATEWAY'

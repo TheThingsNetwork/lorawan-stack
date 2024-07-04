@@ -26,6 +26,20 @@ export const [
   { request: getUserRights, success: getUserRightsSuccess, failure: getUserRightsFailure },
 ] = createRequestActions(GET_USER_RIGHTS_BASE)
 
+export const APPLY_PERSISTED_STATE_BASE = 'APPLY_PERSISTED_STATE'
+export const [
+  {
+    request: APPLY_PERSISTED_STATE,
+    success: APPLY_PERSISTED_STATE_SUCCESS,
+    failure: APPLY_PERSISTED_STATE_FAILURE,
+  },
+  {
+    request: applyPersistedState,
+    success: applyPersistedStateSuccess,
+    failure: applyPersistedStateFailure,
+  },
+] = createRequestActions(APPLY_PERSISTED_STATE_BASE)
+
 export const LOGOUT_BASE = 'LOGOUT'
 export const [
   { request: LOGOUT, success: LOGOUT_SUCCESS, failure: LOGOUT_FAILURE },

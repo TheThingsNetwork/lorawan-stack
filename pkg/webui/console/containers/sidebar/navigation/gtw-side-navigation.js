@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+import { GATEWAY } from '@console/constants/entities'
 
 import {
   IconMap,
@@ -46,8 +47,7 @@ import {
   selectSelectedGatewayId,
   selectGatewayRights,
 } from '@console/store/selectors/gateways'
-import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectGatewayTopEntities } from '@console/store/selectors/top-entities'
 
 import SidebarContext from '../context'
 
@@ -64,8 +64,7 @@ const GtwSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
   const gtwPageSize = getCookie('gateways-list-page-size')
   const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
-  const topEntities = useSelector(selectPerEntityBookmarks('gateway'))
-  const userId = useSelector(selectUserId)
+  const topEntities = useSelector(selectGatewayTopEntities)
 
   if (!gtw) {
     return null
@@ -129,8 +128,8 @@ const GtwSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && topEntities.length > 0 && mayViewGatewayInfo.check(rights) && (
-        <TopEntitiesSection topEntities={topEntities} userId={userId} />
+      {!isMinimized && mayViewGatewayInfo.check(rights) && (
+        <TopEntitiesSection topEntities={topEntities} type={GATEWAY} />
       )}
     </>
   )

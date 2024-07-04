@@ -18,14 +18,9 @@ import { useSelector } from 'react-redux'
 
 import Status from '@ttn-lw/components/status'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import {
-  selectPerEntityBookmarks,
-  selectPerEntityTotalCount,
-} from '@console/store/selectors/user-preferences'
+import { selectGatewayTopEntities } from '@console/store/selectors/top-entities'
 
 import EntitiesList from '../list'
 
@@ -36,38 +31,42 @@ const m = defineMessages({
 })
 
 const TopGatewaysList = () => {
-  const allBookmarks = useSelector(selectPerEntityBookmarks('gateway'))
+  const items = useSelector(selectGatewayTopEntities)
 
   const headers = [
     {
       name: 'name',
       displayName: sharedMessages.name,
-      render: (name, id) => (
-        <>
-          <Message content={name === '' ? id : name} component="p" className="mt-0 mb-cs-xs p-0" />
-          {name && (
-            <Message content={id} component="span" className="c-text-neutral-light fw-normal" />
-          )}
-        </>
-      ),
+      getValue: entity => entity,
+      render: ({ entity: { name }, id }) =>
+        Boolean(name) ? (
+          <>
+            <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{name}</span>
+            <span className="c-text-neutral-light d-block">{id}</span>
+          </>
+        ) : (
+          <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{id}</span>
+        ),
     },
     {
-      name: 'lastSeen',
+      name: 'status',
+      width: '9rem',
       displayName: sharedMessages.status,
-      render: lastSeen => {
+      getValue: entity => entity?.entity?.status,
+      render: status => {
         let indicator = 'unknown'
         let label = sharedMessages.unknown
 
-        if (lastSeen.status === 'connected') {
+        if (status === 'connected') {
           indicator = 'good'
           label = sharedMessages.connected
-        } else if (lastSeen.status === 'disconnected') {
+        } else if (status === 'disconnected') {
           indicator = 'bad'
           label = sharedMessages.disconnected
-        } else if (lastSeen.status === 'other-cluster') {
+        } else if (status === 'other-cluster') {
           indicator = 'unknown'
           label = sharedMessages.otherCluster
-        } else if (lastSeen.status === 'unknown') {
+        } else if (status === 'unknown') {
           indicator = 'mediocre'
           label = sharedMessages.unknown
         }
@@ -79,14 +78,13 @@ const TopGatewaysList = () => {
 
   return (
     <EntitiesList
-      allBookmarks={allBookmarks}
-      itemsCountSelector={selectPerEntityTotalCount}
+      entities={items}
+      itemsCount={items.length}
       headers={headers}
       emptyMessage={m.emptyMessage}
       emptyDescription={m.emptyDescription}
       emptyAction={m.emptyAction}
       emptyPath={'/gateways/add'}
-      entity={'gateway'}
     />
   )
 }

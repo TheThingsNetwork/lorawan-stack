@@ -12,51 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+
+import { APPLICATION, END_DEVICE } from '@console/constants/entities'
+import { EVENT_END_DEVICE_HEARTBEAT_FILTERS_STRING } from '@console/constants/event-filters'
 
 import { Table } from '@ttn-lw/components/table'
 
-import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectDeviceLastSeen } from '@console/store/selectors/devices'
-import { selectApplicationDerivedLastSeen } from '@console/store/selectors/applications'
-import { selectGatewayById } from '@console/store/selectors/gateways'
+import { startDeviceEventsStream, stopDeviceEventsStream } from '@console/store/actions/devices'
+import {
+  startApplicationEventsStream,
+  stopApplicationEventsStream,
+} from '@console/store/actions/applications'
 
-const EntitiesItem = ({ bookmark, headers }) => {
-  const { title, ids, path, icon } = useBookmark(bookmark)
-  const entityIds = bookmark.entity_ids
-  const entity = Object.keys(entityIds)[0].replace('_ids', '')
+const EntitiesItem = ({ entity, headers }) => {
+  const { id, path, type } = entity
+  const createdAt = entity.entity ? entity.entity.created_at : null
+  const dispatch = useDispatch()
 
-  let lastSeenSelector
-  if (entity === 'application') {
-    lastSeenSelector = state => selectApplicationDerivedLastSeen(state, ids.id)
-  } else if (entity === 'gateway') {
-    lastSeenSelector = state => selectGatewayById(state, ids.id)
-  } else if (entity === 'device') {
-    lastSeenSelector = state => selectDeviceLastSeen(state, ids.appId, ids.id)
-  }
-
-  const lastSeenSelected = useSelector(lastSeenSelector)
-
-  const lastSeen = entity === 'gateway' ? { status: lastSeenSelected?.status } : lastSeenSelected
+  // Start an app/device event stream if the entity is an end device
+  // so we can update the last seen status in real-time.
+  useEffect(() => {
+    if (createdAt === null) {
+      // Only start the stream if the entity is already fetched
+      // so we avoid starting streams for entities that don't exist
+      // or we don't have permissions for.
+      return
+    }
+    if (type === END_DEVICE) {
+      dispatch(startDeviceEventsStream(id, { filter: [EVENT_END_DEVICE_HEARTBEAT_FILTERS_STRING] }))
+    } else if (type === APPLICATION) {
+      dispatch(
+        startApplicationEventsStream(id, { filter: [EVENT_END_DEVICE_HEARTBEAT_FILTERS_STRING] }),
+      )
+    }
+    return () => {
+      if (type === END_DEVICE) {
+        dispatch(stopDeviceEventsStream(id))
+      } else if (type === APPLICATION) {
+        dispatch(stopApplicationEventsStream(id))
+      }
+    }
+  }, [createdAt, dispatch, id, type])
 
   return (
-    <Table.Row id={ids.id} clickable linkTo={path} body>
+    <Table.Row id={id} clickable linkTo={path} body>
       {headers.map((header, index) => {
-        const value =
-          headers[index].name === 'name'
-            ? title
-            : headers[index].name === 'type'
-              ? icon
-              : headers[index].name === 'lastSeen'
-                ? lastSeen
-                : ''
-        const entityID = ids.id
+        const value = header.getValue ? header.getValue(entity) : entity[header.name]
         return (
-          <Table.DataCell key={index} align={header.align}>
-            {headers[index].render(value, entityID)}
+          <Table.DataCell key={`${id}-${index}`} align={header.align} className={header.className}>
+            {headers[index].render(value, id)}
           </Table.DataCell>
         )
       })}
@@ -65,9 +73,7 @@ const EntitiesItem = ({ bookmark, headers }) => {
 }
 
 EntitiesItem.propTypes = {
-  bookmark: PropTypes.shape({
-    entity_ids: PropTypes.shape({}).isRequired,
-  }).isRequired,
+  entity: PropTypes.unifiedEntity.isRequired,
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,

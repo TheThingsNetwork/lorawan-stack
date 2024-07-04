@@ -32,6 +32,7 @@ import {
   selectSearchQuery,
   selectIsSearchOpen,
 } from '@console/store/selectors/search'
+import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
 
 import style from './search-panel.styl'
 
@@ -72,8 +73,18 @@ const SearchPanelInner = ({ onClose }) => {
   const searchQuery = useSelector(selectSearchQuery)
   const [searchResultsFetching, setSearchResultsFetching] = useState(false)
   const [searchResultsError, setSearchResultsError] = useState()
+  const topEntitiesResult = useSelector(selectTopEntitiesAll)
+  const topEntities = topEntitiesResult
+    ? [
+        {
+          category: 'top-entities',
+          source: 'top-entities',
+          items: topEntitiesResult,
+        },
+      ]
+    : []
 
-  const [topItemsFetching, topItemsError, topEntities] = useRequest(getTopEntities())
+  const [topItemsFetching, topItemsError] = useRequest(getTopEntities())
 
   const handleQueryChange = useCallback(
     async query => {
@@ -99,7 +110,7 @@ const SearchPanelInner = ({ onClose }) => {
           searchQuery={searchQuery}
           searchResults={searchResults}
           searchResultsFetching={searchResultsFetching}
-          topEntities={topEntities || []}
+          topEntities={topEntities}
           topEntitiesFetching={topItemsFetching}
           onClose={onClose}
           onQueryChange={handleQueryChange}

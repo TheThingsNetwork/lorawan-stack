@@ -16,6 +16,8 @@ import React, { useEffect, useMemo } from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { APPLICATION } from '@console/constants/entities'
+
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
@@ -48,6 +50,7 @@ import {
 } from '@console/store/actions/applications'
 import { getAsConfiguration } from '@console/store/actions/application-server'
 import { getDevicesList } from '@console/store/actions/devices'
+import { trackRecencyFrequencyItem } from '@console/store/actions/recency-frequency-items'
 
 import { selectSelectedApplication } from '@console/store/selectors/applications'
 import {
@@ -57,6 +60,7 @@ import {
 
 const Application = () => {
   const { appId } = useParams()
+  const dispatch = useDispatch()
   const actions = useMemo(
     () => [
       getApplication(
@@ -65,10 +69,15 @@ const Application = () => {
       ),
       getApplicationsRightsList(appId),
       getAsConfiguration(),
-      getDevicesList(appId, { page: 1, limit: 1000 }, ['name']),
+      getDevicesList(appId, { page: 1, limit: 1000 }, ['name', 'last_seen_at']),
     ],
     [appId],
   )
+
+  // Track application access.
+  useEffect(() => {
+    dispatch(trackRecencyFrequencyItem(APPLICATION, appId))
+  }, [appId, dispatch])
 
   // Check whether application still exists after it has been possibly deleted.
   const application = useSelector(selectSelectedApplication)

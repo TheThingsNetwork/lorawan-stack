@@ -67,8 +67,6 @@ const DeleteModalButton = props => {
     <ModalButton
       type="button"
       icon={IconTrash}
-      naked
-      danger
       onApprove={handleDeleteApprove}
       onCancel={onCancel}
       message={message}

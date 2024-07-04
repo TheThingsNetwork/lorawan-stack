@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import { Table } from '@ttn-lw/components/table'
@@ -34,24 +33,19 @@ const m = defineMessages({
 })
 
 const EntitiesList = ({
-  itemsCountSelector,
-  allBookmarks,
+  entities,
   headers,
   emptyMessage,
   emptyDescription,
   emptyAction,
   emptyPath,
   EntitiesItemComponent: EntitiesItemProp,
-  entity,
 }) => {
-  const itemsTotalCount = useSelector(state => itemsCountSelector(state, entity))
   const EntitiesItemComponent = EntitiesItemProp ?? EntitiesItem
 
-  const rows = allBookmarks
+  const rows = entities
     .slice(0, 10)
-    .map((bookmark, index) => (
-      <EntitiesItemComponent key={index} headers={headers} bookmark={bookmark} />
-    ))
+    .map(entity => <EntitiesItemComponent headers={headers} entity={entity} key={entity.id} />)
 
   const columns = (
     <Table.Row head>
@@ -68,7 +62,7 @@ const EntitiesList = ({
     </Table.Row>
   )
 
-  return allBookmarks.length === 0 && itemsTotalCount === 0 ? (
+  return entities.length === 0 ? (
     <div className="d-flex direction-column flex-grow j-center gap-cs-l">
       <div>
         <Message content={emptyMessage} className="d-block text-center fs-l fw-bold" />
@@ -92,12 +86,11 @@ const EntitiesList = ({
 
 EntitiesList.propTypes = {
   EntitiesItemComponent: PropTypes.func,
-  allBookmarks: PropTypes.arrayOf(PropTypes.object).isRequired,
   emptyAction: PropTypes.message,
   emptyDescription: PropTypes.message,
   emptyMessage: PropTypes.message,
   emptyPath: PropTypes.string,
-  entity: PropTypes.string,
+  entities: PropTypes.unifiedEntities.isRequired,
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       align: PropTypes.string,
@@ -107,7 +100,6 @@ EntitiesList.propTypes = {
       className: PropTypes.string,
     }),
   ).isRequired,
-  itemsCountSelector: PropTypes.func.isRequired,
 }
 
 EntitiesList.defaultProps = {
@@ -115,7 +107,6 @@ EntitiesList.defaultProps = {
   emptyMessage: undefined,
   emptyAction: undefined,
   emptyPath: undefined,
-  entity: undefined,
   EntitiesItemComponent: undefined,
 }
 

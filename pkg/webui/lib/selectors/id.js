@@ -52,6 +52,12 @@ export const getCombinedDeviceId = (device = {}) => {
   const devId = getDeviceId(device)
   return combineDeviceIds(appId, devId)
 }
+export const buildObjectDeviceId = combineDeviceIds => {
+  const application_id = extractApplicationIdFromCombinedId(combineDeviceIds)
+  const device_id = extractDeviceIdFromCombinedId(combineDeviceIds)
+
+  return { device_id, application_ids: { application_id } }
+}
 
 export const getCollaboratorId = (collaborator = {}) =>
   getByPath(collaborator, 'ids.organization_ids.organization_id') ||
