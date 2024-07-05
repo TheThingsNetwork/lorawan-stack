@@ -314,6 +314,11 @@ func (c *Component) FrequencyPlansStore(ctx context.Context) (*frequencyplans.St
 	return c.frequencyPlans, nil
 }
 
+// GRPCServer returns the component's gRPC server.
+func (c *Component) GRPCServer() *rpcserver.Server {
+	return c.GRPC
+}
+
 // Start starts the component.
 func (c *Component) Start() (err error) {
 	if c.GRPC != nil {

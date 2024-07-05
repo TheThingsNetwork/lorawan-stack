@@ -24,7 +24,7 @@ type Config struct {
 	// BasicStation defines the configuration for the BasicStation CUPS.
 	BasicStation bscups.ServerConfig `name:"basic-station" description:"BasicStation CUPS configuration."`
 	// TheThingsKickstarterGateway defines the configuration for The Things Kickstarter Gateway.
-	TheThingsKickstarterGateway ttkg.Config `name:"the-things-gateway" description:"The Things Kickstarter Gateway configuration."`
+	TheThingsKickstarterGateway ttkg.Config `name:"the-things-gateway" description:"The Things Kickstarter Gateway configuration."` //nolint:lll
 	// RequreAuth defines if the HTTP endpoints should require authentication or not.
 	RequireAuth bool `name:"require-auth" description:"Require authentication for the HTTP endpoints."`
 }
