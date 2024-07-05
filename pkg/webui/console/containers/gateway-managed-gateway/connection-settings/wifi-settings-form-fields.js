@@ -15,6 +15,7 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -27,6 +28,8 @@ import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shar
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
+import { selectConnectionProfiles } from '@console/store/selectors/connection-profiles'
+
 const m = defineMessages({
   settingsProfile: 'Settings profile',
   profileDescription: 'Connection settings profiles can be shared within the same organization',
@@ -38,14 +41,19 @@ const m = defineMessages({
     'The gateway {connection} is currently attempting to connect using this profile',
   saveToConnect:
     'Please click "Save changes" to start using this {connection} profile for the gateway',
+  createNewSharedProfile: 'Create a new shared profile',
+  setAConfigForThisGateway: 'Set a config for this gateway only',
 })
 
 const WifiSettingsFormFields = ({ index }) => {
   const { values } = useFormContext()
+
+  const profiles = useSelector(selectConnectionProfiles)
+  // TODO: Fetch profiles and map them for the options, decide value for fixed options
   const profileOptions = [
-    { value: '0', label: 'profile1' },
-    { value: '1', label: 'profile2' },
-    { value: '2', label: 'Create new profile...' },
+    ...profiles,
+    { value: '2', label: m.createNewSharedProfile.defaultMessage },
+    { value: '3', label: m.setAConfigForThisGateway.defaultMessage },
   ]
 
   const isConnected = 0
@@ -81,7 +89,7 @@ const WifiSettingsFormFields = ({ index }) => {
         />
       </div>
       <Message component="div" content={m.profileDescription} className="tc-subtle-gray mb-cs-m" />
-      {values.settings[index].profile === '2' && (
+      {(values.settings[index].profile === '2' || values.settings[index].profile === '3') && (
         <GatewayWifiProfilesFormFields namePrefix={`settings.${index}.`} />
       )}
       {connectionStatus !== null && (

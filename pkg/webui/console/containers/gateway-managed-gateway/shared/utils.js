@@ -18,9 +18,10 @@ export const CONNECTION_TYPES = Object.freeze({
   ETHERNET: 'ethernet',
 })
 
-export const getInitialWifiProfile = isShared => ({
+export const initialWifiProfile = {
   profile_name: '',
-  shared: isShared,
+  // TODO: Change this property as expected
+  profileOf: 'yourself',
   access_point: {
     _type: 'all',
     ssid: '',
@@ -36,7 +37,7 @@ export const getInitialWifiProfile = isShared => ({
     gateway: '',
     dns_servers: [],
   },
-})
+}
 
 export const initialEthernetProfile = {
   enable_ethernet_connection: false,
