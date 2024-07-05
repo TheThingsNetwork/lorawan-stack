@@ -230,6 +230,8 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		return nil, err
 	}
 
+	config.TTGC.TLS.KeyVault.CertificateProvider = c.keyService
+
 	c.initRights()
 
 	c.initGRPC()
