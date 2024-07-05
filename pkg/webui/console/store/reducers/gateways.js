@@ -26,8 +26,6 @@ import {
   UPDATE_GTW_STATS_FAILURE,
   START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
-  GET_CONNECTION_PROFILES_LIST_SUCCESS,
-  DELETE_CONNECTION_PROFILE_SUCCESS,
 } from '@console/store/actions/gateways'
 
 const defaultStatisticsState = {
@@ -39,8 +37,6 @@ const defaultState = {
   entities: {},
   selectedGateway: null,
   statistics: defaultStatisticsState,
-  connectionProfiles: [],
-  connectionProfilesTotalCount: undefined,
 }
 
 const gateway = (state = {}, gateway) => ({
@@ -150,18 +146,6 @@ const gateways = (state = defaultState, action) => {
       return {
         ...state,
         statistics: statistics(state.statistics, action),
-      }
-    case GET_CONNECTION_PROFILES_LIST_SUCCESS:
-      return {
-        ...state,
-        connectionProfiles: payload.entities,
-        connectionProfilesTotalCount: payload.connectionProfilesTotalCount,
-      }
-    case DELETE_CONNECTION_PROFILE_SUCCESS:
-      return {
-        ...state,
-        connectionProfiles: state.connectionProfiles.filter(profile => profile.id !== payload.id),
-        connectionProfilesTotalCount: state.connectionProfilesTotalCount - 1,
       }
     default:
       return state

@@ -35,12 +35,15 @@ import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shar
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { deleteConnectionProfile, getConnectionProfilesList } from '@console/store/actions/gateways'
+import {
+  deleteConnectionProfile,
+  getConnectionProfilesList,
+} from '@console/store/actions/connection-profiles'
 
 import {
   selectConnectionProfiles,
   selectConnectionProfilesTotalCount,
-} from '@console/store/selectors/gateways'
+} from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
   information:
