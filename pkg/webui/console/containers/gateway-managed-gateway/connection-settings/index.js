@@ -28,7 +28,7 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import validationSchema from '@console/containers/gateway-managed-gateway/connection-settings/validation-schema'
 import {
   CONNECTION_TYPES,
-  getInitialWifiProfile,
+  initialWifiProfile,
   initialEthernetProfile,
 } from '@console/containers/gateway-managed-gateway/shared/utils'
 import WifiSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/wifi-settings-form-fields'
@@ -70,7 +70,7 @@ const GatewayConnectionSettings = () => {
         {
           _connection_type: CONNECTION_TYPES.WIFI,
           profile: '',
-          ...getInitialWifiProfile(false),
+          ...initialWifiProfile,
         },
         {
           _connection_type: CONNECTION_TYPES.ETHERNET,

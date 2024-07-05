@@ -60,15 +60,15 @@ const GatewayWifiProfilesOverview = () => {
   const navigate = useNavigate()
 
   const onAddProfile = useCallback(
-    shared => {
-      navigate(`add?shared=${shared}`)
+    profileOf => {
+      navigate(`add?profileOf=${profileOf}`)
     },
     [navigate],
   )
 
   const handleEdit = React.useCallback(
-    (profileId, shared) => {
-      navigate(`edit/${profileId}?shared=${shared}`)
+    (profileId, profileOf) => {
+      navigate(`edit/${profileId}?profileOf=${profileOf}`)
     },
     [navigate],
   )
@@ -166,17 +166,17 @@ const GatewayWifiProfilesOverview = () => {
       />
       <Form
         initialValues={{
-          shared: false,
+          profileOf: 'yourself',
         }}
       >
         {({ values }) => (
           <>
             <div className="d-flex j-between al-end gap-cs-m">
-              <ShowProfilesSelect name="shared" />
+              <ShowProfilesSelect name="profileOf" />
               <Button
                 className="mb-cs-m"
                 primary
-                onClick={() => onAddProfile(values.shared)}
+                onClick={() => onAddProfile(values.profileOf)}
                 message={sharedMessages.addWifiProfile}
                 icon="add"
               />

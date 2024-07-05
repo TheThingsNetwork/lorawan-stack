@@ -23,7 +23,7 @@ import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 
-import { getInitialWifiProfile } from '@console/containers/gateway-managed-gateway/shared/utils'
+import { initialWifiProfile } from '@console/containers/gateway-managed-gateway/shared/utils'
 import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/shared/wifi-profiles-form-fields'
 import { wifiValidationSchema } from '@console/containers/gateway-managed-gateway/shared/validation-schema'
 
@@ -58,15 +58,13 @@ const GatewayWifiProfilesForm = () => {
     }
   }, [])
 
-  const initialValues = getInitialWifiProfile(searchParams.get('shared') === 'true')
-
   return (
     <>
       <PageTitle title={isEdit ? m.updateWifiProfile : sharedMessages.addWifiProfile} />
       <Form
         error={error}
         onSubmit={handleSubmit}
-        initialValues={initialValues}
+        initialValues={initialWifiProfile}
         validationSchema={wifiValidationSchema}
       >
         <GatewayWifiProfilesFormFields isEdit={isEdit} />

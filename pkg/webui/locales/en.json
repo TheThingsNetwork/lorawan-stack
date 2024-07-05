@@ -563,6 +563,8 @@
   "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.unableToConnect": "The gateway {connection} is currently unable to connect using this profile",
   "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.attemptingToConnect": "The gateway {connection} is currently attempting to connect using this profile",
   "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.saveToConnect": "Please click \"Save changes\" to start using this {connection} profile for the gateway",
+  "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.createNewSharedProfile": "Create a new shared profile",
+  "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.setAConfigForThisGateway": "Set a config for this gateway only",
   "console.containers.gateway-managed-gateway.shared.network-interface-addresses-form-fields.ipAddresses": "IP addresses",
   "console.containers.gateway-managed-gateway.shared.network-interface-addresses-form-fields.dnsServers": "DNS servers",
   "console.containers.gateway-managed-gateway.shared.network-interface-addresses-form-fields.addServerAddress": "Add server address",

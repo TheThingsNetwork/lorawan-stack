@@ -58,7 +58,7 @@ export const wifiValidationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
-  shared: Yup.boolean(),
+  profileOf: Yup.string(),
   default_network_interface: Yup.boolean(),
   network_interface_addresses: Yup.object().when('default_network_interface', {
     is: false,
