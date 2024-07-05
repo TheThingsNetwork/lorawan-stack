@@ -15,11 +15,16 @@
 .side-footer
   margin-top: auto
 
-  .support-button
-    width: 100%
-
-    button
+  .cluster-button
+    &-content
+      display: flex
       width: 100%
+      font-weight: $fwv2.bold
+      white-space: nowrap
+
+  .support-button
+    button
+      width: fit-content
 
   &-button
     justify-content: space-between
@@ -47,12 +52,18 @@
 
   .side-footer-version
     margin-left: $cs.xxs
-
-  .support-button > button
-    // stylelint-disable-next-line declaration-no-important
-    width: 100% !important
-    justify-content: flex-start
+    color: var(--c-text-neutral-semilight)
+    font-weight: $fwv2.regular
+    overflow: hidden
+    text-overflow: ellipsis
 
   ul.side-footer-cluster-dropdown
+    --dropdown-offset: $cs.m
     left: initial
     right: 0
+
+    &-cluster-id
+      right: $cs.m
+
+.progress-bar
+  height: $cs.xs
