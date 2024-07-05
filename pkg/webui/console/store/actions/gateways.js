@@ -165,41 +165,6 @@ export const [
   (id, timeout) => ({ timeout }),
 )
 
-export const GET_CONNECTION_PROFILES_LIST_BASE = 'GET_CONNECTION_PROFILES_LIST'
-export const [
-  {
-    request: GET_CONNECTION_PROFILES_LIST,
-    success: GET_CONNECTION_PROFILES_LIST_SUCCESS,
-    failure: GET_CONNECTION_PROFILES_LIST_FAILURE,
-  },
-  {
-    request: getConnectionProfilesList,
-    success: getConnectionProfilesListSuccess,
-    failure: getConnectionProfilesListFailure,
-  },
-] = createRequestActions(
-  GET_CONNECTION_PROFILES_LIST_BASE,
-  type => ({ type }),
-  (type, selector) => ({ selector }),
-)
-
-export const DELETE_CONNECTION_PROFILE_BASE = 'DELETE_CONNECTION_PROFILE'
-export const [
-  {
-    request: DELETE_CONNECTION_PROFILE,
-    success: DELETE_CONNECTION_PROFILE_SUCCESS,
-    failure: DELETE_CONNECTION_PROFILE_FAILURE,
-  },
-  {
-    request: deleteConnectionProfile,
-    success: deleteConnectionProfileSuccess,
-    failure: deleteConnectionProfileFailure,
-  },
-] = createRequestActions(DELETE_CONNECTION_PROFILE_BASE, (type, id) => ({
-  type,
-  id,
-}))
-
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
 export const stopGatewayStatistics = () => ({ type: STOP_GTW_STATS })
 

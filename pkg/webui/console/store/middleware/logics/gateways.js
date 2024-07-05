@@ -23,7 +23,6 @@ import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as gateways from '@console/store/actions/gateways'
-import * as authorizations from '@account/store/actions/authorizations'
 
 import {
   selectGatewayById,
@@ -295,33 +294,6 @@ const getGatewayEventLocationLogic = createLogic({
   },
 })
 
-const getConnectionProfilesLogic = createRequestLogic({
-  type: gateways.GET_CONNECTION_PROFILES_LIST,
-  process: async ({ action }) => {
-    const { type } = action.payload
-
-    // TODO: Change call to fetch connection profiles
-    const res = {
-      profiles: [],
-      totalCount: 0,
-    }
-
-    return { entities: res.profiles, connectionProfilesTotalCount: res.totalCount }
-  },
-})
-
-const deleteConnectionProfileLogic = createRequestLogic({
-  type: gateways.DELETE_CONNECTION_PROFILE,
-  process: async ({ action }) => {
-    const { id } = action.payload
-
-    // TODO: Change call to delete connection profiles
-    // await tts.Authorizations.deleteToken(userId, clientId, id)
-
-    return { id }
-  },
-})
-
 export default [
   createGatewayLogic,
   getGatewayLogic,
@@ -336,7 +308,5 @@ export default [
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
   getGatewayEventLocationLogic,
-  getConnectionProfilesLogic,
-  deleteConnectionProfileLogic,
   ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', tts.Gateways.openStream),
 ]
