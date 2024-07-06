@@ -74,7 +74,6 @@ const initialValues = {
 
 const GatewayRegistrationFormSections = () => {
   const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
-  const gatewayEui = values.ids?.eui
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
@@ -91,7 +90,7 @@ const GatewayRegistrationFormSections = () => {
         placeholder={sharedMessages.gatewayIdPlaceholder}
         component={Input}
         tooltipId={tooltipIds.GATEWAY_ID}
-        autoFocus={!Boolean(gatewayEui)}
+        autoFocus
         required
       />
       <Form.Field
@@ -100,7 +99,6 @@ const GatewayRegistrationFormSections = () => {
         name="name"
         component={Input}
         tooltipId={tooltipIds.GATEWAY_NAME}
-        autoFocus={Boolean(gatewayEui)}
       />
       {gsEnabled && <GsFrequencyPlansSelect />}
       <Form.Field

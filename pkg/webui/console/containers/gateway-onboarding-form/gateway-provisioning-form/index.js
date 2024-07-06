@@ -15,7 +15,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ErrorMessage } from 'formik'
 import { defineMessages } from 'react-intl'
-import { useDispatch } from 'react-redux'
 
 import Button from '@ttn-lw/components/button'
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -27,10 +26,7 @@ import OwnersSelect from '@console/containers/owners-select'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
-
-import { getGatewayClaimInfoByEui } from '@console/store/actions/gateways'
 
 import GatewayRegistrationFormSection from './gateway-registration-form-section'
 import GatewayClaimFormSection from './gateway-claim-form-section'
@@ -66,7 +62,6 @@ const gatewayEuiValueSetter = ({ setValues }, { value }) =>
 
 const GatewayProvisioningFormSection = () => {
   const [euiError, setEuiError] = useState(undefined)
-  const dispatch = useDispatch()
   const {
     values: {
       _ownerId: ownerId,
@@ -106,15 +101,12 @@ const GatewayProvisioningFormSection = () => {
       if (!hasEmptyEui) {
         // Const { supports_claiming } = await dispatch(attachPromise(getGatewayClaimInfoByEui(eui)))
         const supports_claiming = false
-        const prefillId = `eui-${eui.toLowerCase()}`
         if (supports_claiming) {
           // TODO: Make API request to determine whether it's a Managed gateway
           // TODO: Preselect frequency plan based on the region
           const isTTIG = false
           setFieldValue('_inputMethod', isTTIG ? 'claim' : 'tts')
-          setFieldValue('target_gateway_id', prefillId)
         } else {
-          setFieldValue('ids.gateway_id', prefillId)
           setFieldValue('_inputMethod', 'register')
         }
       } else {
@@ -124,7 +116,7 @@ const GatewayProvisioningFormSection = () => {
     } catch (error) {
       setEuiError(error)
     }
-  }, [eui, hasEmptyEui, setFieldValue])
+  }, [hasEmptyEui, setFieldValue])
 
   const handleEuiReset = useCallback(async () => {
     setEuiError(undefined)
@@ -153,7 +145,6 @@ const GatewayProvisioningFormSection = () => {
     const euiValue = `${eui.substring(0, 6)}FFFE${eui.substring(6)}`
     setFieldValue('authenticated_identifiers.gateway_eui', euiValue)
     setFieldValue('ids.eui', euiValue)
-    setFieldValue('ids.gateway_id', `eui-${euiValue.toLowerCase()}`)
   }, [eui, setFieldValue])
 
   return (
