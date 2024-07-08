@@ -25,6 +25,7 @@ import ApplicationMapPanel from '@console/components/application-map-panel'
 
 import LatestDecodedPayloadPanel from '@console/containers/latest-decoded-payload-panel'
 import ApplicationOverviewHeader from '@console/containers/application-overview-header'
+import DevicesPanel from '@console/containers/devices-panel'
 
 import Require from '@console/lib/components/require'
 
@@ -65,7 +66,7 @@ const ApplicationOverview = () => {
       <ApplicationOverviewHeader />
       <div className="container container--xl grid p-ls-s gap-ls-s">
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
-          <div style={{ height: '30rem', backgroundColor: 'lightgray' }} />
+          <DevicesPanel />
         </div>
         <div className="item-12 md:item-12 lg:item-6 sm:item-6">
           <BlurryNetworkActivityPanel />

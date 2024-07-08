@@ -84,6 +84,7 @@ const FetchTable = props => {
     getItemsAction,
     baseDataSelector,
     className,
+    headerClassName,
   } = props
 
   const location = useLocation()
@@ -326,6 +327,7 @@ const FetchTable = props => {
           clickable={clickable}
           disableSorting={disableSorting}
           className={className}
+          headerClassName={headerClassName}
         />
       </Overlay>
     </div>
@@ -344,6 +346,7 @@ FetchTable.propTypes = {
   getItemsAction: PropTypes.func.isRequired,
   handlesPagination: PropTypes.bool,
   handlesSorting: PropTypes.bool,
+  headerClassName: PropTypes.string,
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       displayName: PropTypes.message.isRequired,
@@ -394,6 +397,7 @@ FetchTable.defaultProps = {
   actionItems: null,
   clickable: true,
   defaultOrder: undefined,
+  headerClassName: undefined,
 }
 
 export default FetchTable
