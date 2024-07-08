@@ -44,6 +44,8 @@ import { selectSelectedDevice } from '@console/store/selectors/devices'
 import { selectDeviceModelById } from '@console/store/selectors/device-repository'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
+import sensorIconMap from './utils'
+
 import style from './device-info-panel.styl'
 
 const m = defineMessages({
@@ -67,18 +69,10 @@ const hasDecodedPayload = data => {
 
 const DeviceInfoPanel = ({ events }) => {
   const [brandName, setBrandName] = useState('')
-  const [latestEvent, setLatestEvent] = useState(null)
   const appId = useSelector(selectSelectedApplicationId)
   const device = useSelector(selectSelectedDevice)
 
   const actualLastEvent = events.find(e => hasDecodedPayload(e.data))
-  // Save latestEvent only if it there are 10 seconds between actualLastEvent and lastEvent (throttling).
-  if (
-    actualLastEvent &&
-    (!latestEvent || Date.parse(actualLastEvent.time) - Date.parse(latestEvent.time) > 10000)
-  ) {
-    setLatestEvent(actualLastEvent)
-  }
 
   const { version_ids = {} } = device
   const hasVersionIds = Object.keys(version_ids).length > 0
@@ -138,14 +132,14 @@ const DeviceInfoPanel = ({ events }) => {
               <Message content={model?.name} className="fw-bold" />
               <Message content={brandName} />
               <div className="d-flex gap-cs-m">
-                {latestEvent && (
+                {actualLastEvent && (
                   <>
                     <div className="d-inline-flex al-center gap-cs-xxs">
                       <Icon icon={IconAccessPoint} />
                       <Message
                         content={m.snr}
                         values={{
-                          snr: latestEvent?.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
+                          snr: actualLastEvent?.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
                         }}
                       />
                     </div>
@@ -154,7 +148,7 @@ const DeviceInfoPanel = ({ events }) => {
                       <Message
                         content={m.rssi}
                         values={{
-                          rssi: latestEvent?.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
+                          rssi: actualLastEvent?.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
                         }}
                       />
                     </div>
@@ -162,13 +156,14 @@ const DeviceInfoPanel = ({ events }) => {
                 )}
                 {/* Battery */}
               </div>
-              <ButtonGroup align="start">
+              <ButtonGroup align="start" className={style.buttonGroup}>
                 <Button.AnchorLink
                   secondary
                   href={model?.product_url}
                   target="_blank"
                   message={m.deviceWebsite}
                   icon={IconWorld}
+                  className={style.button}
                 />
                 <Button.AnchorLink
                   secondary
@@ -176,11 +171,12 @@ const DeviceInfoPanel = ({ events }) => {
                   target="_blank"
                   message={sharedMessages.dataSheet}
                   icon={IconFileAnalytics}
+                  className={style.button}
                 />
               </ButtonGroup>
             </div>
           </div>
-          {model?.sensors && <TagList tags={model?.sensors} />}
+          {model?.sensors && <TagList tags={model?.sensors} icons={sensorIconMap} />}
         </RequireRequest>
       ) : (
         <div className="d-flex gap-cs-xl">
@@ -190,14 +186,14 @@ const DeviceInfoPanel = ({ events }) => {
           <div className="d-flex direction-column j-center gap-cs-m" style={{ lineHeight: 1 }}>
             <span className="fw-bold">{device.name ?? device.ids.device_id}</span>
             <Message content={m.notInDeviceRepository} className="c-text-neutral-light" />
-            {latestEvent && (
+            {actualLastEvent && (
               <div className="d-flex gap-cs-m">
                 <div className="d-inline-flex al-center gap-cs-xxs">
                   <Icon icon={IconAccessPoint} />
                   <Message
                     content={m.snr}
                     values={{
-                      snr: latestEvent?.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
+                      snr: actualLastEvent?.data.uplink_message?.rx_metadata?.[0]?.snr ?? 0,
                     }}
                   />
                 </div>
@@ -206,7 +202,7 @@ const DeviceInfoPanel = ({ events }) => {
                   <Message
                     content={m.rssi}
                     values={{
-                      rssi: latestEvent?.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
+                      rssi: actualLastEvent?.data.uplink_message?.rx_metadata?.[0]?.rssi ?? 0,
                     }}
                   />
                 </div>

@@ -130,7 +130,7 @@ const DeviceOverviewHeader = ({ device }) => {
   const handleAddToBookmark = useCallback(async () => {
     try {
       if (!isBookmarked) {
-        await dispatch(attachPromise(addBookmark(user.ids.user_id, { gateway_ids: ids })))
+        await dispatch(attachPromise(addBookmark(user.ids.user_id, { device_ids: ids })))
         return
       }
       await dispatch(

@@ -185,7 +185,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
     if (copyElem && copyElem.current) {
       new clipboard(copyElem.current, { container: containerElem.current })
     }
-  }, [])
+  }, [latestEvent, selectedEvent])
 
   const getContent = useCallback(
     (event, minLines = 3) =>
@@ -325,7 +325,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
       title={m.latestDecodedPayload}
       icon={isHovered ? IconPlayerPause : IconCodeDots}
       shortCutLinkTitle={m.seeInLiveData}
-      shortCutLinkPath={`${shortCutLinkPath}${latestEvent ? `?eventId=${latestEvent?.eventId}` : ''}`}
+      shortCutLinkPath={`${shortCutLinkPath}${latestEvent ? `?eventId=${latestEvent?.unique_id}` : ''}`}
       className={classnames(style.panel, className)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

@@ -20,12 +20,12 @@ import Tooltip from '@ttn-lw/components/tooltip'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const TagList = ({ tags }) => {
+const TagList = ({ tags, icons }) => {
   const containerRef = React.useRef()
   const [visibleTags, setVisibleTags] = useState([])
   const [hiddenTagsCount, setHiddenTagsCount] = useState(0)
 
-  // Function to calculate text width
+  // Function to calculate text width.
   const getTextWidth = (text, font) => {
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
@@ -40,7 +40,7 @@ const TagList = ({ tags }) => {
         let currentWidth = 0
         let visibleCount = 0
 
-        // Add padding and margin to each tag
+        // Add padding and margin to each tag.
         const tagPadding = 21
         const tagMargin = 10.5
 
@@ -58,12 +58,12 @@ const TagList = ({ tags }) => {
           }
         }
 
-        // Check if we need to add the "more" tag
+        // Check if we need to add the "more" tag.
         if (visibleCount < tags.length) {
           const moreTagText = `+${tags.length - visibleCount}`
           const moreTagWidth = getTextWidth(moreTagText, font) + tagPadding + tagMargin
 
-          // If adding the "more" tag pushes us over the limit, remove one more visible tag
+          // If adding the "more" tag pushes us over the limit, remove one more visible tag.
           if (currentWidth + moreTagWidth > containerWidth) {
             visibleCount--
           }
@@ -85,7 +85,7 @@ const TagList = ({ tags }) => {
   return (
     <div
       ref={containerRef}
-      className="d-flex j-strat gap-cs-s mt-cs-xl overflow-hidden"
+      className="d-flex j-start gap-cs-s mt-cs-xl overflow-hidden fs-s"
       style={{ flexWrap: 'nowrap' }}
     >
       {visibleTags.map(tag => (
@@ -94,7 +94,7 @@ const TagList = ({ tags }) => {
           className="d-flex j-center al-center gap-cs-xxs p-sides-cs-s p-vert-cs-xxs br-xl c-bg-neutral-light"
           style={{ textWrap: 'nowrap' }}
         >
-          <Icon icon={IconAccessPoint} />
+          <Icon icon={icons && Boolean(icons[tag]) ? icons[tag] : IconAccessPoint} />
           {upperFirst(tag)}
         </span>
       ))}
@@ -115,7 +115,12 @@ const TagList = ({ tags }) => {
 }
 
 TagList.propTypes = {
+  icons: PropTypes.shape({}),
   tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+}
+
+TagList.defaultProps = {
+  icons: undefined,
 }
 
 export default TagList

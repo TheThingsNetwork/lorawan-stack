@@ -15,6 +15,8 @@
 .device-image
   width: 9.5rem
   height: 9.5rem
+  min-width: 6.5rem
+  min-height: 6.5rem
   border-radius: $br.m
   border: 2px solid var(--c-border-neutral-light)
   overflow: hidden
@@ -25,3 +27,13 @@
     width: 6rem
   img
     border-radius: $br.m
+
+@container panel (max-width: 485px)
+  .button-group
+    flex-direction: column
+    justify-content: flex-start
+    align-items: stretch
+
+  .button:not(:last-child)
+    margin-bottom: $cs.s !important
+    margin-right: 0 !important
