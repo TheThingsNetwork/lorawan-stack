@@ -60,7 +60,7 @@ const ApplicationWebhookEditInner = () => {
         className="mb-0"
         hideHeading={Boolean(webhookTemplate)}
       />
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <WebhookEdit
           update
           appId={appId}

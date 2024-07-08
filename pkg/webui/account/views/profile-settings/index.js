@@ -43,7 +43,7 @@ const ProfileSettings = () => {
 
   return (
     <div className="container container--lg grid">
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <PageTitle title={m.profileEdit} />
         <Overlay after={350} visible={fetching} loading>
           <Collapse

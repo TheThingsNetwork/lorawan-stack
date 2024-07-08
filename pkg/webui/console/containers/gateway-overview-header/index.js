@@ -134,7 +134,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
 
   return (
     <div className={style.root}>
-      <div>
+      <div className="overflow-hidden">
         <h5 className={style.name}>{name || gateway_id}</h5>
         <span className={style.id}>
           <Message className={style.idPrefix} content={sharedMessages.id} uppercase />
@@ -142,8 +142,8 @@ const GatewayOverviewHeader = ({ gateway }) => {
         </span>
       </div>
       <div className="d-inline-flex h-full al-center gap-cs-m flex-wrap">
-        <GatewayConnection className="sm:d-none" gtwId={gateway_id} />
-        <div className="d-flex al-center gap-cs-xxs sm:d-none">
+        <GatewayConnection className="md-lg:d-none" gtwId={gateway_id} />
+        <div className="d-flex al-center gap-cs-xxs md-lg:d-none">
           <Icon small className="c-text-neutral-semilight" icon={IconCalendarMonth} />
           <LastSeen
             statusClassName={style.createdAtStatus}
@@ -152,7 +152,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
             className="c-text-neutral-semilight"
           />
         </div>
-        <div className={classnames(style.divider, 'sm:d-none')} />
+        <div className={classnames(style.divider, 'md-lg:d-none')} />
         <div className="d-inline-flex al-center gap-cs-xxs">
           <Button
             secondary

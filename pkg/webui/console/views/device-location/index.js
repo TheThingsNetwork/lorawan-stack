@@ -85,7 +85,7 @@ const DeviceGeneralSettings = () => {
   return (
     <div className="container container--lg grid">
       <IntlHelmet title={sharedMessages.location} />
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <LocationForm
           entityId={devId}
           formTitle={m.setDeviceLocation}
@@ -96,7 +96,7 @@ const DeviceGeneralSettings = () => {
           centerOnMarkers
         />
       </div>
-      <div className="item-12 lg:item-4">
+      <div className="item-12 xl:item-4">
         <Message content={m.locationInfoTitle} component="h4" className="mb-0 mt-ls-xl" />
         <Message content={m.locationInfo} component="p" />
       </div>

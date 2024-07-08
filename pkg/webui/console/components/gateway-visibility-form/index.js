@@ -44,7 +44,7 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error }) => {
       error={error}
       validationSchema={validationSchema}
     >
-      <div className="item-12 md:item-6">
+      <div className="item-12 lg-xl:item-6">
         <Form.Field
           name="visibility.location"
           component={Checkbox}
@@ -68,7 +68,7 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error }) => {
           description={gatewayVisibilityMessages.gatewayFineTimestampsDescription}
         />
       </div>
-      <div className="item-12 sm:item-6">
+      <div className="item-12 md-lg:item-6">
         <Form.Field
           name="visibility.contact_info"
           component={Checkbox}

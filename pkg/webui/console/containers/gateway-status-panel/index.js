@@ -15,6 +15,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 
 import Panel from '@ttn-lw/components/panel'
 import Icon, { IconGateway, IconInfoCircle, IconBolt, IconRouterOff } from '@ttn-lw/components/icon'
@@ -36,7 +37,6 @@ import {
   selectGatewayStatistics,
   selectGatewayStatisticsError,
   selectGatewayStatisticsIsFetching,
-  selectSelectedGatewayId,
 } from '@console/store/selectors/gateways'
 
 import Transmissions from './transmissions'
@@ -93,8 +93,8 @@ SectionTitle.propTypes = {
 }
 
 const EmptyState = ({ title, message }) => (
-  <div>
-    <Message content={title} className="fw-bold" component="div" />
+  <div className="mt-cs-m">
+    <Message content={title} component="div" />
     <Message content={message} className="fs-s c-text-neutral-light mt-cs-s" component="div" />
   </div>
 )
@@ -106,10 +106,10 @@ EmptyState.propTypes = {
 
 const GatewayStatusPanel = () => {
   const dispatch = useDispatch()
+  const { gtwId } = useParams()
   const gatewayStats = useSelector(selectGatewayStatistics)
   const error = useSelector(selectGatewayStatisticsError)
   const fetching = useSelector(selectGatewayStatisticsIsFetching)
-  const gtwId = useSelector(selectSelectedGatewayId)
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
   const isFetching = !Boolean(gatewayStats) && fetching
   const noConnectionYet =
@@ -170,11 +170,11 @@ const GatewayStatusPanel = () => {
       }
     >
       {isFetching ? (
-        <Spinner center>
+        <Spinner center inline>
           <Message content={sharedMessages.fetching} />
         </Spinner>
       ) : noConnectionYet ? (
-        <div className="d-flex direction-column j-center text-center pt-ls-l p-sides-ls-xxl">
+        <div className="d-flex direction-column j-center text-center pt-ls-l p-sides-ls-xxl md-lg:p-sides-cs-xl">
           <Message content={m.noConnection} className="fw-bold" component="div" />
           <Message
             content={m.noConnectionDescription}
@@ -198,8 +198,8 @@ const GatewayStatusPanel = () => {
           <div className={style.gtwStatusPanelUpperContainer}>
             <div className="d-flex direction-column j-between w-full">
               <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
-              <div>
-                <Message content={m.unlockGraph} className="fw-bold" component="div" />
+              <div className="mt-cs-l">
+                <Message content={m.unlockGraph} component="div" />
                 <Button.AnchorLink
                   secondary
                   message={sharedMessages.upgradeNow}
@@ -210,6 +210,7 @@ const GatewayStatusPanel = () => {
                 />
               </div>
             </div>
+            <hr className={style.gtwStatusPanelDividerMobile} />
             <div className="d-flex direction-column j-between w-full">
               <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
               {showRoundTripTimes ? (
@@ -240,19 +241,29 @@ const GatewayStatusPanel = () => {
                 )}
               </div>
             </div>
-            <div className="w-full d-flex direction-column gap-cs-m">
+            <hr className={style.gtwStatusPanelDividerMobile} />
+            <div className="w-full">
               <SectionTitle
                 title={m.dutyCycleUtilization}
                 tooltip={m.dutyCycleUtilizationTooltip}
               />
               {showDutyCycleUtilization ? (
                 gatewayStats.sub_bands.map((band, index) => (
-                  <DutyCycleUtilization key={index} index={index} band={band} />
+                  <DutyCycleUtilization key={index} band={band} />
                 ))
               ) : (
                 <EmptyState title={sharedMessages.noData} message={m.noDutyCycle} />
               )}
             </div>
+          </div>
+          <div className={style.gtwStatusPanelTagMobile}>
+            {showProtocol && (
+              <Message
+                content={m.protocol}
+                values={{ protocol: gatewayStats.protocol.toUpperCase() }}
+                component="div"
+              />
+            )}
           </div>
         </>
       )}

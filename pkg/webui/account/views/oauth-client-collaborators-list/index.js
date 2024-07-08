@@ -38,7 +38,7 @@ const OAuthClientCollaboratorsList = () => {
   )
 
   return (
-    <div className="container container--lg ">
+    <div className="container container--xxl ">
       <IntlHelmet title={sharedMessages.collaborators} />
       <CollaboratorsTable pageSize={PAGE_SIZES.REGULAR} />
     </div>

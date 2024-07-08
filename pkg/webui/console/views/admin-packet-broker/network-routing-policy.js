@@ -212,7 +212,7 @@ const NetworkRoutingPolicyViewInner = () => {
         <Message content={m.routingPolicyFromThisNetwork} component="h3" />
         <RoutingPolicy.Sheet policy={forwarder} />
       </div>
-      <div className={classNames(style.setRoutingPolicyContainer, 'item-12 lg:item-8')}>
+      <div className={classNames(style.setRoutingPolicyContainer, 'item-12 xl:item-8')}>
         <Message content={m.routingPolicyToThisNetwork} component="h3" />
         <RoutingPolicyForm
           onSubmit={handleRoutingPolicySubmit}

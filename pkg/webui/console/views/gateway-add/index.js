@@ -71,7 +71,7 @@ const GatewayAdd = () => {
             />
             <hr className="mb-ls-s" />
           </PageTitle>
-          <div className="item-12 lg:item-9">
+          <div className="item-12 xl:item-9">
             <GatewayOnboardingForm onSuccess={handleSuccess} />
           </div>
         </div>

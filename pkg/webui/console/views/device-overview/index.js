@@ -356,10 +356,10 @@ const DeviceOverview = () => {
       </div>
       <div className="container container--lg grid p-vert-0">
         <IntlHelmet title={sharedMessages.overview} />
-        <div className="item-12 lg:item-6">
+        <div className="item-12 xl:item-6">
           <DeviceInfo frequencyPlans={frequencyPlans} device={device} onExport={onExport} />
         </div>
-        <div className={classNames(style.latestEvents, 'item-12 lg:item-6')}>
+        <div className={classNames(style.latestEvents, 'item-12 xl:item-6')}>
           <DeviceEvents devIds={devIds} widget />
           <DeviceMap device={device} />
         </div>

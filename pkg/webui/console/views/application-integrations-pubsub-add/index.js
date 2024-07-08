@@ -72,7 +72,7 @@ const ApplicationPubsubAdd = () => {
   return (
     <div className="container container--lg grid">
       <PageTitle title={sharedMessages.addPubsub} className="mb-0" />
-      <div className="item-12 lg:item-8">
+      <div className="item-12 xl:item-8">
         <PubsubForm
           appId={appId}
           update={false}

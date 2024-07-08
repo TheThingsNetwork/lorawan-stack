@@ -42,13 +42,13 @@ const SideHeader = ({ Logo }) => {
         <Logo className={classnames(style.logo, { [style.minimizedLogo]: isMinimized })} />
       </Link>
       <Button
-        className={classnames(style.minimizeButton, 's:d-none')}
+        className={classnames(style.minimizeButton, 'md-lg:d-none')}
         icon={isMinimized ? IconLayoutSidebarLeftExpand : IconLayoutSidebarLeftCollapse}
         onClick={onMinimizeToggle}
         naked
       />
       <Button
-        className={classnames(style.minimizeButton, 'd-none', 's:d-flex')}
+        className={classnames(style.minimizeButton, 'd-none', 'md-lg:d-flex')}
         icon={IconX}
         onClick={onDrawerCloseClick}
         naked

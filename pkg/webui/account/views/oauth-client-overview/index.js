@@ -122,7 +122,7 @@ const OAuthClientOverviewInner = () => {
         </div>
       </div>
       <div className="container container--lg grid">
-        <div className="item-12 lg:item-6">
+        <div className="item-12 xl:item-6">
           <DataSheet data={sheetData} />
         </div>
       </div>

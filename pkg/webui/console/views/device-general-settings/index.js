@@ -253,7 +253,7 @@ const DeviceGeneralSettings = () => {
       <div className="container container--lg grid">
         <IntlHelmet title={sharedMessages.generalSettings} />
 
-        <div className={classNames(style.container, 'item-12 lg:item-8')}>
+        <div className={classNames(style.container, 'item-12 xl:item-8')}>
           <Collapse
             title={m.isTitle}
             description={isDescription}

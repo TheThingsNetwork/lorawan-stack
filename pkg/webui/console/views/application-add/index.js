@@ -76,7 +76,7 @@ const ApplicationAdd = () => {
             />
             <hr className="mb-ls-s" />
           </PageTitle>
-          <div className="item-10 lg:item-9">
+          <div className="item-10 xl:item-9">
             <ApplicationForm onSuccess={handleSuccess} />
           </div>
         </div>
