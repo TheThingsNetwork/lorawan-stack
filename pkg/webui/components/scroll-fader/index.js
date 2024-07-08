@@ -61,13 +61,13 @@ const ScrollFader = React.forwardRef(
       mutationObserver.observe(container, { attributes: false, childList: true, subtree: false })
 
       handleScroll() // Call once on mount if needed
-      container.addEventListener('wheel', handleScroll)
+      container.addEventListener('scroll', handleScroll)
       window.addEventListener('resize', handleScroll)
 
       return () => {
         // Cleanup observer and event listeners
         mutationObserver.disconnect()
-        container.removeEventListener('wheel', handleScroll)
+        container.removeEventListener('scroll', handleScroll)
         window.removeEventListener('resize', handleScroll)
       }
     }, [handleScroll])

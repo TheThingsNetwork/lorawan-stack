@@ -162,7 +162,6 @@ const RecentEndDevices = () => {
         paginated={false}
         className={style.devicesPanelOuterTable}
         headerClassName={style.devicesPanelOuterTableHeader}
-        periodical
       />
     </ScrollFader>
   )
