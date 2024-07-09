@@ -46,7 +46,6 @@ import {
   mayViewOrEditGatewayCollaborators,
   mayViewOrEditGatewayApiKeys,
   mayEditBasicGatewayInformation,
-  mayViewManagedGateway,
 } from '@console/lib/feature-checks'
 
 import {
@@ -55,7 +54,11 @@ import {
   getGatewaysRightsList,
 } from '@console/store/actions/gateways'
 
-import { selectSelectedGateway, selectGatewayRights } from '@console/store/selectors/gateways'
+import {
+  selectSelectedGateway,
+  selectGatewayRights,
+  selectIsSelectedGatewayManaged,
+} from '@console/store/selectors/gateways'
 
 const Gateway = () => {
   const { gtwId } = useParams()
@@ -107,6 +110,7 @@ const GatewayInner = () => {
   const { gtwId } = useParams()
   const gateway = useSelector(selectSelectedGateway)
   const rights = useSelector(selectGatewayRights)
+  const isGtwManaged = useSelector(selectIsSelectedGatewayManaged)
 
   const gatewayName = gateway?.name || gtwId
 
@@ -127,7 +131,7 @@ const GatewayInner = () => {
         {mayViewGatewayInfo.check(rights) && (
           <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
         )}
-        {mayViewManagedGateway.check(rights) && (
+        {isGtwManaged && (
           <SideNavigation.Item title={sharedMessages.managedGateway} icon="router">
             <SideNavigation.Item
               title={sharedMessages.connectionSettings}

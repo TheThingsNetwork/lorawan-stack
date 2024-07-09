@@ -49,7 +49,13 @@ const getGatewayLogic = createRequestLogic({
     const gtw = await tts.Gateways.getById(id, selector)
     dispatch(gateways.startGatewayEventsStream(id))
 
-    return gtw
+    // Check if gateway is managed by TTI
+    let managed = undefined
+    try {
+      managed = await tts.Gateways.getManagedGateway(id, ['wifi_profile_id'])
+    } catch (e) {}
+
+    return { ...gtw, managed }
   },
 })
 

@@ -49,6 +49,7 @@ export const selectGatewayById = (state, id) => selectGatewayEntitiesStore(state
 export const selectSelectedGatewayId = state => selectGatewayStore(state).selectedGateway
 export const selectSelectedGateway = state =>
   selectGatewayById(state, selectSelectedGatewayId(state))
+export const selectIsSelectedGatewayManaged = state => Boolean(selectSelectedGateway(state).managed)
 export const selectSelectedGatewayClaimable = state =>
   selectGatewayStore(state).selectedGatewayClaimable
 

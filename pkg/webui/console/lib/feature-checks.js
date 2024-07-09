@@ -17,7 +17,10 @@ import { createSelector } from 'reselect'
 import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
 
 import { selectApplicationRights } from '@console/store/selectors/applications'
-import { selectGatewayRights } from '@console/store/selectors/gateways'
+import {
+  selectGatewayRights,
+  selectIsSelectedGatewayManaged,
+} from '@console/store/selectors/gateways'
 import { selectOrganizationRights } from '@console/store/selectors/organizations'
 import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/logout'
 
@@ -139,8 +142,8 @@ export const mayViewGatewayInfo = {
   check: rights => rights.includes('RIGHT_GATEWAY_INFO'),
 }
 export const mayViewManagedGateway = {
-  rightsSelector: selectGatewayRights,
-  check: rights => rights.includes('RIGHT_GATEWAY_INFO'), // TODO: Change right
+  rightsSelector: selectIsSelectedGatewayManaged,
+  check: isManaged => isManaged,
 }
 export const mayEditBasicGatewayInformation = {
   rightsSelector: selectGatewayRights,
