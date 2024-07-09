@@ -167,10 +167,17 @@ func (s *managedGCSServer) StreamEvents(
 	if err != nil {
 		return err
 	}
+	var skippedFirstEntity bool
 	for {
 		msg, err := sub.Recv()
 		if err != nil {
 			return err
+		}
+		// The Things Gateway Controller always sends the gateway entity first. This can be skipped.
+		// Further entities are updates, which will be passed.
+		if !skippedFirstEntity && msg.GetGateway() != nil {
+			skippedFirstEntity = true
+			continue
 		}
 		evt := toEvent(ids, msg)
 		if evt == nil {
