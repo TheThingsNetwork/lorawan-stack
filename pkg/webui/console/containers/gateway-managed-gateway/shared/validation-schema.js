@@ -74,17 +74,17 @@ export const wifiValidationSchema = Yup.object().shape({
           is: 'other',
           then: schema => schema.required(sharedMessages.validateRequired),
         }),
-      password: Yup.string().when('security', {
-        is: 'WPA2',
-        then: schema =>
+      bssid: Yup.string(),
+      password: Yup.string().when('authentication_mode', {
+        is: 'open',
+        then: schema => schema.strip(),
+        otherwise: schema =>
           schema
             .min(8, Yup.passValues(sharedMessages.validateTooShort))
             .required(sharedMessages.validateRequired),
-        otherwise: schema => schema.strip(),
       }),
-      security: Yup.string(),
-      signal_strength: Yup.number(),
-      is_active: Yup.bool(),
+      authentication_mode: Yup.string(),
+      rssi: Yup.number(),
     })
     .test('has access point selected', m.validateNotSelectedAccessPoint, hasSelectedAccessPoint),
 })

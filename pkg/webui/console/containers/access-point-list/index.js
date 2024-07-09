@@ -15,25 +15,34 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import Spinner from '@ttn-lw/components/spinner'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
+
+import { getAccessPoints } from '@console/store/actions/connection-profiles'
+
+import { selectSelectedGateway } from '@console/store/selectors/gateways'
+import { selectAccessPoints } from '@console/store/selectors/connection-profiles'
 
 import style from './access-point-list.styl'
 
 PropTypes.accessPoint = PropTypes.shape({
   _type: PropTypes.oneOf(['all', 'other']),
   ssid: PropTypes.string,
-  password: PropTypes.string,
-  security: PropTypes.string,
-  signal_strength: PropTypes.number,
-  is_active: PropTypes.bool,
+  bssid: PropTypes.string,
+  channel: PropTypes.number,
+  authentication_mode: PropTypes.string,
+  rssi: PropTypes.number,
 })
 
 const m = defineMessages({
@@ -68,7 +77,7 @@ const AccessPointListItem = ({ accessPoint, onClick, isActive }) => {
         {!isOther && <Icon icon="wifi" />}
         {isOther ? <Message content={sharedMessages.otherOption} /> : accessPoint.ssid}
       </div>
-      {Boolean(accessPoint.password) && !isOther && <Icon icon="lock" />}
+      {accessPoint.authentication_mode !== 'open' && !isOther && <Icon icon="lock" />}
     </div>
   )
 }
@@ -80,41 +89,23 @@ AccessPointListItem.propTypes = {
 }
 
 const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => {
-  // TODO: Change this with selector
-  const accessPoints = [
-    {
-      ssid: 'exampleSSID',
-      password: 'examplePassword',
-      security: 'WPA2',
-      signal_strength: -45,
-      is_active: true,
-    },
-    {
-      ssid: 'openNetwork',
-      password: '',
-      security: 'None',
-      signal_strength: -30,
-      is_active: true,
-    },
-    {
-      ssid: 'exampleSSID2',
-      password: 'examplePassword2',
-      security: 'WPA2',
-      signal_strength: -45,
-      is_active: true,
-    },
-  ]
+  const [lastRefresh, setLastRefresh] = useState(undefined)
 
-  const [lastRefresh, setLastRefresh] = useState(new Date())
+  const dispatch = useDispatch()
+  const isLoading = useSelector(state => selectFetchingEntry(state, 'GET_ACCESS_POINTS'))
+  const accessPoints = useSelector(selectAccessPoints)
+  const selectedGateway = useSelector(selectSelectedGateway)
+  const { ids } = selectedGateway
 
-  const fetchAccessPoints = useCallback(() => {
-    // TODO: Fetch access points
-    setLastRefresh(new Date())
-  }, [])
+  const handleScanAccessPoints = useCallback(() => {
+    dispatch(attachPromise(getAccessPoints(ids.gateway_id, ids.eui))).then(() => {
+      setLastRefresh(new Date())
+    })
+  }, [dispatch, ids.eui, ids.gateway_id])
 
   useEffect(() => {
-    fetchAccessPoints()
-  }, [fetchAccessPoints])
+    handleScanAccessPoints()
+  }, [handleScanAccessPoints])
 
   const handleSelectAccessPoint = useCallback(
     accessPoint => {
@@ -126,40 +117,50 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => 
   return (
     <div className={classnames(className, style.container)} onBlur={onBlur}>
       <div className="w-full">
-        <div className="d-flex gap-cs-l">
-          <div className={classnames(style.list, [style[`input-width-${inputWidth}`]])}>
-            {accessPoints.map(a => (
-              <AccessPointListItem
-                key={a.ssid}
-                accessPoint={{ ...a, _type: 'all' }}
-                onClick={handleSelectAccessPoint}
-                isActive={value.ssid === a.ssid}
-              />
-            ))}
-            <AccessPointListItem
-              accessPoint={{ ssid: '', password: '', _type: 'other' }}
-              onClick={handleSelectAccessPoint}
-              isActive={value._type === 'other'}
-            />
+        {isLoading ? (
+          <div className="d-flex mt-cs-m">
+            <Spinner>
+              <Message content={sharedMessages.fetching} />
+            </Spinner>
           </div>
-          <Message content={m.description} className="tc-subtle-gray" />
-        </div>
+        ) : (
+          <div className="d-flex gap-cs-l">
+            <div className={classnames(style.list, [style[`input-width-${inputWidth}`]])}>
+              {accessPoints.map(a => (
+                <AccessPointListItem
+                  key={a.bssid}
+                  accessPoint={{ ...a, _type: 'all' }}
+                  onClick={handleSelectAccessPoint}
+                  isActive={value.bssid === a.bssid}
+                />
+              ))}
+              <AccessPointListItem
+                accessPoint={{ ssid: '', bssid: '', password: '', _type: 'other' }}
+                onClick={handleSelectAccessPoint}
+                isActive={value._type === 'other'}
+              />
+            </div>
+            <Message content={m.description} className="tc-subtle-gray" />
+          </div>
+        )}
 
         <div className="d-flex al-center gap-cs-s mt-cs-m">
           <Button
             type="button"
             message={sharedMessages.scanAgain}
-            onClick={fetchAccessPoints}
+            onClick={handleScanAccessPoints}
             icon="autorenew"
           />
-          <div className="tc-subtle-gray d-flex gap-cs-xxs">
-            <Message content={m.lastRefresh} />
-            <DateTime.Relative
-              value={lastRefresh}
-              computeDelta={computeDeltaInSeconds}
-              relativeTimeStyle="short"
-            />
-          </div>
+          {Boolean(lastRefresh) && (
+            <div className="tc-subtle-gray d-flex gap-cs-xxs">
+              <Message content={m.lastRefresh} />
+              <DateTime.Relative
+                value={lastRefresh}
+                computeDelta={computeDeltaInSeconds}
+                relativeTimeStyle="short"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

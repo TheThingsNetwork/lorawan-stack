@@ -15,11 +15,14 @@
 import {
   GET_CONNECTION_PROFILES_LIST_SUCCESS,
   DELETE_CONNECTION_PROFILE_SUCCESS,
+  GET_ACCESS_POINTS_SUCCESS,
+  GET_ACCESS_POINTS_FAILURE,
 } from '@console/store/actions/connection-profiles'
 
 const defaultState = {
   profiles: [],
   profilesTotalCount: undefined,
+  accessPoints: [],
 }
 
 const connectionProfiles = (state = defaultState, action) => {
@@ -37,6 +40,16 @@ const connectionProfiles = (state = defaultState, action) => {
         ...state,
         profiles: state.profiles.filter(profile => profile.id !== payload.id),
         profilesTotalCount: state.profilesTotalCount - 1,
+      }
+    case GET_ACCESS_POINTS_SUCCESS:
+      return {
+        ...state,
+        accessPoints: payload,
+      }
+    case GET_ACCESS_POINTS_FAILURE:
+      return {
+        ...state,
+        accessPoints: [],
       }
     default:
       return state

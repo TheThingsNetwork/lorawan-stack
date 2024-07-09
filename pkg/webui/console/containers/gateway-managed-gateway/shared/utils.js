@@ -25,10 +25,10 @@ export const initialWifiProfile = {
   access_point: {
     _type: 'all',
     ssid: '',
-    password: '',
-    security: '',
-    signal_strength: 0,
-    is_active: true,
+    bssid: '',
+    channel: 0,
+    authentication_mode: '',
+    rssi: 0,
   },
   default_network_interface: true,
   network_interface_addresses: {

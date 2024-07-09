@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import tts from '@console/api/tts'
+
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as connectionProfiles from '@console/store/actions/connection-profiles'
@@ -43,4 +45,17 @@ const deleteConnectionProfileLogic = createRequestLogic({
   },
 })
 
-export default [getConnectionProfilesLogic, deleteConnectionProfileLogic]
+const getAccessPointsLogic = createRequestLogic({
+  type: connectionProfiles.GET_ACCESS_POINTS,
+  process: async ({ action }) => {
+    const { gatewayId, gatewayEui } = action.payload
+    try {
+      const result = await tts.ConnectionProfiles.getAccessPoints(gatewayId, gatewayEui)
+      return result?.access_points ?? []
+    } catch (e) {
+      return []
+    }
+  },
+})
+
+export default [getConnectionProfilesLogic, deleteConnectionProfileLogic, getAccessPointsLogic]
