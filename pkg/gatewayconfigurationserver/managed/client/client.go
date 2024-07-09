@@ -19,6 +19,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
@@ -72,6 +73,9 @@ func (c *client) subscribeEventData(ctx context.Context, ids ...*ttnpb.GatewayId
 				for {
 					data, err := stream.Recv()
 					if err != nil {
+						if errors.IsNotFound(err) {
+							return nil
+						}
 						return err
 					}
 					select {
@@ -83,6 +87,9 @@ func (c *client) subscribeEventData(ctx context.Context, ids ...*ttnpb.GatewayId
 					}:
 					}
 				}
+			},
+			Done: func() {
+				close(eventDataCh)
 			},
 			Restart: task.RestartOnFailure,
 			Backoff: task.DialBackoffConfig,
@@ -188,7 +195,10 @@ func (c *client) Subscribe(
 			select {
 			case <-ctx.Done():
 				return
-			case eventData := <-ch:
+			case eventData, ok := <-ch:
+				if !ok {
+					return
+				}
 				evt := mapEvent(ctx, eventData)
 				if evt == nil || !match(evt.Name()) {
 					continue
