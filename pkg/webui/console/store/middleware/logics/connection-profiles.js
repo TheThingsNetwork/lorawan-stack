@@ -53,13 +53,19 @@ const getConnectionProfilesLogic = createRequestLogic({
 
 const deleteConnectionProfileLogic = createRequestLogic({
   type: connectionProfiles.DELETE_CONNECTION_PROFILE,
-  process: async ({ action }) => {
-    const { id } = action.payload
+  process: async ({ action, getState }) => {
+    const { id, entityId, type } = action.payload
 
-    // TODO: Change call to delete connection profiles
-    // await tts.Authorizations.deleteToken(userId, clientId, id)
+    const userId = selectUserId(getState())
+    if (type === CONNECTION_TYPES.WIFI) {
+      if (entityId === userId) {
+        await tts.ConnectionProfiles.deleteWifiProfileForUser(entityId, id)
+      } else {
+        await tts.ConnectionProfiles.deleteWifiProfileForOrganization(entityId, id)
+      }
+    }
 
-    return { id }
+    return { id, type }
   },
 })
 

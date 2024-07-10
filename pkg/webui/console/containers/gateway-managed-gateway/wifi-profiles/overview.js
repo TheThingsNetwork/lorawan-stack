@@ -48,6 +48,7 @@ const m = defineMessages({
     'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.<br></br> <link>Learn more about gateway network connection profiles.</link>',
   profileId: 'Profile ID',
   accessPoint: 'Access point',
+  deleteProfile: 'Delete profile',
   deleteSuccess: 'Connection profile deleted',
   deleteFail: 'There was an error and the connection profile could not be deleted',
 })
@@ -71,17 +72,17 @@ const GatewayWifiProfilesOverview = () => {
   )
 
   const handleDelete = React.useCallback(
-    async (id, profileOf) => {
+    async (id, name, profileOf) => {
       try {
-        await dispatch(attachPromise(deleteConnectionProfile(id)))
+        await dispatch(attachPromise(deleteConnectionProfile(id, profileOf, CONNECTION_TYPES.WIFI)))
         toast({
-          title: id,
+          title: name,
           message: m.deleteSuccess,
           type: toast.types.SUCCESS,
         })
       } catch (err) {
         toast({
-          title: id,
+          title: name,
           message: m.deleteFail,
           type: toast.types.ERROR,
         })
@@ -115,12 +116,15 @@ const GatewayWifiProfilesOverview = () => {
           id: row.profile_id,
           name: row.profile_name,
           edit: handleEdit.bind(null, row.profile_id, profileOf),
-          delete: handleDelete.bind(null, row.profile_id, profileOf),
+          delete: handleDelete.bind(null, row.profile_id, row.profile_name, profileOf),
         }),
         render: details => (
           <ButtonGroup align="end">
             <Button icon="edit" onClick={details.edit} />
             <DeleteModalButton
+              onlyIcon
+              message={m.deleteProfile}
+              defaultMessage=""
               entityId={details.id}
               entityName={details.name}
               onApprove={details.delete}

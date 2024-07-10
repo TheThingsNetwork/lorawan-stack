@@ -63,8 +63,9 @@ export const [
     success: deleteConnectionProfileSuccess,
     failure: deleteConnectionProfileFailure,
   },
-] = createRequestActions(DELETE_CONNECTION_PROFILE_BASE, (type, id) => ({
+] = createRequestActions(DELETE_CONNECTION_PROFILE_BASE, (id, entityId, type) => ({
   type,
+  entityId,
   id,
 }))
 

@@ -39,8 +39,12 @@ const connectionProfiles = (state = defaultState, action) => {
     case DELETE_CONNECTION_PROFILE_SUCCESS:
       return {
         ...state,
-        profiles: state.profiles.filter(profile => profile.id !== payload.id),
-        profilesTotalCount: state.profilesTotalCount - 1,
+        profiles: {
+          ...state.profiles,
+          [payload.type]: state.profiles[payload.type].filter(
+            profile => profile.profile_id !== payload.id,
+          ),
+        },
       }
     case GET_ACCESS_POINTS_SUCCESS:
       return {
