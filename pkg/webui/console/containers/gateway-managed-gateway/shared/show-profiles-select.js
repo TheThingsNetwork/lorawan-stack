@@ -62,12 +62,12 @@ const ShowProfilesSelect = ({ name }) => {
       name,
       collaboratorIds.length && collaboratorIds[0] !== user.ids.user_id
         ? collaboratorIds[0]
-        : 'yourself',
+        : user.ids.user_id,
     )
   }, [collaborators, name, setFieldValue, user.ids.user_id])
 
   const profileOptions = [
-    { value: 'yourself', label: m.yourself },
+    { value: user.ids.user_id, label: m.yourself },
     ...Object.values(organizations).map(o => ({
       value: o.ids.organization_id,
       label: o.name,

@@ -20,8 +20,9 @@ export const CONNECTION_TYPES = Object.freeze({
 
 export const initialWifiProfile = {
   profile_name: '',
-  // TODO: Change this property as expected
-  profileOf: 'yourself',
+  profileOf: '',
+  ssid: '',
+  password: '',
   access_point: {
     _type: 'all',
     ssid: '',

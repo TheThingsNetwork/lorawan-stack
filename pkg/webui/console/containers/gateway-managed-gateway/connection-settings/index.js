@@ -16,6 +16,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Col, Row } from 'react-grid-system'
+import { useSelector } from 'react-redux'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -36,6 +37,7 @@ import EthernetSettingsFormFields from '@console/containers/gateway-managed-gate
 import ManagedGatewayConnections from '@console/containers/gateway-managed-gateway/connection-settings/connections'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 
 const m = defineMessages({
   firstNotification:
@@ -47,6 +49,7 @@ const GatewayConnectionSettings = () => {
   const [searchParams] = useSearchParams()
   const isFirstClaim = Boolean(searchParams.get('claimed'))
   const [error, setError] = useState(undefined)
+  const isLoading = useSelector(state => selectFetchingEntry(state, 'GET_ACCESS_POINTS'))
 
   useBreadcrumbs(
     'gtws.single.managed-gateway.connection-settings',
@@ -98,7 +101,11 @@ const GatewayConnectionSettings = () => {
               <EthernetSettingsFormFields index={1} />
 
               <SubmitBar className="mb-cs-l">
-                <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
+                <Form.Submit
+                  component={SubmitButton}
+                  message={sharedMessages.saveChanges}
+                  disabled={isLoading}
+                />
               </SubmitBar>
             </>
           </Form>

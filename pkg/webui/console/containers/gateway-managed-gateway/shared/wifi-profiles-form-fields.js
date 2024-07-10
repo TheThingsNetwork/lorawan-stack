@@ -16,22 +16,17 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { parseInt } from 'lodash'
 import { defineMessages } from 'react-intl'
-import { useSelector } from 'react-redux'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
 import Button from '@ttn-lw/components/button'
 
-import RequireRequest from '@ttn-lw/lib/components/require-request'
-
 import AccessPointList from '@console/containers/access-point-list'
 import NetworkInterfaceAddressesFormFields from '@console/containers/gateway-managed-gateway/shared/network-interface-addresses-form-fields'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
   profileName: 'Profile name',
@@ -45,7 +40,7 @@ const m = defineMessages({
 })
 
 const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
-  const { values } = useFormContext()
+  const { values, setFieldValue } = useFormContext()
   const [resetPassword, setResetPassword] = useState(false)
 
   const valuesNormalized = useMemo(() => {
@@ -64,7 +59,8 @@ const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
 
   useEffect(() => {
     setResetPassword(false)
-  }, [valuesNormalized.access_point?.ssid])
+    setFieldValue(`${namePrefix}ssid`, valuesNormalized.access_point?.ssid)
+  }, [namePrefix, setFieldValue, valuesNormalized.access_point.ssid])
 
   return (
     <>
@@ -82,23 +78,18 @@ const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
         required
       />
       {valuesNormalized.access_point._type === 'other' && (
-        <Form.Field
-          title={m.ssid}
-          name={`${namePrefix}access_point.ssid`}
-          component={Input}
-          required
-        />
+        <Form.Field title={m.ssid} name={`${namePrefix}ssid`} component={Input} required />
       )}
       {(valuesNormalized.access_point._type === 'other' ||
-        valuesNormalized.access_point.authentication_mode !== 'open') && (
+        (Boolean(valuesNormalized.access_point.authentication_mode) &&
+          valuesNormalized.access_point.authentication_mode !== 'open')) && (
         <Form.Field
           title={m.wifiPassword}
-          name={`${namePrefix}access_point.password`}
+          name={`${namePrefix}password`}
           type="password"
           component={Input}
           readOnly={!canTypePassword}
           placeholder={!canTypePassword ? m.isSet : undefined}
-          value={!canTypePassword ? undefined : valuesNormalized.access_point?.password}
           required={valuesNormalized.access_point?._type !== 'other'}
         >
           {!canTypePassword && (

@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -28,6 +29,7 @@ import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-g
 import { wifiValidationSchema } from '@console/containers/gateway-managed-gateway/shared/validation-schema'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 
 const m = defineMessages({
   updateWifiProfile: 'Update WiFi profile',
@@ -36,7 +38,7 @@ const m = defineMessages({
 const GatewayWifiProfilesForm = () => {
   const [error, setError] = useState(undefined)
   const { gtwId, profileId } = useParams()
-  const [searchParams] = useSearchParams()
+  const isLoading = useSelector(state => selectFetchingEntry(state, 'GET_ACCESS_POINTS'))
 
   const isEdit = Boolean(profileId)
 
@@ -70,7 +72,11 @@ const GatewayWifiProfilesForm = () => {
         <GatewayWifiProfilesFormFields isEdit={isEdit} />
 
         <SubmitBar>
-          <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
+          <Form.Submit
+            component={SubmitButton}
+            message={sharedMessages.saveChanges}
+            disabled={isLoading}
+          />
         </SubmitBar>
       </Form>
     </>

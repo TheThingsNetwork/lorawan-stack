@@ -65,24 +65,26 @@ export const wifiValidationSchema = Yup.object().shape({
     then: schema => schema.shape(networkInterfaceSettings),
     otherwise: schema => schema.strip(),
   }),
+  ssid: Yup.string().when('access_point', {
+    is: accessPoint => accessPoint._type === 'other',
+    then: schema => schema.required(sharedMessages.validateRequired),
+    otherwise: schema => schema.strip(),
+  }),
+  password: Yup.string().when('access_point', {
+    is: accessPoint =>
+      !Boolean(accessPoint.authentication_mode) || accessPoint.authentication_mode === 'open',
+    then: schema => schema.strip(),
+    otherwise: schema =>
+      schema
+        .min(8, Yup.passValues(sharedMessages.validateTooShort))
+        .required(sharedMessages.validateRequired),
+  }),
   access_point: Yup.object()
     .shape({
       _type: Yup.string(),
-      ssid: Yup.string()
-        .default('')
-        .when('_type', {
-          is: 'other',
-          then: schema => schema.required(sharedMessages.validateRequired),
-        }),
+      ssid: Yup.string().default(''),
       bssid: Yup.string(),
-      password: Yup.string().when('authentication_mode', {
-        is: 'open',
-        then: schema => schema.strip(),
-        otherwise: schema =>
-          schema
-            .min(8, Yup.passValues(sharedMessages.validateTooShort))
-            .required(sharedMessages.validateRequired),
-      }),
+      channel: Yup.number(),
       authentication_mode: Yup.string(),
       rssi: Yup.number(),
     })

@@ -166,7 +166,7 @@ const GatewayWifiProfilesOverview = () => {
       />
       <Form
         initialValues={{
-          profileOf: 'yourself',
+          profileOf: '',
         }}
       >
         {({ values }) => (
