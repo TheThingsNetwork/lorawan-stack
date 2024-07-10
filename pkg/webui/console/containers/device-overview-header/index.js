@@ -63,7 +63,7 @@ const m = defineMessages({
   addBookmarkFail: 'There was an error and the end device could not be bookmarked',
   removeBookmarkFail: 'There was an error and the end device could not be removed from bookmarks',
   uplinkDownlinkTooltip:
-    'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.{lineBreak}App: frame counter for application downlinks (`FPort >=1`).{lineBreak}Nwk: frame counter for network downlinks (`FPort = 0`)',
+    'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.{break}`App`: frame counter for application downlinks (FPort >=1). `Nwk`: frame counter for network downlinks (FPort = 0)',
   lastSeenAvailableTooltip:
     'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}',
   noActivityTooltip:
@@ -194,7 +194,7 @@ const DeviceOverviewHeader = ({ device }) => {
             content={
               <Message
                 content={m.uplinkDownlinkTooltip}
-                values={{ lineBreak: <br /> }}
+                values={{ break: <br /> }}
                 convertBackticks
               />
             }

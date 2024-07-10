@@ -28,6 +28,7 @@ import Icon, {
 } from '@ttn-lw/components/icon'
 import ButtonGroup from '@ttn-lw/components/button/group'
 import Button from '@ttn-lw/components/button'
+import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -129,7 +130,11 @@ const DeviceInfoPanel = ({ events }) => {
               />
             </div>
             <div className="d-flex direction-column j-center gap-cs-m" style={{ lineHeight: 1 }}>
-              <Message content={model?.name} className="fw-bold" />
+              {model ? (
+                <Message content={model.name} className="fw-bold" />
+              ) : (
+                <Spinner after={0} micro center faded />
+              )}
               <Message content={brandName} />
               <div className="d-flex gap-cs-m">
                 {actualLastEvent && (
@@ -156,24 +161,28 @@ const DeviceInfoPanel = ({ events }) => {
                 )}
                 {/* Battery */}
               </div>
-              <ButtonGroup align="start" className={style.buttonGroup}>
-                <Button.AnchorLink
-                  secondary
-                  href={model?.product_url}
-                  target="_blank"
-                  message={m.deviceWebsite}
-                  icon={IconWorld}
-                  className={style.button}
-                />
-                <Button.AnchorLink
-                  secondary
-                  href={model?.datasheet_url}
-                  target="_blank"
-                  message={sharedMessages.dataSheet}
-                  icon={IconFileAnalytics}
-                  className={style.button}
-                />
-              </ButtonGroup>
+              {model ? (
+                <ButtonGroup align="start" className={style.buttonGroup}>
+                  <Button.AnchorLink
+                    secondary
+                    href={model.product_url}
+                    target="_blank"
+                    message={m.deviceWebsite}
+                    icon={IconWorld}
+                    className={style.button}
+                  />
+                  <Button.AnchorLink
+                    secondary
+                    href={model.datasheet_url}
+                    target="_blank"
+                    message={sharedMessages.dataSheet}
+                    icon={IconFileAnalytics}
+                    className={style.button}
+                  />
+                </ButtonGroup>
+              ) : (
+                <Spinner after={0} micro center faded />
+              )}
             </div>
           </div>
           {model?.sensors && <TagList tags={model?.sensors} icons={sensorIconMap} />}
