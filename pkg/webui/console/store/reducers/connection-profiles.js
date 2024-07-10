@@ -20,8 +20,7 @@ import {
 } from '@console/store/actions/connection-profiles'
 
 const defaultState = {
-  profiles: [],
-  profilesTotalCount: undefined,
+  profiles: {},
   accessPoints: [],
 }
 
@@ -32,8 +31,10 @@ const connectionProfiles = (state = defaultState, action) => {
     case GET_CONNECTION_PROFILES_LIST_SUCCESS:
       return {
         ...state,
-        profiles: payload.entities,
-        profilesTotalCount: payload.profilesTotalCount,
+        profiles: {
+          ...state.profiles,
+          [payload.type]: payload.entities,
+        },
       }
     case DELETE_CONNECTION_PROFILE_SUCCESS:
       return {

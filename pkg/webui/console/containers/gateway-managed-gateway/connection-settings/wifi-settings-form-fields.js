@@ -22,13 +22,19 @@ import Select from '@ttn-lw/components/select'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/shared/wifi-profiles-form-fields'
 import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shared/show-profiles-select'
+import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { selectConnectionProfiles } from '@console/store/selectors/connection-profiles'
+import { getConnectionProfilesList } from '@console/store/actions/connection-profiles'
+
+import {
+  selectConnectionProfilesByType,
+} from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
   settingsProfile: 'Settings profile',
@@ -48,10 +54,15 @@ const m = defineMessages({
 const WifiSettingsFormFields = ({ index }) => {
   const { values } = useFormContext()
 
-  const profiles = useSelector(selectConnectionProfiles)
-  // TODO: Fetch profiles and map them for the options, decide value for fixed options
+  const profiles = useSelector(state =>
+    selectConnectionProfilesByType(state, CONNECTION_TYPES.WIFI),
+  )
+
   const profileOptions = [
-    ...profiles,
+    ...profiles.map(p => ({
+      value: p.profile_id,
+      label: p.profile_name,
+    })),
     { value: '2', label: m.createNewSharedProfile.defaultMessage },
     { value: '3', label: m.setAConfigForThisGateway.defaultMessage },
   ]
@@ -78,15 +89,24 @@ const WifiSettingsFormFields = ({ index }) => {
     <>
       <Message component="h3" content={m.wifiConnection} />
       <div className="d-flex al-center gap-cs-m">
-        <ShowProfilesSelect name={`settings.${index}.shared`} />
-        <Form.Field
-          name={`settings.${index}.profile`}
-          title={m.settingsProfile}
-          component={Select}
-          options={profileOptions}
-          tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
-          placeholder={m.selectAProfile}
-        />
+        <ShowProfilesSelect name={`settings.${index}.profileOf`} />
+        {Boolean(values.settings[index].profileOf) && (
+          <RequireRequest
+            requestAction={getConnectionProfilesList({
+              entityId: values.settings[index].profileOf,
+              type: CONNECTION_TYPES.WIFI,
+            })}
+          >
+            <Form.Field
+              name={`settings.${index}.profile`}
+              title={m.settingsProfile}
+              component={Select}
+              options={profileOptions}
+              tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
+              placeholder={m.selectAProfile}
+            />
+          </RequireRequest>
+        )}
       </div>
       <Message component="div" content={m.profileDescription} className="tc-subtle-gray mb-cs-m" />
       {(values.settings[index].profile === '2' || values.settings[index].profile === '3') && (

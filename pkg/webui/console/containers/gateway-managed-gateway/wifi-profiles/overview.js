@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
@@ -31,6 +31,7 @@ import FetchTable from '@ttn-lw/containers/fetch-table'
 import Message from '@ttn-lw/lib/components/message'
 
 import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shared/show-profiles-select'
+import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -40,10 +41,7 @@ import {
   getConnectionProfilesList,
 } from '@console/store/actions/connection-profiles'
 
-import {
-  selectConnectionProfiles,
-  selectConnectionProfilesTotalCount,
-} from '@console/store/selectors/connection-profiles'
+import { selectConnectionProfilesByType } from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
   information:
@@ -55,7 +53,6 @@ const m = defineMessages({
 })
 
 const GatewayWifiProfilesOverview = () => {
-  const { type } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -74,7 +71,7 @@ const GatewayWifiProfilesOverview = () => {
   )
 
   const handleDelete = React.useCallback(
-    async id => {
+    async (id, profileOf) => {
       try {
         await dispatch(attachPromise(deleteConnectionProfile(id)))
         toast({
@@ -93,23 +90,21 @@ const GatewayWifiProfilesOverview = () => {
     [dispatch],
   )
 
-  const headers = React.useMemo(
-    () => [
+  const getHeaders = useCallback(
+    profileOf => [
       {
-        name: 'ids.profile_id',
+        name: 'profile_id',
         displayName: m.profileId,
         width: 25,
-        sortable: true,
       },
       {
-        name: 'access_point',
-        displayName: m.accessPoint,
+        name: 'profile_name',
+        displayName: sharedMessages.profileName,
         width: 25,
-        sortable: true,
       },
       {
-        name: 'created_at',
-        displayName: sharedMessages.created,
+        name: 'ssid',
+        displayName: m.accessPoint,
         width: 25,
       },
       {
@@ -117,10 +112,10 @@ const GatewayWifiProfilesOverview = () => {
         displayName: sharedMessages.actions,
         width: 25,
         getValue: row => ({
-          id: row.id,
-          name: row.access_point,
-          edit: handleEdit.bind(null, row.id),
-          delete: handleDelete.bind(null, row.id),
+          id: row.profile_id,
+          name: row.profile_name,
+          edit: handleEdit.bind(null, row.profile_id, profileOf),
+          delete: handleDelete.bind(null, row.profile_id, profileOf),
         }),
         render: details => (
           <ButtonGroup align="end">
@@ -138,16 +133,23 @@ const GatewayWifiProfilesOverview = () => {
   )
 
   const baseDataSelector = createSelector(
-    [selectConnectionProfiles, selectConnectionProfilesTotalCount],
-    (connectionProfiles, totalCount) => ({
+    state => selectConnectionProfilesByType(state, CONNECTION_TYPES.WIFI),
+    connectionProfiles => ({
       connectionProfiles,
-      totalCount,
+      totalCount: connectionProfiles?.length ?? 0,
       mayAdd: false,
       mayLink: false,
     }),
   )
 
-  const getItems = React.useCallback(() => getConnectionProfilesList({ type }), [type])
+  const getItemsAction = useCallback(
+    profileOf =>
+      getConnectionProfilesList({
+        entityId: profileOf,
+        type: CONNECTION_TYPES.WIFI,
+      }),
+    [],
+  )
 
   return (
     <>
@@ -181,14 +183,16 @@ const GatewayWifiProfilesOverview = () => {
                 icon="add"
               />
             </div>
-            <FetchTable
-              entity="connectionProfiles"
-              defaultOrder="-created_at"
-              headers={headers}
-              getItemsAction={getItems}
-              baseDataSelector={baseDataSelector}
-              filtersClassName="d-none"
-            />
+            {Boolean(values.profileOf) && (
+              <FetchTable
+                entity="connectionProfiles"
+                defaultOrder="ssid"
+                headers={getHeaders(values.profileOf)}
+                getItemsAction={() => getItemsAction(values.profileOf)}
+                baseDataSelector={baseDataSelector}
+                filtersClassName="d-none"
+              />
+            )}
           </>
         )}
       </Form>

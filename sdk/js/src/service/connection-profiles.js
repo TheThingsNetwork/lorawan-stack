@@ -98,7 +98,7 @@ class ConnectionProfiles {
 
   // User.
   async getWifiProfilesForUser(userId, params, selector) {
-    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.List2(
+    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.List(
       {
         routeParams: { 'collaborator.user_ids.user_id': userId },
       },
@@ -113,7 +113,7 @@ class ConnectionProfiles {
 
   async getWifiProfileForUser(userId, profileId, selector) {
     const fieldMask = Marshaler.selectorToFieldMask(selector)
-    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Get2(
+    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Get(
       {
         routeParams: { 'collaborator.user_ids.user_id': userId, profile_id: profileId },
       },
@@ -124,7 +124,7 @@ class ConnectionProfiles {
   }
 
   async createWifiProfileForUser(userId, profile) {
-    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Create2(
+    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Create(
       {
         routeParams: { 'collaborator.user_ids.user_id': userId },
       },
@@ -135,7 +135,7 @@ class ConnectionProfiles {
   }
 
   async deleteWifiProfileForUser(userId, profileId) {
-    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Delete2({
+    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Delete({
       routeParams: {
         'collaborator.user_ids.user_id': userId,
         profile_id: profileId,
@@ -151,7 +151,7 @@ class ConnectionProfiles {
     patch,
     mask = Marshaler.fieldMaskFromPatch(patch),
   ) {
-    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Update2(
+    const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Update(
       {
         routeParams: {
           'collaborator.user_ids.user_id': userId,

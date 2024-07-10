@@ -14,22 +14,40 @@
 
 import tts from '@console/api/tts'
 
+import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
+
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as connectionProfiles from '@console/store/actions/connection-profiles'
 
+import { selectUserId } from '@account/store/selectors/user'
+
 const getConnectionProfilesLogic = createRequestLogic({
   type: connectionProfiles.GET_CONNECTION_PROFILES_LIST,
-  process: async ({ action }) => {
-    const { type } = action.payload
-
-    // TODO: Change call to fetch connection profiles
-    const res = {
+  latest: true,
+  process: async ({ action, getState }) => {
+    const { params, entityId, type } = action.payload
+    const { selectors } = action.meta
+    const userId = selectUserId(getState())
+    let data = {
       profiles: [],
-      totalCount: 0,
+    }
+    if (type === CONNECTION_TYPES.WIFI) {
+      if (entityId === userId) {
+        data = await tts.ConnectionProfiles.getWifiProfilesForUser(entityId, params, selectors)
+      } else {
+        data = await tts.ConnectionProfiles.getWifiProfilesForOrganization(
+          entityId,
+          params,
+          selectors,
+        )
+      }
     }
 
-    return { entities: res.profiles, profilesTotalCount: res.totalCount }
+    return {
+      entities: data.profiles,
+      type,
+    }
   },
 })
 
@@ -45,13 +63,25 @@ const deleteConnectionProfileLogic = createRequestLogic({
   },
 })
 
+const filterBestRSSI = accessPoints => {
+  const ssidMap = new Map()
+
+  accessPoints.forEach(ap => {
+    if (!ssidMap.has(ap.ssid) || ssidMap.get(ap.ssid).rssi < ap.rssi) {
+      ssidMap.set(ap.ssid, ap)
+    }
+  })
+
+  return Array.from(ssidMap.values())
+}
+
 const getAccessPointsLogic = createRequestLogic({
   type: connectionProfiles.GET_ACCESS_POINTS,
   process: async ({ action }) => {
     const { gatewayId, gatewayEui } = action.payload
     try {
       const result = await tts.ConnectionProfiles.getAccessPoints(gatewayId, gatewayEui)
-      return result?.access_points ?? []
+      return filterBestRSSI(result?.access_points ?? [])
     } catch (e) {
       return []
     }

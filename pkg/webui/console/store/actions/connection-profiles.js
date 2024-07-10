@@ -29,8 +29,10 @@ export const [
   },
 ] = createPaginationRequestActions(
   GET_CONNECTION_PROFILES_LIST_BASE,
-  ({ page, limit, entityId } = {}) => ({
-    params: { page, limit, entityId },
+  ({ page, limit, entityId, type } = {}) => ({
+    params: { page, limit },
+    entityId,
+    type,
   }),
 )
 

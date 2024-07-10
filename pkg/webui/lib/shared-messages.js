@@ -415,6 +415,7 @@ export default defineMessages({
   pingSlotPeriodicity: 'Ping slot periodicity',
   port: 'Port',
   privacyPolicy: 'Privacy policy',
+  profileName: 'Profile name',
   profileSettings: 'Profile settings',
   provider: 'Provider',
   provisionedOnExternalJoinServer: 'Provisioned on external Join Server',

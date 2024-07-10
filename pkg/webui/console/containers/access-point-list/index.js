@@ -60,6 +60,34 @@ const computeDeltaInSeconds = (from, to) => {
   return Math.floor((from - to) / 1000)
 }
 
+// TODO: Use correct images
+const wifiIconBasedOnRSSI = rssi => {
+  if (rssi >= -50) {
+    // Excellent
+    // return 'signal_wifi_4_bar'
+    return 'wifi'
+  } else if (rssi >= -60) {
+    // Good
+    // return 'signal_wifi_3_bar'
+    return 'wifi'
+  } else if (rssi >= -70) {
+    // Fair
+    // return 'signal_wifi_2_bar'
+    return 'wifi'
+  } else if (rssi >= -80) {
+    // Weak
+    // return 'signal_wifi_1_bar'
+    return 'wifi'
+  } else if (rssi >= -90) {
+    // Very weak
+    // return 'signal_wifi_0_bar'
+    return 'wifi'
+  }
+  // Unusable signal or no signal
+  // return 'wifi_off'
+  return 'wifi'
+}
+
 const AccessPointListItem = ({ accessPoint, onClick, isActive }) => {
   const handleClick = useCallback(() => {
     onClick(accessPoint)
@@ -74,7 +102,7 @@ const AccessPointListItem = ({ accessPoint, onClick, isActive }) => {
       onClick={handleClick}
     >
       <div className="d-flex al-center gap-cs-xs">
-        {!isOther && <Icon icon="wifi" />}
+        {!isOther && <Icon icon={wifiIconBasedOnRSSI(accessPoint.rssi)} />}
         {isOther ? <Message content={sharedMessages.otherOption} /> : accessPoint.ssid}
       </div>
       {accessPoint.authentication_mode !== 'open' && !isOther && <Icon icon="lock" />}
@@ -150,6 +178,7 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => 
             message={sharedMessages.scanAgain}
             onClick={handleScanAccessPoints}
             icon="autorenew"
+            disabled={isLoading}
           />
           {Boolean(lastRefresh) && (
             <div className="tc-subtle-gray d-flex gap-cs-xxs">

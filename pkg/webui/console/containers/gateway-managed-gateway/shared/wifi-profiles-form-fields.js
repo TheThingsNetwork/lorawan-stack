@@ -29,7 +29,6 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
-  profileName: 'Profile name',
   useDefaultNetworkInterfaceSettings: 'Use default network interface settings',
   uncheckToSetCustomSettings:
     'Uncheck if you need to set custom IP addresses, subnet mask and DNS server',
@@ -65,7 +64,7 @@ const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
   return (
     <>
       <Form.Field
-        title={m.profileName}
+        title={sharedMessages.profileName}
         name={`${namePrefix}profile_name`}
         component={Input}
         required

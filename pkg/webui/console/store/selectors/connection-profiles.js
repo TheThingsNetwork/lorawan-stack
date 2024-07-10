@@ -15,6 +15,6 @@
 // Connection profiles
 export const selectConnectionProfilesStore = state => state.connectionProfiles
 export const selectConnectionProfiles = state => selectConnectionProfilesStore(state).profiles
-export const selectConnectionProfilesTotalCount = state =>
-  selectConnectionProfilesStore(state).profilesTotalCount
+export const selectConnectionProfilesByType = (state, type) =>
+  selectConnectionProfiles(state)?.[type] ?? []
 export const selectAccessPoints = state => selectConnectionProfilesStore(state).accessPoints
