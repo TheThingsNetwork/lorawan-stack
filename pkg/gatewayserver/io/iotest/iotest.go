@@ -31,6 +31,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -38,6 +40,7 @@ import (
 	gsio "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewaytokens"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -66,6 +69,8 @@ type FrontendConfig struct {
 	// DeduplicatesUplinks indicates that the frontend deduplicates uplinks that are received at once by using the IO
 	// middleware's UniqueUplinkMessagesByRSSI.
 	DeduplicatesUplinks bool
+	// UsesGatewayToken indicates that the frontend uses gateway tokens for authentication instead of an API key.
+	UsesGatewayToken bool
 	// CustomComponentConfig applies custom configuration for the component before it gets started.
 	// This is typically used for configuring security credentials.
 	CustomComponentConfig func(config *component.Config)
@@ -73,6 +78,7 @@ type FrontendConfig struct {
 	// This is typically used for configuring frontend listeners.
 	CustomGatewayServerConfig func(gsConfig *gatewayserver.Config)
 	// Link links the gateway.
+	// If UsesGatewayToken is true, the key is empty.
 	Link func(
 		ctx context.Context,
 		t *testing.T,
@@ -95,11 +101,16 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 		unregisteredGatewayEUI = types.EUI64{0xBB, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 		timeout                = (1 << 5) * test.Delay
 		testRights             = []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ}
+		keyVault               = map[string][]byte{
+			// This is the key for gateway token hashing, used when UsesGatewayToken is true.
+			"test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f},
+		}
 	)
 
 	a, ctx := test.New(t)
 
-	is, isAddr, closeIS := mockis.New(ctx)
+	keyService := crypto.NewKeyService(cryptoutil.NewMemKeyVault(keyVault))
+	is, isAddr, closeIS := mockis.New(ctx, mockis.WithGatewayTokens(keyService))
 	defer closeIS()
 	ns, nsAddr := mock.StartNS(ctx)
 
@@ -132,6 +143,10 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 				ConfigSource: "static",
 				Static:       test.StaticFrequencyPlans,
 			},
+			KeyVault: config.KeyVault{
+				Provider: "static",
+				Static:   keyVault,
+			},
 		},
 	}
 	if frontend.CustomComponentConfig != nil {
@@ -148,6 +163,9 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 		Stats:                             statsRegistry,
 		FetchGatewayInterval:              (1 << 3) * test.Delay,
 		FetchGatewayJitter:                0.1,
+	}
+	if frontend.UsesGatewayToken {
+		gsConfig.GatewayTokenHashKeyID = "test"
 	}
 	if frontend.CustomGatewayServerConfig != nil {
 		frontend.CustomGatewayServerConfig(gsConfig)
@@ -173,7 +191,13 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 		Eui:       registeredGatewayEUI.Bytes(),
 	}
 	gtw := mockis.DefaultGateway(ids, true, true)
-	is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, gtw, testRights...)
+	is.GatewayRegistry().Add(ctx, ids, "Bearer", registeredGatewayKey, gtw, testRights...)
+	if frontend.UsesGatewayToken {
+		template := gatewaytokens.New("test", ids, &ttnpb.Rights{Rights: testRights}, c.KeyService())
+		token := test.Must(template.Generate(ctx))
+		authValue := test.Must(gatewaytokens.EncodeToString(token))
+		is.GatewayRegistry().Add(ctx, ids, gatewaytokens.AuthType, authValue, gtw)
+	}
 
 	time.Sleep(timeout) // Wait for setup to be completed.
 
@@ -649,10 +673,9 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 			}
 			for _, locationPublic := range []bool{false, true} {
 				t.Run(fmt.Sprintf("LocationPublic=%v", locationPublic), func(t *testing.T) {
-					mockGtw := mockis.DefaultGateway(ids, false, false)
-					mockGtw.LocationPublic = locationPublic
-					mockGtw.Antennas[0].Location = location
-					is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, mockGtw, testRights...)
+					gtw.LocationPublic = locationPublic
+					gtw.UpdateLocationFromStatus = false
+					gtw.Antennas[0].Location = location
 
 					for _, locationInRxMetadata := range []bool{false, true} {
 						t.Run(fmt.Sprintf("RxMetadata=%v", locationInRxMetadata), func(t *testing.T) {
