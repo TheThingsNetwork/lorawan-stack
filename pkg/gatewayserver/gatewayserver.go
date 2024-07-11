@@ -1166,7 +1166,9 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			decoupledCtx,
 			ids,
 			func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
-				stats.ConnectedAt = earliestTimestamp(stats.ConnectedAt, pb.ConnectedAt)
+				if pb != nil {
+					stats.ConnectedAt = earliestTimestamp(stats.ConnectedAt, pb.ConnectedAt)
+				}
 				return stats, paths, nil
 			},
 			gs.config.ConnectionStatsTTL,
