@@ -20,6 +20,7 @@ import (
 	"net"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewaytokens"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -42,8 +43,18 @@ type MockDefinition struct {
 
 type closeMock func()
 
+// Option is a function that can be used to configure the mock.
+type Option func(*MockDefinition)
+
+// WithGatewayTokens returns an Option that adds gateway token support.
+func WithGatewayTokens(ks gatewaytokens.KeyService) Option {
+	return func(md *MockDefinition) {
+		md.gatewayRegistry.gatewayTokenKeyService = ks
+	}
+}
+
 // New returns an Identity Server mock along side its address and closing function.
-func New(ctx context.Context) (*MockDefinition, string, closeMock) { // nolint:revive
+func New(ctx context.Context, opts ...Option) (*MockDefinition, string, closeMock) { // nolint:revive
 	endDeviceRegistry := newEndDeviceRegitry()
 
 	is := &MockDefinition{
@@ -54,6 +65,9 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) { // nolint:r
 		gatewayRegistry:        newGatewayRegistry(),
 		organizationRegistry:   newOrganizationRegistry(),
 		userRegistry:           newUserRegistry(),
+	}
+	for _, opt := range opts {
+		opt(is)
 	}
 
 	srv := rpcserver.New(ctx)
