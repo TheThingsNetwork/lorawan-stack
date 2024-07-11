@@ -18,10 +18,11 @@ import { FormattedNumber, defineMessages } from 'react-intl'
 import Icon, {
   IconDownlink,
   IconUplink,
-  IconHeartRateMonitor,
+  IconActivity,
   IconX,
   IconClockCheck,
   IconClockCancel,
+  IconProtocol,
 } from '@ttn-lw/components/icon'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -33,17 +34,31 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import style from './gateway-status-panel.styl'
 
 const m = defineMessages({
-  statusLabel: 'Up and running for {days} days',
-  statusRecieved: 'Status received',
   noUplinks: 'No uplinks yet',
   noDownlinks: 'No downlinks yet',
   noStatus: 'No status',
   noDataYet: 'No data yet',
-  established: 'Established',
+  established: 'Established for {days}',
   notEstablished: 'Not established',
 })
 
-const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
+const calculateDaysPassed = timestamp => {
+  const oneDay = 24 * 60 * 60 * 1000 // Number of milliseconds in a day
+  const currentTime = new Date().getTime() // Current timestamp in milliseconds
+  const givenTime = new Date(timestamp).getTime() // Given timestamp in milliseconds
+
+  const timePassed = currentTime - givenTime
+
+  if (timePassed < oneDay) {
+    const hoursPassed = Math.floor(timePassed / (60 * 60 * 1000)) // Number of hours passed
+    return `${hoursPassed} hours`
+  }
+
+  const daysPassed = Math.floor(timePassed / oneDay) // Number of days passed
+  return `${daysPassed} days`
+}
+
+const Transmissions = ({ gatewayStats, isDisconnected }) => {
   const showUplink =
     Boolean(gatewayStats?.uplink_count) ||
     (typeof gatewayStats?.uplink_count === 'string' && gatewayStats?.uplink_count !== 0)
@@ -54,12 +69,13 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
   const showDownlinkTime = Boolean(gatewayStats?.last_downlink_received_at)
   const showStatus = Boolean(gatewayStats?.last_status_received_at)
   const showConnectionEstablished = Boolean(gatewayStats?.connected_at)
+  const showProtocol = Boolean(gatewayStats?.protocol)
 
   return (
-    <>
+    <div>
       <div className={style.gtwStatusPanelTransmissions}>
         <div className="d-flex al-center gap-cs-xxs">
-          <Icon icon={IconUplink} className="c-text-neutral-semilight" />
+          <Icon icon={IconUplink} />
           {!showUplink ? (
             <Message content={m.noUplinks} className="fw-bold" />
           ) : (
@@ -72,12 +88,13 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
           <DateTime.Relative
             value={gatewayStats.last_uplink_received_at}
             relativeTimeStyle="short"
+            className="sm-md:d-none"
           />
         )}
       </div>
       <div className={style.gtwStatusPanelTransmissions}>
         <div className="d-flex al-center gap-cs-xxs">
-          <Icon icon={IconDownlink} className="c-text-neutral-semilight" />
+          <Icon icon={IconDownlink} />
           {!showDownlink ? (
             <Message content={m.noDownlinks} className="fw-bold" />
           ) : (
@@ -99,25 +116,21 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
           <DateTime.Relative
             value={gatewayStats.last_downlink_received_at}
             relativeTimeStyle="short"
+            className="sm-md:d-none"
           />
         )}
       </div>
       <div className={style.gtwStatusPanelTransmissions}>
         <div className="d-flex al-center gap-cs-xxs fw-bold">
-          {isUnavailable ? (
-            <>
-              <Icon icon={IconX} className="c-text-warning-normal" />
-              <Message content={m.noDataYet} className="c-text-warning-normal" />
-            </>
-          ) : isDisconnected ? (
+          {isDisconnected ? (
             <>
               <Icon icon={IconX} className="c-text-error-normal" />
               <Message content={sharedMessages.disconnected} className="c-text-error-normal" />
             </>
           ) : showStatus ? (
             <>
-              <Icon icon={IconHeartRateMonitor} className="c-text-success-normal" />
-              <Message content={m.statusRecieved} className="c-text-success-normal" />
+              <Icon icon={IconActivity} />
+              <Message content={sharedMessages.received} />
             </>
           ) : (
             <>
@@ -130,25 +143,29 @@ const Transmissions = ({ gatewayStats, isDisconnected, isUnavailable }) => {
           <DateTime.Relative
             value={gatewayStats.last_status_received_at}
             relativeTimeStyle="short"
+            className="fw-bold"
           />
         )}
       </div>
       <div className={style.gtwStatusPanelTransmissions}>
         <div className="d-flex al-center gap-cs-xxs">
-          <Icon
-            icon={showConnectionEstablished ? IconClockCheck : IconClockCancel}
-            className="c-text-neutral-semilight"
-          />
+          <Icon icon={showConnectionEstablished ? IconClockCheck : IconClockCancel} />
           <Message
             content={showConnectionEstablished ? m.established : m.notEstablished}
             className="fw-bold"
+            values={{ days: calculateDaysPassed(gatewayStats?.connected_at) }}
           />
         </div>
-        {showUplinkTime && (
-          <DateTime.Relative value={gatewayStats.connected_at} relativeTimeStyle="short" />
-        )}
       </div>
-    </>
+      {showProtocol && (
+        <div className={style.gtwStatusPanelTransmissions}>
+          <div className="d-flex al-center gap-cs-xxs fw-bold">
+            <Icon icon={IconProtocol} />
+            <span>{gatewayStats.protocol.toUpperCase()}</span>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -161,9 +178,9 @@ Transmissions.propTypes = {
     tx_acknowledgment_count: PropTypes.string,
     uplink_count: PropTypes.string,
     connected_at: PropTypes.string,
+    protocol: PropTypes.string,
   }),
   isDisconnected: PropTypes.bool.isRequired,
-  isUnavailable: PropTypes.bool.isRequired,
 }
 
 Transmissions.defaultProps = {

@@ -451,6 +451,7 @@ export default defineMessages({
   pubsubs: 'Pub/Subs',
   purge: 'Purge',
   quicklyTroubleshoot: 'Quickly troubleshoot issues and get detailed network statistics',
+  received: 'Received',
   redirecting: 'Redirecting…',
   refresh: 'Refresh',
   registerEndDevice: 'Register end device',

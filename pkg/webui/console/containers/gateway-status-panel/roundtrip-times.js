@@ -16,8 +16,6 @@ import React, { useMemo } from 'react'
 import { FormattedNumber } from 'react-intl'
 import classNames from 'classnames'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './gateway-status-panel.styl'
@@ -89,7 +87,7 @@ const RoundtripTimes = ({ maxRoundTripTime, minRoundTripTime, medianRoundTripTim
         })}
       >
         <FormattedNumber value={(medianRoundTripTime * 1000).toFixed(2)} />
-        <Message content="ms" />
+        <span>ms</span>
       </div>
     </>
   )

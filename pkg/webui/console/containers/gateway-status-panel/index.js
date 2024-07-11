@@ -29,7 +29,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { getBackendErrorDefaultMessage, isBackend } from '@ttn-lw/lib/errors/utils'
+import { getBackendErrorName, isBackend } from '@ttn-lw/lib/errors/utils'
 
 import { startGatewayStatistics, stopGatewayStatistics } from '@console/store/actions/gateways'
 
@@ -69,7 +69,7 @@ const m = defineMessages({
 })
 
 const SectionTitle = ({ title, tooltip }) => (
-  <div>
+  <div className={style.sectionTitle}>
     <Message content={title} className="fw-bold" />
     <Tooltip
       content={
@@ -93,9 +93,9 @@ SectionTitle.propTypes = {
 }
 
 const EmptyState = ({ title, message }) => (
-  <div className="mt-cs-m">
-    <Message content={title} component="div" />
-    <Message content={message} className="fs-s c-text-neutral-light mt-cs-s" component="div" />
+  <div className="mt-cs-l">
+    <Message content={title} component="div" className="c-text-neutral-semilight" />
+    <Message content={message} className="fs-s c-text-neutral-semilight mt-cs-s" component="div" />
   </div>
 )
 
@@ -112,8 +112,11 @@ const GatewayStatusPanel = () => {
   const fetching = useSelector(selectGatewayStatisticsIsFetching)
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
   const isFetching = !Boolean(gatewayStats) && fetching
-  const noConnectionYet =
-    isBackend(error) && getBackendErrorDefaultMessage(error).includes('not_connected')
+  const noConnectionYet = useMemo(
+    () => isBackend(error) && getBackendErrorName(error).includes('not_connected'),
+    [error],
+  )
+
   const isUnavailable = Boolean(error) && Boolean(error.message)
 
   const maxRoundTripTime = useMemo(
@@ -134,7 +137,6 @@ const GatewayStatusPanel = () => {
   )
 
   const showRoundTripTimes = Boolean(gatewayStats?.round_trip_times)
-  const showProtocol = Boolean(gatewayStats?.protocol)
   const showDutyCycleUtilization = Boolean(gatewayStats?.sub_bands)
 
   useEffect(() => {
@@ -148,7 +150,7 @@ const GatewayStatusPanel = () => {
     <Panel
       title="Gateway status"
       icon={isDisconnected ? IconRouterOff : IconGateway}
-      shortCutLinkTitle="Network Operation Center"
+      shortCutLinkTitle={sharedMessages.noc}
       shortCutLinkPath="https://www.thethingsindustries.com/stack/features/noc"
       shortCutLinkTarget="_blank"
       divider
@@ -174,11 +176,15 @@ const GatewayStatusPanel = () => {
           <Message content={sharedMessages.fetching} />
         </Spinner>
       ) : noConnectionYet ? (
-        <div className="d-flex direction-column j-center text-center pt-ls-l p-sides-ls-xxl md-lg:p-sides-cs-xl">
-          <Message content={m.noConnection} className="fw-bold" component="div" />
+        <div className="d-flex direction-column j-center text-center pt-ls-l md-lg:p-sides-0 md-lg:pt-cs-s">
+          <Message
+            content={m.noConnection}
+            className="fw-bold fs-l p-sides-ls-xxl md-lg:p-sides-cs-s"
+            component="div"
+          />
           <Message
             content={m.noConnectionDescription}
-            className="fs-s c-text-neutral-light"
+            className="c-text-neutral-light p-sides-ls-xl md-lg:p-sides-cs-s"
             values={{
               Link: msg => (
                 <Link.Anchor
@@ -196,21 +202,20 @@ const GatewayStatusPanel = () => {
       ) : (
         <>
           <div className={style.gtwStatusPanelUpperContainer}>
-            <div className="d-flex direction-column j-between w-full">
+            <div className="d-flex direction-column j-between w-full sm-md:j-start">
               <SectionTitle title={m.uptime} tooltip={m.uptimeTooltip} />
               <div className="mt-cs-l">
-                <Message content={m.unlockGraph} component="div" />
+                <Message content={m.unlockGraph} component="div" className="fw-bold" />
                 <Button.AnchorLink
-                  secondary
+                  naked
                   message={sharedMessages.upgradeNow}
                   icon={IconBolt}
                   href="https://www.thethingsindustries.com/stack/plans/"
                   target="_blank"
-                  className="mt-cs-m w-content"
+                  className={style.gtwStatusPanelUpgradeButton}
                 />
               </div>
             </div>
-            <hr className={style.gtwStatusPanelDividerMobile} />
             <div className="d-flex direction-column j-between w-full">
               <SectionTitle title={m.roundTripTimes} tooltip={m.roundTripTimesTooltip} />
               {showRoundTripTimes ? (
@@ -223,47 +228,24 @@ const GatewayStatusPanel = () => {
           <hr className={style.gtwStatusPanelDivider} />
           <div className={style.gtwStatusPanelLowerContainer}>
             <div className="w-full">
-              <div>
-                <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />
-                <Transmissions
-                  isUnavailable={isUnavailable}
-                  gatewayStats={gatewayStats}
-                  isDisconnected={isDisconnected}
-                />
-              </div>
-              <div className={style.gtwStatusPanelTag}>
-                {showProtocol && (
-                  <Message
-                    content={m.protocol}
-                    values={{ protocol: gatewayStats.protocol.toUpperCase() }}
-                    component="div"
-                  />
-                )}
-              </div>
+              <SectionTitle title={m.transmissions} tooltip={m.transmissionsTooltip} />
+              <Transmissions gatewayStats={gatewayStats} isDisconnected={isDisconnected} />
             </div>
-            <hr className={style.gtwStatusPanelDividerMobile} />
             <div className="w-full">
               <SectionTitle
                 title={m.dutyCycleUtilization}
                 tooltip={m.dutyCycleUtilizationTooltip}
               />
-              {showDutyCycleUtilization ? (
-                gatewayStats.sub_bands.map((band, index) => (
-                  <DutyCycleUtilization key={index} band={band} />
-                ))
-              ) : (
-                <EmptyState title={sharedMessages.noData} message={m.noDutyCycle} />
-              )}
+              <div>
+                {showDutyCycleUtilization ? (
+                  gatewayStats.sub_bands.map((band, index) => (
+                    <DutyCycleUtilization key={index} band={band} />
+                  ))
+                ) : (
+                  <EmptyState title={sharedMessages.noData} message={m.noDutyCycle} />
+                )}
+              </div>
             </div>
-          </div>
-          <div className={style.gtwStatusPanelTagMobile}>
-            {showProtocol && (
-              <Message
-                content={m.protocol}
-                values={{ protocol: gatewayStats.protocol.toUpperCase() }}
-                component="div"
-              />
-            )}
           </div>
         </>
       )}
