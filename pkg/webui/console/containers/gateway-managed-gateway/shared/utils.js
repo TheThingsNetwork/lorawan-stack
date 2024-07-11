@@ -20,18 +20,19 @@ export const CONNECTION_TYPES = Object.freeze({
 
 export const initialWifiProfile = {
   profile_name: '',
-  profileOf: '',
+  _profileOf: '',
   ssid: '',
   password: '',
-  access_point: {
-    _type: 'all',
+  _access_point: {
+    type: 'all',
     ssid: '',
     bssid: '',
     channel: 0,
     authentication_mode: '',
     rssi: 0,
+    is_password_set: false,
   },
-  default_network_interface: true,
+  _default_network_interface: true,
   network_interface_addresses: {
     ip_addresses: [''],
     subnet_mask: '',

@@ -27,7 +27,7 @@ const m = defineMessages({
 })
 
 const hasSelectedAccessPoint = value =>
-  (value.ssid !== '' && value._type === 'all') || value._type === 'other'
+  (value.ssid !== '' && value.type === 'all') || value._type === 'other'
 
 const hasValidIpAddresses = ipAddresses =>
   ipAddresses &&
@@ -58,35 +58,38 @@ export const wifiValidationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
-  profileOf: Yup.string(),
-  default_network_interface: Yup.boolean(),
-  network_interface_addresses: Yup.object().when('default_network_interface', {
+  _profileOf: Yup.string(),
+  _default_network_interface: Yup.boolean(),
+  network_interface_addresses: Yup.object().when('_default_network_interface', {
     is: false,
     then: schema => schema.shape(networkInterfaceSettings),
     otherwise: schema => schema.strip(),
   }),
-  ssid: Yup.string().when('access_point', {
-    is: accessPoint => accessPoint._type === 'other',
+  ssid: Yup.string().when('_access_point', {
+    is: accessPoint => accessPoint.type === 'other',
     then: schema => schema.required(sharedMessages.validateRequired),
     otherwise: schema => schema.strip(),
   }),
-  password: Yup.string().when('access_point', {
+  password: Yup.string().when('_access_point', {
     is: accessPoint =>
-      !Boolean(accessPoint.authentication_mode) || accessPoint.authentication_mode === 'open',
+      !Boolean(accessPoint.authentication_mode) ||
+      accessPoint.authentication_mode === 'open' ||
+      accessPoint.is_password_set,
     then: schema => schema.strip(),
     otherwise: schema =>
       schema
         .min(8, Yup.passValues(sharedMessages.validateTooShort))
         .required(sharedMessages.validateRequired),
   }),
-  access_point: Yup.object()
+  _access_point: Yup.object()
     .shape({
-      _type: Yup.string(),
+      type: Yup.string(),
       ssid: Yup.string().default(''),
       bssid: Yup.string(),
       channel: Yup.number(),
       authentication_mode: Yup.string(),
       rssi: Yup.number(),
+      is_password_set: Yup.boolean(),
     })
     .test('has access point selected', m.validateNotSelectedAccessPoint, hasSelectedAccessPoint),
 })

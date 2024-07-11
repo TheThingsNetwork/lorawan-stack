@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { parseInt } from 'lodash'
 import { defineMessages } from 'react-intl'
@@ -38,9 +38,8 @@ const m = defineMessages({
   isSet: '(is set)',
 })
 
-const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
-  const { values, setFieldValue } = useFormContext()
-  const [resetPassword, setResetPassword] = useState(false)
+const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
+  const { values, setFieldValue, setFieldTouched } = useFormContext()
 
   const valuesNormalized = useMemo(() => {
     if (!namePrefix) return values
@@ -50,16 +49,21 @@ const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
   }, [namePrefix, values])
 
   const canTypePassword =
-    !isEdit || (isEdit && resetPassword) || valuesNormalized.access_point?._type === 'other'
+    !valuesNormalized._access_point?.is_password_set ||
+    valuesNormalized._access_point?.type === 'other'
 
   const handleRestPassword = useCallback(() => {
-    setResetPassword(true)
-  }, [])
+    setFieldValue(`${namePrefix}_access_point.is_password_set`, false)
+  }, [namePrefix, setFieldValue])
 
   useEffect(() => {
-    setResetPassword(false)
-    setFieldValue(`${namePrefix}ssid`, valuesNormalized.access_point?.ssid)
-  }, [namePrefix, setFieldValue, valuesNormalized.access_point.ssid])
+    if (Boolean(valuesNormalized._access_point.ssid)) {
+      setFieldValue(`${namePrefix}_access_point.is_password_set`, false)
+      setFieldValue(`${namePrefix}ssid`, valuesNormalized._access_point?.ssid)
+      setFieldTouched(`${namePrefix}password`, false)
+      setFieldValue(`${namePrefix}password`, '')
+    }
+  }, [namePrefix, setFieldTouched, setFieldValue, valuesNormalized._access_point.ssid])
 
   return (
     <>
@@ -72,16 +76,16 @@ const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
 
       <Form.Field
         title={m.accessPointAndSsid}
-        name={`${namePrefix}access_point`}
+        name={`${namePrefix}_access_point`}
         component={AccessPointList}
         required
       />
-      {valuesNormalized.access_point._type === 'other' && (
+      {valuesNormalized._access_point.type === 'other' && (
         <Form.Field title={m.ssid} name={`${namePrefix}ssid`} component={Input} required />
       )}
-      {(valuesNormalized.access_point._type === 'other' ||
-        (Boolean(valuesNormalized.access_point.authentication_mode) &&
-          valuesNormalized.access_point.authentication_mode !== 'open')) && (
+      {(valuesNormalized._access_point.type === 'other' ||
+        (Boolean(valuesNormalized._access_point.authentication_mode) &&
+          valuesNormalized._access_point.authentication_mode !== 'open')) && (
         <Form.Field
           title={m.wifiPassword}
           name={`${namePrefix}password`}
@@ -89,7 +93,7 @@ const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
           component={Input}
           readOnly={!canTypePassword}
           placeholder={!canTypePassword ? m.isSet : undefined}
-          required={valuesNormalized.access_point?._type !== 'other'}
+          required={valuesNormalized._access_point?.type !== 'other'}
         >
           {!canTypePassword && (
             <Button
@@ -104,14 +108,14 @@ const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
       )}
 
       <Form.Field
-        name={`${namePrefix}default_network_interface`}
+        name={`${namePrefix}_default_network_interface`}
         component={Checkbox}
         label={m.useDefaultNetworkInterfaceSettings}
         description={m.uncheckToSetCustomSettings}
         tooltipId={tooltipIds.DEFAULT_NETWORK_INTERFACE}
       />
 
-      {!Boolean(valuesNormalized.default_network_interface) && (
+      {!Boolean(valuesNormalized._default_network_interface) && (
         <NetworkInterfaceAddressesFormFields namePrefix={namePrefix} />
       )}
     </>
@@ -119,12 +123,10 @@ const GatewayWifiProfilesFormFields = ({ isEdit, namePrefix }) => {
 }
 
 GatewayWifiProfilesFormFields.propTypes = {
-  isEdit: PropTypes.bool,
   namePrefix: PropTypes.string,
 }
 
 GatewayWifiProfilesFormFields.defaultProps = {
-  isEdit: false,
   namePrefix: '',
 }
 

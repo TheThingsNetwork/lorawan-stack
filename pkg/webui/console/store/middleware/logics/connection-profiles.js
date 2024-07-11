@@ -51,21 +51,85 @@ const getConnectionProfilesLogic = createRequestLogic({
   },
 })
 
+const getConnectionProfileLogic = createRequestLogic({
+  type: connectionProfiles.GET_CONNECTION_PROFILE,
+  process: async ({ action, getState }) => {
+    const { entityId, profileId, type } = action.payload
+    const { selectors } = action.meta
+    const userId = selectUserId(getState())
+    let data
+    if (type === CONNECTION_TYPES.WIFI) {
+      if (entityId === userId) {
+        data = await tts.ConnectionProfiles.getWifiProfileForUser(entityId, profileId, selectors)
+      } else {
+        data = await tts.ConnectionProfiles.getWifiProfileForOrganization(
+          entityId,
+          profileId,
+          selectors,
+        )
+      }
+    }
+
+    return data
+  },
+})
+
+const createConnectionProfileLogic = createRequestLogic({
+  type: connectionProfiles.CREATE_CONNECTION_PROFILE,
+  process: async ({ action, getState }) => {
+    const { entityId, type, profile } = action.payload
+    const userId = selectUserId(getState())
+    let data
+    if (type === CONNECTION_TYPES.WIFI) {
+      if (entityId === userId) {
+        data = await tts.ConnectionProfiles.createWifiProfileForUser(entityId, profile)
+      } else {
+        data = await tts.ConnectionProfiles.createWifiProfileForOrganization(entityId, profile)
+      }
+    }
+
+    return data
+  },
+})
+
+const updateConnectionProfileLogic = createRequestLogic({
+  type: connectionProfiles.UPDATE_CONNECTION_PROFILE,
+  process: async ({ action, getState }) => {
+    const { entityId, profileId, type, patch } = action.payload
+
+    const userId = selectUserId(getState())
+    let data = {}
+    if (type === CONNECTION_TYPES.WIFI) {
+      if (entityId === userId) {
+        data = await tts.ConnectionProfiles.updateWifiProfileForUser(entityId, profileId, patch)
+      } else {
+        data = await tts.ConnectionProfiles.updateWifiProfileForOrganization(
+          entityId,
+          profileId,
+          patch,
+        )
+      }
+    }
+
+    return { ...patch, ...data }
+  },
+})
+
 const deleteConnectionProfileLogic = createRequestLogic({
   type: connectionProfiles.DELETE_CONNECTION_PROFILE,
   process: async ({ action, getState }) => {
-    const { id, entityId, type } = action.payload
+    const { entityId, profileId, type } = action.payload
 
     const userId = selectUserId(getState())
     if (type === CONNECTION_TYPES.WIFI) {
       if (entityId === userId) {
-        await tts.ConnectionProfiles.deleteWifiProfileForUser(entityId, id)
+        await tts.ConnectionProfiles.deleteWifiProfileForUser(entityId, profileId)
       } else {
-        await tts.ConnectionProfiles.deleteWifiProfileForOrganization(entityId, id)
+        await tts.ConnectionProfiles.deleteWifiProfileForOrganization(entityId, profileId)
       }
     }
 
-    return { id, type }
+    return { profileId, type }
   },
 })
 
@@ -94,4 +158,11 @@ const getAccessPointsLogic = createRequestLogic({
   },
 })
 
-export default [getConnectionProfilesLogic, deleteConnectionProfileLogic, getAccessPointsLogic]
+export default [
+  getConnectionProfilesLogic,
+  getConnectionProfileLogic,
+  createConnectionProfileLogic,
+  updateConnectionProfileLogic,
+  deleteConnectionProfileLogic,
+  getAccessPointsLogic,
+]

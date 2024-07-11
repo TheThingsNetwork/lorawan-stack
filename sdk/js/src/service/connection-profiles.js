@@ -81,6 +81,7 @@ class ConnectionProfiles {
     patch,
     mask = Marshaler.fieldMaskFromPatch(patch),
   ) {
+    mask.push('network_interface_addresses')
     const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Update(
       {
         routeParams: {
@@ -151,6 +152,7 @@ class ConnectionProfiles {
     patch,
     mask = Marshaler.fieldMaskFromPatch(patch),
   ) {
+    mask.push('network_interface_addresses')
     const response = await this._api.ManagedGatewayWiFiProfileConfigurationService.Update(
       {
         routeParams: {

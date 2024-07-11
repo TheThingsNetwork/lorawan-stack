@@ -17,10 +17,12 @@ import {
   DELETE_CONNECTION_PROFILE_SUCCESS,
   GET_ACCESS_POINTS_SUCCESS,
   GET_ACCESS_POINTS_FAILURE,
+  GET_CONNECTION_PROFILE_SUCCESS,
 } from '@console/store/actions/connection-profiles'
 
 const defaultState = {
   profiles: {},
+  selectedProfile: undefined,
   accessPoints: [],
 }
 
@@ -36,13 +38,18 @@ const connectionProfiles = (state = defaultState, action) => {
           [payload.type]: payload.entities,
         },
       }
+    case GET_CONNECTION_PROFILE_SUCCESS:
+      return {
+        ...state,
+        selectedProfile: payload,
+      }
     case DELETE_CONNECTION_PROFILE_SUCCESS:
       return {
         ...state,
         profiles: {
           ...state.profiles,
           [payload.type]: state.profiles[payload.type].filter(
-            profile => profile.profile_id !== payload.id,
+            profile => profile.profile_id !== payload.profileId,
           ),
         },
       }

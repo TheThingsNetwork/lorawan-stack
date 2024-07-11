@@ -15,7 +15,7 @@
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 import { createPaginationRequestActions } from '@ttn-lw/lib/store/actions/pagination'
 
-export const GET_CONNECTION_PROFILES_LIST_BASE = 'GET_CONNECTION_PROFILES_LIST'
+export const GET_CONNECTION_PROFILES_LIST_BASE = 'CONNECTION_PROFILES'
 export const [
   {
     request: GET_CONNECTION_PROFILES_LIST,
@@ -36,6 +36,24 @@ export const [
   }),
 )
 
+export const GET_CONNECTION_PROFILE_BASE = 'GET_CONNECTION_PROFILE'
+export const [
+  {
+    request: GET_CONNECTION_PROFILE,
+    success: GET_CONNECTION_PROFILE_SUCCESS,
+    failure: GET_CONNECTION_PROFILE_FAILURE,
+  },
+  {
+    request: getConnectionProfile,
+    success: getConnectionProfileSuccess,
+    failure: getConnectionProfileFailure,
+  },
+] = createRequestActions(
+  GET_CONNECTION_PROFILE_BASE,
+  (entityId, profileId, type) => ({ entityId, profileId, type }),
+  (entityId, profileId, type, selector) => ({ selector }),
+)
+
 export const [
   {
     request: CREATE_CONNECTION_PROFILE,
@@ -47,8 +65,10 @@ export const [
     success: createConnectionProfileSuccess,
     failure: createConnectionProfileFailure,
   },
-] = createRequestActions(`CREATE_CONNECTION_PROFILE`, profile => ({
+] = createRequestActions(`CREATE_CONNECTION_PROFILE`, (entityId, type, profile) => ({
+  entityId,
   profile,
+  type,
 }))
 
 export const DELETE_CONNECTION_PROFILE_BASE = 'DELETE_CONNECTION_PROFILE'
@@ -63,10 +83,10 @@ export const [
     success: deleteConnectionProfileSuccess,
     failure: deleteConnectionProfileFailure,
   },
-] = createRequestActions(DELETE_CONNECTION_PROFILE_BASE, (id, entityId, type) => ({
-  type,
+] = createRequestActions(DELETE_CONNECTION_PROFILE_BASE, (entityId, profileId, type) => ({
   entityId,
-  id,
+  profileId,
+  type,
 }))
 
 export const [
@@ -82,9 +102,11 @@ export const [
   },
 ] = createRequestActions(
   `UPDATE_CONNECTION_PROFILE`,
-  (id, patch) => ({ id, patch }),
-  (id, patch, selector) => ({ selector }),
+  (entityId, profileId, type, patch) => ({ entityId, profileId, type, patch }),
+  (entityId, profileId, type, patch, selector) => ({ selector }),
 )
+
+export const GET_ACCESS_POINTS_BASE = 'GET_ACCESS_POINTS'
 
 export const [
   {
@@ -93,7 +115,7 @@ export const [
     failure: GET_ACCESS_POINTS_FAILURE,
   },
   { request: getAccessPoints, success: getAccessPointsSuccess, failure: getAccessPointsFailure },
-] = createRequestActions('GET_ACCESS_POINTS', (gatewayId, gatewayEui) => ({
+] = createRequestActions(GET_ACCESS_POINTS_BASE, (gatewayId, gatewayEui) => ({
   gatewayId,
   gatewayEui,
 }))

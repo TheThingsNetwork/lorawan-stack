@@ -72,9 +72,11 @@ const GatewayWifiProfilesOverview = () => {
   )
 
   const handleDelete = React.useCallback(
-    async (id, name, profileOf) => {
+    async (profileId, name, profileOf) => {
       try {
-        await dispatch(attachPromise(deleteConnectionProfile(id, profileOf, CONNECTION_TYPES.WIFI)))
+        await dispatch(
+          attachPromise(deleteConnectionProfile(profileOf, profileId, CONNECTION_TYPES.WIFI)),
+        )
         toast({
           title: name,
           message: m.deleteSuccess,
@@ -172,27 +174,27 @@ const GatewayWifiProfilesOverview = () => {
       />
       <Form
         initialValues={{
-          profileOf: '',
+          _profileOf: '',
         }}
       >
         {({ values }) => (
           <>
             <div className="d-flex j-between al-end gap-cs-m">
-              <ShowProfilesSelect name="profileOf" />
+              <ShowProfilesSelect name="_profileOf" />
               <Button
                 className="mb-cs-m"
                 primary
-                onClick={() => onAddProfile(values.profileOf)}
+                onClick={() => onAddProfile(values._profileOf)}
                 message={sharedMessages.addWifiProfile}
                 icon="add"
               />
             </div>
-            {Boolean(values.profileOf) && (
+            {Boolean(values._profileOf) && (
               <FetchTable
                 entity="connectionProfiles"
                 defaultOrder="ssid"
-                headers={getHeaders(values.profileOf)}
-                getItemsAction={() => getItemsAction(values.profileOf)}
+                headers={getHeaders(values._profileOf)}
+                getItemsAction={() => getItemsAction(values._profileOf)}
                 baseDataSelector={baseDataSelector}
                 filtersClassName="d-none"
               />

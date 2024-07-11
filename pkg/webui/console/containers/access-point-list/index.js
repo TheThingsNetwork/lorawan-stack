@@ -29,7 +29,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 
-import { getAccessPoints } from '@console/store/actions/connection-profiles'
+import { GET_ACCESS_POINTS_BASE, getAccessPoints } from '@console/store/actions/connection-profiles'
 
 import { selectSelectedGateway } from '@console/store/selectors/gateways'
 import { selectAccessPoints } from '@console/store/selectors/connection-profiles'
@@ -37,12 +37,13 @@ import { selectAccessPoints } from '@console/store/selectors/connection-profiles
 import style from './access-point-list.styl'
 
 PropTypes.accessPoint = PropTypes.shape({
-  _type: PropTypes.oneOf(['all', 'other']),
+  type: PropTypes.oneOf(['all', 'other']),
   ssid: PropTypes.string,
   bssid: PropTypes.string,
   channel: PropTypes.number,
   authentication_mode: PropTypes.string,
   rssi: PropTypes.number,
+  is_password_set: PropTypes.bool,
 })
 
 const m = defineMessages({
@@ -92,7 +93,7 @@ const AccessPointListItem = ({ accessPoint, onClick, isActive }) => {
   const handleClick = useCallback(() => {
     onClick(accessPoint)
   }, [accessPoint, onClick])
-  const isOther = accessPoint._type === 'other'
+  const isOther = accessPoint.type === 'other'
 
   return (
     <div
@@ -120,7 +121,7 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => 
   const [lastRefresh, setLastRefresh] = useState(undefined)
 
   const dispatch = useDispatch()
-  const isLoading = useSelector(state => selectFetchingEntry(state, 'GET_ACCESS_POINTS'))
+  const isLoading = useSelector(state => selectFetchingEntry(state, GET_ACCESS_POINTS_BASE))
   const accessPoints = useSelector(selectAccessPoints)
   const selectedGateway = useSelector(selectSelectedGateway)
   const { ids } = selectedGateway
@@ -157,15 +158,15 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => 
               {accessPoints.map(a => (
                 <AccessPointListItem
                   key={a.bssid}
-                  accessPoint={{ ...a, _type: 'all' }}
+                  accessPoint={{ ...a, is_password_set: false, type: 'all' }}
                   onClick={handleSelectAccessPoint}
                   isActive={value.bssid === a.bssid}
                 />
               ))}
               <AccessPointListItem
-                accessPoint={{ ssid: '', bssid: '', password: '', _type: 'other' }}
+                accessPoint={{ ssid: '', is_password_set: false, type: 'other' }}
                 onClick={handleSelectAccessPoint}
-                isActive={value._type === 'other'}
+                isActive={value.type === 'other'}
               />
             </div>
             <Message content={m.description} className="tc-subtle-gray" />

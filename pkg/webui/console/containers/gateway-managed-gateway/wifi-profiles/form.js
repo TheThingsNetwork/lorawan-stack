@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -23,24 +23,58 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
+import Spinner from '@ttn-lw/components/spinner'
+import toast from '@ttn-lw/components/toast'
 
-import { initialWifiProfile } from '@console/containers/gateway-managed-gateway/shared/utils'
+import Message from '@ttn-lw/lib/components/message'
+
+import {
+  CONNECTION_TYPES,
+  initialWifiProfile,
+} from '@console/containers/gateway-managed-gateway/shared/utils'
 import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/shared/wifi-profiles-form-fields'
 import { wifiValidationSchema } from '@console/containers/gateway-managed-gateway/shared/validation-schema'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import {
+  createConnectionProfile,
+  GET_ACCESS_POINTS_BASE,
+  GET_CONNECTION_PROFILE_BASE,
+  getConnectionProfile,
+  updateConnectionProfile,
+} from '@console/store/actions/connection-profiles'
+
+import { selectAccessPoints } from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
   updateWifiProfile: 'Update WiFi profile',
+  createSuccess: 'Connection profile created',
+  createFailure: 'There was an error and the connection profile could not be created',
+  updateSuccess: 'Connection profile updated',
+  updateFailure: 'There was an error updating this connection profile',
 })
 
 const GatewayWifiProfilesForm = () => {
   const [error, setError] = useState(undefined)
+  const accessPoints = useSelector(selectAccessPoints)
   const { gtwId, profileId } = useParams()
-  const isLoading = useSelector(state => selectFetchingEntry(state, 'GET_ACCESS_POINTS'))
+  const isLoadingAccessPoints = useSelector(state =>
+    selectFetchingEntry(state, GET_ACCESS_POINTS_BASE),
+  )
+  const isLoadingProfile = useSelector(state =>
+    selectFetchingEntry(state, GET_CONNECTION_PROFILE_BASE),
+  )
+  const formRef = useRef(null)
+  const dispatch = useDispatch()
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
 
   const isEdit = Boolean(profileId)
+
+  const entityId = searchParams.get('profileOf')
 
   const baseUrl = `/gateways/${gtwId}/managed-gateway/wifi-profiles`
 
@@ -52,33 +86,118 @@ const GatewayWifiProfilesForm = () => {
     />,
   )
 
-  const handleSubmit = useCallback(values => {
-    try {
-      console.log(values)
-    } catch (e) {
-      setError(e)
+  useEffect(() => {
+    if (isEdit) {
+      dispatch(attachPromise(getConnectionProfile(entityId, profileId, CONNECTION_TYPES.WIFI)))
+        .then(res => {
+          formRef.current.setValues(values => ({
+            ...values,
+            ...res,
+            _default_network_interface: !Boolean(res.network_interface_addresses),
+          }))
+        })
+        .catch(() => {
+          navigate(baseUrl, { replace: true })
+        })
     }
-  }, [])
+  }, [baseUrl, dispatch, entityId, isEdit, navigate, profileId, searchParams])
+
+  useEffect(() => {
+    if (isEdit && !isLoadingAccessPoints && Boolean(formRef.current)) {
+      formRef.current.setValues(values => {
+        const accessPoint = accessPoints.find(ap => ap.ssid === values.ssid)
+
+        return {
+          ...values,
+          _access_point: {
+            ...accessPoint,
+            is_password_set: true,
+            type: accessPoint ? 'all' : 'other',
+          },
+        }
+      })
+    }
+  }, [accessPoints, isEdit, isLoadingAccessPoints, profileId])
+
+  const handleSubmit = useCallback(
+    async (values, { resetForm, setSubmitting }) => {
+      const { _profileOf, _access_point, _default_network_interface, ...rest } = values
+
+      setError(undefined)
+
+      if (_default_network_interface) {
+        delete rest.network_interface_addresses
+      }
+
+      if (_access_point.is_password_set) {
+        delete rest.ssid
+        delete rest.password
+      }
+
+      if (!Boolean(rest.password)) {
+        delete rest.password
+      }
+
+      try {
+        if (!isEdit) {
+          await dispatch(
+            attachPromise(createConnectionProfile(entityId, CONNECTION_TYPES.WIFI, rest)),
+          )
+          resetForm({ values: initialWifiProfile })
+        } else {
+          await dispatch(
+            attachPromise(
+              updateConnectionProfile(entityId, profileId, CONNECTION_TYPES.WIFI, rest),
+            ),
+          )
+        }
+
+        toast({
+          title: rest.profile_name,
+          message: !isEdit ? m.createSuccess : m.updateSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (error) {
+        setSubmitting(false)
+        setError(error)
+        toast({
+          title: rest.profile_name,
+          message: !isEdit ? m.createFailure : m.updateFailure,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [dispatch, entityId, isEdit, profileId],
+  )
 
   return (
     <>
       <PageTitle title={isEdit ? m.updateWifiProfile : sharedMessages.addWifiProfile} />
-      <Form
-        error={error}
-        onSubmit={handleSubmit}
-        initialValues={initialWifiProfile}
-        validationSchema={wifiValidationSchema}
-      >
-        <GatewayWifiProfilesFormFields isEdit={isEdit} />
+      {isLoadingProfile ? (
+        <div className="pos-relative mt-cs-xl mb-cs-xl">
+          <Spinner center>
+            <Message content={sharedMessages.fetching} />
+          </Spinner>
+        </div>
+      ) : (
+        <Form
+          error={error}
+          onSubmit={handleSubmit}
+          initialValues={initialWifiProfile}
+          validationSchema={wifiValidationSchema}
+          formikRef={formRef}
+        >
+          <GatewayWifiProfilesFormFields />
 
-        <SubmitBar>
-          <Form.Submit
-            component={SubmitButton}
-            message={sharedMessages.saveChanges}
-            disabled={isLoading}
-          />
-        </SubmitBar>
-      </Form>
+          <SubmitBar>
+            <Form.Submit
+              component={SubmitButton}
+              message={sharedMessages.saveChanges}
+              disabled={isLoadingAccessPoints}
+            />
+          </SubmitBar>
+        </Form>
+      )}
     </>
   )
 }

@@ -39,6 +39,8 @@ import ManagedGatewayConnections from '@console/containers/gateway-managed-gatew
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 
+import { GET_ACCESS_POINTS_BASE } from '@console/store/actions/connection-profiles'
+
 const m = defineMessages({
   firstNotification:
     'You have just claimed a managed gateway. To connect it to WiFi or ethernet you can configure those connections here. The preprovisioned cellular backhaul typically connects automatically.',
@@ -49,7 +51,7 @@ const GatewayConnectionSettings = () => {
   const [searchParams] = useSearchParams()
   const isFirstClaim = Boolean(searchParams.get('claimed'))
   const [error, setError] = useState(undefined)
-  const isLoading = useSelector(state => selectFetchingEntry(state, 'GET_ACCESS_POINTS'))
+  const isLoading = useSelector(state => selectFetchingEntry(state, GET_ACCESS_POINTS_BASE))
 
   useBreadcrumbs(
     'gtws.single.managed-gateway.connection-settings',

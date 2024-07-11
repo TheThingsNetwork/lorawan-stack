@@ -32,9 +32,7 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { getConnectionProfilesList } from '@console/store/actions/connection-profiles'
 
-import {
-  selectConnectionProfilesByType,
-} from '@console/store/selectors/connection-profiles'
+import { selectConnectionProfilesByType } from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
   settingsProfile: 'Settings profile',
@@ -89,11 +87,11 @@ const WifiSettingsFormFields = ({ index }) => {
     <>
       <Message component="h3" content={m.wifiConnection} />
       <div className="d-flex al-center gap-cs-m">
-        <ShowProfilesSelect name={`settings.${index}.profileOf`} />
-        {Boolean(values.settings[index].profileOf) && (
+        <ShowProfilesSelect name={`settings.${index}._profileOf`} />
+        {Boolean(values.settings[index]._profileOf) && (
           <RequireRequest
             requestAction={getConnectionProfilesList({
-              entityId: values.settings[index].profileOf,
+              entityId: values.settings[index]._profileOf,
               type: CONNECTION_TYPES.WIFI,
             })}
           >
