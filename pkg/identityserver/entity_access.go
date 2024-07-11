@@ -24,7 +24,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewaytokens"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
@@ -76,6 +78,28 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	md := rpcmetadata.FromIncomingContext(ctx)
 	if md.AuthType == "" {
 		return &ttnpb.AuthInfoResponse{}, nil
+	}
+
+	if md.AuthType == gatewaytokens.AuthType {
+		token, err := gatewaytokens.DecodeFromString(md.AuthValue)
+		if err != nil {
+			return nil, err
+		}
+		rights, err := gatewaytokens.Verify(ctx, token, is.config.Gateways.TokenValidity, is.KeyService())
+		if err != nil {
+			if errors.IsNotFound(err) {
+				log.FromContext(ctx).WithField("id", token.KeyId).Warn("Key not found in key vault")
+			}
+			return nil, err
+		}
+		return &ttnpb.AuthInfoResponse{
+			AccessMethod: &ttnpb.AuthInfoResponse_GatewayToken_{
+				GatewayToken: &ttnpb.AuthInfoResponse_GatewayToken{
+					Rights:     ttnpb.RightsFrom(rights.Rights...).Implied().GetRights(),
+					GatewayIds: token.Payload.GatewayIds,
+				},
+			},
+		}, nil
 	}
 
 	if md.AuthType == clusterauth.AuthType {
@@ -360,6 +384,8 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	} else if accessToken := authInfo.GetOauthAccessToken(); accessToken != nil {
 		return nil
 	} else if userSession := authInfo.GetUserSession(); userSession != nil {
+		return nil
+	} else if gatewaytoken := authInfo.GetGatewayToken(); gatewaytoken != nil {
 		return nil
 	}
 
