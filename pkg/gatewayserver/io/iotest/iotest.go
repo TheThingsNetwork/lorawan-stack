@@ -42,6 +42,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewaytokens"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -317,6 +318,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 		go func() {
 			upCh := make(chan *ttnpb.GatewayUp)
 			downCh := make(chan *ttnpb.GatewayDown)
+			ctx1 := log.NewContextWithField(ctx1, "connection", "first")
 			err := frontend.Link(ctx1, t, gs, id, registeredGatewayKey, upCh, downCh)
 			fail1(err)
 		}()
@@ -330,6 +332,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 		ctx2, cancel2 := context.WithDeadline(ctx, time.Now().Add((1<<3)*timeout))
 		upCh := make(chan *ttnpb.GatewayUp)
 		downCh := make(chan *ttnpb.GatewayDown)
+		ctx2 = log.NewContextWithField(ctx2, "connection", "second")
 		err := frontend.Link(ctx2, t, gs, id, registeredGatewayKey, upCh, downCh)
 		cancel2()
 		if !errors.IsDeadlineExceeded(err) {
