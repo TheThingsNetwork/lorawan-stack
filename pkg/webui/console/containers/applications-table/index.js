@@ -155,7 +155,7 @@ const ApplicationsTable = props => {
             <Button message={sharedMessages.restore} onClick={details.restore} secondary />
             <DeleteModalButton
               entityId={details.id}
-              entityName={name}
+              entityName={details.name}
               message={sharedMessages.purge}
               onApprove={details.purge}
               onlyPurge
@@ -276,7 +276,7 @@ const ApplicationsTable = props => {
       entity="applications"
       defaultOrder="-created_at"
       headers={headers}
-      addMessage={sharedMessages.createApplication}
+      addMessage={sharedMessages.addApplication}
       tableTitle={<Message content={sharedMessages.applications} />}
       getItemsAction={getApplications}
       baseDataSelector={baseDataSelector}

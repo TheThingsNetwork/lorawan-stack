@@ -380,6 +380,7 @@ export default defineMessages({
   mqtt: 'MQTT',
   multicast: 'Define multicast group (ABP & Multicast)',
   name: 'Name',
+  nameAndId: 'Name and Id',
   netId: 'Net ID',
   networkActivity: 'Network activity',
   networkInformation: 'Network information',
@@ -498,6 +499,7 @@ export default defineMessages({
   scheduleAnyTimeDescription:
     'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
   scheduleDownlinkLateDescription: 'Enable server-side buffer of downlink messages',
+  searchApplications: 'Search applications',
   search: 'Search',
   searching: 'Searching…',
   secondInterval: '{count, plural, one {every second} other {every {count} seconds}}',
