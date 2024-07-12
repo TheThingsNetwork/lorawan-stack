@@ -22,8 +22,12 @@ import {
 } from '@console/store/actions/connection-profiles'
 
 const defaultState = {
-  profiles: {},
-  selectedProfile: undefined,
+  profiles: {
+    wifi: [],
+    ethernet: [],
+  },
+  wifiSelectedProfile: undefined,
+  ethernetSelectedProfile: undefined,
   accessPoints: [],
 }
 
@@ -42,7 +46,7 @@ const connectionProfiles = (state = defaultState, action) => {
     case GET_CONNECTION_PROFILE_SUCCESS:
       return {
         ...state,
-        selectedProfile: payload,
+        [`${payload.type}SelectedProfile`]: payload.data,
       }
     case CREATE_CONNECTION_PROFILE_SUCCESS:
       return {

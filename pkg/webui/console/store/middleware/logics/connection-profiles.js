@@ -70,7 +70,11 @@ const getConnectionProfileLogic = createRequestLogic({
       }
     }
 
-    return data
+    if (type === CONNECTION_TYPES.ETHERNET) {
+      data = await tts.ConnectionProfiles.getEthernetProfileForUser(userId, profileId, selectors)
+    }
+
+    return { type, data }
   },
 })
 
@@ -86,6 +90,10 @@ const createConnectionProfileLogic = createRequestLogic({
       } else {
         data = await tts.ConnectionProfiles.createWifiProfileForOrganization(entityId, profile)
       }
+    }
+
+    if (type === CONNECTION_TYPES.ETHERNET) {
+      data = await tts.ConnectionProfiles.createEthernetProfileForUser(userId, profile)
     }
 
     return { type, data }
@@ -109,6 +117,10 @@ const updateConnectionProfileLogic = createRequestLogic({
           patch,
         )
       }
+    }
+
+    if (type === CONNECTION_TYPES.ETHERNET) {
+      data = await tts.ConnectionProfiles.updateEthernetProfileForUser(userId, profileId, patch)
     }
 
     return { ...patch, ...data }

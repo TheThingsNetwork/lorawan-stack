@@ -100,13 +100,17 @@ export const wifiValidationSchema = Yup.object().shape({
 })
 
 export const ethernetValidationSchema = Yup.object().shape({
-  enable_ethernet_connection: Yup.boolean(),
+  profile_name: Yup.string()
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong))
+    .required(sharedMessages.validateRequired),
+  _enable_ethernet_connection: Yup.boolean(),
   shared: Yup.boolean().default(false),
-  use_static_ip: Yup.boolean().when('enable_ethernet_connection', {
+  _use_static_ip: Yup.boolean().when('_enable_ethernet_connection', {
     is: false,
     then: schema => schema.required(sharedMessages.validateRequired),
   }),
-  network_interface_addresses: Yup.object().when('use_static_ip', {
+  network_interface_addresses: Yup.object().when('_use_static_ip', {
     is: true,
     then: schema => schema.shape(networkInterfaceSettings),
     otherwise: schema =>

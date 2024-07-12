@@ -18,13 +18,6 @@ export const CONNECTION_TYPES = Object.freeze({
   ETHERNET: 'ethernet',
 })
 
-const initialNetworkInterfaceAddresses = {
-  ip_addresses: [''],
-  subnet_mask: '',
-  gateway: '',
-  dns_servers: [],
-}
-
 export const initialWifiProfile = {
   profile_name: '',
   shared: true,
@@ -41,7 +34,12 @@ export const initialWifiProfile = {
     is_password_set: false,
   },
   _default_network_interface: true,
-  network_interface_addresses: initialNetworkInterfaceAddresses,
+  network_interface_addresses: {
+    ip_addresses: [''],
+    subnet_mask: '',
+    gateway: '',
+    dns_servers: [],
+  },
 }
 
 export const normalizeWifiProfile = (profile, shared = true) => {
@@ -66,8 +64,32 @@ export const normalizeWifiProfile = (profile, shared = true) => {
 }
 
 export const initialEthernetProfile = {
-  enable_ethernet_connection: false,
-  use_static_ip: false,
+  profile_name: Date.now().toString(),
   shared: false,
-  network_interface_addresses: initialNetworkInterfaceAddresses,
+  _enable_ethernet_connection: false,
+  _use_static_ip: false,
+  network_interface_addresses: {
+    ip_addresses: [''],
+    subnet_mask: '',
+    gateway: '',
+    dns_servers: [],
+  },
+}
+
+export const normalizeEthernetProfile = profile => {
+  const { _enable_ethernet_connection, _use_static_ip, ...rest } = profile
+
+  if (!_enable_ethernet_connection) {
+    rest.network_interface_addresses = undefined
+  }
+
+  if (!_use_static_ip) {
+    delete rest.network_interface_addresses?.ip_addresses
+    delete rest.network_interface_addresses?.subnet_mask
+    delete rest.network_interface_addresses?.gateway
+  }
+
+  rest.profile_name = Date.now().toString()
+
+  return rest
 }

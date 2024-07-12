@@ -51,7 +51,7 @@ import {
 
 import {
   selectAccessPoints,
-  selectSelectedConnectionProfile,
+  selectSelectedWifiConnectionProfile,
 } from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
@@ -72,7 +72,7 @@ const GatewayWifiProfilesForm = () => {
   const isLoadingProfile = useSelector(state =>
     selectFetchingEntry(state, GET_CONNECTION_PROFILE_BASE),
   )
-  const selectedProfile = useSelector(selectSelectedConnectionProfile)
+  const selectedProfile = useSelector(selectSelectedWifiConnectionProfile)
   const formRef = useRef(null)
   const dispatch = useDispatch()
   const [searchParams] = useSearchParams()

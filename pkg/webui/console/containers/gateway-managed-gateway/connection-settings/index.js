@@ -33,6 +33,7 @@ import {
   initialWifiProfile,
   initialEthernetProfile,
   normalizeWifiProfile,
+  normalizeEthernetProfile,
 } from '@console/containers/gateway-managed-gateway/shared/utils'
 import WifiSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/wifi-settings-form-fields'
 import EthernetSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/ethernet-settings-form-fields'
@@ -79,7 +80,7 @@ const GatewayConnectionSettings = () => {
       try {
         const [wifi, ethernet] = values.settings
         if (wifi.profile.includes('shared')) {
-          const { profile, _profileOf, ...wifiProfile } = wifi
+          const { profile, _profileOf, _connection_type, ...wifiProfile } = wifi
           const normalizedWifiProfile = normalizeWifiProfile(wifiProfile, profile === 'shared')
           const {
             data: { profile_id: wifi_profile_id },
@@ -90,6 +91,22 @@ const GatewayConnectionSettings = () => {
           )
           console.log(wifi_profile_id)
         }
+        const { _connection_type, ...ethernetProfile } = ethernet
+
+        const normalizedEthernetProfile = normalizeEthernetProfile(ethernetProfile)
+        const {
+          data: { profile_id: ethernet_profile_id },
+        } = await dispatch(
+          attachPromise(
+            createConnectionProfile(
+              undefined,
+              CONNECTION_TYPES.ETHERNET,
+              normalizedEthernetProfile,
+            ),
+          ),
+        )
+        console.log(ethernet_profile_id)
+
         toast({
           title: selectedGateway.name,
           message: m.updateSuccess,

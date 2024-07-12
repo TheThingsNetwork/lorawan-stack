@@ -36,20 +36,20 @@ const EthernetSettingsFormFields = ({ index }) => {
     <>
       <Message component="h3" content={m.ethernetConnection} />
       <Form.Field
-        name={`settings.${index}.enable_ethernet_connection`}
+        name={`settings.${index}._enable_ethernet_connection`}
         component={Checkbox}
         label={m.enableEthernetConnection}
       />
-      {values.settings[index].enable_ethernet_connection && (
+      {values.settings[index]._enable_ethernet_connection && (
         <>
           <Form.Field
-            name={`settings.${index}.use_static_ip`}
+            name={`settings.${index}._use_static_ip`}
             component={Checkbox}
             label={m.useStaticIp}
           />
           <NetworkInterfaceAddressesFormFields
             namePrefix={`settings.${index}.`}
-            showOnlyDns={!values.settings[index].use_static_ip}
+            showOnlyDns={!values.settings[index]._use_static_ip}
           />
         </>
       )}

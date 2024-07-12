@@ -166,6 +166,52 @@ class ConnectionProfiles {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  // Ethernet profiles.
+  // User.
+  async getEthernetProfileForUser(userId, profileId, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const response = await this._api.ManagedGatewayEthernetProfileConfigurationService.Get(
+      {
+        routeParams: { 'collaborator.user_ids.user_id': userId, profile_id: profileId },
+      },
+      fieldMask,
+    )
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
+  async createEthernetProfileForUser(userId, profile) {
+    const response = await this._api.ManagedGatewayEthernetProfileConfigurationService.Create(
+      {
+        routeParams: { 'collaborator.user_ids.user_id': userId },
+      },
+      { profile },
+    )
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
+  async updateEthernetProfileForUser(
+    userId,
+    profileId,
+    patch,
+    mask = Marshaler.fieldMaskFromPatch(patch),
+  ) {
+    const response = await this._api.ManagedGatewayEthernetProfileConfigurationService.Update(
+      {
+        routeParams: {
+          'collaborator.user_ids.user_id': userId,
+          'profile.profile_id': profileId,
+        },
+      },
+      {
+        profile: patch,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Scan access points.
   async getAccessPoints(gatewayId, gatewayEui) {
     const response = await this._api.ManagedGatewayConfigurationService.ScanWiFiAccessPoints(
