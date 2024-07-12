@@ -37,12 +37,13 @@ func TestFrontend(t *testing.T) {
 	t.Parallel()
 	wsPingInterval := (1 << 3) * test.Delay
 	iotest.Frontend(t, iotest.FrontendConfig{
-		SupportsStatus:         false,
-		DetectsInvalidMessages: true,
-		DetectsDisconnect:      true,
-		AuthenticatesWithEUI:   true,
-		IsAuthenticated:        true,
-		DeduplicatesUplinks:    false,
+		SupportsStatus:       false,
+		DropsCRCFailure:      true,
+		DropsInvalidLoRaWAN:  true,
+		DetectsDisconnect:    true,
+		AuthenticatesWithEUI: true,
+		IsAuthenticated:      true,
+		DeduplicatesUplinks:  false,
 		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.BasicStation = gatewayserver.BasicStationConfig{
 				Listen: ":1887",

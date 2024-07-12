@@ -205,12 +205,13 @@ func TestConnection(t *testing.T) {
 func TestFrontend(t *testing.T) {
 	t.Parallel()
 	iotest.Frontend(t, iotest.FrontendConfig{
-		DetectsInvalidMessages: false,
-		SupportsStatus:         true,
-		DetectsDisconnect:      false,
-		AuthenticatesWithEUI:   true,
-		IsAuthenticated:        false,
-		DeduplicatesUplinks:    true,
+		DropsCRCFailure:      false,
+		DropsInvalidLoRaWAN:  false,
+		SupportsStatus:       true,
+		DetectsDisconnect:    false,
+		AuthenticatesWithEUI: true,
+		IsAuthenticated:      false,
+		DeduplicatesUplinks:  true,
 		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.UDP = gatewayserver.UDPConfig{
 				Config: udp.Config{

@@ -132,11 +132,12 @@ func TestFrontend(t *testing.T) {
 	t.Parallel()
 	timeout := (1 << 4) * test.Delay
 	iotest.Frontend(t, iotest.FrontendConfig{
-		DetectsInvalidMessages: false,
-		SupportsStatus:         true,
-		DetectsDisconnect:      true,
-		IsAuthenticated:        true,
-		DeduplicatesUplinks:    false,
+		DropsCRCFailure:     false,
+		DropsInvalidLoRaWAN: false,
+		SupportsStatus:      true,
+		DetectsDisconnect:   true,
+		IsAuthenticated:     true,
+		DeduplicatesUplinks: false,
 		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.MQTT.Listen = ":1882"
 		},

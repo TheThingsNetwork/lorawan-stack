@@ -58,8 +58,10 @@ import (
 type FrontendConfig struct {
 	// SupportsStatus indicates that the frontend sends gateway status messages.
 	SupportsStatus bool
-	// DetectsInvalidMessages indicates that the frontend detects invalid messages.
-	DetectsInvalidMessages bool
+	// DropsCRCFailure indicates that the frontend drops frames with CRC failure.
+	DropsCRCFailure bool
+	// DropsInvalidLoRaWAN indicates that the frontend drops frames that are invalid LoRaWAN.
+	DropsInvalidLoRaWAN bool
 	// DetectsDisconnect indicates that the frontend detects gateway disconnections.
 	DetectsDisconnect bool
 	// AuthenticatesWithEUI indicates that the gateway uses the EUI to authenticate, instead of the ID and key.
@@ -802,14 +804,14 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 		t.Run("Upstream", func(t *testing.T) {
 			uplinkCount := 0
 			for _, tc := range []struct {
-				Name                         string
-				Up                           *ttnpb.GatewayUp
-				Received                     []uint32 // Timestamps of uplink messages in Up that are received.
-				Dropped                      []uint32 // Timestamps of uplink messages in Up that are dropped.
-				PublicLocation               bool     // If gateway location is public, it should be in RxMetadata
-				UplinkCount                  int      // Number of expected uplinks
-				RepeatUpEvent                bool     // Expect event for repeated uplinks
-				SkipIfDetectsInvalidMessages bool     // Skip this test if the frontend detects invalid messages
+				Name                  string
+				Up                    *ttnpb.GatewayUp
+				Received              []uint32 // Timestamps of uplink messages in Up that are received.
+				Dropped               []uint32 // Timestamps of uplink messages in Up that are dropped.
+				PublicLocation        bool     // If gateway location is public, it should be in RxMetadata
+				UplinkCount           int      // Number of expected uplinks
+				RepeatUpEvent         bool     // Expect event for repeated uplinks
+				SkipIfDropsCRCFailure bool     // Skip this test if the frontend detects invalid messages
 			}{
 				{
 					Name: "GatewayStatus",
@@ -860,9 +862,9 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 							},
 						},
 					},
-					Received:                     []uint32{100},
-					Dropped:                      []uint32{100},
-					SkipIfDetectsInvalidMessages: true,
+					Received:              []uint32{100},
+					Dropped:               []uint32{100},
+					SkipIfDropsCRCFailure: true,
 				},
 				{
 					Name: "OneValidLoRa",
@@ -1114,8 +1116,8 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 				t.Run(tc.Name, func(t *testing.T) {
 					a := assertions.New(t)
 
-					if tc.SkipIfDetectsInvalidMessages && frontend.DetectsInvalidMessages {
-						t.Skip("Skipping test case because gateway detects invalid messages")
+					if tc.SkipIfDropsCRCFailure && frontend.DropsCRCFailure {
+						t.Skip("Skipping test case because gateway drops CRC failures")
 					}
 
 					upEvents := map[string]events.Channel{}
@@ -1151,7 +1153,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 					}
 					if tc.UplinkCount > 0 {
 						uplinkCount += tc.UplinkCount
-					} else if frontend.DetectsInvalidMessages {
+					} else if frontend.DropsInvalidLoRaWAN {
 						uplinkCount += len(tc.Received)
 					} else {
 						uplinkCount += len(tc.Up.UplinkMessages)
