@@ -88,7 +88,7 @@ const createConnectionProfileLogic = createRequestLogic({
       }
     }
 
-    return data
+    return { type, data }
   },
 })
 

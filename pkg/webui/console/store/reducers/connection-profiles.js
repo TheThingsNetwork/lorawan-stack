@@ -18,6 +18,7 @@ import {
   GET_ACCESS_POINTS_SUCCESS,
   GET_ACCESS_POINTS_FAILURE,
   GET_CONNECTION_PROFILE_SUCCESS,
+  CREATE_CONNECTION_PROFILE_SUCCESS,
 } from '@console/store/actions/connection-profiles'
 
 const defaultState = {
@@ -42,6 +43,16 @@ const connectionProfiles = (state = defaultState, action) => {
       return {
         ...state,
         selectedProfile: payload,
+      }
+    case CREATE_CONNECTION_PROFILE_SUCCESS:
+      return {
+        ...state,
+        profiles: {
+          ...state.profiles,
+          [payload.type]: payload.data.shared
+            ? [...state.profiles[payload.type], payload.data]
+            : state.profiles[payload.type],
+        },
       }
     case DELETE_CONNECTION_PROFILE_SUCCESS:
       return {

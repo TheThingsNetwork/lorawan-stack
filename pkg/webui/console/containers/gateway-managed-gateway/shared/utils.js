@@ -18,8 +18,16 @@ export const CONNECTION_TYPES = Object.freeze({
   ETHERNET: 'ethernet',
 })
 
+const initialNetworkInterfaceAddresses = {
+  ip_addresses: [''],
+  subnet_mask: '',
+  gateway: '',
+  dns_servers: [],
+}
+
 export const initialWifiProfile = {
   profile_name: '',
+  shared: true,
   _profileOf: '',
   ssid: '',
   password: '',
@@ -33,21 +41,33 @@ export const initialWifiProfile = {
     is_password_set: false,
   },
   _default_network_interface: true,
-  network_interface_addresses: {
-    ip_addresses: [''],
-    subnet_mask: '',
-    gateway: '',
-    dns_servers: [],
-  },
+  network_interface_addresses: initialNetworkInterfaceAddresses,
+}
+
+export const normalizeWifiProfile = (profile, shared = true) => {
+  const { _profileOf, _access_point, _default_network_interface, ...rest } = profile
+
+  if (_default_network_interface) {
+    rest.network_interface_addresses = undefined
+  }
+
+  if (_access_point.is_password_set) {
+    delete rest.ssid
+    delete rest.password
+  }
+
+  if (!Boolean(rest.password)) {
+    delete rest.password
+  }
+
+  rest.shared = shared
+
+  return rest
 }
 
 export const initialEthernetProfile = {
   enable_ethernet_connection: false,
   use_static_ip: false,
-  network_interface_addresses: {
-    ip_addresses: [''],
-    subnet_mask: '',
-    gateway: '',
-    dns_servers: [],
-  },
+  shared: false,
+  network_interface_addresses: initialNetworkInterfaceAddresses,
 }

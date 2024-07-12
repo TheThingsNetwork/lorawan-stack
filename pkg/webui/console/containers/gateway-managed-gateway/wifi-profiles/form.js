@@ -31,6 +31,7 @@ import Message from '@ttn-lw/lib/components/message'
 import {
   CONNECTION_TYPES,
   initialWifiProfile,
+  normalizeWifiProfile,
 } from '@console/containers/gateway-managed-gateway/shared/utils'
 import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/shared/wifi-profiles-form-fields'
 import { wifiValidationSchema } from '@console/containers/gateway-managed-gateway/shared/validation-schema'
@@ -125,32 +126,17 @@ const GatewayWifiProfilesForm = () => {
   }, [accessPoints, isEdit, isLoadingAccessPoints, profileId])
 
   const handleSubmit = useCallback(
-    async (values, { resetForm, setSubmitting }) => {
-      const { _profileOf, _access_point, _default_network_interface, ...rest } = values
-
+    async (values, { setSubmitting }) => {
       setError(undefined)
-
-      if (_default_network_interface) {
-        rest.network_interface_addresses = undefined
-      }
-
-      if (_access_point.is_password_set) {
-        delete rest.ssid
-        delete rest.password
-      }
-
-      if (!Boolean(rest.password)) {
-        delete rest.password
-      }
-
+      const profile = normalizeWifiProfile(values)
       try {
         if (!isEdit) {
           await dispatch(
-            attachPromise(createConnectionProfile(entityId, CONNECTION_TYPES.WIFI, rest)),
+            attachPromise(createConnectionProfile(entityId, CONNECTION_TYPES.WIFI, profile)),
           )
-          resetForm({ values: initialWifiProfile })
+          navigate(baseUrl, { replace: true })
         } else {
-          const profileDiff = diff(selectedProfile, rest)
+          const profileDiff = diff(selectedProfile, profile)
 
           await dispatch(
             attachPromise(
@@ -160,7 +146,7 @@ const GatewayWifiProfilesForm = () => {
         }
 
         toast({
-          title: rest.profile_name,
+          title: profile.profile_name,
           message: !isEdit ? m.createSuccess : m.updateSuccess,
           type: toast.types.SUCCESS,
         })
@@ -168,13 +154,13 @@ const GatewayWifiProfilesForm = () => {
         setSubmitting(false)
         setError(error)
         toast({
-          title: rest.profile_name,
+          title: profile.profile_name,
           message: !isEdit ? m.createFailure : m.updateFailure,
           type: toast.types.ERROR,
         })
       }
     },
-    [dispatch, entityId, isEdit, profileId, selectedProfile],
+    [baseUrl, dispatch, entityId, isEdit, navigate, profileId, selectedProfile],
   )
 
   return (

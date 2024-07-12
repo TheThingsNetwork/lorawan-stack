@@ -61,8 +61,8 @@ const WifiSettingsFormFields = ({ index }) => {
       value: p.profile_id,
       label: p.profile_name,
     })),
-    { value: '2', label: m.createNewSharedProfile.defaultMessage },
-    { value: '3', label: m.setAConfigForThisGateway.defaultMessage },
+    { value: 'shared', label: m.createNewSharedProfile.defaultMessage },
+    { value: 'non-shared', label: m.setAConfigForThisGateway.defaultMessage },
   ]
 
   const isConnected = 0
@@ -107,7 +107,7 @@ const WifiSettingsFormFields = ({ index }) => {
         )}
       </div>
       <Message component="div" content={m.profileDescription} className="tc-subtle-gray mb-cs-m" />
-      {(values.settings[index].profile === '2' || values.settings[index].profile === '3') && (
+      {values.settings[index].profile.includes('shared') && (
         <GatewayWifiProfilesFormFields namePrefix={`settings.${index}.`} />
       )}
       {connectionStatus !== null && (

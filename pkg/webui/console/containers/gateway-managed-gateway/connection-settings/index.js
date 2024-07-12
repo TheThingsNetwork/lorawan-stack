@@ -16,7 +16,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Col, Row } from 'react-grid-system'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -25,12 +25,14 @@ import Notification from '@ttn-lw/components/notification'
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import toast from '@ttn-lw/components/toast'
 
 import validationSchema from '@console/containers/gateway-managed-gateway/connection-settings/validation-schema'
 import {
   CONNECTION_TYPES,
   initialWifiProfile,
   initialEthernetProfile,
+  normalizeWifiProfile,
 } from '@console/containers/gateway-managed-gateway/shared/utils'
 import WifiSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/wifi-settings-form-fields'
 import EthernetSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/ethernet-settings-form-fields'
@@ -38,20 +40,30 @@ import ManagedGatewayConnections from '@console/containers/gateway-managed-gatew
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { GET_ACCESS_POINTS_BASE } from '@console/store/actions/connection-profiles'
+import {
+  createConnectionProfile,
+  GET_ACCESS_POINTS_BASE,
+} from '@console/store/actions/connection-profiles'
+
+import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
   firstNotification:
     'You have just claimed a managed gateway. To connect it to WiFi or ethernet you can configure those connections here. The preprovisioned cellular backhaul typically connects automatically.',
+  updateSuccess: 'Connection settings updated',
+  updateFailure: 'There was an error updating these connection settings',
 })
 
 const GatewayConnectionSettings = () => {
   const { gtwId } = useParams()
+  const selectedGateway = useSelector(selectSelectedGateway)
   const [searchParams] = useSearchParams()
   const isFirstClaim = Boolean(searchParams.get('claimed'))
   const [error, setError] = useState(undefined)
   const isLoading = useSelector(state => selectFetchingEntry(state, GET_ACCESS_POINTS_BASE))
+  const dispatch = useDispatch()
 
   useBreadcrumbs(
     'gtws.single.managed-gateway.connection-settings',
@@ -61,13 +73,40 @@ const GatewayConnectionSettings = () => {
     />,
   )
 
-  const handleSubmit = useCallback(values => {
-    try {
-      console.log(values)
-    } catch (e) {
-      setError(e)
-    }
-  }, [])
+  const handleSubmit = useCallback(
+    async (values, { setSubmitting }) => {
+      setError(undefined)
+      try {
+        const [wifi, ethernet] = values.settings
+        if (wifi.profile.includes('shared')) {
+          const { profile, _profileOf, ...wifiProfile } = wifi
+          const normalizedWifiProfile = normalizeWifiProfile(wifiProfile, profile === 'shared')
+          const {
+            data: { profile_id: wifi_profile_id },
+          } = await dispatch(
+            attachPromise(
+              createConnectionProfile(_profileOf, CONNECTION_TYPES.WIFI, normalizedWifiProfile),
+            ),
+          )
+          console.log(wifi_profile_id)
+        }
+        toast({
+          title: selectedGateway.name,
+          message: m.updateSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (error) {
+        setSubmitting(false)
+        setError(error)
+        toast({
+          title: selectedGateway.name,
+          message: m.updateFailure,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [dispatch, selectedGateway.name],
+  )
 
   const initialValues = useMemo(
     () => ({
