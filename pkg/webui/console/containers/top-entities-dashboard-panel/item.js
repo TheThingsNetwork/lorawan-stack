@@ -59,11 +59,16 @@ const EntitiesItem = ({ entity, headers }) => {
   }, [createdAt, dispatch, id, type])
 
   return (
-    <Table.Row id={id} clickable linkTo={path} body>
+    <Table.Row id={id} clickable linkTo={path} body panelStyle>
       {headers.map((header, index) => {
         const value = header.getValue ? header.getValue(entity) : entity[header.name]
         return (
-          <Table.DataCell key={`${id}-${index}`} align={header.align} className={header.className}>
+          <Table.DataCell
+            key={`${id}-${index}`}
+            align={header.align}
+            className={header.className}
+            panelStyle
+          >
             {headers[index].render(value, id)}
           </Table.DataCell>
         )

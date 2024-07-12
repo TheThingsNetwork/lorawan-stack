@@ -113,21 +113,20 @@ const GatewaysTable = () => {
     const baseHeaders = [
       {
         name: 'ids.gateway_id',
-        displayName: sharedMessages.id,
-        width: 25,
+        displayName: sharedMessages.nameAndId,
+        getValue: row => ({
+          id: row.ids.gateway_id,
+          name: row.name,
+        }),
+        render: ({ name, id }) => <span className="fw-bold">{name ?? id}</span>,
         sortable: true,
         sortKey: 'gateway_id',
-      },
-      {
-        name: 'name',
-        displayName: sharedMessages.name,
-        width: 33,
-        sortable: true,
+        width: 40,
       },
       {
         name: 'ids.eui',
         displayName: sharedMessages.gatewayEUI,
-        width: 22,
+        align: 'center',
         sortable: true,
         sortKey: 'gateway_eui',
         render: gatewayEui =>
@@ -141,6 +140,7 @@ const GatewaysTable = () => {
           ) : (
             <SafeInspector data={gatewayEui} noTransform noCopyPopup small hideable={false} />
           ),
+        width: '13rem',
       },
     ]
 
@@ -148,7 +148,6 @@ const GatewaysTable = () => {
       baseHeaders.push({
         name: 'actions',
         displayName: sharedMessages.actions,
-        width: 25,
         getValue: row => ({
           id: row.ids.gateway_id,
           name: row.name,
@@ -172,8 +171,8 @@ const GatewaysTable = () => {
       baseHeaders.push(
         {
           name: 'status',
-          width: 10,
           displayName: sharedMessages.status,
+          align: 'center',
           render: status => {
             let indicator = 'unknown'
             let label = sharedMessages.unknown
@@ -192,16 +191,16 @@ const GatewaysTable = () => {
               label = sharedMessages.unknown
             }
 
-            return <Status status={indicator} label={label} flipped />
+            return <Status status={indicator} label={label} className="d-flex al-center j-center" />
           },
         },
         {
           name: 'created_at',
-          width: 10,
           displayName: sharedMessages.createdAt,
-          align: 'right',
+          align: 'center',
           sortable: true,
           render: date => <DateTime.Relative value={date} />,
+          width: 15,
         },
       )
     }

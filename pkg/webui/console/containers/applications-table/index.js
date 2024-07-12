@@ -52,7 +52,7 @@ import {
 } from '@console/store/selectors/applications'
 
 const m = defineMessages({
-  ownedTabTitle: 'Owned applications',
+  ownedTabTitle: 'Owned by me',
   restoreSuccess: 'Application restored',
   restoreFail: 'There was an error and application could not be restored',
   purgeSuccess: 'Application purged',
@@ -78,6 +78,7 @@ const tabs = [
 
 const ApplicationsTable = props => {
   const { isAdmin, restoreApplication, purgeApplication, ...rest } = props
+  // TODO: Add lastSeen column.
 
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
@@ -126,16 +127,15 @@ const ApplicationsTable = props => {
     const baseHeaders = [
       {
         name: 'ids.application_id',
-        displayName: sharedMessages.id,
-        width: 30,
+        displayName: sharedMessages.nameAndId,
+        getValue: row => ({
+          id: row.ids.application_id,
+          name: row.name,
+        }),
+        render: ({ name, id }) => <span className="fw-bold">{name ?? id}</span>,
+        width: 10,
         sortable: true,
         sortKey: 'application_id',
-      },
-      {
-        name: 'name',
-        displayName: sharedMessages.name,
-        width: 30,
-        sortable: true,
       },
     ]
 
@@ -199,22 +199,20 @@ const ApplicationsTable = props => {
         {
           name: '_devices',
           width: 8,
-          displayName: sharedMessages.devices,
+          displayName: sharedMessages.devicesShort,
           align: 'center',
           render: deviceCount =>
             typeof deviceCount !== 'number' ? (
               <Spinner micro center inline after={100} className="c-icon" />
             ) : (
-              <strong>
-                <FormattedNumber value={deviceCount} />
-              </strong>
+              <FormattedNumber value={deviceCount} />
             ),
         },
         {
           name: 'created_at',
           width: 15,
-          displayName: sharedMessages.createdAt,
-          align: 'right',
+          displayName: sharedMessages.created,
+          align: 'center',
           sortable: true,
           render: date => <DateTime.Relative value={date} />,
         },
@@ -285,6 +283,7 @@ const ApplicationsTable = props => {
       searchable
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : []}
+      searchPlaceholderMessage={sharedMessages.searchApplications}
       {...rest}
     />
   )

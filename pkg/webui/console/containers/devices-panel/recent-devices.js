@@ -158,6 +158,7 @@ const RecentEndDevices = () => {
         paginated={false}
         className={style.devicesPanelOuterTable}
         headerClassName={style.devicesPanelOuterTableHeader}
+        panelStyle
       />
     </ScrollFader>
   )
