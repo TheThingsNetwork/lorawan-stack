@@ -289,3 +289,25 @@ func fromWiFiProfile(profile *ttnpb.ManagedGatewayWiFiProfile) *northboundv1.Wif
 		NetworkInterfaceAddresses: fromNetworkInterfaceAddresses(profile.NetworkInterfaceAddresses),
 	}
 }
+
+func toEthernetProfile(profileID []byte, profile *northboundv1.EthernetProfile) *ttnpb.ManagedGatewayEthernetProfile {
+	if profile == nil {
+		return nil
+	}
+	return &ttnpb.ManagedGatewayEthernetProfile{
+		ProfileId:                 toProfileID(profileID),
+		ProfileName:               profile.ProfileName,
+		NetworkInterfaceAddresses: toNetworkInterfaceAddresses(profile.NetworkInterfaceAddresses),
+	}
+}
+
+func fromEthernetProfile(profile *ttnpb.ManagedGatewayEthernetProfile) *northboundv1.EthernetProfile {
+	if profile == nil {
+		return nil
+	}
+	return &northboundv1.EthernetProfile{
+		ProfileName:               profile.ProfileName,
+		Shared:                    true,
+		NetworkInterfaceAddresses: fromNetworkInterfaceAddresses(profile.NetworkInterfaceAddresses),
+	}
+}
