@@ -886,12 +886,12 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 										Modulation: &ttnpb.DataRate_Lora{
 											Lora: &ttnpb.LoRaDataRate{
 												SpreadingFactor: 7,
-												Bandwidth:       250000,
+												Bandwidth:       125000,
 												CodingRate:      band.Cr4_5,
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 867500000,
 									Timestamp: 200,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -925,7 +925,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 868300000, // LoRa standard channel frequency
 									Timestamp: 301,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -951,7 +951,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 868300000, // LoRa standard channel frequency
 									Timestamp: 300,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -977,7 +977,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 868300000, // LoRa standard channel frequency
 									Timestamp: 300,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -1011,7 +1011,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 868800000,
 									Timestamp: 400,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
