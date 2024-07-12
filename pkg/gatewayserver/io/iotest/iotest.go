@@ -824,10 +824,18 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 					},
 				},
 				{
-					Name: "TxAck",
+					Name: "TxAckSuccess",
 					Up: &ttnpb.GatewayUp{
 						TxAcknowledgment: &ttnpb.TxAcknowledgment{
 							Result: ttnpb.TxAcknowledgment_SUCCESS,
+						},
+					},
+				},
+				{
+					Name: "TxAckWrongFrequency",
+					Up: &ttnpb.GatewayUp{
+						TxAcknowledgment: &ttnpb.TxAcknowledgment{
+							Result: ttnpb.TxAcknowledgment_TX_FREQ,
 						},
 					},
 				},
