@@ -48,6 +48,7 @@ const Tabular = ({
   clickable,
   disableSorting,
   onSortRequest,
+  panelStyle,
 }) => {
   const handlePageChange = useCallback(
     page => {
@@ -86,7 +87,7 @@ const Tabular = ({
   )
 
   const columns = (
-    <Table.Row head>
+    <Table.Row head panelStyle={panelStyle}>
       {headers.map((header, key) => (
         <Table.HeadCell
           key={key}
@@ -95,6 +96,7 @@ const Tabular = ({
           name={header.name}
           width={header.width}
           className={header.className}
+          panelStyle={panelStyle}
         >
           {header.sortable && !disableSorting ? (
             <Table.SortButton
@@ -134,13 +136,14 @@ const Tabular = ({
         clickable={rowClickable}
         linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
         body
+        panelStyle={panelStyle}
       >
         {headers.map((header, index) => {
           const value = headers[index].getValue
             ? headers[index].getValue(row)
             : getByPath(row, headers[index].name)
           return (
-            <Table.DataCell key={index} align={header.align} small={small}>
+            <Table.DataCell key={index} align={header.align} small={small} panelStyle={panelStyle}>
               {headers[index].render ? headers[index].render(value) : value}
             </Table.DataCell>
           )
@@ -171,7 +174,9 @@ const Tabular = ({
     <div className={classnames(style.container, className)}>
       <Overlay visible={loading} loading={loading} className={style.overlay}>
         <Table minWidth={minWidth}>
-          <Table.Head className={headerClassName}>{columns}</Table.Head>
+          <Table.Head className={headerClassName} panelStyle={panelStyle}>
+            {columns}
+          </Table.Head>
           <Table.Body loading={loading} empty={rows.length === 0} emptyMessage={emptyMessage}>
             {rows}
           </Table.Body>
@@ -248,6 +253,7 @@ Tabular.propTypes = {
   pageSize: PropTypes.number,
   /** A flag identifying whether the table should have pagination. */
   paginated: PropTypes.bool,
+  panelStyle: PropTypes.bool,
   /** A selector to determine the `href`/`to` prop of the rendered rows. */
   rowHrefSelector: PropTypes.func,
   /** A selector to determine the `key` prop of the rendered rows. */
@@ -280,6 +286,7 @@ Tabular.defaultProps = {
   rowHrefSelector: undefined,
   disableSorting: false,
   headerClassName: undefined,
+  panelStyle: false,
 }
 
 export { Tabular as default, Table }

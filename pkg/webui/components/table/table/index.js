@@ -38,16 +38,21 @@ Empty.defaultProps = {
   message: undefined,
 }
 
-const Head = ({ className, ...props }) => (
-  <div {...props} className={classnames(className, style.sectionHeader)} />
+const Head = ({ className, panelStyle, ...props }) => (
+  <>
+    {!panelStyle && <div className={style.sectionDivider} />}
+    <div {...props} className={classnames(className, style.sectionHeader)} />
+  </>
 )
 
 Head.propTypes = {
   className: PropTypes.string,
+  panelStyle: PropTypes.bool,
 }
 
 Head.defaultProps = {
   className: undefined,
+  panelStyle: false,
 }
 
 const Body = ({ className, empty, loading, emptyMessage, ...props }) => {

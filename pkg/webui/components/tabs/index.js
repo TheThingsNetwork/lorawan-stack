@@ -34,9 +34,13 @@ const Tabs = ({
   onTabChange,
   divider,
   narrow,
+  toggleStyle,
 }) => (
   <ul
-    className={classnames(className, style.tabs, { [style.divider]: divider })}
+    className={classnames(className, style.tabs, {
+      [style.divider]: divider,
+      [style.tabsToggleStyle]: toggleStyle,
+    })}
     data-test-id="tabs"
   >
     {tabs.map(
@@ -53,6 +57,7 @@ const Tabs = ({
             exact={exact}
             tabClassName={individualTabClassName}
             className={tabItemClassName}
+            toggleStyle={toggleStyle}
           >
             {icon && <Icon icon={icon} className={style.icon} />}
             <Message content={title} />
@@ -86,6 +91,7 @@ Tabs.propTypes = {
       hidden: PropTypes.bool,
     }),
   ).isRequired,
+  toggleStyle: PropTypes.bool,
 }
 
 Tabs.defaultProps = {
@@ -96,6 +102,7 @@ Tabs.defaultProps = {
   onTabChange: () => null,
   divider: false,
   narrow: false,
+  toggleStyle: false,
 }
 
 export default Tabs
