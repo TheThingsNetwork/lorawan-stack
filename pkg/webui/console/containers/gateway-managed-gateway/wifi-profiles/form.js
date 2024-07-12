@@ -38,6 +38,7 @@ import { wifiValidationSchema } from '@console/containers/gateway-managed-gatewa
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import diff from '@ttn-lw/lib/diff'
 
 import {
   createConnectionProfile,
@@ -47,7 +48,10 @@ import {
   updateConnectionProfile,
 } from '@console/store/actions/connection-profiles'
 
-import { selectAccessPoints } from '@console/store/selectors/connection-profiles'
+import {
+  selectAccessPoints,
+  selectSelectedConnectionProfile,
+} from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
   updateWifiProfile: 'Update WiFi profile',
@@ -67,6 +71,7 @@ const GatewayWifiProfilesForm = () => {
   const isLoadingProfile = useSelector(state =>
     selectFetchingEntry(state, GET_CONNECTION_PROFILE_BASE),
   )
+  const selectedProfile = useSelector(selectSelectedConnectionProfile)
   const formRef = useRef(null)
   const dispatch = useDispatch()
   const [searchParams] = useSearchParams()
@@ -126,7 +131,7 @@ const GatewayWifiProfilesForm = () => {
       setError(undefined)
 
       if (_default_network_interface) {
-        delete rest.network_interface_addresses
+        rest.network_interface_addresses = undefined
       }
 
       if (_access_point.is_password_set) {
@@ -145,9 +150,11 @@ const GatewayWifiProfilesForm = () => {
           )
           resetForm({ values: initialWifiProfile })
         } else {
+          const profileDiff = diff(selectedProfile, rest)
+
           await dispatch(
             attachPromise(
-              updateConnectionProfile(entityId, profileId, CONNECTION_TYPES.WIFI, rest),
+              updateConnectionProfile(entityId, profileId, CONNECTION_TYPES.WIFI, profileDiff),
             ),
           )
         }
@@ -167,7 +174,7 @@ const GatewayWifiProfilesForm = () => {
         })
       }
     },
-    [dispatch, entityId, isEdit, profileId],
+    [dispatch, entityId, isEdit, profileId, selectedProfile],
   )
 
   return (

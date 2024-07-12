@@ -27,7 +27,7 @@ const m = defineMessages({
 })
 
 const hasSelectedAccessPoint = value =>
-  (value.ssid !== '' && value.type === 'all') || value._type === 'other'
+  (value.ssid !== '' && value.type === 'all') || value.type === 'other'
 
 const hasValidIpAddresses = ipAddresses =>
   ipAddresses &&
