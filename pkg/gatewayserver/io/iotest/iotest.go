@@ -734,6 +734,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 							select {
 							case <-upEvents["gs.gateway.connect"]:
 							case <-time.After(timeout):
+								t.Fatal("Expected gateway to be connected, but it is not")
 							}
 
 							if locationInRxMetadata {
@@ -771,6 +772,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 							select {
 							case <-upEvents["gs.gateway.disconnect"]:
 							case <-time.After(timeout):
+								t.Fatal("Expected gateway to be disconnected, but it has not disconnected")
 							}
 						})
 					}
@@ -1261,7 +1263,9 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}
-					a.So(stats.UplinkCount, should.Equal, uplinkCount)
+					if !a.So(stats.UplinkCount, should.Equal, uplinkCount) {
+						t.FailNow()
+					}
 
 					if tc.Up.GatewayStatus != nil && frontend.SupportsStatus {
 						if !a.So(stats.LastStatus, should.NotBeNil) {
