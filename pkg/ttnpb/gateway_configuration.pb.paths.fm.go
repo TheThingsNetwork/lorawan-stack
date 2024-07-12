@@ -65,6 +65,7 @@ var CreateManagedGatewayWiFiProfileRequestFieldPathsNested = []string{
 	"profile.password",
 	"profile.profile_id",
 	"profile.profile_name",
+	"profile.shared",
 	"profile.ssid",
 }
 
@@ -90,6 +91,7 @@ var UpdateManagedGatewayWiFiProfileRequestFieldPathsNested = []string{
 	"profile.password",
 	"profile.profile_id",
 	"profile.profile_name",
+	"profile.shared",
 	"profile.ssid",
 }
 
@@ -165,6 +167,7 @@ var CreateManagedGatewayEthernetProfileRequestFieldPathsNested = []string{
 	"profile.network_interface_addresses.subnet_mask",
 	"profile.profile_id",
 	"profile.profile_name",
+	"profile.shared",
 }
 
 var CreateManagedGatewayEthernetProfileRequestFieldPathsTopLevel = []string{
@@ -188,6 +191,7 @@ var UpdateManagedGatewayEthernetProfileRequestFieldPathsNested = []string{
 	"profile.network_interface_addresses.subnet_mask",
 	"profile.profile_id",
 	"profile.profile_name",
+	"profile.shared",
 }
 
 var UpdateManagedGatewayEthernetProfileRequestFieldPathsTopLevel = []string{

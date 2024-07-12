@@ -271,6 +271,7 @@ func toWiFiProfile(profileID []byte, profile *northboundv1.WifiProfile) *ttnpb.M
 	return &ttnpb.ManagedGatewayWiFiProfile{
 		ProfileId:                 toProfileID(profileID),
 		ProfileName:               profile.ProfileName,
+		Shared:                    profile.Shared,
 		Ssid:                      profile.Ssid,
 		Password:                  profile.Password,
 		NetworkInterfaceAddresses: toNetworkInterfaceAddresses(profile.NetworkInterfaceAddresses),
@@ -283,7 +284,7 @@ func fromWiFiProfile(profile *ttnpb.ManagedGatewayWiFiProfile) *northboundv1.Wif
 	}
 	return &northboundv1.WifiProfile{
 		ProfileName:               profile.ProfileName,
-		Shared:                    true,
+		Shared:                    profile.Shared,
 		Ssid:                      profile.Ssid,
 		Password:                  profile.Password,
 		NetworkInterfaceAddresses: fromNetworkInterfaceAddresses(profile.NetworkInterfaceAddresses),
@@ -297,6 +298,7 @@ func toEthernetProfile(profileID []byte, profile *northboundv1.EthernetProfile) 
 	return &ttnpb.ManagedGatewayEthernetProfile{
 		ProfileId:                 toProfileID(profileID),
 		ProfileName:               profile.ProfileName,
+		Shared:                    profile.Shared,
 		NetworkInterfaceAddresses: toNetworkInterfaceAddresses(profile.NetworkInterfaceAddresses),
 	}
 }
@@ -307,7 +309,7 @@ func fromEthernetProfile(profile *ttnpb.ManagedGatewayEthernetProfile) *northbou
 	}
 	return &northboundv1.EthernetProfile{
 		ProfileName:               profile.ProfileName,
-		Shared:                    true,
+		Shared:                    profile.Shared,
 		NetworkInterfaceAddresses: fromNetworkInterfaceAddresses(profile.NetworkInterfaceAddresses),
 	}
 }

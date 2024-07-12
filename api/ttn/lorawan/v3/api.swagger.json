@@ -26271,6 +26271,9 @@
         "profile_name": {
           "type": "string"
         },
+        "shared": {
+          "type": "boolean"
+        },
         "network_interface_addresses": {
           "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceAddresses"
         }
@@ -26310,6 +26313,9 @@
           "properties": {
             "profile_name": {
               "type": "string"
+            },
+            "shared": {
+              "type": "boolean"
             },
             "network_interface_addresses": {
               "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceAddresses"
@@ -26545,6 +26551,9 @@
         "profile_name": {
           "type": "string"
         },
+        "shared": {
+          "type": "boolean"
+        },
         "ssid": {
           "type": "string"
         },
@@ -26590,6 +26599,9 @@
           "properties": {
             "profile_name": {
               "type": "string"
+            },
+            "shared": {
+              "type": "boolean"
             },
             "ssid": {
               "type": "string"

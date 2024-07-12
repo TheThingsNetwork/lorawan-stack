@@ -1629,6 +1629,16 @@ func (dst *ManagedGatewayWiFiProfile) SetFields(src *ManagedGatewayWiFiProfile, 
 				var zero string
 				dst.ProfileName = zero
 			}
+		case "shared":
+			if len(subs) > 0 {
+				return fmt.Errorf("'shared' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Shared = src.Shared
+			} else {
+				var zero bool
+				dst.Shared = zero
+			}
 		case "ssid":
 			if len(subs) > 0 {
 				return fmt.Errorf("'ssid' has no subfields, but %s were specified", subs)
@@ -1724,6 +1734,16 @@ func (dst *ManagedGatewayEthernetProfile) SetFields(src *ManagedGatewayEthernetP
 			} else {
 				var zero string
 				dst.ProfileName = zero
+			}
+		case "shared":
+			if len(subs) > 0 {
+				return fmt.Errorf("'shared' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Shared = src.Shared
+			} else {
+				var zero bool
+				dst.Shared = zero
 			}
 		case "network_interface_addresses":
 			if len(subs) > 0 {

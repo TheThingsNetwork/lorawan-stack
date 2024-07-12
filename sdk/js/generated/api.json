@@ -24330,6 +24330,18 @@
               }
             },
             {
+              "name": "shared",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "network_interface_addresses",
               "description": "",
               "label": "",
@@ -24976,6 +24988,18 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "shared",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             },
             {
               "name": "ssid",

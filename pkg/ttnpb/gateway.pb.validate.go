@@ -2689,6 +2689,8 @@ func (m *ManagedGatewayWiFiProfile) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "shared":
+			// no validation rules for Shared
 		case "ssid":
 
 			if utf8.RuneCountInString(m.GetSsid()) > 32 {
@@ -2931,6 +2933,8 @@ func (m *ManagedGatewayEthernetProfile) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "shared":
+			// no validation rules for Shared
 		case "network_interface_addresses":
 
 			if v, ok := interface{}(m.GetNetworkInterfaceAddresses()).(interface{ ValidateFields(...string) error }); ok {

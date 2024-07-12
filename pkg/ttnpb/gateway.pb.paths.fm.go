@@ -411,6 +411,7 @@ var ManagedGatewayWiFiProfileFieldPathsNested = []string{
 	"password",
 	"profile_id",
 	"profile_name",
+	"shared",
 	"ssid",
 }
 
@@ -419,6 +420,7 @@ var ManagedGatewayWiFiProfileFieldPathsTopLevel = []string{
 	"password",
 	"profile_id",
 	"profile_name",
+	"shared",
 	"ssid",
 }
 var ManagedGatewayWiFiProfilesFieldPathsNested = []string{
@@ -436,12 +438,14 @@ var ManagedGatewayEthernetProfileFieldPathsNested = []string{
 	"network_interface_addresses.subnet_mask",
 	"profile_id",
 	"profile_name",
+	"shared",
 }
 
 var ManagedGatewayEthernetProfileFieldPathsTopLevel = []string{
 	"network_interface_addresses",
 	"profile_id",
 	"profile_name",
+	"shared",
 }
 var ManagedGatewayEthernetProfilesFieldPathsNested = []string{
 	"profiles",

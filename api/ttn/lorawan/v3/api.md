@@ -5427,6 +5427,7 @@ Identifies an end device model with version information.
 | ----- | ---- | ----- | ----------- |
 | `profile_id` | [`string`](#string) |  |  |
 | `profile_name` | [`string`](#string) |  |  |
+| `shared` | [`bool`](#bool) |  |  |
 | `network_interface_addresses` | [`ManagedGatewayNetworkInterfaceAddresses`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses) |  |  |
 
 #### Field Rules
@@ -5555,6 +5556,7 @@ Identifies an end device model with version information.
 | ----- | ---- | ----- | ----------- |
 | `profile_id` | [`string`](#string) |  |  |
 | `profile_name` | [`string`](#string) |  |  |
+| `shared` | [`bool`](#bool) |  |  |
 | `ssid` | [`string`](#string) |  |  |
 | `password` | [`string`](#string) |  |  |
 | `network_interface_addresses` | [`ManagedGatewayNetworkInterfaceAddresses`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses) |  |  |

@@ -777,6 +777,7 @@ func (m *ManagedGateway) SetFromFlags(flags *pflag.FlagSet, prefix string) (path
 func AddSelectFlagsForManagedGatewayWiFiProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-id", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-name", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-name", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("shared", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("shared", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("ssid", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("ssid", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("password", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("password", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("network-interface-addresses", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("network-interface-addresses", prefix), true), flagsplugin.WithHidden(hidden)))
@@ -794,6 +795,11 @@ func PathsFromSelectFlagsForManagedGatewayWiFiProfile(flags *pflag.FlagSet, pref
 		return nil, err
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("profile_name", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("shared", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("shared", prefix))
 	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("ssid", prefix)); err != nil {
 		return nil, err
@@ -818,6 +824,7 @@ func PathsFromSelectFlagsForManagedGatewayWiFiProfile(flags *pflag.FlagSet, pref
 func AddSetFlagsForManagedGatewayWiFiProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-id", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-name", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("shared", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("ssid", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("password", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping NetworkInterfaceAddresses because it does not seem to implement AddSetFlags.
@@ -836,6 +843,12 @@ func (m *ManagedGatewayWiFiProfile) SetFromFlags(flags *pflag.FlagSet, prefix st
 	} else if changed {
 		m.ProfileName = val
 		paths = append(paths, flagsplugin.Prefix("profile_name", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("shared", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Shared = val
+		paths = append(paths, flagsplugin.Prefix("shared", prefix))
 	}
 	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("ssid", prefix)); err != nil {
 		return nil, err
@@ -857,6 +870,7 @@ func (m *ManagedGatewayWiFiProfile) SetFromFlags(flags *pflag.FlagSet, prefix st
 func AddSelectFlagsForManagedGatewayEthernetProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-id", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-name", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-name", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("shared", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("shared", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("network-interface-addresses", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("network-interface-addresses", prefix), true), flagsplugin.WithHidden(hidden)))
 	// NOTE: network_interface_addresses (ManagedGatewayNetworkInterfaceAddresses) does not seem to have select flags.
 }
@@ -873,6 +887,11 @@ func PathsFromSelectFlagsForManagedGatewayEthernetProfile(flags *pflag.FlagSet, 
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("profile_name", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("shared", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("shared", prefix))
+	}
 	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("network_interface_addresses", prefix)); err != nil {
 		return nil, err
 	} else if selected && val {
@@ -886,6 +905,7 @@ func PathsFromSelectFlagsForManagedGatewayEthernetProfile(flags *pflag.FlagSet, 
 func AddSetFlagsForManagedGatewayEthernetProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-id", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-name", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("shared", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping NetworkInterfaceAddresses because it does not seem to implement AddSetFlags.
 }
 
@@ -902,6 +922,12 @@ func (m *ManagedGatewayEthernetProfile) SetFromFlags(flags *pflag.FlagSet, prefi
 	} else if changed {
 		m.ProfileName = val
 		paths = append(paths, flagsplugin.Prefix("profile_name", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("shared", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Shared = val
+		paths = append(paths, flagsplugin.Prefix("shared", prefix))
 	}
 	// FIXME: Skipping NetworkInterfaceAddresses because it does not seem to implement AddSetFlags.
 	return paths, nil

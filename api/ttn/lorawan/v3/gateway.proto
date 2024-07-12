@@ -487,6 +487,7 @@ message ManagedGatewayWiFiProfile {
   string profile_name = 2 [(validate.rules).string = {
     max_len: 32
   }];
+  bool shared = 6;
   string ssid = 3 [(validate.rules).string = {
     max_len: 32
   }];
@@ -510,6 +511,7 @@ message ManagedGatewayEthernetProfile {
   string profile_name = 2 [(validate.rules).string = {
     max_len: 32
   }];
+  bool shared = 4;
   ManagedGatewayNetworkInterfaceAddresses network_interface_addresses = 3;
 }
 

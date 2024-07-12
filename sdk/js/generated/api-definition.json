@@ -3135,7 +3135,8 @@
         "network_interface_addresses.ip_addresses",
         "network_interface_addresses.subnet_mask",
         "profile_id",
-        "profile_name"
+        "profile_name",
+        "shared"
       ]
     },
     "List": {
@@ -3168,7 +3169,8 @@
         "network_interface_addresses.ip_addresses",
         "network_interface_addresses.subnet_mask",
         "profile_id",
-        "profile_name"
+        "profile_name",
+        "shared"
       ]
     },
     "Get": {
@@ -3203,7 +3205,8 @@
         "network_interface_addresses.ip_addresses",
         "network_interface_addresses.subnet_mask",
         "profile_id",
-        "profile_name"
+        "profile_name",
+        "shared"
       ]
     },
     "Delete": {
@@ -3296,6 +3299,7 @@
         "password",
         "profile_id",
         "profile_name",
+        "shared",
         "ssid"
       ]
     },
@@ -3331,6 +3335,7 @@
         "password",
         "profile_id",
         "profile_name",
+        "shared",
         "ssid"
       ]
     },
@@ -3368,6 +3373,7 @@
         "password",
         "profile_id",
         "profile_name",
+        "shared",
         "ssid"
       ]
     },
