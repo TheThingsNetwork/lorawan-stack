@@ -17,13 +17,15 @@ import { defineMessages } from 'react-intl'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { ipAddress } from '@console/lib/regexp'
+import { ipAddress, subnetMask } from '@console/lib/regexp'
 
 const m = defineMessages({
   validateDnsServers: 'There are some not valid dns servers.',
   validateIpAddresses: 'There are some not valid IP addresses.',
   validateIpAddress: '{field} must contain a valid address.',
+  validateSubnetMask: '{field} must contain a valid subnet mask.',
   validateNotSelectedAccessPoint: 'There must be at least one access point / SSID selected',
+  addressesValidateTooMany: '{field} must be 2 items or fewer',
 })
 
 const hasSelectedAccessPoint = value =>
@@ -41,16 +43,18 @@ const hasValidDnsServers = dnsServers =>
 const networkInterfaceSettings = {
   ip_addresses: Yup.array()
     .default([])
-    .test('has valid entries', m.validateIpAddresses, hasValidIpAddresses),
+    .test('has valid entries', m.validateIpAddresses, hasValidIpAddresses)
+    .max(2, Yup.passValues(m.addressesValidateTooMany)),
   subnet_mask: Yup.string()
     .required(sharedMessages.validateRequired)
-    .matches(ipAddress, Yup.passValues(m.validateIpAddress)),
+    .matches(subnetMask, Yup.passValues(m.validateSubnetMask)),
   gateway: Yup.string()
     .required(sharedMessages.validateRequired)
     .matches(ipAddress, Yup.passValues(m.validateIpAddress)),
   dns_servers: Yup.array()
     .default([])
-    .test('has valid entries', m.validateDnsServers, hasValidDnsServers),
+    .test('has valid entries', m.validateDnsServers, hasValidDnsServers)
+    .max(2, Yup.passValues(m.addressesValidateTooMany)),
 }
 
 export const wifiValidationSchema = Yup.object().shape({

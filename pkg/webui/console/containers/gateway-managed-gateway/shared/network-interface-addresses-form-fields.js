@@ -26,7 +26,6 @@ const m = defineMessages({
   ipAddresses: 'IP addresses',
   dnsServers: 'DNS servers',
   addServerAddress: 'Add server address',
-  addressPlaceholder: '0.0.0.0',
 })
 
 const NetworkInterfaceAddressesFormFields = ({ namePrefix, showOnlyDns }) => (
@@ -39,13 +38,14 @@ const NetworkInterfaceAddressesFormFields = ({ namePrefix, showOnlyDns }) => (
           addMessage={m.addServerAddress}
           component={KeyValueMap}
           indexAsKey
-          valuePlaceholder={m.addressPlaceholder}
+          valuePlaceholder="192.168.100.5"
           required
         />
         <Form.Field
           title={sharedMessages.subnetMask}
           name={`${namePrefix}network_interface_addresses.subnet_mask`}
           component={Input}
+          placeholder="255.255.255.0"
           required
         />
         <Form.Field
@@ -53,6 +53,7 @@ const NetworkInterfaceAddressesFormFields = ({ namePrefix, showOnlyDns }) => (
           name={`${namePrefix}network_interface_addresses.gateway`}
           component={Input}
           required
+          placeholder="192.168.1.0"
         />
       </>
     )}
@@ -63,7 +64,7 @@ const NetworkInterfaceAddressesFormFields = ({ namePrefix, showOnlyDns }) => (
       addMessage={m.addServerAddress}
       component={KeyValueMap}
       indexAsKey
-      valuePlaceholder={m.addressPlaceholder}
+      valuePlaceholder="8.8.8.8"
     />
   </>
 )

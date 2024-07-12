@@ -34,3 +34,5 @@ export const apiKeyPath = /([A-Z0-9]{39})/
 export const duration = /^[0-9]+([a-z])$/
 export const activationEvent = /.*\.join\..*/
 export const ipAddress = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/
+export const subnetMask =
+  /^(?:255|254|252|248|240|224|192|128|0)\.((?:255|254|252|248|240|224|192|128|0)\.){2}(?:255|254|252|248|240|224|192|128|0)$/
