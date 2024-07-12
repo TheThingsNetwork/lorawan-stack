@@ -57,7 +57,6 @@ const m = defineMessages({
     'This gateway is connected to an external Gateway Server that is not handling messages for this cluster. You will hence not be able to see any activity from this gateway.',
   messageCountTooltip:
     'The amount of received uplinks and sent downlinks of this gateway since the last (re)connect. Note that some gateway types reconnect frequently causing the counter to be reset.',
-  upAndDown: '{up} up / {down} down',
 })
 
 const GatewayConnection = props => {
@@ -190,7 +189,7 @@ const GatewayConnection = props => {
           <Icon small className="c-text-neutral-semilight" icon={IconArrowsSort} />
           <Message
             component="span"
-            content={m.upAndDown}
+            content={sharedMessages.upAndDown}
             className="c-text-neutral-semilight"
             values={{
               up: <FormattedNumber value={uplinkCount} />,

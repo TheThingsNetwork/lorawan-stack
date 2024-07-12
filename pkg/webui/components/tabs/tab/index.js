@@ -31,6 +31,7 @@ const Tab = props => {
     children,
     link,
     exact = true,
+    tabClassName,
     ...rest
   } = props
 
@@ -39,6 +40,8 @@ const Tab = props => {
       onClick(name)
     }
   }, [disabled, name, onClick])
+
+  const tabClassNames = classnames(tabClassName, style.tab)
 
   const tabItemClassNames = classnames(className, style.tabItem, {
     [style.tabItemNarrow]: narrow,
@@ -71,7 +74,7 @@ const Tab = props => {
   }
 
   return (
-    <li {...rest} className={style.tab}>
+    <li {...rest} className={tabClassNames}>
       <Component {...componentProps} children={children} />
     </li>
   )
@@ -94,11 +97,13 @@ Tab.propTypes = {
    * name of the new active tab as an argument.
    */
   onClick: PropTypes.func,
+  tabClassName: PropTypes.string,
 }
 
 Tab.defaultProps = {
   children: undefined,
   className: undefined,
+  tabClassName: undefined,
   link: undefined,
   onClick: () => null,
   active: false,
