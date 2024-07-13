@@ -31,6 +31,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -64,6 +65,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -477,6 +479,14 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 	if ids.IsZero() {
 		return nil, nil, errEmptyIdentifiers.New()
 	}
+	var (
+		linkRightsInContext bool
+		linkRights          = &ttnpb.Rights{
+			Rights: []ttnpb.Right{
+				ttnpb.Right_RIGHT_GATEWAY_LINK,
+			},
+		}
+	)
 	if ids.GatewayId == "" {
 		eui := types.MustEUI64(ids.Eui)
 		if eui.OrZero().IsZero() {
@@ -492,6 +502,12 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 				return nil, nil, errGatewayEUINotRegistered.WithAttributes("eui", eui).WithCause(err)
 			}
 			ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(eui.String()))
+			ctx = rights.NewContext(ctx, &rights.Rights{
+				GatewayRights: *rights.NewMap(map[string]*ttnpb.Rights{
+					unique.ID(ctx, ids): linkRights,
+				}),
+			})
+			linkRightsInContext = true
 		} else {
 			return nil, nil, err
 		}
@@ -502,19 +518,12 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 		if err != nil {
 			return nil, nil, errUnauthenticatedGatewayConnection.WithCause(err)
 		}
-		token := gatewaytokens.New(
-			gs.config.GatewayTokenHashKeyID,
-			ids,
-			&ttnpb.Rights{
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_GATEWAY_LINK,
-				},
-			},
-			gs.KeyService(),
-		)
-		ctx, err = gatewaytokens.AuthenticatedContext(gatewaytokens.NewContext(ctx, token))
-		if err != nil {
-			return nil, nil, err
+		if !linkRightsInContext {
+			token := gatewaytokens.New(gs.config.GatewayTokenHashKeyID, ids, linkRights, gs.KeyService())
+			ctx, err = gatewaytokens.AuthenticatedContext(gatewaytokens.NewContext(ctx, token))
+			if err != nil {
+				return nil, nil, err
+			}
 		}
 	}
 	return ctx, ids, nil
@@ -570,13 +579,13 @@ func (gs *GatewayServer) Connect(
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	var isAuthenticated bool
+	var (
+		isAuthenticated bool
+		fieldMask       *fieldmaskpb.FieldMask
+	)
 	if _, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()); err == nil {
 		isAuthenticated = true
-	}
-	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: ids,
-		FieldMask: ttnpb.FieldMask(
+		fieldMask = ttnpb.FieldMask(
 			"administrative_contact",
 			"antennas",
 			"attributes",
@@ -593,7 +602,13 @@ func (gs *GatewayServer) Connect(
 			"status_public",
 			"technical_contact",
 			"update_location_from_status",
-		),
+		)
+	} else {
+		fieldMask = ttnpb.FieldMask(ttnpb.PublicGatewayFields...)
+	}
+	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
+		GatewayIds: ids,
+		FieldMask:  fieldMask,
 	})
 	if errors.IsNotFound(err) {
 		if gs.requireRegisteredGateways {
