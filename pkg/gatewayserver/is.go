@@ -20,6 +20,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewaytokens"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -194,5 +195,5 @@ func (is IS) newGatewayBatchAccessClient(ctx context.Context) (ttnpb.GatewayBatc
 }
 
 func getAuthenticatedContext(ctx context.Context) (context.Context, error) {
-	return ctx, nil
+	return gatewaytokens.AuthenticatedContext(ctx)
 }
