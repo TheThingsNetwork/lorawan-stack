@@ -29,62 +29,62 @@ var (
 		events.WithDataType(&ttnpb.ManagedGateway{}),
 	)
 	evtUpdateManagedGatewayLocation = events.Define(
-		"gcs.managed.location.update", "update managed gateway location",
+		"gcs.managed.location.update", "update location",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithDataType(&ttnpb.Location{}),
 	)
 	evtReceiveManagedGatewaySystemStatus = events.Define(
-		"gcs.managed.system_status.receive", "receive managed gateway system status",
+		"gcs.managed.system_status.receive", "receive system status",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithDataType(&ttnpb.ManagedGatewaySystemStatus{}),
 	)
 	evtManagedGatewayControllerUp = events.Define(
-		"gcs.managed.controller.up", "managed gateway controller connection up",
+		"gcs.managed.controller.up", "controller connection up",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithDataType(&ttnpb.ManagedGatewayControllerConnection{}),
 	)
 	evtManagedGatewayControllerDown = events.Define(
-		"gcs.managed.controller.down", "managed gateway controller connection down",
+		"gcs.managed.controller.down", "controller connection down",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 	)
 	evtManagedGatewayGatewayServerUp = events.Define(
-		"gcs.managed.gs.up", "managed gateway connection with Gateway Server up",
+		"gcs.managed.gs.up", "connection with Gateway Server up",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithDataType(&ttnpb.ManagedGatewayGatewayServerConnection{}),
 	)
 	evtManagedGatewayGatewayServerDown = events.Define(
-		"gcs.managed.gs.down", "managed gateway connection with Gateway Server down",
+		"gcs.managed.gs.down", "connection with Gateway Server down",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 	)
 	evtManagedGatewayCellularUp = events.Define(
-		"gcs.managed.cellular.up", "managed gateway cellular backhaul up",
+		"gcs.managed.cellular.up", "cellular backhaul up",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithDataType(&ttnpb.ManagedGatewayCellularBackhaul{}),
 	)
 	evtManagedGatewayCellularDown = events.Define(
-		"gcs.managed.cellular.down", "managed gateway cellular backhaul down",
+		"gcs.managed.cellular.down", "cellular backhaul down",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 	)
 	evtManagedGatewayWiFiUp = events.Define(
-		"gcs.managed.wifi.up", "managed gateway WiFi backhaul up",
+		"gcs.managed.wifi.up", "WiFi backhaul up",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithDataType(&ttnpb.ManagedGatewayWiFiBackhaul{}),
 	)
 	evtManagedGatewayWiFiDown = events.Define(
-		"gcs.managed.wifi.down", "managed gateway WiFi backhaul down",
+		"gcs.managed.wifi.down", "WiFi backhaul down",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 	)
 	evtManagedGatewayWiFiFail = events.Define(
-		"gcs.managed.wifi.fail", "managed gateway WiFi backhaul fail",
+		"gcs.managed.wifi.fail", "WiFi backhaul fail",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 	)
 	evtManagedGatewayEthernetUp = events.Define(
-		"gcs.managed.ethernet.up", "managed gateway Ethernet backhaul up",
+		"gcs.managed.ethernet.up", "Ethernet backhaul up",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithDataType(&ttnpb.ManagedGatewayEthernetBackhaul{}),
 	)
 	evtManagedGatewayEthernetDown = events.Define(
-		"gcs.managed.ethernet.down", "managed gateway Ethernet backhaul down",
+		"gcs.managed.ethernet.down", "Ethernet backhaul down",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 	)
 )

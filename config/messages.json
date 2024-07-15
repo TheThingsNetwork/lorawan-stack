@@ -10558,7 +10558,7 @@
   },
   "event:gcs.managed.cellular.down": {
     "translations": {
-      "en": "managed gateway cellular backhaul down"
+      "en": "cellular backhaul down"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10567,7 +10567,7 @@
   },
   "event:gcs.managed.cellular.up": {
     "translations": {
-      "en": "managed gateway cellular backhaul up"
+      "en": "cellular backhaul up"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10576,7 +10576,7 @@
   },
   "event:gcs.managed.controller.down": {
     "translations": {
-      "en": "managed gateway controller connection down"
+      "en": "controller connection down"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10585,7 +10585,7 @@
   },
   "event:gcs.managed.controller.up": {
     "translations": {
-      "en": "managed gateway controller connection up"
+      "en": "controller connection up"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10594,7 +10594,7 @@
   },
   "event:gcs.managed.ethernet.down": {
     "translations": {
-      "en": "managed gateway Ethernet backhaul down"
+      "en": "Ethernet backhaul down"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10603,7 +10603,7 @@
   },
   "event:gcs.managed.ethernet.up": {
     "translations": {
-      "en": "managed gateway Ethernet backhaul up"
+      "en": "Ethernet backhaul up"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10612,7 +10612,7 @@
   },
   "event:gcs.managed.gs.down": {
     "translations": {
-      "en": "managed gateway connection with Gateway Server down"
+      "en": "connection with Gateway Server down"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10621,7 +10621,7 @@
   },
   "event:gcs.managed.gs.up": {
     "translations": {
-      "en": "managed gateway connection with Gateway Server up"
+      "en": "connection with Gateway Server up"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10630,7 +10630,7 @@
   },
   "event:gcs.managed.location.update": {
     "translations": {
-      "en": "update managed gateway location"
+      "en": "update location"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10639,7 +10639,7 @@
   },
   "event:gcs.managed.system_status.receive": {
     "translations": {
-      "en": "receive managed gateway system status"
+      "en": "receive system status"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10657,7 +10657,7 @@
   },
   "event:gcs.managed.wifi.down": {
     "translations": {
-      "en": "managed gateway WiFi backhaul down"
+      "en": "WiFi backhaul down"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10666,7 +10666,7 @@
   },
   "event:gcs.managed.wifi.fail": {
     "translations": {
-      "en": "managed gateway WiFi backhaul fail"
+      "en": "WiFi backhaul fail"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
@@ -10675,7 +10675,7 @@
   },
   "event:gcs.managed.wifi.up": {
     "translations": {
-      "en": "managed gateway WiFi backhaul up"
+      "en": "WiFi backhaul up"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed/client",
