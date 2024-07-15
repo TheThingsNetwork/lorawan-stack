@@ -12,7 +12,7 @@ require (
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.6.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.2.0
-	github.com/aws/aws-sdk-go v1.54.16
+	github.com/aws/aws-sdk-go v1.54.19
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.14
 	github.com/bluele/gcache v0.0.2
@@ -20,7 +20,7 @@ require (
 	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eclipse/paho.mqtt.golang v1.4.4-0.20230810210351-7b759f1d9ddf
-	github.com/emersion/go-smtp v0.21.2
+	github.com/emersion/go-smtp v0.21.3
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/felixge/httpsnoop v1.0.4
 	github.com/getsentry/sentry-go v0.28.1
@@ -61,7 +61,7 @@ require (
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.1
-	github.com/redis/go-redis/v9 v9.5.3
+	github.com/redis/go-redis/v9 v9.5.4
 	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/smarty/assertions v1.16.0
