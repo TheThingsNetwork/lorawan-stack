@@ -22,10 +22,12 @@ const messages = defineMessages({
   cellular: 'Cellular',
   wifi: 'WiFi',
   ethernet: 'Ethernet',
-  macAddress: 'MAC address',
+  macAddress: 'MAC address: {address}',
   rssiValue: '{value}dBm',
   ipAddress: 'IP address',
   bssid: 'BSSID',
+  hardwareVersion: 'Hardware version: {version}',
+  firmwareVersion: 'Firmware version: {version}',
 })
 
 export default messages

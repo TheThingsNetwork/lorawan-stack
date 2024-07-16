@@ -20,6 +20,7 @@ export const CONNECTION_TYPES = Object.freeze({
 
 export const initialWifiProfile = {
   profile_name: '',
+  profile_id: '',
   shared: true,
   _profileOf: '',
   ssid: '',

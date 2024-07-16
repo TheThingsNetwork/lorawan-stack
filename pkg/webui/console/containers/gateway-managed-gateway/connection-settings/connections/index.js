@@ -52,6 +52,7 @@ const ManagedGatewayConnections = () => {
     cellularBackhaul,
     wifiBackhaul,
     ethernetBackhaul,
+    updatedManagedGateway,
   } = useConnectionsData()
 
   const gatewayControllerConnection =
@@ -70,7 +71,9 @@ const ManagedGatewayConnections = () => {
 
   const isEthernetConnected = isConnected(ethernetBackhaul?.network_interface?.status)
 
-  const cellularDetails = isEthernetConnected && getEthernetDetails(ethernetBackhaul)
+  const cellularDetails = isEthernetConnected && getCellularDetails(cellularBackhaul)
+
+  const managedGateway = updatedManagedGateway ?? selectedManagedGateway
 
   const getIsConnectedDiv = isConnected => (
     <div className="d-flex al-center gap-cs-xxs">
@@ -84,14 +87,19 @@ const ManagedGatewayConnections = () => {
       <Message className="fw-bold mt-0" component="h2" content={sharedMessages.managedGateway} />
       <div className={classnames(style.top, 'd-flex j-between al-center pb-cs-xs mb-cs-xs')}>
         <div>
-          <p className="m-0">
-            <Message content={sharedMessages.hardwareVersion} />:{' '}
-            {selectedManagedGateway.version_ids.hardware_version}
-          </p>
-          <p className="m-0">
-            <Message content={sharedMessages.firmwareVersion} />:{' '}
-            {selectedManagedGateway.version_ids.firmware_version}
-          </p>
+          <Message
+            component="p"
+            className="m-0"
+            content={m.hardwareVersion}
+            values={{ version: managedGateway.version_ids.hardware_version }}
+          />
+          <Message
+            component="p"
+            className="m-0"
+            content={m.firmwareVersion}
+            values={{ version: managedGateway.version_ids.firmware_version }}
+          />
+
           {systemStatus?.cpu_temperature && (
             <div className="d-flex al-center gap-cs-xxs mb-cs-s mt-cs-xxs">
               <Icon icon="cloud" />
@@ -99,8 +107,8 @@ const ManagedGatewayConnections = () => {
             </div>
           )}
 
-          <Link.Anchor primary href="/gateways/adding-gateways">
-            {m.officialDocumentation.defaultMessage}
+          <Link.Anchor primary href="#">
+            <Message content={m.officialDocumentation} />
           </Link.Anchor>
         </div>
         <img className={style.image} src={gatewayIcon} alt="managed-gateway" />
@@ -157,7 +165,7 @@ const ManagedGatewayConnections = () => {
         )}
       </div>
       <div>
-        <Message content={m.macAddress} />: {selectedManagedGateway.wifi_mac_address}
+        <Message content={m.macAddress} values={{ address: managedGateway.wifi_mac_address }} />
       </div>
       {isWifiConnected && getDetails(getWifiDetails(wifiBackhaul))}
 
@@ -173,7 +181,7 @@ const ManagedGatewayConnections = () => {
         )}
       </div>
       <div>
-        <Message content={m.macAddress} />: {selectedManagedGateway.ethernet_mac_address}
+        <Message content={m.macAddress} values={{ address: managedGateway.ethernet_mac_address }} />
       </div>
       {isEthernetConnected && getDetails(getEthernetDetails(ethernetBackhaul))}
     </div>

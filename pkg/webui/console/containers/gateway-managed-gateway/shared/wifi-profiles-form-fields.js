@@ -43,9 +43,13 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
 
   const valuesNormalized = useMemo(() => {
     if (!namePrefix) return values
-    const nameSplitted = namePrefix.split('.')
 
-    return values[nameSplitted[0]][parseInt(nameSplitted[1])]
+    const nameSplitted = namePrefix.slice(0, -1).split('.')
+    let result = values
+    nameSplitted.forEach(part => {
+      result = result[isNaN(part) ? part : Number(part)]
+    })
+    return result
   }, [namePrefix, values])
 
   const canTypePassword =
@@ -61,7 +65,6 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
       Boolean(valuesNormalized._access_point.ssid) ||
       !valuesNormalized._access_point.is_password_set
     ) {
-      setFieldValue(`${namePrefix}_access_point.is_password_set`, false)
       setFieldValue(`${namePrefix}ssid`, valuesNormalized._access_point?.ssid)
       setFieldTouched(`${namePrefix}password`, false)
       setFieldValue(`${namePrefix}password`, '')

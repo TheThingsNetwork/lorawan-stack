@@ -29,36 +29,32 @@ const m = defineMessages({
   useStaticIp: 'Use a static IP address',
 })
 
-const EthernetSettingsFormFields = ({ index }) => {
+const EthernetSettingsFormFields = () => {
   const { values } = useFormContext()
 
   return (
     <>
       <Message component="h3" content={m.ethernetConnection} />
       <Form.Field
-        name={`settings.${index}._enable_ethernet_connection`}
+        name={`ethernet_profile._enable_ethernet_connection`}
         component={Checkbox}
         label={m.enableEthernetConnection}
       />
-      {values.settings[index]._enable_ethernet_connection && (
+      {values.ethernet_profile._enable_ethernet_connection && (
         <>
           <Form.Field
-            name={`settings.${index}._use_static_ip`}
+            name={`ethernet_profile._use_static_ip`}
             component={Checkbox}
             label={m.useStaticIp}
           />
           <NetworkInterfaceAddressesFormFields
-            namePrefix={`settings.${index}.`}
-            showOnlyDns={!values.settings[index]._use_static_ip}
+            namePrefix={`ethernet_profile.`}
+            showOnlyDns={!values.ethernet_profile._use_static_ip}
           />
         </>
       )}
     </>
   )
-}
-
-EthernetSettingsFormFields.propTypes = {
-  index: PropTypes.number.isRequired,
 }
 
 export default EthernetSettingsFormFields

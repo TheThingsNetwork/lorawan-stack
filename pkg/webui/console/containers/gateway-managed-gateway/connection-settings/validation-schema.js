@@ -16,32 +16,20 @@ import {
   ethernetValidationSchema,
   wifiValidationSchema,
 } from '@console/containers/gateway-managed-gateway/shared/validation-schema'
-import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 export const validationSchema = Yup.object().shape({
-  settings: Yup.array().of(
-    Yup.object()
-      .shape({
-        _connection_type: Yup.string()
-          .oneOf(Object.values(CONNECTION_TYPES))
-          .default(CONNECTION_TYPES.WIFI),
-      })
-      .when('._connection_type', {
-        is: CONNECTION_TYPES.WIFI,
-        then: schema =>
-          schema
-            .concat(
-              Yup.object().shape({
-                profile: Yup.string().required(sharedMessages.validateRequired),
-              }),
-            )
-            .concat(wifiValidationSchema),
-        otherwise: schema => schema.concat(ethernetValidationSchema),
-      }),
-  ),
+  wifi_profile: Yup.object()
+    .shape({
+      profile_id: Yup.string().required(sharedMessages.validateRequired),
+    })
+    .when('profile_id', {
+      is: profileId => profileId && profileId.includes('shared'),
+      then: wifiValidationSchema,
+    }),
+  ethernet_profile: ethernetValidationSchema,
 })
 
 export default validationSchema

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useCallback, useMemo, useRef } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
@@ -29,12 +29,16 @@ import PageTitle from '@ttn-lw/components/page-title'
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shared/show-profiles-select'
 import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+
+import { checkFromState, mayViewOrEditGatewayCollaborators } from '@console/lib/feature-checks'
 
 import {
   deleteConnectionProfile,
@@ -54,15 +58,17 @@ const m = defineMessages({
 })
 
 const GatewayWifiProfilesOverview = () => {
+  const { gtwId } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
-
-  const onAddProfile = useCallback(
-    profileOf => {
-      navigate(`add?profileOf=${profileOf}`)
-    },
-    [navigate],
+  const formRef = useRef(null)
+  const mayViewCollaborators = useSelector(state =>
+    checkFromState(mayViewOrEditGatewayCollaborators, state),
   )
+
+  const onAddProfile = useCallback(() => {
+    navigate(`add?profileOf=${formRef.current.values._profileOf}`)
+  }, [navigate])
 
   const handleEdit = React.useCallback(
     (profileId, profileOf) => {
@@ -93,8 +99,8 @@ const GatewayWifiProfilesOverview = () => {
     [dispatch],
   )
 
-  const getHeaders = useCallback(
-    profileOf => [
+  const headers = useMemo(
+    () => [
       {
         name: 'profile_name',
         displayName: sharedMessages.profileName,
@@ -109,8 +115,13 @@ const GatewayWifiProfilesOverview = () => {
         getValue: row => ({
           id: row.profile_id,
           name: row.profile_name,
-          edit: handleEdit.bind(null, row.profile_id, profileOf),
-          delete: handleDelete.bind(null, row.profile_id, row.profile_name, profileOf),
+          edit: handleEdit.bind(null, row.profile_id, formRef.current.values._profileOf),
+          delete: handleDelete.bind(
+            null,
+            row.profile_id,
+            row.profile_name,
+            formRef.current.values._profileOf,
+          ),
         }),
         render: details => (
           <ButtonGroup align="end">
@@ -141,16 +152,39 @@ const GatewayWifiProfilesOverview = () => {
   )
 
   const getItemsAction = useCallback(
-    profileOf =>
+    () =>
       getConnectionProfilesList({
-        entityId: profileOf,
+        entityId: formRef.current.values._profileOf,
         type: CONNECTION_TYPES.WIFI,
       }),
     [],
   )
 
+  const handleChangeProfile = useCallback(
+    async value => {
+      await dispatch(
+        attachPromise(
+          getConnectionProfilesList({
+            entityId: value,
+            type: CONNECTION_TYPES.WIFI,
+          }),
+        ),
+      )
+    },
+    [dispatch],
+  )
+
+  const loadData = useCallback(
+    async dispatch => {
+      if (mayViewCollaborators) {
+        dispatch(getCollaboratorsList('gateway', gtwId))
+      }
+    },
+    [gtwId, mayViewCollaborators],
+  )
+
   return (
-    <>
+    <RequireRequest requestAction={loadData}>
       <PageTitle title={sharedMessages.wifiProfiles} />
       <Message
         className="d-block mb-cs-l"
@@ -168,15 +202,16 @@ const GatewayWifiProfilesOverview = () => {
         initialValues={{
           _profileOf: '',
         }}
+        formikRef={formRef}
       >
         {({ values }) => (
           <>
             <div className="d-flex j-between al-end gap-cs-m">
-              <ShowProfilesSelect name="_profileOf" />
+              <ShowProfilesSelect name="_profileOf" onChange={handleChangeProfile} />
               <Button
                 className="mb-cs-m"
                 primary
-                onClick={() => onAddProfile(values._profileOf)}
+                onClick={onAddProfile}
                 message={sharedMessages.addWifiProfile}
                 icon="add"
               />
@@ -185,8 +220,8 @@ const GatewayWifiProfilesOverview = () => {
               <FetchTable
                 entity="connectionProfiles"
                 defaultOrder="ssid"
-                headers={getHeaders(values._profileOf)}
-                getItemsAction={() => getItemsAction(values._profileOf)}
+                headers={headers}
+                getItemsAction={getItemsAction}
                 baseDataSelector={baseDataSelector}
                 filtersClassName="d-none"
               />
@@ -194,7 +229,7 @@ const GatewayWifiProfilesOverview = () => {
           </>
         )}
       </Form>
-    </>
+    </RequireRequest>
   )
 }
 

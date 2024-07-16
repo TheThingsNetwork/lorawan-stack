@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  width: 100%
-  display: flex
-  .list
-    border-input()
-    input-width-classes()
-    box-sizing: border-box
-    border-radius: $br.s
-    max-height: $ls.xxl
-    min-width: 15rem
-    overflow-x: auto
-    .item
-      padding: $cs.xxs $cs.xs
-      &.active
-        background-color: $c-active-blue-active
-        color: white
-      &:not(.active):hover
-        cursor: pointer
-        background-color: $c-backdrop
+.list
+  border-input()
+  input-width-classes()
+  box-sizing: border-box
+  border-radius: $br.s
+  max-height: $ls.xxl
+  min-width: 15rem
+  overflow-x: auto
+  .item
+    padding: $cs.xxs $cs.xs
+    &.active
+      background-color: $c-active-blue-active
+      color: white
+    &:not(.active):hover
+      cursor: pointer
+      background-color: $c-backdrop
 

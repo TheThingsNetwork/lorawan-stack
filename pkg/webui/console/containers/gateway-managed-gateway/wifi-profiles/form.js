@@ -27,6 +27,7 @@ import Spinner from '@ttn-lw/components/spinner'
 import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import {
   CONNECTION_TYPES,
@@ -40,6 +41,9 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import diff from '@ttn-lw/lib/diff'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+
+import { checkFromState, mayViewOrEditGatewayCollaborators } from '@console/lib/feature-checks'
 
 import {
   createConnectionProfile,
@@ -73,6 +77,7 @@ const GatewayWifiProfilesForm = () => {
     selectFetchingEntry(state, GET_CONNECTION_PROFILE_BASE),
   )
   const selectedProfile = useSelector(selectSelectedWifiConnectionProfile)
+
   const formRef = useRef(null)
   const dispatch = useDispatch()
   const [searchParams] = useSearchParams()

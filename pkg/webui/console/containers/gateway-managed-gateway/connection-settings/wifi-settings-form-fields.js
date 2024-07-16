@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo } from 'react'
-import PropTypes from 'prop-types'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { defineMessages } from 'react-intl'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -29,6 +28,7 @@ import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shar
 import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { getConnectionProfilesList } from '@console/store/actions/connection-profiles'
 
@@ -49,8 +49,9 @@ const m = defineMessages({
   setAConfigForThisGateway: 'Set a config for this gateway only',
 })
 
-const WifiSettingsFormFields = ({ index }) => {
-  const { values } = useFormContext()
+const WifiSettingsFormFields = () => {
+  const { values, setValues } = useFormContext()
+  const dispatch = useDispatch()
 
   const profiles = useSelector(state =>
     selectConnectionProfilesByType(state, CONNECTION_TYPES.WIFI),
@@ -83,20 +84,40 @@ const WifiSettingsFormFields = ({ index }) => {
     return null
   }, [])
 
+  const handleChangeProfile = useCallback(
+    async value => {
+      setValues(values => ({
+        ...values,
+        wifi_profile: {
+          ...values.wifi_profile,
+          profile_id: '',
+        },
+      }))
+      await dispatch(
+        attachPromise(
+          getConnectionProfilesList({
+            entityId: value,
+            type: CONNECTION_TYPES.WIFI,
+          }),
+        ),
+      )
+    },
+    [dispatch, setValues],
+  )
   return (
     <>
       <Message component="h3" content={m.wifiConnection} />
       <div className="d-flex al-center gap-cs-m">
-        <ShowProfilesSelect name={`settings.${index}._profileOf`} />
-        {Boolean(values.settings[index]._profileOf) && (
+        <ShowProfilesSelect name={`wifi_profile._profileOf`} onChange={handleChangeProfile} />
+        {Boolean(values.wifi_profile._profileOf) && (
           <RequireRequest
             requestAction={getConnectionProfilesList({
-              entityId: values.settings[index]._profileOf,
+              entityId: values.wifi_profile._profileOf,
               type: CONNECTION_TYPES.WIFI,
             })}
           >
             <Form.Field
-              name={`settings.${index}.profile`}
+              name={`wifi_profile.profile_id`}
               title={m.settingsProfile}
               component={Select}
               options={profileOptions}
@@ -107,8 +128,8 @@ const WifiSettingsFormFields = ({ index }) => {
         )}
       </div>
       <Message component="div" content={m.profileDescription} className="tc-subtle-gray mb-cs-m" />
-      {values.settings[index].profile.includes('shared') && (
-        <GatewayWifiProfilesFormFields namePrefix={`settings.${index}.`} />
+      {values.wifi_profile.profile_id.includes('shared') && (
+        <GatewayWifiProfilesFormFields namePrefix={`wifi_profile.`} />
       )}
       {connectionStatus !== null && (
         <div className="d-flex al-center gap-cs-xs">
@@ -116,17 +137,13 @@ const WifiSettingsFormFields = ({ index }) => {
           <Message
             content={connectionStatus.message}
             values={{
-              connection: m[values.settings[index]._connection_type].defaultMessage,
+              connection: m[values.wifi_profile._connection_type].defaultMessage,
             }}
           />
         </div>
       )}
     </>
   )
-}
-
-WifiSettingsFormFields.propTypes = {
-  index: PropTypes.number.isRequired,
 }
 
 export default WifiSettingsFormFields

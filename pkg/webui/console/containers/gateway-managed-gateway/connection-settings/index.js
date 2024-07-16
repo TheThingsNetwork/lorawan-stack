@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Col, Row } from 'react-grid-system'
@@ -26,6 +26,8 @@ import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
+
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import validationSchema from '@console/containers/gateway-managed-gateway/connection-settings/validation-schema'
 import {
@@ -42,13 +44,22 @@ import ManagedGatewayConnections from '@console/containers/gateway-managed-gatew
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
+
+import { checkFromState, mayViewOrEditGatewayCollaborators } from '@console/lib/feature-checks'
 
 import {
   createConnectionProfile,
   GET_ACCESS_POINTS_BASE,
+  getConnectionProfile,
 } from '@console/store/actions/connection-profiles'
 
-import { selectSelectedGateway } from '@console/store/selectors/gateways'
+import {
+  selectSelectedGateway,
+  selectSelectedManagedGateway,
+} from '@console/store/selectors/gateways'
+import { selectUserId } from '@account/store/selectors/user'
 
 const m = defineMessages({
   firstNotification:
@@ -64,7 +75,14 @@ const GatewayConnectionSettings = () => {
   const isFirstClaim = Boolean(searchParams.get('claimed'))
   const [error, setError] = useState(undefined)
   const isLoading = useSelector(state => selectFetchingEntry(state, GET_ACCESS_POINTS_BASE))
+  const mayViewCollaborators = useSelector(state =>
+    checkFromState(mayViewOrEditGatewayCollaborators, state),
+  )
+  const selectedManagedGateway = useSelector(selectSelectedManagedGateway)
+  const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
+
+  const hasWifiProfileSet = Boolean(selectedManagedGateway.wifi_profile_id)
 
   useBreadcrumbs(
     'gtws.single.managed-gateway.connection-settings',
@@ -78,9 +96,9 @@ const GatewayConnectionSettings = () => {
     async (values, { setSubmitting }) => {
       setError(undefined)
       try {
-        const [wifi, ethernet] = values.settings
-        if (wifi.profile.includes('shared')) {
-          const { profile, _profileOf, _connection_type, ...wifiProfile } = wifi
+        const { wifi_profile, ethernet_profile } = values
+        if (wifi_profile.profile.includes('shared')) {
+          const { profile, _profileOf, _connection_type, ...wifiProfile } = wifi_profile
           const normalizedWifiProfile = normalizeWifiProfile(wifiProfile, profile === 'shared')
           const {
             data: { profile_id: wifi_profile_id },
@@ -91,7 +109,7 @@ const GatewayConnectionSettings = () => {
           )
           console.log(wifi_profile_id)
         }
-        const { _connection_type, ...ethernetProfile } = ethernet
+        const { _connection_type, ...ethernetProfile } = ethernet_profile
 
         const normalizedEthernetProfile = normalizeEthernetProfile(ethernetProfile)
         const {
@@ -127,23 +145,70 @@ const GatewayConnectionSettings = () => {
 
   const initialValues = useMemo(
     () => ({
-      settings: [
-        {
-          _connection_type: CONNECTION_TYPES.WIFI,
-          profile: '',
-          ...initialWifiProfile,
-        },
-        {
-          _connection_type: CONNECTION_TYPES.ETHERNET,
-          ...initialEthernetProfile,
-        },
-      ],
+      wifi_profile: { ...initialWifiProfile },
+      ethernet_profile: { ...initialEthernetProfile },
     }),
     [],
   )
 
+  const loadData = useCallback(
+    async dispatch => {
+      let collaborators = []
+      let wifiProfile
+      let entityId
+      if (mayViewCollaborators) {
+        const { entities } = await dispatch(attachPromise(getCollaboratorsList('gateway', gtwId)))
+        collaborators = entities
+      }
+      if (hasWifiProfileSet) {
+        try {
+          wifiProfile = await dispatch(
+            attachPromise(
+              getConnectionProfile(
+                userId,
+                selectedManagedGateway.wifi_profile_id,
+                CONNECTION_TYPES.WIFI,
+              ),
+            ),
+          )
+          entityId = userId
+        } catch (e) {}
+        if (!wifiProfile) {
+          const orgCollaborators = collaborators
+            .filter(({ ids }) => 'organization_ids' in ids)
+            .map(({ ids }) => getCollaboratorId({ ids }))
+
+          for (const orgId of orgCollaborators) {
+            try {
+              wifiProfile = await dispatch(
+                attachPromise(
+                  getConnectionProfile(
+                    orgId,
+                    selectedManagedGateway.wifi_profile_id,
+                    CONNECTION_TYPES.WIFI,
+                  ),
+                ),
+              )
+              entityId = orgId
+              break
+            } catch (e) {
+              console.log(e)
+            }
+          }
+        }
+      }
+    },
+    [
+      gtwId,
+      hasWifiProfileSet,
+      mayViewCollaborators,
+      selectedManagedGateway.wifi_profile_id,
+      userId,
+    ],
+  )
+
   return (
-    <>
+    <RequireRequest requestAction={loadData}>
       <PageTitle title={sharedMessages.connectionSettings} />
       <Row>
         <Col lg={8} md={6} sm={12}>
@@ -155,8 +220,8 @@ const GatewayConnectionSettings = () => {
             validationSchema={validationSchema}
           >
             <>
-              <WifiSettingsFormFields index={0} />
-              <EthernetSettingsFormFields index={1} />
+              <WifiSettingsFormFields />
+              <EthernetSettingsFormFields />
 
               <SubmitBar className="mb-cs-l">
                 <Form.Submit
@@ -172,7 +237,7 @@ const GatewayConnectionSettings = () => {
           <ManagedGatewayConnections />
         </Col>
       </Row>
-    </>
+    </RequireRequest>
   )
 }
 

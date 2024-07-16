@@ -47,6 +47,11 @@ const useConnectionsData = () => {
     [events],
   )
 
+  const updatedManagedGateway = useMemo(
+    () => events.find(e => /\.managed\.update$/.test(e.name))?.data,
+    [events],
+  )
+
   return {
     systemStatus,
     controllerConnection,
@@ -54,6 +59,7 @@ const useConnectionsData = () => {
     cellularBackhaul,
     wifiBackhaul,
     ethernetBackhaul,
+    updatedManagedGateway,
   }
 }
 

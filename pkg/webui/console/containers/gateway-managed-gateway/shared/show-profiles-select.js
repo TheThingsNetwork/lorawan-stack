@@ -16,7 +16,6 @@ import React, { useCallback, useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
 
 import Select from '@ttn-lw/components/select'
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -24,14 +23,10 @@ import Form, { useFormContext } from '@ttn-lw/components/form'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
-import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { selectCollaboratorsEntitiesStore } from '@ttn-lw/lib/store/selectors/collaborators'
+import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
-import {
-  checkFromState,
-  mayViewOrEditGatewayCollaborators,
-  mayViewOrganizationsOfUser,
-} from '@console/lib/feature-checks'
+import { checkFromState, mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
 import { getOrganizationsList } from '@console/store/actions/organizations'
 
@@ -43,16 +38,12 @@ const m = defineMessages({
   yourself: 'Yourself',
 })
 
-const ShowProfilesSelect = ({ name }) => {
-  const { gtwId } = useParams()
+const ShowProfilesSelect = ({ name, ...rest }) => {
   const { setFieldValue } = useFormContext()
   const organizations = useSelector(selectOrganizationEntitiesStore)
   const collaborators = useSelector(selectCollaboratorsEntitiesStore)
   const userId = useSelector(selectUserId)
 
-  const mayViewCollaborators = useSelector(state =>
-    checkFromState(mayViewOrEditGatewayCollaborators, state),
-  )
   const mayViewOrganizations = useSelector(state =>
     checkFromState(mayViewOrganizationsOfUser, state),
   )
@@ -67,27 +58,21 @@ const ShowProfilesSelect = ({ name }) => {
 
   const profileOptions = [
     { value: userId, label: m.yourself },
-    ...Object.values(organizations).map(o => ({
-      value: o.ids.organization_id,
-      label: o.name,
-    })),
+    ...Object.values(organizations)
+      .filter(({ ids }) => Boolean(collaborators[getOrganizationId({ ids })]))
+      .map(({ ids, name }) => ({
+        value: getOrganizationId({ ids }),
+        label: name,
+      })),
   ]
 
   const loadData = useCallback(
     async dispatch => {
-      if (mayViewCollaborators) {
-        dispatch(getCollaboratorsList('gateway', gtwId))
-      }
-
       if (mayViewOrganizations) {
-        dispatch(
-          getOrganizationsList({ page: 0, limit: 1000, deleted: false }, ['name', 'description'], {
-            withCollaboratorCount: true,
-          }),
-        )
+        dispatch(getOrganizationsList(undefined, ['name']))
       }
     },
-    [gtwId, mayViewOrganizations, mayViewCollaborators],
+    [mayViewOrganizations],
   )
 
   return (
@@ -99,6 +84,7 @@ const ShowProfilesSelect = ({ name }) => {
         options={profileOptions}
         disabled={!Object.keys(organizations).length}
         tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
+        {...rest}
       />
     </RequireRequest>
   )

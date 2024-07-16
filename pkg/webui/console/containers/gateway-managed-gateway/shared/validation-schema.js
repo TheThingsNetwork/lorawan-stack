@@ -24,7 +24,7 @@ const m = defineMessages({
   validateIpAddresses: 'There are some not valid IP addresses.',
   validateIpAddress: '{field} must contain a valid address.',
   validateSubnetMask: '{field} must contain a valid subnet mask.',
-  validateNotSelectedAccessPoint: 'There must be at least one access point / SSID selected',
+  validateNotSelectedAccessPoint: 'There must be at least one access point selected',
   addressesValidateTooMany: '{field} must be 2 items or fewer',
 })
 

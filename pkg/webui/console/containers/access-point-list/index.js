@@ -126,14 +126,22 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => 
   const selectedGateway = useSelector(selectSelectedGateway)
   const { ids } = selectedGateway
 
+  const [isMounted, setIsMounted] = useState(true)
+
   const handleScanAccessPoints = useCallback(() => {
     dispatch(attachPromise(getAccessPoints(ids.gateway_id, ids.eui))).then(() => {
-      setLastRefresh(new Date())
+      if (isMounted) {
+        setLastRefresh(new Date())
+      }
     })
-  }, [dispatch, ids.eui, ids.gateway_id])
+  }, [dispatch, ids.eui, ids.gateway_id, isMounted])
 
   useEffect(() => {
     handleScanAccessPoints()
+
+    return () => {
+      setIsMounted(false)
+    }
   }, [handleScanAccessPoints])
 
   const handleSelectAccessPoint = useCallback(
@@ -144,7 +152,7 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => 
   )
 
   return (
-    <div className={classnames(className, style.container)} onBlur={onBlur}>
+    <div className={classnames(className, 'd-flex', 'w-full')} onBlur={onBlur}>
       <div className="w-full">
         {isLoading ? (
           <div className="d-flex mt-cs-m">
