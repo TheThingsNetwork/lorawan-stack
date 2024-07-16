@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -36,11 +36,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
-import {
-  getOrganization,
-  stopOrganizationEventsStream,
-  getOrganizationsRightsList,
-} from '@console/store/actions/organizations'
+import { getOrganization, getOrganizationsRightsList } from '@console/store/actions/organizations'
 
 import { selectSelectedOrganization } from '@console/store/selectors/organizations'
 
@@ -74,7 +70,6 @@ const OrganizationInner = () => {
   const { orgId } = useParams()
   const organization = useSelector(selectSelectedOrganization)
   const name = organization.name || orgId
-  const dispatch = useDispatch()
   const siteName = selectApplicationSiteName()
 
   useBreadcrumbs('overview.orgs.single', <Breadcrumb path={`/organizations/${orgId}`} content={name} />)
@@ -101,13 +96,6 @@ const OrganizationInner = () => {
       icon: IconGeneralSettings,
     },
   ]
-
-  useEffect(
-    () => () => {
-      dispatch(stopOrganizationEventsStream(orgId))
-    },
-    [dispatch, orgId],
-  )
 
   return (
     <>
