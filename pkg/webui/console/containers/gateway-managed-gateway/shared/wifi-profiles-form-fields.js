@@ -57,13 +57,22 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
   }, [namePrefix, setFieldValue])
 
   useEffect(() => {
-    if (Boolean(valuesNormalized._access_point.ssid)) {
+    if (
+      Boolean(valuesNormalized._access_point.ssid) ||
+      !valuesNormalized._access_point.is_password_set
+    ) {
       setFieldValue(`${namePrefix}_access_point.is_password_set`, false)
       setFieldValue(`${namePrefix}ssid`, valuesNormalized._access_point?.ssid)
       setFieldTouched(`${namePrefix}password`, false)
       setFieldValue(`${namePrefix}password`, '')
     }
-  }, [namePrefix, setFieldTouched, setFieldValue, valuesNormalized._access_point.ssid])
+  }, [
+    namePrefix,
+    setFieldTouched,
+    setFieldValue,
+    valuesNormalized._access_point.is_password_set,
+    valuesNormalized._access_point.ssid,
+  ])
 
   return (
     <>

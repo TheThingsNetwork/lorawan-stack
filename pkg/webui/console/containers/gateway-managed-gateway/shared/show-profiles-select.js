@@ -36,7 +36,7 @@ import {
 import { getOrganizationsList } from '@console/store/actions/organizations'
 
 import { selectOrganizationEntitiesStore } from '@console/store/selectors/organizations'
-import { selectUser } from '@console/store/selectors/logout'
+import { selectUserId } from '@account/store/selectors/user'
 
 const m = defineMessages({
   showProfilesOf: 'Show profiles of',
@@ -48,7 +48,8 @@ const ShowProfilesSelect = ({ name }) => {
   const { setFieldValue } = useFormContext()
   const organizations = useSelector(selectOrganizationEntitiesStore)
   const collaborators = useSelector(selectCollaboratorsEntitiesStore)
-  const user = useSelector(selectUser)
+  const userId = useSelector(selectUserId)
+
   const mayViewCollaborators = useSelector(state =>
     checkFromState(mayViewOrEditGatewayCollaborators, state),
   )
@@ -60,14 +61,12 @@ const ShowProfilesSelect = ({ name }) => {
     const collaboratorIds = Object.keys(collaborators)
     setFieldValue(
       name,
-      collaboratorIds.length && collaboratorIds[0] !== user.ids.user_id
-        ? collaboratorIds[0]
-        : user.ids.user_id,
+      collaboratorIds.length && collaboratorIds[0] !== userId ? collaboratorIds[0] : userId,
     )
-  }, [collaborators, name, setFieldValue, user.ids.user_id])
+  }, [collaborators, name, setFieldValue, userId])
 
   const profileOptions = [
-    { value: user.ids.user_id, label: m.yourself },
+    { value: userId, label: m.yourself },
     ...Object.values(organizations).map(o => ({
       value: o.ids.organization_id,
       label: o.name,

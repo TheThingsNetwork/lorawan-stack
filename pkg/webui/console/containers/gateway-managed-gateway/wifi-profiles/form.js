@@ -98,8 +98,8 @@ const GatewayWifiProfilesForm = () => {
         .then(res => {
           formRef.current.setValues(values => ({
             ...values,
-            ...res,
-            _default_network_interface: !Boolean(res.network_interface_addresses),
+            ...res.data,
+            _default_network_interface: !Boolean(res.data.network_interface_addresses),
           }))
         })
         .catch(() => {
