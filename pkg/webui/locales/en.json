@@ -1365,6 +1365,7 @@
   "lib.shared-messages.gsServerAddressDescription": "The address of the Gateway Server to connect to",
   "lib.shared-messages.hardware": "Hardware",
   "lib.shared-messages.hardwareVersion": "Hardware version",
+  "lib.shared-messages.home": "Home",
   "lib.shared-messages.homeNetID": "Home NetID",
   "lib.shared-messages.homeNetIDDescription": "ID to identify the LoRaWAN network",
   "lib.shared-messages.hours": "hours",
