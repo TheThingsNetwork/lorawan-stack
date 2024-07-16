@@ -29,11 +29,18 @@ import (
 )
 
 var (
-	errInvalidBoard      = errors.DefineInvalidArgument("invalid_board", "invalid board `{board}`")
-	errInvalidIFChain    = errors.DefineInvalidArgument("invalid_if_chain", "invalid IF chain `{if_chain}`")
-	errInvalidModulation = errors.DefineInvalidArgument("invalid_modulation", "invalid modulation")
-	errNotScheduled      = errors.DefineInvalidArgument("not_scheduled", "downlink message not scheduled")
-	errInvalidFrequency  = errors.DefineInvalidArgument("invalid_frequency", "invalid frequency `{frequency}`")
+	errInvalidBoard                = errors.DefineInvalidArgument("invalid_board", "invalid board `{board}`")
+	errInvalidIFChain              = errors.DefineInvalidArgument("invalid_if_chain", "invalid IF chain `{if_chain}`")
+	errInvalidModulation           = errors.DefineInvalidArgument("invalid_modulation", "invalid modulation")
+	errUnsupportedDownlinkDataRate = errors.DefineInvalidArgument(
+		"unsupported_downlink_data_rate", "unsupported downlink data rate index `{data_rate_index}` in channel `{channel}`",
+	)
+	errDownlinkChannelMixedBandwidths = errors.DefineInvalidArgument(
+		"downlink_channel_mixed_bandwidths",
+		"downlink channel `{channel}` has mixed bandwidths `{bandwidth_low}` and `{bandwidth_high}` Hz",
+	)
+	errNotScheduled     = errors.DefineInvalidArgument("not_scheduled", "downlink message not scheduled")
+	errInvalidFrequency = errors.DefineInvalidArgument("invalid_frequency", "invalid frequency `{frequency}`")
 )
 
 const eirpDelta = 2.15
@@ -138,8 +145,31 @@ func buildLoRaGatewayConfig(fp *frequencyplans.FrequencyPlan) (*lorav1.GatewayCo
 		if i == 16 {
 			break
 		}
+		// To minimize protocol messages, it is assumed that a transmission channel uses a single bandwidth.
+		drLow := phy.DataRates[ttnpb.DataRateIndex(ch.MinDataRate)].Rate.GetLora()
+		if drLow == nil {
+			return nil, errUnsupportedDownlinkDataRate.WithAttributes(
+				"data_rate_index", ch.MinDataRate,
+				"channel", i,
+			)
+		}
+		drHigh := phy.DataRates[ttnpb.DataRateIndex(ch.MaxDataRate)].Rate.GetLora()
+		if drHigh == nil {
+			return nil, errUnsupportedDownlinkDataRate.WithAttributes(
+				"data_rate_index", ch.MaxDataRate,
+				"channel", i,
+			)
+		}
+		if drLow.Bandwidth != drHigh.Bandwidth {
+			return nil, errDownlinkChannelMixedBandwidths.WithAttributes(
+				"channel", i,
+				"bandwidth_low", drLow.Bandwidth,
+				"bandwidth_high", drHigh.Bandwidth,
+			)
+		}
 		tx = append(tx, &lorav1.TransmitChannel{
 			Frequency: ch.Frequency,
+			Bandwidth: bandwidthFromHz[drLow.Bandwidth],
 		})
 	}
 
@@ -295,7 +325,6 @@ func fromDownlinkMessage(
 		res.DataRate = &lorav1.DownlinkMessage_Lora_{
 			Lora: &lorav1.DownlinkMessage_Lora{
 				SpreadingFactor: mod.Lora.SpreadingFactor,
-				Bandwidth:       bandwidthFromHz[mod.Lora.Bandwidth],
 				CodeRate:        fromCodingRate[mod.Lora.CodingRate],
 				LorawanUplink:   scheduled.EnableCrc && !scheduled.Downlink.InvertPolarization,
 			},
