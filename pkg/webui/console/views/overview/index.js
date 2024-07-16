@@ -1,4 +1,4 @@
-// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,50 +13,44 @@
 // limitations under the License.
 
 import React from 'react'
+import { Routes, Route } from 'react-router-dom'
 
-import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
-import RequireRequest from '@ttn-lw/lib/components/require-request'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
-import ShortcutPanel from '@console/containers/shortcut-panel'
-import NotificationsDashboardPanel from '@console/containers/notifications-dashboard-panel'
-import DocumentationDashboardPanel from '@console/containers/documentation-dashboard-panel'
-import TopEntitiesDashboardPanel from '@console/containers/top-entities-dashboard-panel'
+import Organizations from '@console/views/organizations'
+import AdminPanel from '@console/views/admin-panel'
+import User from '@console/views/user'
+import Notifications from '@console/views/notifications'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { uuid as uuidRegexp } from '@ttn-lw/lib/regexp'
 
-import { getApplicationsList } from '@console/store/actions/applications'
-import { getGatewaysList } from '@console/store/actions/gateways'
+import Overview from './overview'
 
-const Overview = () => {
+const OverviewRoutes = () => {
   useBreadcrumbs('overview', <Breadcrumb path="/" content={sharedMessages.overview} />)
 
   return (
-    <RequireRequest
-      requestAction={[
-        getApplicationsList(),
-        getGatewaysList(undefined, ['name', 'gateway_server_address'], {
-          withStatus: true,
-        }),
-      ]}
-    >
-      <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
-        <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
-          <TopEntitiesDashboardPanel />
-        </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
-          <NotificationsDashboardPanel />
-        </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
-          <DocumentationDashboardPanel />
-        </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
-          <ShortcutPanel />
-        </div>
-      </div>
-    </RequireRequest>
+    <Routes>
+      <Route index Component={Overview} />
+      <Route path="organizations/*" Component={Organizations} />
+      <Route path="admin-panel/*" Component={AdminPanel} />
+      <Route path="user/*" Component={User} />
+      <Route path="notifications" Component={Notifications} />
+      <Route
+        path="notifications/:category?/:id?"
+        Component={Notifications}
+        element={
+          <ValidateRouteParam
+            check={{ category: /^inbox|archived$/, id: uuidRegexp }}
+            Component={Notifications}
+          />
+        }
+      />
+    </Routes>
   )
 }
-
-export default Overview
+export default OverviewRoutes

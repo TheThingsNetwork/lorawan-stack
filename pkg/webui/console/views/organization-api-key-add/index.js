@@ -34,7 +34,7 @@ const OrganizationApiKeyAdd = () => {
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.addApiKey} />
       <div className="item-12 xl:item-8">
         <ApiKeyCreateForm entity={ORGANIZATION} entityId={orgId} />

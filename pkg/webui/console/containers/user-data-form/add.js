@@ -115,7 +115,7 @@ const UserDataFormAdd = () => {
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.userAdd} />
       <div className="item-12">
         <Form

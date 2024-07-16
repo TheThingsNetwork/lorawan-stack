@@ -32,7 +32,7 @@ import { getOrganizationsList } from '@console/store/actions/organizations'
 
 const NetworkInformation = () => {
   useBreadcrumbs(
-    'admin-panel.network-information',
+    'overview.admin-panel.network-information',
     <Breadcrumb
       path={`/admin-panel/network-information`}
       content={sharedMessages.networkInformation}

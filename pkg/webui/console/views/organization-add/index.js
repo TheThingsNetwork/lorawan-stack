@@ -53,7 +53,7 @@ const OrganizationAdd = () => {
 
   return (
     <Require featureCheck={mayCreateOrganizations} otherwise={{ redirect: '/organizations' }}>
-      <div className="container container--lg grid">
+      <div className="container container--xxl grid">
         <PageTitle
           colProps={{ md: 10, lg: 9 }}
           className="mb-cs-s"

@@ -163,7 +163,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">
-      <div className="container container--lg grid">
+      <div className="container container--xl grid">
         <div className="item-12 lg-xl:item-10 xl:item-8 xxl:item-7">
           {safe ? (
             <Helmet titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}>

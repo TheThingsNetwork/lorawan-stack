@@ -60,13 +60,13 @@ const Overview = () => {
   return (
     <Require featureCheck={mayViewOrganizationInformation} otherwise={{ redirect: '/' }}>
       <div className={style.titleSection}>
-        <div className="container container--lg grid p-vert-0">
+        <div className="container container--xxl grid p-vert-0">
           <div className="item-12">
             <OrganizationTitleSection />
           </div>
         </div>
       </div>
-      <div className="container container--lg grid">
+      <div className="container container--xxl grid">
         <IntlHelmet title={sharedMessages.overview} />
         <div className="item-12 xl:item-6">
           <DataSheet data={sheetData} />

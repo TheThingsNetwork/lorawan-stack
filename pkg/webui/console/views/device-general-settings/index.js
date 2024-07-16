@@ -250,7 +250,7 @@ const DeviceGeneralSettings = () => {
 
   return (
     <RequireRequest requestAction={fetchData}>
-      <div className="container container--lg grid">
+      <div className="container container--xxl grid">
         <IntlHelmet title={sharedMessages.generalSettings} />
 
         <div className={classNames(style.container, 'item-12 xl:item-8')}>

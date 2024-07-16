@@ -157,7 +157,7 @@ const ApplicationMqtt = () => {
         otherwise={{ redirect: `/applications/${appId}` }}
       >
         <ErrorView errorRender={SubViewError}>
-          <div className="container container--lg grid">
+          <div className="container container--xxl grid">
             <div className="item-12 xl:item-8">
               <PageTitle title={sharedMessages.mqtt} noGrid />
               <Message content={m.mqttInfoText} className="mt-0" />

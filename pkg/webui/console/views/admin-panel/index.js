@@ -51,7 +51,7 @@ const m = defineMessages({
 
 const AdminPanel = () => {
   useBreadcrumbs(
-    'admin-panel',
+    'overview.admin-panel',
     <Breadcrumb path="/admin-panel" content={sharedMessages.adminPanel} />,
   )
   const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))

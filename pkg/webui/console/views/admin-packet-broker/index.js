@@ -35,7 +35,7 @@ import NetworkRoutingPolicy from './network-routing-policy'
 
 const PacketBrokerRouter = () => {
   useBreadcrumbs(
-    'admin-panel.packet-broker',
+    'overview.admin-panel.packet-broker',
     <Breadcrumb
       path={'/admin-panel/packet-broker/routing-configuration'}
       content={sharedMessages.packetBroker}

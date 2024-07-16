@@ -32,7 +32,7 @@ import {
 const NotificationsView = () => {
   const { category } = useParams()
   useBreadcrumbs(
-    'notifications',
+    'overview.notifications',
     <Breadcrumb path="/notifications" content={sharedMessages.notifications} />,
   )
 

@@ -61,7 +61,7 @@ const Switcher = ({ isMinimized }) => {
     >
       <NavLink to="/" className={getOverviewNavLinkClass} ref={overviewRef}>
         <Icon icon={IconHome} className={style.icon} />
-        <Message className={style.caption} content={sharedMessages.overview} />
+        <Message className={style.caption} content={sharedMessages.home} />
         {isMinimized && (
           <Dropdown.Attached
             attachedRef={overviewRef}
@@ -70,7 +70,7 @@ const Switcher = ({ isMinimized }) => {
             hover
             portalled
           >
-            <Dropdown.HeaderItem title={sharedMessages.overview} />
+            <Dropdown.HeaderItem title={sharedMessages.home} />
           </Dropdown.Attached>
         )}
       </NavLink>

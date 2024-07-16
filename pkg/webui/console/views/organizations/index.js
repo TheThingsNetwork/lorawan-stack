@@ -39,7 +39,7 @@ const Organizations = () => {
   const orgPageSize = getCookie('organizations-list-page-size')
   const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
   useBreadcrumbs(
-    'orgs',
+    'overview.orgs',
     <Breadcrumb path={`/organizations${orgParam}`} content={sharedMessages.organizations} />,
   )
 
