@@ -366,6 +366,7 @@ export default defineMessages({
     'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
   macVersion: 'LoRaWAN version',
   map: 'Map',
+  members: 'Members',
   messageTypes: 'Message types',
   messages: 'messages',
   message: 'Message',

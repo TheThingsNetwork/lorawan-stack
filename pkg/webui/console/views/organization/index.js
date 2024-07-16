@@ -18,6 +18,8 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Tabs from '@ttn-lw/components/tabs'
+import { IconCollaborators, IconGeneralSettings, IconKey } from '@ttn-lw/components/icon'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -25,13 +27,12 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import Require from '@console/lib/components/require'
 
-import OrganizationOverview from '@console/views/organization-overview'
-import OrganizationData from '@console/views/organization-data'
 import OrganizationGeneralSettings from '@console/views/organization-general-settings'
 import OrganizationApiKeys from '@console/views/organization-api-keys'
 import OrganizationCollaborators from '@console/views/organization-collaborators'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
@@ -42,6 +43,8 @@ import {
 } from '@console/store/actions/organizations'
 
 import { selectSelectedOrganization } from '@console/store/selectors/organizations'
+
+import OrganizationHeader from './organization-header'
 
 const Organization = () => {
   const { orgId } = useParams()
@@ -76,6 +79,29 @@ const OrganizationInner = () => {
 
   useBreadcrumbs('overview.orgs.single', <Breadcrumb path={`/organizations/${orgId}`} content={name} />)
 
+  const basePath = `/organizations/${orgId}`
+
+  const tabs = [
+    {
+      title: sharedMessages.members,
+      name: 'members',
+      link: basePath,
+      icon: IconCollaborators,
+    },
+    {
+      title: sharedMessages.apiKeys,
+      name: 'api-keys',
+      link: `${basePath}/api-keys`,
+      icon: IconKey,
+    },
+    {
+      title: sharedMessages.settings,
+      name: 'general-settings',
+      link: `${basePath}/general-settings`,
+      icon: IconGeneralSettings,
+    },
+  ]
+
   useEffect(
     () => () => {
       dispatch(stopOrganizationEventsStream(orgId))
@@ -84,17 +110,23 @@ const OrganizationInner = () => {
   )
 
   return (
-    <React.Fragment>
+    <>
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
+      <OrganizationHeader org={organization} />
+      <Tabs
+        className="w-full"
+        tabs={tabs}
+        divider
+        individualTabClassName="al-center w-full"
+        tabItemClassName="w-full box-border j-center"
+      />
       <Routes>
-        <Route index Component={OrganizationOverview} />
-        <Route path="data" Component={OrganizationData} />
+        <Route index Component={OrganizationCollaborators} />
         <Route path="general-settings" Component={OrganizationGeneralSettings} />
         <Route path="api-keys/*" Component={OrganizationApiKeys} />
-        <Route path="collaborators/*" Component={OrganizationCollaborators} />
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
-    </React.Fragment>
+    </>
   )
 }
 
