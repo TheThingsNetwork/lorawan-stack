@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { useSelector } from 'react-redux'
 
 import gatewayIcon from '@assets/misc/gateway.svg'
 
@@ -24,7 +25,6 @@ import Message from '@ttn-lw/lib/components/message'
 
 import {
   connectionMessageMap,
-  exampleConnectionsResponse,
   getCellularDetails,
   getConnectionType,
   getDetails,
@@ -33,35 +33,44 @@ import {
   isConnected,
   NETWORK_INTERFACE_TYPES,
 } from '@console/containers/gateway-managed-gateway/connection-settings/connections/utils'
+import useConnectionsData from '@console/containers/gateway-managed-gateway/connection-settings/connections/use-connections-data'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { selectSelectedManagedGateway } from '@console/store/selectors/gateways'
 
 import m from './messages'
 
 import style from './connections.styl'
 
 const ManagedGatewayConnections = () => {
-  const managedGateway = exampleConnectionsResponse
+  const selectedManagedGateway = useSelector(selectSelectedManagedGateway)
+  const {
+    systemStatus,
+    controllerConnection,
+    serverConnection,
+    cellularBackhaul,
+    wifiBackhaul,
+    ethernetBackhaul,
+  } = useConnectionsData()
 
   const gatewayControllerConnection =
-    managedGateway.result.controller_connection.network_interface_type
+    controllerConnection?.network_interface_type ?? NETWORK_INTERFACE_TYPES.UNSPECIFIED
   const gatewayServerConnection =
-    managedGateway.result.gateway_server_connection.network_interface_type
+    serverConnection?.network_interface_type ?? NETWORK_INTERFACE_TYPES.UNSPECIFIED
 
   const controllerConnectionIsSpecified =
     gatewayControllerConnection !== NETWORK_INTERFACE_TYPES.UNSPECIFIED
   const serverConnectionIsSpecified =
     gatewayServerConnection !== NETWORK_INTERFACE_TYPES.UNSPECIFIED
 
-  const isCellularConnected = isConnected(
-    managedGateway.result.cellular_backhaul.network_interface.status,
-  )
+  const isCellularConnected = isConnected(cellularBackhaul?.network_interface?.status)
 
-  const isWifiConnected = isConnected(managedGateway.result.wifi_backhaul.network_interface.status)
+  const isWifiConnected = isConnected(wifiBackhaul?.network_interface?.status)
 
-  const isEthernetConnected = isConnected(
-    managedGateway.result.ethernet_backhaul.network_interface.status,
-  )
+  const isEthernetConnected = isConnected(ethernetBackhaul?.network_interface?.status)
+
+  const cellularDetails = isEthernetConnected && getEthernetDetails(ethernetBackhaul)
 
   const getIsConnectedDiv = isConnected => (
     <div className="d-flex al-center gap-cs-xxs">
@@ -77,16 +86,19 @@ const ManagedGatewayConnections = () => {
         <div>
           <p className="m-0">
             <Message content={sharedMessages.hardwareVersion} />:{' '}
-            {managedGateway.result.entity.version_ids.hardware_version}
+            {selectedManagedGateway.version_ids.hardware_version}
           </p>
           <p className="m-0">
             <Message content={sharedMessages.firmwareVersion} />:{' '}
-            {managedGateway.result.entity.version_ids.firmware_version}
+            {selectedManagedGateway.version_ids.firmware_version}
           </p>
-          <div className="d-flex al-center gap-cs-xxs mb-cs-s mt-cs-xxs">
-            <Icon icon="cloud" />
-            {managedGateway.result.system_metrics.temperature} &deg;C
-          </div>
+          {systemStatus?.cpu_temperature && (
+            <div className="d-flex al-center gap-cs-xxs mb-cs-s mt-cs-xxs">
+              <Icon icon="cloud" />
+              {systemStatus?.cpu_temperature} &deg;C
+            </div>
+          )}
+
           <Link.Anchor primary href="/gateways/adding-gateways">
             {m.officialDocumentation.defaultMessage}
           </Link.Anchor>
@@ -128,12 +140,11 @@ const ManagedGatewayConnections = () => {
         {isCellularConnected && (
           <div className="d-flex al-center gap-cs-xxs">
             <Icon icon="signal_cellular_alt" />
-            {managedGateway.result.cellular_backhaul.operator}
+            {cellularBackhaul?.operator}
           </div>
         )}
       </div>
-      {isCellularConnected &&
-        getDetails(getCellularDetails(managedGateway.result.cellular_backhaul))}
+      {Boolean(cellularDetails?.items?.length) && getDetails(cellularDetails)}
 
       <Message className="fw-bold mb-cs-xs" component="h4" content={m.wifi} />
       <div className="d-flex al-center gap-cs-m">
@@ -141,14 +152,14 @@ const ManagedGatewayConnections = () => {
         {isWifiConnected && (
           <div className="d-flex al-center gap-cs-xxs">
             <Icon icon="wifi" />
-            {managedGateway.result.wifi_backhaul.ssid}
+            {wifiBackhaul?.ssid}
           </div>
         )}
       </div>
       <div>
-        <Message content={m.macAddress} />: {managedGateway.result.entity.wifi_mac_address}
+        <Message content={m.macAddress} />: {selectedManagedGateway.wifi_mac_address}
       </div>
-      {isWifiConnected && getDetails(getWifiDetails(managedGateway.result.wifi_backhaul))}
+      {isWifiConnected && getDetails(getWifiDetails(wifiBackhaul))}
 
       <Message className="fw-bold mb-cs-xs" component="h4" content={m.ethernet} />
       <div className="d-flex al-center gap-cs-m">
@@ -157,15 +168,14 @@ const ManagedGatewayConnections = () => {
           <div className="d-flex al-center gap-cs-xxs">
             <Icon icon="router" />
             {/* TODO: Check which property is displayed here*/}
-            {managedGateway.result.ethernet_backhaul.network_interface.addresses.gateway}
+            {ethernetBackhaul.network_interface.addresses.gateway}
           </div>
         )}
       </div>
       <div>
-        <Message content={m.macAddress} />: {managedGateway.result.entity.ethernet_mac_address}
+        <Message content={m.macAddress} />: {selectedManagedGateway.ethernet_mac_address}
       </div>
-      {isEthernetConnected &&
-        getDetails(getEthernetDetails(managedGateway.result.ethernet_backhaul))}
+      {isEthernetConnected && getDetails(getEthernetDetails(ethernetBackhaul))}
     </div>
   )
 }

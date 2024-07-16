@@ -96,24 +96,16 @@ const GatewayWifiProfilesOverview = () => {
   const getHeaders = useCallback(
     profileOf => [
       {
-        name: 'profile_id',
-        displayName: m.profileId,
-        width: 25,
-      },
-      {
         name: 'profile_name',
         displayName: sharedMessages.profileName,
-        width: 25,
       },
       {
         name: 'ssid',
         displayName: m.accessPoint,
-        width: 25,
       },
       {
         name: 'actions',
         displayName: sharedMessages.actions,
-        width: 25,
         getValue: row => ({
           id: row.profile_id,
           name: row.profile_name,

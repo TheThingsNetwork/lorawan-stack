@@ -52,6 +52,7 @@ export const selectSelectedGateway = state =>
 export const selectIsSelectedGatewayManaged = state => Boolean(selectSelectedGateway(state).managed)
 export const selectSelectedGatewayClaimable = state =>
   selectGatewayStore(state).selectedGatewayClaimable
+export const selectSelectedManagedGateway = state => selectSelectedGateway(state).managed
 
 // Gateways.
 const selectGtwsIds = createPaginationIdsSelectorByEntity(ENTITY)

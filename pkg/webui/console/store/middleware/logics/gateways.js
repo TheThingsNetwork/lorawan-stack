@@ -52,7 +52,13 @@ const getGatewayLogic = createRequestLogic({
     // Check if gateway is managed by TTI
     let managed = undefined
     try {
-      managed = await tts.Gateways.getManagedGateway(id, ['wifi_profile_id', 'ethernet_profile_id'])
+      managed = await tts.Gateways.getManagedGateway(id, [
+        'wifi_profile_id',
+        'ethernet_profile_id',
+        'version_ids',
+        'wifi_mac_address',
+        'ethernet_mac_address',
+      ])
     } catch (e) {}
 
     return { ...gtw, managed }
