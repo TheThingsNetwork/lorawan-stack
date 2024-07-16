@@ -17,7 +17,7 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { components } from 'react-select'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconOrganization, IconUser } from '@ttn-lw/components/icon'
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
 
@@ -74,7 +74,7 @@ const Suggest = ({ entity, entityId, ...rest }) => {
             'user_ids' in account
               ? account.user_ids?.user_id
               : account.organization_ids?.organization_id,
-          icon: 'user_ids' in account ? 'user' : 'organization',
+          icon: 'user_ids' in account ? IconUser : IconOrganization,
         }))
 
         const translatedOptions = newOptions?.map(option => {

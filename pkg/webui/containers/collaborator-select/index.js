@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages, useIntl } from 'react-intl'
 import { components } from 'react-select'
 
-import Icon, { IconUser } from '@ttn-lw/components/icon'
+import Icon, { IconOrganization, IconUser } from '@ttn-lw/components/icon'
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
 import Button from '@ttn-lw/components/button'
@@ -115,7 +115,7 @@ const Suggest = ({
               'user_ids' in account
                 ? account.user_ids?.user_id
                 : account.organization_ids?.organization_id,
-            icon: 'user_ids' in account ? 'user' : 'organization',
+            icon: 'user_ids' in account ? IconUser : IconOrganization,
           }))
 
           const translatedOptions = newOptions?.map(option => {
@@ -208,7 +208,7 @@ const CollaboratorSelect = ({ userId, name, entity, entityId, isResctrictedUser,
   let collaboratorOptions = firstEightCollaborators
   if (entity === 'organization') {
     collaboratorOptions = firstEightCollaborators.filter(
-      collaborator => collaborator.icon === 'user',
+      collaborator => collaborator.icon === IconUser,
     )
   }
 
