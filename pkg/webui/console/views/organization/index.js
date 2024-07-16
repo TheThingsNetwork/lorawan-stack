@@ -121,7 +121,7 @@ const OrganizationInner = () => {
         tabItemClassName="w-full box-border j-center"
       />
       <Routes>
-        <Route index Component={OrganizationCollaborators} />
+        <Route path="/*" Component={OrganizationCollaborators} />
         <Route path="general-settings" Component={OrganizationGeneralSettings} />
         <Route path="api-keys/*" Component={OrganizationApiKeys} />
         <Route path="*" element={<GenericNotFound />} />
