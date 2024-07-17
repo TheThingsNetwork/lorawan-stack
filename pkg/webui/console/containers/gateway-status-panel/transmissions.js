@@ -38,25 +38,9 @@ const m = defineMessages({
   noDownlinks: 'No downlinks yet',
   noStatus: 'No status',
   noDataYet: 'No data yet',
-  established: 'Established for {days}',
-  notEstablished: 'Not established',
+  established: 'Connection started {days}',
+  notEstablished: 'Connection not started',
 })
-
-const calculateDaysPassed = timestamp => {
-  const oneDay = 24 * 60 * 60 * 1000 // Number of milliseconds in a day
-  const currentTime = new Date().getTime() // Current timestamp in milliseconds
-  const givenTime = new Date(timestamp).getTime() // Given timestamp in milliseconds
-
-  const timePassed = currentTime - givenTime
-
-  if (timePassed < oneDay) {
-    const hoursPassed = Math.floor(timePassed / (60 * 60 * 1000)) // Number of hours passed
-    return `${hoursPassed} hours`
-  }
-
-  const daysPassed = Math.floor(timePassed / oneDay) // Number of days passed
-  return `${daysPassed} days`
-}
 
 const Transmissions = ({ gatewayStats, isDisconnected }) => {
   const showUplink =
@@ -153,7 +137,7 @@ const Transmissions = ({ gatewayStats, isDisconnected }) => {
           <Message
             content={showConnectionEstablished ? m.established : m.notEstablished}
             className="fw-bold"
-            values={{ days: calculateDaysPassed(gatewayStats?.connected_at) }}
+            values={{ days: <DateTime.Relative value={gatewayStats?.connected_at} /> }}
           />
         </div>
       </div>
