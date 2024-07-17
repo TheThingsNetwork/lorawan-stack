@@ -336,7 +336,7 @@ func (c BlobPathConfig) IsZero() bool {
 
 // FrequencyPlansConfig contains the source of the frequency plans.
 type FrequencyPlansConfig struct {
-	ConfigSource string            `name:"config-source" description:"Source of the frequency plans (static, directory, url, blob)"` //nolint:lll
+	ConfigSource string            `name:"config-source" description:"Source of the frequency plans (directory, url, blob)"` //nolint:lll
 	Static       map[string][]byte `name:"-"`
 	Directory    string            `name:"directory" description:"OS filesystem directory, which contains frequency plans"` //nolint:lll
 	URL          string            `name:"url" description:"URL, which contains frequency plans"`
@@ -448,7 +448,7 @@ func (c InteropClient) Fetcher(ctx context.Context, httpClientProvider httpclien
 
 // SenderClientCA is the sender client CA configuration.
 type SenderClientCA struct {
-	Source    string            `name:"source" description:"Source of the sender client CA configuration (static, directory, url, blob)"` //nolint:lll
+	Source    string            `name:"source" description:"Source of the sender client CA configuration (directory, url, blob)"` //nolint:lll
 	Static    map[string][]byte `name:"-"`
 	Directory string            `name:"directory" description:"OS filesystem directory, which contains sender client CA configuration"` //nolint:lll
 	URL       string            `name:"url" description:"URL, which contains sender client CA configuration"`
