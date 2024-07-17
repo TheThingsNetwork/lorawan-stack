@@ -126,7 +126,7 @@ const CollaboratorsTable = props => {
       defaultOrder="id"
       rowKeySelector={rowKeySelector}
       getItemPathPrefix={getCollaboratorPathPrefix}
-      addMessage={sharedMessages.addCollaborator}
+      addMessage={isMember ? sharedMessages.addMember : sharedMessages.addCollaborator}
       tableTitle={
         <Message content={isMember ? sharedMessages.members : sharedMessages.collaborators} />
       }

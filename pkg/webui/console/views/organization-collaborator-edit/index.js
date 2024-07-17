@@ -51,6 +51,7 @@ const OrganizationCollaboratorEditInner = () => {
           collaboratorId={collaboratorId}
           collaboratorType="user"
           update
+          isMember
         />
       </div>
     </div>

@@ -48,7 +48,7 @@ const OrganizationAdd = () => {
 
   useBreadcrumbs(
     'overview.orgs.add',
-    <Breadcrumb path={`/organizations/add`} content={sharedMessages.createOrganization} />,
+    <Breadcrumb path="/organizations/add" content={sharedMessages.createOrganization} />,
   )
 
   return (
