@@ -80,7 +80,7 @@ const Panel = ({
             <Link
               primary
               to={shortCutLinkPath}
-              className={styles.button}
+              className={styles.panelButton}
               target={shortCutLinkTarget}
               disabled={shortCutLinkDisabled}
             >

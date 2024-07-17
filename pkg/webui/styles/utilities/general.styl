@@ -118,16 +118,16 @@
   // Responsive justification styles.
   for $name, $width in $bp
     +media-query($width)
-      .{$name}:j-center
+      .{$name}\\:j-center
         justify-content: center
 
-      .{$name}:j-start
+      .{$name}\\:j-start
         justify-content: start
 
-      .{$name}:end
+      .{$name}\\:end
         justify-content: end
 
-      .{$name}:j-between
+      .{$name}\\:j-between
         justify-content: space-between
 
       .{$name}\\:al-center

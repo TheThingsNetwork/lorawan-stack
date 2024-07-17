@@ -14,27 +14,24 @@
 
 .gtw-status-panel
   height: 100%
+
   &-upper-container
     display: flex
     gap: $ls.xl
     justify-content: space-between
 
-    +media-query($bp.md)
-      gap: $cs.l
-    +media-query($bp.xs)
-      flex-direction: column
-      justify-content: start
+    .gtw-status-panel-upgrade-button
+      background: var(--c-bg-brand-extralight)
+      color: var(--c-text-brand-normal)
+      font-weight: $fwv2.medium
+      box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05)
+      margin-top: $cs.m
+      width: fit-content
 
   &-lower-container
     display: flex
     gap: $ls.xl
     justify-content: space-between
-
-    +media-query($bp.md)
-      gap: $cs.m
-    +media-query($bp.sm)
-      gap: 0
-      flex-direction: column
 
   &-icon
     background-color: var(--c-bg-error-light)
@@ -43,23 +40,6 @@
   &-tooltip
     margin-bottom: -4px
     margin-left: 2px
-
-  &-tag-mobile
-    display: none
-
-  &-tag
-    height: 2.5rem
-    margin-top: $cs.xl
-    div
-      border-radius: $br.m
-      padding: $cs.s $cs.m
-      color: var(--c-text-neutral-heavy)
-      background-color: var(--c-bg-neutral-light)
-      font-weight: 600
-      width: fit-content
-      line-height: 1
-      position: absolute
-      bottom: 28px
 
   &-round-trip-time
     &-bar
@@ -88,14 +68,12 @@
   &-transmissions
     display: flex
     align-items: center
-    justify-content: space-between
-    gap: $cs.m
+    gap: $cs.xs
     margin-bottom: $cs.m
-    margin-top: $cs.l
     font-size: $fs.s
 
     &:first-child
-      margin-top: 0
+      margin-top: $cs.l
 
     &:last-child
       margin-bottom: 0
@@ -106,7 +84,13 @@
     justify-content: space-between
     gap: $cs.m
     font-size: $fs.s
-    margin-top: $cs.l
+    margin-bottom: $cs.m
+
+    &:first-child
+      margin-top: $cs.l
+
+    &:last-child
+      margin-bottom: 0
 
 .gtw-status-panel-divider
   border-bottom: 1px solid var(--c-border-neutral-light)
@@ -115,65 +99,23 @@
   height: 0px
   width: 100%
 
-.gtw-status-panel-divider-mobile
-  display: none
-  border-bottom: 1px solid var(--c-border-neutral-light)
-  margin-top: $cs.xl
-  margin-bottom: $cs.xl
-  height: 0px
-  width: 100%
-
-@container panel (max-width: 420px)
-  .gtw-status-panel-transmissions
-    flex-direction: column
-    align-items: start
-    gap: $cs.xxs
-
+@container panel (max-width: 460px)
   .gtw-status-panel-duty-cycle
-    flex-direction: column
-    align-items: start
-    gap: $cs.xs
+    gap: unset
 
-@container panel (max-width: 385px)
   .gtw-status-panel-upper-container
-    gap: 0
-    flex-direction: column
-    justify-content: start
+    gap: $cs.xl
 
   .gtw-status-panel-lower-container
-    gap: 0
-    flex-direction: column
-    justify-content: start
+    gap: $cs.xl
 
-  .gtw-status-panel-divider-mobile
-    display: block
-
-  .gtw-status-panel-transmissions
-    flex-direction: row
-    align-items: center
-    justify-content: space-between
-    gap: $cs.m
+@container panel (max-width: 350px)
+  .section-title
+    text-wrap: nowrap
 
   .gtw-status-panel-duty-cycle
-    flex-direction: row
-    align-items: center
-    justify-content: space-between
-    gap: $cs.m
+    gap: unset
+    line-height: 1
 
-  .gtw-status-panel-tag
-    display: none
-
-  .gtw-status-panel-tag-mobile
-    height: 2.5rem
-    margin-top: $cs.xl
-    display: block
-    div
-      border-radius: $br.m
-      padding: $cs.s $cs.m
-      color: var(--c-text-neutral-heavy)
-      background-color: var(--c-bg-neutral-light)
-      font-weight: 600
-      width: fit-content
-      line-height: 1
-      position: relative
-      bottom: 0
+  .gtw-status-panel-transmissions
+    margin-bottom: $cs.xs

@@ -74,7 +74,6 @@ const deviceNameAndImageSelector = createSelector(
 const m = defineMessages({
   latestDecodedPayload: 'Latest decoded payload',
   source: 'Source: {source}',
-  received: 'Received',
   seeInLiveData: 'See in live data',
   up: '{up} up',
   rssi: `{rssi}dBm RSSI`,
@@ -265,8 +264,8 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
                 className={style.source}
               />
               <LastSeen
-                statusClassName={style.received}
-                message={m.received}
+                statusClassName={style.receivedStatus}
+                message={sharedMessages.received}
                 lastSeen={event?.time}
                 short
                 displayMessage
