@@ -2,57 +2,6 @@
 
 The Things Stack components are primarily built in Go, we use React for web front-ends. It is assumed that you have decent knowledge and experience with these technologies. If you want to get more familiar with Go, we strongly recommend to take [A Tour of Go](https://tour.golang.org/).
 
-## Table of contents
-
-- [Development Environment](#development-environment)
-- [Cloning the Repository](#cloning-the-repository)
-- [Getting Started](#getting-started)
-- [Running a development build of The Things Stack](#running-a-development-build-of-the-things-stack)
-  - [Pre-requisites](#pre-requisites)
-  - [Steps](#steps)
-- [Using the CLI with the Development Environment](#using-the-cli-with-the-development-environment)
-- [Managing the Development Databases](#managing-the-development-databases)
-  - [PostgreSQL](#PostgreSQL)
-  - [Redis](#redis)
-- [Building the Frontend](#building-the-frontend)
-- [Starting The Things Stack](#starting-the-things-stack)
-- [Project Structure](#project-structure)
-  - [API](#api)
-  - [Documentation](#documentation)
-  - [Web UI](#web-ui)
-- [Code Style](#code-style)
-  - [Code Formatting](#code-formatting)
-  - [Line Length](#line-length)
-  - [Formatting and Linting](#formatting-and-linting)
-  - [Documentation Site](#documentation-site)
-- [Naming Guidelines](#naming-guidelines)
-  - [API Method Naming](#api-method-naming)
-  - [Variable Naming](#variable-naming)
-  - [Event Naming](#event-naming)
-  - [Error Naming](#error-naming)
-  - [Log Field Keys, Event Names, Error Names, Error Attributes and Task Identifiers](#log-field-keys-event-names-error-names-error-attributes-and-task-identifiers)
-  - [Comments](#comments)
-- [JavaScript Code Style](#javascript-code-style)
-  - [Code Formatting](#code-formatting)
-  - [Code Comments](#code-comments)
-  - [Import Statement Order](#import-statement-order)
-  - [React Component Syntax (Functional, Class Components and Hooks)](#react-component-syntax-functional-class-components-and-hooks)
-  - [React Component Types](#react-component-types)
-  - [Frontend Related Pull Requests](#frontend-related-pull-requests)
-- [Translations](#translations)
-  - [Backend Translations](#backend-translations)
-  - [Frontend Translations](#frontend-translations)
-- [Events](#events)
-- [Testing](#testing)
-  - [Unit Tests](#unit-tests)
-  - [End-to-end Tests](#end-to-end-tests)
-- [Building and Running](#building-and-running)
-- [Releasing](#releasing)
-  - [Release From Master](#release-from-master)
-  - [Release Backports](#release-backports)
-- [Troubleshooting](#troubleshooting)
-  - [Console](#console)
-
 ## Development Environment
 
 The Things Network's development tooling uses [Mage](https://magefile.org/). Under the hood, `mage` calls other tools such as `git`, `go`, `yarn`, `docker` etc. Recent versions are supported; Node v20.x and Go v1.21.x.
@@ -130,11 +79,17 @@ This creates a database, migrates tables and creates a user `admin` with passwor
 $ go run ./cmd/ttn-lw-stack -c ./config/stack/ttn-lw-stack.yml start
 ```
 
-5. Login to The Things Stack via the Console
+5. Run the Frontend with
+
+```bash
+$ tools/bin/mage js:serve
+```
+
+6. Login to The Things Stack via the Console
 
 In a web browser, navigate to `http://localhost:1885/` and login using credentials from step 3.
 
-6. Customizing configuration
+7. Customizing configuration
 
 To customize the configuration, copy the configuration file `/config/stack/ttn-lw-stack.yml` to a different location (ex: the `.env` folder in your repo). The configuration is documented in the [Configuration Reference](https://thethingsstack.io/reference/configuration/).
 
@@ -296,16 +251,9 @@ The folder structure of the frontend looks as follows:
 ├── template.go       go template module used to render the frontend HTML
 ```
 
-For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `tools/bin/mage js:build`, it can be served using:
-
-```bash
-$ export NODE_ENV=development
-$ tools/bin/mage js:serve
-```
-
-The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
-
 #### Development Configuration
+
+> To use a convenient interactive launcher for the development environments without any further setup required, please see the (interactive development stack launcher tool)[#interactive-development-stack-launcher-tool]
 
 In order to set up The Things Stack to support running the frontend via `webpack-dev-server`, the following environment setup is needed:
 
@@ -313,20 +261,68 @@ In order to set up The Things Stack to support running the frontend via `webpack
 # .dev.env
 export NODE_ENV="development"
 export TTN_LW_LOG_LEVEL="debug"
+export TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js account.js"
+export TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js"
 export TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
 export TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="http://localhost:8080/oauth/authorize"
 export TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="http://localhost:8080/oauth/logout"
 export TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
 export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
-export TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth"
+export TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
+export TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 export TTN_LW_IS_EMAIL_PROVIDER="dir"
 export TTN_LW_IS_EMAIL_DIR=".dev/email"
-export TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
-export TTN_LW_IS_OAUTH_UI_CONSOLE_URL="http://localhost:8080/console"
-export TTN_LW_CONSOLE_UI_ACCOUNT_URL="http://localhost:8080/oauth"
+
+export TTN_LW_CONSOLE_UI_IS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_AS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_NS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_JS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_GS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_EDTC_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_GCS_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_QRG_BASE_URL="http://localhost:8080/api/v3"
+
+export TTN_LW_IS_OAUTH_UI_IS_BASE_URL="http://localhost:8080/api/v3"
 ```
 
 We recommend saving this configuration as an `.dev.env` file and sourcing it like `source .dev.env`. This allows you to easily apply development configuration when needed.
+
+The development server can also be run with a staging environment (`.staging.env`) with the following set up:
+
+```bash
+# .staging.env
+export NODE_ENV="development"
+export TTN_LW_LOG_LEVEL="debug"
+
+export TTN_LW_AS_WEBHOOKS_TEMPLATES_DIRECTORY="<GOPATH>/src/github.com/TheThingsNetwork/webhook-templates"
+export TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="https://tti.staging1.cloud.thethings.industries/oauth/authorize"
+export TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="https://tti.staging1.cloud.thethings.industries/oauth/logout"
+export TTN_LW_CONSOLE_OAUTH_TOKEN_URL="https://tti.staging1.cloud.thethings.industries/oauth/token"
+export TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
+export TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
+export TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js paint.js"
+export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
+export TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js oauth.js"
+
+export TTN_LW_CONSOLE_UI_SUPPORT_LINK="https://thethingsstack.io"
+
+export TTN_LW_CONSOLE_UI_IS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_AS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_NS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_GS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_JS_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_QRG_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+export TTN_LW_CONSOLE_UI_EDTC_BASE_URL="https://tti.staging1.cloud.thethings.industries/api/v3"
+
+export TTN_LW_CONSOLE_OAUTH_CLIENT_ID="localhost-console"
+export TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET="console"
+
+export TTN_LW_TLS_CERTIFICATE=<GOPATH>/src/github.com/TheThingsNetwork/lorawan-stack/cert.pem
+export TTN_LW_TLS_KEY=<GOPATH>/src/github.com/TheThingsNetwork/lorawan-stack/key.pem
+export TTN_LW_TLS_ROOT_CA=<GOPATH>/src/github.com/TheThingsNetwork/lorawan-stack/cert.pem
+export TTN_LW_TLS_SOURCE="file"
+export TTN_LW_TLS_INSECURE_SKIP_VERIFY="true"
+```
 
 > Note: It is important to **source these environment variables in all terminal sessions** that run The Things Stack or the `tools/bin/mage` commands. Failing to do so will result in erros such as blank page renders. See also [troubleshooting](#troubleshooting).
 
@@ -350,6 +346,27 @@ WEBPACK_DEV_SERVER_USE_TLS="true"
 This option uses the key and certificate set via `TTN_LW_TLS_KEY` and `TTN_LW_TLS_CERTIFICATE` environment variables. Useful when developing functionalities that rely on TLS.
 
 > Note: To use this option, The Things Stack for LoRaWAN must be properly setup for TLS. You can obtain more information about this in the **Getting Started** section of the The Things Stack for LoRaWAN documentation.
+
+#### Serving
+
+For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `tools/bin/mage js:build`, and setting up the correct environment, it can be served using:
+
+```bash
+$ export NODE_ENV=development
+$ tools/bin/mage js:serve
+```
+
+The development server runs on `http://localhost:8080` and will proxy all API calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
+
+#### Interactive development stack launcher tool
+
+In order to easily launch development environments in different deployment contexts, this script configures and starts a development environment for The Things Stack, allowing users to choose between local and staging environments, enable branding, and configure cloud-hosted mock setups. You can launch it via:
+
+```bash
+$ node tools/js/serve-dev-stack.js
+```
+
+It will interactively guide you through the desired setup and launches the The Things Stack Enterprise as well as a frontend development server wia webpack.
 
 ## Code Style
 

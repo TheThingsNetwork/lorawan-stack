@@ -20,6 +20,9 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 const (
@@ -27,8 +30,9 @@ const (
 
 	headerXForwardedFor   = "X-Forwarded-For"
 	headerXForwardedHost  = "X-Forwarded-Host"
-	headerXForwardedProto = "X-Forwarded-Proto" // We don't support non-standard headers such as Front-End-Https, X-Forwarded-Ssl, X-Url-Scheme.
+	headerXForwardedProto = "X-Forwarded-Proto"
 	headerXRealIP         = "X-Real-IP"
+	// We don't support non-standard headers such as Front-End-Https, X-Forwarded-Ssl, X-Url-Scheme.
 
 	headerXForwardedClientCert        = "X-Forwarded-Client-Cert"          // Envoy mTLS.
 	headerXForwardedTLSClientCert     = "X-Forwarded-Tls-Client-Cert"      // Traefik mTLS.
@@ -68,11 +72,11 @@ func (c ProxyConfiguration) trustedIP(ip net.IP) bool {
 // ParseAndAddTrusted parses a list of CIDRs and adds them to the list of trusted ranges.
 func (c *ProxyConfiguration) ParseAndAddTrusted(cidrs ...string) error {
 	for _, cidr := range cidrs {
-		_, net, err := net.ParseCIDR(cidr)
+		_, ipNet, err := net.ParseCIDR(cidr)
 		if err != nil {
 			return err
 		}
-		c.Trusted = append(c.Trusted, net)
+		c.Trusted = append(c.Trusted, ipNet)
 	}
 	return nil
 }
@@ -98,6 +102,11 @@ func ProxyHeaders(config ProxyConfiguration) MiddlewareFunc {
 				}
 				if forwardedHost != "" {
 					r.URL.Host = forwardedHost
+				}
+				if cert, ok, err := mtls.FromProxyHeaders(r.Header); err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to parse client certificate from proxy headers")
+				} else if ok {
+					ctx = mtls.NewContextWithClientCertificate(ctx, cert)
 				}
 			} else {
 				// We don't trust the proxy, remove its headers.

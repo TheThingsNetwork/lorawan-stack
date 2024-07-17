@@ -41,13 +41,21 @@ jobs:
           git add CHANGELOG.md
           git commit -m "all: Cut off changelog version ${RELEASE_VERSION#v}"
           git push --set-upstream origin "changelog/${RELEASE_VERSION}"
+
+          export PR_URL=$(mktemp)
+
           gh pr create \
               --assignee '${{ github.actor }}' \
               --head "changelog/${RELEASE_VERSION}" \
               --base '${{ github.ref_name }}' \
               --body "This pull request cuts off the ${RELEASE_VERSION} changelog." \
               --label "release" \
+              --title "Changelog cutoff ${RELEASE_VERSION}" \
+              | tee "${PR_URL}"
+
+          # Try adding a milestone but ignore errors
+          gh pr edit < "${PR_URL}" \
               --milestone "${RELEASE_VERSION}" \
-              --title "Changelog cutoff ${RELEASE_VERSION}"
+              || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -81,8 +81,6 @@ describe('End device repository claiming', () => {
     // Provision first device using claiming flow.
     cy.findByLabelText('DevEUI').type(device1.devEui)
     cy.findByLabelText('Claim authentication code').type(device1.cac)
-    cy.findByLabelText('End device ID').should('have.value', `eui-${device1.devEui.toLowerCase()}`)
-    cy.findByLabelText('End device ID').clear()
     cy.findByLabelText('End device ID').type(device1.id)
     cy.findByLabelText('Register another end device of this type').check()
     cy.findByRole('button', { name: 'Register end device' }).click()
@@ -97,8 +95,6 @@ describe('End device repository claiming', () => {
     // Provision second device using claiming flow.
     cy.findByLabelText('DevEUI').type(device2.devEui)
     cy.findByLabelText('Claim authentication code').type(device2.cac)
-    cy.findByLabelText('End device ID').should('have.value', `eui-${device2.devEui.toLowerCase()}`)
-    cy.findByLabelText('End device ID').clear()
     cy.findByLabelText('End device ID').type(device2.id)
     cy.findByLabelText('View registered end device').check()
     cy.findByRole('button', { name: 'Register end device' }).click()

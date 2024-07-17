@@ -25337,6 +25337,116 @@
       ]
     },
     {
+      "name": "ttn/lorawan/v3/gatewaytokens.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GatewayToken",
+          "longName": "GatewayToken",
+          "fullName": "ttn.lorawan.v3.GatewayToken",
+          "description": "GatewayToken is a special auth token used by cluster components to authenticate on behalf of gateways.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key_id",
+              "description": "ID of the key used to hash the token.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "payload",
+              "description": "",
+              "label": "",
+              "type": "Payload",
+              "longType": "GatewayToken.Payload",
+              "fullType": "ttn.lorawan.v3.GatewayToken.Payload",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "checksum",
+              "description": "Checksum of the payload to verify the authenticity of the caller.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Payload",
+          "longName": "GatewayToken.Payload",
+          "fullName": "ttn.lorawan.v3.GatewayToken.Payload",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rights",
+              "description": "",
+              "label": "",
+              "type": "Rights",
+              "longType": "Rights",
+              "fullType": "ttn.lorawan.v3.Rights",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "created_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "ttn/lorawan/v3/identifiers.proto",
       "description": "",
       "package": "ttn.lorawan.v3",

@@ -62,6 +62,8 @@ type Config struct {
 
 	UpdateVersionInfoDelay time.Duration `name:"update-version-info-delay" description:"Maximum time to wait to update version information. A Jitter of 25% is applied for randomization"`
 
+	GatewayTokenHashKeyID string `name:"gateway-token-hash-key-id" description:"Identifier of the key used to hash gateway tokens"` //nolint:lll
+
 	Forward      map[string][]string `name:"forward" description:"Forward the DevAddr prefixes to the specified hosts"`
 	PacketBroker PacketBrokerConfig  `name:"packetbroker" description:"Packet Broker upstream configuration"`
 

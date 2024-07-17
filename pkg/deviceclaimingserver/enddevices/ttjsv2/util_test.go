@@ -170,7 +170,7 @@ func (srv *mockTTJS) handleClaim(w http.ResponseWriter, r *http.Request) { //nol
 		}
 
 		if dev.claimAuthenticationCode != req.OwnerToken {
-			writeResponse(w, http.StatusUnauthorized, "Owner token mismatch")
+			writeResponse(w, http.StatusForbidden, "claim failed with given owner token")
 			return
 		}
 

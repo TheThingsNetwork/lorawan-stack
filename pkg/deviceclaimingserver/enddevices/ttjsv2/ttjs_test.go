@@ -132,7 +132,7 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: "",
 			ErrorAssertion: func(err error) bool {
-				return errors.IsUnauthenticated(err)
+				return errors.IsInvalidArgument(err)
 			},
 		},
 		{
@@ -141,7 +141,7 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: "invalid",
 			ErrorAssertion: func(err error) bool {
-				return errors.IsUnauthenticated(err)
+				return errors.IsInvalidArgument(err)
 			},
 		},
 		{
@@ -191,18 +191,18 @@ func TestTTJS(t *testing.T) { //nolint:paralleltest
 		},
 	})
 	err = client2.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
-	a.So(errors.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsInternal(err), should.BeTrue)
 	ret, err := client2.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
-	a.So(errors.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 	a.So(ret, should.BeNil)
 	err = client2.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  devEUI.Bytes(),
 		JoinEui: supportedJoinEUI.Bytes(),
 	})
-	a.So(errors.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
 	// Unclaim
 	err = client1.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{

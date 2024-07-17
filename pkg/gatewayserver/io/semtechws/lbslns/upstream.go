@@ -581,7 +581,10 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		up, err := jreq.toUplinkMessage(ids, conn.BandID(), receivedAt)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to parse join request")
-			return nil, err
+			// If an error is returned here, the gateway will be disconnected.
+			// We don't return parsing errors as this could lead to a denial of service attack on the gateway.
+			// The caller already handles the (nil, nil) case.
+			return nil, nil
 		}
 		semtechws.UpdateSessionID(ctx, semtechws.SessionIDFromXTime(jreq.UpInfo.XTime))
 		ct := recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime)
@@ -602,7 +605,10 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIde
 		up, err := updf.toUplinkMessage(ids, conn.BandID(), receivedAt)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to parse uplink message")
-			return nil, err
+			// If an error is returned here, the gateway will be disconnected.
+			// We don't return parsing errors as this could lead to a denial of service attack on the gateway.
+			// The caller already handles the (nil, nil) case.
+			return nil, nil
 		}
 		semtechws.UpdateSessionID(ctx, semtechws.SessionIDFromXTime(updf.UpInfo.XTime))
 		ct := recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime)

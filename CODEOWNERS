@@ -7,28 +7,30 @@
 # Clear common folders
 /pkg
 
+# Clear package files
+/package.json
+/sdk/js/package.json
+
 # Dependencies
 /go.mod @TheThingsNetwork/stack-reviewers-1
 /go.sum @TheThingsNetwork/stack-reviewers-1
-/package.json @TheThingsNetwork/stack-reviewers-3
 /yarn.lock @TheThingsNetwork/stack-reviewers-3
-/sdk/js/package.json @TheThingsNetwork/stack-reviewers-3
 /sdk/js/yarn.lock @TheThingsNetwork/stack-reviewers-3
 
 # Build pipeline and tooling
-/Makefile @TheThingsNetwork/stack-reviewers-4
-/tools @TheThingsNetwork/stack-reviewers-4
-/.github/workflows @TheThingsNetwork/stack-reviewers-4
+/Makefile @TheThingsNetwork/stack-reviewers-7
+/tools @TheThingsNetwork/stack-reviewers-7
+/.github/workflows @TheThingsNetwork/stack-reviewers-7
 /config @TheThingsNetwork/stack-reviewers-3
 /config/stack @TheThingsNetwork/stack-reviewers-5
 /cypress @TheThingsNetwork/stack-reviewers-3
 
 # API, configuration, CLI and storage compatibility
 /api/*.proto @TheThingsNetwork/stack-reviewers-1
-/cmd @TheThingsNetwork/stack-reviewers-4
-/pkg/**/config.go @TheThingsNetwork/stack-reviewers-4
-/pkg/**/registry.go @TheThingsNetwork/stack-reviewers-4
-/pkg/config/shared.go @TheThingsNetwork/stack-reviewers-4
+/cmd @TheThingsNetwork/stack-reviewers-7
+/pkg/**/config.go @TheThingsNetwork/stack-reviewers-7
+/pkg/**/registry.go @TheThingsNetwork/stack-reviewers-7
+/pkg/config/shared.go @TheThingsNetwork/stack-reviewers-7
 /pkg/goproto @TheThingsNetwork/stack-reviewers-1
 /pkg/identityserver/store @TheThingsNetwork/stack-reviewers-1
 /pkg/jsonpb @TheThingsNetwork/stack-reviewers-1
@@ -43,7 +45,7 @@
 /pkg/cluster @TheThingsNetwork/stack-reviewers-1
 /pkg/component @TheThingsNetwork/stack-reviewers-1
 /pkg/errors @TheThingsNetwork/stack-reviewers-1
-/pkg/events @TheThingsNetwork/stack-reviewers-4
+/pkg/events @TheThingsNetwork/stack-reviewers-7
 /pkg/frequencyplans @TheThingsNetwork/stack-reviewers-7
 /pkg/interop @TheThingsNetwork/stack-reviewers-1
 /pkg/rpcmiddleware @TheThingsNetwork/stack-reviewers-1

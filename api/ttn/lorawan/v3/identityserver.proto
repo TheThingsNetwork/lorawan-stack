@@ -137,8 +137,10 @@ message IsConfiguration {
     google.protobuf.BoolValue set_others_as_contacts = 1;
   }
   CollaboratorRights collaborator_rights = 14;
+  reserved 15;
+  reserved "tenant_registration";
 
-  // next: 15
+  // next: 16
 }
 
 message GetIsConfigurationResponse {

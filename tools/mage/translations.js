@@ -174,7 +174,7 @@ const readLocales = async () => {
 
       // Detect duplicate messages in the English locale and store them per message
       // this will cause a non-zero exit code so that this issue can be caught in CI
-      if (locale === defaultLocale) {
+      if (!(backendOnly || localesDir.includes('.backend')) && locale === defaultLocale) {
         const duplicates = Object.entries(parsed)
           .reduce((acc, [id, message]) => {
             const existing = acc.find(d => d.message === message)
@@ -200,6 +200,15 @@ const readLocales = async () => {
 
           if (!ignoreDuplicates) {
             process.exit(1)
+          }
+        } else {
+          // Remove the duplicate file if it exists
+          try {
+            fs.unlinkSync(`${path.resolve(localesDir)}/${locale}-duplicates.json`)
+          } catch (err) {
+            if (err.code !== 'ENOENT') {
+              throw err
+            }
           }
         }
       }
