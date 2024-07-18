@@ -61,7 +61,7 @@ const DeviceAddBulk = () => {
       errorRenderFunction={SubViewError}
       spinnerProps={{ center: false, inline: true }}
     >
-      <div className="container container--lg grid">
+      <div className="container container--xxl grid">
         <PageTitle title={sharedMessages.importDevices} />
         <div className="item-12">
           {showEmptyWarning && (

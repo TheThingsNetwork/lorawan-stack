@@ -81,7 +81,7 @@ const LoRaCloud = () => {
         ]}
       >
         <ErrorView errorRender={SubViewError}>
-          <div className="container container--lg grid">
+          <div className="container container--xxl grid">
             <PageTitle title="LoRa Cloud Modem and Geolocation Services" />
             <div className="item-12 xl:item-8">
               <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />

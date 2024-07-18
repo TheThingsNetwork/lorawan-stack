@@ -17,6 +17,8 @@ import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import Tabs from '@ttn-lw/components/tabs'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -46,12 +48,20 @@ const DeviceMessaging = () => {
         ]
       : []
 
+  useBreadcrumbs(
+    'apps.single.devices.single.messaging',
+    <Breadcrumb
+      path={`/applications/${appId}/devices/${devId}`}
+      content={sharedMessages.messaging}
+    />,
+  )
+
   return (
     <Require
       featureCheck={mayWriteTraffic}
       otherwise={{ redirect: `/applications/${appId}/devices/${devId}` }}
     >
-      <div className="container container--lg grid">
+      <div className="container container--xxl grid">
         <IntlHelmet title={sharedMessages.messaging} />
         {tabs.length > 0 && (
           <div className="item-12">

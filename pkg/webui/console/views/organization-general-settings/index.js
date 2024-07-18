@@ -61,7 +61,7 @@ const GeneralSettings = () => {
   const orgId = useSelector(selectSelectedOrganizationId)
 
   useBreadcrumbs(
-    'orgs.single.general-settings',
+    'overview.orgs.single.general-settings',
     <Breadcrumb
       path={`/organizations/${orgId}/general-settings`}
       content={sharedMessages.generalSettings}
@@ -107,7 +107,7 @@ const GeneralSettings = () => {
       otherwise={{ redirect: `/organizations/${orgId}` }}
     >
       <RequireRequest requestAction={getIsConfiguration()}>
-        <div className="container container--lg grid">
+        <div className="container container--xxl grid">
           <PageTitle title={sharedMessages.generalSettings} />
           <div className="item-12 xl:item-8">
             <OrganizationUpdateForm onDeleteSuccess={handleDeleteSuccess} />

@@ -83,7 +83,7 @@ const DeviceGeneralSettings = () => {
   const { user, ...nonUserLocations } = device.locations || {}
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <IntlHelmet title={sharedMessages.location} />
       <div className="item-12 xl:item-8">
         <LocationForm

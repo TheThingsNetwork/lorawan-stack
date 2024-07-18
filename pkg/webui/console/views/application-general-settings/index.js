@@ -16,6 +16,8 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 
 import PageTitle from '@ttn-lw/components/page-title'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -70,6 +72,11 @@ const ApplicationGeneralSettings = () => {
     getIsConfiguration(),
   ]
 
+  useBreadcrumbs(
+    `apps.single#${appId}.general-settings`,
+    <Breadcrumb path={`/applications/${appId}`} content={sharedMessages.generalSettings} />,
+  )
+
   return (
     <Require
       featureCheck={mayEditBasicApplicationInfo}
@@ -78,7 +85,7 @@ const ApplicationGeneralSettings = () => {
       {/* The request getApplicationLink returns 404 when there is no `skip_payload_crypto`. */}
       {/* This is expected behavior and should not be treated as an error. */}
       <RequireRequest requestAction={requestsList} handleErrors={false}>
-        <div className="container container--lg grid">
+        <div className="container container--xxl grid">
           <PageTitle title={sharedMessages.generalSettings} />
           <div className="item-12 xl:item-8">
             <ApplicationGeneralSettingsContainer appId={appId} />

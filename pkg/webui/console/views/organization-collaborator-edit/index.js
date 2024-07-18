@@ -34,7 +34,7 @@ const OrganizationCollaboratorEditInner = () => {
   const { orgId, collaboratorId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.collaborators.edit',
+    'overview.orgs.single.collaborators.edit',
     <Breadcrumb
       path={`/organizations/${orgId}/collaborators/user/${collaboratorId}`}
       content={sharedMessages.edit}
@@ -42,7 +42,7 @@ const OrganizationCollaboratorEditInner = () => {
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
       <div className="item-12 xl:item-8">
         <ConsoleCollaboratorsForm

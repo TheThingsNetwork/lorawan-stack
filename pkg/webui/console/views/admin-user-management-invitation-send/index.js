@@ -37,7 +37,7 @@ const InvitationSend = () => {
 
   return (
     <Require featureCheck={maySendInvites} otherwise={{ redirect: '/' }}>
-      <div className="container container--lg grid">
+      <div className="container container--xxl grid">
         <PageTitle title={sharedMessages.invite} />
         <div className="item-12">
           <InviteForm />

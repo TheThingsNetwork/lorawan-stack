@@ -44,6 +44,8 @@ import {
   selectDeviceEvents,
 } from '@console/store/selectors/devices'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 const m = defineMessages({
   failedAccessOtherHostDevice:
@@ -92,10 +94,19 @@ const DeviceOverview = () => {
     downloadDataUriAsFile(toExportData, `${ids.device_id}_mac_data_${Date.now()}.json`)
   }, [appId, device])
 
+  useBreadcrumbs(
+    'apps.single.devices.single.overview',
+    <Breadcrumb
+      path={`/applications/${appId}/devices/${device.ids.device_id}`}
+      content={sharedMessages.endDeviceOverview}
+    />,
+  )
+
   const otherwise = {
     redirect: '/applications',
     message: m.failedAccessOtherHostDevice,
   }
+
   return (
     <Require condition={!shouldRedirect} otherwise={otherwise}>
       <IntlHelmet title={sharedMessages.overview} />

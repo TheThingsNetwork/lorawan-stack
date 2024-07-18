@@ -17,6 +17,9 @@ import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -54,6 +57,10 @@ const ApplicationOverview = () => {
   const may = useSelector(state => checkFromState(mayViewApplicationInfo, state))
   const shouldRedirect = isOtherClusterApp(application)
   const condition = !shouldRedirect && may
+  useBreadcrumbs(
+    `apps.single#${appId}.overview`,
+    <Breadcrumb path={`/applications/${appId}`} content={sharedMessages.appOverview} />,
+  )
 
   const otherwise = {
     redirect: '/applications',

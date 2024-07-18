@@ -36,7 +36,7 @@ const OrganizationApiKeyEditInner = () => {
   const { orgId, apiKeyId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.api-keys.edit',
+    'overview.orgs.single.api-keys.edit',
     <Breadcrumb
       path={`/organizations/${orgId}/api-keys/${apiKeyId}`}
       content={sharedMessages.edit}
@@ -44,7 +44,7 @@ const OrganizationApiKeyEditInner = () => {
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.keyEdit} />
       <div className="item-12 xl:item-8">
         <ApiKeyEditForm entity={ORGANIZATION} entityId={orgId} />

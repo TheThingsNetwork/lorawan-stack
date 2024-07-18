@@ -29,12 +29,12 @@ const OrganizationCollaboratorAdd = () => {
   const { orgId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.collaborators.add',
+    'overview.orgs.single.collaborators.add',
     <Breadcrumb path={`/organizations/${orgId}/collaborators/add`} content={sharedMessages.add} />,
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.addCollaborator} />
       <div className="item-12 xl:item-8">
         <ConsoleCollaboratorsForm entity={ORGANIZATION} entityId={orgId} />

@@ -66,7 +66,7 @@ const WebhookChooser = () => {
   const webhookTemplates = useSelector(selectWebhookTemplates)
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <div className="item-12 xl:item-8">
         <PageTitle title={m.chooseTemplate} />
       </div>

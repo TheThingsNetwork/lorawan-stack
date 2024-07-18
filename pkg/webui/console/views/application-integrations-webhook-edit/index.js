@@ -54,7 +54,7 @@ const ApplicationWebhookEditInner = () => {
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <PageTitle
         title={sharedMessages.editWebhook}
         className="mb-0"

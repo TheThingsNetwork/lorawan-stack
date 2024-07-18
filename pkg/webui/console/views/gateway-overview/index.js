@@ -15,6 +15,9 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
@@ -34,6 +37,13 @@ import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
 const GatewayOverview = () => {
   const gateway = useSelector(selectSelectedGateway)
+  useBreadcrumbs(
+    `gtws.single.overview`,
+    <Breadcrumb
+      path={`/gateways/${gateway.ids.gateway_id}`}
+      content={sharedMessages.gatewayOverview}
+    />,
+  )
 
   return (
     <Require featureCheck={mayViewGatewayInfo} otherwise={{ redirect: '/' }}>

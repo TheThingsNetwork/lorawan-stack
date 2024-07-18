@@ -62,7 +62,7 @@ const GatewayAdd = () => {
   return (
     <Require featureCheck={mayCreateGateways} otherwise={{ redirect: '/gateways' }}>
       <RequireRequest requestAction={getOrganizationsList()}>
-        <div className="container container--lg grid">
+        <div className="container container--xxl grid">
           <PageTitle className="mb-cs-s" title={sharedMessages.registerGateway}>
             <Message
               component="p"

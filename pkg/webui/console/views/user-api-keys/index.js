@@ -33,7 +33,7 @@ import { apiKeyPath as apiKeyPathRegexp } from '@console/lib/regexp'
 
 const UserApiKeys = () => {
   useBreadcrumbs(
-    'usr.single.api-keys',
+    'overview.usr.single.api-keys',
     <Breadcrumb path={`/user/api-keys`} content={sharedMessages.personalApiKeys} />,
   )
 

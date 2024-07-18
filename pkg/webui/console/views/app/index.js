@@ -33,19 +33,14 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import WithAuth from '@ttn-lw/lib/components/with-auth'
 import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
-import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
 import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
 import Sidebar from '@console/containers/sidebar'
 
-import Overview from '@console/views/overview'
+import OverviewRoutes from '@console/views/overview'
 import Applications from '@console/views/applications'
 import Gateways from '@console/views/gateways'
-import Organizations from '@console/views/organizations'
-import AdminPanel from '@console/views/admin-panel'
-import User from '@console/views/user'
-import Notifications from '@console/views/notifications'
 
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
@@ -54,7 +49,6 @@ import {
   selectApplicationSiteTitle,
   selectPageData,
 } from '@ttn-lw/lib/selectors/env'
-import { uuid as uuidRegexp } from '@ttn-lw/lib/regexp'
 
 import {
   selectUser,
@@ -198,23 +192,9 @@ const ConsoleRoot = () => {
       <Breadcrumbs />
       <Routes>
         <Route element={<Layout />}>
-          <Route index Component={Overview} />
+          <Route path="/*" Component={OverviewRoutes} />
           <Route path="applications/*" Component={Applications} />
           <Route path="gateways/*" Component={Gateways} />
-          <Route path="organizations/*" Component={Organizations} />
-          <Route path="admin-panel/*" Component={AdminPanel} />
-          <Route path="user/*" Component={User} />
-          <Route path="notifications" Component={Notifications} />
-          <Route
-            path="notifications/:category?/:id?"
-            Component={Notifications}
-            element={
-              <ValidateRouteParam
-                check={{ category: /^inbox|archived$/, id: uuidRegexp }}
-                Component={Notifications}
-              />
-            }
-          />
           <Route path="*" Component={GenericNotFound} />
         </Route>
       </Routes>

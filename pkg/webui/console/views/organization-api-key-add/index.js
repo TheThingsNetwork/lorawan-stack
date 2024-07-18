@@ -29,12 +29,12 @@ const OrganizationApiKeyAdd = () => {
   const { orgId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.api-keys.add',
+    'overview.orgs.single.api-keys.add',
     <Breadcrumb path={`/organizations/${orgId}/api-keys/add`} content={sharedMessages.add} />,
   )
 
   return (
-    <div className="container container--lg grid">
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.addApiKey} />
       <div className="item-12 xl:item-8">
         <ApiKeyCreateForm entity={ORGANIZATION} entityId={orgId} />
