@@ -950,6 +950,7 @@
   "containers.collaborator-form.index.memberIdPlaceholder": "",
   "containers.collaborator-form.index.memberDeleteSuccess": "",
   "containers.collaborator-form.index.memberUpdateSuccess": "",
+  "containers.collaborator-form.index.validateMember": "",
   "containers.collaborator-select.index.setYourself": "自分自身を{name}として設定する",
   "containers.fetch-table.index.errorMessage": "エラーが発生し、{entity, select, applications {applications} organizations {organizations} keys {API keys} collaborators {collaborators} devices {end devices} gateways {gateways} users {users} webhooks {webhooks} other {entities}}のリストを表示できませんでした。",
   "lib.components.date-time.relative.justNow": "ただ今",

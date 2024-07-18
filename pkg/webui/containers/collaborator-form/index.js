@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { isEmpty } from 'lodash'
@@ -51,24 +51,12 @@ const collaboratorUserSchema = Yup.object().shape({
   user_id: Yup.string().matches(collaboratorIdRegexp, sharedMessages.validateAlphanum),
 })
 
-const validationSchema = Yup.object().shape({
-  collaborator: Yup.object()
-    .shape({
-      ids: Yup.object().when(['organization_ids'], {
-        is: organizationIds => Boolean(organizationIds),
-        then: schema => schema.concat(collaboratorOrganizationSchema),
-        otherwise: schema => schema.concat(collaboratorUserSchema),
-      }),
-    })
-    .test('collaborator is not empty', sharedMessages.validateRequired, emptyCollaboratorCheck),
-  rights: Yup.array().min(1, sharedMessages.validateRights),
-})
-
 const m = defineMessages({
   collaboratorIdPlaceholder: 'Type to choose a collaborator',
   memberIdPlaceholder: 'Type to choose a member',
   memberDeleteSuccess: 'Member removed',
   memberUpdateSuccess: 'Member rights updated',
+  validateMember: 'Member is required',
 })
 
 const encodeCollaborator = collaboratorOption =>
@@ -87,6 +75,27 @@ const decodeCollaborator = collaborator =>
 
 const CollaboratorForm = props => {
   const { entity, entityId, collaboratorId, deleteDisabled, update, tts, isMember } = props
+
+  const validationSchema = useMemo(
+    () =>
+      Yup.object().shape({
+        collaborator: Yup.object()
+          .shape({
+            ids: Yup.object().when(['organization_ids'], {
+              is: organizationIds => Boolean(organizationIds),
+              then: schema => schema.concat(collaboratorOrganizationSchema),
+              otherwise: schema => schema.concat(collaboratorUserSchema),
+            }),
+          })
+          .test(
+            'collaborator is not empty',
+            isMember ? m.validateMember : sharedMessages.validateRequired,
+            emptyCollaboratorCheck,
+          ),
+        rights: Yup.array().min(1, sharedMessages.validateRights),
+      }),
+    [isMember],
+  )
 
   const {
     collaborator,

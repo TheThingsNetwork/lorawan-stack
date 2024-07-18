@@ -950,6 +950,7 @@
   "containers.collaborator-form.index.memberIdPlaceholder": "Type to choose a member",
   "containers.collaborator-form.index.memberDeleteSuccess": "Member removed",
   "containers.collaborator-form.index.memberUpdateSuccess": "Member rights updated",
+  "containers.collaborator-form.index.validateMember": "Member is required",
   "containers.collaborator-select.index.setYourself": "Set yourself as {name}",
   "containers.fetch-table.index.errorMessage": "There was an error and the list of {entity, select, applications {applications} organizations {organizations} keys {API keys} collaborators {collaborators} devices {end devices} gateways {gateways} users {users} webhooks {webhooks} other {entities}} could not be displayed",
   "lib.components.date-time.relative.justNow": "just now",
