@@ -72,7 +72,10 @@ const OrganizationInner = () => {
   const name = organization.name || orgId
   const siteName = selectApplicationSiteName()
 
-  useBreadcrumbs('overview.orgs.single', <Breadcrumb path={`/organizations/${orgId}`} content={name} />)
+  useBreadcrumbs(
+    'overview.orgs.single',
+    <Breadcrumb path={`/organizations/${orgId}`} content={name} />,
+  )
 
   const basePath = `/organizations/${orgId}`
 

@@ -34,9 +34,9 @@ const OrganizationCollaboratorEditInner = () => {
   const { orgId, collaboratorId } = useParams()
 
   useBreadcrumbs(
-    'overview.orgs.single.collaborators.edit',
+    'overview.orgs.single.collaborators.single.edit',
     <Breadcrumb
-      path={`/organizations/${orgId}/collaborators/user/${collaboratorId}`}
+      path={`/organizations/${orgId}/collaborators/user/${collaboratorId}/edit`}
       content={sharedMessages.edit}
     />,
   )
@@ -64,6 +64,11 @@ const OrganizationCollaboratorEdit = () => {
   // Check if collaborator still exists after being possibly deleted.
   const collaborator = useSelector(state => selectCollaboratorById(state, collaboratorId))
   const hasCollaborator = Boolean(collaborator)
+
+  useBreadcrumbs(
+    'overview.orgs.single.collaborators.single',
+    <Breadcrumb path={`/organizations/${orgId}`} content={collaboratorId} />,
+  )
 
   return (
     <RequireRequest requestAction={getCollaborator('organization', orgId, collaboratorId, true)}>
