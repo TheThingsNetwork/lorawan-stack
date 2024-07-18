@@ -1,0 +1,55 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.root
+  position: sticky
+  top: 0
+  z-index: $zi.dropdown - 1
+  display: flex
+  justify-content: space-between
+  gap: $cs.xl
+  align-items: center
+  padding: $cs.m
+  background-color: var(--c-bg-neutral-min)
+  border-bottom: 1px solid var(--c-border-neutral-light)
+
+  .name
+    line-height: normal
+    white-space: nowrap
+    color: var(--c-text-neutral-heavy)
+    font-weight: $fw.bold
+    font-size: $fsv2.l
+    margin: 0
+
+  .id
+    color: var(--c-text-neutral-semilight)
+    font-size: $fs.s
+    font-family: $font-family-mono
+    &-prefix
+      &:after
+        content: ':'
+        padding-right: $cs.xxs
+
+  .divider
+    height: $cs.xl
+    border-left: 1px solid var(--c-border-neutral-light)
+
+  .created-at-status > span
+    display: none
+
+.status
+  color: var(--c-text-neutral-semilight)
+  display: flex
+  align-items: center
+  white-space: nowrap

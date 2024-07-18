@@ -52,6 +52,7 @@ const OrganizationCollaboratorsList = () => {
           pageSize={PAGE_SIZES.MAX}
           baseDataSelector={baseDataSelectors}
           getItemsAction={getItemsAction}
+          isMember
         />
       </div>
     </div>

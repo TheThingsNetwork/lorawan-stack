@@ -39,10 +39,7 @@ const OrganizationCollaborators = () => {
 
   useBreadcrumbs(
     'overview.orgs.single.collaborators',
-    <Breadcrumb
-      path={`/organizations/${orgId}/collaborators`}
-      content={sharedMessages.collaborators}
-    />,
+    <Breadcrumb path={`/organizations/${orgId}`} content={sharedMessages.members} />,
   )
 
   return (

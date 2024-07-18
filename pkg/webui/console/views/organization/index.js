@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Tabs from '@ttn-lw/components/tabs'
+import { IconCollaborators, IconGeneralSettings, IconKey } from '@ttn-lw/components/icon'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -25,23 +27,20 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import Require from '@console/lib/components/require'
 
-import OrganizationOverview from '@console/views/organization-overview'
-import OrganizationData from '@console/views/organization-data'
 import OrganizationGeneralSettings from '@console/views/organization-general-settings'
 import OrganizationApiKeys from '@console/views/organization-api-keys'
 import OrganizationCollaborators from '@console/views/organization-collaborators'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
-import {
-  getOrganization,
-  stopOrganizationEventsStream,
-  getOrganizationsRightsList,
-} from '@console/store/actions/organizations'
+import { getOrganization, getOrganizationsRightsList } from '@console/store/actions/organizations'
 
 import { selectSelectedOrganization } from '@console/store/selectors/organizations'
+
+import OrganizationHeader from './organization-header'
 
 const Organization = () => {
   const { orgId } = useParams()
@@ -71,30 +70,48 @@ const OrganizationInner = () => {
   const { orgId } = useParams()
   const organization = useSelector(selectSelectedOrganization)
   const name = organization.name || orgId
-  const dispatch = useDispatch()
   const siteName = selectApplicationSiteName()
 
-  useBreadcrumbs('overview.orgs.single', <Breadcrumb path={`/organizations/${orgId}`} content={name} />)
-
-  useEffect(
-    () => () => {
-      dispatch(stopOrganizationEventsStream(orgId))
-    },
-    [dispatch, orgId],
+  useBreadcrumbs(
+    'overview.orgs.single',
+    <Breadcrumb path={`/organizations/${orgId}`} content={name} />,
   )
 
+  const basePath = `/organizations/${orgId}`
+
+  const tabs = [
+    {
+      title: sharedMessages.members,
+      name: 'members',
+      link: basePath,
+      icon: IconCollaborators,
+    },
+    {
+      title: sharedMessages.apiKeys,
+      name: 'api-keys',
+      link: `${basePath}/api-keys`,
+      icon: IconKey,
+    },
+    {
+      title: sharedMessages.settings,
+      name: 'general-settings',
+      link: `${basePath}/general-settings`,
+      icon: IconGeneralSettings,
+    },
+  ]
+
   return (
-    <React.Fragment>
+    <>
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
+      <OrganizationHeader org={organization} />
+      <Tabs tabs={tabs} divider />
       <Routes>
-        <Route index Component={OrganizationOverview} />
-        <Route path="data" Component={OrganizationData} />
+        <Route path="/*" Component={OrganizationCollaborators} />
         <Route path="general-settings" Component={OrganizationGeneralSettings} />
         <Route path="api-keys/*" Component={OrganizationApiKeys} />
-        <Route path="collaborators/*" Component={OrganizationCollaborators} />
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
-    </React.Fragment>
+    </>
   )
 }
 

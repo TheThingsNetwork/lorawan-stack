@@ -18,7 +18,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { bindActionCreators } from 'redux'
 import { createSelector } from 'reselect'
 
-import Icon, { IconTrash } from '@ttn-lw/components/icon'
+import Icon, { IconOrganization, IconTrash, IconUser } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 import Tag from '@ttn-lw/components/tag'
@@ -107,7 +107,7 @@ const CollaboratorsTable = props => {
         displayName: sharedMessages.type,
         render: ids => {
           const isUser = 'user_ids' in ids
-          const icon = isUser ? 'user' : 'organization'
+          const icon = isUser ? IconUser : IconOrganization
 
           return (
             <span>

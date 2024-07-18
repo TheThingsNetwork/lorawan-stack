@@ -19,7 +19,7 @@ import { useIntl } from 'react-intl'
 
 import Tag from '@ttn-lw/components/tag'
 import TagGroup from '@ttn-lw/components/tag/group'
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconOrganization, IconUser } from '@ttn-lw/components/icon'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -44,7 +44,7 @@ const getCollaboratorPathPrefix = collaborator =>
   )}`
 
 const CollaboratorsTable = props => {
-  const { baseDataSelector, ...restProps } = props
+  const { baseDataSelector, isMember, ...restProps } = props
   const intl = useIntl()
   const userId = useSelector(selectUserId)
   const headers = [
@@ -57,7 +57,7 @@ const CollaboratorsTable = props => {
       render: ids => {
         const isUser = 'user_ids' in ids
         const collaboratorId = getCollaboratorId({ ids })
-        const icon = isUser ? 'user' : 'organization'
+        const icon = isUser ? IconUser : IconOrganization
         let userLabel = collaboratorId
 
         if (isUser && collaboratorId === userId) {
@@ -126,8 +126,10 @@ const CollaboratorsTable = props => {
       defaultOrder="id"
       rowKeySelector={rowKeySelector}
       getItemPathPrefix={getCollaboratorPathPrefix}
-      addMessage={sharedMessages.addCollaborator}
-      tableTitle={<Message content={sharedMessages.collaborators} />}
+      addMessage={isMember ? sharedMessages.addMember : sharedMessages.addCollaborator}
+      tableTitle={
+        <Message content={isMember ? sharedMessages.members : sharedMessages.collaborators} />
+      }
       baseDataSelector={decoratedBaseDataSelector}
       handlesSorting
       {...restProps}
@@ -137,6 +139,11 @@ const CollaboratorsTable = props => {
 
 CollaboratorsTable.propTypes = {
   baseDataSelector: PropTypes.func.isRequired,
+  isMember: PropTypes.bool,
+}
+
+CollaboratorsTable.defaultProps = {
+  isMember: false,
 }
 
 export default CollaboratorsTable

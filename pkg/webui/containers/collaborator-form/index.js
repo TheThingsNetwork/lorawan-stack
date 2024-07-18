@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { isEmpty } from 'lodash'
@@ -51,21 +51,12 @@ const collaboratorUserSchema = Yup.object().shape({
   user_id: Yup.string().matches(collaboratorIdRegexp, sharedMessages.validateAlphanum),
 })
 
-const validationSchema = Yup.object().shape({
-  collaborator: Yup.object()
-    .shape({
-      ids: Yup.object().when(['organization_ids'], {
-        is: organizationIds => Boolean(organizationIds),
-        then: schema => schema.concat(collaboratorOrganizationSchema),
-        otherwise: schema => schema.concat(collaboratorUserSchema),
-      }),
-    })
-    .test('collaborator is not empty', sharedMessages.validateRequired, emptyCollaboratorCheck),
-  rights: Yup.array().min(1, sharedMessages.validateRights),
-})
-
 const m = defineMessages({
   collaboratorIdPlaceholder: 'Type to choose a collaborator',
+  memberIdPlaceholder: 'Type to choose a member',
+  memberDeleteSuccess: 'Member removed',
+  memberUpdateSuccess: 'Member rights updated',
+  validateMember: 'Member is required',
 })
 
 const encodeCollaborator = collaboratorOption =>
@@ -83,7 +74,28 @@ const decodeCollaborator = collaborator =>
   collaborator && collaborator.ids ? composeOption(collaborator) : null
 
 const CollaboratorForm = props => {
-  const { entity, entityId, collaboratorId, deleteDisabled, update, tts } = props
+  const { entity, entityId, collaboratorId, deleteDisabled, update, tts, isMember } = props
+
+  const validationSchema = useMemo(
+    () =>
+      Yup.object().shape({
+        collaborator: Yup.object()
+          .shape({
+            ids: Yup.object().when(['organization_ids'], {
+              is: organizationIds => Boolean(organizationIds),
+              then: schema => schema.concat(collaboratorOrganizationSchema),
+              otherwise: schema => schema.concat(collaboratorUserSchema),
+            }),
+          })
+          .test(
+            'collaborator is not empty',
+            isMember ? m.validateMember : sharedMessages.validateRequired,
+            emptyCollaboratorCheck,
+          ),
+        rights: Yup.array().min(1, sharedMessages.validateRights),
+      }),
+    [isMember],
+  )
 
   const {
     collaborator,
@@ -120,7 +132,7 @@ const CollaboratorForm = props => {
           navigate('..')
         } else {
           toast({
-            message: sharedMessages.collaboratorUpdateSuccess,
+            message: isMember ? m.memberUpdateSuccess : sharedMessages.collaboratorUpdateSuccess,
             type: toast.types.SUCCESS,
           })
         }
@@ -129,7 +141,7 @@ const CollaboratorForm = props => {
         setSubmitError(error)
       }
     },
-    [navigate, update, updateCollaborator],
+    [navigate, update, updateCollaborator, isMember],
   )
   const handleDelete = useCallback(async () => {
     setSubmitError(undefined)
@@ -137,14 +149,14 @@ const CollaboratorForm = props => {
     try {
       await removeCollaborator(isCollaboratorUser, collaboratorId)
       toast({
-        message: sharedMessages.collaboratorDeleteSuccess,
+        message: isMember ? m.memberDeleteSuccess : sharedMessages.collaboratorDeleteSuccess,
         type: toast.types.SUCCESS,
       })
       navigate('../')
     } catch (error) {
       setSubmitError(error)
     }
-  }, [collaboratorId, isCollaboratorUser, navigate, removeCollaborator])
+  }, [collaboratorId, isCollaboratorUser, navigate, removeCollaborator, isMember])
 
   const initialValues = React.useMemo(() => {
     if (!collaborator) {
@@ -183,8 +195,8 @@ const CollaboratorForm = props => {
       {warning}
       <AccountSelect
         name="collaborator"
-        title={sharedMessages.collaborator}
-        placeholder={m.collaboratorIdPlaceholder}
+        title={isMember ? sharedMessages.member : sharedMessages.collaborator}
+        placeholder={isMember ? m.memberIdPlaceholder : m.collaboratorIdPlaceholder}
         noOptionsMessage={sharedMessages.noMatchingCollaborators}
         required
         autoFocus={!update}
@@ -206,7 +218,13 @@ const CollaboratorForm = props => {
       <SubmitBar>
         <Form.Submit
           component={SubmitButton}
-          message={update ? sharedMessages.saveChanges : sharedMessages.addCollaborator}
+          message={
+            update
+              ? sharedMessages.saveChanges
+              : isMember
+                ? sharedMessages.addMember
+                : sharedMessages.addCollaborator
+          }
         />
         {update && (
           <ModalButton
@@ -217,10 +235,16 @@ const CollaboratorForm = props => {
             naked
             message={
               deleteDisabled
-                ? sharedMessages.removeCollaboratorLast
+                ? isMember
+                  ? sharedMessages.removeMemberLast
+                  : sharedMessages.removeCollaboratorLast
                 : isCollaboratorCurrentUser
-                  ? sharedMessages.removeCollaboratorSelf
-                  : sharedMessages.removeCollaborator
+                  ? isMember
+                    ? sharedMessages.removeMemberSelf
+                    : sharedMessages.removeCollaboratorSelf
+                  : isMember
+                    ? sharedMessages.removeMember
+                    : sharedMessages.removeCollaborator
             }
             modalData={{
               message: isCollaboratorCurrentUser
@@ -243,6 +267,7 @@ CollaboratorForm.propTypes = {
   deleteDisabled: PropTypes.bool,
   entity: PropTypes.entity.isRequired,
   entityId: PropTypes.string.isRequired,
+  isMember: PropTypes.bool,
   tts: PropTypes.object.isRequired,
   update: PropTypes.bool,
 }
@@ -251,6 +276,7 @@ CollaboratorForm.defaultProps = {
   collaboratorId: undefined,
   deleteDisabled: false,
   update: false,
+  isMember: false,
 }
 
 export default CollaboratorForm
