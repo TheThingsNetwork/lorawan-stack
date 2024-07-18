@@ -101,13 +101,7 @@ const OrganizationInner = () => {
     <>
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
       <OrganizationHeader org={organization} />
-      <Tabs
-        className="w-full"
-        tabs={tabs}
-        divider
-        individualTabClassName="al-center w-full"
-        tabItemClassName="w-full box-border j-center"
-      />
+      <Tabs tabs={tabs} divider />
       <Routes>
         <Route path="/*" Component={OrganizationCollaborators} />
         <Route path="general-settings" Component={OrganizationGeneralSettings} />

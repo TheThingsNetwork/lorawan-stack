@@ -61,15 +61,6 @@ const validationSchema = Yup.object().shape({
       }),
     })
     .test('collaborator is not empty', sharedMessages.validateRequired, emptyCollaboratorCheck),
-  member: Yup.object()
-    .shape({
-      ids: Yup.object().when(['organization_ids'], {
-        is: organizationIds => Boolean(organizationIds),
-        then: schema => schema.concat(collaboratorOrganizationSchema),
-        otherwise: schema => schema.concat(collaboratorUserSchema),
-      }),
-    })
-    .test('collaborator is not empty', sharedMessages.validateRequired, emptyCollaboratorCheck),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 
@@ -194,7 +185,7 @@ const CollaboratorForm = props => {
     >
       {warning}
       <AccountSelect
-        name={isMember ? 'member' : 'collaborator'}
+        name="collaborator"
         title={isMember ? sharedMessages.member : sharedMessages.collaborator}
         placeholder={isMember ? m.memberIdPlaceholder : m.collaboratorIdPlaceholder}
         noOptionsMessage={sharedMessages.noMatchingCollaborators}
