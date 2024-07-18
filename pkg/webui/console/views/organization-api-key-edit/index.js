@@ -36,7 +36,7 @@ const OrganizationApiKeyEditInner = () => {
   const { orgId, apiKeyId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.api-keys.edit',
+    'overview.orgs.single.api-keys.edit',
     <Breadcrumb
       path={`/organizations/${orgId}/api-keys/${apiKeyId}`}
       content={sharedMessages.edit}

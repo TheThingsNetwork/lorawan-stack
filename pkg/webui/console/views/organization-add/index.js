@@ -47,7 +47,7 @@ const OrganizationAdd = () => {
   )
 
   useBreadcrumbs(
-    'orgs.add',
+    'overview.orgs.add',
     <Breadcrumb path={`/gateways/add`} content={sharedMessages.registerGateway} />,
   )
 

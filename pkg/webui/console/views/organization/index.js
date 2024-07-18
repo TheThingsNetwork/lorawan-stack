@@ -74,7 +74,7 @@ const OrganizationInner = () => {
   const dispatch = useDispatch()
   const siteName = selectApplicationSiteName()
 
-  useBreadcrumbs('orgs.single', <Breadcrumb path={`/organizations/${orgId}`} content={name} />)
+  useBreadcrumbs('overview.orgs.single', <Breadcrumb path={`/organizations/${orgId}`} content={name} />)
 
   useEffect(
     () => () => {

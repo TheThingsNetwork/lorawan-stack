@@ -38,7 +38,7 @@ const OrganizationApiKeys = () => {
   const { orgId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.api-keys',
+    'overview.orgs.single.api-keys',
     <Breadcrumb path={`/organizations/${orgId}/api-keys`} content={sharedMessages.apiKeys} />,
   )
 

@@ -61,7 +61,7 @@ const GeneralSettings = () => {
   const orgId = useSelector(selectSelectedOrganizationId)
 
   useBreadcrumbs(
-    'orgs.single.general-settings',
+    'overview.orgs.single.general-settings',
     <Breadcrumb
       path={`/organizations/${orgId}/general-settings`}
       content={sharedMessages.generalSettings}
