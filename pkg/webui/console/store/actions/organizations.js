@@ -61,7 +61,7 @@ export const [
 ] = createRequestActions(
   GET_ORG_BASE,
   id => ({ id }),
-  (id, selector) => ({ selector }),
+  (id, selector, options = {}) => ({ selector, options }),
 )
 
 export const GET_ORG_COLLABORATOR_COUNT_BASE = 'GET_ORGANIZATION_COLLABORATOR_COUNT'

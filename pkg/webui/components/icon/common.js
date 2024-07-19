@@ -12,6 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {
+  IconCpu,
+  IconDeviceDesktopAnalytics,
+  IconRouter,
+  IconUsersGroup,
+} from '@tabler/icons-react'
+
+import { APPLICATION, GATEWAY, END_DEVICE, ORGANIZATION } from '@console/constants/entities'
+
 export {
   IconLock as IconAccess,
   IconUserShield as IconAdminPanel,
@@ -59,3 +68,10 @@ export {
   IconUserCog as IconUserManagement,
   IconCircleCheck as IconValid,
 } from '@tabler/icons-react'
+
+export const entityIcons = {
+  [APPLICATION]: IconDeviceDesktopAnalytics,
+  [GATEWAY]: IconRouter,
+  [END_DEVICE]: IconCpu,
+  [ORGANIZATION]: IconUsersGroup,
+}

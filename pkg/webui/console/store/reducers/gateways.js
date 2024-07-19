@@ -71,14 +71,14 @@ const statistics = (state = defaultStatisticsState, { type, payload }) => {
 }
 
 const gateways = (state = defaultState, action) => {
-  const { type, payload } = action
+  const { type, payload, meta } = action
 
   switch (type) {
     case GET_GTW:
       return {
         ...state,
         statistics: defaultStatisticsState,
-        selectedGateway: payload.id,
+        selectedGateway: meta.options.noSelect ? state.selectedGateway : payload.id,
       }
     case GET_GTW_SUCCESS:
     case UPDATE_GTW_SUCCESS:

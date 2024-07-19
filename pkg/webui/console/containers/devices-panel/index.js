@@ -24,12 +24,13 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
+import TopDevicesList from '../top-entities-dashboard-panel/top-devices'
+
 import RecentEndDevices from './recent-devices'
 
 import style from './devices-panel.styl'
 
 const m = defineMessages({
-  topDevices: 'Top end devices',
   recentDevices: 'Recently active',
 })
 
@@ -47,7 +48,7 @@ const DevicesPanel = () => {
   )
 
   const options = [
-    { label: m.topDevices, value: 'top' },
+    { label: sharedMessages.topDevices, value: 'top' },
     { label: m.recentDevices, value: 'recent' },
     { label: sharedMessages.all, value: 'all', link: `/applications/${appId}/devices` },
   ]
@@ -61,7 +62,7 @@ const DevicesPanel = () => {
       onToggleClick={handleChange}
       className={classNames(style.devicesPanel)}
     >
-      {active === 'top' && <div />}
+      {active === 'top' && <TopDevicesList appId={appId} />}
       {active === 'recent' && <RecentEndDevices />}
     </Panel>
   )

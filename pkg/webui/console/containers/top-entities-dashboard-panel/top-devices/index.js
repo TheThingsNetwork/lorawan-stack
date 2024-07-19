@@ -12,48 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { defineMessages } from 'react-intl'
+import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import Status from '@ttn-lw/components/status'
 
-import Message from '@ttn-lw/lib/components/message'
-
 import LastSeen from '@console/components/last-seen'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
-import {
-  selectPerEntityBookmarks,
-  selectPerEntityTotalCount,
-} from '@console/store/selectors/user-preferences'
+import { selectEndDeviceTopEntities } from '@console/store/selectors/top-entities'
 
 import EntitiesList from '../list'
 
-const m = defineMessages({
-  emptyMessage: 'No top device yet',
-  emptyDescription: 'Your most visited, and bookmarked end devices will be listed here',
-})
-
-const TopDevicesList = () => {
-  const allBookmarks = useSelector(selectPerEntityBookmarks('device'))
+const TopDevicesList = ({ appId }) => {
+  const topEntityFilter = useCallback(e => (appId ? e.id.startsWith(appId) : undefined), [appId])
+  const items = useSelector(state => selectEndDeviceTopEntities(state, topEntityFilter))
 
   const headers = [
     {
       name: 'name',
       displayName: sharedMessages.name,
-      render: (name, id) => (
-        <>
-          <Message content={name === '' ? id : name} component="p" className="mt-0 mb-cs-xs p-0" />
-          {name && (
-            <Message content={id} component="span" className="c-text-neutral-light fw-normal" />
-          )}
-        </>
-      ),
+      getValue: entity => entity,
+      render: ({ entity: { name }, id }) =>
+        Boolean(name) ? (
+          <>
+            <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{name}</span>
+            <span className="c-text-neutral-light d-block">{id}</span>
+          </>
+        ) : (
+          <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{id}</span>
+        ),
     },
     {
-      name: 'lastSeen',
+      name: 'last_seen_at',
+      width: '9rem',
+      getValue: entity => entity?.entity?.last_seen_at,
       displayName: sharedMessages.lastSeen,
       render: lastSeen => {
         const showLastSeen = Boolean(lastSeen)
@@ -72,14 +67,23 @@ const TopDevicesList = () => {
 
   return (
     <EntitiesList
-      allBookmarks={allBookmarks}
-      itemsCountSelector={selectPerEntityTotalCount}
+      entities={items}
+      itemsCount={items.length}
       headers={headers}
-      emptyMessage={m.emptyMessage}
-      emptyDescription={m.emptyDescription}
-      entity={'device'}
+      emptyMessage={sharedMessages.noTopEndDevices}
+      emptyDescription={sharedMessages.noTopEndDevicesDescription}
+      emptyAction={appId ? sharedMessages.registerEndDevice : undefined}
+      emptyPath={appId ? `/applications/${appId}/devices/add` : undefined}
     />
   )
+}
+
+TopDevicesList.propTypes = {
+  appId: PropTypes.string,
+}
+
+TopDevicesList.defaultProps = {
+  appId: undefined,
 }
 
 export default TopDevicesList

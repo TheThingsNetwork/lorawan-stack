@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { handleActions } from 'redux-actions'
+import { createAction } from '@reduxjs/toolkit'
 
-const defaultState = {
-  lastFetched: undefined,
-}
+export const GET_RECENCY_FREQUENCY_ITEMS = 'GET_TOP_ENTITIES'
+export const getTopRecencyFrequencyItems = createAction(GET_RECENCY_FREQUENCY_ITEMS)
 
-export default handleActions(
-  {
-    GET_TOP_ENTITIES_SUCCESS: state => ({
-      ...state,
-      lastFetched: Date.now(),
-    }),
-  },
-  defaultState,
+export const TRACK_RECENCY_FREQUENCY_ITEM = 'TRACK_RECENCY_FREQUENCY_ITEM'
+export const trackRecencyFrequencyItem = createAction(TRACK_RECENCY_FREQUENCY_ITEM, (type, id) => ({
+  payload: { type, id },
+}))
+
+export const DELETE_RECENCY_FREQUENCY_ITEM = 'DELETE_RECENCY_FREQUENCY_ITEM'
+export const deleteRecencyFrequencyItem = createAction(
+  DELETE_RECENCY_FREQUENCY_ITEM,
+  (type, id) => ({
+    payload: { type, id },
+  }),
 )

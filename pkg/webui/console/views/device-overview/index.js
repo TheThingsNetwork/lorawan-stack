@@ -19,6 +19,8 @@ import { defineMessages } from 'react-intl'
 import tts from '@console/api/tts'
 
 import toast from '@ttn-lw/components/toast'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -44,8 +46,6 @@ import {
   selectDeviceEvents,
 } from '@console/store/selectors/devices'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 const m = defineMessages({
   failedAccessOtherHostDevice:

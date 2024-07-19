@@ -36,7 +36,7 @@ import {
 import getCookie from '@console/lib/table-utils'
 
 import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
-import { selectBookmarksList } from '@console/store/selectors/user-preferences'
+import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
 
 import SidebarContext from '../context'
 
@@ -44,7 +44,7 @@ import TopEntitiesSection from './top-entities-section'
 
 const GeneralSideNavigation = () => {
   const { isMinimized } = useContext(SidebarContext)
-  const topEntities = useSelector(state => selectBookmarksList(state))
+  const topEntities = useSelector(selectTopEntitiesAll)
   const isUserAdmin = useSelector(selectUserIsAdmin)
   const user = useSelector(selectUser)
   const mayViewOrgs = useSelector(state =>
@@ -95,9 +95,7 @@ const GeneralSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && topEntities.length > 0 && (
-        <TopEntitiesSection topEntities={topEntities} userId={user.ids.user_id} />
-      )}
+      {!isMinimized && <TopEntitiesSection topEntities={topEntities} />}
     </>
   )
 }

@@ -51,8 +51,12 @@ PanelItem.propTypes = {
   onClick: PropTypes.func.isRequired,
   onMouseEnter: PropTypes.func.isRequired,
   path: PropTypes.string.isRequired,
-  subtitle: PropTypes.message,
-  title: PropTypes.message.isRequired,
+  subtitle: PropTypes.node,
+  title: PropTypes.node.isRequired,
+}
+
+PanelItem.defaultProps = {
+  subtitle: undefined,
 }
 
 PanelItem.defaultProps = {

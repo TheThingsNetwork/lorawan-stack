@@ -17,8 +17,6 @@ import React from 'react'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
-import RequireRequest from '@ttn-lw/lib/components/require-request'
-
 import ShortcutPanel from '@console/containers/shortcut-panel'
 import NotificationsDashboardPanel from '@console/containers/notifications-dashboard-panel'
 import DocumentationDashboardPanel from '@console/containers/documentation-dashboard-panel'
@@ -26,36 +24,24 @@ import TopEntitiesDashboardPanel from '@console/containers/top-entities-dashboar
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getApplicationsList } from '@console/store/actions/applications'
-import { getGatewaysList } from '@console/store/actions/gateways'
-
 const Overview = () => {
   useBreadcrumbs('overview.dashboard', <Breadcrumb path="/" content={sharedMessages.dashboard} />)
 
   return (
-    <RequireRequest
-      requestAction={[
-        getApplicationsList(),
-        getGatewaysList(undefined, ['name', 'gateway_server_address'], {
-          withStatus: true,
-        }),
-      ]}
-    >
-      <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
-        <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
-          <TopEntitiesDashboardPanel />
-        </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
-          <NotificationsDashboardPanel />
-        </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
-          <DocumentationDashboardPanel />
-        </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
-          <ShortcutPanel />
-        </div>
+    <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
+      <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
+        <TopEntitiesDashboardPanel />
       </div>
-    </RequireRequest>
+      <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
+        <NotificationsDashboardPanel />
+      </div>
+      <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
+        <DocumentationDashboardPanel />
+      </div>
+      <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
+        <ShortcutPanel />
+      </div>
+    </div>
   )
 }
 

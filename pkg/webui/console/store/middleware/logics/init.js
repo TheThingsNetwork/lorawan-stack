@@ -60,8 +60,9 @@ const consoleAppLogic = createRequestLogic({
 
     if (info) {
       try {
-        dispatch(user.getUserMe())
         const userId = info.oauth_access_token.user_ids.user_id
+        dispatch(user.getUserMe())
+        dispatch(user.applyPersistedState(userId))
         const userResult = await tts.Users.getById(userId, [
           'state',
           'name',

@@ -25,7 +25,7 @@ import {
 
 import * as search from '@console/store/actions/search'
 
-import { selectConcatenatedTopEntitiesByType } from '@console/store/selectors/top-entities'
+import { selectApplicationTopEntities } from '@console/store/selectors/top-entities'
 
 const getGlobalSearchResults = createRequestLogic({
   type: search.GET_GLOBAL_SEARCH_RESULTS,
@@ -39,7 +39,7 @@ const getGlobalSearchResults = createRequestLogic({
       deleted: false,
     }
 
-    const topApplications = selectConcatenatedTopEntitiesByType(getState(), APPLICATION).slice(0, 3)
+    const topApplications = selectApplicationTopEntities(getState()).slice(0, 3)
 
     const responses = await Promise.all([
       tts.Applications.search(params, ['name']),
@@ -57,7 +57,7 @@ const getGlobalSearchResults = createRequestLogic({
           id: getApplicationId(app),
           type: APPLICATION,
           path: `/applications/${getApplicationId(app)}`,
-          ...app,
+          entity: app,
         })),
         totalCount: responses[0].totalCount,
       },
@@ -77,7 +77,7 @@ const getGlobalSearchResults = createRequestLogic({
             id: getDeviceId(device),
             type: END_DEVICE,
             path: `/applications/${getApplicationId(device)}/devices/${getDeviceId(device)}`,
-            ...device,
+            entity: device,
           })),
         totalCount: responses[1].totalCount,
       },
@@ -87,7 +87,7 @@ const getGlobalSearchResults = createRequestLogic({
           id: getGatewayId(gateway),
           type: GATEWAY,
           path: `/gateways/${getGatewayId(gateway)}`,
-          ...gateway,
+          entity: gateway,
         })),
         totalCount: responses[2].totalCount,
       },
@@ -97,7 +97,7 @@ const getGlobalSearchResults = createRequestLogic({
           id: getOrganizationId(org),
           type: ORGANIZATION,
           path: `/organizations/${getOrganizationId(org)}`,
-          ...org,
+          entity: org,
         })),
         totalCount: responses[3].totalCount,
       },

@@ -13,15 +13,14 @@
 // limitations under the License.
 
 import tts from '@console/api/tts'
-import { APPLICATION } from '@console/constants/entities'
 
 import { isNotFoundError, isConflictError } from '@ttn-lw/lib/errors/utils'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
-import { trackEntityAccess } from '@console/lib/frequently-visited-entities'
-
 import * as applications from '@console/store/actions/applications'
 import * as link from '@console/store/actions/link'
+
+import { selectApplicationDeviceCount } from '@console/store/selectors/applications'
 
 import createEventsConnectLogics from './events'
 
@@ -42,7 +41,6 @@ const getApplicationLogic = createRequestLogic({
       meta: { selector },
     } = action
     const app = await tts.Applications.getById(id, selector)
-    trackEntityAccess(APPLICATION, id)
     dispatch(applications.startApplicationEventsStream(id))
 
     return app
@@ -142,8 +140,15 @@ const getApplicationsLogic = createRequestLogic({
 
 const getApplicationDeviceCountLogic = createRequestLogic({
   type: applications.GET_APP_DEV_COUNT,
-  process: async ({ action }) => {
+  process: async ({ action, getState }) => {
     const { id: appId } = action.payload
+
+    // Fetch only if the count is not already in the store.
+    const storedDeviceCount = selectApplicationDeviceCount(getState(), appId)
+    if (storedDeviceCount !== undefined) {
+      return { id: appId, applicationDeviceCount: storedDeviceCount }
+    }
+
     const data = await tts.Applications.Devices.getAll(appId, { limit: 1 })
 
     return { id: appId, applicationDeviceCount: data.totalCount }

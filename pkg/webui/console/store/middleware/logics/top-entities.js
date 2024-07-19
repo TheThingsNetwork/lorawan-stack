@@ -12,171 +12,204 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { APPLICATION, END_DEVICE, GATEWAY, ORGANIZATION } from '@console/constants/entities'
+import { chunk } from 'lodash'
+
+import { APPLICATION, END_DEVICE, GATEWAY } from '@console/constants/entities'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { isNotFoundError, isPermissionDeniedError } from '@ttn-lw/lib/errors/utils'
 import {
-  combineDeviceIds,
   extractApplicationIdFromCombinedId,
   extractDeviceIdFromCombinedId,
 } from '@ttn-lw/lib/selectors/id'
 
-import { getTopFrequencyRecencyItems, getTypeAndId } from '@console/lib/frequently-visited-entities'
+import { getTypeAndId } from '@console/lib/recency-frequency-entities'
 
-import * as actions from '@console/store/actions/top-entities'
-import { getAllBookmarks } from '@console/store/actions/user-preferences'
-import { getApplicationsList } from '@console/store/actions/applications'
-import { getOrganizationsList } from '@console/store/actions/organizations'
-import { getGatewaysList } from '@console/store/actions/gateways'
-import { getDevicesList } from '@console/store/actions/devices'
+import { GET_TOP_ENTITIES } from '@console/store/actions/top-entities'
+import { getBookmarksList } from '@console/store/actions/user-preferences'
+import { getApplication, getApplicationsList } from '@console/store/actions/applications'
+import { getGateway, getGatewaysList } from '@console/store/actions/gateways'
+import { getDevice, getDevicesList } from '@console/store/actions/devices'
 
 import { selectUserId } from '@account/store/selectors/user'
-import { selectApplicationById } from '@console/store/selectors/applications'
-import { selectGatewayById } from '@console/store/selectors/gateways'
-import { selectOrganizationById } from '@console/store/selectors/organizations'
-import { selectDeviceByIds } from '@console/store/selectors/devices'
-import { selectTopEntitiesLastFetched } from '@console/store/selectors/top-entities'
+import {
+  selectTopEntities,
+  selectTopEntitiesLastFetched,
+} from '@console/store/selectors/top-entities'
+import { selectScoredRecencyFrequencyItems } from '@console/store/selectors/recency-frequency-items'
 
-const MAX_ENTITIES = 15
-
-const getBookmarkType = bookmark =>
-  Object.keys(bookmark.entity_ids)[0].replace('_ids', '').toUpperCase()
-const getEntityPath = (id, type) => {
-  switch (type) {
-    case APPLICATION:
-      return `/applications/${id}`
-    case END_DEVICE:
-      return `/applications/${extractApplicationIdFromCombinedId(id)}/devices/${extractDeviceIdFromCombinedId(id)}`
-    case GATEWAY:
-      return `/gateways/${id}`
-    case ORGANIZATION:
-      return `/organizations/${id}`
-  }
-}
-const getEntityName = (id, type, state) => {
-  switch (type) {
-    case APPLICATION:
-      return selectApplicationById(state, id)?.name
-    case END_DEVICE:
-      return selectDeviceByIds(
-        state,
-        extractApplicationIdFromCombinedId(id),
-        extractDeviceIdFromCombinedId(id),
-      )?.name
-    case GATEWAY:
-      return selectGatewayById(state, id)?.name
-    case ORGANIZATION:
-      return selectOrganizationById(state, id)?.name
-    default:
-      return ''
-  }
-}
-const getBookmarkEntityId = bookmark => {
-  const type = getBookmarkType(bookmark)
-  switch (type) {
-    case APPLICATION:
-      return bookmark.entity_ids.application_ids.application_id
-    case END_DEVICE:
-      return combineDeviceIds(
-        bookmark.entity_ids.end_device_ids.application_ids.application_id,
-        bookmark.entity_ids.end_device_ids.device_id,
-      )
-    case GATEWAY:
-      return bookmark.entity_ids.gateway_ids.gateway_id
-    case ORGANIZATION:
-      return bookmark.entity_ids.organization_ids.organization_id
-  }
+const requestMap = {
+  [APPLICATION]: getApplication,
+  [GATEWAY]: getGateway,
+  [END_DEVICE]: getDevice,
 }
 
-const getTopEntitiesLogic = createRequestLogic({
-  type: actions.GET_TOP_ENTITIES,
-  process: async ({ getState }, dispatch) => {
-    const state = getState()
-    const limit = 100
-    const order = '-created_at'
-    const lastFetched = selectTopEntitiesLastFetched(state)
+/** Limit the number of concurrent promises.
+ * @param {Array<Function>} promises - An array of functions that return promises.
+ * @param {number} limit - The number of promises to run concurrently.
+ * @returns {Promise<Array>} - A promise that resolves to an array of results.
+ */
+const limitedPromiseAll = async (promises, limit) => {
+  const chunks = chunk(promises, limit)
+  const results = []
 
-    // Only refetch entity names every 5 minutes.
-    const shouldRefetch = lastFetched && Date.now() - lastFetched < 1000 * 60 * 5 // 5 minutes
+  for (const chunk of chunks) {
+    /* eslint-disable no-await-in-loop */
+    const chunkResults = await Promise.all(chunk.map(p => p()))
+    results.push(...chunkResults)
+  }
 
-    if (!shouldRefetch) {
-      // Fetch 100 items of all entity types to have some initial data in the store
-      // to source the entity names from. This is a best effort to avoid making
-      // requests for every single entity.
+  return results
+}
+
+/** Fetch missing entities.
+ * @param {object} topEntities - The top entities.
+ * @param {Function} dispatch - The dispatch function.
+ * @returns {Promise<Array>} - A promise that resolves to an array of results.
+ */
+const fetchMissingEntities = (topEntities, dispatch) => {
+  const missingEntities = []
+  Object.values(topEntities).forEach(entities => {
+    entities.forEach(entity => {
+      if (!entity.entity && !missingEntities.some(({ path }) => path === entity.path)) {
+        missingEntities.push(entity)
+      }
+    })
+  })
+
+  // Fetch the missing entities but limit the number of concurrent requests to 5.
+  return limitedPromiseAll(
+    missingEntities.map(({ id, type }) => async () => {
+      try {
+        const idParams =
+          type === END_DEVICE
+            ? [extractApplicationIdFromCombinedId(id), extractDeviceIdFromCombinedId(id)]
+            : [id]
+        await dispatch(
+          attachPromise(
+            requestMap[type](...idParams, ['name'], { noSelect: true, startStream: false }),
+          ),
+        )
+      } catch (error) {
+        if (isPermissionDeniedError(error)) {
+          // Permission denied is not necessarily conclusive that the entity cannot be
+          // accessed at all, since it's possible that only certain parts of the entity
+          // are not accessible. In any case, it should not cause the logic to fail.
+          return
+        }
+        if (!isNotFoundError(error)) {
+          throw error
+        }
+      }
+    }),
+    5,
+  )
+}
+
+// In the Console, top entities refer to a collection of items that
+// are deemed important to the user. These items are a mix of bookmarks
+// which are stored in the backend and frequency recency items which are
+// calculated based on the user's usage of the Console and stored in the
+// local storage.
+// Since for these entities, only the type and id are stored, we need to
+// fetch the entity names from the backend to display them in the UI.
+// This should however be done in a way that is most efficient and does
+// overload the backend.
+// Since the top entities are entirely a derivative of other store items,
+// the composition is done on the selector level.
+const fetchTopEntities = async (getState, dispatch) => {
+  const state = getState()
+  const prefetchLimit = 100
+  const order = '-created_at'
+  const lastFetched = selectTopEntitiesLastFetched(state)
+
+  // Only refetch entity names every 5 minutes.
+  const shouldRefetch = lastFetched && Date.now() - lastFetched < 1000 * 60 * 5 // 5 minutes.
+
+  if (!shouldRefetch) {
+    // Fetch 100 items of all entity types to have some initial data in the store
+    // to source the entity names from. This is a best effort to avoid making
+    // requests for every single entity.
+    try {
       await Promise.all([
-        dispatch(attachPromise(getApplicationsList({ page: 1, limit, order }, ['name']))),
-        dispatch(attachPromise(getGatewaysList({ page: 1, limit, order }, ['name']))),
-        dispatch(attachPromise(getOrganizationsList({ page: 1, limit, order }, ['name']))),
-      ])
-    }
-
-    const topEntities = []
-    const topFrequencyRecencyItems = getTopFrequencyRecencyItems()
-    const userId = selectUserId(state)
-
-    const { bookmarks } = await dispatch(attachPromise(getAllBookmarks(userId)))
-
-    // Get the top 3 frequency recency items that are applications.
-    const topFrequencyRecencyApplicationIds = topFrequencyRecencyItems
-      .filter(item => item.key.startsWith(APPLICATION))
-      .map(getTypeAndId)
-      .slice(0, 3)
-
-    if (!shouldRefetch) {
-      // Fetch the 1000 last registered devices for the top 3 applications.
-      // This is a best effort to get the device names for the top entities.
-      await Promise.all(
-        topFrequencyRecencyApplicationIds.map(({ entityId }) =>
-          dispatch(
-            attachPromise(getDevicesList(entityId, { page: 1, limit: 1000, order }, ['name'])),
+        dispatch(
+          attachPromise(getApplicationsList({ page: 1, limit: prefetchLimit, order }, ['name'])),
+        ),
+        dispatch(
+          attachPromise(
+            getGatewaysList(
+              { page: 1, limit: prefetchLimit, order },
+              ['name', 'gateway_server_address'],
+              {
+                withStatus: true,
+              },
+            ),
           ),
         ),
-      )
+      ])
+    } catch (error) {
+      // Ignore any errors that occur during the prefetch.
+      // The entity names will not be displayed in the worst case,
+      // but the logic should not fail.
     }
+  }
 
-    // Always put the bookmarks first.
-    topEntities.push({
-      category: 'bookmarks',
-      source: 'top-entities',
-      items: bookmarks.slice(0, MAX_ENTITIES).map(bookmark => {
-        const id = getBookmarkEntityId(bookmark)
-        const type = getBookmarkType(bookmark)
-        return {
-          id: getBookmarkEntityId(bookmark),
-          name: getEntityName(id, type, state),
-          type: getBookmarkType(bookmark),
-          path: getEntityPath(id, type, state),
+  const topRecencyFrequencyItems = selectScoredRecencyFrequencyItems(state)
+  const userId = selectUserId(state)
+
+  await dispatch(attachPromise(getBookmarksList(userId, { page: 1, limit: 100 })))
+
+  // Get the top 3 frequency recency items that are applications.
+  const topRecencyFrequencyApplicationIds = topRecencyFrequencyItems.APPLICATION.slice(0, 3).map(
+    getTypeAndId,
+  )
+
+  if (!shouldRefetch) {
+    // Fetch the 1000 last registered devices for the top 3 applications.
+    // This is a best effort to get the device names for the top entities.
+    await Promise.all(
+      topRecencyFrequencyApplicationIds.map(async ({ entityId }) => {
+        try {
+          return await dispatch(
+            attachPromise(
+              getDevicesList(entityId, { page: 1, limit: 1000, order }, ['name', 'last_seen_at']),
+            ),
+          )
+        } catch (error) {
+          // Ignore any errors that occur during the prefetch.
+          // The entity names will not be displayed in the worst case,
+          // but the logic should not fail.
         }
       }),
-    })
+    )
+  }
 
-    // Then add the top frequency recency items, but only if we have not already.
-    const slicedTopFrequencyRecencyItems = topFrequencyRecencyItems
-      .slice(0, MAX_ENTITIES - bookmarks.length)
-      .reduce((acc, item) => {
-        const { entityType, entityId } = getTypeAndId(item)
-        const path = getEntityPath(entityId, entityType, state)
-        // Skip if the entity is already in the list.
-        if (topEntities[0].items.find(e => e.path === path)) {
-          return acc
-        }
-        acc.push({
-          id: entityId,
-          name: getEntityName(entityId, entityType, state),
-          type: entityType,
-          path,
-        })
-        return acc
-      }, [])
+  const topEntities = selectTopEntities(getState())
 
-    topEntities.push({
-      category: 'recency',
-      source: 'top-entities',
-      items: slicedTopFrequencyRecencyItems,
-    })
+  // Fetch the missing entities.
+  await fetchMissingEntities(topEntities, dispatch)
 
-    return topEntities
+  // Get the composed top entities.
+  return topEntities
+}
+
+// This promise is used to prevent multiple concurrent requests for the top entities.
+let topEntitiesPromise = null
+
+const getTopEntitiesLogic = createRequestLogic({
+  type: GET_TOP_ENTITIES,
+  process: async ({ getState }, dispatch) => {
+    if (topEntitiesPromise) {
+      return topEntitiesPromise
+    }
+
+    topEntitiesPromise = fetchTopEntities(getState, dispatch)
+    const result = await topEntitiesPromise
+
+    topEntitiesPromise = null
+
+    return result
   },
 })
 

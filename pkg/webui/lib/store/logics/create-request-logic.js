@@ -71,7 +71,12 @@ const createRequestLogic = (
     successAction = payload => ({ type: successType, payload })
   }
   if (typeof failType === 'string') {
-    failAction = error => ({ type: failType, error: true, payload: error })
+    failAction = (error, originalAction) => ({
+      type: failType,
+      error: true,
+      payload: error,
+      meta: { requestPayload: originalAction.payload },
+    })
   }
   if (typeof abortType === 'string') {
     abortAction = () => ({ type: abortType })
@@ -193,7 +198,7 @@ const createRequestLogic = (
           )
 
           // Dispatch the failure action and reject the promise, if attached.
-          dispatch(failAction(e))
+          dispatch(failAction(e, action))
           if (promiseAttached) {
             const {
               meta: { _reject },

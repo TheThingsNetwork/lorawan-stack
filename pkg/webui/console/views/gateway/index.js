@@ -16,6 +16,8 @@ import React, { useCallback, useEffect } from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { GATEWAY } from '@console/constants/entities'
+
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
@@ -39,6 +41,7 @@ import {
   getGatewaysRightsList,
 } from '@console/store/actions/gateways'
 import { getGsFrequencyPlans } from '@console/store/actions/configuration'
+import { trackRecencyFrequencyItem } from '@console/store/actions/recency-frequency-items'
 
 import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
@@ -81,6 +84,11 @@ const Gateway = () => {
     [gtwId],
   )
   useEffect(() => () => dispatch(stopGatewayEventsStream(gtwId)), [gtwId, dispatch])
+
+  // Track gateway access.
+  useEffect(() => {
+    dispatch(trackRecencyFrequencyItem(GATEWAY, gtwId))
+  }, [dispatch, gtwId])
 
   const gateway = useSelector(selectSelectedGateway)
   const hasGateway = Boolean(gateway)

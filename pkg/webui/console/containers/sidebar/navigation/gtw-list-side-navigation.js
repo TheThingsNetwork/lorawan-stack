@@ -15,13 +15,14 @@
 import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 
+import { GATEWAY } from '@console/constants/entities'
+
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
 import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectUserId } from '@console/store/selectors/logout'
-import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
+import { selectGatewayTopEntities } from '@console/store/selectors/top-entities'
 
 import SidebarContext from '../context'
 
@@ -38,15 +39,14 @@ Bookmark.propTypes = {
 }
 
 const GtwListSideNavigation = () => {
-  const topEntities = useSelector(selectPerEntityBookmarks('gateway'))
+  const topEntities = useSelector(selectGatewayTopEntities)
   const { isMinimized } = useContext(SidebarContext)
-  const userId = useSelector(selectUserId)
 
   if (isMinimized || topEntities.length === 0) {
     return <div />
   }
 
-  return <TopEntitiesSection topEntities={topEntities} userId={userId} entity="gateway" />
+  return <TopEntitiesSection topEntities={topEntities} type={GATEWAY} />
 }
 
 export default GtwListSideNavigation

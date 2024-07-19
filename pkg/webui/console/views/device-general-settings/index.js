@@ -43,7 +43,12 @@ import {
   mayReadApplicationDeviceKeys,
 } from '@console/lib/feature-checks'
 
-import { updateDevice, resetDevice, resetUsedDevNonces } from '@console/store/actions/devices'
+import {
+  updateDevice,
+  resetDevice,
+  resetUsedDevNonces,
+  deleteDevice,
+} from '@console/store/actions/devices'
 import { unclaimDevice } from '@console/store/actions/claim'
 import { getBandsList, getNsFrequencyPlans } from '@console/store/actions/configuration'
 
@@ -119,8 +124,8 @@ const DeviceGeneralSettings = () => {
   }, [devId])
 
   const handleDelete = useCallback(
-    async () => tts.Applications.Devices.deleteById(appId, devId),
-    [appId, devId],
+    async () => await dispatch(attachPromise(deleteDevice(appId, devId))),
+    [appId, devId, dispatch],
   )
 
   const handleDeleteSuccess = useCallback(async () => {

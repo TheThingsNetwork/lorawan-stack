@@ -28,10 +28,20 @@ import { selectUserId } from '@console/store/selectors/logout'
 
 import rootReducer from './reducers'
 import logics from './middleware/logics'
+import { localStorageMiddleware } from './middleware/local-storage'
 
 const logicMiddleware = createLogicMiddleware(logics)
 
-const middlewares = [requestPromiseMiddleware, logicMiddleware]
+const middlewares = [
+  requestPromiseMiddleware,
+  logicMiddleware,
+  // In order to persist the recency and frequency items, we use a middleware that
+  // listens to the state changes and persists the state to the local storage.
+  // The state is persisted under the key `${userId}/console-state` and is automatically
+  // loaded when the application is initialized and the user is authenticated via the
+  // `applyPersistedState` action.
+  localStorageMiddleware(['recencyFrequencyItems'], selectUserId),
+]
 
 const sentryEnhancer = Sentry.createReduxEnhancer({
   stateTransformer: state => omitDeep(trimEvents(state), sensitiveFields),
@@ -46,7 +56,8 @@ const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActionPaths: ['meta._resolve', 'meta._reject'],
+        ignoredActionPaths: ['meta._resolve', 'meta._reject', /error/],
+        ignoredPaths: [/error/],
       },
     }).concat(middlewares),
   enhancer: getDefaultEnhancers => getDefaultEnhancers().concat(enhancers),

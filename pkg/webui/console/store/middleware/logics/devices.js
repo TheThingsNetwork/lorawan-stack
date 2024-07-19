@@ -17,14 +17,11 @@ import { defineMessage } from 'react-intl'
 import { get } from 'lodash'
 
 import tts from '@console/api/tts'
-import { END_DEVICE } from '@console/constants/entities'
 
 import toast from '@ttn-lw/components/toast'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
-
-import { trackEntityAccess } from '@console/lib/frequently-visited-entities'
 
 import * as devices from '@console/store/actions/devices'
 import { getModel } from '@console/store/actions/device-repository'
@@ -52,7 +49,6 @@ const createDeviceLogic = createRequestLogic({
 
 const getDeviceLogic = createRequestLogic({
   type: devices.GET_DEV,
-  debounce: 250,
   process: async ({ action, getState }, dispatch) => {
     const {
       payload: { appId, deviceId },
@@ -87,7 +83,6 @@ const getDeviceLogic = createRequestLogic({
         getModel(appId, dev.version_ids?.brand_id, dev.version_ids?.model_id, modelSelector),
       )
     }
-    trackEntityAccess(END_DEVICE, combineDeviceIds(appId, deviceId))
     if (startStream) {
       dispatch(devices.startDeviceEventsStream(dev.ids))
     }
@@ -110,6 +105,18 @@ const updateDeviceLogic = createRequestLogic(
   },
   devices.updateDeviceSuccess,
 )
+
+const deleteDeviceLogic = createRequestLogic({
+  type: devices.DELETE_DEV,
+  process: async ({ action }) => {
+    const {
+      payload: { appId, deviceId },
+    } = action
+    await tts.Applications.Devices.deleteById(appId, deviceId)
+
+    return { appId, deviceId, id: combineDeviceIds(appId, deviceId) }
+  },
+})
 
 const getDevicesListLogic = createRequestLogic({
   type: devices.GET_DEVICES_LIST,
@@ -225,6 +232,7 @@ export default [
   getDeviceLogic,
   resetDeviceLogic,
   updateDeviceLogic,
+  deleteDeviceLogic,
   getDeviceSessionLogic,
   resetUsedDevNoncesLogic,
   ...createEventsConnectLogics(devices.SHARED_NAME, 'devices', tts.Applications.Devices.openStream),

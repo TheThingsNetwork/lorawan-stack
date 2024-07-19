@@ -33,7 +33,6 @@ describe('Applications reducer', () => {
     entities: {},
     derived: {},
     selectedApplication: null,
-    applicationDeviceCounts: {},
     mqtt: {},
   }
 

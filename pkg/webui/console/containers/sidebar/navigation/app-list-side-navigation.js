@@ -15,17 +15,17 @@
 import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 
-import { selectUserId } from '@console/store/selectors/logout'
-import { selectPerEntityBookmarks } from '@console/store/selectors/user-preferences'
+import { APPLICATION } from '@console/constants/entities'
+
+import { selectApplicationTopEntities } from '@console/store/selectors/top-entities'
 
 import SidebarContext from '../context'
 
 import TopEntitiesSection from './top-entities-section'
 
 const AppListSideNavigation = () => {
-  const topEntities = useSelector(selectPerEntityBookmarks('application'))
+  const topEntities = useSelector(selectApplicationTopEntities)
   const { isMinimized } = useContext(SidebarContext)
-  const userId = useSelector(selectUserId)
 
   if (isMinimized || topEntities.length === 0) {
     // Rendering an empty div to prevent the shadow of the search bar
@@ -34,7 +34,7 @@ const AppListSideNavigation = () => {
     return <div />
   }
 
-  return <TopEntitiesSection topEntities={topEntities} userId={userId} entity="application" />
+  return <TopEntitiesSection topEntities={topEntities} type={APPLICATION} />
 }
 
 export default AppListSideNavigation

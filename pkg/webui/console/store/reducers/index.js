@@ -65,6 +65,7 @@ import packetBroker from './packet-broker'
 import ns from './network-server'
 import notifications from './notifications'
 import userPreferences from './user-preferences'
+import recencyFrequencyItems from './recency-frequency-items'
 import topEntities from './top-entities'
 import search from './search'
 
@@ -128,5 +129,6 @@ export default combineReducers({
   notifications,
   userPreferences,
   search,
+  recencyFrequencyItems,
   topEntities,
 })

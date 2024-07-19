@@ -45,6 +45,17 @@ const ENTITY = 'applications'
 export const selectApplicationStore = state => state.applications
 export const selectApplicationEntitiesStore = state => selectApplicationStore(state).entities
 export const selectApplicationDerivedStore = state => selectApplicationStore(state).derived
+export const selectApplicationCombinedStore = createSelector(
+  [selectApplicationEntitiesStore, selectApplicationDerivedStore],
+  (entities, derived) =>
+    Object.keys(entities).reduce((acc, id) => {
+      acc[id] = {
+        ...entities[id],
+        ...derived[id],
+      }
+      return acc
+    }, {}),
+)
 export const selectApplicationDerivedById = (state, id) => selectApplicationDerivedStore(state)[id]
 export const selectApplicationById = (state, id) => selectApplicationEntitiesStore(state)[id]
 export const selectSelectedApplicationId = state =>
@@ -56,9 +67,7 @@ export const selectSelectedApplication = state =>
 export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)
 export const selectApplicationError = createErrorSelector(GET_APP_BASE)
 export const selectApplicationDeviceCount = (state, id) =>
-  selectApplicationStore(state).applicationDeviceCounts[id]
-export const selectApplicationDeviceCounts = state =>
-  selectApplicationStore(state).applicationDeviceCounts
+  selectApplicationDerivedById(state, id)?.deviceCount
 export const selectApplicationDeviceCountFetching = createFetchingSelector(GET_APP_DEV_COUNT_BASE)
 export const selectApplicationDeviceCountError = createErrorSelector(GET_APP_DEV_COUNT_BASE)
 export const selectApplicationDerivedLastSeen = (state, id) =>
@@ -76,11 +85,11 @@ export const selectApplications = createSelector(
 )
 export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
 export const selectApplicationsWithDeviceCounts = createSelector(
-  [selectApplications, selectApplicationDeviceCounts],
-  (applications, deviceCounts) =>
+  [selectApplications, selectApplicationDerivedStore],
+  (applications, derived) =>
     applications.map(app => ({
       ...app,
-      _devices: deviceCounts[app.ids.application_id],
+      _devices: derived[app.ids.application_id]?.deviceCount,
     })),
 )
 

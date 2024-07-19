@@ -64,7 +64,7 @@ export const [
 ] = createRequestActions(
   GET_APP_BASE,
   id => ({ id }),
-  (id, selector) => ({ selector }),
+  (id, selector, options = {}) => ({ selector, options }),
 )
 
 export const ISSUE_DEV_EUI_BASE = 'ISSUE_DEV_EUI'

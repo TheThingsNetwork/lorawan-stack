@@ -234,7 +234,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
               <div className={style.rightHeaderColumn}>
                 <LastSeen
                   statusClassName={style.receivedStatus}
-                  message={m.received}
+                  message={sharedMessages.received}
                   lastSeen={event?.time}
                   short
                   displayMessage
