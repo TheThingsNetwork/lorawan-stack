@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
@@ -34,9 +34,6 @@ import LatestDecodedPayloadPanel from '@console/containers/latest-decoded-payloa
 import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
-import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
-import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 
 import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
@@ -50,12 +47,7 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 const m = defineMessages({
   failedAccessOtherHostDevice:
     'The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
-  downloadMacData: 'Download MAC data',
-  macStateError: 'There was an error and MAC state could not be included in the MAC data.',
 })
-
-const nsHost = getHostFromUrl(selectNsConfig().base_url)
-const nsEnabled = selectNsConfig().enabled
 
 const DeviceOverview = () => {
   const appId = useSelector(selectSelectedApplicationId)
@@ -64,35 +56,6 @@ const DeviceOverview = () => {
   const frequencyPlans = useSelector(selectNsFrequencyPlans)
   const combinedId = combineDeviceIds(appId, device.ids.device_id)
   const events = useSelector(state => selectDeviceEvents(state, combinedId))
-
-  const onExport = useCallback(async () => {
-    const { ids, mac_settings, session, network_server_address } = device
-
-    let result
-    if (session && nsEnabled && getHostFromUrl(network_server_address) === nsHost) {
-      try {
-        result = await tts.Applications.Devices.getById(appId, ids.device_id, ['mac_state'])
-
-        if (!('mac_state' in result)) {
-          toast({
-            title: m.downloadMacData,
-            message: m.macStateError,
-            type: toast.types.ERROR,
-          })
-        }
-      } catch {
-        toast({
-          title: m.downloadMacData,
-          message: m.macStateError,
-          type: toast.types.ERROR,
-        })
-      }
-    }
-
-    const toExport = { mac_state: result?.mac_state, mac_settings }
-    const toExportData = composeDataUri(JSON.stringify(toExport, undefined, 2))
-    downloadDataUriAsFile(toExportData, `${ids.device_id}_mac_data_${Date.now()}.json`)
-  }, [appId, device])
 
   useBreadcrumbs(
     'apps.single.devices.single.overview',

@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages, FormattedNumber } from 'react-intl'
 import classnames from 'classnames'
 
+import tts from '@console/api/tts'
+
 import Icon, {
   IconMenu2,
   IconStar,
@@ -29,6 +31,7 @@ import toast from '@ttn-lw/components/toast'
 import Tooltip from '@ttn-lw/components/tooltip'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Status from '@ttn-lw/components/status'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -39,6 +42,9 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
+import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
+import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 import {
   ADD_BOOKMARK_BASE,
@@ -68,7 +74,12 @@ const m = defineMessages({
     'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}',
   noActivityTooltip:
     'The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.',
+  downloadMacData: 'Download MAC data',
+  macStateError: 'There was an error and MAC state could not be included in the MAC data.',
 })
+
+const nsHost = getHostFromUrl(selectNsConfig().base_url)
+const nsEnabled = selectNsConfig().enabled
 
 const DeviceOverviewHeader = ({ device }) => {
   const dispatch = useDispatch()
@@ -150,6 +161,41 @@ const DeviceOverviewHeader = ({ device }) => {
     }
   }, [dispatch, device_id, ids, isBookmarked, user.ids])
 
+  const onExport = useCallback(async () => {
+    const { ids, mac_settings, session, network_server_address } = device
+
+    let result
+    if (session && nsEnabled && getHostFromUrl(network_server_address) === nsHost) {
+      try {
+        result = await tts.Applications.Devices.getById(appId, ids.device_id, ['mac_state'])
+
+        if (!('mac_state' in result)) {
+          toast({
+            title: m.downloadMacData,
+            message: m.macStateError,
+            type: toast.types.ERROR,
+          })
+        }
+      } catch {
+        toast({
+          title: m.downloadMacData,
+          message: m.macStateError,
+          type: toast.types.ERROR,
+        })
+      }
+    }
+
+    const toExport = { mac_state: result?.mac_state, mac_settings }
+    const toExportData = composeDataUri(JSON.stringify(toExport, undefined, 2))
+    downloadDataUriAsFile(toExportData, `${ids.device_id}_mac_data_${Date.now()}.json`)
+  }, [appId, device])
+
+  const menuDropdownItems = (
+    <>
+      <Dropdown.Item title={m.downloadMacData} action={onExport} />
+    </>
+  )
+
   return (
     <div className={style.root}>
       <div>
@@ -227,7 +273,7 @@ const DeviceOverviewHeader = ({ device }) => {
             secondary
             icon={IconMenu2}
             noDropdownIcon
-            dropdownItems={[]}
+            dropdownItems={menuDropdownItems}
             dropdownPosition="below left"
           />
         </div>
