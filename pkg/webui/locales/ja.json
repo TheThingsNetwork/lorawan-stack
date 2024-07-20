@@ -2415,6 +2415,7 @@
   "error:pkg/networkserver:schedule": "全てのスケジュールされたダウンリンクが失敗に終わりました",
   "error:pkg/networkserver:transmission": "ダウンリンク伝送が結果 `{result}` で失敗しました",
   "error:pkg/networkserver:unknown_mac_state": "不明なMAC状態",
+  "error:pkg/networkserver:unknown_mac_version": "",
   "error:pkg/networkserver:unknown_nwk_s_enc_key": "不明なNwkSEncKey",
   "error:pkg/networkserver:unknown_s_nwk_s_int_key": "不明なSNwkSIntKey",
   "error:pkg/networkserver:unknown_session": "不明なセッション",

@@ -8162,6 +8162,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:unknown_mac_version": {
+    "translations": {
+      "en": "MAC version is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:unknown_nwk_s_enc_key": {
     "translations": {
       "en": "NwkSEncKey is unknown"

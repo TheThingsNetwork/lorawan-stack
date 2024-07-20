@@ -40,10 +40,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Fix potential issue with application event stream stopping after showing initial events.
-- Fix storybook compiling issue.
-- Fixed an issue where an downlink message was scheduled by the Application Layer Clock Synchronization (ALCS) implementation when there is no answer to send (i.e. `AnsRequired` is not set and the difference with what the end device reports falls within the threshold).
-
+- Potential issue with application event stream stopping after showing initial events.
+- Storybook compiling issue.
+- Issue where an downlink message was scheduled by the Application Layer Clock Synchronization (ALCS) implementation when there is no answer to send (i.e. `AnsRequired` is not set and the difference with what the end device reports falls within the threshold).
+- Error log level and reporting when an end device attempts to join that does not have a MAC version set. Instead, the Network Server now publishes a drop join-request event.
 
 ## [3.30.2] - 2024-06-11
 
