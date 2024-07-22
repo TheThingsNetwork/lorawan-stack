@@ -161,27 +161,29 @@ const DeviceInfoPanel = ({ events }) => {
                 )}
                 {/* Battery */}
               </div>
-              {model ? (
+              {model && (model.product_url || model.datasheet_url) && (
                 <ButtonGroup align="start" className={style.buttonGroup}>
-                  <Button.AnchorLink
-                    secondary
-                    href={model.product_url}
-                    target="_blank"
-                    message={m.deviceWebsite}
-                    icon={IconWorld}
-                    className={style.button}
-                  />
-                  <Button.AnchorLink
-                    secondary
-                    href={model.datasheet_url}
-                    target="_blank"
-                    message={sharedMessages.dataSheet}
-                    icon={IconFileAnalytics}
-                    className={style.button}
-                  />
+                  {model.product_url && (
+                    <Button.AnchorLink
+                      secondary
+                      href={model.product_url}
+                      target="_blank"
+                      message={m.deviceWebsite}
+                      icon={IconWorld}
+                      className={style.button}
+                    />
+                  )}
+                  {model.datasheet_url && (
+                    <Button.AnchorLink
+                      secondary
+                      href={model.datasheet_url}
+                      target="_blank"
+                      message={sharedMessages.dataSheet}
+                      icon={IconFileAnalytics}
+                      className={style.button}
+                    />
+                  )}
                 </ButtonGroup>
-              ) : (
-                <Spinner after={0} micro center faded />
               )}
             </div>
           </div>
