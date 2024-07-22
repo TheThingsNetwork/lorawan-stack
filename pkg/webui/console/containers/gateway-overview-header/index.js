@@ -34,7 +34,7 @@ import Message from '@ttn-lw/lib/components/message'
 import LastSeen from '@console/components/last-seen'
 
 import GatewayConnection from '@console/containers/gateway-connection'
-import DeleteGatewayModal from '@console/containers/delete-gateway-modal'
+import DeleteEntityHeaderModal from '@console/containers/delete-entity-header-modal'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -42,7 +42,12 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
-import { checkFromState, mayDeleteGateway } from '@console/lib/feature-checks'
+import {
+  checkFromState,
+  mayDeleteGateway,
+  mayViewOrEditGatewayApiKeys,
+  mayViewOrEditGatewayCollaborators,
+} from '@console/lib/feature-checks'
 
 import {
   ADD_BOOKMARK_BASE,
@@ -50,6 +55,7 @@ import {
   DELETE_BOOKMARK_BASE,
   deleteBookmark,
 } from '@console/store/actions/user-preferences'
+import { deleteGateway } from '@console/store/actions/gateways'
 
 import { selectUser } from '@console/store/selectors/logout'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
@@ -170,11 +176,20 @@ const GatewayOverviewHeader = ({ gateway }) => {
             dropdownPosition="below left"
           />
         </div>
-        <DeleteGatewayModal
-          gtwId={gateway_id}
-          gtwName={name}
+        <DeleteEntityHeaderModal
+          entity="gateway"
+          entityId={gateway_id}
+          entityName={name}
           setVisible={setDeleteGatewayVisible}
           visible={deleteGatewayVisible}
+          mayDeleteEntitySelector={mayDeleteGateway}
+          mayViewOrEditEntityCollaborators={mayViewOrEditGatewayCollaborators}
+          mayViewOrEditEntityApiKeys={mayViewOrEditGatewayApiKeys}
+          path="/gateways"
+          deleteEntity={deleteGateway}
+          deleteMessage={sharedMessages.deleteGateway}
+          deletedMessage={sharedMessages.gatewayDeleted}
+          deletedErrorMessage={sharedMessages.gatewayDeleteError}
         />
       </div>
     </div>
