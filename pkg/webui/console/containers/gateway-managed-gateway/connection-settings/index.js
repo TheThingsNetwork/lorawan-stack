@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Col, Row } from 'react-grid-system'
@@ -40,6 +40,7 @@ import {
 import WifiSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/wifi-settings-form-fields'
 import EthernetSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/ethernet-settings-form-fields'
 import ManagedGatewayConnections from '@console/containers/gateway-managed-gateway/connection-settings/connections'
+import useConnectionsData from '@console/containers/gateway-managed-gateway/connection-settings/use-connections-data'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
@@ -82,6 +83,13 @@ const GatewayConnectionSettings = () => {
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
 
+  const connectionsData = useConnectionsData()
+
+  const [initialValues, setInitialValues] = useState({
+    wifi_profile: { ...initialWifiProfile },
+    ethernet_profile: { ...initialEthernetProfile },
+  })
+
   const hasWifiProfileSet = Boolean(selectedManagedGateway.wifi_profile_id)
 
   useBreadcrumbs(
@@ -98,13 +106,13 @@ const GatewayConnectionSettings = () => {
       try {
         const { wifi_profile, ethernet_profile } = values
         if (wifi_profile.profile.includes('shared')) {
-          const { profile, _profileOf, _connection_type, ...wifiProfile } = wifi_profile
+          const { profile, _profile_of, _connection_type, ...wifiProfile } = wifi_profile
           const normalizedWifiProfile = normalizeWifiProfile(wifiProfile, profile === 'shared')
           const {
             data: { profile_id: wifi_profile_id },
           } = await dispatch(
             attachPromise(
-              createConnectionProfile(_profileOf, CONNECTION_TYPES.WIFI, normalizedWifiProfile),
+              createConnectionProfile(_profile_of, CONNECTION_TYPES.WIFI, normalizedWifiProfile),
             ),
           )
           console.log(wifi_profile_id)
@@ -141,14 +149,6 @@ const GatewayConnectionSettings = () => {
       }
     },
     [dispatch, selectedGateway.name],
-  )
-
-  const initialValues = useMemo(
-    () => ({
-      wifi_profile: { ...initialWifiProfile },
-      ethernet_profile: { ...initialEthernetProfile },
-    }),
-    [],
   )
 
   const loadData = useCallback(
@@ -196,6 +196,17 @@ const GatewayConnectionSettings = () => {
             }
           }
         }
+        setInitialValues(oldValues => ({
+          ...oldValues,
+          ...(!Boolean(wifiProfile) &&
+            hasWifiProfileSet && {
+              wifi_profile: {
+                ...oldValues.wifi_profile,
+                _override: true,
+                _profile_of: entityId,
+              },
+            }),
+        }))
       }
     },
     [
@@ -220,7 +231,10 @@ const GatewayConnectionSettings = () => {
             validationSchema={validationSchema}
           >
             <>
-              <WifiSettingsFormFields />
+              <WifiSettingsFormFields
+                initialValues={initialValues}
+                isWifiConnected={connectionsData.isWifiConnected}
+              />
               <EthernetSettingsFormFields />
 
               <SubmitBar className="mb-cs-l">
@@ -234,7 +248,7 @@ const GatewayConnectionSettings = () => {
           </Form>
         </Col>
         <Col lg={4} md={6} sm={12}>
-          <ManagedGatewayConnections />
+          <ManagedGatewayConnections connectionsData={connectionsData} />
         </Col>
       </Row>
     </RequireRequest>

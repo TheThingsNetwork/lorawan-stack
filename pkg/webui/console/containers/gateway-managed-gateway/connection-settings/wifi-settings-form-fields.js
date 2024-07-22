@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
+import { isEqual, omit } from 'lodash'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
 import Icon from '@ttn-lw/components/icon'
+import Notification from '@ttn-lw/components/notification'
+import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -29,6 +32,7 @@ import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/sh
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getConnectionProfilesList } from '@console/store/actions/connection-profiles'
 
@@ -39,22 +43,35 @@ const m = defineMessages({
   profileDescription: 'Connection settings profiles can be shared within the same organization',
   wifiConnection: 'WiFi connection',
   selectAProfile: 'Select a profile',
-  connected: 'The gateway {connection} successfully connected using this profile',
-  unableToConnect: 'The gateway {connection} is currently unable to connect using this profile',
-  attemptingToConnect:
-    'The gateway {connection} is currently attempting to connect using this profile',
-  saveToConnect:
-    'Please click "Save changes" to start using this {connection} profile for the gateway',
+  connected: 'The gateway WiFi successfully connected using this profile',
+  connectedCollaborator: "The gateway WiFi successfully connected using a collaborator's profile",
+  unableToConnect: 'The gateway WiFi is currently unable to connect using this profile',
+  unableToConnectCollaborator:
+    "The gateway WiFi is currently unable to connect using  a collaborator's profile",
+  attemptingToConnect: 'The gateway WiFi is currently attempting to connect using this profile',
+  saveToConnect: 'Please click "Save changes" to start using this WiFi profile for the gateway',
   createNewSharedProfile: 'Create a new shared profile',
   setAConfigForThisGateway: 'Set a config for this gateway only',
+  notificationContent:
+    'This gateway already has a WiFi profile set by another collaborator. If wished, you can override this profile below.',
+  overrideProfile: 'Override this profile',
 })
 
-const WifiSettingsFormFields = () => {
+const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
   const { values, setValues } = useFormContext()
   const dispatch = useDispatch()
 
   const profiles = useSelector(state =>
     selectConnectionProfilesByType(state, CONNECTION_TYPES.WIFI),
+  )
+
+  const hasChanged = useMemo(
+    () =>
+      !isEqual(
+        omit(values.wifi_profile, ['_profile_of', '_override']),
+        omit(initialValues.wifi_profile, ['_profile_of', '_override']),
+      ),
+    [initialValues, values],
   )
 
   const profileOptions = [
@@ -69,20 +86,27 @@ const WifiSettingsFormFields = () => {
   const isConnected = 0
 
   const connectionStatus = useMemo(() => {
-    if (isConnected === 1) {
+    if (hasChanged) {
+      return { message: m.saveToConnect, icon: 'more_horiz' }
+    }
+    if (isWifiConnected) {
+      if (values.wifi_profile._override) {
+        return { message: m.connectedCollaborator, icon: 'valid' }
+      }
       return { message: m.connected, icon: 'valid' }
     }
-    if (isConnected === 2) {
+    if (!isWifiConnected) {
+      if (values.wifi_profile._override) {
+        return { message: m.unableToConnectCollaborator, icon: 'cancel' }
+      }
       return { message: m.unableToConnect, icon: 'cancel' }
     }
     if (isConnected === 3) {
       return { message: m.attemptingToConnect, icon: 'more_horiz' }
     }
-    if (isConnected === 4) {
-      return { message: m.saveToConnect, icon: 'more_horiz' }
-    }
+
     return null
-  }, [])
+  }, [hasChanged, isWifiConnected, values.wifi_profile._override])
 
   const handleChangeProfile = useCallback(
     async value => {
@@ -93,6 +117,7 @@ const WifiSettingsFormFields = () => {
           profile_id: '',
         },
       }))
+
       await dispatch(
         attachPromise(
           getConnectionProfilesList({
@@ -104,46 +129,86 @@ const WifiSettingsFormFields = () => {
     },
     [dispatch, setValues],
   )
+
+  const handleOverrideProfile = useCallback(
+    () =>
+      setValues(oldValues => ({
+        ...oldValues,
+        wifi_profile: {
+          ...oldValues.wifi_profile,
+          _override: false,
+        },
+      })),
+    [setValues],
+  )
+
   return (
     <>
       <Message component="h3" content={m.wifiConnection} />
-      <div className="d-flex al-center gap-cs-m">
-        <ShowProfilesSelect name={`wifi_profile._profileOf`} onChange={handleChangeProfile} />
-        {Boolean(values.wifi_profile._profileOf) && (
-          <RequireRequest
-            requestAction={getConnectionProfilesList({
-              entityId: values.wifi_profile._profileOf,
-              type: CONNECTION_TYPES.WIFI,
-            })}
-          >
-            <Form.Field
-              name={`wifi_profile.profile_id`}
-              title={m.settingsProfile}
-              component={Select}
-              options={profileOptions}
-              tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
-              placeholder={m.selectAProfile}
-            />
-          </RequireRequest>
-        )}
-      </div>
-      <Message component="div" content={m.profileDescription} className="tc-subtle-gray mb-cs-m" />
-      {values.wifi_profile.profile_id.includes('shared') && (
-        <GatewayWifiProfilesFormFields namePrefix={`wifi_profile.`} />
+      {!values.wifi_profile._override ? (
+        <>
+          <div className="d-flex al-center gap-cs-m">
+            <ShowProfilesSelect name={`wifi_profile._profile_of`} onChange={handleChangeProfile} />
+            {Boolean(values.wifi_profile._profile_of) && (
+              <RequireRequest
+                requestAction={getConnectionProfilesList({
+                  entityId: values.wifi_profile._profile_of,
+                  type: CONNECTION_TYPES.WIFI,
+                })}
+              >
+                <Form.Field
+                  name={`wifi_profile.profile_id`}
+                  title={m.settingsProfile}
+                  component={Select}
+                  options={profileOptions}
+                  tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
+                  placeholder={m.selectAProfile}
+                />
+              </RequireRequest>
+            )}
+          </div>
+          <Message
+            component="div"
+            content={m.profileDescription}
+            className="tc-subtle-gray mb-cs-m"
+          />
+          {values.wifi_profile.profile_id.includes('shared') && (
+            <GatewayWifiProfilesFormFields namePrefix={`wifi_profile.`} />
+          )}
+        </>
+      ) : (
+        <>
+          <Notification info small content={m.notificationContent} />
+          <Button
+            type="button"
+            className="mb-cs-m"
+            message={m.overrideProfile}
+            onClick={handleOverrideProfile}
+          />
+        </>
       )}
+
       {connectionStatus !== null && (
         <div className="d-flex al-center gap-cs-xs">
           <Icon icon={connectionStatus.icon} />
-          <Message
-            content={connectionStatus.message}
-            values={{
-              connection: m[values.wifi_profile._connection_type].defaultMessage,
-            }}
-          />
+          <Message content={connectionStatus.message} />
         </div>
       )}
     </>
   )
+}
+
+WifiSettingsFormFields.propTypes = {
+  initialValues: PropTypes.shape({
+    wifi_profile: PropTypes.shape({
+      _override: PropTypes.bool,
+    }),
+  }).isRequired,
+  isWifiConnected: PropTypes.bool,
+}
+
+WifiSettingsFormFields.defaultProps = {
+  isWifiConnected: false,
 }
 
 export default WifiSettingsFormFields

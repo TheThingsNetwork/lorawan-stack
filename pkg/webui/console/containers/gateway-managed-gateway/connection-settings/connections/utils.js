@@ -43,8 +43,6 @@ export const getConnectionType = type => {
   return null
 }
 
-export const isConnected = type => type && type !== NETWORK_INTERFACE_STATUS.UNSPECIFIED
-
 export const connectionMessageMap = {
   [CONNECTION_TYPES.CELLULAR]: m.cellular,
   [CONNECTION_TYPES.WIFI]: m.wifi,

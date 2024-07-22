@@ -22,7 +22,7 @@ export const initialWifiProfile = {
   profile_name: '',
   profile_id: '',
   shared: true,
-  _profileOf: '',
+  _profile_of: '',
   ssid: '',
   password: '',
   _access_point: {
@@ -44,7 +44,7 @@ export const initialWifiProfile = {
 }
 
 export const normalizeWifiProfile = (profile, shared = true) => {
-  const { _profileOf, _access_point, _default_network_interface, ...rest } = profile
+  const { _profile_of, _access_point, _default_network_interface, ...rest } = profile
 
   if (_default_network_interface) {
     rest.network_interface_addresses = undefined

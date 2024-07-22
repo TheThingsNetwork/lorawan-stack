@@ -23,11 +23,15 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 export const validationSchema = Yup.object().shape({
   wifi_profile: Yup.object()
     .shape({
-      profile_id: Yup.string().required(sharedMessages.validateRequired),
+      _override: Yup.boolean().default(false),
+      profile_id: Yup.string().when('_override', {
+        is: false,
+        then: schema => schema.required(sharedMessages.validateRequired),
+      }),
     })
-    .when('profile_id', {
+    .when('.profile_id', {
       is: profileId => profileId && profileId.includes('shared'),
-      then: wifiValidationSchema,
+      then: schema => schema.concat(wifiValidationSchema),
     }),
   ethernet_profile: ethernetValidationSchema,
 })

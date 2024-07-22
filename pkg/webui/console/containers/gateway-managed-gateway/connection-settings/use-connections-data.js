@@ -16,7 +16,11 @@ import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useMemo } from 'react'
 
+import { NETWORK_INTERFACE_STATUS } from '@console/containers/gateway-managed-gateway/connection-settings/connections/utils'
+
 import { selectGatewayEvents } from '@console/store/selectors/gateways'
+
+const isConnected = type => type && type !== NETWORK_INTERFACE_STATUS.UNSPECIFIED
 
 const useConnectionsData = () => {
   const { gtwId } = useParams()
@@ -52,6 +56,12 @@ const useConnectionsData = () => {
     [events],
   )
 
+  const isCellularConnected = isConnected(cellularBackhaul?.network_interface?.status)
+
+  const isWifiConnected = isConnected(wifiBackhaul?.network_interface?.status)
+
+  const isEthernetConnected = isConnected(ethernetBackhaul?.network_interface?.status)
+
   return {
     systemStatus,
     controllerConnection,
@@ -60,6 +70,9 @@ const useConnectionsData = () => {
     wifiBackhaul,
     ethernetBackhaul,
     updatedManagedGateway,
+    isCellularConnected,
+    isWifiConnected,
+    isEthernetConnected,
   }
 }
 

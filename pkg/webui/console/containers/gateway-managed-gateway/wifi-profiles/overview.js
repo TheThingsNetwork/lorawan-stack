@@ -67,7 +67,7 @@ const GatewayWifiProfilesOverview = () => {
   )
 
   const onAddProfile = useCallback(() => {
-    navigate(`add?profileOf=${formRef.current.values._profileOf}`)
+    navigate(`add?profileOf=${formRef.current.values._profile_of}`)
   }, [navigate])
 
   const handleEdit = React.useCallback(
@@ -115,12 +115,12 @@ const GatewayWifiProfilesOverview = () => {
         getValue: row => ({
           id: row.profile_id,
           name: row.profile_name,
-          edit: handleEdit.bind(null, row.profile_id, formRef.current.values._profileOf),
+          edit: handleEdit.bind(null, row.profile_id, formRef.current.values._profile_of),
           delete: handleDelete.bind(
             null,
             row.profile_id,
             row.profile_name,
-            formRef.current.values._profileOf,
+            formRef.current.values._profile_of,
           ),
         }),
         render: details => (
@@ -154,7 +154,7 @@ const GatewayWifiProfilesOverview = () => {
   const getItemsAction = useCallback(
     () =>
       getConnectionProfilesList({
-        entityId: formRef.current.values._profileOf,
+        entityId: formRef.current.values._profile_of,
         type: CONNECTION_TYPES.WIFI,
       }),
     [],
@@ -200,14 +200,14 @@ const GatewayWifiProfilesOverview = () => {
       />
       <Form
         initialValues={{
-          _profileOf: '',
+          _profile_of: '',
         }}
         formikRef={formRef}
       >
         {({ values }) => (
           <>
             <div className="d-flex j-between al-end gap-cs-m">
-              <ShowProfilesSelect name="_profileOf" onChange={handleChangeProfile} />
+              <ShowProfilesSelect name="_profile_of" onChange={handleChangeProfile} />
               <Button
                 className="mb-cs-m"
                 primary
@@ -216,7 +216,7 @@ const GatewayWifiProfilesOverview = () => {
                 icon="add"
               />
             </div>
-            {Boolean(values._profileOf) && (
+            {Boolean(values._profile_of) && (
               <FetchTable
                 entity="connectionProfiles"
                 defaultOrder="ssid"

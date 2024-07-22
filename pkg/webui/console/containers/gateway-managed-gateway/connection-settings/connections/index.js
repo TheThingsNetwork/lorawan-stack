@@ -30,12 +30,11 @@ import {
   getDetails,
   getEthernetDetails,
   getWifiDetails,
-  isConnected,
   NETWORK_INTERFACE_TYPES,
 } from '@console/containers/gateway-managed-gateway/connection-settings/connections/utils'
-import useConnectionsData from '@console/containers/gateway-managed-gateway/connection-settings/connections/use-connections-data'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { selectSelectedManagedGateway } from '@console/store/selectors/gateways'
 
@@ -43,7 +42,7 @@ import m from './messages'
 
 import style from './connections.styl'
 
-const ManagedGatewayConnections = () => {
+const ManagedGatewayConnections = ({ connectionsData }) => {
   const selectedManagedGateway = useSelector(selectSelectedManagedGateway)
   const {
     systemStatus,
@@ -53,7 +52,10 @@ const ManagedGatewayConnections = () => {
     wifiBackhaul,
     ethernetBackhaul,
     updatedManagedGateway,
-  } = useConnectionsData()
+    isCellularConnected,
+    isWifiConnected,
+    isEthernetConnected,
+  } = connectionsData
 
   const gatewayControllerConnection =
     controllerConnection?.network_interface_type ?? NETWORK_INTERFACE_TYPES.UNSPECIFIED
@@ -64,12 +66,6 @@ const ManagedGatewayConnections = () => {
     gatewayControllerConnection !== NETWORK_INTERFACE_TYPES.UNSPECIFIED
   const serverConnectionIsSpecified =
     gatewayServerConnection !== NETWORK_INTERFACE_TYPES.UNSPECIFIED
-
-  const isCellularConnected = isConnected(cellularBackhaul?.network_interface?.status)
-
-  const isWifiConnected = isConnected(wifiBackhaul?.network_interface?.status)
-
-  const isEthernetConnected = isConnected(ethernetBackhaul?.network_interface?.status)
 
   const cellularDetails = isEthernetConnected && getCellularDetails(cellularBackhaul)
 
@@ -186,6 +182,21 @@ const ManagedGatewayConnections = () => {
       {isEthernetConnected && getDetails(getEthernetDetails(ethernetBackhaul))}
     </div>
   )
+}
+
+ManagedGatewayConnections.propTypes = {
+  connectionsData: PropTypes.shape({
+    systemStatus: PropTypes.object,
+    controllerConnection: PropTypes.object,
+    serverConnection: PropTypes.object,
+    cellularBackhaul: PropTypes.object,
+    wifiBackhaul: PropTypes.object,
+    ethernetBackhaul: PropTypes.object,
+    updatedManagedGateway: PropTypes.object,
+    isCellularConnected: PropTypes.bool,
+    isWifiConnected: PropTypes.bool,
+    isEthernetConnected: PropTypes.bool,
+  }).isRequired,
 }
 
 export default ManagedGatewayConnections
