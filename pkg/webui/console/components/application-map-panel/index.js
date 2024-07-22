@@ -16,12 +16,15 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { isEmpty, isPlainObject } from 'lodash'
 import { defineMessages } from 'react-intl'
+import { useParams } from 'react-router-dom'
 
 import { END_DEVICE } from '@console/constants/entities'
 
+import { getApplicationId } from '@ttn-lw/lib/selectors/id'
+
 import locationToMarkers from '@console/lib/location-to-markers'
 
-import { selectDevices } from '@console/store/selectors/devices'
+import { selectDeviceEntitiesStore } from '@console/store/selectors/devices'
 
 import MapPanel from '../map-panel'
 
@@ -30,7 +33,14 @@ const m = defineMessages({
 })
 
 const ApplicationMapPanel = () => {
-  const devices = useSelector(selectDevices)
+  const { appId } = useParams()
+  const deviceEntities = useSelector(selectDeviceEntitiesStore)
+
+  // Select devices from current application
+  const devices = useMemo(
+    () => Object.values(deviceEntities).filter(device => getApplicationId(device) === appId),
+    [appId, deviceEntities],
+  )
 
   const markers = useMemo(() => {
     const m = []
