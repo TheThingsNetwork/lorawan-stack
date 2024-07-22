@@ -22,6 +22,8 @@ import Form, { useFormContext } from '@ttn-lw/components/form'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
+import { getValuesNormalized } from '@console/containers/gateway-managed-gateway/shared/utils'
+
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { selectCollaboratorsEntitiesStore } from '@ttn-lw/lib/store/selectors/collaborators'
 import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
@@ -39,7 +41,7 @@ const m = defineMessages({
 })
 
 const ShowProfilesSelect = ({ name, ...rest }) => {
-  const { setFieldValue } = useFormContext()
+  const { values, setFieldValue } = useFormContext()
   const organizations = useSelector(selectOrganizationEntitiesStore)
   const collaborators = useSelector(selectCollaboratorsEntitiesStore)
   const userId = useSelector(selectUserId)
@@ -48,13 +50,17 @@ const ShowProfilesSelect = ({ name, ...rest }) => {
     checkFromState(mayViewOrganizationsOfUser, state),
   )
 
+  const value = getValuesNormalized(name, values)
+
   useEffect(() => {
-    const collaboratorIds = Object.keys(collaborators)
-    setFieldValue(
-      name,
-      collaboratorIds.length && collaboratorIds[0] !== userId ? collaboratorIds[0] : userId,
-    )
-  }, [collaborators, name, setFieldValue, userId])
+    if (!Boolean(value)) {
+      const collaboratorIds = Object.keys(collaborators)
+      setFieldValue(
+        name,
+        collaboratorIds.length && collaboratorIds[0] !== userId ? collaboratorIds[0] : userId,
+      )
+    }
+  }, [collaborators, name, setFieldValue, userId, value])
 
   const profileOptions = [
     { value: userId, label: m.yourself },

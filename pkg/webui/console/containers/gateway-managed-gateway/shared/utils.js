@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useMemo } from 'react'
+
 export const CONNECTION_TYPES = Object.freeze({
   CELLULAR: 'cellular',
   WIFI: 'wifi',
@@ -41,6 +43,20 @@ export const initialWifiProfile = {
     gateway: '',
     dns_servers: [],
   },
+}
+
+export const getValuesNormalized = (namePrefix, values) => {
+  if (!namePrefix) return values
+  let name = namePrefix
+  if (namePrefix.endsWith('.')) {
+    name = name.slice(0, -1)
+  }
+  const nameSplitted = name.split('.')
+  let result = values
+  nameSplitted.forEach(part => {
+    result = result[isNaN(part) ? part : Number(part)]
+  })
+  return result
 }
 
 export const normalizeWifiProfile = (profile, shared = true) => {

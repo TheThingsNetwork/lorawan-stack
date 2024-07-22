@@ -55,6 +55,7 @@ import {
   GET_ACCESS_POINTS_BASE,
   getConnectionProfile,
 } from '@console/store/actions/connection-profiles'
+import { updateManagedGateway } from '@console/store/actions/gateways'
 
 import {
   selectSelectedGateway,
@@ -68,6 +69,11 @@ const m = defineMessages({
   updateSuccess: 'Connection settings updated',
   updateFailure: 'There was an error updating these connection settings',
 })
+
+const initialFormState = {
+  wifi_profile: { ...initialWifiProfile },
+  ethernet_profile: { ...initialEthernetProfile },
+}
 
 const GatewayConnectionSettings = () => {
   const { gtwId } = useParams()
@@ -85,10 +91,8 @@ const GatewayConnectionSettings = () => {
 
   const connectionsData = useConnectionsData()
 
-  const [initialValues, setInitialValues] = useState({
-    wifi_profile: { ...initialWifiProfile },
-    ethernet_profile: { ...initialEthernetProfile },
-  })
+  const [initialValues, setInitialValues] = useState(initialFormState)
+  const [attemptWifiConnect, setAttemptWifiConnect] = useState(false)
 
   const hasWifiProfileSet = Boolean(selectedManagedGateway.wifi_profile_id)
 
@@ -100,26 +104,53 @@ const GatewayConnectionSettings = () => {
     />,
   )
 
+  const handleAttemptToConnectToWifi = useCallback(() => {
+    setAttemptWifiConnect(true)
+    setTimeout(() => setAttemptWifiConnect(false), 60000)
+  }, [])
+
   const handleSubmit = useCallback(
-    async (values, { setSubmitting }) => {
+    async (values, { setSubmitting, resetForm }) => {
       setError(undefined)
       try {
         const { wifi_profile, ethernet_profile } = values
-        if (wifi_profile.profile.includes('shared')) {
-          const { profile, _profile_of, _connection_type, ...wifiProfile } = wifi_profile
-          const normalizedWifiProfile = normalizeWifiProfile(wifiProfile, profile === 'shared')
+        const { profile_id, _profile_of: wifiEntityId, ...wifiProfile } = wifi_profile
+        let wifiProfileId = profile_id
+        if (wifiProfileId.includes('shared')) {
+          const normalizedWifiProfile = normalizeWifiProfile(
+            wifiProfile,
+            wifiProfileId === 'shared',
+          )
           const {
-            data: { profile_id: wifi_profile_id },
+            data: { profile_id },
           } = await dispatch(
             attachPromise(
-              createConnectionProfile(_profile_of, CONNECTION_TYPES.WIFI, normalizedWifiProfile),
+              createConnectionProfile(wifiEntityId, CONNECTION_TYPES.WIFI, normalizedWifiProfile),
             ),
           )
-          console.log(wifi_profile_id)
+          wifiProfileId = profile_id
         }
-        const { _connection_type, ...ethernetProfile } = ethernet_profile
 
-        const normalizedEthernetProfile = normalizeEthernetProfile(ethernetProfile)
+        if (wifiProfileId !== initialWifiProfile.profile_id) {
+          await dispatch(
+            attachPromise(updateManagedGateway(gtwId, { wifi_profile_id: wifiProfileId })),
+          )
+          const resetValues = {
+            ...initialFormState,
+            wifi_profile: {
+              ...initialFormState.wifi_profile,
+              profile_id: wifiProfileId,
+              _profile_of: wifiEntityId,
+            },
+          }
+          setInitialValues(resetValues)
+          resetForm({
+            values: resetValues,
+          })
+          handleAttemptToConnectToWifi()
+        }
+
+        /* Const normalizedEthernetProfile = normalizeEthernetProfile(ethernet_profile)
         const {
           data: { profile_id: ethernet_profile_id },
         } = await dispatch(
@@ -131,7 +162,7 @@ const GatewayConnectionSettings = () => {
             ),
           ),
         )
-        console.log(ethernet_profile_id)
+        console.log(ethernet_profile_id)*/
 
         toast({
           title: selectedGateway.name,
@@ -148,7 +179,7 @@ const GatewayConnectionSettings = () => {
         })
       }
     },
-    [dispatch, selectedGateway.name],
+    [dispatch, gtwId, handleAttemptToConnectToWifi, selectedGateway.name],
   )
 
   const loadData = useCallback(
@@ -191,19 +222,24 @@ const GatewayConnectionSettings = () => {
               )
               entityId = orgId
               break
-            } catch (e) {
-              console.log(e)
-            }
+            } catch (e) {}
           }
         }
+
         setInitialValues(oldValues => ({
           ...oldValues,
+          ...(Boolean(wifiProfile) && {
+            wifi_profile: {
+              ...oldValues.wifi_profile,
+              profile_id: wifiProfile.data.profile_id,
+              _profile_of: entityId,
+            },
+          }),
           ...(!Boolean(wifiProfile) &&
             hasWifiProfileSet && {
               wifi_profile: {
                 ...oldValues.wifi_profile,
                 _override: true,
-                _profile_of: entityId,
               },
             }),
         }))
@@ -234,6 +270,7 @@ const GatewayConnectionSettings = () => {
               <WifiSettingsFormFields
                 initialValues={initialValues}
                 isWifiConnected={connectionsData.isWifiConnected}
+                attemptWifiConnect={attemptWifiConnect}
               />
               <EthernetSettingsFormFields />
 

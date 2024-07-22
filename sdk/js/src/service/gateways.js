@@ -316,6 +316,19 @@ class Gateways {
 
     return Marshaler.payloadSingleResponse(response)
   }
+
+  async updateManagedGateway(gatewayId, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+    const response = await this._api.ManagedGatewayConfigurationService.Update(
+      {
+        routeParams: { 'gateway.ids.gateway_id': gatewayId },
+      },
+      {
+        gateway: patch,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
+    return Marshaler.payloadSingleResponse(response)
+  }
 }
 
 export default Gateways

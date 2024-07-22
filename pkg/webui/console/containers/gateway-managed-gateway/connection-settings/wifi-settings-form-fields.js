@@ -22,6 +22,7 @@ import Select from '@ttn-lw/components/select'
 import Icon from '@ttn-lw/components/icon'
 import Notification from '@ttn-lw/components/notification'
 import Button from '@ttn-lw/components/button'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -55,9 +56,10 @@ const m = defineMessages({
   notificationContent:
     'This gateway already has a WiFi profile set by another collaborator. If wished, you can override this profile below.',
   overrideProfile: 'Override this profile',
+  editProfile: 'Edit this profile',
 })
 
-const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
+const WifiSettingsFormFields = ({ initialValues, isWifiConnected, attemptWifiConnect }) => {
   const { values, setValues } = useFormContext()
   const dispatch = useDispatch()
 
@@ -68,8 +70,8 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
   const hasChanged = useMemo(
     () =>
       !isEqual(
-        omit(values.wifi_profile, ['_profile_of', '_override']),
-        omit(initialValues.wifi_profile, ['_profile_of', '_override']),
+        omit(values.wifi_profile, ['_profile_of']),
+        omit(initialValues.wifi_profile, ['_profile_of']),
       ),
     [initialValues, values],
   )
@@ -83,9 +85,10 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
     { value: 'non-shared', label: m.setAConfigForThisGateway.defaultMessage },
   ]
 
-  const isConnected = 0
-
   const connectionStatus = useMemo(() => {
+    if (attemptWifiConnect) {
+      return { message: m.attemptingToConnect, icon: 'more_horiz' }
+    }
     if (hasChanged) {
       return { message: m.saveToConnect, icon: 'more_horiz' }
     }
@@ -101,12 +104,9 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
       }
       return { message: m.unableToConnect, icon: 'cancel' }
     }
-    if (isConnected === 3) {
-      return { message: m.attemptingToConnect, icon: 'more_horiz' }
-    }
 
     return null
-  }, [hasChanged, isWifiConnected, values.wifi_profile._override])
+  }, [attemptWifiConnect, hasChanged, isWifiConnected, values.wifi_profile._override])
 
   const handleChangeProfile = useCallback(
     async value => {
@@ -194,14 +194,26 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
           <Message content={connectionStatus.message} />
         </div>
       )}
+      {Boolean(values.wifi_profile.profile_id) &&
+        !values.wifi_profile.profile_id.includes('shared') && (
+          <Link.Anchor
+            primary
+            href={`wifi-profiles/edit/${values.wifi_profile.profile_id}?profileOf=${values.wifi_profile._profile_of}`}
+          >
+            <Message content={m.editProfile} />
+          </Link.Anchor>
+        )}
     </>
   )
 }
 
 WifiSettingsFormFields.propTypes = {
+  attemptWifiConnect: PropTypes.bool.isRequired,
   initialValues: PropTypes.shape({
     wifi_profile: PropTypes.shape({
       _override: PropTypes.bool,
+      profile_id: PropTypes.string,
+      _profile_of: PropTypes.string,
     }),
   }).isRequired,
   isWifiConnected: PropTypes.bool,

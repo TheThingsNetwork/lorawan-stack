@@ -306,6 +306,17 @@ const getGatewayEventLocationLogic = createLogic({
   },
 })
 
+const updateManagedGatewayLogic = createRequestLogic({
+  type: gateways.UPDATE_MANAGED_GATEWAY,
+  process: async ({ action }) => {
+    const { gatewayId, patch } = action.payload
+
+    const data = await tts.Gateways.updateManagedGateway(gatewayId, patch)
+
+    return { id: gatewayId, data: { ...patch, ...data } }
+  },
+})
+
 export default [
   createGatewayLogic,
   getGatewayLogic,
@@ -320,5 +331,6 @@ export default [
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
   getGatewayEventLocationLogic,
+  updateManagedGatewayLogic,
   ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', tts.Gateways.openStream),
 ]

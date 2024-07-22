@@ -24,6 +24,7 @@ import Button from '@ttn-lw/components/button'
 
 import AccessPointList from '@console/containers/access-point-list'
 import NetworkInterfaceAddressesFormFields from '@console/containers/gateway-managed-gateway/shared/network-interface-addresses-form-fields'
+import { getValuesNormalized } from '@console/containers/gateway-managed-gateway/shared/utils'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -41,16 +42,7 @@ const m = defineMessages({
 const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
   const { values, setFieldValue, setFieldTouched } = useFormContext()
 
-  const valuesNormalized = useMemo(() => {
-    if (!namePrefix) return values
-
-    const nameSplitted = namePrefix.slice(0, -1).split('.')
-    let result = values
-    nameSplitted.forEach(part => {
-      result = result[isNaN(part) ? part : Number(part)]
-    })
-    return result
-  }, [namePrefix, values])
+  const valuesNormalized = getValuesNormalized(namePrefix, values)
 
   const canTypePassword =
     !valuesNormalized._access_point?.is_password_set ||
