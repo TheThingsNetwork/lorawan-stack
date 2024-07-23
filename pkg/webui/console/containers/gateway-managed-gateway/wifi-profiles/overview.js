@@ -162,14 +162,16 @@ const GatewayWifiProfilesOverview = () => {
 
   const handleChangeProfile = useCallback(
     async value => {
-      await dispatch(
-        attachPromise(
-          getConnectionProfilesList({
-            entityId: value,
-            type: CONNECTION_TYPES.WIFI,
-          }),
-        ),
-      )
+      try {
+        await dispatch(
+          attachPromise(
+            getConnectionProfilesList({
+              entityId: value,
+              type: CONNECTION_TYPES.WIFI,
+            }),
+          ),
+        )
+      } catch (e) {}
     },
     [dispatch],
   )

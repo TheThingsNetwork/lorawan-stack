@@ -16,7 +16,7 @@ import React, { useCallback, useMemo } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEqual, omit } from 'lodash'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -35,7 +35,6 @@ import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/sh
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
 import { getConnectionProfilesList } from '@console/store/actions/connection-profiles'
 
@@ -64,8 +63,6 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
   const { gtwId } = useParams()
   const { values, setValues } = useFormContext()
   const dispatch = useDispatch()
-  const location = useLocation()
-  const appRoot = selectApplicationRootPath()
   const profiles = useSelector(state =>
     selectConnectionProfilesByType(state, CONNECTION_TYPES.WIFI),
   )
@@ -118,15 +115,16 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
           profile_id: '',
         },
       }))
-
-      await dispatch(
-        attachPromise(
-          getConnectionProfilesList({
-            entityId: value,
-            type: CONNECTION_TYPES.WIFI,
-          }),
-        ),
-      )
+      try {
+        await dispatch(
+          attachPromise(
+            getConnectionProfilesList({
+              entityId: value,
+              type: CONNECTION_TYPES.WIFI,
+            }),
+          ),
+        )
+      } catch (e) {}
     },
     [dispatch, setValues],
   )
@@ -157,6 +155,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
                   entityId: values.wifi_profile._profile_of,
                   type: CONNECTION_TYPES.WIFI,
                 })}
+                handleErrors={false}
               >
                 <Form.Field
                   name={`wifi_profile.profile_id`}
@@ -197,6 +196,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
         </div>
       )}
       {Boolean(values.wifi_profile.profile_id) &&
+        !values.wifi_profile._override &&
         !values.wifi_profile.profile_id.includes('shared') && (
           <Link
             primary
