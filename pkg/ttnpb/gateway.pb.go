@@ -1243,7 +1243,7 @@ type ManagedGatewaySystemStatus struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// CPU temperature (Celcius).
+	// CPU temperature (Celsius).
 	CpuTemperature *wrapperspb.FloatValue `protobuf:"bytes,1,opt,name=cpu_temperature,json=cpuTemperature,proto3" json:"cpu_temperature,omitempty"`
 }
 

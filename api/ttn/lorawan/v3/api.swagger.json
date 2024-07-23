@@ -26475,7 +26475,7 @@
         "cpu_temperature": {
           "type": "number",
           "format": "float",
-          "description": "CPU temperature (Celcius)."
+          "description": "CPU temperature (Celsius)."
         }
       }
     },

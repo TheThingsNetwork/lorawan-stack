@@ -24699,7 +24699,7 @@
           "fields": [
             {
               "name": "cpu_temperature",
-              "description": "CPU temperature (Celcius).",
+              "description": "CPU temperature (Celsius).",
               "label": "",
               "type": "FloatValue",
               "longType": "google.protobuf.FloatValue",

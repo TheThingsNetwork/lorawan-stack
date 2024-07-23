@@ -5505,7 +5505,7 @@ Identifies an end device model with version information.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `cpu_temperature` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | CPU temperature (Celcius). |
+| `cpu_temperature` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | CPU temperature (Celsius). |
 
 ### <a name="ttn.lorawan.v3.ManagedGatewayWiFiAccessPoint">Message `ManagedGatewayWiFiAccessPoint`</a>
 

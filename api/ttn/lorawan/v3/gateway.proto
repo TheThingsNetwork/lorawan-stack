@@ -413,7 +413,7 @@ message ManagedGatewayNetworkInterfaceAddresses {
 }
 
 message ManagedGatewaySystemStatus {
-  // CPU temperature (Celcius).
+  // CPU temperature (Celsius).
   google.protobuf.FloatValue cpu_temperature = 1;
 }
 
