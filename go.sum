@@ -656,6 +656,8 @@ go.packetbroker.org/api/v3 v3.17.1 h1:LcyFPUGqVubGWMvQ16tZlQIKd+noGx7urzEYhSLiEQ
 go.packetbroker.org/api/v3 v3.17.1/go.mod h1:6bVbdWAYLnvZ5kgXxA7GBQvZTN7vxI0DoF1Di1NoAT4=
 go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240723094213-b40a14f3b543 h1:CpDA1J3O/krqQrPypf+ePIV5xiLyy9RIayLXRnxiDSI=
 go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240723094213-b40a14f3b543/go.mod h1:2+WsMwIunNLh22oauBzGL56JazE3UY34W1fstqEbacw=
+go.thethings.industries/pkg/ca v0.0.0-20240723133124-de1ba66b57ff h1:yN0R1JvCtGdB1eZFrvwuGU9OHyBnIlsC9E7Agw2j0BM=
+go.thethings.industries/pkg/ca v0.0.0-20240723133124-de1ba66b57ff/go.mod h1:89OU623VYKW9i3W4CZgIGFmtgb/jsN8JV2PAuCsj+7w=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e h1:TWGQ3lh7gI2W5hnb6qPdpoAa0d7s/XPwvgf2VVCMJaY=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e/go.mod h1:/smENFuESiJCyWRsHRLBjbZGMN889BORQXIPP6NlpZE=
 go.thethings.network/lorawan-stack-legacy/v2 v2.1.0 h1:xP1fElQiH8/6GWXg6JG8UqRD0uluhmicIRS4e/BzcAw=

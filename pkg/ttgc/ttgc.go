@@ -18,7 +18,9 @@ package ttgc
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 
+	ttica "go.thethings.industries/pkg/ca"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"google.golang.org/grpc"
@@ -47,10 +49,16 @@ func NewClient(
 	if err != nil {
 		return nil, err
 	}
+
+	// Add The Things Industries Root CA: the Gateway Controller is only available as hosted service.
+	if tlsConfig.RootCAs == nil {
+		tlsConfig.RootCAs = x509.NewCertPool()
+	}
+	tlsConfig.RootCAs.AppendCertsFromPEM(ttica.RootCA)
+
 	if err := config.TLS.ApplyTo(tlsConfig); err != nil {
 		return nil, err
 	}
-
 	opts := rpcclient.DefaultDialOptions(ctx)
 	opts = append(opts, dialOpts...)
 	opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
