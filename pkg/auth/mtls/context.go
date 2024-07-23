@@ -47,3 +47,27 @@ func ClientCertificateFromContext(ctx context.Context) *x509.Certificate {
 	}
 	return nil
 }
+
+type rootCAsKeyType struct{}
+
+var rootCAsKey rootCAsKeyType
+
+// RootCAsFromContext returns the root CAs from the context if present.
+func RootCAsFromContext(ctx context.Context) *x509.CertPool {
+	if pool, ok := ctx.Value(rootCAsKey).(*x509.CertPool); ok {
+		return pool
+	}
+	return nil
+}
+
+// AppendRootCAsToContext appends the given PEM encoded Root Certificates to the root CAs in the context.
+func AppendRootCAsToContext(parent context.Context, pem []byte) context.Context {
+	certPool := RootCAsFromContext(parent)
+	if certPool != nil {
+		certPool = certPool.Clone()
+	} else {
+		certPool = x509.NewCertPool()
+	}
+	certPool.AppendCertsFromPEM(pem)
+	return context.WithValue(parent, rootCAsKey, certPool)
+}
