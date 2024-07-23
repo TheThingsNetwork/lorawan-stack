@@ -72,7 +72,7 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 	},
 	TheThingsIndustriesGateway: gatewayserver.TheThingsIndustriesGatewayConfig{
 		Config:    ttigw.DefaultConfig,
-		Listen:    ":1888",
-		ListenTLS: ":8888",
+		Listen:    ":1889",
+		ListenTLS: ":8889",
 	},
 }

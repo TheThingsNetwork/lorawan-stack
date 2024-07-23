@@ -95,7 +95,7 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 			}
 		},
 		CustomGatewayServerConfig: func(gsConfig *gatewayserver.Config) {
-			gsConfig.TheThingsIndustriesGateway.ListenTLS = ":8888"
+			gsConfig.TheThingsIndustriesGateway.ListenTLS = ":8889"
 		},
 		Link: func(
 			ctx context.Context,
@@ -116,7 +116,7 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 			}
 			conn, _, err := websocket.Dial( //nolint:bodyclose
 				ctx,
-				"wss://localhost:8888/api/protocols/tti/v1",
+				"wss://localhost:8889/api/protocols/tti/v1",
 				&websocket.DialOptions{
 					Subprotocols: []string{"v1.lora.data.gateway.thethings.industries"},
 					HTTPClient: &http.Client{
