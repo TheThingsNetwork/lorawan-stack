@@ -5093,6 +5093,15 @@
       "file": "ws.go"
     }
   },
+  "error:pkg/gatewayserver/io/ttigw:downlink_channel_mixed_bandwidths": {
+    "translations": {
+      "en": "downlink channel `{channel}` has mixed bandwidths `{bandwidth_low}` and `{bandwidth_high}` Hz"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
   "error:pkg/gatewayserver/io/ttigw:invalid_board": {
     "translations": {
       "en": "invalid board `{board}`"
@@ -5163,6 +5172,15 @@
     "description": {
       "package": "pkg/gatewayserver/io/ttigw",
       "file": "ttigw.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:unsupported_downlink_data_rate": {
+    "translations": {
+      "en": "unsupported downlink data rate index `{data_rate_index}` in channel `{channel}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
     }
   },
   "error:pkg/gatewayserver/io/ttigw:unsupported_message_type": {
