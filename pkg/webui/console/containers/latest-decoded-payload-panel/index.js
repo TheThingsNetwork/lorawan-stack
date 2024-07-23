@@ -15,7 +15,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { defineMessages, FormattedNumber } from 'react-intl'
 import classnames from 'classnames'
-import clipboard from 'clipboard'
 import { useDispatch, useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
 
@@ -91,15 +90,13 @@ const hasDecodedPayload = data => {
 }
 
 const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className, isDevice }) => {
-  const [selectedEvent, setSelectedEvent] = useState(null)
+  const [modalVisible, setModalVisible] = useState(null)
   const [copied, setCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [latestEvent, setLatestEvent] = useState(null)
   const dispatch = useDispatch()
 
   const _timer = useRef(null)
-  const containerElem = useRef(null)
-  const copyElem = useRef(null)
 
   const actualLastEvent = events.find(e => hasDecodedPayload(e.data))
   // Save latestEvent only if it there are 10 seconds between actualLastEvent and lastEvent (throttling).
@@ -108,7 +105,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
     (!latestEvent || Date.parse(actualLastEvent.time) - Date.parse(latestEvent.time) > 10000) &&
     // Do not update latestEvent if it is hovered or selected.
     !isHovered &&
-    !selectedEvent
+    !modalVisible
   ) {
     setLatestEvent(actualLastEvent)
   }
@@ -118,6 +115,8 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
     null,
     2,
   )
+
+  const canCopy = navigator.clipboard && navigator.clipboard.writeText
 
   const devId = latestEvent ? latestEvent.identifiers[0].device_ids.device_id : null
 
@@ -162,29 +161,27 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
   }, [])
 
   const handleOpenMaximizeCodeModal = useCallback(() => {
-    setSelectedEvent(latestEvent)
-  }, [latestEvent])
+    setModalVisible(true)
+  }, [])
 
   const handleCloseMaximizeCodeModal = useCallback(() => {
-    setSelectedEvent(null)
+    setModalVisible(false)
+    setIsHovered(false)
   }, [])
 
   const handleCopyClick = useCallback(() => {
     if (copied) {
       return
     }
-    setCopied(true)
+    if (canCopy) {
+      navigator.clipboard.writeText(formattedPayload)
+      setCopied(true)
 
-    _timer.current = setTimeout(() => {
-      setCopied(false)
-    }, 3000)
-  }, [copied])
-
-  useEffect(() => {
-    if (copyElem && copyElem.current) {
-      new clipboard(copyElem.current, { container: containerElem.current })
+      _timer.current = setTimeout(() => {
+        setCopied(false)
+      }, 3000)
     }
-  }, [latestEvent, selectedEvent])
+  }, [canCopy, copied, formattedPayload])
 
   const getContent = useCallback(
     (event, minLines = 3) =>
@@ -273,17 +270,18 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
             </div>
           )}
           <div className="pos-relative">
-            <div className={style.cornerIcons} ref={containerElem}>
-              <Button
-                icon={copied ? IconCopyCheck : IconCopy}
-                className={style.maximize}
-                data-clipboard-text={formattedPayload}
-                onClick={handleCopyClick}
-                ref={copyElem}
-                naked
-                small
-              />
-              {!Boolean(selectedEvent) && (
+            <div className={style.cornerIcons}>
+              {canCopy && (
+                <Button
+                  icon={copied ? IconCopyCheck : IconCopy}
+                  className={style.maximize}
+                  data-clipboard-text={formattedPayload}
+                  onClick={handleCopyClick}
+                  naked
+                  small
+                />
+              )}
+              {!modalVisible && (
                 <Button
                   naked
                   icon={IconArrowsMaximize}
@@ -306,6 +304,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
         </>
       ),
     [
+      canCopy,
       copied,
       devId,
       deviceName,
@@ -314,8 +313,8 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
       handleOpenMaximizeCodeModal,
       image,
       imageFetching,
-      selectedEvent,
       isDevice,
+      modalVisible,
     ],
   )
 
@@ -333,7 +332,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
         <div className="pos-relative">
           {getContent(latestEvent)}
           <PortalledModal
-            visible={Boolean(selectedEvent)}
+            visible={modalVisible}
             noTitleLine
             noControlBar
             className={style.modalBody}
@@ -347,7 +346,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
                 <Button naked icon={IconX} onClick={handleCloseMaximizeCodeModal} />
               </div>
 
-              {getContent(selectedEvent)}
+              {getContent(latestEvent)}
               <div className="d-flex j-center al-center gap-cs-m pt-cs-xl">
                 <Button
                   secondary
