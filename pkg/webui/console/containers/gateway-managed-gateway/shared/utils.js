@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { useMemo } from 'react'
+import { omit } from 'lodash'
 
 export const CONNECTION_TYPES = Object.freeze({
   CELLULAR: 'cellular',
@@ -82,6 +83,7 @@ export const normalizeWifiProfile = (profile, shared = true) => {
 
 export const initialEthernetProfile = {
   profile_name: Date.now().toString(),
+  profile_id: '',
   shared: false,
   _enable_ethernet_connection: false,
   _use_static_ip: false,
@@ -109,4 +111,17 @@ export const normalizeEthernetProfile = profile => {
   rest.profile_name = Date.now().toString()
 
   return rest
+}
+
+export const revertEthernetProfile = (profile, enableEthernet) => {
+  const result = { ...omit(initialEthernetProfile, ['network_interface_addresses']), ...profile }
+
+  result._enable_ethernet_connection = enableEthernet
+
+  result._use_static_ip =
+    Boolean(result.network_interface_addresses?.ip_addresses) ||
+    Boolean(result.network_interface_addresses?.subnet_mask) ||
+    Boolean(result.network_interface_addresses?.gateway)
+
+  return result
 }

@@ -49,7 +49,6 @@ const m = defineMessages({
   unableToConnect: 'The gateway WiFi is currently unable to connect using this profile',
   unableToConnectCollaborator:
     "The gateway WiFi is currently unable to connect using  a collaborator's profile",
-  attemptingToConnect: 'The gateway WiFi is currently attempting to connect using this profile',
   saveToConnect: 'Please click "Save changes" to start using this WiFi profile for the gateway',
   createNewSharedProfile: 'Create a new shared profile',
   setAConfigForThisGateway: 'Set a config for this gateway only',
@@ -59,7 +58,7 @@ const m = defineMessages({
   editProfile: 'Edit this profile',
 })
 
-const WifiSettingsFormFields = ({ initialValues, isWifiConnected, attemptWifiConnect }) => {
+const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
   const { values, setValues } = useFormContext()
   const dispatch = useDispatch()
 
@@ -86,9 +85,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, attemptWifiCon
   ]
 
   const connectionStatus = useMemo(() => {
-    if (attemptWifiConnect) {
-      return { message: m.attemptingToConnect, icon: 'more_horiz' }
-    }
+    if (!values.wifi_profile.profile_id) return null
     if (hasChanged) {
       return { message: m.saveToConnect, icon: 'more_horiz' }
     }
@@ -106,7 +103,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, attemptWifiCon
     }
 
     return null
-  }, [attemptWifiConnect, hasChanged, isWifiConnected, values.wifi_profile._override])
+  }, [hasChanged, isWifiConnected, values.wifi_profile._override, values.wifi_profile.profile_id])
 
   const handleChangeProfile = useCallback(
     async value => {
@@ -137,6 +134,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, attemptWifiCon
         wifi_profile: {
           ...oldValues.wifi_profile,
           _override: false,
+          profile_id: '',
         },
       })),
     [setValues],
@@ -208,7 +206,6 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, attemptWifiCon
 }
 
 WifiSettingsFormFields.propTypes = {
-  attemptWifiConnect: PropTypes.bool.isRequired,
   initialValues: PropTypes.shape({
     wifi_profile: PropTypes.shape({
       _override: PropTypes.bool,
