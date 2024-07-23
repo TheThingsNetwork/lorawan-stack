@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import Status from '@ttn-lw/components/status'
@@ -27,7 +27,7 @@ import { selectEndDeviceTopEntities } from '@console/store/selectors/top-entitie
 import EntitiesList from '../list'
 
 const TopDevicesList = ({ appId }) => {
-  const topEntityFilter = useCallback(e => (appId ? e.id.startsWith(appId) : undefined), [appId])
+  const topEntityFilter = useMemo(() => (appId ? e => e.id.startsWith(appId) : undefined), [appId])
   const items = useSelector(state => selectEndDeviceTopEntities(state, topEntityFilter))
 
   const headers = [
