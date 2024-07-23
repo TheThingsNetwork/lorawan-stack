@@ -447,6 +447,7 @@ export default defineMessages({
   resume: 'Resume',
   rights: 'Rights',
   rootKeys: 'Root keys',
+  router: 'Router',
   rssi: 'RSSI',
   rx1DataRateOffset: 'Rx1 data rate offset',
   rx1Delay: 'Rx1 delay',

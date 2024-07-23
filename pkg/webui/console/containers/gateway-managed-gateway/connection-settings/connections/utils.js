@@ -76,9 +76,12 @@ export const getWifiDetails = wifiBackhaul => [
     items: [
       {
         key: m.ipAddress,
-        value: wifiBackhaul.network_interface.addresses.ip_addresses[0], // TODO: Check logic to display correct IP address
+        value: wifiBackhaul.network_interface.addresses.ip_addresses[0],
       },
-      // TODO: Check router part from wifi details
+      {
+        key: sharedMessages.router,
+        value: wifiBackhaul.network_interface.addresses.gateway,
+      },
       {
         key: sharedMessages.subnetMask,
         value: wifiBackhaul.network_interface.addresses.subnet_mask,
@@ -91,10 +94,10 @@ export const getWifiDetails = wifiBackhaul => [
         key: m.bssid,
         value: wifiBackhaul.bssid,
       },
-      {
+      ...(wifiBackhaul.rssi && {
         key: sharedMessages.rssi,
         value: <Message content={m.rssiValue} values={{ value: wifiBackhaul.rssi }} />,
-      },
+      }),
     ],
   },
 ]
@@ -105,14 +108,16 @@ export const getEthernetDetails = ethernetBackhaul => [
     items: [
       {
         key: m.ipAddress,
-        value: ethernetBackhaul.network_interface.addresses.ip_addresses[0], // TODO: Check logic to display correct IP address
+        value: ethernetBackhaul.network_interface.addresses.ip_addresses[0],
       },
-      // TODO: Check router part from ethernet details
+      {
+        key: sharedMessages.router,
+        value: ethernetBackhaul.network_interface.addresses.gateway,
+      },
       {
         key: sharedMessages.subnetMask,
         value: ethernetBackhaul.network_interface.addresses.subnet_mask,
       },
-      // TODO: Check security and bssid part from ethernet details
     ],
   },
 ]

@@ -16,6 +16,7 @@ import React, { useCallback, useMemo } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEqual, omit } from 'lodash'
+import { useLocation, useParams } from 'react-router-dom'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -34,6 +35,7 @@ import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/sh
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
 import { getConnectionProfilesList } from '@console/store/actions/connection-profiles'
 
@@ -59,9 +61,11 @@ const m = defineMessages({
 })
 
 const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
+  const { gtwId } = useParams()
   const { values, setValues } = useFormContext()
   const dispatch = useDispatch()
-
+  const location = useLocation()
+  const appRoot = selectApplicationRootPath()
   const profiles = useSelector(state =>
     selectConnectionProfilesByType(state, CONNECTION_TYPES.WIFI),
   )
@@ -194,12 +198,12 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
       )}
       {Boolean(values.wifi_profile.profile_id) &&
         !values.wifi_profile.profile_id.includes('shared') && (
-          <Link.Anchor
+          <Link
             primary
-            href={`wifi-profiles/edit/${values.wifi_profile.profile_id}?profileOf=${values.wifi_profile._profile_of}`}
+            to={`/gateways/${gtwId}/managed-gateway/wifi-profiles/edit/${values.wifi_profile.profile_id}?profileOf=${values.wifi_profile._profile_of}`}
           >
             <Message content={m.editProfile} />
-          </Link.Anchor>
+          </Link>
         )}
     </>
   )
