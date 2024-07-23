@@ -244,7 +244,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
-	go.thethings.industries/pkg/ca v0.0.0-20240723133124-de1ba66b57ff // indirect
+	go.thethings.industries/pkg/ca v0.0.0-20240723151912-b9bb4097ae6c // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/image v0.14.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect

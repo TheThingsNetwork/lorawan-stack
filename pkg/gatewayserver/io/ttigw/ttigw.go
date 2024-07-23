@@ -26,6 +26,7 @@ import (
 	"time"
 
 	lorav1 "go.thethings.industries/pkg/api/gen/tti/gateway/data/lora/v1"
+	ttica "go.thethings.industries/pkg/ca"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
@@ -155,6 +156,10 @@ func (f *Frontend) authenticate(
 	if err := eui.UnmarshalText([]byte(cert.Subject.CommonName)); err != nil {
 		return nil, nil, errInvalidGatewayEUI.WithCause(err).WithAttributes("common_name", cert.Subject.CommonName)
 	}
+
+	// Append the The Things Industries gateways CAs to the root CAs in the context:
+	// Gateways using this frontend are provisioned by The Things Industries.
+	ctx = mtls.AppendRootCAsToContext(ctx, ttica.GatewaysCAs)
 
 	ids := &ttnpb.GatewayIdentifiers{Eui: eui.Bytes()}
 	ctx, ids, err := f.server.FillGatewayContext(ctx, ids)
