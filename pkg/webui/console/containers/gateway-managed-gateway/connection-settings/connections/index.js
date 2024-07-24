@@ -67,13 +67,16 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
   const serverConnectionIsSpecified =
     gatewayServerConnection !== NETWORK_INTERFACE_TYPES.UNSPECIFIED
 
-  const cellularDetails = isEthernetConnected && getCellularDetails(cellularBackhaul)
+  const cellularDetails = isCellularConnected && getCellularDetails(cellularBackhaul)
 
   const managedGateway = updatedManagedGateway ?? selectedManagedGateway
 
   const getIsConnectedDiv = isConnected => (
     <div className="d-flex al-center gap-cs-xxs">
-      <Icon icon={isConnected ? 'valid' : 'cancel'} />
+      <Icon
+        icon={isConnected ? 'check_circle_outline' : 'highlight_remove'}
+        className={isConnected ? 'c-success' : 'c-error'}
+      />
       <Message content={isConnected ? sharedMessages.connected : sharedMessages.disconnected} />
     </div>
   )
@@ -98,7 +101,7 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
 
           {systemStatus?.cpu_temperature && (
             <div className="d-flex al-center gap-cs-xxs mb-cs-s mt-cs-xxs">
-              <Icon icon="cloud" />
+              <Icon icon="device_thermostat" />
               {systemStatus?.cpu_temperature} &deg;C
             </div>
           )}

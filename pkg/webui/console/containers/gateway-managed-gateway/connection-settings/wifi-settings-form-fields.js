@@ -88,19 +88,27 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
   const connectionStatus = useMemo(() => {
     if (!values.wifi_profile.profile_id) return null
     if (hasChanged) {
-      return { message: m.saveToConnect, icon: 'more_horiz' }
+      return { message: m.saveToConnect, icon: 'rotate_right' }
     }
     if (isWifiConnected) {
       if (values.wifi_profile._override) {
-        return { message: m.connectedCollaborator, icon: 'valid' }
+        return {
+          message: m.connectedCollaborator,
+          icon: 'check_circle_outline',
+          color: 'c-success',
+        }
       }
-      return { message: m.connected, icon: 'valid' }
+      return { message: m.connected, icon: 'check_circle_outline', color: 'c-success' }
     }
     if (!isWifiConnected) {
       if (values.wifi_profile._override) {
-        return { message: m.unableToConnectCollaborator, icon: 'cancel' }
+        return {
+          message: m.unableToConnectCollaborator,
+          icon: 'highlight_remove',
+          color: 'c-error',
+        }
       }
-      return { message: m.unableToConnect, icon: 'cancel' }
+      return { message: m.unableToConnect, icon: 'highlight_remove', color: 'c-error' }
     }
 
     return null
@@ -191,7 +199,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
 
       {connectionStatus !== null && (
         <div className="d-flex al-center gap-cs-xs">
-          <Icon icon={connectionStatus.icon} />
+          <Icon icon={connectionStatus.icon} className={connectionStatus.color} />
           <Message content={connectionStatus.message} />
         </div>
       )}

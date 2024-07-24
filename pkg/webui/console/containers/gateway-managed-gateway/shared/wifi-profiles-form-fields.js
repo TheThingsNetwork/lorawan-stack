@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { parseInt } from 'lodash'
 import { defineMessages } from 'react-intl'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'

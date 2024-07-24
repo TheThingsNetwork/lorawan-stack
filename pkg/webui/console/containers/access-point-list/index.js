@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
@@ -61,32 +61,16 @@ const computeDeltaInSeconds = (from, to) => {
   return Math.floor((from - to) / 1000)
 }
 
-// TODO: Use correct images
 const wifiIconBasedOnRSSI = rssi => {
-  if (rssi >= -50) {
-    // Excellent
-    // return 'signal_wifi_4_bar'
-    return 'wifi'
-  } else if (rssi >= -60) {
-    // Good
-    // return 'signal_wifi_3_bar'
-    return 'wifi'
-  } else if (rssi >= -70) {
-    // Fair
-    // return 'signal_wifi_2_bar'
+  if (rssi >= -60) {
+    // Strong
     return 'wifi'
   } else if (rssi >= -80) {
-    // Weak
-    // return 'signal_wifi_1_bar'
-    return 'wifi'
-  } else if (rssi >= -90) {
-    // Very weak
-    // return 'signal_wifi_0_bar'
-    return 'wifi'
+    // Moderate
+    return 'signal_wifi_2'
   }
-  // Unusable signal or no signal
-  // return 'wifi_off'
-  return 'wifi'
+  // Weak
+  return 'signal_wifi_1'
 }
 
 const AccessPointListItem = ({ accessPoint, onClick, isActive }) => {
@@ -106,7 +90,9 @@ const AccessPointListItem = ({ accessPoint, onClick, isActive }) => {
         {!isOther && <Icon icon={wifiIconBasedOnRSSI(accessPoint.rssi)} />}
         {isOther ? <Message content={sharedMessages.otherOption} /> : accessPoint.ssid}
       </div>
-      {accessPoint.authentication_mode !== 'open' && !isOther && <Icon icon="lock" />}
+      {accessPoint.authentication_mode !== 'open' && !isOther && (
+        <Icon icon="lock" small className="tc-subtle-gray" />
+      )}
     </div>
   )
 }
@@ -117,7 +103,7 @@ AccessPointListItem.propTypes = {
   onClick: PropTypes.func.isRequired,
 }
 
-const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => {
+const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid }) => {
   const [lastRefresh, setLastRefresh] = useState(undefined)
 
   const dispatch = useDispatch()
@@ -125,6 +111,7 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => 
   const accessPoints = useSelector(selectAccessPoints)
   const selectedGateway = useSelector(selectSelectedGateway)
   const { ids } = selectedGateway
+  const isFirstRender = useRef(true)
 
   const [isMounted, setIsMounted] = useState(true)
 
@@ -135,6 +122,23 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur }) => 
       }
     })
   }, [dispatch, ids.eui, ids.gateway_id, isMounted])
+
+  useEffect(() => {
+    if (!isFirstRender.current && Boolean(ssid) && !isLoading) {
+      const accessPoint = accessPoints.find(ap => ap.ssid === ssid)
+
+      onChange(
+        {
+          ...accessPoint,
+          is_password_set: true,
+          type: accessPoint ? 'all' : 'other',
+        },
+        true,
+      )
+    }
+    isFirstRender.current = false
+    /* eslint-disable */
+  }, [accessPoints, isLoading, ssid])
 
   useEffect(() => {
     handleScanAccessPoints()
@@ -210,12 +214,14 @@ AccessPointList.propTypes = {
   inputWidth: PropTypes.inputWidth,
   onBlur: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
+  ssid: PropTypes.string,
   value: PropTypes.accessPoint.isRequired,
 }
 
 AccessPointList.defaultProps = {
   className: undefined,
   inputWidth: 'm',
+  ssid: undefined,
 }
 
 export default AccessPointList
