@@ -19,11 +19,10 @@
   padding: 0 'calc(%s / 2)' % $cs.s
 
   &:first-child
-    padding: 0
-    font-weight: $fwv2.medium
+    padding-left: 0
 
   &:last-child
-    padding: 0
+    padding-right: 0
 
   &-panel-style
     &:first-child
@@ -35,6 +34,9 @@
   &:not(&-centered):not(&-left)
     &:last-child
       text-align: right
+      justify-content: flex-end
+      & > *
+        justify-content: flex-end
 
   &-centered
     text-align: center
@@ -45,6 +47,8 @@
   &-right
     text-align: right
     justify-content: flex-end
+    & > *
+      justify-content: flex-end
 
   &-head
     height: 3rem
@@ -60,7 +64,9 @@
   &-data
     height: 4rem
     white-space: nowrap
-    overflow: hidden
+
+    &:not(:last-child)
+      overflow: hidden
 
     & > *
       overflow: inherit

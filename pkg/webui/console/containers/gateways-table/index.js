@@ -40,7 +40,6 @@ import { selectUserIsAdmin } from '@console/store/selectors/logout'
 import { selectGateways, selectGatewaysTotalCount } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
-  ownedTabTitle: 'Owned gateways',
   restoreSuccess: 'Gateway restored',
   restoreFail: 'There was an error and the gateway could not be restored',
   purgeSuccess: 'Gateway purged',
@@ -52,7 +51,7 @@ const ALL_TAB = 'all'
 const DELETED_TAB = 'deleted'
 const tabs = [
   {
-    title: m.ownedTabTitle,
+    title: sharedMessages.ownedByMe,
     name: OWNED_TAB,
   },
   {
@@ -118,35 +117,44 @@ const GatewaysTable = () => {
           id: row.ids.gateway_id,
           name: row.name,
         }),
-        render: ({ name, id }) => <span className="fw-bold">{name ?? id}</span>,
+        render: ({ name, id }) =>
+          Boolean(name) ? (
+            <>
+              <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
+              <span className="c-text-neutral-light d-block">{id}</span>
+            </>
+          ) : (
+            <span className="mt-0 p-0 fw-bold d-block">{id}</span>
+          ),
         sortable: true,
         sortKey: 'gateway_id',
-        width: 40,
       },
       {
         name: 'ids.eui',
         displayName: sharedMessages.gatewayEUI,
-        align: 'center',
+        width: '14rem',
         sortable: true,
         sortKey: 'gateway_eui',
         render: gatewayEui =>
           !Boolean(gatewayEui) ? (
-            <Message
-              className="c-text-neutral-light"
-              component="i"
-              content={sharedMessages.none}
-              firstToLower
-            />
+            <Message className="c-text-neutral-light" component="i" content={sharedMessages.none} />
           ) : (
-            <SafeInspector data={gatewayEui} noTransform noCopyPopup small hideable={false} />
+            <SafeInspector
+              data={gatewayEui}
+              noTransform
+              noCopyPopup
+              small
+              hideable={false}
+              className="w-content"
+            />
           ),
-        width: '13rem',
       },
     ]
 
     if (tab === DELETED_TAB) {
       baseHeaders.push({
         name: 'actions',
+        width: '13rem',
         displayName: sharedMessages.actions,
         getValue: row => ({
           id: row.ids.gateway_id,
@@ -172,7 +180,7 @@ const GatewaysTable = () => {
         {
           name: 'status',
           displayName: sharedMessages.status,
-          align: 'center',
+          width: '8rem',
           render: status => {
             let indicator = 'unknown'
             let label = sharedMessages.unknown
@@ -191,16 +199,15 @@ const GatewaysTable = () => {
               label = sharedMessages.unknown
             }
 
-            return <Status status={indicator} label={label} className="d-flex al-center j-center" />
+            return <Status status={indicator} label={label} className="d-flex al-center" />
           },
         },
         {
           name: 'created_at',
           displayName: sharedMessages.createdAt,
-          align: 'center',
+          width: '8rem',
           sortable: true,
           render: date => <DateTime.Relative value={date} />,
-          width: 15,
         },
       )
     }
@@ -245,6 +252,7 @@ const GatewaysTable = () => {
       baseDataSelector={baseDataSelector}
       tableTitle={<Message content={sharedMessages.gateways} />}
       searchable
+      searchPlaceholderMessage={sharedMessages.searchGateways}
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : []}
     />

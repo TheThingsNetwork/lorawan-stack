@@ -70,6 +70,8 @@ const DeleteModalButton = props => {
       onApprove={handleDeleteApprove}
       onCancel={onCancel}
       message={message}
+      secondary
+      danger
       modalData={{
         title: sharedMessages.deleteModalConfirmDeletion,
         approveButtonProps: {

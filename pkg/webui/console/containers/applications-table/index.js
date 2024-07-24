@@ -52,7 +52,6 @@ import {
 } from '@console/store/selectors/applications'
 
 const m = defineMessages({
-  ownedTabTitle: 'Owned by me',
   restoreSuccess: 'Application restored',
   restoreFail: 'There was an error and application could not be restored',
   purgeSuccess: 'Application purged',
@@ -66,7 +65,7 @@ const ALL_TAB = 'all'
 const DELETED_TAB = 'deleted'
 const tabs = [
   {
-    title: m.ownedTabTitle,
+    title: sharedMessages.ownedByMe,
     name: OWNED_TAB,
   },
   {
@@ -132,8 +131,15 @@ const ApplicationsTable = props => {
           id: row.ids.application_id,
           name: row.name,
         }),
-        render: ({ name, id }) => <span className="fw-bold">{name ?? id}</span>,
-        width: 10,
+        render: ({ name, id }) =>
+          Boolean(name) ? (
+            <>
+              <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
+              <span className="c-text-neutral-light d-block">{id}</span>
+            </>
+          ) : (
+            <span className="mt-0 p-0 fw-bold d-block">{id}</span>
+          ),
         sortable: true,
         sortKey: 'application_id',
       },
@@ -143,7 +149,7 @@ const ApplicationsTable = props => {
       baseHeaders.push({
         name: 'actions',
         displayName: sharedMessages.actions,
-        width: 45,
+        width: '13rem',
         getValue: row => ({
           id: row.ids.application_id,
           name: row.name,
@@ -168,7 +174,7 @@ const ApplicationsTable = props => {
         {
           name: 'status',
           displayName: '',
-          width: 17,
+          width: '10rem',
           render: status => {
             if (status.otherCluster) {
               const host = status.host
@@ -198,7 +204,7 @@ const ApplicationsTable = props => {
         },
         {
           name: '_devices',
-          width: 8,
+          width: '7rem',
           displayName: sharedMessages.devicesShort,
           align: 'center',
           render: deviceCount =>
@@ -210,9 +216,8 @@ const ApplicationsTable = props => {
         },
         {
           name: 'created_at',
-          width: 15,
+          width: '8rem',
           displayName: sharedMessages.created,
-          align: 'center',
           sortable: true,
           render: date => <DateTime.Relative value={date} />,
         },
