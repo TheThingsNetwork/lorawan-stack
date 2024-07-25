@@ -343,7 +343,7 @@ const GatewayConnectionSettings = () => {
     <RequireRequest requestAction={loadData}>
       <PageTitle title={sharedMessages.connectionSettings} />
       <Row>
-        <Col lg={8} md={6} sm={12}>
+        <Col lg={7} md={6} sm={12}>
           {isFirstClaim && <Notification info small content={m.firstNotification} />}
           <Form
             error={error}
@@ -368,7 +368,7 @@ const GatewayConnectionSettings = () => {
             </>
           </Form>
         </Col>
-        <Col lg={4} md={6} sm={12}>
+        <Col lg={5} md={6} sm={12}>
           <ManagedGatewayConnections connectionsData={connectionsData} />
         </Col>
       </Row>

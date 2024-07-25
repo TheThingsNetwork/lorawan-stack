@@ -17,17 +17,20 @@ import { defineMessages } from 'react-intl'
 const messages = defineMessages({
   officialDocumentation: 'Official documentation',
   connections: 'Connections',
-  connectedToGatewayController: 'Connected to the gateway controller via {type}',
-  connectedToGatewayServer: 'Connected to the gateway server via {type}',
+  connectedToGatewayController: 'Connected to the <span>Gateway Controller</span> via {type}',
+  disconnectedFromGatewayController: 'Disconnected from the <span>Gateway Controller</span>',
+  connectedToGatewayServer: 'Connected to the <span>Gateway Server</span> via {type}',
+  disconnectedFromGatewayServer: 'Disconnected from the <span>Gateway Server</span>',
   cellular: 'Cellular',
   wifi: 'WiFi',
   ethernet: 'Ethernet',
   macAddress: 'MAC address: {address}',
-  rssiValue: '{value}dBm',
+  rssiValue: '{value} dBm',
   ipAddress: 'IP address',
   bssid: 'BSSID',
-  hardwareVersion: 'Hardware version: {version}',
-  firmwareVersion: 'Firmware version: {version}',
+  hardwareVersion: 'Hardware version: <span>{version}</span>',
+  firmwareVersion: 'Firmware version: <span>{version}</span>',
+  connectedVia: 'Connected via {connectedVia}',
 })
 
 export default messages

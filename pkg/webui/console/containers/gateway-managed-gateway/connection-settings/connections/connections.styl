@@ -13,18 +13,44 @@
 // limitations under the License.
 
 .root
-  border-input()
-  border-radius: $br.m
+  border-normal()
+  border-radius: $br.l
   box-sizing: border-box
-  padding: $cs.s
+  padding: $cs.l
+  display: flex
+  flex-direction: column
+  gap: $cs.l
 
   .top
-    border-input('bottom')
+    border-normal()
+    box-sizing: border-box
+    border-radius: $br.l
+    display: flex
 
-  .image
-    height: 100%
-    width: auto
-    max-width: $ls.xl
+  .img-div
+    background-color: $c-backdrop-lighter
+    border-radius: $br.l 0 0 $br.l
+    .image
+      height: 6rem
+      width: auto
+
+  .horizontal-line
+    background-color: $c-divider
+
+  .connections
+    border-normal()
+    box-sizing: border-box
+    border-radius: $br.l
+    display: flex
+    flex-direction: column
+    gap: $cs.xxs
+    padding: $cs.m $cs.s
+
+  .connection
+    padding-inline: $cs.xxs
+    // TODO: Change color
+    background-color: #EEEFF9
+    border-radius: $br.m
 
   .details
     & tr:not(:first-child)

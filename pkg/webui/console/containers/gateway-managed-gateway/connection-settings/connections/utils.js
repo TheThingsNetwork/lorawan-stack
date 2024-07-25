@@ -14,12 +14,9 @@
 
 import React from 'react'
 
-import DataSheet from '@ttn-lw/components/data-sheet'
-
 import Message from '@ttn-lw/lib/components/message'
 
 import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
-import style from '@console/containers/gateway-managed-gateway/connection-settings/connections/connections.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -43,29 +40,30 @@ export const getConnectionType = type => {
   return null
 }
 
-export const connectionMessageMap = {
+export const connectionIconMap = {
+  [CONNECTION_TYPES.CELLULAR]: 'signal_cellular_alt',
+  [CONNECTION_TYPES.WIFI]: 'wifi',
+  [CONNECTION_TYPES.ETHERNET]: 'settings_input_hdmi',
+}
+
+export const connectionNameMap = {
   [CONNECTION_TYPES.CELLULAR]: m.cellular,
   [CONNECTION_TYPES.WIFI]: m.wifi,
   [CONNECTION_TYPES.ETHERNET]: m.ethernet,
 }
 
-export const getDetails = details => (
-  <details>
-    <summary>
-      <Message content={sharedMessages.details} />
-    </summary>
-    <DataSheet data={details} className={style.details} />
-  </details>
-)
-
 export const getCellularDetails = cellularBackhaul => [
   {
     header: '',
     items: [
-      ...(cellularBackhaul.rssi && {
-        key: sharedMessages.rssi,
-        value: <Message content={m.rssiValue} values={{ value: cellularBackhaul.rssi }} />,
-      }),
+      ...(cellularBackhaul.rssi
+        ? [
+            {
+              key: sharedMessages.rssi,
+              value: <Message content={m.rssiValue} values={{ value: cellularBackhaul.rssi }} />,
+            },
+          ]
+        : []),
     ],
   },
 ]
@@ -92,12 +90,16 @@ export const getWifiDetails = wifiBackhaul => [
       },
       {
         key: m.bssid,
-        value: wifiBackhaul.bssid,
+        value: formatMACAddress(wifiBackhaul.bssid),
       },
-      ...(wifiBackhaul.rssi && {
-        key: sharedMessages.rssi,
-        value: <Message content={m.rssiValue} values={{ value: wifiBackhaul.rssi }} />,
-      }),
+      ...(wifiBackhaul.rssi
+        ? [
+            {
+              key: sharedMessages.rssi,
+              value: <Message content={m.rssiValue} values={{ value: wifiBackhaul.rssi }} />,
+            },
+          ]
+        : []),
     ],
   },
 ]
@@ -121,3 +123,11 @@ export const getEthernetDetails = ethernetBackhaul => [
     ],
   },
 ]
+
+export const formatMACAddress = value => {
+  if (!Boolean(value)) {
+    return value
+  }
+
+  return value.match(/.{1,2}/g).join(':')
+}
