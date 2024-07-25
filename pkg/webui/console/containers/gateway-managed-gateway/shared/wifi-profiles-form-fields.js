@@ -47,26 +47,20 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
     !valuesNormalized._access_point?.is_password_set ||
     valuesNormalized._access_point?.type === 'other'
 
-  const handleRestPassword = useCallback(() => {
+  const handleResetPassword = useCallback(() => {
     setFieldValue(`${namePrefix}_access_point.is_password_set`, false)
   }, [namePrefix, setFieldValue])
 
-  useEffect(() => {
-    if (
-      Boolean(valuesNormalized._access_point.ssid) ||
-      !valuesNormalized._access_point.is_password_set
-    ) {
-      setFieldValue(`${namePrefix}ssid`, valuesNormalized._access_point?.ssid)
-      setFieldTouched(`${namePrefix}password`, false)
-      setFieldValue(`${namePrefix}password`, '')
-    }
-  }, [
-    namePrefix,
-    setFieldTouched,
-    setFieldValue,
-    valuesNormalized._access_point.is_password_set,
-    valuesNormalized._access_point.ssid,
-  ])
+  const handleChangeAccessPoint = useCallback(
+    accessPoint => {
+      if (Boolean(accessPoint.ssid) || !accessPoint.is_password_set) {
+        setFieldValue(`${namePrefix}ssid`, accessPoint?.ssid)
+        setFieldTouched(`${namePrefix}password`, false)
+        setFieldValue(`${namePrefix}password`, '')
+      }
+    },
+    [namePrefix, setFieldTouched, setFieldValue],
+  )
 
   return (
     <>
@@ -80,8 +74,10 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
       <Form.Field
         title={m.accessPointAndSsid}
         name={`${namePrefix}_access_point`}
+        onChange={handleChangeAccessPoint}
         component={AccessPointList}
         required
+        ssid={valuesNormalized.ssid}
       />
       {valuesNormalized._access_point.type === 'other' && (
         <Form.Field title={m.ssid} name={`${namePrefix}ssid`} component={Input} required />
@@ -104,7 +100,7 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
               type="button"
               message={sharedMessages.reset}
               icon="delete"
-              onClick={handleRestPassword}
+              onClick={handleResetPassword}
             />
           )}
         </Form.Field>

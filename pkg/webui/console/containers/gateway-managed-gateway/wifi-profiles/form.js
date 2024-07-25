@@ -49,10 +49,7 @@ import {
   updateConnectionProfile,
 } from '@console/store/actions/connection-profiles'
 
-import {
-  selectAccessPoints,
-  selectSelectedWifiConnectionProfile,
-} from '@console/store/selectors/connection-profiles'
+import { selectSelectedWifiConnectionProfile } from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
   updateWifiProfile: 'Update WiFi profile',
@@ -64,7 +61,6 @@ const m = defineMessages({
 
 const GatewayWifiProfilesForm = () => {
   const [error, setError] = useState(undefined)
-  const accessPoints = useSelector(selectAccessPoints)
   const { gtwId, profileId } = useParams()
   const isLoadingAccessPoints = useSelector(state =>
     selectFetchingEntry(state, GET_ACCESS_POINTS_BASE),
@@ -108,23 +104,6 @@ const GatewayWifiProfilesForm = () => {
         })
     }
   }, [baseUrl, dispatch, entityId, isEdit, navigate, profileId, searchParams])
-
-  useEffect(() => {
-    if (isEdit && !isLoadingAccessPoints && Boolean(formRef.current)) {
-      formRef.current.setValues(values => {
-        const accessPoint = accessPoints.find(ap => ap.ssid === values.ssid)
-
-        return {
-          ...values,
-          _access_point: {
-            ...accessPoint,
-            is_password_set: true,
-            type: accessPoint ? 'all' : 'other',
-          },
-        }
-      })
-    }
-  }, [accessPoints, isEdit, isLoadingAccessPoints, profileId])
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting }) => {

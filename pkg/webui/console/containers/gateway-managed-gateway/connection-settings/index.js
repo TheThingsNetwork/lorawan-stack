@@ -48,6 +48,7 @@ import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
+import diff from '@ttn-lw/lib/diff'
 
 import { checkFromState, mayViewOrEditGatewayCollaborators } from '@console/lib/feature-checks'
 
@@ -55,6 +56,7 @@ import {
   createConnectionProfile,
   GET_ACCESS_POINTS_BASE,
   getConnectionProfile,
+  updateConnectionProfile,
 } from '@console/store/actions/connection-profiles'
 import { updateManagedGateway } from '@console/store/actions/gateways'
 
@@ -84,6 +86,7 @@ const GatewayConnectionSettings = () => {
   const selectedManagedGateway = useSelector(selectSelectedManagedGateway)
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
+  const [nonSharedWifiProfileId, setNonSharedWifiProfileId] = useState(null)
 
   const connectionsData = useConnectionsData()
 
@@ -127,7 +130,7 @@ const GatewayConnectionSettings = () => {
             .filter(({ ids }) => 'organization_ids' in ids)
             .map(({ ids }) => getCollaboratorId({ ids }))
 
-          // If the Wifi profile doesn't belong to the user, iterate through collaborators until found
+          // If the WiFi profile doesn't belong to the user, iterate through collaborators until found
           for (const orgId of orgCollaborators) {
             try {
               wifiProfile = await dispatch(
@@ -168,6 +171,26 @@ const GatewayConnectionSettings = () => {
     return { ethernetProfile }
   }, [dispatch, hasEthernetProfileSet, selectedManagedGateway.ethernet_profile_id])
 
+  const updateInitialWifiProfile = useCallback(
+    (values, profile, entityId, isNonSharedProfile) => ({
+      ...values.wifi_profile,
+      ...(isNonSharedProfile && { ...profile.data }),
+      profile_id: isNonSharedProfile ? 'non-shared' : selectedManagedGateway.wifi_profile_id ?? '',
+      _override: !Boolean(profile) && hasWifiProfileSet,
+      _profile_of: entityId ?? '',
+    }),
+    [hasWifiProfileSet, selectedManagedGateway.wifi_profile_id],
+  )
+
+  const updateInitialEthernetProfile = useCallback(
+    (values, profile) => ({
+      ...values.ethernet_profile,
+      ...revertEthernetProfile(profile?.data ?? {}, hasEthernetProfileSet),
+      profile_id: selectedManagedGateway.ethernet_profile_id ?? '',
+    }),
+    [hasEthernetProfileSet, selectedManagedGateway.ethernet_profile_id],
+  )
+
   const loadData = useCallback(
     async dispatch => {
       let collaborators = []
@@ -177,49 +200,66 @@ const GatewayConnectionSettings = () => {
       }
       const { wifiProfile, entityId } = await fetchWifiProfile(collaborators)
       const { ethernetProfile } = await fetchEthernetProfile()
+      const isNonSharedProfile = Boolean(wifiProfile) && !Boolean(wifiProfile.data.shared)
+      if (isNonSharedProfile) {
+        setNonSharedWifiProfileId(selectedManagedGateway.wifi_profile_id)
+      }
       setInitialValues(oldValues => ({
         ...oldValues,
-        wifi_profile: {
-          ...oldValues.wifi_profile,
-          profile_id: selectedManagedGateway.wifi_profile_id ?? '',
-          _override: !Boolean(wifiProfile) && hasWifiProfileSet,
-          _profile_of: entityId ?? '',
-        },
-        ethernet_profile: {
-          ...oldValues.ethernet_profile,
-          ...revertEthernetProfile(ethernetProfile?.data ?? {}, Boolean(ethernetProfile)),
-          profile_id: selectedManagedGateway.ethernet_profile_id ?? '',
-        },
+        wifi_profile: updateInitialWifiProfile(
+          oldValues,
+          wifiProfile,
+          entityId,
+          isNonSharedProfile,
+        ),
+        ethernet_profile: updateInitialEthernetProfile(oldValues, ethernetProfile),
       }))
     },
     [
       fetchEthernetProfile,
       fetchWifiProfile,
       gtwId,
-      hasWifiProfileSet,
       mayViewCollaborators,
-      selectedManagedGateway.ethernet_profile_id,
       selectedManagedGateway.wifi_profile_id,
+      updateInitialEthernetProfile,
+      updateInitialWifiProfile,
     ],
   )
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting, resetForm }) => {
-      const getWifiProfileId = async profile => {
+      const getWifiProfileId = async (profile, shouldUpdateNonSharedWifiProfile) => {
         const { profile_id, _profile_of, _override, ...wifiProfile } = profile
         let wifiProfileId = profile_id
-        // If the WiFi profile id contains 'shared', create that profile. It could be either shared or non-shared
+        // If the WiFi profile id contains 'shared', create/update that profile.
+        // The id could be either shared or non-shared.
         if (wifiProfileId.includes('shared')) {
           const normalizedWifiProfile = normalizeWifiProfile(
             wifiProfile,
             wifiProfileId === 'shared',
           )
-          const { data } = await dispatch(
-            attachPromise(
-              createConnectionProfile(_profile_of, CONNECTION_TYPES.WIFI, normalizedWifiProfile),
-            ),
-          )
-          wifiProfileId = data.profile_id
+          if (shouldUpdateNonSharedWifiProfile) {
+            const profileDiff = diff(initialValues.wifi_profile, normalizedWifiProfile)
+
+            await dispatch(
+              attachPromise(
+                updateConnectionProfile(
+                  _profile_of,
+                  nonSharedWifiProfileId,
+                  CONNECTION_TYPES.WIFI,
+                  profileDiff,
+                ),
+              ),
+            )
+            wifiProfileId = nonSharedWifiProfileId
+          } else {
+            const { data } = await dispatch(
+              attachPromise(
+                createConnectionProfile(_profile_of, CONNECTION_TYPES.WIFI, normalizedWifiProfile),
+              ),
+            )
+            wifiProfileId = data.profile_id
+          }
         }
         return wifiProfileId
       }
@@ -249,7 +289,10 @@ const GatewayConnectionSettings = () => {
       setError(undefined)
       try {
         const { wifi_profile, ethernet_profile } = values
-        const wifiProfileId = await getWifiProfileId(wifi_profile)
+        const shouldUpdateNonSharedWifiProfile =
+          wifi_profile.profile_id === 'non-shared' && Boolean(nonSharedWifiProfileId)
+
+        const wifiProfileId = await getWifiProfileId(wifi_profile, shouldUpdateNonSharedWifiProfile)
         const ethernetProfileId = await getEthernetProfileId(ethernet_profile)
         const body = {
           ...(Boolean(wifiProfileId) && { wifi_profile_id: wifiProfileId }),
@@ -261,14 +304,18 @@ const GatewayConnectionSettings = () => {
         await dispatch(attachPromise(updateManagedGateway(gtwId, body)))
 
         // Reset the form and the initial values
-        const resetValues = {
-          ...values,
-          wifi_profile: {
-            ...initialWifiProfile,
-            profile_id: wifiProfileId,
-            _profile_of: wifi_profile._profile_of,
-          },
+        let resetValues = { ...values }
+        if (!shouldUpdateNonSharedWifiProfile) {
+          resetValues = {
+            ...values,
+            wifi_profile: {
+              ...initialWifiProfile,
+              profile_id: wifiProfileId,
+              _profile_of: wifi_profile._profile_of,
+            },
+          }
         }
+
         setInitialValues(resetValues)
         resetForm({
           values: resetValues,
@@ -289,7 +336,7 @@ const GatewayConnectionSettings = () => {
         })
       }
     },
-    [dispatch, gtwId, selectedGateway.name],
+    [dispatch, gtwId, initialValues.wifi_profile, nonSharedWifiProfileId, selectedGateway.name],
   )
 
   return (

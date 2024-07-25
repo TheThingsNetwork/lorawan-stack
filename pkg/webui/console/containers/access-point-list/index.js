@@ -123,22 +123,20 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
     })
   }, [dispatch, ids.eui, ids.gateway_id, isMounted])
 
+  // Trigger this useEffect only the first time component is rendered and has accessPoints loaded.
   useEffect(() => {
-    if (!isFirstRender.current && Boolean(ssid) && !isLoading) {
+    if (!isFirstRender.current && ssid && !isLoading) {
       const accessPoint = accessPoints.find(ap => ap.ssid === ssid)
-
-      onChange(
-        {
-          ...accessPoint,
-          is_password_set: true,
-          type: accessPoint ? 'all' : 'other',
-        },
-        true,
-      )
+      const updatedAccessPoint = {
+        ...accessPoint,
+        is_password_set: true,
+        type: accessPoint ? 'all' : 'other',
+      }
+      onChange(updatedAccessPoint, true)
     }
     isFirstRender.current = false
     /* eslint-disable */
-  }, [accessPoints, isLoading, ssid])
+  }, [accessPoints, isLoading])
 
   useEffect(() => {
     handleScanAccessPoints()

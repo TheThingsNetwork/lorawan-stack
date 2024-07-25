@@ -30,7 +30,10 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import GatewayWifiProfilesFormFields from '@console/containers/gateway-managed-gateway/shared/wifi-profiles-form-fields'
 import ShowProfilesSelect from '@console/containers/gateway-managed-gateway/shared/show-profiles-select'
-import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/shared/utils'
+import {
+  CONNECTION_TYPES,
+  initialWifiProfile,
+} from '@console/containers/gateway-managed-gateway/shared/utils'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -70,8 +73,8 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
   const hasChanged = useMemo(
     () =>
       !isEqual(
-        omit(values.wifi_profile, ['_profile_of']),
-        omit(initialValues.wifi_profile, ['_profile_of']),
+        omit(values.wifi_profile, ['_profile_of', '_access_point']),
+        omit(initialValues.wifi_profile, ['_profile_of', '_access_point']),
       ),
     [initialValues, values],
   )
@@ -150,6 +153,22 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
     [setValues],
   )
 
+  const handleProfileIdChange = useCallback(
+    value => {
+      if (value.includes('shared')) {
+        const { profile_id, _profile_of, ...initialProfile } = initialWifiProfile
+        setValues(oldValues => ({
+          ...oldValues,
+          wifi_profile: {
+            ...oldValues.wifi_profile,
+            ...initialProfile,
+          },
+        }))
+      }
+    },
+    [setValues],
+  )
+
   return (
     <>
       <Message component="h3" content={m.wifiConnection} />
@@ -172,6 +191,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
                   options={profileOptions}
                   tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
                   placeholder={m.selectAProfile}
+                  onChange={handleProfileIdChange}
                 />
               </RequireRequest>
             )}

@@ -67,7 +67,7 @@ export const normalizeWifiProfile = (profile, shared = true) => {
     rest.network_interface_addresses = undefined
   }
 
-  if (_access_point.is_password_set) {
+  if (_access_point.is_password_set && _access_point.type !== 'other') {
     delete rest.ssid
     delete rest.password
   }
