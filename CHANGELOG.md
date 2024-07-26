@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix unhandled video stream in QR code scanner
+
 ### Security
 
 ## [3.31.1] - unreleased
