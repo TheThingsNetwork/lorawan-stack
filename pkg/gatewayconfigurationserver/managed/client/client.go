@@ -17,14 +17,16 @@ package client
 
 import (
 	"context"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 )
 
@@ -49,7 +51,9 @@ type eventData struct {
 	*ttnpb.ManagedGatewayEventData
 }
 
-func (c *client) subscribeEventData(ctx context.Context, ids ...*ttnpb.GatewayIdentifiers) (chan *eventData, error) {
+func (c *client) subscribeEventData(
+	ctx context.Context, ch chan *eventData, ids ...*ttnpb.GatewayIdentifiers,
+) (wait func() error, err error) {
 	conn, err := c.component.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER, nil)
 	if err != nil {
 		return nil, err
@@ -59,43 +63,37 @@ func (c *client) subscribeEventData(ctx context.Context, ids ...*ttnpb.GatewayId
 		return nil, err
 	}
 	client := ttnpb.NewManagedGatewayConfigurationServiceClient(conn)
-	eventDataCh := make(chan *eventData)
+
+	ctx, cancel := context.WithCancel(ctx)
+	wg, ctx := errgroup.WithContext(ctx)
 	for _, gtwID := range ids {
 		gtwID := gtwID
-		c.component.StartTask(&task.Config{
-			Context: ctx,
-			ID:      "managed_gateway_events",
-			Func: func(ctx context.Context) error {
-				stream, err := client.StreamEvents(ctx, gtwID, callOpt)
+		stream, err := client.StreamEvents(ctx, gtwID, callOpt)
+		if err != nil {
+			cancel()
+			return nil, err
+		}
+		wg.Go(func() error {
+			for {
+				data, err := stream.Recv()
 				if err != nil {
 					return err
 				}
-				for {
-					data, err := stream.Recv()
-					if err != nil {
-						if errors.IsNotFound(err) {
-							return nil
-						}
-						return err
-					}
-					select {
-					case <-ctx.Done():
-						return ctx.Err()
-					case eventDataCh <- &eventData{
-						GatewayIdentifiers:      gtwID,
-						ManagedGatewayEventData: data,
-					}:
-					}
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case ch <- &eventData{
+					GatewayIdentifiers:      gtwID,
+					ManagedGatewayEventData: data,
+				}:
 				}
-			},
-			Done: func() {
-				close(eventDataCh)
-			},
-			Restart: task.RestartOnFailure,
-			Backoff: task.DialBackoffConfig,
+			}
 		})
 	}
-	return eventDataCh, nil
+	return func() error {
+		defer cancel()
+		return wg.Wait()
+	}, nil
 }
 
 func mapEvent(ctx context.Context, eventData *eventData) events.Event {
@@ -176,6 +174,7 @@ func matcherByNames(names []string) func(name string) bool {
 }
 
 // Subscribe implements events.Subscriber.
+// This method does not block once the subscription is established.
 func (c *client) Subscribe(
 	ctx context.Context, names []string, identifiers []*ttnpb.EntityIdentifiers, hdl events.Handler,
 ) error {
@@ -185,20 +184,24 @@ func (c *client) Subscribe(
 			ids = append(ids, id.GetGatewayIds())
 		}
 	}
-	ch, err := c.subscribeEventData(ctx, ids...)
+	ch := make(chan *eventData)
+	wait, err := c.subscribeEventData(ctx, ch, ids...)
 	if err != nil {
 		return err
 	}
+	go func() {
+		defer close(ch)
+		if err := wait(); err != nil && !errors.IsCanceled(err) {
+			log.FromContext(ctx).WithError(err).Warn("Failed to subscribe to managed gateway events")
+		}
+	}()
 	match := matcherByNames(names)
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case eventData, ok := <-ch:
-				if !ok {
-					return
-				}
+			case eventData := <-ch:
 				evt := mapEvent(ctx, eventData)
 				if evt == nil || !match(evt.Name()) {
 					continue
@@ -208,4 +211,55 @@ func (c *client) Subscribe(
 		}
 	}()
 	return nil
+}
+
+// SubscribeWithHistory implements events.SubscriberWithHistory.
+// This method blocks until the context is done or an error occurs.
+func (c *client) SubscribeWithHistory(
+	ctx context.Context,
+	names []string,
+	identifiers []*ttnpb.EntityIdentifiers,
+	_ *time.Time,
+	_ int,
+	hdl events.Handler,
+) error {
+	ids := make([]*ttnpb.GatewayIdentifiers, 0, len(identifiers))
+	for _, id := range identifiers {
+		if id.GetGatewayIds() != nil {
+			ids = append(ids, id.GetGatewayIds())
+		}
+	}
+	ch := make(chan *eventData)
+	wait, err := c.subscribeEventData(ctx, ch, ids...)
+	if err != nil {
+		return err
+	}
+	match := matcherByNames(names)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case eventData := <-ch:
+				evt := mapEvent(ctx, eventData)
+				if evt == nil || !match(evt.Name()) {
+					continue
+				}
+				hdl.Notify(evt)
+			}
+		}
+	}()
+	return wait()
+}
+
+// FindRelated implements events.SubscriberWithHistory.
+func (*client) FindRelated(context.Context, string) ([]events.Event, error) {
+	return nil, nil
+}
+
+// FetchHistory implements events.SubscriberWithHistory.
+func (*client) FetchHistory(
+	context.Context, []string, []*ttnpb.EntityIdentifiers, *time.Time, int,
+) ([]events.Event, error) {
+	return nil, nil
 }

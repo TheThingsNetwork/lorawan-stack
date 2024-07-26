@@ -17,10 +17,14 @@ package mux
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 	"sort"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"golang.org/x/sync/errgroup"
@@ -91,6 +95,14 @@ nextStream:
 	return streams
 }
 
+func (*multiplexer) subscriberType(sub events.Subscriber) string {
+	t := reflect.TypeOf(sub)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	return fmt.Sprintf("%s.%s", t.PkgPath(), t.Name())
+}
+
 // Publish implements events.PubSub.
 func (m *multiplexer) Publish(evts ...events.Event) {
 	m.ps.Publish(evts...)
@@ -106,11 +118,14 @@ func (m *multiplexer) Subscribe(
 			cancel()
 		}
 	}()
-	if err := m.ps.Subscribe(ctx, names, identifiers, hdl); err != nil {
-		return err
+	subs := make([]events.Subscriber, 0, len(m.streams)+1)
+	subs = append(subs, m.ps)
+	for _, s := range m.matchingStreams(names...) {
+		subs = append(subs, s.ps)
 	}
-	for _, stream := range m.matchingStreams(names...) {
-		if err := stream.ps.Subscribe(ctx, names, identifiers, hdl); err != nil {
+	for _, sub := range subs {
+		ctx := log.NewContextWithField(ctx, "events_mux_subscription_type", m.subscriberType(sub))
+		if err := sub.Subscribe(ctx, names, identifiers, hdl); err != nil {
 			return err
 		}
 	}
@@ -122,7 +137,7 @@ type multiplexerStore struct {
 	multiplexer
 }
 
-func (*multiplexerStore) fromSubscribers(
+func (m *multiplexerStore) fromSubscribers(
 	ctx context.Context,
 	subs []events.SubscriberWithHistory,
 	f func(context.Context, events.SubscriberWithHistory) ([]events.Event, error),
@@ -131,6 +146,7 @@ func (*multiplexerStore) fromSubscribers(
 	res := make(chan []events.Event, len(subs))
 	for _, ps := range subs {
 		ps := ps
+		ctx := log.NewContextWithField(ctx, "events_mux_subscription_type", m.subscriberType(ps))
 		group.Go(func() error {
 			evts, err := f(ctx, ps)
 			if err != nil {
@@ -198,6 +214,26 @@ func (m *multiplexerStore) FindRelated(ctx context.Context, correlationID string
 	)
 }
 
+func (*multiplexerStore) swallowNonRetryableStreamErr(ctx context.Context, isPrimary bool, err error) error {
+	if isPrimary {
+		return err
+	}
+	logger := log.FromContext(ctx).WithError(err)
+	switch {
+	case errors.IsCanceled(err),
+		errors.IsDeadlineExceeded(err),
+		errors.IsUnavailable(err),
+		errors.IsResourceExhausted(err):
+		logger.Info("Stream failed with retryable error")
+		return err
+	default:
+		// Other error codes are considered not retryable. They are not propagated to the caller, because that would
+		// cause the multiplexed subscription to fail.
+		logger.WithError(err).Warn("Stream failed with non-retryable error")
+		return nil
+	}
+}
+
 // SubscribeWithHistory implements events.Store.
 func (m *multiplexerStore) SubscribeWithHistory(
 	ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int, hdl events.Handler,
@@ -209,15 +245,18 @@ func (m *multiplexerStore) SubscribeWithHistory(
 		subs = append(subs, s.ps)
 	}
 	wg, ctx := errgroup.WithContext(ctx)
-	for _, sub := range subs {
-		sub := sub
+	for i, sub := range subs {
+		sub, isPrimary := sub, i == 0
+		ctx := log.NewContextWithField(ctx, "events_mux_subscription_type", m.subscriberType(sub))
 		if subWithHistory, hasHistory := sub.(events.SubscriberWithHistory); hasHistory {
 			wg.Go(func() error {
-				return subWithHistory.SubscribeWithHistory(ctx, names, ids, after, tail, hdl)
+				return m.swallowNonRetryableStreamErr(
+					ctx, isPrimary, subWithHistory.SubscribeWithHistory(ctx, names, ids, after, tail, hdl),
+				)
 			})
 		} else {
 			wg.Go(func() error {
-				return sub.Subscribe(ctx, names, ids, hdl)
+				return m.swallowNonRetryableStreamErr(ctx, isPrimary, sub.Subscribe(ctx, names, ids, hdl))
 			})
 		}
 	}
