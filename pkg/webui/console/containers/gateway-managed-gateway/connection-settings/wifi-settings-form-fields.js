@@ -60,9 +60,10 @@ const m = defineMessages({
     'This gateway already has a WiFi profile set by another collaborator. If wished, you can override this profile below.',
   overrideProfile: 'Override this profile',
   editProfile: 'Edit this profile',
+  attemptingToConnect: 'The gateway WiFi is currently attempting to connect using this profile',
 })
 
-const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
+const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicked }) => {
   const { gtwId } = useParams()
   const { values, setValues } = useFormContext()
   const dispatch = useDispatch()
@@ -91,7 +92,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
   const connectionStatus = useMemo(() => {
     if (!values.wifi_profile.profile_id) return null
     if (hasChanged) {
-      return { message: m.saveToConnect, icon: 'rotate_right' }
+      return { message: m.saveToConnect, icon: 'save' }
     }
     if (isWifiConnected) {
       if (values.wifi_profile._override) {
@@ -104,6 +105,12 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
       return { message: m.connected, icon: 'check_circle_outline', color: 'c-success' }
     }
     if (!isWifiConnected) {
+      if (saveFormClicked) {
+        return {
+          message: m.attemptingToConnect,
+          icon: 'rotate_right',
+        }
+      }
       if (values.wifi_profile._override) {
         return {
           message: m.unableToConnectCollaborator,
@@ -115,7 +122,13 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected }) => {
     }
 
     return null
-  }, [hasChanged, isWifiConnected, values.wifi_profile._override, values.wifi_profile.profile_id])
+  }, [
+    hasChanged,
+    isWifiConnected,
+    saveFormClicked,
+    values.wifi_profile._override,
+    values.wifi_profile.profile_id,
+  ])
 
   const handleChangeProfile = useCallback(
     async value => {
@@ -246,6 +259,7 @@ WifiSettingsFormFields.propTypes = {
     }),
   }).isRequired,
   isWifiConnected: PropTypes.bool,
+  saveFormClicked: PropTypes.bool.isRequired,
 }
 
 WifiSettingsFormFields.defaultProps = {

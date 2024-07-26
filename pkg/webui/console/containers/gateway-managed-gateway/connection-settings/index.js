@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Col, Row } from 'react-grid-system'
@@ -87,6 +87,7 @@ const GatewayConnectionSettings = () => {
   const userId = useSelector(selectUserId)
   const dispatch = useDispatch()
   const [nonSharedWifiProfileId, setNonSharedWifiProfileId] = useState(null)
+  const [saveFormClicked, setSaveFormClicked] = useState(false)
 
   const connectionsData = useConnectionsData()
 
@@ -305,7 +306,7 @@ const GatewayConnectionSettings = () => {
 
         // Reset the form and the initial values
         let resetValues = { ...values }
-        if (!shouldUpdateNonSharedWifiProfile) {
+        if (wifi_profile.profile_id !== 'non-shared') {
           resetValues = {
             ...values,
             wifi_profile: {
@@ -320,6 +321,7 @@ const GatewayConnectionSettings = () => {
         resetForm({
           values: resetValues,
         })
+        setSaveFormClicked(true)
 
         toast({
           title: selectedGateway.name,
@@ -355,6 +357,7 @@ const GatewayConnectionSettings = () => {
               <WifiSettingsFormFields
                 initialValues={initialValues}
                 isWifiConnected={connectionsData.isWifiConnected}
+                saveFormClicked={saveFormClicked}
               />
               <EthernetSettingsFormFields />
 

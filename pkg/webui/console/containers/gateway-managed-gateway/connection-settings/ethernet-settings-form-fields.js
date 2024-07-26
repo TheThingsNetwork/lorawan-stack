@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import { defineMessages } from 'react-intl'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'

@@ -24,52 +24,48 @@ const isConnected = type => type && type !== NETWORK_INTERFACE_STATUS.UNSPECIFIE
 
 const useConnectionsData = () => {
   const { gtwId } = useParams()
-
   const events = useSelector(state => selectGatewayEvents(state, gtwId))
 
-  const systemStatus = useMemo(
-    () => events.find(e => /\.system_status\./.test(e.name))?.data,
-    [events],
+  const connectionsData = useMemo(() => {
+    const matchEvent = (e, regex) => (regex.test(e.name) ? e.data : null)
+
+    const eventTypes = [
+      { key: 'systemStatus', regex: /\.system_status\./ },
+      { key: 'controllerConnection', regex: /\.controller\./ },
+      { key: 'serverConnection', regex: /\.gs\./ },
+      { key: 'cellularBackhaul', regex: /\.cellular\./ },
+      { key: 'wifiBackhaul', regex: /\.wifi\./ },
+      { key: 'ethernetBackhaul', regex: /\.ethernet\./ },
+      { key: 'updatedManagedGateway', regex: /\.managed\.update$/ },
+    ]
+
+    const result = {}
+    for (const e of events) {
+      const remainingEventTypes = eventTypes.filter(({ key }) => !(key in result))
+      for (const { key, regex } of remainingEventTypes) {
+        const matchedData = matchEvent(e, regex)
+        if (matchedData !== null) {
+          result[key] = matchedData
+        }
+      }
+      if (Object.keys(result).length === eventTypes.length) {
+        break
+      }
+    }
+
+    return result
+  }, [events])
+
+  const isCellularConnected = isConnected(
+    connectionsData.cellularBackhaul?.network_interface?.status,
   )
-
-  const controllerConnection = useMemo(
-    () => events.find(e => /\.controller\./.test(e.name))?.data,
-    [events],
+  const isWifiConnected = isConnected(connectionsData.wifiBackhaul?.network_interface?.status)
+  const isEthernetConnected = isConnected(
+    connectionsData.ethernetBackhaul?.network_interface?.status,
   )
-
-  const serverConnection = useMemo(() => events.find(e => /\.gs\./.test(e.name))?.data, [events])
-
-  const cellularBackhaul = useMemo(
-    () => events.find(e => /\.cellular\./.test(e.name))?.data,
-    [events],
-  )
-
-  const wifiBackhaul = useMemo(() => events.find(e => /\.wifi\./.test(e.name))?.data, [events])
-
-  const ethernetBackhaul = useMemo(
-    () => events.find(e => /\.ethernet\./.test(e.name))?.data,
-    [events],
-  )
-
-  const updatedManagedGateway = useMemo(
-    () => events.find(e => /\.managed\.update$/.test(e.name))?.data,
-    [events],
-  )
-
-  const isCellularConnected = isConnected(cellularBackhaul?.network_interface?.status)
-
-  const isWifiConnected = isConnected(wifiBackhaul?.network_interface?.status)
-
-  const isEthernetConnected = isConnected(ethernetBackhaul?.network_interface?.status)
 
   return {
-    systemStatus,
-    controllerConnection,
-    serverConnection,
-    cellularBackhaul,
-    wifiBackhaul,
-    ethernetBackhaul,
-    updatedManagedGateway,
+    ...connectionsData,
     isCellularConnected,
     isWifiConnected,
     isEthernetConnected,

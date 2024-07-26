@@ -124,6 +124,7 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
   }, [dispatch, ids.eui, ids.gateway_id, isMounted])
 
   // Trigger this useEffect only the first time component is rendered and has accessPoints loaded.
+  // Change value only if ssid is provided. (if it's edit form)
   useEffect(() => {
     if (!isFirstRender.current && ssid && !isLoading) {
       const accessPoint = accessPoints.find(ap => ap.ssid === ssid)
