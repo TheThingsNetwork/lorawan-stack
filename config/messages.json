@@ -3923,6 +3923,33 @@
       "file": "ttjs.go"
     }
   },
+  "error:pkg/deviceclaimingserver/gateways/ttgc:not_implemented": {
+    "translations": {
+      "en": "not implemented"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways/ttgc",
+      "file": "ttgc.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/gateways:invalid_upstream": {
+    "translations": {
+      "en": "upstream `{name}` is invalid"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways",
+      "file": "gateways.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:claim gateway": {
+    "translations": {
+      "en": "claim gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
+    }
+  },
   "error:pkg/deviceclaimingserver:claiming_not_supported": {
     "translations": {
       "en": "claiming not supported for JoinEUI `{eui}`"
@@ -3930,6 +3957,15 @@
     "description": {
       "package": "pkg/deviceclaimingserver",
       "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:create_gateway": {
+    "translations": {
+      "en": "create gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
     }
   },
   "error:pkg/deviceclaimingserver:device_not_found": {
@@ -3941,13 +3977,31 @@
       "file": "grpc_end_devices.go"
     }
   },
-  "error:pkg/deviceclaimingserver:method_unavailable": {
+  "error:pkg/deviceclaimingserver:gateway_already_exists": {
     "translations": {
-      "en": "method unavailable"
+      "en": "gateway with EUI `{eui}` already exists"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",
-      "file": "grpc_end_devices.go"
+      "file": "grpc_gateways.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:gateway_claiming_not_supported": {
+    "translations": {
+      "en": "claiming not supported for gateway with EUI `{eui}`"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:gateway_claiming_with_qrcodes_not_implemented": {
+    "translations": {
+      "en": "gateway claiming with QR codes not implemented"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
     }
   },
   "error:pkg/deviceclaimingserver:no_devices_found": {
@@ -3959,6 +4013,15 @@
       "file": "grpc_end_devices.go"
     }
   },
+  "error:pkg/deviceclaimingserver:no_eui": {
+    "translations": {
+      "en": "no EUI found for gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
+    }
+  },
   "error:pkg/deviceclaimingserver:no_euis": {
     "translations": {
       "en": "DevEUI/JoinEUI not set for device"
@@ -3966,6 +4029,15 @@
     "description": {
       "package": "pkg/deviceclaimingserver",
       "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:no_gateway_server_address": {
+    "translations": {
+      "en": "no gateway server address set for gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
     }
   },
   "error:pkg/deviceclaimingserver:no_join_eui": {
@@ -10149,6 +10221,96 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "client_registry.go"
+    }
+  },
+  "event:dcs.end_device.claim.abort": {
+    "translations": {
+      "en": "abort end device claim"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.end_device.claim.fail": {
+    "translations": {
+      "en": "claim end device failure"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.end_device.claim.success": {
+    "translations": {
+      "en": "claim end device successful"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.end_device.unclaim.fail": {
+    "translations": {
+      "en": "unclaim end device failure"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.end_device.unclaim.success": {
+    "translations": {
+      "en": "unclaim end device successful"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.claim.abort": {
+    "translations": {
+      "en": "abort gateway claim"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.claim.fail": {
+    "translations": {
+      "en": "claim gateway failure"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.claim.success": {
+    "translations": {
+      "en": "claim gateway successful"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.unclaim.fail": {
+    "translations": {
+      "en": "unclaim gateway failure"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.unclaim.success": {
+    "translations": {
+      "en": "unclaim gateway successful"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
     }
   },
   "event:end_device.batch.delete": {
