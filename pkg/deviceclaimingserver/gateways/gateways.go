@@ -36,9 +36,9 @@ type Config struct {
 var errInvalidUpstream = errors.DefineInvalidArgument("invalid_upstream", "upstream `{name}` is invalid")
 
 // ParseGatewayEUIRanges parses the configured upstream map and returns map of ranges.
-func ParseGatewayEUIRanges(config map[string][]string) (map[string][]dcstypes.EUI64Range, error) {
-	res := make(map[string][]dcstypes.EUI64Range, len(config))
-	for host, ranges := range config {
+func ParseGatewayEUIRanges(conf map[string][]string) (map[string][]dcstypes.EUI64Range, error) {
+	res := make(map[string][]dcstypes.EUI64Range, len(conf))
+	for host, ranges := range conf {
 		res[host] = make([]dcstypes.EUI64Range, 0, len(ranges))
 		for _, val := range ranges {
 			var r dcstypes.EUI64Range
