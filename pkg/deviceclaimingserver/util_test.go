@@ -81,7 +81,7 @@ type MockGatewayClaimer struct {
 	EUIs []types.EUI64
 
 	ClaimFunc   func(context.Context, types.EUI64, string, string) error
-	UnclaimFunc func(context.Context, types.EUI64, string) error
+	UnclaimFunc func(context.Context, types.EUI64) error
 }
 
 // Claim implements gateways.Claimer.
@@ -95,8 +95,8 @@ func (claimer MockGatewayClaimer) Claim(
 }
 
 // Unclaim implements gateways.Claimer.
-func (claimer MockGatewayClaimer) Unclaim(ctx context.Context, eui types.EUI64, clusterAddress string) error {
-	return claimer.UnclaimFunc(ctx, eui, clusterAddress)
+func (claimer MockGatewayClaimer) Unclaim(ctx context.Context, eui types.EUI64) error {
+	return claimer.UnclaimFunc(ctx, eui)
 }
 
 type mockGatewayRegistry struct {
