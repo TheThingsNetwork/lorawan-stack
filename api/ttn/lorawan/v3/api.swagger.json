@@ -7862,9 +7862,49 @@
         ]
       }
     },
+    "/gcls/claim/{gateway_id}": {
+      "delete": {
+        "summary": "Unclaims the gateway.\nEUI provided in the request are ignored and the end device is looked up by the gateway ID.",
+        "operationId": "GatewayClaimingServer_Unclaim",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "GatewayClaimingServer"
+        ]
+      }
+    },
     "/gcls/gateways/{gateway_ids.gateway_id}/authorize": {
       "post": {
-        "summary": "AuthorizeGateway allows a gateway to be claimed.",
+        "summary": "AuthorizeGateway allows a gateway to be claimed.\nDEPRECATED: Authorizing gateways for claiming is no longer supported and will be removed in a future version of The\nThings Stack.",
         "operationId": "GatewayClaimingServer_AuthorizeGateway",
         "responses": {
           "200": {
@@ -7904,7 +7944,7 @@
     },
     "/gcls/gateways/{gateway_id}/authorize": {
       "delete": {
-        "summary": "UnauthorizeGateway prevents a gateway from being claimed.",
+        "summary": "UnauthorizeGateway prevents a gateway from being claimed.\nDEPRECATED: Unauthorizing (locking) gateways for claiming is no longer supported and will be removed in a future\nversion of The Things Stack.",
         "operationId": "GatewayClaimingServer_UnauthorizeGateway",
         "responses": {
           "200": {
@@ -20451,7 +20491,8 @@
           "type": "string",
           "description": "The Device Claiming Server will fill this field with a The Things Stack API Key."
         }
-      }
+      },
+      "description": "DEPRECATED: This message is deprecated and will be removed in a future version of The Things Stack."
     },
     "v3ClaimEndDeviceRequest": {
       "type": "object",
@@ -20520,7 +20561,7 @@
         },
         "cups_redirection": {
           "$ref": "#/definitions/v3CUPSRedirection",
-          "description": "Parameters to set CUPS redirection for the gateway."
+          "description": "Parameters to set CUPS redirection for the gateway.\nDEPRECATED: This field is deprecated and will be removed in a future version of The Things Stack."
         },
         "target_frequency_plan_id": {
           "type": "string",

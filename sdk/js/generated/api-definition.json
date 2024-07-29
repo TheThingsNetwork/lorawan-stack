@@ -2280,6 +2280,29 @@
         }
       ]
     },
+    "Unclaim": {
+      "file": "ttn/lorawan/v3/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/gcls/claim/{gateway_id}",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
+    },
+    "GetInfoByGatewayEUI": {
+      "file": "ttn/lorawan/v3/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/gcls/claim/info",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    },
     "AuthorizeGateway": {
       "file": "ttn/lorawan/v3/deviceclaimingserver.proto",
       "http": [
@@ -2302,17 +2325,6 @@
           "parameters": [
             "gateway_id"
           ]
-        }
-      ]
-    },
-    "GetInfoByGatewayEUI": {
-      "file": "ttn/lorawan/v3/deviceclaimingserver.proto",
-      "http": [
-        {
-          "method": "post",
-          "pattern": "/gcls/claim/info",
-          "body": "*",
-          "parameters": []
         }
       ]
     }

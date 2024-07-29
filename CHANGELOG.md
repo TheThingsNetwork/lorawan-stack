@@ -15,7 +15,12 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
+- Experimental RPCs `AuthorizeGateway` and `UnauthorizeGateway` of the Gateway Claiming Server (GCLS).
+- `CUPSRedirection` field of `ClaimGatewayRequest`.
+
 ### Removed
+
+- `authorize` and `unauthorize` sub-commands of the gateway `claim` command.
 
 ### Fixed
 
