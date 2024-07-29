@@ -70,7 +70,7 @@ func TestRedisPassthrough(t *testing.T) {
 		Timeout: timeout,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
 			conf := config.RedisEvents{
-				Config: redisConfig(),
+				Config: redisConfig("mux"),
 			}
 			conf.Store.Enable = true
 			batchConf := config.BatchEvents{Enable: true}
@@ -106,7 +106,7 @@ func TestMultiplexing(t *testing.T) {
 			// C and D are basic PubSubs which do not implement events.Store.
 
 			confA := config.RedisEvents{
-				Config: redisConfig("a"),
+				Config: redisConfig("mux", "a"),
 			}
 			confA.Store.Enable = true
 			batchConfA := config.BatchEvents{Enable: true}
@@ -114,7 +114,7 @@ func TestMultiplexing(t *testing.T) {
 			defer innerA.(*redis.PubSubStore).Close(ctx)
 
 			confB := config.RedisEvents{
-				Config: redisConfig("b"),
+				Config: redisConfig("mux", "b"),
 			}
 			confB.Store.Enable = true
 			batchConfB := config.BatchEvents{Enable: true}
