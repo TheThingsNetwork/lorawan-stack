@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import { GATEWAY } from '@console/constants/entities'
 import tts from '@console/api/tts'
 
 import Icon, {
@@ -42,12 +43,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
-import {
-  checkFromState,
-  mayDeleteGateway,
-  mayViewOrEditGatewayApiKeys,
-  mayViewOrEditGatewayCollaborators,
-} from '@console/lib/feature-checks'
+import { checkFromState, mayDeleteGateway } from '@console/lib/feature-checks'
 
 import {
   ADD_BOOKMARK_BASE,
@@ -55,7 +51,6 @@ import {
   DELETE_BOOKMARK_BASE,
   deleteBookmark,
 } from '@console/store/actions/user-preferences'
-import { deleteGateway } from '@console/store/actions/gateways'
 
 import { selectUser } from '@console/store/selectors/logout'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
@@ -177,19 +172,11 @@ const GatewayOverviewHeader = ({ gateway }) => {
           />
         </div>
         <DeleteEntityHeaderModal
-          entity="gateway"
+          entity={GATEWAY}
           entityId={gateway_id}
           entityName={name}
           setVisible={setDeleteGatewayVisible}
           visible={deleteGatewayVisible}
-          mayDeleteEntitySelector={mayDeleteGateway}
-          mayViewOrEditEntityCollaborators={mayViewOrEditGatewayCollaborators}
-          mayViewOrEditEntityApiKeys={mayViewOrEditGatewayApiKeys}
-          path="/gateways"
-          deleteEntity={deleteGateway}
-          deleteMessage={sharedMessages.deleteGateway}
-          deletedMessage={sharedMessages.gatewayDeleted}
-          deletedErrorMessage={sharedMessages.gatewayDeleteError}
         />
       </div>
     </div>

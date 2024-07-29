@@ -16,6 +16,8 @@ import React, { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { APPLICATION, GATEWAY } from '@console/constants/entities'
+
 import { IconTrash } from '@ttn-lw/components/icon'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import toast from '@ttn-lw/components/toast'
@@ -34,39 +36,78 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/collaborators'
 
-import { checkFromState, mayPurgeEntities } from '@console/lib/feature-checks'
+import {
+  checkFromState,
+  mayDeleteApplication,
+  mayDeleteGateway,
+  mayPurgeEntities,
+  mayViewOrEditApplicationApiKeys,
+  mayViewOrEditApplicationCollaborators,
+  mayViewOrEditGatewayApiKeys,
+  mayViewOrEditGatewayCollaborators,
+} from '@console/lib/feature-checks'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
+import { deleteApplication } from '@console/store/actions/applications'
+import { deleteGateway } from '@console/store/actions/gateways'
 
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
-const DeleteEntityHeaderModal = props => {
-  const {
-    entity,
-    entityId,
-    entityName,
-    visible,
-    setVisible,
-    setError,
-    mayDeleteEntitySelector,
-    mayViewOrEditEntityCollaborators,
-    mayViewOrEditEntityApiKeys,
-    path,
-    deleteEntity,
-    deleteMessage,
-    deletedMessage,
-    deletedErrorMessage,
-    additionalConditions,
-  } = props
+const deleteEntityActionMap = {
+  [APPLICATION]: deleteApplication,
+  [GATEWAY]: deleteGateway,
+}
 
+const mayDeleteEntitySelectorMap = {
+  [APPLICATION]: mayDeleteApplication,
+  [GATEWAY]: mayDeleteGateway,
+}
+
+const mayViewOrEditEntityCollaboratorsMap = {
+  [APPLICATION]: mayViewOrEditApplicationCollaborators,
+  [GATEWAY]: mayViewOrEditGatewayCollaborators,
+}
+
+const mayViewOrEditEntityApiKeysMap = {
+  [APPLICATION]: mayViewOrEditApplicationApiKeys,
+  [GATEWAY]: mayViewOrEditGatewayApiKeys,
+}
+
+const path = {
+  [APPLICATION]: '/applications',
+  [GATEWAY]: '/gateways',
+}
+
+const deleteMessageMap = {
+  [APPLICATION]: sharedMessages.deleteApp,
+  [GATEWAY]: sharedMessages.deleteGateway,
+}
+
+const deletedMessageMap = {
+  [APPLICATION]: sharedMessages.deleteSuccess,
+  [GATEWAY]: sharedMessages.gatewayDeleted,
+}
+
+const deletedErrorMessageMap = {
+  [APPLICATION]: sharedMessages.applicationDeleteFailure,
+  [GATEWAY]: sharedMessages.gatewayDeleteError,
+}
+
+const DeleteEntityHeaderModal = props => {
+  const { entity, entityId, entityName, visible, setVisible, setError, additionalConditions } =
+    props
+
+  const lowerCaseEntity = entity.toLowerCase()
   const [confirmId, setConfirmId] = React.useState('')
   const [purgeEntity, setPurgeEntity] = React.useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const mayPurgeEntity = useSelector(state => checkFromState(mayPurgeEntities, state))
-  const mayDeleteEntity = useSelector(state => checkFromState(mayDeleteEntitySelector, state))
+  const mayDeleteEntity = useSelector(state =>
+    checkFromState(mayDeleteEntitySelectorMap[entity], state),
+  )
   const apiKeysCount = useSelector(selectApiKeysTotalCount)
   const collaboratorsCount = useSelector(state =>
     selectCollaboratorsTotalCount(state, { id: entityId }),
@@ -75,9 +116,11 @@ const DeleteEntityHeaderModal = props => {
   const hasAddedCollaborators = collaboratorsCount > 1
   const isPristine = !hasAddedCollaborators && !hasApiKeys && !additionalConditions
   const mayViewCollaborators = useSelector(state =>
-    checkFromState(mayViewOrEditEntityCollaborators, state),
+    checkFromState(mayViewOrEditEntityCollaboratorsMap[entity], state),
   )
-  const mayViewApiKeys = useSelector(state => checkFromState(mayViewOrEditEntityApiKeys, state))
+  const mayViewApiKeys = useSelector(state =>
+    checkFromState(mayViewOrEditEntityApiKeysMap[entity], state),
+  )
   const shouldConfirmDelete = !isPristine || !mayViewCollaborators || !mayViewApiKeys
 
   const name = entityName ? entityName : entityId
@@ -95,11 +138,15 @@ const DeleteEntityHeaderModal = props => {
             if (setError) {
               setError(undefined)
             }
-            await dispatch(attachPromise(deleteEntity(entityId, { purge: purgeEntity || false })))
-            navigate(path)
+            await dispatch(
+              attachPromise(
+                deleteEntityActionMap[entity](entityId, { purge: purgeEntity || false }),
+              ),
+            )
+            navigate(path[entity])
             toast({
               title: entityId,
-              message: deletedMessage,
+              message: deletedMessageMap[entity],
               type: toast.types.SUCCESS,
             })
           } catch (error) {
@@ -108,7 +155,7 @@ const DeleteEntityHeaderModal = props => {
             }
             toast({
               title: entityId,
-              message: deletedErrorMessage,
+              message: deletedErrorMessageMap[entity],
               type: toast.types.ERROR,
             })
           }
@@ -116,33 +163,22 @@ const DeleteEntityHeaderModal = props => {
       }
       setVisible(false)
     },
-    [
-      dispatch,
-      entityId,
-      navigate,
-      purgeEntity,
-      setError,
-      setVisible,
-      path,
-      deleteEntity,
-      deletedMessage,
-      deletedErrorMessage,
-    ],
+    [dispatch, entityId, navigate, purgeEntity, setError, setVisible, entity],
   )
 
   const loadData = useCallback(
     async dispatch => {
       if (mayDeleteEntity) {
         if (mayViewApiKeys) {
-          await dispatch(attachPromise(getApiKeysList(entity, entityId)))
+          await dispatch(attachPromise(getApiKeysList(lowerCaseEntity, entityId)))
         }
         if (mayViewCollaborators) {
-          await dispatch(attachPromise(getCollaboratorsList(entity, entityId)))
+          await dispatch(attachPromise(getCollaboratorsList(lowerCaseEntity, entityId)))
         }
       }
       dispatch(attachPromise(getIsConfiguration()))
     },
-    [entityId, mayDeleteEntity, mayViewApiKeys, mayViewCollaborators, entity],
+    [entityId, mayDeleteEntity, mayViewApiKeys, mayViewCollaborators, lowerCaseEntity],
   )
 
   const initialValues = React.useMemo(
@@ -163,7 +199,7 @@ const DeleteEntityHeaderModal = props => {
           disabled: shouldConfirmDelete && confirmId !== entityId,
           icon: IconTrash,
           primary: true,
-          message: deleteMessage,
+          message: deleteMessageMap[entity],
         }}
       >
         <div>
@@ -231,17 +267,9 @@ const DeleteEntityHeaderModal = props => {
 
 DeleteEntityHeaderModal.propTypes = {
   additionalConditions: PropTypes.bool,
-  deleteEntity: PropTypes.func.isRequired,
-  deleteMessage: PropTypes.message.isRequired,
-  deletedErrorMessage: PropTypes.message.isRequired,
-  deletedMessage: PropTypes.message.isRequired,
   entity: PropTypes.string.isRequired,
   entityId: PropTypes.string.isRequired,
   entityName: PropTypes.string,
-  mayDeleteEntitySelector: PropTypes.shape({}).isRequired,
-  mayViewOrEditEntityApiKeys: PropTypes.shape({}).isRequired,
-  mayViewOrEditEntityCollaborators: PropTypes.shape({}).isRequired,
-  path: PropTypes.string.isRequired,
   setError: PropTypes.func,
   setVisible: PropTypes.func.isRequired,
   visible: PropTypes.bool.isRequired,

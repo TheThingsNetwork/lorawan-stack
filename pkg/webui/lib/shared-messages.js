@@ -551,7 +551,7 @@ export default defineMessages({
   token: 'Token',
   tokenDelete: 'Token delete',
   tokenDeleted: 'Token deleted',
-  topDevices: 'Top devices',
+  topDevices: 'Top end devices',
   topEntities: 'Top entities',
   topEntitiesError: 'Top entities are currently unavailable',
   tokenSet: 'Set token',

@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import { APPLICATION } from '@console/constants/entities'
+
 import Icon, {
   IconBroadcast,
   IconCalendarMonth,
@@ -47,8 +49,6 @@ import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import {
   checkFromState,
   mayDeleteApplication,
-  mayViewOrEditApplicationApiKeys,
-  mayViewOrEditApplicationCollaborators,
   mayViewApplicationDevices,
 } from '@console/lib/feature-checks'
 
@@ -58,7 +58,7 @@ import {
   DELETE_BOOKMARK_BASE,
   deleteBookmark,
 } from '@console/store/actions/user-preferences'
-import { deleteApplication, getApplicationDeviceCount } from '@console/store/actions/applications'
+import { getApplicationDeviceCount } from '@console/store/actions/applications'
 import { getPubsubsList } from '@console/store/actions/pubsubs'
 import { getWebhooksList } from '@console/store/actions/webhooks'
 
@@ -99,7 +99,7 @@ const ApplicationOverviewHeader = () => {
   const webhooksCount = useSelector(selectWebhooksTotalCount)
   const pubsubsCount = useSelector(selectPubsubsTotalCount)
   const hasIntegrations = webhooksCount > 0 || pubsubsCount > 0
-  const additionalConditions = hasIntegrations
+  const additionalCondition = hasIntegrations
   const mayViewDevices = useSelector(state => checkFromState(mayViewApplicationDevices, state))
   const devicesTotalCount = useSelector(state =>
     selectApplicationDeviceCount(state, application_id),
@@ -244,20 +244,12 @@ const ApplicationOverviewHeader = () => {
           requestAction={[getPubsubsList(application_id), getWebhooksList(application_id)]}
         >
           <DeleteEntityHeaderModal
-            entity="application"
+            entity={APPLICATION}
             entityId={application_id}
             entityName={name}
             setVisible={setDeleteApplicationModalVisible}
             visible={deleteApplicationModalVisible}
-            mayDeleteEntitySelector={mayDeleteApplication}
-            mayViewOrEditEntityCollaborators={mayViewOrEditApplicationCollaborators}
-            mayViewOrEditEntityApiKeys={mayViewOrEditApplicationApiKeys}
-            path="/gateways"
-            deleteEntity={deleteApplication}
-            deleteMessage={sharedMessages.deleteApp}
-            deletedMessage={sharedMessages.deleteSuccess}
-            deletedErrorMessage={sharedMessages.applicationDeleteFailure}
-            additionalConditions={additionalConditions}
+            additionalConditions={additionalCondition}
           />
         </RequireRequest>
       </div>

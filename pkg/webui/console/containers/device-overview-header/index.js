@@ -80,7 +80,7 @@ const m = defineMessages({
   noActivityTooltip:
     'The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.',
   downloadMacData: 'Download MAC data',
-  macStateError: 'There was an error and MAC state could not be included in the MAC data.',
+  macStateError: 'There was an error and MAC state could not be included in the MAC data',
 })
 
 const nsHost = getHostFromUrl(selectNsConfig().base_url)
