@@ -21,8 +21,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-// MockClaimer is a mock Claimer.
-type MockClaimer struct {
+// MockEndDeviceClaimer is a mock Claimer.
+type MockEndDeviceClaimer struct {
 	JoinEUIs []types.EUI64
 
 	ClaimFunc        func(context.Context, types.EUI64, types.EUI64, string) error
@@ -33,7 +33,7 @@ type MockClaimer struct {
 }
 
 // SupportsJoinEUI returns whether the Join Server supports this JoinEUI.
-func (m MockClaimer) SupportsJoinEUI(joinEUI types.EUI64) bool {
+func (m MockEndDeviceClaimer) SupportsJoinEUI(joinEUI types.EUI64) bool {
 	for _, eui := range m.JoinEUIs {
 		if eui.Equal(joinEUI) {
 			return true
@@ -43,14 +43,14 @@ func (m MockClaimer) SupportsJoinEUI(joinEUI types.EUI64) bool {
 }
 
 // Claim claims an End Device.
-func (m MockClaimer) Claim(
+func (m MockEndDeviceClaimer) Claim(
 	ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string,
 ) error {
 	return m.ClaimFunc(ctx, joinEUI, devEUI, claimAuthenticationCode)
 }
 
 // GetClaimStatus returns the claim status an End Device.
-func (MockClaimer) GetClaimStatus(_ context.Context,
+func (MockEndDeviceClaimer) GetClaimStatus(_ context.Context,
 	ids *ttnpb.EndDeviceIdentifiers,
 ) (*ttnpb.GetClaimStatusResponse, error) {
 	return &ttnpb.GetClaimStatusResponse{
@@ -59,14 +59,14 @@ func (MockClaimer) GetClaimStatus(_ context.Context,
 }
 
 // Unclaim releases the claim on an End Device.
-func (MockClaimer) Unclaim(_ context.Context,
+func (MockEndDeviceClaimer) Unclaim(_ context.Context,
 	_ *ttnpb.EndDeviceIdentifiers,
 ) (err error) {
 	return nil
 }
 
 // Unclaim releases the claim on an End Device.
-func (m MockClaimer) BatchUnclaim(
+func (m MockEndDeviceClaimer) BatchUnclaim(
 	ctx context.Context,
 	ids []*ttnpb.EndDeviceIdentifiers,
 ) error {

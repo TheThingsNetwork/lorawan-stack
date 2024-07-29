@@ -25,7 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	. "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
 	claimerrors "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -91,10 +91,10 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 		ctx,
 		c,
 		enddevices.Config{},
-		enddevices.WithClaimer("test", &MockClaimer{
+		enddevices.WithClaimer("test", &MockEndDeviceClaimer{
 			JoinEUIs: []types.EUI64{registeredJoinEUI},
 			ClaimFunc: func(
-				ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string,
+				_ context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string,
 			) error {
 				a.So(joinEUI, should.Equal, registeredJoinEUI)
 				a.So(devEUI, should.Resemble, registeredDevEUI)
@@ -104,7 +104,11 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 		}),
 	)
 	a.So(err, should.BeNil)
-	dcs, err := New(c, &Config{}, WithEndDeviceClaimingUpstream(mockUpstream))
+	dcs, err := deviceclaimingserver.New(
+		c,
+		&deviceclaimingserver.Config{},
+		deviceclaimingserver.WithEndDeviceClaimingUpstream(mockUpstream),
+	)
 	test.Must(dcs, err)
 
 	componenttest.StartComponent(t, c)
@@ -398,7 +402,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 	})
 
 	registeredJoinEUI2 := types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0E}
-	mockClaimer := &MockClaimer{
+	mockEndDeviceClaimer := &MockEndDeviceClaimer{
 		JoinEUIs: []types.EUI64{
 			registeredJoinEUI,
 			registeredJoinEUI2,
@@ -408,10 +412,14 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 		ctx,
 		c,
 		enddevices.Config{},
-		enddevices.WithClaimer("test", mockClaimer),
+		enddevices.WithClaimer("test", mockEndDeviceClaimer),
 	)
 	a.So(err, should.BeNil)
-	dcs, err := New(c, &Config{}, WithEndDeviceClaimingUpstream(mockUpstream))
+	dcs, err := deviceclaimingserver.New(
+		c,
+		&deviceclaimingserver.Config{},
+		deviceclaimingserver.WithEndDeviceClaimingUpstream(mockUpstream),
+	)
 	test.Must(dcs, err)
 
 	componenttest.StartComponent(t, c)
@@ -582,8 +590,8 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			},
 			CallOpts: authorizedCallOpt,
 			BatchUnclaimFunc: func(
-				ctx context.Context,
-				ids []*ttnpb.EndDeviceIdentifiers,
+				_ context.Context,
+				_ []*ttnpb.EndDeviceIdentifiers,
 			) error {
 				return errors.DefineCanceled("batch level error", "batch level error")
 			},
@@ -600,7 +608,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			},
 			CallOpts: authorizedCallOpt,
 			BatchUnclaimFunc: func(
-				ctx context.Context,
+				_ context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
 			) error {
 				a.So(ids, should.HaveLength, 2)
@@ -637,7 +645,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			},
 			CallOpts: authorizedCallOpt,
 			BatchUnclaimFunc: func(
-				ctx context.Context,
+				_ context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
 			) error {
 				a.So(ids, should.HaveLength, 2)
@@ -673,7 +681,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			},
 			CallOpts: authorizedCallOpt,
 			BatchUnclaimFunc: func(
-				ctx context.Context,
+				_ context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
 			) error {
 				a.So(ids, should.HaveLength, 2)
@@ -711,7 +719,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			},
 			CallOpts: authorizedCallOpt,
 			BatchUnclaimFunc: func(
-				ctx context.Context,
+				_ context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
 			) error {
 				a.So(ids, should.HaveLength, 2)
@@ -753,7 +761,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			},
 			CallOpts: authorizedCallOpt,
 			BatchUnclaimFunc: func(
-				ctx context.Context,
+				_ context.Context,
 				ids []*ttnpb.EndDeviceIdentifiers,
 			) error {
 				a.So(ids, should.HaveLength, 2)
@@ -784,7 +792,7 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 	} {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			mockClaimer.BatchUnclaimFunc = tc.BatchUnclaimFunc
+			mockEndDeviceClaimer.BatchUnclaimFunc = tc.BatchUnclaimFunc
 			ret, err := edcsClient.Unclaim(ctx, tc.Req, tc.CallOpts)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
