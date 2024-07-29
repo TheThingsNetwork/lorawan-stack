@@ -21,6 +21,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways"
+	gtwregistry "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/registry/gateways"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -34,8 +36,6 @@ type DeviceClaimingServer struct {
 	config Config
 
 	endDeviceClaimingUpstream *enddevices.Upstream
-
-	gatewayClaimingServerUpstream ttnpb.GatewayClaimingServerServer
 
 	grpc struct {
 		endDeviceClaimingServer      *endDeviceClaimingServer
@@ -64,6 +64,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 		}
 		dcs.endDeviceClaimingUpstream = upstream
 	}
+
 	dcs.grpc.endDeviceClaimingServer = &endDeviceClaimingServer{
 		DCS: dcs,
 	}
@@ -72,9 +73,18 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 		DCS: dcs,
 	}
 
-	dcs.gatewayClaimingServerUpstream = noopGCLS{}
-	dcs.grpc.gatewayClaimingServer = &gatewayClaimingServer{
-		DCS: dcs,
+	if dcs.grpc.gatewayClaimingServer == nil {
+		upstream, err := gateways.NewUpstream(ctx, conf.GatewayClaimingServerConfig)
+		if err != nil {
+			return nil, err
+		}
+		dcs.grpc.gatewayClaimingServer = &gatewayClaimingServer{
+			upstream: upstream,
+			registry: gtwregistry.Registry{
+				Cluster: c,
+			},
+			peerAccess: c,
+		}
 	}
 
 	c.RegisterGRPC(dcs)
@@ -88,6 +98,21 @@ type Option func(*DeviceClaimingServer)
 func WithEndDeviceClaimingUpstream(upstream *enddevices.Upstream) Option {
 	return func(dcs *DeviceClaimingServer) {
 		dcs.endDeviceClaimingUpstream = upstream
+	}
+}
+
+// WithGatewayClaimingServer configures the gateway claiming server.
+func WithGatewayClaimingServer(
+	upstream *gateways.Upstream,
+	registry gtwregistry.GatewayRegistry,
+	access peerAccess,
+) Option {
+	return func(dcs *DeviceClaimingServer) {
+		dcs.grpc.gatewayClaimingServer = &gatewayClaimingServer{
+			upstream:   upstream,
+			registry:   registry,
+			peerAccess: access,
+		}
 	}
 }
 
