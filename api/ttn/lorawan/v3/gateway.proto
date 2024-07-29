@@ -484,13 +484,9 @@ message ManagedGatewayWiFiProfile {
     uuid: true
     ignore_empty: true
   }];
-  string profile_name = 2 [(validate.rules).string = {
-    max_len: 32
-  }];
+  string profile_name = 2 [(validate.rules).string = {max_len: 32}];
   bool shared = 6;
-  string ssid = 3 [(validate.rules).string = {
-    max_len: 32
-  }];
+  string ssid = 3 [(validate.rules).string = {max_len: 32}];
   string password = 4 [(validate.rules).string.max_len = 64];
   ManagedGatewayNetworkInterfaceAddresses network_interface_addresses = 5;
 }
@@ -508,9 +504,7 @@ message ManagedGatewayEthernetProfile {
     uuid: true
     ignore_empty: true
   }];
-  string profile_name = 2 [(validate.rules).string = {
-    max_len: 32
-  }];
+  string profile_name = 2 [(validate.rules).string = {max_len: 32}];
   bool shared = 4;
   ManagedGatewayNetworkInterfaceAddresses network_interface_addresses = 3;
 }
