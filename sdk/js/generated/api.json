@@ -10886,7 +10886,7 @@
           "name": "CUPSRedirection",
           "longName": "CUPSRedirection",
           "fullName": "ttn.lorawan.v3.CUPSRedirection",
-          "description": "",
+          "description": "DEPRECATED: This message is deprecated and will be removed in a future version of The Things Stack.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": true,
@@ -10984,7 +10984,10 @@
                 ]
               }
             }
-          ]
+          ],
+          "options": {
+            "deprecated": true
+          }
         },
         {
           "name": "ClientTLS",
@@ -11314,7 +11317,7 @@
             },
             {
               "name": "cups_redirection",
-              "description": "Parameters to set CUPS redirection for the gateway.",
+              "description": "Parameters to set CUPS redirection for the gateway.\nDEPRECATED: This field is deprecated and will be removed in a future version of The Things Stack.",
               "label": "",
               "type": "CUPSRedirection",
               "longType": "CUPSRedirection",
@@ -11322,7 +11325,10 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "target_frequency_plan_id",
@@ -11983,31 +11989,8 @@
               }
             },
             {
-              "name": "AuthorizeGateway",
-              "description": "AuthorizeGateway allows a gateway to be claimed.",
-              "requestType": "AuthorizeGatewayRequest",
-              "requestLongType": "AuthorizeGatewayRequest",
-              "requestFullType": "ttn.lorawan.v3.AuthorizeGatewayRequest",
-              "requestStreaming": false,
-              "responseType": "Empty",
-              "responseLongType": ".google.protobuf.Empty",
-              "responseFullType": "google.protobuf.Empty",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "POST",
-                      "pattern": "/gcls/gateways/{gateway_ids.gateway_id}/authorize",
-                      "body": "*"
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "name": "UnauthorizeGateway",
-              "description": "UnauthorizeGateway prevents a gateway from being claimed.",
+              "name": "Unclaim",
+              "description": "Unclaims the gateway.\nEUI provided in the request are ignored and the end device is looked up by the gateway ID.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -12021,7 +12004,7 @@
                   "rules": [
                     {
                       "method": "DELETE",
-                      "pattern": "/gcls/gateways/{gateway_id}/authorize"
+                      "pattern": "/gcls/claim/{gateway_id}"
                     }
                   ]
                 }
@@ -12045,6 +12028,53 @@
                       "method": "POST",
                       "pattern": "/gcls/claim/info",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "AuthorizeGateway",
+              "description": "AuthorizeGateway allows a gateway to be claimed.\nDEPRECATED: Authorizing gateways for claiming is no longer supported and will be removed in a future version of The\nThings Stack.",
+              "requestType": "AuthorizeGatewayRequest",
+              "requestLongType": "AuthorizeGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.AuthorizeGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "deprecated": true,
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/gcls/gateways/{gateway_ids.gateway_id}/authorize",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UnauthorizeGateway",
+              "description": "UnauthorizeGateway prevents a gateway from being claimed.\nDEPRECATED: Unauthorizing (locking) gateways for claiming is no longer supported and will be removed in a future\nversion of The Things Stack.",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "deprecated": true,
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gcls/gateways/{gateway_id}/authorize"
                     }
                   ]
                 }

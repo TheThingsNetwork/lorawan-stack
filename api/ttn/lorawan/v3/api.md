@@ -2924,6 +2924,8 @@ in a future version of The Things Stack.
 
 ### <a name="ttn.lorawan.v3.CUPSRedirection">Message `CUPSRedirection`</a>
 
+DEPRECATED: This message is deprecated and will be removed in a future version of The Things Stack.
+
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `target_cups_uri` | [`string`](#string) |  | CUPS URI for LoRa Basics Station CUPS redirection. |
@@ -2996,7 +2998,7 @@ in a future version of The Things Stack.
 | `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  | Collaborator to grant all rights on the target gateway. |
 | `target_gateway_id` | [`string`](#string) |  | Gateway ID for the target gateway. This must be a unique value. If this is not set, the target ID for the target gateway will be set to `<gateway-eui>`. |
 | `target_gateway_server_address` | [`string`](#string) |  | Target Gateway Server Address for the target gateway. |
-| `cups_redirection` | [`CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection) |  | Parameters to set CUPS redirection for the gateway. |
+| `cups_redirection` | [`CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection) |  | Parameters to set CUPS redirection for the gateway. DEPRECATED: This field is deprecated and will be removed in a future version of The Things Stack. |
 | `target_frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the target gateway. TODO: Remove this field (https://github.com/TheThingsIndustries/lorawan-stack/issues/4024) DEPRECATED: Use target_frequency_plan_ids instead. |
 | `target_frequency_plan_ids` | [`string`](#string) | repeated | Frequency plan IDs of the target gateway. |
 
@@ -3164,18 +3166,20 @@ The GatewayClaimingServer service support claiming and managing gateway claims.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Claim` | [`ClaimGatewayRequest`](#ttn.lorawan.v3.ClaimGatewayRequest) | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user. |
-| `AuthorizeGateway` | [`AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | AuthorizeGateway allows a gateway to be claimed. |
-| `UnauthorizeGateway` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | UnauthorizeGateway prevents a gateway from being claimed. |
+| `Unclaim` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unclaims the gateway. EUI provided in the request are ignored and the end device is looked up by the gateway ID. |
 | `GetInfoByGatewayEUI` | [`GetInfoByGatewayEUIRequest`](#ttn.lorawan.v3.GetInfoByGatewayEUIRequest) | [`GetInfoByGatewayEUIResponse`](#ttn.lorawan.v3.GetInfoByGatewayEUIResponse) | Return whether claiming is available for a given gateway EUI. |
+| `AuthorizeGateway` | [`AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | AuthorizeGateway allows a gateway to be claimed. DEPRECATED: Authorizing gateways for claiming is no longer supported and will be removed in a future version of The Things Stack. |
+| `UnauthorizeGateway` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | UnauthorizeGateway prevents a gateway from being claimed. DEPRECATED: Unauthorizing (locking) gateways for claiming is no longer supported and will be removed in a future version of The Things Stack. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `Claim` | `POST` | `/api/v3/gcls/claim` | `*` |
+| `Unclaim` | `DELETE` | `/api/v3/gcls/claim/{gateway_id}` |  |
+| `GetInfoByGatewayEUI` | `POST` | `/api/v3/gcls/claim/info` | `*` |
 | `AuthorizeGateway` | `POST` | `/api/v3/gcls/gateways/{gateway_ids.gateway_id}/authorize` | `*` |
 | `UnauthorizeGateway` | `DELETE` | `/api/v3/gcls/gateways/{gateway_id}/authorize` |  |
-| `GetInfoByGatewayEUI` | `POST` | `/api/v3/gcls/claim/info` | `*` |
 
 ## <a name="ttn/lorawan/v3/devicerepository.proto">File `ttn/lorawan/v3/devicerepository.proto`</a>
 
