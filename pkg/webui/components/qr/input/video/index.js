@@ -129,6 +129,11 @@ const Stream = props => {
           const userStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'environment' },
           })
+          // We are only using this stream to get the device id so we can immediately stop the tracks
+          // so that the camera does not stay on.
+          userStream.getTracks().forEach(track => {
+            track.stop()
+          })
           // After requesting the stream, get the devices again as we now have permission to see all devices
           getDevices()
           // On initial request set the device id from the stream, this should rerender this component
