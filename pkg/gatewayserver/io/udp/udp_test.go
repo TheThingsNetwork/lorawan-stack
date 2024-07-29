@@ -212,6 +212,15 @@ func TestFrontend(t *testing.T) {
 		AuthenticatesWithEUI: true,
 		IsAuthenticated:      false,
 		DeduplicatesUplinks:  true,
+		CustomRxMetadataAssertion: func(t *testing.T, actual, expected *ttnpb.RxMetadata) {
+			t.Helper()
+			a := assertions.New(t)
+			a.So(actual.UplinkToken, should.NotBeEmpty)
+			actual.UplinkToken = nil
+			actual.ReceivedAt = nil
+			expected.SignalRssi = nil
+			a.So(actual, should.Resemble, expected)
+		},
 		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.UDP = gatewayserver.UDPConfig{
 				Config: udp.Config{
