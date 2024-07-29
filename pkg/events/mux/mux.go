@@ -226,6 +226,9 @@ func (*multiplexerStore) swallowNonRetryableStreamErr(ctx context.Context, isPri
 		errors.IsResourceExhausted(err):
 		logger.Info("Stream failed with retryable error")
 		return err
+	case errors.IsNotFound(err):
+		logger.WithError(err).Debug("Stream failed with non-retryable error")
+		return nil
 	default:
 		// Other error codes are considered not retryable. They are not propagated to the caller, because that would
 		// cause the multiplexed subscription to fail.
