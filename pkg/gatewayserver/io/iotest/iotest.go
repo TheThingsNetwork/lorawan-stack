@@ -74,6 +74,8 @@ type FrontendConfig struct {
 	DeduplicatesUplinks bool
 	// UsesGatewayToken indicates that the frontend uses gateway tokens for authentication instead of an API key.
 	UsesGatewayToken bool
+	// CustomRxMetadataAssertion is a custom assertion for RxMetadata.
+	CustomRxMetadataAssertion func(t *testing.T, actual, expected *ttnpb.RxMetadata)
 	// CustomComponentConfig applies custom configuration for the component before it gets started.
 	// This is typically used for configuring security credentials.
 	CustomComponentConfig func(config *component.Config)
@@ -1214,11 +1216,19 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 								a.So(time.Since(*ttnpb.StdTime(msg.ReceivedAt)), should.BeLessThan, timeout)
 								a.So(msg.Settings, should.Resemble, expected.Settings)
 								a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
+								rxMetadataAssertion := frontend.CustomRxMetadataAssertion
+								if rxMetadataAssertion == nil {
+									rxMetadataAssertion = func(t *testing.T, actual, expected *ttnpb.RxMetadata) {
+										t.Helper()
+										a := assertions.New(t)
+										a.So(actual.UplinkToken, should.NotBeEmpty)
+										actual.UplinkToken = nil
+										actual.ReceivedAt = nil
+										a.So(actual, should.Resemble, expected)
+									}
+								}
 								for i, md := range msg.RxMetadata {
-									a.So(md.UplinkToken, should.NotBeEmpty)
-									md.UplinkToken = nil
-									md.ReceivedAt = nil
-									a.So(md, should.Resemble, expected.RxMetadata[i])
+									rxMetadataAssertion(t, md, expected.RxMetadata[i])
 								}
 								a.So(msg.RawPayload, should.Resemble, expected.RawPayload)
 							case <-time.After(timeout):
