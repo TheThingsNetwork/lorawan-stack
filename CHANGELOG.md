@@ -11,6 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support for managed gateways through The Things Gateway Controller.
+- Support for The Things Industries gateway protocol. This is adds a new pair of ports to Gateway Server: `1889` for Envoy or Traefik terminated TLS mutual authentication, and `8889` for The Things Stack terminated TLS mutual authentication.
+
 ### Changed
 
 ### Deprecated
