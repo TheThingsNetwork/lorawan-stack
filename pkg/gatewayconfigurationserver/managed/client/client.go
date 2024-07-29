@@ -201,7 +201,10 @@ func (c *client) Subscribe(
 			select {
 			case <-ctx.Done():
 				return
-			case eventData := <-ch:
+			case eventData, ok := <-ch:
+				if !ok {
+					return
+				}
 				evt := mapEvent(ctx, eventData)
 				if evt == nil || !match(evt.Name()) {
 					continue
