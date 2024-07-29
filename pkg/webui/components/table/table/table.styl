@@ -31,12 +31,11 @@
   // Hacky way of extending the header row by adding a divider between the header and the body.
   &-divider
     position: absolute
-    top: 42px
-    left: -20px
+    bottom: 0
+    left: - $cs.l
+    right: - $cs.l
     height: 1px
-    width: 98.5rem
     background: var(--c-border-neutral-light)
-    z-index: 9999
 
   &-header
     position: sticky
