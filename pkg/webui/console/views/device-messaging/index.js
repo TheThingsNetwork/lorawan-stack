@@ -44,8 +44,8 @@ const DeviceMessaging = () => {
   const tabs =
     mayScheduleDown && maySendUp
       ? [
-          { title: sharedMessages.uplink, name: 'uplink', link: 'uplink' },
-          { title: sharedMessages.downlink, name: 'downlink', link: 'downlink' },
+          { title: sharedMessages.scheduleDownlink, name: 'downlink', link: 'downlink' },
+          { title: sharedMessages.simulateUplink, name: 'uplink', link: 'uplink' },
         ]
       : []
 
@@ -64,9 +64,9 @@ const DeviceMessaging = () => {
           )}
           <Col lg={8} md={12}>
             <Routes>
-              {maySendUp && <Route path="uplink" Component={UplinkForm} />}
               {mayScheduleDown && <Route path="downlink" Component={DownlinkForm} />}
-              <Route index element={<Navigate to="uplink" replace />} />
+              {maySendUp && <Route path="uplink" Component={UplinkForm} />}
+              <Route index element={<Navigate to="downlink" replace />} />
             </Routes>
           </Col>
         </Row>

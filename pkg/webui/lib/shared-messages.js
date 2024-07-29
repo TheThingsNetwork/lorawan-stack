@@ -451,6 +451,7 @@ export default defineMessages({
   scheduleAnyTimeDelay: 'Schedule any time delay',
   scheduleAnyTimeDescription:
     'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
+  scheduleDownlink: 'Schedule downlink',
   scheduleDownlinkLateDescription: 'Enable server-side buffer of downlink messages',
   search: 'Search',
   secondInterval: '{count, plural, one {every second} other {every {count} seconds}}',
@@ -466,6 +467,7 @@ export default defineMessages({
   settings: 'Settings',
   setup: 'Setup',
   shareGatewayInfo: 'Share gateway information',
+  simulateUplink: 'Simulate uplink',
   skipCryptoDescription: 'Skip decryption of uplink payloads and encryption of downlink payloads',
   skipCryptoPlaceholder: 'Encryption/decryption disabled',
   skipCryptoTitle: 'Skip payload encryption and decryption',

@@ -23,7 +23,7 @@ const user = {
 const appId = 'import-devices-test-application'
 const application = { ids: { application_id: appId } }
 
-describe('End device messaging', () => {
+describe('End device import', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)

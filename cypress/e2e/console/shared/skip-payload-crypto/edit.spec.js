@@ -81,7 +81,9 @@ describe('Skip payload crypto', () => {
           .findByText(`Simulation is disabled for devices that skip payload crypto`)
           .should('be.visible')
 
-        cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
+        cy.findAllByRole('button', { name: 'Simulate uplink' })
+          .filter('[type="submit"]')
+          .should('be.disabled')
       })
 
       it('allows messaging when device disabled SPC via overwrite', () => {
@@ -121,7 +123,9 @@ describe('Skip payload crypto', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
         )
 
-        cy.findByRole('button', { name: 'Simulate uplink' }).should('be.enabled')
+        cy.findAllByRole('button', { name: 'Simulate uplink' })
+          .filter('[type="submit"]')
+          .should('be.enabled')
       })
     })
 
@@ -167,7 +171,9 @@ describe('Skip payload crypto', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
         )
 
-        cy.findByRole('button', { name: 'Simulate uplink' }).should('be.enabled')
+        cy.findAllByRole('button', { name: 'Simulate uplink' })
+          .filter('[type="submit"]')
+          .should('be.enabled')
       })
 
       it('disables messaging when device disabled SPC via overwrite', () => {
@@ -212,7 +218,9 @@ describe('Skip payload crypto', () => {
           .findByText(`Simulation is disabled for devices that skip payload crypto`)
           .should('be.visible')
 
-        cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
+        cy.findAllByRole('button', { name: 'Simulate uplink' })
+          .filter('[type="submit"]')
+          .should('be.disabled')
       })
     })
   })
