@@ -89,6 +89,7 @@ require (
 	go.packetbroker.org/api/routing v1.9.2
 	go.packetbroker.org/api/v3 v3.17.1
 	go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240723094213-b40a14f3b543
+	go.thethings.industries/pkg/ca v0.0.0-20240723151912-b9bb4097ae6c
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0
 	go.uber.org/automaxprocs v1.5.3
@@ -244,7 +245,6 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
-	go.thethings.industries/pkg/ca v0.0.0-20240723151912-b9bb4097ae6c // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/image v0.14.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
