@@ -80,7 +80,7 @@ const NotificationsDashboardPanel = () => {
     {
       name: 'notification.created_at',
       displayName: sharedMessages.time,
-      width: '6.5rem',
+      width: '8rem',
       render: date => <DateTime.Relative value={date} />,
     },
   ]
@@ -133,6 +133,7 @@ const NotificationsDashboardPanel = () => {
             getItemsAction={getItems}
             getItemPathPrefix={item => `/notifications/inbox/${item.id}`}
             paginated={false}
+            panelStyle
           />
         </ScrollFader>
       )}

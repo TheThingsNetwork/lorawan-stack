@@ -28,6 +28,15 @@
 
 .section
 
+  // Hacky way of extending the header row by adding a divider between the header and the body.
+  &-divider
+    position: absolute
+    bottom: 0
+    left: - $cs.l
+    right: - $cs.l
+    height: 1px
+    background: var(--c-border-neutral-light)
+
   &-header
     position: sticky
     background: var(--c-bg-neutral-min)

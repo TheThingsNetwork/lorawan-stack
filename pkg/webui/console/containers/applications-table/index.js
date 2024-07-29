@@ -52,7 +52,6 @@ import {
 } from '@console/store/selectors/applications'
 
 const m = defineMessages({
-  ownedTabTitle: 'Owned applications',
   restoreSuccess: 'Application restored',
   restoreFail: 'There was an error and application could not be restored',
   purgeSuccess: 'Application purged',
@@ -66,7 +65,7 @@ const ALL_TAB = 'all'
 const DELETED_TAB = 'deleted'
 const tabs = [
   {
-    title: m.ownedTabTitle,
+    title: sharedMessages.ownedByMe,
     name: OWNED_TAB,
   },
   {
@@ -78,6 +77,7 @@ const tabs = [
 
 const ApplicationsTable = props => {
   const { isAdmin, restoreApplication, purgeApplication, ...rest } = props
+  // TODO: Add lastSeen column.
 
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
@@ -126,16 +126,22 @@ const ApplicationsTable = props => {
     const baseHeaders = [
       {
         name: 'ids.application_id',
-        displayName: sharedMessages.id,
-        width: 30,
+        displayName: sharedMessages.nameAndId,
+        getValue: row => ({
+          id: row.ids.application_id,
+          name: row.name,
+        }),
+        render: ({ name, id }) =>
+          Boolean(name) ? (
+            <>
+              <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
+              <span className="c-text-neutral-light d-block">{id}</span>
+            </>
+          ) : (
+            <span className="mt-0 p-0 fw-bold d-block">{id}</span>
+          ),
         sortable: true,
         sortKey: 'application_id',
-      },
-      {
-        name: 'name',
-        displayName: sharedMessages.name,
-        width: 30,
-        sortable: true,
       },
     ]
 
@@ -143,7 +149,7 @@ const ApplicationsTable = props => {
       baseHeaders.push({
         name: 'actions',
         displayName: sharedMessages.actions,
-        width: 45,
+        width: '13rem',
         getValue: row => ({
           id: row.ids.application_id,
           name: row.name,
@@ -155,7 +161,7 @@ const ApplicationsTable = props => {
             <Button message={sharedMessages.restore} onClick={details.restore} secondary />
             <DeleteModalButton
               entityId={details.id}
-              entityName={name}
+              entityName={details.name}
               message={sharedMessages.purge}
               onApprove={details.purge}
               onlyPurge
@@ -168,7 +174,7 @@ const ApplicationsTable = props => {
         {
           name: 'status',
           displayName: '',
-          width: 17,
+          width: '10rem',
           render: status => {
             if (status.otherCluster) {
               const host = status.host
@@ -198,23 +204,20 @@ const ApplicationsTable = props => {
         },
         {
           name: '_devices',
-          width: 8,
-          displayName: sharedMessages.devices,
+          width: '7rem',
+          displayName: sharedMessages.devicesShort,
           align: 'center',
           render: deviceCount =>
             typeof deviceCount !== 'number' ? (
               <Spinner micro center inline after={100} className="c-icon" />
             ) : (
-              <strong>
-                <FormattedNumber value={deviceCount} />
-              </strong>
+              <FormattedNumber value={deviceCount} />
             ),
         },
         {
           name: 'created_at',
-          width: 15,
-          displayName: sharedMessages.createdAt,
-          align: 'right',
+          width: '8rem',
+          displayName: sharedMessages.created,
           sortable: true,
           render: date => <DateTime.Relative value={date} />,
         },
@@ -278,13 +281,14 @@ const ApplicationsTable = props => {
       entity="applications"
       defaultOrder="-created_at"
       headers={headers}
-      addMessage={sharedMessages.createApplication}
+      addMessage={sharedMessages.addApplication}
       tableTitle={<Message content={sharedMessages.applications} />}
       getItemsAction={getApplications}
       baseDataSelector={baseDataSelector}
       searchable
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : []}
+      searchPlaceholderMessage={sharedMessages.searchApplications}
       {...rest}
     />
   )

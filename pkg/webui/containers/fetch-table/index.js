@@ -15,14 +15,13 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import classnames from 'classnames'
 import { orderBy as lodashOrderBy } from 'lodash'
 import { useLocation } from 'react-router-dom'
 import Query from 'query-string'
 
 import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
-import { IconPlus, IconSearch } from '@ttn-lw/components/icon'
+import { IconPlus } from '@ttn-lw/components/icon'
 import Tabular from '@ttn-lw/components/table'
 import Input from '@ttn-lw/components/input'
 import Button from '@ttn-lw/components/button'
@@ -85,6 +84,7 @@ const FetchTable = props => {
     baseDataSelector,
     className,
     headerClassName,
+    panelStyle,
   } = props
 
   const location = useLocation()
@@ -242,10 +242,6 @@ const FetchTable = props => {
     ? lodashOrderBy(items, i => getByPath(i, orderBy), [orderDirection])
     : items
 
-  const filtersCls = classnames(style.filters, {
-    [style.topRule]: tabs.length > 0,
-  })
-
   // Go back to page 1 when no items are left on the current page.
   useEffect(() => {
     if (preparedItems.length === 0 && page > 1 && !initialFetch) {
@@ -256,10 +252,16 @@ const FetchTable = props => {
   return (
     <div data-test-id={`${entity}-table`}>
       {(tabs.length > 0 || tableTitle || actionItems || mayAdd || searchable) && (
-        <div className={filtersCls}>
+        <div className={style.filters}>
           <div className={style.filtersLeft}>
             {tabs.length > 0 ? (
-              <Tabs active={tab} className={style.tabs} tabs={tabs} onTabChange={onTabChange} />
+              <Tabs
+                active={tab}
+                className={style.tabs}
+                tabs={tabs}
+                onTabChange={onTabChange}
+                toggleStyle
+              />
             ) : (
               tableTitle && (
                 <div className={style.tableTitle}>
@@ -273,7 +275,6 @@ const FetchTable = props => {
               <Input
                 data-test-id="search-input"
                 value={query}
-                icon={IconSearch}
                 onChange={onQueryChange}
                 placeholder={searchPlaceholderMessage}
                 className={style.searchBar}
@@ -328,6 +329,7 @@ const FetchTable = props => {
           disableSorting={disableSorting}
           className={className}
           headerClassName={headerClassName}
+          panelStyle={panelStyle}
         />
       </Overlay>
     </div>
@@ -361,6 +363,7 @@ FetchTable.propTypes = {
   itemPathPrefix: PropTypes.string,
   pageSize: PropTypes.number,
   paginated: PropTypes.bool,
+  panelStyle: PropTypes.bool,
   rowKeySelector: PropTypes.func,
   searchItemsAction: PropTypes.func,
   searchPlaceholderMessage: PropTypes.message,
@@ -398,6 +401,7 @@ FetchTable.defaultProps = {
   clickable: true,
   defaultOrder: undefined,
   headerClassName: undefined,
+  panelStyle: false,
 }
 
 export default FetchTable

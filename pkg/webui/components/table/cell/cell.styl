@@ -19,14 +19,24 @@
   padding: 0 'calc(%s / 2)' % $cs.s
 
   &:first-child
-    padding: 0 'calc(%s / 2)' % $cs.s 0 $cs.s
+    padding-left: 0
 
   &:last-child
-    padding: 0 $cs.s 0 'calc(%s / 2)' % $cs.s
+    padding-right: 0
+
+  &-panel-style
+    &:first-child
+      padding: 0 'calc(%s / 2)' % $cs.s 0 $cs.s
+
+    &:last-child
+      padding: 0 $cs.s 0 'calc(%s / 2)' % $cs.s
 
   &:not(&-centered):not(&-left)
     &:last-child
       text-align: right
+      justify-content: flex-end
+      & > *
+        justify-content: flex-end
 
   &-centered
     text-align: center
@@ -34,22 +44,29 @@
   &-left
     text-align: left
 
-  &-right > *
+  &-right
     text-align: right
     justify-content: flex-end
+    & > *
+      justify-content: flex-end
 
   &-head
     height: 3rem
     text-transform: uppercase
     font-weight: 600
-    font-size: $fsv2.s
+    font-size: $fs.s
     color: var(--c-text-neutral-light)
     white-space: nowrap
+
+    &-panel-style
+      font-size: $fsv2.s
 
   &-data
     height: 4rem
     white-space: nowrap
-    overflow: hidden
+
+    &:not(:last-child)
+      overflow: hidden
 
     & > *
       overflow: inherit

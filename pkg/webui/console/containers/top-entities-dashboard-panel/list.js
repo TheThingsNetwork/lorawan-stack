@@ -48,7 +48,7 @@ const EntitiesList = ({
     .map(entity => <EntitiesItemComponent headers={headers} entity={entity} key={entity.id} />)
 
   const columns = (
-    <Table.Row head>
+    <Table.Row head panelStyle>
       {headers.map((header, key) => (
         <Table.HeadCell
           key={key}
@@ -57,6 +57,7 @@ const EntitiesList = ({
           name={header.name}
           width={header.width}
           className={header.className}
+          panelStyle
         />
       ))}
     </Table.Row>
@@ -77,7 +78,9 @@ const EntitiesList = ({
   ) : (
     <ScrollFader className={styles.scrollFader} faderHeight="4rem" topFaderOffset="3rem" light>
       <Table>
-        <Table.Head className={styles.topEntitiesPanelOuterTableHeader}>{columns}</Table.Head>
+        <Table.Head className={styles.topEntitiesPanelOuterTableHeader} panelStyle>
+          {columns}
+        </Table.Head>
         <Table.Body emptyMessage={m.empty}>{rows}</Table.Body>
       </Table>
     </ScrollFader>

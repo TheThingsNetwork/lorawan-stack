@@ -18,7 +18,10 @@
   align-items: center
   margin-bottom: $cs.s
   flex-wrap: wrap
-  margin-top: - $ls.xs3 // Compensate visual bounding box of tabs.
+  margin-left: 0
+
+  +media-query($bp.md)
+    gap: $cs.m
 
   &.top-rule
     border-normal('bottom')
@@ -27,7 +30,7 @@
     .filters-left
       padding-bottom: 0
 
-    +media-query($bp.xs)
+    +media-query($bp.md)
       .filters-left
         padding-bottom: $cs.s
         flex-basis: 100%
@@ -48,7 +51,7 @@
     align-items: center
     gap: $cs.xs
 
-    +media-query($bp.xs)
+    +media-query($bp.md)
       justify-content: flex-start
       max-width: none
       flex-basis: 100%
@@ -75,7 +78,7 @@
   padding-left: $cs.m
   color: var(--c-text-neutral-heavy)
 
-  +media-query($bp.xs)
+  +media-query($bp.md)
     padding-bottom: $cs.s
     padding-left: 0
 
@@ -88,3 +91,6 @@
   max-width: 90vw
   transform: translate(-50%, 0)
   color: var(--c-text-error-normal)
+
+.add-button
+  font-weight: $fwv2.medium

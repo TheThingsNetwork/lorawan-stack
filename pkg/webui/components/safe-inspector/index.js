@@ -111,11 +111,11 @@ const SafeInspector = ({
     const containerWidth = containerElem.current.offsetWidth
     const buttonsWidth = buttonsElem.current.offsetWidth
     const displayWidth = displayElem.current.offsetWidth
-    const netContainerWidth = containerWidth - buttonsWidth - 14
+    const netContainerWidth = containerWidth - buttonsWidth
 
     if (netContainerWidth < displayWidth && !truncated) {
       setTruncated(true)
-    } else if (netContainerWidth > displayWidth && truncated) {
+    } else if (netContainerWidth >= displayWidth && truncated) {
       setTruncated(false)
     }
   }, [truncated])

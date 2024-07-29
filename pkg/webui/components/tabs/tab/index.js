@@ -32,6 +32,7 @@ const Tab = props => {
     link,
     exact = true,
     tabClassName,
+    toggleStyle,
     ...rest
   } = props
 
@@ -45,9 +46,11 @@ const Tab = props => {
 
   const tabItemClassNames = classnames(className, style.tabItem, {
     [style.tabItemNarrow]: narrow,
-    [style.tabItemActive]: !disabled && active,
-    [style.tabItemDefault]: !disabled && !active,
+    [style.tabItemActive]: !toggleStyle && !disabled && active,
+    [style.tabItemDefault]: !toggleStyle && !disabled && !active,
     [style.tabItemDisabled]: disabled,
+    [style.tabItemToggleStyle]: toggleStyle,
+    [style.tabItemToggleStyleActive]: toggleStyle && !disabled && active,
   })
 
   // There is no support for disabled on anchors in html and hence in
@@ -98,6 +101,8 @@ Tab.propTypes = {
    */
   onClick: PropTypes.func,
   tabClassName: PropTypes.string,
+  /** A flag specifying whether the tab should render a toggle style. */
+  toggleStyle: PropTypes.bool,
 }
 
 Tab.defaultProps = {
@@ -110,6 +115,7 @@ Tab.defaultProps = {
   disabled: false,
   narrow: false,
   exact: true,
+  toggleStyle: false,
 }
 
 export default Tab
