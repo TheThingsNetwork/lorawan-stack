@@ -16,9 +16,11 @@ package deviceclaimingserver
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways"
 )
 
 // Config is the configuration for the Device Claiming Server.
 type Config struct {
 	EndDeviceClaimingServerConfig enddevices.Config `name:"edcs"`
+	GatewayClaimingServerConfig   gateways.Config   `name:"gcls"`
 }
