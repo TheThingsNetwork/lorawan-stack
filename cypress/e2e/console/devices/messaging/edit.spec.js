@@ -53,7 +53,7 @@ describe('End device messaging', () => {
       cy.findByLabelText('FPort').type('1')
       cy.findByLabelText('Payload').type('0000')
 
-      cy.findByRole('button', { name: 'Simulate uplink' }).click()
+      cy.findAllByRole('button', { name: 'Simulate uplink' }).filter('[type="submit"]').click()
 
       cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Uplink sent')
 
@@ -86,7 +86,9 @@ describe('End device messaging', () => {
       cy.findByLabelText('FPort').should('be.disabled')
       cy.findByLabelText('Payload').should('be.disabled')
 
-      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
+      cy.findAllByRole('button', { name: 'Simulate uplink' })
+        .filter('[type="submit"]')
+        .should('be.disabled')
     })
   })
 
@@ -117,7 +119,9 @@ describe('End device messaging', () => {
       cy.findByLabelText('Payload').should('be.disabled')
       cy.findByLabelText('Confirmed downlink').should('be.disabled')
 
-      cy.findByRole('button', { name: 'Schedule downlink' }).should('be.disabled')
+      cy.findAllByRole('button', { name: 'Schedule downlink' })
+        .filter('[type="submit"]')
+        .should('be.disabled')
     })
 
     it('disables downlink messaging when skip payload crypto is enabled', () => {
@@ -149,7 +153,9 @@ describe('End device messaging', () => {
       cy.findByLabelText('Payload').should('be.disabled')
       cy.findByLabelText('Confirmed downlink').should('be.disabled')
 
-      cy.findByRole('button', { name: 'Schedule downlink' }).should('be.disabled')
+      cy.findAllByRole('button', { name: 'Schedule downlink' })
+        .filter('[type="submit"]')
+        .should('be.disabled')
     })
   })
 })

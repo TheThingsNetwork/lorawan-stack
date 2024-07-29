@@ -47,7 +47,6 @@ const m = defineMessages({
   bytes: 'Bytes',
   replace: 'Replace downlink queue',
   push: 'Push to downlink queue (append)',
-  scheduleDownlink: 'Schedule downlink',
   downlinkSuccess: 'Downlink scheduled',
   bytesPayloadDescription: 'The desired payload bytes of the downlink message',
   jsonPayloadDescription: 'The decoded payload of the downlink message',
@@ -142,7 +141,7 @@ const DownlinkForm = () => {
         <Notification content={sharedMessages.deviceSimulationDisabledWarning} warning small />
       )}
       {!validSession && <Notification content={m.invalidSessionWarning} warning small />}
-      <IntlHelmet title={m.scheduleDownlink} />
+      <IntlHelmet title={sharedMessages.scheduleDownlink} />
       <Form
         error={error}
         onSubmit={handleSubmit}
@@ -150,7 +149,7 @@ const DownlinkForm = () => {
         validationSchema={validationSchema}
         disabled={deviceSimulationDisabled}
       >
-        <Form.SubTitle title={m.scheduleDownlink} />
+        <Form.SubTitle title={sharedMessages.scheduleDownlink} />
         <Form.Field name="_mode" title={m.insertMode} component={RadioButton.Group}>
           <RadioButton label={m.replace} value="replace" />
           <RadioButton label={m.push} value="push" />
@@ -200,7 +199,7 @@ const DownlinkForm = () => {
           component={Checkbox}
         />
         <SubmitBar>
-          <Form.Submit component={SubmitButton} message={m.scheduleDownlink} />
+          <Form.Submit component={SubmitButton} message={sharedMessages.scheduleDownlink} />
         </SubmitBar>
       </Form>
     </>
