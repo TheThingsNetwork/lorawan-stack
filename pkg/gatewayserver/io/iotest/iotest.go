@@ -74,6 +74,8 @@ type FrontendConfig struct {
 	DeduplicatesUplinks bool
 	// UsesGatewayToken indicates that the frontend uses gateway tokens for authentication instead of an API key.
 	UsesGatewayToken bool
+	// SkipsTxAcknowledgmentOnFailure indicates that the frontend does not send a Tx acknowledgment on failure.
+	SkipsTxAcknowledgmentOnFailure bool
 	// CustomRxMetadataAssertion is a custom assertion for RxMetadata.
 	CustomRxMetadataAssertion func(t *testing.T, actual, expected *ttnpb.RxMetadata)
 	// CustomComponentConfig applies custom configuration for the component before it gets started.
@@ -1244,7 +1246,8 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 							t.Fatal("Expected uplink event timeout")
 						}
 					}
-					if expected := tc.Up.TxAcknowledgment; expected != nil {
+					if expected := tc.Up.TxAcknowledgment; expected != nil &&
+						(!frontend.SkipsTxAcknowledgmentOnFailure || expected.Result == ttnpb.TxAcknowledgment_SUCCESS) {
 						select {
 						case <-upEvents["gs.down.tx.success"]:
 						case evt := <-upEvents["gs.down.tx.fail"]:
