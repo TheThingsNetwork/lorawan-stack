@@ -132,14 +132,15 @@ const SideFooter = () => {
         <Button
           className={style.supportButton}
           secondary
-          message={m.resources}
+          message={isMinimized ? undefined : m.resources}
+          noDropdownIcon={isMinimized}
           icon={IconInfoSquareRounded}
           dropdownItems={supportDropdownItems}
           dropdownPosition="above"
           dropdownClassName={style.sideFooterDropdown}
           ref={supportButtonRef}
         />
-        <Button className={classnames(style.clusterButton)} noDropdownIcon>
+        <Button className={style.clusterButton} noDropdownIcon>
           <span className={style.clusterButtonContent}>
             <span className={style.sideFooterVersion}>
               v{process.env.VERSION}.{process.env.REVISION}

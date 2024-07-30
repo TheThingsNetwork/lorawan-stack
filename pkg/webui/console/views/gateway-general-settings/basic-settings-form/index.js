@@ -29,7 +29,7 @@ import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-se
 
 import Message from '@ttn-lw/lib/components/message'
 
-import DeleteGatewayModal from '@console/containers/delete-gateway-modal'
+import DeleteEntityHeaderModal from '@console/containers/delete-entity-header-modal'
 
 import Require from '@console/lib/components/require'
 
@@ -38,7 +38,14 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
-import { checkFromState, mayDeleteGateway } from '@console/lib/feature-checks'
+import {
+  checkFromState,
+  mayDeleteGateway,
+  mayViewOrEditGatewayApiKeys,
+  mayViewOrEditGatewayCollaborators,
+} from '@console/lib/feature-checks'
+
+import { deleteGateway } from '@console/store/actions/gateways'
 
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
 import { selectUserId } from '@console/store/selectors/logout'
@@ -264,12 +271,20 @@ const BasicSettingsForm = React.memo(props => {
             naked
             danger
           />
-          <DeleteGatewayModal
-            gtwId={gtwId}
-            gtwName={gateway.name}
+          <DeleteEntityHeaderModal
+            entity="gateway"
+            entityId={gtwId}
+            entityName={gateway.name}
             setVisible={setDeleteGtwVisible}
             visible={deleteGtwVisible}
-            setError={setError}
+            mayDeleteEntitySelector={mayDeleteGateway}
+            mayViewOrEditEntityCollaborators={mayViewOrEditGatewayCollaborators}
+            mayViewOrEditEntityApiKeys={mayViewOrEditGatewayApiKeys}
+            path="/gateways"
+            deleteEntity={deleteGateway}
+            deleteMessage={sharedMessages.deleteGateway}
+            deletedMessage={sharedMessages.gatewayDeleted}
+            deletedErrorMessage={sharedMessages.gatewayDeleteError}
           />
         </Require>
       </SubmitBar>

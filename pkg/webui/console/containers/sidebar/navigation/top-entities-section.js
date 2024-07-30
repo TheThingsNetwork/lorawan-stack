@@ -33,7 +33,6 @@ import { getTopEntities } from '@console/store/actions/top-entities'
 const m = defineMessages({
   topGateways: 'Top gateways',
   topApplications: 'Top applications',
-  topDevices: 'Top devices',
   noTopEntities: 'No top entities yet',
   noTopGateways: 'No top gateways yet',
   noTopApplications: 'No top applications yet',
@@ -80,7 +79,7 @@ const TopEntitiesSection = ({ topEntities, type }) => {
     label = m.topApplications
     noneLabel = m.noTopApplications
   } else if (type === END_DEVICE) {
-    label = m.topDevices
+    label = sharedMessages.topDevices
     noneLabel = m.noTopDevices
   }
   return (

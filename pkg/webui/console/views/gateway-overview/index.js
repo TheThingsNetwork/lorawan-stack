@@ -23,7 +23,6 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
 import GatewayMapPanel from '@console/components/gateway-map-panel'
 
-import GatewayOverviewHeader from '@console/containers/gateway-overview-header'
 import GatewayStatusPanel from '@console/containers/gateway-status-panel'
 import GatewayGeneralInformationPanel from '@console/containers/gateway-general-information-panel'
 
@@ -48,7 +47,6 @@ const GatewayOverview = () => {
   return (
     <Require featureCheck={mayViewGatewayInfo} otherwise={{ redirect: '/' }}>
       <IntlHelmet title={sharedMessages.overview} />
-      <GatewayOverviewHeader gateway={gateway} />
       <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
         <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <GatewayGeneralInformationPanel />

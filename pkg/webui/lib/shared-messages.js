@@ -166,6 +166,12 @@ export default defineMessages({
   delayWarning:
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
   deleteGateway: 'Delete gateway',
+  unclaimAndDeleteDevice: 'Unclaim and delete end device',
+  deleteDevice: 'Delete end device',
+  deleteApp: 'Delete application',
+  deleteSuccess: 'Application deleted',
+  applicationDeleteFailure: 'Application delete error',
+  deleteWarning: 'Are you sure you want to delete "{deviceId}"? This action cannot be undone.',
   deleteModalConfirmDeletion: 'Confirm deletion',
   deleteModalConfirmMessage: 'Please enter <pre>{entityId}</pre> to confirm the deletion.',
   deleteModalDefaultMessage:
@@ -549,6 +555,7 @@ export default defineMessages({
   token: 'Token',
   tokenDelete: 'Token delete',
   tokenDeleted: 'Token deleted',
+  topDevices: 'Top end devices',
   topEntities: 'Top entities',
   topEntitiesError: 'Top entities are currently unavailable',
   tokenSet: 'Set token',

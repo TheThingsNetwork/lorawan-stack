@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
+
+import { APPLICATION } from '@console/constants/entities'
 
 import Icon, {
   IconBroadcast,
@@ -29,17 +31,26 @@ import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Status from '@ttn-lw/components/status'
+import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import LastSeen from '@console/components/last-seen'
 
+import DeleteEntityHeaderModal from '@console/containers/delete-entity-header-modal'
+
+import Require from '@console/lib/components/require'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 
-import { checkFromState, mayViewApplicationDevices } from '@console/lib/feature-checks'
+import {
+  checkFromState,
+  mayDeleteApplication,
+  mayViewApplicationDevices,
+} from '@console/lib/feature-checks'
 
 import {
   ADD_BOOKMARK_BASE,
@@ -48,6 +59,8 @@ import {
   deleteBookmark,
 } from '@console/store/actions/user-preferences'
 import { getApplicationDeviceCount } from '@console/store/actions/applications'
+import { getPubsubsList } from '@console/store/actions/pubsubs'
+import { getWebhooksList } from '@console/store/actions/webhooks'
 
 import { selectUser } from '@console/store/selectors/logout'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
@@ -56,6 +69,8 @@ import {
   selectApplicationDeviceCount,
   selectSelectedApplication,
 } from '@console/store/selectors/applications'
+import { selectWebhooksTotalCount } from '@console/store/selectors/webhooks'
+import { selectPubsubsTotalCount } from '@console/store/selectors/pubsubs'
 
 import style from './application-overview-header.styl'
 
@@ -70,6 +85,8 @@ const m = defineMessages({
 })
 
 const ApplicationOverviewHeader = () => {
+  const [deleteApplicationModalVisible, setDeleteApplicationModalVisible] = useState(false)
+
   const dispatch = useDispatch()
   const { name, created_at, ids } = useSelector(selectSelectedApplication)
   const { application_id } = ids
@@ -79,6 +96,10 @@ const ApplicationOverviewHeader = () => {
   const deleteBookmarkLoading = useSelector(state =>
     selectFetchingEntry(state, DELETE_BOOKMARK_BASE),
   )
+  const webhooksCount = useSelector(selectWebhooksTotalCount)
+  const pubsubsCount = useSelector(selectPubsubsTotalCount)
+  const hasIntegrations = webhooksCount > 0 || pubsubsCount > 0
+  const additionalCondition = hasIntegrations
   const mayViewDevices = useSelector(state => checkFromState(mayViewApplicationDevices, state))
   const devicesTotalCount = useSelector(state =>
     selectApplicationDeviceCount(state, application_id),
@@ -152,7 +173,22 @@ const ApplicationOverviewHeader = () => {
     )
   }, [lastSeen, showLastSeen])
 
-  const menuDropdownItems = <></>
+  const handleOpenDeleteApplicationModal = useCallback(() => {
+    setDeleteApplicationModalVisible(true)
+  }, [])
+
+  const menuDropdownItems = (
+    <>
+      {
+        <Require featureCheck={mayDeleteApplication}>
+          <Dropdown.Item
+            title={sharedMessages.deleteApp}
+            action={handleOpenDeleteApplicationModal}
+          />
+        </Require>
+      }
+    </>
+  )
 
   return (
     <div className={style.root}>
@@ -204,6 +240,18 @@ const ApplicationOverviewHeader = () => {
             dropdownPosition="below left"
           />
         </div>
+        <RequireRequest
+          requestAction={[getPubsubsList(application_id), getWebhooksList(application_id)]}
+        >
+          <DeleteEntityHeaderModal
+            entity={APPLICATION}
+            entityId={application_id}
+            entityName={name}
+            setVisible={setDeleteApplicationModalVisible}
+            visible={deleteApplicationModalVisible}
+            additionalConditions={additionalCondition}
+          />
+        </RequireRequest>
       </div>
     </div>
   )

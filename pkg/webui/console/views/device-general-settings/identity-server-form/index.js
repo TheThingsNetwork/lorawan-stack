@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import { isEqual } from 'lodash'
 
 import { IconTrash } from '@ttn-lw/components/icon'
@@ -37,12 +36,6 @@ import { parseLorawanMacVersion } from '@console/lib/device-utils'
 import { hasExternalJs, isDeviceOTAA } from '../utils'
 
 import validationSchema from './validation-schema'
-
-const messages = defineMessages({
-  unclaimAndDeleteDevice: 'Unclaim and delete end device',
-  deleteDevice: 'Delete end device',
-  deleteWarning: 'Are you sure you want to delete "{deviceId}"? This action cannot be undone.',
-})
 
 const IdentityServerForm = React.memo(props => {
   const {
@@ -294,9 +287,14 @@ const IdentityServerForm = React.memo(props => {
         <ModalButton
           type="button"
           icon={IconTrash}
-          message={supportsClaiming ? messages.unclaimAndDeleteDevice : messages.deleteDevice}
+          message={
+            supportsClaiming ? sharedMessages.unclaimAndDeleteDevice : sharedMessages.deleteDevice
+          }
           modalData={{
-            message: { values: { deviceId: name || ids.device_id }, ...messages.deleteWarning },
+            message: {
+              values: { deviceId: name || ids.device_id },
+              ...sharedMessages.deleteWarning,
+            },
           }}
           onApprove={onDeviceDelete}
           naked

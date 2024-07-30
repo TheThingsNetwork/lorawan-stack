@@ -16,6 +16,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 
 import Icon, { IconKey, IconCollaborators, IconCalendarMonth } from '@ttn-lw/components/icon'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -63,7 +64,10 @@ const OrganizationHeader = ({ org }) => {
       </div>
       <div className="d-inline-flex h-full al-center gap-cs-m flex-wrap">
         {mayViewCollaborators && (
-          <div className="d-inline-flex al-center gap-cs-xxs">
+          <Link
+            to={`/organizations/${orgId}`}
+            className="d-inline-flex al-center gap-cs-xxs c-text-neutral-semilight"
+          >
             <Icon icon={IconCollaborators} small className="c-text-neutral-semilight" />
             <span className="fw-bold">{collaboratorsTotalCount ?? 0}</span>
             <Message
@@ -71,18 +75,17 @@ const OrganizationHeader = ({ org }) => {
               content={sharedMessages.members}
               className="c-text-neutral-semilight"
             />
-          </div>
+          </Link>
         )}
         {mayViewApiKeys && (
-          <div className="d-inline-flex al-center gap-cs-xxs">
-            <Icon icon={IconKey} small className="c-text-neutral-semilight" />
+          <Link
+            to={`/organizations/${orgId}/api-keys`}
+            className="d-inline-flex al-center gap-cs-xxs c-text-neutral-semilight"
+          >
+            <Icon icon={IconKey} small />
             <span className="fw-bold">{apiKeysTotalCount ?? 0}</span>
-            <Message
-              component="span"
-              content={sharedMessages.apiKeys}
-              className="c-text-neutral-semilight"
-            />
-          </div>
+            <Message component="span" content={sharedMessages.apiKeys} />
+          </Link>
         )}
         <div className="d-flex al-center gap-cs-xxs sm:d-none">
           <Icon small className="c-text-neutral-semilight" icon={IconCalendarMonth} />

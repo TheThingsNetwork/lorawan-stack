@@ -40,6 +40,7 @@ const Modal = props => {
     noTitleLine,
     children,
     message,
+    messageValues,
     logo,
     approval,
     formName,
@@ -99,7 +100,9 @@ const Modal = props => {
 
   const name = formName ? { name: formName } : {}
   const RootComponent = props.method ? 'form' : 'div'
-  const messageElement = message && <Message content={message} className={style.message} />
+  const messageElement = message && (
+    <Message content={message} className={style.message} values={messageValues} />
+  )
   const bottomLineElement =
     typeof bottomLine === 'object' && Boolean(bottomLine.id) ? (
       <Message content={bottomLine} />
@@ -209,6 +212,7 @@ Modal.propTypes = {
   inline: PropTypes.bool,
   logo: PropTypes.node,
   message: PropTypes.message,
+  messageValues: PropTypes.shape({}),
   method: PropTypes.string,
   name: PropTypes.string,
   noControlBar: PropTypes.bool,
@@ -228,6 +232,7 @@ Modal.defaultProps = {
   formName: undefined,
   logo: undefined,
   message: undefined,
+  messageValues: {},
   method: undefined,
   noControlBar: false,
   noTitleLine: false,
