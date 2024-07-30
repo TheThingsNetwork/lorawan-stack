@@ -140,9 +140,6 @@ describe('Gateway create', () => {
       target_gateway_id: `eui-${gateway.eui}`,
       target_frequency_plan_id: gateway.frequency_plan,
       target_gateway_server_address: window.location.hostname,
-      cups_redirection: {
-        target_cups_uri: `${window.location.protocol}//${window.location.hostname}:443`,
-      },
     }
     cy.intercept('GET', '/api/v3/gateways/*', { statusCode: 200 })
     cy.intercept('POST', '/api/v3/gcls/claim/info', {

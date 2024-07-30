@@ -39,18 +39,6 @@ const m = defineMessages({
     'We detected that your gateway is likely a The Things Indoor Gateway that uses gateway claiming. Use the WIFI password printed on the TTIG as claim authentication code below.',
 })
 
-const getCupsUri = gsUrl => {
-  try {
-    const gtwUrl = new URL(gsUrl)
-
-    return `${gtwUrl.protocol}//${gtwUrl.hostname}:443`
-  } catch (err) {
-    // Ignore any errors related to the URL composition.
-  }
-
-  return ''
-}
-
 const initialValues = {
   authenticated_identifiers: {
     authentication_code: '',
@@ -59,9 +47,6 @@ const initialValues = {
   target_gateway_id: '',
   target_frequency_plan_id: '',
   target_gateway_server_address: gsEnabled ? getHostFromUrl(gsBaseURL) : '',
-  cups_redirection: {
-    target_cups_uri: gsEnabled ? getCupsUri(gsBaseURL) : '',
-  },
 }
 
 // This is the TrackNet prefix that all TTIGs use.
