@@ -14,10 +14,15 @@
 
 import Yup from '@ttn-lw/lib/yup'
 
+import claimValidationSchema from './gateway-claim-form-section/validation-schema'
 import registerValidationSchema from './gateway-registration-form-section/validation-schema'
 
 export const validationSchema = Yup.object({
-  _ownerId: Yup.string(),
-}).concat(registerValidationSchema)
+  _owner_id: Yup.string(),
+}).when('._inputMethod', {
+  is: 'register',
+  then: schema => schema.concat(registerValidationSchema),
+  otherwise: schema => schema.concat(claimValidationSchema),
+})
 
 export default validationSchema

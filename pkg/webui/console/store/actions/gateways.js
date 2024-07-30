@@ -114,6 +114,16 @@ export const [
   },
 ] = createGetRightsListRequestActions(SHARED_NAME)
 
+export const CLAIM_GATEWAY_BASE = 'CLAIM_GATEWAY'
+export const [{ request: CLAIM_GATEWAY }, { request: claimGateway }] = createRequestActions(
+  CLAIM_GATEWAY_BASE,
+  details => ({ details }),
+)
+
+export const GET_GATEWAY_CLAIM_INFO_BY_EUI_BASE = 'GET_GATEWAY_CLAIM_INFO_BY_EUI'
+export const [{ request: GET_GATEWAY_CLAIM_INFO_BY_EUI }, { request: getGatewayClaimInfoByEui }] =
+  createRequestActions(GET_GATEWAY_CLAIM_INFO_BY_EUI_BASE, gatewayEui => ({ gatewayEui }))
+
 export const UPDATE_GTW_STATS_BASE = 'UPDATE_GATEWAY_STATISTICS'
 export const [
   {

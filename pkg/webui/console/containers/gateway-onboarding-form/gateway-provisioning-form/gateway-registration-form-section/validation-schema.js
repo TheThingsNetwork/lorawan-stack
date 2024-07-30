@@ -26,7 +26,9 @@ const m = defineMessages({
 })
 
 const hasAtLeastOneEntry = frequencyPlanIds =>
-  frequencyPlanIds.length > 0 && frequencyPlanIds.some(entry => entry !== '' && entry !== undefined)
+  frequencyPlanIds &&
+  frequencyPlanIds.length > 0 &&
+  frequencyPlanIds.some(entry => entry !== '' && entry !== undefined)
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({

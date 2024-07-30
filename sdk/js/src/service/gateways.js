@@ -237,6 +237,14 @@ class Gateways {
     return Marshaler.unwrapRights(result)
   }
 
+  async getInfoByEUI(gatewayEUI) {
+    const response = await this._api.GatewayClaimingServer.GetInfoByGatewayEUI(undefined, {
+      eui: gatewayEUI,
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Events Stream
 
   async openStream(identifiers, names, tail, after, listeners) {
@@ -275,6 +283,14 @@ class Gateways {
     const response = await this._api._connector.handleRequest('get', endpoint, 'gcs')
 
     return Marshaler.payloadSingleResponse(response.data)
+  }
+
+  // Claiming Server.
+
+  async claim(details) {
+    const result = await this._api.GatewayClaimingServer.Claim(undefined, details)
+
+    return Marshaler.payloadSingleResponse(result)
   }
 }
 

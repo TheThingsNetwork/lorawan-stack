@@ -36,12 +36,37 @@ describe('Gateway create', () => {
   it('displays UI elements in place', () => {
     cy.findByText('Register gateway', { selector: 'h1' }).should('be.visible')
     cy.findByLabelText('Gateway EUI').should('be.visible')
-    cy.findByLabelText('Gateway ID').should('be.visible')
+
+    cy.findByText(
+      'To continue, please confirm the Gateway EUI so we can determine onboarding options',
+    ).should('be.visible')
+    cy.findByRole('button', { name: 'Continue without EUI' }).should('be.visible')
+  })
+
+  it('succeeds to show manual registration form', () => {
+    cy.findByLabelText('Gateway EUI').type(generateHexValue(16))
+    cy.findByRole('button', { name: 'Confirm' }).click()
+
+    cy.findByRole('button', { name: 'Reset' }).should('be.visible')
+    cy.findByLabelText('Gateway EUI').should('be.visible').should('be.disabled')
     cy.findByLabelText('Gateway name').should('be.visible')
     cy.findByTestId('key-value-map').should('be.visible')
-    cy.findByLabelText(/Require authenticated connection/).should('exist')
-    cy.findByLabelText(/Share status within network/).should('exist')
-    cy.findByLabelText(/Share location within network/).should('exist')
+
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/gateways/add`)
+    cy.findByTestId('error-notification').should('not.exist')
+  })
+
+  it('succeeds to reset manual registration form', () => {
+    cy.findByLabelText('Gateway EUI').type(generateHexValue(16))
+    cy.findByRole('button', { name: 'Confirm' }).click()
+    cy.findByRole('button', { name: 'Reset' }).should('be.visible').click()
+    cy.findByLabelText('Gateway EUI')
+      .should('be.visible')
+      .should('not.be.disabled')
+      .should('have.value', '')
+    cy.findByRole('button', { name: 'Continue without EUI' }).should('be.visible')
+
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/gateways/add`)
   })
 
   it('succeeds adding gateway manually', () => {
@@ -49,9 +74,12 @@ describe('Gateway create', () => {
       frequency_plan: 'EU_863_870',
       eui: generateHexValue(16),
     }
-
+    cy.intercept('GET', '/api/v3/configuration/frequency-plans').as('get-frequency-plans')
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
     cy.findByLabelText('Gateway EUI').blur()
+    cy.findByRole('button', { name: 'Confirm' }).click()
+
+    cy.wait('@get-frequency-plans')
     cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByLabelText('Gateway name').type('Test Gateway')
     cy.findByText('Frequency plan')
@@ -70,12 +98,115 @@ describe('Gateway create', () => {
     cy.findByTestId('error-notification').should('not.exist')
   })
 
+  it('displays claiming gateway form', () => {
+    const gateway = {
+      frequency_plan: 'EU_863_870',
+      eui: '58A0CBFFFE000001',
+    }
+
+    cy.intercept('POST', '/api/v3/gcls/claim/info', {
+      body: {
+        supports_claiming: true,
+      },
+    })
+
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByRole('button', { name: 'Confirm' }).click()
+    cy.findByTestId('notification').should('exist')
+    cy.findByLabelText('Claim authentication code').type('12345')
+    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
+    cy.findByText('Frequency plan')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption(gateway.frequency_plan)
+  })
+
+  it('succeeds claiming gateway', () => {
+    const gateway = {
+      frequency_plan: 'EU_863_870',
+      eui: generateHexValue(16),
+    }
+    const expectedRequest = {
+      collaborator: {
+        user_ids: {
+          user_id: user.ids.user_id,
+        },
+      },
+      authenticated_identifiers: {
+        gateway_eui: gateway.eui.toUpperCase(),
+        authentication_code: 'MTIzNDU=',
+      },
+      target_gateway_id: `eui-${gateway.eui}`,
+      target_frequency_plan_id: gateway.frequency_plan,
+      target_gateway_server_address: window.location.hostname,
+      cups_redirection: {
+        target_cups_uri: `${window.location.protocol}//${window.location.hostname}:443`,
+      },
+    }
+    cy.intercept('GET', '/api/v3/gateways/*', { statusCode: 200 })
+    cy.intercept('POST', '/api/v3/gcls/claim/info', {
+      body: {
+        supports_claiming: true,
+      },
+    })
+
+    cy.intercept('POST', '/api/v3/gcls/claim', {
+      statusCode: 201,
+      body: {
+        gateway_id: `eui-${gateway.eui}`,
+        eui: gateway.eui,
+      },
+    }).as('claim-request')
+
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByRole('button', { name: 'Confirm' }).click()
+    cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
+    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
+    cy.findByLabelText('Claim authentication code').type('12345')
+    cy.findByRole('button', { name: 'Claim gateway' }).click()
+    cy.wait('@claim-request').its('request.body').should('deep.equal', expectedRequest)
+    cy.findByTestId('error-notification').should('not.exist')
+
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
+    )
+  })
+
+  it('succeeds adding gateway without frequency plan and without EUI', () => {
+    const gateway = {
+      gateway_id: 'gateway-without-fp-eui',
+      frequency_plan: 'EU_863_870',
+    }
+    cy.intercept('GET', '/api/v3/configuration/frequency-plans').as('get-frequency-plans')
+    cy.findByRole('button', { name: 'Continue without EUI' }).click()
+    cy.findByLabelText('Gateway ID').type(gateway.gateway_id)
+    cy.wait('@get-frequency-plans')
+    cy.findByText('Frequency plan')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption('no-frequency-plan')
+    cy.findByText(/Without choosing a frequency plan/)
+    cy.findByRole('button', { name: 'Register gateway' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway.gateway_id}`,
+    )
+    cy.findByRole('heading', { name: gateway.gateway_id })
+    cy.findByTestId('error-notification').should('not.exist')
+  })
+
   it('succeeds converting MAC to EUI', () => {
     const gatewayMac = generateHexValue(12)
 
     cy.findByLabelText('Gateway EUI').type(gatewayMac)
     cy.contains('Convert MAC to EUI', { timeout: 3500 }).should('be.visible').click()
     cy.contains('Convert MAC to EUI').should('not.exist')
+    cy.findByRole('button', { name: 'Confirm' }).click()
 
     const gatewayEui = `${gatewayMac.substring(0, 6)}fffe${gatewayMac.substring(6)}`
     cy.findByLabelText('Gateway ID').type(`eui-${gatewayEui}`)
@@ -86,9 +217,12 @@ describe('Gateway create', () => {
       frequency_plan: 'EU_863_870',
       eui: generateHexValue(16),
     }
-
+    cy.intercept('GET', '/api/v3/configuration/frequency-plans').as('get-frequency-plans')
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
     cy.findByLabelText('Gateway EUI').blur()
+    cy.findByRole('button', { name: 'Confirm' }).click()
+
+    cy.wait('@get-frequency-plans')
     cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByLabelText('Gateway name').type('Test Gateway')
     cy.findByText('Frequency plan')
@@ -117,33 +251,9 @@ describe('Gateway create', () => {
       'eq',
       `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
     )
+
     cy.findByRole('heading', { name: 'Test Gateway' })
     cy.findByText(gateway.frequency_plan).should('be.visible')
-    cy.findByTestId('error-notification').should('not.exist')
-  })
-
-  it('succeeds adding gateway without frequency plan', () => {
-    const gateway = {
-      frequency_plan: 'EU_863_870',
-      eui: generateHexValue(16),
-    }
-
-    cy.findByLabelText('Gateway EUI').type(gateway.eui)
-    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
-    cy.findByText('Frequency plan')
-      .parents('div[data-test-id="form-field"]')
-      .find('input')
-      .first()
-      .selectOption('no-frequency-plan')
-    cy.findByText(/Without choosing a frequency plan/)
-    cy.findByRole('button', { name: 'Register gateway' }).click()
-
-    cy.findByTestId('error-notification').should('not.exist')
-    cy.location('pathname').should(
-      'eq',
-      `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
-    )
-    cy.findByRole('heading', { name: `eui-${gateway.eui}` })
     cy.findByTestId('error-notification').should('not.exist')
   })
 
@@ -152,9 +262,14 @@ describe('Gateway create', () => {
       frequency_plan: 'EU_863_870',
       eui: generateHexValue(16),
     }
-
+    cy.intercept('GET', '/api/v3/configuration/frequency-plans').as('get-frequency-plans')
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByLabelText('Gateway EUI').blur()
+    cy.findByRole('button', { name: 'Confirm' }).click()
+
     cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
+    cy.wait('@get-frequency-plans')
+
     cy.findByText('Frequency plan')
       .parents('div[data-test-id="form-field"]')
       .find('input')
@@ -194,8 +309,8 @@ describe('Gateway create', () => {
       }
 
       cy.findByLabelText('Gateway EUI').type(gateway.eui)
+      cy.findByRole('button', { name: 'Confirm' }).click()
       cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
-
       cy.findByTestId('key-value-map').should('not.exist')
       cy.findByRole('button', { name: 'Register gateway' }).click()
 
