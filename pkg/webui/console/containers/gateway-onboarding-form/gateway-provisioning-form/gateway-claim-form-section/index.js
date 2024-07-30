@@ -24,6 +24,7 @@ import Notification from '@ttn-lw/components/notification'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import Link from '@ttn-lw/components/link'
 
 import { GsFrequencyPlansSelect as FrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
@@ -36,7 +37,7 @@ const { enabled: gsEnabled, base_url: gsBaseURL } = selectGsConfig()
 
 const m = defineMessages({
   claimWarning:
-    'We detected that your gateway is likely a The Things Indoor Gateway that uses gateway claiming. Use the WIFI password printed on the TTIG as claim authentication code below.',
+    'We detected that your gateway is a <strong>Managed Gateway</strong>. To claim this gateway, please use the claim authentication code printed on the <link1>inside of the mounting lid</link1> or <link2>scan the QR code</link2> to claim instantly.',
 })
 
 const initialValues = {
@@ -49,12 +50,9 @@ const initialValues = {
   target_gateway_server_address: gsEnabled ? getHostFromUrl(gsBaseURL) : '',
 }
 
-// This is the TrackNet prefix that all TTIGs use.
-const TRACKNET_PREFIX = '58A0CBFFFE'
-
 const GatewayClaimFormSection = () => {
   const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
-  const maybeTTIG = values.ids?.eui?.startsWith(TRACKNET_PREFIX)
+  const isManaged = values._inputMethod === 'managed'
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
@@ -65,9 +63,28 @@ const GatewayClaimFormSection = () => {
 
   return (
     <>
-      {maybeTTIG && (
+      {isManaged && (
         <Form.InfoField>
-          <Notification small info content={m.claimWarning} messageValues={{ br: <br /> }} />
+          <Notification
+            small
+            info
+            content={m.claimWarning}
+            messageValues={{
+              strong: txt => <strong>{txt}</strong>,
+              // TODO: Update links
+              link1: txt => (
+                <Link to="#" secondary>
+                  {txt}
+                </Link>
+              ),
+              link2: txt => (
+                <Link to="#" secondary>
+                  {txt}
+                </Link>
+              ),
+            }}
+            className="mb-0"
+          />
         </Form.InfoField>
       )}
       <Form.Field
