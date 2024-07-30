@@ -27,6 +27,7 @@ import {
   DELETE_APP_SUCCESS,
   GET_APP_EVENT_MESSAGE_SUCCESS,
   GET_MQTT_INFO_SUCCESS,
+  FETCH_APPS_LIST_SUCCESS,
 } from '@console/store/actions/applications'
 
 const application = (state = {}, application) => ({
@@ -52,6 +53,7 @@ const applications = (state = defaultState, { type, payload, event, meta }) => {
         selectedApplication: payload.id,
       }
     case GET_APPS_LIST_SUCCESS:
+    case FETCH_APPS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
         (acc, app) => {
           const id = getApplicationId(app)

@@ -28,9 +28,9 @@ import { getTypeAndId } from '@console/lib/recency-frequency-entities'
 
 import { GET_TOP_ENTITIES } from '@console/store/actions/top-entities'
 import { getBookmarksList } from '@console/store/actions/user-preferences'
-import { getApplication, getApplicationsList } from '@console/store/actions/applications'
-import { getGateway, getGatewaysList } from '@console/store/actions/gateways'
-import { getDevice, getDevicesList } from '@console/store/actions/devices'
+import { fetchApplicationsList, getApplication } from '@console/store/actions/applications'
+import { fetchGatewaysList, getGateway } from '@console/store/actions/gateways'
+import { fetchDevicesList, getDevice } from '@console/store/actions/devices'
 
 import { selectUserId } from '@account/store/selectors/user'
 import {
@@ -134,11 +134,11 @@ const fetchTopEntities = async (getState, dispatch) => {
     try {
       await Promise.all([
         dispatch(
-          attachPromise(getApplicationsList({ page: 1, limit: prefetchLimit, order }, ['name'])),
+          attachPromise(fetchApplicationsList({ page: 1, limit: prefetchLimit, order }, ['name'])),
         ),
         dispatch(
           attachPromise(
-            getGatewaysList(
+            fetchGatewaysList(
               { page: 1, limit: prefetchLimit, order },
               ['name', 'gateway_server_address'],
               {
@@ -173,7 +173,7 @@ const fetchTopEntities = async (getState, dispatch) => {
         try {
           return await dispatch(
             attachPromise(
-              getDevicesList(entityId, { page: 1, limit: 1000, order }, ['name', 'last_seen_at']),
+              fetchDevicesList(entityId, { page: 1, limit: 1000, order }, ['name', 'last_seen_at']),
             ),
           )
         } catch (error) {

@@ -26,6 +26,7 @@ import {
   UPDATE_GTW_STATS_FAILURE,
   START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
+  FETCH_GTWS_LIST_SUCCESS,
 } from '@console/store/actions/gateways'
 
 const defaultStatisticsState = {
@@ -123,6 +124,7 @@ const gateways = (state = defaultState, action) => {
         selectedGateway: null,
         entities: rest,
       }
+    case FETCH_GTWS_LIST_SUCCESS:
     case GET_GTWS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
         (acc, gtw) => {

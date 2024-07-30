@@ -84,6 +84,23 @@ export const [
   { request: getDevicesList, success: getDevicesListSuccess, failure: getDevicesListFailure },
 ] = createPaginationByIdRequestActions(SHARED_NAME)
 
+export const FETCH_DEVICES_LIST_BASE = 'FETCH_END_DEVICE_LIST'
+export const [
+  {
+    request: FETCH_DEVICES_LIST,
+    success: FETCH_DEVICES_LIST_SUCCESS,
+    failure: FETCH_DEVICES_LIST_FAILURE,
+  },
+  { request: fetchDevicesList, success: fetchDevicesListSuccess, failure: fetchDevicesListFailure },
+] = createRequestActions(
+  FETCH_DEVICES_LIST_BASE,
+  (id, { page, limit, query, order } = {}) => ({
+    id,
+    params: { page, limit, query, order },
+  }),
+  (id, params, selectors = [], options = {}) => ({ selectors, options }),
+)
+
 export const RESET_DEV_BASE = 'RESET_END_DEVICE'
 export const [
   { request: RESET_DEV, success: RESET_DEV_SUCCESS, failure: RESET_DEV_FAILURE },

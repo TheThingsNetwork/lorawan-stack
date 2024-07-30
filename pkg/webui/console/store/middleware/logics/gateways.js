@@ -93,8 +93,7 @@ const restoreGatewayLogic = createRequestLogic({
 })
 
 const getGatewaysLogic = createRequestLogic({
-  type: gateways.GET_GTWS_LIST,
-  latest: true,
+  type: [gateways.GET_GTWS_LIST, gateways.FETCH_GTWS_LIST],
   process: async ({ action }) => {
     const {
       params: { page, limit, query, order, deleted },

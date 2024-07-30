@@ -107,8 +107,7 @@ const restoreApplicationLogic = createRequestLogic({
 })
 
 const getApplicationsLogic = createRequestLogic({
-  type: applications.GET_APPS_LIST,
-  latest: true,
+  type: [applications.GET_APPS_LIST, applications.FETCH_APPS_LIST],
   process: async ({ action }, dispatch) => {
     const {
       params: { page, limit, query, order, deleted },
