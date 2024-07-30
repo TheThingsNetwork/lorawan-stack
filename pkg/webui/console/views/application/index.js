@@ -25,6 +25,8 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
+import ApplicationOverviewHeader from '@console/containers/application-overview-header'
+
 import Require from '@console/lib/components/require'
 
 import ApplicationOverview from '@console/views/application-overview'
@@ -112,6 +114,7 @@ const ApplicationInner = () => {
   return (
     <>
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
+      <ApplicationOverviewHeader />
       <Routes>
         <Route index Component={ApplicationOverview} />
         <Route path="general-settings" Component={ApplicationGeneralSettings} />

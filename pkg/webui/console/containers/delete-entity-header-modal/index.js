@@ -16,6 +16,8 @@ import React, { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { APPLICATION, GATEWAY } from '@console/constants/entities'
+
 import { IconTrash } from '@ttn-lw/components/icon'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import toast from '@ttn-lw/components/toast'
@@ -36,42 +38,92 @@ import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/colla
 
 import {
   checkFromState,
+  mayDeleteApplication,
   mayDeleteGateway,
   mayPurgeEntities,
+  mayViewOrEditApplicationApiKeys,
+  mayViewOrEditApplicationCollaborators,
   mayViewOrEditGatewayApiKeys,
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
+import { deleteApplication } from '@console/store/actions/applications'
 import { deleteGateway } from '@console/store/actions/gateways'
 
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
-const DeleteGatewayModal = props => {
-  const { gtwId, gtwName, visible, setVisible, setError } = props
+const deleteEntityActionMap = {
+  [APPLICATION]: deleteApplication,
+  [GATEWAY]: deleteGateway,
+}
 
+const mayDeleteEntitySelectorMap = {
+  [APPLICATION]: mayDeleteApplication,
+  [GATEWAY]: mayDeleteGateway,
+}
+
+const mayViewOrEditEntityCollaboratorsMap = {
+  [APPLICATION]: mayViewOrEditApplicationCollaborators,
+  [GATEWAY]: mayViewOrEditGatewayCollaborators,
+}
+
+const mayViewOrEditEntityApiKeysMap = {
+  [APPLICATION]: mayViewOrEditApplicationApiKeys,
+  [GATEWAY]: mayViewOrEditGatewayApiKeys,
+}
+
+const path = {
+  [APPLICATION]: '/applications',
+  [GATEWAY]: '/gateways',
+}
+
+const deleteMessageMap = {
+  [APPLICATION]: sharedMessages.deleteApp,
+  [GATEWAY]: sharedMessages.deleteGateway,
+}
+
+const deletedMessageMap = {
+  [APPLICATION]: sharedMessages.deleteSuccess,
+  [GATEWAY]: sharedMessages.gatewayDeleted,
+}
+
+const deletedErrorMessageMap = {
+  [APPLICATION]: sharedMessages.applicationDeleteFailure,
+  [GATEWAY]: sharedMessages.gatewayDeleteError,
+}
+
+const DeleteEntityHeaderModal = props => {
+  const { entity, entityId, entityName, visible, setVisible, setError, additionalConditions } =
+    props
+
+  const lowerCaseEntity = entity.toLowerCase()
   const [confirmId, setConfirmId] = React.useState('')
   const [purgeEntity, setPurgeEntity] = React.useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const mayPurgeGtw = useSelector(state => checkFromState(mayPurgeEntities, state))
-  const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
+  const mayPurgeEntity = useSelector(state => checkFromState(mayPurgeEntities, state))
+  const mayDeleteEntity = useSelector(state =>
+    checkFromState(mayDeleteEntitySelectorMap[entity], state),
+  )
   const apiKeysCount = useSelector(selectApiKeysTotalCount)
   const collaboratorsCount = useSelector(state =>
-    selectCollaboratorsTotalCount(state, { id: gtwId }),
+    selectCollaboratorsTotalCount(state, { id: entityId }),
   )
   const hasApiKeys = apiKeysCount > 0
   const hasAddedCollaborators = collaboratorsCount > 1
-  const isPristine = !hasAddedCollaborators && !hasApiKeys
+  const isPristine = !hasAddedCollaborators && !hasApiKeys && !additionalConditions
   const mayViewCollaborators = useSelector(state =>
-    checkFromState(mayViewOrEditGatewayCollaborators, state),
+    checkFromState(mayViewOrEditEntityCollaboratorsMap[entity], state),
   )
-  const mayViewApiKeys = useSelector(state => checkFromState(mayViewOrEditGatewayApiKeys, state))
+  const mayViewApiKeys = useSelector(state =>
+    checkFromState(mayViewOrEditEntityApiKeysMap[entity], state),
+  )
   const shouldConfirmDelete = !isPristine || !mayViewCollaborators || !mayViewApiKeys
 
-  const name = gtwName ? gtwName : gtwId
+  const name = entityName ? entityName : entityId
 
   const handlePurgeEntityChange = React.useCallback(() => {
     setPurgeEntity(purge => !purge)
@@ -86,11 +138,15 @@ const DeleteGatewayModal = props => {
             if (setError) {
               setError(undefined)
             }
-            await dispatch(attachPromise(deleteGateway(gtwId, { purge: purgeEntity || false })))
-            navigate('/gateways')
+            await dispatch(
+              attachPromise(
+                deleteEntityActionMap[entity](entityId, { purge: purgeEntity || false }),
+              ),
+            )
+            navigate(path[entity])
             toast({
-              title: gtwId,
-              message: sharedMessages.gatewayDeleted,
+              title: entityId,
+              message: deletedMessageMap[entity],
               type: toast.types.SUCCESS,
             })
           } catch (error) {
@@ -98,8 +154,8 @@ const DeleteGatewayModal = props => {
               setError(error)
             }
             toast({
-              title: gtwId,
-              message: sharedMessages.gatewayDeleteError,
+              title: entityId,
+              message: deletedErrorMessageMap[entity],
               type: toast.types.ERROR,
             })
           }
@@ -107,22 +163,22 @@ const DeleteGatewayModal = props => {
       }
       setVisible(false)
     },
-    [dispatch, gtwId, navigate, purgeEntity, setError, setVisible],
+    [dispatch, entityId, navigate, purgeEntity, setError, setVisible, entity],
   )
 
   const loadData = useCallback(
     async dispatch => {
-      if (mayDeleteGtw) {
+      if (mayDeleteEntity) {
         if (mayViewApiKeys) {
-          await dispatch(attachPromise(getApiKeysList('gateway', gtwId)))
+          await dispatch(attachPromise(getApiKeysList(lowerCaseEntity, entityId)))
         }
         if (mayViewCollaborators) {
-          await dispatch(attachPromise(getCollaboratorsList('gateway', gtwId)))
+          await dispatch(attachPromise(getCollaboratorsList(lowerCaseEntity, entityId)))
         }
       }
       dispatch(attachPromise(getIsConfiguration()))
     },
-    [gtwId, mayDeleteGtw, mayViewApiKeys, mayViewCollaborators],
+    [entityId, mayDeleteEntity, mayViewApiKeys, mayViewCollaborators, lowerCaseEntity],
   )
 
   const initialValues = React.useMemo(
@@ -140,10 +196,10 @@ const DeleteGatewayModal = props => {
         onComplete={handleComplete}
         title={sharedMessages.deleteModalConfirmDeletion}
         approveButtonProps={{
-          disabled: shouldConfirmDelete && confirmId !== gtwId,
+          disabled: shouldConfirmDelete && confirmId !== entityId,
           icon: IconTrash,
           primary: true,
-          message: sharedMessages.deleteGateway,
+          message: deleteMessageMap[entity],
         }}
       >
         <div>
@@ -162,7 +218,7 @@ const DeleteGatewayModal = props => {
             component="p"
           />
           <Form initialValues={initialValues}>
-            {mayPurgeGtw && (
+            {mayPurgeEntity && (
               <Form.Field
                 name="purge"
                 className="mt-ls-xxs"
@@ -191,7 +247,7 @@ const DeleteGatewayModal = props => {
               <>
                 <Message
                   content={sharedMessages.deleteModalConfirmMessage}
-                  values={{ entityId: gtwId, pre: id => <pre className="d-inline">{id}</pre> }}
+                  values={{ entityId, pre: id => <pre className="d-inline">{id}</pre> }}
                   component="span"
                 />
                 <Input
@@ -209,17 +265,20 @@ const DeleteGatewayModal = props => {
   )
 }
 
-DeleteGatewayModal.propTypes = {
-  gtwId: PropTypes.string.isRequired,
-  gtwName: PropTypes.string,
+DeleteEntityHeaderModal.propTypes = {
+  additionalConditions: PropTypes.bool,
+  entity: PropTypes.string.isRequired,
+  entityId: PropTypes.string.isRequired,
+  entityName: PropTypes.string,
   setError: PropTypes.func,
   setVisible: PropTypes.func.isRequired,
   visible: PropTypes.bool.isRequired,
 }
 
-DeleteGatewayModal.defaultProps = {
-  gtwName: undefined,
+DeleteEntityHeaderModal.defaultProps = {
+  additionalConditions: false,
+  entityName: undefined,
   setError: undefined,
 }
 
-export default DeleteGatewayModal
+export default DeleteEntityHeaderModal

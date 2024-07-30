@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import { GATEWAY } from '@console/constants/entities'
 import tts from '@console/api/tts'
 
 import Icon, {
@@ -34,7 +35,7 @@ import Message from '@ttn-lw/lib/components/message'
 import LastSeen from '@console/components/last-seen'
 
 import GatewayConnection from '@console/containers/gateway-connection'
-import DeleteGatewayModal from '@console/containers/delete-gateway-modal'
+import DeleteEntityHeaderModal from '@console/containers/delete-entity-header-modal'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -170,9 +171,10 @@ const GatewayOverviewHeader = ({ gateway }) => {
             dropdownPosition="below left"
           />
         </div>
-        <DeleteGatewayModal
-          gtwId={gateway_id}
-          gtwName={name}
+        <DeleteEntityHeaderModal
+          entity={GATEWAY}
+          entityId={gateway_id}
+          entityName={name}
           setVisible={setDeleteGatewayVisible}
           visible={deleteGatewayVisible}
         />

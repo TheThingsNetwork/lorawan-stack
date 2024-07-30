@@ -27,7 +27,6 @@ import BlurryNetworkActivityPanel from '@console/components/blurry-network-activ
 import ApplicationMapPanel from '@console/components/application-map-panel'
 
 import LatestDecodedPayloadPanel from '@console/containers/latest-decoded-payload-panel'
-import ApplicationOverviewHeader from '@console/containers/application-overview-header'
 import DevicesPanel from '@console/containers/devices-panel'
 
 import Require from '@console/lib/components/require'
@@ -70,7 +69,6 @@ const ApplicationOverview = () => {
   return (
     <Require condition={condition} otherwise={otherwise}>
       <IntlHelmet title={sharedMessages.overview} />
-      <ApplicationOverviewHeader />
       <div className="container container--xl grid p-ls-s gap-ls-s">
         <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <DevicesPanel />

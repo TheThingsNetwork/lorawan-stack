@@ -25,6 +25,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
 import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/collaborators'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   checkFromState,
@@ -61,7 +62,6 @@ const alcsyncPackageName = 'alcsync-v1'
 
 const m = defineMessages({
   updateSuccess: 'Application updated',
-  deleteSuccess: 'Application deleted',
 })
 
 const ApplicationGeneralSettingsContainer = ({ appId }) => {
@@ -172,7 +172,7 @@ const ApplicationGeneralSettingsContainer = ({ appId }) => {
         await dispatch(attachPromise(deleteApplication(appId, { purge: shouldPurge || false })))
         toast({
           title: appId,
-          message: m.deleteSuccess,
+          message: sharedMessages.deleteSuccess,
           type: toast.types.SUCCESS,
         })
         onDeleteSuccess()

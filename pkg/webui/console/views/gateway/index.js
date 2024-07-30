@@ -25,6 +25,8 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
+import GatewayOverviewHeader from '@console/containers/gateway-overview-header'
+
 import GatewayCollaborators from '@console/views/gateway-collaborators'
 import GatewayLocation from '@console/views/gateway-location'
 import GatewayData from '@console/views/gateway-data'
@@ -111,6 +113,7 @@ const GatewayInner = () => {
   return (
     <>
       <IntlHelmet titleTemplate={`%s - ${gatewayName} - ${selectApplicationSiteName()}`} />
+      <GatewayOverviewHeader gateway={gateway} />
       <Routes>
         <Route index Component={GatewayOverview} />
         <Route path="api-keys/*" Component={GatewayApiKeys} />

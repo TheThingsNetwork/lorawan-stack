@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages, FormattedNumber } from 'react-intl'
 import classnames from 'classnames'
+
+import tts from '@console/api/tts'
 
 import Icon, {
   IconMenu2,
@@ -23,12 +26,15 @@ import Icon, {
   IconStarFilled,
   IconArrowsSort,
   IconBroadcast,
+  IconTrash,
 } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 import Tooltip from '@ttn-lw/components/tooltip'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Status from '@ttn-lw/components/status'
+import Dropdown from '@ttn-lw/components/dropdown'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -39,6 +45,9 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
+import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
+import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 import {
   ADD_BOOKMARK_BASE,
@@ -46,6 +55,7 @@ import {
   DELETE_BOOKMARK_BASE,
   deleteBookmark,
 } from '@console/store/actions/user-preferences'
+import { unclaimDevice } from '@console/store/actions/claim'
 
 import { selectUser } from '@console/store/selectors/logout'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
@@ -55,6 +65,7 @@ import {
   selectDeviceDerivedUplinkFrameCount,
   selectDeviceLastSeen,
   selectSelectedCombinedDeviceId,
+  selectSelectedDeviceClaimable,
 } from '@console/store/selectors/devices'
 
 import style from './device-overview-header.styl'
@@ -68,10 +79,42 @@ const m = defineMessages({
     'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}',
   noActivityTooltip:
     'The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.',
+  downloadMacData: 'Download MAC data',
+  macStateError: 'There was an error and MAC state could not be included in the MAC data',
 })
 
+const nsHost = getHostFromUrl(selectNsConfig().base_url)
+const nsEnabled = selectNsConfig().enabled
+
+const DeviceDeleteModal = ({ visible, handleComplete, buttonMessage, message, deviceId }) => (
+  <PortalledModal
+    danger
+    visible={visible}
+    onComplete={handleComplete}
+    title={sharedMessages.deleteModalConfirmDeletion}
+    message={message}
+    messageValues={{ deviceId }}
+    approveButtonProps={{
+      icon: IconTrash,
+      primary: true,
+      message: buttonMessage,
+    }}
+  />
+)
+
+DeviceDeleteModal.propTypes = {
+  buttonMessage: PropTypes.message.isRequired,
+  deviceId: PropTypes.string.isRequired,
+  handleComplete: PropTypes.func.isRequired,
+  message: PropTypes.message.isRequired,
+  visible: PropTypes.bool.isRequired,
+}
+
 const DeviceOverviewHeader = ({ device }) => {
+  const [deleteDeviceVisible, setDeleteDeviceVisible] = useState(false)
+
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { ids, name } = device
   const { device_id } = ids
   const [appId, devId] = useSelector(selectSelectedCombinedDeviceId).split('/')
@@ -85,6 +128,7 @@ const DeviceOverviewHeader = ({ device }) => {
     selectDeviceDerivedNwkDownlinkFrameCount(state, appId, devId),
   )
   const lastSeen = useSelector(state => selectDeviceLastSeen(state, appId, devId))
+  const supportsClaiming = useSelector(selectSelectedDeviceClaimable)
   const showLastSeen = Boolean(lastSeen)
   const showUplinkCount = typeof uplinkFrameCount === 'number'
   const showAppDownlinkCount = typeof downlinkAppFrameCount === 'number'
@@ -149,6 +193,113 @@ const DeviceOverviewHeader = ({ device }) => {
       })
     }
   }, [dispatch, device_id, ids, isBookmarked, user.ids])
+
+  const onExport = useCallback(async () => {
+    const { ids, mac_settings, session, network_server_address } = device
+
+    let result
+    if (session && nsEnabled && getHostFromUrl(network_server_address) === nsHost) {
+      try {
+        result = await tts.Applications.Devices.getById(appId, ids.device_id, ['mac_state'])
+
+        if (!('mac_state' in result)) {
+          toast({
+            title: m.downloadMacData,
+            message: m.macStateError,
+            type: toast.types.ERROR,
+          })
+        }
+      } catch {
+        toast({
+          title: m.downloadMacData,
+          message: m.macStateError,
+          type: toast.types.ERROR,
+        })
+      }
+    }
+
+    const toExport = { mac_state: result?.mac_state, mac_settings }
+    const toExportData = composeDataUri(JSON.stringify(toExport, undefined, 2))
+    downloadDataUriAsFile(toExportData, `${ids.device_id}_mac_data_${Date.now()}.json`)
+  }, [appId, device])
+
+  const handleUnclaim = useCallback(async () => {
+    const {
+      ids: { dev_eui: devEui, join_eui: joinEui },
+    } = device
+    await dispatch(attachPromise(unclaimDevice(appId, devId, devEui, joinEui)))
+  }, [appId, devId, device, dispatch])
+
+  const handleUnclaimFailure = useCallback(async () => {
+    toast({
+      title: devId,
+      message: m.unclaimFailure,
+      type: toast.types.ERROR,
+    })
+  }, [devId])
+
+  const handleDelete = useCallback(
+    async () => tts.Applications.Devices.deleteById(appId, devId),
+    [appId, devId],
+  )
+
+  const handleDeleteSuccess = useCallback(async () => {
+    navigate(`/applications/${appId}/devices`)
+    toast({
+      title: device_id,
+      message: m.deleteSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }, [appId, device_id, navigate])
+
+  const handleDeleteFailure = useCallback(async () => {
+    toast({
+      title: device_id,
+      message: m.deleteFailure,
+      type: toast.types.ERROR,
+    })
+  }, [device_id])
+
+  const onDeviceDelete = React.useCallback(async () => {
+    // Check if device is claimable and if so, try to unclaim.
+    if (supportsClaiming) {
+      try {
+        await handleUnclaim()
+      } catch {
+        return handleUnclaimFailure()
+      }
+    }
+    // Delete device.
+    try {
+      await handleDelete()
+      handleDeleteSuccess()
+    } catch (error) {
+      handleDeleteFailure()
+    }
+  }, [
+    handleDelete,
+    handleDeleteFailure,
+    handleDeleteSuccess,
+    handleUnclaim,
+    handleUnclaimFailure,
+    supportsClaiming,
+  ])
+
+  const handleOpenDeleteDeviceModal = useCallback(() => {
+    setDeleteDeviceVisible(true)
+  }, [])
+
+  const menuDropdownItems = (
+    <>
+      <Dropdown.Item title={m.downloadMacData} action={onExport} />
+      <Dropdown.Item
+        title={
+          supportsClaiming ? sharedMessages.unclaimAndDeleteDevice : sharedMessages.deleteDevice
+        }
+        action={handleOpenDeleteDeviceModal}
+      />
+    </>
+  )
 
   return (
     <div className={style.root}>
@@ -227,10 +378,19 @@ const DeviceOverviewHeader = ({ device }) => {
             secondary
             icon={IconMenu2}
             noDropdownIcon
-            dropdownItems={[]}
+            dropdownItems={menuDropdownItems}
             dropdownPosition="below left"
           />
         </div>
+        <DeviceDeleteModal
+          visible={deleteDeviceVisible}
+          handleComplete={onDeviceDelete}
+          buttonMessage={
+            supportsClaiming ? sharedMessages.unclaimAndDeleteDevice : sharedMessages.deleteDevice
+          }
+          message={sharedMessages.deleteWarning}
+          deviceId={name ?? device_id}
+        />
       </div>
     </div>
   )

@@ -46,7 +46,6 @@ import {
 
 const m = defineMessages({
   basics: 'Basics',
-  deleteApp: 'Delete application',
   useAlcsync: 'Use Application Layer Clock Synchronization',
   adminContactDescription:
     'Administrative contact information for this application. Typically used to indicate who to contact with administrative questions about the application.',
@@ -206,7 +205,7 @@ const ApplicationGeneralSettingsForm = ({
       <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       <Require featureCheck={mayDeleteApplication}>
         <DeleteModalButton
-          message={m.deleteApp}
+          message={sharedMessages.deleteApp}
           entityId={appId}
           entityName={applicationName}
           onApprove={handleDelete}
