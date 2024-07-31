@@ -20,13 +20,14 @@
   display: flex
   justify-content: space-between
   align-items: center
-  padding: $cs.xxs $cs.xxs
+  padding: $cs.xs
   gap: $cs.xxs
   box-shadow: 0px 2px 7px 1px rgba(0, 0, 0, .06)
   background: var(--c-bg-neutral-min)
-  border: 1px solid var(--c-border-neutral-semilight)
+  border: 1px solid var(--c-border-neutral-light)
   border-radius: $br.l
   transition: border-color .08s linear, box-shadow .08s linear, color .08s linear
+  height: 2.7rem // ~38px
 
 
   &:hover
@@ -40,7 +41,7 @@
     & > div p
       display: none
 
-    .backslash
+    .keyboard-key
       display: none
 
   p
@@ -49,20 +50,20 @@
   .icon
     font-size: $fs.xl
     position: relative
-    top: 1px
 
-  .backslash
+  .keyboard-key
     margin: 0
-    height: 1.65rem // 24px
-    width: 1.65rem // 24px
+    height: 1.75rem
+    min-width: 1.75rem
+    box-sizing: border-box
     text-align: center
     border-radius: $br.m
     border: 1px solid var(--c-border-neutral-light)
-    font-size: $fs.m
+    font-size: $fs.s
     display: flex
     justify-content: center
     align-items: center
-    padding-bottom: 1px
+    padding: 0 $cs.xxs
 
 .fly-out-list
   --dropdown-offset: calc(.75rem - 3px)

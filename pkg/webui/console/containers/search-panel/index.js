@@ -43,7 +43,7 @@ const SearchPanelManager = () => {
   // Add a handler for the Command+K keyboard shortcut.
   useEffect(() => {
     const handleSlashKey = event => {
-      if (event.key === '/' || (event.key === 'k' && (event.metaKey || event.ctrlKey))) {
+      if ((event.key === 'k' || event.key === '/') && (event.metaKey || event.ctrlKey)) {
         dispatch(setSearchOpen(true))
       }
     }

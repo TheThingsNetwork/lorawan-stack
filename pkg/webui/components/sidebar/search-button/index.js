@@ -31,6 +31,7 @@ import style from './search-button.styl'
 const SearchButton = ({ onClick, className }) => {
   const ref = useRef(null)
   const { isMinimized } = useContext(SidebarContext)
+  const isMacClient = window.navigator.platform.includes('Mac')
 
   const handleClick = useCallback(() => {
     onClick()
@@ -59,7 +60,10 @@ const SearchButton = ({ onClick, className }) => {
           <Dropdown.HeaderItem title={sharedMessages.search} />
         </Dropdown.Attached>
       )}
-      <p className={style.backslash}>/</p>
+      <div className="d-flex gap-cs-xxs">
+        <p className={style.keyboardKey}>{isMacClient ? '⌘' : 'Ctrl'}</p>
+        <p className={style.keyboardKey}>K</p>
+      </div>
     </Button>
   )
 }
