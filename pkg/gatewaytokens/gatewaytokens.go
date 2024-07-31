@@ -124,6 +124,15 @@ func Verify(
 	return token.Payload.Rights, nil
 }
 
+// EncodeToString encodes the GatewayToken to a hex encoded string.
+func EncodeToString(token *ttnpb.GatewayToken) (string, error) {
+	b, err := proto.Marshal(token)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
+}
+
 // DecodeFromString decodes the GatewayToken from a hex encoded string.
 func DecodeFromString(s string) (*ttnpb.GatewayToken, error) {
 	b, err := hex.DecodeString(s)
@@ -150,13 +159,12 @@ func AuthenticatedContext(ctx context.Context) (context.Context, error) {
 	if err != nil {
 		return nil, err
 	}
-	msg, err := proto.Marshal(token)
+	authValue, err := EncodeToString(token)
 	if err != nil {
 		return nil, err
 	}
-
 	md := metadata.New(map[string]string{
-		"authorization": fmt.Sprintf("%s %s", AuthType, hex.EncodeToString(msg)),
+		"authorization": fmt.Sprintf("%s %s", AuthType, authValue),
 	})
 	return metadata.NewIncomingContext(ctx, md), nil
 }

@@ -55,7 +55,7 @@ func TestAuthentication(t *testing.T) {
 	is, isAddr, closeIS := mockis.New(ctx)
 	defer closeIS()
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, testRights...)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayKey, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -132,13 +132,13 @@ func TestFrontend(t *testing.T) {
 	t.Parallel()
 	timeout := (1 << 4) * test.Delay
 	iotest.Frontend(t, iotest.FrontendConfig{
-		DetectsInvalidMessages: false,
-		SupportsStatus:         true,
-		DetectsDisconnect:      true,
-		TimeoutOnInvalidAuth:   true, // The MQTT client keeps reconnecting on invalid auth.
-		IsAuthenticated:        true,
-		DeduplicatesUplinks:    false,
-		CustomConfig: func(config *gatewayserver.Config) {
+		DropsCRCFailure:     false,
+		DropsInvalidLoRaWAN: false,
+		SupportsStatus:      true,
+		DetectsDisconnect:   true,
+		IsAuthenticated:     true,
+		DeduplicatesUplinks: false,
+		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.MQTT.Listen = ":1882"
 		},
 		Link: func(

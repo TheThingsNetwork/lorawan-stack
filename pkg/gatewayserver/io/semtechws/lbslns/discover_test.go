@@ -28,7 +28,7 @@ import (
 )
 
 func TestDiscover(t *testing.T) {
-	a := assertions.New(t)
+	t.Parallel()
 	ctx := context.Background()
 	var lbsLNS lbsLNS
 	eui := types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}
@@ -65,7 +65,10 @@ func TestDiscover(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			a := assertions.New(t)
 			msg, err := json.Marshal(tc.Query)
 			a.So(err, should.BeNil)
 			resp := lbsLNS.HandleConnectionInfo(ctx, msg, mockServer, info, noopAssertRights)

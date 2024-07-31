@@ -7,6 +7,7 @@
 package ttnpb
 
 import (
+	golang "github.com/TheThingsIndustries/protoc-gen-go-json/golang"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 )
 
@@ -77,5 +78,571 @@ func (x *GetGatewayConfigurationRequest) UnmarshalProtoJSON(s *jsonplugin.Unmars
 
 // UnmarshalJSON unmarshals the GetGatewayConfigurationRequest from JSON.
 func (x *GetGatewayConfigurationRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UpdateManagedGatewayRequest message to JSON.
+func (x *UpdateManagedGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Gateway != nil || s.HasField("gateway") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway")
+		x.Gateway.MarshalProtoJSON(s.WithField("gateway"))
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UpdateManagedGatewayRequest to JSON.
+func (x *UpdateManagedGatewayRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UpdateManagedGatewayRequest message from JSON.
+func (x *UpdateManagedGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "gateway":
+			if s.ReadNil() {
+				x.Gateway = nil
+				return
+			}
+			x.Gateway = &ManagedGateway{}
+			x.Gateway.UnmarshalProtoJSON(s.WithField("gateway", true))
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UpdateManagedGatewayRequest from JSON.
+func (x *UpdateManagedGatewayRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UpdateManagedGatewayWiFiProfileRequest message to JSON.
+func (x *UpdateManagedGatewayWiFiProfileRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Profile != nil || s.HasField("profile") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("profile")
+		// NOTE: ManagedGatewayWiFiProfile does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Profile)
+	}
+	if x.Collaborator != nil || s.HasField("collaborator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Collaborator)
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UpdateManagedGatewayWiFiProfileRequest to JSON.
+func (x *UpdateManagedGatewayWiFiProfileRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UpdateManagedGatewayWiFiProfileRequest message from JSON.
+func (x *UpdateManagedGatewayWiFiProfileRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "profile":
+			s.AddField("profile")
+			if s.ReadNil() {
+				x.Profile = nil
+				return
+			}
+			// NOTE: ManagedGatewayWiFiProfile does not seem to implement UnmarshalProtoJSON.
+			var v ManagedGatewayWiFiProfile
+			golang.UnmarshalMessage(s, &v)
+			x.Profile = &v
+		case "collaborator":
+			s.AddField("collaborator")
+			if s.ReadNil() {
+				x.Collaborator = nil
+				return
+			}
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.Collaborator = &v
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UpdateManagedGatewayWiFiProfileRequest from JSON.
+func (x *UpdateManagedGatewayWiFiProfileRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ListManagedGatewayWiFiProfilesRequest message to JSON.
+func (x *ListManagedGatewayWiFiProfilesRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Collaborator != nil || s.HasField("collaborator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Collaborator)
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	if x.Limit != 0 || s.HasField("limit") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limit")
+		s.WriteUint32(x.Limit)
+	}
+	if x.Page != 0 || s.HasField("page") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("page")
+		s.WriteUint32(x.Page)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ListManagedGatewayWiFiProfilesRequest to JSON.
+func (x *ListManagedGatewayWiFiProfilesRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ListManagedGatewayWiFiProfilesRequest message from JSON.
+func (x *ListManagedGatewayWiFiProfilesRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "collaborator":
+			s.AddField("collaborator")
+			if s.ReadNil() {
+				x.Collaborator = nil
+				return
+			}
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.Collaborator = &v
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		case "limit":
+			s.AddField("limit")
+			x.Limit = s.ReadUint32()
+		case "page":
+			s.AddField("page")
+			x.Page = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ListManagedGatewayWiFiProfilesRequest from JSON.
+func (x *ListManagedGatewayWiFiProfilesRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetManagedGatewayWiFiProfileRequest message to JSON.
+func (x *GetManagedGatewayWiFiProfileRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Collaborator != nil || s.HasField("collaborator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Collaborator)
+	}
+	if x.ProfileId != "" || s.HasField("profile_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("profile_id")
+		s.WriteString(x.ProfileId)
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetManagedGatewayWiFiProfileRequest to JSON.
+func (x *GetManagedGatewayWiFiProfileRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetManagedGatewayWiFiProfileRequest message from JSON.
+func (x *GetManagedGatewayWiFiProfileRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "collaborator":
+			s.AddField("collaborator")
+			if s.ReadNil() {
+				x.Collaborator = nil
+				return
+			}
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.Collaborator = &v
+		case "profile_id", "profileId":
+			s.AddField("profile_id")
+			x.ProfileId = s.ReadString()
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetManagedGatewayWiFiProfileRequest from JSON.
+func (x *GetManagedGatewayWiFiProfileRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the UpdateManagedGatewayEthernetProfileRequest message to JSON.
+func (x *UpdateManagedGatewayEthernetProfileRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Profile != nil || s.HasField("profile") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("profile")
+		// NOTE: ManagedGatewayEthernetProfile does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Profile)
+	}
+	if x.Collaborator != nil || s.HasField("collaborator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Collaborator)
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UpdateManagedGatewayEthernetProfileRequest to JSON.
+func (x *UpdateManagedGatewayEthernetProfileRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the UpdateManagedGatewayEthernetProfileRequest message from JSON.
+func (x *UpdateManagedGatewayEthernetProfileRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "profile":
+			s.AddField("profile")
+			if s.ReadNil() {
+				x.Profile = nil
+				return
+			}
+			// NOTE: ManagedGatewayEthernetProfile does not seem to implement UnmarshalProtoJSON.
+			var v ManagedGatewayEthernetProfile
+			golang.UnmarshalMessage(s, &v)
+			x.Profile = &v
+		case "collaborator":
+			s.AddField("collaborator")
+			if s.ReadNil() {
+				x.Collaborator = nil
+				return
+			}
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.Collaborator = &v
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the UpdateManagedGatewayEthernetProfileRequest from JSON.
+func (x *UpdateManagedGatewayEthernetProfileRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ListManagedGatewayEthernetProfilesRequest message to JSON.
+func (x *ListManagedGatewayEthernetProfilesRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Collaborator != nil || s.HasField("collaborator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Collaborator)
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	if x.Limit != 0 || s.HasField("limit") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("limit")
+		s.WriteUint32(x.Limit)
+	}
+	if x.Page != 0 || s.HasField("page") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("page")
+		s.WriteUint32(x.Page)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ListManagedGatewayEthernetProfilesRequest to JSON.
+func (x *ListManagedGatewayEthernetProfilesRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ListManagedGatewayEthernetProfilesRequest message from JSON.
+func (x *ListManagedGatewayEthernetProfilesRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "collaborator":
+			s.AddField("collaborator")
+			if s.ReadNil() {
+				x.Collaborator = nil
+				return
+			}
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.Collaborator = &v
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		case "limit":
+			s.AddField("limit")
+			x.Limit = s.ReadUint32()
+		case "page":
+			s.AddField("page")
+			x.Page = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ListManagedGatewayEthernetProfilesRequest from JSON.
+func (x *ListManagedGatewayEthernetProfilesRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetManagedGatewayEthernetProfileRequest message to JSON.
+func (x *GetManagedGatewayEthernetProfileRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Collaborator != nil || s.HasField("collaborator") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("collaborator")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Collaborator)
+	}
+	if x.ProfileId != "" || s.HasField("profile_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("profile_id")
+		s.WriteString(x.ProfileId)
+	}
+	if x.FieldMask != nil || s.HasField("field_mask") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("field_mask")
+		if x.FieldMask == nil {
+			s.WriteNil()
+		} else {
+			golang.MarshalLegacyFieldMask(s, x.FieldMask)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetManagedGatewayEthernetProfileRequest to JSON.
+func (x *GetManagedGatewayEthernetProfileRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetManagedGatewayEthernetProfileRequest message from JSON.
+func (x *GetManagedGatewayEthernetProfileRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "collaborator":
+			s.AddField("collaborator")
+			if s.ReadNil() {
+				x.Collaborator = nil
+				return
+			}
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.Collaborator = &v
+		case "profile_id", "profileId":
+			s.AddField("profile_id")
+			x.ProfileId = s.ReadString()
+		case "field_mask", "fieldMask":
+			s.AddField("field_mask")
+			if s.ReadNil() {
+				x.FieldMask = nil
+				return
+			}
+			v := golang.UnmarshalFieldMask(s)
+			if s.Err() != nil {
+				return
+			}
+			x.FieldMask = v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetManagedGatewayEthernetProfileRequest from JSON.
+func (x *GetManagedGatewayEthernetProfileRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

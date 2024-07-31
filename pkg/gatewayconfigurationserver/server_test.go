@@ -78,7 +78,7 @@ func TestWeb(t *testing.T) {
 	defer closeIS()
 
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, ttnpb.Right_RIGHT_GATEWAY_INFO)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayKey, testGtw, ttnpb.Right_RIGHT_GATEWAY_INFO)
 
 	fpConf := config.FrequencyPlansConfig{
 		ConfigSource: "static",
@@ -251,7 +251,7 @@ func TestGRPC(t *testing.T) {
 	defer closeIS()
 
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, ttnpb.Right_RIGHT_GATEWAY_INFO)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayKey, testGtw, ttnpb.Right_RIGHT_GATEWAY_INFO)
 
 	fpConf := config.FrequencyPlansConfig{
 		ConfigSource: "static",
@@ -475,6 +475,6 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 }
 
 func init() {
-	testConfig.TheThingsGateway.Default.FirmwareURL = "http://example.com"
-	testConfig.TheThingsGateway.Default.UpdateChannel = "stable"
+	testConfig.TheThingsKickstarterGateway.Default.FirmwareURL = "http://example.com"
+	testConfig.TheThingsKickstarterGateway.Default.UpdateChannel = "stable"
 }

@@ -2999,6 +2999,411 @@
       ]
     }
   },
+  "ManagedGatewayConfigurationService": {
+    "Get": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/managed/{gateway_ids.gateway_id}",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "cellular_imei",
+        "cellular_imsi",
+        "ethernet_mac_address",
+        "ethernet_profile_id",
+        "ids",
+        "ids.eui",
+        "ids.gateway_id",
+        "version_ids",
+        "version_ids.brand_id",
+        "version_ids.firmware_version",
+        "version_ids.hardware_version",
+        "version_ids.model_id",
+        "version_ids.runtime_version",
+        "wifi_mac_address",
+        "wifi_profile_id"
+      ]
+    },
+    "Update": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/gcs/gateways/managed/{gateway.ids.gateway_id}",
+          "body": "*",
+          "parameters": [
+            "gateway.ids.gateway_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "ethernet_profile_id",
+        "wifi_profile_id"
+      ]
+    },
+    "StreamEvents": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/gcs/gateways/managed/{gateway_id}/events",
+          "body": "*",
+          "parameters": [
+            "gateway_id"
+          ],
+          "stream": true
+        }
+      ]
+    },
+    "ScanWiFiAccessPoints": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/gcs/gateways/managed/{gateway_id}/wifi/scan",
+          "body": "*",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
+    }
+  },
+  "ManagedGatewayEthernetProfileConfigurationService": {
+    "Create": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "post",
+          "pattern": "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}",
+          "body": "*",
+          "parameters": [
+            "collaborator.organization_ids.organization_id"
+          ]
+        },
+        {
+          "method": "post",
+          "pattern": "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}",
+          "body": "*",
+          "parameters": [
+            "collaborator.user_ids.user_id"
+          ]
+        }
+      ]
+    },
+    "Update": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "put",
+          "pattern": "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile.profile_id}",
+          "body": "*",
+          "parameters": [
+            "collaborator.organization_ids.organization_id",
+            "profile.profile_id"
+          ]
+        },
+        {
+          "method": "put",
+          "pattern": "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile.profile_id}",
+          "body": "*",
+          "parameters": [
+            "collaborator.user_ids.user_id",
+            "profile.profile_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "network_interface_addresses",
+        "network_interface_addresses.dns_servers",
+        "network_interface_addresses.gateway",
+        "network_interface_addresses.ip_addresses",
+        "network_interface_addresses.subnet_mask",
+        "profile_id",
+        "profile_name",
+        "shared"
+      ]
+    },
+    "List": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}",
+          "parameters": [
+            "collaborator.organization_ids.organization_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}",
+          "parameters": [
+            "collaborator.user_ids.user_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "network_interface_addresses",
+        "network_interface_addresses.dns_servers",
+        "network_interface_addresses.gateway",
+        "network_interface_addresses.ip_addresses",
+        "network_interface_addresses.subnet_mask",
+        "profile_id",
+        "profile_name",
+        "shared"
+      ]
+    },
+    "Get": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile_id}",
+          "parameters": [
+            "collaborator.organization_ids.organization_id",
+            "profile_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile_id}",
+          "parameters": [
+            "collaborator.user_ids.user_id",
+            "profile_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "network_interface_addresses",
+        "network_interface_addresses.dns_servers",
+        "network_interface_addresses.gateway",
+        "network_interface_addresses.ip_addresses",
+        "network_interface_addresses.subnet_mask",
+        "profile_id",
+        "profile_name",
+        "shared"
+      ]
+    },
+    "Delete": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile_id}",
+          "parameters": [
+            "collaborator.organization_ids.organization_id",
+            "profile_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile_id}",
+          "parameters": [
+            "collaborator.user_ids.user_id",
+            "profile_id"
+          ]
+        }
+      ]
+    }
+  },
+  "ManagedGatewayWiFiProfileConfigurationService": {
+    "Create": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "post",
+          "pattern": "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}",
+          "body": "*",
+          "parameters": [
+            "collaborator.organization_ids.organization_id"
+          ]
+        },
+        {
+          "method": "post",
+          "pattern": "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}",
+          "body": "*",
+          "parameters": [
+            "collaborator.user_ids.user_id"
+          ]
+        }
+      ]
+    },
+    "Update": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "put",
+          "pattern": "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile.profile_id}",
+          "body": "*",
+          "parameters": [
+            "collaborator.organization_ids.organization_id",
+            "profile.profile_id"
+          ]
+        },
+        {
+          "method": "put",
+          "pattern": "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile.profile_id}",
+          "body": "*",
+          "parameters": [
+            "collaborator.user_ids.user_id",
+            "profile.profile_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "network_interface_addresses",
+        "network_interface_addresses.dns_servers",
+        "network_interface_addresses.gateway",
+        "network_interface_addresses.ip_addresses",
+        "network_interface_addresses.subnet_mask",
+        "password",
+        "profile_id",
+        "profile_name",
+        "shared",
+        "ssid"
+      ]
+    },
+    "List": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}",
+          "parameters": [
+            "collaborator.organization_ids.organization_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}",
+          "parameters": [
+            "collaborator.user_ids.user_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "network_interface_addresses",
+        "network_interface_addresses.dns_servers",
+        "network_interface_addresses.gateway",
+        "network_interface_addresses.ip_addresses",
+        "network_interface_addresses.subnet_mask",
+        "password",
+        "profile_id",
+        "profile_name",
+        "shared",
+        "ssid"
+      ]
+    },
+    "Get": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile_id}",
+          "parameters": [
+            "collaborator.organization_ids.organization_id",
+            "profile_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile_id}",
+          "parameters": [
+            "collaborator.user_ids.user_id",
+            "profile_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "network_interface_addresses",
+        "network_interface_addresses.dns_servers",
+        "network_interface_addresses.gateway",
+        "network_interface_addresses.ip_addresses",
+        "network_interface_addresses.subnet_mask",
+        "password",
+        "profile_id",
+        "profile_name",
+        "shared",
+        "ssid"
+      ]
+    },
+    "Delete": {
+      "file": "ttn/lorawan/v3/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "delete",
+          "pattern": "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile_id}",
+          "parameters": [
+            "collaborator.organization_ids.organization_id",
+            "profile_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile_id}",
+          "parameters": [
+            "collaborator.user_ids.user_id",
+            "profile_id"
+          ]
+        }
+      ]
+    }
+  },
   "GatewayAccess": {
     "ListRights": {
       "file": "ttn/lorawan/v3/gateway_services.proto",
@@ -3188,73 +3593,6 @@
       ]
     }
   },
-  "GatewayConfigurator": {
-    "PullConfiguration": {
-      "file": "ttn/lorawan/v3/gateway_services.proto",
-      "http": [],
-      "allowedFieldMaskPaths": [
-        "administrative_contact",
-        "administrative_contact.ids",
-        "administrative_contact.ids.organization_ids",
-        "administrative_contact.ids.organization_ids.organization_id",
-        "administrative_contact.ids.user_ids",
-        "administrative_contact.ids.user_ids.email",
-        "administrative_contact.ids.user_ids.user_id",
-        "antennas",
-        "attributes",
-        "auto_update",
-        "claim_authentication_code",
-        "claim_authentication_code.secret",
-        "claim_authentication_code.secret.key_id",
-        "claim_authentication_code.secret.value",
-        "claim_authentication_code.valid_from",
-        "claim_authentication_code.valid_to",
-        "contact_info",
-        "created_at",
-        "deleted_at",
-        "description",
-        "disable_packet_broker_forwarding",
-        "downlink_path_constraint",
-        "enforce_duty_cycle",
-        "frequency_plan_id",
-        "frequency_plan_ids",
-        "gateway_server_address",
-        "ids",
-        "ids.eui",
-        "ids.gateway_id",
-        "lbs_lns_secret",
-        "lbs_lns_secret.key_id",
-        "lbs_lns_secret.value",
-        "location_public",
-        "lrfhss",
-        "lrfhss.supported",
-        "name",
-        "require_authenticated_connection",
-        "schedule_anytime_delay",
-        "schedule_downlink_late",
-        "status_public",
-        "target_cups_key",
-        "target_cups_key.key_id",
-        "target_cups_key.value",
-        "target_cups_uri",
-        "technical_contact",
-        "technical_contact.ids",
-        "technical_contact.ids.organization_ids",
-        "technical_contact.ids.organization_ids.organization_id",
-        "technical_contact.ids.user_ids",
-        "technical_contact.ids.user_ids.email",
-        "technical_contact.ids.user_ids.user_id",
-        "update_channel",
-        "update_location_from_status",
-        "updated_at",
-        "version_ids",
-        "version_ids.brand_id",
-        "version_ids.firmware_version",
-        "version_ids.hardware_version",
-        "version_ids.model_id"
-      ]
-    }
-  },
   "GatewayRegistry": {
     "Create": {
       "file": "ttn/lorawan/v3/gateway_services.proto",
@@ -3347,7 +3685,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.runtime_version"
       ]
     },
     "GetIdentifiersForEUI": {
@@ -3436,7 +3775,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.runtime_version"
       ]
     },
     "Update": {
@@ -3510,7 +3850,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.runtime_version"
       ]
     },
     "Delete": {
@@ -7003,7 +7344,8 @@
         "version_ids.brand_id",
         "version_ids.firmware_version",
         "version_ids.hardware_version",
-        "version_ids.model_id"
+        "version_ids.model_id",
+        "version_ids.runtime_version"
       ]
     },
     "SearchOrganizations": {

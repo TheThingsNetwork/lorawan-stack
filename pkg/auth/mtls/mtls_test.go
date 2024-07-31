@@ -29,8 +29,16 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-//go:embed testdata/2222222222222222.pem
-var validGatewayCertificatePEM []byte
+var (
+	//go:embed testdata/2222222222222222.pem
+	validStoreGatewayCertificatePEM []byte
+
+	//go:embed testdata/rootCA.pem
+	contextRootCAPEM []byte
+
+	//go:embed testdata/3333333333333333.pem
+	validContextGatewayCertificatePEM []byte
+)
 
 func TestTLSCertVerification(t *testing.T) {
 	t.Parallel()
@@ -97,15 +105,26 @@ enSyC2URWEsszHuPDCO9J0KAdbMbyIgq6w7as6ZeE1z90YC8H3Y8OA==
 	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
 	// Valid
-	block, _ = pem.Decode(validGatewayCertificatePEM)
+	block, _ = pem.Decode(validStoreGatewayCertificatePEM)
 	a.So(block, should.NotBeNil)
-	validGatewayCertificate, err := x509.ParseCertificate(block.Bytes)
+	validStoreGatewayCertificate, err := x509.ParseCertificate(block.Bytes)
 	a.So(err, should.BeNil)
-	err = caStore.Verify(ctx, mtls.ClientTypeUnspecified, "2222222222222222", validGatewayCertificate)
+	err = caStore.Verify(ctx, mtls.ClientTypeUnspecified, "2222222222222222", validStoreGatewayCertificate)
 	a.So(err, should.BeNil)
-
-	// Context
-	ctx = mtls.NewContextWithClientCertificate(ctx, validGatewayCertificate)
+	ctx = mtls.NewContextWithClientCertificate(ctx, validStoreGatewayCertificate)
 	cert := mtls.ClientCertificateFromContext(ctx)
-	a.So(cert, should.Resemble, validGatewayCertificate)
+	a.So(cert, should.Resemble, validStoreGatewayCertificate)
+
+	// Invalid (CA is not in store)
+	block, _ = pem.Decode(validContextGatewayCertificatePEM)
+	a.So(block, should.NotBeNil)
+	validContextGatewayCertificate, err := x509.ParseCertificate(block.Bytes)
+	a.So(err, should.BeNil)
+	err = caStore.Verify(ctx, mtls.ClientTypeUnspecified, "3333333333333333", validContextGatewayCertificate)
+	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+	// Valid (CA is in context)
+	rootCACtx := mtls.AppendRootCAsToContext(ctx, contextRootCAPEM)
+	err = caStore.Verify(rootCACtx, mtls.ClientTypeUnspecified, "3333333333333333", validContextGatewayCertificate)
+	a.So(err, should.BeNil)
 }

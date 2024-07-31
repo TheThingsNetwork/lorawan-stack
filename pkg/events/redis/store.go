@@ -297,9 +297,29 @@ func (ps *PubSubStore) iterateStreamPartition(
 		for _, s := range states {
 			args.Streams = append(args.Streams, s.start)
 		}
-		streams, err := ps.client.XRead(ctx, args).Result()
-		if err != nil && !errors.Is(err, redis.Nil) {
-			return ttnredis.ConvertError(err)
+		// XRead is blocking until the given block time, not respecting the context cancellation.
+		// Therefore, it is run in a goroutine to await context cancellation.
+		type xreadResult struct {
+			streams []redis.XStream
+			err     error
+		}
+		resCh := make(chan xreadResult, 1)
+		go func() {
+			streams, err := ps.client.XRead(ctx, args).Result()
+			select {
+			case <-ctx.Done():
+			case resCh <- xreadResult{streams, err}:
+			}
+		}()
+		var streams []redis.XStream
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case res := <-resCh:
+			if err := res.err; err != nil && !errors.Is(err, redis.Nil) {
+				return ttnredis.ConvertError(err)
+			}
+			streams = res.streams
 		}
 		result := make([]redis.XStream, 0, len(streams))
 		for _, stream := range streams {

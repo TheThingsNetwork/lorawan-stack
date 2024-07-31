@@ -35,13 +35,14 @@ export const APPLICATION_EVENTS_VERBOSE_FILTERS = [
 ]
 
 export const GATEWAY_EVENTS_VERBOSE_FILTERS = [
-  'gs.down.send',
   'gs.gateway.connect',
   'gs.gateway.disconnect',
-  'gs.status.receive',
   'gs.up.receive',
-  '*.warning',
-  '*.fail',
+  'gs.down.send',
+  'gs.down.schedule.fail',
+  'gs.down.tx.fail',
+  'gs.status.receive',
+  'gcs.managed.*',
   'gateway.*',
 ]
 

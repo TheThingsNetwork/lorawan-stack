@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
@@ -31,20 +32,31 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestFrontend(t *testing.T) {
 	t.Parallel()
 	wsPingInterval := (1 << 3) * test.Delay
 	iotest.Frontend(t, iotest.FrontendConfig{
-		SupportsStatus:         false,
-		DetectsInvalidMessages: true,
-		DetectsDisconnect:      true,
-		AuthenticatesWithEUI:   true,
-		TimeoutOnInvalidAuth:   false,
-		IsAuthenticated:        true,
-		DeduplicatesUplinks:    false,
-		CustomConfig: func(config *gatewayserver.Config) {
+		SupportsStatus:                 false,
+		DropsCRCFailure:                true,
+		DropsInvalidLoRaWAN:            true,
+		DetectsDisconnect:              true,
+		AuthenticatesWithEUI:           true,
+		IsAuthenticated:                true,
+		DeduplicatesUplinks:            false,
+		SkipsTxAcknowledgmentOnFailure: true,
+		CustomRxMetadataAssertion: func(t *testing.T, actual, expected *ttnpb.RxMetadata) {
+			t.Helper()
+			a := assertions.New(t)
+			a.So(actual.UplinkToken, should.NotBeEmpty)
+			actual.UplinkToken = nil
+			actual.ReceivedAt = nil
+			expected.SignalRssi = nil
+			a.So(actual, should.Resemble, expected)
+		},
+		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.BasicStation = gatewayserver.BasicStationConfig{
 				Listen: ":1887",
 				Config: semtechws.Config{

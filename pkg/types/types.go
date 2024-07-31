@@ -165,6 +165,9 @@ func Unmarshal3Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNByt
 // Unmarshal4Bytes unmarshals 4 bytes from JSON. It accepts both hex and base64 encoding.
 func Unmarshal4Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNBytes(s, 4) }
 
+// Unmarshal6Bytes unmarshals 8 bytes from JSON. It accepts both hex and base64 encoding.
+func Unmarshal6Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNBytes(s, 6) }
+
 // Unmarshal8Bytes unmarshals 8 bytes from JSON. It accepts both hex and base64 encoding.
 func Unmarshal8Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNBytes(s, 8) }
 

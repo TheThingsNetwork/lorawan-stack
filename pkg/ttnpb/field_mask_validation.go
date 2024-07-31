@@ -1695,10 +1695,44 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		Set:     true,
 	},
 
-	// Gateway Configuration:
-	"/ttn.lorawan.v3.GatewayConfigurator/PullConfiguration": {
-		All:     GatewayFieldPathsNested,
-		Allowed: GatewayFieldPathsNested,
+	// Managed Gateway:
+	"/ttn.lorawan.v3.ManagedGatewayConfigurationService/Get": {
+		All:     ManagedGatewayFieldPathsNested,
+		Allowed: ManagedGatewayFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ManagedGatewayConfigurationService/Update": {
+		All: ManagedGatewayFieldPathsNested,
+		Allowed: []string{
+			"ethernet_profile_id",
+			"wifi_profile_id",
+		},
+		Set: true,
+	},
+	"/ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService/Update": {
+		All:     ManagedGatewayWiFiProfileFieldPathsNested,
+		Allowed: ManagedGatewayWiFiProfileFieldPathsNested,
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService/List": {
+		All:     ManagedGatewayWiFiProfileFieldPathsNested,
+		Allowed: ManagedGatewayWiFiProfileFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService/Get": {
+		All:     ManagedGatewayWiFiProfileFieldPathsNested,
+		Allowed: ManagedGatewayWiFiProfileFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService/Update": {
+		All:     ManagedGatewayEthernetProfileFieldPathsNested,
+		Allowed: ManagedGatewayEthernetProfileFieldPathsNested,
+		Set:     true,
+	},
+	"/ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService/List": {
+		All:     ManagedGatewayEthernetProfileFieldPathsNested,
+		Allowed: ManagedGatewayEthernetProfileFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService/Get": {
+		All:     ManagedGatewayEthernetProfileFieldPathsNested,
+		Allowed: ManagedGatewayEthernetProfileFieldPathsNested,
 	},
 
 	// Organizations:

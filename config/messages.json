@@ -4877,12 +4877,39 @@
       "file": "frequencyplans.go"
     }
   },
-  "error:pkg/gatewayconfigurationserver/v2:unauthenticated": {
+  "error:pkg/gatewayconfigurationserver/managed:gateway_not_managed": {
+    "translations": {
+      "en": "gateway `{gateway_id}` is not managed by The Things Gateway Controller"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver/managed:no_profile_name": {
+    "translations": {
+      "en": "no profile name set"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed",
+      "file": "grpc_util.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver/managed:no_ssid": {
+    "translations": {
+      "en": "no SSID set"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed",
+      "file": "grpc_wifi_profiles.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver/ttkg:unauthenticated": {
     "translations": {
       "en": "unauthenticated"
     },
     "description": {
-      "package": "pkg/gatewayconfigurationserver/v2",
+      "package": "pkg/gatewayconfigurationserver/ttkg",
       "file": "http_gateway.go"
     }
   },
@@ -5064,6 +5091,105 @@
     "description": {
       "package": "pkg/gatewayserver/io/semtechws",
       "file": "ws.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:downlink_channel_mixed_bandwidths": {
+    "translations": {
+      "en": "downlink channel `{channel}` has mixed bandwidths `{bandwidth_low}` and `{bandwidth_high}` Hz"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_board": {
+    "translations": {
+      "en": "invalid board `{board}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_frequency": {
+    "translations": {
+      "en": "invalid frequency `{frequency}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_gateway_eui": {
+    "translations": {
+      "en": "invalid gateway EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "ttigw.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_if_chain": {
+    "translations": {
+      "en": "invalid IF chain `{if_chain}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_modulation": {
+    "translations": {
+      "en": "invalid modulation"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:no_client_hello": {
+    "translations": {
+      "en": "no client hello"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "ttigw.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:not_scheduled": {
+    "translations": {
+      "en": "downlink message not scheduled"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:unknown_message_type": {
+    "translations": {
+      "en": "unknown message type"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "ttigw.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:unsupported_downlink_data_rate": {
+    "translations": {
+      "en": "unsupported downlink data rate index `{data_rate_index}` in channel `{channel}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:unsupported_message_type": {
+    "translations": {
+      "en": "unsupported message type"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "ttigw.go"
     }
   },
   "error:pkg/gatewayserver/io/udp:already_connected": {
@@ -10446,6 +10572,132 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "gateway_registry.go"
+    }
+  },
+  "event:gcs.managed.cellular.down": {
+    "translations": {
+      "en": "cellular backhaul down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.cellular.up": {
+    "translations": {
+      "en": "cellular backhaul up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.controller.down": {
+    "translations": {
+      "en": "controller connection down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.controller.up": {
+    "translations": {
+      "en": "controller connection up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.ethernet.down": {
+    "translations": {
+      "en": "Ethernet backhaul down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.ethernet.up": {
+    "translations": {
+      "en": "Ethernet backhaul up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.gs.down": {
+    "translations": {
+      "en": "connection with Gateway Server down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.gs.up": {
+    "translations": {
+      "en": "connection with Gateway Server up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.location.update": {
+    "translations": {
+      "en": "update location"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.system_status.receive": {
+    "translations": {
+      "en": "receive system status"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.update": {
+    "translations": {
+      "en": "update managed gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.wifi.down": {
+    "translations": {
+      "en": "WiFi backhaul down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.wifi.fail": {
+    "translations": {
+      "en": "WiFi backhaul fail"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.wifi.up": {
+    "translations": {
+      "en": "WiFi backhaul up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
     }
   },
   "event:gs.down.schedule.attempt": {

@@ -85,7 +85,7 @@ func TestClientTokenAuth(t *testing.T) {
 	defer cancelIS()
 
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayToken, testGtw, testRights...)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayToken, testGtw, testRights...)
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -219,7 +219,7 @@ func TestDiscover(t *testing.T) {
 	is, isAddr, cancelIS := mockis.New(ctx)
 	defer cancelIS()
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayToken, testGtw, testRights...)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayToken, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -481,7 +481,7 @@ func TestVersion(t *testing.T) {
 	is, _, cancelIS := mockis.New(ctx)
 	defer cancelIS()
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayToken, testGtw, testRights...)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayToken, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -738,10 +738,6 @@ func TestVersion(t *testing.T) {
 			}
 			select {
 			case stat := <-gsConn.Status():
-				if a.So(stat.Time, should.NotBeNil) {
-					a.So(time.Since(*ttnpb.StdTime(stat.Time)), should.BeLessThan, timeout)
-					stat.Time = nil
-				}
 				a.So(stat, should.Resemble, tc.ExpectedStatusMessage)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
@@ -759,7 +755,7 @@ func TestTraffic(t *testing.T) {
 	is, isAddr, cancelIS := mockis.New(ctx)
 	defer cancelIS()
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayToken, testGtw, testRights...)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayToken, testGtw, testRights...)
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -1348,7 +1344,7 @@ func TestRTT(t *testing.T) {
 	is, isAddr, cancelIS := mockis.New(ctx)
 	defer cancelIS()
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayToken, testGtw, testRights...)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayToken, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -1674,7 +1670,7 @@ func TestPingPong(t *testing.T) {
 	is, isAddr, cancelIS := mockis.New(ctx)
 	defer cancelIS()
 	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
-	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayToken, testGtw, testRights...)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, "Bearer", registeredGatewayToken, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{

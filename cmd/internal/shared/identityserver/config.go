@@ -78,4 +78,5 @@ func init() {
 	DefaultIdentityServerConfig.CollaboratorRights.SetOthersAsContacts = true
 	DefaultIdentityServerConfig.LoginTokens.TokenTTL = time.Hour
 	DefaultIdentityServerConfig.Delete.Restore = 24 * time.Hour
+	DefaultIdentityServerConfig.Gateways.TokenValidity = 5 * time.Second
 }

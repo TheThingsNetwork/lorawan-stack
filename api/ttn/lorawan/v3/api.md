@@ -343,14 +343,46 @@
   - [Message `ListGatewayAPIKeysRequest`](#ttn.lorawan.v3.ListGatewayAPIKeysRequest)
   - [Message `ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest)
   - [Message `ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest)
+  - [Message `ManagedGateway`](#ttn.lorawan.v3.ManagedGateway)
+  - [Message `ManagedGatewayCellularBackhaul`](#ttn.lorawan.v3.ManagedGatewayCellularBackhaul)
+  - [Message `ManagedGatewayControllerConnection`](#ttn.lorawan.v3.ManagedGatewayControllerConnection)
+  - [Message `ManagedGatewayEthernetBackhaul`](#ttn.lorawan.v3.ManagedGatewayEthernetBackhaul)
+  - [Message `ManagedGatewayEthernetProfile`](#ttn.lorawan.v3.ManagedGatewayEthernetProfile)
+  - [Message `ManagedGatewayEthernetProfiles`](#ttn.lorawan.v3.ManagedGatewayEthernetProfiles)
+  - [Message `ManagedGatewayEventData`](#ttn.lorawan.v3.ManagedGatewayEventData)
+  - [Message `ManagedGatewayGatewayServerConnection`](#ttn.lorawan.v3.ManagedGatewayGatewayServerConnection)
+  - [Message `ManagedGatewayNetworkInterfaceAddresses`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses)
+  - [Message `ManagedGatewayNetworkInterfaceInfo`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo)
+  - [Message `ManagedGatewaySystemStatus`](#ttn.lorawan.v3.ManagedGatewaySystemStatus)
+  - [Message `ManagedGatewayWiFiAccessPoint`](#ttn.lorawan.v3.ManagedGatewayWiFiAccessPoint)
+  - [Message `ManagedGatewayWiFiAccessPoints`](#ttn.lorawan.v3.ManagedGatewayWiFiAccessPoints)
+  - [Message `ManagedGatewayWiFiBackhaul`](#ttn.lorawan.v3.ManagedGatewayWiFiBackhaul)
+  - [Message `ManagedGatewayWiFiProfile`](#ttn.lorawan.v3.ManagedGatewayWiFiProfile)
+  - [Message `ManagedGatewayWiFiProfiles`](#ttn.lorawan.v3.ManagedGatewayWiFiProfiles)
   - [Message `SetGatewayCollaboratorRequest`](#ttn.lorawan.v3.SetGatewayCollaboratorRequest)
   - [Message `UpdateGatewayAPIKeyRequest`](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest)
   - [Message `UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest)
   - [Enum `GatewayAntennaPlacement`](#ttn.lorawan.v3.GatewayAntennaPlacement)
+  - [Enum `ManagedGatewayNetworkInterfaceStatus`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceStatus)
+  - [Enum `ManagedGatewayNetworkInterfaceType`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceType)
 - [File `ttn/lorawan/v3/gateway_configuration.proto`](#ttn/lorawan/v3/gateway_configuration.proto)
+  - [Message `CreateManagedGatewayEthernetProfileRequest`](#ttn.lorawan.v3.CreateManagedGatewayEthernetProfileRequest)
+  - [Message `CreateManagedGatewayWiFiProfileRequest`](#ttn.lorawan.v3.CreateManagedGatewayWiFiProfileRequest)
+  - [Message `DeleteManagedGatewayEthernetProfileRequest`](#ttn.lorawan.v3.DeleteManagedGatewayEthernetProfileRequest)
+  - [Message `DeleteManagedGatewayWiFiProfileRequest`](#ttn.lorawan.v3.DeleteManagedGatewayWiFiProfileRequest)
   - [Message `GetGatewayConfigurationRequest`](#ttn.lorawan.v3.GetGatewayConfigurationRequest)
   - [Message `GetGatewayConfigurationResponse`](#ttn.lorawan.v3.GetGatewayConfigurationResponse)
+  - [Message `GetManagedGatewayEthernetProfileRequest`](#ttn.lorawan.v3.GetManagedGatewayEthernetProfileRequest)
+  - [Message `GetManagedGatewayWiFiProfileRequest`](#ttn.lorawan.v3.GetManagedGatewayWiFiProfileRequest)
+  - [Message `ListManagedGatewayEthernetProfilesRequest`](#ttn.lorawan.v3.ListManagedGatewayEthernetProfilesRequest)
+  - [Message `ListManagedGatewayWiFiProfilesRequest`](#ttn.lorawan.v3.ListManagedGatewayWiFiProfilesRequest)
+  - [Message `UpdateManagedGatewayEthernetProfileRequest`](#ttn.lorawan.v3.UpdateManagedGatewayEthernetProfileRequest)
+  - [Message `UpdateManagedGatewayRequest`](#ttn.lorawan.v3.UpdateManagedGatewayRequest)
+  - [Message `UpdateManagedGatewayWiFiProfileRequest`](#ttn.lorawan.v3.UpdateManagedGatewayWiFiProfileRequest)
   - [Service `GatewayConfigurationService`](#ttn.lorawan.v3.GatewayConfigurationService)
+  - [Service `ManagedGatewayConfigurationService`](#ttn.lorawan.v3.ManagedGatewayConfigurationService)
+  - [Service `ManagedGatewayEthernetProfileConfigurationService`](#ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService)
+  - [Service `ManagedGatewayWiFiProfileConfigurationService`](#ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService)
 - [File `ttn/lorawan/v3/gateway_services.proto`](#ttn/lorawan/v3/gateway_services.proto)
   - [Message `AssertGatewayRightsRequest`](#ttn.lorawan.v3.AssertGatewayRightsRequest)
   - [Message `BatchDeleteGatewaysRequest`](#ttn.lorawan.v3.BatchDeleteGatewaysRequest)
@@ -358,7 +390,6 @@
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
   - [Service `GatewayBatchAccess`](#ttn.lorawan.v3.GatewayBatchAccess)
   - [Service `GatewayBatchRegistry`](#ttn.lorawan.v3.GatewayBatchRegistry)
-  - [Service `GatewayConfigurator`](#ttn.lorawan.v3.GatewayConfigurator)
   - [Service `GatewayRegistry`](#ttn.lorawan.v3.GatewayRegistry)
 - [File `ttn/lorawan/v3/gatewayserver.proto`](#ttn/lorawan/v3/gatewayserver.proto)
   - [Message `BatchGetGatewayConnectionStatsRequest`](#ttn.lorawan.v3.BatchGetGatewayConnectionStatsRequest)
@@ -5211,6 +5242,7 @@ Identifies an end device model with version information.
 | `model_id` | [`string`](#string) |  |  |
 | `hardware_version` | [`string`](#string) |  |  |
 | `firmware_version` | [`string`](#string) |  |  |
+| `runtime_version` | [`string`](#string) |  |  |
 
 #### Field Rules
 
@@ -5220,6 +5252,7 @@ Identifies an end device model with version information.
 | `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `hardware_version` | <p>`string.max_len`: `32`</p> |
 | `firmware_version` | <p>`string.max_len`: `32`</p> |
+| `runtime_version` | <p>`string.max_len`: `32`</p> |
 
 ### <a name="ttn.lorawan.v3.Gateways">Message `Gateways`</a>
 
@@ -5331,6 +5364,218 @@ Identifies an end device model with version information.
 | `order` | <p>`string.in`: `[ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
+### <a name="ttn.lorawan.v3.ManagedGateway">Message `ManagedGateway`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `version_ids` | [`GatewayVersionIdentifiers`](#ttn.lorawan.v3.GatewayVersionIdentifiers) |  |  |
+| `cellular_imei` | [`string`](#string) |  |  |
+| `cellular_imsi` | [`string`](#string) |  |  |
+| `wifi_mac_address` | [`bytes`](#bytes) |  |  |
+| `ethernet_mac_address` | [`bytes`](#bytes) |  |  |
+| `wifi_profile_id` | [`string`](#string) |  |  |
+| `ethernet_profile_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `cellular_imei` | <p>`string.pattern`: `^[0-9]{15}$`</p> |
+| `cellular_imsi` | <p>`string.pattern`: `^[0-9]{15}$`</p> |
+| `wifi_mac_address` | <p>`bytes.len`: `6`</p> |
+| `ethernet_mac_address` | <p>`bytes.len`: `6`</p> |
+| `wifi_profile_id` | <p>`string.uuid`: `true`</p> |
+| `ethernet_profile_id` | <p>`string.uuid`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayCellularBackhaul">Message `ManagedGatewayCellularBackhaul`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `network_interface` | [`ManagedGatewayNetworkInterfaceInfo`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo) |  |  |
+| `operator` | [`string`](#string) |  |  |
+| `rssi` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `operator` | <p>`string.max_len`: `32`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayControllerConnection">Message `ManagedGatewayControllerConnection`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `network_interface_type` | [`ManagedGatewayNetworkInterfaceType`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceType) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `network_interface_type` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayEthernetBackhaul">Message `ManagedGatewayEthernetBackhaul`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `network_interface` | [`ManagedGatewayNetworkInterfaceInfo`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo) |  |  |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayEthernetProfile">Message `ManagedGatewayEthernetProfile`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profile_id` | [`string`](#string) |  |  |
+| `profile_name` | [`string`](#string) |  |  |
+| `shared` | [`bool`](#bool) |  |  |
+| `network_interface_addresses` | [`ManagedGatewayNetworkInterfaceAddresses`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `profile_id` | <p>`string.uuid`: `true`</p> |
+| `profile_name` | <p>`string.max_len`: `32`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayEthernetProfiles">Message `ManagedGatewayEthernetProfiles`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profiles` | [`ManagedGatewayEthernetProfile`](#ttn.lorawan.v3.ManagedGatewayEthernetProfile) | repeated |  |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayEventData">Message `ManagedGatewayEventData`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `entity` | [`ManagedGateway`](#ttn.lorawan.v3.ManagedGateway) |  |  |
+| `location` | [`Location`](#ttn.lorawan.v3.Location) |  |  |
+| `system_status` | [`ManagedGatewaySystemStatus`](#ttn.lorawan.v3.ManagedGatewaySystemStatus) |  |  |
+| `controller_connection` | [`ManagedGatewayControllerConnection`](#ttn.lorawan.v3.ManagedGatewayControllerConnection) |  |  |
+| `gateway_server_connection` | [`ManagedGatewayGatewayServerConnection`](#ttn.lorawan.v3.ManagedGatewayGatewayServerConnection) |  |  |
+| `cellular_backhaul` | [`ManagedGatewayCellularBackhaul`](#ttn.lorawan.v3.ManagedGatewayCellularBackhaul) |  |  |
+| `wifi_backhaul` | [`ManagedGatewayWiFiBackhaul`](#ttn.lorawan.v3.ManagedGatewayWiFiBackhaul) |  |  |
+| `ethernet_backhaul` | [`ManagedGatewayEthernetBackhaul`](#ttn.lorawan.v3.ManagedGatewayEthernetBackhaul) |  |  |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayGatewayServerConnection">Message `ManagedGatewayGatewayServerConnection`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `network_interface_type` | [`ManagedGatewayNetworkInterfaceType`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceType) |  |  |
+| `address` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `network_interface_type` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses">Message `ManagedGatewayNetworkInterfaceAddresses`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ip_addresses` | [`string`](#string) | repeated |  |
+| `subnet_mask` | [`string`](#string) |  |  |
+| `gateway` | [`string`](#string) |  |  |
+| `dns_servers` | [`string`](#string) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ip_addresses` | <p>`repeated.max_items`: `2`</p><p>`repeated.items.string.ip`: `true`</p> |
+| `subnet_mask` | <p>`string.ipv4`: `true`</p> |
+| `gateway` | <p>`string.ipv4`: `true`</p> |
+| `dns_servers` | <p>`repeated.max_items`: `2`</p><p>`repeated.items.string.ipv4`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo">Message `ManagedGatewayNetworkInterfaceInfo`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `status` | [`ManagedGatewayNetworkInterfaceStatus`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceStatus) |  |  |
+| `dhcp_enabled` | [`bool`](#bool) |  |  |
+| `addresses` | [`ManagedGatewayNetworkInterfaceAddresses`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `status` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewaySystemStatus">Message `ManagedGatewaySystemStatus`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `cpu_temperature` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | CPU temperature (Celsius). |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayWiFiAccessPoint">Message `ManagedGatewayWiFiAccessPoint`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ssid` | [`string`](#string) |  |  |
+| `bssid` | [`bytes`](#bytes) |  |  |
+| `channel` | [`uint32`](#uint32) |  |  |
+| `authentication_mode` | [`string`](#string) |  |  |
+| `rssi` | [`float`](#float) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ssid` | <p>`string.max_len`: `32`</p> |
+| `bssid` | <p>`bytes.len`: `6`</p> |
+| `channel` | <p>`uint32.gte`: `1`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayWiFiAccessPoints">Message `ManagedGatewayWiFiAccessPoints`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `access_points` | [`ManagedGatewayWiFiAccessPoint`](#ttn.lorawan.v3.ManagedGatewayWiFiAccessPoint) | repeated |  |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayWiFiBackhaul">Message `ManagedGatewayWiFiBackhaul`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `network_interface` | [`ManagedGatewayNetworkInterfaceInfo`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceInfo) |  |  |
+| `ssid` | [`string`](#string) |  |  |
+| `bssid` | [`bytes`](#bytes) |  |  |
+| `channel` | [`uint32`](#uint32) |  |  |
+| `authentication_mode` | [`string`](#string) |  |  |
+| `rssi` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ssid` | <p>`string.max_len`: `32`</p> |
+| `bssid` | <p>`bytes.len`: `6`</p> |
+| `channel` | <p>`uint32.gte`: `1`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayWiFiProfile">Message `ManagedGatewayWiFiProfile`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profile_id` | [`string`](#string) |  |  |
+| `profile_name` | [`string`](#string) |  |  |
+| `shared` | [`bool`](#bool) |  |  |
+| `ssid` | [`string`](#string) |  |  |
+| `password` | [`string`](#string) |  |  |
+| `network_interface_addresses` | [`ManagedGatewayNetworkInterfaceAddresses`](#ttn.lorawan.v3.ManagedGatewayNetworkInterfaceAddresses) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `profile_id` | <p>`string.uuid`: `true`</p> |
+| `profile_name` | <p>`string.max_len`: `32`</p> |
+| `ssid` | <p>`string.max_len`: `32`</p> |
+| `password` | <p>`string.max_len`: `64`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayWiFiProfiles">Message `ManagedGatewayWiFiProfiles`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profiles` | [`ManagedGatewayWiFiProfile`](#ttn.lorawan.v3.ManagedGatewayWiFiProfile) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.SetGatewayCollaboratorRequest">Message `SetGatewayCollaboratorRequest`</a>
 
 | Field | Type | Label | Description |
@@ -5381,7 +5626,81 @@ Identifies an end device model with version information.
 | `INDOOR` | 1 |  |
 | `OUTDOOR` | 2 |  |
 
+### <a name="ttn.lorawan.v3.ManagedGatewayNetworkInterfaceStatus">Enum `ManagedGatewayNetworkInterfaceStatus`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UNSPECIFIED` | 0 |  |
+| `MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_DOWN` | 1 |  |
+| `MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UP` | 2 |  |
+| `MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_FAILED` | 3 |  |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayNetworkInterfaceType">Enum `ManagedGatewayNetworkInterfaceType`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_UNSPECIFIED` | 0 |  |
+| `MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_CELLULAR` | 1 |  |
+| `MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_WIFI` | 2 |  |
+| `MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_ETHERNET` | 3 |  |
+
 ## <a name="ttn/lorawan/v3/gateway_configuration.proto">File `ttn/lorawan/v3/gateway_configuration.proto`</a>
+
+### <a name="ttn.lorawan.v3.CreateManagedGatewayEthernetProfileRequest">Message `CreateManagedGatewayEthernetProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profile` | [`ManagedGatewayEthernetProfile`](#ttn.lorawan.v3.ManagedGatewayEthernetProfile) |  |  |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `profile` | <p>`message.required`: `true`</p> |
+| `collaborator` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.CreateManagedGatewayWiFiProfileRequest">Message `CreateManagedGatewayWiFiProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profile` | [`ManagedGatewayWiFiProfile`](#ttn.lorawan.v3.ManagedGatewayWiFiProfile) |  |  |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `profile` | <p>`message.required`: `true`</p> |
+| `collaborator` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DeleteManagedGatewayEthernetProfileRequest">Message `DeleteManagedGatewayEthernetProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `profile_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `collaborator` | <p>`message.required`: `true`</p> |
+| `profile_id` | <p>`string.uuid`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DeleteManagedGatewayWiFiProfileRequest">Message `DeleteManagedGatewayWiFiProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `profile_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `collaborator` | <p>`message.required`: `true`</p> |
+| `profile_id` | <p>`string.uuid`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GetGatewayConfigurationRequest">Message `GetGatewayConfigurationRequest`</a>
 
@@ -5407,6 +5726,111 @@ Identifies an end device model with version information.
 | ----- | ---- | ----- | ----------- |
 | `contents` | [`bytes`](#bytes) |  |  |
 
+### <a name="ttn.lorawan.v3.GetManagedGatewayEthernetProfileRequest">Message `GetManagedGatewayEthernetProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `profile_id` | [`string`](#string) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that should be returned. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `collaborator` | <p>`message.required`: `true`</p> |
+| `profile_id` | <p>`string.uuid`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetManagedGatewayWiFiProfileRequest">Message `GetManagedGatewayWiFiProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `profile_id` | [`string`](#string) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that should be returned. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `collaborator` | <p>`message.required`: `true`</p> |
+| `profile_id` | <p>`string.uuid`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ListManagedGatewayEthernetProfilesRequest">Message `ListManagedGatewayEthernetProfilesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that should be returned. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `collaborator` | <p>`message.required`: `true`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.ListManagedGatewayWiFiProfilesRequest">Message `ListManagedGatewayWiFiProfilesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that should be returned. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `collaborator` | <p>`message.required`: `true`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.UpdateManagedGatewayEthernetProfileRequest">Message `UpdateManagedGatewayEthernetProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profile` | [`ManagedGatewayEthernetProfile`](#ttn.lorawan.v3.ManagedGatewayEthernetProfile) |  |  |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that should be updated. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `profile` | <p>`message.required`: `true`</p> |
+| `collaborator` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UpdateManagedGatewayRequest">Message `UpdateManagedGatewayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway` | [`ManagedGateway`](#ttn.lorawan.v3.ManagedGateway) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that should be updated. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UpdateManagedGatewayWiFiProfileRequest">Message `UpdateManagedGatewayWiFiProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `profile` | [`ManagedGatewayWiFiProfile`](#ttn.lorawan.v3.ManagedGatewayWiFiProfile) |  |  |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that should be updated. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `profile` | <p>`message.required`: `true`</p> |
+| `collaborator` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GatewayConfigurationService">Service `GatewayConfigurationService`</a>
 
 The GatewayConfigurationService fetches the configuration of a gateway.
@@ -5422,6 +5846,84 @@ The GatewayConfigurationService fetches the configuration of a gateway.
 | `GetGatewayConfiguration` | `` | `/api/v3` |  |
 | `GetGatewayConfiguration` | `GET` | `/api/v3/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{filename}` |  |
 | `GetGatewayConfiguration` | `GET` | `/api/v3/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{type}/{filename}` |  |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayConfigurationService">Service `ManagedGatewayConfigurationService`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Get` | [`GetGatewayRequest`](#ttn.lorawan.v3.GetGatewayRequest) | [`ManagedGateway`](#ttn.lorawan.v3.ManagedGateway) |  |
+| `Update` | [`UpdateManagedGatewayRequest`](#ttn.lorawan.v3.UpdateManagedGatewayRequest) | [`ManagedGateway`](#ttn.lorawan.v3.ManagedGateway) |  |
+| `StreamEvents` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`ManagedGatewayEventData`](#ttn.lorawan.v3.ManagedGatewayEventData) _stream_ |  |
+| `ScanWiFiAccessPoints` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`ManagedGatewayWiFiAccessPoints`](#ttn.lorawan.v3.ManagedGatewayWiFiAccessPoints) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Get` | `GET` | `/api/v3/gcs/gateways/managed/{gateway_ids.gateway_id}` |  |
+| `Update` | `PUT` | `/api/v3/gcs/gateways/managed/{gateway.ids.gateway_id}` | `*` |
+| `StreamEvents` | `POST` | `/api/v3/gcs/gateways/managed/{gateway_id}/events` | `*` |
+| `ScanWiFiAccessPoints` | `POST` | `/api/v3/gcs/gateways/managed/{gateway_id}/wifi/scan` | `*` |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayEthernetProfileConfigurationService">Service `ManagedGatewayEthernetProfileConfigurationService`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Create` | [`CreateManagedGatewayEthernetProfileRequest`](#ttn.lorawan.v3.CreateManagedGatewayEthernetProfileRequest) | [`ManagedGatewayEthernetProfile`](#ttn.lorawan.v3.ManagedGatewayEthernetProfile) |  |
+| `Update` | [`UpdateManagedGatewayEthernetProfileRequest`](#ttn.lorawan.v3.UpdateManagedGatewayEthernetProfileRequest) | [`ManagedGatewayEthernetProfile`](#ttn.lorawan.v3.ManagedGatewayEthernetProfile) |  |
+| `List` | [`ListManagedGatewayEthernetProfilesRequest`](#ttn.lorawan.v3.ListManagedGatewayEthernetProfilesRequest) | [`ManagedGatewayEthernetProfiles`](#ttn.lorawan.v3.ManagedGatewayEthernetProfiles) |  |
+| `Get` | [`GetManagedGatewayEthernetProfileRequest`](#ttn.lorawan.v3.GetManagedGatewayEthernetProfileRequest) | [`ManagedGatewayEthernetProfile`](#ttn.lorawan.v3.ManagedGatewayEthernetProfile) |  |
+| `Delete` | [`DeleteManagedGatewayEthernetProfileRequest`](#ttn.lorawan.v3.DeleteManagedGatewayEthernetProfileRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Create` | `` | `/api/v3` |  |
+| `Create` | `POST` | `/api/v3/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}` | `*` |
+| `Create` | `POST` | `/api/v3/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}` | `*` |
+| `Update` | `` | `/api/v3` |  |
+| `Update` | `PUT` | `/api/v3/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile.profile_id}` | `*` |
+| `Update` | `PUT` | `/api/v3/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile.profile_id}` | `*` |
+| `List` | `` | `/api/v3` |  |
+| `List` | `GET` | `/api/v3/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}` |  |
+| `List` | `GET` | `/api/v3/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}` |  |
+| `Get` | `` | `/api/v3` |  |
+| `Get` | `GET` | `/api/v3/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile_id}` |  |
+| `Get` | `GET` | `/api/v3/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile_id}` |  |
+| `Delete` | `` | `/api/v3` |  |
+| `Delete` | `DELETE` | `/api/v3/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile_id}` |  |
+
+### <a name="ttn.lorawan.v3.ManagedGatewayWiFiProfileConfigurationService">Service `ManagedGatewayWiFiProfileConfigurationService`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Create` | [`CreateManagedGatewayWiFiProfileRequest`](#ttn.lorawan.v3.CreateManagedGatewayWiFiProfileRequest) | [`ManagedGatewayWiFiProfile`](#ttn.lorawan.v3.ManagedGatewayWiFiProfile) |  |
+| `Update` | [`UpdateManagedGatewayWiFiProfileRequest`](#ttn.lorawan.v3.UpdateManagedGatewayWiFiProfileRequest) | [`ManagedGatewayWiFiProfile`](#ttn.lorawan.v3.ManagedGatewayWiFiProfile) |  |
+| `List` | [`ListManagedGatewayWiFiProfilesRequest`](#ttn.lorawan.v3.ListManagedGatewayWiFiProfilesRequest) | [`ManagedGatewayWiFiProfiles`](#ttn.lorawan.v3.ManagedGatewayWiFiProfiles) |  |
+| `Get` | [`GetManagedGatewayWiFiProfileRequest`](#ttn.lorawan.v3.GetManagedGatewayWiFiProfileRequest) | [`ManagedGatewayWiFiProfile`](#ttn.lorawan.v3.ManagedGatewayWiFiProfile) |  |
+| `Delete` | [`DeleteManagedGatewayWiFiProfileRequest`](#ttn.lorawan.v3.DeleteManagedGatewayWiFiProfileRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Create` | `` | `/api/v3` |  |
+| `Create` | `POST` | `/api/v3/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}` | `*` |
+| `Create` | `POST` | `/api/v3/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}` | `*` |
+| `Update` | `` | `/api/v3` |  |
+| `Update` | `PUT` | `/api/v3/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile.profile_id}` | `*` |
+| `Update` | `PUT` | `/api/v3/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile.profile_id}` | `*` |
+| `List` | `` | `/api/v3` |  |
+| `List` | `GET` | `/api/v3/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}` |  |
+| `List` | `GET` | `/api/v3/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}` |  |
+| `Get` | `` | `/api/v3` |  |
+| `Get` | `GET` | `/api/v3/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile_id}` |  |
+| `Get` | `GET` | `/api/v3/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile_id}` |  |
+| `Delete` | `` | `/api/v3` |  |
+| `Delete` | `DELETE` | `/api/v3/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile_id}` |  |
 
 ## <a name="ttn/lorawan/v3/gateway_services.proto">File `ttn/lorawan/v3/gateway_services.proto`</a>
 
@@ -5525,14 +6027,6 @@ gateway registrations in batches.
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `Delete` | `DELETE` | `/api/v3/gateways/batch` |  |
-
-### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
-
-The GatewayConfigurator service is used to fetch gateway configuration.
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| `PullConfiguration` | [`PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [`Gateway`](#ttn.lorawan.v3.Gateway) _stream_ |  |
 
 ### <a name="ttn.lorawan.v3.GatewayRegistry">Service `GatewayRegistry`</a>
 

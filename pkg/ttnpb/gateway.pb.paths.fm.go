@@ -31,6 +31,7 @@ var GatewayVersionIdentifiersFieldPathsNested = []string{
 	"firmware_version",
 	"hardware_version",
 	"model_id",
+	"runtime_version",
 }
 
 var GatewayVersionIdentifiersFieldPathsTopLevel = []string{
@@ -38,6 +39,7 @@ var GatewayVersionIdentifiersFieldPathsTopLevel = []string{
 	"firmware_version",
 	"hardware_version",
 	"model_id",
+	"runtime_version",
 }
 var GatewayRadioFieldPathsNested = []string{
 	"chip_type",
@@ -130,6 +132,7 @@ var GatewayFieldPathsNested = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.runtime_version",
 }
 
 var GatewayFieldPathsTopLevel = []string{
@@ -171,6 +174,285 @@ var GatewaysFieldPathsNested = []string{
 
 var GatewaysFieldPathsTopLevel = []string{
 	"gateways",
+}
+var ManagedGatewayFieldPathsNested = []string{
+	"cellular_imei",
+	"cellular_imsi",
+	"ethernet_mac_address",
+	"ethernet_profile_id",
+	"ids",
+	"ids.eui",
+	"ids.gateway_id",
+	"version_ids",
+	"version_ids.brand_id",
+	"version_ids.firmware_version",
+	"version_ids.hardware_version",
+	"version_ids.model_id",
+	"version_ids.runtime_version",
+	"wifi_mac_address",
+	"wifi_profile_id",
+}
+
+var ManagedGatewayFieldPathsTopLevel = []string{
+	"cellular_imei",
+	"cellular_imsi",
+	"ethernet_mac_address",
+	"ethernet_profile_id",
+	"ids",
+	"version_ids",
+	"wifi_mac_address",
+	"wifi_profile_id",
+}
+var ManagedGatewayWiFiAccessPointFieldPathsNested = []string{
+	"authentication_mode",
+	"bssid",
+	"channel",
+	"rssi",
+	"ssid",
+}
+
+var ManagedGatewayWiFiAccessPointFieldPathsTopLevel = []string{
+	"authentication_mode",
+	"bssid",
+	"channel",
+	"rssi",
+	"ssid",
+}
+var ManagedGatewayWiFiAccessPointsFieldPathsNested = []string{
+	"access_points",
+}
+
+var ManagedGatewayWiFiAccessPointsFieldPathsTopLevel = []string{
+	"access_points",
+}
+var ManagedGatewayNetworkInterfaceAddressesFieldPathsNested = []string{
+	"dns_servers",
+	"gateway",
+	"ip_addresses",
+	"subnet_mask",
+}
+
+var ManagedGatewayNetworkInterfaceAddressesFieldPathsTopLevel = []string{
+	"dns_servers",
+	"gateway",
+	"ip_addresses",
+	"subnet_mask",
+}
+var ManagedGatewaySystemStatusFieldPathsNested = []string{
+	"cpu_temperature",
+}
+
+var ManagedGatewaySystemStatusFieldPathsTopLevel = []string{
+	"cpu_temperature",
+}
+var ManagedGatewayControllerConnectionFieldPathsNested = []string{
+	"network_interface_type",
+}
+
+var ManagedGatewayControllerConnectionFieldPathsTopLevel = []string{
+	"network_interface_type",
+}
+var ManagedGatewayGatewayServerConnectionFieldPathsNested = []string{
+	"address",
+	"network_interface_type",
+}
+
+var ManagedGatewayGatewayServerConnectionFieldPathsTopLevel = []string{
+	"address",
+	"network_interface_type",
+}
+var ManagedGatewayNetworkInterfaceInfoFieldPathsNested = []string{
+	"addresses",
+	"addresses.dns_servers",
+	"addresses.gateway",
+	"addresses.ip_addresses",
+	"addresses.subnet_mask",
+	"dhcp_enabled",
+	"status",
+}
+
+var ManagedGatewayNetworkInterfaceInfoFieldPathsTopLevel = []string{
+	"addresses",
+	"dhcp_enabled",
+	"status",
+}
+var ManagedGatewayCellularBackhaulFieldPathsNested = []string{
+	"network_interface",
+	"network_interface.addresses",
+	"network_interface.addresses.dns_servers",
+	"network_interface.addresses.gateway",
+	"network_interface.addresses.ip_addresses",
+	"network_interface.addresses.subnet_mask",
+	"network_interface.dhcp_enabled",
+	"network_interface.status",
+	"operator",
+	"rssi",
+}
+
+var ManagedGatewayCellularBackhaulFieldPathsTopLevel = []string{
+	"network_interface",
+	"operator",
+	"rssi",
+}
+var ManagedGatewayWiFiBackhaulFieldPathsNested = []string{
+	"authentication_mode",
+	"bssid",
+	"channel",
+	"network_interface",
+	"network_interface.addresses",
+	"network_interface.addresses.dns_servers",
+	"network_interface.addresses.gateway",
+	"network_interface.addresses.ip_addresses",
+	"network_interface.addresses.subnet_mask",
+	"network_interface.dhcp_enabled",
+	"network_interface.status",
+	"rssi",
+	"ssid",
+}
+
+var ManagedGatewayWiFiBackhaulFieldPathsTopLevel = []string{
+	"authentication_mode",
+	"bssid",
+	"channel",
+	"network_interface",
+	"rssi",
+	"ssid",
+}
+var ManagedGatewayEthernetBackhaulFieldPathsNested = []string{
+	"network_interface",
+	"network_interface.addresses",
+	"network_interface.addresses.dns_servers",
+	"network_interface.addresses.gateway",
+	"network_interface.addresses.ip_addresses",
+	"network_interface.addresses.subnet_mask",
+	"network_interface.dhcp_enabled",
+	"network_interface.status",
+}
+
+var ManagedGatewayEthernetBackhaulFieldPathsTopLevel = []string{
+	"network_interface",
+}
+var ManagedGatewayEventDataFieldPathsNested = []string{
+	"data",
+	"data.cellular_backhaul",
+	"data.cellular_backhaul.network_interface",
+	"data.cellular_backhaul.network_interface.addresses",
+	"data.cellular_backhaul.network_interface.addresses.dns_servers",
+	"data.cellular_backhaul.network_interface.addresses.gateway",
+	"data.cellular_backhaul.network_interface.addresses.ip_addresses",
+	"data.cellular_backhaul.network_interface.addresses.subnet_mask",
+	"data.cellular_backhaul.network_interface.dhcp_enabled",
+	"data.cellular_backhaul.network_interface.status",
+	"data.cellular_backhaul.operator",
+	"data.cellular_backhaul.rssi",
+	"data.controller_connection",
+	"data.controller_connection.network_interface_type",
+	"data.entity",
+	"data.entity.cellular_imei",
+	"data.entity.cellular_imsi",
+	"data.entity.ethernet_mac_address",
+	"data.entity.ethernet_profile_id",
+	"data.entity.ids",
+	"data.entity.ids.eui",
+	"data.entity.ids.gateway_id",
+	"data.entity.version_ids",
+	"data.entity.version_ids.brand_id",
+	"data.entity.version_ids.firmware_version",
+	"data.entity.version_ids.hardware_version",
+	"data.entity.version_ids.model_id",
+	"data.entity.version_ids.runtime_version",
+	"data.entity.wifi_mac_address",
+	"data.entity.wifi_profile_id",
+	"data.ethernet_backhaul",
+	"data.ethernet_backhaul.network_interface",
+	"data.ethernet_backhaul.network_interface.addresses",
+	"data.ethernet_backhaul.network_interface.addresses.dns_servers",
+	"data.ethernet_backhaul.network_interface.addresses.gateway",
+	"data.ethernet_backhaul.network_interface.addresses.ip_addresses",
+	"data.ethernet_backhaul.network_interface.addresses.subnet_mask",
+	"data.ethernet_backhaul.network_interface.dhcp_enabled",
+	"data.ethernet_backhaul.network_interface.status",
+	"data.gateway_server_connection",
+	"data.gateway_server_connection.address",
+	"data.gateway_server_connection.network_interface_type",
+	"data.location",
+	"data.location.accuracy",
+	"data.location.altitude",
+	"data.location.latitude",
+	"data.location.longitude",
+	"data.location.source",
+	"data.system_status",
+	"data.system_status.cpu_temperature",
+	"data.wifi_backhaul",
+	"data.wifi_backhaul.authentication_mode",
+	"data.wifi_backhaul.bssid",
+	"data.wifi_backhaul.channel",
+	"data.wifi_backhaul.network_interface",
+	"data.wifi_backhaul.network_interface.addresses",
+	"data.wifi_backhaul.network_interface.addresses.dns_servers",
+	"data.wifi_backhaul.network_interface.addresses.gateway",
+	"data.wifi_backhaul.network_interface.addresses.ip_addresses",
+	"data.wifi_backhaul.network_interface.addresses.subnet_mask",
+	"data.wifi_backhaul.network_interface.dhcp_enabled",
+	"data.wifi_backhaul.network_interface.status",
+	"data.wifi_backhaul.rssi",
+	"data.wifi_backhaul.ssid",
+}
+
+var ManagedGatewayEventDataFieldPathsTopLevel = []string{
+	"data",
+}
+var ManagedGatewayWiFiProfileFieldPathsNested = []string{
+	"network_interface_addresses",
+	"network_interface_addresses.dns_servers",
+	"network_interface_addresses.gateway",
+	"network_interface_addresses.ip_addresses",
+	"network_interface_addresses.subnet_mask",
+	"password",
+	"profile_id",
+	"profile_name",
+	"shared",
+	"ssid",
+}
+
+var ManagedGatewayWiFiProfileFieldPathsTopLevel = []string{
+	"network_interface_addresses",
+	"password",
+	"profile_id",
+	"profile_name",
+	"shared",
+	"ssid",
+}
+var ManagedGatewayWiFiProfilesFieldPathsNested = []string{
+	"profiles",
+}
+
+var ManagedGatewayWiFiProfilesFieldPathsTopLevel = []string{
+	"profiles",
+}
+var ManagedGatewayEthernetProfileFieldPathsNested = []string{
+	"network_interface_addresses",
+	"network_interface_addresses.dns_servers",
+	"network_interface_addresses.gateway",
+	"network_interface_addresses.ip_addresses",
+	"network_interface_addresses.subnet_mask",
+	"profile_id",
+	"profile_name",
+	"shared",
+}
+
+var ManagedGatewayEthernetProfileFieldPathsTopLevel = []string{
+	"network_interface_addresses",
+	"profile_id",
+	"profile_name",
+	"shared",
+}
+var ManagedGatewayEthernetProfilesFieldPathsNested = []string{
+	"profiles",
+}
+
+var ManagedGatewayEthernetProfilesFieldPathsTopLevel = []string{
+	"profiles",
 }
 var GetGatewayRequestFieldPathsNested = []string{
 	"field_mask",
@@ -281,6 +563,7 @@ var CreateGatewayRequestFieldPathsNested = []string{
 	"gateway.version_ids.firmware_version",
 	"gateway.version_ids.hardware_version",
 	"gateway.version_ids.model_id",
+	"gateway.version_ids.runtime_version",
 }
 
 var CreateGatewayRequestFieldPathsTopLevel = []string{
@@ -349,6 +632,7 @@ var UpdateGatewayRequestFieldPathsNested = []string{
 	"gateway.version_ids.firmware_version",
 	"gateway.version_ids.hardware_version",
 	"gateway.version_ids.model_id",
+	"gateway.version_ids.runtime_version",
 }
 
 var UpdateGatewayRequestFieldPathsTopLevel = []string{

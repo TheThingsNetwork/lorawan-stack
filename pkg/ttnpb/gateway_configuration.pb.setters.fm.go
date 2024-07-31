@@ -89,3 +89,642 @@ func (dst *GetGatewayConfigurationResponse) SetFields(src *GetGatewayConfigurati
 	}
 	return nil
 }
+
+func (dst *UpdateManagedGatewayRequest) SetFields(src *UpdateManagedGatewayRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGateway
+				if (src == nil || src.Gateway == nil) && dst.Gateway == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Gateway
+				}
+				if dst.Gateway != nil {
+					newDst = dst.Gateway
+				} else {
+					newDst = &ManagedGateway{}
+					dst.Gateway = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Gateway = src.Gateway
+				} else {
+					dst.Gateway = nil
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *CreateManagedGatewayWiFiProfileRequest) SetFields(src *CreateManagedGatewayWiFiProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profile":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayWiFiProfile
+				if (src == nil || src.Profile == nil) && dst.Profile == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Profile
+				}
+				if dst.Profile != nil {
+					newDst = dst.Profile
+				} else {
+					newDst = &ManagedGatewayWiFiProfile{}
+					dst.Profile = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Profile = src.Profile
+				} else {
+					dst.Profile = nil
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UpdateManagedGatewayWiFiProfileRequest) SetFields(src *UpdateManagedGatewayWiFiProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profile":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayWiFiProfile
+				if (src == nil || src.Profile == nil) && dst.Profile == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Profile
+				}
+				if dst.Profile != nil {
+					newDst = dst.Profile
+				} else {
+					newDst = &ManagedGatewayWiFiProfile{}
+					dst.Profile = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Profile = src.Profile
+				} else {
+					dst.Profile = nil
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListManagedGatewayWiFiProfilesRequest) SetFields(src *ListManagedGatewayWiFiProfilesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetManagedGatewayWiFiProfileRequest) SetFields(src *GetManagedGatewayWiFiProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DeleteManagedGatewayWiFiProfileRequest) SetFields(src *DeleteManagedGatewayWiFiProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *CreateManagedGatewayEthernetProfileRequest) SetFields(src *CreateManagedGatewayEthernetProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profile":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayEthernetProfile
+				if (src == nil || src.Profile == nil) && dst.Profile == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Profile
+				}
+				if dst.Profile != nil {
+					newDst = dst.Profile
+				} else {
+					newDst = &ManagedGatewayEthernetProfile{}
+					dst.Profile = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Profile = src.Profile
+				} else {
+					dst.Profile = nil
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UpdateManagedGatewayEthernetProfileRequest) SetFields(src *UpdateManagedGatewayEthernetProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profile":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayEthernetProfile
+				if (src == nil || src.Profile == nil) && dst.Profile == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Profile
+				}
+				if dst.Profile != nil {
+					newDst = dst.Profile
+				} else {
+					newDst = &ManagedGatewayEthernetProfile{}
+					dst.Profile = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Profile = src.Profile
+				} else {
+					dst.Profile = nil
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListManagedGatewayEthernetProfilesRequest) SetFields(src *ListManagedGatewayEthernetProfilesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetManagedGatewayEthernetProfileRequest) SetFields(src *GetManagedGatewayEthernetProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DeleteManagedGatewayEthernetProfileRequest) SetFields(src *DeleteManagedGatewayEthernetProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					dst.Collaborator = nil
+				}
+			}
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

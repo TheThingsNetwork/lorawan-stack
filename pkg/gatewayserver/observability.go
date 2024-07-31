@@ -384,7 +384,7 @@ func registerSuccessDownlink(ctx context.Context, gtw *ttnpb.Gateway, protocol s
 }
 
 func registerFailDownlink(ctx context.Context, gtw *ttnpb.Gateway, txAck *ttnpb.TxAcknowledgment, protocol string) {
-	events.Publish(evtTxFailureDown.NewWithIdentifiersAndData(ctx, gtw, txAck))
+	events.Publish(evtTxFailureDown.NewWithIdentifiersAndData(ctx, gtw, txAck.GetResult()))
 	gsMetrics.downlinkTxFailed.WithLabelValues(ctx, protocol, txAck.Result.String()).Inc()
 }
 

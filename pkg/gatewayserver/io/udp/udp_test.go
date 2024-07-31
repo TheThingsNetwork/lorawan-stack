@@ -205,14 +205,23 @@ func TestConnection(t *testing.T) {
 func TestFrontend(t *testing.T) {
 	t.Parallel()
 	iotest.Frontend(t, iotest.FrontendConfig{
-		DetectsInvalidMessages: false,
-		SupportsStatus:         true,
-		DetectsDisconnect:      false,
-		AuthenticatesWithEUI:   true,
-		TimeoutOnInvalidAuth:   false,
-		IsAuthenticated:        false,
-		DeduplicatesUplinks:    true,
-		CustomConfig: func(config *gatewayserver.Config) {
+		DropsCRCFailure:      false,
+		DropsInvalidLoRaWAN:  false,
+		SupportsStatus:       true,
+		DetectsDisconnect:    false,
+		AuthenticatesWithEUI: true,
+		IsAuthenticated:      false,
+		DeduplicatesUplinks:  true,
+		CustomRxMetadataAssertion: func(t *testing.T, actual, expected *ttnpb.RxMetadata) {
+			t.Helper()
+			a := assertions.New(t)
+			a.So(actual.UplinkToken, should.NotBeEmpty)
+			actual.UplinkToken = nil
+			actual.ReceivedAt = nil
+			expected.SignalRssi = nil
+			a.So(actual, should.Resemble, expected)
+		},
+		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.UDP = gatewayserver.UDPConfig{
 				Config: udp.Config{
 					PacketHandlers:      2,

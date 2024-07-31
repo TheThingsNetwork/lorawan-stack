@@ -230,6 +230,8 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		return nil, err
 	}
 
+	config.TTGC.TLS.KeyVault.CertificateProvider = c.keyService
+
 	c.initRights()
 
 	c.initGRPC()
@@ -310,6 +312,11 @@ func (c *Component) KeyService() crypto.KeyService {
 // FrequencyPlansStore returns the component's frequencyPlans Store
 func (c *Component) FrequencyPlansStore(ctx context.Context) (*frequencyplans.Store, error) {
 	return c.frequencyPlans, nil
+}
+
+// GRPCServer returns the component's gRPC server.
+func (c *Component) GRPCServer() *rpcserver.Server {
+	return c.GRPC
 }
 
 // Start starts the component.

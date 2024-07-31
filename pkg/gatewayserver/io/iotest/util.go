@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 func mustHavePeer(ctx context.Context, t *testing.T, c *component.Component, role ttnpb.ClusterRole) {
@@ -41,9 +42,9 @@ func mustHavePeer(ctx context.Context, t *testing.T, c *component.Component, rol
 
 func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	var fNwkSIntKey, sNwkSIntKey, appSKey types.AES128Key
-	rand.Read(fNwkSIntKey[:])
-	rand.Read(sNwkSIntKey[:])
-	rand.Read(appSKey[:])
+	test.Must(rand.Read(fNwkSIntKey[:]))
+	test.Must(rand.Read(sNwkSIntKey[:]))
+	test.Must(rand.Read(appSKey[:]))
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
@@ -83,9 +84,9 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 
 func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 	var nwkKey types.AES128Key
-	rand.Read(nwkKey[:])
+	test.Must(rand.Read(nwkKey[:]))
 	var devNonce types.DevNonce
-	rand.Read(devNonce[:])
+	test.Must(rand.Read(devNonce[:]))
 
 	msg := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
@@ -115,8 +116,8 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 
 func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	var sNwkSIntKey, appSKey types.AES128Key
-	rand.Read(sNwkSIntKey[:])
-	rand.Read(appSKey[:])
+	test.Must(rand.Read(sNwkSIntKey[:]))
+	test.Must(rand.Read(appSKey[:]))
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
