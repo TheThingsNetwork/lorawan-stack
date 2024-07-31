@@ -169,11 +169,24 @@ func (gcls gatewayClaimingServer) GetInfoByGatewayEUI(
 	if err != nil {
 		return nil, err
 	}
-	eui := types.MustEUI64(in.Eui).OrZero()
+	var (
+		eui              = types.MustEUI64(in.Eui).OrZero()
+		claimer          = gcls.upstream.Claimer(eui)
+		supportsClaiming = claimer != nil
+		isManaged        bool
+	)
+	if supportsClaiming {
+		var err error
+		isManaged, err = claimer.IsManagedGateway(ctx, eui)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return &ttnpb.GetInfoByGatewayEUIResponse{
 		Eui:              in.Eui,
-		SupportsClaiming: gcls.upstream.Claimer(eui) != nil,
+		SupportsClaiming: supportsClaiming,
+		IsManaged:        isManaged,
 	}, nil
 }
 

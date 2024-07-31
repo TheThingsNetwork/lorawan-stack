@@ -3100,6 +3100,7 @@ DEPRECATED: This message is deprecated and will be removed in a future version o
 | ----- | ---- | ----- | ----------- |
 | `eui` | [`bytes`](#bytes) |  |  |
 | `supports_claiming` | [`bool`](#bool) |  |  |
+| `is_managed` | [`bool`](#bool) |  | Indicates whether the gateway is a managed gateway. If true, when the gateway is successfully claimed, it can be managed with ManagedGatewayConfigurationService. |
 
 #### Field Rules
 

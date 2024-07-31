@@ -205,3 +205,9 @@ func (u *Upstream) Unclaim(ctx context.Context, eui types.EUI64) error {
 	}
 	return nil
 }
+
+// IsManagedGateway implements gateways.GatewayClaimer.
+// This method always returns true.
+func (*Upstream) IsManagedGateway(context.Context, types.EUI64) (bool, error) {
+	return true, nil
+}

@@ -88,6 +88,8 @@ type Claimer interface {
 	Claim(ctx context.Context, eui types.EUI64, ownerToken string, clusterAddress string) error
 	// Unclaim unclaims a gateway.
 	Unclaim(ctx context.Context, eui types.EUI64) error
+	// IsManagedGateway returns true if the gateway is a managed gateway.
+	IsManagedGateway(ctx context.Context, eui types.EUI64) (bool, error)
 }
 
 // rangeClaimer supports claiming a range of EUIs.

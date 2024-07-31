@@ -71,7 +71,11 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 		},
 	})
 
-	mockGatewayclaimer := &MockGatewayClaimer{}
+	mockGatewayclaimer := &MockGatewayClaimer{
+		IsManagedGatewayFunc: func(_ context.Context, e types.EUI64) (bool, error) {
+			return e.Equal(supportedEUI), nil
+		},
+	}
 	mockUpstream, err := gateways.NewUpstream(
 		ctx,
 		c,
@@ -157,6 +161,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 	a.So(err, should.BeNil)
 	a.So(resp.Eui, should.Resemble, unsupportedEUI.Bytes())
 	a.So(resp.SupportsClaiming, should.BeFalse)
+	a.So(resp.IsManaged, should.BeFalse)
 
 	resp, err = gclsClient.GetInfoByGatewayEUI(
 		ctx,
@@ -168,6 +173,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 	a.So(err, should.BeNil)
 	a.So(resp.Eui, should.Resemble, supportedEUI.Bytes())
 	a.So(resp.SupportsClaiming, should.BeTrue)
+	a.So(resp.IsManaged, should.BeTrue)
 
 	// Test claiming
 	for _, tc := range []struct {
