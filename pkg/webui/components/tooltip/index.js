@@ -51,6 +51,7 @@ const Tooltip = props => {
     placement,
     small,
     trigger,
+    noOffset,
   } = props
 
   const handleShow = useCallback(
@@ -70,7 +71,7 @@ const Tooltip = props => {
       content={content}
       interactive={interactive}
       placement={placement}
-      popperOptions={{ modifiers: popperModifiers }}
+      popperOptions={{ modifiers: noOffset ? popperModifiers.slice(1) : popperModifiers }}
       delay={delay}
       onShow={handleShow}
       appendTo={appendTo ? appendTo : interactive ? 'parent' : document.body}
@@ -92,6 +93,7 @@ Tooltip.propTypes = {
   delay: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf(PropTypes.number)]),
   hideOnClick: PropTypes.bool,
   interactive: PropTypes.bool,
+  noOffset: PropTypes.bool,
   onShow: PropTypes.func,
   placement: PropTypes.oneOf([
     'top',
@@ -119,6 +121,7 @@ Tooltip.defaultProps = {
   className: '',
   hideOnClick: true,
   interactive: false,
+  noOffset: false,
   placement: 'bottom',
   small: false,
   delay: 300,
