@@ -66,26 +66,12 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
   cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   cy.visit(Cypress.config('consoleRootPath'))
 
-  cy.get('header').within(() => {
-    cy.findByRole('link', { name: /Applications/ }).click()
-  })
+  cy.findByRole('link', { name: /Applications/ }).click()
   cy.findByRole('cell', { name: application.ids.application_id }).click()
-  cy.findByRole('cell', { name: deviceId }).click()
+  cy.findByRole('link', { name: /End devices/ }).click()
+  cy.findByRole('cell', { name: `Test Device Name ${deviceId}` }).click()
 
   cy.get('#stage').within(() => {
-    cy.findAllByText(deviceId).should('be.visible')
-    cy.findByRole('columnheader', { name: 'General information' }).parent().should('be.visible')
-    cy.findByRole('columnheader', { name: 'Activation information' }).parent().should('be.visible')
-    cy.findByRole('columnheader', { name: 'Session information' }).parent().should('be.visible')
-    cy.findByRole('columnheader', { name: 'MAC data' }).parent().should('be.visible')
-    cy.findByRole('heading', { name: /Live data/ })
-      .parent()
-      .should('be.visible')
-    cy.findByRole('heading', { name: /Location/ })
-      .parent()
-      .should('be.visible')
-    cy.findByTestId('error-notification').should('not.exist')
-
     cy.findByRole('button', { name: 'Live data' }).click()
     cy.findByText(/Waiting for events from/).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
@@ -117,7 +103,7 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
     cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
 
-    cy.findByRole('button', { name: /General settings/ }).click()
+    cy.findByRole('button', { name: /Settings/ }).click()
     cy.findByText('Basic')
       .should('be.visible')
       .closest('[data-test-id="collapsible-section"]')

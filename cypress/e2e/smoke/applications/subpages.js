@@ -28,11 +28,7 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
   cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   cy.visit(Cypress.config('consoleRootPath'))
 
-  cy.get('header').within(() => {
-    cy.findAllByRole('link', { name: /Applications/ })
-      .first()
-      .click()
-  })
+  cy.findAllByRole('link', { name: /Applications/ }).click()
   cy.findByRole('cell', { name: application.ids.application_id }).click()
 
   cy.findAllByRole('link', { name: /End devices/ })
@@ -84,7 +80,7 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
   cy.findByTestId('error-notification').should('not.exist')
 
   cy.findByRole('link', { name: /LoRa Cloud/ }).click()
-  cy.findByText('Geolocation Services')
+  cy.findByText('Geolocation')
     .closest('[data-test-id="collapsible-section"]')
     .within(() => {
       cy.findByRole('button', { name: 'Expand' }).click()
@@ -93,7 +89,7 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
       cy.findByRole('button', { name: 'Collapse' }).click()
       cy.findByTestId('error-notification').should('not.exist')
     })
-  cy.findByRole('heading', { name: 'Modem Services' })
+  cy.findByRole('heading', { name: 'Device & Application Services' })
     .closest('[data-test-id="collapsible-section"]')
     .within(() => {
       cy.findByRole('button', { name: 'Expand' }).click()

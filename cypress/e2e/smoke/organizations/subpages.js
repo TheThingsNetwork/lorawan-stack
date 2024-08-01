@@ -26,30 +26,24 @@ const organizationSubpages = defineSmokeTest('check all organization sub-pages',
     ids: { organization_id: 'org-subpages-test' },
   }
   cy.createUser(user)
-  cy.createOrganization(organization, user.ids.user_id)
+  cy.createOrganization(organization, user.ids.user_id).as('createOrg')
   cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-  cy.visit(Cypress.config('consoleRootPath'))
+  cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${organization.ids.organization_id}`)
 
-  cy.get('header').within(() => {
-    cy.findByRole('link', { name: /Organizations/ }).click()
+  cy.findByText('Members (1)').should('be.visible')
+  cy.findByRole('link', { name: /Add member/ }).should('be.visible')
+  cy.findByTestId('error-notification').should('not.exist')
+
+  cy.findByTestId('tabs').within(() => {
+    cy.findByText(/API keys/).click()
   })
-  cy.findByRole('cell', { name: organization.ids.organization_id }).click()
-
-  cy.findByRole('link', { name: /Live data/ }).click()
-  cy.findByText(/Waiting for events from/).should('be.visible')
-  cy.findByTestId('error-notification').should('not.exist')
-
-  cy.findByRole('link', { name: /Collaborators/ }).click()
-  cy.findByText('Collaborators (1)').should('be.visible')
-  cy.findByRole('link', { name: /Add collaborator/ }).should('be.visible')
-  cy.findByTestId('error-notification').should('not.exist')
-
-  cy.findByRole('link', { name: /API keys/ }).click()
   cy.findByText('API keys (0)').should('be.visible')
   cy.findByRole('link', { name: /Add API key/ }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 
-  cy.findByRole('link', { name: /General settings/ }).click()
+  cy.findByTestId('tabs').within(() => {
+    cy.findByText(/Settings/).click()
+  })
   cy.findByLabelText('Organization ID').should('be.visible')
   cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')

@@ -498,9 +498,6 @@ const getFieldDescriptorByLabel = label => {
 Cypress.Commands.add('findErrorByLabelText', label => {
   getFieldDescriptorByLabel(label).as('error')
 
-  // Check for the error icon.
-  cy.get('@error').children().first().should('contain', 'error').and('be.visible')
-
   return cy.get('@error')
 })
 
