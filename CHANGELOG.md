@@ -31,7 +31,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.31.1] - unreleased
+## [3.31.1] - 2024-08-01
 
 ### Changed
 
