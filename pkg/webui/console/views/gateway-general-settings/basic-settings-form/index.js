@@ -69,6 +69,7 @@ const BasicSettingsForm = React.memo(props => {
     mayEditSecrets,
     shouldConfirmDelete,
     mayPurge,
+    supportsClaiming,
   } = props
 
   const userId = useSelector(selectUserId)
@@ -271,7 +272,7 @@ const BasicSettingsForm = React.memo(props => {
           <DeleteModalButton
             entityId={gtwId}
             entityName={gateway.name}
-            message={m.deleteGateway}
+            message={supportsClaiming ? m.unclaimAndDeleteGateway : m.deleteGateway}
             defaultMessage={m.deleteGatewayDefaultMessage}
             onApprove={onGatewayDelete}
             shouldConfirm={shouldConfirmDelete}
@@ -292,6 +293,7 @@ BasicSettingsForm.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   shouldConfirmDelete: PropTypes.bool.isRequired,
+  supportsClaiming: PropTypes.bool.isRequired,
 }
 
 export default BasicSettingsForm

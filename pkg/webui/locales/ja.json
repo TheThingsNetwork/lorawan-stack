@@ -819,6 +819,7 @@
   "console.views.gateway-general-settings.messages.adminContactDescription": "このゲートウェイの管理連絡先情報。通常、ゲートウェイに関する管理的な質問をする人を指すために使用されます。",
   "console.views.gateway-general-settings.messages.techContactDescription": "このゲートウェイの技術連絡先情報。通常、ゲートウェイに関する技術的/セキュリティ的な質問をする人を指すために使用されます。",
   "console.views.gateway-general-settings.messages.deleteGatewayDefaultMessage": "",
+  "console.views.gateway-general-settings.messages.unclaimAndDeleteGateway": "",
   "console.views.gateway-overview.index.downloadGlobalConf": "global_conf.json のダウンロード",
   "console.views.gateway-overview.index.globalConf": "グローバル設定",
   "console.views.gateway-overview.index.globalConfFailed": "global_conf.json のダウンロードに失敗しました",

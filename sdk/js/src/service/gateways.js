@@ -292,6 +292,16 @@ class Gateways {
 
     return Marshaler.payloadSingleResponse(result)
   }
+
+  async unclaim(gatewayId) {
+    const result = await this._api.GatewayClaimingServer.Unclaim({
+      routeParams: {
+        gateway_id: gatewayId,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(result)
+  }
 }
 
 export default Gateways
