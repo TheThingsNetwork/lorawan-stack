@@ -22,10 +22,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { eventMessages } from '@console/lib/events/definitions'
 
-import { getEventId } from '../utils'
 import messages from '../messages'
-
-import RawEventDetails from './raw'
 
 import style from './details.styl'
 
@@ -46,8 +43,6 @@ const SyntheticEventDetails = ({ event }) => (
         />
       </div>
     )}
-    <Message component="h4" content={messages.rawEvent} />
-    <RawEventDetails className={style.codeEditor} details={event} id={getEventId(event)} />
   </>
 )
 
