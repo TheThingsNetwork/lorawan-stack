@@ -18,6 +18,8 @@
 // All utility classes and CSS variables will be generated from this file.
 // Base colors are in the file `variables/colors.styl`.
 
+// Progression: min, extralight, light, semilight, normal, semibold, bold, heavy, max
+
 $tokens = {
 
   theme-light: {
@@ -31,8 +33,12 @@ $tokens = {
 
       'bg-neutral-min': $c.neutral-white, // Background color for panels, dropdowns, inputs, tab, table, ...
       'bg-neutral-min-hover': $c.neutral-025, // Background color for panels, dropdowns, inputs, tab, table, ... on hover.
+      'bg-neutral-extralight': $c.neutral-050, // Background for navigation element items.
       'bg-neutral-light': $c.neutral-075, // Background for navigation element items on hover.
       'bg-neutral-semilight': $c.neutral-100, // Background for the console dashboard.
+      'bg-neutral-normal': $c.neutral-500, // Background for the console dashboard on hover.
+      'bg-neutral-semibold': $c.neutral-700,
+      'bg-neutral-bold': $c.neutral-800,
       'bg-neutral-heavy': $c.neutral-900, // Background for navigation element items when active.
 
       // Brand
@@ -102,6 +108,8 @@ $tokens = {
       'text-warning-normal-hover': $c.warning-700, // Text color for warning information on hover.
       'text-error-normal-hover': $c.error-700, // Text color for error information on hover.
       'text-info-normal-hover': $c.information-700, // Text color for info information on hover.
+
+      'text-warning-light': $c.warning-400, // Text color for warning information on warning surface.
 
       // ICON COLORS
       // ===========
