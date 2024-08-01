@@ -132,7 +132,7 @@ func (gcls *gatewayClaimingServer) Claim(
 	defer func(ids *ttnpb.GatewayIdentifiers) {
 		if retErr != nil {
 			observability.RegisterAbortClaim(ctx, ids.GetEntityIdentifiers(), retErr)
-			if err := claimer.Unclaim(ctx, gatewayEUI, string(authCode)); err != nil {
+			if err := claimer.Unclaim(ctx, gatewayEUI); err != nil {
 				logger.WithError(err).Warn("Failed to unclaim gateway")
 			}
 			return
@@ -169,11 +169,24 @@ func (gcls gatewayClaimingServer) GetInfoByGatewayEUI(
 	if err != nil {
 		return nil, err
 	}
-	eui := types.MustEUI64(in.Eui).OrZero()
+	var (
+		eui              = types.MustEUI64(in.Eui).OrZero()
+		claimer          = gcls.upstream.Claimer(eui)
+		supportsClaiming = claimer != nil
+		isManaged        bool
+	)
+	if supportsClaiming {
+		var err error
+		isManaged, err = claimer.IsManagedGateway(ctx, eui)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return &ttnpb.GetInfoByGatewayEUIResponse{
 		Eui:              in.Eui,
-		SupportsClaiming: gcls.upstream.Claimer(eui) != nil,
+		SupportsClaiming: supportsClaiming,
+		IsManaged:        isManaged,
 	}, nil
 }
 
@@ -210,7 +223,7 @@ func (gcls gatewayClaimingServer) Unclaim(ctx context.Context, req *ttnpb.Gatewa
 		return nil, errGatewayClaimingNotSupported.WithAttributes("eui", gatewayEUI)
 	}
 
-	if err := claimer.Unclaim(ctx, gatewayEUI, gtw.GatewayServerAddress); err != nil {
+	if err := claimer.Unclaim(ctx, gatewayEUI); err != nil {
 		observability.RegisterFailUnclaim(ctx, gtw.GetEntityIdentifiers(), err)
 		return nil, err
 	}

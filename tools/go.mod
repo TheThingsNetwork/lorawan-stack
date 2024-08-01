@@ -218,7 +218,7 @@ require (
 	go.packetbroker.org/api/mapping/v2 v2.3.2 // indirect
 	go.packetbroker.org/api/routing v1.9.2 // indirect
 	go.packetbroker.org/api/v3 v3.17.1 // indirect
-	go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240723094213-b40a14f3b543 // indirect
+	go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240729145607-ea516688afbd // indirect
 	go.thethings.industries/pkg/ca v0.0.0-20240723151912-b9bb4097ae6c // indirect
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e // indirect
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0 // indirect

@@ -419,6 +419,9 @@ message GetInfoByGatewayEUIResponse {
     }
   ];
   bool supports_claiming = 2;
+  // Indicates whether the gateway is a managed gateway.
+  // If true, when the gateway is successfully claimed, it can be managed with ManagedGatewayConfigurationService.
+  bool is_managed = 3;
 }
 
 // The GatewayClaimingServer service support claiming and managing gateway claims.

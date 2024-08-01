@@ -17,28 +17,39 @@ package gateways
 
 import (
 	"context"
+	"crypto/tls"
 	"strings"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways/ttgc"
 	dcstypes "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+// Component is the interface to the component.
+type Component interface {
+	GetBaseConfig(context.Context) config.ServiceBase
+	GetTLSClientConfig(context.Context, ...tlsconfig.Option) (*tls.Config, error)
+}
+
 // Config is the configuration for the Gateway Claiming Server.
 type Config struct {
 	CreateOnNotFound            bool                `name:"create-on-not-found" description:"DEPRECATED"`                                      // nolint:lll
 	DefaultGatewayServerAddress string              `name:"default-gateway-server-address" description:"The default Gateway Server Address"`   // nolint:lll
 	Upstreams                   map[string][]string `name:"upstreams" description:"Map of upstream type and the supported Gateway EUI ranges"` // nolint:lll
-	TTGC                        ttgc.Config         `name:"ttgc"`
 }
 
-var errInvalidUpstream = errors.DefineInvalidArgument("invalid_upstream", "upstream `{name}` is invalid")
+var (
+	errInvalidUpstream = errors.DefineInvalidArgument("invalid_upstream", "upstream `{name}` is invalid")
+	errTTGCNotEnabled  = errors.DefineFailedPrecondition("ttgc_not_enabled", "TTGC is not enabled")
+)
 
 // ParseGatewayEUIRanges parses the configured upstream map and returns map of ranges.
-func ParseGatewayEUIRanges(config map[string][]string) (map[string][]dcstypes.EUI64Range, error) {
-	res := make(map[string][]dcstypes.EUI64Range, len(config))
-	for host, ranges := range config {
+func ParseGatewayEUIRanges(conf map[string][]string) (map[string][]dcstypes.EUI64Range, error) {
+	res := make(map[string][]dcstypes.EUI64Range, len(conf))
+	for host, ranges := range conf {
 		res[host] = make([]dcstypes.EUI64Range, 0, len(ranges))
 		for _, val := range ranges {
 			var r dcstypes.EUI64Range
@@ -76,7 +87,9 @@ type Claimer interface {
 	// Claim claims a gateway.
 	Claim(ctx context.Context, eui types.EUI64, ownerToken string, clusterAddress string) error
 	// Unclaim unclaims a gateway.
-	Unclaim(context.Context, types.EUI64, string) error
+	Unclaim(ctx context.Context, eui types.EUI64) error
+	// IsManagedGateway returns true if the gateway is a managed gateway.
+	IsManagedGateway(ctx context.Context, eui types.EUI64) (bool, error)
 }
 
 // rangeClaimer supports claiming a range of EUIs.
@@ -93,6 +106,7 @@ type Upstream struct {
 // NewUpstream returns a new upstream based on the provided configuration.
 func NewUpstream(
 	ctx context.Context,
+	c Component,
 	conf Config,
 	opts ...Option,
 ) (*Upstream, error) {
@@ -107,6 +121,17 @@ func NewUpstream(
 	if err != nil {
 		return nil, err
 	}
+
+	// Implicitly add TTGC if it is enabled and not already configured.
+	ttgcConf := c.GetBaseConfig(ctx).TTGC
+	if _, ttgcAdded := hosts["ttgc"]; ttgcConf.Enabled && !ttgcAdded {
+		ttgcRanges := make([]dcstypes.EUI64Range, len(ttgcConf.GatewayEUIs))
+		for i, prefix := range ttgcConf.GatewayEUIs {
+			ttgcRanges[i] = dcstypes.RangeFromEUI64Prefix(prefix)
+		}
+		hosts["ttgc"] = ttgcRanges
+	}
+
 	// Setup upstream table.
 	for name, ranges := range hosts {
 		if len(ranges) == 0 || name == "" {
@@ -115,7 +140,10 @@ func NewUpstream(
 		var claimer Claimer
 		switch name {
 		case "ttgc":
-			claimer, err = conf.TTGC.NewClient(ctx)
+			if !ttgcConf.Enabled {
+				return nil, errTTGCNotEnabled.New()
+			}
+			claimer, err = ttgc.New(ctx, c, ttgcConf)
 			if err != nil {
 				return nil, err
 			}

@@ -1696,6 +1696,8 @@ func (m *GetInfoByGatewayEUIResponse) ValidateFields(paths ...string) error {
 
 		case "supports_claiming":
 			// no validation rules for SupportsClaiming
+		case "is_managed":
+			// no validation rules for IsManaged
 		default:
 			return GetInfoByGatewayEUIResponseValidationError{
 				field:  name,

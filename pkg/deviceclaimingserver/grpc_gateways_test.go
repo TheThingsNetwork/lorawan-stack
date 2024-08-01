@@ -71,9 +71,14 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 		},
 	})
 
-	mockGatewayclaimer := &MockGatewayClaimer{}
+	mockGatewayclaimer := &MockGatewayClaimer{
+		IsManagedGatewayFunc: func(_ context.Context, e types.EUI64) (bool, error) {
+			return e.Equal(supportedEUI), nil
+		},
+	}
 	mockUpstream, err := gateways.NewUpstream(
 		ctx,
+		c,
 		gateways.Config{},
 		gateways.WithClaimer(
 			"mock",
@@ -156,6 +161,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 	a.So(err, should.BeNil)
 	a.So(resp.Eui, should.Resemble, unsupportedEUI.Bytes())
 	a.So(resp.SupportsClaiming, should.BeFalse)
+	a.So(resp.IsManaged, should.BeFalse)
 
 	resp, err = gclsClient.GetInfoByGatewayEUI(
 		ctx,
@@ -167,6 +173,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 	a.So(err, should.BeNil)
 	a.So(resp.Eui, should.Resemble, supportedEUI.Bytes())
 	a.So(resp.SupportsClaiming, should.BeTrue)
+	a.So(resp.IsManaged, should.BeTrue)
 
 	// Test claiming
 	for _, tc := range []struct {
@@ -175,7 +182,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 		CallOpt        grpc.CallOption
 		ClaimFunc      func(context.Context, types.EUI64, string, string) error
 		CreateFunc     func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error)
-		UnclaimFunc    func(context.Context, types.EUI64, string) error
+		UnclaimFunc    func(context.Context, types.EUI64) error
 		ErrorAssertion func(error) bool
 	}{
 		{
@@ -289,7 +296,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errCreate.New()
 			},
-			UnclaimFunc: func(_ context.Context, eui types.EUI64, _ string) error {
+			UnclaimFunc: func(_ context.Context, eui types.EUI64) error {
 				if eui.Equal(supportedEUI) {
 					return nil
 				}
@@ -317,7 +324,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errCreate.New()
 			},
-			UnclaimFunc: func(context.Context, types.EUI64, string) error {
+			UnclaimFunc: func(context.Context, types.EUI64) error {
 				return errUnclaim.New()
 			},
 			ErrorAssertion: errors.IsAborted,
@@ -373,7 +380,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 		Req            *ttnpb.GatewayIdentifiers
 		CallOpt        grpc.CallOption
 		GetFunc        func(context.Context, *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
-		UnclaimFunc    func(context.Context, types.EUI64, string) error
+		UnclaimFunc    func(context.Context, types.EUI64) error
 		ErrorAssertion func(error) bool
 	}{
 		{
@@ -460,7 +467,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 					GatewayServerAddress: "test.example.com",
 				}, nil
 			},
-			UnclaimFunc: func(context.Context, types.EUI64, string) error {
+			UnclaimFunc: func(context.Context, types.EUI64) error {
 				return errUnclaim.New()
 			},
 			CallOpt:        authorizedCallOpt,
@@ -480,7 +487,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 					GatewayServerAddress: "test.example.com",
 				}, nil
 			},
-			UnclaimFunc: func(context.Context, types.EUI64, string) error {
+			UnclaimFunc: func(context.Context, types.EUI64) error {
 				return nil
 			},
 			CallOpt: authorizedCallOpt,

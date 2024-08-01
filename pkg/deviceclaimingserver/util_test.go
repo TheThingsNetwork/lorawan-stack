@@ -80,8 +80,9 @@ func (m MockEndDeviceClaimer) BatchUnclaim(
 type MockGatewayClaimer struct {
 	EUIs []types.EUI64
 
-	ClaimFunc   func(context.Context, types.EUI64, string, string) error
-	UnclaimFunc func(context.Context, types.EUI64, string) error
+	ClaimFunc            func(context.Context, types.EUI64, string, string) error
+	UnclaimFunc          func(context.Context, types.EUI64) error
+	IsManagedGatewayFunc func(context.Context, types.EUI64) (bool, error)
 }
 
 // Claim implements gateways.Claimer.
@@ -95,8 +96,13 @@ func (claimer MockGatewayClaimer) Claim(
 }
 
 // Unclaim implements gateways.Claimer.
-func (claimer MockGatewayClaimer) Unclaim(ctx context.Context, eui types.EUI64, clusterAddress string) error {
-	return claimer.UnclaimFunc(ctx, eui, clusterAddress)
+func (claimer MockGatewayClaimer) Unclaim(ctx context.Context, eui types.EUI64) error {
+	return claimer.UnclaimFunc(ctx, eui)
+}
+
+// IsManagedGateway implements gateways.Claimer.
+func (claimer MockGatewayClaimer) IsManagedGateway(ctx context.Context, eui types.EUI64) (bool, error) {
+	return claimer.IsManagedGatewayFunc(ctx, eui)
 }
 
 type mockGatewayRegistry struct {

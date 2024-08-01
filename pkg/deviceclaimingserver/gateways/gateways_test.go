@@ -17,10 +17,14 @@ package gateways_test
 import (
 	"testing"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways"
-	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways/ttgc"
 	dcstypes "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttgc"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -30,6 +34,25 @@ func TestUpstream(t *testing.T) {
 	t.Parallel()
 
 	a, ctx := test.New(t)
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			TTGC: ttgc.Config{
+				Enabled: true,
+				GatewayEUIs: []types.EUI64Prefix{
+					{
+						EUI64:  types.EUI64{0x58, 0xa0, 0xcb, 0xff, 0xfe, 0x80, 0x00, 0x00},
+						Length: 48,
+					},
+				},
+				TLS: tlsconfig.ClientAuth{
+					Source:      "file",
+					Certificate: "testdata/client.pem",
+					Key:         "testdata/client-key.pem",
+				},
+			},
+		},
+	})
 
 	// Invalid ranges.
 	ranges := map[string][]string{"ttgc": {"&S(FU*)"}}
@@ -85,28 +108,25 @@ func TestUpstream(t *testing.T) {
 	})
 
 	// Invalid configurations
-	config := gateways.Config{
+	conf := gateways.Config{
 		Upstreams: map[string][]string{"ttgc": {"&S(FU*)"}},
-		TTGC:      ttgc.Config{},
 	}
-	upstream, err := gateways.NewUpstream(ctx, config)
+	upstream, err := gateways.NewUpstream(ctx, c, conf)
 	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 	a.So(upstream, should.BeNil)
 
-	config = gateways.Config{
+	conf = gateways.Config{
 		Upstreams: map[string][]string{"unsupported": {"58A0CBFFFE800000/48"}},
-		TTGC:      ttgc.Config{},
 	}
-	upstream, err = gateways.NewUpstream(ctx, config)
+	upstream, err = gateways.NewUpstream(ctx, c, conf)
 	a.So(errors.IsInvalidArgument(err), should.BeTrue)
 	a.So(upstream, should.BeNil)
 
 	// Valid Configuration
-	config = gateways.Config{
+	conf = gateways.Config{
 		Upstreams: map[string][]string{"ttgc": {"58A0CBFFFE800000/48"}},
-		TTGC:      ttgc.Config{},
 	}
-	upstream, err = gateways.NewUpstream(ctx, config)
+	upstream, err = gateways.NewUpstream(ctx, c, conf)
 	a.So(err, should.BeNil)
 	a.So(upstream, should.NotBeNil)
 

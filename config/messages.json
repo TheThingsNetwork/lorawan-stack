@@ -3923,18 +3923,36 @@
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/gateways/ttgc:not_implemented": {
+  "error:pkg/deviceclaimingserver/gateways/ttgc:dial_gateway_server": {
     "translations": {
-      "en": "not implemented"
+      "en": "dial Gateway Gerver"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/gateways/ttgc",
-      "file": "ttgc.go"
+      "file": "root_ca.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/gateways/ttgc:gateway_server_tls": {
+    "translations": {
+      "en": "establish TLS connection with Gateway Server"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways/ttgc",
+      "file": "root_ca.go"
     }
   },
   "error:pkg/deviceclaimingserver/gateways:invalid_upstream": {
     "translations": {
       "en": "upstream `{name}` is invalid"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways",
+      "file": "gateways.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/gateways:ttgc_not_enabled": {
+    "translations": {
+      "en": "TTGC is not enabled"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/gateways",

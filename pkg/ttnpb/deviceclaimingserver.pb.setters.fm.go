@@ -814,6 +814,16 @@ func (dst *GetInfoByGatewayEUIResponse) SetFields(src *GetInfoByGatewayEUIRespon
 				var zero bool
 				dst.SupportsClaiming = zero
 			}
+		case "is_managed":
+			if len(subs) > 0 {
+				return fmt.Errorf("'is_managed' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IsManaged = src.IsManaged
+			} else {
+				var zero bool
+				dst.IsManaged = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

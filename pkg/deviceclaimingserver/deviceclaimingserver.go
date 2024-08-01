@@ -74,7 +74,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 	}
 
 	if dcs.grpc.gatewayClaimingServer == nil {
-		upstream, err := gateways.NewUpstream(ctx, conf.GatewayClaimingServerConfig)
+		upstream, err := gateways.NewUpstream(ctx, c, conf.GatewayClaimingServerConfig)
 		if err != nil {
 			return nil, err
 		}

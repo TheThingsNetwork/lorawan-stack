@@ -24696,6 +24696,10 @@
         },
         "supports_claiming": {
           "type": "boolean"
+        },
+        "is_managed": {
+          "type": "boolean",
+          "description": "Indicates whether the gateway is a managed gateway.\nIf true, when the gateway is successfully claimed, it can be managed with ManagedGatewayConfigurationService."
         }
       }
     },
