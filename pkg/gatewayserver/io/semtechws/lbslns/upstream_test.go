@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/id6"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -661,10 +662,10 @@ func TestTxAck(t *testing.T) {
 		RawPayload:     []byte{0x00, 0x00},
 		CorrelationIds: []string{"cid:1", "cid:2"},
 	}
-	var lnsLNS lbsLNS
+	var tokens io.DownlinkTokens
 	now := time.Now()
-	lnsLNS.tokens.Next(msg, time.Unix(int64(0), 0))
-	txAck := txConf.ToTxAck(context.Background(), lnsLNS.tokens, now)
+	tokens.Next(msg, time.Unix(int64(0), 0))
+	txAck := txConf.ToTxAck(context.Background(), &tokens, now)
 	if !a.So(txAck, should.Resemble, &ttnpb.TxAcknowledgment{
 		DownlinkMessage: msg,
 		CorrelationIds:  msg.CorrelationIds,

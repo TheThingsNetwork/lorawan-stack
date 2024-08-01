@@ -304,6 +304,9 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		defer ticker.Stop()
 	}
 
+	// Store per-gateway downlink tokens to correlate with Tx acknowledgement messages.
+	downlinkTokens := io.DownlinkTokens{}
+
 	go func() (err error) {
 		defer ws.Close()
 		defer func() {
@@ -349,7 +352,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 					return err
 				}
 			case down := <-conn.Down():
-				dnmsg, err := s.formatter.FromDownlink(ctx, down, conn.BandID(), time.Now())
+				dnmsg, err := s.formatter.FromDownlink(ctx, down, conn.BandID(), time.Now(), &downlinkTokens)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
@@ -378,7 +381,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 			logger.WithError(err).Debug("Failed to read message")
 			return err
 		}
-		downstream, err := s.formatter.HandleUp(ctx, data, ids, conn, time.Now())
+		downstream, err := s.formatter.HandleUp(ctx, data, ids, conn, time.Now(), &downlinkTokens)
 		if err != nil {
 			return err
 		}

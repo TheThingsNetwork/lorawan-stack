@@ -53,10 +53,21 @@ type Formatter interface {
 	// HandleUp handles upstream messages from web socket based gateways.
 	// This function optionally returns a byte stream to be sent as response to the upstream message.
 	HandleUp(
-		ctx context.Context, raw []byte, ids *ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time,
+		ctx context.Context,
+		raw []byte,
+		ids *ttnpb.GatewayIdentifiers,
+		conn *io.Connection,
+		receivedAt time.Time,
+		tokens *io.DownlinkTokens,
 	) ([]byte, error)
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
-	FromDownlink(ctx context.Context, down *ttnpb.DownlinkMessage, bandID string, dlTime time.Time) ([]byte, error)
+	FromDownlink(
+		ctx context.Context,
+		down *ttnpb.DownlinkMessage,
+		bandID string,
+		dlTime time.Time,
+		tokens *io.DownlinkTokens,
+	) ([]byte, error)
 	// TransferTime generates a spurious time transfer message for a particular server time.
 	TransferTime(
 		ctx context.Context, serverTime time.Time, gpsTime *time.Time, concentratorTime *scheduling.ConcentratorTime,
