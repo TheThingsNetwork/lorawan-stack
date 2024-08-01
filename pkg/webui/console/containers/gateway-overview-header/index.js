@@ -135,7 +135,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
 
   return (
     <div className={style.root}>
-      <div className="overflow-hidden">
+      <div className="overflow-hidden d-flex flex-column gap-cs-xs">
         <h5 className={style.name}>{name || gateway_id}</h5>
         <span className={style.id}>
           <Message className={style.idPrefix} content={sharedMessages.id} uppercase />

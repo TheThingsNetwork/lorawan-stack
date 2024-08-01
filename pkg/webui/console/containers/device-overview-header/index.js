@@ -303,7 +303,7 @@ const DeviceOverviewHeader = ({ device }) => {
 
   return (
     <div className={style.root}>
-      <div>
+      <div className="overflow-hidden d-flex flex-column gap-cs-xs">
         <h5 className={style.name}>{name || device_id}</h5>
         <span className={style.id}>
           <Message className={style.idPrefix} content={sharedMessages.id} uppercase />

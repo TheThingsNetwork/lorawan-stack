@@ -20,12 +20,12 @@
   justify-content: space-between
   gap: $cs.xl
   align-items: center
-  padding: $cs.m
+  padding: $cs.m $cs.m
   background-color: var(--c-bg-neutral-min)
   border-bottom: 1px solid var(--c-border-neutral-light)
 
   .name
-    line-height: normal
+    line-height: 1
     white-space: nowrap
     color: var(--c-text-neutral-heavy)
     font-weight: $fw.bold
@@ -34,7 +34,9 @@
 
   .id
     color: var(--c-text-neutral-semilight)
-    font-size: $fs.xs
+    font-size: $fs.s
+    line-height: 1
+    display: block
     font-family: $font-family-mono
     &-prefix
       &:after
