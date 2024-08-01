@@ -138,6 +138,16 @@ func (dst *GatewayVersionIdentifiers) SetFields(src *GatewayVersionIdentifiers, 
 				var zero string
 				dst.FirmwareVersion = zero
 			}
+		case "runtime_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'runtime_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RuntimeVersion = src.RuntimeVersion
+			} else {
+				var zero string
+				dst.RuntimeVersion = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -719,6 +729,1066 @@ func (dst *Gateways) SetFields(src *Gateways, paths ...string) error {
 				dst.Gateways = src.Gateways
 			} else {
 				dst.Gateways = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGateway) SetFields(src *ManagedGateway, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &GatewayIdentifiers{}
+					dst.Ids = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Ids = src.Ids
+				} else {
+					dst.Ids = nil
+				}
+			}
+		case "version_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayVersionIdentifiers
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.VersionIds
+				}
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
+				} else {
+					newDst = &GatewayVersionIdentifiers{}
+					dst.VersionIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.VersionIds = src.VersionIds
+				} else {
+					dst.VersionIds = nil
+				}
+			}
+		case "cellular_imei":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cellular_imei' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CellularImei = src.CellularImei
+			} else {
+				var zero string
+				dst.CellularImei = zero
+			}
+		case "cellular_imsi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cellular_imsi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CellularImsi = src.CellularImsi
+			} else {
+				var zero string
+				dst.CellularImsi = zero
+			}
+		case "wifi_mac_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'wifi_mac_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WifiMacAddress = src.WifiMacAddress
+			} else {
+				dst.WifiMacAddress = nil
+			}
+		case "ethernet_mac_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ethernet_mac_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EthernetMacAddress = src.EthernetMacAddress
+			} else {
+				dst.EthernetMacAddress = nil
+			}
+		case "wifi_profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'wifi_profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WifiProfileId = src.WifiProfileId
+			} else {
+				var zero string
+				dst.WifiProfileId = zero
+			}
+		case "ethernet_profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ethernet_profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EthernetProfileId = src.EthernetProfileId
+			} else {
+				var zero string
+				dst.EthernetProfileId = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayWiFiAccessPoint) SetFields(src *ManagedGatewayWiFiAccessPoint, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ssid":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ssid' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Ssid = src.Ssid
+			} else {
+				var zero string
+				dst.Ssid = zero
+			}
+		case "bssid":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bssid' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Bssid = src.Bssid
+			} else {
+				dst.Bssid = nil
+			}
+		case "channel":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Channel = src.Channel
+			} else {
+				var zero uint32
+				dst.Channel = zero
+			}
+		case "authentication_mode":
+			if len(subs) > 0 {
+				return fmt.Errorf("'authentication_mode' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AuthenticationMode = src.AuthenticationMode
+			} else {
+				var zero string
+				dst.AuthenticationMode = zero
+			}
+		case "rssi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rssi = src.Rssi
+			} else {
+				var zero float32
+				dst.Rssi = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayWiFiAccessPoints) SetFields(src *ManagedGatewayWiFiAccessPoints, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "access_points":
+			if len(subs) > 0 {
+				return fmt.Errorf("'access_points' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AccessPoints = src.AccessPoints
+			} else {
+				dst.AccessPoints = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayNetworkInterfaceAddresses) SetFields(src *ManagedGatewayNetworkInterfaceAddresses, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ip_addresses":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ip_addresses' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IpAddresses = src.IpAddresses
+			} else {
+				dst.IpAddresses = nil
+			}
+		case "subnet_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'subnet_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SubnetMask = src.SubnetMask
+			} else {
+				var zero string
+				dst.SubnetMask = zero
+			}
+		case "gateway":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Gateway = src.Gateway
+			} else {
+				var zero string
+				dst.Gateway = zero
+			}
+		case "dns_servers":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dns_servers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DnsServers = src.DnsServers
+			} else {
+				dst.DnsServers = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewaySystemStatus) SetFields(src *ManagedGatewaySystemStatus, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "cpu_temperature":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cpu_temperature' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CpuTemperature = src.CpuTemperature
+			} else {
+				dst.CpuTemperature = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayControllerConnection) SetFields(src *ManagedGatewayControllerConnection, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "network_interface_type":
+			if len(subs) > 0 {
+				return fmt.Errorf("'network_interface_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetworkInterfaceType = src.NetworkInterfaceType
+			} else {
+				dst.NetworkInterfaceType = 0
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayGatewayServerConnection) SetFields(src *ManagedGatewayGatewayServerConnection, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "network_interface_type":
+			if len(subs) > 0 {
+				return fmt.Errorf("'network_interface_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetworkInterfaceType = src.NetworkInterfaceType
+			} else {
+				dst.NetworkInterfaceType = 0
+			}
+		case "address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Address = src.Address
+			} else {
+				var zero string
+				dst.Address = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayNetworkInterfaceInfo) SetFields(src *ManagedGatewayNetworkInterfaceInfo, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "status":
+			if len(subs) > 0 {
+				return fmt.Errorf("'status' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Status = src.Status
+			} else {
+				dst.Status = 0
+			}
+		case "dhcp_enabled":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dhcp_enabled' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DhcpEnabled = src.DhcpEnabled
+			} else {
+				var zero bool
+				dst.DhcpEnabled = zero
+			}
+		case "addresses":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayNetworkInterfaceAddresses
+				if (src == nil || src.Addresses == nil) && dst.Addresses == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Addresses
+				}
+				if dst.Addresses != nil {
+					newDst = dst.Addresses
+				} else {
+					newDst = &ManagedGatewayNetworkInterfaceAddresses{}
+					dst.Addresses = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Addresses = src.Addresses
+				} else {
+					dst.Addresses = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayCellularBackhaul) SetFields(src *ManagedGatewayCellularBackhaul, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "network_interface":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayNetworkInterfaceInfo
+				if (src == nil || src.NetworkInterface == nil) && dst.NetworkInterface == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkInterface
+				}
+				if dst.NetworkInterface != nil {
+					newDst = dst.NetworkInterface
+				} else {
+					newDst = &ManagedGatewayNetworkInterfaceInfo{}
+					dst.NetworkInterface = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkInterface = src.NetworkInterface
+				} else {
+					dst.NetworkInterface = nil
+				}
+			}
+		case "operator":
+			if len(subs) > 0 {
+				return fmt.Errorf("'operator' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Operator = src.Operator
+			} else {
+				var zero string
+				dst.Operator = zero
+			}
+		case "rssi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rssi = src.Rssi
+			} else {
+				dst.Rssi = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayWiFiBackhaul) SetFields(src *ManagedGatewayWiFiBackhaul, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "network_interface":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayNetworkInterfaceInfo
+				if (src == nil || src.NetworkInterface == nil) && dst.NetworkInterface == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkInterface
+				}
+				if dst.NetworkInterface != nil {
+					newDst = dst.NetworkInterface
+				} else {
+					newDst = &ManagedGatewayNetworkInterfaceInfo{}
+					dst.NetworkInterface = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkInterface = src.NetworkInterface
+				} else {
+					dst.NetworkInterface = nil
+				}
+			}
+		case "ssid":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ssid' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Ssid = src.Ssid
+			} else {
+				var zero string
+				dst.Ssid = zero
+			}
+		case "bssid":
+			if len(subs) > 0 {
+				return fmt.Errorf("'bssid' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Bssid = src.Bssid
+			} else {
+				dst.Bssid = nil
+			}
+		case "channel":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Channel = src.Channel
+			} else {
+				var zero uint32
+				dst.Channel = zero
+			}
+		case "authentication_mode":
+			if len(subs) > 0 {
+				return fmt.Errorf("'authentication_mode' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AuthenticationMode = src.AuthenticationMode
+			} else {
+				var zero string
+				dst.AuthenticationMode = zero
+			}
+		case "rssi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rssi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rssi = src.Rssi
+			} else {
+				dst.Rssi = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayEthernetBackhaul) SetFields(src *ManagedGatewayEthernetBackhaul, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "network_interface":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayNetworkInterfaceInfo
+				if (src == nil || src.NetworkInterface == nil) && dst.NetworkInterface == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkInterface
+				}
+				if dst.NetworkInterface != nil {
+					newDst = dst.NetworkInterface
+				} else {
+					newDst = &ManagedGatewayNetworkInterfaceInfo{}
+					dst.NetworkInterface = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkInterface = src.NetworkInterface
+				} else {
+					dst.NetworkInterface = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayEventData) SetFields(src *ManagedGatewayEventData, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "data":
+			if len(subs) == 0 && src == nil {
+				dst.Data = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Data = src.Data
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "entity":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_Entity)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'entity', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_Entity)
+					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'entity', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ManagedGateway
+						if srcTypeOk {
+							newSrc = src.Data.(*ManagedGatewayEventData_Entity).Entity
+						}
+						if dstTypeOk {
+							newDst = dst.Data.(*ManagedGatewayEventData_Entity).Entity
+						} else if srcTypeOk {
+							newDst = &ManagedGateway{}
+							dst.Data = &ManagedGatewayEventData_Entity{Entity: newDst}
+						} else {
+							dst.Data = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+				case "location":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_Location)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'location', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_Location)
+					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'location', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *Location
+						if srcTypeOk {
+							newSrc = src.Data.(*ManagedGatewayEventData_Location).Location
+						}
+						if dstTypeOk {
+							newDst = dst.Data.(*ManagedGatewayEventData_Location).Location
+						} else if srcTypeOk {
+							newDst = &Location{}
+							dst.Data = &ManagedGatewayEventData_Location{Location: newDst}
+						} else {
+							dst.Data = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+				case "system_status":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_SystemStatus)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'system_status', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_SystemStatus)
+					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'system_status', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ManagedGatewaySystemStatus
+						if srcTypeOk {
+							newSrc = src.Data.(*ManagedGatewayEventData_SystemStatus).SystemStatus
+						}
+						if dstTypeOk {
+							newDst = dst.Data.(*ManagedGatewayEventData_SystemStatus).SystemStatus
+						} else if srcTypeOk {
+							newDst = &ManagedGatewaySystemStatus{}
+							dst.Data = &ManagedGatewayEventData_SystemStatus{SystemStatus: newDst}
+						} else {
+							dst.Data = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+				case "controller_connection":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_ControllerConnection)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'controller_connection', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_ControllerConnection)
+					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'controller_connection', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ManagedGatewayControllerConnection
+						if srcTypeOk {
+							newSrc = src.Data.(*ManagedGatewayEventData_ControllerConnection).ControllerConnection
+						}
+						if dstTypeOk {
+							newDst = dst.Data.(*ManagedGatewayEventData_ControllerConnection).ControllerConnection
+						} else if srcTypeOk {
+							newDst = &ManagedGatewayControllerConnection{}
+							dst.Data = &ManagedGatewayEventData_ControllerConnection{ControllerConnection: newDst}
+						} else {
+							dst.Data = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+				case "gateway_server_connection":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_GatewayServerConnection)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'gateway_server_connection', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_GatewayServerConnection)
+					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'gateway_server_connection', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ManagedGatewayGatewayServerConnection
+						if srcTypeOk {
+							newSrc = src.Data.(*ManagedGatewayEventData_GatewayServerConnection).GatewayServerConnection
+						}
+						if dstTypeOk {
+							newDst = dst.Data.(*ManagedGatewayEventData_GatewayServerConnection).GatewayServerConnection
+						} else if srcTypeOk {
+							newDst = &ManagedGatewayGatewayServerConnection{}
+							dst.Data = &ManagedGatewayEventData_GatewayServerConnection{GatewayServerConnection: newDst}
+						} else {
+							dst.Data = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+				case "cellular_backhaul":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_CellularBackhaul)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'cellular_backhaul', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_CellularBackhaul)
+					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'cellular_backhaul', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ManagedGatewayCellularBackhaul
+						if srcTypeOk {
+							newSrc = src.Data.(*ManagedGatewayEventData_CellularBackhaul).CellularBackhaul
+						}
+						if dstTypeOk {
+							newDst = dst.Data.(*ManagedGatewayEventData_CellularBackhaul).CellularBackhaul
+						} else if srcTypeOk {
+							newDst = &ManagedGatewayCellularBackhaul{}
+							dst.Data = &ManagedGatewayEventData_CellularBackhaul{CellularBackhaul: newDst}
+						} else {
+							dst.Data = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+				case "wifi_backhaul":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_WifiBackhaul)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'wifi_backhaul', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_WifiBackhaul)
+					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'wifi_backhaul', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ManagedGatewayWiFiBackhaul
+						if srcTypeOk {
+							newSrc = src.Data.(*ManagedGatewayEventData_WifiBackhaul).WifiBackhaul
+						}
+						if dstTypeOk {
+							newDst = dst.Data.(*ManagedGatewayEventData_WifiBackhaul).WifiBackhaul
+						} else if srcTypeOk {
+							newDst = &ManagedGatewayWiFiBackhaul{}
+							dst.Data = &ManagedGatewayEventData_WifiBackhaul{WifiBackhaul: newDst}
+						} else {
+							dst.Data = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+				case "ethernet_backhaul":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Data.(*ManagedGatewayEventData_EthernetBackhaul)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Data == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'ethernet_backhaul', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Data.(*ManagedGatewayEventData_EthernetBackhaul)
+					if dstValid := dstTypeOk || dst.Data == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'ethernet_backhaul', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ManagedGatewayEthernetBackhaul
+						if srcTypeOk {
+							newSrc = src.Data.(*ManagedGatewayEventData_EthernetBackhaul).EthernetBackhaul
+						}
+						if dstTypeOk {
+							newDst = dst.Data.(*ManagedGatewayEventData_EthernetBackhaul).EthernetBackhaul
+						} else if srcTypeOk {
+							newDst = &ManagedGatewayEthernetBackhaul{}
+							dst.Data = &ManagedGatewayEventData_EthernetBackhaul{EthernetBackhaul: newDst}
+						} else {
+							dst.Data = nil
+							continue
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if srcTypeOk {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayWiFiProfile) SetFields(src *ManagedGatewayWiFiProfile, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+		case "profile_name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileName = src.ProfileName
+			} else {
+				var zero string
+				dst.ProfileName = zero
+			}
+		case "shared":
+			if len(subs) > 0 {
+				return fmt.Errorf("'shared' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Shared = src.Shared
+			} else {
+				var zero bool
+				dst.Shared = zero
+			}
+		case "ssid":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ssid' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Ssid = src.Ssid
+			} else {
+				var zero string
+				dst.Ssid = zero
+			}
+		case "password":
+			if len(subs) > 0 {
+				return fmt.Errorf("'password' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Password = src.Password
+			} else {
+				var zero string
+				dst.Password = zero
+			}
+		case "network_interface_addresses":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayNetworkInterfaceAddresses
+				if (src == nil || src.NetworkInterfaceAddresses == nil) && dst.NetworkInterfaceAddresses == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkInterfaceAddresses
+				}
+				if dst.NetworkInterfaceAddresses != nil {
+					newDst = dst.NetworkInterfaceAddresses
+				} else {
+					newDst = &ManagedGatewayNetworkInterfaceAddresses{}
+					dst.NetworkInterfaceAddresses = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkInterfaceAddresses = src.NetworkInterfaceAddresses
+				} else {
+					dst.NetworkInterfaceAddresses = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayWiFiProfiles) SetFields(src *ManagedGatewayWiFiProfiles, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profiles":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profiles' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Profiles = src.Profiles
+			} else {
+				dst.Profiles = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayEthernetProfile) SetFields(src *ManagedGatewayEthernetProfile, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+		case "profile_name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileName = src.ProfileName
+			} else {
+				var zero string
+				dst.ProfileName = zero
+			}
+		case "shared":
+			if len(subs) > 0 {
+				return fmt.Errorf("'shared' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Shared = src.Shared
+			} else {
+				var zero bool
+				dst.Shared = zero
+			}
+		case "network_interface_addresses":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGatewayNetworkInterfaceAddresses
+				if (src == nil || src.NetworkInterfaceAddresses == nil) && dst.NetworkInterfaceAddresses == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkInterfaceAddresses
+				}
+				if dst.NetworkInterfaceAddresses != nil {
+					newDst = dst.NetworkInterfaceAddresses
+				} else {
+					newDst = &ManagedGatewayNetworkInterfaceAddresses{}
+					dst.NetworkInterfaceAddresses = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkInterfaceAddresses = src.NetworkInterfaceAddresses
+				} else {
+					dst.NetworkInterfaceAddresses = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGatewayEthernetProfiles) SetFields(src *ManagedGatewayEthernetProfiles, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "profiles":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profiles' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Profiles = src.Profiles
+			} else {
+				dst.Profiles = nil
 			}
 
 		default:

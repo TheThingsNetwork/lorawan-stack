@@ -18,7 +18,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	gcsv2 "go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver/v2"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver/managed"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver/ttkg"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -30,21 +31,31 @@ type Server struct {
 
 	*component.Component
 	config *Config
+
+	managedServer *managed.Server
 }
 
 // Roles returns the roles that the Gateway Configuration Server fulfills.
-func (s *Server) Roles() []ttnpb.ClusterRole {
+func (*Server) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER}
 }
 
 // RegisterServices registers services provided by gcs at s.
 func (s *Server) RegisterServices(grpcServer *grpc.Server) {
 	ttnpb.RegisterGatewayConfigurationServiceServer(grpcServer, s)
+	if s.managedServer != nil {
+		s.managedServer.RegisterServices(grpcServer)
+	}
 }
 
 // RegisterHandlers registers gRPC handlers.
+//
+//nolint:errcheck
 func (s *Server) RegisterHandlers(mux *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterGatewayConfigurationServiceHandler(s.Context(), mux, conn)
+	if s.managedServer != nil {
+		s.managedServer.RegisterHandlers(mux, conn)
+	}
 }
 
 // New returns new *Server.
@@ -57,11 +68,19 @@ func New(c *component.Component, conf *Config) (*Server, error) {
 	bsCUPS := conf.BasicStation.NewServer(c)
 	_ = bsCUPS
 
-	v2GCS := gcsv2.New(c, gcsv2.WithTheThingsGatewayConfig(conf.TheThingsGateway))
-	_ = v2GCS
+	ttkgServer := ttkg.New(c, ttkg.WithConfig(conf.TheThingsKickstarterGateway))
+	_ = ttkgServer
 
-	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayconfigurationserver"))
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayconfigurationserver")) //nolint:lll
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", cluster.HookName, c.ClusterAuthUnaryHook())
+
+	if ttgcConf := c.GetBaseConfig(c.Context()).TTGC; ttgcConf.Enabled {
+		var err error
+		gcs.managedServer, err = managed.New(c.Context(), c, ttgcConf)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	c.RegisterGRPC(gcs)
 	c.RegisterWeb(gcs)

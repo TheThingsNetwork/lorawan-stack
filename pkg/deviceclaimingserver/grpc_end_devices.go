@@ -36,7 +36,6 @@ var (
 		"DevEUI/JoinEUI not set for device",
 	)
 	errDeviceNotFound       = errors.DefineNotFound("device_not_found", "device not found")
-	errMethodUnavailable    = errors.DefineUnimplemented("method_unavailable", "method unavailable")
 	errClaimingNotSupported = errors.DefineAborted(
 		"claiming_not_supported",
 		"claiming not supported for JoinEUI `{eui}`",
@@ -215,10 +214,8 @@ func (dcs *DeviceClaimingServer) getEndDevices(
 	if err != nil {
 		return nil, err
 	}
-	client, err := ttnpb.NewEndDeviceBatchRegistryClient(conn), nil
-	if err != nil {
-		return nil, err
-	}
+	client := ttnpb.NewEndDeviceBatchRegistryClient(conn)
+
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, dcs.AllowInsecureForCredentials())
 	if err != nil {
 		return nil, err

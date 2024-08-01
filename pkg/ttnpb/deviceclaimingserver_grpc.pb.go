@@ -479,9 +479,10 @@ var EndDeviceBatchClaimingServer_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	GatewayClaimingServer_Claim_FullMethodName               = "/ttn.lorawan.v3.GatewayClaimingServer/Claim"
+	GatewayClaimingServer_Unclaim_FullMethodName             = "/ttn.lorawan.v3.GatewayClaimingServer/Unclaim"
+	GatewayClaimingServer_GetInfoByGatewayEUI_FullMethodName = "/ttn.lorawan.v3.GatewayClaimingServer/GetInfoByGatewayEUI"
 	GatewayClaimingServer_AuthorizeGateway_FullMethodName    = "/ttn.lorawan.v3.GatewayClaimingServer/AuthorizeGateway"
 	GatewayClaimingServer_UnauthorizeGateway_FullMethodName  = "/ttn.lorawan.v3.GatewayClaimingServer/UnauthorizeGateway"
-	GatewayClaimingServer_GetInfoByGatewayEUI_FullMethodName = "/ttn.lorawan.v3.GatewayClaimingServer/GetInfoByGatewayEUI"
 )
 
 // GatewayClaimingServerClient is the client API for GatewayClaimingServer service.
@@ -490,12 +491,21 @@ const (
 type GatewayClaimingServerClient interface {
 	// Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user.
 	Claim(ctx context.Context, in *ClaimGatewayRequest, opts ...grpc.CallOption) (*GatewayIdentifiers, error)
-	// AuthorizeGateway allows a gateway to be claimed.
-	AuthorizeGateway(ctx context.Context, in *AuthorizeGatewayRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// UnauthorizeGateway prevents a gateway from being claimed.
-	UnauthorizeGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Unclaims the gateway.
+	// EUI provided in the request are ignored and the end device is looked up by the gateway ID.
+	Unclaim(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Return whether claiming is available for a given gateway EUI.
 	GetInfoByGatewayEUI(ctx context.Context, in *GetInfoByGatewayEUIRequest, opts ...grpc.CallOption) (*GetInfoByGatewayEUIResponse, error)
+	// Deprecated: Do not use.
+	// AuthorizeGateway allows a gateway to be claimed.
+	// DEPRECATED: Authorizing gateways for claiming is no longer supported and will be removed in a future version of The
+	// Things Stack.
+	AuthorizeGateway(ctx context.Context, in *AuthorizeGatewayRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Deprecated: Do not use.
+	// UnauthorizeGateway prevents a gateway from being claimed.
+	// DEPRECATED: Unauthorizing (locking) gateways for claiming is no longer supported and will be removed in a future
+	// version of The Things Stack.
+	UnauthorizeGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type gatewayClaimingServerClient struct {
@@ -515,18 +525,9 @@ func (c *gatewayClaimingServerClient) Claim(ctx context.Context, in *ClaimGatewa
 	return out, nil
 }
 
-func (c *gatewayClaimingServerClient) AuthorizeGateway(ctx context.Context, in *AuthorizeGatewayRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *gatewayClaimingServerClient) Unclaim(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, GatewayClaimingServer_AuthorizeGateway_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gatewayClaimingServerClient) UnauthorizeGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, GatewayClaimingServer_UnauthorizeGateway_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, GatewayClaimingServer_Unclaim_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -542,18 +543,47 @@ func (c *gatewayClaimingServerClient) GetInfoByGatewayEUI(ctx context.Context, i
 	return out, nil
 }
 
+// Deprecated: Do not use.
+func (c *gatewayClaimingServerClient) AuthorizeGateway(ctx context.Context, in *AuthorizeGatewayRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GatewayClaimingServer_AuthorizeGateway_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Deprecated: Do not use.
+func (c *gatewayClaimingServerClient) UnauthorizeGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GatewayClaimingServer_UnauthorizeGateway_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GatewayClaimingServerServer is the server API for GatewayClaimingServer service.
 // All implementations must embed UnimplementedGatewayClaimingServerServer
 // for forward compatibility
 type GatewayClaimingServerServer interface {
 	// Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user.
 	Claim(context.Context, *ClaimGatewayRequest) (*GatewayIdentifiers, error)
-	// AuthorizeGateway allows a gateway to be claimed.
-	AuthorizeGateway(context.Context, *AuthorizeGatewayRequest) (*emptypb.Empty, error)
-	// UnauthorizeGateway prevents a gateway from being claimed.
-	UnauthorizeGateway(context.Context, *GatewayIdentifiers) (*emptypb.Empty, error)
+	// Unclaims the gateway.
+	// EUI provided in the request are ignored and the end device is looked up by the gateway ID.
+	Unclaim(context.Context, *GatewayIdentifiers) (*emptypb.Empty, error)
 	// Return whether claiming is available for a given gateway EUI.
 	GetInfoByGatewayEUI(context.Context, *GetInfoByGatewayEUIRequest) (*GetInfoByGatewayEUIResponse, error)
+	// Deprecated: Do not use.
+	// AuthorizeGateway allows a gateway to be claimed.
+	// DEPRECATED: Authorizing gateways for claiming is no longer supported and will be removed in a future version of The
+	// Things Stack.
+	AuthorizeGateway(context.Context, *AuthorizeGatewayRequest) (*emptypb.Empty, error)
+	// Deprecated: Do not use.
+	// UnauthorizeGateway prevents a gateway from being claimed.
+	// DEPRECATED: Unauthorizing (locking) gateways for claiming is no longer supported and will be removed in a future
+	// version of The Things Stack.
+	UnauthorizeGateway(context.Context, *GatewayIdentifiers) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGatewayClaimingServerServer()
 }
 
@@ -564,14 +594,17 @@ type UnimplementedGatewayClaimingServerServer struct {
 func (UnimplementedGatewayClaimingServerServer) Claim(context.Context, *ClaimGatewayRequest) (*GatewayIdentifiers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Claim not implemented")
 }
+func (UnimplementedGatewayClaimingServerServer) Unclaim(context.Context, *GatewayIdentifiers) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Unclaim not implemented")
+}
+func (UnimplementedGatewayClaimingServerServer) GetInfoByGatewayEUI(context.Context, *GetInfoByGatewayEUIRequest) (*GetInfoByGatewayEUIResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInfoByGatewayEUI not implemented")
+}
 func (UnimplementedGatewayClaimingServerServer) AuthorizeGateway(context.Context, *AuthorizeGatewayRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthorizeGateway not implemented")
 }
 func (UnimplementedGatewayClaimingServerServer) UnauthorizeGateway(context.Context, *GatewayIdentifiers) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnauthorizeGateway not implemented")
-}
-func (UnimplementedGatewayClaimingServerServer) GetInfoByGatewayEUI(context.Context, *GetInfoByGatewayEUIRequest) (*GetInfoByGatewayEUIResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetInfoByGatewayEUI not implemented")
 }
 func (UnimplementedGatewayClaimingServerServer) mustEmbedUnimplementedGatewayClaimingServerServer() {}
 
@@ -600,6 +633,42 @@ func _GatewayClaimingServer_Claim_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GatewayClaimingServerServer).Claim(ctx, req.(*ClaimGatewayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GatewayClaimingServer_Unclaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayClaimingServerServer).Unclaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayClaimingServer_Unclaim_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayClaimingServerServer).Unclaim(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GatewayClaimingServer_GetInfoByGatewayEUI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInfoByGatewayEUIRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayClaimingServerServer).GetInfoByGatewayEUI(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayClaimingServer_GetInfoByGatewayEUI_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayClaimingServerServer).GetInfoByGatewayEUI(ctx, req.(*GetInfoByGatewayEUIRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -640,24 +709,6 @@ func _GatewayClaimingServer_UnauthorizeGateway_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GatewayClaimingServer_GetInfoByGatewayEUI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetInfoByGatewayEUIRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GatewayClaimingServerServer).GetInfoByGatewayEUI(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: GatewayClaimingServer_GetInfoByGatewayEUI_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GatewayClaimingServerServer).GetInfoByGatewayEUI(ctx, req.(*GetInfoByGatewayEUIRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // GatewayClaimingServer_ServiceDesc is the grpc.ServiceDesc for GatewayClaimingServer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -670,16 +721,20 @@ var GatewayClaimingServer_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GatewayClaimingServer_Claim_Handler,
 		},
 		{
+			MethodName: "Unclaim",
+			Handler:    _GatewayClaimingServer_Unclaim_Handler,
+		},
+		{
+			MethodName: "GetInfoByGatewayEUI",
+			Handler:    _GatewayClaimingServer_GetInfoByGatewayEUI_Handler,
+		},
+		{
 			MethodName: "AuthorizeGateway",
 			Handler:    _GatewayClaimingServer_AuthorizeGateway_Handler,
 		},
 		{
 			MethodName: "UnauthorizeGateway",
 			Handler:    _GatewayClaimingServer_UnauthorizeGateway_Handler,
-		},
-		{
-			MethodName: "GetInfoByGatewayEUI",
-			Handler:    _GatewayClaimingServer_GetInfoByGatewayEUI_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

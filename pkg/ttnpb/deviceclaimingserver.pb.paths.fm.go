@@ -174,11 +174,13 @@ var GetInfoByGatewayEUIRequestFieldPathsTopLevel = []string{
 }
 var GetInfoByGatewayEUIResponseFieldPathsNested = []string{
 	"eui",
+	"is_managed",
 	"supports_claiming",
 }
 
 var GetInfoByGatewayEUIResponseFieldPathsTopLevel = []string{
 	"eui",
+	"is_managed",
 	"supports_claiming",
 }
 var ClaimEndDeviceRequest_AuthenticatedIdentifiersFieldPathsNested = []string{

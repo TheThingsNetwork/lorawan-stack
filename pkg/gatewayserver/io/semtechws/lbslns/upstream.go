@@ -107,7 +107,7 @@ func (updf UplinkDataFrame) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// TxConfirmation is the LoRaWAN Join Request message from the BasicStation.
+// TxConfirmation is a Transmit Confirmation message from the BasicStation.
 type TxConfirmation struct {
 	Diid    int64   `json:"diid"`
 	DevEUI  id6.EUI `json:"DevEui"`

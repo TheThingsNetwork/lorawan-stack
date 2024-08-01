@@ -17,6 +17,7 @@ package gatewayserver
 
 import (
 	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	stdio "io"
@@ -30,6 +31,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -43,6 +45,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws/lbslns"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ttigw"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/ns"
@@ -62,6 +65,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -287,39 +291,34 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}
 
 	// Start Semtech web socket listeners.
-	type listenerConfig struct {
-		fallbackFreqPlanID string
-		listen             string
-		listenTLS          string
-		frontend           semtechws.Config
-	}
 	for _, version := range []struct {
-		Name           string
-		Formatter      semtechws.Formatter
-		listenerConfig listenerConfig
+		Name      string
+		Formatter semtechws.Formatter
+		FallbackFreqPlanID,
+		Listen,
+		ListenTLS string
+		Frontend semtechws.Config
 	}{
 		{
-			Name:      "basicstation",
-			Formatter: lbslns.NewFormatter(conf.BasicStation.MaxValidRoundTripDelay),
-			listenerConfig: listenerConfig{
-				fallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
-				listen:             conf.BasicStation.Listen,
-				listenTLS:          conf.BasicStation.ListenTLS,
-				frontend:           conf.BasicStation.Config,
-			},
+			Name:               "basicstation",
+			Formatter:          lbslns.NewFormatter(conf.BasicStation.MaxValidRoundTripDelay),
+			FallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
+			Listen:             conf.BasicStation.Listen,
+			ListenTLS:          conf.BasicStation.ListenTLS,
+			Frontend:           conf.BasicStation.Config,
 		},
 	} {
 		ctx := gs.Context()
-		if version.listenerConfig.fallbackFreqPlanID != "" {
-			ctx = frequencyplans.WithFallbackID(ctx, version.listenerConfig.fallbackFreqPlanID)
+		if version.FallbackFreqPlanID != "" {
+			ctx = frequencyplans.WithFallbackID(ctx, version.FallbackFreqPlanID)
 		}
-		web, err := semtechws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
+		web, err := semtechws.New(ctx, gs, version.Formatter, version.Frontend)
 		if err != nil {
 			return nil, err
 		}
 		for _, endpoint := range []component.Endpoint{
-			component.NewTCPEndpoint(version.listenerConfig.listen, version.Name),
-			component.NewTLSEndpoint(version.listenerConfig.listenTLS, version.Name, tlsconfig.WithNextProtos("h2", "http/1.1")),
+			component.NewTCPEndpoint(version.Listen, version.Name),
+			component.NewTLSEndpoint(version.ListenTLS, version.Name, tlsconfig.WithNextProtos("h2", "http/1.1")),
 		} {
 			endpoint := endpoint
 			if endpoint.Address() == "" {
@@ -367,6 +366,66 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			})
 		}
 	}
+
+	// Start The Things Industries gateway web socket listeners.
+	ttiGWHandler, err := ttigw.New(ctx, gs, conf.TheThingsIndustriesGateway.Config)
+	if err != nil {
+		return nil, err
+	}
+	for _, endpoint := range []component.Endpoint{
+		component.NewTCPEndpoint(conf.TheThingsIndustriesGateway.Listen, "ttigw"),
+		component.NewTLSEndpoint(conf.TheThingsIndustriesGateway.ListenTLS, "ttigw",
+			tlsconfig.WithTLSClientAuth(tls.RequestClientCert, nil, nil),
+			tlsconfig.WithNextProtos("h2", "http/1.1"),
+		),
+	} {
+		endpoint := endpoint
+		if endpoint.Address() == "" {
+			continue
+		}
+		gs.RegisterTask(&task.Config{
+			Context: gs.Context(),
+			ID:      fmt.Sprintf("serve_ttigw/%s", endpoint.Address()),
+			Func: func(ctx context.Context) error {
+				l, err := gs.ListenTCP(endpoint.Address())
+				if err != nil {
+					return errListenFrontend.WithCause(err).WithAttributes(
+						"address", endpoint.Address(),
+						"protocol", endpoint.Protocol(),
+					)
+				}
+				lis, err := endpoint.Listen(l)
+				if err != nil {
+					return errListenFrontend.WithCause(err).WithAttributes(
+						"address", endpoint.Address(),
+						"protocol", endpoint.Protocol(),
+					)
+				}
+				defer lis.Close()
+				srv := http.Server{
+					Handler:           ttiGWHandler,
+					ReadTimeout:       120 * time.Second,
+					ReadHeaderTimeout: 30 * time.Second,
+					ErrorLog:          stdlog.New(stdio.Discard, "", 0),
+					BaseContext: func(net.Listener) context.Context {
+						ctx := context.Background()
+						if fallbackID := conf.TheThingsIndustriesGateway.FallbackFrequencyPlanID; fallbackID != "" {
+							ctx = frequencyplans.WithFallbackID(ctx, fallbackID)
+						}
+						return ctx
+					},
+				}
+				go func() {
+					<-ctx.Done()
+					srv.Close()
+				}()
+				return srv.Serve(lis)
+			},
+			Restart: task.RestartOnFailure,
+			Backoff: task.DefaultBackoffConfig,
+		})
+	}
+
 	return gs, nil
 }
 
@@ -420,6 +479,14 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 	if ids.IsZero() {
 		return nil, nil, errEmptyIdentifiers.New()
 	}
+	var (
+		linkRightsInContext bool
+		linkRights          = &ttnpb.Rights{
+			Rights: []ttnpb.Right{
+				ttnpb.Right_RIGHT_GATEWAY_LINK,
+			},
+		}
+	)
 	if ids.GatewayId == "" {
 		eui := types.MustEUI64(ids.Eui)
 		if eui.OrZero().IsZero() {
@@ -435,6 +502,12 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 				return nil, nil, errGatewayEUINotRegistered.WithAttributes("eui", eui).WithCause(err)
 			}
 			ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(eui.String()))
+			ctx = rights.NewContext(ctx, &rights.Rights{
+				GatewayRights: *rights.NewMap(map[string]*ttnpb.Rights{
+					unique.ID(ctx, ids): linkRights,
+				}),
+			})
+			linkRightsInContext = true
 		} else {
 			return nil, nil, err
 		}
@@ -445,17 +518,13 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.Gate
 		if err != nil {
 			return nil, nil, errUnauthenticatedGatewayConnection.WithCause(err)
 		}
-		token := gatewaytokens.New(
-			gs.config.GatewayTokenHashKeyID,
-			ids,
-			&ttnpb.Rights{
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_GATEWAY_LINK,
-				},
-			},
-			gs.KeyService(),
-		)
-		ctx = gatewaytokens.NewContext(ctx, token)
+		if !linkRightsInContext {
+			token := gatewaytokens.New(gs.config.GatewayTokenHashKeyID, ids, linkRights, gs.KeyService())
+			ctx, err = gatewaytokens.AuthenticatedContext(gatewaytokens.NewContext(ctx, token))
+			if err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 	return ctx, ids, nil
 }
@@ -510,13 +579,13 @@ func (gs *GatewayServer) Connect(
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	var isAuthenticated bool
+	var (
+		isAuthenticated bool
+		fieldMask       *fieldmaskpb.FieldMask
+	)
 	if _, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()); err == nil {
 		isAuthenticated = true
-	}
-	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: ids,
-		FieldMask: ttnpb.FieldMask(
+		fieldMask = ttnpb.FieldMask(
 			"administrative_contact",
 			"antennas",
 			"attributes",
@@ -533,7 +602,13 @@ func (gs *GatewayServer) Connect(
 			"status_public",
 			"technical_contact",
 			"update_location_from_status",
-		),
+		)
+	} else {
+		fieldMask = ttnpb.FieldMask(ttnpb.PublicGatewayFields...)
+	}
+	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
+		GatewayIds: ids,
+		FieldMask:  fieldMask,
 	})
 	if errors.IsNotFound(err) {
 		if gs.requireRegisteredGateways {
@@ -1106,7 +1181,9 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			decoupledCtx,
 			ids,
 			func(pb *ttnpb.GatewayConnectionStats) (*ttnpb.GatewayConnectionStats, []string, error) {
-				stats.ConnectedAt = earliestTimestamp(stats.ConnectedAt, pb.ConnectedAt)
+				if pb != nil {
+					stats.ConnectedAt = earliestTimestamp(stats.ConnectedAt, pb.ConnectedAt)
+				}
 				return stats, paths, nil
 			},
 			gs.config.ConnectionStatsTTL,

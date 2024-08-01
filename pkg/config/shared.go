@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttgc"
 	"gocloud.dev/blob"
 )
 
@@ -336,7 +337,7 @@ func (c BlobPathConfig) IsZero() bool {
 
 // FrequencyPlansConfig contains the source of the frequency plans.
 type FrequencyPlansConfig struct {
-	ConfigSource string            `name:"config-source" description:"Source of the frequency plans (static, directory, url, blob)"` //nolint:lll
+	ConfigSource string            `name:"config-source" description:"Source of the frequency plans (directory, url, blob)"` //nolint:lll
 	Static       map[string][]byte `name:"-"`
 	Directory    string            `name:"directory" description:"OS filesystem directory, which contains frequency plans"` //nolint:lll
 	URL          string            `name:"url" description:"URL, which contains frequency plans"`
@@ -448,7 +449,7 @@ func (c InteropClient) Fetcher(ctx context.Context, httpClientProvider httpclien
 
 // SenderClientCA is the sender client CA configuration.
 type SenderClientCA struct {
-	Source    string            `name:"source" description:"Source of the sender client CA configuration (static, directory, url, blob)"` //nolint:lll
+	Source    string            `name:"source" description:"Source of the sender client CA configuration (directory, url, blob)"` //nolint:lll
 	Static    map[string][]byte `name:"-"`
 	Directory string            `name:"directory" description:"OS filesystem directory, which contains sender client CA configuration"` //nolint:lll
 	URL       string            `name:"url" description:"URL, which contains sender client CA configuration"`
@@ -518,7 +519,8 @@ type ServiceBase struct {
 	Tracing          tracing.Config       `name:"tracing" yaml:"tracing" description:"Tracing configuration"`
 	SkipVersionCheck bool                 `name:"skip-version-check" yaml:"skip-version-check" description:"Skip version checks"` //nolint:lll
 	Telemetry        telemetry.Config     `name:"telemetry" yaml:"telemetry" description:"Telemetry configuration"`
-	MTLSAuth         MTLSAuthConfig       `name:"mtls-auth" description:"mTLS authentication configuration (EXPERIMENTAL)"` //nolint:lll
+	MTLSAuth         MTLSAuthConfig       `name:"mtls-auth" description:"mTLS authentication configuration (EXPERIMENTAL)"`      //nolint:lll
+	TTGC             ttgc.Config          `name:"ttgc" description:"The Things Gateway Controller configuration (EXPERIMENTAL)"` //nolint:lll
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.

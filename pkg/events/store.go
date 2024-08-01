@@ -21,9 +21,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// Store extends PubSub implementations with storage of historical events.
-type Store interface {
-	PubSub
+// SubscriberWithHistory extends the Subscriber interface with the ability to fetch historical events.
+type SubscriberWithHistory interface {
+	Subscriber
 	// FindRelated finds events with matching correlation IDs.
 	FindRelated(ctx context.Context, correlationID string) ([]Event, error)
 	// FetchHistory fetches the tail (optional) of historical events matching the
@@ -36,4 +36,10 @@ type Store interface {
 	SubscribeWithHistory(
 		ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int, hdl Handler,
 	) error
+}
+
+// Store extends PubSub implementations with storage of historical events.
+type Store interface {
+	PubSub
+	SubscriberWithHistory
 }

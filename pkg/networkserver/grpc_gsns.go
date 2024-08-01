@@ -1268,8 +1268,15 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		publishEvents(ctx, queuedEvents...)
 	}()
 
+	if matched.LorawanVersion == ttnpb.MACVersion_MAC_UNKNOWN {
+		log.FromContext(ctx).Info("Unknown LoRaWAN version")
+		queuedEvents = append(queuedEvents,
+			evtDropJoinRequest.NewWithIdentifiersAndData(ctx, matched.Ids, errUnknownMACVersion),
+		)
+		return nil
+	}
 	if !matched.SupportsJoin {
-		log.FromContext(ctx).Warn("ABP device sent a join-request, drop")
+		log.FromContext(ctx).Info("ABP device sent a join-request, drop")
 		queuedEvents = append(queuedEvents, evtDropJoinRequest.NewWithIdentifiersAndData(ctx, matched.Ids, errABPJoinRequest))
 		return nil
 	}

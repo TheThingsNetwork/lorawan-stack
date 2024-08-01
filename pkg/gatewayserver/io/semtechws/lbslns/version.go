@@ -27,7 +27,6 @@ import (
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/structpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Version contains version information.
@@ -94,7 +93,6 @@ func (*lbsLNS) GetRouterConfig(
 	}
 	// TODO: Revisit these fields for v3 events (https://github.com/TheThingsNetwork/lorawan-stack/issues/2629)
 	stat := &ttnpb.GatewayStatus{
-		Time: timestamppb.New(receivedAt),
 		Versions: map[string]string{
 			"station":  version.Station,
 			"firmware": version.Firmware,

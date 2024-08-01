@@ -3923,6 +3923,51 @@
       "file": "ttjs.go"
     }
   },
+  "error:pkg/deviceclaimingserver/gateways/ttgc:dial_gateway_server": {
+    "translations": {
+      "en": "dial Gateway Gerver"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways/ttgc",
+      "file": "root_ca.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/gateways/ttgc:gateway_server_tls": {
+    "translations": {
+      "en": "establish TLS connection with Gateway Server"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways/ttgc",
+      "file": "root_ca.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/gateways:invalid_upstream": {
+    "translations": {
+      "en": "upstream `{name}` is invalid"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways",
+      "file": "gateways.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/gateways:ttgc_not_enabled": {
+    "translations": {
+      "en": "TTGC is not enabled"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways",
+      "file": "gateways.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:claim gateway": {
+    "translations": {
+      "en": "claim gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
+    }
+  },
   "error:pkg/deviceclaimingserver:claiming_not_supported": {
     "translations": {
       "en": "claiming not supported for JoinEUI `{eui}`"
@@ -3930,6 +3975,15 @@
     "description": {
       "package": "pkg/deviceclaimingserver",
       "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:create_gateway": {
+    "translations": {
+      "en": "create gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
     }
   },
   "error:pkg/deviceclaimingserver:device_not_found": {
@@ -3941,13 +3995,31 @@
       "file": "grpc_end_devices.go"
     }
   },
-  "error:pkg/deviceclaimingserver:method_unavailable": {
+  "error:pkg/deviceclaimingserver:gateway_already_exists": {
     "translations": {
-      "en": "method unavailable"
+      "en": "gateway with EUI `{eui}` already exists"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",
-      "file": "grpc_end_devices.go"
+      "file": "grpc_gateways.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:gateway_claiming_not_supported": {
+    "translations": {
+      "en": "claiming not supported for gateway with EUI `{eui}`"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:gateway_claiming_with_qrcodes_not_implemented": {
+    "translations": {
+      "en": "gateway claiming with QR codes not implemented"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
     }
   },
   "error:pkg/deviceclaimingserver:no_devices_found": {
@@ -3959,6 +4031,15 @@
       "file": "grpc_end_devices.go"
     }
   },
+  "error:pkg/deviceclaimingserver:no_eui": {
+    "translations": {
+      "en": "no EUI found for gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
+    }
+  },
   "error:pkg/deviceclaimingserver:no_euis": {
     "translations": {
       "en": "DevEUI/JoinEUI not set for device"
@@ -3966,6 +4047,15 @@
     "description": {
       "package": "pkg/deviceclaimingserver",
       "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:no_gateway_server_address": {
+    "translations": {
+      "en": "no gateway server address set for gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
     }
   },
   "error:pkg/deviceclaimingserver:no_join_eui": {
@@ -4805,12 +4895,39 @@
       "file": "frequencyplans.go"
     }
   },
-  "error:pkg/gatewayconfigurationserver/v2:unauthenticated": {
+  "error:pkg/gatewayconfigurationserver/managed:gateway_not_managed": {
+    "translations": {
+      "en": "gateway `{gateway_id}` is not managed by The Things Gateway Controller"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver/managed:no_profile_name": {
+    "translations": {
+      "en": "no profile name set"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed",
+      "file": "grpc_util.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver/managed:no_ssid": {
+    "translations": {
+      "en": "no SSID set"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed",
+      "file": "grpc_wifi_profiles.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver/ttkg:unauthenticated": {
     "translations": {
       "en": "unauthenticated"
     },
     "description": {
-      "package": "pkg/gatewayconfigurationserver/v2",
+      "package": "pkg/gatewayconfigurationserver/ttkg",
       "file": "http_gateway.go"
     }
   },
@@ -4992,6 +5109,105 @@
     "description": {
       "package": "pkg/gatewayserver/io/semtechws",
       "file": "ws.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:downlink_channel_mixed_bandwidths": {
+    "translations": {
+      "en": "downlink channel `{channel}` has mixed bandwidths `{bandwidth_low}` and `{bandwidth_high}` Hz"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_board": {
+    "translations": {
+      "en": "invalid board `{board}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_frequency": {
+    "translations": {
+      "en": "invalid frequency `{frequency}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_gateway_eui": {
+    "translations": {
+      "en": "invalid gateway EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "ttigw.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_if_chain": {
+    "translations": {
+      "en": "invalid IF chain `{if_chain}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:invalid_modulation": {
+    "translations": {
+      "en": "invalid modulation"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:no_client_hello": {
+    "translations": {
+      "en": "no client hello"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "ttigw.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:not_scheduled": {
+    "translations": {
+      "en": "downlink message not scheduled"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:unknown_message_type": {
+    "translations": {
+      "en": "unknown message type"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "ttigw.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:unsupported_downlink_data_rate": {
+    "translations": {
+      "en": "unsupported downlink data rate index `{data_rate_index}` in channel `{channel}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ttigw:unsupported_message_type": {
+    "translations": {
+      "en": "unsupported message type"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "ttigw.go"
     }
   },
   "error:pkg/gatewayserver/io/udp:already_connected": {
@@ -8162,6 +8378,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:unknown_mac_version": {
+    "translations": {
+      "en": "MAC version is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:unknown_nwk_s_enc_key": {
     "translations": {
       "en": "NwkSEncKey is unknown"
@@ -10142,6 +10367,96 @@
       "file": "client_registry.go"
     }
   },
+  "event:dcs.end_device.claim.abort": {
+    "translations": {
+      "en": "abort end device claim"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.end_device.claim.fail": {
+    "translations": {
+      "en": "claim end device failure"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.end_device.claim.success": {
+    "translations": {
+      "en": "claim end device successful"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.end_device.unclaim.fail": {
+    "translations": {
+      "en": "unclaim end device failure"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.end_device.unclaim.success": {
+    "translations": {
+      "en": "unclaim end device successful"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.claim.abort": {
+    "translations": {
+      "en": "abort gateway claim"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.claim.fail": {
+    "translations": {
+      "en": "claim gateway failure"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.claim.success": {
+    "translations": {
+      "en": "claim gateway successful"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.unclaim.fail": {
+    "translations": {
+      "en": "unclaim gateway failure"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
+  "event:dcs.gateway.unclaim.success": {
+    "translations": {
+      "en": "unclaim gateway successful"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/observability",
+      "file": "observability.go"
+    }
+  },
   "event:end_device.batch.delete": {
     "translations": {
       "en": "batch delete end devices"
@@ -10275,6 +10590,132 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "gateway_registry.go"
+    }
+  },
+  "event:gcs.managed.cellular.down": {
+    "translations": {
+      "en": "cellular backhaul down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.cellular.up": {
+    "translations": {
+      "en": "cellular backhaul up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.controller.down": {
+    "translations": {
+      "en": "controller connection down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.controller.up": {
+    "translations": {
+      "en": "controller connection up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.ethernet.down": {
+    "translations": {
+      "en": "Ethernet backhaul down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.ethernet.up": {
+    "translations": {
+      "en": "Ethernet backhaul up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.gs.down": {
+    "translations": {
+      "en": "connection with Gateway Server down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.gs.up": {
+    "translations": {
+      "en": "connection with Gateway Server up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.location.update": {
+    "translations": {
+      "en": "update location"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.system_status.receive": {
+    "translations": {
+      "en": "receive system status"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.update": {
+    "translations": {
+      "en": "update managed gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.wifi.down": {
+    "translations": {
+      "en": "WiFi backhaul down"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.wifi.fail": {
+    "translations": {
+      "en": "WiFi backhaul fail"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
+    }
+  },
+  "event:gcs.managed.wifi.up": {
+    "translations": {
+      "en": "WiFi backhaul up"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed/client",
+      "file": "observability.go"
     }
   },
   "event:gs.down.schedule.attempt": {

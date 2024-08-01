@@ -90,8 +90,15 @@ func NewCAStore(_ context.Context, fetcher fetch.Interface) (*CAStore, error) {
 	return s, nil
 }
 
-func (c CAStore) certPool(_ context.Context, _ ClientType) (*x509.CertPool, error) { //nolint:unparam
-	return c.commonPool.Clone(), nil
+func (c CAStore) certPools(ctx context.Context, _ ClientType) ([]*x509.CertPool, error) { //nolint:unparam
+	var certPools []*x509.CertPool
+	if !c.commonPool.Equal(x509.NewCertPool()) {
+		certPools = append(certPools, c.commonPool)
+	}
+	if certPool := RootCAsFromContext(ctx); certPool != nil {
+		certPools = append(certPools, certPool)
+	}
+	return certPools, nil
 }
 
 // Verify verifies the certificate against the certificate pool for the client type.
@@ -105,21 +112,24 @@ func (c *CAStore) Verify(ctx context.Context, clientType ClientType, cn string, 
 		)
 	}
 
-	certPool, err := c.certPool(ctx, clientType)
+	certPools, err := c.certPools(ctx, clientType)
 	if err != nil {
 		return err
 	}
-	if certPool.Equal(x509.NewCertPool()) {
+	if len(certPools) == 0 {
 		return errNoCAPool.New()
 	}
-	opts := x509.VerifyOptions{
-		Roots: certPool,
-		KeyUsages: []x509.ExtKeyUsage{
-			x509.ExtKeyUsageClientAuth,
-		},
+	for _, certPool := range certPools {
+		opts := x509.VerifyOptions{
+			Roots: certPool,
+			KeyUsages: []x509.ExtKeyUsage{
+				x509.ExtKeyUsageClientAuth,
+			},
+		}
+		_, err = cert.Verify(opts)
+		if err == nil {
+			return nil
+		}
 	}
-	if _, err := cert.Verify(opts); err != nil {
-		return errCertificateNotVerified.WithCause(err)
-	}
-	return nil
+	return errCertificateNotVerified.WithCause(err)
 }

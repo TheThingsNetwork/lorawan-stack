@@ -25,6 +25,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttgc"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"golang.org/x/crypto/acme"
 )
 
@@ -174,6 +176,23 @@ var DefaultTelemetryConfig = telemetry.Config{
 	},
 }
 
+// DefaultTTGCConfig is the default config for The Things Gateway Controller.
+var DefaultTTGCConfig = ttgc.Config{
+	GatewayEUIs: []types.EUI64Prefix{
+		// The Things Industries gateways
+		{
+			EUI64:  types.EUI64{0xEC, 0x65, 0x6E, 0xFF, 0xFE, 0x00, 0x00, 0x00},
+			Length: 40,
+		},
+	},
+	Address: "gc.thethings.industries:443",
+	TLS: tlsconfig.ClientAuth{
+		Source:      "file",
+		Certificate: "cert.pem",
+		Key:         "key.pem",
+	},
+}
+
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
@@ -192,6 +211,7 @@ var DefaultServiceBase = config.ServiceBase{
 	RateLimiting:   DefaultRateLimitingConfig,
 	Tracing:        DefaultTracingConfig,
 	Telemetry:      DefaultTelemetryConfig,
+	TTGC:           DefaultTTGCConfig,
 }
 
 // DefaultPublicHost is the default public host where The Things Stack is served.

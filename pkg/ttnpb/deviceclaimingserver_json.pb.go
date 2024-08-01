@@ -742,6 +742,11 @@ func (x *GetInfoByGatewayEUIResponse) MarshalProtoJSON(s *jsonplugin.MarshalStat
 		s.WriteObjectField("supports_claiming")
 		s.WriteBool(x.SupportsClaiming)
 	}
+	if x.IsManaged || s.HasField("is_managed") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("is_managed")
+		s.WriteBool(x.IsManaged)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -765,6 +770,9 @@ func (x *GetInfoByGatewayEUIResponse) UnmarshalProtoJSON(s *jsonplugin.Unmarshal
 		case "supports_claiming", "supportsClaiming":
 			s.AddField("supports_claiming")
 			x.SupportsClaiming = s.ReadBool()
+		case "is_managed", "isManaged":
+			s.AddField("is_managed")
+			x.IsManaged = s.ReadBool()
 		}
 	})
 }

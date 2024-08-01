@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package iotest implements tests for Gateway Server frontends.
 package iotest
 
 import (
@@ -30,6 +31,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -37,7 +40,9 @@ import (
 	gsio "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewaytokens"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -53,25 +58,34 @@ import (
 type FrontendConfig struct {
 	// SupportsStatus indicates that the frontend sends gateway status messages.
 	SupportsStatus bool
-	// DetectsInvalidMessages indicates that the frontend detects invalid messages.
-	DetectsInvalidMessages bool
+	// DropsCRCFailure indicates that the frontend drops frames with CRC failure.
+	DropsCRCFailure bool
+	// DropsInvalidLoRaWAN indicates that the frontend drops frames that are invalid LoRaWAN.
+	DropsInvalidLoRaWAN bool
 	// DetectsDisconnect indicates that the frontend detects gateway disconnections.
 	DetectsDisconnect bool
 	// AuthenticatesWithEUI indicates that the gateway uses the EUI to authenticate, instead of the ID and key.
 	AuthenticatesWithEUI bool
-	// TimeoutOnInvalidAuth indicates that the frontend does not have a mechanism to convey an authentication failure to
-	// the gateway.
-	TimeoutOnInvalidAuth bool
 	// IsAuthenticated indicates whether the gateway connection provides authentication.
 	// This is typically true for all frontends except UDP which is inherently unauthenticated.
 	IsAuthenticated bool
 	// DeduplicatesUplinks indicates that the frontend deduplicates uplinks that are received at once by using the IO
 	// middleware's UniqueUplinkMessagesByRSSI.
 	DeduplicatesUplinks bool
-	// CustomConfig applies custom configuration for the Gateway Server before it gets started.
+	// UsesGatewayToken indicates that the frontend uses gateway tokens for authentication instead of an API key.
+	UsesGatewayToken bool
+	// SkipsTxAcknowledgmentOnFailure indicates that the frontend does not send a Tx acknowledgment on failure.
+	SkipsTxAcknowledgmentOnFailure bool
+	// CustomRxMetadataAssertion is a custom assertion for RxMetadata.
+	CustomRxMetadataAssertion func(t *testing.T, actual, expected *ttnpb.RxMetadata)
+	// CustomComponentConfig applies custom configuration for the component before it gets started.
+	// This is typically used for configuring security credentials.
+	CustomComponentConfig func(config *component.Config)
+	// CustomGatewayServerConfig applies custom configuration for the Gateway Server before it gets started.
 	// This is typically used for configuring frontend listeners.
-	CustomConfig func(gsConfig *gatewayserver.Config)
+	CustomGatewayServerConfig func(gsConfig *gatewayserver.Config)
 	// Link links the gateway.
+	// If UsesGatewayToken is true, the key is empty.
 	Link func(
 		ctx context.Context,
 		t *testing.T,
@@ -84,7 +98,7 @@ type FrontendConfig struct {
 }
 
 // Frontend tests a frontend.
-func Frontend(t *testing.T, frontend FrontendConfig) {
+func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 	t.Helper()
 
 	var (
@@ -94,11 +108,16 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		unregisteredGatewayEUI = types.EUI64{0xBB, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 		timeout                = (1 << 5) * test.Delay
 		testRights             = []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ}
+		keyVault               = map[string][]byte{
+			// This is the key for gateway token hashing, used when UsesGatewayToken is true.
+			"test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f},
+		}
 	)
 
 	a, ctx := test.New(t)
 
-	is, isAddr, closeIS := mockis.New(ctx)
+	keyService := crypto.NewKeyService(cryptoutil.NewMemKeyVault(keyVault))
+	is, isAddr, closeIS := mockis.New(ctx, mockis.WithGatewayTokens(keyService))
 	defer closeIS()
 	ns, nsAddr := mock.StartNS(ctx)
 
@@ -117,7 +136,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		statsRegistry = registry
 	}
 
-	c := componenttest.NewComponent(t, &component.Config{
+	componentConfig := &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -131,8 +150,17 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				ConfigSource: "static",
 				Static:       test.StaticFrequencyPlans,
 			},
+			KeyVault: config.KeyVault{
+				Provider: "static",
+				Static:   keyVault,
+			},
 		},
-	})
+	}
+	if frontend.CustomComponentConfig != nil {
+		frontend.CustomComponentConfig(componentConfig)
+	}
+	c := componenttest.NewComponent(t, componentConfig)
+
 	gsConfig := &gatewayserver.Config{
 		RequireRegisteredGateways:         true,
 		UpdateGatewayLocationDebounceTime: 0,
@@ -143,10 +171,12 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		FetchGatewayInterval:              (1 << 3) * test.Delay,
 		FetchGatewayJitter:                0.1,
 	}
-	if frontend.CustomConfig != nil {
-		frontend.CustomConfig(gsConfig)
+	if frontend.UsesGatewayToken {
+		gsConfig.GatewayTokenHashKeyID = "test"
 	}
-
+	if frontend.CustomGatewayServerConfig != nil {
+		frontend.CustomGatewayServerConfig(gsConfig)
+	}
 	er := gatewayserver.NewIS(c)
 	gs, err := gatewayserver.New(c, gsConfig,
 		gatewayserver.WithRegistry(er),
@@ -168,7 +198,13 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		Eui:       registeredGatewayEUI.Bytes(),
 	}
 	gtw := mockis.DefaultGateway(ids, true, true)
-	is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, gtw, testRights...)
+	is.GatewayRegistry().Add(ctx, ids, "Bearer", registeredGatewayKey, gtw, testRights...)
+	if frontend.UsesGatewayToken {
+		template := gatewaytokens.New("test", ids, &ttnpb.Rights{Rights: testRights}, c.KeyService())
+		token := test.Must(template.Generate(ctx))
+		authValue := test.Must(gatewaytokens.EncodeToString(token))
+		is.GatewayRegistry().Add(ctx, ids, gatewaytokens.AuthType, authValue, gtw)
+	}
 
 	time.Sleep(timeout) // Wait for setup to be completed.
 
@@ -202,6 +238,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				ID:   &ttnpb.GatewayIdentifiers{Eui: unregisteredGatewayEUI.Bytes()},
 			},
 		} {
+			ctc := ctc
 			t.Run(ctc.Name, func(t *testing.T) {
 				ctx, cancel := context.WithCancel(ctx)
 				upCh := make(chan *ttnpb.GatewayUp)
@@ -211,7 +248,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				for _, event := range []string{"gs.gateway.connect"} {
 					upEvents[event] = make(events.Channel, 5)
 				}
-				defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+				defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 					PublishFunc: func(evs ...events.Event) {
 						for _, ev := range evs {
 							ev := ev
@@ -229,7 +266,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 
 				var validAuth func(*ttnpb.GatewayIdentifiers, string) bool
 				if frontend.AuthenticatesWithEUI {
-					validAuth = func(ids *ttnpb.GatewayIdentifiers, key string) bool {
+					validAuth = func(ids *ttnpb.GatewayIdentifiers, _ string) bool {
 						return bytes.Equal(ids.Eui, registeredGatewayEUI.Bytes())
 					}
 				} else {
@@ -287,6 +324,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		go func() {
 			upCh := make(chan *ttnpb.GatewayUp)
 			downCh := make(chan *ttnpb.GatewayDown)
+			ctx1 := log.NewContextWithField(ctx1, "connection", "first")
 			err := frontend.Link(ctx1, t, gs, id, registeredGatewayKey, upCh, downCh)
 			fail1(err)
 		}()
@@ -300,6 +338,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		ctx2, cancel2 := context.WithDeadline(ctx, time.Now().Add((1<<3)*timeout))
 		upCh := make(chan *ttnpb.GatewayUp)
 		downCh := make(chan *ttnpb.GatewayDown)
+		ctx2 = log.NewContextWithField(ctx2, "connection", "second")
 		err := frontend.Link(ctx2, t, gs, id, registeredGatewayKey, upCh, downCh)
 		cancel2()
 		if !errors.IsDeadlineExceeded(err) {
@@ -436,7 +475,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						} {
 							upEvents[event] = make(events.Channel, 5)
 						}
-						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 							PublishFunc: func(evs ...events.Event) {
 								for _, ev := range evs {
 									ev := ev
@@ -528,7 +567,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					} {
 						upEvents[event] = make(events.Channel, 5)
 					}
-					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 						PublishFunc: func(evs ...events.Event) {
 							for _, ev := range evs {
 								ev := ev
@@ -567,7 +606,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					})
 					a.So(err, should.BeNil)
 					gtw.Antennas[0].Gain = tc.AntennaGain
-					gtw, err = is.GatewayRegistry().Update(ctx, &ttnpb.UpdateGatewayRequest{
+					_, err = is.GatewayRegistry().Update(ctx, &ttnpb.UpdateGatewayRequest{
 						Gateway:   gtw,
 						FieldMask: ttnpb.FieldMask("antennas"),
 					})
@@ -643,10 +682,9 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 			}
 			for _, locationPublic := range []bool{false, true} {
 				t.Run(fmt.Sprintf("LocationPublic=%v", locationPublic), func(t *testing.T) {
-					mockGtw := mockis.DefaultGateway(ids, false, false)
-					mockGtw.LocationPublic = locationPublic
-					mockGtw.Antennas[0].Location = location
-					is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, mockGtw, testRights...)
+					gtw.LocationPublic = locationPublic
+					gtw.UpdateLocationFromStatus = false
+					gtw.Antennas[0].Location = location
 
 					for _, locationInRxMetadata := range []bool{false, true} {
 						t.Run(fmt.Sprintf("RxMetadata=%v", locationInRxMetadata), func(t *testing.T) {
@@ -669,7 +707,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							} {
 								upEvents[event] = make(events.Channel, 5)
 							}
-							defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+							defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 								PublishFunc: func(evs ...events.Event) {
 									for _, ev := range evs {
 										ev := ev
@@ -700,6 +738,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							select {
 							case <-upEvents["gs.gateway.connect"]:
 							case <-time.After(timeout):
+								t.Fatal("Expected gateway to be connected, but it is not")
 							}
 
 							if locationInRxMetadata {
@@ -737,6 +776,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							select {
 							case <-upEvents["gs.gateway.disconnect"]:
 							case <-time.After(timeout):
+								t.Fatal("Expected gateway to be disconnected, but it has not disconnected")
 							}
 						})
 					}
@@ -770,14 +810,14 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 		t.Run("Upstream", func(t *testing.T) {
 			uplinkCount := 0
 			for _, tc := range []struct {
-				Name                         string
-				Up                           *ttnpb.GatewayUp
-				Received                     []uint32 // Timestamps of uplink messages in Up that are received.
-				Dropped                      []uint32 // Timestamps of uplink messages in Up that are dropped.
-				PublicLocation               bool     // If gateway location is public, it should be in RxMetadata
-				UplinkCount                  int      // Number of expected uplinks
-				RepeatUpEvent                bool     // Expect event for repeated uplinks
-				SkipIfDetectsInvalidMessages bool     // Skip this test if the frontend detects invalid messages
+				Name                  string
+				Up                    *ttnpb.GatewayUp
+				Received              []uint32 // Timestamps of uplink messages in Up that are received.
+				Dropped               []uint32 // Timestamps of uplink messages in Up that are dropped.
+				PublicLocation        bool     // If gateway location is public, it should be in RxMetadata
+				UplinkCount           int      // Number of expected uplinks
+				RepeatUpEvent         bool     // Expect event for repeated uplinks
+				SkipIfDropsCRCFailure bool     // Skip this test if the frontend detects invalid messages
 			}{
 				{
 					Name: "GatewayStatus",
@@ -788,10 +828,18 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					},
 				},
 				{
-					Name: "TxAck",
+					Name: "TxAckSuccess",
 					Up: &ttnpb.GatewayUp{
 						TxAcknowledgment: &ttnpb.TxAcknowledgment{
 							Result: ttnpb.TxAcknowledgment_SUCCESS,
+						},
+					},
+				},
+				{
+					Name: "TxAckWrongFrequency",
+					Up: &ttnpb.GatewayUp{
+						TxAcknowledgment: &ttnpb.TxAcknowledgment{
+							Result: ttnpb.TxAcknowledgment_TX_FREQ,
 						},
 					},
 				},
@@ -828,9 +876,9 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							},
 						},
 					},
-					Received:                     []uint32{100},
-					Dropped:                      []uint32{100},
-					SkipIfDetectsInvalidMessages: true,
+					Received:              []uint32{100},
+					Dropped:               []uint32{100},
+					SkipIfDropsCRCFailure: true,
 				},
 				{
 					Name: "OneValidLoRa",
@@ -842,12 +890,12 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Modulation: &ttnpb.DataRate_Lora{
 											Lora: &ttnpb.LoRaDataRate{
 												SpreadingFactor: 7,
-												Bandwidth:       250000,
+												Bandwidth:       125000,
 												CodingRate:      band.Cr4_5,
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 867500000,
 									Timestamp: 200,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -856,6 +904,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Timestamp:   200,
 										Rssi:        -69,
 										ChannelRssi: -69,
+										SignalRssi:  wrapperspb.Float(-70),
 										Snr:         11,
 										Location:    location,
 									},
@@ -881,7 +930,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 868300000, // LoRa standard channel frequency
 									Timestamp: 301,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -890,6 +939,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Timestamp:   301,
 										Rssi:        -42,
 										ChannelRssi: -42,
+										SignalRssi:  wrapperspb.Float(-43),
 										Snr:         11,
 										Location:    location,
 									},
@@ -907,7 +957,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 868300000, // LoRa standard channel frequency
 									Timestamp: 300,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -916,6 +966,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Timestamp:   300,
 										Rssi:        -69,
 										ChannelRssi: -69,
+										SignalRssi:  wrapperspb.Float(-70),
 										Snr:         11,
 										Location:    location,
 									},
@@ -933,7 +984,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 868300000, // LoRa standard channel frequency
 									Timestamp: 300,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -942,6 +993,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Timestamp:   300,
 										Rssi:        -69,
 										ChannelRssi: -69,
+										SignalRssi:  wrapperspb.Float(-70),
 										Snr:         11,
 										Location:    location,
 									},
@@ -967,7 +1019,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 											},
 										},
 									},
-									Frequency: 867900000,
+									Frequency: 868800000,
 									Timestamp: 400,
 								},
 								RxMetadata: []*ttnpb.RxMetadata{
@@ -976,7 +1028,6 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Timestamp:   400,
 										Rssi:        -69,
 										ChannelRssi: -69,
-										Snr:         11,
 										Location:    location,
 									},
 								},
@@ -1010,6 +1061,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Timestamp:   500,
 										Rssi:        -112,
 										ChannelRssi: -112,
+										SignalRssi:  wrapperspb.Float(-113),
 										Snr:         2,
 										Location:    location,
 									},
@@ -1036,6 +1088,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Timestamp:   501,
 										Rssi:        -69,
 										ChannelRssi: -69,
+										SignalRssi:  wrapperspb.Float(-70),
 										Snr:         11,
 										Location:    location,
 									},
@@ -1062,6 +1115,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 										Timestamp:   502,
 										Rssi:        -36,
 										ChannelRssi: -36,
+										SignalRssi:  wrapperspb.Float(-37),
 										Snr:         5,
 										Location:    location,
 									},
@@ -1082,8 +1136,8 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				t.Run(tc.Name, func(t *testing.T) {
 					a := assertions.New(t)
 
-					if tc.SkipIfDetectsInvalidMessages && frontend.DetectsInvalidMessages {
-						t.Skip("Skipping test case because gateway detects invalid messages")
+					if tc.SkipIfDropsCRCFailure && frontend.DropsCRCFailure {
+						t.Skip("Skipping test case because gateway drops CRC failures")
 					}
 
 					upEvents := map[string]events.Channel{}
@@ -1096,7 +1150,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					} {
 						upEvents[event] = make(events.Channel, 5)
 					}
-					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 						PublishFunc: func(evs ...events.Event) {
 							for _, ev := range evs {
 								ev := ev
@@ -1119,7 +1173,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					}
 					if tc.UplinkCount > 0 {
 						uplinkCount += tc.UplinkCount
-					} else if frontend.DetectsInvalidMessages {
+					} else if frontend.DropsInvalidLoRaWAN {
 						uplinkCount += len(tc.Received)
 					} else {
 						uplinkCount += len(tc.Up.UplinkMessages)
@@ -1164,11 +1218,19 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 								a.So(time.Since(*ttnpb.StdTime(msg.ReceivedAt)), should.BeLessThan, timeout)
 								a.So(msg.Settings, should.Resemble, expected.Settings)
 								a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
+								rxMetadataAssertion := frontend.CustomRxMetadataAssertion
+								if rxMetadataAssertion == nil {
+									rxMetadataAssertion = func(t *testing.T, actual, expected *ttnpb.RxMetadata) {
+										t.Helper()
+										a := assertions.New(t)
+										a.So(actual.UplinkToken, should.NotBeEmpty)
+										actual.UplinkToken = nil
+										actual.ReceivedAt = nil
+										a.So(actual, should.Resemble, expected)
+									}
+								}
 								for i, md := range msg.RxMetadata {
-									a.So(md.UplinkToken, should.NotBeEmpty)
-									md.UplinkToken = nil
-									md.ReceivedAt = nil
-									a.So(md, should.Resemble, expected.RxMetadata[i])
+									rxMetadataAssertion(t, md, expected.RxMetadata[i])
 								}
 								a.So(msg.RawPayload, should.Resemble, expected.RawPayload)
 							case <-time.After(timeout):
@@ -1178,13 +1240,14 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 						select {
 						case evt := <-upEvents["gs.up.receive"]:
 							a.So(evt.Name(), should.Equal, "gs.up.receive")
-							msg := evt.Data().(*ttnpb.GatewayUplinkMessage)
+							msg := evt.Data().(*ttnpb.GatewayUplinkMessage) //nolint:revive
 							delete(received, msg.Message.Settings.Timestamp)
 						case <-time.After(timeout):
 							t.Fatal("Expected uplink event timeout")
 						}
 					}
-					if expected := tc.Up.TxAcknowledgment; expected != nil {
+					if expected := tc.Up.TxAcknowledgment; expected != nil &&
+						(!frontend.SkipsTxAcknowledgmentOnFailure || expected.Result == ttnpb.TxAcknowledgment_SUCCESS) {
 						select {
 						case <-upEvents["gs.down.tx.success"]:
 						case evt := <-upEvents["gs.down.tx.fail"]:
@@ -1227,7 +1290,9 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}
-					a.So(stats.UplinkCount, should.Equal, uplinkCount)
+					if !a.So(stats.UplinkCount, should.Equal, uplinkCount) {
+						t.FailNow()
+					}
 
 					if tc.Up.GatewayStatus != nil && frontend.SupportsStatus {
 						if !a.So(stats.LastStatus, should.NotBeNil) {
@@ -1461,7 +1526,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 				{
 					Name: "ValidClassCWithoutFrequencyPlanInTxRequest",
 					Message: &ttnpb.DownlinkMessage{
-						RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
+						RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 42, 2),
 						Settings: &ttnpb.DownlinkMessage_Request{
 							Request: &ttnpb.TxRequest{
 								Class: ttnpb.Class_CLASS_C,
@@ -1506,7 +1571,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 							if !a.So(errors.Details(err), should.HaveLength, 1) {
 								t.FailNow()
 							}
-							details := errors.Details(err)[0].(*ttnpb.ScheduleDownlinkErrorDetails)
+							details := errors.Details(err)[0].(*ttnpb.ScheduleDownlinkErrorDetails) //nolint:revive
 							if !a.So(details, should.NotBeNil) || !a.So(details.PathErrors, should.HaveLength, 1) {
 								t.FailNow()
 							}
@@ -1516,7 +1581,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) {
 								if !a.So(errors.Details(errSchedulePathCause), should.HaveLength, 1) {
 									t.FailNow()
 								}
-								errSchedulePathCauseDetails := errors.Details(errSchedulePathCause)[0].(*ttnpb.ScheduleDownlinkErrorDetails)
+								errSchedulePathCauseDetails := errors.Details(errSchedulePathCause)[0].(*ttnpb.ScheduleDownlinkErrorDetails) //nolint:revive,lll
 								if !a.So(errSchedulePathCauseDetails, should.NotBeNil) {
 									t.FailNow()
 								}

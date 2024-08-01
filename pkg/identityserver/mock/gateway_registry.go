@@ -16,17 +16,16 @@ package mockis
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"sync"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewaytokens"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -55,27 +54,56 @@ type mockISGatewayRegistry struct {
 	ttnpb.UnimplementedGatewayRegistryServer
 	ttnpb.UnimplementedGatewayAccessServer
 	ttnpb.UnimplementedGatewayBatchAccessServer
-	gateways      map[string]*ttnpb.Gateway
-	gatewayEUIs   map[types.EUI64]*ttnpb.GatewayIdentifiers
-	gatewayAuths  map[string][]string
-	gatewayRights map[string]authKeyToRights
+	gateways               map[string]*ttnpb.Gateway
+	gatewayEUIs            map[types.EUI64]*ttnpb.GatewayIdentifiers
+	gatewayBearerAuths     map[string][]string
+	gatewayBearerRights    map[string]authKeyToRights
+	gatewayTokenKeyService gatewaytokens.KeyService
 
 	mu sync.Mutex
 }
 
 func newGatewayRegistry() *mockISGatewayRegistry {
 	return &mockISGatewayRegistry{
-		gateways:      make(map[string]*ttnpb.Gateway),
-		gatewayEUIs:   make(map[types.EUI64]*ttnpb.GatewayIdentifiers),
-		gatewayAuths:  make(map[string][]string),
-		gatewayRights: make(map[string]authKeyToRights),
+		gateways:            make(map[string]*ttnpb.Gateway),
+		gatewayEUIs:         make(map[types.EUI64]*ttnpb.GatewayIdentifiers),
+		gatewayBearerAuths:  make(map[string][]string),
+		gatewayBearerRights: make(map[string]authKeyToRights),
 	}
+}
+
+// listRights returns the rights of the gateway from the authenticated context.
+// This method assumes that the mutex is held.
+func (is *mockISGatewayRegistry) listRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) *ttnpb.Rights {
+	res := &ttnpb.Rights{}
+	md := rpcmetadata.FromIncomingContext(ctx)
+	switch md.AuthType {
+	case "Bearer":
+		uid := unique.ID(ctx, ids)
+		auths, ok := is.gatewayBearerAuths[uid]
+		if !ok {
+			return res
+		}
+		for _, auth := range auths {
+			if auth == md.AuthValue && is.gatewayBearerRights[uid] != nil {
+				res.Rights = append(res.Rights, is.gatewayBearerRights[uid][auth]...)
+			}
+		}
+	case gatewaytokens.AuthType:
+		token, err := gatewaytokens.DecodeFromString(md.AuthValue)
+		if err != nil {
+			return res
+		}
+		res, _ = gatewaytokens.Verify(ctx, token, time.Hour, is.gatewayTokenKeyService)
+	}
+	return res
 }
 
 func (is *mockISGatewayRegistry) Add(
 	ctx context.Context,
 	ids *ttnpb.GatewayIdentifiers,
-	key string,
+	authType,
+	authValue string,
 	gtw *ttnpb.Gateway,
 	rights ...ttnpb.Right,
 ) {
@@ -89,15 +117,18 @@ func (is *mockISGatewayRegistry) Add(
 		is.gatewayEUIs[*eui] = ids
 	}
 
-	var bearerKey string
-	if key != "" {
-		bearerKey = fmt.Sprintf("Bearer %v", key)
-		is.gatewayAuths[uid] = []string{bearerKey}
+	switch authType {
+	case "Bearer":
+		if authType != "" && authValue != "" {
+			is.gatewayBearerAuths[uid] = append(is.gatewayBearerAuths[uid], authValue)
+		}
+		if is.gatewayBearerRights[uid] == nil {
+			is.gatewayBearerRights[uid] = make(authKeyToRights)
+		}
+		is.gatewayBearerRights[uid][authValue] = rights
+	case gatewaytokens.AuthType:
+		// Rights are encoded in the token
 	}
-	if is.gatewayRights[uid] == nil {
-		is.gatewayRights[uid] = make(authKeyToRights)
-	}
-	is.gatewayRights[uid][bearerKey] = rights
 }
 
 func (is *mockISGatewayRegistry) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
@@ -150,27 +181,7 @@ func (is *mockISGatewayRegistry) ListRights(
 	is.mu.Lock()
 	defer is.mu.Unlock()
 
-	res = &ttnpb.Rights{}
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return res, err
-	}
-	authorization, ok := md["authorization"]
-	if !ok || len(authorization) == 0 {
-		return res, err
-	}
-
-	uid := unique.ID(ctx, ids)
-	auths, ok := is.gatewayAuths[uid]
-	if !ok {
-		return res, err
-	}
-	for _, auth := range auths {
-		if auth == authorization[0] && is.gatewayRights[uid] != nil {
-			res.Rights = append(res.Rights, is.gatewayRights[uid][auth]...)
-		}
-	}
-	return res, err
+	return is.listRights(ctx, ids), nil
 }
 
 // AssertRights implements GatewayBatchAccess.
@@ -185,32 +196,11 @@ func (is *mockISGatewayRegistry) AssertRights(
 	if md.AuthType == "" {
 		return nil, errNoGatewayRights.New()
 	}
-	if strings.ToLower(md.AuthType) != "bearer" {
-		return nil, errNoGatewayRights.New()
-	}
 
 	for _, ids := range req.GatewayIds {
-		uid := unique.ID(ctx, ids)
-		auths, ok := is.gatewayAuths[uid]
-		if !ok {
+		rights := is.listRights(ctx, ids)
+		if len(rights.Intersect(req.Required).GetRights()) == 0 {
 			return nil, errNoGatewayRights.New()
-		}
-		for _, a := range auths {
-			if a != fmt.Sprintf("Bearer %s", md.AuthValue) {
-				return nil, errNoGatewayRights.New()
-			}
-			authKeyToRights := is.gatewayRights[uid]
-			if authKeyToRights == nil {
-				return nil, errNoGatewayRights.New()
-			}
-			r, ok := authKeyToRights[a]
-			if !ok {
-				return nil, errNoGatewayRights.New()
-			}
-			rights := &ttnpb.Rights{Rights: r}
-			if len(rights.Intersect(req.Required).GetRights()) == 0 {
-				return nil, errNoGatewayRights.New()
-			}
 		}
 	}
 	return ttnpb.Empty, nil

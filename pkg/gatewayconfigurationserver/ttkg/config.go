@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gatewayconfigurationserver
+package ttkg
 
-// TheThingsGatewayConfig is the configuration for The Things Gateway.
-type TheThingsGatewayConfig struct {
+// Config is the configuration for The Things Kickstarter Gateway.
+type Config struct {
 	Default struct {
 		UpdateChannel string `name:"update-channel" description:"The default update channel that the gateways should use"`
 		MQTTServer    string `name:"mqtt-server" description:"The default MQTT server that the gateways should use"`

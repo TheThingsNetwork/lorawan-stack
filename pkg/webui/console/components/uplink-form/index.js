@@ -39,7 +39,6 @@ import {
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 const m = defineMessages({
-  simulateUplink: 'Simulate uplink',
   payloadDescription: 'The desired payload bytes of the uplink message',
   uplinkSuccess: 'Uplink sent',
 })
@@ -108,7 +107,7 @@ const UplinkForm = () => {
       {deviceSimulationDisabled && (
         <Notification content={sharedMessages.deviceSimulationDisabledWarning} warning small />
       )}
-      <IntlHelmet title={m.simulateUplink} />
+      <IntlHelmet title={sharedMessages.simulateUplink} />
       <Form
         error={error}
         initialValues={initialValues}
@@ -116,7 +115,7 @@ const UplinkForm = () => {
         onSubmit={handleSubmit}
         disabled={deviceSimulationDisabled}
       >
-        <Form.SubTitle title={m.simulateUplink} />
+        <Form.SubTitle title={sharedMessages.simulateUplink} />
         <Form.Field
           name="f_port"
           title="FPort"
@@ -135,7 +134,7 @@ const UplinkForm = () => {
           unbounded
         />
         <SubmitBar>
-          <Form.Submit component={SubmitButton} message={m.simulateUplink} />
+          <Form.Submit component={SubmitButton} message={sharedMessages.simulateUplink} />
         </SubmitBar>
       </Form>
     </>

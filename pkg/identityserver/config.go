@@ -124,7 +124,7 @@ type Config struct {
 }
 
 type emailTemplatesConfig struct {
-	Source    string                `name:"source" description:"Source of the email template files (static, directory, url, blob)"`
+	Source    string                `name:"source" description:"Source of the email template files (directory, url, blob)"` // nolint:lll
 	Static    map[string][]byte     `name:"-"`
 	Directory string                `name:"directory" description:"Retrieve the email templates from the filesystem"`
 	URL       string                `name:"url" description:"Retrieve the email templates from a web server"`

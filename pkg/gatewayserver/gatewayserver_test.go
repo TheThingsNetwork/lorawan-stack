@@ -73,7 +73,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 		Eui:       registeredGatewayEUI.Bytes(),
 	}
 	gtw := mockis.DefaultGateway(ids, true, true)
-	is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, gtw, testRights...)
+	is.GatewayRegistry().Add(ctx, ids, "Bearer", registeredGatewayKey, gtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -124,7 +124,7 @@ func TestUpdateVersionInfo(t *testing.T) { //nolint:paralleltest
 	}
 
 	mockGtw := mockis.DefaultGateway(gtwIDs, true, true)
-	is.GatewayRegistry().Add(ctx, gtwIDs, registeredGatewayKey, mockGtw, testRights...)
+	is.GatewayRegistry().Add(ctx, gtwIDs, "Bearer", registeredGatewayKey, mockGtw, testRights...)
 	time.Sleep(timeout) // Wait for setup to be completed.
 
 	link := func(ctx context.Context, ids *ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {
@@ -393,11 +393,11 @@ func TestBatchGetStatus(t *testing.T) { // nolint:paralleltest
 			a.So(res, should.BeNil)
 
 			mockGtw1 := mockis.DefaultGateway(gtwIDs1, true, true)
-			is.GatewayRegistry().Add(ctx, gtwIDs1, registeredGatewayKey, mockGtw1, testRights...)
+			is.GatewayRegistry().Add(ctx, gtwIDs1, "Bearer", registeredGatewayKey, mockGtw1, testRights...)
 			time.Sleep(timeout) // Wait for setup to be completed.
 
 			mockGtw2 := mockis.DefaultGateway(gtwIDs2, true, true)
-			is.GatewayRegistry().Add(ctx, gtwIDs2, registeredGatewayKey, mockGtw2, testRights...)
+			is.GatewayRegistry().Add(ctx, gtwIDs2, "Bearer", registeredGatewayKey, mockGtw2, testRights...)
 			time.Sleep(timeout) // Wait for setup to be completed.
 
 			// Invalid batch

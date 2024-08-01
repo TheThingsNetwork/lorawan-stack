@@ -22,10 +22,12 @@ import (
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	. "go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/peer"
 )
 
 func TestPeer(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	m := Peer()
@@ -33,9 +35,32 @@ func TestPeer(t *testing.T) {
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
 
 	rec := httptest.NewRecorder()
-	m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	m(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		peer, ok := peer.FromContext(r.Context())
 		a.So(ok, should.BeTrue)
 		a.So(peer.Addr.String(), should.Equal, "192.0.2.1:1234")
 	})).ServeHTTP(rec, r)
+}
+
+func TestPeerTLS(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+
+	m := Peer()
+
+	handler := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		peer, ok := peer.FromContext(r.Context())
+		a.So(ok, should.BeTrue)
+		a.So(peer.AuthInfo, should.HaveSameTypeAs, credentials.TLSInfo{})
+	})
+
+	server := httptest.NewTLSServer(m(handler))
+	defer server.Close()
+
+	client := server.Client()
+	resp, err := client.Get(server.URL)
+	if err != nil {
+		t.Fatalf("Failed to make a GET request: %v", err)
+	}
+	defer resp.Body.Close()
 }

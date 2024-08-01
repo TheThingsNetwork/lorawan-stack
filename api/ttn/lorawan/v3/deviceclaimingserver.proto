@@ -286,7 +286,9 @@ service EndDeviceBatchClaimingServer {
   }
 }
 
+// DEPRECATED: This message is deprecated and will be removed in a future version of The Things Stack.
 message CUPSRedirection {
+  option deprecated = true;
   // CUPS URI for LoRa Basics Station CUPS redirection.
   string target_cups_uri = 1 [(validate.rules).string = {
     uri: true,
@@ -356,7 +358,8 @@ message ClaimGatewayRequest {
   string target_gateway_server_address = 5 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
 
   // Parameters to set CUPS redirection for the gateway.
-  CUPSRedirection cups_redirection = 6;
+  // DEPRECATED: This field is deprecated and will be removed in a future version of The Things Stack.
+  CUPSRedirection cups_redirection = 6 [deprecated = true];
 
   // Frequency plan ID of the target gateway.
   // TODO: Remove this field (https://github.com/TheThingsIndustries/lorawan-stack/issues/4024)
@@ -416,6 +419,9 @@ message GetInfoByGatewayEUIResponse {
     }
   ];
   bool supports_claiming = 2;
+  // Indicates whether the gateway is a managed gateway.
+  // If true, when the gateway is successfully claimed, it can be managed with ManagedGatewayConfigurationService.
+  bool is_managed = 3;
 }
 
 // The GatewayClaimingServer service support claiming and managing gateway claims.
@@ -429,17 +435,10 @@ service GatewayClaimingServer {
     };
   }
 
-  // AuthorizeGateway allows a gateway to be claimed.
-  rpc AuthorizeGateway(AuthorizeGatewayRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/gcls/gateways/{gateway_ids.gateway_id}/authorize",
-      body: "*"
-    };
-  }
-
-  // UnauthorizeGateway prevents a gateway from being claimed.
-  rpc UnauthorizeGateway(GatewayIdentifiers) returns (google.protobuf.Empty) {
-    option (google.api.http) = {delete: "/gcls/gateways/{gateway_id}/authorize"};
+  // Unclaims the gateway.
+  // EUI provided in the request are ignored and the end device is looked up by the gateway ID.
+  rpc Unclaim(GatewayIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/gcls/claim/{gateway_id}"};
   }
 
   // Return whether claiming is available for a given gateway EUI.
@@ -448,5 +447,24 @@ service GatewayClaimingServer {
       post: "/gcls/claim/info",
       body: "*"
     };
+  }
+
+  // AuthorizeGateway allows a gateway to be claimed.
+  // DEPRECATED: Authorizing gateways for claiming is no longer supported and will be removed in a future version of The
+  // Things Stack.
+  rpc AuthorizeGateway(AuthorizeGatewayRequest) returns (google.protobuf.Empty) {
+    option deprecated = true;
+    option (google.api.http) = {
+      post: "/gcls/gateways/{gateway_ids.gateway_id}/authorize",
+      body: "*"
+    };
+  }
+
+  // UnauthorizeGateway prevents a gateway from being claimed.
+  // DEPRECATED: Unauthorizing (locking) gateways for claiming is no longer supported and will be removed in a future
+  // version of The Things Stack.
+  rpc UnauthorizeGateway(GatewayIdentifiers) returns (google.protobuf.Empty) {
+    option deprecated = true;
+    option (google.api.http) = {delete: "/gcls/gateways/{gateway_id}/authorize"};
   }
 }

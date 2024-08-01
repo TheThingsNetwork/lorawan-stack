@@ -106,16 +106,24 @@
       "description": "Fetch configuration for gateways."
     },
     {
+      "name": "ManagedGatewayConfigurationService",
+      "description": "Configure managed gateways."
+    },
+    {
+      "name": "ManagedGatewayWiFiProfileConfigurationService",
+      "description": "Configure WiFi profiles for managed gateways."
+    },
+    {
+      "name": "ManagedGatewayEthernetProfileConfigurationService",
+      "description": "Configure Ethernet profiles for managed gateways."
+    },
+    {
       "name": "GatewayRegistry",
       "description": "Manage gateways."
     },
     {
       "name": "GatewayAccess",
       "description": "Manage access to gateways."
-    },
-    {
-      "name": "GatewayConfigurator",
-      "description": "Fetch gateway configuration."
     },
     {
       "name": "GatewayBatchAccess",
@@ -7862,9 +7870,49 @@
         ]
       }
     },
+    "/gcls/claim/{gateway_id}": {
+      "delete": {
+        "summary": "Unclaims the gateway.\nEUI provided in the request are ignored and the end device is looked up by the gateway ID.",
+        "operationId": "GatewayClaimingServer_Unclaim",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "GatewayClaimingServer"
+        ]
+      }
+    },
     "/gcls/gateways/{gateway_ids.gateway_id}/authorize": {
       "post": {
-        "summary": "AuthorizeGateway allows a gateway to be claimed.",
+        "summary": "AuthorizeGateway allows a gateway to be claimed.\nDEPRECATED: Authorizing gateways for claiming is no longer supported and will be removed in a future version of The\nThings Stack.",
         "operationId": "GatewayClaimingServer_AuthorizeGateway",
         "responses": {
           "200": {
@@ -7904,7 +7952,7 @@
     },
     "/gcls/gateways/{gateway_id}/authorize": {
       "delete": {
-        "summary": "UnauthorizeGateway prevents a gateway from being claimed.",
+        "summary": "UnauthorizeGateway prevents a gateway from being claimed.\nDEPRECATED: Unauthorizing (locking) gateways for claiming is no longer supported and will be removed in a future\nversion of The Things Stack.",
         "operationId": "GatewayClaimingServer_UnauthorizeGateway",
         "responses": {
           "200": {
@@ -8051,6 +8099,1206 @@
         ],
         "tags": [
           "GatewayConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/managed/{gateway.ids.gateway_id}": {
+      "put": {
+        "operationId": "ManagedGatewayConfigurationService_Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGateway"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway.ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayConfigurationServiceUpdateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/managed/{gateway_ids.gateway_id}": {
+      "get": {
+        "operationId": "ManagedGatewayConfigurationService_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGateway"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/managed/{gateway_id}/events": {
+      "post": {
+        "operationId": "ManagedGatewayConfigurationService_StreamEvents",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v3ManagedGatewayEventData"
+                },
+                "error": {
+                  "$ref": "#/definitions/googlerpcStatus"
+                }
+              },
+              "title": "Stream result of v3ManagedGatewayEventData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ManagedGatewayConfigurationServiceStreamEventsBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/managed/{gateway_id}/wifi/scan": {
+      "post": {
+        "operationId": "ManagedGatewayConfigurationService_ScanWiFiAccessPoints",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiAccessPoints"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ManagedGatewayConfigurationServiceScanWiFiAccessPointsBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}": {
+      "get": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfiles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      },
+      "post": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfileConfigurationServiceCreateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile.profile_id}": {
+      "put": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile.profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfileConfigurationServiceUpdateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/ethernet/organizations/{collaborator.organization_ids.organization_id}/{profile_id}": {
+      "get": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}": {
+      "get": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_List2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfiles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      },
+      "post": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_Create2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfileConfigurationServiceCreateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile.profile_id}": {
+      "put": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_Update2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile.profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfileConfigurationServiceUpdateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/ethernet/users/{collaborator.user_ids.user_id}/{profile_id}": {
+      "get": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_Get2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayEthernetProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagedGatewayEthernetProfileConfigurationService_Delete2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayEthernetProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}": {
+      "get": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfiles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      },
+      "post": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfileConfigurationServiceCreateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile.profile_id}": {
+      "put": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile.profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfileConfigurationServiceUpdateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/wifi/organizations/{collaborator.organization_ids.organization_id}/{profile_id}": {
+      "get": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}": {
+      "get": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_List2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfiles"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      },
+      "post": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_Create2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfileConfigurationServiceCreateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile.profile_id}": {
+      "put": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_Update2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile.profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfileConfigurationServiceUpdateBody"
+            }
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/profiles/wifi/users/{collaborator.user_ids.user_id}/{profile_id}": {
+      "get": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_Get2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ManagedGatewayWiFiProfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "field_mask",
+            "description": "The names of the gateway fields that should be returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagedGatewayWiFiProfileConfigurationService_Delete2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagedGatewayWiFiProfileConfigurationService"
         ]
       }
     },
@@ -17161,6 +18409,28 @@
       ],
       "default": "AT_MOST_ONCE"
     },
+    "ManagedGatewayConfigurationServiceScanWiFiAccessPointsBody": {
+      "type": "object",
+      "properties": {
+        "eui": {
+          "type": "string",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
+          "description": "Secondary identifier, which can only be used in specific requests."
+        }
+      }
+    },
+    "ManagedGatewayConfigurationServiceStreamEventsBody": {
+      "type": "object",
+      "properties": {
+        "eui": {
+          "type": "string",
+          "format": "string",
+          "example": "70B3D57ED000ABCD",
+          "description": "Secondary identifier, which can only be used in specific requests."
+        }
+      }
+    },
     "NotificationServiceUpdateStatusBody": {
       "type": "object",
       "properties": {
@@ -20451,7 +21721,8 @@
           "type": "string",
           "description": "The Device Claiming Server will fill this field with a The Things Stack API Key."
         }
-      }
+      },
+      "description": "DEPRECATED: This message is deprecated and will be removed in a future version of The Things Stack."
     },
     "v3ClaimEndDeviceRequest": {
       "type": "object",
@@ -20520,7 +21791,7 @@
         },
         "cups_redirection": {
           "$ref": "#/definitions/v3CUPSRedirection",
-          "description": "Parameters to set CUPS redirection for the gateway."
+          "description": "Parameters to set CUPS redirection for the gateway.\nDEPRECATED: This field is deprecated and will be removed in a future version of The Things Stack."
         },
         "target_frequency_plan_id": {
           "type": "string",
@@ -23268,6 +24539,9 @@
         },
         "firmware_version": {
           "type": "string"
+        },
+        "runtime_version": {
+          "type": "string"
         }
       },
       "description": "Identifies an end device model with version information."
@@ -23422,6 +24696,10 @@
         },
         "supports_claiming": {
           "type": "boolean"
+        },
+        "is_managed": {
+          "type": "boolean",
+          "description": "Indicates whether the gateway is a managed gateway.\nIf true, when the gateway is successfully claimed, it can be managed with ManagedGatewayConfigurationService."
         }
       }
     },
@@ -24873,6 +26151,508 @@
         "LORAWAN_R1"
       ],
       "default": "LORAWAN_R1"
+    },
+    "v3ManagedGateway": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+        },
+        "version_ids": {
+          "$ref": "#/definitions/v3GatewayVersionIdentifiers"
+        },
+        "cellular_imei": {
+          "type": "string"
+        },
+        "cellular_imsi": {
+          "type": "string"
+        },
+        "wifi_mac_address": {
+          "type": "string",
+          "format": "string",
+          "example": "EC656E000100"
+        },
+        "ethernet_mac_address": {
+          "type": "string",
+          "format": "string",
+          "example": "EC656E000100"
+        },
+        "wifi_profile_id": {
+          "type": "string"
+        },
+        "ethernet_profile_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v3ManagedGatewayCellularBackhaul": {
+      "type": "object",
+      "properties": {
+        "network_interface": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceInfo"
+        },
+        "operator": {
+          "type": "string"
+        },
+        "rssi": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "v3ManagedGatewayConfigurationServiceUpdateBody": {
+      "type": "object",
+      "properties": {
+        "gateway": {
+          "type": "object",
+          "properties": {
+            "ids": {
+              "type": "object",
+              "properties": {
+                "eui": {
+                  "type": "string",
+                  "format": "string",
+                  "example": "70B3D57ED000ABCD",
+                  "description": "Secondary identifier, which can only be used in specific requests."
+                }
+              }
+            },
+            "version_ids": {
+              "$ref": "#/definitions/v3GatewayVersionIdentifiers"
+            },
+            "cellular_imei": {
+              "type": "string"
+            },
+            "cellular_imsi": {
+              "type": "string"
+            },
+            "wifi_mac_address": {
+              "type": "string",
+              "format": "string",
+              "example": "EC656E000100"
+            },
+            "ethernet_mac_address": {
+              "type": "string",
+              "format": "string",
+              "example": "EC656E000100"
+            },
+            "wifi_profile_id": {
+              "type": "string"
+            },
+            "ethernet_profile_id": {
+              "type": "string"
+            }
+          }
+        },
+        "field_mask": {
+          "type": "string",
+          "description": "The names of the gateway fields that should be updated."
+        }
+      }
+    },
+    "v3ManagedGatewayControllerConnection": {
+      "type": "object",
+      "properties": {
+        "network_interface_type": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceType"
+        }
+      }
+    },
+    "v3ManagedGatewayEthernetBackhaul": {
+      "type": "object",
+      "properties": {
+        "network_interface": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceInfo"
+        }
+      }
+    },
+    "v3ManagedGatewayEthernetProfile": {
+      "type": "object",
+      "properties": {
+        "profile_id": {
+          "type": "string"
+        },
+        "profile_name": {
+          "type": "string"
+        },
+        "shared": {
+          "type": "boolean"
+        },
+        "network_interface_addresses": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceAddresses"
+        }
+      }
+    },
+    "v3ManagedGatewayEthernetProfileConfigurationServiceCreateBody": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/definitions/v3ManagedGatewayEthernetProfile"
+        },
+        "collaborator": {
+          "type": "object",
+          "properties": {
+            "organization_ids": {
+              "$ref": "#/definitions/v3OrganizationIdentifiers"
+            },
+            "user_ids": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "Secondary identifier, which can only be used in specific requests."
+                }
+              }
+            }
+          },
+          "description": "OrganizationOrUserIdentifiers contains either organization or user identifiers."
+        }
+      }
+    },
+    "v3ManagedGatewayEthernetProfileConfigurationServiceUpdateBody": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "type": "object",
+          "properties": {
+            "profile_name": {
+              "type": "string"
+            },
+            "shared": {
+              "type": "boolean"
+            },
+            "network_interface_addresses": {
+              "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceAddresses"
+            }
+          }
+        },
+        "collaborator": {
+          "type": "object",
+          "properties": {
+            "organization_ids": {
+              "$ref": "#/definitions/v3OrganizationIdentifiers"
+            },
+            "user_ids": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "Secondary identifier, which can only be used in specific requests."
+                }
+              }
+            }
+          },
+          "description": "OrganizationOrUserIdentifiers contains either organization or user identifiers."
+        },
+        "field_mask": {
+          "type": "string",
+          "description": "The names of the gateway fields that should be updated."
+        }
+      }
+    },
+    "v3ManagedGatewayEthernetProfiles": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3ManagedGatewayEthernetProfile"
+          }
+        }
+      }
+    },
+    "v3ManagedGatewayEventData": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "$ref": "#/definitions/v3ManagedGateway"
+        },
+        "location": {
+          "$ref": "#/definitions/lorawanv3Location"
+        },
+        "system_status": {
+          "$ref": "#/definitions/v3ManagedGatewaySystemStatus"
+        },
+        "controller_connection": {
+          "$ref": "#/definitions/v3ManagedGatewayControllerConnection"
+        },
+        "gateway_server_connection": {
+          "$ref": "#/definitions/v3ManagedGatewayGatewayServerConnection"
+        },
+        "cellular_backhaul": {
+          "$ref": "#/definitions/v3ManagedGatewayCellularBackhaul"
+        },
+        "wifi_backhaul": {
+          "$ref": "#/definitions/v3ManagedGatewayWiFiBackhaul"
+        },
+        "ethernet_backhaul": {
+          "$ref": "#/definitions/v3ManagedGatewayEthernetBackhaul"
+        }
+      }
+    },
+    "v3ManagedGatewayGatewayServerConnection": {
+      "type": "object",
+      "properties": {
+        "network_interface_type": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceType"
+        },
+        "address": {
+          "type": "string"
+        }
+      }
+    },
+    "v3ManagedGatewayNetworkInterfaceAddresses": {
+      "type": "object",
+      "properties": {
+        "ip_addresses": {
+          "type": "string",
+          "example": [
+            "192.0.2.0",
+            "2001:db8::1"
+          ],
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "subnet_mask": {
+          "type": "string",
+          "format": "string",
+          "example": "192.0.2.0"
+        },
+        "gateway": {
+          "type": "string",
+          "format": "string",
+          "example": "192.0.2.0"
+        },
+        "dns_servers": {
+          "type": "string",
+          "example": [
+            "192.0.2.0",
+            "192.0.2.1"
+          ],
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        }
+      }
+    },
+    "v3ManagedGatewayNetworkInterfaceInfo": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceStatus"
+        },
+        "dhcp_enabled": {
+          "type": "boolean"
+        },
+        "addresses": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceAddresses"
+        }
+      }
+    },
+    "v3ManagedGatewayNetworkInterfaceStatus": {
+      "type": "string",
+      "enum": [
+        "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UNSPECIFIED",
+        "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_DOWN",
+        "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UP",
+        "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_FAILED"
+      ],
+      "default": "MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UNSPECIFIED"
+    },
+    "v3ManagedGatewayNetworkInterfaceType": {
+      "type": "string",
+      "enum": [
+        "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_UNSPECIFIED",
+        "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_CELLULAR",
+        "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_WIFI",
+        "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_ETHERNET"
+      ],
+      "default": "MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_UNSPECIFIED"
+    },
+    "v3ManagedGatewaySystemStatus": {
+      "type": "object",
+      "properties": {
+        "cpu_temperature": {
+          "type": "number",
+          "format": "float",
+          "description": "CPU temperature (Celsius)."
+        }
+      }
+    },
+    "v3ManagedGatewayWiFiAccessPoint": {
+      "type": "object",
+      "properties": {
+        "ssid": {
+          "type": "string"
+        },
+        "bssid": {
+          "type": "string",
+          "format": "string",
+          "example": "EC656E000100"
+        },
+        "channel": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "authentication_mode": {
+          "type": "string"
+        },
+        "rssi": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "v3ManagedGatewayWiFiAccessPoints": {
+      "type": "object",
+      "properties": {
+        "access_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3ManagedGatewayWiFiAccessPoint"
+          }
+        }
+      }
+    },
+    "v3ManagedGatewayWiFiBackhaul": {
+      "type": "object",
+      "properties": {
+        "network_interface": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceInfo"
+        },
+        "ssid": {
+          "type": "string"
+        },
+        "bssid": {
+          "type": "string",
+          "format": "string",
+          "example": "EC656E000100"
+        },
+        "channel": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "authentication_mode": {
+          "type": "string"
+        },
+        "rssi": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "v3ManagedGatewayWiFiProfile": {
+      "type": "object",
+      "properties": {
+        "profile_id": {
+          "type": "string"
+        },
+        "profile_name": {
+          "type": "string"
+        },
+        "shared": {
+          "type": "boolean"
+        },
+        "ssid": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "network_interface_addresses": {
+          "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceAddresses"
+        }
+      }
+    },
+    "v3ManagedGatewayWiFiProfileConfigurationServiceCreateBody": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/definitions/v3ManagedGatewayWiFiProfile"
+        },
+        "collaborator": {
+          "type": "object",
+          "properties": {
+            "organization_ids": {
+              "$ref": "#/definitions/v3OrganizationIdentifiers"
+            },
+            "user_ids": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "Secondary identifier, which can only be used in specific requests."
+                }
+              }
+            }
+          },
+          "description": "OrganizationOrUserIdentifiers contains either organization or user identifiers."
+        }
+      }
+    },
+    "v3ManagedGatewayWiFiProfileConfigurationServiceUpdateBody": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "type": "object",
+          "properties": {
+            "profile_name": {
+              "type": "string"
+            },
+            "shared": {
+              "type": "boolean"
+            },
+            "ssid": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "network_interface_addresses": {
+              "$ref": "#/definitions/v3ManagedGatewayNetworkInterfaceAddresses"
+            }
+          }
+        },
+        "collaborator": {
+          "type": "object",
+          "properties": {
+            "organization_ids": {
+              "$ref": "#/definitions/v3OrganizationIdentifiers"
+            },
+            "user_ids": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "Secondary identifier, which can only be used in specific requests."
+                }
+              }
+            }
+          },
+          "description": "OrganizationOrUserIdentifiers contains either organization or user identifiers."
+        },
+        "field_mask": {
+          "type": "string",
+          "description": "The names of the gateway fields that should be updated."
+        }
+      }
+    },
+    "v3ManagedGatewayWiFiProfiles": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3ManagedGatewayWiFiProfile"
+          }
+        }
+      }
     },
     "v3MessagePayloadDecoder": {
       "type": "object",
