@@ -49,7 +49,6 @@ const DeviceGeneralInformationPanel = ({ frequencyPlans }) => {
   const device = useSelector(selectSelectedDevice)
   const {
     ids,
-    description,
     root_keys = {},
     session: actualSession,
     pending_session,
@@ -84,12 +83,6 @@ const DeviceGeneralInformationPanel = ({ frequencyPlans }) => {
       header: sharedMessages.generalInformation,
       items: [
         { key: sharedMessages.devID, value: ids.device_id, type: 'code', sensitive: false },
-        ...(description
-          ? {
-              key: sharedMessages.description,
-              value: description || <Message content={sharedMessages.noDesc} />,
-            }
-          : undefined),
         {
           key: sharedMessages.frequencyPlan,
           value: frequencyPlan,

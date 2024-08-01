@@ -15,6 +15,8 @@
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
+import { GATEWAY } from '@console/constants/entities'
+
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Form from '@ttn-lw/components/form'
@@ -38,14 +40,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
-import {
-  checkFromState,
-  mayDeleteGateway,
-  mayViewOrEditGatewayApiKeys,
-  mayViewOrEditGatewayCollaborators,
-} from '@console/lib/feature-checks'
-
-import { deleteGateway } from '@console/store/actions/gateways'
+import { checkFromState, mayDeleteGateway } from '@console/lib/feature-checks'
 
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
 import { selectUserId } from '@console/store/selectors/logout'
@@ -272,19 +267,11 @@ const BasicSettingsForm = React.memo(props => {
             danger
           />
           <DeleteEntityHeaderModal
-            entity="gateway"
+            entity={GATEWAY}
             entityId={gtwId}
             entityName={gateway.name}
             setVisible={setDeleteGtwVisible}
             visible={deleteGtwVisible}
-            mayDeleteEntitySelector={mayDeleteGateway}
-            mayViewOrEditEntityCollaborators={mayViewOrEditGatewayCollaborators}
-            mayViewOrEditEntityApiKeys={mayViewOrEditGatewayApiKeys}
-            path="/gateways"
-            deleteEntity={deleteGateway}
-            deleteMessage={sharedMessages.deleteGateway}
-            deletedMessage={sharedMessages.gatewayDeleted}
-            deletedErrorMessage={sharedMessages.gatewayDeleteError}
           />
         </Require>
       </SubmitBar>

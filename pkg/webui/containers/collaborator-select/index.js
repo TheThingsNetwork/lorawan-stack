@@ -109,8 +109,8 @@ const Suggest = ({
           const newOptions = searchResultsRef?.current?.map(account => ({
             value:
               'user_ids' in account
-                ? account.user_ids?.user_id
-                : account.organization_ids?.organization_id,
+                ? `user#${account.user_ids?.user_id}`
+                : `organization#${account.organization_ids?.organization_id}`,
             label:
               'user_ids' in account
                 ? account.user_ids?.user_id
@@ -181,7 +181,7 @@ Suggest.propTypes = {
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired,
-      icon: PropTypes.string.isRequired,
+      icon: PropTypes.shape({}).isRequired,
     }),
   ),
   isResctrictedUser: PropTypes.bool,

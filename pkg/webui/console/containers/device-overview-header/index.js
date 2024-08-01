@@ -27,6 +27,7 @@ import Icon, {
   IconArrowsSort,
   IconBroadcast,
   IconTrash,
+  IconDownload,
 } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
@@ -81,6 +82,10 @@ const m = defineMessages({
     'The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.',
   downloadMacData: 'Download MAC data',
   macStateError: 'There was an error and MAC state could not be included in the MAC data',
+  sensitiveDataWarning:
+    'The MAC data can contain sensitive information such as session keys that can be used to decrypt messages. <b>Do not share this information publicly</b>.',
+  noSessionWarning:
+    'The end device is currently not connected to the network (no active session). The MAC data will hence only contain the current MAC settings.',
 })
 
 const nsHost = getHostFromUrl(selectNsConfig().base_url)
@@ -110,12 +115,34 @@ DeviceDeleteModal.propTypes = {
   visible: PropTypes.bool.isRequired,
 }
 
+const DeviceDownloadMacDataModal = ({ visible, handleComplete, message }) => (
+  <PortalledModal
+    visible={visible}
+    onComplete={handleComplete}
+    title={m.downloadMacData}
+    message={message}
+    approveButtonProps={{
+      icon: IconDownload,
+      primary: true,
+      message: m.downloadMacData,
+    }}
+  />
+)
+
+DeviceDownloadMacDataModal.propTypes = {
+  handleComplete: PropTypes.func.isRequired,
+  message: PropTypes.message.isRequired,
+  visible: PropTypes.bool.isRequired,
+}
+
 const DeviceOverviewHeader = ({ device }) => {
   const [deleteDeviceVisible, setDeleteDeviceVisible] = useState(false)
+  const [downloadMacDataVisible, setDownloadMacDataVisible] = useState(false)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { ids, name } = device
+  const { ids, name, session: actualSession, pending_session } = device
+  const session = actualSession || pending_session
   const { device_id } = ids
   const [appId, devId] = useSelector(selectSelectedCombinedDeviceId).split('/')
   const uplinkFrameCount = useSelector(state =>
@@ -194,34 +221,41 @@ const DeviceOverviewHeader = ({ device }) => {
     }
   }, [dispatch, device_id, ids, isBookmarked, user.ids])
 
-  const onExport = useCallback(async () => {
-    const { ids, mac_settings, session, network_server_address } = device
+  const onExport = useCallback(
+    async confirmed => {
+      if (confirmed) {
+        const { mac_settings, network_server_address } = device
 
-    let result
-    if (session && nsEnabled && getHostFromUrl(network_server_address) === nsHost) {
-      try {
-        result = await tts.Applications.Devices.getById(appId, ids.device_id, ['mac_state'])
+        let result
+        if (session && nsEnabled && getHostFromUrl(network_server_address) === nsHost) {
+          try {
+            result = await tts.Applications.Devices.getById(appId, ids.device_id, ['mac_state'])
 
-        if (!('mac_state' in result)) {
-          toast({
-            title: m.downloadMacData,
-            message: m.macStateError,
-            type: toast.types.ERROR,
-          })
+            if (!('mac_state' in result)) {
+              toast({
+                title: m.downloadMacData,
+                message: m.macStateError,
+                type: toast.types.ERROR,
+              })
+            }
+          } catch {
+            toast({
+              title: m.downloadMacData,
+              message: m.macStateError,
+              type: toast.types.ERROR,
+            })
+          }
         }
-      } catch {
-        toast({
-          title: m.downloadMacData,
-          message: m.macStateError,
-          type: toast.types.ERROR,
-        })
-      }
-    }
 
-    const toExport = { mac_state: result?.mac_state, mac_settings }
-    const toExportData = composeDataUri(JSON.stringify(toExport, undefined, 2))
-    downloadDataUriAsFile(toExportData, `${ids.device_id}_mac_data_${Date.now()}.json`)
-  }, [appId, device])
+        const toExport = { mac_state: result?.mac_state, mac_settings }
+        const toExportData = composeDataUri(JSON.stringify(toExport, undefined, 2))
+        downloadDataUriAsFile(toExportData, `${ids.device_id}_mac_data_${Date.now()}.json`)
+      }
+
+      setDownloadMacDataVisible(false)
+    },
+    [appId, device, session, ids.device_id],
+  )
 
   const handleUnclaim = useCallback(async () => {
     const {
@@ -289,9 +323,13 @@ const DeviceOverviewHeader = ({ device }) => {
     setDeleteDeviceVisible(true)
   }, [])
 
+  const handleOpenDownloadMacDataModal = useCallback(() => {
+    setDownloadMacDataVisible(true)
+  }, [])
+
   const menuDropdownItems = (
     <>
-      <Dropdown.Item title={m.downloadMacData} action={onExport} />
+      <Dropdown.Item title={m.downloadMacData} action={handleOpenDownloadMacDataModal} />
       <Dropdown.Item
         title={
           supportsClaiming ? sharedMessages.unclaimAndDeleteDevice : sharedMessages.deleteDevice
@@ -302,7 +340,7 @@ const DeviceOverviewHeader = ({ device }) => {
   )
 
   return (
-    <div className={style.root}>
+    <div className={style.root} data-test-id="device-overview-header">
       <div className="overflow-hidden d-flex flex-column gap-cs-xs">
         <h5 className={style.name}>{name || device_id}</h5>
         <span className={style.id}>
@@ -375,6 +413,7 @@ const DeviceOverviewHeader = ({ device }) => {
             }
           />
           <Button
+            data-test-id="device-header-menu"
             secondary
             icon={IconMenu2}
             noDropdownIcon
@@ -390,6 +429,20 @@ const DeviceOverviewHeader = ({ device }) => {
           }
           message={sharedMessages.deleteWarning}
           deviceId={name ?? device_id}
+        />
+        <DeviceDownloadMacDataModal
+          visible={downloadMacDataVisible}
+          handleComplete={onExport}
+          message={
+            session
+              ? {
+                  values: { b: msg => <b>{msg}</b> },
+                  ...m.sensitiveDataWarning,
+                }
+              : {
+                  ...m.noSessionWarning,
+                }
+          }
         />
       </div>
     </div>

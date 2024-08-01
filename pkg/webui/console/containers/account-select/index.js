@@ -68,8 +68,8 @@ const Suggest = ({ entity, entityId, ...rest }) => {
         const newOptions = searchResultsRef.current.map(account => ({
           value:
             'user_ids' in account
-              ? account.user_ids?.user_id
-              : account.organization_ids?.organization_id,
+              ? `user#${account.user_ids?.user_id}`
+              : `organization#${account.organization_ids?.organization_id}`,
           label:
             'user_ids' in account
               ? account.user_ids?.user_id

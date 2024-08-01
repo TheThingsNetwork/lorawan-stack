@@ -60,6 +60,7 @@ const Panel = ({
   shortCutLinkDisabled,
 }) => (
   <div
+    data-test-id={`overview-panel-${title?.defaultMessage ?? ''}`}
     className={classnames(styles.panel, className, { [styles.divider]: divider })}
     onMouseEnter={onMouseEnter}
     onMouseLeave={onMouseLeave}
