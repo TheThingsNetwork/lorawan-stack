@@ -35,6 +35,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	ctx = semtechws.NewContextWithSession(ctx, &semtechws.Session{})
 	semtechws.UpdateSessionID(ctx, 0x11)
 	var lbsLNS lbsLNS
+	downlinkTokens := &io.DownlinkTokens{}
 	for _, tc := range []struct {
 		BandID,
 		Name string
@@ -136,7 +137,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 				tc.DownlinkMessage,
 				tc.BandID,
 				time.Unix(1554300787, 123456000),
-				&io.DownlinkTokens{},
+				downlinkTokens,
 			)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()

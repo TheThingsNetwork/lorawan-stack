@@ -481,7 +481,11 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 }
 
 // ToTxAck converts the LoRa Basics Station TxConfirmation message to ttnpb.TxAcknowledgment
-func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens *io.DownlinkTokens, receivedAt time.Time) *ttnpb.TxAcknowledgment {
+func (conf TxConfirmation) ToTxAck(
+	ctx context.Context,
+	tokens *io.DownlinkTokens,
+	receivedAt time.Time,
+) *ttnpb.TxAcknowledgment {
 	var txAck ttnpb.TxAcknowledgment
 	if msg, _, ok := tokens.Get(uint16(conf.Diid), receivedAt); ok && msg != nil {
 		txAck.DownlinkMessage = msg
@@ -489,13 +493,15 @@ func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens *io.DownlinkToken
 		txAck.Result = ttnpb.TxAcknowledgment_SUCCESS
 	} else {
 		logger := log.FromContext(ctx)
-		logger.WithField("diid", conf.Diid).Debug("Tx acknowledgment either does not correspond to a downlink message or arrived too late")
+		logger.WithField("diid", conf.Diid).Debug(
+			"Tx acknowledgment either does not correspond to a downlink message or arrived too late",
+		)
 	}
 	return &txAck
 }
 
 // HandleUp implements Formatter.
-func (f *lbsLNS) HandleUp(
+func (f *lbsLNS) HandleUp( // nolint:gocyclo
 	ctx context.Context,
 	raw []byte,
 	ids *ttnpb.GatewayIdentifiers,
