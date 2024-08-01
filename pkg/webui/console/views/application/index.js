@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useEffect, useMemo } from 'react'
-import { Routes, Route, useParams } from 'react-router-dom'
+import { Routes, Route, useParams, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { APPLICATION } from '@console/constants/entities'
@@ -96,11 +96,13 @@ const Application = () => {
 
 const ApplicationInner = () => {
   const { appId } = useParams()
+  const { pathname } = useLocation()
   const application = useSelector(selectSelectedApplication)
   const name = application.name || appId
   const siteName = selectApplicationSiteName()
   const natsDisabled = useSelector(selectNatsProviderDisabled)
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
+  const isDeviceRoute = pathname.startsWith(`/applications/${appId}/devices/`)
 
   const dispatch = useDispatch()
   const stopStream = React.useCallback(id => dispatch(stopApplicationEventsStream(id)), [dispatch])
@@ -114,7 +116,7 @@ const ApplicationInner = () => {
   return (
     <>
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
-      <ApplicationOverviewHeader />
+      {!isDeviceRoute && <ApplicationOverviewHeader />}
       <Routes>
         <Route index Component={ApplicationOverview} />
         <Route path="general-settings" Component={ApplicationGeneralSettings} />
