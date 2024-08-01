@@ -141,6 +141,22 @@ export const [
   },
 ] = createPaginationRequestActions(SHARED_NAME)
 
+export const FETCH_APPS_LIST_BASE = 'FETCH_APPS_LIST'
+export const [
+  { request: FETCH_APPS_LIST, success: FETCH_APPS_LIST_SUCCESS, failure: FETCH_APPS_LIST_FAILURE },
+  {
+    request: fetchApplicationsList,
+    success: fetchApplicationsListSuccess,
+    failure: fetchApplicationsListFailure,
+  },
+] = createRequestActions(
+  FETCH_APPS_LIST_BASE,
+  ({ page, limit, query, order, deleted } = {}) => ({
+    params: { page, limit, query, order, deleted },
+  }),
+  (_, selectors = [], options = {}) => ({ selectors, options }),
+)
+
 export const GET_APPS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [
   {

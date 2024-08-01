@@ -119,7 +119,7 @@ const deleteDeviceLogic = createRequestLogic({
 })
 
 const getDevicesListLogic = createRequestLogic({
-  type: devices.GET_DEVICES_LIST,
+  type: [devices.GET_DEVICES_LIST, devices.FETCH_DEVICES_LIST],
   process: async ({ action }) => {
     const {
       id: appId,

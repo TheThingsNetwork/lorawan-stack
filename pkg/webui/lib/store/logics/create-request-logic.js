@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,58 +48,46 @@ let lastError
  * @param {object} options - The logic options (to be passed to `createLogic()`).
  * @param {boolean} options.noCancelOnRouteChange - Flag to disable the decoration
  * of the `cancelType` option.
- * @param {(string|Function)} successType - The success action type or action creator.
- * @param {(string|Function)} failType - The fail action type or action creator.
- * @param {(string|Function)} abortType - The abort action type or action creator.
+ * @param {string} abortType - The type of the abort action.
  * @returns {object} The `redux-logic` (decorated) logic.
  */
 const createRequestLogic = (
   { noCancelOnRouteChange, ...options },
-  successType = getResultActionFromType(options.type, 'SUCCESS'),
-  failType = getResultActionFromType(options.type, 'FAILURE'),
   abortType = getResultActionFromType(options.type, 'ABORT'),
 ) => {
-  if (!successType || !failType) {
+  if (
+    options.type === undefined ||
+    (options.type instanceof Array && options.type.length === 0) ||
+    (options.type instanceof Array &&
+      options.type.some(type => typeof type !== 'string' || type.indexOf('_REQUEST') === -1))
+  ) {
     throw new Error('Could not derive result actions from provided options')
   }
-
-  let successAction = successType
-  let failAction = failType
-  let abortAction = abortType
-
-  if (typeof successType === 'string') {
-    successAction = payload => ({ type: successType, payload })
-  }
-  if (typeof failType === 'string') {
-    failAction = (error, originalAction) => ({
-      type: failType,
-      error: true,
-      payload: error,
-      meta: { requestPayload: originalAction.payload },
-    })
-  }
-  if (typeof abortType === 'string') {
-    abortAction = () => ({ type: abortType })
-  }
-
   return createLogic({
     ...options,
     cancelType: abortType,
     process: async (deps, dispatch, done) => {
-      const { action, getState, cancelled$, action$ } = deps
+      const { action, getState, cancelled$ } = deps
       const promiseAttached = action.meta && action.meta._attachPromise
       const promisifiedDispatch = promisifyDispatch(dispatch)
       let actionSubscription
 
+      // Compose response actions.
+      const successAction = payload => ({
+        type: getResultActionFromType(action.type, 'SUCCESS'),
+        payload,
+      })
+      const failAction = (error, originalAction) => ({
+        type: getResultActionFromType(action.type, 'FAILURE'),
+        error: true,
+        payload: error,
+        meta: { requestPayload: originalAction.payload },
+      })
+      const abortAction = () => ({ type: getResultActionFromType(action.type, 'ABORT') })
+
       if (!noCancelOnRouteChange) {
         // Subscribe to action observable to dispatch an abort action on route changes.
-        actionSubscription = action$.subscribe({
-          next: action => {
-            if (action.type === '@@router/LOCATION_CHANGE') {
-              dispatch(abortAction())
-            }
-          },
-        })
+        // TODO: Reintroduce the route change detection after removing the `connected-react-router`.
       }
 
       let success = false

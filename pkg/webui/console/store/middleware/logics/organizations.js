@@ -38,7 +38,6 @@ const getOrganizationLogic = createRequestLogic({
 
 const getOrganizationsLogic = createRequestLogic({
   type: organizations.GET_ORGS_LIST,
-  latest: true,
   process: async ({ action }, dispatch) => {
     const {
       params: { page, limit, order, query, deleted },

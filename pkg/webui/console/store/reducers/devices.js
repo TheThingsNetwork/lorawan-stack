@@ -30,6 +30,7 @@ import {
   RESET_DEV_SUCCESS,
   GET_DEVICE_EVENT_MESSAGE_SUCCESS,
   DELETE_DEV_SUCCESS,
+  FETCH_DEVICES_LIST_SUCCESS,
 } from '@console/store/actions/devices'
 import { GET_APP_EVENT_MESSAGE_SUCCESS } from '@console/store/actions/applications'
 
@@ -156,6 +157,7 @@ const devices = (state = defaultState, { type, payload, event, meta }) => {
       }
 
       return mergeDerived(state, combinedId, defaultDerived)
+    case FETCH_DEVICES_LIST_SUCCESS:
     case GET_DEVICES_LIST_SUCCESS:
       const newEntities = payload.entities.reduce(
         (acc, dev) => {
