@@ -15,7 +15,6 @@
 import React from 'react'
 import classNames from 'classnames'
 import { useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
@@ -27,14 +26,16 @@ import Notification from '@console/components/notifications'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
-
 import style from '../notifications.styl'
 
-export const NotificationListItem = ({ notification, isSelected, isNextSelected }) => {
+export const NotificationListItem = ({
+  notification,
+  isSelected,
+  isNextSelected,
+  isUpdatePending,
+}) => {
   const { category } = useParams()
-  const totalUnseenCount = useSelector(selectTotalUnseenCount)
-  const showUnseenStatus = !notification.status && totalUnseenCount > 0
+  const showUnseenStatus = !notification.status && !isUpdatePending
   const classes = classNames(style.notificationPreview, {
     [style.notificationSelected]: isSelected,
     [style.notificationNextSelected]: isNextSelected,
@@ -85,6 +86,7 @@ export const NotificationListItem = ({ notification, isSelected, isNextSelected 
 NotificationListItem.propTypes = {
   isNextSelected: PropTypes.bool,
   isSelected: PropTypes.bool,
+  isUpdatePending: PropTypes.bool.isRequired,
   notification: PropTypes.shape({
     id: PropTypes.string,
     created_at: PropTypes.string,

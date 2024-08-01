@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState, useRef, useEffect } from 'react'
+import React, { useCallback, useState, useRef, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
@@ -24,10 +24,12 @@ import Button from '@ttn-lw/components/button'
 import Spinner from '@ttn-lw/components/spinner'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import useRequest from '@ttn-lw/lib/hooks/use-request'
 
 import {
   getArchivedNotifications,
   getInboxNotifications,
+  refreshNotifications,
   updateNotificationStatus,
 } from '@console/store/actions/notifications'
 
@@ -61,7 +63,7 @@ const Notifications = React.memo(() => {
   const listRef = useRef(null)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { id: notificationId, category = 'inbox' } = useParams()
+  const { id: notificationId, category } = useParams()
   const showArchived = category === 'archived'
   const items = useSelector(showArchived ? selectArchivedNotifications : selectInboxNotifications)
   const totalCount = useSelector(
@@ -70,8 +72,10 @@ const Notifications = React.memo(() => {
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const hasNextPage = items.length < totalCount
   const [fetching, setFetching] = useState(false)
-  const [selectionCache, setSelectionCache] = useState({ archived: undefined, inbox: undefined })
+  const [updatePendingNotificationIds, setUpdatePendingNotificationIds] = useState([])
+  const [updateNotificationStatusLoading, setUpdateNotificationStatusLoading] = useState(false)
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < LAYOUT.BREAKPOINTS.M)
+  const [refreshNotificationsLoading] = useRequest(refreshNotifications())
 
   const loadNextPage = useCallback(
     async (startIndex, stopIndex) => {
@@ -148,43 +152,51 @@ const Notifications = React.memo(() => {
     return () => window.removeEventListener('resize', handleResize)
   }, [category, dispatch, showArchived])
 
-  // Update the selection cache when a notification is selected.
-  // This is used to restore the selection when switching between categories.
-  useEffect(() => {
-    setSelectionCache(v => ({ ...v, [category]: notificationId }))
-  }, [category, notificationId])
+  const selectedNotification = useMemo(
+    () => items?.find(item => item.id === notificationId),
+    [items, notificationId],
+  )
 
-  // Set the first notification as selected if none is currently selected.
+  const isUpdateStatusPending = useMemo(
+    () => updatePendingNotificationIds.find(id => id === selectedNotification?.id),
+    [selectedNotification, updatePendingNotificationIds],
+  )
+
+  const handleUpdateNotificationStatus = useCallback(async () => {
+    setUpdateNotificationStatusLoading(true)
+    await dispatch(
+      attachPromise(
+        updateNotificationStatus(updatePendingNotificationIds, 'NOTIFICATION_STATUS_SEEN'),
+      ),
+    )
+    setUpdatePendingNotificationIds([])
+    setUpdateNotificationStatusLoading(false)
+  }, [dispatch, updatePendingNotificationIds])
+
   useEffect(() => {
     if (
-      !isSmallScreen &&
-      (!notificationId || !items.find(i => i.id === notificationId)) &&
-      items.length > 0
+      selectedNotification?.id &&
+      !selectedNotification?.status &&
+      !Boolean(isUpdateStatusPending)
     ) {
-      const selectedId = selectionCache[category] || items[0].id
-      navigate(`/notifications/${category}/${selectedId}`)
+      setUpdatePendingNotificationIds(ids => [...ids, selectedNotification.id])
     }
-  }, [category, isSmallScreen, items, navigate, notificationId, selectionCache])
+  }, [isUpdateStatusPending, selectedNotification])
 
-  // Update the status of the selected notification to seen.
   useEffect(() => {
-    const clickedNotification = items.find(notification => notification.id === notificationId)
-    const index = items.findIndex(notification => notification.id === notificationId)
-    const timer = setTimeout(() => {
-      if (category === 'inbox' && !clickedNotification?.status && totalUnseenCount > 0) {
-        dispatch(
-          attachPromise(
-            updateNotificationStatus([clickedNotification.id], 'NOTIFICATION_STATUS_SEEN'),
-          ),
-        )
-        loadNextPage(index, index + 1)
-      }
-    }, 500)
-
-    return () => clearTimeout(timer)
-  }, [category, items, dispatch, loadNextPage, totalUnseenCount, notificationId])
-
-  const selectedNotification = items?.find(item => item.id === notificationId)
+    if (
+      !updateNotificationStatusLoading &&
+      updatePendingNotificationIds.length !== 0 &&
+      updatePendingNotificationIds.length <= totalUnseenCount
+    ) {
+      handleUpdateNotificationStatus()
+    }
+  }, [
+    handleUpdateNotificationStatus,
+    totalUnseenCount,
+    updateNotificationStatusLoading,
+    updatePendingNotificationIds.length,
+  ])
 
   if (!items) {
     return (
@@ -207,6 +219,8 @@ const Notifications = React.memo(() => {
           items={items}
           totalCount={totalCount}
           selectedNotification={selectedNotification}
+          countLoading={refreshNotificationsLoading}
+          updatePendingNotificationIds={updatePendingNotificationIds}
           listRef={listRef}
         />
         <div className="d-flex j-center">

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
@@ -21,8 +21,9 @@ import InfiniteLoader from 'react-window-infinite-loader'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useParams } from 'react-router-dom'
 
-import Icon, { IconEye } from '@ttn-lw/components/icon'
+import { IconEye } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -50,6 +51,8 @@ const NotificationList = ({
   selectedNotification,
   totalCount,
   listRef,
+  countLoading,
+  updatePendingNotificationIds,
 }) => {
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const { category } = useParams()
@@ -75,8 +78,6 @@ const NotificationList = ({
     }
   }, [dispatch, totalUnseenCount, loadNextPage, items])
 
-  const classes = classNames(styles.notificationHeaderIcon)
-
   const isSelected = notification =>
     notification && selectedNotification && selectedNotification.id === notification.id
   const isNextSelected = notification => {
@@ -91,6 +92,7 @@ const NotificationList = ({
           notification={items[index]}
           isSelected={isSelected(items[index])}
           isNextSelected={isNextSelected(items[index])}
+          isUpdatePending={Boolean(updatePendingNotificationIds.find(id => id === items[index].id))}
         />
       </div>
     ) : (
@@ -104,21 +106,30 @@ const NotificationList = ({
     style: PropTypes.shape({}).isRequired,
   }
 
+  const notificationCount = useMemo(() => {
+    if (Boolean(totalUnseenCount) && !isArchive && !countLoading) {
+      return (
+        <span className={styles.totalNotifications} data-test-id="total-unseen-notifications">
+          {totalUnseenCount}
+        </span>
+      )
+    }
+    if (countLoading && !isArchive) {
+      return <Spinner micro className="ml-cs-xxs" />
+    }
+    return null
+  }, [countLoading, isArchive, totalUnseenCount])
+
   return (
     <>
       <div className={styles.notificationHeader}>
         <div className={classNames(styles.notificationHeaderTitle, 'd-flex gap-cs-xxs')}>
-          <Icon icon={isArchive ? 'archive' : 'inbox'} nudgeDown className={classes} />
           <Message
             content={isArchive ? m.archived : sharedMessages.notifications}
             component="p"
-            className="m-0"
+            className="m-0 fs-l"
           />
-          {Boolean(totalUnseenCount) && !isArchive && (
-            <span className={styles.totalNotifications} data-test-id="total-unseen-notifications">
-              {totalUnseenCount}
-            </span>
-          )}
+          {notificationCount}
         </div>
         {!isArchive && (
           <Button
@@ -161,6 +172,7 @@ const NotificationList = ({
 }
 
 NotificationList.propTypes = {
+  countLoading: PropTypes.bool.isRequired,
   hasNextPage: PropTypes.bool.isRequired,
   items: PropTypes.array.isRequired,
   listRef: PropTypes.shape({ current: PropTypes.shape({}) }).isRequired,
@@ -169,6 +181,7 @@ NotificationList.propTypes = {
     id: PropTypes.string,
   }),
   totalCount: PropTypes.number.isRequired,
+  updatePendingNotificationIds: PropTypes.arrayOf(PropTypes.string).isRequired,
 }
 
 NotificationList.defaultProps = {

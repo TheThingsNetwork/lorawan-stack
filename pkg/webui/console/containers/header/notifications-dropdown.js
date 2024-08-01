@@ -74,7 +74,7 @@ const NotificationsDropdown = () => {
           {dropdownItems.slice(0, 3).map(notification => (
             <Link
               to={{
-                pathname: `/notifications/all/${notification.id}`,
+                pathname: `/notifications/inbox/${notification.id}`,
               }}
               key={notification.id}
               className={classnames(style.notificationsDropdownLink, 'd-flex')}
@@ -100,7 +100,9 @@ const NotificationsDropdown = () => {
                     notificationType={notification.notification_type}
                   />
                 </div>
-                <Status pulse={false} status="good" className="mr-cs-xs" />
+                {!Boolean(notification.status) && (
+                  <Status pulse={false} status="good" className="mr-cs-xs" />
+                )}
                 <DateTime.Relative
                   relativeTimeStyle="short"
                   showAbsoluteAfter={2}

@@ -83,6 +83,15 @@ const notifications = (state = defaultState, { type, payload }) => {
           payload.status === 'NOTIFICATION_STATUS_SEEN' && state.unseenTotalCount > 0
             ? state.unseenTotalCount - payload.ids.length
             : state.unseenTotalCount,
+        notifications: {
+          ...state.notifications,
+          inbox: {
+            ...state.notifications.inbox,
+            entities: state.notifications.inbox.entities.map(entity =>
+              payload.ids.includes(entity.id) ? { ...entity, status: payload.status } : entity,
+            ),
+          },
+        },
       }
     case MARK_ALL_AS_SEEN_SUCCESS:
       return {
