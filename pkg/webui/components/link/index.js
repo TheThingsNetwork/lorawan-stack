@@ -44,7 +44,7 @@ const formatTitle = (content, values, formatter) => {
   return content
 }
 
-const Link = props => {
+const Link = React.forwardRef((props, ref) => {
   const {
     className,
     disabled,
@@ -92,11 +92,12 @@ const Link = props => {
       onMouseEnter={onMouseEnter}
       tabIndex={tabIndex}
       role={role}
+      ref={ref}
     >
       {children}
     </RouterLink>
   )
-}
+})
 
 Link.propTypes = {
   children: PropTypes.node,
