@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   MapContainer,
   Marker,
@@ -109,6 +109,25 @@ const MarkerRenderer = ({ marker }) => {
 const Controller = ({ onClick, centerOnMarkers, markers, bounds }) => {
   const map = useMap()
 
+  useEffect(() => {
+    const handleWheel = e => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+
+        const delta = e.deltaY > 0 ? 1 : -1 // Determine scroll direction
+        const zoomLevel = map.getZoom() - delta // Calculate the new zoom level
+
+        map.setZoom(zoomLevel)
+      }
+    }
+
+    map.getContainer().addEventListener('wheel', handleWheel)
+
+    return () => {
+      map.getContainer().removeEventListener('wheel', handleWheel)
+    }
+  }, [map])
+
   useMapEvent('click', onClick)
   // Fix incomplete tile loading in some rare cases.
   map.invalidateSize()
@@ -166,6 +185,7 @@ const LocationMap = props => {
             [-90, -180],
             [90, 180],
           ]}
+          scrollWheelZoom={false}
           maxBoundsViscosity={1.0}
           {...leafletConfig}
         >
