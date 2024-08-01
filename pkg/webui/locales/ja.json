@@ -1962,7 +1962,6 @@
   "error:pkg/deviceclaimingserver:no_devices_found": "デバイスレジストリにバッチ内のデバイスが見つかりません",
   "error:pkg/deviceclaimingserver:no_eui": "",
   "error:pkg/deviceclaimingserver:no_euis": "デバイスにDevEUI/JoinEUIが設定されていません",
-  "error:pkg/deviceclaimingserver:no_gateway_server_address": "",
   "error:pkg/deviceclaimingserver:no_join_eui": "リクエストからJoinEUIを抽出",
   "error:pkg/deviceclaimingserver:parse_qr_code": "QRコードの解析に失敗しました",
   "error:pkg/deviceclaimingserver:qr_code_data": "無効なQRコードデータ",

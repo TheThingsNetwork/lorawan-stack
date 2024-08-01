@@ -37,6 +37,7 @@ describe('Gateways reducer', () => {
     entities: {},
     selectedGateway: null,
     statistics: defaultStatisticsState,
+    selectedGatewayClaimable: false,
   }
 
   it('returns the initial state', () => {

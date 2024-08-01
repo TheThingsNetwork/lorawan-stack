@@ -68,10 +68,6 @@ var (
 		"no_eui",
 		"no EUI found for gateway",
 	)
-	errNoGatewayServerAddress = errors.DefineInvalidArgument(
-		"no_gateway_server_address",
-		"no gateway server address set for gateway",
-	)
 )
 
 // Claim implements GatewayClaimingServer.
@@ -201,9 +197,6 @@ func (gcls gatewayClaimingServer) Unclaim(ctx context.Context, req *ttnpb.Gatewa
 	gatewayEUI := types.MustEUI64(gtw.Ids.Eui).OrZero()
 	if gatewayEUI.IsZero() {
 		return nil, errNoEUI.New()
-	}
-	if gtw.GatewayServerAddress == "" {
-		return nil, errNoGatewayServerAddress.New()
 	}
 	claimer := gcls.upstream.Claimer(gatewayEUI)
 	if claimer == nil {

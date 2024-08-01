@@ -4031,15 +4031,6 @@
       "file": "grpc_end_devices.go"
     }
   },
-  "error:pkg/deviceclaimingserver:no_gateway_server_address": {
-    "translations": {
-      "en": "no gateway server address set for gateway"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver",
-      "file": "grpc_gateways.go"
-    }
-  },
   "error:pkg/deviceclaimingserver:no_join_eui": {
     "translations": {
       "en": "extract JoinEUI from request"
