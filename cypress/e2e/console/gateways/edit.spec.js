@@ -138,6 +138,7 @@ describe('Gateway general settings', () => {
     cy.findByRole('heading', { name: 'LoRaWAN options' }).should('be.visible')
     cy.findByText('Frequency plan').should('not.exist')
     cy.findByRole('button', { name: 'Expand' }).click()
+    cy.get(`span[id="frequency_plan_ids-field-description"]`).scrollIntoView()
     cy.findByText('Frequency plan').should('be.visible')
     cy.findByLabelText(/Enforce duty cycle/)
       .should('exist')
@@ -153,12 +154,16 @@ describe('Gateway general settings', () => {
     cy.visit(
       `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
     )
+    cy.intercept('GET', '/api/v3/is/configuration').as('getConfig')
 
     const newGatewayName = 'New Gateway Name'
     const newGatewayDesc = 'New Gateway Desc'
     const newFrequencyPlan = 'Europe 863-870 MHz (SF12 for RX2)'
     const address = 'otherhost'
     const lnsKey = '1234'
+
+    // Wait for the last request to finish, before clearing the input fields and typing new values to avoid flakiness
+    cy.wait('@getConfig')
 
     cy.findByLabelText('Gateway name').clear()
     cy.findByLabelText('Gateway name').type(newGatewayName)
@@ -185,17 +190,17 @@ describe('Gateway general settings', () => {
     cy.findByLabelText('Gateway name').should('have.value', newGatewayName)
     cy.findByLabelText('Gateway description').should('have.value', newGatewayDesc)
     cy.findByLabelText('Gateway Server address').should('have.value', address)
-    cy.findByLabelText('Require authenticated connection').should('have.attr', 'checked')
+    cy.findByLabelText('Require authenticated connection').should('have.attr', 'value', 'true')
     cy.findByLabelText('LoRa Basics Station LNS Authentication Key')
       .should('have.attr', 'value')
       .and('eq', lnsKey)
-    cy.findByLabelText('Gateway status').should('have.attr', 'checked')
-    cy.findByLabelText('Gateway location').should('have.attr', 'checked')
+    cy.findByLabelText('Gateway status').should('have.attr', 'value', 'true')
+    cy.findByLabelText('Gateway location').should('have.attr', 'value', 'true')
     cy.findByPlaceholderText('key').should('have.value', 'key-changed')
     cy.findByPlaceholderText('value').should('have.value', 'value-changed')
-    cy.findByLabelText('Automatic updates').should('have.attr', 'checked')
+    cy.findByLabelText('Automatic updates').should('have.attr', 'value', 'true')
     cy.findByLabelText('Channel').should('have.value', 'test')
-    cy.findByLabelText('Packet Broker').should('have.attr', 'checked')
+    cy.findByLabelText('Packet Broker').should('have.attr', 'value', 'true')
 
     cy.findByText('LoRaWAN options', { selector: 'h3' })
       .closest('[data-test-id="collapsible-section"]')
@@ -222,8 +227,8 @@ describe('Gateway general settings', () => {
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByText(newFrequencyPlan)
-        cy.findByLabelText('Schedule downlink late').should('have.attr', 'checked')
-        cy.findByLabelText(/Enforce duty cycle/).should('not.have.attr', 'checked')
+        cy.findByLabelText('Schedule downlink late').should('have.attr', 'value', 'true')
+        cy.findByLabelText(/Enforce duty cycle/).should('have.attr', 'value', 'false')
         cy.findByLabelText('Schedule any time delay').should('have.value', '1')
       })
   })
@@ -238,6 +243,7 @@ describe('Gateway general settings', () => {
       `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
     )
 
+    cy.get('button[type="submit').scrollIntoView()
     cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').clear()
     cy.findByLabelText('Administrative contact').type('test-non-collab-user')
@@ -254,6 +260,7 @@ describe('Gateway general settings', () => {
       `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
     )
 
+    cy.get('button[type="submit').scrollIntoView()
     cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').clear()
     cy.findByLabelText('Administrative contact').selectOption(collabUserId)
@@ -275,6 +282,7 @@ describe('Gateway general settings', () => {
       `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
     )
 
+    cy.get('button[type="submit').scrollIntoView()
     cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').should('have.attr', 'disabled')
     cy.findByLabelText('Administrative contact')

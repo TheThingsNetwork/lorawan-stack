@@ -62,6 +62,7 @@ const gatewaySubpages = defineSmokeTest('check all gateway sub-pages', () => {
     .closest('[data-test-id="collapsible-section"]')
     .within(() => {
       cy.findByLabelText('Gateway ID').should('be.visible')
+      cy.get('button[type="submit"]').scrollIntoView()
       cy.findByRole('button', { name: /Save changes/ }).should('be.visible')
       cy.findByTestId('error-notification').should('not.exist')
       cy.findByRole('button', { name: 'Collapse' }).click()

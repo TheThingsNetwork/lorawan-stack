@@ -491,7 +491,7 @@ const getFieldDescriptorByLabel = label => {
   return cy
     .get('@field')
     .invoke('attr', 'aria-describedby')
-    .then(describedBy => cy.get(`[id="${describedBy}"]`))
+    .then(describedBy => cy.get(`[id="${describedBy}"]`).scrollIntoView())
 }
 
 // Helper function to select field error.

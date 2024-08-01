@@ -263,6 +263,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('JoinEUI').should('exist') // Todo: why does be visible not work?
         cy.findByRole('button', { name: 'Confirm' }).should('be.visible').and('be.disabled')
         cy.findByRole('button', { name: 'Register end device' }).should('not.exist')
+        cy.get('input[name="ids.join_eui,authenticated_identifiers.join_eui"]').scrollIntoView()
         cy.findByText(
           'To continue, please enter the JoinEUI of the end device so we can determine onboarding options',
         ).should('be.visible')

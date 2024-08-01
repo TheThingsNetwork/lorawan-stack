@@ -120,6 +120,7 @@ describe('End device repository claiming', () => {
     cy.findByText('Join settings')
       .parents('[data-test-id="collapsible-section"]')
       .within(() => {
+        cy.get('p').scrollIntoView()
         cy.findByText('Not registered in this cluster').should('be.visible')
       })
     cy.get('#sidebar').within(() => {
@@ -228,6 +229,7 @@ describe('End device repository claiming', () => {
       )}/applications/${appId}/devices/${device3.id.toLowerCase()}`,
     )
     cy.findByRole('heading', { name: `${device3.id.toLowerCase()}` }).should('be.visible')
+    cy.get('[data-test-id="overview-panel-"]').scrollIntoView()
     cy.findByText('Provisioned on external Join Server').should('be.visible')
     cy.visit(
       `${Cypress.config(
@@ -237,6 +239,7 @@ describe('End device repository claiming', () => {
     cy.findByText('Join settings')
       .parents('[data-test-id="collapsible-section"]')
       .within(() => {
+        cy.get('p').scrollIntoView()
         cy.findByText('Not registered in this cluster').should('be.visible')
       })
     cy.get('#sidebar').within(() => {

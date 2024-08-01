@@ -65,7 +65,7 @@ module.exports = defineConfig({
 
       return configWithPermissions
     },
-    scrollBehavior: 'bottom',
+    scrollBehavior: 'center',
     experimentalRunAllSpecs: true,
     excludeSpecPattern: [
       '!*.spec.js',

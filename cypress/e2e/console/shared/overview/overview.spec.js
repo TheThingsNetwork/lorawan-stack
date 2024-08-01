@@ -170,6 +170,7 @@ describe('Overview', () => {
       cy.findByText('General information').should('be.visible')
       cy.findByText('Latest decoded payload').should('be.visible')
       cy.findByText('Network activity').should('be.visible')
+      cy.get('[data-test-id="overview-panel-Location"]').scrollIntoView()
       cy.findByTestId('overview-panel-Location').within(() => {
         cy.findByText('Location').should('be.visible')
       })
