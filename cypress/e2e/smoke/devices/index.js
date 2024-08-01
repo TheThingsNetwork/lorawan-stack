@@ -91,6 +91,7 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
 
     cy.findByRole('button', { name: 'Location' }).click()
     cy.findByRole('heading', { name: 'Set end device location manually' }).should('be.visible')
+    cy.get('button[type="submit"]').scrollIntoView()
     cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
 
@@ -109,6 +110,7 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
       .closest('[data-test-id="collapsible-section"]')
       .within(() => {
         cy.findByLabelText('End device ID')
+        cy.get('button[type="submit"]').scrollIntoView()
         cy.findByRole('button', { name: /Save changes/ }).should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
         cy.findByRole('button', { name: 'Collapse' }).click()
@@ -119,8 +121,10 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByLabelText('Frequency plan').should('be.visible')
+        cy.get('button[type="submit"]').scrollIntoView()
         cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
         cy.findByText('Advanced MAC settings').click()
+        cy.get('#mac-settings').scrollIntoView()
         cy.findByText('Frame counter width').should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
         cy.findByRole('button', { name: 'Collapse' }).click()
@@ -141,6 +145,7 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByLabelText('Home NetID').should('be.visible')
+        cy.get('button[type="submit"]').scrollIntoView()
         cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
         cy.findByRole('button', { name: 'Collapse' }).click()

@@ -45,6 +45,7 @@ const organizationSubpages = defineSmokeTest('check all organization sub-pages',
     cy.findByText(/Settings/).click()
   })
   cy.findByLabelText('Organization ID').should('be.visible')
+  cy.get('button[type="submit"]').scrollIntoView()
   cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 })

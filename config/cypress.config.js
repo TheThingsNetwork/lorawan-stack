@@ -65,6 +65,7 @@ module.exports = defineConfig({
 
       return configWithPermissions
     },
+    scrollBehavior: 'bottom',
     experimentalRunAllSpecs: true,
     excludeSpecPattern: '!*.spec.js',
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',

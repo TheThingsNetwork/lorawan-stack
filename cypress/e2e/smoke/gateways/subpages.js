@@ -42,6 +42,7 @@ const gatewaySubpages = defineSmokeTest('check all gateway sub-pages', () => {
 
   cy.findByRole('link', { name: /Location/ }).click()
   cy.findByLabelText('Location privacy').should('exist')
+  cy.get('button[type="submit"]').scrollIntoView()
   cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 
