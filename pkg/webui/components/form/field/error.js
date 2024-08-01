@@ -39,7 +39,7 @@ const FieldError = ({ content, error, warning, title, className, id }) => {
 
   return (
     <div className={classname} id={id}>
-      <Icon icon={icon} className={style.icon} small />
+      <Icon icon={icon} className={style.icon} small data-test-id="error-icon" />
       <Message content={content.message || content} values={contentValues} />
     </div>
   )
