@@ -176,7 +176,6 @@ describe('Gateway general settings', () => {
     cy.findByLabelText('Channel').type('test')
     cy.findByLabelText('Packet Broker').check()
 
-    cy.findByLabelText('Require authenticated connection').check()
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')

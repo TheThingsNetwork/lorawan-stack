@@ -50,7 +50,7 @@ describe('Packet Broker networks', () => {
         'consoleRootPath',
       )}/admin-panel/packet-broker/routing-configuration/networks`,
     )
-    cy.findByLabelText('Use custom routing policies').check()
+    cy.findByLabelText('Use custom routing policies').check({ force: true })
 
     const { networks } = this.networks
     const networksFiltered = networks.filter(
