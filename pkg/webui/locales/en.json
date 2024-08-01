@@ -555,6 +555,8 @@
   "console.containers.device-overview-header.index.noActivityTooltip": "The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.",
   "console.containers.device-overview-header.index.downloadMacData": "Download MAC data",
   "console.containers.device-overview-header.index.macStateError": "There was an error and MAC state could not be included in the MAC data",
+  "console.containers.device-overview-header.index.sensitiveDataWarning": "The MAC data can contain sensitive information such as session keys that can be used to decrypt messages. <b>Do not share this information publicly</b>.",
+  "console.containers.device-overview-header.index.noSessionWarning": "The end device is currently not connected to the network (no active session). The MAC data will hence only contain the current MAC settings.",
   "console.containers.device-payload-formatters.messages.defaultFormatter": "Click <Link>here</Link> to modify the default payload formatter for this application",
   "console.containers.device-payload-formatters.messages.mayNotViewLink": "You are not allowed to view link information of this application. This includes seeing the default payload formatter of this application.",
   "console.containers.device-profile-section.device-card.index.productWebsite": "Product website",
