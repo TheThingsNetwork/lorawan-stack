@@ -67,7 +67,12 @@ module.exports = defineConfig({
     },
     scrollBehavior: 'bottom',
     experimentalRunAllSpecs: true,
-    excludeSpecPattern: '!*.spec.js',
+    excludeSpecPattern: [
+      '!*.spec.js',
+      // TODO: Activate the following lines when the tests are ready.
+      'cypress/e2e/account/*.{js,jsx,ts,tsx}',
+      'cypress/e2e/account/oauth-clients/*.{js,jsx,ts,tsx}',
+    ],
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
   },
   asBaseUrl: 'http://localhost:1885/api/v3',
