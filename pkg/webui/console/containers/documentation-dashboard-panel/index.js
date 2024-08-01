@@ -16,12 +16,12 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 
 import Icon, {
-  IconUsersGroup,
   IconArrowRight,
   IconArrowMerge,
   IconBook,
   IconDevice,
   IconGateway,
+  IconRocket,
 } from '@ttn-lw/components/icon'
 import IconTts from '@ttn-lw/components/icon/supplemental/tts'
 import Link from '@ttn-lw/components/link'
@@ -63,7 +63,7 @@ const DocumentationDashboardPanel = () => (
     <DocsPanelLink
       path={`${docBaseUrl}/getting-started/`}
       title={m.gettingStarted}
-      icon={IconUsersGroup}
+      icon={IconRocket}
     />
     <DocsPanelLink
       path={`${docBaseUrl}/devices/`}
