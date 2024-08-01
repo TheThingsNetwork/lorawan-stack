@@ -46,7 +46,7 @@ export const NotificationListItem = ({ notification, isSelected, isNextSelected 
       key={notification.id}
       to={`/notifications/${category}/${notification.id}`}
       className={classes}
-      data-test-id="notification-list-item"
+      dataTestId="notification-list-item"
       value={notification.id}
     >
       {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}

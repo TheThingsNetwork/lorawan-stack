@@ -62,6 +62,7 @@ const Link = props => {
     primary,
     tabIndex,
     role,
+    dataTestId,
   } = props
 
   const { formatMessage } = useIntl()
@@ -92,6 +93,7 @@ const Link = props => {
       onMouseEnter={onMouseEnter}
       tabIndex={tabIndex}
       role={role}
+      data-test-id={dataTestId}
     >
       {children}
     </RouterLink>
@@ -101,6 +103,7 @@ const Link = props => {
 Link.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
+  dataTestId: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   onClick: PropTypes.func,
@@ -141,6 +144,7 @@ Link.defaultProps = {
   target: undefined,
   title: undefined,
   titleValues: undefined,
+  dataTestId: '',
 }
 
 const DocLink = props => {

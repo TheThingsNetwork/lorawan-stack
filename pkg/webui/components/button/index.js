@@ -182,7 +182,7 @@ Button.defaultProps = {
 }
 
 const LinkButton = props => {
-  const { disabled, titleMessage, onClick, value } = props
+  const { disabled, titleMessage, onClick, value, dataTestId } = props
   const buttonClassNames = assembleClassnames(props)
   const { to } = props
 
@@ -204,6 +204,7 @@ const LinkButton = props => {
       title={titleMessage}
       children={buttonChildren(props)}
       onClick={handleClick}
+      dataTestId={dataTestId}
     />
   )
 }
