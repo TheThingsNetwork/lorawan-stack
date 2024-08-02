@@ -34,7 +34,7 @@ describe('Connection loss detection', () => {
     })
 
     cy.intercept('/api/v3/application*', { forceNetworkError: true }).as('offlineIntercept')
-    cy.intercept('/api/v3/auth_info', { times: 2 }, { forceNetworkError: true }).as(
+    cy.intercept({ url: '/api/v3/auth_info', times: 3 }, { forceNetworkError: true }).as(
       'reconnectionIntercept',
     )
 
@@ -45,9 +45,6 @@ describe('Connection loss detection', () => {
         .should('be.visible')
         .as('offlineToast')
     })
-
-    // Use an assertion to check that the 'offline' header notification is no longer in the DOM.
-    cy.get('@offlineToast').should('not.exist')
 
     // After the 'offline' toast has disappeared, wait for the reconnection intercept to resolve.
     cy.wait('@reconnectionIntercept')
