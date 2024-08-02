@@ -44,12 +44,21 @@ import {
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 
-import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
+import {
+  updateGateway,
+  deleteGateway,
+  getGatewayClaimInfoByEui,
+  unclaimGateway,
+} from '@console/store/actions/gateways'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
 
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
-import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
+import {
+  selectSelectedGateway,
+  selectSelectedGatewayClaimable,
+  selectSelectedGatewayId,
+} from '@console/store/selectors/gateways'
 
 import LorawanSettingsForm from './lorawan-settings-form'
 import BasicSettingsForm from './basic-settings-form'
@@ -72,6 +81,7 @@ const GatewayGeneralSettingsInner = () => {
     checkFromState(mayViewOrEditGatewayCollaborators, state),
   )
   const mayViewApiKeys = useSelector(state => checkFromState(mayViewOrEditGatewayApiKeys, state))
+  const supportsClaiming = useSelector(selectSelectedGatewayClaimable)
   const shouldConfirmDelete = !isPristine || !mayViewCollaborators || !mayViewApiKeys
 
   const handleSubmit = useCallback(
@@ -111,7 +121,12 @@ const GatewayGeneralSettingsInner = () => {
   const handleDelete = useCallback(
     async shouldPurge => {
       try {
+        // Check if gateway is claimable and if so, try to unclaim.
+        if (supportsClaiming) {
+          await dispatch(attachPromise(unclaimGateway(gtwId)))
+        }
         await dispatch(attachPromise(deleteGateway(gtwId, { purge: shouldPurge || false })))
+
         navigate('/gateways')
         toast({
           title: gtwId,
@@ -126,7 +141,7 @@ const GatewayGeneralSettingsInner = () => {
         })
       }
     },
-    [dispatch, gtwId, navigate],
+    [dispatch, gtwId, navigate, supportsClaiming],
   )
 
   return (
@@ -149,6 +164,7 @@ const GatewayGeneralSettingsInner = () => {
               mayEditSecrets={mayEditSecrets}
               shouldConfirmDelete={shouldConfirmDelete}
               mayPurge={mayPurgeGtw}
+              supportsClaiming={supportsClaiming}
             />
           </Collapse>
           <Collapse
@@ -167,6 +183,9 @@ const GatewayGeneralSettingsInner = () => {
 
 const GatewaySettings = () => {
   const gtwId = useSelector(selectSelectedGatewayId)
+  const {
+    ids: { eui },
+  } = useSelector(selectSelectedGateway)
   const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
   const mayViewApiKeys = useSelector(state => checkFromState(mayViewOrEditGatewayApiKeys, state))
   const mayViewCollaborators = useSelector(state =>
@@ -184,8 +203,9 @@ const GatewaySettings = () => {
         }
       }
       dispatch(attachPromise(getIsConfiguration()))
+      dispatch(attachPromise(getGatewayClaimInfoByEui(eui, true)))
     },
-    [mayDeleteGtw, mayViewApiKeys, mayViewCollaborators, gtwId],
+    [mayDeleteGtw, eui, mayViewApiKeys, mayViewCollaborators, gtwId],
   )
 
   useBreadcrumbs(

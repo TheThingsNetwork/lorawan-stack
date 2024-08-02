@@ -26,6 +26,7 @@ import {
   UPDATE_GTW_STATS_FAILURE,
   START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
+  GET_GATEWAY_CLAIM_INFO_BY_EUI_SUCCESS,
 } from '@console/store/actions/gateways'
 
 const defaultStatisticsState = {
@@ -37,6 +38,7 @@ const defaultState = {
   entities: {},
   selectedGateway: null,
   statistics: defaultStatisticsState,
+  selectedGatewayClaimable: false,
 }
 
 const gateway = (state = {}, gateway) => ({
@@ -74,6 +76,11 @@ const gateways = (state = defaultState, action) => {
   const { type, payload } = action
 
   switch (type) {
+    case GET_GATEWAY_CLAIM_INFO_BY_EUI_SUCCESS:
+      return {
+        ...state,
+        selectedGatewayClaimable: Boolean(payload.is_details && payload.supports_claiming),
+      }
     case GET_GTW:
       return {
         ...state,

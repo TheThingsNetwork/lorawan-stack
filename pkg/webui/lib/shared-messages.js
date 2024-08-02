@@ -99,6 +99,7 @@ export default defineMessages({
   channel: 'Channel',
   claimAuthCode: 'Claim authentication code',
   claiming: 'Claiming',
+  claimGateway: 'Claim gateway',
   classBTimeout: 'Class B timeout',
   classCTimeout: 'Class C timeout',
   clear: 'Clear',

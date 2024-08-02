@@ -162,6 +162,35 @@ const getGatewaysLogic = createRequestLogic({
   },
 })
 
+const claimGatewayLogic = createRequestLogic({
+  type: gateways.CLAIM_GATEWAY,
+  process: async ({ action }) => {
+    const { details } = action.payload
+
+    return tts.Gateways.claim(details)
+  },
+})
+
+const unclaimGatewayLogic = createRequestLogic({
+  type: gateways.UNCLAIM_GATEWAY,
+  process: async ({ action }) => {
+    const { gatewayId } = action.payload
+
+    return await tts.Gateways.unclaim(gatewayId)
+  },
+})
+
+const getGatewayClaimInfoByEuiLogic = createRequestLogic({
+  type: gateways.GET_GATEWAY_CLAIM_INFO_BY_EUI,
+  process: async ({ action }) => {
+    const { gatewayEui, isDetails } = action.payload
+
+    const result = await tts.Gateways.getInfoByEUI(gatewayEui)
+
+    return { ...result, is_details: isDetails }
+  },
+})
+
 const getGatewaysRightsLogic = createRequestLogic({
   type: gateways.GET_GTWS_RIGHTS_LIST,
   process: async ({ action }) => {
@@ -272,6 +301,9 @@ export default [
   deleteGatewayLogic,
   restoreGatewayLogic,
   getGatewaysLogic,
+  claimGatewayLogic,
+  unclaimGatewayLogic,
+  getGatewayClaimInfoByEuiLogic,
   getGatewaysRightsLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,

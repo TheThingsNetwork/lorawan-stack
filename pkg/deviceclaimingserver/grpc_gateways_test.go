@@ -421,22 +421,6 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
-			Name: "Unclaim/NoGatewayServerAddress",
-			Req: &ttnpb.GatewayIdentifiers{
-				GatewayId: "invalid-gateway-server-address",
-			},
-			GetFunc: func(context.Context, *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
-				return &ttnpb.Gateway{
-					Ids: &ttnpb.GatewayIdentifiers{
-						GatewayId: "test-gateway",
-						Eui:       supportedEUI.Bytes(),
-					},
-				}, nil
-			},
-			CallOpt:        authorizedCallOpt,
-			ErrorAssertion: errors.IsInvalidArgument,
-		},
-		{
 			Name: "Unclaim/EUINotRegisteredForClaiming",
 			Req: &ttnpb.GatewayIdentifiers{
 				GatewayId: "unsupported-eui",

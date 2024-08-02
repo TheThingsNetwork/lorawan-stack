@@ -49,6 +49,8 @@ export const selectGatewayById = (state, id) => selectGatewayEntitiesStore(state
 export const selectSelectedGatewayId = state => selectGatewayStore(state).selectedGateway
 export const selectSelectedGateway = state =>
   selectGatewayById(state, selectSelectedGatewayId(state))
+export const selectSelectedGatewayClaimable = state =>
+  selectGatewayStore(state).selectedGatewayClaimable
 
 // Gateways.
 const selectGtwsIds = createPaginationIdsSelectorByEntity(ENTITY)
