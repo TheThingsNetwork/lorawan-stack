@@ -77,7 +77,7 @@ const GeneralSideNavigation = () => {
         )}
         <SideNavigation.Item
           title={sharedMessages.notifications}
-          path="/notifications"
+          path="/notifications/inbox"
           icon={IconInbox}
         />
         {mayHandleApiKeys && (

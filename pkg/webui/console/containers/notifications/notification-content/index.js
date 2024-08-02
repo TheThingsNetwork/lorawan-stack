@@ -44,7 +44,7 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
   )
   const userId = useSelector(selectUserId)
   const { category } = useParams()
-  const isArchive = category === 'archive'
+  const isArchive = category === 'archived'
 
   useEffect(() => {
     const handleResize = () => {

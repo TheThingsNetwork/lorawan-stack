@@ -42,7 +42,6 @@ import {
 import style from './notifications-dashboard-panel.styl'
 
 const m = defineMessages({
-  noNotifications: 'No notifications yet',
   noNotificationsDescription: 'Your latest notifications will appear here',
 })
 
@@ -117,7 +116,10 @@ const NotificationsDashboardPanel = () => {
     >
       {notifications && notifications.length === 0 ? (
         <div className="d-flex direction-column flex-grow j-center">
-          <Message content={m.noNotifications} className="d-block text-center fs-l fw-bold" />
+          <Message
+            content={sharedMessages.noNotifications}
+            className="d-block text-center fs-l fw-bold"
+          />
           <Message
             content={m.noNotificationsDescription}
             className="d-block text-center c-text-neutral-light"

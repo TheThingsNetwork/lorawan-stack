@@ -53,6 +53,7 @@ const NotificationList = ({
   listRef,
   countLoading,
   updatePendingNotificationIds,
+  unreadNotificationsCount,
 }) => {
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const { category } = useParams()
@@ -137,6 +138,7 @@ const NotificationList = ({
             icon={IconEye}
             onClick={handleMarkAllAsSeen}
             message={m.markAllAsRead}
+            disabled={!unreadNotificationsCount}
           />
         )}
       </div>
@@ -181,6 +183,7 @@ NotificationList.propTypes = {
     id: PropTypes.string,
   }),
   totalCount: PropTypes.number.isRequired,
+  unreadNotificationsCount: PropTypes.number.isRequired,
   updatePendingNotificationIds: PropTypes.arrayOf(PropTypes.string).isRequired,
 }
 

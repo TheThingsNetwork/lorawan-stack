@@ -22,9 +22,13 @@ import LAYOUT from '@ttn-lw/constants/layout'
 
 import Button from '@ttn-lw/components/button'
 import Spinner from '@ttn-lw/components/spinner'
+import Icon, { IconInbox } from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import useRequest from '@ttn-lw/lib/hooks/use-request'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   getArchivedNotifications,
@@ -57,6 +61,10 @@ const indicesToPage = (startIndex, stopIndex, limit) => {
 const m = defineMessages({
   seeArchived: 'See archived messages',
   seeAll: 'See all messages',
+  noNotificationsSubtitle: 'Once you receive a notification, it can be viewed here',
+  unreadMessagesTitle: '{value} unread notifications',
+  archivedMessageTitle: '{value} archived notifications',
+  unreadMessagesSubtitle: 'Select a notification to display the content here.',
 })
 
 const Notifications = React.memo(() => {
@@ -76,6 +84,10 @@ const Notifications = React.memo(() => {
   const [updateNotificationStatusLoading, setUpdateNotificationStatusLoading] = useState(false)
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < LAYOUT.BREAKPOINTS.M)
   const [refreshNotificationsLoading] = useRequest(refreshNotifications())
+
+  const unreadNotificationsCount = refreshNotificationsLoading
+    ? items.filter(n => !n.status && !updatePendingNotificationIds.includes(n.id)).length
+    : totalUnseenCount
 
   const loadNextPage = useCallback(
     async (startIndex, stopIndex) => {
@@ -129,7 +141,9 @@ const Notifications = React.memo(() => {
       if (isSmallScreen) {
         navigate(`/notifications/${category}`)
       } else {
-        navigate(`/notifications/${category}/${previousNotification.id}`)
+        navigate(
+          `/notifications/${category}${previousNotification ? `/${previousNotification.id}` : ''}`,
+        )
       }
 
       // Reset the list cache if available so that old items are discarded.
@@ -206,6 +220,52 @@ const Notifications = React.memo(() => {
     )
   }
 
+  const messageBox = useCallback(
+    ({ icon, title, subtitle, titleValues }) => (
+      <div className={classNames(style.messageBox, 'h-full d-flex al-center j-center gap-cs-s')}>
+        <Icon size={64} icon={icon} className="c-icon-neutral-extralight" />
+        <div className="d-flex flex-column al-center gap-cs-xxs">
+          <Message content={title} className="fw-bold fs-l" values={{ ...titleValues }} />
+          <Message content={subtitle} className="c-text-neutral-light" />
+        </div>
+      </div>
+    ),
+    [],
+  )
+
+  const mainContent = useMemo(() => {
+    if (selectedNotification) {
+      return (
+        <NotificationContent
+          selectedNotification={selectedNotification}
+          onArchive={handleArchive}
+          isSmallScreen={isSmallScreen}
+        />
+      )
+    }
+    if (!totalCount) {
+      return messageBox({
+        icon: IconInbox,
+        title: sharedMessages.noNotifications,
+        subtitle: m.noNotificationsSubtitle,
+      })
+    }
+    return messageBox({
+      icon: IconInbox,
+      title: showArchived ? m.archivedMessageTitle : m.unreadMessagesTitle,
+      subtitle: m.unreadMessagesSubtitle,
+      titleValues: { value: showArchived ? totalCount : unreadNotificationsCount },
+    })
+  }, [
+    handleArchive,
+    isSmallScreen,
+    messageBox,
+    selectedNotification,
+    showArchived,
+    totalCount,
+    unreadNotificationsCount,
+  ])
+
   return (
     <div className="d-flex flex-grow">
       <div
@@ -221,6 +281,7 @@ const Notifications = React.memo(() => {
           selectedNotification={selectedNotification}
           countLoading={refreshNotificationsLoading}
           updatePendingNotificationIds={updatePendingNotificationIds}
+          unreadNotificationsCount={unreadNotificationsCount}
           listRef={listRef}
         />
         <div className="d-flex j-center">
@@ -237,13 +298,7 @@ const Notifications = React.memo(() => {
           [style.notificationSelected]: selectedNotification,
         })}
       >
-        {selectedNotification && (
-          <NotificationContent
-            selectedNotification={selectedNotification}
-            onArchive={handleArchive}
-            isSmallScreen={isSmallScreen}
-          />
-        )}
+        {mainContent}
       </div>
     </div>
   )
