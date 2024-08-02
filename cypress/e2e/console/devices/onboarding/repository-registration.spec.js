@@ -463,6 +463,12 @@ describe('End device repository manual registration', () => {
       it('succeeds registering device', () => {
         const devId = 'test-abp-dev'
 
+        cy.intercept(
+          'GET',
+          `/api/v3/dr/applications/${appId}/brands/test-brand-otaa?field_mask=name`,
+          { brand_id: 'test-brand-abp', name: 'Test Brand ABP' },
+        )
+
         // End device selection.
         cy.findByLabelText('End device brand').selectOption('test-brand-abp')
         cy.findByLabelText('Model').selectOption('test-model1')
