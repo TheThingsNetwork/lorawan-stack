@@ -21,6 +21,7 @@ import (
 
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -34,6 +35,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	ctx = semtechws.NewContextWithSession(ctx, &semtechws.Session{})
 	semtechws.UpdateSessionID(ctx, 0x11)
 	var lbsLNS lbsLNS
+	downlinkTokens := &io.DownlinkTokens{}
 	for _, tc := range []struct {
 		BandID,
 		Name string
@@ -130,7 +132,13 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			raw, err := lbsLNS.FromDownlink(ctx, tc.DownlinkMessage, tc.BandID, time.Unix(1554300787, 123456000))
+			raw, err := lbsLNS.FromDownlink(
+				ctx,
+				tc.DownlinkMessage,
+				tc.BandID,
+				time.Unix(1554300787, 123456000),
+				downlinkTokens,
+			)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

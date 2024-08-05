@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -77,12 +78,16 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 
 // FromDownlink implements Formatter.
 func (f *lbsLNS) FromDownlink(
-	ctx context.Context, down *ttnpb.DownlinkMessage, bandID string, dlTime time.Time,
+	ctx context.Context,
+	down *ttnpb.DownlinkMessage,
+	bandID string,
+	dlTime time.Time,
+	tokens *io.DownlinkTokens,
 ) ([]byte, error) {
 	settings := down.GetScheduled()
 	dnmsg := DownlinkMessage{
 		DevEUI:   "00-00-00-00-00-00-00-01", // The DevEUI is required for transmission acknowledgements.
-		Diid:     int64(f.tokens.Next(down, dlTime)),
+		Diid:     int64(tokens.Next(down, dlTime)),
 		Pdu:      hex.EncodeToString(down.GetRawPayload()),
 		Priority: 25,
 		RCtx:     int64(settings.Downlink.AntennaIndex),
