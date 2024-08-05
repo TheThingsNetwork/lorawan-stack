@@ -62,7 +62,10 @@ const Link = React.forwardRef((props, ref) => {
     primary,
     tabIndex,
     role,
+    ...rest
   } = props
+
+  const dataProps = useMemo(() => filterDataProps(rest), [rest])
 
   const { formatMessage } = useIntl()
   const formattedTitle = formatTitle(title, titleValues, formatMessage)
@@ -93,6 +96,7 @@ const Link = React.forwardRef((props, ref) => {
       tabIndex={tabIndex}
       role={role}
       ref={ref}
+      {...dataProps}
     >
       {children}
     </RouterLink>

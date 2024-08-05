@@ -69,7 +69,7 @@ const GatewayGeneralInformationPanel = () => {
     disable_packet_broker_forwarding,
   } = gateway
   const frequencyPlanIdsFormatted = frequency_plan_ids?.map(
-    id => frequencyPlanIds.find(plan => plan.id === id).name,
+    id => frequencyPlanIds.find(plan => plan.id === id)?.name,
   )
 
   const getNetworkSettingsInfo = useCallback(

@@ -54,8 +54,8 @@ export const NotificationListItem = ({
       data-test-id="notification-list-item"
       value={notification.id}
     >
-      {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
-      <div className="w-full">
+      <div className="w-full pos-relative">
+        {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
         <div className={style.notificationPreviewTitle}>
           <div className={style.notificationPreviewTitleText}>
             <Notification.Title

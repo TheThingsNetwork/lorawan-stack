@@ -48,14 +48,11 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < LAYOUT.BREAKPOINTS.L) {
-        setIsMediumScreen(true)
-      }
+      setIsMediumScreen(window.innerWidth < LAYOUT.BREAKPOINTS.L)
     }
     window.addEventListener('resize', handleResize)
 
     return () => window.removeEventListener('resize', handleResize)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const dateFormat = isMediumScreen

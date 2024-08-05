@@ -27,6 +27,7 @@ import Message from '@ttn-lw/lib/components/message'
 import Notification from '@console/components/notifications'
 
 import notificationStyle from '@console/containers/notifications/notifications.styl'
+import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -100,8 +101,14 @@ const NotificationsDropdown = () => {
                     notificationType={notification.notification_type}
                   />
                 </div>
-                {!Boolean(notification.status) && (
-                  <Status pulse={false} status="good" className="mr-cs-xs" />
+                {![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(
+                  notification.status,
+                ) && (
+                  <Status
+                    pulse={false}
+                    status="good"
+                    className={classnames(style.status, 'mr-cs-xs')}
+                  />
                 )}
                 <DateTime.Relative
                   relativeTimeStyle="short"

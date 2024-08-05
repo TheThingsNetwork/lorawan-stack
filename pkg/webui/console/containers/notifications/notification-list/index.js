@@ -112,6 +112,7 @@ const NotificationList = ({
       <div className={styles.notificationHeader}>
         <div className={classNames(styles.notificationHeaderTitle, 'd-flex gap-cs-xxs')}>
           <Message
+            data-test-id="notifications-title"
             content={isArchive ? m.archived : sharedMessages.notifications}
             component="p"
             className="m-0 fs-l"
