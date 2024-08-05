@@ -24,6 +24,8 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 
 import Notification from '@console/components/notifications'
 
+import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from '../notifications.styl'
@@ -35,7 +37,9 @@ export const NotificationListItem = ({
   isUpdatePending,
 }) => {
   const { category } = useParams()
-  const showUnseenStatus = !notification.status && !isUpdatePending
+  const showUnseenStatus =
+    ![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(notification.status) &&
+    !isUpdatePending
   const classes = classNames(style.notificationPreview, {
     [style.notificationSelected]: isSelected,
     [style.notificationNextSelected]: isNextSelected,

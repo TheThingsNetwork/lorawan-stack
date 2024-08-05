@@ -26,7 +26,7 @@
     color: var(--c-text-brand-normal) !important
 
   &.notification-selected
-    +media-query($bp.sm)
+    +media-query($bp['md-lg'])
       display: none
 
 .notification-header
@@ -38,24 +38,24 @@
   padding: $cs.m $cs.s
   gap: .25rem
 
-  +media-query($bp.sm)
+  +media-query($bp['md-lg'])
     padding: $cs.xs
 
   &-date
     font-weight: $fw.normal
     color: var(--c-text-neutral-light)
 
-    +media-query($bp.sm)
+    +media-query($bp['md-lg'])
       font-size: $fs.s
 
     &.notification-selected
       display: block
-      +media-query($bp.sm)
+      +media-query($bp['md-lg'])
         display: none
 
     &.notification-selected-mobile
       display: none
-      +media-query($bp.sm)
+      +media-query($bp['md-lg'])
         display: block
 
   .total-notifications
@@ -75,7 +75,7 @@
     align-items: center
     gap: $cs.s
 
-    +media-query($bp.sm)
+    +media-query($bp['md-lg'])
       max-width: fit-content
 
   &-title
@@ -89,7 +89,7 @@
         text-overflow: ellipsis
         white-space: nowrap
 
-    +media-query($bp.sm)
+    +media-query($bp['md-lg'])
       max-width: 100%
       overflow: hidden
       display: flex
@@ -101,7 +101,7 @@
   .back-button
     padding-left: 1.07rem
     display: none
-    +media-query($bp.sm)
+    +media-query($bp['md-lg'])
       display: block
 
 .notification-preview
@@ -126,12 +126,12 @@
     background-color: var(--c-bg-brand-normal)
     border-radius: $br.m
     border: 0
-    +media-query($bp.sm)
+    +media-query($bp['md-lg'])
       background-color: unset
 
     .notification-preview-title
       color: var(--c-text-neutral-min)
-      +media-query($bp.sm)
+      +media-query($bp['md-lg'])
         color: var(--c-text-neutral-heavy)
 
       .notification-time
@@ -139,7 +139,7 @@
 
     .notification-preview-content
       color: var(--c-text-neutral-min)
-      +media-query($bp.sm)
+      +media-query($bp['md-lg'])
         color: var(--c-text-neutral-light)
 
   &.notification-next-selected
@@ -178,7 +178,7 @@
 
   &.notification-selected
     color: var(--c-text-neutral-min)
-    +media-query($bp.sm)
+    +media-query($bp['md-lg'])
       color: var(--c-text-neutral-light)
 
   .unseen-mark
@@ -188,14 +188,16 @@
 
 .notification-content
   width: 66%
-  .message-box
-    flex-direction: column
-  +media-query($bp.sm)
+
+  +media-query($bp['md-lg'])
     display: none
     height: 88vh
     margin: 0
 
+  .message-box
+    flex-direction: column
+
   &.notification-selected
-    +media-query($bp.sm)
+    +media-query($bp['md-lg'])
       display: block
       width: 100%

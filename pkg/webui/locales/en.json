@@ -694,6 +694,7 @@
   "console.containers.notifications.index.unreadMessagesTitle": "{value} unread notifications",
   "console.containers.notifications.index.archivedMessageTitle": "{value} archived notifications",
   "console.containers.notifications.index.unreadMessagesSubtitle": "Select a notification to display the content here.",
+  "console.containers.notifications.index.noArchivedNotificationsSubtitle": "Once you archive a notification, it can be viewed here",
   "console.containers.notifications.notification-content.index.archive": "Archive",
   "console.containers.notifications.notification-content.index.unarchive": "Unarchive",
   "console.containers.notifications.notification-list.index.archived": "Archived notifications",

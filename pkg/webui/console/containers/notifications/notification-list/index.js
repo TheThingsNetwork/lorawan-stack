@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 import { FixedSizeList as List } from 'react-window'
@@ -23,7 +23,6 @@ import { useParams } from 'react-router-dom'
 
 import { IconEye } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
-import Spinner from '@ttn-lw/components/spinner'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,8 +31,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { markAllAsSeen } from '@console/store/actions/notifications'
-
-import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import styles from '../notifications.styl'
 
@@ -51,11 +48,9 @@ const NotificationList = ({
   selectedNotification,
   totalCount,
   listRef,
-  countLoading,
   updatePendingNotificationIds,
   unreadNotificationsCount,
 }) => {
-  const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const { category } = useParams()
   const isArchive = category === 'archived'
   const dispatch = useDispatch()
@@ -69,15 +64,8 @@ const NotificationList = ({
   const itemCount = totalCount >= 0 ? totalCount : 100
 
   const handleMarkAllAsSeen = useCallback(async () => {
-    if (totalUnseenCount > 0) {
-      const result = await dispatch(attachPromise(markAllAsSeen()))
-      const firstIndex = items.findIndex(notification => notification.id === result[0])
-      const lastIndex = items.findIndex(
-        notification => notification.id === result[result.length - 1],
-      )
-      loadNextPage(firstIndex, lastIndex)
-    }
-  }, [dispatch, totalUnseenCount, loadNextPage, items])
+    await dispatch(attachPromise(markAllAsSeen()))
+  }, [dispatch])
 
   const isSelected = notification =>
     notification && selectedNotification && selectedNotification.id === notification.id
@@ -108,18 +96,16 @@ const NotificationList = ({
   }
 
   const notificationCount = useMemo(() => {
-    if (Boolean(totalUnseenCount) && !isArchive && !countLoading) {
+    if (!isArchive && unreadNotificationsCount) {
       return (
         <span className={styles.totalNotifications} data-test-id="total-unseen-notifications">
-          {totalUnseenCount}
+          {unreadNotificationsCount}
         </span>
       )
     }
-    if (countLoading && !isArchive) {
-      return <Spinner micro className="ml-cs-xxs" />
-    }
+
     return null
-  }, [countLoading, isArchive, totalUnseenCount])
+  }, [isArchive, unreadNotificationsCount])
 
   return (
     <>
@@ -174,7 +160,6 @@ const NotificationList = ({
 }
 
 NotificationList.propTypes = {
-  countLoading: PropTypes.bool.isRequired,
   hasNextPage: PropTypes.bool.isRequired,
   items: PropTypes.array.isRequired,
   listRef: PropTypes.shape({ current: PropTypes.shape({}) }).isRequired,

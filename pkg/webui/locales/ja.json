@@ -694,6 +694,7 @@
   "console.containers.notifications.index.unreadMessagesTitle": "",
   "console.containers.notifications.index.archivedMessageTitle": "",
   "console.containers.notifications.index.unreadMessagesSubtitle": "",
+  "console.containers.notifications.index.noArchivedNotificationsSubtitle": "",
   "console.containers.notifications.notification-content.index.archive": "",
   "console.containers.notifications.notification-content.index.unarchive": "",
   "console.containers.notifications.notification-list.index.archived": "",

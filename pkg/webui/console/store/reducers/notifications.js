@@ -14,9 +14,12 @@
 
 import { fillIntoArray, pageToIndices } from '@console/store/utils'
 
+import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
+
 import {
   GET_ARCHIVED_NOTIFICATIONS_SUCCESS,
   GET_INBOX_NOTIFICATIONS_SUCCESS,
+  GET_UNSEEN_NOTIFICATIONS_SUCCESS,
   MARK_ALL_AS_SEEN_SUCCESS,
   REFRESH_NOTIFICATIONS_SUCCESS,
   UPDATE_NOTIFICATION_STATUS_SUCCESS,
@@ -76,11 +79,16 @@ const notifications = (state = defaultState, { type, payload }) => {
           },
         },
       }
+    case GET_UNSEEN_NOTIFICATIONS_SUCCESS:
+      return {
+        ...state,
+        unseenTotalCount: payload.totalCount,
+      }
     case UPDATE_NOTIFICATION_STATUS_SUCCESS:
       return {
         ...state,
         unseenTotalCount:
-          payload.status === 'NOTIFICATION_STATUS_SEEN' && state.unseenTotalCount > 0
+          payload.status === NOTIFICATION_STATUS.SEEN && state.unseenTotalCount > 0
             ? state.unseenTotalCount - payload.ids.length
             : state.unseenTotalCount,
         notifications: {
@@ -97,6 +105,16 @@ const notifications = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         unseenTotalCount: 0,
+        notifications: {
+          ...state.notifications,
+          inbox: {
+            ...state.notifications.inbox,
+            entities: state.notifications.inbox.entities.map(entity => ({
+              ...entity,
+              status: NOTIFICATION_STATUS.SEEN,
+            })),
+          },
+        },
       }
     default:
       return state

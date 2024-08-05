@@ -26,6 +26,8 @@ import Icon, { IconInbox } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
+
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import useRequest from '@ttn-lw/lib/hooks/use-request'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -33,6 +35,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
   getArchivedNotifications,
   getInboxNotifications,
+  getUnseenNotifications,
   refreshNotifications,
   updateNotificationStatus,
 } from '@console/store/actions/notifications'
@@ -65,6 +68,7 @@ const m = defineMessages({
   unreadMessagesTitle: '{value} unread notifications',
   archivedMessageTitle: '{value} archived notifications',
   unreadMessagesSubtitle: 'Select a notification to display the content here.',
+  noArchivedNotificationsSubtitle: 'Once you archive a notification, it can be viewed here',
 })
 
 const Notifications = React.memo(() => {
@@ -83,10 +87,14 @@ const Notifications = React.memo(() => {
   const [updatePendingNotificationIds, setUpdatePendingNotificationIds] = useState([])
   const [updateNotificationStatusLoading, setUpdateNotificationStatusLoading] = useState(false)
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < LAYOUT.BREAKPOINTS.M)
-  const [refreshNotificationsLoading] = useRequest(refreshNotifications())
+  const [unseenNotificationsLoading] = useRequest(getUnseenNotifications({ page: 1, limit: 1 }))
 
-  const unreadNotificationsCount = refreshNotificationsLoading
-    ? items.filter(n => !n.status && !updatePendingNotificationIds.includes(n.id)).length
+  const unreadNotificationsCount = unseenNotificationsLoading
+    ? items.filter(
+        n =>
+          ![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(n.status) &&
+          !updatePendingNotificationIds.includes(n.id),
+      ).length
     : totalUnseenCount
 
   const loadNextPage = useCallback(
@@ -118,9 +126,7 @@ const Notifications = React.memo(() => {
   const handleArchive = useCallback(
     async (_, id) => {
       // Determine the filter to apply based on the showArchived state.
-      const updateFilter = showArchived
-        ? 'NOTIFICATION_STATUS_SEEN'
-        : 'NOTIFICATION_STATUS_ARCHIVED'
+      const updateFilter = showArchived ? NOTIFICATION_STATUS.SEEN : NOTIFICATION_STATUS.ARCHIVED
 
       // Update the status of the notification.
       await dispatch(attachPromise(updateNotificationStatus([id], updateFilter)))
@@ -172,7 +178,7 @@ const Notifications = React.memo(() => {
   )
 
   const isUpdateStatusPending = useMemo(
-    () => updatePendingNotificationIds.find(id => id === selectedNotification?.id),
+    () => updatePendingNotificationIds.some(id => id === selectedNotification?.id),
     [selectedNotification, updatePendingNotificationIds],
   )
 
@@ -180,7 +186,7 @@ const Notifications = React.memo(() => {
     setUpdateNotificationStatusLoading(true)
     await dispatch(
       attachPromise(
-        updateNotificationStatus(updatePendingNotificationIds, 'NOTIFICATION_STATUS_SEEN'),
+        updateNotificationStatus(updatePendingNotificationIds, NOTIFICATION_STATUS.SEEN),
       ),
     )
     setUpdatePendingNotificationIds([])
@@ -190,8 +196,10 @@ const Notifications = React.memo(() => {
   useEffect(() => {
     if (
       selectedNotification?.id &&
-      !selectedNotification?.status &&
-      !Boolean(isUpdateStatusPending)
+      ![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(
+        selectedNotification?.status,
+      ) &&
+      !isUpdateStatusPending
     ) {
       setUpdatePendingNotificationIds(ids => [...ids, selectedNotification.id])
     }
@@ -201,13 +209,13 @@ const Notifications = React.memo(() => {
     if (
       !updateNotificationStatusLoading &&
       updatePendingNotificationIds.length !== 0 &&
-      updatePendingNotificationIds.length <= totalUnseenCount
+      updatePendingNotificationIds.length <= unreadNotificationsCount
     ) {
       handleUpdateNotificationStatus()
     }
   }, [
     handleUpdateNotificationStatus,
-    totalUnseenCount,
+    unreadNotificationsCount,
     updateNotificationStatusLoading,
     updatePendingNotificationIds.length,
   ])
@@ -247,7 +255,7 @@ const Notifications = React.memo(() => {
       return messageBox({
         icon: IconInbox,
         title: sharedMessages.noNotifications,
-        subtitle: m.noNotificationsSubtitle,
+        subtitle: showArchived ? m.noArchivedNotificationsSubtitle : m.noNotificationsSubtitle,
       })
     }
     return messageBox({
@@ -279,7 +287,6 @@ const Notifications = React.memo(() => {
           items={items}
           totalCount={totalCount}
           selectedNotification={selectedNotification}
-          countLoading={refreshNotificationsLoading}
           updatePendingNotificationIds={updatePendingNotificationIds}
           unreadNotificationsCount={unreadNotificationsCount}
           listRef={listRef}

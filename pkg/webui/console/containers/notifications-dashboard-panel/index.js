@@ -30,8 +30,9 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 import Notification from '@console/components/notifications'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import useRequest from '@ttn-lw/lib/hooks/use-request'
 
-import { getInboxNotifications } from '@console/store/actions/notifications'
+import { getInboxNotifications, getUnseenNotifications } from '@console/store/actions/notifications'
 
 import {
   selectInboxNotifications,
@@ -48,6 +49,7 @@ const m = defineMessages({
 const NotificationsDashboardPanel = () => {
   const totalUnseenNotifications = useSelector(selectTotalUnseenCount)
   const notifications = useSelector(selectInboxNotifications)
+  useRequest(getUnseenNotifications({ page: 1, limit: 1 }))
 
   const MessageDecorator = () => (
     <span className={style.notificationPanelTotal}>{totalUnseenNotifications}</span>
