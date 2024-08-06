@@ -56,7 +56,6 @@ $event-container-height = 40px
       min-height: $event-container-height * 12
 
   &:not(.theme-dark)
-    --bg-header: var(--c-bg-neutral-min)
     --bg-body: var(--c-bg-neutral-extralight)
     --bg-active: var(--c-bg-neutral-min)
     --bg-synthetic: var(--c-bg-neutral-semilight)
@@ -66,39 +65,45 @@ $event-container-height = 40px
     --text-neutral-light: var(--c-text-neutral-light)
     --text-warning: var(--c-text-warning-normal)
     --text-error: var(--c-text-error-normal)
-    --c-border: $c.neutral-700
+    --c-border: var(--c-border-neutral-bold)
+    --scrollbar-track: var(--c-bg-neutral-min)
+    --scrollbar-thumb: var(--c-border-neutral-semilight)
 
   &.theme-dark
     &, :after, :before
-      --bg-header: var(--c-bg-neutral-bold)
-      --bg-body: var(--c-bg-neutral-semibold)
-      --bg-active: var(--c-bg-dark-active)
+      // Reassigned new tokens.
+      --bg-body: $c.neutral-700
+      --bg-active: $c.neutral-800
       --bg-synthetic: $c.neutral-600
       --bg-hover: $c.neutral-600
-      --bg-sidebar: var(--c-bg-neutral-bold)
+      --bg-sidebar: $c.neutral-800
       --text-neutral: $c.white
       --text-neutral-light: $c.neutral-300
-      --text-warning: var(--c-text-warning-light)
-      --text-error: var(--c-text-error-normal)
+      --text-warning: $c.warning-400
+      --text-error: $c.error-600
       --c-border: $c.neutral-200
+      --scrollbar-track: $c.neutral-800
+      --scrollbar-thumb: $c.neutral-500
 
-      --c-icon-neutral-light: var(--c-text-neutral-light)
-      --c-bg-neutral-max: var(--c-bg-neutral-max)
+      // Reassigned existing tokens.
+      --c-icon-neutral-light: $c.neutral-500
       --c-bg-neutral-semilight: $c.neutral-800
       --c-bg-success-normal: $c.success-600
-      --c-bg-neutral-min: var(--c-bg-neutral-bold)
-      --c-bg-neutral-light: var(--c-bg-neutral-semibold)
-      --c-border-neutral-normal: var(--c-border-neutral-semibold)
+      --c-bg-neutral-min: $c.neutral-800
+      --c-bg-neutral-light: $c.neutral-700
+      --c-bg-neutral-extralight: $c.neutral-050
+      --c-border-neutral-normal: $c.neutral-500
+      --c-border-neutral-semilight: $c.neutral-800
       --c-border-neutral-light: $c.neutral-700
       --c-border-neutral-extralight: $c.neutral-600
-      --c-text-neutral-heavy: var(--c-text-neutral-min)
-      --c-text-neutral-light: var(--c-text-neutral-extralight)
+      --c-text-neutral-heavy: $c.neutral-white
+      --c-text-neutral-light: $c.neutral-500
       --c-text-info-normal: $c.information-300
       --c-text-success-normal: $c.success-300
       --c-text-brand-normal: $c.tts-300
 
 .header
-  background-color: var(--bg-header)
+  background-color: var(--c-bg-neutral-min)
   border-bottom: 1px solid var(--c-border-neutral-light)
   height: 3rem
   z-index: $zi.slight
@@ -214,15 +219,12 @@ $event-container-height = 40px
 
   ol > div
     scrollbar-width: thin
-    scrollbar-color: var(--c-border-neutral-semibold) var(--c-bg-neutral-semibold)
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track)
 
     &::-webkit-scrollbar
       width: 1.2rem
       height: 1.2rem
       background-color: none
-
-    &::-webkit-scrollbar-button
-      display: none
 
     &::-webkit-scrollbar-track
       background: none
