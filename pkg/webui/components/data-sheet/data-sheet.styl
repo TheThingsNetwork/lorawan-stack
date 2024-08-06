@@ -12,36 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.table
-  width: 100%
-  table-layout: fixed
-  border-collapse: separate
-  border-spacing: 0 $cs.xs
-
-  tr
+.data-sheet
+  &-header
     height: 2.5rem
+    color: var(--c-text-neutral-heavy)
+    font-weight: $fw.bold
+    white-space: nowrap
+    margin-bottom: $cs.xs
 
-  th
-    text-align: left
-    font-weight: 400
-    color: var(--c-text-neutral-semilight)
-    min-width: 20rem
-    padding-right: $cs.s
+  &-row
+    &-heading
+      height: 2.5rem
+      text-align: left
+      font-weight: 400
+      color: var(--c-text-neutral-semilight)
 
-  tr.group-heading
-    height: 2.2rem
-    vertical-align: top
+    &-content
+      height: 2.5rem
+      display: flex
+      align-items: center
+      justify-content: space-between
+      margin-bottom: $cs.xs
 
-    &:not(:first-child)
-      height: 3.7rem
-      vertical-align: middle
-    th
-      color: var(--c-text-neutral-heavy)
-      font-weight: $fw.bold
-      white-space: nowrap
-
-.sub th
-  padding-left: $cs.l
+      &-value
+        flex-grow: 1
+        text-align: left
+        max-width: 40%
 
 .not-available
   color: var(--c-text-neutral-light)
@@ -50,3 +46,16 @@
   color: var(--c-icon-neutral-light)
   margin-bottom: -4px
   margin-left: 2px
+
+@container panel (max-width: 460px)
+  .data-sheet-row-heading
+    height: 1.7rem
+  .data-sheet-row-content
+    flex-direction: column
+    justify-content: flex-start
+    align-items: flex-start
+    height: fit-content
+  .data-sheet-row-content:last-child
+    margin-bottom: $cs.l
+  .data-sheet-row-content-value
+    max-width: 100%

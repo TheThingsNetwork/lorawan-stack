@@ -27,45 +27,44 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import style from './data-sheet.styl'
 
 const DataSheet = ({ className, data }) => (
-  <table className={classnames(className, style.table)}>
-    <tbody>
-      {data.map((group, index) => (
-        <React.Fragment key={`${group.header}_${index}`}>
-          <tr className={style.groupHeading}>
-            <th>
-              <Message content={group.header} />
-            </th>
-          </tr>
-          {group.items.length > 0 ? (
-            group.items.map(item => {
-              if (!item) {
-                return null
-              }
-              const keyId = typeof item.key === 'object' ? item.key.id : item.key
-              const subItems = item.subItems
-                ? item.subItems.map((subItem, subIndex) => (
-                    <DataSheetRow sub item={subItem} key={`${keyId}_${index}_${subIndex}`} />
-                  ))
-                : null
+  <div className={classnames(style.dataSheet, className)}>
+    {data.map((group, index) => (
+      <div key={`${group.header}_${index}`}>
+        <div className={style.dataSheetHeader}>
+          <Message content={group.header} />
+        </div>
+        {group.items.length > 0 ? (
+          group.items.map(item => {
+            if (!item) {
+              return null
+            }
+            const keyId = typeof item.key === 'object' ? item.key.id : item.key
+            const subItems = item.subItems
+              ? item.subItems.map((subItem, subIndex) => (
+                  <div
+                    key={`${keyId}_${index}`}
+                    className={classnames(style.dataSheetRowContent, 'pl-cs-l')}
+                  >
+                    <DataSheetRow item={subItem} key={`${keyId}_${index}_${subIndex}`} />
+                  </div>
+                ))
+              : null
 
-              return (
-                <React.Fragment key={`${keyId}_${index}`}>
-                  <DataSheetRow item={item} />
-                  {subItems}
-                </React.Fragment>
-              )
-            })
-          ) : (
-            <tr>
-              <th colSpan={2}>
-                <Message content={group.emptyMessage || sharedMessages.noData} />
-              </th>
-            </tr>
-          )}
-        </React.Fragment>
-      ))}
-    </tbody>
-  </table>
+            return (
+              <div key={`${keyId}_${index}`} className={style.dataSheetRowContent}>
+                <DataSheetRow item={item} />
+                {subItems}
+              </div>
+            )
+          })
+        ) : (
+          <div>
+            <Message content={group.emptyMessage || sharedMessages.noData} />
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
 )
 
 DataSheet.propTypes = {
@@ -101,25 +100,22 @@ DataSheet.defaultProps = {
   className: undefined,
 }
 
-const DataSheetRow = ({ item, sub }) => {
+const DataSheetRow = ({ item }) => {
   const isSafeInspector = item.type === 'byte' || item.type === 'code'
-  const rowStyle = classnames({
-    [style.sub]: sub,
-  })
 
   return (
-    <tr className={rowStyle}>
+    <>
       {item.key && (
-        <th>
+        <div className={style.dataSheetRowHeading}>
           <Message content={item.key} />
           {item.tooltipMessage && (
             <Tooltip content={<Message content={item.tooltipMessage} />} small>
               <Icon icon={IconInfoCircle} className={style.tooltipIcon} size={16} />
             </Tooltip>
           )}
-        </th>
+        </div>
       )}
-      <td>
+      <div className={style.dataSheetRowContentValue}>
         {item.value && isSafeInspector ? (
           <SafeInspector
             hideable={false || item.sensitive}
@@ -132,8 +128,8 @@ const DataSheetRow = ({ item, sub }) => {
             <Message className={style.notAvailable} content={sharedMessages.notAvailable} />
           )
         )}
-      </td>
-    </tr>
+      </div>
+    </>
   )
 }
 
@@ -153,11 +149,6 @@ DataSheetRow.propTypes = {
     /** Optional subitems of this item (same shape as item, but no deeper hierarchies). */
     subItems: PropTypes.arrayOf(PropTypes.shape({})),
   }).isRequired,
-  sub: PropTypes.bool,
-}
-
-DataSheetRow.defaultProps = {
-  sub: false,
 }
 
 export default DataSheet
