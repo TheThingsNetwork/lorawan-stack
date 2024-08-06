@@ -30,8 +30,9 @@ import SyntheticEventDetails from './synthetic'
 
 import style from './details.styl'
 
-const EventDetails = ({ className, children, event }) => {
+const EventDetails = ({ className, children, event, darkTheme }) => {
   const hasChildren = Boolean(children)
+  const { isSynthetic } = event || {}
   const dataFormatsDocumentationLink = (
     <Link.DocLink
       secondary
@@ -51,17 +52,24 @@ const EventDetails = ({ className, children, event }) => {
   }
 
   return (
-    <div className={classnames(className, style.details)}>
+    <div className={classnames(className, { 'p-cs-m': isSynthetic })}>
       {!hasChildren ? (
         event.isSynthetic ? (
           <SyntheticEventDetails event={event} id={getEventId(event)} />
         ) : (
-          <RawEventDetails className={style.codeEditor} details={event} id={getEventId(event)} />
+          <RawEventDetails
+            className={style.codeEditor}
+            details={event}
+            id={getEventId(event)}
+            darkTheme={darkTheme}
+          />
         )
       ) : (
         children
       )}
       <Message
+        component="p"
+        className={classnames({ 'p-sides-cs-m': !isSynthetic })}
         content={messages.dataFormatsInformation}
         values={{ dataFormatsDocumentationLink }}
       />
@@ -72,12 +80,14 @@ const EventDetails = ({ className, children, event }) => {
 EventDetails.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   className: PropTypes.string,
+  darkTheme: PropTypes.bool,
   event: PropTypes.event,
 }
 
 EventDetails.defaultProps = {
   children: null,
   className: undefined,
+  darkTheme: false,
   event: undefined,
 }
 

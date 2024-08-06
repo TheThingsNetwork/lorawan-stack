@@ -24,10 +24,7 @@ import GatewayEvents from '@console/containers/gateway-events'
 
 import Require from '@console/lib/components/require'
 
-import style from '@console/views/app/app.styl'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import useRootClass from '@ttn-lw/lib/hooks/use-root-class'
 
 import { mayViewGatewayEvents } from '@console/lib/feature-checks'
 
@@ -42,8 +39,6 @@ const GatewayData = () => {
     'gtws.single.data',
     <Breadcrumb path={`/gateways/${gtwId}/data`} content={sharedMessages.liveData} />,
   )
-
-  useRootClass(style.stage, 'stage')
 
   return (
     <Require featureCheck={mayViewGatewayEvents} otherwise={{ redirect: `/gateways/${gtwId}` }}>

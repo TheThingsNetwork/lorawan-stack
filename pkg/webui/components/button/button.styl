@@ -35,220 +35,232 @@
     white-space: nowrap
     box-sizing: border-box
 
-  .icon
-    margin-left: - $cs.xxs
-    flex-shrink: 0
+    &.small
+      height: 2rem
+      padding: 0 $cs.s
+      gap: $cs.xs3
 
-    &:only-child
+    .icon
+      margin-left: - $cs.xxs
+      flex-shrink: 0
+
+      &:only-child
+        margin-right: - $cs.xxs
+
+    &.with-alert:after
+      content: ''
+      position: absolute
+      top: 4px
+      left: 17px
+      border: 3px solid var(--c-border-neutral-min)
+      border-radius: 100%
+      size: 13px
+      box-sizing: border-box
+      background-color: var(--c-bg-brand-normal)
+
+    .expand-icon
+      color: var(--c-icon-neutral-light)
+      font-size: 1.285rem
+      margin-left: .2rem
       margin-right: - $cs.xxs
 
-  &.with-alert:after
-    content: ''
-    position: absolute
-    top: 4px
-    left: 17px
-    border: 3px solid var(--c-border-neutral-min)
-    border-radius: 100%
-    size: 13px
-    box-sizing: border-box
-    background-color: var(--c-bg-brand-normal)
+    &.only-icon
+      gap: 0
+      padding: 0 $cs.s
+      width: 2.5rem
+      height: 2.5rem
 
-  .expand-icon
-    color: var(--c-icon-neutral-light)
-    font-size: 1.285rem
-    margin-left: .2rem
-    margin-right: - $cs.xxs
-
-  &.only-icon
-    gap: 0
-    padding: 0 $cs.s
-    width: 2.5rem
-    height: 2.5rem
-
-  &.primary
-    color: var(--c-bg-neutral-min)
-    background-color: var(--c-text-brand-normal)
-
-    &:disabled
-      background-color: var(--c-border-neutral-light)
-
-    &:not(:disabled)
-      &:hover
-        background-color: var(--c-text-brand-normal-hover)
-
-      +focus-visible()
-        background-color: var(--c-text-brand-normal-hover)
-
-      &:active
-        background-color: var(--c-text-brand-normal-active)
-
-    &:disabled
-      background-color: var(--c-bg-neutral-min-disabled)
-
-    &.warning
-      background-color: var(--c-bg-warning-normal)
-
-      &:not(:disabled)
-        &:hover
-          background-color: var(--c-bg-warning-normal-hover)
-
-        +focus-visible()
-          background-color: var(--c-bg-warning-normal-hover)
-
-        &:active
-          background-color: var(--c-bg-warning-normal-active)
-
-        &:disabled
-          background-color: var(--c-bg-warning-normal-disabled)
-
-    &.danger
-      background-color: var(--c-bg-error-normal)
-
-      &:not(:disabled)
-        &:hover
-          background-color: var(--c-bg-error-normal-hover)
-
-        +focus-visible()
-          background-color: var(--c-bg-error-normal-hover)
-
-        &:active
-          background-color: var(--c-bg-error-normal-active)
+    &.primary
+      color: var(--c-bg-neutral-min)
+      background-color: var(--c-text-brand-normal)
 
       &:disabled
-        background-color: var(--c-bg-error-normal-disabled)
+        background-color: var(--c-border-neutral-light)
 
-  &.secondary
-    color: var(--c-text-neutral-heavy)
-    background-color: var(--c-bg-neutral-min)
-    box-shadow: 0px 2px 2px 0px rgba(0 0 0 4.5%), inset 0px 0px 0px 1px var(--c-bg-neutral-min)
-    gradient-border(var(--c-bg-neutral-min), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
-    border: 1px solid transparent
+      &:not(:disabled)
+        &:hover
+          background-color: var(--c-text-brand-normal-hover)
 
-    &.warning
-      color: var(--c-text-warning-normal)
-      border-color: var(--c-border-warning-normal)
+        +focus-visible()
+          background-color: var(--c-text-brand-normal-hover)
 
-    &.danger
-      color: var(--c-text-error-normal)
-      border-color: var(--c-border-error-normal)
+        &:active
+          background-color: var(--c-text-brand-normal-active)
 
-    &:disabled
-      color: var(--c-text-neutral-extralight)
-      background-color: var(--c-bg-neutral-semilight)
-      border-color: var(--c-border-neutral-light)
+      &:disabled
+        background-color: var(--c-bg-neutral-min-disabled)
 
-    &:not(:disabled)
-      &:hover
-        gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+      &.warning
+        background-color: var(--c-bg-warning-normal)
 
-      +focus-visible()
-        gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+        &:not(:disabled)
+          &:hover
+            background-color: var(--c-bg-warning-normal-hover)
 
-      &:active
-        gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
-        box-shadow: none
+          +focus-visible()
+            background-color: var(--c-bg-warning-normal-hover)
 
-  &.naked
-    color: var(--c-text-neutral-light)
+          &:active
+            background-color: var(--c-bg-warning-normal-active)
 
-    &:disabled
-      color: var(--c-text-neutral-extralight)
+          &:disabled
+            background-color: var(--c-bg-warning-normal-disabled)
 
-    &:not(:disabled)
-      &:hover
-        background-color: rgba(0,0,0,.04)
-        color: var(--c-text-neutral-heavy)
+      &.danger
+        background-color: var(--c-bg-error-normal)
 
-      +focus-visible()
-        background-color: rgba(0,0,0,.04)
-        color: var(--c-text-neutral-heavy)
+        &:not(:disabled)
+          &:hover
+            background-color: var(--c-bg-error-normal-hover)
 
-      &:active
+          +focus-visible()
+            background-color: var(--c-bg-error-normal-hover)
+
+          &:active
+            background-color: var(--c-bg-error-normal-active)
+
+        &:disabled
+          background-color: var(--c-bg-error-normal-disabled)
+
+    &.secondary
+      color: var(--c-text-neutral-heavy)
+      background-color: var(--c-bg-neutral-min)
+      box-shadow: 0px 2px 2px 0px rgba(0 0 0 4.5%), inset 0px 0px 0px 1px var(--c-bg-neutral-min)
+      gradient-border(var(--c-bg-neutral-min), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+      border: 1px solid transparent
+
+      &.warning
+        color: var(--c-text-warning-normal)
+        border-color: var(--c-border-warning-normal)
+
+      &.danger
+        color: var(--c-text-error-normal)
+        border-color: var(--c-border-error-normal)
+
+      &:disabled
+        color: var(--c-text-neutral-extralight)
         background-color: var(--c-bg-neutral-semilight)
+        border-color: var(--c-border-neutral-light)
 
-    &.small
-      width: 2rem
-      height: 2rem
-      border-radius: $br.s
+      &.small
+        margin: $cs.xxs
+        border-radius: $br.s
+        font-size: $fs.s
 
-    &.warning
-      color: var(--c-text-warning-normal)
-
-      &:hover
-        color: var(--c-text-warning-normal-hover)
-
-    &.danger
-      color: var(--c-text-error-normal)
-
-      &:hover
-        color: var(--c-text-error-normal-hover)
-
-  &.with-dropdown&.only-icon
-    width: fit-content
-
-  &.with-icon
-    line-height: 1.3
-
-    &.responsive-label
-      padding: $cs.xs
-
-      +media-query($bp.xxs)
         .icon
-          margin-left: 0
-          margin-right: 0
+          width: 1.2rem
+          height: 1.2rem
 
-        .link-button-message
-          display: none
+      &:not(:disabled)
+        &:hover
+          gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
 
-  &.error
-    animation: shake .15s 4 linear
+        +focus-visible()
+          gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
 
-  &:disabled
-    cursor: default
+        &:active
+          gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+          box-shadow: none
 
-  &.busy:not(.naked),
-  &.busy
-    // stylelint-disable-next-line declaration-no-important
-    color: transparent !important
+    &.naked
+      color: var(--c-text-neutral-light)
+
+      &:disabled
+        color: var(--c-text-neutral-extralight)
+
+      &:not(:disabled)
+        &:hover
+          background-color: rgba(0,0,0,.04)
+          color: var(--c-text-neutral-heavy)
+
+        +focus-visible()
+          background-color: rgba(0,0,0,.04)
+          color: var(--c-text-neutral-heavy)
+
+        &:active
+          background-color: var(--c-bg-neutral-semilight)
+
+      &.small
+        border-radius: $br.s
+
+      &.warning
+        color: var(--c-text-warning-normal)
+
+        &:hover
+          color: var(--c-text-warning-normal-hover)
+
+      &.danger
+        color: var(--c-text-error-normal)
+
+        &:hover
+          color: var(--c-text-error-normal-hover)
+
+    &.with-dropdown&.only-icon
+      width: fit-content
+
+    &.with-icon
+      line-height: 1.3
+
+      &.responsive-label
+        padding: $cs.xs
+
+        +media-query($bp.xxs)
+          .icon
+            margin-left: 0
+            margin-right: 0
+
+          .link-button-message
+            display: none
+
+    &.error
+      animation: shake .15s 4 linear
+
+    &:disabled
+      cursor: default
+
+    &.busy:not(.naked),
+    &.busy
+      // stylelint-disable-next-line declaration-no-important
+      color: transparent !important
+      position: relative
+      svg
+        center-absolute()
+
+      stop
+        stop-color: $s
+  .content
     position: relative
-    svg
-      center-absolute()
 
-    stop
-      stop-color: $s
-.content
-  position: relative
+  .spinner
+    position: absolute
+    top: 0
+    bottom: 0
+    left: - $cs.s
+    right: - $cs.s
 
-.spinner
-  position: absolute
-  top: 0
-  bottom: 0
-  left: - $cs.s
-  right: - $cs.s
+  .button-group
+    display: flex
+    flex-direction: column
+    align-items: stretch
 
-.button-group
-  display: flex
-  flex-direction: column
-  align-items: stretch
+    &.align-start
+      justify-content: flex-start
 
-  &.align-start
-    justify-content: flex-start
+    &.align-end
+      justify-content: flex-end
 
-  &.align-end
-    justify-content: flex-end
+    &.align-center
+      justify-content: center
 
-  &.align-center
-    justify-content: center
+    +media-query-min($bp.sm)
+      flex-direction: row
+      align-items: center
 
-  +media-query-min($bp.sm)
-    flex-direction: row
-    align-items: center
+    .button:not(:last-child)
+      margin-right: $cs.xs
 
-  .button:not(:last-child)
-    margin-right: $cs.xs
-
-    +media-query($bp.sm)
-      // stylelint-disable declaration-no-important
-      margin-bottom: $cs.s !important
-      margin-right: 0 !important
-      // stylelint-enable declaration-no-important
+      +media-query($bp.sm)
+        // stylelint-disable declaration-no-important
+        margin-bottom: $cs.s !important
+        margin-right: 0 !important
+        // stylelint-enable declaration-no-important

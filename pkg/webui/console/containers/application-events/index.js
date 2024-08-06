@@ -14,6 +14,7 @@
 
 import React, { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import Events from '@console/components/events'
 
@@ -35,10 +36,17 @@ import {
   selectApplicationEventsPaused,
   selectApplicationEventsTruncated,
   selectApplicationEventsFilter,
+  selectApplicationById,
 } from '@console/store/selectors/applications'
 
+const m = defineMessages({
+  applicationEventsOf: 'Application events of <strong>{entityName}</strong>',
+})
+
 const ApplicationEvents = props => {
-  const { appId, widget } = props
+  const { appId, widget, darkTheme, framed } = props
+
+  const applicationName = useSelector(state => selectApplicationById(state, appId).name) || appId
 
   const events = useSelector(state => selectApplicationEvents(state, appId))
   const paused = useSelector(state => selectApplicationEventsPaused(state, appId))
@@ -86,19 +94,40 @@ const ApplicationEvents = props => {
         filter={filter}
         onPauseToggle={onPauseToggle}
         onFilterChange={onFilterChange}
+        darkTheme={darkTheme}
+        framed={framed}
+        titleMessage={m.applicationEventsOf}
+        entityName={applicationName}
       />
     )
-  }, [appId, events, filter, onClear, onFilterChange, onPauseToggle, paused, truncated, widget])
+  }, [
+    appId,
+    applicationName,
+    darkTheme,
+    events,
+    filter,
+    framed,
+    onClear,
+    onFilterChange,
+    onPauseToggle,
+    paused,
+    truncated,
+    widget,
+  ])
 
   return <Require featureCheck={mayViewApplicationEvents}>{content}</Require>
 }
 
 ApplicationEvents.propTypes = {
   appId: PropTypes.string.isRequired,
+  darkTheme: PropTypes.bool,
+  framed: PropTypes.bool,
   widget: PropTypes.bool,
 }
 
 ApplicationEvents.defaultProps = {
+  darkTheme: false,
+  framed: false,
   widget: false,
 }
 

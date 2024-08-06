@@ -32,6 +32,8 @@ import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import DeviceOverviewHeader from '@console/containers/device-overview-header'
+import EventSplitFrame from '@console/containers/event-split-frame'
+import DeviceEvents from '@console/containers/device-events'
 
 import DeviceData from '@console/views/device-data'
 import DeviceGeneralSettings from '@console/views/device-general-settings'
@@ -54,12 +56,13 @@ import { selectSelectedDevice } from '@console/store/selectors/devices'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import style from './device.styl'
-import {} from '@tabler/icons-react'
 
 const Device = () => {
   const { devId } = useParams()
+  const { pathname } = useLocation()
   const appId = useSelector(selectSelectedApplicationId)
   const device = useSelector(state => selectSelectedDevice(state))
+  const isEventsPath = pathname.endsWith('/data')
 
   const { name, application_server_address } = device
 
@@ -156,6 +159,11 @@ const Device = () => {
         )}
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
+      {!isEventsPath && (
+        <EventSplitFrame>
+          <DeviceEvents devIds={device.ids} darkTheme framed />
+        </EventSplitFrame>
+      )}
     </>
   )
 }

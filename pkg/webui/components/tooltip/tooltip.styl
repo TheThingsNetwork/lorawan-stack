@@ -16,13 +16,12 @@
 
 :global {
   .tippy-box {
-    border-normal()
     z-index: $zi.tooltip
     border-radius: $br.m
-    background: var(--c-bg-neutral-min)
+    background: var(--c-bg-neutral-heavy)
+    color: var(--c-text-neutral-min)
     padding: $cs.m
     max-width: $bp.xs3
-    box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .08), inset 0 -1px 0 0 rgba(0, 0, 0, .11)
     transition: opacity, visibility
     white-space: normal
 
@@ -54,39 +53,19 @@
   }
 
   .tippy-box[data-placement^='top'] > .tippy-arrow {
-    bottom: -3px
-  }
-
-  .tippy-box[data-placement^='top'] > .tippy-arrow:before {
-    border-normal('right')
-    border-normal('bottom')
+    bottom: -4px
   }
 
   .tippy-box[data-placement^='bottom'] > .tippy-arrow {
-    top: -5px
-  }
-
-  .tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
-    border-normal('left')
-    border-normal('top')
+    top: -4px
   }
 
   .tippy-box[data-placement^='left'] > .tippy-arrow {
-    right: -3px
-  }
-
-  .tippy-box[data-placement^='left'] > .tippy-arrow:before {
-    border-normal('right')
-    border-normal('top')
+    right: -4px
   }
 
   .tippy-box[data-placement^='right'] > .tippy-arrow {
-    left: -5px
-  }
-
-  .tippy-box[data-placement^='right'] > .tippy-arrow:before {
-    border-normal('left')
-    border-normal('bottom')
+    left: -4px
   }
 }
 
@@ -94,3 +73,4 @@
 
 .small
   padding: $cs.xxs $cs.s
+  border-radius: $br.xs

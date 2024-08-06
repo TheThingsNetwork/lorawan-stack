@@ -26,6 +26,8 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import ApplicationOverviewHeader from '@console/containers/application-overview-header'
+import EventSplitFrame from '@console/containers/event-split-frame'
+import ApplicationEvents from '@console/containers/application-events'
 
 import Require from '@console/lib/components/require'
 
@@ -97,6 +99,10 @@ const Application = () => {
 const ApplicationInner = () => {
   const { appId } = useParams()
   const { pathname } = useLocation()
+  const isDevicePath = pathname.startsWith(`/applications/${appId}/devices/`)
+  const isEventsPath = pathname.endsWith('/data')
+  const showEventSplitFrame = !isDevicePath && !isEventsPath
+
   const application = useSelector(selectSelectedApplication)
   const name = application.name || appId
   const siteName = selectApplicationSiteName()
@@ -133,6 +139,11 @@ const ApplicationInner = () => {
         <Route path="integrations/lora-cloud" Component={ApplicationIntegrationsLoRaCloud} />
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
+      {showEventSplitFrame && (
+        <EventSplitFrame>
+          <ApplicationEvents appId={appId} darkTheme framed />
+        </EventSplitFrame>
+      )}
     </>
   )
 }

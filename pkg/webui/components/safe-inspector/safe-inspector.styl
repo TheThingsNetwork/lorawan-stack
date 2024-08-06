@@ -99,7 +99,6 @@ $height-small = 2rem
   box-sizing: border-box
   font-family: 'IBM Plex Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
   display: inline
-  background-color: var(--c-bg-neutral-min)
   align-items: center
   height: 100%
   padding: 0 $cs.xs
@@ -108,19 +107,11 @@ $height-small = 2rem
   white-space: nowrap
   border-radius: $br.m
 
-  &:hover
-    background-color: var(--c-bg-neutral-min) // Needs to be here for Safari to work.
-
-  span
+  span:not(:last-child)
     margin-right: .3rem
 
 .data-truncated:not(.data-hidden):hover
-  border-input()
   z-index: $zi.slight
-  min-width: calc(100% + 2px)
-  position: absolute
-  left: -1px
-  top: -1px
   height: calc(100% + 2px)
 
 .data-hidden
@@ -135,7 +126,6 @@ $height-small = 2rem
   color: var(--c-text-neutral-heavy)
   top: -3rem
   left: -50%
-  font-size: $fs.s
   padding: $cs.xxs
   display: hidden
   animation: animation-frames ease 2s
