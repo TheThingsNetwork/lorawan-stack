@@ -29,11 +29,11 @@ const SidebarNavigation = () => {
   const isSingleAppPath =
     isApplicationsPath &&
     /\/applications\/[a-z0-9]+([-]?[a-z0-9]+)*\/?/i.test(pathname) &&
-    !pathname.endsWith('/add')
+    !pathname.endsWith('applications/add')
   const isSingleGatewayPath =
     isGatewaysPath &&
     /\/gateways\/[a-z0-9]+([-]?[a-z0-9]+)*\/?/i.test(pathname) &&
-    !pathname.endsWith('/add')
+    !pathname.endsWith('gateways/add')
 
   return (
     <>
