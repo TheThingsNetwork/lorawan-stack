@@ -17,7 +17,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import classnames from 'classnames'
 import { defineMessages, useIntl } from 'react-intl'
 
-import Icon, { IconExternalLink, IconBook } from '@ttn-lw/components/icon'
+import Icon, { IconBook } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
