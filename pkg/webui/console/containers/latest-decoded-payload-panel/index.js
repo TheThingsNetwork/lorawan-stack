@@ -77,6 +77,7 @@ const m = defineMessages({
   up: '{up} up',
   rssi: `{rssi}dBm RSSI`,
   snr: `{snr}dB SNR`,
+  noRecentActivityDescription: "There haven't been any uplinks recently in this application",
 })
 
 const hasDecodedPayload = data => {
@@ -252,7 +253,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
             </Link>
           ) : (
             <div
-              className={classnames(style.header, 'd-flex j-between p-cs-m c-text-neutral-light')}
+              className={classnames(style.header, 'd-flex j-between p-cs-s c-text-neutral-light')}
             >
               <Message
                 uppercase
@@ -321,7 +322,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
   return (
     <Panel
       title={m.latestDecodedPayload}
-      icon={isHovered ? IconPlayerPause : IconCodeDots}
+      icon={latestEvent && isHovered ? IconPlayerPause : IconCodeDots}
       shortCutLinkTitle={m.seeInLiveData}
       shortCutLinkPath={`${shortCutLinkPath}${latestEvent ? `?eventId=${latestEvent?.unique_id}` : ''}`}
       className={classnames(style.panel, className)}
@@ -360,7 +361,16 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
         </div>
       ) : (
         <PanelError>
-          <Message component="p" content={sharedMessages.noRecentActivity} />
+          <div className="d-flex direction-column flex-grow j-center p-vert-ls-l">
+            <Message
+              content={sharedMessages.noRecentActivity}
+              className="d-block text-center fw-bold c-text-neutral-heavy fs-l"
+            />
+            <Message
+              content={m.noRecentActivityDescription}
+              className="d-block text-center c-text-neutral-light"
+            />
+          </div>
         </PanelError>
       )}
     </Panel>

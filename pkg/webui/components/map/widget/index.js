@@ -49,14 +49,14 @@ const Map = ({ id, markers, setupLocationLink }) => {
           widget
         />
       ) : (
-        <div className={style.mapDisabled}>
+        <div className="d-flex direction-column flex-grow j-center al-center mb-ls-m">
           <Message
             className="c-text-neutral-heavy fw-bold fs-l text-center"
             content={sharedMessages.noLocationYet}
           />
           <Message
             className="c-text-neutral-light fs-m text-center mb-cs-l"
-            content={sharedMessages.connectedDevicesWillAppearHere}
+            content={sharedMessages.noLocationYetDescription}
           />
           {setupLocationLink && (
             <Button.Link
