@@ -36,12 +36,10 @@ const ApplicationsList = () => {
   )
 
   return (
-    <>
-      <div className="container container--xxl">
-        <IntlHelmet title={sharedMessages.applications} />
-        <ApplicationsTable />
-      </div>
-    </>
+    <div className="container container--xxl p-vert-cs-xs p-sides-cs-m">
+      <IntlHelmet title={sharedMessages.applications} />
+      <ApplicationsTable />
+    </div>
   )
 }
 

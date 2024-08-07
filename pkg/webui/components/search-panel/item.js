@@ -37,7 +37,7 @@ const PanelItem = ({ icon, title, path, subtitle, isFocused, index, onClick, onM
     >
       <Icon className="c-icon-neutral-normal" icon={icon} />
       <div className="d-flex flex-column gap-cs-xxs">
-        <div className="c-text-neutral-heavy">{title}</div>
+        <div className="c-text-neutral-heavy fw-bold">{title}</div>
         <div className="c-text-neutral-light">{subtitle}</div>
       </div>
     </Link>

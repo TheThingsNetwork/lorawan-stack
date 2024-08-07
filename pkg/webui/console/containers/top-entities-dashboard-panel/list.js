@@ -77,7 +77,7 @@ const EntitiesList = ({
     </div>
   ) : (
     <ScrollFader className={styles.scrollFader} faderHeight="4rem" topFaderOffset="3rem" light>
-      <Table>
+      <Table className={styles.table}>
         <Table.Head className={styles.topEntitiesPanelOuterTableHeader} panelStyle>
           {columns}
         </Table.Head>
