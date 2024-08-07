@@ -134,6 +134,7 @@ const GatewayConnectionSettings = () => {
           // If the WiFi profile doesn't belong to the user, iterate through collaborators until found
           for (const orgId of orgCollaborators) {
             try {
+              // eslint-disable-next-line no-await-in-loop
               wifiProfile = await dispatch(
                 attachPromise(
                   getConnectionProfile(

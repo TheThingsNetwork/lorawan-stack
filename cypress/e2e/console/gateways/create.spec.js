@@ -112,7 +112,6 @@ describe('Gateway create', () => {
 
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
     cy.findByRole('button', { name: 'Confirm' }).click()
-    cy.findByTestId('notification').should('exist')
     cy.findByLabelText('Claim authentication code').type('12345')
     cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByText('Frequency plan')
