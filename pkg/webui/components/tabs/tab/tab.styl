@@ -15,9 +15,14 @@
 .tab
   display: flex
   flex-direction: column
+  border-radius: $br.m
+  transition: background-color $ad.xs linear
 
   &:not(:last-child)
     margin-bottom: 0
+
+  &:hover
+    background: var(--c-bg-neutral-extralight)
 
 .tab-item
   display: flex
