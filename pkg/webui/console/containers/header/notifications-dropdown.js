@@ -39,7 +39,7 @@ import {
 import style from './header.styl'
 
 const m = defineMessages({
-  description: 'Showing last 3 of {totalNotifications} notifications',
+  description: 'Showing last {numNotifications} of {totalNotifications} notifications',
   noNotifications: 'All caught up!',
   noNotificationsDescription: 'You don’t have any notifications currently',
 })
@@ -99,24 +99,37 @@ const NotificationsDropdown = () => {
                     notificationType={notification.notification_type}
                   />
                 </div>
-                {![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(
-                  notification.status,
-                ) && <Status pulse={false} status="good" className="d-flex al-center" flipped />}
-                <DateTime.Relative
-                  relativeTimeStyle="short"
-                  showAbsoluteAfter={2}
-                  dateTimeProps={{
-                    time: false,
-                    dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
-                  }}
-                  value={notification.created_at}
-                  className="fs-s c-text-neutral-light"
-                />
+
+                <Status
+                  pulse={false}
+                  status="good"
+                  className={classnames('d-flex al-center', {
+                    [style.hideStatus]: [
+                      NOTIFICATION_STATUS.SEEN,
+                      NOTIFICATION_STATUS.ARCHIVED,
+                    ].includes(notification.status),
+                  })}
+                  flipped
+                >
+                  <DateTime.Relative
+                    relativeTimeStyle="short"
+                    showAbsoluteAfter={2}
+                    dateTimeProps={{
+                      time: false,
+                      dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
+                    }}
+                    value={notification.created_at}
+                    className="fs-s c-text-neutral-light"
+                  />
+                </Status>
               </div>
             </Link>
           ))}
           <div className="p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight br-l">
-            <Message content={m.description} values={{ totalNotifications }} />
+            <Message
+              content={m.description}
+              values={{ numNotifications: dropdownItems.length, totalNotifications }}
+            />
           </div>
         </>
       )}
