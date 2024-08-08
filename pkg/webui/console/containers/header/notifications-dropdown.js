@@ -51,13 +51,11 @@ const NotificationsDropdown = () => {
   return (
     <>
       <div className={style.notificationsDropdownHeader}>
-        <span>
-          <Message content={sharedMessages.notifications} />{' '}
-          <Message
-            className="c-text-neutral-semilight fw-normal fs-m"
-            content={`(${totalNotifications})`}
-          />
-        </span>
+        <Message content={sharedMessages.notifications} />{' '}
+        <Message
+          className="c-text-neutral-semilight fw-normal fs-m"
+          content={`(${totalNotifications})`}
+        />
       </div>
       {dropdownItems && dropdownItems.length === 0 ? (
         <div className={style.emptyState}>
@@ -103,13 +101,7 @@ const NotificationsDropdown = () => {
                 </div>
                 {![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(
                   notification.status,
-                ) && (
-                  <Status
-                    pulse={false}
-                    status="good"
-                    className={classnames(style.status, 'mr-cs-xs')}
-                  />
-                )}
+                ) && <Status pulse={false} status="good" className="d-flex al-center" flipped />}
                 <DateTime.Relative
                   relativeTimeStyle="short"
                   showAbsoluteAfter={2}
@@ -118,12 +110,12 @@ const NotificationsDropdown = () => {
                     dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
                   }}
                   value={notification.created_at}
-                  className="fs-s c-text-neutral-heavy"
+                  className="fs-s c-text-neutral-light"
                 />
               </div>
             </Link>
           ))}
-          <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
+          <div className="p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight br-l">
             <Message content={m.description} values={{ totalNotifications }} />
           </div>
         </>

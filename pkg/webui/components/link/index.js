@@ -17,7 +17,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import classnames from 'classnames'
 import { defineMessages, useIntl } from 'react-intl'
 
-import Icon, { IconExternalLink, IconBook } from '@ttn-lw/components/icon'
+import Icon, { IconBook } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -62,6 +62,7 @@ const Link = React.forwardRef((props, ref) => {
     primary,
     tabIndex,
     role,
+    allowWrap,
     ...rest
   } = props
 
@@ -73,6 +74,7 @@ const Link = React.forwardRef((props, ref) => {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
     [style.secondary]: secondary,
+    [style.allowWrap]: allowWrap,
   })
 
   if (disabled) {
@@ -104,6 +106,7 @@ const Link = React.forwardRef((props, ref) => {
 })
 
 Link.propTypes = {
+  allowWrap: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
   disabled: PropTypes.bool,
@@ -131,6 +134,7 @@ Link.propTypes = {
 }
 
 Link.defaultProps = {
+  allowWrap: false,
   children: undefined,
   className: undefined,
   disabled: false,
@@ -164,6 +168,7 @@ const DocLink = props => {
     tabIndex,
     raw,
     onClick,
+    allowWrap,
   } = props
 
   const { formatMessage } = useIntl()
@@ -171,6 +176,7 @@ const DocLink = props => {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
     [style.secondary]: secondary,
+    [style.allowWrap]: allowWrap,
   })
   if (disabled) {
     return <span className={classnames(classNames, style.disabled)}>{children}</span>
@@ -189,14 +195,14 @@ const DocLink = props => {
       onClick={onClick}
       tabIndex={tabIndex}
     >
-      {!raw && <Icon className={style.docIcon} icon={IconBook} size={18} />}
+      {!raw && <Icon className={style.docIcon} icon={IconBook} size={16} />}
       {children}
-      {!raw && <Icon className={style.icon} icon={IconExternalLink} size={14} />}
     </a>
   )
 }
 
 DocLink.propTypes = {
+  allowWrap: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
   disabled: PropTypes.bool,
@@ -214,6 +220,7 @@ DocLink.propTypes = {
 }
 
 DocLink.defaultProps = {
+  allowWrap: false,
   children: undefined,
   className: undefined,
   disabled: false,
@@ -285,6 +292,7 @@ const AnchorLink = props => {
     disabled,
     external,
     tabIndex,
+    allowWrap,
     ...rest
   } = props
 
@@ -294,6 +302,7 @@ const AnchorLink = props => {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
     [style.secondary]: secondary,
+    [style.allowWrap]: allowWrap,
   })
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
 
@@ -313,12 +322,12 @@ const AnchorLink = props => {
       {...dataProps}
     >
       {children}
-      {external ? <Icon className={style.icon} icon={IconExternalLink} size={14} /> : null}
     </a>
   )
 }
 
 AnchorLink.propTypes = {
+  allowWrap: PropTypes.bool,
   href: PropTypes.string.isRequired,
   id: PropTypes.string,
   name: PropTypes.string,
@@ -329,6 +338,7 @@ AnchorLink.propTypes = {
 }
 
 AnchorLink.defaultProps = {
+  allowWrap: false,
   showVisited: false,
 }
 

@@ -30,7 +30,7 @@ import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
 import EntitiesList from '../list'
 
 const m = defineMessages({
-  noTopEntitiesDescription: 'Your most visited and bookmarked entities will be listed here.',
+  noTopEntitiesDescription: 'Your most visited and bookmarked entities will be listed here',
   statusLastSeen: 'Status / Last seen',
 })
 
