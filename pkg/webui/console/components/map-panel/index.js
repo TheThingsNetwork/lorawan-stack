@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import classnames from 'classnames'
 
 import { Map } from '@ttn-lw/components/map/widget'
 import { IconMapPin } from '@ttn-lw/components/icon'
@@ -23,11 +24,11 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './map-panel.styl'
 
-const MapPanel = ({ panelTitle, markers, entity, locationLink, centerOnMarkers }) => (
+const MapPanel = ({ panelTitle, markers, entity, locationLink, centerOnMarkers, className }) => (
   <Panel
     title={panelTitle}
     icon={IconMapPin}
-    className={style.panel}
+    className={classnames(style.panel, className)}
     shortCutLinkTitle={locationLink ? sharedMessages.map : undefined}
     shortCutLinkPath={locationLink ?? undefined}
   >
@@ -44,6 +45,7 @@ const MapPanel = ({ panelTitle, markers, entity, locationLink, centerOnMarkers }
 
 MapPanel.propTypes = {
   centerOnMarkers: PropTypes.bool,
+  className: PropTypes.string,
   entity: PropTypes.string.isRequired,
   locationLink: PropTypes.string,
   markers: PropTypes.array.isRequired,
@@ -53,6 +55,7 @@ MapPanel.propTypes = {
 MapPanel.defaultProps = {
   centerOnMarkers: false,
   locationLink: undefined,
+  className: undefined,
 }
 
 export default MapPanel

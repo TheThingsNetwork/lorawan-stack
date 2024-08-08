@@ -14,13 +14,14 @@
 
 import React, { useState, useEffect } from 'react'
 import { upperFirst } from 'lodash'
+import classnames from 'classnames'
 
 import Icon, { IconAccessPoint } from '@ttn-lw/components/icon'
 import Tooltip from '@ttn-lw/components/tooltip'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const TagList = ({ tags, icons }) => {
+const TagList = ({ tags, icons, className }) => {
   const containerRef = React.useRef()
   const [visibleTags, setVisibleTags] = useState([])
   const [hiddenTagsCount, setHiddenTagsCount] = useState(0)
@@ -85,7 +86,7 @@ const TagList = ({ tags, icons }) => {
   return (
     <div
       ref={containerRef}
-      className="d-flex j-start gap-cs-s mt-cs-xl overflow-hidden fs-s"
+      className={classnames('d-flex j-start gap-cs-s mt-cs-xl overflow-hidden fs-s', className)}
       style={{ flexWrap: 'nowrap' }}
     >
       {visibleTags.map(tag => (
@@ -115,12 +116,14 @@ const TagList = ({ tags, icons }) => {
 }
 
 TagList.propTypes = {
+  className: PropTypes.string,
   icons: PropTypes.shape({}),
   tags: PropTypes.arrayOf(PropTypes.string).isRequired,
 }
 
 TagList.defaultProps = {
   icons: undefined,
+  className: undefined,
 }
 
 export default TagList
