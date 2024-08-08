@@ -14,15 +14,32 @@
 
 .data-sheet
   &-header
-    height: 2.5rem
+    display: flex
+    align-items: center
+    justify-content: space-between
+    line-height: 1
+    height: auto
     color: var(--c-text-neutral-heavy)
     font-weight: $fw.bold
     white-space: nowrap
-    margin-bottom: $cs.xs
+    margin-bottom: $cs.xl
+
+    +media-query($bp.sm-md)
+      margin: $cs.m $cs.m $cs.xl
+
+  &-section-collapsed
+    height: auto
+    opacity: 1
+    transition: max-height $ad.m ease-in-out, opacity $ad.xs ease-in-out
+    +media-query($bp.sm-md)
+      height: 0px
+      margin-bottom: 0
+      opacity: 0
 
   &-row
     &-heading
-      height: 2.5rem
+      display: flex
+      align-items: center
       text-align: left
       font-weight: 400
       color: var(--c-text-neutral-semilight)
@@ -34,10 +51,25 @@
       justify-content: space-between
       margin-bottom: $cs.xs
 
+      +media-query($bp.sm-md)
+        margin-left: $cs.l
+
+      &:last-child
+        margin-bottom: 0
+        &:not(.last-group-last-item)
+          margin-bottom: $cs.xl
+
       &-value
         flex-grow: 1
         text-align: left
-        max-width: 40%
+        max-width: 55%
+
+  &-divider
+    +media-query($bp.sm-md)
+      height: 1px
+      width: 22rem
+      margin: 0 auto $cs.l
+      background: var(--c-border-neutral-light)
 
 .not-available
   color: var(--c-text-neutral-light)
@@ -47,15 +79,32 @@
   margin-bottom: -4px
   margin-left: 2px
 
+.icon
+  display: none
+
+@container panel (max-width: 530px)
+  .data-sheet-row-content-value
+    max-width: 45%
+
 @container panel (max-width: 460px)
+  .data-sheet-header
+    margin-bottom: $cs.l
+
   .data-sheet-row-heading
-    height: 1.7rem
+    height: auto
+    line-height: 1
+    margin-bottom: $cs.m
+
   .data-sheet-row-content
+    line-height: 1
     flex-direction: column
     justify-content: flex-start
     align-items: flex-start
     height: fit-content
-  .data-sheet-row-content:last-child
-    margin-bottom: $cs.l
+    margin-bottom: $cs.xxl
+
   .data-sheet-row-content-value
     max-width: 100%
+
+  .icon
+    display: inline-block
