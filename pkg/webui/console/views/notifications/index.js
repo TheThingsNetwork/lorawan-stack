@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useEffect, useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -31,10 +31,18 @@ import {
 
 const NotificationsView = () => {
   const { category } = useParams()
+  const navigate = useNavigate()
+
   useBreadcrumbs(
     'overview.notifications',
     <Breadcrumb path="/notifications" content={sharedMessages.notifications} />,
   )
+
+  useEffect(() => {
+    if (category !== 'archived' && category !== 'inbox') {
+      navigate(`/notifications/inbox`, { replace: true })
+    }
+  }, [category, navigate])
 
   const action = useMemo(
     () =>

@@ -13,12 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-
-import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 
 import Organizations from '@console/views/organizations'
 import AdminPanel from '@console/views/admin-panel'
@@ -26,7 +24,6 @@ import User from '@console/views/user'
 import Notifications from '@console/views/notifications'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { uuid as uuidRegexp } from '@ttn-lw/lib/regexp'
 
 import Overview from './overview'
 
@@ -39,17 +36,8 @@ const OverviewRoutes = () => {
       <Route path="organizations/*" Component={Organizations} />
       <Route path="admin-panel/*" Component={AdminPanel} />
       <Route path="user/*" Component={User} />
-      <Route path="notifications" Component={Notifications} />
-      <Route
-        path="notifications/:category?/:id?"
-        Component={Notifications}
-        element={
-          <ValidateRouteParam
-            check={{ category: /^inbox|archived$/, id: uuidRegexp }}
-            Component={Notifications}
-          />
-        }
-      />
+      <Route path="notifications" element={<Navigate to="/notifications/inbox" />} />
+      <Route path="notifications/:category/:id?" Component={Notifications} />
     </Routes>
   )
 }

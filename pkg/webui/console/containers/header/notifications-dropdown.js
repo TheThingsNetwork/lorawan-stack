@@ -27,6 +27,7 @@ import Message from '@ttn-lw/lib/components/message'
 import Notification from '@console/components/notifications'
 
 import notificationStyle from '@console/containers/notifications/notifications.styl'
+import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -38,7 +39,7 @@ import {
 import style from './header.styl'
 
 const m = defineMessages({
-  description: 'Showing last 3 of {totalNotifications} notifications',
+  description: 'Showing last {numNotifications} of {totalNotifications} notifications',
   noNotifications: 'All caught up!',
   noNotificationsDescription: 'You don’t have any notifications currently',
 })
@@ -72,7 +73,7 @@ const NotificationsDropdown = () => {
           {dropdownItems.slice(0, 3).map(notification => (
             <Link
               to={{
-                pathname: `/notifications/all/${notification.id}`,
+                pathname: `/notifications/inbox/${notification.id}`,
               }}
               key={notification.id}
               className={classnames(style.notificationsDropdownLink, 'd-flex')}
@@ -98,7 +99,18 @@ const NotificationsDropdown = () => {
                     notificationType={notification.notification_type}
                   />
                 </div>
-                <Status pulse={false} status="good" className="d-flex al-center" flipped>
+
+                <Status
+                  pulse={false}
+                  status="good"
+                  className={classnames('d-flex al-center', {
+                    [style.hideStatus]: [
+                      NOTIFICATION_STATUS.SEEN,
+                      NOTIFICATION_STATUS.ARCHIVED,
+                    ].includes(notification.status),
+                  })}
+                  flipped
+                >
                   <DateTime.Relative
                     relativeTimeStyle="short"
                     showAbsoluteAfter={2}
@@ -114,7 +126,10 @@ const NotificationsDropdown = () => {
             </Link>
           ))}
           <div className="p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight br-l">
-            <Message content={m.description} values={{ totalNotifications }} />
+            <Message
+              content={m.description}
+              values={{ numNotifications: dropdownItems.length, totalNotifications }}
+            />
           </div>
         </>
       )}
