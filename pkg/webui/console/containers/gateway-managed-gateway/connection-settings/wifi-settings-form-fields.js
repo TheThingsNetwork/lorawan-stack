@@ -175,6 +175,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
           wifi_profile: {
             ...oldValues.wifi_profile,
             ...initialProfile,
+            profile_name: value === 'non-shared' ? Date.now().toString() : '',
           },
         }))
       }

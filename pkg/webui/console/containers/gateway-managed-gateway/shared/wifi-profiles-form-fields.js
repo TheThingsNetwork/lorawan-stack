@@ -64,12 +64,14 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
 
   return (
     <>
-      <Form.Field
-        title={sharedMessages.profileName}
-        name={`${namePrefix}profile_name`}
-        component={Input}
-        required
-      />
+      {valuesNormalized.profile_id !== 'non-shared' && (
+        <Form.Field
+          title={sharedMessages.profileName}
+          name={`${namePrefix}profile_name`}
+          component={Input}
+          required
+        />
+      )}
 
       <Form.Field
         title={m.accessPointAndSsid}

@@ -175,7 +175,11 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
 
   return (
     <div className={style.root}>
-      <Message className="fw-bold m-0" component="h3" content={sharedMessages.managedGateway} />
+      <Message
+        className="fw-bold m-0"
+        component="h3"
+        content={managedGateway.version_ids?.model_id ?? sharedMessages.managedGateway}
+      />
       <div className="d-flex direction-column gap-cs-s">
         <div className={style.top}>
           <div className={classnames(style.imgDiv, 'd-flex al-center')}>
