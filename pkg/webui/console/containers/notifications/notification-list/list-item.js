@@ -51,7 +51,7 @@ export const NotificationListItem = ({
       key={notification.id}
       to={`/notifications/${category}/${notification.id}`}
       className={classes}
-      dataTestId="notification-list-item"
+      data-test-id="notification-list-item"
       value={notification.id}
     >
       <div className="w-full pos-relative">

@@ -46,7 +46,7 @@ describe('Notifications', () => {
     cy.findByTestId('notifications-title').should('be.visible')
     cy.findAllByTestId('notification-list-item').should('have.length', 2)
     cy.findByText(/2 unread notifications/).should('be.visible')
-    cy.findByText(/Select a notification to display the content here./).should('be.visible')
+    cy.findByText(/Select a notification to display the content here/).should('be.visible')
   })
 
   it('succeeds opening a notification', () => {
@@ -77,6 +77,6 @@ describe('Notifications', () => {
   it('succeeds displaying no notifications text', () => {
     cy.findByText(/See archived messages/).click()
     cy.findByText(/No notifications yet/).should('be.visible')
-    cy.findByText(/Once you archive a notification, it can be viewed here./).should('be.visible')
+    cy.findByText(/Once you archive a notification, it can be viewed here/).should('be.visible')
   })
 })
