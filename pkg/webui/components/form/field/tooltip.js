@@ -139,6 +139,7 @@ const FieldTooltip = React.memo(props => {
       className={style.tooltip}
       placement="bottom-start"
       interactive
+      small
       content={
         <Content
           glossaryTerm={glossaryTerm}

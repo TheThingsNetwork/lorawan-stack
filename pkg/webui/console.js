@@ -28,6 +28,7 @@ import { FullViewError } from '@ttn-lw/lib/components/full-view-error'
 import Init from '@ttn-lw/lib/components/init'
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 
+import { EventSplitFrameContextProvider } from '@console/containers/event-split-frame/context'
 import Logo from '@console/containers/logo'
 
 import App from '@console/views/app'
@@ -59,7 +60,9 @@ DOM.render(
       <WithLocale>
         <Init>
           <BreadcrumbsProvider>
-            <App history={history} />
+            <EventSplitFrameContextProvider>
+              <App history={history} />
+            </EventSplitFrameContextProvider>
           </BreadcrumbsProvider>
         </Init>
       </WithLocale>

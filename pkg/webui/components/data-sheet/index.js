@@ -113,8 +113,8 @@ const DataSheetRow = ({ item, sub }) => {
         <th>
           <Message content={item.key} />
           {item.tooltipMessage && (
-            <Tooltip content={<Message content={item.tooltipMessage} />}>
-              <Icon icon={IconInfoCircle} className={style.tooltipIcon} small />
+            <Tooltip content={<Message content={item.tooltipMessage} />} small>
+              <Icon icon={IconInfoCircle} className={style.tooltipIcon} size={16} />
             </Tooltip>
           )}
         </th>

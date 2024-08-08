@@ -50,13 +50,11 @@ const NotificationsDropdown = () => {
   return (
     <>
       <div className={style.notificationsDropdownHeader}>
-        <span>
-          <Message content={sharedMessages.notifications} />{' '}
-          <Message
-            className="c-text-neutral-semilight fw-normal fs-m"
-            content={`(${totalNotifications})`}
-          />
-        </span>
+        <Message content={sharedMessages.notifications} />{' '}
+        <Message
+          className="c-text-neutral-semilight fw-normal fs-m"
+          content={`(${totalNotifications})`}
+        />
       </div>
       {dropdownItems && dropdownItems.length === 0 ? (
         <div className={style.emptyState}>
@@ -100,21 +98,22 @@ const NotificationsDropdown = () => {
                     notificationType={notification.notification_type}
                   />
                 </div>
-                <Status pulse={false} status="good" className="mr-cs-xs" />
-                <DateTime.Relative
-                  relativeTimeStyle="short"
-                  showAbsoluteAfter={2}
-                  dateTimeProps={{
-                    time: false,
-                    dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
-                  }}
-                  value={notification.created_at}
-                  className="fs-s c-text-neutral-heavy"
-                />
+                <Status pulse={false} status="good" className="d-flex al-center" flipped>
+                  <DateTime.Relative
+                    relativeTimeStyle="short"
+                    showAbsoluteAfter={2}
+                    dateTimeProps={{
+                      time: false,
+                      dateFormatOptions: { month: '2-digit', day: '2-digit', year: 'numeric' },
+                    }}
+                    value={notification.created_at}
+                    className="fs-s c-text-neutral-light"
+                  />
+                </Status>
               </div>
             </Link>
           ))}
-          <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
+          <div className="p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight br-l">
             <Message content={m.description} values={{ totalNotifications }} />
           </div>
         </>

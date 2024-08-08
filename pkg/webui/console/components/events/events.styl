@@ -22,30 +22,108 @@ $event-container-height = 40px
   justify-content: space-between
   position: relative
   overflow: hidden
-  min-width: 50rem
+  height: 100%
 
-  +media-query-min($bp.sm)
-    // Ensure at least 18 events to be visible at once on desktop.
-    min-height: $event-container-height * 18
+  ::-webkit-scrollbar
+    width: 1.2rem
+    height: 1.2rem
+    background-color: none
 
-  +media-query($bp.sm)
-    // Ensure at least 10 events to be visible at once on mobile.
-    min-height: $event-container-height * 12
+  ::-webkit-scrollbar-button
+    display: none
+
+  ::-webkit-scrollbar-track
+    background: none
+    border-radius: $br.l
+
+  ::-webkit-scrollbar-thumb
+    background: var(--c-border-neutral-semibold)
+    border-radius: $br.l
+    border: 4px solid transparent
+    background-clip: padding-box
+
+  &.framed
+    --event-sidebar-header-height: 3rem
+    .header
+      border-bottom: 0
+
+  &:not(.framed)
+    --event-sidebar-header-height: 3rem
+    +media-query-min($bp.sm)
+      min-height: $event-container-height * 18
+
+    +media-query($bp.sm)
+      min-height: $event-container-height * 12
+
+  &:not(.theme-dark)
+    --bg-body: var(--c-bg-neutral-extralight)
+    --bg-active: var(--c-bg-neutral-min)
+    --bg-synthetic: var(--c-bg-neutral-semilight)
+    --bg-hover: var(--c-bg-neutral-light)
+    --bg-sidebar: var(--c-bg-neutral-min)
+    --text-neutral: var(--c-text-neutral-semilight)
+    --text-neutral-light: var(--c-text-neutral-light)
+    --text-warning: var(--c-text-warning-normal)
+    --text-error: var(--c-text-error-normal)
+    --c-border: var(--c-border-neutral-bold)
+    --scrollbar-track: var(--c-bg-neutral-min)
+    --scrollbar-thumb: var(--c-border-neutral-semilight)
+
+  &.theme-dark
+    &, :after, :before
+      // Reassigned new tokens.
+      --bg-body: $c.neutral-700
+      --bg-active: $c.neutral-800
+      --bg-synthetic: $c.neutral-600
+      --bg-hover: $c.neutral-600
+      --bg-sidebar: $c.neutral-800
+      --text-neutral: $c.white
+      --text-neutral-light: $c.neutral-300
+      --text-warning: $c.warning-400
+      --text-error: $c.error-600
+      --c-border: $c.neutral-200
+      --scrollbar-track: $c.neutral-800
+      --scrollbar-thumb: $c.neutral-500
+
+      // Reassigned existing tokens.
+      --c-icon-neutral-light: $c.neutral-500
+      --c-bg-neutral-semilight: $c.neutral-800
+      --c-bg-success-normal: $c.success-600
+      --c-bg-neutral-min: $c.neutral-800
+      --c-bg-neutral-light: $c.neutral-700
+      --c-bg-neutral-extralight: $c.neutral-050
+      --c-border-neutral-normal: $c.neutral-500
+      --c-border-neutral-semilight: $c.neutral-800
+      --c-border-neutral-light: $c.neutral-700
+      --c-border-neutral-extralight: $c.neutral-600
+      --c-text-neutral-heavy: $c.neutral-white
+      --c-text-neutral-light: $c.neutral-500
+      --c-text-info-normal: $c.information-300
+      --c-text-success-normal: $c.success-300
+      --c-text-brand-normal: $c.tts-300
 
 .header
-  border-normal('bottom')
   background-color: var(--c-bg-neutral-min)
+  border-bottom: 1px solid var(--c-border-neutral-light)
   height: 3rem
   z-index: $zi.slight
   box-sizing: border-box
   display: flex
+  color: var(--text-neutral)
+  position: absolute
+  width: 100%
 
 .header-cells
+  font-size: $fs.xs
+  position: absolute
+  width: 100%
+  height: 100%
+  font-weight: $fw.medium
   .cell-time
+    color: var(--text-neutral)
     justify-content: center
 
   & > div:not(.cell-preview):not(:last-child)
-    font-weight: $fw.bold
     +media-query($bp.sm)
       display: none
 
@@ -53,8 +131,11 @@ $event-container-height = 40px
     +media-query($bp.lg)
       display: none
 
+  & > div
+    text-transform: uppercase
+
 .header-cells, .event
-  padding: $cs.xxs 0 $cs.xxs $cs.xs
+  padding: 0 $cs.xxs 0 $cs.xs
   display: flex
   align-items: center
   flex: 1
@@ -70,22 +151,47 @@ $event-container-height = 40px
   flex-grow: 1
   right: $cs.s
   display: flex
+  height: 100%
+  align-items: center
   +media-query-min($bp.xs)
     justify-content: flex-end
     position: sticky
 
-  .actions
-    background-color: var(--c-bg-neutral-min)
-    display: flex
+.actions
+  display: flex
+  flex-grow: 1
+  justify-content: flex-end
+  align-items: center
+  right: $cs.xs
+  position: absolute
+  height: 100%
 
   button
-    // stylelint-disable-next-line declaration-no-important
-    margin-right: 0 !important
+    margin-right: 0
+
+.pause-button
+  width: 5.5rem
+
+.button-bar
+  display: flex
+  align-items: center
+  position: relative
+  justify-content: flex-end
+
+.framed-button
+  color: var(--text-neutral-light)
+  display: flex
+  align-items: center
+  padding: $cs.xxs
+  gap: $cs.xs
+
+  &:hover
+    color: var(--text-neutral)
 
 .toggle-container
   display: flex
   align-items: center
-  color: var(--c-text-neutral-light)
+  color: var(--text-neutral-light)
   margin-right: $cs.s
 
 .toggle-label
@@ -106,9 +212,29 @@ $event-container-height = 40px
 
 .body
   overflow: hidden
-  background-color: var(--c-bg-neutral-light)
+  background-color: var(--bg-body)
   flex-grow: 1
   position: relative
+  margin-top: 3rem
+
+  ol > div
+    scrollbar-width: thin
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track)
+
+    &::-webkit-scrollbar
+      width: 1.2rem
+      height: 1.2rem
+      background-color: none
+
+    &::-webkit-scrollbar-track
+      background: none
+      border-radius: $br.l
+
+    &::-webkit-scrollbar-thumb
+      background: var(--c-border-neutral-semibold)
+      border-radius: $br.l
+      border: 4px solid transparent
+      background-clip: padding-box
 
   ol
     padding-left: 0
@@ -120,8 +246,8 @@ $event-container-height = 40px
   display: flex
   align-items: center
   justify-content: center
-  font-size: $fs.xs
-  color: var(--c-text-warning-normal)
+  font-size: $fs.s
+  color: var(--text-warning)
   padding: $cs.xxs 0
 
   span
@@ -133,7 +259,7 @@ $event-container-height = 40px
   box-sizing: border-box
 
   &.active
-    background-color: var(--c-bg-neutral-min)
+    background-color: var(--bg-active)
     box-shadow: 0 0 2rem 0 rgba(0,0,0,.1)
 
   &.widget
@@ -145,34 +271,31 @@ $event-container-height = 40px
       text-overflow: ellipsis
       display: flex
 
-  &:not(.widget)
-    .cell-preview
-      overflow-y: auto
-
   &.synthetic
-    background-color: var(--c-bg-neutral-semilight)
+    background-color: var(--bg-synthetic)
     .cell-time
-      color: var(--c-text-warning-normal)
+      color: var(--text-warning)
     .cell-type::before
       content: "Console:"
       margin-right: $cs.xs
 
   &:not(.widget)
     cursor: pointer
-    transition: background-color ease-in-out $ad.s
+    transition: background-color ease-in-out $ad.xs
 
     &:hover:not(.active)
-      background-color: var(--c-bg-neutral-semilight)
+      background-color: var(--bg-hover)
 
   .cell-time, .cell-type, .cell-id, .cell-error
     overflow: hidden
     text-overflow: ellipsis
     white-space: nowrap
     font-family: $font-family-mono
-    font-size: $fs.xs
+    font-size: $fs.s
+    color: var(--text-neutral)
 
   .cell-time
-    color: var(--c-text-neutral-light)
+    color: var(--text-neutral-light)
 
   .cell-type span, .cell-id span
     overflow: hidden
@@ -195,20 +318,17 @@ $event-container-height = 40px
     display: none
 
 .cell-preview
+  color: var(--text-neutral-light)
   flex-basis: auto
   flex-grow: 1
   padding-right: 0
   white-space: nowrap
 
-  &::-webkit-scrollbar
-    width: .3rem
-    height: .3rem
-
 .cell-data, .cell-error
   flex-grow: 1
 
 .cell-error
-  color: var(--c-text-error-normal)
+  color: var(--text-error)
 
 .event-icon
   margin-right: $cs.xxs
@@ -225,31 +345,32 @@ $event-container-height = 40px
     justify-content: center
 
   &-content
-    color: var(--c-text-neutral-light)
+    color: var(--text-neutral-light)
     pre
       display: inline
-      font-size: $fs.xs
+      font-size: $fs.s
 
 .sidebar
   &-container
-    border-normal(left)
-    background-color: var(--c-bg-neutral-min)
+    background-color: var(--bg-sidebar)
+    color: var(--c-text-neutral-heavy)
     flex-direction: column
     display: flex
 
-    +media-query-min($bp.sm)
+    +media-query-min($bp.sm-md)
       sidebar-transition(right)
-      z-index: $zi.slight
+      z-index: $zi.nav
       height: 100%
       position: absolute
       width: 43rem
-      right: -43rem
+      max-width: 100vw
+      right: -100%
 
       &.expanded
         right: 0
         box-shadow: 0 0 8rem 2rem rgba(0,0,0,.2)
 
-    +media-query($bp.sm)
+    +media-query($bp.sm-md)
       sidebar-transition(left)
       z-index: $zi.nav
       position: fixed
@@ -263,24 +384,35 @@ $event-container-height = 40px
 
   &-header
     display: flex
+    flex: 0 0 var(--event-sidebar-header-height)
     justify-content: space-between
     align-items: center
-    padding: 0 $cs.xs
-    height: $breadcrumbs-bar-height
+    padding-left: $cs.xs
     box-sizing: border-box
     flex-grow: 0
+    border-bottom: 1px solid var(--c-border-neutral-light)
+    box-sizing: border-box
 
   &-content
     flex-grow: 1
     overflow: auto
 
-  &-close-button
-    reset-button()
-    width: 2rem
+  &-button
+    color: var(--text-neutral-light)
     height: 100%
     padding: $cs.xxs
+    display: flex
+    align-items: center
+    justify-content: center
+    position: relative
+    top: 1px
+
+    &:hover
+      color: var(--text-neutral)
 
   &-title
+    text-transform: uppercase
+    font-size: $fs.s
     font-weight: $fw.bold
 
 .body-link

@@ -38,6 +38,8 @@ const BlurryNetworkActivityPanel = () => {
     setActiveToggle(value)
   }, [])
 
+  const upgradeUrl = 'https://www.thethingsindustries.com/stack/plans/'
+
   return (
     <Panel
       title={sharedMessages.networkActivity}
@@ -72,7 +74,7 @@ const BlurryNetworkActivityPanel = () => {
             primary
             message={sharedMessages.upgradeNow}
             icon={IconBolt}
-            href="https://www.thethingsindustries.com/stack/plans/"
+            href={upgradeUrl}
             target="_blank"
           />
         </div>

@@ -15,6 +15,7 @@
 import React, { useCallback, forwardRef, useMemo, useRef } from 'react'
 import classnames from 'classnames'
 import { useIntl } from 'react-intl'
+import { isPlainObject } from 'lodash'
 
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
@@ -26,6 +27,7 @@ import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Dropdown from '../dropdown'
+import Tooltip from '../tooltip'
 
 import style from './button.styl'
 
@@ -71,11 +73,12 @@ const assembleClassnames = ({
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, busy, message, messageValues, noDropdownIcon, children } = props
+  const { dropdownItems, icon, busy, message, messageValues, noDropdownIcon, children, small } =
+    props
 
   const content = (
     <>
-      {icon && <Icon className={style.icon} icon={icon} />}
+      {icon && <Icon className={style.icon} icon={icon} size={small ? 16 : 18} />}
       {message && (
         <Message content={message} values={messageValues} className={style.linkButtonMessage} />
       )}
@@ -83,7 +86,7 @@ const buttonChildren = props => {
       {dropdownItems && (
         <>
           {!noDropdownIcon && (
-            <Icon className={style.expandIcon} icon={IconChevronDown} size={18} />
+            <Icon className={style.expandIcon} icon={IconChevronDown} size={small ? 12 : 18} />
           )}
         </>
       )}
@@ -115,6 +118,8 @@ const Button = forwardRef((props, ref) => {
     form,
     className,
     portalledDropdown,
+    tooltip,
+    tooltipPlacement,
     ...rest
   } = props
   const innerRef = useRef()
@@ -157,10 +162,24 @@ const Button = forwardRef((props, ref) => {
     />
   )
 
+  const wrappedButtonElement = tooltip ? (
+    <Tooltip
+      content={isPlainObject(tooltip) ? <Message content={tooltip} /> : tooltip}
+      placement={tooltipPlacement}
+      delay={0}
+      noOffset
+      small
+    >
+      {buttonElement}
+    </Tooltip>
+  ) : (
+    buttonElement
+  )
+
   if (dropdownItems) {
     return (
       <div className={classnames(className, 'pos-relative')}>
-        {buttonElement}
+        {wrappedButtonElement}
         <Dropdown.Attached
           className={dropdownClassName}
           attachedRef={innerRef}
@@ -173,7 +192,7 @@ const Button = forwardRef((props, ref) => {
     )
   }
 
-  return buttonElement
+  return wrappedButtonElement
 })
 
 Button.defaultProps = {
@@ -182,7 +201,7 @@ Button.defaultProps = {
 }
 
 const LinkButton = props => {
-  const { disabled, titleMessage, onClick, value, dataTestId } = props
+  const { disabled, titleMessage, onClick, value, tooltip, tooltipPlacement, dataTestId } = props
   const buttonClassNames = assembleClassnames(props)
   const { to } = props
 
@@ -196,7 +215,7 @@ const LinkButton = props => {
     [onClick, value],
   )
 
-  return (
+  const buttonElement = (
     <Link
       className={buttonClassNames}
       to={to}
@@ -207,6 +226,22 @@ const LinkButton = props => {
       dataTestId={dataTestId}
     />
   )
+
+  const wrappedButtonElement = tooltip ? (
+    <Tooltip
+      content={isPlainObject(tooltip) ? <Message content={tooltip} /> : tooltip}
+      placement={tooltipPlacement}
+      delay={0}
+      noOffset
+      small
+    >
+      {buttonElement}
+    </Tooltip>
+  ) : (
+    buttonElement
+  )
+
+  return wrappedButtonElement
 }
 
 const AnchorLinkButton = props => {
@@ -277,6 +312,8 @@ const commonPropTypes = {
   autoFocus: PropTypes.bool,
   /** A message to be evaluated and passed to the <button /> element. */
   title: PropTypes.message,
+  /** The tooltip message to be displayed when hovering over the button. */
+  tooltip: PropTypes.oneOfType([PropTypes.message, PropTypes.node]),
   /** Dropdown items of the button. */
   dropdownItems: PropTypes.node,
   /** A flag specifying whether the small styling should applied to the button. */

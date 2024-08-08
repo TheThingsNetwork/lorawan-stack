@@ -176,28 +176,21 @@ const GatewayStatusPanel = () => {
           <Message content={sharedMessages.fetching} />
         </Spinner>
       ) : noConnectionYet ? (
-        <div className="d-flex direction-column j-center text-center pt-ls-l md-lg:p-sides-0 md-lg:pt-cs-s">
-          <Message
-            content={m.noConnection}
-            className="fw-bold fs-l p-sides-ls-xxl md-lg:p-sides-cs-s"
-            component="div"
-          />
-          <Message
-            content={m.noConnectionDescription}
-            className="c-text-neutral-light p-sides-ls-xl md-lg:p-sides-cs-s"
-            values={{
-              Link: msg => (
-                <Link.Anchor
-                  primary
-                  href="https://thethingsindustries.com/docs/gateways/troubleshooting/"
-                  target="_blank"
-                  external
-                >
-                  {msg}
-                </Link.Anchor>
-              ),
-            }}
-          />
+        <div className="d-flex j-center al-center flex-grow">
+          <div className="d-flex direction-column j-center al-center text-center w-60 gap-cs-m mb-ls-m">
+            <Message content={m.noConnection} className="fw-bold fs-l lh-xs3" component="div" />
+            <Message
+              content={m.noConnectionDescription}
+              className="c-text-neutral-light lh-xxs"
+              values={{
+                Link: msg => (
+                  <Link.DocLink primary path="/gateways/troubleshooting/" allowWrap>
+                    {msg}
+                  </Link.DocLink>
+                ),
+              }}
+            />
+          </div>
         </div>
       ) : (
         <>

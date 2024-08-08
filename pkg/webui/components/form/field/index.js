@@ -198,7 +198,7 @@ const FormField = props => {
   const showWarning = !showError && Boolean(warning)
   const error = showError && errors[0]
   const showDescription = !showError && !showWarning && Boolean(description)
-  const tooltipIcon = hasTooltip ? <Tooltip id={tooltipId} glossaryTerm={title} /> : null
+  const tooltipIcon = hasTooltip ? <Tooltip id={tooltipId} glossaryTerm={title} small /> : null
   const describedBy = showError
     ? `${name}-field-error`
     : showWarning

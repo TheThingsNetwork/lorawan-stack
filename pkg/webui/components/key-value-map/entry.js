@@ -152,8 +152,8 @@ const Entry = ({
           title={m.deleteEntry}
           message={removeMessage}
           disabled={readOnly}
+          secondary
           danger
-          naked
         />
       )}
     </div>

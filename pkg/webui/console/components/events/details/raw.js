@@ -13,29 +13,39 @@
 // limitations under the License.
 
 import React from 'react'
+import classNames from 'classnames'
 
 import CodeEditor from '@ttn-lw/components/code-editor'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const RawEventDetails = React.memo(props => {
-  const { className, id, details } = props
+  const { className, id, details, darkTheme } = props
 
   const formattedDetails = JSON.stringify(details, null, 2)
 
   return (
-    <CodeEditor className={className} readOnly name={id} language="json" value={formattedDetails} />
+    <CodeEditor
+      className={classNames(className, 'br-0 border-none')}
+      readOnly
+      name={id}
+      language="json"
+      value={formattedDetails}
+      darkTheme={darkTheme}
+    />
   )
 })
 
 RawEventDetails.propTypes = {
   className: PropTypes.string,
+  darkTheme: PropTypes.bool,
   details: PropTypes.shape({}).isRequired,
   id: PropTypes.string.isRequired,
 }
 
 RawEventDetails.defaultProps = {
   className: undefined,
+  darkTheme: false,
 }
 
 export default RawEventDetails

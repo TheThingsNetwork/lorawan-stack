@@ -13,7 +13,10 @@
 // limitations under the License.
 
 .link
-  white-space: nowrap
+  box-sizing: border-box
+
+  &:not(.allow-wrap)
+    white-space: nowrap
 
   &:not(.primary):not(.secondary)
     text-decoration: none
@@ -46,8 +49,10 @@
       cursor: not-allowed
 
 .doc-link
-  white-space: nowrap
   align-items: center
+
+  &:not(.allow-wrap)
+    white-space: nowrap
 
 .icon
   nudge('up', 2px)

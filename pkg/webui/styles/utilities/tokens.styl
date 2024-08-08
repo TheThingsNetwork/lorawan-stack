@@ -12,37 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// stylelint-disable
+
 make-utilities($name, $theme)
   $dict = lookup('$' + $name)
   for $key, $val in $dict[$theme][color]
     $value = convert('var(--c-' + $key + ')')
     if split('-', $key)[0] == 'bg'
       .c-{$key}
-        background-color: $value
+        background-color: $value !important
       .hover\\:c-{$key}:hover
-        background-color: $value
+        background-color: $value !important
       .active\\:c-{$key}:active
-        background-color: $value
+        background-color: $value !important
       .forcus\\:c-{$key}:focus
-        background-color: $value
+        background-color: $value !important
     else if split('-', $key)[0] == 'text' or split('-', $key)[0] == 'icon'
       .c-{$key}
-        color: $value
+        color: $value !important
       .hover\\:c-{$key}:hover
-        color: $value
+        color: $value !important
       .active\\:c-{$key}:active
-        color: $value
+        color: $value !important
       .focus\\:c-{$key}:focus
-        color: $value
+        color: $value !important
     else if split('-', $key)[0] == 'border'
       .c-{$key}
-        border-color: $value
+        border-color: $value !important
       .hover\\:c-{$key}:hover
-        border-color: $value
+        border-color: $value !important
       .active\\:c-{$key}:active
-        border-color: $value
+        border-color: $value !important
       .focus\\:c-{$key}:focus
-        border-color: $value
+        border-color: $value !important
 
 :global
   make-utilities('tokens', 'theme-light')

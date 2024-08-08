@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Route,
@@ -23,10 +23,13 @@ import {
   ScrollRestoration,
 } from 'react-router-dom'
 import classnames from 'classnames'
+import { IconLayoutBottombarExpand } from '@tabler/icons-react'
+import { defineMessages } from 'react-intl'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import { AlertBannerProvider } from '@ttn-lw/components/alert-banner/context'
+import Button from '@ttn-lw/components/button'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -37,6 +40,7 @@ import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-v
 import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
 import Sidebar from '@console/containers/sidebar'
+import EventSplitFrameContext from '@console/containers/event-split-frame/context'
 
 import OverviewRoutes from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -60,6 +64,10 @@ import {
 
 import style from './app.styl'
 
+const m = defineMessages({
+  expandEventPanel: 'Expand live data overlay',
+})
+
 const errorRender = error => <FullViewError error={error} header={<Header />} />
 const getScrollRestorationKey = location => {
   // Preserve scroll position only when necessary.
@@ -80,6 +88,14 @@ const Layout = () => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const siteTitle = selectApplicationSiteTitle()
   const siteName = selectApplicationSiteName()
+
+  const {
+    height: splitFrameHeight,
+    setIsOpen,
+    isOpen,
+    isMounted,
+    isActive,
+  } = useContext(EventSplitFrameContext)
 
   // For the mobile side menu drawer functionality.
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -131,7 +147,11 @@ const Layout = () => {
           <div id="dropdown-container" className="pos-absolute-container" />
           <div className="d-flex">
             <AlertBannerProvider>
-              <Sidebar isDrawerOpen={isDrawerOpen} onDrawerCloseClick={closeDrawer} />
+              <Sidebar
+                isDrawerOpen={isDrawerOpen}
+                onDrawerCloseClick={closeDrawer}
+                paddingBottom={splitFrameHeight}
+              />
               <div className="w-full h-vh d-flex direction-column">
                 <Header onMenuClick={onDrawerExpandClick} />
                 <main
@@ -146,15 +166,33 @@ const Layout = () => {
                     isAdmin={isAdmin}
                   >
                     <div className={style.content}>
-                      <div className={style.stage} id="stage">
+                      <div
+                        className={style.stage}
+                        id="stage"
+                        style={{ paddingBottom: splitFrameHeight }}
+                      >
                         <Outlet />
                       </div>
+                      {isMounted && isActive && !isOpen && (
+                        <div className={style.openButton}>
+                          <Button
+                            icon={IconLayoutBottombarExpand}
+                            tooltip={m.expandEventPanel}
+                            tooltipPlacement="left"
+                            onClick={() => setIsOpen(true)}
+                            secondary
+                            small
+                          />
+                        </div>
+                      )}
                     </div>
                   </WithAuth>
                 </main>
               </div>
             </AlertBannerProvider>
           </div>
+
+          <div id="split-frame" className={style.splitFrame} />
         </div>
       </ErrorView>
     </>

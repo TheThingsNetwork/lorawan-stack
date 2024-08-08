@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useEffect } from 'react'
-import { Routes, Route, useParams } from 'react-router-dom'
+import { Routes, Route, useParams, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { GATEWAY } from '@console/constants/entities'
@@ -26,6 +26,8 @@ import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import GatewayOverviewHeader from '@console/containers/gateway-overview-header'
+import EventSplitFrame from '@console/containers/event-split-frame'
+import GatewayEvents from '@console/containers/gateway-events'
 
 import GatewayCollaborators from '@console/views/gateway-collaborators'
 import GatewayLocation from '@console/views/gateway-location'
@@ -104,7 +106,9 @@ const Gateway = () => {
 
 const GatewayInner = () => {
   const { gtwId } = useParams()
+  const { pathname } = useLocation()
   const gateway = useSelector(selectSelectedGateway)
+  const isEventsPath = pathname.endsWith('/data')
 
   const gatewayName = gateway?.name || gtwId
 
@@ -123,6 +127,11 @@ const GatewayInner = () => {
         <Route path="general-settings" Component={GatewayGeneralSettings} />
         <Route path="*" element={GenericNotFound} />
       </Routes>
+      {!isEventsPath && (
+        <EventSplitFrame>
+          <GatewayEvents gtwId={gtwId} darkTheme framed />
+        </EventSplitFrame>
+      )}
     </>
   )
 }
