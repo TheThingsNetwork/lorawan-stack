@@ -90,7 +90,7 @@ const AttachedDropdown = ({
 
   if (portalled) {
     return (
-      <Portal visible={open} positionReference={attachedRef}>
+      <Portal visible={open} setOpen={setOpen} positionReference={attachedRef}>
         <Dropdown
           open={open}
           onItemsClick={handleItemsClick}
