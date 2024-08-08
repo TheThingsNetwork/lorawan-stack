@@ -334,6 +334,11 @@
     .fs-{$name}
       font-size: convert('$fs.' + $name)
 
+  // Line heights.
+  for $name in $lh
+    .lh-{$name}
+      line-height: convert('$lh.' + $name)
+
   // Font weights.
   .fw-normal
     font-weight: $fw.normal

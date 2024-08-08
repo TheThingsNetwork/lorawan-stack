@@ -94,7 +94,7 @@ const TagList = ({ tags, icons }) => {
           className="d-flex j-center al-center gap-cs-xxs p-sides-cs-s p-vert-cs-xxs br-xl c-bg-neutral-light"
           style={{ textWrap: 'nowrap' }}
         >
-          <Icon icon={icons && Boolean(icons[tag]) ? icons[tag] : IconAccessPoint} />
+          <Icon icon={icons && Boolean(icons[tag]) ? icons[tag] : IconAccessPoint} size={17.5} />
           {upperFirst(tag)}
         </span>
       ))}

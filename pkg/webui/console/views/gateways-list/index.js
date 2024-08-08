@@ -36,7 +36,7 @@ const GatewaysList = () => {
   )
 
   return (
-    <div className="container container--xxl">
+    <div className="container container--xxl p-vert-cs-xs p-sides-0">
       <IntlHelmet title={sharedMessages.gateways} />
       <GatewaysTable />
     </div>

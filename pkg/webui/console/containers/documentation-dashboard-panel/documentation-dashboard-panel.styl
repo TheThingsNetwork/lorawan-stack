@@ -13,6 +13,7 @@
 // limitations under the License.
 
 .docs-link
+  display: flex
   box-sizing: border-box
   transition: color 50ms linear
   text-decoration: none
@@ -22,9 +23,12 @@
   align-items: center
   padding: $cs.xs 0 $cs.xs $cs.xs
   width: 100%
-  margin-bottom: $cs.s
+  border-radius: $br.m
+  padding: $cs.s
+  transition: background-color $ad.s linear, color $ad.s linear
 
   &:hover
+    background-color: var(--c-bg-neutral-min-hover)
     color: var(--c-text-neutral-heavy)
 
     .icon
