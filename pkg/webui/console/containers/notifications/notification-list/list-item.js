@@ -15,7 +15,6 @@
 import React from 'react'
 import classNames from 'classnames'
 import { useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
@@ -25,16 +24,22 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 
 import Notification from '@console/components/notifications'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
+import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
 
-import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from '../notifications.styl'
 
-export const NotificationListItem = ({ notification, isSelected, isNextSelected }) => {
+export const NotificationListItem = ({
+  notification,
+  isSelected,
+  isNextSelected,
+  isUpdatePending,
+}) => {
   const { category } = useParams()
-  const totalUnseenCount = useSelector(selectTotalUnseenCount)
-  const showUnseenStatus = !notification.status && totalUnseenCount > 0
+  const showUnseenStatus =
+    ![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(notification.status) &&
+    !isUpdatePending
   const classes = classNames(style.notificationPreview, {
     [style.notificationSelected]: isSelected,
     [style.notificationNextSelected]: isNextSelected,
@@ -49,8 +54,8 @@ export const NotificationListItem = ({ notification, isSelected, isNextSelected 
       data-test-id="notification-list-item"
       value={notification.id}
     >
-      {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
-      <div className="w-full">
+      <div className="w-full pos-relative">
+        {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
         <div className={style.notificationPreviewTitle}>
           <div className={style.notificationPreviewTitleText}>
             <Notification.Title
@@ -85,6 +90,7 @@ export const NotificationListItem = ({ notification, isSelected, isNextSelected 
 NotificationListItem.propTypes = {
   isNextSelected: PropTypes.bool,
   isSelected: PropTypes.bool,
+  isUpdatePending: PropTypes.bool.isRequired,
   notification: PropTypes.shape({
     id: PropTypes.string,
     created_at: PropTypes.string,

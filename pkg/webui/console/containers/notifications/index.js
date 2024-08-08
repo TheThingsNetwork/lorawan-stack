@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState, useRef, useEffect } from 'react'
+import React, { useCallback, useState, useRef, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
@@ -22,12 +22,20 @@ import LAYOUT from '@ttn-lw/constants/layout'
 
 import Button from '@ttn-lw/components/button'
 import Spinner from '@ttn-lw/components/spinner'
+import Icon, { IconInbox } from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import useRequest from '@ttn-lw/lib/hooks/use-request'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   getArchivedNotifications,
   getInboxNotifications,
+  getUnseenNotifications,
   updateNotificationStatus,
 } from '@console/store/actions/notifications'
 
@@ -55,13 +63,18 @@ const indicesToPage = (startIndex, stopIndex, limit) => {
 const m = defineMessages({
   seeArchived: 'See archived messages',
   seeAll: 'See all messages',
+  noNotificationsSubtitle: 'Once you receive a notification, it can be viewed here',
+  unreadMessagesTitle: '{value} unread notifications',
+  archivedMessageTitle: '{value} archived notifications',
+  unreadMessagesSubtitle: 'Select a notification to display the content here',
+  noArchivedNotificationsSubtitle: 'Once you archive a notification, it can be viewed here',
 })
 
 const Notifications = React.memo(() => {
   const listRef = useRef(null)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { id: notificationId, category = 'inbox' } = useParams()
+  const { id: notificationId, category } = useParams()
   const showArchived = category === 'archived'
   const items = useSelector(showArchived ? selectArchivedNotifications : selectInboxNotifications)
   const totalCount = useSelector(
@@ -70,8 +83,18 @@ const Notifications = React.memo(() => {
   const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const hasNextPage = items.length < totalCount
   const [fetching, setFetching] = useState(false)
-  const [selectionCache, setSelectionCache] = useState({ archived: undefined, inbox: undefined })
+  const [updatePendingNotificationIds, setUpdatePendingNotificationIds] = useState([])
+  const [updateNotificationStatusLoading, setUpdateNotificationStatusLoading] = useState(false)
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < LAYOUT.BREAKPOINTS.M)
+  const [unseenNotificationsLoading] = useRequest(getUnseenNotifications({ page: 1, limit: 1 }))
+
+  const unreadNotificationsCount = unseenNotificationsLoading
+    ? items.filter(
+        n =>
+          ![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(n.status) &&
+          !updatePendingNotificationIds.includes(n.id),
+      ).length
+    : totalUnseenCount
 
   const loadNextPage = useCallback(
     async (startIndex, stopIndex) => {
@@ -102,9 +125,7 @@ const Notifications = React.memo(() => {
   const handleArchive = useCallback(
     async (_, id) => {
       // Determine the filter to apply based on the showArchived state.
-      const updateFilter = showArchived
-        ? 'NOTIFICATION_STATUS_SEEN'
-        : 'NOTIFICATION_STATUS_ARCHIVED'
+      const updateFilter = showArchived ? NOTIFICATION_STATUS.SEEN : NOTIFICATION_STATUS.ARCHIVED
 
       // Update the status of the notification.
       await dispatch(attachPromise(updateNotificationStatus([id], updateFilter)))
@@ -125,7 +146,9 @@ const Notifications = React.memo(() => {
       if (isSmallScreen) {
         navigate(`/notifications/${category}`)
       } else {
-        navigate(`/notifications/${category}/${previousNotification.id}`)
+        navigate(
+          `/notifications/${category}${previousNotification ? `/${previousNotification.id}` : ''}`,
+        )
       }
 
       // Reset the list cache if available so that old items are discarded.
@@ -148,43 +171,53 @@ const Notifications = React.memo(() => {
     return () => window.removeEventListener('resize', handleResize)
   }, [category, dispatch, showArchived])
 
-  // Update the selection cache when a notification is selected.
-  // This is used to restore the selection when switching between categories.
-  useEffect(() => {
-    setSelectionCache(v => ({ ...v, [category]: notificationId }))
-  }, [category, notificationId])
+  const selectedNotification = useMemo(
+    () => items?.find(item => item.id === notificationId),
+    [items, notificationId],
+  )
 
-  // Set the first notification as selected if none is currently selected.
+  const isUpdateStatusPending = useMemo(
+    () => updatePendingNotificationIds.some(id => id === selectedNotification?.id),
+    [selectedNotification, updatePendingNotificationIds],
+  )
+
+  const handleUpdateNotificationStatus = useCallback(async () => {
+    setUpdateNotificationStatusLoading(true)
+    await dispatch(
+      attachPromise(
+        updateNotificationStatus(updatePendingNotificationIds, NOTIFICATION_STATUS.SEEN),
+      ),
+    )
+    setUpdatePendingNotificationIds([])
+    setUpdateNotificationStatusLoading(false)
+  }, [dispatch, updatePendingNotificationIds])
+
   useEffect(() => {
     if (
-      !isSmallScreen &&
-      (!notificationId || !items.find(i => i.id === notificationId)) &&
-      items.length > 0
+      selectedNotification?.id &&
+      ![NOTIFICATION_STATUS.SEEN, NOTIFICATION_STATUS.ARCHIVED].includes(
+        selectedNotification?.status,
+      ) &&
+      !isUpdateStatusPending
     ) {
-      const selectedId = selectionCache[category] || items[0].id
-      navigate(`/notifications/${category}/${selectedId}`)
+      setUpdatePendingNotificationIds(ids => [...ids, selectedNotification.id])
     }
-  }, [category, isSmallScreen, items, navigate, notificationId, selectionCache])
+  }, [isUpdateStatusPending, selectedNotification])
 
-  // Update the status of the selected notification to seen.
   useEffect(() => {
-    const clickedNotification = items.find(notification => notification.id === notificationId)
-    const index = items.findIndex(notification => notification.id === notificationId)
-    const timer = setTimeout(() => {
-      if (category === 'inbox' && !clickedNotification?.status && totalUnseenCount > 0) {
-        dispatch(
-          attachPromise(
-            updateNotificationStatus([clickedNotification.id], 'NOTIFICATION_STATUS_SEEN'),
-          ),
-        )
-        loadNextPage(index, index + 1)
-      }
-    }, 500)
-
-    return () => clearTimeout(timer)
-  }, [category, items, dispatch, loadNextPage, totalUnseenCount, notificationId])
-
-  const selectedNotification = items?.find(item => item.id === notificationId)
+    if (
+      !updateNotificationStatusLoading &&
+      updatePendingNotificationIds.length !== 0 &&
+      updatePendingNotificationIds.length <= unreadNotificationsCount
+    ) {
+      handleUpdateNotificationStatus()
+    }
+  }, [
+    handleUpdateNotificationStatus,
+    unreadNotificationsCount,
+    updateNotificationStatusLoading,
+    updatePendingNotificationIds.length,
+  ])
 
   if (!items) {
     return (
@@ -193,6 +226,52 @@ const Notifications = React.memo(() => {
       </div>
     )
   }
+
+  const messageBox = useCallback(
+    ({ icon, title, subtitle, titleValues }) => (
+      <div className={classNames(style.messageBox, 'h-full d-flex al-center j-center gap-cs-s')}>
+        <Icon size={64} icon={icon} className="c-icon-neutral-extralight" />
+        <div className="d-flex flex-column al-center gap-cs-xxs">
+          <Message content={title} className="fw-bold fs-l" values={{ ...titleValues }} />
+          <Message content={subtitle} className="c-text-neutral-light" />
+        </div>
+      </div>
+    ),
+    [],
+  )
+
+  const mainContent = useMemo(() => {
+    if (selectedNotification) {
+      return (
+        <NotificationContent
+          selectedNotification={selectedNotification}
+          onArchive={handleArchive}
+          isSmallScreen={isSmallScreen}
+        />
+      )
+    }
+    if (!totalCount) {
+      return messageBox({
+        icon: IconInbox,
+        title: sharedMessages.noNotifications,
+        subtitle: showArchived ? m.noArchivedNotificationsSubtitle : m.noNotificationsSubtitle,
+      })
+    }
+    return messageBox({
+      icon: IconInbox,
+      title: showArchived ? m.archivedMessageTitle : m.unreadMessagesTitle,
+      subtitle: m.unreadMessagesSubtitle,
+      titleValues: { value: showArchived ? totalCount : unreadNotificationsCount },
+    })
+  }, [
+    handleArchive,
+    isSmallScreen,
+    messageBox,
+    selectedNotification,
+    showArchived,
+    totalCount,
+    unreadNotificationsCount,
+  ])
 
   return (
     <div className="d-flex flex-grow">
@@ -207,6 +286,8 @@ const Notifications = React.memo(() => {
           items={items}
           totalCount={totalCount}
           selectedNotification={selectedNotification}
+          updatePendingNotificationIds={updatePendingNotificationIds}
+          unreadNotificationsCount={unreadNotificationsCount}
           listRef={listRef}
         />
         <div className="d-flex j-center">
@@ -223,13 +304,7 @@ const Notifications = React.memo(() => {
           [style.notificationSelected]: selectedNotification,
         })}
       >
-        {selectedNotification && (
-          <NotificationContent
-            selectedNotification={selectedNotification}
-            onArchive={handleArchive}
-            isSmallScreen={isSmallScreen}
-          />
-        )}
+        {mainContent}
       </div>
     </div>
   )

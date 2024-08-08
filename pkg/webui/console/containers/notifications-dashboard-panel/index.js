@@ -30,8 +30,9 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 import Notification from '@console/components/notifications'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import useRequest from '@ttn-lw/lib/hooks/use-request'
 
-import { getInboxNotifications } from '@console/store/actions/notifications'
+import { getInboxNotifications, getUnseenNotifications } from '@console/store/actions/notifications'
 
 import {
   selectInboxNotifications,
@@ -42,13 +43,13 @@ import {
 import style from './notifications-dashboard-panel.styl'
 
 const m = defineMessages({
-  noNotifications: 'No notifications yet',
   noNotificationsDescription: 'Your latest notifications will appear here',
 })
 
 const NotificationsDashboardPanel = () => {
   const totalUnseenNotifications = useSelector(selectTotalUnseenCount)
   const notifications = useSelector(selectInboxNotifications)
+  useRequest(getUnseenNotifications({ page: 1, limit: 1 }))
 
   const MessageDecorator = () => (
     <span className={style.notificationPanelTotal}>{totalUnseenNotifications}</span>
@@ -117,7 +118,10 @@ const NotificationsDashboardPanel = () => {
     >
       {notifications && notifications.length === 0 ? (
         <div className="d-flex direction-column flex-grow j-center">
-          <Message content={m.noNotifications} className="d-block text-center fs-l fw-bold" />
+          <Message
+            content={sharedMessages.noNotifications}
+            className="d-block text-center fs-l fw-bold"
+          />
           <Message
             content={m.noNotificationsDescription}
             className="d-block text-center c-text-neutral-light"

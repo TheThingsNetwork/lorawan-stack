@@ -401,6 +401,7 @@ export default defineMessages({
   noLocationYetDescription: 'There is no location data available',
   noMatch: 'No items found',
   noMatchingUserFound: 'No matching user or organization was found',
+  noNotifications: 'No notifications yet',
   noRecentActivity: 'No recent activity',
   noRecentEndDevices: 'No recently active end devices',
   noRecentEndDevicesDescription: 'Your most recently active end devices will be listed here',

@@ -15,6 +15,8 @@
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
+import { GATEWAY } from '@console/constants/entities'
+
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Form from '@ttn-lw/components/form'
@@ -272,7 +274,7 @@ const BasicSettingsForm = React.memo(props => {
             danger
           />
           <DeleteEntityHeaderModal
-            entity="gateway"
+            entity={GATEWAY}
             entityId={gtwId}
             entityName={gateway.name}
             setVisible={setDeleteGtwVisible}

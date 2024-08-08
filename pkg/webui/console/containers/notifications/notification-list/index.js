@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useCallback, useMemo } from 'react'
+import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 import { defineMessages } from 'react-intl'
 import { FixedSizeList as List } from 'react-window'
@@ -21,7 +21,7 @@ import InfiniteLoader from 'react-window-infinite-loader'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { useParams } from 'react-router-dom'
 
-import Icon, { IconEye } from '@ttn-lw/components/icon'
+import { IconEye } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -31,8 +31,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { markAllAsSeen } from '@console/store/actions/notifications'
-
-import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import styles from '../notifications.styl'
 
@@ -50,8 +48,9 @@ const NotificationList = ({
   selectedNotification,
   totalCount,
   listRef,
+  updatePendingNotificationIds,
+  unreadNotificationsCount,
 }) => {
-  const totalUnseenCount = useSelector(selectTotalUnseenCount)
   const { category } = useParams()
   const isArchive = category === 'archived'
   const dispatch = useDispatch()
@@ -65,17 +64,8 @@ const NotificationList = ({
   const itemCount = totalCount >= 0 ? totalCount : 100
 
   const handleMarkAllAsSeen = useCallback(async () => {
-    if (totalUnseenCount > 0) {
-      const result = await dispatch(attachPromise(markAllAsSeen()))
-      const firstIndex = items.findIndex(notification => notification.id === result[0])
-      const lastIndex = items.findIndex(
-        notification => notification.id === result[result.length - 1],
-      )
-      loadNextPage(firstIndex, lastIndex)
-    }
-  }, [dispatch, totalUnseenCount, loadNextPage, items])
-
-  const classes = classNames(styles.notificationHeaderIcon)
+    await dispatch(attachPromise(markAllAsSeen()))
+  }, [dispatch])
 
   const isSelected = notification =>
     notification && selectedNotification && selectedNotification.id === notification.id
@@ -91,6 +81,7 @@ const NotificationList = ({
           notification={items[index]}
           isSelected={isSelected(items[index])}
           isNextSelected={isNextSelected(items[index])}
+          isUpdatePending={Boolean(updatePendingNotificationIds.find(id => id === items[index].id))}
         />
       </div>
     ) : (
@@ -104,21 +95,29 @@ const NotificationList = ({
     style: PropTypes.shape({}).isRequired,
   }
 
+  const notificationCount = useMemo(() => {
+    if (!isArchive && unreadNotificationsCount) {
+      return (
+        <span className={styles.totalNotifications} data-test-id="total-unseen-notifications">
+          {unreadNotificationsCount}
+        </span>
+      )
+    }
+
+    return null
+  }, [isArchive, unreadNotificationsCount])
+
   return (
     <>
       <div className={styles.notificationHeader}>
         <div className={classNames(styles.notificationHeaderTitle, 'd-flex gap-cs-xxs')}>
-          <Icon icon={isArchive ? 'archive' : 'inbox'} nudgeDown className={classes} />
           <Message
+            data-test-id="notifications-title"
             content={isArchive ? m.archived : sharedMessages.notifications}
             component="p"
-            className="m-0"
+            className="m-0 fs-l"
           />
-          {Boolean(totalUnseenCount) && !isArchive && (
-            <span className={styles.totalNotifications} data-test-id="total-unseen-notifications">
-              {totalUnseenCount}
-            </span>
-          )}
+          {notificationCount}
         </div>
         {!isArchive && (
           <Button
@@ -126,6 +125,7 @@ const NotificationList = ({
             icon={IconEye}
             onClick={handleMarkAllAsSeen}
             message={m.markAllAsRead}
+            disabled={!unreadNotificationsCount}
           />
         )}
       </div>
@@ -169,6 +169,8 @@ NotificationList.propTypes = {
     id: PropTypes.string,
   }),
   totalCount: PropTypes.number.isRequired,
+  unreadNotificationsCount: PropTypes.number.isRequired,
+  updatePendingNotificationIds: PropTypes.arrayOf(PropTypes.string).isRequired,
 }
 
 NotificationList.defaultProps = {

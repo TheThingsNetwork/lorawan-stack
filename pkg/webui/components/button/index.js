@@ -201,8 +201,9 @@ Button.defaultProps = {
 }
 
 const LinkButton = props => {
-  const { disabled, titleMessage, onClick, value, tooltip, tooltipPlacement } = props
+  const { disabled, titleMessage, onClick, value, tooltip, tooltipPlacement, ...rest } = props
   const buttonClassNames = assembleClassnames(props)
+  const dataProps = useMemo(() => filterDataProps(rest), [rest])
   const { to } = props
 
   const handleClick = useCallback(
@@ -223,6 +224,7 @@ const LinkButton = props => {
       title={titleMessage}
       children={buttonChildren(props)}
       onClick={handleClick}
+      {...dataProps}
     />
   )
 
