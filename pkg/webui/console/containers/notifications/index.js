@@ -63,11 +63,11 @@ const indicesToPage = (startIndex, stopIndex, limit) => {
 const m = defineMessages({
   seeArchived: 'See archived messages',
   seeAll: 'See all messages',
-  noNotificationsSubtitle: 'Once you receive a notification, it can be viewed here.',
+  noNotificationsSubtitle: 'Once you receive a notification, it can be viewed here',
   unreadMessagesTitle: '{value} unread notifications',
   archivedMessageTitle: '{value} archived notifications',
-  unreadMessagesSubtitle: 'Select a notification to display the content here.',
-  noArchivedNotificationsSubtitle: 'Once you archive a notification, it can be viewed here.',
+  unreadMessagesSubtitle: 'Select a notification to display the content here',
+  noArchivedNotificationsSubtitle: 'Once you archive a notification, it can be viewed here',
 })
 
 const Notifications = React.memo(() => {
