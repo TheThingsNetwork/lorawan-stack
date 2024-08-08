@@ -24,14 +24,15 @@
     white-space: nowrap
     margin-bottom: $cs.xl
 
-    +media-query($bp.sm-md)
-      margin: $cs.m $cs.m $cs.xl
+    +media-query($bp.md)
+      margin-top: $cs.m
 
   &-section-collapsed
     height: auto
     opacity: 1
+    overflow: hidden
     transition: max-height $ad.m ease-in-out, opacity $ad.xs ease-in-out
-    +media-query($bp.sm-md)
+    +media-query($bp.md)
       height: 0px
       margin-bottom: 0
       opacity: 0
@@ -51,8 +52,8 @@
       justify-content: space-between
       margin-bottom: $cs.xs
 
-      +media-query($bp.sm-md)
-        margin-left: $cs.l
+      +media-query($bp.md)
+        margin-left: $cs.s
 
       &:last-child
         margin-bottom: 0
@@ -65,9 +66,9 @@
         max-width: 55%
 
   &-divider
-    +media-query($bp.sm-md)
+    +media-query($bp.md)
       height: 1px
-      width: 22rem
+      width: 100%
       margin: 0 auto $cs.l
       background: var(--c-border-neutral-light)
 
@@ -81,6 +82,8 @@
 
 .icon
   display: none
+  +media-query($bp.md)
+    display: inline-block
 
 @container panel (max-width: 530px)
   .data-sheet-row-content-value
@@ -105,6 +108,3 @@
 
   .data-sheet-row-content-value
     max-width: 100%
-
-  .icon
-    display: inline-block
