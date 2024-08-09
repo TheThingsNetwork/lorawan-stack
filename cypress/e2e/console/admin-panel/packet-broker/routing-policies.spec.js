@@ -88,24 +88,24 @@ describe('Packet Broker routing policies', () => {
     })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/packet-broker`)
 
-    cy.findByLabelText('Use custom routing policies').check()
+    cy.findByLabelText('Use custom routing policies').check({ force: true })
 
     // Check routing policy form checkboxes.
     cy.findByText('Uplink')
       .parent()
       .within(() => {
-        cy.findByLabelText('Join request').check()
-        cy.findByLabelText('MAC data').check()
-        cy.findByLabelText('Application data').check()
-        cy.findByLabelText('Signal quality information').check()
-        cy.findByLabelText('Localization information').check()
+        cy.findByLabelText('Join request').check({ force: true })
+        cy.findByLabelText('MAC data').check({ force: true })
+        cy.findByLabelText('Application data').check({ force: true })
+        cy.findByLabelText('Signal quality information').check({ force: true })
+        cy.findByLabelText('Localization information').check({ force: true })
       })
     cy.findByText('Downlink')
       .parent()
       .within(() => {
-        cy.findByLabelText('Join accept').check()
-        cy.findByLabelText('MAC data').check()
-        cy.findByLabelText('Application data').check()
+        cy.findByLabelText('Join accept').check({ force: true })
+        cy.findByLabelText('MAC data').check({ force: true })
+        cy.findByLabelText('Application data').check({ force: true })
       })
     cy.findByRole('button', { name: 'Save routing configuration' }).click()
 

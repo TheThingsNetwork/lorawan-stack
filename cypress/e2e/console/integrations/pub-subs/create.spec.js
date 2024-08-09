@@ -46,6 +46,7 @@ describe('Application Pub/Sub create', () => {
       cy.findByRole('heading', { name: 'Add Pub/Sub' }).should('be.visible')
       cy.findByRole('heading', { name: 'General settings' }).should('be.visible')
       cy.findByRole('heading', { name: 'MQTT configuration' }).should('be.visible')
+      cy.findByRole('heading', { name: 'Enabled event types' }).scrollIntoView()
       cy.findByRole('heading', { name: 'Enabled event types' }).should('be.visible')
       cy.findByLabelText('Pub/Sub ID').should('have.attr', 'placeholder').and('eq', 'my-new-pubsub')
       cy.findByLabelText('Server URL')
@@ -58,6 +59,7 @@ describe('Application Pub/Sub create', () => {
       cy.findByText('For each enabled message type an optional sub-topic can be defined').should(
         'be.visible',
       )
+      cy.get('button[type="submit"]').scrollIntoView()
       cy.findByRole('button', { name: 'Add Pub/Sub' }).should('be.visible')
     })
 
@@ -202,6 +204,7 @@ describe('Application Pub/Sub create', () => {
       cy.findByRole('heading', { name: 'Add Pub/Sub' }).should('be.visible')
       cy.findByRole('heading', { name: 'General settings' }).should('be.visible')
       cy.findByRole('heading', { name: 'NATS configuration' }).should('be.visible')
+      cy.findByRole('heading', { name: 'Enabled event types' }).scrollIntoView()
       cy.findByRole('heading', { name: 'Enabled event types' }).should('be.visible')
       cy.findByLabelText('Pub/Sub ID').should('have.attr', 'placeholder').and('eq', 'my-new-pubsub')
       cy.findByLabelText('Username').should('have.attr', 'placeholder').and('eq', 'my-username')
@@ -212,6 +215,7 @@ describe('Application Pub/Sub create', () => {
       cy.findByText('For each enabled message type an optional sub-topic can be defined').should(
         'be.visible',
       )
+      cy.get('button[type="submit"]').scrollIntoView()
       cy.findByRole('button', { name: 'Add Pub/Sub' }).should('be.visible')
     })
 

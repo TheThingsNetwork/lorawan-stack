@@ -145,7 +145,10 @@ const AppStatusBadge = ({ className }) => {
   }
 
   return (
-    <RequireRequest requestAction={getNetworkStatusSummary()} handleErrors={false}>
+    <RequireRequest
+      requestAction={statusPageUrl ? getNetworkStatusSummary() : []}
+      handleErrors={false}
+    >
       <StatusLabel
         type={status.type}
         icon={status.icon}

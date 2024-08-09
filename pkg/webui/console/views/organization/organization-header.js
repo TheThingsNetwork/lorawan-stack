@@ -54,7 +54,7 @@ const OrganizationHeader = ({ org }) => {
   )
 
   return (
-    <div className={style.root}>
+    <div className={style.root} data-test-id="organization-header">
       <div>
         <h5 className={style.name}>{name || organization_id}</h5>
         <span className={style.id}>

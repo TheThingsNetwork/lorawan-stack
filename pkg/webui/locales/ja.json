@@ -558,6 +558,8 @@
   "console.containers.device-overview-header.index.noActivityTooltip": "",
   "console.containers.device-overview-header.index.downloadMacData": "",
   "console.containers.device-overview-header.index.macStateError": "",
+  "console.containers.device-overview-header.index.sensitiveDataWarning": "",
+  "console.containers.device-overview-header.index.noSessionWarning": "",
   "console.containers.device-payload-formatters.messages.defaultFormatter": "<Link>こちら</Link> をクリックすると、このアプリケーションのデフォルトのペイロードフォーマッターを変更できます",
   "console.containers.device-payload-formatters.messages.mayNotViewLink": "このアプリケーションのリンク情報を表示することは許可されていません。これには、このアプリケーションのデフォルトのペイロードフォーマッタを見ることも含まれます",
   "console.containers.device-profile-section.device-card.index.productWebsite": "",

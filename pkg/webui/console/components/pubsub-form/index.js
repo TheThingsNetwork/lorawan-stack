@@ -313,7 +313,11 @@ const PubsubForm = props => {
   const messageTypesSection = useMemo(
     () => (
       <>
-        <Form.SubTitle title={sharedMessages.eventEnabledTypes} className="mb-0" />
+        <Form.SubTitle
+          title={sharedMessages.eventEnabledTypes}
+          className="mb-0"
+          data-test-id="enbaled-event-types"
+        />
         <Message component="p" content={m.messageInfo} className="mt-0 mb-ls-xxs" />
         <PubsubFormatSelector name="format" required />
         <Form.Field

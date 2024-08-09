@@ -17,12 +17,12 @@ describe('Header', () => {
     cy.dropAndSeedDatabase()
   })
   describe('Console logout', () => {
-    const logout = userName => {
+    const logout = () => {
       cy.get('header').within(() => {
-        cy.findByTestId('profile-dropdown').should('contain', userName).as('profileDropdown')
+        cy.findByTestId('profile-dropdown').as('profileDropdown')
 
         cy.get('@profileDropdown').click()
-        cy.get('@profileDropdown').findByText('Logout').click()
+        cy.findByText('Logout').click()
       })
     }
 
@@ -37,7 +37,7 @@ describe('Header', () => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
       cy.visit(Cypress.config('consoleRootPath'))
 
-      logout(user.ids.user_id)
+      logout()
 
       cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/login`)
     })
@@ -63,7 +63,7 @@ describe('Header', () => {
       cy.visit(Cypress.config('consoleRootPath'))
       cy.clearCookie('_console_csrf')
 
-      logout(user.ids.user_id)
+      logout()
 
       cy.location('pathname').should('eq', `${accountAppRootPath}/login`)
     })
@@ -82,7 +82,7 @@ describe('Header', () => {
       cy.visit(Cypress.config('consoleRootPath'))
 
       cy.get('header').within(() => {
-        cy.findByTestId('profile-dropdown').should('contain', user.name)
+        cy.findByTestId('profile-dropdown').should('be.visible')
 
         cy.findByAltText('Profile picture')
           .should('be.visible')

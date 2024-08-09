@@ -491,7 +491,7 @@ const getFieldDescriptorByLabel = label => {
   return cy
     .get('@field')
     .invoke('attr', 'aria-describedby')
-    .then(describedBy => cy.get(`[id="${describedBy}"]`))
+    .then(describedBy => cy.get(`[id="${describedBy}"]`).scrollIntoView())
 }
 
 // Helper function to select field error.
@@ -499,7 +499,7 @@ Cypress.Commands.add('findErrorByLabelText', label => {
   getFieldDescriptorByLabel(label).as('error')
 
   // Check for the error icon.
-  cy.get('@error').children().first().should('contain', 'error').and('be.visible')
+  cy.get('@error').within(() => cy.get('[data-test-id="error-icon"]').should('be.visible'))
 
   return cy.get('@error')
 })

@@ -63,8 +63,9 @@ const encodeCollaborator = collaboratorOption =>
   collaboratorOption
     ? {
         ids: {
-          [`${collaboratorOption.icon}_ids`]: {
-            [`${collaboratorOption.icon}_id`]: collaboratorOption.value,
+          [`${collaboratorOption.value.split('#')[0]}_ids`]: {
+            [`${collaboratorOption.value.split('#')[0]}_id`]:
+              collaboratorOption.value.split('#')[1],
           },
         },
       }

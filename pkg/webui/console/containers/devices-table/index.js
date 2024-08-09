@@ -133,7 +133,11 @@ const headers = [
             content={<Message content={m.otherClusterTooltip} values={{ host }} convertBackticks />}
             placement="top-end"
           >
-            <Status status="unknown" label={sharedMessages.otherCluster} className="al-center">
+            <Status
+              status="unknown"
+              label={sharedMessages.otherCluster}
+              className="d-flex al-center"
+            >
               <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
             </Status>
           </DocTooltip>

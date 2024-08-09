@@ -135,8 +135,13 @@ const DropdownItem = ({
       {iconElement}
       <Message content={title} />
     </button>
+  ) : external ? (
+    <Link.Anchor href={path} external tabIndex={tabIndex} className={style.button}>
+      {Boolean(iconElement) ? iconElement : null}
+      <Message content={title} component="span" className={messageClassName} />
+    </Link.Anchor>
   ) : (
-    <Link to={path} external={external} tabIndex={tabIndex} className={style.button}>
+    <Link to={path} tabIndex={tabIndex} className={style.button}>
       {Boolean(iconElement) ? iconElement : null}
       <Message content={title} component="span" className={messageClassName} />
     </Link>

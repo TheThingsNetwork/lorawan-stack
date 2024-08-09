@@ -341,6 +341,7 @@ describe('Payload formatters', () => {
 
         cy.findByLabelText('Formatter type').selectOption('javascript')
         cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.get('button[type="submit"]').first().scrollIntoView()
         cy.findByRole('button', { name: 'Paste repository formatter' }).should('be.visible')
         cy.findByLabelText('Formatter type').selectOption('repository')
         cy.findByTestId('code-editor-repository-formatter').should('be.visible')
@@ -356,6 +357,7 @@ describe('Payload formatters', () => {
         cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
         cy.findByLabelText('Formatter type').selectOption('javascript')
         cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.get('button[type="submit"]').first().scrollIntoView()
         cy.findByRole('button', { name: 'Paste repository formatter' }).should('not.exist')
         cy.findByRole('button', { name: 'Paste application formatter' }).should('be.visible')
         cy.findByLabelText('Formatter type').selectOption('application')
@@ -478,6 +480,7 @@ describe('Payload formatters', () => {
 
         cy.findByLabelText('Formatter type').selectOption('javascript')
         cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.get('button[type="submit"]').first().scrollIntoView()
         cy.findByRole('button', { name: 'Paste repository formatter' }).should('be.visible')
         cy.findByLabelText('Formatter type').selectOption('repository')
         cy.findByTestId('code-editor-repository-formatter').should('be.visible')
@@ -493,6 +496,7 @@ describe('Payload formatters', () => {
         cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
         cy.findByLabelText('Formatter type').selectOption('javascript')
         cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.get('button[type="submit"]').first().scrollIntoView()
         cy.findByRole('button', { name: 'Paste repository formatter' }).should('not.exist')
         cy.findByRole('button', { name: 'Paste application formatter' }).should('be.visible')
       })

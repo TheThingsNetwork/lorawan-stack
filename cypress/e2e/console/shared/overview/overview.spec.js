@@ -45,15 +45,18 @@ describe('Overview', () => {
     it('displays UI elements in place', () => {
       cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}`)
 
-      cy.findByText(`${application.name}`, { selector: 'h1' }).should('be.visible')
-      cy.findByRole('link', { name: /0 End device/ }).should('be.visible')
-      cy.findByRole('link', { name: /1 Collaborator/ }).should('be.visible')
-      cy.findByRole('link', { name: /0 API key/ }).should('be.visible')
+      // Check header.
+      cy.findByText(`${application.name}`, { selector: 'h5' }).should('be.visible')
+      cy.findByText(/0 End devices/).should('be.visible')
+      cy.findByText(/Created/).should('be.visible')
 
-      cy.findByRole('row', { name: new RegExp(applicationId) }).should('be.visible')
+      cy.findByText(new RegExp(applicationId)).should('be.visible')
 
-      cy.findByTestId('events-widget').should('be.visible')
-      cy.findByTestId('devices-table').should('be.visible')
+      // Check panels.
+      cy.findByText('Top end devices').should('be.visible')
+      cy.findByText('Network activity').should('be.visible')
+      cy.findByText('Latest decoded payload').should('be.visible')
+      cy.findByText('Device locations').should('be.visible')
 
       cy.findByTestId('error-notification').should('not.exist')
     })
@@ -80,18 +83,18 @@ describe('Overview', () => {
     it('displays UI elements in place', () => {
       cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}`)
 
-      cy.findByText(`${gateway.name}`, { selector: 'h1' }).should('be.visible')
-      cy.findByRole('link', { name: /1 Collaborator/ }).should('be.visible')
-      cy.findByRole('link', { name: /0 API key/ }).should('be.visible')
+      // Check header.
+      cy.findByText(`${gateway.name}`, { selector: 'h5' }).should('be.visible')
 
+      // Check general information panel.
       cy.findByRole('row', { name: new RegExp(gatewayId) }).should('be.visible')
       cy.findByRole('row', { name: new RegExp(gateway.ids.eui) }).should('be.visible')
-      cy.findByText(new RegExp(gateway.description)).should('be.visible')
-      cy.findByText(new RegExp(gateway.gateway_server_address)).should('be.visible')
-      cy.findByText(new RegExp(gateway.frequency_plan_id)).should('be.visible')
+      cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
 
-      cy.findByTestId('events-widget').should('be.visible')
-      cy.findByTestId('map-widget').should('be.visible')
+      // Check panels.
+      cy.findByText('General information').should('be.visible')
+      cy.findByText('Gateway status').should('be.visible')
+      cy.findByText('Network activity').should('be.visible')
 
       cy.findByTestId('error-notification').should('not.exist')
     })
@@ -115,13 +118,17 @@ describe('Overview', () => {
     it('displays UI elements in place', () => {
       cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${organizationId}`)
 
-      cy.findByText(`${organization.name}`, { selector: 'h1' }).should('be.visible')
-      cy.findByRole('link', { name: /1 Collaborator/ }).should('be.visible')
-      cy.findByRole('link', { name: /0 API key/ }).should('be.visible')
+      cy.findByTestId('organization-header').within(() => {
+        cy.findByText(`${organization.name}`, { selector: 'h5' }).should('be.visible')
+        cy.findByText(/Members/).should('be.visible')
+        cy.findByText(/API keys/).should('be.visible')
+      })
 
-      cy.findByRole('row', { name: new RegExp(organizationId) }).should('be.visible')
+      cy.findByText(new RegExp(organizationId)).should('be.visible')
 
-      cy.findByTestId('events-widget').should('be.visible')
+      cy.findByRole('button', { name: 'Members' }).should('be.visible')
+      cy.findByRole('button', { name: 'API keys' }).should('be.visible')
+      cy.findByRole('button', { name: 'Settings' }).should('be.visible')
 
       cy.findByTestId('error-notification').should('not.exist')
     })
@@ -154,15 +161,19 @@ describe('Overview', () => {
         }`,
       )
 
-      cy.findByText(`${endDevice.name}`, { selector: 'h1' }).should('be.visible')
+      cy.findByTestId('device-overview-header').within(() => {
+        cy.findByText(`${endDevice.name}`, { selector: 'h5' }).should('be.visible')
+        cy.findByText(new RegExp(endDevice.ids.device_id)).should('be.visible')
+      })
 
-      cy.findByRole('row', { name: new RegExp(endDevice.ids.device_id) }).should('be.visible')
-      cy.findByText(new RegExp(endDevice.description)).should('be.visible')
-      cy.findByRole('row', { name: new RegExp(endDevice.ids.dev_eui) }).should('be.visible')
-      cy.findByRole('row', { name: new RegExp(endDevice.ids.join_eui) }).should('be.visible')
-
-      cy.findByTestId('events-widget').should('be.visible')
-      cy.findByTestId('map-widget').should('be.visible')
+      cy.findByText('End device info').should('be.visible')
+      cy.findByText('General information').should('be.visible')
+      cy.findByText('Latest decoded payload').should('be.visible')
+      cy.findByText('Network activity').should('be.visible')
+      cy.get('[data-test-id="overview-panel-Location"]').scrollIntoView()
+      cy.findByTestId('overview-panel-Location').within(() => {
+        cy.findByText('Location').should('be.visible')
+      })
 
       cy.findByTestId('error-notification').should('not.exist')
     })

@@ -17,7 +17,10 @@ import { IconOrganization, IconUser } from '@ttn-lw/components/icon'
 export const composeOption = value => {
   const data = value.ids || value
   return {
-    value: 'user_ids' in data ? data.user_ids?.user_id : data.organization_ids?.organization_id,
+    value:
+      'user_ids' in data
+        ? `user#${data.user_ids?.user_id}`
+        : `organization#${data.organization_ids?.organization_id}`,
     label: 'user_ids' in data ? data.user_ids?.user_id : data.organization_ids?.organization_id,
     icon: 'user_ids' in data ? IconUser : IconOrganization,
   }
@@ -26,8 +29,8 @@ export const composeOption = value => {
 export const encodeContact = value =>
   value
     ? {
-        [`${value.icon}_ids`]: {
-          [`${value.icon}_id`]: value.value,
+        [`${value.value.split('#')[0]}_ids`]: {
+          [`${value.value.split('#')[0]}_id`]: value.value.split('#')[1],
         },
       }
     : null

@@ -106,9 +106,15 @@ describe('End Device list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 3)
     })
-    cy.findByRole('cell', { name: endDevices[0].ids.device_id }).should('be.visible')
-    cy.findByRole('cell', { name: endDevices[1].ids.device_id }).should('be.visible')
-    cy.findByRole('cell', { name: endDevices[2].ids.device_id }).should('be.visible')
+    cy.findByRole('cell', { name: `${endDevices[0].name} ${endDevices[0].ids.device_id}` }).should(
+      'be.visible',
+    )
+    cy.findByRole('cell', { name: `${endDevices[1].name} ${endDevices[1].ids.device_id}` }).should(
+      'be.visible',
+    )
+    cy.findByRole('cell', { name: `${endDevices[2].name} ${endDevices[2].ids.device_id}` }).should(
+      'be.visible',
+    )
 
     cy.findByTestId('search-input').as('searchInput')
     cy.get('@searchInput').type('some')
@@ -116,9 +122,15 @@ describe('End Device list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 1)
     })
-    cy.findByRole('cell', { name: endDevices[0].ids.device_id }).should('be.visible')
-    cy.findByRole('cell', { name: endDevices[1].ids.device_id }).should('not.exist')
-    cy.findByRole('cell', { name: endDevices[2].ids.device_id }).should('not.exist')
+    cy.findByRole('cell', { name: `${endDevices[0].name} ${endDevices[0].ids.device_id}` }).should(
+      'be.visible',
+    )
+    cy.findByRole('cell', { name: `${endDevices[1].name} ${endDevices[1].ids.device_id}` }).should(
+      'not.exist',
+    )
+    cy.findByRole('cell', { name: `${endDevices[2].name} ${endDevices[2].ids.device_id}` }).should(
+      'not.exist',
+    )
 
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('other')
@@ -126,9 +138,15 @@ describe('End Device list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findByRole('row').should('have.length', 1)
     })
-    cy.findByRole('cell', { name: endDevices[0].ids.device_id }).should('not.exist')
-    cy.findByRole('cell', { name: endDevices[1].ids.device_id }).should('be.visible')
-    cy.findByRole('cell', { name: endDevices[2].ids.device_id }).should('not.exist')
+    cy.findByRole('cell', { name: `${endDevices[0].name} ${endDevices[0].ids.device_id}` }).should(
+      'not.exist',
+    )
+    cy.findByRole('cell', { name: `${endDevices[1].name} ${endDevices[1].ids.device_id}` }).should(
+      'be.visible',
+    )
+    cy.findByRole('cell', { name: `${endDevices[2].name} ${endDevices[2].ids.device_id}` }).should(
+      'not.exist',
+    )
 
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('third')
@@ -136,9 +154,15 @@ describe('End Device list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 1)
     })
-    cy.findByRole('cell', { name: endDevices[0].ids.device_id }).should('not.exist')
-    cy.findByRole('cell', { name: endDevices[1].ids.device_id }).should('not.exist')
-    cy.findByRole('cell', { name: endDevices[2].ids.device_id }).should('be.visible')
+    cy.findByRole('cell', { name: `${endDevices[0].name} ${endDevices[0].ids.device_id}` }).should(
+      'not.exist',
+    )
+    cy.findByRole('cell', { name: `${endDevices[1].name} ${endDevices[1].ids.device_id}` }).should(
+      'not.exist',
+    )
+    cy.findByRole('cell', { name: `${endDevices[2].name} ${endDevices[2].ids.device_id}` }).should(
+      'be.visible',
+    )
 
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('test-end-device')
@@ -146,8 +170,14 @@ describe('End Device list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 3)
     })
-    cy.findByRole('cell', { name: endDevices[0].ids.device_id }).should('be.visible')
-    cy.findByRole('cell', { name: endDevices[1].ids.device_id }).should('be.visible')
-    cy.findByRole('cell', { name: endDevices[2].ids.device_id }).should('be.visible')
+    cy.findByRole('cell', { name: `${endDevices[0].name} ${endDevices[0].ids.device_id}` }).should(
+      'be.visible',
+    )
+    cy.findByRole('cell', { name: `${endDevices[1].name} ${endDevices[1].ids.device_id}` }).should(
+      'be.visible',
+    )
+    cy.findByRole('cell', { name: `${endDevices[2].name} ${endDevices[2].ids.device_id}` }).should(
+      'be.visible',
+    )
   })
 })

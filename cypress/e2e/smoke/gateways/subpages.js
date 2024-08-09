@@ -30,9 +30,10 @@ const gatewaySubpages = defineSmokeTest('check all gateway sub-pages', () => {
   cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   cy.visit(Cypress.config('consoleRootPath'))
 
-  cy.get('header').within(() => {
+  cy.get('div[id="sidebar"]').within(() => {
     cy.findByRole('link', { name: /Gateways/ }).click()
   })
+
   cy.findByRole('cell', { name: gateway.ids.gateway_id }).click()
 
   cy.findByRole('link', { name: /Live data/ }).click()
@@ -41,6 +42,7 @@ const gatewaySubpages = defineSmokeTest('check all gateway sub-pages', () => {
 
   cy.findByRole('link', { name: /Location/ }).click()
   cy.findByLabelText('Location privacy').should('exist')
+  cy.get('button[type="submit"]').scrollIntoView()
   cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 
@@ -60,6 +62,7 @@ const gatewaySubpages = defineSmokeTest('check all gateway sub-pages', () => {
     .closest('[data-test-id="collapsible-section"]')
     .within(() => {
       cy.findByLabelText('Gateway ID').should('be.visible')
+      cy.get('button[type="submit"]').scrollIntoView()
       cy.findByRole('button', { name: /Save changes/ }).should('be.visible')
       cy.findByTestId('error-notification').should('not.exist')
       cy.findByRole('button', { name: 'Collapse' }).click()

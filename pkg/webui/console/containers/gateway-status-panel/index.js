@@ -148,7 +148,7 @@ const GatewayStatusPanel = () => {
 
   return (
     <Panel
-      title="Gateway status"
+      title={sharedMessages.gatewayStatus}
       icon={isDisconnected ? IconRouterOff : IconGateway}
       shortCutLinkTitle={sharedMessages.noc}
       shortCutLinkPath="https://www.thethingsindustries.com/stack/features/noc"
