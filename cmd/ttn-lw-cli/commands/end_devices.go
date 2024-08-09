@@ -234,18 +234,36 @@ var (
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceListFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EndDeviceRegistry/List"].Allowed)
 
-			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-			if err != nil {
-				return err
-			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
-			res, err := ttnpb.NewEndDeviceRegistryClient(is).List(ctx, &ttnpb.ListEndDevicesRequest{
+			req := &ttnpb.ListEndDevicesRequest{
 				ApplicationIds: appID,
 				FieldMask:      ttnpb.FieldMask(paths...),
 				Limit:          limit,
 				Page:           page,
 				Order:          getOrder(cmd.Flags()),
-			}, opt)
+			}
+
+			updatedSince, err := getFilterUpdatedSince(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			if updatedSince != nil {
+				req.Filters = []*ttnpb.ListEndDevicesRequest_Filter{
+					{
+						Field: &ttnpb.ListEndDevicesRequest_Filter_UpdatedSince{
+							UpdatedSince: ttnpb.ProtoTime(updatedSince),
+						},
+					},
+				}
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+
+			res, err := ttnpb.NewEndDeviceRegistryClient(is).List(ctx, req, opt)
 			if err != nil {
 				return err
 			}
@@ -1567,6 +1585,7 @@ func init() {
 	endDevicesListCommand.Flags().AddFlagSet(selectAllEndDeviceFlags)
 	endDevicesListCommand.Flags().AddFlagSet(paginationFlags())
 	endDevicesListCommand.Flags().AddFlagSet(orderFlags())
+	endDevicesListCommand.Flags().AddFlagSet(filterFlags())
 	endDevicesCommand.AddCommand(endDevicesListCommand)
 	ttnpb.AddSetFlagsForSearchEndDevicesRequest(endDevicesSearchCommand.Flags(), "", false)
 	endDevicesSearchCommand.Flags().AddFlagSet(selectEndDeviceFlags)
