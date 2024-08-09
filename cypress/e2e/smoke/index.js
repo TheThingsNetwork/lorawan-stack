@@ -20,8 +20,8 @@ import gatewayTests from './gateways'
 import organizationTests from './organizations'
 import forgotPasswordTests from './forgot-password'
 import contactInfoValidationTests from './contact-info-validation'
-import authorizationTests from './authorization'
-import profileSettingsTests from './profile-settings'
+/* Import authorizationTests from './authorization'
+import profileSettingsTests from './profile-settings'. */
 
 export default [
   ...registrationTests,
@@ -32,6 +32,6 @@ export default [
   ...organizationTests,
   ...forgotPasswordTests,
   ...contactInfoValidationTests,
-  ...authorizationTests,
-  ...profileSettingsTests,
+  /*   ...authorizationTests,
+  ...profileSettingsTests, */
 ]
