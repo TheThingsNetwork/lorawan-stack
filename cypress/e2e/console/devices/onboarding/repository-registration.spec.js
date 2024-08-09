@@ -463,12 +463,6 @@ describe('End device repository manual registration', () => {
       it('succeeds registering device', () => {
         const devId = 'test-abp-dev'
 
-        cy.intercept(
-          'GET',
-          `/api/v3/dr/applications/${appId}/brands/test-brand-otaa?field_mask=name`,
-          { brand_id: 'test-brand-abp', name: 'Test Brand ABP' },
-        )
-
         // End device selection.
         cy.findByLabelText('End device brand').selectOption('test-brand-abp')
         cy.findByLabelText('Model').selectOption('test-model1')
@@ -482,7 +476,11 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('End device ID').type(devId)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
-
+        cy.intercept(
+          'GET',
+          `/api/v3/dr/applications/abp-test-application/brands/test-brand-abp?field_mask=name`,
+          { brand_id: 'test-brand-abp', name: 'Test Brand ABP' },
+        )
         cy.location('pathname').should(
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devId}`,
