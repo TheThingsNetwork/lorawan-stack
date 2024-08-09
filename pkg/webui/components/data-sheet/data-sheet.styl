@@ -25,7 +25,7 @@
     margin-bottom: $cs.xl
 
     +media-query($bp.md)
-      margin-top: $cs.m
+      margin-top: $cs.l
 
   &-section-collapsed
     height: auto
@@ -45,6 +45,9 @@
       font-weight: 400
       color: var(--c-text-neutral-semilight)
 
+      +media-query($bp.md)
+        font-size: $fs.s
+
     &-content
       height: 2.5rem
       display: flex
@@ -56,7 +59,6 @@
         margin-left: $cs.s
 
       &:last-child
-        margin-bottom: 0
         &:not(.last-group-last-item)
           margin-bottom: $cs.xl
 
@@ -89,7 +91,7 @@
   .data-sheet-row-content-value
     max-width: 45%
 
-@container panel (max-width: 460px)
+@container panel (max-width: 500px)
   .data-sheet-header
     margin-bottom: $cs.l
 

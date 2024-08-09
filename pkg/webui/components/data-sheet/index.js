@@ -121,7 +121,7 @@ const DataSheetSection = ({ dataLength, group, index }) => {
             )
           })
         ) : (
-          <div>
+          <div className={style.dataSheetRowContent}>
             <Message content={group.emptyMessage || sharedMessages.noData} />
           </div>
         )}
