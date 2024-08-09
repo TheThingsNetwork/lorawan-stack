@@ -43,6 +43,11 @@ func (u *Upstream) getRootCA(ctx context.Context, address string) (*x509.Certifi
 	if err != nil {
 		return nil, err
 	}
+	host, _, err := net.SplitHostPort(address)
+	if err != nil {
+		return nil, err
+	}
+	tlsConfig.ServerName = host
 	tlsConn := tls.Client(netConn, tlsConfig)
 	if err := tlsConn.HandshakeContext(ctx); err != nil {
 		return nil, errGatewayServerTLS.WithCause(err)
