@@ -363,6 +363,7 @@ func (s *endDeviceStore) listEndDevicesBy(
 
 	// Apply ordering, paging and field masking.
 	selectQuery = selectQuery.
+		Apply(selectWithFilterFromContext(ctx)).
 		Apply(selectWithOrderFromContext(ctx, "device_id", map[string]string{
 			"device_id":    "device_id",
 			"name":         "name",
