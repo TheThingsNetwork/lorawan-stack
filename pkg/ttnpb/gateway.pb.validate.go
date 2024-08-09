@@ -3389,6 +3389,23 @@ func (m *ListGatewaysRequest) ValidateFields(paths ...string) error {
 			// no validation rules for Page
 		case "deleted":
 			// no validation rules for Deleted
+		case "filters":
+
+			for idx, item := range m.GetFilters() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ListGatewaysRequestValidationError{
+							field:  fmt.Sprintf("filters[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return ListGatewaysRequestValidationError{
 				field:  name,
@@ -5647,6 +5664,126 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Gateway_LRFHSSValidationError{}
+
+// ValidateFields checks the field values on ListGatewaysRequest_Filter with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ListGatewaysRequest_Filter) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListGatewaysRequest_FilterFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "field":
+			if len(subs) == 0 {
+				subs = []string{
+					"updated_since",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "updated_since":
+					w, ok := m.Field.(*ListGatewaysRequest_Filter_UpdatedSince)
+					if !ok || w == nil {
+						continue
+					}
+
+					if t := m.GetUpdatedSince(); t != nil {
+						ts, err := t.AsTime(), t.CheckValid()
+						if err != nil {
+							return ListGatewaysRequest_FilterValidationError{
+								field:  "updated_since",
+								reason: "value is not a valid timestamp",
+								cause:  err,
+							}
+						}
+
+						now := time.Now()
+
+						if ts.Sub(now) >= 0 {
+							return ListGatewaysRequest_FilterValidationError{
+								field:  "updated_since",
+								reason: "value must be less than now",
+							}
+						}
+
+					}
+
+				}
+			}
+		default:
+			return ListGatewaysRequest_FilterValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListGatewaysRequest_FilterValidationError is the validation error returned
+// by ListGatewaysRequest_Filter.ValidateFields if the designated constraints
+// aren't met.
+type ListGatewaysRequest_FilterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListGatewaysRequest_FilterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListGatewaysRequest_FilterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListGatewaysRequest_FilterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListGatewaysRequest_FilterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListGatewaysRequest_FilterValidationError) ErrorName() string {
+	return "ListGatewaysRequest_FilterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListGatewaysRequest_FilterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListGatewaysRequest_Filter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListGatewaysRequest_FilterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListGatewaysRequest_FilterValidationError{}
 
 // ValidateFields checks the field values on
 // GatewayConnectionStats_RoundTripTimes with the rules defined in the proto

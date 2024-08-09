@@ -1310,6 +1310,13 @@ message ListEndDevicesRequest {
   uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 5;
+  // Filter end devices by fields.
+  message Filter {
+    oneof field {
+      google.protobuf.Timestamp updated_since = 1 [(validate.rules).timestamp.lt_now = true];
+    }
+  }
+  repeated Filter filters = 6;
 }
 
 message SetEndDeviceRequest {

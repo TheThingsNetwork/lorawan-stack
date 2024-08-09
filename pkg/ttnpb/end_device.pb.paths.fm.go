@@ -3550,6 +3550,7 @@ var ListEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
 	"field_mask",
+	"filters",
 	"limit",
 	"order",
 	"page",
@@ -3558,6 +3559,7 @@ var ListEndDevicesRequestFieldPathsNested = []string{
 var ListEndDevicesRequestFieldPathsTopLevel = []string{
 	"application_ids",
 	"field_mask",
+	"filters",
 	"limit",
 	"order",
 	"page",
@@ -5602,4 +5604,12 @@ var BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdateFieldPathsNested 
 var BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdateFieldPathsTopLevel = []string{
 	"ids",
 	"last_seen_at",
+}
+var ListEndDevicesRequest_FilterFieldPathsNested = []string{
+	"field",
+	"field.updated_since",
+}
+
+var ListEndDevicesRequest_FilterFieldPathsTopLevel = []string{
+	"field",
 }

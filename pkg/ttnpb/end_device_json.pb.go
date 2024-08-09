@@ -4627,6 +4627,18 @@ func (x *ListEndDevicesRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("page")
 		s.WriteUint32(x.Page)
 	}
+	if len(x.Filters) > 0 || s.HasField("filters") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("filters")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Filters {
+			s.WriteMoreIf(&wroteElement)
+			// NOTE: ListEndDevicesRequest_Filter does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, element)
+		}
+		s.WriteArrayEnd()
+	}
 	s.WriteObjectEnd()
 }
 
@@ -4674,6 +4686,18 @@ func (x *ListEndDevicesRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 		case "page":
 			s.AddField("page")
 			x.Page = s.ReadUint32()
+		case "filters":
+			s.AddField("filters")
+			if s.ReadNil() {
+				x.Filters = nil
+				return
+			}
+			s.ReadArray(func() {
+				// NOTE: ListEndDevicesRequest_Filter does not seem to implement UnmarshalProtoJSON.
+				var v ListEndDevicesRequest_Filter
+				golang.UnmarshalMessage(s, &v)
+				x.Filters = append(x.Filters, &v)
+			})
 		}
 	})
 }

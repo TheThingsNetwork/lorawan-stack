@@ -482,6 +482,7 @@ var ListGatewaysRequestFieldPathsNested = []string{
 	"collaborator.ids.user_ids.user_id",
 	"deleted",
 	"field_mask",
+	"filters",
 	"limit",
 	"order",
 	"page",
@@ -491,6 +492,7 @@ var ListGatewaysRequestFieldPathsTopLevel = []string{
 	"collaborator",
 	"deleted",
 	"field_mask",
+	"filters",
 	"limit",
 	"order",
 	"page",
@@ -885,6 +887,14 @@ var Gateway_LRFHSSFieldPathsNested = []string{
 
 var Gateway_LRFHSSFieldPathsTopLevel = []string{
 	"supported",
+}
+var ListGatewaysRequest_FilterFieldPathsNested = []string{
+	"field",
+	"field.updated_since",
+}
+
+var ListGatewaysRequest_FilterFieldPathsTopLevel = []string{
+	"field",
 }
 var GatewayConnectionStats_RoundTripTimesFieldPathsNested = []string{
 	"count",

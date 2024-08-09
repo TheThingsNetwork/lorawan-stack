@@ -17560,6 +17560,50 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "filters",
+              "description": "",
+              "label": "repeated",
+              "type": "Filter",
+              "longType": "ListEndDevicesRequest.Filter",
+              "fullType": "ttn.lorawan.v3.ListEndDevicesRequest.Filter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Filter",
+          "longName": "ListEndDevicesRequest.Filter",
+          "fullName": "ttn.lorawan.v3.ListEndDevicesRequest.Filter",
+          "description": "Filter end devices by fields.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "updated_since",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "field",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.lt_now",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -24012,6 +24056,50 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "filters",
+              "description": "",
+              "label": "repeated",
+              "type": "Filter",
+              "longType": "ListGatewaysRequest.Filter",
+              "fullType": "ttn.lorawan.v3.ListGatewaysRequest.Filter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Filter",
+          "longName": "ListGatewaysRequest.Filter",
+          "fullName": "ttn.lorawan.v3.ListGatewaysRequest.Filter",
+          "description": "Filter gateways by fields.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "updated_since",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "field",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.lt_now",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
