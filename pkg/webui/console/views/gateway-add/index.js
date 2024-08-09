@@ -49,7 +49,7 @@ const GatewayAdd = () => {
   const handleSuccess = useCallback(
     (gtwId, isManaged = false) => {
       if (isManaged) {
-        navigate(`/gateways/${gtwId}/managed-gateway/connection-settings`)
+        navigate(`/gateways/${gtwId}/managed-gateway/connection-settings?claimed=true`)
         return
       }
       navigate(`/gateways/${gtwId}`)
