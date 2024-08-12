@@ -249,7 +249,7 @@ describe('Gateway create', () => {
       `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}/managed-gateway/connection-settings`,
     )
 
-    cy.intercept('GET', `/api/v3/gcs/gateways/managed/*`, {
+    cy.intercept('GET', `/api/v3/gcs/gateways/managed/eui-${gateway.eui}*`, {
       statusCode: 200,
       body: {
         ids: {
@@ -257,7 +257,7 @@ describe('Gateway create', () => {
           eui: gateway.eui,
         },
       },
-    }).as('get-is-gtw-managed')
+    })
   })
 
   it('succeeds adding gateway without frequency plan and without EUI', () => {

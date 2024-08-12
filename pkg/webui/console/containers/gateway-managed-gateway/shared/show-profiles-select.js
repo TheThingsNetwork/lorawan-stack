@@ -68,7 +68,7 @@ const ShowProfilesSelect = ({ name, ...rest }) => {
       .filter(({ ids }) => Boolean(collaborators[getOrganizationId({ ids })]))
       .map(({ ids, name }) => ({
         value: getOrganizationId({ ids }),
-        label: name,
+        label: name ?? getOrganizationId({ ids }),
       })),
   ]
 
