@@ -21,6 +21,7 @@ import {
   createBrowserRouter,
   RouterProvider,
   ScrollRestoration,
+  useLocation,
 } from 'react-router-dom'
 import classnames from 'classnames'
 import { IconLayoutBottombarExpand } from '@tabler/icons-react'
@@ -81,6 +82,8 @@ const getScrollRestorationKey = location => {
 }
 
 const Layout = () => {
+  const { search } = useLocation()
+  const page = new URLSearchParams(search).get('page')
   const user = useSelector(selectUser)
   const fetching = useSelector(selectUserFetching)
   const error = useSelector(selectUserError)
@@ -88,6 +91,7 @@ const Layout = () => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const siteTitle = selectApplicationSiteTitle()
   const siteName = selectApplicationSiteName()
+  const main = useRef()
 
   const {
     height: splitFrameHeight,
@@ -134,6 +138,12 @@ const Layout = () => {
   }, [isDrawerOpen, openDrawer, closeDrawer])
   // End of mobile side menu drawer functionality
 
+  useEffect(() => {
+    if (main.current) {
+      main.current.scrollTop = 0
+    }
+  }, [page])
+
   return (
     <>
       <ScrollRestoration getKey={getScrollRestorationKey} />
@@ -156,6 +166,7 @@ const Layout = () => {
                 <Header onMenuClick={onDrawerExpandClick} />
                 <main
                   className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+                  ref={main}
                 >
                   <WithAuth
                     user={user}
