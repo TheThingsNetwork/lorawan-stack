@@ -425,6 +425,7 @@ func (s *gatewayStore) listGatewaysBy(
 
 	// Apply ordering, paging and field masking.
 	selectQuery = selectQuery.
+		Apply(selectWithFilterFromContext(ctx)).
 		Apply(selectWithOrderFromContext(ctx, "gateway_id", map[string]string{
 			"gateway_id": "gateway_id",
 			"name":       "name",

@@ -1685,6 +1685,7 @@
   "error:cmd/ttn-lw-cli/commands:expiry_date_invalid": "有効期限の日付が過去です",
   "error:cmd/ttn-lw-cli/commands:fail_write": "`{file}`の書き込み失敗",
   "error:cmd/ttn-lw-cli/commands:file_exists": "`{file}` が存在します",
+  "error:cmd/ttn-lw-cli/commands:filter_date_format_invalid": "",
   "error:cmd/ttn-lw-cli/commands:flags_unsupported": "",
   "error:cmd/ttn-lw-cli/commands:gateway_server_address_mismatch": "ゲートウェイサーバのアドレスが合致しません",
   "error:cmd/ttn-lw-cli/commands:inconsistent_end_device_eui": "デバイスEUIが登録されたものと合致しません",

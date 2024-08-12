@@ -117,7 +117,14 @@ var (
 	errNoAPIKeyID        = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
 	errNoAPIKeyRights    = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
 	errExpiryDateInPast  = errors.DefineInvalidArgument("expiry_date_invalid", "expiry date is in the past")
-	errInvalidDateFormat = errors.DefineInvalidArgument("expiry_date_format_invalid", "invalid expiry date format (RFC3339: YYYY-MM-DDTHH:MM:SSZ)")
+	errInvalidDateFormat = errors.DefineInvalidArgument(
+		"expiry_date_format_invalid",
+		"invalid expiry date format (RFC3339: YYYY-MM-DDTHH:MM:SSZ)",
+	)
+	errInvalidFilterDateFormat = errors.DefineInvalidArgument(
+		"filter_date_format_invalid",
+		"invalid filter date format (RFC3339: YYYY-MM-DDTHH:MM:SSZ)",
+	)
 )
 
 func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
@@ -384,4 +391,24 @@ func GetClassBCGatewayIdentifiers(flagSet *pflag.FlagSet, prefix string) (identi
 		identifiers = append(identifiers, ids)
 	}
 	return identifiers, nil
+}
+
+func filterFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.String("filter.updated-since",
+		"",
+		"filter the `updated_at` field by this timestamp (YYYY-MM-DDTHH:MM:SSZ)")
+	return flagSet
+}
+
+func getFilterUpdatedSince(flagSet *pflag.FlagSet) (*time.Time, error) {
+	since, _ := flagSet.GetString("filter.updated-since")
+	if since == "" {
+		return nil, nil // nolint: nilnil
+	}
+	sinceDate, err := time.Parse(time.RFC3339, since)
+	if err != nil {
+		return nil, errInvalidFilterDateFormat.New()
+	}
+	return &sinceDate, nil
 }

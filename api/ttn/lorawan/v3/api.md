@@ -263,6 +263,7 @@
   - [Message `GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest)
   - [Message `GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest)
   - [Message `ListEndDevicesRequest`](#ttn.lorawan.v3.ListEndDevicesRequest)
+  - [Message `ListEndDevicesRequest.Filter`](#ttn.lorawan.v3.ListEndDevicesRequest.Filter)
   - [Message `MACParameters`](#ttn.lorawan.v3.MACParameters)
   - [Message `MACParameters.Channel`](#ttn.lorawan.v3.MACParameters.Channel)
   - [Message `MACSettings`](#ttn.lorawan.v3.MACSettings)
@@ -343,6 +344,7 @@
   - [Message `ListGatewayAPIKeysRequest`](#ttn.lorawan.v3.ListGatewayAPIKeysRequest)
   - [Message `ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest)
   - [Message `ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest)
+  - [Message `ListGatewaysRequest.Filter`](#ttn.lorawan.v3.ListGatewaysRequest.Filter)
   - [Message `ManagedGateway`](#ttn.lorawan.v3.ManagedGateway)
   - [Message `ManagedGatewayCellularBackhaul`](#ttn.lorawan.v3.ManagedGatewayCellularBackhaul)
   - [Message `ManagedGatewayControllerConnection`](#ttn.lorawan.v3.ManagedGatewayControllerConnection)
@@ -4189,6 +4191,7 @@ Template for creating end devices.
 | `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `filters` | [`ListEndDevicesRequest.Filter`](#ttn.lorawan.v3.ListEndDevicesRequest.Filter) | repeated |  |
 
 #### Field Rules
 
@@ -4196,6 +4199,20 @@ Template for creating end devices.
 | ----- | ----------- |
 | `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at last_seen_at -last_seen_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.ListEndDevicesRequest.Filter">Message `ListEndDevicesRequest.Filter`</a>
+
+Filter end devices by fields.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `updated_since` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `updated_since` | <p>`timestamp.lt_now`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACParameters">Message `MACParameters`</a>
 
@@ -5357,6 +5374,7 @@ Identifies an end device model with version information.
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 | `deleted` | [`bool`](#bool) |  | Only return recently deleted gateways. |
+| `filters` | [`ListGatewaysRequest.Filter`](#ttn.lorawan.v3.ListGatewaysRequest.Filter) | repeated |  |
 
 #### Field Rules
 
@@ -5364,6 +5382,20 @@ Identifies an end device model with version information.
 | ----- | ----------- |
 | `order` | <p>`string.in`: `[ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.ListGatewaysRequest.Filter">Message `ListGatewaysRequest.Filter`</a>
+
+Filter gateways by fields.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `updated_since` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `updated_since` | <p>`timestamp.lt_now`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ManagedGateway">Message `ManagedGateway`</a>
 

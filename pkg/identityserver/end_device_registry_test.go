@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"testing"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
@@ -24,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const noOfDevices = 3
@@ -346,6 +348,76 @@ func TestEndDevicesBatchOperations(t *testing.T) {
 			}, readCreds)
 			a.So(got, should.BeNil)
 			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+	}, withPrivateTestDatabase(p))
+}
+
+func TestEndDevicesFilter(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	for i := 0; i < 5; i++ {
+		p.NewEndDevice(app1.GetIds())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewEndDeviceRegistryClient(cc)
+
+		// Filter by 1 hour ago.
+		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			FieldMask:      ttnpb.FieldMask("name"),
+			Filters: []*ttnpb.ListEndDevicesRequest_Filter{
+				{
+					Field: &ttnpb.ListEndDevicesRequest_Filter_UpdatedSince{
+						UpdatedSince: timestamppb.New(time.Now().Add(-time.Hour)),
+					},
+				},
+			},
+		}, creds)
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.EndDevices, should.HaveLength, 5)
+		}
+
+		// Filter by now. The timestamp is newer then the last `update_at`, so no devices should be returned.
+		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			FieldMask:      ttnpb.FieldMask("name"),
+			Filters: []*ttnpb.ListEndDevicesRequest_Filter{
+				{
+					Field: &ttnpb.ListEndDevicesRequest_Filter_UpdatedSince{
+						UpdatedSince: timestamppb.New(time.Now()),
+					},
+				},
+			},
+		}, creds)
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.EndDevices, should.HaveLength, 0)
+		}
+
+		// Filter by 1 hour ago with pagination.
+		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			FieldMask:      ttnpb.FieldMask("name"),
+			Limit:          2,
+			Page:           1,
+			Filters: []*ttnpb.ListEndDevicesRequest_Filter{
+				{
+					Field: &ttnpb.ListEndDevicesRequest_Filter_UpdatedSince{
+						UpdatedSince: timestamppb.New(time.Now().Add(-time.Hour)),
+					},
+				},
+			},
+		}, creds)
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.EndDevices, should.HaveLength, 2)
 		}
 	}, withPrivateTestDatabase(p))
 }

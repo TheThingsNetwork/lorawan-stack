@@ -1538,6 +1538,15 @@
       "file": "use.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:filter_date_format_invalid": {
+    "translations": {
+      "en": "invalid filter date format (RFC3339: YYYY-MM-DDTHH:MM:SSZ)"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:flags_unsupported": {
     "translations": {
       "en": "flags are not supported for this command"

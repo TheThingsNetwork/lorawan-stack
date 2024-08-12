@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"testing"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
@@ -25,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const noOfGateways = 3
@@ -457,5 +459,74 @@ func TestGatewayBatchOperations(t *testing.T) {
 		}, limitedCreds)
 		a.So(err, should.BeNil)
 		a.So(len(gtws.Gateways), should.Equal, 0)
+	}, withPrivateTestDatabase(p))
+}
+
+func TestGatewaysFilter(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	for i := 0; i < 5; i++ {
+		p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewGatewayRegistryClient(cc)
+
+		// Filter by 1 hour ago.
+		list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
+			FieldMask:    ttnpb.FieldMask("name"),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			Filters: []*ttnpb.ListGatewaysRequest_Filter{
+				{
+					Field: &ttnpb.ListGatewaysRequest_Filter_UpdatedSince{
+						UpdatedSince: timestamppb.New(time.Now().Add(-time.Hour)),
+					},
+				},
+			},
+		}, creds)
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.Gateways, should.HaveLength, 5)
+		}
+
+		// Filter by now. The timestamp is newer then the last `update_at`, so no devices should be returned.
+		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
+			FieldMask:    ttnpb.FieldMask("name"),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			Filters: []*ttnpb.ListGatewaysRequest_Filter{
+				{
+					Field: &ttnpb.ListGatewaysRequest_Filter_UpdatedSince{
+						UpdatedSince: timestamppb.New(time.Now()),
+					},
+				},
+			},
+		}, creds)
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.Gateways, should.HaveLength, 0)
+		}
+
+		// Filter by 1 hour ago with pagination.
+		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
+			FieldMask:    ttnpb.FieldMask("name"),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			Limit:        2,
+			Page:         1,
+			Filters: []*ttnpb.ListGatewaysRequest_Filter{
+				{
+					Field: &ttnpb.ListGatewaysRequest_Filter_UpdatedSince{
+						UpdatedSince: timestamppb.New(time.Now().Add(-time.Hour)),
+					},
+				},
+			},
+		}, creds)
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.Gateways, should.HaveLength, 2)
+		}
 	}, withPrivateTestDatabase(p))
 }

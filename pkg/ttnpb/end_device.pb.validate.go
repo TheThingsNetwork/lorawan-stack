@@ -4452,6 +4452,23 @@ func (m *ListEndDevicesRequest) ValidateFields(paths ...string) error {
 
 		case "page":
 			// no validation rules for Page
+		case "filters":
+
+			for idx, item := range m.GetFilters() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ListEndDevicesRequestValidationError{
+							field:  fmt.Sprintf("filters[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return ListEndDevicesRequestValidationError{
 				field:  name,
@@ -8263,3 +8280,123 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdateValidationError{}
+
+// ValidateFields checks the field values on ListEndDevicesRequest_Filter with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ListEndDevicesRequest_Filter) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListEndDevicesRequest_FilterFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "field":
+			if len(subs) == 0 {
+				subs = []string{
+					"updated_since",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "updated_since":
+					w, ok := m.Field.(*ListEndDevicesRequest_Filter_UpdatedSince)
+					if !ok || w == nil {
+						continue
+					}
+
+					if t := m.GetUpdatedSince(); t != nil {
+						ts, err := t.AsTime(), t.CheckValid()
+						if err != nil {
+							return ListEndDevicesRequest_FilterValidationError{
+								field:  "updated_since",
+								reason: "value is not a valid timestamp",
+								cause:  err,
+							}
+						}
+
+						now := time.Now()
+
+						if ts.Sub(now) >= 0 {
+							return ListEndDevicesRequest_FilterValidationError{
+								field:  "updated_since",
+								reason: "value must be less than now",
+							}
+						}
+
+					}
+
+				}
+			}
+		default:
+			return ListEndDevicesRequest_FilterValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListEndDevicesRequest_FilterValidationError is the validation error returned
+// by ListEndDevicesRequest_Filter.ValidateFields if the designated
+// constraints aren't met.
+type ListEndDevicesRequest_FilterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListEndDevicesRequest_FilterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListEndDevicesRequest_FilterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListEndDevicesRequest_FilterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListEndDevicesRequest_FilterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListEndDevicesRequest_FilterValidationError) ErrorName() string {
+	return "ListEndDevicesRequest_FilterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListEndDevicesRequest_FilterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListEndDevicesRequest_Filter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListEndDevicesRequest_FilterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListEndDevicesRequest_FilterValidationError{}

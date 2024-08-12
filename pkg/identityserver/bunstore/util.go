@@ -113,6 +113,15 @@ func selectWithOrderFromContext(
 	}
 }
 
+func selectWithFilterFromContext(ctx context.Context) func(*bun.SelectQuery) *bun.SelectQuery {
+	return func(q *bun.SelectQuery) *bun.SelectQuery {
+		if filter, ok := store.FilterOptionsFromContext(ctx); ok {
+			return q.Where(fmt.Sprintf("?TableAlias.%s >= (?)", filter.Field), filter.Threshold)
+		}
+		return q
+	}
+}
+
 func convertIntSlice[A, B int | ~int32](in []A) []B {
 	out := make([]B, len(in))
 	for i, el := range in {

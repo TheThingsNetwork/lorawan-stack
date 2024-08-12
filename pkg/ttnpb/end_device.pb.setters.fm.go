@@ -3889,6 +3889,15 @@ func (dst *ListEndDevicesRequest) SetFields(src *ListEndDevicesRequest, paths ..
 				var zero uint32
 				dst.Page = zero
 			}
+		case "filters":
+			if len(subs) > 0 {
+				return fmt.Errorf("'filters' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Filters = src.Filters
+			} else {
+				dst.Filters = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -5757,6 +5766,58 @@ func (dst *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) SetField
 				dst.LastSeenAt = src.LastSeenAt
 			} else {
 				dst.LastSeenAt = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListEndDevicesRequest_Filter) SetFields(src *ListEndDevicesRequest_Filter, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "field":
+			if len(subs) == 0 && src == nil {
+				dst.Field = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Field = src.Field
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "updated_since":
+					var srcTypeOk bool
+					if src != nil {
+						_, srcTypeOk = src.Field.(*ListEndDevicesRequest_Filter_UpdatedSince)
+					}
+					if srcValid := srcTypeOk || src == nil || src.Field == nil || len(oneofSubs) == 0; !srcValid {
+						return fmt.Errorf("attempt to set oneof 'updated_since', while different oneof is set in source")
+					}
+					_, dstTypeOk := dst.Field.(*ListEndDevicesRequest_Filter_UpdatedSince)
+					if dstValid := dstTypeOk || dst.Field == nil || len(oneofSubs) == 0; !dstValid {
+						return fmt.Errorf("attempt to set oneof 'updated_since', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						return fmt.Errorf("'updated_since' has no subfields, but %s were specified", oneofSubs)
+					}
+					if srcTypeOk {
+						dst.Field = src.Field
+					} else {
+						dst.Field = nil
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
 			}
 
 		default:
