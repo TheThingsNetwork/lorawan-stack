@@ -593,6 +593,7 @@
   "console.containers.header.bookmarks-dropdown.noBookmarks": "",
   "console.containers.header.bookmarks-dropdown.noBookmarksDescription": "",
   "console.containers.header.bookmarks-dropdown.threshold": "",
+  "console.containers.header.index.tooltipMinimize": "",
   "console.containers.header.notifications-dropdown.description": "",
   "console.containers.header.notifications-dropdown.noNotifications": "",
   "console.containers.header.notifications-dropdown.noNotificationsDescription": "",

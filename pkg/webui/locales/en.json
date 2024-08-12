@@ -594,6 +594,7 @@
   "console.containers.header.bookmarks-dropdown.noBookmarksDescription": "Your bookmarked entities will be listed here",
   "console.containers.header.bookmarks-dropdown.threshold": "Only showing latest 15 bookmarks",
   "console.containers.header.notifications-dropdown.description": "Showing last {numNotifications} of {totalNotifications} notifications",
+  "console.containers.header.index.tooltipMinimize": "Keep sidebar open",
   "console.containers.header.notifications-dropdown.noNotifications": "All caught up!",
   "console.containers.header.notifications-dropdown.noNotificationsDescription": "You don’t have any notifications currently",
   "console.containers.invite-user-form.index.invitationsDescription": "You can invite users to this network by providing an email address. The person will then get an email with instructions on how to join your network.",
