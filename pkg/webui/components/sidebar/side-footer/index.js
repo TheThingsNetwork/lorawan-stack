@@ -28,8 +28,6 @@ import Dropdown from '@ttn-lw/components/dropdown'
 
 import { LanguageContext } from '@ttn-lw/lib/components/with-locale'
 
-import SidebarContext from '@console/containers/sidebar/context'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import {
@@ -65,7 +63,6 @@ LanguageOption.propTypes = {
 }
 
 const SideFooter = () => {
-  const { isMinimized } = useContext(SidebarContext)
   const supportButtonRef = useRef(null)
 
   const languageContext = useContext(LanguageContext)
@@ -122,9 +119,7 @@ const SideFooter = () => {
     </>
   )
 
-  const sideFooterClassnames = classnames('d-flex', 'j-between', 'al-center', 'gap-cs-m', 'fs-s', {
-    [style.isMinimized]: isMinimized,
-  })
+  const sideFooterClassnames = classnames('d-flex', 'j-between', 'al-center', 'gap-cs-m', 'fs-s')
 
   return (
     <div className={style.sideFooter}>
@@ -132,8 +127,7 @@ const SideFooter = () => {
         <Button
           className={style.supportButton}
           secondary
-          message={isMinimized ? undefined : m.resources}
-          noDropdownIcon={isMinimized}
+          message={m.resources}
           icon={IconInfoSquareRounded}
           dropdownItems={supportDropdownItems}
           dropdownPosition="above"

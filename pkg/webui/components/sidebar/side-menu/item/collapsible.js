@@ -16,7 +16,6 @@ import React, { useRef } from 'react'
 import classnames from 'classnames'
 
 import Icon, { IconChevronDown } from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -27,36 +26,12 @@ import SideNavigationList from '../list'
 
 import style from './item.styl'
 
-const CollapsibleItem = ({
-  children,
-  onClick,
-  isExpanded,
-  isMinimized,
-  title,
-  icon,
-  depth,
-  onDropdownItemsClick,
-  currentPathName,
-}) => {
+const CollapsibleItem = ({ children, onClick, isExpanded, title, icon, depth }) => {
   const ref = useRef()
-  const subItems = React.Children.toArray(children)
-    .filter(item => React.isValidElement(item) && item.props)
-    .map(item => ({
-      title: item.props.title,
-      path: item.props.path,
-      icon: item.props.icon,
-    }))
-
-  const subItemActive = subItems.some(item => currentPathName.includes(item.path))
 
   return (
-    <div className={classnames(style.container, { [style.isMinimized]: isMinimized })} ref={ref}>
-      <Button
-        className={classnames(style.link, {
-          [style.active]: isMinimized && subItemActive,
-        })}
-        onClick={onClick}
-      >
+    <div className={style.container} ref={ref}>
+      <Button className={style.link} onClick={onClick}>
         {icon && <Icon icon={icon} className={style.icon} />}
         <Message content={title} className={style.title} />
         <Icon
@@ -67,21 +42,6 @@ const CollapsibleItem = ({
           })}
         />
       </Button>
-      {isMinimized && (
-        <Dropdown.Attached
-          className={style.flyOutList}
-          onItemsClick={onDropdownItemsClick}
-          attachedRef={ref}
-          position="right"
-          hover
-          portalled
-        >
-          <Dropdown.HeaderItem title={title.defaultMessage} />
-          {subItems.map(item => (
-            <Dropdown.Item key={item.path} title={item.title} path={item.path} icon={item.icon} />
-          ))}
-        </Dropdown.Attached>
-      )}
       <SideNavigationList depth={depth + 1} className={style.subItemList} isExpanded={isExpanded}>
         {children}
       </SideNavigationList>
@@ -91,20 +51,16 @@ const CollapsibleItem = ({
 
 CollapsibleItem.propTypes = {
   children: PropTypes.node,
-  currentPathName: PropTypes.string.isRequired,
   depth: PropTypes.number.isRequired,
   icon: PropTypes.icon,
   isExpanded: PropTypes.bool.isRequired,
-  isMinimized: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
-  onDropdownItemsClick: PropTypes.func,
   title: PropTypes.message.isRequired,
 }
 
 CollapsibleItem.defaultProps = {
   children: undefined,
   icon: undefined,
-  onDropdownItemsClick: () => null,
 }
 
 export default CollapsibleItem

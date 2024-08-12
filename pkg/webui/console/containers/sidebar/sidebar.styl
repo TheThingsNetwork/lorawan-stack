@@ -54,7 +54,17 @@
     cursor: pointer
 
   &-minimized
-    +media-query-min($bp.lg-xl)
-      width: 4.5rem
-      min-width: initial
-      max-width: initial
+    transition: left .4s cubic-bezier(.22, .005, .295, 1)
+    position: absolute
+    top: 3.8rem
+    left: -90vw
+    bottom: 0
+    width: 90vw
+    min-width: 18rem
+    height: calc(100vh - 3.8rem)
+    z-index: $zi.mobile-menu
+
+  &-open&.sidebar-minimized
+    transition: left .6s cubic-bezier(.165, .84, .44, 1)
+    left: 0
+    box-shadow: 0 0 13rem 2rem rgba(0,0,0,.4)

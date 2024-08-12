@@ -19,7 +19,6 @@ import classnames from 'classnames'
 import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
 import Icon, { IconHome, IconApplication, IconGateway } from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -62,47 +61,14 @@ const Switcher = ({ isMinimized }) => {
       <NavLink to="/" className={getOverviewNavLinkClass} ref={overviewRef}>
         <Icon icon={IconHome} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.home} />
-        {isMinimized && (
-          <Dropdown.Attached
-            attachedRef={overviewRef}
-            className={style.flyOutList}
-            position="right"
-            hover
-            portalled
-          >
-            <Dropdown.HeaderItem title={sharedMessages.home} />
-          </Dropdown.Attached>
-        )}
       </NavLink>
       <NavLink to={`/applications${appParam}`} className={getNavLinkClass} ref={applicationsRef}>
         <Icon icon={IconApplication} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.applications} />
-        {isMinimized && (
-          <Dropdown.Attached
-            attachedRef={applicationsRef}
-            className={style.flyOutList}
-            position="right"
-            hover
-            portalled
-          >
-            <Dropdown.HeaderItem title={sharedMessages.applications} />
-          </Dropdown.Attached>
-        )}
       </NavLink>
       <NavLink to={`/gateways${gtwParam}`} className={getNavLinkClass} ref={gatewaysRef}>
         <Icon icon={IconGateway} className={style.icon} />
         <Message className={style.caption} content={sharedMessages.gateways} />
-        {isMinimized && (
-          <Dropdown.Attached
-            attachedRef={gatewaysRef}
-            className={style.flyOutList}
-            position="right"
-            hover
-            portalled
-          >
-            <Dropdown.HeaderItem title={sharedMessages.gateways} />
-          </Dropdown.Attached>
-        )}
       </NavLink>
     </div>
   )

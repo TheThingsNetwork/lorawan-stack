@@ -16,11 +16,7 @@ import React, { useContext } from 'react'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
 
-import {
-  IconLayoutSidebarLeftCollapse,
-  IconLayoutSidebarLeftExpand,
-  IconX,
-} from '@ttn-lw/components/icon'
+import { IconLayoutSidebarLeftCollapse, IconX } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import SidebarContext from '@console/containers/sidebar/context'
@@ -30,27 +26,23 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './side-header.styl'
 
 const SideHeader = ({ Logo }) => {
-  const { onMinimizeToggle, isMinimized, onDrawerCloseClick } = useContext(SidebarContext)
+  const { onMinimizeToggle, isMinimized, closeDrawer } = useContext(SidebarContext)
 
   return (
-    <div
-      className={classnames(style.headerContainer, {
-        [style.isMinimized]: isMinimized,
-      })}
-    >
+    <div className={classnames(style.headerContainer)}>
       <Link to="/">
-        <Logo className={classnames(style.logo, { [style.minimizedLogo]: isMinimized })} />
+        <Logo className={classnames(style.logo)} />
       </Link>
       <Button
         className={classnames(style.minimizeButton, 'md-lg:d-none')}
-        icon={isMinimized ? IconLayoutSidebarLeftExpand : IconLayoutSidebarLeftCollapse}
-        onClick={onMinimizeToggle}
+        icon={isMinimized ? IconX : IconLayoutSidebarLeftCollapse}
+        onClick={isMinimized ? closeDrawer : onMinimizeToggle}
         naked
       />
       <Button
         className={classnames(style.minimizeButton, 'd-none', 'md-lg:d-flex')}
         icon={IconX}
-        onClick={onDrawerCloseClick}
+        onClick={closeDrawer}
         naked
       />
     </div>

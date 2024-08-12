@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 
 import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
@@ -50,12 +50,9 @@ import getCookie from '@console/lib/table-utils'
 import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
 
-import SidebarContext from '../context'
-
 import TopEntitiesSection from './top-entities-section'
 
 const GeneralSideNavigation = () => {
-  const { isMinimized } = useContext(SidebarContext)
   const topEntities = useSelector(selectTopEntitiesAll)
   const isUserAdmin = useSelector(selectUserIsAdmin)
   const user = useSelector(selectUser)
@@ -165,7 +162,7 @@ const GeneralSideNavigation = () => {
           )}
         </SideNavigation.Item>
       </SideNavigation>
-      {!isMinimized && <TopEntitiesSection topEntities={topEntities} />}
+      <TopEntitiesSection topEntities={topEntities} />
     </>
   )
 }

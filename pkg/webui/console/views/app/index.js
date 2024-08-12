@@ -43,6 +43,7 @@ import LogBackInModal from '@console/containers/log-back-in-modal'
 import Sidebar from '@console/containers/sidebar'
 import EventSplitFrameContext from '@console/containers/event-split-frame/context'
 import Logo from '@console/containers/logo'
+import SidebarContext from '@console/containers/sidebar/context'
 
 import OverviewRoutes from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -106,6 +107,7 @@ const Layout = () => {
 
   // For the mobile side menu drawer functionality.
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
   const node = useRef()
 
   const openDrawer = useCallback(() => {
@@ -118,6 +120,16 @@ const Layout = () => {
     document.body.classList.remove(style.scrollLock)
   }, [])
 
+  const handleMouseMove = useCallback(
+    e => {
+      if (e.clientX <= 20 && isMinimized) {
+        // If the mouse is within 20px of the left edge
+        setIsDrawerOpen(true)
+      }
+    },
+    [isMinimized],
+  )
+
   useEffect(() => {
     const onClickOutside = e => {
       if (isDrawerOpen && node.current && !node.current.contains(e.target)) {
@@ -125,11 +137,16 @@ const Layout = () => {
       }
     }
 
+    if (isMinimized) {
+      document.addEventListener('mousemove', handleMouseMove)
+      return () => document.removeEventListener('mousemove', handleMouseMove)
+    }
+
     if (isDrawerOpen) {
       document.addEventListener('mousedown', onClickOutside)
       return () => document.removeEventListener('mousedown', onClickOutside)
     }
-  }, [isDrawerOpen, closeDrawer])
+  }, [isDrawerOpen, closeDrawer, isMinimized, handleMouseMove])
 
   // Pass this function to the header prop `onMenuClick`.
   const onDrawerExpandClick = useCallback(() => {
@@ -140,6 +157,11 @@ const Layout = () => {
     }
   }, [isDrawerOpen, openDrawer, closeDrawer])
   // End of mobile side menu drawer functionality
+
+  const onMinimizeToggle = useCallback(async () => {
+    setIsMinimized(prev => !prev)
+    setIsDrawerOpen(false)
+  }, [setIsMinimized])
 
   useEffect(() => {
     if (main.current) {
@@ -159,49 +181,49 @@ const Layout = () => {
           <div id="modal-container" />
           <div id="dropdown-container" className="pos-absolute-container" />
           <div className="d-flex">
-            <Sidebar
-              isDrawerOpen={isDrawerOpen}
-              onDrawerCloseClick={closeDrawer}
-              paddingBottom={splitFrameHeight}
-            />
-            <div className="w-full h-vh d-flex direction-column">
-              <Header onMenuClick={onDrawerExpandClick} />
-              <main
-                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
-                ref={main}
-              >
-                <WithAuth
-                  user={user}
-                  fetching={fetching}
-                  error={error}
-                  errorComponent={FullViewErrorInner}
-                  rights={rights}
-                  isAdmin={isAdmin}
+            <SidebarContext.Provider
+              value={{ onMinimizeToggle, isMinimized, setIsMinimized, closeDrawer }}
+            >
+              <Sidebar isDrawerOpen={isDrawerOpen} paddingBottom={splitFrameHeight} />
+              <div className="w-full h-vh d-flex direction-column">
+                <Header onMenuClick={onDrawerExpandClick} />
+                <main
+                  className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+                  ref={main}
                 >
-                  <div className={style.content}>
-                    <div
-                      className={style.stage}
-                      id="stage"
-                      style={{ paddingBottom: splitFrameHeight }}
-                    >
-                      <Outlet />
-                    </div>
-                    {isMounted && isActive && !isOpen && (
-                      <div className={style.openButton}>
-                        <Button
-                          icon={IconLayoutBottombarExpand}
-                          tooltip={m.expandEventPanel}
-                          tooltipPlacement="left"
-                          onClick={() => setIsOpen(true)}
-                          secondary
-                          small
-                        />
+                  <WithAuth
+                    user={user}
+                    fetching={fetching}
+                    error={error}
+                    errorComponent={FullViewErrorInner}
+                    rights={rights}
+                    isAdmin={isAdmin}
+                  >
+                    <div className={style.content}>
+                      <div
+                        className={style.stage}
+                        id="stage"
+                        style={{ paddingBottom: splitFrameHeight }}
+                      >
+                        <Outlet />
                       </div>
-                    )}
-                  </div>
-                </WithAuth>
-              </main>
-            </div>
+                      {isMounted && isActive && !isOpen && (
+                        <div className={style.openButton}>
+                          <Button
+                            icon={IconLayoutBottombarExpand}
+                            tooltip={m.expandEventPanel}
+                            tooltipPlacement="left"
+                            onClick={() => setIsOpen(true)}
+                            secondary
+                            small
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </WithAuth>
+                </main>
+              </div>
+            </SidebarContext.Provider>
           </div>
 
           <div id="split-frame" className={style.splitFrame} />

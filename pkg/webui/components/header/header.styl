@@ -24,6 +24,9 @@
   +media-query($bp.xs)
     padding: 0 $cs.xs
 
+  &-minimized
+    z-index: $zi.mobile-menu + 1
+
   .notifications-dropdown
     max-width: 31rem
     width: 31rem // Avoids flash of small container when dropdown is opened
@@ -38,3 +41,8 @@
   height: $cs.l
   +media-query($bp.xs)
     width: 3rem
+
+.divider
+  height: 2.5rem
+  width: 1px
+  background: var(--c-border-neutral-light)

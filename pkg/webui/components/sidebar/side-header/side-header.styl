@@ -18,19 +18,6 @@
   align-items: center
   gap: $cs.m
 
-  &.is-minimized
-    flex-direction: column
-    gap: $cs.xs
-
-    .minimized-logo
-      img:first-child
-        display: none
-      img:last-child
-        display: block
-
-    button.minimize-button
-      width: 100%
-
   button.minimize-button
     transition: none
 
@@ -40,10 +27,5 @@
       margin-right: - $cs.s
 
   .logo
-    &:not(.is-minimized)
-      width: auto
-      height: 1.8rem
-    &.is-minimized
-      display: none
-      height: 1.58rem
-      padding: $cs.s 0
+    width: auto
+    height: 1.8rem

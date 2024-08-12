@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { APPLICATION } from '@console/constants/entities'
@@ -49,12 +49,14 @@ import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import Logo from '../logo'
+import SidebarContext from '../sidebar/context'
 
 import NotificationsDropdown from './notifications-dropdown'
 import BookmarksDropdown from './bookmarks-dropdown'
 
 const Header = ({ onMenuClick, alwaysShowLogo }) => {
   const dispatch = useDispatch()
+  const { isMinimized, onMinimizeToggle } = useContext(SidebarContext)
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
   const user = useSelector(selectUser)
@@ -143,6 +145,8 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
 
   return (
     <HeaderComponent
+      isSidebarMinimized={isMinimized}
+      toggleSidebarMinimized={onMinimizeToggle}
       user={user}
       profileDropdownItems={dropdownItems}
       addDropdownItems={plusDropdownItems}

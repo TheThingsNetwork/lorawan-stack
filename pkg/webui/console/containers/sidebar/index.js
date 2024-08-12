@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import classnames from 'classnames'
 import { useDispatch } from 'react-redux'
@@ -35,9 +35,9 @@ import SwitcherContainer from './switcher'
 
 import style from './sidebar.styl'
 
-const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
+const Sidebar = ({ isDrawerOpen }) => {
   const { pathname } = useLocation()
-  const [isMinimized, setIsMinimized] = useState(false)
+  const { setIsMinimized, isMinimized, closeDrawer } = useContext(SidebarContext)
   const dispatch = useDispatch()
 
   // Reset minimized state when screen size changes to mobile.
@@ -55,12 +55,8 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
 
   // Close the drawer on navigation changes.
   useEffect(() => {
-    onDrawerCloseClick()
-  }, [pathname, onDrawerCloseClick])
-
-  const onMinimizeToggle = useCallback(async () => {
-    setIsMinimized(prev => !prev)
-  }, [setIsMinimized])
+    closeDrawer()
+  }, [pathname, closeDrawer])
 
   const handleSearchClick = useCallback(() => {
     dispatch(setSearchOpen(true))
@@ -68,29 +64,25 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
 
   const sidebarClassnames = classnames(
     style.sidebar,
-    'd-flex direction-column j-between c-bg-brand-extralight gap-cs-l',
+    'd-flex direction-column j-between c-bg-brand-extralight gap-cs-l p-cs-m',
     {
       [style.sidebarMinimized]: isMinimized,
       [style.sidebarOpen]: isDrawerOpen,
-      'p-cs-m': !isMinimized,
-      'pt-cs-m pb-cs-xs p-sides-cs-xs': isMinimized,
     },
   )
 
   return (
     <>
-      <SidebarContext.Provider value={{ onMinimizeToggle, isMinimized, onDrawerCloseClick }}>
-        <div className={sidebarClassnames} id="sidebar">
-          <SideHeader />
-          <div className="d-flex direction-column gap-cs-m">
-            <SwitcherContainer />
-            <SearchButton onClick={handleSearchClick} />
-          </div>
-          <SidebarNavigation />
-          <SideFooter />
+      <div className={sidebarClassnames} id="sidebar">
+        <SideHeader />
+        <div className="d-flex direction-column gap-cs-m">
+          <SwitcherContainer />
+          <SearchButton onClick={handleSearchClick} />
         </div>
-      </SidebarContext.Provider>
-      <div className={style.sidebarBackdrop} onClick={onDrawerCloseClick} />
+        <SidebarNavigation />
+        <SideFooter />
+      </div>
+      <div className={style.sidebarBackdrop} onClick={closeDrawer} />
       <SearchPanelManager />
     </>
   )
@@ -98,7 +90,6 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
 
 Sidebar.propTypes = {
   isDrawerOpen: PropTypes.bool.isRequired,
-  onDrawerCloseClick: PropTypes.func.isRequired,
 }
 
 export default Sidebar

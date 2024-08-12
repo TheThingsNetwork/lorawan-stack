@@ -15,22 +15,6 @@
 .container
   position: relative
 
-  &.is-minimized, &.is-minimized .link
-    justify-content: center
-
-    .title
-      display: none
-
-    .expand-icon
-      display: none
-
-    .icon
-      transition: color 50ms linear
-      color: var(--c-icon-neutral-normal)
-
-    .sub-item-list
-      display: none
-
 .message
   vertical-align: middle
 
@@ -81,8 +65,3 @@
 
     .icon
       color: inherit
-
-.fly-out-list
-  --dropdown-offset: calc(.75rem - 2px)
-  top: - $cs.xs
-  z-index: $zi.dropdown
