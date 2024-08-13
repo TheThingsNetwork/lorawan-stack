@@ -21,11 +21,15 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
+import Require from '@console/lib/components/require'
+
 import AuthorizationOverview from '@console/views/user-settings-oauth-auths'
 import AuthorizationsList from '@console/views/user-settings-oauth-auth-list'
 
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewOrEditClientAuthorizations } from '@console/lib/feature-checks'
 
 const OAuthClientAuthorizations = () => {
   useBreadcrumbs(
@@ -37,19 +41,24 @@ const OAuthClientAuthorizations = () => {
   )
 
   return (
-    <Routes>
-      <Route index Component={AuthorizationsList} />
-      <Route
-        path=":clientId/*"
-        element={
-          <ValidateRouteParam
-            check={{ clientId: pathIdRegexp }}
-            Component={AuthorizationOverview}
-          />
-        }
-      />
-      <Route path="*" element={<GenericNotFound />} />
-    </Routes>
+    <Require
+      featureCheck={mayViewOrEditClientAuthorizations}
+      otherwise={{ redirect: '/user-settings' }}
+    >
+      <Routes>
+        <Route index Component={AuthorizationsList} />
+        <Route
+          path=":clientId/*"
+          element={
+            <ValidateRouteParam
+              check={{ clientId: pathIdRegexp }}
+              Component={AuthorizationOverview}
+            />
+          }
+        />
+        <Route path="*" element={<GenericNotFound />} />
+      </Routes>
+    </Require>
   )
 }
 

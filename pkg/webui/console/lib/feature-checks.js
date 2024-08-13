@@ -14,6 +14,7 @@
 
 import { createSelector } from 'reselect'
 
+import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
 
 import { selectApplicationRights } from '@console/store/selectors/applications'
 import { selectGatewayRights } from '@console/store/selectors/gateways'
@@ -71,6 +72,21 @@ export const mayCreateClients = {
 export const mayViewClientsOfUser = {
   rightsSelector: selectUserRights,
   check: rights => rights.includes('RIGHT_USER_CLIENTS_LIST'),
+}
+
+export const mayViewOrEditClientAuthorizations = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_AUTHORIZED_CLIENTS'),
+}
+
+export const mayViewOrEditUserSettings = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_SETTINGS_BASIC'),
+}
+
+export const mayViewOrEditUserApiKeys = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_SETTINGS_API_KEYS'),
 }
 
 // Application related feature checks.

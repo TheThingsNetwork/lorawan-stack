@@ -28,6 +28,8 @@ import {
   IconPassword,
   IconUserCog,
   IconApiKeys,
+  IconShieldLock,
+  IconLockOpen,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
@@ -37,6 +39,10 @@ import {
   checkFromState,
   mayConfigurePacketBroker,
   mayManageUsers,
+  mayViewClientsOfUser,
+  mayViewOrEditClientAuthorizations,
+  mayViewOrEditUserApiKeys,
+  mayViewOrEditUserSettings,
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
 import getCookie from '@console/lib/table-utils'
@@ -58,6 +64,12 @@ const GeneralSideNavigation = () => {
   )
   const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))
   const showPacketBroker = useSelector(state => checkFromState(mayConfigurePacketBroker, state))
+  const showProfileSettings = useSelector(state => checkFromState(mayViewOrEditUserSettings, state))
+  const showUserApiKeys = useSelector(state => checkFromState(mayViewOrEditUserApiKeys, state))
+  const showAuthorizationManagement = useSelector(state =>
+    checkFromState(mayViewOrEditClientAuthorizations, state),
+  )
+  const showClientManagement = useSelector(state => checkFromState(mayViewClientsOfUser, state))
 
   const orgPageSize = getCookie('organizations-list-page-size')
   const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
@@ -111,31 +123,39 @@ const GeneralSideNavigation = () => {
           </SideNavigation.Item>
         )}
         <SideNavigation.Item title={sharedMessages.userSettings} icon={IconUserCog}>
-          <SideNavigation.Item
-            title={sharedMessages.profile}
-            path="/user-settings/profile"
-            icon={IconUserCircle}
-          />
-          <SideNavigation.Item
-            title={sharedMessages.password}
-            path="/user-settings/password"
-            icon={IconPassword}
-          />
-          <SideNavigation.Item
-            title={sharedMessages.personalApiKeys}
-            path="/user-settings/api-keys"
-            icon={IconApiKeys}
-          />
+          {showProfileSettings && (
+            <SideNavigation.Item
+              title={sharedMessages.profile}
+              path="/user-settings/profile"
+              icon={IconUserCircle}
+            />
+          )}
+          {showProfileSettings && (
+            <SideNavigation.Item
+              title={sharedMessages.password}
+              path="/user-settings/password"
+              icon={IconPassword}
+            />
+          )}
+          {showUserApiKeys && (
+            <SideNavigation.Item
+              title={sharedMessages.apiKeys}
+              path="/user-settings/api-keys"
+              icon={IconApiKeys}
+            />
+          )}
           <SideNavigation.Item
             title={sharedMessages.sessionManagement}
             path="/user-settings/sessions"
             icon={IconShieldLock}
           />
-          <SideNavigation.Item
-            title={sharedMessages.authorizations}
-            path="/user-settings/authorizations"
-            icon={IconLockOpen}
-          />
+          {showAuthorizationManagement && (
+            <SideNavigation.Item
+              title={sharedMessages.authorizations}
+              path="/user-settings/authorizations"
+              icon={IconLockOpen}
+            />
+          )}
           {showClientManagement && (
             <SideNavigation.Item
               title={sharedMessages.oauthClients}
