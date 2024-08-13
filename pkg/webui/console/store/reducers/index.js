@@ -70,6 +70,8 @@ import recencyFrequencyItems from './recency-frequency-items'
 import topEntities from './top-entities'
 import search from './search'
 import sessions from './sessions'
+import authorizations from './authorizations'
+import clients from './clients'
 
 export default combineReducers({
   user,
@@ -135,4 +137,6 @@ export default combineReducers({
   recencyFrequencyItems,
   topEntities,
   sessions,
+  authorizations,
+  clients,
 })

@@ -42,6 +42,8 @@ import userPreferences from './user-preferences'
 import search from './search'
 import topEntities from './top-entities'
 import sessions from './sessions'
+import authorizations from './authorizations'
+import clients from './clients'
 
 export default [
   ...status,
@@ -73,4 +75,6 @@ export default [
   ...search,
   ...topEntities,
   ...sessions,
+  ...authorizations,
+  ...clients,
 ]
