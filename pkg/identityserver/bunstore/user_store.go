@@ -66,6 +66,7 @@ type User struct {
 	ProfilePicture   *Picture `bun:"rel:belongs-to,join:profile_picture_id=id"`
 
 	ConsolePreferences json.RawMessage `bun:"console_preferences"`
+	UniversalRights    []int           `bun:"universal_rights,array,nullzero"`
 }
 
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
@@ -596,6 +597,8 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 		case "console_preferences.sort_by":
 			updateConsolePreferences = true
 			consolePreferences.SortBy = pb.ConsolePreferences.GetSortBy()
+		case "universal_rights":
+			columns = append(columns, "universal_rights")
 		}
 	}
 
