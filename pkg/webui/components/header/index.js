@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import {
   IconStar,
@@ -31,6 +32,10 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './header.styl'
 
+const m = defineMessages({
+  tooltipMinimize: 'Keep sidebar open',
+})
+
 const Header = ({
   brandLogo,
   Logo,
@@ -46,7 +51,8 @@ const Header = ({
   alwaysShowLogo,
   isSidebarMinimized,
   toggleSidebarMinimized,
-  tooltipMessage,
+  expandSidebar,
+  handleHideSidebar,
   ...rest
 }) => (
   <header
@@ -66,7 +72,7 @@ const Header = ({
                 icon={IconLayoutSidebarLeftExpand}
                 onClick={toggleSidebarMinimized}
                 naked
-                tooltip={tooltipMessage}
+                tooltip={m.tooltipMinimize}
                 tooltipPlacement="right"
               />
               <div className={style.divider} />
@@ -86,7 +92,7 @@ const Header = ({
                 icon={IconLayoutSidebarLeftExpand}
                 onClick={toggleSidebarMinimized}
                 naked
-                tooltip={tooltipMessage}
+                tooltip={m.tooltipMinimize}
                 tooltipPlacement="right"
               />
               <div className={style.divider} />
@@ -157,6 +163,10 @@ Header.propTypes = {
   brandLogo: imgPropType,
   /** The classname applied to the component. */
   className: PropTypes.string,
+  /** A handler for when the sidebar is expanded. */
+  expandSidebar: PropTypes.func.isRequired,
+  /** A handler for when the sidebar is hidden. */
+  handleHideSidebar: PropTypes.func,
   /** Whether the sidebar is minimized. */
   isSidebarMinimized: PropTypes.bool.isRequired,
   /** The dropdown items when the notifications button is clicked. */
@@ -191,6 +201,7 @@ Header.defaultProps = {
   notificationsDropdownItems: undefined,
   profileDropdownItems: undefined,
   onMenuClick: () => null,
+  handleHideSidebar: () => null,
 }
 
 export default Header

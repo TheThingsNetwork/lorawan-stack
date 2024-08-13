@@ -108,6 +108,7 @@ const Layout = () => {
   // For the mobile side menu drawer functionality.
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
+  const [isSideBarHovered, setIsSideBarHovered] = useState(false)
   const node = useRef()
 
   const openDrawer = useCallback(() => {
@@ -122,10 +123,16 @@ const Layout = () => {
 
   const handleMouseMove = useCallback(
     e => {
-      if (e.clientX <= 20 && isMinimized) {
-        // If the mouse is within 20px of the left edge
-        setIsDrawerOpen(true)
-      }
+      const timer = setTimeout(() => {
+        if (e.clientX <= 20 && isMinimized) {
+          // If the mouse is within 20px of the left edge
+          setIsDrawerOpen(true)
+        } else if (e.clientX >= 650 && isMinimized) {
+          // If the mouse is within 300px of the sidebar
+          setIsDrawerOpen(false)
+        }
+      }, 150)
+      return () => clearTimeout(timer)
     },
     [isMinimized],
   )
@@ -182,11 +189,25 @@ const Layout = () => {
           <div id="dropdown-container" className="pos-absolute-container" />
           <div className="d-flex">
             <SidebarContext.Provider
-              value={{ onMinimizeToggle, isMinimized, setIsMinimized, closeDrawer }}
+              value={{
+                onMinimizeToggle,
+                isMinimized,
+                setIsMinimized,
+                closeDrawer,
+                onDrawerExpandClick,
+              }}
             >
-              <Sidebar isDrawerOpen={isDrawerOpen} paddingBottom={splitFrameHeight} />
+              <Sidebar
+                isDrawerOpen={isDrawerOpen}
+                paddingBottom={splitFrameHeight}
+                isSideBarHovered={isSideBarHovered}
+                setIsHovered={setIsSideBarHovered}
+              />
               <div className="w-full h-vh d-flex direction-column">
-                <Header onMenuClick={onDrawerExpandClick} />
+                <Header
+                  onMenuClick={onDrawerExpandClick}
+                  setIsSideBarHovered={setIsSideBarHovered}
+                />
                 <main
                   className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
                   ref={main}

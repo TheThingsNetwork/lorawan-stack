@@ -54,9 +54,9 @@ import SidebarContext from '../sidebar/context'
 import NotificationsDropdown from './notifications-dropdown'
 import BookmarksDropdown from './bookmarks-dropdown'
 
-const Header = ({ onMenuClick, alwaysShowLogo }) => {
+const Header = ({ onMenuClick, alwaysShowLogo, setIsSideBarHovered }) => {
   const dispatch = useDispatch()
-  const { isMinimized, onMinimizeToggle } = useContext(SidebarContext)
+  const { isMinimized, onMinimizeToggle, onDrawerExpandClick } = useContext(SidebarContext)
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
   const user = useSelector(selectUser)
@@ -143,6 +143,15 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
       }
     : undefined
 
+  const handleExpandSidebar = useCallback(() => {
+    onDrawerExpandClick()
+    setIsSideBarHovered(true)
+  }, [onDrawerExpandClick, setIsSideBarHovered])
+
+  const handleHideSidebar = useCallback(() => {
+    setIsSideBarHovered(false)
+  }, [setIsSideBarHovered])
+
   return (
     <HeaderComponent
       isSidebarMinimized={isMinimized}
@@ -157,6 +166,8 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
       onMenuClick={onMenuClick}
       showNotificationDot={hasUnseenNotifications}
       alwaysShowLogo={alwaysShowLogo}
+      expandSidebar={handleExpandSidebar}
+      handleHideSidebar={handleHideSidebar}
     />
   )
 }
@@ -164,6 +175,7 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
 Header.propTypes = {
   alwaysShowLogo: PropTypes.bool,
   onMenuClick: PropTypes.func.isRequired,
+  setIsSideBarHovered: PropTypes.func.isRequired,
 }
 
 Header.defaultProps = {

@@ -35,7 +35,7 @@ import SwitcherContainer from './switcher'
 
 import style from './sidebar.styl'
 
-const Sidebar = ({ isDrawerOpen }) => {
+const Sidebar = ({ isDrawerOpen, isSideBarHovered, setIsHovered }) => {
   const { pathname } = useLocation()
   const { setIsMinimized, isMinimized, closeDrawer } = useContext(SidebarContext)
   const dispatch = useDispatch()
@@ -53,6 +53,16 @@ const Sidebar = ({ isDrawerOpen }) => {
     return () => window.removeEventListener('resize', handleResize)
   }, [setIsMinimized])
 
+  useEffect(() => {
+    let timer
+    if (!isSideBarHovered && isMinimized && isDrawerOpen) {
+      timer = setTimeout(() => {
+        closeDrawer()
+      }, 800)
+    }
+    return () => clearTimeout(timer)
+  }, [isSideBarHovered, closeDrawer, isDrawerOpen, isMinimized])
+
   // Close the drawer on navigation changes.
   useEffect(() => {
     closeDrawer()
@@ -61,6 +71,14 @@ const Sidebar = ({ isDrawerOpen }) => {
   const handleSearchClick = useCallback(() => {
     dispatch(setSearchOpen(true))
   }, [dispatch])
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true)
+  }, [setIsHovered])
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false)
+  }, [setIsHovered])
 
   const sidebarClassnames = classnames(
     style.sidebar,
@@ -73,7 +91,12 @@ const Sidebar = ({ isDrawerOpen }) => {
 
   return (
     <>
-      <div className={sidebarClassnames} id="sidebar">
+      <div
+        className={sidebarClassnames}
+        id="sidebar"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <SideHeader />
         <div className="d-flex direction-column gap-cs-m">
           <SwitcherContainer />
@@ -90,6 +113,8 @@ const Sidebar = ({ isDrawerOpen }) => {
 
 Sidebar.propTypes = {
   isDrawerOpen: PropTypes.bool.isRequired,
+  isSideBarHovered: PropTypes.bool.isRequired,
+  setIsHovered: PropTypes.func.isRequired,
 }
 
 export default Sidebar
