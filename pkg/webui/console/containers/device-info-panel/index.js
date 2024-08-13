@@ -107,6 +107,7 @@ const DeviceInfoPanel = ({ events }) => {
       shortCutLinkPath={shortCutLinkPath}
       shortCutLinkTarget="_blank"
       divider
+      className="h-full"
     >
       {Object.keys(version_ids).length > 0 ? (
         <RequireRequest
