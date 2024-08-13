@@ -16,8 +16,8 @@ import React from 'react'
 import classnames from 'classnames'
 
 import { IconStar, IconPlus, IconInbox, IconMenu2 } from '@ttn-lw/components/icon'
-import Button from '@ttn-lw/components/button'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
+import Button from '@ttn-lw/components/button'
 
 import AppStatusBadge from '@console/containers/app-status-badge'
 
@@ -36,14 +36,23 @@ const Header = ({
   user,
   onMenuClick,
   showNotificationDot,
+  alwaysShowLogo,
   ...rest
 }) => (
   <header {...rest} className={classnames(className, style.container)} id="header">
-    <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
-    <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
-      <Button secondary icon={IconMenu2} onClick={onMenuClick} />
-      <Logo className={style.logo} />
-    </div>
+    {alwaysShowLogo ? (
+      <div className="d-flex al-center gap-cs-xs">
+        <Logo className={style.logo} />
+      </div>
+    ) : (
+      <>
+        <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
+        <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
+          <Button secondary icon={IconMenu2} onClick={onMenuClick} />
+          <Logo className={style.logo} />
+        </div>
+      </>
+    )}
 
     <div className="d-flex al-center gap-cs-xs">
       <AppStatusBadge />
@@ -88,9 +97,12 @@ const imgPropType = PropTypes.shape({
 })
 
 Header.propTypes = {
+  /** The logo component. */
   Logo: PropTypes.elementType.isRequired,
   /** The dropdown items when the add button is clicked. */
   addDropdownItems: PropTypes.node.isRequired,
+  /** Whether to always show the logo, which is required in error views, where there is no sidebar. */
+  alwaysShowLogo: PropTypes.bool,
   /** The dropdown items when the bookmark button is clicked. */
   bookmarkDropdownItems: PropTypes.node.isRequired,
   brandLogo: imgPropType,
@@ -112,6 +124,7 @@ Header.propTypes = {
 }
 
 Header.defaultProps = {
+  alwaysShowLogo: false,
   className: undefined,
   user: undefined,
   brandLogo: undefined,

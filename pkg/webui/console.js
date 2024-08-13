@@ -21,7 +21,6 @@ import * as Sentry from '@sentry/react'
 import sentryConfig from '@ttn-lw/constants/sentry'
 
 import { BreadcrumbsProvider } from '@ttn-lw/components/breadcrumbs/context'
-import Header from '@ttn-lw/components/header'
 
 import { ErrorView } from '@ttn-lw/lib/components/error-view'
 import { FullViewError } from '@ttn-lw/lib/components/full-view-error'
@@ -29,13 +28,13 @@ import Init from '@ttn-lw/lib/components/init'
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 
 import { EventSplitFrameContextProvider } from '@console/containers/event-split-frame/context'
-import Logo from '@console/containers/logo'
 
 import App from '@console/views/app'
 
 import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
 
 import store from './console/store'
+import { AlertBannerProvider } from './components/alert-banner/context'
 
 const appRoot = selectApplicationRootPath()
 
@@ -50,9 +49,7 @@ const rootElement = document.getElementById('app')
 // Error renderer for the outermost error boundary.
 // Do not use any components that depend on context
 // e.g. Intl, Router, Redux store.
-const errorRender = error => (
-  <FullViewError error={error} header={<Header logo={<Logo safe />} />} safe />
-)
+const errorRender = error => <FullViewError error={error} safe />
 
 DOM.render(
   <ErrorView errorRender={errorRender}>
@@ -61,7 +58,9 @@ DOM.render(
         <Init>
           <BreadcrumbsProvider>
             <EventSplitFrameContextProvider>
-              <App history={history} />
+              <AlertBannerProvider>
+                <App history={history} />
+              </AlertBannerProvider>
             </EventSplitFrameContextProvider>
           </BreadcrumbsProvider>
         </Init>
