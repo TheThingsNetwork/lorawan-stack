@@ -23,6 +23,8 @@ import {
   IconUserShield,
   IconKey,
   IconInbox,
+  IconAperture,
+  IconTextCaption,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
@@ -30,6 +32,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   checkFromState,
+  mayConfigurePacketBroker,
+  mayManageUsers,
   mayViewOrEditApiKeys,
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
@@ -53,6 +57,8 @@ const GeneralSideNavigation = () => {
   const mayHandleApiKeys = useSelector(state =>
     user ? checkFromState(mayViewOrEditApiKeys, state) : false,
   )
+  const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))
+  const showPacketBroker = useSelector(state => checkFromState(mayConfigurePacketBroker, state))
 
   const orgPageSize = getCookie('organizations-list-page-size')
   const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
@@ -92,7 +98,27 @@ const GeneralSideNavigation = () => {
             title={sharedMessages.adminPanel}
             path="/admin-panel"
             icon={IconUserShield}
-          />
+          >
+            <SideNavigation.Item
+              title={sharedMessages.networkInformation}
+              path="/admin-panel/network-information"
+              icon={IconTextCaption}
+            />
+            {showUserManagement && (
+              <SideNavigation.Item
+                title={sharedMessages.userManagement}
+                path="/admin-panel/user-management"
+                icon={IconUsersGroup}
+              />
+            )}
+            {showPacketBroker && (
+              <SideNavigation.Item
+                title={sharedMessages.packetBroker}
+                path="/admin-panel/packet-broker"
+                icon={IconAperture}
+              />
+            )}
+          </SideNavigation.Item>
         )}
       </SideNavigation>
       {!isMinimized && <TopEntitiesSection topEntities={topEntities} />}

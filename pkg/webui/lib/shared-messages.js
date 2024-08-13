@@ -452,6 +452,7 @@ export default defineMessages({
   payloadFormattersUpdateFailure: 'There was an error updating the payload formatter',
   payloadFormattersUpdateSuccess: 'Payload formatter updated',
   payloadFormattersUplink: 'Uplink payload formatters',
+  peeringSettings: 'Peering settings',
   personalApiKeys: 'Personal API keys',
   phyVersion: 'Regional Parameters version',
   phyVersionDescription:

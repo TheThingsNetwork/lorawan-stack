@@ -47,13 +47,13 @@ const NetworkInformation = () => {
   ]
 
   return (
-    <>
-      <RequireRequest requestAction={requestActions}>
+    <RequireRequest requestAction={requestActions}>
+      <div className="container container--xxl p-vert-cs-s">
         <PageTitle title={sharedMessages.networkInformation} className="panel-title mb-0" />
         <NetworkInformationContainer />
         <DeploymentComponentStatus />
-      </RequireRequest>
-    </>
+      </div>
+    </RequireRequest>
   )
 }
 
