@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ describe('OAuth Client general settings', () => {
   })
 
   it('succeeds editing client', () => {
-    cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients/${clientId}/general-settings`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/oauth-clients/${clientId}`)
 
     cy.findByLabelText('Name').type('test-name')
     cy.findByLabelText('Description').type('test-description')
@@ -69,7 +69,7 @@ describe('OAuth Client general settings', () => {
   })
 
   it('succeeds deleting client', () => {
-    cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients/${clientId}/general-settings`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/oauth-clients/${clientId}`)
     cy.findByRole('button', { name: /Delete OAuth client/ }).click()
 
     cy.findByTestId('modal-window')
@@ -81,7 +81,10 @@ describe('OAuth Client general settings', () => {
 
     cy.findByTestId('error-notification').should('not.exist')
 
-    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/oauth-clients`)
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/user-settings/oauth-clients`,
+    )
 
     cy.findByRole('cell', { name: clientId }).should('not.exist')
   })

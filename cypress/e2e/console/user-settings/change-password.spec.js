@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const updatePasswordLinkRegExp = `https?:\\/\\/[a-zA-Z0-9-_.:]+/[a-zA-Z0-9-_]+\\/update-password\\?.+&current=[A-Z0-9]+`
 const user = {
   ids: { user_id: 'test-user-id1' },
   primary_email_address: 'test-user1@example.com',
@@ -20,33 +19,25 @@ const user = {
   password_confirm: 'ABCDefg123!',
 }
 
-describe('Account App change password (via forgot password)', () => {
-  let temporaryPasswordLink
-  before(() => {
+const newPassword = 'ABCDefg321!'
+
+describe('User settings / change password', () => {
+  beforeEach(() => {
     cy.dropAndSeedDatabase()
-
     cy.createUser(user)
-
-    cy.request({
-      method: 'POST',
-      url: `${Cypress.config('baseUrl')}/api/v3/users/${user.ids.user_id}/temporary_password`,
-    })
-    cy.task('findInLatestEmail', updatePasswordLinkRegExp).then(res => {
-      temporaryPasswordLink = res
-    })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/password`)
   })
 
   it('displays UI elements in place', () => {
-    cy.visit(temporaryPasswordLink)
+    cy.findByLabelText('Current password').should('be.visible')
     cy.findByLabelText('New password').should('be.visible')
     cy.findByLabelText('Confirm new password').should('be.visible')
-    cy.findByLabelText('Revoke all access').should('exist').should('have.attr', 'value', 'false')
+    cy.findByLabelText('Revoke all access').should('exist').and('not.be.checked')
     cy.findByRole('button', { name: 'Change password' }).should('be.visible')
-    cy.findByRole('link', { name: 'Cancel' }).should('be.visible')
   })
 
-  it('validates before submitting the form', () => {
-    cy.visit(temporaryPasswordLink)
+  it('validates before submitting an empty form', () => {
     cy.findByRole('button', { name: 'Change password' }).click()
 
     cy.findErrorByLabelText('New password')
@@ -56,18 +47,27 @@ describe('Account App change password (via forgot password)', () => {
       .should('contain.text', 'Confirm new password is required')
       .and('be.visible')
 
-    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/update-password`)
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/user-settings/password`,
+    )
   })
 
   it('succeeds changing password when revoking access', () => {
-    const newPassword = 'ABCDefg321!'
-    cy.visit(temporaryPasswordLink)
+    cy.findByLabelText('Current password').type(user.password)
     cy.findByLabelText('New password').type(newPassword)
-    cy.findByLabelText('Confirm new password').type(`${newPassword}`)
     cy.findByLabelText('Revoke all access').check()
+    cy.findByLabelText('Confirm new password').type(`${newPassword}{enter}`)
+
+    cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Password changed')
+  })
+
+  it('succeeds changing password without revoking access', () => {
+    cy.findByLabelText('Current password').type(user.password)
+    cy.findByLabelText('New password').type(newPassword)
+    cy.findByLabelText('Confirm new password').type(newPassword)
     cy.findByRole('button', { name: 'Change password' }).click()
 
-    cy.findByTestId('notification').should('be.visible').should('contain', 'password was changed')
-    cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
+    cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Password changed')
   })
 })

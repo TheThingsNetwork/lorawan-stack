@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ describe('OAuth Clients list', () => {
 
   beforeEach(() => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/oauth-clients`)
   })
 
   it('succeeds searching by client id', () => {

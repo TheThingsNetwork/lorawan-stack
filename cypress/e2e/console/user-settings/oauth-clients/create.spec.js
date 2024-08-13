@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,27 +13,25 @@
 // limitations under the License.
 
 describe('OAuth Client create', () => {
-  let user
   const clientId = 'test-client'
+  const user = {
+    ids: { user_id: 'create-client-test-user' },
+    primary_email_address: 'create-client-test-user@example.com',
+    password: 'ABCDefg123!',
+    password_confirm: 'ABCDefg123!',
+  }
 
   before(() => {
     cy.dropAndSeedDatabase()
+    cy.createUser(user)
   })
 
   beforeEach(() => {
-    user = {
-      ids: { user_id: 'create-client-test-user' },
-      primary_email_address: 'create-client-test-user@example.com',
-      password: 'ABCDefg123!',
-      password_confirm: 'ABCDefg123!',
-    }
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/oauth-clients/add`)
   })
 
   it('displays UI elements in place', () => {
-    cy.createUser(user)
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients/add`)
-
     cy.findByText('Add OAuth client', { selector: 'h1' }).should('be.visible')
     cy.findByLabelText('OAuth client ID')
       .should('be.visible')
@@ -53,14 +51,11 @@ describe('OAuth Client create', () => {
         'The description is displayed to the user when authorizing the client. Use it to explain the purpose of your client.',
       )
       .and('be.visible')
-    cy.findByRole('button', { name: 'Create OAuth client' }).should('be.visible')
+    cy.findByRole('button', { name: 'Create OAuth client' }).should('be.exist')
   })
 
   it('validates before submitting an empty form', () => {
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients/add`)
-
-    cy.findByRole('button', { name: 'Create OAuth client' }).should('be.visible').click()
+    cy.findByRole('button', { name: 'Create OAuth client' }).click()
 
     cy.findErrorByLabelText('OAuth client ID')
       .should('contain.text', 'OAuth client ID is required')
@@ -68,13 +63,11 @@ describe('OAuth Client create', () => {
 
     cy.location('pathname').should(
       'eq',
-      `${Cypress.config('accountAppRootPath')}/oauth-clients/add`,
+      `${Cypress.config('consoleRootPath')}/user-settings/oauth-clients/add`,
     )
   })
 
   it('succeeds adding client', () => {
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/oauth-clients/add`)
     cy.findByLabelText('OAuth client ID').type(clientId)
 
     cy.findByRole('button', { name: 'Create OAuth client' }).click()
@@ -83,7 +76,11 @@ describe('OAuth Client create', () => {
     cy.findByTestId('full-error-view').should('not.exist')
     cy.location('pathname').should(
       'eq',
-      `${Cypress.config('accountAppRootPath')}/oauth-clients/${clientId}`,
+      `${Cypress.config('consoleRootPath')}/user-settings/oauth-clients`,
     )
+    cy.findByRole('rowgroup').within(() => {
+      cy.findAllByRole('row').should('have.length', 1)
+    })
+    cy.findByRole('cell', { name: clientId }).should('be.visible')
   })
 })

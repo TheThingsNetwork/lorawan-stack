@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,21 +20,15 @@ const user = {
   password_confirm: 'ABCDefg123!',
 }
 
-describe('Account App profile settings', () => {
+describe('User settings / profile', () => {
   before(() => {
     cy.dropAndSeedDatabase()
   })
 
   it('displays UI elements in place', () => {
     cy.createUser(user)
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/profile-settings`)
-
-    cy.findByText('General settings', { selector: 'h3' })
-      .closest('[data-test-id="collapsible-section"]')
-      .within(() => {
-        cy.findByRole('button', { name: 'Expand' }).click()
-      })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
     cy.findByText('Profile picture').should('be.visible')
     cy.findByLabelText('Use Gravatar').should('exist').and('be.checked')
@@ -58,14 +52,8 @@ describe('Account App profile settings', () => {
       name: 'Jane Doe',
       primary_email_address: 'jane.doe@example.com',
     }
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/profile-settings`)
-
-    cy.findByText('General settings', { selector: 'h3' })
-      .closest('[data-test-id="collapsible-section"]')
-      .within(() => {
-        cy.findByRole('button', { name: 'Expand' }).click()
-      })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
     cy.findByLabelText('Use Gravatar').check()
     cy.findByLabelText('Name').type(userUpdate.name)
@@ -93,14 +81,8 @@ describe('Account App profile settings', () => {
   it('succeeds using an uploaded profile picture', () => {
     const imageFile = 'test-image.png'
 
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/profile-settings`)
-
-    cy.findByText('General settings', { selector: 'h3' })
-      .closest('[data-test-id="collapsible-section"]')
-      .within(() => {
-        cy.findByRole('button', { name: 'Expand' }).click()
-      })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
     cy.findByLabelText('Upload an image').check()
 
@@ -130,14 +112,8 @@ describe('Account App profile settings', () => {
   })
 
   it('succeeds deleting the account', () => {
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/profile-settings`)
-
-    cy.findByText('General settings', { selector: 'h3' })
-      .closest('[data-test-id="collapsible-section"]')
-      .within(() => {
-        cy.findByRole('button', { name: 'Expand' }).click()
-      })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
     cy.findByRole('button', { name: /Delete account/ }).click()
 
@@ -160,21 +136,15 @@ describe('Account App profile settings', () => {
   })
 })
 
-describe('Account App profile settings with disabled upload', () => {
+describe('User settings / profile with disabled upload', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.augmentIsConfig({ profile_picture: { disable_upload: true } })
   })
   it('displays UI elements in place', () => {
     cy.createUser(user)
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/profile-settings`)
-
-    cy.findByText('General settings', { selector: 'h3' })
-      .closest('[data-test-id="collapsible-section"]')
-      .within(() => {
-        cy.findByRole('button', { name: 'Expand' }).click()
-      })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
     cy.findByText('Gravatar image').should('be.visible')
     cy.findByText('Upload image', { exact: false }).should('not.exist')
@@ -197,21 +167,15 @@ describe('Account App profile settings with disabled upload', () => {
   })
 })
 
-describe('Account App profile settings without gravatar', () => {
+describe('User settings / profile without gravatar', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.augmentIsConfig({ profile_picture: { use_gravatar: false } })
   })
   it('displays UI elements in place', () => {
     cy.createUser(user)
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/profile-settings`)
-
-    cy.findByText('General settings', { selector: 'h3' })
-      .closest('[data-test-id="collapsible-section"]')
-      .within(() => {
-        cy.findByRole('button', { name: 'Expand' }).click()
-      })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
     cy.findByText('Gravatar', { exact: false }).should('not.exist')
     cy.findByLabelText('Image upload').should('be.visible')
@@ -231,7 +195,7 @@ describe('Account App profile settings without gravatar', () => {
   })
 })
 
-describe('Account App profile settings without gravatar and upload', () => {
+describe('User settings / profile without gravatar and upload', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.augmentIsConfig({ profile_picture: { use_gravatar: false, disable_upload: true } })
@@ -239,14 +203,8 @@ describe('Account App profile settings without gravatar and upload', () => {
 
   it('displays UI elements in place', () => {
     cy.createUser(user)
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/profile-settings`)
-
-    cy.findByText('General settings', { selector: 'h3' })
-      .closest('[data-test-id="collapsible-section"]')
-      .within(() => {
-        cy.findByRole('button', { name: 'Expand' }).click()
-      })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
     cy.findByText('Gravatar', { exact: false }).should('not.exist')
     cy.findByText('Upload image', { exact: false }).should('not.exist')

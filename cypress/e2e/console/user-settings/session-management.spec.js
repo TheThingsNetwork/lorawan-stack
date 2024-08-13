@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@ const user = {
   password_confirm: 'ABCDefg123!',
 }
 
-describe('Account App session management', () => {
+describe('User settings / session management', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('accountAppRootPath'))
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('accountAppRootPath'))
   })
 
   it('succeeds showing a list of sessions', () => {
-    cy.visit(`${Cypress.config('accountAppRootPath')}/session-management`)
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/sessions`)
 
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 2)
@@ -39,8 +39,8 @@ describe('Account App session management', () => {
   })
 
   it('succeeds deleting a session', () => {
-    cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('accountAppRootPath')}/session-management`)
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/sessions`)
 
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 3)

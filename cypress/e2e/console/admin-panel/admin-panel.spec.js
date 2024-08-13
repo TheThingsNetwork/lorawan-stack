@@ -25,12 +25,21 @@ describe('Admin Panel', () => {
   it('succeeds displaying different views in the admin panel', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel`)
 
-    cy.findByText('User management').should('be.visible').click()
-    cy.findByText('User management', { selector: 'h1' }).should('be.visible')
+    cy.get('main').within(() => {
+      cy.findByText('Network information', { selector: 'h1' }).should('be.visible')
+    })
     cy.findByTestId('error-notification').should('not.exist')
 
-    cy.findByText('Peering settings').should('be.visible').click()
-    cy.findByText('Packet Broker', { selector: 'h1' }).should('be.visible')
+    cy.findByText('User management').should('be.visible').click()
+    cy.get('header').within(() => {
+      cy.findByText('User management').should('be.visible')
+    })
+    cy.findByTestId('error-notification').should('not.exist')
+
+    cy.findByText('Packet Broker').should('be.visible').click()
+    cy.get('main').within(() => {
+      cy.findByText('Packet Broker', { selector: 'h1' }).should('be.visible')
+    })
     cy.findByTestId('error-notification').should('not.exist')
   })
 })
