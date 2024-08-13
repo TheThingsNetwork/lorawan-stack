@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 import React, { useCallback, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { defineMessages } from 'react-intl'
 
 import tts from '@console/api/tts'
 
@@ -33,15 +32,6 @@ import createPasswordValidationSchema from '@ttn-lw/lib/create-password-validati
 
 import { selectUserId } from '@console/store/selectors/user'
 import { selectPasswordRequirements } from '@console/store/selectors/identity-server'
-
-const m = defineMessages({
-  currentPassword: 'Current password',
-  newPassword: 'New password',
-  newPasswordConfirm: 'Confirm new password',
-  revokeAllAccess: 'Revoke all access',
-  revokeAllAccessDescription:
-    'Check this option if you also wish to revoke all your currently active sessions',
-})
 
 const validationSchemaOldPassword = Yup.object().shape({
   old: Yup.string().required(sharedMessages.validateRequired).default(''),
@@ -97,7 +87,7 @@ const ChangePasswordForm = ({ userId, old, cancelRoute, onSubmitSuccess }) => {
         <Form.Field
           name="old"
           component={Input}
-          title={m.currentPassword}
+          title={sharedMessages.currentPassword}
           type="password"
           required
         />
@@ -105,22 +95,22 @@ const ChangePasswordForm = ({ userId, old, cancelRoute, onSubmitSuccess }) => {
       <Form.Field
         name="password"
         component={Input}
-        title={m.newPassword}
+        title={sharedMessages.newPassword}
         type="password"
         required
       />
       <Form.Field
         name="confirmPassword"
         component={Input}
-        title={m.newPasswordConfirm}
+        title={sharedMessages.newPasswordConfirm}
         type="password"
         required
       />
       <Form.Field
         name="revoke_all_access"
         component={Checkbox}
-        title={m.revokeAllAccess}
-        description={m.revokeAllAccessDescription}
+        title={sharedMessages.revokeAllAccess}
+        description={sharedMessages.revokeAllAccessDescription}
       />
       {usesTemporaryPw ? (
         <>
@@ -150,7 +140,6 @@ ChangePasswordForm.defaultProps = {
   cancelRoute: undefined,
   onSubmitSuccess: () => {
     toast({
-      title: m.success,
       message: sharedMessages.passwordChanged,
       type: toast.types.SUCCESS,
     })

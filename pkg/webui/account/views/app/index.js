@@ -26,11 +26,12 @@ import {
 import { Helmet } from 'react-helmet'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
+import Footer from '@ttn-lw/components/footer'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import FullViewError from '@ttn-lw/lib/components/full-view-error'
 
-import Header from '@account/containers/header'
+import Logo from '@account/containers/logo'
 
 import Landing from '@account/views/landing'
 import Authorize from '@account/views/authorize'
@@ -45,12 +46,13 @@ import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 import { selectUser } from '@account/store/selectors/user'
 
 import Front from '../front'
+import style from '../front/front.styl'
 
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 const pageData = selectPageData()
 
-const errorRender = error => <FullViewError error={error} header={<Header />} />
+const errorRender = error => <FullViewError error={error} />
 const getScrollRestorationKey = location => {
   // Preserve scroll position only when necessary.
   // E.g. we don't want to scroll to top when changing tabs of a table,
@@ -72,7 +74,16 @@ const Layout = () => (
           titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
           defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
         />
-        <Outlet />
+        <div className={style.container}>
+          <section className={style.content}>
+            <div className={style.main}>
+              <Logo className={style.loginLogo} unlockSize />
+              <Outlet />
+            </div>
+          </section>
+          <section className={style.visual} />
+          <Footer className={style.footer} transparent />
+        </div>
       </React.Fragment>
     </ErrorView>
   </>
@@ -99,15 +110,15 @@ const AccountRoot = () => {
   if (pageData && pageData.error) {
     return (
       <BrowserRouter history={history} basename="/oauth">
-        <FullViewError error={pageData.error} header={<Header />} />
+        <FullViewError error={pageData.error} />
       </BrowserRouter>
     )
   }
 
   return (
     <Routes>
+      <Route path="/authorize/*" Component={Authorize} />
       <Route element={<Layout />}>
-        <Route path="/authorize/*" Component={Authorize} />
         <Route path="*" Component={Boolean(user) ? Landing : Front} />
       </Route>
     </Routes>

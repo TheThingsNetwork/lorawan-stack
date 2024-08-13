@@ -32,10 +32,8 @@ import style from '@account/views/front/front.styl'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { userId as userIdRegexp } from '@ttn-lw/lib/regexp'
-import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 
 const m = defineMessages({
-  forgotPassword: 'Forgot password',
   passwordRequested:
     'An email with reset instruction was sent to the email address associated with your username. Please check your spam folder as well.',
   send: 'Send',
@@ -52,8 +50,6 @@ const validationSchema = Yup.object().shape({
 })
 
 const initialValues = { user_id: '' }
-
-const siteName = selectApplicationSiteName()
 
 const ForgotPassword = () => {
   const navigate = useNavigate()
@@ -80,11 +76,9 @@ const ForgotPassword = () => {
 
   return (
     <div className={style.form}>
-      <IntlHelmet title={m.forgotPassword} />
+      <IntlHelmet title={sharedMessages.forgotPassword} />
       <h1 className={style.title}>
-        {siteName}
-        <br />
-        <Message component="strong" content={m.resetPassword} />
+        <Message content={m.resetPassword} />
       </h1>
       <hr className={style.hRule} />
       <Message content={m.resetPasswordDescription} component="p" className={style.description} />

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
@@ -25,10 +24,6 @@ import UserSessionsTable from '@console/containers/sessions-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const m = defineMessages({
-  sessionManagement: 'Session management',
-})
-
 const SessionManagement = () => {
   useBreadcrumbs(
     'user-settings.session-management',
@@ -37,7 +32,7 @@ const SessionManagement = () => {
 
   return (
     <div className="container container--xxl p-vert-cs-xs p-sides-0">
-      <PageTitle title={m.sessionManagement} hideHeading />
+      <PageTitle title={sharedMessages.sessionManagement} hideHeading />
       <UserSessionsTable pageSize={PAGE_SIZES.REGULAR} />
     </div>
   )

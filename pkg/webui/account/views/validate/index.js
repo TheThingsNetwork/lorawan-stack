@@ -29,6 +29,8 @@ import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
+import Logo from '@account/containers/logo'
+
 import style from '@account/views/front/front.styl'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -99,7 +101,7 @@ const Validate = ({ hideTitle }) => {
             <h1 className={style.title}>
               {siteName}
               <br />
-              <Message component="strong" content={m.contactInfoValidation} />
+              <Message content={m.contactInfoValidation} />
             </h1>
             <hr className={style.hRule} />
           </>
@@ -118,6 +120,7 @@ const Validate = ({ hideTitle }) => {
           to="/"
           icon={IconChevronLeft}
           message={{ ...m.backToAccount, values: { siteTitle } }}
+          secondary
         />
       </div>
     </RequireRequest>
@@ -126,7 +129,10 @@ const Validate = ({ hideTitle }) => {
 
 const ValidateWithAuth = props => (
   <div className="container container--lg grid">
-    <div className="item-12 xl:item-8">
+    <div className="item-12">
+      <Logo className="al-start j-start" />
+    </div>
+    <div className="item-12 lg-xl:item-6 xl:item-4">
       <PageTitle title={m.contactInfoValidation} />
       <Validate hideTitle {...props} />
     </div>

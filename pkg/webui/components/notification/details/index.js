@@ -57,7 +57,7 @@ const Details = props => {
         onComplete={handleModalComplete}
         approval={false}
         buttonMessage={sharedMessages.close}
-        approveButtonProps={{ primary: false, icon: undefined }}
+        approveButtonProps={{ secondary: true, icon: undefined }}
         noTitleLine
       >
         <pre className={style.detailsCode}>{content}</pre>

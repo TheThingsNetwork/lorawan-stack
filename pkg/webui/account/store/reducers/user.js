@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,7 @@
 
 import { INITIALIZE_SUCCESS } from '@ttn-lw/lib/store/actions/init'
 
-import {
-  GET_USER_SUCCESS,
-  UPDATE_USER_SUCCESS,
-  GET_USER_RIGHTS_SUCCESS,
-} from '@account/store/actions/user'
+import { GET_USER_SUCCESS } from '@account/store/actions/user'
 
 const defaultState = {
   user: undefined,
@@ -44,22 +40,6 @@ const user = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         user: payload,
-      }
-    case UPDATE_USER_SUCCESS:
-      return {
-        ...state,
-        user: {
-          ...state.user,
-          ...payload,
-        },
-      }
-    case GET_USER_RIGHTS_SUCCESS:
-      return {
-        ...state,
-        rights: {
-          regular: payload.filter(right => !right.endsWith('_ALL')),
-          pseudo: payload.filter(right => right.endsWith('_ALL')),
-        },
       }
     default:
       return state

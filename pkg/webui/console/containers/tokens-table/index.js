@@ -51,7 +51,6 @@ const m = defineMessages({
   deleteAllSuccess: 'All access tokens invalidated',
   deleteAllFail: 'There was an error and the access tokens could not be invalidated',
   deleteAllButton: 'Invalidate all access tokens',
-  expiry: 'Expiry',
 })
 
 const TokensTable = () => {
@@ -136,7 +135,7 @@ const TokensTable = () => {
       },
       {
         name: 'expires_at',
-        displayName: m.expiry,
+        displayName: sharedMessages.expiry,
         width: '4rem',
         render: expires_at => <DateTime.Relative value={expires_at} />,
       },

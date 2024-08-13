@@ -157,6 +157,7 @@ export default defineMessages({
   created: 'Created',
   createdAt: 'Created at',
   currentCollaborators: 'Current collaborators',
+  currentPassword: 'Current password',
   currentUserIndicator: '(This is you)',
   dashboard: 'Dashboard',
   data: 'Data',
@@ -392,6 +393,8 @@ export default defineMessages({
   networkServerAddress: 'Network Server address',
   networks: 'Networks',
   never: 'Never',
+  newPassword: 'New password',
+  newPasswordConfirm: 'Confirm new password',
   next: 'Next',
   noActivityYet: 'No activity yet',
   noData: 'No data available',
@@ -496,6 +499,9 @@ export default defineMessages({
   restrictedUser:
     'You can only set yourself as a contact. If you would like another collaborator set as contact, please contact this collaborator to self-assign as contact.',
   resume: 'Resume',
+  revokeAllAccess: 'Revoke all access',
+  revokeAllAccessDescription:
+    'Check this option if you also wish to revoke all your currently active sessions',
   rights: 'Rights',
   rightsList: 'Rights:',
   rootKeys: 'Root keys',

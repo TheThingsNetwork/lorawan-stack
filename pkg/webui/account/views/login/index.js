@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,23 +26,19 @@ import Input from '@ttn-lw/components/input'
 import SubmitButton from '@ttn-lw/components/submit-button'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-
-import Logo from '@account/containers/logo'
+import Message from '@ttn-lw/lib/components/message'
 
 import style from '@account/views/front/front.styl'
 
 import Yup from '@ttn-lw/lib/yup'
-import {
-  selectApplicationRootPath,
-  selectApplicationSiteName,
-  selectApplicationSiteTitle,
-} from '@ttn-lw/lib/selectors/env'
+import { selectApplicationRootPath, selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { userId as userIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { selectEnableUserRegistration } from '@account/lib/selectors/app-config'
 
 const m = defineMessages({
+  loginTo: 'Log in to',
   createAccount: 'Create an account',
   forgotPassword: 'Forgot password?',
   loginToContinue: 'Please login to continue',
@@ -50,7 +46,6 @@ const m = defineMessages({
 
 const appRoot = selectApplicationRootPath()
 const siteName = selectApplicationSiteName()
-const siteTitle = selectApplicationSiteTitle()
 const enableUserRegistration = selectEnableUserRegistration()
 
 const validationSchema = Yup.object().shape({
@@ -121,11 +116,10 @@ const Login = () => {
     <div className={style.form}>
       <IntlHelmet title={sharedMessages.login} />
       <h1 className={style.title}>
-        {siteName}
+        <Message content={m.loginTo} />
         <br />
-        <span className={style.subTitle}>{siteTitle}</span>
+        {siteName}
       </h1>
-      <Logo className={style.loginLogo} />
       <hr className={style.hRule} />
       <Form
         onSubmit={handleSubmit}
@@ -158,7 +152,7 @@ const Login = () => {
             error={Boolean(error)}
           />
           {enableUserRegistration && (
-            <Button.Link to={`/register${location.search}`} message={m.createAccount} />
+            <Button.Link secondary to={`/register${location.search}`} message={m.createAccount} />
           )}
           <Button.Link naked message={m.forgotPassword} to={`/forgot-password${location.search}`} />
         </ButtonGroup>
