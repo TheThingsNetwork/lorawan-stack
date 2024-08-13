@@ -29,7 +29,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getUsersRightsList } from '@console/store/actions/users'
 
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 
 const UserApiKeyAddInner = () => {
   const userId = useSelector(selectUserId)

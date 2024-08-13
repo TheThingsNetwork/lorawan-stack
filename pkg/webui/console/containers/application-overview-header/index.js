@@ -62,7 +62,7 @@ import { getApplicationDeviceCount } from '@console/store/actions/applications'
 import { getPubsubsList } from '@console/store/actions/pubsubs'
 import { getWebhooksList } from '@console/store/actions/webhooks'
 
-import { selectUser } from '@console/store/selectors/logout'
+import { selectUser } from '@console/store/selectors/user'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
 import {
   selectApplicationDerivedLastSeen,
@@ -166,7 +166,7 @@ const ApplicationOverviewHeader = () => {
       )
     }
     return (
-      <div className="d-inline-flex al-center gap-cs-xxs md-lg:d-none">
+      <div className="d-inline-flex al-center gap-cs-xxs sm:d-none">
         <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
         {node}
       </div>
@@ -203,7 +203,7 @@ const ApplicationOverviewHeader = () => {
         {recentActivity}
         {mayViewDevices && (
           <RequireRequest requestAction={getApplicationDeviceCount(application_id)}>
-            <div className="d-inline-flex al-center gap-cs-xxs md-lg:d-none">
+            <div className="d-inline-flex al-center gap-cs-xxs sm:d-none">
               <Icon icon={IconCpu} small className="c-text-neutral-semilight" />
               <Message
                 content={m.deviceCount}
@@ -213,7 +213,7 @@ const ApplicationOverviewHeader = () => {
             </div>
           </RequireRequest>
         )}
-        <div className="d-flex al-center gap-cs-xxs md-lg:d-none">
+        <div className="d-flex al-center gap-cs-xxs sm:d-none">
           <Icon small className="c-text-neutral-semilight" icon={IconCalendarMonth} />
           <LastSeen
             statusClassName={style.createdAtStatus}
@@ -222,7 +222,7 @@ const ApplicationOverviewHeader = () => {
             className="c-text-neutral-semilight"
           />
         </div>
-        <div className={classnames(style.divider, 'md-lg:d-none')} />
+        <div className={classnames(style.divider, 'sm:d-none')} />
         <div className="d-inline-flex al-center gap-cs-xxs">
           <Button
             secondary

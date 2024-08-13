@@ -43,7 +43,7 @@ import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
 import { checkFromState, mayDeleteGateway } from '@console/lib/feature-checks'
 
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 
 import m from '../messages'
 

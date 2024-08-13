@@ -34,7 +34,7 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { id as organizationIdRegexp } from '@ttn-lw/lib/regexp'
 import contactSchema from '@ttn-lw/lib/shared-schemas'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
 
 const validationSchema = Yup.object().shape({

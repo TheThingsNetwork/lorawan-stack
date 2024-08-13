@@ -45,7 +45,7 @@ import {
   getApplicationsList,
 } from '@console/store/actions/applications'
 
-import { selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUserIsAdmin } from '@console/store/selectors/user'
 import {
   selectApplicationsTotalCount,
   selectApplicationsWithDeviceCounts,

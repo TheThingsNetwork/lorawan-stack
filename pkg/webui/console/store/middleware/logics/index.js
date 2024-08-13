@@ -14,7 +14,8 @@
 
 import status from '@ttn-lw/lib/store/logics/status'
 
-import user from './logout'
+import user from './user'
+import logout from './logout'
 import users from './users'
 import init from './init'
 import applications from './applications'
@@ -44,6 +45,7 @@ import topEntities from './top-entities'
 export default [
   ...status,
   ...user,
+  ...logout,
   ...users,
   ...init,
   ...applications,

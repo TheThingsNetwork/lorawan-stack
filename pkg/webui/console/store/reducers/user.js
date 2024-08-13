@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { LOGOUT_FAILURE } from '@console/store/actions/logout'
+import {
+  GET_USER_ME_SUCCESS,
+  GET_USER_ME_FAILURE,
+  GET_USER_ME,
+  GET_USER_RIGHTS_SUCCESS,
+} from '@console/store/actions/user'
 
 const defaultState = {
   user: undefined,
@@ -22,10 +27,29 @@ const defaultState = {
 
 const user = (state = defaultState, { type, payload }) => {
   switch (type) {
-    case LOGOUT_FAILURE:
+    case GET_USER_ME:
       return {
         ...state,
+        user: undefined,
+        error: undefined,
+      }
+
+    case GET_USER_ME_SUCCESS:
+      return {
+        ...state,
+        user: payload,
+        error: undefined,
+      }
+    case GET_USER_ME_FAILURE:
+      return {
+        ...state,
+        user: undefined,
         error: payload,
+      }
+    case GET_USER_RIGHTS_SUCCESS:
+      return {
+        ...state,
+        rights: payload,
       }
     default:
       return state

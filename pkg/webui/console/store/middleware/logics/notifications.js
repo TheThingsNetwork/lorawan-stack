@@ -27,7 +27,7 @@ import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 import * as notifications from '@console/store/actions/notifications'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 const m = defineMessage({

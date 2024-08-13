@@ -27,7 +27,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { createGateway, updateGateway } from '@console/store/actions/gateways'
 import { createGatewayApiKey } from '@console/store/actions/api-keys'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 
 import GatewayProvisioningFormSection from './gateway-provisioning-form'
 import validationSchema from './gateway-provisioning-form/validation-schema'

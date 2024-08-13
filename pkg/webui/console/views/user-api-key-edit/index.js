@@ -31,7 +31,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getUsersRightsList } from '@console/store/actions/users'
 import { getApiKey } from '@console/store/actions/api-keys'
 
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 import { selectApiKeyById } from '@console/store/selectors/api-keys'
 
 const UserApiKeyEditInner = () => {

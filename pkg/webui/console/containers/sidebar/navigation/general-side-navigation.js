@@ -39,7 +39,7 @@ import {
 } from '@console/lib/feature-checks'
 import getCookie from '@console/lib/table-utils'
 
-import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
 
 import SidebarContext from '../context'

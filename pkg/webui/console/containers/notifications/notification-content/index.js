@@ -29,7 +29,7 @@ import Notification from '@console/components/notifications'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 
 import style from '../notifications.styl'
 

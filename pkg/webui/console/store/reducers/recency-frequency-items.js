@@ -27,7 +27,7 @@ import {
 import { DELETE_APP_SUCCESS, GET_APP_FAILURE } from '../actions/applications'
 import { DELETE_GTW_SUCCESS, GET_GTW_FAILURE } from '../actions/gateways'
 import { DELETE_DEV_SUCCESS, GET_DEVICES_LIST_FAILURE, GET_DEV_FAILURE } from '../actions/devices'
-import { APPLY_PERSISTED_STATE_SUCCESS } from '../actions/logout'
+import { APPLY_PERSISTED_STATE_SUCCESS } from '../actions/user'
 
 const KEY_PATTERN = /^(END_DEVICE|APPLICATION|GATEWAY):[a-z0-9](?:[-]?[a-z0-9/]){2,}$/
 

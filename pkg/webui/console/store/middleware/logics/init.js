@@ -22,7 +22,7 @@ import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/err
 import { selectPageStatusBaseUrlConfig } from '@ttn-lw/lib/selectors/env'
 import { getNetworkStatusSummary } from '@ttn-lw/lib/store/actions/status'
 
-import * as user from '@console/store/actions/logout'
+import * as user from '@console/store/actions/user'
 import {
   getInboxNotifications,
   getUnseenNotificationsPeriodically,

@@ -52,7 +52,7 @@ import {
   selectSelectedApplication,
 } from '@console/store/selectors/applications'
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 
 const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
 const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)

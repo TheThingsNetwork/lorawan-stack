@@ -24,7 +24,7 @@ import dev from '@ttn-lw/lib/dev'
 import requestPromiseMiddleware from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 import { trimEvents } from '@ttn-lw/lib/store/util'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 
 import rootReducer from './reducers'
 import logics from './middleware/logics'

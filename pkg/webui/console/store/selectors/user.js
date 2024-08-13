@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createSelector } from 'reselect'
+
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
+import { GET_USER_ME_BASE, GET_USER_RIGHTS_BASE } from '@console/store/actions/user'
 import { LOGOUT_BASE } from '@console/store/actions/logout'
-import { GET_USER_ME_BASE } from '@console/store/actions/user'
 
 const selectUserStore = state => state?.user
 

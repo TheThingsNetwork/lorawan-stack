@@ -20,7 +20,7 @@ import {
   GET_ALL_BOOKMARKS_SUCCESS,
   GET_BOOKMARKS_LIST_SUCCESS,
 } from '@console/store/actions/user-preferences'
-import { GET_USER_ME_SUCCESS } from '@console/store/actions/logout'
+import { GET_USER_ME_SUCCESS } from '@console/store/actions/user'
 
 const initialState = {
   bookmarks: {
