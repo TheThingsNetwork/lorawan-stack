@@ -51,6 +51,8 @@ export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
 export TTN_LW_IS_OAUTH_UI_IS_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js account.js"
 export WEBPACK_DEV_BACKEND_API_PROXY_URL="http://localhost:1885"
+export TTN_LW_CONSOLE_UI_ACCOUNT_URL="http://localhost:8080/oauth"
+export TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth"
 `
 
 // Branding configuration environment variables
@@ -63,6 +65,7 @@ export TTN_LW_CONSOLE_UI_SLA_INFORMATION_URL="http://example.com"
 export TTN_LW_CONSOLE_UI_SUPPORT_LINK="http://example.com"
 export TTN_LW_CONSOLE_UI_SUPPORT_PLAN_APPLIES="Premium"
 export TTN_LW_CONSOLE_UI_SUPPORT_PLAN_INFORMATION_URL="http://example.com"
+export TTN_LW_CONSOLE_UI_ACCOUNT_URL="${STAGING_URL}/oauth"
 `
 
 // Staging configuration environment variables
