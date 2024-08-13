@@ -15,6 +15,8 @@ For details about compatibility between different releases, see the **Commitment
 - Support for The Things Industries gateway protocol. This is adds a new pair of ports to Gateway Server: `1889` for Envoy or Traefik terminated TLS mutual authentication, and `8889` for The Things Stack terminated TLS mutual authentication.
 - Option to filter the output of the `List` RPCs for end devices and gateways based on when they were updated.
   - `ListGatewaysRequest` and `ListEndDevicesRequest` RPCs have a new `Filter` field that supports an `updated_since` timestamp.
+- Preparation for universal rights assigned to users.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`).
 
 ### Changed
 
