@@ -126,6 +126,11 @@ const GeneralSideNavigation = () => {
             path="/user-settings/api-keys"
             icon={IconApiKeys}
           />
+          <SideNavigation.Item
+            title={sharedMessages.sessionManagement}
+            path="/user-settings/sessions"
+            icon={IconShieldLock}
+          />
         </SideNavigation.Item>
       </SideNavigation>
       {!isMinimized && <TopEntitiesSection topEntities={topEntities} />}

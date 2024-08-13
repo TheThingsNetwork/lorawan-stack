@@ -41,6 +41,7 @@ import notifications from './notifications'
 import userPreferences from './user-preferences'
 import search from './search'
 import topEntities from './top-entities'
+import sessions from './sessions'
 
 export default [
   ...status,
@@ -71,4 +72,5 @@ export default [
   ...userPreferences,
   ...search,
   ...topEntities,
+  ...sessions,
 ]

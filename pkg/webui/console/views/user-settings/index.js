@@ -23,11 +23,11 @@ import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import ProfileSettings from '@console/views/user-settings-profile'
 import UserApiKeys from '@console/views/user-api-keys'
+import ChangePassword from '@console/views/user-settings-password'
+import SessionManagement from '@console/views/user-settings-sessions'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import ChangePassword from '../user-settings-password'
 
 const UserSettings = () => {
   useBreadcrumbs(
@@ -41,6 +41,7 @@ const UserSettings = () => {
         <Route path="profile" Component={ProfileSettings} />
         <Route path="password" Component={ChangePassword} />
         <Route path="api-keys/*" Component={UserApiKeys} />
+        <Route path="sessions/*" Component={SessionManagement} />
         <Route index element={<Navigate to="profile" />} />
         <Route path="*" Component={GenericNotFound} />
       </Routes>

@@ -524,6 +524,7 @@ export default defineMessages({
   serverUrl: 'Server URL',
   serviceData: 'Service data',
   sessions: 'Sessions',
+  sessionManagement: 'Session management',
   setLoRaCloudToken: 'Set LoRa Cloud token',
   settings: 'Settings',
   setup: 'Setup',

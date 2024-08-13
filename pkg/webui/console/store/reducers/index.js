@@ -69,6 +69,7 @@ import userPreferences from './user-preferences'
 import recencyFrequencyItems from './recency-frequency-items'
 import topEntities from './top-entities'
 import search from './search'
+import sessions from './sessions'
 
 export default combineReducers({
   user,
@@ -133,4 +134,5 @@ export default combineReducers({
   search,
   recencyFrequencyItems,
   topEntities,
+  sessions,
 })
