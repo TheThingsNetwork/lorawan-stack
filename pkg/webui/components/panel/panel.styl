@@ -50,6 +50,9 @@
     transition: text-decoration $ad.s ease-in-out
     align-self: center
 
+    +media-query($bp.md-lg)
+      display: none
+
     &:hover:not(:disabled)
       color: var(--c-text-brand-normal)
       text-decoration: underline

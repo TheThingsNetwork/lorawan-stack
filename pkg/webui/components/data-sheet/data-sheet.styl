@@ -12,36 +12,67 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.table
-  width: 100%
-  table-layout: fixed
-  border-collapse: separate
-  border-spacing: 0 $cs.xs
+.data-sheet
+  &-header
+    display: flex
+    align-items: center
+    justify-content: space-between
+    line-height: 1
+    height: auto
+    color: var(--c-text-neutral-heavy)
+    font-weight: $fw.bold
+    white-space: nowrap
+    margin-bottom: $cs.xl
 
-  tr
-    height: 2.5rem
+    +media-query($bp.md)
+      margin-top: $cs.l
 
-  th
-    text-align: left
-    font-weight: 400
-    color: var(--c-text-neutral-semilight)
-    min-width: 20rem
-    padding-right: $cs.s
+  &-section-collapsed
+    height: auto
+    opacity: 1
+    overflow: hidden
+    transition: max-height $ad.m ease-in-out, opacity $ad.xs ease-in-out
+    +media-query($bp.md)
+      height: 0px
+      margin-bottom: 0
+      opacity: 0
 
-  tr.group-heading
-    height: 2.2rem
-    vertical-align: top
+  &-row
+    &-heading
+      display: flex
+      align-items: center
+      text-align: left
+      font-weight: 400
+      color: var(--c-text-neutral-semilight)
 
-    &:not(:first-child)
-      height: 3.7rem
-      vertical-align: middle
-    th
-      color: var(--c-text-neutral-heavy)
-      font-weight: $fw.bold
-      white-space: nowrap
+      +media-query($bp.md)
+        font-size: $fs.s
 
-.sub th
-  padding-left: $cs.l
+    &-content
+      height: 2.5rem
+      display: flex
+      align-items: center
+      justify-content: space-between
+      margin-bottom: $cs.xs
+
+      +media-query($bp.md)
+        margin-left: $cs.s
+
+      &:last-child
+        &:not(.last-group-last-item)
+          margin-bottom: $cs.xl
+
+      &-value
+        flex-grow: 1
+        text-align: left
+        max-width: 55%
+
+  &-divider
+    +media-query($bp.md)
+      height: 1px
+      width: 100%
+      margin: 0 auto $cs.l
+      background: var(--c-border-neutral-light)
 
 .not-available
   color: var(--c-text-neutral-light)
@@ -50,3 +81,32 @@
   color: var(--c-icon-neutral-light)
   margin-bottom: -4px
   margin-left: 2px
+
+.icon
+  display: none
+  +media-query($bp.md)
+    display: inline-block
+
+@container panel (max-width: 530px)
+  .data-sheet-row-content-value
+    max-width: 45%
+
+@container panel (max-width: 500px)
+  .data-sheet-header
+    margin-bottom: $cs.l
+
+  .data-sheet-row-heading
+    height: auto
+    line-height: 1
+    margin-bottom: $cs.m
+
+  .data-sheet-row-content
+    line-height: 1
+    flex-direction: column
+    justify-content: flex-start
+    align-items: flex-start
+    height: fit-content
+    margin-bottom: $cs.xxl
+
+  .data-sheet-row-content-value
+    max-width: 100%

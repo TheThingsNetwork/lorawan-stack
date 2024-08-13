@@ -21,6 +21,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Icon from '../icon'
 import Link from '../link'
+import Button from '../button'
 
 import Toggle from './toggle'
 
@@ -92,6 +93,17 @@ const Panel = ({
       </div>
     )}
     {children}
+    {shortCutLinkTitle && (
+      <Button.Link
+        naked
+        to={shortCutLinkPath}
+        className="d-none md-lg:d-flex c-bg-brand-extralight c-text-brand-normal mt-cs-l w-full fw-bold"
+        target={shortCutLinkTarget}
+        disabled={shortCutLinkDisabled}
+      >
+        <Message content={shortCutLinkTitle} /> →
+      </Button.Link>
+    )}
   </div>
 )
 

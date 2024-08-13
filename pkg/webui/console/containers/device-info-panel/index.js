@@ -162,7 +162,10 @@ const DeviceInfoPanel = ({ events }) => {
                 {/* Battery */}
               </div>
               {model && (model.product_url || model.datasheet_url) && (
-                <ButtonGroup align="start" className={style.buttonGroup}>
+                <ButtonGroup
+                  align="start"
+                  className={classNames(style.buttonGroup, 'md-lg:d-none')}
+                >
                   {model.product_url && (
                     <Button.AnchorLink
                       secondary
@@ -187,7 +190,33 @@ const DeviceInfoPanel = ({ events }) => {
               )}
             </div>
           </div>
-          {model?.sensors && <TagList tags={model?.sensors} icons={sensorIconMap} />}
+          {model && (model.product_url || model.datasheet_url) && (
+            <ButtonGroup align="start" className="d-none mt-cs-xl md-lg:d-flex">
+              {model.product_url && (
+                <Button.AnchorLink
+                  secondary
+                  href={model.product_url}
+                  target="_blank"
+                  message={m.deviceWebsite}
+                  icon={IconWorld}
+                  className="w-full"
+                />
+              )}
+              {model.datasheet_url && (
+                <Button.AnchorLink
+                  secondary
+                  href={model.datasheet_url}
+                  target="_blank"
+                  message={sharedMessages.dataSheet}
+                  icon={IconFileAnalytics}
+                  className="w-full"
+                />
+              )}
+            </ButtonGroup>
+          )}
+          {model?.sensors && (
+            <TagList tags={model?.sensors} icons={sensorIconMap} className="md-lg:mt-cs-l" />
+          )}
         </RequireRequest>
       ) : (
         <div className="d-flex gap-cs-xl">

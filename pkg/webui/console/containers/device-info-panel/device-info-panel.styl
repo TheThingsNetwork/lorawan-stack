@@ -23,6 +23,12 @@
   display: flex
   justify-content: center
 
+  +media-query($bp.md-lg)
+    width: 5.4rem
+    height: 5.4rem
+    min-width: 5.4rem
+    min-height: 5.4rem
+
   &-placeholder
     width: 6rem
   img
@@ -31,7 +37,7 @@
     width: 100%
     height: 100%
 
-@container panel (max-width: 485px)
+@container panel (max-width: 430px)
   .button-group
     flex-direction: column
     justify-content: flex-start
@@ -39,6 +45,6 @@
 
   .button:not(:last-child)
     // stylelint-disable-next-line declaration-no-important
-    margin-bottom: $cs.s !important
+    margin-bottom: 0 !important
     // stylelint-disable-next-line declaration-no-important
     margin-right: 0 !important

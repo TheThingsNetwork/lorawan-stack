@@ -26,6 +26,8 @@ import { selectSelectedDevice } from '@console/store/selectors/devices'
 
 import MapPanel from '../map-panel'
 
+import style from './device-map-panel.styl'
+
 const DeviceMapPanel = () => {
   const device = useSelector(selectSelectedDevice)
   const { device_id } = device.ids
@@ -44,6 +46,7 @@ const DeviceMapPanel = () => {
       markers={markers}
       entity={END_DEVICE}
       locationLink={locationLink}
+      className={style.gatewayMapPanel}
     />
   )
 }

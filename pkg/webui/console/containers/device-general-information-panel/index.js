@@ -208,7 +208,7 @@ const DeviceGeneralInformationPanel = ({ frequencyPlans }) => {
   sheetData.push(sessionInfoData)
 
   return (
-    <Panel className={style.infoPanel}>
+    <Panel className={style.deviceGeneralInfoPanel}>
       <DataSheet data={sheetData} />
     </Panel>
   )
