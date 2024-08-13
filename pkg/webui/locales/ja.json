@@ -2029,7 +2029,7 @@
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unclaim_device": "EUI `{dev_eui}`のデバイスの主張を取り消す",
   "error:pkg/deviceclaimingserver/enddevices/ttjsv2:unclaim_devices": "デバイスの主張を取り消す",
   "error:pkg/deviceclaimingserver/gateways/ttgc:dial_gateway_server": "",
-  "error:pkg/deviceclaimingserver/gateways/ttgc:gateway_server_tls": "",
+  "error:pkg/deviceclaimingserver/gateways/ttgc:verify_gateway_server_tls": "",
   "error:pkg/deviceclaimingserver/gateways:invalid_upstream": "",
   "error:pkg/deviceclaimingserver/gateways:ttgc_not_enabled": "",
   "error:pkg/deviceclaimingserver:claim gateway": "",
