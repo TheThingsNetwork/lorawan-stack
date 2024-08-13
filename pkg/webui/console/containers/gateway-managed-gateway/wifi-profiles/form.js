@@ -53,10 +53,10 @@ import { selectSelectedWifiConnectionProfile } from '@console/store/selectors/co
 
 const m = defineMessages({
   updateWifiProfile: 'Update WiFi profile',
-  createSuccess: 'Connection profile created',
-  createFailure: 'There was an error and the connection profile could not be created',
-  updateSuccess: 'Connection profile updated',
-  updateFailure: 'There was an error updating this connection profile',
+  createSuccess: 'WiFi profile created',
+  createFailure: 'There was an error and the WiFi profile could not be created',
+  updateSuccess: 'WiFi profile updated',
+  updateFailure: 'There was an error updating this WiFi profile',
 })
 
 const GatewayWifiProfilesForm = () => {

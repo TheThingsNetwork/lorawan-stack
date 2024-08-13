@@ -53,8 +53,8 @@ const m = defineMessages({
   profileId: 'Profile ID',
   accessPoint: 'Access point',
   deleteProfile: 'Delete profile',
-  deleteSuccess: 'Connection profile deleted',
-  deleteFail: 'There was an error and the connection profile could not be deleted',
+  deleteSuccess: 'WiFi profile deleted',
+  deleteFail: 'There was an error and the WiFi profile could not be deleted',
 })
 
 const GatewayWifiProfilesOverview = () => {

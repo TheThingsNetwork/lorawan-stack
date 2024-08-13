@@ -30,12 +30,17 @@ describe('Managed Gateway connection settings', () => {
     model_id: 'Managed gateway',
   }
 
+  const wifiProfileId = 'test-profile1'
+  const ethernetProfileId = 'ethernet-profile'
+
+  const organizationId = 'test-organization'
+
   beforeEach(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createGateway(gateway, userId)
-    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}`)
+
+    // Interceptors
     cy.intercept('GET', `/api/v3/gcs/gateways/managed/${gatewayId}*`, {
       statusCode: 200,
       body: {
@@ -46,7 +51,7 @@ describe('Managed Gateway connection settings', () => {
         version_ids: gatewayVersionIds,
       },
     }).as('get-is-gtw-managed')
-    cy.wait('@get-is-gtw-managed')
+
     cy.intercept('GET', `/api/v3/gcs/gateways/profiles/wifi/users/${userId}`, {
       statusCode: 200,
       body: {
@@ -66,9 +71,76 @@ describe('Managed Gateway connection settings', () => {
         ],
       },
     })
+
+    cy.intercept('PUT', `/api/v3/gcs/gateways/managed/${gatewayId}*`, {
+      statusCode: 200,
+      body: {
+        ids: {
+          gateway_id: gatewayId,
+        },
+      },
+    }).as('update-connection-settings')
+
+    cy.intercept('POST', `/api/v3/gcs/gateways/managed/${gatewayId}/wifi/scan`, {
+      statusCode: 200,
+      body: {
+        access_points: [
+          {
+            ssid: 'AccessPoint1',
+            bssid: 'EC656E000100',
+            channel: 0,
+            authentication_mode: 'open',
+            rssi: -70,
+          },
+        ],
+      },
+    }).as('scan-access-points')
+
+    cy.intercept('POST', `/api/v3/gcs/gateways/profiles/wifi/users/${userId}`, {
+      statusCode: 200,
+      body: {
+        profile_id: wifiProfileId,
+      },
+    })
+
+    cy.intercept('POST', `/api/v3/gcs/gateways/profiles/ethernet/users/${userId}`, {
+      statusCode: 200,
+      body: {
+        profile_id: ethernetProfileId,
+      },
+    })
+
+    cy.intercept('GET', `/api/v3/gcs/gateways/profiles/wifi/organizations/${organizationId}`, {
+      statusCode: 200,
+      body: {
+        profiles: [
+          {
+            profile_id: 'test-profile1',
+            profile_name: 'Test profile1',
+            shared: true,
+            ssid: 'profile1',
+          },
+          {
+            profile_id: 'test-profile2',
+            profile_name: 'Test profile2',
+            shared: true,
+            ssid: 'profile2',
+          },
+        ],
+      },
+    })
+    // End interceptors.
+
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}`)
+    cy.wait('@get-is-gtw-managed')
     cy.findByRole('heading', { name: 'test-managed-gateway' })
     cy.get('button').contains('Managed gateway').click()
     cy.get('a').contains('Connection settings').click()
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/connection-settings`,
+    )
     cy.findByTestId('error-notification').should('not.exist')
   })
 
@@ -85,15 +157,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to set WiFi connection with already created profile', () => {
-    const wifiProfileId = 'test-profile1'
-    cy.intercept('PUT', `/api/v3/gcs/gateways/managed/${gatewayId}*`, {
-      statusCode: 200,
-      body: {
-        ids: {
-          gateway_id: gatewayId,
-        },
-      },
-    }).as('update-connection-settings')
     cy.findByLabelText('Settings profile').selectOption(wifiProfileId)
     cy.findByText(
       'Please click "Save changes" to start using this WiFi profile for the gateway',
@@ -114,20 +177,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to validate new WiFi profile fields', () => {
-    cy.intercept('POST', `/api/v3/gcs/gateways/managed/${gatewayId}/wifi/scan`, {
-      statusCode: 200,
-      body: {
-        access_points: [
-          {
-            ssid: 'AccessPoint1',
-            bssid: 'EC656E000100',
-            channel: 0,
-            authentication_mode: 'open',
-            rssi: -70,
-          },
-        ],
-      },
-    }).as('scan-access-points')
     cy.findByLabelText('Settings profile').selectOption('shared')
     cy.wait('@scan-access-points')
     cy.findByLabelText(/Use default network interface settings/).uncheck()
@@ -145,35 +194,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to set WiFi connection with new shared profile', () => {
-    const wifiProfileId = 'wifi-profile'
-    cy.intercept('POST', `/api/v3/gcs/gateways/profiles/wifi/users/${userId}`, {
-      statusCode: 200,
-      body: {
-        profile_id: wifiProfileId,
-      },
-    })
-    cy.intercept('PUT', `/api/v3/gcs/gateways/managed/${gatewayId}*`, {
-      statusCode: 200,
-      body: {
-        ids: {
-          gateway_id: gatewayId,
-        },
-      },
-    }).as('update-connection-settings')
-    cy.intercept('POST', `/api/v3/gcs/gateways/managed/${gatewayId}/wifi/scan`, {
-      statusCode: 200,
-      body: {
-        access_points: [
-          {
-            ssid: 'AccessPoint1',
-            bssid: 'EC656E000100',
-            channel: 0,
-            authentication_mode: 'open',
-            rssi: -70,
-          },
-        ],
-      },
-    }).as('scan-access-points')
     cy.findByLabelText('Settings profile').selectOption('shared')
     cy.wait('@scan-access-points')
     cy.findByLabelText('Profile name').type('New WiFi profile')
@@ -197,35 +217,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to set WiFi connection with new non-shared profile', () => {
-    const wifiProfileId = 'wifi-profile'
-    cy.intercept('POST', `/api/v3/gcs/gateways/profiles/wifi/users/${userId}`, {
-      statusCode: 200,
-      body: {
-        profile_id: wifiProfileId,
-      },
-    })
-    cy.intercept('PUT', `/api/v3/gcs/gateways/managed/${gatewayId}*`, {
-      statusCode: 200,
-      body: {
-        ids: {
-          gateway_id: gatewayId,
-        },
-      },
-    }).as('update-connection-settings')
-    cy.intercept('POST', `/api/v3/gcs/gateways/managed/${gatewayId}/wifi/scan`, {
-      statusCode: 200,
-      body: {
-        access_points: [
-          {
-            ssid: 'AccessPoint1',
-            bssid: 'EC656E000100',
-            channel: 0,
-            authentication_mode: 'open',
-            rssi: -70,
-          },
-        ],
-      },
-    }).as('scan-access-points')
     cy.findByLabelText('Settings profile').selectOption('non-shared')
     cy.wait('@scan-access-points')
     cy.findByText('AccessPoint1').click()
@@ -248,21 +239,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to set Ethernet connection with default network settings', () => {
-    const ethernetProfileId = 'ethernet-profile'
-    cy.intercept('POST', `/api/v3/gcs/gateways/profiles/ethernet/users/${userId}`, {
-      statusCode: 200,
-      body: {
-        profile_id: ethernetProfileId,
-      },
-    })
-    cy.intercept('PUT', `/api/v3/gcs/gateways/managed/${gatewayId}*`, {
-      statusCode: 200,
-      body: {
-        ids: {
-          gateway_id: gatewayId,
-        },
-      },
-    }).as('update-connection-settings')
     cy.findByLabelText(/Enable ethernet connection/).check()
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.wait('@update-connection-settings')
@@ -292,21 +268,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to set Ethernet connection with custom network settings', () => {
-    const ethernetProfileId = 'ethernet-profile'
-    cy.intercept('POST', `/api/v3/gcs/gateways/profiles/ethernet/users/${userId}`, {
-      statusCode: 200,
-      body: {
-        profile_id: ethernetProfileId,
-      },
-    })
-    cy.intercept('PUT', `/api/v3/gcs/gateways/managed/${gatewayId}*`, {
-      statusCode: 200,
-      body: {
-        ids: {
-          gateway_id: gatewayId,
-        },
-      },
-    }).as('update-connection-settings')
     cy.findByLabelText(/Enable ethernet connection/).check()
     cy.findByLabelText(/Use a static IP address/).check()
     cy.findByText('IP addresses')
@@ -329,38 +290,7 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it("succeeds to set organization's WiFi profile", () => {
-    const wifiProfileId = 'test-profile1'
-    const organizationId = 'test-organization'
     const organization = { ids: { organization_id: organizationId }, name: 'Test organization' }
-    cy.intercept('GET', `/api/v3/gcs/gateways/profiles/wifi/organizations/${organizationId}`, {
-      statusCode: 200,
-      body: {
-        profiles: [
-          {
-            profile_id: 'test-profile1',
-            profile_name: 'Test profile1',
-            shared: true,
-            ssid: 'profile1',
-          },
-          {
-            profile_id: 'test-profile2',
-            profile_name: 'Test profile2',
-            shared: true,
-            ssid: 'profile2',
-          },
-        ],
-      },
-    })
-
-    cy.intercept('PUT', `/api/v3/gcs/gateways/managed/${gatewayId}*`, {
-      statusCode: 200,
-      body: {
-        ids: {
-          gateway_id: gatewayId,
-        },
-      },
-    }).as('update-connection-settings')
-
     cy.createOrganization(organization, userId)
     cy.createCollaborator('gateways', gatewayId, {
       collaborator: {

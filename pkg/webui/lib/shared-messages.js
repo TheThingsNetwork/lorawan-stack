@@ -395,7 +395,7 @@ export default defineMessages({
   organizations: 'Organizations',
   otaa: 'Over the air activation (OTAA)',
   otherCluster: 'Other cluster',
-  otherOption: 'Other…',
+  otherOption: 'Other...',
   overview: 'Overview',
   packetBroker: 'Packet Broker',
   password: 'Password',

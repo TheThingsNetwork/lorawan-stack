@@ -54,7 +54,12 @@ const ShowProfilesSelect = ({ name, ...rest }) => {
 
   useEffect(() => {
     if (!Boolean(value)) {
-      const collaboratorIds = Object.keys(collaborators)
+      const collaboratorIds = Object.keys(collaborators).filter(key => {
+        const value = collaborators[key]
+        const userIdCheck = value.ids.user_ids?.user_id === userId
+        const organizationIdCheck = Boolean(value.ids.organization_ids?.organization_id)
+        return userIdCheck || organizationIdCheck
+      })
       setFieldValue(
         name,
         collaboratorIds.length && collaboratorIds[0] !== userId ? collaboratorIds[0] : userId,
