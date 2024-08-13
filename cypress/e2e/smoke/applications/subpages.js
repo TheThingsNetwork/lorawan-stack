@@ -90,7 +90,7 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
       cy.findByRole('button', { name: 'Collapse' }).click()
       cy.findByTestId('error-notification').should('not.exist')
     })
-  cy.findByRole('heading', { name: 'Device & Application Services' })
+  cy.findByRole('heading', { name: 'Modem Services' })
     .closest('[data-test-id="collapsible-section"]')
     .within(() => {
       cy.findByRole('button', { name: 'Expand' }).click()

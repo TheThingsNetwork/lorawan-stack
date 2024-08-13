@@ -108,7 +108,7 @@ const LoRaCloud = () => {
                 <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
                 <LoRaCloudGeolocationServicesForm />
               </Collapse>
-              <Collapse title="Device & Application Services" description={m.dasDescription}>
+              <Collapse title="Modem Services" description={m.dasDescription}>
                 <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
                 <LoRaCloudModemServicesForm />
               </Collapse>
