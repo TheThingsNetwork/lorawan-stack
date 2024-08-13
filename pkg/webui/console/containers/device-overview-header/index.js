@@ -419,6 +419,7 @@ const DeviceOverviewHeader = ({ device }) => {
               noDropdownIcon
               dropdownItems={menuDropdownItems}
               dropdownPosition="below left"
+              data-test-id="device-header-menu"
             />
           </div>
           <DeviceDeleteModal
