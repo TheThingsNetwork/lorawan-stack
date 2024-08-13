@@ -231,6 +231,16 @@ export const mayPerformAdminActions = {
   check: isAdmin => isAdmin,
 }
 
+export const mayPerformAllClientActions = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_CLIENT_ALL'),
+}
+
+export const mayEditBasicClientInformation = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_CLIENT_SETTINGS_BASIC'),
+}
+
 export const mayManageUsers = mayPerformAdminActions
 export const mayPurgeEntities = mayPerformAdminActions
 export const mayConfigurePacketBroker = mayPerformAdminActions

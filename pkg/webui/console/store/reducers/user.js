@@ -22,7 +22,10 @@ import {
 const defaultState = {
   user: undefined,
   error: undefined,
-  rights: undefined,
+  rights: {
+    regular: [],
+    pseudo: [],
+  },
 }
 
 const user = (state = defaultState, { type, payload }) => {
@@ -49,7 +52,10 @@ const user = (state = defaultState, { type, payload }) => {
     case GET_USER_RIGHTS_SUCCESS:
       return {
         ...state,
-        rights: payload,
+        rights: {
+          regular: payload.filter(right => !right.endsWith('_ALL')),
+          pseudo: payload.filter(right => right.endsWith('_ALL')),
+        },
       }
     default:
       return state

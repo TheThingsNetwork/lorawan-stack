@@ -54,4 +54,12 @@ export const selectUserIsAdmin = state => {
   return user ? user.isAdmin : false
 }
 
-export const selectUserRights = state => selectUserStore(state).rights
+// Rights.
+export const selectUserRights = createSelector(selectUserStore, ({ rights }) => [
+  ...rights.regular,
+  ...rights.pseudo,
+])
+export const selectUserRegularRights = state => selectUserStore(state).rights?.regular
+export const selectUserPseudoRights = state => selectUserStore(state).rights?.pseudo
+export const selectUserRightsError = createErrorSelector(GET_USER_RIGHTS_BASE)
+export const selectUserRightsFetching = createFetchingSelector(GET_USER_RIGHTS_BASE)

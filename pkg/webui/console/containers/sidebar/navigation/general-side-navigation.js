@@ -136,6 +136,11 @@ const GeneralSideNavigation = () => {
             path="/user-settings/authorizations"
             icon={IconLockOpen}
           />
+          <SideNavigation.Item
+            title={sharedMessages.oauthClients}
+            path="/user-settings/oauth-clients"
+            icon={IconUserShield}
+          />
         </SideNavigation.Item>
       </SideNavigation>
       {!isMinimized && <TopEntitiesSection topEntities={topEntities} />}

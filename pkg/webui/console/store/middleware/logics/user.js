@@ -90,4 +90,17 @@ const deleteUserLogic = createRequestLogic({
   },
 })
 
-export default [applyPersistedStateLogic, updateUserLogic, deleteUserLogic]
+const getUserRightsLogic = createRequestLogic({
+  type: user.GET_USER_RIGHTS,
+  process: async ({ getState }) => {
+    const userId = selectUserId(getState())
+    if (!userId) {
+      return []
+    }
+    const result = await tts.Users.getRightsById(userId)
+
+    return result.rights.sort()
+  },
+})
+
+export default [applyPersistedStateLogic, updateUserLogic, deleteUserLogic, getUserRightsLogic]

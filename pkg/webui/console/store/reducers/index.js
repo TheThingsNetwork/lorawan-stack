@@ -25,6 +25,7 @@ import {
   getApiKeyId,
   getCollaboratorId,
   getPacketBrokerNetworkId,
+  getClientId,
 } from '@ttn-lw/lib/selectors/id'
 import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
@@ -122,6 +123,7 @@ export default combineReducers({
       PACKET_BROKER_NETWORKS_SHARED_NAME,
       getPacketBrokerNetworkId,
     ),
+    clients: createNamedPaginationReducer('CLIENTS', getClientId),
   }),
   js,
   gatewayStatus,

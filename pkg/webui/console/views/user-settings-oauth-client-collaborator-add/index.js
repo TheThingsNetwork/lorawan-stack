@@ -1,4 +1,4 @@
-// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,15 +19,14 @@ import { CLIENT } from '@console/constants/entities'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import PageTitle from '@ttn-lw/components/page-title'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
-import AccountCollaboratorsForm from '@account/containers/collaborators-form'
+import AccountCollaboratorsForm from '@console/containers/collaborators-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getClientRights } from '@account/store/actions/clients'
+import { getClientRights } from '@console/store/actions/clients'
 
 const OAuthClientCollaboratorAddInner = () => {
   const { clientId } = useParams()
@@ -35,14 +34,13 @@ const OAuthClientCollaboratorAddInner = () => {
   useBreadcrumbs(
     'user-settings.oauth-clients.single.collaborators.add',
     <Breadcrumb
-      path={`/oauth-clients/${clientId}/collaborators/add`}
+      path={`/user-settings/oauth-clients/${clientId}/collaborators/add`}
       content={sharedMessages.add}
     />,
   )
 
   return (
-    <div className="container container--lg grid">
-      <PageTitle title={sharedMessages.addCollaborator} />
+    <div className="container container--xl grid">
       <div className="item-12 xl:item-8">
         <AccountCollaboratorsForm entity={CLIENT} entityId={clientId} />
       </div>

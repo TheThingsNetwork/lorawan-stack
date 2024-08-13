@@ -30,7 +30,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 
 import style from './collaborators-table.styl'
 
@@ -72,10 +72,10 @@ const CollaboratorsTable = props => {
           )
         }
         return (
-          <>
+          <div className="d-flex al-center">
             <Icon icon={icon} className="mr-cs-xs" />
             {userLabel}
-          </>
+          </div>
         )
       },
     },

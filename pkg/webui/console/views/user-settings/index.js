@@ -26,6 +26,7 @@ import UserApiKeys from '@console/views/user-api-keys'
 import ChangePassword from '@console/views/user-settings-password'
 import SessionManagement from '@console/views/user-settings-sessions'
 import OAuthClientAuthorizations from '@console/views/user-settings-oauth-client-authorizations'
+import OAuthClients from '@console/views/user-settings-oauth-clients'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -44,6 +45,7 @@ const UserSettings = () => {
         <Route path="api-keys/*" Component={UserApiKeys} />
         <Route path="sessions/*" Component={SessionManagement} />
         <Route path="authorizations/*" Component={OAuthClientAuthorizations} />
+        <Route path="oauth-clients/*" Component={OAuthClients} />
         <Route index element={<Navigate to="profile" />} />
         <Route path="*" Component={GenericNotFound} />
       </Routes>
