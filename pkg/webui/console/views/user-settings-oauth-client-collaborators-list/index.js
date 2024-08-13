@@ -25,12 +25,16 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import CollaboratorsTable from '@console/containers/collaborators-table'
 
+import Require from '@console/lib/components/require'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
 } from '@ttn-lw/lib/store/selectors/collaborators'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+
+import { mayViewOrEditClientCollaborators } from '@console/lib/feature-checks'
 
 const OAuthClientCollaboratorsList = () => {
   const { clientId } = useParams()
@@ -51,20 +55,25 @@ const OAuthClientCollaboratorsList = () => {
   useBreadcrumbs(
     'user-settings.oauth-clients.single.collaborators',
     <Breadcrumb
-      path={`/oauth-clients/${clientId}/collaborators`}
+      path={`/user-settings/oauth-clients/${clientId}/collaborators`}
       content={sharedMessages.collaborators}
     />,
   )
 
   return (
-    <div className="container container--xxl">
-      <IntlHelmet title={sharedMessages.collaborators} />
-      <CollaboratorsTable
-        pageSize={PAGE_SIZES.REGULAR}
-        baseDataSelector={baseDataSelectors}
-        getItemsAction={getCollaborators}
-      />
-    </div>
+    <Require
+      featureCheck={mayViewOrEditClientCollaborators}
+      otherwise={{ redirect: '/user-settings/oauth-clients' }}
+    >
+      <div className="container container--xxl">
+        <IntlHelmet title={sharedMessages.collaborators} />
+        <CollaboratorsTable
+          pageSize={PAGE_SIZES.REGULAR}
+          baseDataSelector={baseDataSelectors}
+          getItemsAction={getCollaborators}
+        />
+      </div>
+    </Require>
   )
 }
 

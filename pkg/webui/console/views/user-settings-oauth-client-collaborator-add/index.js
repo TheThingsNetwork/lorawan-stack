@@ -20,13 +20,13 @@ import { CLIENT } from '@console/constants/entities'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
-import RequireRequest from '@ttn-lw/lib/components/require-request'
-
 import AccountCollaboratorsForm from '@console/containers/collaborators-form'
+
+import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getClientRights } from '@console/store/actions/clients'
+import { mayViewOrEditClientCollaborators } from '@console/lib/feature-checks'
 
 const OAuthClientCollaboratorAddInner = () => {
   const { clientId } = useParams()
@@ -48,14 +48,13 @@ const OAuthClientCollaboratorAddInner = () => {
   )
 }
 
-const OAuthClientCollaboratorAdd = () => {
-  const { clientId } = useParams()
-
-  return (
-    <RequireRequest requestAction={getClientRights(clientId)}>
-      <OAuthClientCollaboratorAddInner />
-    </RequireRequest>
-  )
-}
+const OAuthClientCollaboratorAdd = () => (
+  <Require
+    featureCheck={mayViewOrEditClientCollaborators}
+    otherwise={{ redirect: '/user-settings/oauth-clients' }}
+  >
+    <OAuthClientCollaboratorAddInner />
+  </Require>
+)
 
 export default OAuthClientCollaboratorAdd

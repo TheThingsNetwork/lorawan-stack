@@ -25,6 +25,12 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
 
+import {
+  checkFromState,
+  mayDeleteClients,
+  mayEditBasicClientInformation,
+} from '@console/lib/feature-checks'
+
 import { deleteClient, updateClient } from '@console/store/actions/clients'
 
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
@@ -64,6 +70,8 @@ const ClientAdd = props => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const isConfig = useSelector(selectIsConfiguration)
+  const mayEdit = useSelector(state => checkFromState(mayEditBasicClientInformation, state))
+  const mayDelete = useSelector(state => checkFromState(mayDeleteClients, state))
   const isResctrictedUser =
     isConfig && isConfig.collaborator_rights?.set_others_as_contacts === false
 
@@ -144,6 +152,8 @@ const ClientAdd = props => {
       rights={rights}
       pseudoRights={pseudoRights}
       isResctrictedUser={isResctrictedUser}
+      readOnly={!isAdmin && !mayEdit}
+      mayDelete={mayDelete}
     />
   )
 }

@@ -71,7 +71,7 @@ const OAuthClientInner = () => {
   )
 
   return (
-    <React.Fragment>
+    <>
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
       <div className={style.titleSection}>
         <div className="container container--xl grid pb-0">
@@ -87,7 +87,7 @@ const OAuthClientInner = () => {
         <Route path="collaborators/add" Component={OAuthClientCollaboratorAdd} />
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
-    </React.Fragment>
+    </>
   )
 }
 

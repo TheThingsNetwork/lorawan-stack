@@ -14,7 +14,14 @@
 
 import { combineReducers } from 'redux'
 
-import { APPLICATION, END_DEVICE, GATEWAY, USER, ORGANIZATION } from '@console/constants/entities'
+import {
+  APPLICATION,
+  END_DEVICE,
+  GATEWAY,
+  USER,
+  ORGANIZATION,
+  CLIENT,
+} from '@console/constants/entities'
 
 import {
   getUserId,
@@ -100,6 +107,7 @@ export default combineReducers({
     gateways: createNamedRightsReducer(GATEWAY),
     organizations: createNamedRightsReducer(ORGANIZATION),
     users: createNamedRightsReducer(USER),
+    clients: createNamedRightsReducer(CLIENT),
   }),
   events: combineReducers({
     applications: createNamedEventsReducer(APPLICATION),

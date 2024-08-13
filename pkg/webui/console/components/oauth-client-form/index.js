@@ -57,6 +57,8 @@ const OAuthClientForm = props => {
     onSubmit,
     onDelete,
     isResctrictedUser,
+    readOnly,
+    mayDelete,
   } = props
   const { formatMessage } = useIntl()
 
@@ -109,6 +111,7 @@ const OAuthClientForm = props => {
       onSubmit={handleSubmit}
       initialValues={initialValues}
       validationSchema={validationSchema}
+      disabled={readOnly}
     >
       <Form.SubTitle title={sharedMessages.generalSettings} />
       <Form.Field
@@ -255,7 +258,7 @@ const OAuthClientForm = props => {
           message={update ? sharedMessages.saveChanges : m.createClient}
           component={SubmitButton}
         />
-        {update && (
+        {update && mayDelete && (
           <DeleteModalButton
             message={m.deleteClient}
             entityId={initialValues.ids.client_id}
@@ -286,6 +289,7 @@ OAuthClientForm.propTypes = {
   onDelete: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
+  readOnly: PropTypes.bool,
   rights: PropTypes.rights,
   update: PropTypes.bool,
   userId: PropTypes.string.isRequired,
@@ -307,6 +311,7 @@ OAuthClientForm.defaultProps = {
     state_description: '',
   },
   update: false,
+  readOnly: false,
   rights: undefined,
   error: undefined,
   onDelete: () => null,

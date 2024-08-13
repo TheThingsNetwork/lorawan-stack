@@ -15,7 +15,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
@@ -24,13 +23,11 @@ import DataSheet from '@ttn-lw/components/data-sheet'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import DateTime from '@ttn-lw/lib/components/date-time'
-import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import EntityTitleSection from '@console/components/entity-title-section'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
-import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/collaborators'
 
 import { mayPerformAdminActions } from '@console/lib/feature-checks'
@@ -45,7 +42,7 @@ import style from './user-settings-oauth-client-overview.styl'
 
 const { Content } = EntityTitleSection
 
-const OAuthClientOverviewInner = () => {
+const OAuthClientOverview = () => {
   const oauthClient = useSelector(selectSelectedClient)
   const oauthClientId = oauthClient.ids.client_id || oauthClient.name
   const { created_at, updated_at, state, state_description, secret, name } = oauthClient
@@ -127,16 +124,6 @@ const OAuthClientOverviewInner = () => {
         </div>
       </div>
     </>
-  )
-}
-
-const OAuthClientOverview = () => {
-  const { clientId } = useParams()
-
-  return (
-    <RequireRequest requestAction={getCollaboratorsList('client', clientId)}>
-      <OAuthClientOverviewInner />
-    </RequireRequest>
   )
 }
 

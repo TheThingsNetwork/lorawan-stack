@@ -31,7 +31,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 
-import { checkFromState, mayPerformAllClientActions } from '@console/lib/feature-checks'
+import { checkFromState, mayCreateClients } from '@console/lib/feature-checks'
 
 import { deleteClient, restoreClient, getClientsList } from '@console/store/actions/clients'
 
@@ -61,7 +61,7 @@ const tabs = [
   },
   { title: sharedMessages.deleted, name: DELETED_TAB },
 ]
-const mayAddSelector = state => checkFromState(mayPerformAllClientActions, state)
+const mayAddSelector = state => checkFromState(mayCreateClients, state)
 
 const ClientsTable = () => {
   const { formatMessage } = useIntl()

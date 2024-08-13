@@ -19,24 +19,19 @@ import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 import PageTitle from '@ttn-lw/components/page-title'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import ClientsTable from '@console/containers/oauth-clients-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { getUserRights } from '@console/store/actions/user'
-
 const ClientsList = () => (
-  <RequireRequest requestAction={getUserRights()}>
-    <div className="container container--xxl p-vert-cs-xs p-sides-0">
-      <IntlHelmet title={sharedMessages.oauthClients} />
-      <div className="item-12">
-        <PageTitle title={sharedMessages.oauthClients} hideHeading />
-        <ClientsTable pageSize={PAGE_SIZES.REGULAR} />
-      </div>
+  <div className="container container--xxl p-vert-cs-xs p-sides-0">
+    <IntlHelmet title={sharedMessages.oauthClients} />
+    <div className="item-12">
+      <PageTitle title={sharedMessages.oauthClients} hideHeading />
+      <ClientsTable pageSize={PAGE_SIZES.REGULAR} />
     </div>
-  </RequireRequest>
+  </div>
 )
 
 export default ClientsList

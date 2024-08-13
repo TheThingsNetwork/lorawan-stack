@@ -19,6 +19,8 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import OAuthClientEdit from '@console/containers/oauth-client-edit'
 
+import { checkFromState, mayEditBasicClientInformation } from '@console/lib/feature-checks'
+
 import { getUserRights } from '@console/store/actions/user'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
 
@@ -36,6 +38,7 @@ const OAuthClientGeneralSettingsInner = () => {
   const regularRights = useSelector(selectUserRegularRights)
   const pseudoRights = useSelector(selectUserPseudoRights)
   const oauthClient = useSelector(selectSelectedClient)
+  const mayEdit = useSelector(state => checkFromState(mayEditBasicClientInformation, state))
 
   return (
     <div className="container container--xl grid">
@@ -46,6 +49,7 @@ const OAuthClientGeneralSettingsInner = () => {
           userId={userId}
           rights={regularRights}
           pseudoRights={pseudoRights}
+          readOnly={!mayEdit}
           update
         />
       </div>

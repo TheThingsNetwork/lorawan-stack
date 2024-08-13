@@ -21,12 +21,16 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
+import Require from '@console/lib/components/require'
+
 import OAuthClientAdd from '@console/views/user-settings-oauth-client-add'
 import OAuthClient from '@console/views/user-settings-oauth-client'
 import ClientsList from '@console/views/user-settings-oauth-clients-list'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
+
+import { mayViewClientsOfUser } from '@console/lib/feature-checks'
 
 const OAuthClients = () => {
   useBreadcrumbs(
@@ -35,15 +39,19 @@ const OAuthClients = () => {
   )
 
   return (
-    <Routes>
-      <Route index Component={ClientsList} />
-      <Route path="add" Component={OAuthClientAdd} />
-      <Route
-        path=":clientId/*"
-        element={<ValidateRouteParam check={{ clientId: pathIdRegexp }} Component={OAuthClient} />}
-      />
-      <Route path="*" element={<GenericNotFound />} />
-    </Routes>
+    <Require featureCheck={mayViewClientsOfUser} otherwise={{ redirect: '/user-settings' }}>
+      <Routes>
+        <Route index Component={ClientsList} />
+        <Route path="add" Component={OAuthClientAdd} />
+        <Route
+          path=":clientId/*"
+          element={
+            <ValidateRouteParam check={{ clientId: pathIdRegexp }} Component={OAuthClient} />
+          }
+        />
+        <Route path="*" element={<GenericNotFound />} />
+      </Routes>
+    </Require>
   )
 }
 export default OAuthClients
