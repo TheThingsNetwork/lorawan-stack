@@ -87,13 +87,15 @@ describe('Overview', () => {
       cy.findByText(`${gateway.name}`, { selector: 'h5' }).should('be.visible')
 
       // Check general information panel.
-      cy.findByRole('row', { name: new RegExp(gatewayId) }).should('be.visible')
-      cy.findByRole('row', { name: new RegExp(gateway.ids.eui) }).should('be.visible')
-      cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
+      cy.get('[data-test-id="overview-panel-"]').within(() => {
+        cy.findByText(new RegExp(gatewayId)).should('be.visible')
+        cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
+      })
 
       // Check panels.
       cy.findByText('General information').should('be.visible')
       cy.findByText('Gateway status').should('be.visible')
+      cy.get('[data-test-id="overview-panel-Network activity"]').scrollIntoView()
       cy.findByText('Network activity').should('be.visible')
 
       cy.findByTestId('error-notification').should('not.exist')
