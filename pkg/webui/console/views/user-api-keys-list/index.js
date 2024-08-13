@@ -25,7 +25,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import { selectApiKeys, selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 
 const UserApiKeysList = () => {
   const userId = useSelector(selectUserId)
@@ -49,10 +49,10 @@ const UserApiKeysList = () => {
   )
 
   return (
-    <div className="container container--xxl">
+    <>
       <IntlHelmet title={sharedMessages.personalApiKeys} />
       <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
-    </div>
+    </>
   )
 }
 

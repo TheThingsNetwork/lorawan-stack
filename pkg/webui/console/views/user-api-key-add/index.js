@@ -35,8 +35,8 @@ const UserApiKeyAddInner = () => {
   const userId = useSelector(selectUserId)
 
   useBreadcrumbs(
-    'usr.single.api-keys.add',
-    <Breadcrumb path={`/users/api-keys/add`} content={sharedMessages.add} />,
+    'user-settings.api-keys.add',
+    <Breadcrumb path={`/user-settings/api-keys/add`} content={sharedMessages.add} />,
   )
 
   return (

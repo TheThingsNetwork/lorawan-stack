@@ -39,8 +39,8 @@ const UserApiKeyEditInner = () => {
   const { apiKeyId } = useParams()
 
   useBreadcrumbs(
-    'usr.single.api-keys.edit',
-    <Breadcrumb path={`/users/api-keys/edit/${apiKeyId}`} content={sharedMessages.edit} />,
+    'user-settings.api-keys.edit',
+    <Breadcrumb path={`/user-settings/api-keys/edit/${apiKeyId}`} content={sharedMessages.edit} />,
   )
 
   return (

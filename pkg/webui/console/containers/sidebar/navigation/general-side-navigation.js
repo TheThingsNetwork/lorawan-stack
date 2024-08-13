@@ -21,10 +21,13 @@ import {
   IconUsersGroup,
   IconLayoutDashboard,
   IconUserShield,
-  IconKey,
   IconInbox,
   IconAperture,
   IconTextCaption,
+  IconUserCircle,
+  IconPassword,
+  IconUserCog,
+  IconApiKeys,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
@@ -34,7 +37,6 @@ import {
   checkFromState,
   mayConfigurePacketBroker,
   mayManageUsers,
-  mayViewOrEditApiKeys,
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
 import getCookie from '@console/lib/table-utils'
@@ -54,16 +56,11 @@ const GeneralSideNavigation = () => {
   const mayViewOrgs = useSelector(state =>
     user ? checkFromState(mayViewOrganizationsOfUser, state) : false,
   )
-  const mayHandleApiKeys = useSelector(state =>
-    user ? checkFromState(mayViewOrEditApiKeys, state) : false,
-  )
   const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))
   const showPacketBroker = useSelector(state => checkFromState(mayConfigurePacketBroker, state))
 
   const orgPageSize = getCookie('organizations-list-page-size')
   const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
-  const keysPageSize = getCookie('keys-list-page-size')
-  const keysParam = `?page-size=${keysPageSize ? keysPageSize : PAGE_SIZES.REGULAR}`
 
   return (
     <>
@@ -86,13 +83,6 @@ const GeneralSideNavigation = () => {
           path="/notifications/inbox"
           icon={IconInbox}
         />
-        {mayHandleApiKeys && (
-          <SideNavigation.Item
-            title={sharedMessages.personalApiKeys}
-            path={`/user/api-keys${keysParam}`}
-            icon={IconKey}
-          />
-        )}
         {isUserAdmin && (
           <SideNavigation.Item
             title={sharedMessages.adminPanel}
@@ -120,6 +110,23 @@ const GeneralSideNavigation = () => {
             )}
           </SideNavigation.Item>
         )}
+        <SideNavigation.Item title={sharedMessages.userSettings} icon={IconUserCog}>
+          <SideNavigation.Item
+            title={sharedMessages.profile}
+            path="/user-settings/profile"
+            icon={IconUserCircle}
+          />
+          <SideNavigation.Item
+            title={sharedMessages.password}
+            path="/user-settings/password"
+            icon={IconPassword}
+          />
+          <SideNavigation.Item
+            title={sharedMessages.personalApiKeys}
+            path="/user-settings/api-keys"
+            icon={IconApiKeys}
+          />
+        </SideNavigation.Item>
       </SideNavigation>
       {!isMinimized && <TopEntitiesSection topEntities={topEntities} />}
     </>

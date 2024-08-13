@@ -69,6 +69,7 @@ const consoleAppLogic = createRequestLogic({
         const userResult = await tts.Users.getById(userId, [
           'state',
           'name',
+          'primary_email_address',
           'primary_email_address_validated_at',
           'profile_picture',
           'console_preferences',
