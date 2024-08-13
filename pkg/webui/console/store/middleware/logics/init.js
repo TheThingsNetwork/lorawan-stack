@@ -19,6 +19,8 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import * as init from '@ttn-lw/lib/store/actions/init'
 import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
+import { selectPageStatusBaseUrlConfig } from '@ttn-lw/lib/selectors/env'
+import { getNetworkStatusSummary } from '@ttn-lw/lib/store/actions/status'
 
 import * as user from '@console/store/actions/logout'
 import {
@@ -61,6 +63,7 @@ const consoleAppLogic = createRequestLogic({
     if (info) {
       try {
         const userId = info.oauth_access_token.user_ids.user_id
+        const statusPageUrl = selectPageStatusBaseUrlConfig()
         dispatch(user.getUserMe())
         dispatch(user.applyPersistedState(userId))
         const userResult = await tts.Users.getById(userId, [
@@ -75,6 +78,9 @@ const consoleAppLogic = createRequestLogic({
         dispatch(getInboxNotifications({ page: 1, limit: 3 }))
         dispatch(getAllBookmarks(userId))
         dispatch(getUnseenNotificationsPeriodically())
+        if (statusPageUrl) {
+          dispatch(getNetworkStatusSummary())
+        }
       } catch (error) {
         dispatch(user.getUserMeFailure(error))
       }

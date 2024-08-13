@@ -29,8 +29,6 @@ import Link from '@ttn-lw/components/link'
 import { useAlertBanner } from '@ttn-lw/components/alert-banner/context'
 import StatusLabel from '@ttn-lw/components/status-label'
 
-import RequireRequest from '@ttn-lw/lib/components/require-request'
-
 import StatusIndicator from '@console/containers/app-status-badge/status-indicator'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -41,7 +39,6 @@ import {
   selectUpcomingMaintenancesStore,
 } from '@ttn-lw/lib/store/selectors/status'
 import { selectPageStatusBaseUrlConfig } from '@ttn-lw/lib/selectors/env'
-import { getNetworkStatusSummary } from '@ttn-lw/lib/store/actions/status'
 
 import alertStyle from '../../../components/alert-banner/alert-banner.styl'
 import statusLabelStyle from '../../../components/status-label/status-label.styl'
@@ -60,6 +57,8 @@ const m = defineMessages({
   maintenance: 'Maintenance',
   maintenanceScheduledSubtitle: '<link>Maintenance</link> scheduled in less than 1 hour',
 })
+
+// NOTE: The network status is fetched during initialization in the init logic.
 
 const AppStatusBadge = ({ className }) => {
   const onlineStatus = useSelector(selectOnlineStatus)
@@ -145,25 +144,20 @@ const AppStatusBadge = ({ className }) => {
   }
 
   return (
-    <RequireRequest
-      requestAction={statusPageUrl ? getNetworkStatusSummary() : []}
-      handleErrors={false}
-    >
-      <StatusLabel
-        type={status.type}
-        icon={status.icon}
-        content={status.label}
-        className={classnames(style.appStatusBadge, className)}
-        contentValues={{
-          link: link => (
-            <Link className={statusLabelStyle.link} to={statusPageUrl} target="_blank">
-              <span>{link}</span>
-            </Link>
-          ),
-        }}
-        onClick={handleBadgeClick}
-      />
-    </RequireRequest>
+    <StatusLabel
+      type={status.type}
+      icon={status.icon}
+      content={status.label}
+      className={classnames(style.appStatusBadge, className)}
+      contentValues={{
+        link: link => (
+          <Link className={statusLabelStyle.link} to={statusPageUrl} target="_blank">
+            <span>{link}</span>
+          </Link>
+        ),
+      }}
+      onClick={handleBadgeClick}
+    />
   )
 }
 
