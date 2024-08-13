@@ -486,3 +486,64 @@ dwell-time:
 		})
 	}
 }
+
+func TestGetGatewayFrequencyPlans(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+
+	store := frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{
+		"frequency-plans.yml": []byte(`- id: EU_863_870
+  band-id: EU_863_870
+  name: Europe 863-870 MHz (SF12 for RX2)
+  description: Default frequency plan for Europe
+  base-frequency: 868
+  file: EU_863_870.yml
+- id: EU_863_870_TTN
+  band-id: EU_863_870
+  name: Europe 863-870 MHz (SF9 for RX2 - recommended)
+  description: TTN Community Network frequency plan for Europe, using SF9 for RX2
+  base-frequency: 868
+  base-id: EU_863_870
+  file: EU_863_870_TTN.yml
+- id: US_902_928_FSB_1
+  band-id: US_902_928
+  name: United States 902-928 MHz, FSB 1
+  description: Default frequency plan for the United States and Canada, using sub-band 1
+  base-frequency: 915
+  file: US_902_928_FSB_1.yml
+- id: AS_923_2
+  band-id: AS_923_2
+  name: Asia 920-923 MHz (AS923 Group 2) with only default channels
+  description: Compatibility frequency plan for Asian countries with common channels in the 921.4-922.0 MHz sub-band
+  base-frequency: 915
+  file: AS_923_2.yml
+- id: AS_923_2_DT
+  band-id: AS_923_2
+  name: Asia 920-923 MHz (AS923 Group 2) with only default channels and dwell time enabled
+  base-frequency: 915
+  base-id: AS_923_2
+  file: enable_dwell_time_400ms.yml
+`),
+		"EU_863_870.yml": []byte(`band-id: EU_863_870
+gateways: false
+`),
+		"EU_863_870_TTN.yml": []byte(`gateways: true
+`),
+		"US_902_928_FSB_1.yml": []byte(`band-id: US_902_928
+`),
+		"AS_923_2.yml": []byte(`band-id: AS_923_2
+gateways: true
+`),
+		"enable_dwell_time_400ms.yml": []byte(`gateways: false
+`),
+	}))
+
+	// Frequency plan with gateways
+	{
+		plans, err := store.GetGatewayFrequencyPlans()
+		a.So(err, should.BeNil)
+		a.So(plans, should.HaveLength, 2)
+		a.So(plans[0].BandID, should.Equal, "EU_863_870")
+		a.So(plans[1].BandID, should.Equal, "AS_923_2")
+	}
+}
