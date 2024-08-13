@@ -41,7 +41,7 @@ import { getPubsubsList } from '@console/store/actions/pubsubs'
 import { getWebhooksList } from '@console/store/actions/webhooks'
 import { getApplicationLink } from '@console/store/actions/link'
 import { getApiKeysList } from '@console/store/actions/api-keys'
-import { getIsConfiguration } from '@account/store/actions/identity-server'
+import { getIsConfiguration } from '@console/store/actions/identity-server'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 

@@ -31,13 +31,13 @@ import { getGateway } from '@console/store/actions/gateways'
 import { getOrganization } from '@console/store/actions/organizations'
 import { getUser } from '@account/store/actions/user'
 import { getDevice } from '@console/store/actions/devices'
-import { getClient } from '@account/store/actions/clients'
+import { getClient } from '@console/store/actions/clients'
 
 import { selectApplicationById } from '@console/store/selectors/applications'
 import { selectGatewayById } from '@console/store/selectors/gateways'
 import { selectOrganizationById } from '@console/store/selectors/organizations'
 import { selectUserById } from '@console/store/selectors/users'
-import { selectClientById } from '@account/store/selectors/clients'
+import { selectClientById } from '@console/store/selectors/clients'
 import { selectDeviceByIds } from '@console/store/selectors/devices'
 
 const iconMap = {

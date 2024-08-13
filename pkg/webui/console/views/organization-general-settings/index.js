@@ -38,8 +38,8 @@ import {
   mayDeleteOrganization,
   mayViewOrEditOrganizationApiKeys,
   mayViewOrEditOrganizationCollaborators,
+  checkFromState,
 } from '@console/lib/feature-checks'
-import { checkFromState } from '@account/lib/feature-checks'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
