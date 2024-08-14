@@ -87,9 +87,7 @@ const DeviceOverview = () => {
           <DeviceGeneralInformationPanel frequencyPlans={frequencyPlans} />
         </div>
         <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
-          <BlurryNetworkActivityPanel />
-        </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+          <BlurryNetworkActivityPanel className="mb-ls-s h-content" />
           <DeviceMapPanel />
         </div>
       </div>

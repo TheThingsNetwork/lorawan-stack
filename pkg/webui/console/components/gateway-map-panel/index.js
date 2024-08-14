@@ -23,7 +23,7 @@ import locationToMarkers from '@console/lib/location-to-markers'
 
 import MapPanel from '../map-panel'
 
-const GatewayMapPanel = ({ gateway }) => {
+const GatewayMapPanel = ({ gateway, className }) => {
   const { gateway_id } = gateway.ids
 
   const markers = gateway.antennas
@@ -41,12 +41,18 @@ const GatewayMapPanel = ({ gateway }) => {
       markers={markers}
       entity={GATEWAY}
       locationLink={locationLink}
+      className={className}
     />
   )
 }
 
 GatewayMapPanel.propTypes = {
+  className: PropTypes.string,
   gateway: PropTypes.gateway.isRequired,
+}
+
+GatewayMapPanel.defaultProps = {
+  className: undefined,
 }
 
 export default GatewayMapPanel

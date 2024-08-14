@@ -22,6 +22,7 @@ import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './blurry-network-activity-panel.styl'
@@ -31,7 +32,7 @@ const toggleOptions = [
   { label: sharedMessages.packetsPerChannel, value: 1 },
 ]
 
-const BlurryNetworkActivityPanel = () => {
+const BlurryNetworkActivityPanel = ({ className }) => {
   const [activeToggle, setActiveToggle] = useState(0)
 
   const handleToggleChange = useCallback((_, value) => {
@@ -48,7 +49,7 @@ const BlurryNetworkActivityPanel = () => {
       shortCutLinkPath="#"
       shortCutLinkTarget="_blank"
       shortCutLinkDisabled
-      className={style.panel}
+      className={classnames(style.panel, className)}
     >
       <Toggle
         options={toggleOptions}
@@ -81,6 +82,14 @@ const BlurryNetworkActivityPanel = () => {
       </div>
     </Panel>
   )
+}
+
+BlurryNetworkActivityPanel.propTypes = {
+  className: PropTypes.string,
+}
+
+BlurryNetworkActivityPanel.defaultProps = {
+  className: undefined,
 }
 
 export default BlurryNetworkActivityPanel

@@ -16,6 +16,7 @@ import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
+import classNames from 'classnames'
 
 import Panel from '@ttn-lw/components/panel'
 import Icon, { IconGateway, IconInfoCircle, IconBolt, IconRouterOff } from '@ttn-lw/components/icon'
@@ -104,7 +105,7 @@ EmptyState.propTypes = {
   title: PropTypes.message.isRequired,
 }
 
-const GatewayStatusPanel = () => {
+const GatewayStatusPanel = ({ className }) => {
   const dispatch = useDispatch()
   const { gtwId } = useParams()
   const gatewayStats = useSelector(selectGatewayStatistics)
@@ -154,7 +155,7 @@ const GatewayStatusPanel = () => {
       shortCutLinkPath="https://www.thethingsindustries.com/stack/features/noc"
       shortCutLinkTarget="_blank"
       divider
-      className={style.gtwStatusPanel}
+      className={classNames(style.gtwStatusPanel, className)}
       iconClassName={isDisconnected ? style.gtwStatusPanelIcon : undefined}
       messageDecorators={
         <Status
@@ -244,6 +245,14 @@ const GatewayStatusPanel = () => {
       )}
     </Panel>
   )
+}
+
+GatewayStatusPanel.propTypes = {
+  className: PropTypes.string,
+}
+
+GatewayStatusPanel.defaultProps = {
+  className: undefined,
 }
 
 export default GatewayStatusPanel
