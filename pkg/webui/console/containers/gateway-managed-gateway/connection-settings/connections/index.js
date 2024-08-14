@@ -16,10 +16,9 @@ import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import classnames from 'classnames'
 
-import managedGatewayImage from '@assets/misc/managed-gateway.png'
+import managedGatewayImage from '@assets/misc/gateway.svg'
 
 import Icon from '@ttn-lw/components/icon'
-import Link from '@ttn-lw/components/link'
 import DataSheet from '@ttn-lw/components/data-sheet'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -50,7 +49,7 @@ const ConnectionByType = ({ type, isConnected, details, connectedVia, macAddress
     <div className="d-flex al-center gap-cs-xxs">
       <Icon icon={connectionIconMap[type]} />
       <Message content={connectionNameMap[type]} component="p" className="m-0 fw-bold" />
-      <div className={classnames(style.connection, 'd-flex al-center gap-cs-xxs')}>
+      <div className={classnames(style.connection, 'd-flex al-center gap-cs-xxs ml-cs-xs')}>
         <Icon
           small
           icon={isConnected ? 'check_circle_outline' : 'highlight_remove'}
@@ -207,22 +206,27 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
             />
 
             {systemStatus?.cpu_temperature && (
-              <div className="d-flex al-center gap-cs-xxs tc-subtle-gray">
+              <div className="d-flex al-center gap-cs-xxs">
                 <Icon icon="device_thermostat" />
-                {systemStatus?.cpu_temperature} &deg;C
+                <Message
+                  content={m.cpuTemperature}
+                  values={{ temperature: `${systemStatus.cpu_temperature}°C` }}
+                />
               </div>
             )}
           </div>
         </div>
 
+        {/* TODO: Add link to official once available.
         <Link.DocLink primary path="#">
           <Message content={m.officialDocumentation} />
         </Link.DocLink>
+        */}
       </div>
 
       <hr className={classnames(style.horizontalLine, 'w-full m-0')} />
 
-      <Message className="fw-bold m-0" component="h3" content={m.connections} />
+      <Message className="fw-bold m-0 lh-1" component="h3" content={m.connections} />
 
       <div className={style.connections}>
         {getConnectionData({
@@ -239,7 +243,7 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
         })}
       </div>
 
-      <div className="d-flex flex-column gap-cs-m">
+      <div className="d-flex flex-column gap-ls-xs">
         <ConnectionByType
           isConnected={isCellularConnected}
           type={CONNECTION_TYPES.CELLULAR}

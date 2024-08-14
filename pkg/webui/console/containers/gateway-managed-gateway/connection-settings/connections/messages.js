@@ -31,6 +31,7 @@ const messages = defineMessages({
   hardwareVersion: 'Hardware version: <span>{version}</span>',
   firmwareVersion: 'Firmware version: <span>{version}</span>',
   connectedVia: 'Connected via {connectedVia}',
+  cpuTemperature: 'CPU temperature: {temperature}',
 })
 
 export default messages

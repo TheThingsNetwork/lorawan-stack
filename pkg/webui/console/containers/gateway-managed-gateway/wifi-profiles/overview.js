@@ -18,7 +18,6 @@ import { createSelector } from 'reselect'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import Link from '@ttn-lw/components/link'
 import Form from '@ttn-lw/components/form'
 import Button from '@ttn-lw/components/button'
 import ButtonGroup from '@ttn-lw/components/button/group'
@@ -48,8 +47,9 @@ import {
 import { selectConnectionProfilesByType } from '@console/store/selectors/connection-profiles'
 
 const m = defineMessages({
+  // TODO: This message should include a link to a documentation page that explains about managed gateways.
   information:
-    'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.<br></br> <link>Learn more about gateway network connection profiles.</link>',
+    'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.',
   profileId: 'Profile ID',
   accessPoint: 'Access point',
   deleteProfile: 'Delete profile',
@@ -125,11 +125,9 @@ const GatewayWifiProfilesOverview = () => {
         }),
         render: details => (
           <ButtonGroup align="end">
-            <Button icon="edit" onClick={details.edit} />
+            <Button message={sharedMessages.edit} icon="edit" onClick={details.edit} />
             <DeleteModalButton
-              onlyIcon
-              message={m.deleteProfile}
-              defaultMessage=""
+              message={sharedMessages.delete}
               entityId={details.id}
               entityName={details.name}
               onApprove={details.delete}
@@ -188,18 +186,7 @@ const GatewayWifiProfilesOverview = () => {
   return (
     <RequireRequest requestAction={loadData}>
       <PageTitle title={sharedMessages.wifiProfiles} />
-      <Message
-        className="d-block mb-cs-l"
-        content={m.information}
-        values={{
-          link: txt => (
-            <Link secondary to="#">
-              {txt}
-            </Link>
-          ),
-          br: () => <br />,
-        }}
-      />
+      <Message className="d-block mb-cs-l" content={m.information} />
       <Form
         initialValues={{
           _profile_of: '',

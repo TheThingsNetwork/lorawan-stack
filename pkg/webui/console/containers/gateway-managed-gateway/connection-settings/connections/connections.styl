@@ -13,7 +13,7 @@
 // limitations under the License.
 
 .root
-  border-normal()
+  border-dark()
   border-radius: $br.l
   box-sizing: border-box
   padding: $cs.l
@@ -22,7 +22,7 @@
   gap: $cs.l
 
   .top
-    border-normal()
+    border-dark()
     box-sizing: border-box
     border-radius: $br.l
     display: flex
@@ -30,21 +30,27 @@
   .img-div
     background-color: $c-backdrop-lighter
     border-radius: $br.l 0 0 $br.l
+    border-dark('right')
     .image
+      object-fit: contain
+      box-sizing: border-box
+      padding: $cs.s
       height: 6rem
-      width: auto
+      width: 10rem
+      opacity: 0.7
+      filter: grayscale(100%)
 
   .horizontal-line
-    background-color: $c-divider
+    background-color: $c-divider-dark
 
   .connections
-    border-normal()
+    border-dark()
     box-sizing: border-box
     border-radius: $br.l
     display: flex
     flex-direction: column
     gap: $cs.xxs
-    padding: $cs.m $cs.s
+    padding: $cs.xs $cs.s
 
   .connection
     padding-inline: $cs.xxs

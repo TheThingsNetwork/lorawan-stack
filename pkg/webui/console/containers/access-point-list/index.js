@@ -50,6 +50,7 @@ const m = defineMessages({
   lastRefresh: 'Last refresh',
   description:
     'This list shows WiFi networks as detected by your gateway. You can select an access point or choose "Other..." to enter an SSID of a hidden access point.',
+  scanningWifi: 'Scanning WiFi networks…',
 })
 
 const computeDeltaInSeconds = (from, to) => {
@@ -158,10 +159,13 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
     <div className={classnames(className, 'd-flex', 'w-full')} onBlur={onBlur}>
       <div className="w-full">
         {isLoading ? (
-          <div className="d-flex mt-cs-m">
-            <Spinner>
-              <Message content={sharedMessages.fetching} />
-            </Spinner>
+          <div className="d-flex gap-cs-l">
+            <div className={classnames(style.list, [style[`input-width-${inputWidth}`]])}>
+              <Spinner small center>
+                <Message content={m.scanningWifi} />
+              </Spinner>
+            </div>
+            <Message content={m.description} className="tc-subtle-gray" />
           </div>
         ) : (
           <div className="d-flex gap-cs-l">

@@ -12,24 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.list
-  border-input()
-  input-width-classes()
-  position: relative
-  box-sizing: border-box
-  border-radius: $br.s
-  height: 15rem
-  min-width: 15rem
-  overflow-x: auto
-  .item
-    padding: $cs.xxs $cs.xs
-    &.active
-      background-color: $c-active-blue-active
-      color: white
+.connection
+  display: inline-flex
+  align-items: center
+  gap: $cs.xxs
+  padding: $cs.xxs $cs.s $cs.xxs $cs.xs
+  font-weight: $fw.bold
+  // TODO: Change color
+  background-color: #EEEFF9
+  border-radius: $br.m
+  border-width: 1px
+  border-style: solid
+  border-color: $c-input-border
 
-      span
-        color: white
-    &:not(.active):hover
-      cursor: pointer
-      background-color: $c-backdrop
+.connected
+  border-color: $c-success
+  background-color: #e6ffe4
 
+  span
+    color: $c-success
+
+.notConnected
+  border-color: $c-error
+  background-color: #ffe4e4
+
+  span
+    color: $c-error
+
+.fieldDescription
+  color: $tc-subtle-gray
+  margin-bottom: $cs.m
+  margin-top: - $cs.m

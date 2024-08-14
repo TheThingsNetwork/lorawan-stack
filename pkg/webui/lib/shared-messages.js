@@ -167,6 +167,7 @@ export default defineMessages({
   deleteModalReleaseIdLabel: 'Also release entity IDs (purge)',
   deleteModalReleaseIdTitle: 'Entity purge (admin only)',
   deleteModalTitle: 'Are you sure you want to delete <pre>{entityName}</pre>?',
+  delete: 'Delete',
   deleted: 'Deleted (Admin)',
   description: 'Description',
   details: 'Details',

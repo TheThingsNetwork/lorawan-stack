@@ -25,7 +25,6 @@ import AccessPointList from '@console/containers/access-point-list'
 import NetworkInterfaceAddressesFormFields from '@console/containers/gateway-managed-gateway/shared/network-interface-addresses-form-fields'
 import { getValuesNormalized } from '@console/containers/gateway-managed-gateway/shared/utils'
 
-import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
@@ -113,7 +112,6 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
         component={Checkbox}
         label={m.useDefaultNetworkInterfaceSettings}
         description={m.uncheckToSetCustomSettings}
-        tooltipId={tooltipIds.DEFAULT_NETWORK_INTERFACE}
       />
 
       {!Boolean(valuesNormalized._default_network_interface) && (

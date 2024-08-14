@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEqual, omit } from 'lodash'
 import { useParams } from 'react-router-dom'
+import classNames from 'classnames'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -35,13 +36,14 @@ import {
   initialWifiProfile,
 } from '@console/containers/gateway-managed-gateway/shared/utils'
 
-import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getConnectionProfilesList } from '@console/store/actions/connection-profiles'
 
 import { selectConnectionProfilesByType } from '@console/store/selectors/connection-profiles'
+
+import style from './wifi-settings-form-fields.styl'
 
 const m = defineMessages({
   settingsProfile: 'Settings profile',
@@ -61,6 +63,8 @@ const m = defineMessages({
   overrideProfile: 'Override this profile',
   editProfile: 'Edit this profile',
   attemptingToConnect: 'The gateway WiFi is currently attempting to connect using this profile',
+  settingsProfileTooltip:
+    'To set up the gateway connection, you can either use a shared profile, to share the connection settings with other gateways, or set a config for this gateway only.',
 })
 
 const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicked }) => {
@@ -92,17 +96,17 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
   const connectionStatus = useMemo(() => {
     if (!values.wifi_profile.profile_id) return null
     if (hasChanged) {
-      return { message: m.saveToConnect, icon: 'save' }
+      return { message: m.saveToConnect, icon: 'info_outline' }
     }
     if (isWifiConnected) {
       if (values.wifi_profile._override) {
         return {
           message: m.connectedCollaborator,
           icon: 'check_circle_outline',
-          color: 'c-success',
+          color: style.connected,
         }
       }
-      return { message: m.connected, icon: 'check_circle_outline', color: 'c-success' }
+      return { message: m.connected, icon: 'check_circle_outline', color: style.connected }
     }
     if (!isWifiConnected) {
       if (saveFormClicked) {
@@ -115,10 +119,10 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
         return {
           message: m.unableToConnectCollaborator,
           icon: 'highlight_remove',
-          color: 'c-error',
+          color: style.notConnected,
         }
       }
-      return { message: m.unableToConnect, icon: 'highlight_remove', color: 'c-error' }
+      return { message: m.unableToConnect, icon: 'highlight_remove', color: style.notConnected }
     }
 
     return null
@@ -185,7 +189,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
 
   return (
     <>
-      <Message component="h3" content={m.wifiConnection} />
+      <Message component="h3" content={m.wifiConnection} className="mt-0" />
       {!values.wifi_profile._override ? (
         <>
           <div className="d-flex al-center gap-cs-m">
@@ -203,7 +207,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
                   title={m.settingsProfile}
                   component={Select}
                   options={profileOptions}
-                  tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
+                  tooltip={m.settingsProfileTooltip}
                   placeholder={m.selectAProfile}
                   onChange={handleProfileIdChange}
                 />
@@ -213,14 +217,14 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
           <Message
             component="div"
             content={m.profileDescription}
-            className="tc-subtle-gray mb-cs-m"
+            className={style.fieldDescription}
           />
           {values.wifi_profile.profile_id.includes('shared') && (
             <GatewayWifiProfilesFormFields namePrefix={`wifi_profile.`} />
           )}
         </>
       ) : (
-        <>
+        <div>
           <Notification info small content={m.notificationContent} />
           <Button
             type="button"
@@ -228,25 +232,27 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
             message={m.overrideProfile}
             onClick={handleOverrideProfile}
           />
-        </>
+        </div>
       )}
 
       {connectionStatus !== null && (
-        <div className="d-flex al-center gap-cs-xs">
-          <Icon icon={connectionStatus.icon} className={connectionStatus.color} />
-          <Message content={connectionStatus.message} />
+        <div className="d-inline-flex al-center gap-cs-m">
+          <div className={classNames(style.connection, connectionStatus.color)}>
+            <Icon icon={connectionStatus.icon} className={connectionStatus.color} />
+            <Message content={connectionStatus.message} />
+          </div>
+          {Boolean(values.wifi_profile.profile_id) &&
+            !values.wifi_profile._override &&
+            !values.wifi_profile.profile_id.includes('shared') && (
+              <Link
+                primary
+                to={`/gateways/${gtwId}/managed-gateway/wifi-profiles/edit/${values.wifi_profile.profile_id}?profileOf=${values.wifi_profile._profile_of}`}
+              >
+                <Message content={m.editProfile} />
+              </Link>
+            )}
         </div>
       )}
-      {Boolean(values.wifi_profile.profile_id) &&
-        !values.wifi_profile._override &&
-        !values.wifi_profile.profile_id.includes('shared') && (
-          <Link
-            primary
-            to={`/gateways/${gtwId}/managed-gateway/wifi-profiles/edit/${values.wifi_profile.profile_id}?profileOf=${values.wifi_profile._profile_of}`}
-          >
-            <Message content={m.editProfile} />
-          </Link>
-        )}
     </>
   )
 }

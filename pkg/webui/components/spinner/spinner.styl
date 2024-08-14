@@ -72,22 +72,14 @@ $xs = $cs.m
 .center
   &:not(.inline)
     position: absolute
-    top: ($l * -1) // To achieve visual centering.
+    top: 0
     left: 0
     right: 0
     bottom: 0
     margin: auto
-    height: $l
+    height: fit-content
   &.inline
     justify-content: center
-
-  &.small
-    height: $s
-    top: ($s * -1) // To achieve visual centering.
-
-  &.micro
-    height: $xs
-    top: ($xs * -1) // To achieve visual centering.
 
 .small .spinner
   width: $s

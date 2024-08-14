@@ -24,7 +24,6 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import { getValuesNormalized } from '@console/containers/gateway-managed-gateway/shared/utils'
 
-import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { selectCollaboratorsEntitiesStore } from '@ttn-lw/lib/store/selectors/collaborators'
 import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
@@ -38,6 +37,8 @@ import { selectUserId } from '@account/store/selectors/user'
 const m = defineMessages({
   showProfilesOf: 'Show profiles of',
   yourself: 'Yourself',
+  showProfilesOfTooltip:
+    'Managed gateways can be setup with WiFi profiles shared within an organization. This dropdown allows you to select the source of the profiles applicable to this gateway. If you are a collaborator of an organization, you can select the organization to view its shared profiles.',
 })
 
 const ShowProfilesSelect = ({ name, ...rest }) => {
@@ -94,7 +95,7 @@ const ShowProfilesSelect = ({ name, ...rest }) => {
         component={Select}
         options={profileOptions}
         disabled={!Object.keys(organizations).length}
-        tooltipId={tooltipIds.GATEWAY_SHOW_PROFILES}
+        tooltip={m.showProfilesOfTooltip}
         {...rest}
       />
     </RequireRequest>
