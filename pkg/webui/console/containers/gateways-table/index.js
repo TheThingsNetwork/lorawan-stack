@@ -254,7 +254,7 @@ const GatewaysTable = () => {
       searchable
       searchPlaceholderMessage={sharedMessages.searchGateways}
       clickable={!isDeletedTab}
-      tabs={isAdmin ? tabs : []}
+      tabs={isAdmin ? tabs : undefined}
     />
   )
 }
