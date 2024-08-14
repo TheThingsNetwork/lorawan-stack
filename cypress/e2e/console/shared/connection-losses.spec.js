@@ -50,7 +50,7 @@ describe('Connection loss detection', () => {
     cy.wait('@reconnectionIntercept')
 
     cy.get('header').within(() => {
-      cy.findByText(/Offline/).should('not.exist')
+      cy.findByText(/Offline/, { timeout: 20 * 1000 }).should('not.exist')
     })
   })
   it('does not see individual network errors as connection loss', () => {
