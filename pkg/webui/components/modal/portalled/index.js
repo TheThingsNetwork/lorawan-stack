@@ -30,8 +30,16 @@ import Modal from '..'
  * @param {boolean} props.visible - Whether the modal is currently visible.
  * @returns {object} - The modal rendered into a portal.
  */
-const PortalledModal = ({ visible, ...modalProps }) =>
-  DOM.createPortal(visible && <Modal {...modalProps} />, document.getElementById('modal-container'))
+const PortalledModal = ({ visible, ...modalProps }) => {
+  if (document.getElementById('modal-container') === null) {
+    return null
+  }
+
+  return DOM.createPortal(
+    visible && <Modal {...modalProps} />,
+    document.getElementById('modal-container'),
+  )
+}
 
 PortalledModal.Modal = Modal
 

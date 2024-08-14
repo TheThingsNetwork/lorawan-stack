@@ -35,7 +35,7 @@ import {
   selectOrganizationRights,
   selectOrganizationRightsError,
 } from '@console/store/selectors/organizations'
-import { selectClientPseudoRights, selectClientRights } from '@account/store/selectors/clients'
+import { selectClientPseudoRights, selectClientRights } from '@console/store/selectors/clients'
 
 const sdkServices = {
   [APPLICATION]: 'Applications',

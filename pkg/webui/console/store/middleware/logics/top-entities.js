@@ -32,7 +32,7 @@ import { fetchApplicationsList, getApplication } from '@console/store/actions/ap
 import { fetchGatewaysList, getGateway } from '@console/store/actions/gateways'
 import { fetchDevicesList, getDevice } from '@console/store/actions/devices'
 
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 import {
   selectTopEntities,
   selectTopEntitiesLastFetched,

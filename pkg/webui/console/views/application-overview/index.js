@@ -34,8 +34,7 @@ import Require from '@console/lib/components/require'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { isOtherClusterApp } from '@console/lib/application-utils'
-import { mayViewApplicationInfo } from '@console/lib/feature-checks'
-import { checkFromState } from '@account/lib/feature-checks'
+import { mayViewApplicationInfo, checkFromState } from '@console/lib/feature-checks'
 
 import { getDevicesList } from '@console/store/actions/devices'
 

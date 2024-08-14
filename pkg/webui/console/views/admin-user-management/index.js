@@ -42,17 +42,21 @@ const UserManagementRouter = () => {
   )
   return (
     <Require featureCheck={mayManageUsers} otherwise={{ redirect: '/' }}>
-      <IntlHelmet title={sharedMessages.userManagement} />
-      <Routes>
-        <Route index Component={UserManagement} />
-        <Route path="add" Component={UserAdd} />
-        <Route path="invitations/add" Component={InvitationSend} />
-        <Route
-          path=":userId/*"
-          element={<ValidateRouteParam check={{ userId: userPathIdRegexp }} Component={UserEdit} />}
-        />
-        <Route path="*" Component={GenericNotFound} />
-      </Routes>
+      <div className="container container--xxl p-vert-cs-xs p-sides-0">
+        <IntlHelmet title={sharedMessages.userManagement} />
+        <Routes>
+          <Route index Component={UserManagement} />
+          <Route path="add" Component={UserAdd} />
+          <Route path="invitations/add" Component={InvitationSend} />
+          <Route
+            path=":userId/*"
+            element={
+              <ValidateRouteParam check={{ userId: userPathIdRegexp }} Component={UserEdit} />
+            }
+          />
+          <Route path="*" Component={GenericNotFound} />
+        </Routes>
+      </div>
     </Require>
   )
 }

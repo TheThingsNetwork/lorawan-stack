@@ -26,8 +26,6 @@ import Message from '@ttn-lw/lib/components/message'
 import { selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import style from './code.styl'
-
 const m = defineMessages({
   codeDescription: 'Your authorization code is:',
 })
@@ -45,20 +43,17 @@ const Code = () => {
   return (
     <div className="container container--lg grid">
       <div className="item-12 lg-xl:item-6 xl:item-4">
-        <PageTitle title={sharedMessages.authorizationCode} />
-        <Message content={m.codeDescription} component="label" className={style.codeDescription} />
-        <SafeInspector
-          data={code}
-          initiallyVisible
-          hideable={false}
-          isBytes={false}
-          className={style.code}
-        />
-        <Button.Link
-          to="/"
-          icon={IconChevronLeft}
-          message={{ ...sharedMessages.backTo, values: { siteTitle } }}
-        />
+        <div className="d-flex flex-column al-start gap-cs-m">
+          <PageTitle title={sharedMessages.authorizationCode} />
+          <Message content={m.codeDescription} component="label" className="d-block" />
+          <SafeInspector data={code} initiallyVisible hideable={false} isBytes={false} />
+          <Button.Link
+            to="/"
+            icon={IconChevronLeft}
+            message={{ ...sharedMessages.backTo, values: { siteTitle } }}
+            secondary
+          />
+        </div>
       </div>
     </div>
   )

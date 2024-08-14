@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/err
 import { selectPageStatusBaseUrlConfig } from '@ttn-lw/lib/selectors/env'
 import { getNetworkStatusSummary } from '@ttn-lw/lib/store/actions/status'
 
-import * as user from '@console/store/actions/logout'
+import { getActiveUserSessionIdSuccess } from '@console/store/actions/sessions'
+import * as user from '@console/store/actions/user'
 import {
   getInboxNotifications,
   getUnseenNotificationsPeriodically,
@@ -35,14 +36,16 @@ const consoleAppLogic = createRequestLogic({
   process: async (_, dispatch) => {
     dispatch(user.getUserRights())
 
-    let info, rights
+    let info, rights, sessionId
 
     try {
       // There is no way to retrieve the current user directly within the
       // console app, so first get the authentication info and only afterwards
       // fetch the user.
       info = await tts.Auth.getAuthInfo()
+      sessionId = info.oauth_access_token.user_session_id
       rights = info.oauth_access_token.rights
+      dispatch(getActiveUserSessionIdSuccess(sessionId))
       dispatch(user.getUserRightsSuccess(rights))
     } catch (error) {
       if (
@@ -69,6 +72,7 @@ const consoleAppLogic = createRequestLogic({
         const userResult = await tts.Users.getById(userId, [
           'state',
           'name',
+          'primary_email_address',
           'primary_email_address_validated_at',
           'profile_picture',
           'console_preferences',

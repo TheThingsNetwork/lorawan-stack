@@ -22,6 +22,7 @@ import Icon, {
   IconClipboard,
   IconClipboardCheck,
   IconLifebuoy,
+  IconError404,
 } from '@ttn-lw/components/icon'
 import Footer from '@ttn-lw/components/footer'
 import Button from '@ttn-lw/components/button'
@@ -172,8 +173,12 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
           ) : (
             <IntlHelmet title={errorMessages.error} />
           )}
-          <h1>
-            <Icon className={style.icon} textPaddedRight icon={IconExclamationCircle} />
+          <h1 className="d-flex al-center gap-cs-xxs mb-cs-xxs">
+            <Icon
+              icon={isNotFound ? IconError404 : IconExclamationCircle}
+              size={isNotFound ? 38 : 28}
+              className="c-icon-error-normal"
+            />
             <Message content={errorTitle} />
           </h1>
           <div className={style.fullViewErrorSub}>

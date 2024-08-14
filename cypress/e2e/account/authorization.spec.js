@@ -12,34 +12,73 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const user = {
+  ids: { user_id: 'create-app-test-user' },
+  primary_email_address: 'create-app-test-user@example.com',
+  password: 'ABCDefg123!',
+  password_confirm: 'ABCDefg123!',
+}
+
 describe('Account App authorization view', () => {
-  before(() => {
+  beforeEach(() => {
     cy.dropAndSeedDatabase()
+    cy.createUser(user)
   })
 
   it('displays UI elements in place', () => {
-    const user = {
-      ids: { user_id: 'create-app-test-user' },
-      primary_email_address: 'create-app-test-user@example.com',
-      password: 'ABCDefg123!',
-      password_confirm: 'ABCDefg123!',
-    }
-
-    cy.createUser(user)
-    cy.visitConsoleAuthorizationScreen({ user_id: user.ids.user_id, password: user.password })
-
     // Check authorization screen.
+    cy.visitConsoleAuthorizationScreen({ user_id: user.ids.user_id, password: user.password })
     cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
     cy.findByTestId('full-error-view').should('not.exist')
     cy.findByText('Request for permission').should('be.visible')
     cy.findByText('Console').should('be.visible')
     cy.findByText('All possible rights', { exact: false }).should('be.visible')
     cy.findByText('all possible current and future rights').should('be.visible')
-    cy.findByText(`You are logged in as ${user.ids.user_id}.`).should('be.visible')
+    cy.findByText(/You are logged in as/).should('be.visible')
+    cy.findByText(user.ids.user_id).should('be.visible')
     cy.findByText(
       `You will be redirected to ${Cypress.config('consoleRootPath')}/oauth/callback`,
     ).should('be.visible')
     cy.findByRole('button', { name: /Cancel/ }).should('be.visible')
     cy.findByRole('button', { name: /Authorize Console/ }).should('be.visible')
+  })
+
+  it('succeeds manually authorizing Account App clients', () => {
+    // Set Console client's `skip_authorization` flag to false.
+    cy.task('execSql', `UPDATE clients SET skip_authorization=false WHERE client_id='console';`)
+    cy.visit(Cypress.config('consoleRootPath'))
+
+    // Login.
+    cy.findByLabelText('User ID').type(user.ids.user_id)
+    cy.findByLabelText('Password').type(user.password)
+    cy.findByRole('button', { name: 'Login' }).click()
+
+    // Authorize.
+    cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
+    cy.findByRole('button', { name: /Authorize Console/ }).click()
+
+    // Check Console landing view.
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/`)
+    cy.findByTestId('full-error-view').should('not.exist')
+  })
+
+  it('succeeds manually aborting Account App client authorization', () => {
+    // Set Console client's `skip_authorization` flag to false.
+    cy.task('execSql', `UPDATE clients SET skip_authorization=false WHERE client_id='console';`)
+    cy.visit(Cypress.config('consoleRootPath'))
+
+    // Login.
+    cy.findByLabelText('User ID').type(user.ids.user_id)
+    cy.findByLabelText('Password').type(user.password)
+    cy.findByRole('button', { name: 'Login' }).click()
+
+    // Deny authorization.
+    cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
+    cy.findByRole('button', { name: /Cancel/ }).click()
+
+    // Check Console error.
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/oauth/callback`)
+    cy.findByTestId('full-error-view').should('exist')
+    cy.findByText(/Login failed/).should('be.visible')
   })
 })

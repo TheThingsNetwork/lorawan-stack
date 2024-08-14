@@ -499,7 +499,11 @@ Cypress.Commands.add('findErrorByLabelText', label => {
   getFieldDescriptorByLabel(label).as('error')
 
   // Check for the error icon.
-  cy.get('@error').within(() => cy.get('[data-test-id="error-icon"]').should('be.visible'))
+  cy.get('@error')
+    .children()
+    .first()
+    .should('have.class', 'tabler-icon-exclamation-circle')
+    .and('be.visible')
 
   return cy.get('@error')
 })
@@ -509,7 +513,11 @@ Cypress.Commands.add('findWarningByLabelText', label => {
   getFieldDescriptorByLabel(label).as('warning')
 
   // Check for the warning icon.
-  cy.get('@warning').children().first().should('contain', 'warning').and('be.visible')
+  cy.get('@warning')
+    .children()
+    .first()
+    .should('have.class', 'tabler-icon-warning-triangle')
+    .and('be.visible')
 
   return cy.get('@warning')
 })

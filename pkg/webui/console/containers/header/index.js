@@ -33,7 +33,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectAssetsRootPath, selectBrandingRootPath } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import selectAccountUrl from '@console/lib/selectors/app-config'
 import {
   checkFromState,
   mayViewApplications,
@@ -43,7 +42,7 @@ import {
 
 import { logout } from '@console/store/actions/logout'
 
-import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import Logo from '../logo'
@@ -51,9 +50,7 @@ import Logo from '../logo'
 import NotificationsDropdown from './notifications-dropdown'
 import BookmarksDropdown from './bookmarks-dropdown'
 
-const accountUrl = selectAccountUrl()
-
-const Header = ({ onMenuClick }) => {
+const Header = ({ onMenuClick, alwaysShowLogo }) => {
   const dispatch = useDispatch()
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
@@ -101,7 +98,7 @@ const Header = ({ onMenuClick }) => {
       <Dropdown.Item
         title={sharedMessages.profileSettings}
         icon={IconUserCircle}
-        path={`${accountUrl}/profile-settings`}
+        path="/user-settings/profile-settings"
         external
       />
       {isAdmin && (
@@ -148,12 +145,18 @@ const Header = ({ onMenuClick }) => {
       Logo={Logo}
       onMenuClick={onMenuClick}
       showNotificationDot={hasUnseenNotifications}
+      alwaysShowLogo={alwaysShowLogo}
     />
   )
 }
 
 Header.propTypes = {
+  alwaysShowLogo: PropTypes.bool,
   onMenuClick: PropTypes.func.isRequired,
+}
+
+Header.defaultProps = {
+  alwaysShowLogo: false,
 }
 
 export default Header

@@ -52,7 +52,7 @@ import {
   deleteBookmark,
 } from '@console/store/actions/user-preferences'
 
-import { selectUser } from '@console/store/selectors/logout'
+import { selectUser } from '@console/store/selectors/user'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
 
 import style from './gateway-overview-header.styl'

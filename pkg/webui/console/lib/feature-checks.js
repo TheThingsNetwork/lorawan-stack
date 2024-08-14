@@ -19,7 +19,8 @@ import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
 import { selectApplicationRights } from '@console/store/selectors/applications'
 import { selectGatewayRights } from '@console/store/selectors/gateways'
 import { selectOrganizationRights } from '@console/store/selectors/organizations'
-import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/user'
+import { selectClientRights } from '@console/store/selectors/clients'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
@@ -61,6 +62,31 @@ export const mayViewOrEditApiKeys = {
 export const maySendInvites = {
   rightsSelector: selectUserRights,
   check: rights => rights.includes('RIGHT_SEND_INVITES'),
+}
+
+export const mayCreateClients = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_CLIENTS_CREATE'),
+}
+
+export const mayViewClientsOfUser = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_CLIENTS_LIST'),
+}
+
+export const mayViewOrEditClientAuthorizations = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_AUTHORIZED_CLIENTS'),
+}
+
+export const mayViewOrEditUserSettings = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_SETTINGS_BASIC'),
+}
+
+export const mayViewOrEditUserApiKeys = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_SETTINGS_API_KEYS'),
 }
 
 // Application related feature checks.
@@ -229,6 +255,32 @@ export const mayAddOrganizationAsCollaborator = {
 export const mayPerformAdminActions = {
   rightsSelector: selectUserIsAdmin,
   check: isAdmin => isAdmin,
+}
+
+// Client feature checks.
+export const mayPerformAllClientActions = {
+  rightsSelector: selectClientRights,
+  check: rights => rights.includes('RIGHT_CLIENT_ALL'),
+}
+
+export const mayEditBasicClientInformation = {
+  rightsSelector: selectClientRights,
+  check: rights => rights.includes('RIGHT_CLIENT_SETTINGS_BASIC'),
+}
+
+export const mayViewBasicClientInformation = {
+  rightsSelector: selectClientRights,
+  check: rights => rights.includes('RIGHT_CLIENT_INFO'),
+}
+
+export const mayDeleteClients = {
+  rightsSelector: selectClientRights,
+  check: rights => rights.includes('RIGHT_CLIENT_DELETE'),
+}
+
+export const mayViewOrEditClientCollaborators = {
+  rightsSelector: selectClientRights,
+  check: rights => rights.includes('RIGHT_CLIENT_SETTINGS_COLLABORATORS'),
 }
 
 export const mayManageUsers = mayPerformAdminActions

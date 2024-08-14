@@ -20,10 +20,11 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import Organizations from '@console/views/organizations'
 import AdminPanel from '@console/views/admin-panel'
-import User from '@console/views/user'
 import Notifications from '@console/views/notifications'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import UserSettingsView from '../user-settings'
 
 import Overview from './overview'
 
@@ -35,7 +36,7 @@ const OverviewRoutes = () => {
       <Route index Component={Overview} />
       <Route path="organizations/*" Component={Organizations} />
       <Route path="admin-panel/*" Component={AdminPanel} />
-      <Route path="user/*" Component={User} />
+      <Route path="user-settings/*" Component={UserSettingsView} />
       <Route path="notifications" element={<Navigate to="/notifications/inbox" />} />
       <Route path="notifications/:category/:id?" Component={Notifications} />
     </Routes>

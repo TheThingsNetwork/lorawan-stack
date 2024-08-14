@@ -58,7 +58,7 @@ import {
 } from '@console/store/actions/user-preferences'
 import { unclaimDevice } from '@console/store/actions/claim'
 
-import { selectUser } from '@console/store/selectors/logout'
+import { selectUser } from '@console/store/selectors/user'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
 import {
   selectDeviceDerivedAppDownlinkFrameCount,

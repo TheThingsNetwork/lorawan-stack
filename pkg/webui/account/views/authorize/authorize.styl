@@ -33,12 +33,11 @@
 
   li
     display: flex
-    align-items: flex-start
+    align-items: center
+    gap: $cs.xxs
 
-  li > span:first-child
+  li > svg:first-child
     color: var(--c-bg-info-normal)
-    margin-right: $cs.xs
-    nudge('down', 3px)
 
 .right
   +media-query($bp.sm)
@@ -59,9 +58,10 @@
   color: var(--c-text-neutral-heavy)
 
 .note-text
-  color: var(--c-text-neutral-light)
+  font-size: $fs.s
+  color: var(--c-text-neutral-semilight)
 
 .logout-button
-  reset-button()
   color: var(--c-text-neutral-light)
   text-decoration: underline
+  display: inline-block

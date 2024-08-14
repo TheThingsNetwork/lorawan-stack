@@ -22,13 +22,13 @@
     width: 100%
     object-fit: contain
 
-  .logo-container
-    display: flex
-    align-items: center
-    line-height: 0
+  &:not(.unlock-size)
+    img:first-child
+      height: 1.6rem
 
-    img
-      width: 100%
+    img:last-child
+      width: 3rem
+      padding: $cs.s 0
 
   +media-query-min($bp.xs)
     img:first-child

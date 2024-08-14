@@ -60,14 +60,14 @@
       display: block
 
   .title
-    line-height: $lh.xxl
+    margin-bottom: 0
     text-margin-top()
 
     &:last-child
       text-margin-bottom()
 
     &:not(:last-child)
-      text-margin-bottom($cs.l)
+      text-margin-bottom($cs.m)
 
   .logo
     max-width: 12rem
@@ -85,7 +85,7 @@
   height: 1px
   width: 18%
   background-color: var(--c-border-neutral-normal)
-  margin-left: $cs.xl3
+  margin-left: $cs.xxl
   flex-shrink: 0
   margin-bottom: -4px // Compensate for own visual height.
 

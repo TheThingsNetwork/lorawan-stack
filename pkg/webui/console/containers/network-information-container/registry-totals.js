@@ -44,26 +44,24 @@ const RegistryTotals = () => {
   const intl = useIntl()
 
   return (
-    <>
-      <div className={classNames('m-0', 'mt-ls-s', 'mb-cs-xl', styles.registryTotalsContainer)}>
-        <div className={styles.registryTotalBox}>
-          <Message content={messages.applicationsUsed} component="div" />
-          <h2 className="mt-cs-xs mb-cs-xs">{intl.formatNumber(applicationTotal)}</h2>
-        </div>
-        <div className={styles.registryTotalBox}>
-          <Message content={messages.gatewaysUsed} component="div" />
-          <h2 className="mt-cs-xs mb-cs-xs">{intl.formatNumber(gatewayTotal)}</h2>
-        </div>
-        <div className={styles.registryTotalBox}>
-          <Message content={messages.registeredUsers} component="div" />
-          <h2 className="mt-cs-xs mb-cs-xs">{intl.formatNumber(userTotal)}</h2>
-        </div>
-        <div className={styles.registryTotalBox}>
-          <Message content={sharedMessages.organizations} component="div" />
-          <h2 className="mt-cs-xs mb-cs-xs">{intl.formatNumber(organizationTotal)}</h2>
-        </div>
+    <div className={classNames('m-0', 'mt-ls-s', 'mb-cs-xl', styles.registryTotalsContainer)}>
+      <div className={styles.registryTotalBox}>
+        <Message content={messages.applicationsUsed} component="div" />
+        <h2 className="mt-cs-xs mb-cs-xs">{intl.formatNumber(applicationTotal)}</h2>
       </div>
-    </>
+      <div className={styles.registryTotalBox}>
+        <Message content={messages.gatewaysUsed} component="div" />
+        <h2 className="mt-cs-xs mb-cs-xs">{intl.formatNumber(gatewayTotal)}</h2>
+      </div>
+      <div className={styles.registryTotalBox}>
+        <Message content={messages.registeredUsers} component="div" />
+        <h2 className="mt-cs-xs mb-cs-xs">{intl.formatNumber(userTotal)}</h2>
+      </div>
+      <div className={styles.registryTotalBox}>
+        <Message content={sharedMessages.organizations} component="div" />
+        <h2 className="mt-cs-xs mb-cs-xs">{intl.formatNumber(organizationTotal)}</h2>
+      </div>
+    </div>
   )
 }
 

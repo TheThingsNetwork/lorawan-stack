@@ -44,7 +44,7 @@ const PacketBrokerRouter = () => {
 
   return (
     <Require featureCheck={mayConfigurePacketBroker} otherwise={{ redirect: '/' }}>
-      <RequireRequest requestAction={getPacketBrokerInfo()}>
+      <RequireRequest requestAction={getPacketBrokerInfo()} handleErrors={false}>
         <Routes>
           <Route
             path="routing-configuration/networks/:netId/:tenantId?"

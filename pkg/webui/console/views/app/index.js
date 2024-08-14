@@ -29,7 +29,6 @@ import { defineMessages } from 'react-intl'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
-import { AlertBannerProvider } from '@ttn-lw/components/alert-banner/context'
 import Button from '@ttn-lw/components/button'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -61,7 +60,7 @@ import {
   selectUserError,
   selectUserRights,
   selectUserIsAdmin,
-} from '@console/store/selectors/logout'
+} from '@console/store/selectors/user'
 
 import style from './app.styl'
 
@@ -69,7 +68,7 @@ const m = defineMessages({
   expandEventPanel: 'Expand live data overlay',
 })
 
-const errorRender = error => <FullViewError error={error} header={<Header />} />
+const errorRender = error => <FullViewError error={error} header={<Header alwaysShowLogo />} />
 const getScrollRestorationKey = location => {
   // Preserve scroll position only when necessary.
   // E.g. we don't want to scroll to top when changing tabs of a table,
@@ -156,51 +155,49 @@ const Layout = () => {
           <div id="modal-container" />
           <div id="dropdown-container" className="pos-absolute-container" />
           <div className="d-flex">
-            <AlertBannerProvider>
-              <Sidebar
-                isDrawerOpen={isDrawerOpen}
-                onDrawerCloseClick={closeDrawer}
-                paddingBottom={splitFrameHeight}
-              />
-              <div className="w-full h-vh d-flex direction-column">
-                <Header onMenuClick={onDrawerExpandClick} />
-                <main
-                  className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
-                  ref={main}
+            <Sidebar
+              isDrawerOpen={isDrawerOpen}
+              onDrawerCloseClick={closeDrawer}
+              paddingBottom={splitFrameHeight}
+            />
+            <div className="w-full h-vh d-flex direction-column">
+              <Header onMenuClick={onDrawerExpandClick} />
+              <main
+                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+                ref={main}
+              >
+                <WithAuth
+                  user={user}
+                  fetching={fetching}
+                  error={error}
+                  errorComponent={FullViewErrorInner}
+                  rights={rights}
+                  isAdmin={isAdmin}
                 >
-                  <WithAuth
-                    user={user}
-                    fetching={fetching}
-                    error={error}
-                    errorComponent={FullViewErrorInner}
-                    rights={rights}
-                    isAdmin={isAdmin}
-                  >
-                    <div className={style.content}>
-                      <div
-                        className={style.stage}
-                        id="stage"
-                        style={{ paddingBottom: splitFrameHeight }}
-                      >
-                        <Outlet />
-                      </div>
-                      {isMounted && isActive && !isOpen && (
-                        <div className={style.openButton}>
-                          <Button
-                            icon={IconLayoutBottombarExpand}
-                            tooltip={m.expandEventPanel}
-                            tooltipPlacement="left"
-                            onClick={() => setIsOpen(true)}
-                            secondary
-                            small
-                          />
-                        </div>
-                      )}
+                  <div className={style.content}>
+                    <div
+                      className={style.stage}
+                      id="stage"
+                      style={{ paddingBottom: splitFrameHeight }}
+                    >
+                      <Outlet />
                     </div>
-                  </WithAuth>
-                </main>
-              </div>
-            </AlertBannerProvider>
+                    {isMounted && isActive && !isOpen && (
+                      <div className={style.openButton}>
+                        <Button
+                          icon={IconLayoutBottombarExpand}
+                          tooltip={m.expandEventPanel}
+                          tooltipPlacement="left"
+                          onClick={() => setIsOpen(true)}
+                          secondary
+                          small
+                        />
+                      </div>
+                    )}
+                  </div>
+                </WithAuth>
+              </main>
+            </div>
           </div>
 
           <div id="split-frame" className={style.splitFrame} />
@@ -231,7 +228,7 @@ const ConsoleRoot = () => {
   }, [handleConnectionStatusChange])
 
   if (pageData && pageData.error) {
-    return <FullViewError error={pageData.error} header={<Header />} />
+    return <FullViewError error={pageData.error} header={<Header alwaysShowLogo />} />
   }
 
   return (

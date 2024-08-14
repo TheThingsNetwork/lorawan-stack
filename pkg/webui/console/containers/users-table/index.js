@@ -44,7 +44,7 @@ import {
   restoreUser,
 } from '@console/store/actions/users'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 import {
   selectUsers,
   selectUsersTotalCount,

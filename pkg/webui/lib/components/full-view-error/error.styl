@@ -41,6 +41,7 @@
 
   &-sub
     display: block
+    margin-bottom: $ls.s
 
   summary
     color: var(--c-text-neutral-light)
@@ -65,14 +66,6 @@
 
   & > span
     color: var(--c-text-neutral-light)
-
-.icon
-  nudge('up', .1rem)
-  color: var(--c-bg-error-normal)
-  +media-query-min($bp.sm)
-    font-size: 2rem
-  +media-query($bp.sm)
-    font-size: 1.4rem
 
 .action-button
   margin-right: $cs.m

@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,13 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-import { createSelector } from 'reselect'
-
-import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
-import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
-
-import { GET_USER_RIGHTS_BASE } from '@account/store/actions/user'
 
 const selectUserStore = state => state.user
 
@@ -43,13 +36,3 @@ export const selectUserIsAdmin = state => {
 export const selectUserName = state => selectUser(state).name
 
 export const selectUserProfilePicture = state => selectUser(state).profile_picture
-
-// Rights.
-export const selectUserRights = createSelector(selectUserStore, ({ rights }) => [
-  ...rights.regular,
-  ...rights.pseudo,
-])
-export const selectUserRegularRights = state => selectUserStore(state).rights?.regular
-export const selectUserPseudoRights = state => selectUserStore(state).rights?.pseudo
-export const selectUserRightsError = createErrorSelector(GET_USER_RIGHTS_BASE)
-export const selectUserRightsFetching = createFetchingSelector(GET_USER_RIGHTS_BASE)

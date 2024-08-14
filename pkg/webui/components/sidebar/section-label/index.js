@@ -32,7 +32,7 @@ import {
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
 
-import { selectUser } from '@console/store/selectors/logout'
+import { selectUser } from '@console/store/selectors/user'
 
 const SectionLabel = ({ label, icon, className, buttonDisabled, 'data-test-id': dataTestId }) => {
   const user = useSelector(selectUser)

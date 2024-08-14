@@ -31,8 +31,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
   maySetApplicationPayloadFormatters,
   mayViewApplicationLink,
+  checkFromState,
 } from '@console/lib/feature-checks'
-import { checkFromState } from '@account/lib/feature-checks'
 
 import { getApplicationLink } from '@console/store/actions/link'
 

@@ -123,7 +123,6 @@ const AppSideNavigation = () => {
             icon={IconLiveData}
           />
         )}
-        {/* <SideNavigation.Item title={'Network Information Center'} path="/noc" icon={IconGraph} /> */}
         {maySetApplicationPayloadFormatters.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.payloadFormatters}

@@ -32,7 +32,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getIsConfiguration } from '@account/store/actions/identity-server'
 
 const m = defineMessages({
-  sessionRevoked: 'Your password was changed and all active sessions were revoked',
+  forgotPassword: 'Forgot password',
 })
 
 const siteName = selectApplicationSiteName()

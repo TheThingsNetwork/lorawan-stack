@@ -19,8 +19,10 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './logo.styl'
 
-const Logo = ({ className, logo, miniLogo }) => {
-  const classname = classnames(style.container, className)
+const Logo = ({ className, logo, miniLogo, unlockSize }) => {
+  const classname = classnames(style.container, className, {
+    [style.unlockSize]: unlockSize,
+  })
 
   return (
     <div className={classname}>
@@ -41,6 +43,7 @@ Logo.propTypes = {
   logo: imgPropType.isRequired,
   miniLogo: imgPropType.isRequired,
   safe: PropTypes.bool,
+  unlockSize: PropTypes.bool,
   vertical: PropTypes.bool,
 }
 
@@ -48,6 +51,7 @@ Logo.defaultProps = {
   className: undefined,
   brandLogo: undefined,
   vertical: false,
+  unlockSize: false,
   safe: false,
 }
 

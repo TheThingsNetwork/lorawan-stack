@@ -36,7 +36,7 @@ import { checkFromState, mayCreateGateways } from '@console/lib/feature-checks'
 
 import { getGatewaysList, restoreGateway, deleteGateway } from '@console/store/actions/gateways'
 
-import { selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectGateways, selectGatewaysTotalCount } from '@console/store/selectors/gateways'
 
 const m = defineMessages({

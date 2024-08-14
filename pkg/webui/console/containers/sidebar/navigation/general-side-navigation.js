@@ -21,8 +21,15 @@ import {
   IconUsersGroup,
   IconLayoutDashboard,
   IconUserShield,
-  IconKey,
   IconInbox,
+  IconAperture,
+  IconTextCaption,
+  IconUserCircle,
+  IconPassword,
+  IconUserCog,
+  IconApiKeys,
+  IconShieldLock,
+  IconLockOpen,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
@@ -30,12 +37,17 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   checkFromState,
-  mayViewOrEditApiKeys,
+  mayConfigurePacketBroker,
+  mayManageUsers,
+  mayViewClientsOfUser,
+  mayViewOrEditClientAuthorizations,
+  mayViewOrEditUserApiKeys,
+  mayViewOrEditUserSettings,
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
 import getCookie from '@console/lib/table-utils'
 
-import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
 
 import SidebarContext from '../context'
@@ -50,14 +62,17 @@ const GeneralSideNavigation = () => {
   const mayViewOrgs = useSelector(state =>
     user ? checkFromState(mayViewOrganizationsOfUser, state) : false,
   )
-  const mayHandleApiKeys = useSelector(state =>
-    user ? checkFromState(mayViewOrEditApiKeys, state) : false,
+  const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))
+  const showPacketBroker = useSelector(state => checkFromState(mayConfigurePacketBroker, state))
+  const showProfileSettings = useSelector(state => checkFromState(mayViewOrEditUserSettings, state))
+  const showUserApiKeys = useSelector(state => checkFromState(mayViewOrEditUserApiKeys, state))
+  const showAuthorizationManagement = useSelector(state =>
+    checkFromState(mayViewOrEditClientAuthorizations, state),
   )
+  const showClientManagement = useSelector(state => checkFromState(mayViewClientsOfUser, state))
 
   const orgPageSize = getCookie('organizations-list-page-size')
   const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
-  const keysPageSize = getCookie('keys-list-page-size')
-  const keysParam = `?page-size=${keysPageSize ? keysPageSize : PAGE_SIZES.REGULAR}`
 
   return (
     <>
@@ -80,20 +95,75 @@ const GeneralSideNavigation = () => {
           path="/notifications/inbox"
           icon={IconInbox}
         />
-        {mayHandleApiKeys && (
-          <SideNavigation.Item
-            title={sharedMessages.personalApiKeys}
-            path={`/user/api-keys${keysParam}`}
-            icon={IconKey}
-          />
-        )}
         {isUserAdmin && (
           <SideNavigation.Item
             title={sharedMessages.adminPanel}
             path="/admin-panel"
             icon={IconUserShield}
-          />
+          >
+            <SideNavigation.Item
+              title={sharedMessages.networkInformation}
+              path="/admin-panel/network-information"
+              icon={IconTextCaption}
+            />
+            {showUserManagement && (
+              <SideNavigation.Item
+                title={sharedMessages.userManagement}
+                path="/admin-panel/user-management"
+                icon={IconUsersGroup}
+              />
+            )}
+            {showPacketBroker && (
+              <SideNavigation.Item
+                title={sharedMessages.packetBroker}
+                path="/admin-panel/packet-broker"
+                icon={IconAperture}
+              />
+            )}
+          </SideNavigation.Item>
         )}
+        <SideNavigation.Item title={sharedMessages.userSettings} icon={IconUserCog}>
+          {showProfileSettings && (
+            <SideNavigation.Item
+              title={sharedMessages.profile}
+              path="/user-settings/profile"
+              icon={IconUserCircle}
+            />
+          )}
+          {showProfileSettings && (
+            <SideNavigation.Item
+              title={sharedMessages.password}
+              path="/user-settings/password"
+              icon={IconPassword}
+            />
+          )}
+          {showUserApiKeys && (
+            <SideNavigation.Item
+              title={sharedMessages.apiKeys}
+              path="/user-settings/api-keys"
+              icon={IconApiKeys}
+            />
+          )}
+          <SideNavigation.Item
+            title={sharedMessages.sessionManagement}
+            path="/user-settings/sessions"
+            icon={IconShieldLock}
+          />
+          {showAuthorizationManagement && (
+            <SideNavigation.Item
+              title={sharedMessages.authorizations}
+              path="/user-settings/authorizations"
+              icon={IconLockOpen}
+            />
+          )}
+          {showClientManagement && (
+            <SideNavigation.Item
+              title={sharedMessages.oauthClients}
+              path="/user-settings/oauth-clients"
+              icon={IconUserShield}
+            />
+          )}
+        </SideNavigation.Item>
       </SideNavigation>
       {!isMinimized && <TopEntitiesSection topEntities={topEntities} />}
     </>
