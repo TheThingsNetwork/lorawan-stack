@@ -283,6 +283,8 @@ func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask
 				"console_preferences.dashboard_layouts",
 				"console_preferences.sort_by":
 				columns = append(columns, "console_preferences")
+			case "universal_rights":
+				columns = append(columns, "universal_rights")
 			case "attributes":
 				q = q.Relation("Attributes")
 			case "administrative_contact":
@@ -597,8 +599,6 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 		case "console_preferences.sort_by":
 			updateConsolePreferences = true
 			consolePreferences.SortBy = pb.ConsolePreferences.GetSortBy()
-		case "universal_rights":
-			columns = append(columns, "universal_rights")
 		}
 	}
 
