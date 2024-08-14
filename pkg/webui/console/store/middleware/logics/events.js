@@ -20,7 +20,7 @@ import EVENT_TAIL from '@console/constants/event-tail'
 
 import { buildObjectDeviceId, getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
-import { SET_CONNECTION_STATUS, setStatusChecking } from '@ttn-lw/lib/store/actions/status'
+import { SET_CONNECTION_STATUS } from '@ttn-lw/lib/store/actions/status'
 import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 import {
@@ -198,10 +198,6 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       process: async ({ action }, dispatch, done) => {
         const idString = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
         if (action.type === START_EVENTS_FAILURE) {
-          // Set the connection status to `checking` to trigger connection checks
-          // and detect possible offline state.
-          dispatch(setStatusChecking())
-
           // In case of a network error, the connection could not be closed
           // since the network connection is disrupted. We can regard this
           // as equivalent to a closed connection.
