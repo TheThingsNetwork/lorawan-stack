@@ -94,8 +94,7 @@ describe('Overview', () => {
         // Check panels.
         cy.findByText('General information').should('be.visible')
         cy.findByText('Gateway status').should('be.visible')
-        cy.findByText('Network activity').should('exist').scrollIntoView()
-        cy.findByText('Network activity').should('be.visible')
+        cy.contains('Network activity').filter(':visible').eq(0).should('be.visible')
         cy.findByText('Location').should('be.visible')
       })
 

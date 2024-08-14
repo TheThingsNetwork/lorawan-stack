@@ -53,10 +53,11 @@ const GatewayOverview = () => {
         </div>
         <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <GatewayStatusPanel className="xl-xxl:mb-ls-s" />
-          <GatewayMapPanel gateway={gateway} className="d-none mb-ls-s h-content xl-xxl:d-flex" />
+          <BlurryNetworkActivityPanel className="d-none mb-ls-s h-content xl-xxl:d-flex" />
         </div>
         <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
-          <BlurryNetworkActivityPanel />
+          <BlurryNetworkActivityPanel className="d-flex xl-xxl:d-none" />
+          <GatewayMapPanel gateway={gateway} className="d-none xl-xxl:d-flex" />
         </div>
         <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <GatewayMapPanel gateway={gateway} className="d-flex xl-xxl:d-none" />
