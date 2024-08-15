@@ -21,6 +21,7 @@
   "account.views.login.index.loginToContinue": "Please login to continue",
   "account.views.token-login.index.loginToken": "Login Token",
   "account.views.update-password.index.forgotPassword": "Forgot password",
+  "account.views.update-password.index.sessionRevoked": "Your password was changed and all active sessions were revoked",
   "account.views.validate.index.backToAccount": "Back to Account",
   "account.views.validate.index.contactInfoValidation": "Contact info validation",
   "account.views.validate.index.validateSuccess": "Validation successful",

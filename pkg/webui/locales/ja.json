@@ -21,6 +21,7 @@
   "account.views.login.index.loginToContinue": "続けるにはログインしてください。",
   "account.views.token-login.index.loginToken": "ログイン・トークン",
   "account.views.update-password.index.forgotPassword": "",
+  "account.views.update-password.index.sessionRevoked": "",
   "account.views.validate.index.backToAccount": "アカウントに戻る",
   "account.views.validate.index.contactInfoValidation": "連絡先情報の検証",
   "account.views.validate.index.validateSuccess": "検証が成功しました",
