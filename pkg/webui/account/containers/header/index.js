@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,113 +13,97 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  IconUser,
   IconLogout,
-  IconKey,
-  IconAccess,
-  IconOverview,
-  IconOauthClients,
+  IconUserCircle,
+  IconBook,
+  IconAdminPanel,
+  IconSupport,
 } from '@ttn-lw/components/icon'
 import HeaderComponent from '@ttn-lw/components/header'
-import NavigationBar from '@ttn-lw/components/navigation/bar'
 import Dropdown from '@ttn-lw/components/dropdown'
 
-import Logo from '@account/containers/logo'
-
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectAssetsRootPath, selectBrandingRootPath } from '@ttn-lw/lib/selectors/env'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { logout } from '@account/store/actions/user'
+import { logout } from '@console/store/actions/logout'
 
-import { selectUser } from '@account/store/selectors/user'
+import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 
-const Header = ({ handleSearchRequest, searchable }) => {
-  const user = useSelector(selectUser)
+import Logo from '../logo'
+
+const Header = ({ onMenuClick, alwaysShowLogo }) => {
   const dispatch = useDispatch()
 
-  const handleLogout = useCallback(() => {
-    dispatch(logout())
-  }, [dispatch])
+  const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
+  const user = useSelector(selectUser)
 
-  const navigation = [
-    {
-      title: sharedMessages.overview,
-      icon: IconOverview,
-      path: '/',
-      exact: true,
-      hidden: false,
-    },
-    {
-      title: sharedMessages.profileSettings,
-      icon: IconUser,
-      path: '/profile-settings',
-    },
-    {
-      title: sharedMessages.sessions,
-      icon: IconKey,
-      path: '/session-management',
-    },
-    {
-      title: sharedMessages.oauthClients,
-      icon: IconOauthClients,
-      path: '/oauth-clients',
-    },
-    {
-      title: sharedMessages.authorizations,
-      icon: IconAccess,
-      path: '/client-authorizations',
-    },
-  ]
-
-  const navigationEntries = (
-    <React.Fragment>
-      {navigation.map(
-        ({ hidden, ...rest }) => !hidden && <NavigationBar.Item {...rest} key={rest.title.id} />,
-      )}
-    </React.Fragment>
-  )
+  const isAdmin = useSelector(selectUserIsAdmin)
 
   const dropdownItems = (
     <React.Fragment>
+      <Dropdown.Item
+        title={sharedMessages.profileSettings}
+        icon={IconUserCircle}
+        path="/console/user-settings/profile"
+        external
+      />
+      {isAdmin && (
+        <Dropdown.Item
+          title={sharedMessages.adminPanel}
+          icon={IconAdminPanel}
+          path="/console/admin-panel/network-information"
+          external
+        />
+      )}
+      <hr />
+      <Dropdown.Item
+        title={sharedMessages.getSupport}
+        icon={IconSupport}
+        path="https://thethingsindustries.com/support"
+        external
+      />
+      <Dropdown.Item
+        title={sharedMessages.documentation}
+        icon={IconBook}
+        path="https://thethingsindustries.com/docs"
+        external
+      />
+      <hr />
       <Dropdown.Item title={sharedMessages.logout} icon={IconLogout} action={handleLogout} />
     </React.Fragment>
   )
 
-  const mobileDropdownItems = (
-    <React.Fragment>
-      {navigation.map(
-        ({ hidden, ...rest }) => !hidden && <Dropdown.Item {...rest} key={rest.title.id} />,
-      )}
-    </React.Fragment>
-  )
+  const hasCustomBranding = selectBrandingRootPath() !== selectAssetsRootPath()
+  const brandLogo = hasCustomBranding
+    ? {
+        src: `${selectBrandingRootPath()}/logo.svg`,
+        alt: 'Logo',
+      }
+    : undefined
 
   return (
     <HeaderComponent
       user={user}
-      dropdownItems={dropdownItems}
-      mobileDropdownItems={mobileDropdownItems}
-      navigationEntries={navigationEntries}
-      searchable={searchable}
-      onSearchRequest={handleSearchRequest}
-      onLogout={handleLogout}
-      logo={<Logo />}
+      profileDropdownItems={dropdownItems}
+      brandLogo={brandLogo}
+      Logo={Logo}
+      onMenuClick={onMenuClick}
+      alwaysShowLogo={alwaysShowLogo}
     />
   )
 }
 
 Header.propTypes = {
-  /** A handler for when the user used the search input. */
-  handleSearchRequest: PropTypes.func,
-  /** A flag identifying whether the header should display the search input. */
-  searchable: PropTypes.bool,
+  alwaysShowLogo: PropTypes.bool,
+  onMenuClick: PropTypes.func.isRequired,
 }
 
 Header.defaultProps = {
-  handleSearchRequest: () => null,
-  searchable: false,
+  alwaysShowLogo: false,
 }
 
 export default Header

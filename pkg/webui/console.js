@@ -36,7 +36,7 @@ import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/se
 
 import store from './console/store'
 import { AlertBannerProvider } from './components/alert-banner/context'
-import Header from './components/header'
+import HeaderComponent from './components/header'
 
 const appRoot = selectApplicationRootPath()
 
@@ -52,7 +52,7 @@ const rootElement = document.getElementById('app')
 // Do not use any components that depend on context
 // e.g. Intl, Router, Redux store.
 const errorRender = error => (
-  <FullViewError error={error} header={<Header alwaysShowLogo safe Logo={Logo} />} safe />
+  <FullViewError error={error} safe header={<HeaderComponent safe alwaysShowLogo Logo={Logo} />} />
 )
 
 DOM.render(
