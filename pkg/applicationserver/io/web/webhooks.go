@@ -54,6 +54,7 @@ var webhookFanOutFieldMask = []string{
 	"service_data",
 	"uplink_message",
 	"uplink_normalized",
+	"paused",
 }
 
 // Webhooks is an interface for registering incoming webhooks for downlink and creating a subscription to outgoing
@@ -135,6 +136,12 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			Health:       hook.HealthStatus,
 		})
 		ctx = log.NewContextWithField(ctx, "hook", hook.Ids.WebhookId)
+
+		if hook.Paused {
+			log.FromContext(ctx).Debug("Webhook is paused")
+			continue
+		}
+
 		f := func(ctx context.Context) error {
 			req, err := NewRequest(ctx, w.downlinks, msg, hook)
 			if err != nil {
@@ -192,6 +199,10 @@ func (w *webhooks) handleDown(
 		}
 		if hook == nil {
 			webhandlers.Error(res, req, errWebhookNotFound.New())
+			return
+		}
+		if hook.Paused {
+			logger.Debug("Webhook is paused")
 			return
 		}
 		format, ok := formats[hook.Format]
