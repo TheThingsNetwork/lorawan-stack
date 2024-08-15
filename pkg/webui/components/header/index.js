@@ -28,6 +28,7 @@ import style from './header.styl'
 const Header = ({
   brandLogo,
   Logo,
+  safe,
   className,
   addDropdownItems,
   bookmarkDropdownItems,
@@ -54,40 +55,42 @@ const Header = ({
       </>
     )}
 
-    <div className="d-flex al-center gap-cs-xs">
-      <AppStatusBadge />
-      <Button
-        secondary
-        icon={IconPlus}
-        dropdownItems={addDropdownItems}
-        dropdownPosition="below left"
-        className="md-lg:d-none"
-      />
-      <Button
-        secondary
-        icon={IconStar}
-        dropdownItems={bookmarkDropdownItems}
-        dropdownClassName={style.bookmarksDropdown}
-        dropdownPosition="below left"
-        className="md-lg:d-none"
-      />
-      <Button
-        secondary
-        icon={IconInbox}
-        dropdownItems={notificationsDropdownItems}
-        dropdownClassName={style.notificationsDropdown}
-        dropdownPosition="below left"
-        withAlert={showNotificationDot}
-        className="md-lg:d-none"
-      />
-      <ProfileDropdown
-        brandLogo={brandLogo}
-        data-test-id="profile-dropdown"
-        profilePicture={user?.profile_picture}
-      >
-        {profileDropdownItems}
-      </ProfileDropdown>
-    </div>
+    {!safe && (
+      <div className="d-flex al-center gap-cs-xs">
+        <AppStatusBadge />
+        <Button
+          secondary
+          icon={IconPlus}
+          dropdownItems={addDropdownItems}
+          dropdownPosition="below left"
+          className="md-lg:d-none"
+        />
+        <Button
+          secondary
+          icon={IconStar}
+          dropdownItems={bookmarkDropdownItems}
+          dropdownClassName={style.bookmarksDropdown}
+          dropdownPosition="below left"
+          className="md-lg:d-none"
+        />
+        <Button
+          secondary
+          icon={IconInbox}
+          dropdownItems={notificationsDropdownItems}
+          dropdownClassName={style.notificationsDropdown}
+          dropdownPosition="below left"
+          withAlert={showNotificationDot}
+          className="md-lg:d-none"
+        />
+        <ProfileDropdown
+          brandLogo={brandLogo}
+          data-test-id="profile-dropdown"
+          profilePicture={user?.profile_picture}
+        >
+          {profileDropdownItems}
+        </ProfileDropdown>
+      </div>
+    )}
   </header>
 )
 
@@ -100,20 +103,22 @@ Header.propTypes = {
   /** The logo component. */
   Logo: PropTypes.elementType.isRequired,
   /** The dropdown items when the add button is clicked. */
-  addDropdownItems: PropTypes.node.isRequired,
+  addDropdownItems: PropTypes.node,
   /** Whether to always show the logo, which is required in error views, where there is no sidebar. */
   alwaysShowLogo: PropTypes.bool,
   /** The dropdown items when the bookmark button is clicked. */
-  bookmarkDropdownItems: PropTypes.node.isRequired,
+  bookmarkDropdownItems: PropTypes.node,
   brandLogo: imgPropType,
   /** The classname applied to the component. */
   className: PropTypes.string,
   /** The dropdown items when the notifications button is clicked. */
-  notificationsDropdownItems: PropTypes.node.isRequired,
+  notificationsDropdownItems: PropTypes.node,
   /** A handler for when the menu button is clicked. */
-  onMenuClick: PropTypes.func.isRequired,
+  onMenuClick: PropTypes.func,
   /** The dropdown items when the profile button is clicked. */
-  profileDropdownItems: PropTypes.node.isRequired,
+  profileDropdownItems: PropTypes.node,
+  /** Whether the header should be rendered in safe mode. */
+  safe: PropTypes.bool,
   /** Whether to show a notification dot. */
   showNotificationDot: PropTypes.bool,
   /**
@@ -129,6 +134,12 @@ Header.defaultProps = {
   user: undefined,
   brandLogo: undefined,
   showNotificationDot: false,
+  safe: false,
+  addDropdownItems: undefined,
+  bookmarkDropdownItems: undefined,
+  notificationsDropdownItems: undefined,
+  profileDropdownItems: undefined,
+  onMenuClick: () => null,
 }
 
 export default Header

@@ -41,6 +41,7 @@ import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
 import Sidebar from '@console/containers/sidebar'
 import EventSplitFrameContext from '@console/containers/event-split-frame/context'
+import Logo from '@console/containers/logo'
 
 import OverviewRoutes from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -68,7 +69,9 @@ const m = defineMessages({
   expandEventPanel: 'Expand live data overlay',
 })
 
-const errorRender = error => <FullViewError error={error} header={<Header alwaysShowLogo />} />
+const errorRender = error => (
+  <FullViewError error={error} header={<Header alwaysShowLogo Logo={Logo} />} />
+)
 const getScrollRestorationKey = location => {
   // Preserve scroll position only when necessary.
   // E.g. we don't want to scroll to top when changing tabs of a table,
