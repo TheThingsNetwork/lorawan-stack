@@ -46,7 +46,7 @@ if (selectSentryDsnConfig()) {
 // Do not use any components that depend on context
 // e.g. Intl, Router, Redux store.
 const errorRender = error => (
-  <FullViewError error={error} header={<Header logo={<Logo safe />} />} safe />
+  <FullViewError error={error} header={<Header alwaysShowLogo safe Logo={Logo} />} safe />
 )
 
 const history = createBrowserHistory({ basename: `${selectApplicationRootPath()}/` })

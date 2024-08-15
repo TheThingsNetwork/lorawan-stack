@@ -27,6 +27,7 @@ import { Helmet } from 'react-helmet'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Footer from '@ttn-lw/components/footer'
+import Header from '@ttn-lw/components/header'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import FullViewError from '@ttn-lw/lib/components/full-view-error'
@@ -52,7 +53,9 @@ const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 const pageData = selectPageData()
 
-const errorRender = error => <FullViewError error={error} />
+const errorRender = error => (
+  <FullViewError error={error} header={<Header alwaysShowLogo Logo={Logo} safe />} />
+)
 const getScrollRestorationKey = location => {
   // Preserve scroll position only when necessary.
   // E.g. we don't want to scroll to top when changing tabs of a table,
