@@ -292,7 +292,7 @@ const GatewayConnectionSettings = () => {
       }
 
       const getEthernetProfileId = async (profile, cleanProfile) => {
-        if (!isEqual(profile, initialValues.ethernet_profile)) {
+        if (!isEqual(profile, initialValues.ethernet_profile) || !hasEthernetProfileSet) {
           const { _use_static_ip, ...rest } = cleanProfile
           const body = { ...rest, profile_name: Date.now().toString() }
           const {
@@ -360,7 +360,15 @@ const GatewayConnectionSettings = () => {
         })
       }
     },
-    [dispatch, gtwId, initialValues, nonSharedWifiProfileId, selectedGateway.name],
+    [
+      dispatch,
+      gtwId,
+      hasEthernetProfileSet,
+      initialValues.ethernet_profile,
+      initialValues.wifi_profile,
+      nonSharedWifiProfileId,
+      selectedGateway.name,
+    ],
   )
 
   return (
