@@ -588,6 +588,11 @@ func (x *ApplicationWebhook) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			golang.MarshalLegacyFieldMask(s, x.FieldMask)
 		}
 	}
+	if x.Paused || s.HasField("paused") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("paused")
+		s.WriteBool(x.Paused)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -807,6 +812,9 @@ func (x *ApplicationWebhook) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.FieldMask = v
+		case "paused":
+			s.AddField("paused")
+			x.Paused = s.ReadBool()
 		}
 	})
 }

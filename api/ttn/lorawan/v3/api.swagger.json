@@ -20844,6 +20844,10 @@
         },
         "field_mask": {
           "type": "string"
+        },
+        "paused": {
+          "type": "boolean",
+          "description": "Set to true to skip processing the messages for this webhook."
         }
       }
     },
@@ -20983,6 +20987,10 @@
             },
             "field_mask": {
               "type": "string"
+            },
+            "paused": {
+              "type": "boolean",
+              "description": "Set to true to skip processing the messages for this webhook."
             }
           }
         },

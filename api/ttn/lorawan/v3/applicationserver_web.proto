@@ -227,7 +227,10 @@ message ApplicationWebhook {
   reserved 23;
   reserved "queue";
 
-  // next: 24
+  // Set to true to skip processing the messages for this webhook.
+  bool paused = 24;
+
+  // next: 25
 }
 
 message ApplicationWebhooks {
