@@ -98,8 +98,7 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
       <Dropdown.Item
         title={sharedMessages.profileSettings}
         icon={IconUserCircle}
-        path="/user-settings/profile-settings"
-        external
+        path="/user-settings/profile"
       />
       {isAdmin && (
         <Dropdown.Item
