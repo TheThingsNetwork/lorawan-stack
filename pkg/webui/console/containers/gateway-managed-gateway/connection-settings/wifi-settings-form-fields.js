@@ -15,7 +15,7 @@
 import React, { useCallback, useMemo } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import { isEmpty, isEqual, omit } from 'lodash'
+import { isEmpty } from 'lodash'
 import { useParams } from 'react-router-dom'
 import classNames from 'classnames'
 

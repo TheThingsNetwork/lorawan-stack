@@ -24,7 +24,6 @@ import Notification from '@ttn-lw/components/notification'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import Link from '@ttn-lw/components/link'
 
 import { GsFrequencyPlansSelect as FrequencyPlansSelect } from '@console/containers/freq-plans-select'
 

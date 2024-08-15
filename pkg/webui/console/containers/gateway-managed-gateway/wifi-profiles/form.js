@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
@@ -42,7 +42,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import diff from '@ttn-lw/lib/diff'
-import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 
 import {
   createConnectionProfile,
@@ -51,8 +50,6 @@ import {
   getConnectionProfile,
   updateConnectionProfile,
 } from '@console/store/actions/connection-profiles'
-import { getApiKeysList } from '@console/store/actions/api-keys'
-import { getApplicationDeviceCount } from '@console/store/actions/applications'
 
 import { selectSelectedWifiConnectionProfile } from '@console/store/selectors/connection-profiles'
 
