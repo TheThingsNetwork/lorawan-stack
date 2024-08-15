@@ -22,7 +22,7 @@ import sentryConfig from '@ttn-lw/constants/sentry'
 import store from '@account/store'
 
 import { BreadcrumbsProvider } from '@ttn-lw/components/breadcrumbs/context'
-import Header from '@ttn-lw/components/header'
+import HeaderComponent from '@ttn-lw/components/header'
 
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 import { ErrorView } from '@ttn-lw/lib/components/error-view'
@@ -46,7 +46,7 @@ if (selectSentryDsnConfig()) {
 // Do not use any components that depend on context
 // e.g. Intl, Router, Redux store.
 const errorRender = error => (
-  <FullViewError error={error} header={<Header alwaysShowLogo safe Logo={Logo} />} safe />
+  <FullViewError error={error} header={<HeaderComponent alwaysShowLogo safe Logo={Logo} />} safe />
 )
 
 const history = createBrowserHistory({ basename: `${selectApplicationRootPath()}/` })

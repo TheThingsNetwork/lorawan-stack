@@ -30,6 +30,7 @@ import { defineMessages } from 'react-intl'
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import Button from '@ttn-lw/components/button'
+import HeaderComponent from '@ttn-lw/components/header'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -231,7 +232,13 @@ const ConsoleRoot = () => {
   }, [handleConnectionStatusChange])
 
   if (pageData && pageData.error) {
-    return <FullViewError error={pageData.error} header={<Header alwaysShowLogo />} />
+    return (
+      <FullViewError
+        error={pageData.error}
+        header={<HeaderComponent safe alwaysShowLogo Logo={Logo} />}
+        safe
+      />
+    )
   }
 
   return (

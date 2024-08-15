@@ -27,12 +27,13 @@ import { Helmet } from 'react-helmet'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Footer from '@ttn-lw/components/footer'
-import Header from '@ttn-lw/components/header'
+import HeaderComponent from '@ttn-lw/components/header'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import FullViewError from '@ttn-lw/lib/components/full-view-error'
 
 import Logo from '@account/containers/logo'
+import Header from '@account/containers/header'
 
 import Landing from '@account/views/landing'
 import Authorize from '@account/views/authorize'
@@ -53,9 +54,7 @@ const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 const pageData = selectPageData()
 
-const errorRender = error => (
-  <FullViewError error={error} header={<Header alwaysShowLogo Logo={Logo} safe />} />
-)
+const errorRender = error => <FullViewError error={error} header={<Header alwaysShowLogo />} />
 const getScrollRestorationKey = location => {
   // Preserve scroll position only when necessary.
   // E.g. we don't want to scroll to top when changing tabs of a table,
@@ -113,7 +112,10 @@ const AccountRoot = () => {
   if (pageData && pageData.error) {
     return (
       <BrowserRouter history={history} basename="/oauth">
-        <FullViewError error={pageData.error} />
+        <FullViewError
+          error={pageData.error}
+          header={<HeaderComponent safe alwaysShowLogo Logo={Logo} />}
+        />
       </BrowserRouter>
     )
   }
