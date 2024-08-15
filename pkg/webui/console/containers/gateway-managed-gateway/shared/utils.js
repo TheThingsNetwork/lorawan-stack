@@ -84,7 +84,6 @@ export const initialEthernetProfile = {
   profile_name: Date.now().toString(),
   profile_id: '',
   shared: false,
-  _enable_ethernet_connection: false,
   _use_static_ip: false,
   network_interface_addresses: {
     ip_addresses: [''],
@@ -94,28 +93,8 @@ export const initialEthernetProfile = {
   },
 }
 
-export const normalizeEthernetProfile = profile => {
-  const { _enable_ethernet_connection, _use_static_ip, ...rest } = profile
-
-  if (!_enable_ethernet_connection) {
-    rest.network_interface_addresses = undefined
-  }
-
-  if (!_use_static_ip) {
-    delete rest.network_interface_addresses?.ip_addresses
-    delete rest.network_interface_addresses?.subnet_mask
-    delete rest.network_interface_addresses?.gateway
-  }
-
-  rest.profile_name = Date.now().toString()
-
-  return rest
-}
-
-export const revertEthernetProfile = (profile, enableEthernet) => {
+export const revertEthernetProfile = profile => {
   const result = { ...omit(initialEthernetProfile, ['network_interface_addresses']), ...profile }
-
-  result._enable_ethernet_connection = enableEthernet
 
   result._use_static_ip =
     Boolean(result.network_interface_addresses?.ip_addresses) ||

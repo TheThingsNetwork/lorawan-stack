@@ -19,6 +19,7 @@ import {
   GET_ACCESS_POINTS_FAILURE,
   GET_CONNECTION_PROFILE_SUCCESS,
   CREATE_CONNECTION_PROFILE_SUCCESS,
+  UPDATE_CONNECTION_PROFILE_SUCCESS,
 } from '@console/store/actions/connection-profiles'
 
 const defaultState = {
@@ -67,6 +68,20 @@ const connectionProfiles = (state = defaultState, action) => {
             profile => profile.profile_id !== payload.profileId,
           ),
         },
+      }
+    case UPDATE_CONNECTION_PROFILE_SUCCESS:
+      return {
+        ...state,
+        profiles: {
+          ...state.profiles,
+          [payload.type]: state.profiles[payload.type].map(profile => {
+            if (payload.profileId === profile.profile_id) {
+              return payload.data
+            }
+            return profile
+          }),
+        },
+        [`${payload.type}SelectedProfile`]: payload.data,
       }
     case GET_ACCESS_POINTS_SUCCESS:
       return {

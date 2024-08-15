@@ -20,10 +20,10 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { ipAddress, subnetMask } from '@console/lib/regexp'
 
 const m = defineMessages({
-  validateDnsServers: 'There are some not valid dns servers.',
-  validateIpAddresses: 'There are some not valid IP addresses.',
-  validateIpAddress: '{field} must contain a valid address.',
-  validateSubnetMask: '{field} must contain a valid subnet mask.',
+  validateDnsServers: 'There are some invalid dns servers addresses',
+  validateIpAddresses: 'There are some invalid IP addresses',
+  validateIpAddress: '{field} must be of a valid IPv4 address format',
+  validateSubnetMask: '{field} must be a valid subnet mask',
   validateNotSelectedAccessPoint: 'There must be at least one access point selected',
   addressesValidateTooMany: '{field} must be 2 items or fewer',
 })
@@ -104,12 +104,8 @@ export const ethernetValidationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
-  _enable_ethernet_connection: Yup.boolean(),
   shared: Yup.boolean().default(false),
-  _use_static_ip: Yup.boolean().when('_enable_ethernet_connection', {
-    is: false,
-    then: schema => schema.required(sharedMessages.validateRequired),
-  }),
+  _use_static_ip: Yup.boolean().required(sharedMessages.validateRequired),
   network_interface_addresses: Yup.object().when('_use_static_ip', {
     is: true,
     then: schema => schema.shape(networkInterfaceSettings),

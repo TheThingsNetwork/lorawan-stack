@@ -15,7 +15,7 @@
 import React, { useCallback, useMemo } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import { isEqual, omit } from 'lodash'
+import { isEmpty, isEqual, omit } from 'lodash'
 import { useParams } from 'react-router-dom'
 import classNames from 'classnames'
 
@@ -25,6 +25,7 @@ import Icon from '@ttn-lw/components/icon'
 import Notification from '@ttn-lw/components/notification'
 import Button from '@ttn-lw/components/button'
 import Link from '@ttn-lw/components/link'
+import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -38,6 +39,7 @@ import {
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import diff from '@ttn-lw/lib/diff'
 
 import { getConnectionProfilesList } from '@console/store/actions/connection-profiles'
 
@@ -65,6 +67,7 @@ const m = defineMessages({
   attemptingToConnect: 'The gateway WiFi is currently attempting to connect using this profile',
   settingsProfileTooltip:
     'To set up the gateway connection, you can either use a shared profile, to share the connection settings with other gateways, or set a config for this gateway only.',
+  fetchProfilesFailure: 'There was an error and the WiFi profiles cannot be fetched.',
 })
 
 const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicked }) => {
@@ -77,9 +80,10 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
 
   const hasChanged = useMemo(
     () =>
-      !isEqual(
-        omit(values.wifi_profile, ['_profile_of', '_access_point']),
-        omit(initialValues.wifi_profile, ['_profile_of', '_access_point']),
+      !isEmpty(
+        diff(initialValues.wifi_profile, values.wifi_profile, {
+          exclude: ['_profile_of', '_access_point'],
+        }),
       ),
     [initialValues, values],
   )
@@ -152,7 +156,12 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
             }),
           ),
         )
-      } catch (e) {}
+      } catch (e) {
+        toast({
+          message: m.fetchProfilesFailure,
+          type: toast.types.ERROR,
+        })
+      }
     },
     [dispatch, setValues],
   )

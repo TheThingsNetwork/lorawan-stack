@@ -16,6 +16,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
+import { isEmpty } from 'lodash'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -27,6 +28,7 @@ import Spinner from '@ttn-lw/components/spinner'
 import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import {
   CONNECTION_TYPES,
@@ -40,6 +42,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectFetchingEntry } from '@ttn-lw/lib/store/selectors/fetching'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import diff from '@ttn-lw/lib/diff'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 
 import {
   createConnectionProfile,
@@ -48,6 +51,8 @@ import {
   getConnectionProfile,
   updateConnectionProfile,
 } from '@console/store/actions/connection-profiles'
+import { getApiKeysList } from '@console/store/actions/api-keys'
+import { getApplicationDeviceCount } from '@console/store/actions/applications'
 
 import { selectSelectedWifiConnectionProfile } from '@console/store/selectors/connection-profiles'
 
@@ -61,6 +66,7 @@ const m = defineMessages({
 
 const GatewayWifiProfilesForm = () => {
   const [error, setError] = useState(undefined)
+  const [initialValues, setInitialValues] = useState(initialWifiProfile)
   const { gtwId, profileId } = useParams()
   const isLoadingAccessPoints = useSelector(state =>
     selectFetchingEntry(state, GET_ACCESS_POINTS_BASE),
@@ -89,21 +95,26 @@ const GatewayWifiProfilesForm = () => {
     />,
   )
 
-  useEffect(() => {
-    if (isEdit) {
-      dispatch(attachPromise(getConnectionProfile(entityId, profileId, CONNECTION_TYPES.WIFI)))
-        .then(res => {
-          formRef.current.setValues(values => ({
-            ...values,
-            ...res.data,
-            _default_network_interface: !Boolean(res.data.network_interface_addresses),
+  const loadData = useCallback(
+    async dispatch => {
+      if (isEdit) {
+        try {
+          const { data: profile } = await dispatch(
+            attachPromise(getConnectionProfile(entityId, profileId, CONNECTION_TYPES.WIFI)),
+          )
+
+          setInitialValues(oldValues => ({
+            ...oldValues,
+            ...profile,
+            _default_network_interface: !Boolean(profile.network_interface_addresses),
           }))
-        })
-        .catch(() => {
-          navigate(baseUrl, { replace: true })
-        })
-    }
-  }, [baseUrl, dispatch, entityId, isEdit, navigate, profileId, searchParams])
+        } catch (e) {
+          // Navigate(baseUrl, { replace: true })
+        }
+      }
+    },
+    [entityId, isEdit, profileId],
+  )
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting }) => {
@@ -117,12 +128,13 @@ const GatewayWifiProfilesForm = () => {
           navigate(baseUrl, { replace: true })
         } else {
           const profileDiff = diff(selectedProfile, profile)
-
-          await dispatch(
-            attachPromise(
-              updateConnectionProfile(entityId, profileId, CONNECTION_TYPES.WIFI, profileDiff),
-            ),
-          )
+          if (!isEmpty(profileDiff)) {
+            await dispatch(
+              attachPromise(
+                updateConnectionProfile(entityId, profileId, CONNECTION_TYPES.WIFI, profileDiff),
+              ),
+            )
+          }
         }
 
         toast({
@@ -144,7 +156,7 @@ const GatewayWifiProfilesForm = () => {
   )
 
   return (
-    <>
+    <RequireRequest requestAction={loadData}>
       <PageTitle title={isEdit ? m.updateWifiProfile : sharedMessages.addWifiProfile} />
       {isLoadingProfile ? (
         <div className="pos-relative mt-cs-xl mb-cs-xl">
@@ -156,7 +168,7 @@ const GatewayWifiProfilesForm = () => {
         <Form
           error={error}
           onSubmit={handleSubmit}
-          initialValues={initialWifiProfile}
+          initialValues={initialValues}
           validationSchema={wifiValidationSchema}
           formikRef={formRef}
         >
@@ -171,7 +183,7 @@ const GatewayWifiProfilesForm = () => {
           </SubmitBar>
         </Form>
       )}
-    </>
+    </RequireRequest>
   )
 }
 

@@ -24,7 +24,6 @@ import { selectUserId } from '@account/store/selectors/user'
 
 const getConnectionProfilesLogic = createRequestLogic({
   type: connectionProfiles.GET_CONNECTION_PROFILES_LIST,
-  latest: true,
   process: async ({ action, getState }) => {
     const { params, entityId, type } = action.payload
     const { selectors } = action.meta
@@ -123,7 +122,7 @@ const updateConnectionProfileLogic = createRequestLogic({
       data = await tts.ConnectionProfiles.updateEthernetProfileForUser(userId, profileId, patch)
     }
 
-    return { ...patch, ...data }
+    return { profileId, type, data: { ...patch, ...data } }
   },
 })
 

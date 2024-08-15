@@ -34,24 +34,16 @@ const EthernetSettingsFormFields = () => {
   return (
     <>
       <Message component="h3" content={m.ethernetConnection} />
+
       <Form.Field
-        name={`ethernet_profile._enable_ethernet_connection`}
+        name={`ethernet_profile._use_static_ip`}
         component={Checkbox}
-        label={m.enableEthernetConnection}
+        label={m.useStaticIp}
       />
-      {values.ethernet_profile._enable_ethernet_connection && (
-        <>
-          <Form.Field
-            name={`ethernet_profile._use_static_ip`}
-            component={Checkbox}
-            label={m.useStaticIp}
-          />
-          <NetworkInterfaceAddressesFormFields
-            namePrefix={`ethernet_profile.`}
-            showOnlyDns={!values.ethernet_profile._use_static_ip}
-          />
-        </>
-      )}
+      <NetworkInterfaceAddressesFormFields
+        namePrefix={`ethernet_profile.`}
+        showOnlyDns={!values.ethernet_profile._use_static_ip}
+      />
     </>
   )
 }

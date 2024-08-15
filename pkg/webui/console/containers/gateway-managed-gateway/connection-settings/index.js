@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Col, Row } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
+import { isEmpty, isEqual } from 'lodash'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -35,7 +36,6 @@ import {
   initialWifiProfile,
   initialEthernetProfile,
   normalizeWifiProfile,
-  normalizeEthernetProfile,
   revertEthernetProfile,
 } from '@console/containers/gateway-managed-gateway/shared/utils'
 import WifiSettingsFormFields from '@console/containers/gateway-managed-gateway/connection-settings/wifi-settings-form-fields'
@@ -49,6 +49,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import diff from '@ttn-lw/lib/diff'
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 
 import { checkFromState, mayViewOrEditGatewayCollaborators } from '@console/lib/feature-checks'
 
@@ -113,6 +114,7 @@ const GatewayConnectionSettings = () => {
       let entityId
 
       if (hasWifiProfileSet) {
+        setError(undefined)
         try {
           // If WiFi profile is set, first check if that profile belongs to the user
           wifiProfile = await dispatch(
@@ -125,12 +127,17 @@ const GatewayConnectionSettings = () => {
             ),
           )
           entityId = userId
-        } catch (e) {}
+        } catch (e) {
+          if (!isNotFoundError(e)) {
+            setError(e)
+          }
+        }
         if (!wifiProfile) {
           const orgCollaborators = collaborators
             .filter(({ ids }) => 'organization_ids' in ids)
             .map(({ ids }) => getCollaboratorId({ ids }))
 
+          setError(undefined)
           // If the WiFi profile doesn't belong to the user, iterate through collaborators until found
           for (const orgId of orgCollaborators) {
             try {
@@ -146,7 +153,12 @@ const GatewayConnectionSettings = () => {
               )
               entityId = orgId
               break
-            } catch (e) {}
+            } catch (e) {
+              if (!isNotFoundError(e)) {
+                setError(e)
+                break
+              }
+            }
           }
         }
       }
@@ -158,6 +170,7 @@ const GatewayConnectionSettings = () => {
   const fetchEthernetProfile = useCallback(async () => {
     let ethernetProfile
     if (hasEthernetProfileSet) {
+      setError(undefined)
       try {
         ethernetProfile = await dispatch(
           attachPromise(
@@ -168,7 +181,11 @@ const GatewayConnectionSettings = () => {
             ),
           ),
         )
-      } catch (e) {}
+      } catch (e) {
+        if (!isNotFoundError(e)) {
+          setError(e)
+        }
+      }
     }
     return { ethernetProfile }
   }, [dispatch, hasEthernetProfileSet, selectedManagedGateway.ethernet_profile_id])
@@ -187,10 +204,10 @@ const GatewayConnectionSettings = () => {
   const updateInitialEthernetProfile = useCallback(
     (values, profile) => ({
       ...values.ethernet_profile,
-      ...revertEthernetProfile(profile?.data ?? {}, hasEthernetProfileSet),
+      ...revertEthernetProfile(profile?.data ?? {}),
       profile_id: selectedManagedGateway.ethernet_profile_id ?? '',
     }),
-    [hasEthernetProfileSet, selectedManagedGateway.ethernet_profile_id],
+    [selectedManagedGateway.ethernet_profile_id],
   )
 
   const loadData = useCallback(
@@ -229,7 +246,7 @@ const GatewayConnectionSettings = () => {
   )
 
   const handleSubmit = useCallback(
-    async (values, { setSubmitting, resetForm }) => {
+    async (values, { resetForm, setSubmitting }, cleanValues) => {
       const getWifiProfileId = async (profile, shouldUpdateNonSharedWifiProfile) => {
         const { profile_id, _profile_of, _override, ...wifiProfile } = profile
         let wifiProfileId = profile_id
@@ -241,18 +258,26 @@ const GatewayConnectionSettings = () => {
             wifiProfileId === 'shared',
           )
           if (shouldUpdateNonSharedWifiProfile) {
-            const profileDiff = diff(initialValues.wifi_profile, normalizedWifiProfile)
+            if (
+              !isEmpty(
+                diff(initialValues.wifi_profile, profile, {
+                  exclude: ['_access_point'],
+                }),
+              )
+            ) {
+              const profileDiff = diff(initialValues.wifi_profile, normalizedWifiProfile)
 
-            await dispatch(
-              attachPromise(
-                updateConnectionProfile(
-                  _profile_of,
-                  nonSharedWifiProfileId,
-                  CONNECTION_TYPES.WIFI,
-                  profileDiff,
+              await dispatch(
+                attachPromise(
+                  updateConnectionProfile(
+                    _profile_of,
+                    nonSharedWifiProfileId,
+                    CONNECTION_TYPES.WIFI,
+                    profileDiff,
+                  ),
                 ),
-              ),
-            )
+              )
+            }
             wifiProfileId = nonSharedWifiProfileId
           } else {
             const { data } = await dispatch(
@@ -266,41 +291,37 @@ const GatewayConnectionSettings = () => {
         return wifiProfileId
       }
 
-      const getEthernetProfileId = async profile => {
-        const normalizedEthernetProfile = normalizeEthernetProfile(profile)
-
-        if (profile._enable_ethernet_connection) {
+      const getEthernetProfileId = async (profile, cleanProfile) => {
+        if (!isEqual(profile, initialValues.ethernet_profile)) {
+          const { _use_static_ip, ...rest } = cleanProfile
+          const body = { ...rest, profile_name: Date.now().toString() }
           const {
             data: { profile_id: ethernet_profile_id },
           } = await dispatch(
-            attachPromise(
-              createConnectionProfile(
-                undefined,
-                CONNECTION_TYPES.ETHERNET,
-                normalizedEthernetProfile,
-              ),
-            ),
+            attachPromise(createConnectionProfile(undefined, CONNECTION_TYPES.ETHERNET, body)),
           )
 
           return ethernet_profile_id
         }
 
-        return undefined
+        return initialValues.ethernet_profile.profile_id
       }
 
       setError(undefined)
       try {
         const { wifi_profile, ethernet_profile } = values
+
         const shouldUpdateNonSharedWifiProfile =
           wifi_profile.profile_id === 'non-shared' && Boolean(nonSharedWifiProfileId)
 
         const wifiProfileId = await getWifiProfileId(wifi_profile, shouldUpdateNonSharedWifiProfile)
-        const ethernetProfileId = await getEthernetProfileId(ethernet_profile)
+        const ethernetProfileId = await getEthernetProfileId(
+          ethernet_profile,
+          cleanValues.ethernet_profile,
+        )
         const body = {
           ...(Boolean(wifiProfileId) && { wifi_profile_id: wifiProfileId }),
-          ...(Boolean(ethernetProfileId) && {
-            ethernet_profile_id: ethernetProfileId,
-          }),
+          ethernet_profile_id: ethernetProfileId,
         }
 
         await dispatch(attachPromise(updateManagedGateway(gtwId, body)))
@@ -339,7 +360,7 @@ const GatewayConnectionSettings = () => {
         })
       }
     },
-    [dispatch, gtwId, initialValues.wifi_profile, nonSharedWifiProfileId, selectedGateway.name],
+    [dispatch, gtwId, initialValues, nonSharedWifiProfileId, selectedGateway.name],
   )
 
   return (

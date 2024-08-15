@@ -13,16 +13,21 @@
 // limitations under the License.
 
 import React from 'react'
-import { Navigate, Route, Routes, useParams } from 'react-router-dom'
+import { Route, Routes, useParams } from 'react-router-dom'
 import { Col, Row } from 'react-grid-system'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
+import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
+import ValidateRouteParam from '@ttn-lw/lib/components/validate-route-param'
+
 import GatewayWifiProfilesForm from '@console/containers/gateway-managed-gateway/wifi-profiles/form'
 import GatewayWifiProfilesOverview from '@console/containers/gateway-managed-gateway/wifi-profiles/overview'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { profileIdPath } from '@console/lib/regexp'
 
 const GatewayWifiProfiles = () => {
   const { gtwId } = useParams()
@@ -40,8 +45,17 @@ const GatewayWifiProfiles = () => {
         <Routes>
           <Route index Component={GatewayWifiProfilesOverview} />
           <Route path="add" Component={GatewayWifiProfilesForm} />
-          <Route path="edit/:profileId" Component={GatewayWifiProfilesForm} />
-          <Route path="*" element={<Navigate to="" replace />} />
+          <Route
+            path="edit/:profileId"
+            element={
+              <ValidateRouteParam
+                check={{ profileId: profileIdPath }}
+                Component={GatewayWifiProfilesForm}
+                otherwise={{ redirect: `/gateways/${gtwId}/managed-gateway/wifi-profiles` }}
+              />
+            }
+          />
+          <Route path="*" element={<GenericNotFound />} />
         </Routes>
       </Col>
     </Row>

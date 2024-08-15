@@ -21,6 +21,7 @@ import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import { getGatewayId } from '@ttn-lw/lib/selectors/id'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 
 import * as gateways from '@console/store/actions/gateways'
 
@@ -59,7 +60,11 @@ const getGatewayLogic = createRequestLogic({
         'wifi_mac_address',
         'ethernet_mac_address',
       ])
-    } catch (e) {}
+    } catch (e) {
+      if (!isNotFoundError(e)) {
+        throw e
+      }
+    }
 
     return { ...gtw, managed }
   },
@@ -311,10 +316,7 @@ const updateManagedGatewayLogic = createRequestLogic({
   process: async ({ action }) => {
     const { gatewayId, patch } = action.payload
 
-    const data = await tts.Gateways.updateManagedGateway(gatewayId, patch, [
-      'wifi_profile_id',
-      'ethernet_profile_id',
-    ])
+    const data = await tts.Gateways.updateManagedGateway(gatewayId, patch)
 
     return { id: gatewayId, data: { ...patch, ...data } }
   },

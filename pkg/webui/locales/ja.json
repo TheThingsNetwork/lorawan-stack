@@ -578,6 +578,7 @@
   "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.editProfile": "",
   "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.attemptingToConnect": "",
   "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.settingsProfileTooltip": "",
+  "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.fetchProfilesFailure": "",
   "console.containers.gateway-managed-gateway.shared.network-interface-addresses-form-fields.ipAddresses": "",
   "console.containers.gateway-managed-gateway.shared.network-interface-addresses-form-fields.dnsServers": "",
   "console.containers.gateway-managed-gateway.shared.network-interface-addresses-form-fields.addServerAddress": "",
