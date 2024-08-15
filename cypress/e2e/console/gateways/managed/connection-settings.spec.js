@@ -239,7 +239,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to set Ethernet connection with default network settings', () => {
-    cy.findByLabelText(/Enable ethernet connection/).check()
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.wait('@update-connection-settings')
       .its('request.body')
@@ -253,7 +252,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to validate custom ethernet network settings fields', () => {
-    cy.findByLabelText(/Enable ethernet connection/).check()
     cy.findByLabelText(/Use a static IP address/).check()
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.get('#ethernet_profile\\.network_interface_addresses\\.ip_addresses-field-error').should(
@@ -268,7 +266,6 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to set Ethernet connection with custom network settings', () => {
-    cy.findByLabelText(/Enable ethernet connection/).check()
     cy.findByLabelText(/Use a static IP address/).check()
     cy.findByText('IP addresses')
       .parents('div[data-test-id="form-field"]')
