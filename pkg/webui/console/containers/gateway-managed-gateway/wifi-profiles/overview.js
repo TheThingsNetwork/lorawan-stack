@@ -50,7 +50,6 @@ const m = defineMessages({
   // TODO: This message should include a link to a documentation page that explains about managed gateways.
   information:
     'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.',
-  profileId: 'Profile ID',
   accessPoint: 'Access point',
   deleteProfile: 'Delete profile',
   deleteSuccess: 'WiFi profile deleted',

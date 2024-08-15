@@ -603,7 +603,6 @@
   "console.containers.gateway-managed-gateway.wifi-profiles.form.updateSuccess": "",
   "console.containers.gateway-managed-gateway.wifi-profiles.form.updateFailure": "",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.information": "",
-  "console.containers.gateway-managed-gateway.wifi-profiles.overview.profileId": "",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.accessPoint": "",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.deleteProfile": "",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.deleteSuccess": "",

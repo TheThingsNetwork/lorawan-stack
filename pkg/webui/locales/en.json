@@ -603,7 +603,6 @@
   "console.containers.gateway-managed-gateway.wifi-profiles.form.updateSuccess": "WiFi profile updated",
   "console.containers.gateway-managed-gateway.wifi-profiles.form.updateFailure": "There was an error updating this WiFi profile",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.information": "Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.",
-  "console.containers.gateway-managed-gateway.wifi-profiles.overview.profileId": "Profile ID",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.accessPoint": "Access point",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.deleteProfile": "Delete profile",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.deleteSuccess": "WiFi profile deleted",
