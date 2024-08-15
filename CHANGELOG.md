@@ -11,14 +11,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.32.0] - unreleased
+
+### Added
+
 - Support for managed gateways and claiming through The Things Gateway Controller.
 - Support for The Things Industries gateway protocol. This is adds a new pair of ports to Gateway Server: `1889` for Envoy or Traefik terminated TLS mutual authentication, and `8889` for The Things Stack terminated TLS mutual authentication.
 - Option to filter the output of the `List` RPCs for end devices and gateways based on when they were updated.
   - `ListGatewaysRequest` and `ListEndDevicesRequest` RPCs have a new `Filter` field that supports an `updated_since` timestamp.
 - Preparation for universal rights assigned to users.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`).
-
-### Changed
 
 ### Deprecated
 
@@ -32,8 +44,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Fix unhandled video stream in QR code scanner
-
-### Security
 
 ## [3.31.1] - 2024-08-01
 
@@ -2852,7 +2862,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.1...v3.31
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.0...v3.32
+[3.32.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.1...v3.32.0
 [3.31.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.0...v3.31.1
 [3.31.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.2...v3.31.0
 [3.30.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.1...v3.30.2
