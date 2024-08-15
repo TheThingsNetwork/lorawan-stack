@@ -64,22 +64,6 @@ const Header = ({
   >
     {alwaysShowLogo ? (
       <div className="d-flex al-center gap-cs-xs">
-        <div className="d-flex j-start al-center gap-cs-s lg-xl:d-none">
-          {isSidebarMinimized && (
-            <>
-              <Button
-                className="md-lg:d-none"
-                icon={IconLayoutSidebarLeftExpand}
-                onClick={toggleSidebarMinimized}
-                naked
-                tooltip={m.tooltipMinimize}
-                tooltipPlacement="right"
-              />
-              <div className={style.divider} />
-            </>
-          )}
-          <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
-        </div>
         <Logo className={style.logo} />
       </div>
     ) : (
@@ -94,6 +78,8 @@ const Header = ({
                 naked
                 tooltip={m.tooltipMinimize}
                 tooltipPlacement="right"
+                onMouseEnter={expandSidebar}
+                onMouseLeave={handleHideSidebar}
               />
               <div className={style.divider} />
             </>
