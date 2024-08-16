@@ -96,64 +96,97 @@ func (c *client) subscribeEventData(
 	}, nil
 }
 
-func mapEvent(ctx context.Context, eventData *eventData) events.Event {
+func mapEvent(ctx context.Context, eventData *eventData) []events.Event {
 	switch data := eventData.Data.(type) {
 	case *ttnpb.ManagedGatewayEventData_Entity:
-		return evtUpdateManagedGateway.NewWithIdentifiersAndData(
-			ctx, eventData.GatewayIdentifiers, data.Entity,
-		)
+		return []events.Event{
+			evtUpdateManagedGateway.NewWithIdentifiersAndData(
+				ctx, eventData.GatewayIdentifiers, data.Entity,
+			),
+		}
 	case *ttnpb.ManagedGatewayEventData_Location:
-		return evtUpdateManagedGatewayLocation.NewWithIdentifiersAndData(
-			ctx, eventData.GatewayIdentifiers, data.Location,
-		)
+		return []events.Event{
+			evtUpdateManagedGatewayLocation.NewWithIdentifiersAndData(
+				ctx, eventData.GatewayIdentifiers, data.Location,
+			),
+		}
 	case *ttnpb.ManagedGatewayEventData_SystemStatus:
-		return evtReceiveManagedGatewaySystemStatus.NewWithIdentifiersAndData(
-			ctx, eventData.GatewayIdentifiers, data.SystemStatus,
-		)
+		return []events.Event{
+			evtReceiveManagedGatewaySystemStatus.NewWithIdentifiersAndData(
+				ctx, eventData.GatewayIdentifiers, data.SystemStatus,
+			),
+		}
 	case *ttnpb.ManagedGatewayEventData_ControllerConnection:
 		if data.ControllerConnection.NetworkInterfaceType !=
 			ttnpb.ManagedGatewayNetworkInterfaceType_MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_UNSPECIFIED {
-			return evtManagedGatewayControllerUp.NewWithIdentifiersAndData(
-				ctx, eventData.GatewayIdentifiers, data.ControllerConnection,
-			)
+			return []events.Event{
+				evtManagedGatewayControllerUp.NewWithIdentifiersAndData(
+					ctx, eventData.GatewayIdentifiers, data.ControllerConnection,
+				),
+			}
 		}
-		return evtManagedGatewayControllerDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers))
+		return []events.Event{
+			// If the Controller connection is down, report that everything is down because it cannot be determined.
+			evtManagedGatewayControllerDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+			evtManagedGatewayGatewayServerDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+			evtManagedGatewayCellularDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+			evtManagedGatewayWiFiDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+			evtManagedGatewayEthernetDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+		}
 	case *ttnpb.ManagedGatewayEventData_GatewayServerConnection:
 		if data.GatewayServerConnection.NetworkInterfaceType !=
 			ttnpb.ManagedGatewayNetworkInterfaceType_MANAGED_GATEWAY_NETWORK_INTERFACE_TYPE_UNSPECIFIED {
-			return evtManagedGatewayGatewayServerUp.NewWithIdentifiersAndData(
-				ctx, eventData.GatewayIdentifiers, data.GatewayServerConnection,
-			)
+			return []events.Event{
+				evtManagedGatewayGatewayServerUp.NewWithIdentifiersAndData(
+					ctx, eventData.GatewayIdentifiers, data.GatewayServerConnection,
+				),
+			}
 		}
-		return evtManagedGatewayGatewayServerDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers))
+		return []events.Event{
+			evtManagedGatewayGatewayServerDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+		}
 	case *ttnpb.ManagedGatewayEventData_CellularBackhaul:
 		switch data.CellularBackhaul.NetworkInterface.GetStatus() {
 		case ttnpb.ManagedGatewayNetworkInterfaceStatus_MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UP:
-			return evtManagedGatewayCellularUp.NewWithIdentifiersAndData(
-				ctx, eventData.GatewayIdentifiers, data.CellularBackhaul,
-			)
+			return []events.Event{
+				evtManagedGatewayCellularUp.NewWithIdentifiersAndData(
+					ctx, eventData.GatewayIdentifiers, data.CellularBackhaul,
+				),
+			}
 		default:
-			return evtManagedGatewayCellularDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers))
+			return []events.Event{
+				evtManagedGatewayCellularDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+			}
 		}
 	case *ttnpb.ManagedGatewayEventData_WifiBackhaul:
 		switch data.WifiBackhaul.NetworkInterface.GetStatus() {
 		case ttnpb.ManagedGatewayNetworkInterfaceStatus_MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UP:
-			return evtManagedGatewayWiFiUp.NewWithIdentifiersAndData(
-				ctx, eventData.GatewayIdentifiers, data.WifiBackhaul,
-			)
+			return []events.Event{
+				evtManagedGatewayWiFiUp.NewWithIdentifiersAndData(
+					ctx, eventData.GatewayIdentifiers, data.WifiBackhaul,
+				),
+			}
 		case ttnpb.ManagedGatewayNetworkInterfaceStatus_MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_FAILED:
-			return evtManagedGatewayWiFiFail.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers))
+			return []events.Event{
+				evtManagedGatewayWiFiFail.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+			}
 		default:
-			return evtManagedGatewayWiFiDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers))
+			return []events.Event{
+				evtManagedGatewayWiFiDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+			}
 		}
 	case *ttnpb.ManagedGatewayEventData_EthernetBackhaul:
 		switch data.EthernetBackhaul.NetworkInterface.GetStatus() {
 		case ttnpb.ManagedGatewayNetworkInterfaceStatus_MANAGED_GATEWAY_NETWORK_INTERFACE_STATUS_UP:
-			return evtManagedGatewayEthernetUp.NewWithIdentifiersAndData(
-				ctx, eventData.GatewayIdentifiers, data.EthernetBackhaul,
-			)
+			return []events.Event{
+				evtManagedGatewayEthernetUp.NewWithIdentifiersAndData(
+					ctx, eventData.GatewayIdentifiers, data.EthernetBackhaul,
+				),
+			}
 		default:
-			return evtManagedGatewayEthernetDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers))
+			return []events.Event{
+				evtManagedGatewayEthernetDown.New(ctx, events.WithIdentifiers(eventData.GatewayIdentifiers)),
+			}
 		}
 	}
 	return nil
@@ -205,11 +238,13 @@ func (c *client) Subscribe(
 				if !ok {
 					return
 				}
-				evt := mapEvent(ctx, eventData)
-				if evt == nil || !match(evt.Name()) {
-					continue
+				evts := mapEvent(ctx, eventData)
+				for _, evt := range evts {
+					if !match(evt.Name()) {
+						continue
+					}
+					hdl.Notify(evt)
 				}
-				hdl.Notify(evt)
 			}
 		}
 	}()
@@ -244,11 +279,13 @@ func (c *client) SubscribeWithHistory(
 			case <-ctx.Done():
 				return
 			case eventData := <-ch:
-				evt := mapEvent(ctx, eventData)
-				if evt == nil || !match(evt.Name()) {
-					continue
+				evts := mapEvent(ctx, eventData)
+				for _, evt := range evts {
+					if !match(evt.Name()) {
+						continue
+					}
+					hdl.Notify(evt)
 				}
-				hdl.Notify(evt)
 			}
 		}
 	}()

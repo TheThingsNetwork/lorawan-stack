@@ -51,6 +51,8 @@ const GatewayEvents = props => {
     dispatch(clearGatewayEventsStream(gtwId))
   }, [dispatch, gtwId])
 
+  const filteredEvents = useMemo(() => events.filter(e => !/gcs\.managed\./.test(e.name)), [events])
+
   const onPauseToggle = useCallback(
     paused => {
       if (paused) {
@@ -73,7 +75,7 @@ const GatewayEvents = props => {
     if (widget) {
       return (
         <Events.Widget
-          events={events}
+          events={filteredEvents}
           entityId={gtwId}
           toAllUrl={`/gateways/${gtwId}/data`}
           scoped
@@ -83,7 +85,7 @@ const GatewayEvents = props => {
 
     return (
       <Events
-        events={events}
+        events={filteredEvents}
         entityId={gtwId}
         paused={paused}
         onClear={onClear}
@@ -94,7 +96,17 @@ const GatewayEvents = props => {
         scoped
       />
     )
-  }, [events, filter, gtwId, onClear, onFilterChange, onPauseToggle, paused, truncated, widget])
+  }, [
+    filter,
+    filteredEvents,
+    gtwId,
+    onClear,
+    onFilterChange,
+    onPauseToggle,
+    paused,
+    truncated,
+    widget,
+  ])
 
   return <Require featureCheck={mayViewGatewayEvents}>{content}</Require>
 }

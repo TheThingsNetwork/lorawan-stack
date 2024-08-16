@@ -33,6 +33,7 @@ import GatewayData from '@console/views/gateway-data'
 import GatewayGeneralSettings from '@console/views/gateway-general-settings'
 import GatewayApiKeys from '@console/views/gateway-api-keys'
 import GatewayOverview from '@console/views/gateway-overview'
+import GatewayManagedGateway from '@console/views/gateway-managed-gateway'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -53,7 +54,11 @@ import {
   getGatewaysRightsList,
 } from '@console/store/actions/gateways'
 
-import { selectSelectedGateway, selectGatewayRights } from '@console/store/selectors/gateways'
+import {
+  selectSelectedGateway,
+  selectGatewayRights,
+  selectIsSelectedGatewayManaged,
+} from '@console/store/selectors/gateways'
 
 const Gateway = () => {
   const { gtwId } = useParams()
@@ -105,6 +110,7 @@ const GatewayInner = () => {
   const { gtwId } = useParams()
   const gateway = useSelector(selectSelectedGateway)
   const rights = useSelector(selectGatewayRights)
+  const isGtwManaged = useSelector(selectIsSelectedGatewayManaged)
 
   const gatewayName = gateway?.name || gtwId
 
@@ -124,6 +130,20 @@ const GatewayInner = () => {
       >
         {mayViewGatewayInfo.check(rights) && (
           <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
+        )}
+        {isGtwManaged && (
+          <SideNavigation.Item title={sharedMessages.managedGateway} icon="router">
+            <SideNavigation.Item
+              title={sharedMessages.connectionSettings}
+              path="managed-gateway/connection-settings"
+              icon="language"
+            />
+            <SideNavigation.Item
+              title={sharedMessages.wifiProfiles}
+              path="managed-gateway/wifi-profiles"
+              icon="tune"
+            />
+          </SideNavigation.Item>
         )}
         {mayViewGatewayEvents.check(rights) && (
           <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="data" />
@@ -151,6 +171,7 @@ const GatewayInner = () => {
       </SideNavigation>
       <Routes>
         <Route index Component={GatewayOverview} />
+        <Route path="managed-gateway/*" Component={GatewayManagedGateway} />
         <Route path="api-keys/*" Component={GatewayApiKeys} />
         <Route path="collaborators/*" Component={GatewayCollaborators} />
         <Route path="location" Component={GatewayLocation} />

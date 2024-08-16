@@ -25,6 +25,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	lorav1 "go.thethings.industries/pkg/api/gen/tti/gateway/data/lora/v1"
 	ttica "go.thethings.industries/pkg/ca"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
@@ -34,11 +36,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
-	"go.thethings.network/lorawan-stack/v3/pkg/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -62,21 +64,25 @@ var _ io.Frontend = (*Frontend)(nil)
 
 // New returns a new The Things Industries V1 gateway frontend.
 func New(ctx context.Context, server io.Server, cfg Config) (*Frontend, error) {
-	w, err := web.New(
-		ctx,
-		web.WithDisableWarnings(true),
-		web.WithTrustedProxies(server.GetBaseConfig(ctx).HTTP.TrustedProxies...),
-	)
-	if err != nil {
+	var proxyConfiguration webmiddleware.ProxyConfiguration
+	if err := proxyConfiguration.ParseAndAddTrusted(server.GetBaseConfig(ctx).HTTP.TrustedProxies...); err != nil {
 		return nil, err
 	}
-	router := w.APIRouter()
+	router := mux.NewRouter()
 	router.Use(
+		mux.MiddlewareFunc(webmiddleware.Recover()),
+		otelmux.Middleware("ttn-lw-stack", otelmux.WithTracerProvider(tracing.FromContext(ctx))),
+		mux.MiddlewareFunc(webmiddleware.Peer()),
+		mux.MiddlewareFunc(webmiddleware.RequestURL()),
+		mux.MiddlewareFunc(webmiddleware.RequestID()),
+		mux.MiddlewareFunc(webmiddleware.ProxyHeaders(proxyConfiguration)),
+		mux.MiddlewareFunc(webmiddleware.MaxBody(1024*4)),
+		mux.MiddlewareFunc(webmiddleware.Log(log.FromContext(ctx), nil)),
 		ratelimit.HTTPMiddleware(server.RateLimiter(), "gs:accept:ttigw"),
 	)
 
 	f := &Frontend{
-		Handler: w,
+		Handler: router,
 		server:  server,
 		cfg:     cfg,
 	}
@@ -100,6 +106,18 @@ func (*Frontend) SupportsDownlinkClaim() bool {
 	return false
 }
 
+func writeError(w http.ResponseWriter, err error) {
+	statusCode := http.StatusInternalServerError
+	if ttnErr, ok := errors.From(err); ok {
+		statusCode = errors.ToHTTPStatusCode(ttnErr)
+	}
+	if statusCode >= 500 {
+		http.Error(w, "internal server error", statusCode)
+	} else {
+		http.Error(w, err.Error(), statusCode)
+	}
+}
+
 func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := log.FromContext(ctx)
@@ -113,7 +131,7 @@ func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 	ctx, ids, err := f.authenticate(ctx, cert)
 	if err != nil {
 		logger.WithError(err).Debug("Client certificate verification failed")
-		webhandlers.Error(w, r, err)
+		writeError(w, err)
 		return
 	}
 	logger = log.FromContext(ctx)
@@ -123,7 +141,7 @@ func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		logger.WithError(err).Info("Failed to connect")
-		webhandlers.Error(w, r, err)
+		writeError(w, err)
 		return
 	}
 
@@ -132,7 +150,7 @@ func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		logger.WithError(err).Error("Failed to upgrade request to websocket connection")
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeError(w, err)
 		return
 	}
 	defer wsConn.CloseNow() //nolint:errcheck

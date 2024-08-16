@@ -47,7 +47,11 @@ const GatewayGuideLink = content => (
 const GatewayAdd = () => {
   const navigate = useNavigate()
   const handleSuccess = useCallback(
-    gtwId => {
+    (gtwId, isManaged = false) => {
+      if (isManaged) {
+        navigate(`/gateways/${gtwId}/managed-gateway/connection-settings?claimed=true`)
+        return
+      }
       navigate(`/gateways/${gtwId}`)
     },
     [navigate],

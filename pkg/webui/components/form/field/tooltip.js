@@ -35,7 +35,7 @@ const m = defineMessages({
 })
 
 const Content = props => {
-  const { tooltipDescription, glossaryTerm, children } = props
+  const { tooltipDescription, tooltip, glossaryTerm, children } = props
   const { description, location, absence, glossaryId } = tooltipDescription
 
   const hasLocation = Boolean(location)
@@ -46,12 +46,22 @@ const Content = props => {
   return (
     <div className={style.tooltipContent}>
       <Message className={style.tooltipTitle} content={m.descriptionTitle} component="h4" />
-      <Message
-        className={style.tooltipDescription}
-        content={description}
-        component="p"
-        convertBackticks
-      />
+      {description && (
+        <Message
+          className={style.tooltipDescription}
+          content={description}
+          component="p"
+          convertBackticks
+        />
+      )}
+      {Boolean(tooltip) && (
+        <Message
+          className={style.tooltipDescription}
+          content={tooltip}
+          component="p"
+          convertBackticks
+        />
+      )}
       {hasLocation && (
         <>
           <Message className={style.tooltipTitle} content={m.locationTitle} component="h4" />
@@ -94,24 +104,27 @@ const Content = props => {
 Content.propTypes = {
   children: PropTypes.node,
   glossaryTerm: PropTypes.message,
+  tooltip: PropTypes.node,
   tooltipDescription: PropTypes.shape({
     description: PropTypes.message.isRequired,
     location: PropTypes.message,
     absence: PropTypes.message,
     glossaryId: PropTypes.string,
-  }).isRequired,
+  }),
 }
 
 Content.defaultProps = {
   children: null,
   glossaryTerm: undefined,
+  tooltipDescription: {},
+  tooltip: null,
 }
 
 const FieldTooltip = React.memo(props => {
-  const { id, glossaryTerm } = props
+  const { id, glossaryTerm, tooltip } = props
 
   const tooltipDescription = descriptions[id]
-  if (!tooltipDescription) {
+  if ((!id || !tooltipDescription) && !tooltip) {
     return null
   }
 
@@ -142,6 +155,7 @@ const FieldTooltip = React.memo(props => {
       content={
         <Content
           glossaryTerm={glossaryTerm}
+          tooltip={tooltip}
           tooltipDescription={tooltipDescription}
           children={link}
         />
@@ -154,11 +168,14 @@ const FieldTooltip = React.memo(props => {
 
 FieldTooltip.propTypes = {
   glossaryTerm: PropTypes.message,
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string,
+  tooltip: PropTypes.node,
 }
 
 FieldTooltip.defaultProps = {
   glossaryTerm: undefined,
+  id: undefined,
+  tooltip: undefined,
 }
 
 export default FieldTooltip

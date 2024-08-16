@@ -98,7 +98,7 @@ describe('Gateway create', () => {
     cy.findByTestId('error-notification').should('not.exist')
   })
 
-  it('displays claiming gateway form', () => {
+  it('displays claiming non-managed gateway form', () => {
     const gateway = {
       frequency_plan: 'EU_863_870',
       eui: '58A0CBFFFE000001',
@@ -107,12 +107,13 @@ describe('Gateway create', () => {
     cy.intercept('POST', '/api/v3/gcls/claim/info', {
       body: {
         supports_claiming: true,
+        is_managed: false,
       },
     })
 
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
     cy.findByRole('button', { name: 'Confirm' }).click()
-    cy.findByTestId('notification').should('exist')
+    cy.findByTestId('notification').should('not.exist')
     cy.findByLabelText('Claim authentication code').type('12345')
     cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByText('Frequency plan')
@@ -122,7 +123,83 @@ describe('Gateway create', () => {
       .selectOption(gateway.frequency_plan)
   })
 
-  it('succeeds claiming gateway', () => {
+  it('succeeds claiming non-managed gateway', () => {
+    const gateway = {
+      frequency_plan: 'EU_863_870',
+      eui: generateHexValue(16),
+    }
+    const expectedRequest = {
+      collaborator: {
+        user_ids: {
+          user_id: user.ids.user_id,
+        },
+      },
+      authenticated_identifiers: {
+        gateway_eui: gateway.eui.toUpperCase(),
+        authentication_code: 'MTIzNDU=',
+      },
+      target_gateway_id: `eui-${gateway.eui}`,
+      target_frequency_plan_id: gateway.frequency_plan,
+      target_gateway_server_address: window.location.hostname,
+    }
+    cy.intercept('GET', '/api/v3/gateways/!*', { statusCode: 200 })
+    cy.intercept('POST', '/api/v3/gcls/claim/info', {
+      body: {
+        supports_claiming: true,
+        is_managed: false,
+      },
+    })
+
+    cy.intercept('POST', '/api/v3/gcls/claim', {
+      statusCode: 201,
+      body: {
+        gateway_id: `eui-${gateway.eui}`,
+        eui: gateway.eui,
+      },
+    }).as('claim-request')
+
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByRole('button', { name: 'Confirm' }).click()
+    cy.findByTestId('notification').should('not.exist')
+    cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
+    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
+    cy.findByLabelText('Claim authentication code').type('12345')
+    cy.findByRole('button', { name: 'Claim gateway' }).click()
+    cy.wait('@claim-request').its('request.body').should('deep.equal', expectedRequest)
+    cy.findByTestId('error-notification').should('not.exist')
+
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
+    )
+  })
+
+  it('displays claiming managed gateway form', () => {
+    const gateway = {
+      frequency_plan: 'EU_863_870',
+      eui: '58A0CBFFFE000001',
+    }
+
+    cy.intercept('POST', '/api/v3/gcls/claim/info', {
+      body: {
+        supports_claiming: true,
+        is_managed: true,
+      },
+    })
+
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByRole('button', { name: 'Confirm' }).click()
+    cy.findByTestId('notification').should('be.visible')
+    cy.findByLabelText('Claim authentication code').type('12345')
+    cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
+    cy.findByText('Frequency plan')
+      .parents('div[data-test-id="form-field"]')
+      .find('input')
+      .first()
+      .selectOption(gateway.frequency_plan)
+  })
+
+  it('succeeds claiming managed gateway', () => {
     const gateway = {
       frequency_plan: 'EU_863_870',
       eui: generateHexValue(16),
@@ -145,6 +222,7 @@ describe('Gateway create', () => {
     cy.intercept('POST', '/api/v3/gcls/claim/info', {
       body: {
         supports_claiming: true,
+        is_managed: true,
       },
     })
 
@@ -158,6 +236,7 @@ describe('Gateway create', () => {
 
     cy.findByLabelText('Gateway EUI').type(gateway.eui)
     cy.findByRole('button', { name: 'Confirm' }).click()
+    cy.findByTestId('notification').should('be.visible')
     cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
     cy.findByLabelText('Gateway ID').type(`eui-${gateway.eui}`)
     cy.findByLabelText('Claim authentication code').type('12345')
@@ -167,8 +246,18 @@ describe('Gateway create', () => {
 
     cy.location('pathname').should(
       'eq',
-      `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
+      `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}/managed-gateway/connection-settings`,
     )
+
+    cy.intercept('GET', `/api/v3/gcs/gateways/managed/eui-${gateway.eui}*`, {
+      statusCode: 200,
+      body: {
+        ids: {
+          gateway_id: `eui-${gateway.eui}`,
+          eui: gateway.eui,
+        },
+      },
+    })
   })
 
   it('succeeds adding gateway without frequency plan and without EUI', () => {

@@ -165,6 +165,23 @@ export const [
   (id, timeout) => ({ timeout }),
 )
 
+export const [
+  {
+    request: UPDATE_MANAGED_GATEWAY,
+    success: UPDATE_MANAGED_GATEWAY_SUCCESS,
+    failure: UPDATE_MANAGED_GATEWAY_FAILURE,
+  },
+  {
+    request: updateManagedGateway,
+    success: updateManagedGatewaySuccess,
+    failure: updateManagedGatewayFailure,
+  },
+] = createRequestActions(
+  `UPDATE_MANAGED_GATEWAY`,
+  (gatewayId, patch) => ({ gatewayId, patch }),
+  (gatewayId, patch, selector) => ({ selector }),
+)
+
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
 export const stopGatewayStatistics = () => ({ type: STOP_GTW_STATS })
 

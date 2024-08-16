@@ -68,10 +68,11 @@ const ModalButton = ({ modalData, message, onApprove, onCancel, ...rest }) => {
 ModalButton.defaultProps = {
   onApprove: () => null,
   onCancel: () => null,
+  message: undefined,
 }
 
 ModalButton.propTypes = {
-  message: PropTypes.message.isRequired,
+  message: PropTypes.message,
   modalData: PropTypes.shape({ ...PortalledModal.Modal.propTypes }).isRequired,
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,

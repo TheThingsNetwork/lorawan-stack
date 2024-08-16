@@ -2,8 +2,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20190801 at Wed Jan  8 12:39:38 2020
- By Unknown
+Created by FontForge 20230101 at Wed Jul 24 12:22:37 2024
+ By Kevin Schiffer
 Copyright 2017 Google, Inc. All Rights Reserved.
 </metadata>
 <defs>
@@ -1563,6 +1563,10 @@ d="M85 128h342v256h-342v-256zM43 427h426v-342h-426v342zM363 213v86h-22v-86h22zM3
 q-9 0 -15 6t-6 15v128q0 9 6 15t15 6h64zM107 341h42v-170h-42v170z" />
     <glyph glyph-name="uniE57E" unicode="sort_order" 
 d="M149 276h214l-107 108zM149 236h214l-107 -107z" />
+    <glyph glyph-name="uniE57F" unicode="tti" 
+d="M461 278q15 0 26 -11t11 -27v-91q0 -15 -11 -26q-13 -13 -26 -13q-14 0 -26 13q-11 11 -11 26v91q0 16 11 27q10 11 26 11zM146 343q18 0 30 -12q12 -13 12 -30v-147q0 -17 -12 -30q-12 -12 -30 -12q-17 0 -29.5 12.5t-12.5 29.5v147q0 17 13 30q12 12 29 12zM51 278
+q16 0 26 -11q11 -11 11 -27v-91q0 -15 -10.5 -26t-26.5 -11q-15 0 -26 11t-11 26v91q0 16 11 27t26 11zM366 327q17 0 29 -13q13 -12 13 -30v-130q0 -17 -13 -30q-12 -12 -29 -12q-18 0 -30 12q-12 13 -12 30v130q0 18 12 30q12 13 30 13zM256 395q21 0 36 -15
+q16 -16 16 -37v-179q0 -22 -16 -37q-15 -15 -36 -15t-36 15q-16 15 -16 37v179q0 21 16 37q15 15 36 15z" />
     <glyph glyph-name="uniE5C3" unicode="apps" 
 d="M341 85v86h86v-86h-86zM341 213v86h86v-86h-86zM213 341v86h86v-86h-86zM341 427h86v-86h-86v86zM213 213v86h86v-86h-86zM85 213v86h86v-86h-86zM85 85v86h86v-86h-86zM213 85v86h86v-86h-86zM85 341v86h86v-86h-86z" />
     <glyph glyph-name="uniE5C4" unicode="arrow_back" 
@@ -2549,6 +2553,12 @@ d="M213 277v-42h43v42h-43zM299 384v-320h-235v43h43v341h192v-21h106v-320h43v-43h-
     <glyph glyph-name="u10FFFD" unicode="goat" 
 d="M511 318q1 -1 1 -2.5t-1 -2.5l-25 -32q-2 -2 -4 -2l-15 3l-7 -22q-2 -4 -6.5 -4t-6.5 4l-14 30l-23 5l-47 -112l17 -136q0 -4 -4 -4h-20q-2 0 -4 3l-20 81l-10 17l-25 -98q0 -3 -4 -3h-21q-4 0 -4 4l23 135h-135l-35 -66l8 -68q2 -5 -4 -5h-20q-3 0 -4 2l-28 102l-34 -39
 l6 -60q2 -5 -4 -5h-22q-4 0 -4 2l-13 56l21 82v144q-23 9 -23 30h274q48 -1 95 33q-8 22 6 36q28 -20 36 -25q7 -4 11.5 1.5t2.5 12.5q-9 28 -45 42q-1 0 -3 1q-12 3 -10 8q0 3 4 3q29 -4 49.5 -22.5t27.5 -35.5l4 -3q3 -4 6.5 -8t6 -11.5t1.5 -15.5q0 -5 2 -7z" />
+    <glyph glyph-name="uniE64C" unicode="signal_wifi_&#x33;" 
+d="M107 235q62 61 149.5 61t148.5 -61l-42 -43q-44 44 -107 44t-107 -44zM192 149q26 26 64 26t64 -26l-64 -64zM21 320q98 97 235.5 97t234.5 -97l-43 -43q-80 79 -192 79t-192 -79z" />
+    <glyph glyph-name="uniE64D" unicode="signal_wifi_&#x32;" 
+d="M107 235q62 61 149.5 61t148.5 -61l-42 -43q-44 44 -107 44t-107 -44zM192 149q26 26 64 26t64 -26l-64 -64z" />
+    <glyph glyph-name="uniE64E" unicode="signal_wifi_&#x31;" 
+d="M192 149q26 26 64 26t64 -26l-64 -64z" />
     <glyph glyph-name=".notdef" 
 d="M17 0v341h136v-341h-136zM34 17h102v307h-102v-307z" />
     <glyph glyph-name="glyph1" horiz-adv-x="0" 
