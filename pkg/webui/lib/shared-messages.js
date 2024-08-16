@@ -42,6 +42,8 @@ export default defineMessages({
   addPubsub: 'Add Pub/Sub',
   addWebhook: 'Add webhook',
   addWifiProfile: 'Add WiFi profile',
+  addEntity: 'Add entity',
+  addToBookmarks: 'Add to bookmarks',
   address: 'Address',
   addressPlaceholder: 'host',
   admin: 'Admin',
@@ -494,6 +496,7 @@ export default defineMessages({
   removeMemberLast: 'Cannot remove last member',
   removeCollaboratorSelf: 'Remove yourself as collaborator',
   removeMemberSelf: 'Remove yourself as member',
+  removeFromBookmarks: 'Remove from bookmarks',
   replaceWebhook: 'Replace webhook',
   requireAuthenticatedConnection: 'Require authenticated connection',
   requireAuthenticatedConnectionDescription:

@@ -289,6 +289,8 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
                   small
                   className={style.maximize}
                   onClick={handleOpenMaximizeCodeModal}
+                  tooltip={sharedMessages.expand}
+                  tooltipPlacement="top"
                 />
               )}
             </div>

@@ -421,6 +421,9 @@ const DeviceOverviewHeader = ({ device }) => {
               disabled={
                 (!isBookmarked && addBookmarkLoading) || (isBookmarked && deleteBookmarkLoading)
               }
+              tooltip={
+                isBookmarked ? sharedMessages.removeFromBookmarks : sharedMessages.addToBookmarks
+              }
             />
             <Button
               secondary
