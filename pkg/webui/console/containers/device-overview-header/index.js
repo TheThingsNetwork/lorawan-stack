@@ -36,6 +36,7 @@ import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Status from '@ttn-lw/components/status'
 import Dropdown from '@ttn-lw/components/dropdown'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
@@ -352,31 +353,39 @@ const DeviceOverviewHeader = ({ device }) => {
         <div className="d-inline-flex h-full al-center gap-cs-m flex-wrap">
           <div className="d-flex al-center gap-cs-xxs md-lg:d-none">
             {showLastSeen ? (
-              <DocTooltip
-                docPath="/reference/last-activity"
-                content={
-                  <Message
-                    content={m.lastSeenAvailableTooltip}
-                    values={{ lineBreak, lastActivityInfo }}
-                  />
-                }
-              >
-                <div className="d-inline-flex al-center gap-cs-xxs">
-                  <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
-                  <LastSeen lastSeen={lastSeen} className="c-text-neutral-semilight" />
-                </div>
-              </DocTooltip>
+              <Link to={`/applications/${appId}/devices/${devId}/data`}>
+                <DocTooltip
+                  docPath="/reference/last-activity"
+                  content={
+                    <Message
+                      content={m.lastSeenAvailableTooltip}
+                      values={{ lineBreak, lastActivityInfo }}
+                    />
+                  }
+                >
+                  <div className="d-inline-flex al-center gap-cs-xxs">
+                    <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
+                    <LastSeen lastSeen={lastSeen} className="c-text-neutral-semilight" />
+                  </div>
+                </DocTooltip>
+              </Link>
             ) : (
-              <DocTooltip
-                docPath="/devices/troubleshooting/#my-device-wont-join-what-do-i-do"
-                docTitle={sharedMessages.troubleshooting}
-                content={<Message content={m.noActivityTooltip} />}
-              >
-                <div className="d-inline-flex al-center gap-cs-xxs">
-                  <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
-                  <Status status="mediocre" label={sharedMessages.noActivityYet} />
-                </div>
-              </DocTooltip>
+              <Link to={`/applications/${appId}/devices/${devId}/data`}>
+                <DocTooltip
+                  docPath="/devices/troubleshooting/#my-device-wont-join-what-do-i-do"
+                  docTitle={sharedMessages.troubleshooting}
+                  content={<Message content={m.noActivityTooltip} />}
+                >
+                  <div className="d-inline-flex al-center gap-cs-xxs">
+                    <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
+                    <Status
+                      status="mediocre"
+                      label={sharedMessages.noActivityYet}
+                      className={style.status}
+                    />
+                  </div>
+                </DocTooltip>
+              </Link>
             )}
           </div>
           <div className="d-flex al-center gap-cs-xxs md-lg:d-none">
