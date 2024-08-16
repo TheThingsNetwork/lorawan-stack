@@ -112,7 +112,8 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
   const accessPoints = useSelector(selectAccessPoints)
   const selectedGateway = useSelector(selectSelectedGateway)
   const { ids } = selectedGateway
-  const isFirstRender = useRef(true)
+  const isInitialLoading = useRef(true)
+  const didUpdateValue = useRef(false)
 
   const [isMounted, setIsMounted] = useState(true)
 
@@ -127,7 +128,15 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
   // Trigger this useEffect only the first time component is rendered and has accessPoints loaded.
   // Change value only if ssid is provided. (if it's edit form)
   useEffect(() => {
-    if (!isFirstRender.current && ssid && !isLoading) {
+    // Skip the first effect when isLoading is false
+    if (isInitialLoading.current) {
+      if (isLoading) {
+        isInitialLoading.current = false
+      }
+      return
+    }
+
+    if (!isLoading && !didUpdateValue.current && Boolean(ssid)) {
       const accessPoint = accessPoints.find(ap => ap.ssid === ssid)
       const updatedAccessPoint = {
         ...accessPoint,
@@ -136,9 +145,8 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
       }
       onChange(updatedAccessPoint, true)
     }
-    isFirstRender.current = false
-    /* eslint-disable */
-  }, [accessPoints, isLoading])
+    didUpdateValue.current = true
+  }, [accessPoints, isLoading, onChange, ssid])
 
   useEffect(() => {
     handleScanAccessPoints()

@@ -178,6 +178,7 @@ describe('Managed Gateway WiFi profiles', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
       cy.get('#password-field-error').should('be.visible')
       cy.findByText('Other...').click()
+      cy.findByRole('button', { name: 'Save changes' }).click()
       cy.get('#ssid-field-error').should('be.visible')
     })
 
@@ -313,9 +314,7 @@ describe('Managed Gateway WiFi profiles', () => {
         `/api/v3/gcs/gateways/profiles/wifi/users/${userId}/${profiles[0].profile_id}`,
         {
           statusCode: 200,
-          body: {
-            profile: profiles[0],
-          },
+          body: profiles[0],
         },
       )
 
@@ -329,8 +328,6 @@ describe('Managed Gateway WiFi profiles', () => {
 
       const expectedRequest = {
         profile_name: 'Updated WiFi profile',
-        profile_id: '',
-        shared: true,
         ssid: 'AccessPoint2',
         password: 'ABCDefg123!',
       }

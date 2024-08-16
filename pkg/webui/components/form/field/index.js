@@ -114,7 +114,10 @@ const FormField = props => {
   // Extract field state.
   const errors = compact(at(formErrors, names))
   const touched = at(formTouched, names).some(Boolean)
-  const encodedValue = isCompositeField ? pick(values, names) : get(values, name)
+  const encodedValue = useMemo(
+    () => (isCompositeField ? pick(values, names) : get(values, name)),
+    [isCompositeField, name, names, values],
+  )
 
   // Register field(s) in formiks internal field registry.
   useEffect(() => {

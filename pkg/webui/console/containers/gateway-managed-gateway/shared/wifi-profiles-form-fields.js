@@ -54,6 +54,7 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
     accessPoint => {
       if (Boolean(accessPoint.ssid) || !accessPoint.is_password_set) {
         setFieldValue(`${namePrefix}ssid`, accessPoint?.ssid)
+        setFieldTouched(`${namePrefix}ssid`, false)
         setFieldTouched(`${namePrefix}password`, false)
         setFieldValue(`${namePrefix}password`, '')
       }
