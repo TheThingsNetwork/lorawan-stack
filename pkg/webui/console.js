@@ -28,6 +28,7 @@ import Init from '@ttn-lw/lib/components/init'
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 
 import { EventSplitFrameContextProvider } from '@console/containers/event-split-frame/context'
+import Logo from '@console/containers/logo'
 
 import App from '@console/views/app'
 
@@ -35,6 +36,7 @@ import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/se
 
 import store from './console/store'
 import { AlertBannerProvider } from './components/alert-banner/context'
+import HeaderComponent from './components/header'
 
 const appRoot = selectApplicationRootPath()
 
@@ -49,7 +51,9 @@ const rootElement = document.getElementById('app')
 // Error renderer for the outermost error boundary.
 // Do not use any components that depend on context
 // e.g. Intl, Router, Redux store.
-const errorRender = error => <FullViewError error={error} safe />
+const errorRender = error => (
+  <FullViewError error={error} safe header={<HeaderComponent safe alwaysShowLogo Logo={Logo} />} />
+)
 
 DOM.render(
   <ErrorView errorRender={errorRender}>

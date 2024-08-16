@@ -30,6 +30,7 @@ import { defineMessages } from 'react-intl'
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import Button from '@ttn-lw/components/button'
+import HeaderComponent from '@ttn-lw/components/header'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -41,6 +42,7 @@ import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
 import Sidebar from '@console/containers/sidebar'
 import EventSplitFrameContext from '@console/containers/event-split-frame/context'
+import Logo from '@console/containers/logo'
 
 import OverviewRoutes from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -68,7 +70,9 @@ const m = defineMessages({
   expandEventPanel: 'Expand live data overlay',
 })
 
-const errorRender = error => <FullViewError error={error} header={<Header alwaysShowLogo />} />
+const errorRender = error => (
+  <FullViewError error={error} header={<Header alwaysShowLogo Logo={Logo} />} />
+)
 const getScrollRestorationKey = location => {
   // Preserve scroll position only when necessary.
   // E.g. we don't want to scroll to top when changing tabs of a table,
@@ -228,7 +232,13 @@ const ConsoleRoot = () => {
   }, [handleConnectionStatusChange])
 
   if (pageData && pageData.error) {
-    return <FullViewError error={pageData.error} header={<Header alwaysShowLogo />} />
+    return (
+      <FullViewError
+        error={pageData.error}
+        header={<HeaderComponent safe alwaysShowLogo Logo={Logo} />}
+        safe
+      />
+    )
   }
 
   return (
