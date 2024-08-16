@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// TODO: Update tests
 describe('Managed Gateway WiFi profiles', () => {
   const generateUUID = () =>
     'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -21,7 +20,7 @@ describe('Managed Gateway WiFi profiles', () => {
       return v.toString(16)
     })
 
-  const userId = generateUUID()
+  const userId = 'managed-gateway-test-user'
   const user = {
     ids: { user_id: userId },
     primary_email_address: 'managed-gateway-test-user@example.com',
@@ -29,7 +28,7 @@ describe('Managed Gateway WiFi profiles', () => {
     password_confirm: 'ABCDefg123!',
   }
 
-  const organizationId = generateUUID()
+  const organizationId = 'test-organization'
   const organization = { ids: { organization_id: organizationId }, name: 'Test organization' }
 
   const gatewayId = 'test-managed-gateway'
@@ -52,6 +51,34 @@ describe('Managed Gateway WiFi profiles', () => {
     },
   }
 
+  const profiles = [
+    {
+      profile_id: generateUUID(),
+      profile_name: 'Test profile1',
+      shared: true,
+      ssid: 'AccessPoint1',
+    },
+    {
+      profile_id: generateUUID(),
+      profile_name: 'Test profile2',
+      shared: true,
+      ssid: 'AccessPoint2',
+      password: 'ABCDefg123!',
+    },
+    {
+      profile_name: 'Test profile3',
+      profile_id: generateUUID(),
+      shared: true,
+      ssid: 'AccessPoint1',
+      network_interface_addresses: {
+        ip_addresses: ['198.168.100.5'],
+        subnet_mask: '255.255.255.0',
+        gateway: '198.168.255.10',
+        dns_servers: ['198.168.100.5'],
+      },
+    },
+  ]
+
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
@@ -61,6 +88,24 @@ describe('Managed Gateway WiFi profiles', () => {
   })
 
   beforeEach(() => {
+    cy.intercept('GET', `/api/v3/gcs/gateways/profiles/wifi/users/${userId}`, {
+      statusCode: 200,
+      body: {
+        profiles,
+      },
+    })
+
+    cy.intercept('POST', `/api/v3/gcs/gateways/profiles/wifi/users/${userId}`, {
+      statusCode: 200,
+    }).as('create-profile')
+
+    cy.intercept('GET', `/api/v3/gcs/gateways/profiles/wifi/organizations/${organizationId}`, {
+      statusCode: 200,
+      body: {
+        profiles,
+      },
+    })
+
     cy.intercept('POST', `/api/v3/gcs/gateways/managed/${gatewayId}/wifi/scan`, {
       statusCode: 200,
       body: {
@@ -103,17 +148,18 @@ describe('Managed Gateway WiFi profiles', () => {
       `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/wifi-profiles`,
     )
     cy.findByLabelText('Show profiles of').should('be.visible').selectOption(userId)
-    // Cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('error-notification').should('not.exist')
   })
 
   it('succeeds to display UI elements in place', () => {
     cy.findByText('WiFi profiles', { selector: 'h1' }).should('be.visible')
     cy.contains('button', 'Add WiFi profile').should('be.visible')
-    // Cy.findByText('No items found').should('be.visible')
+    cy.findByRole('rowgroup').within(() => {
+      cy.findAllByRole('row').should('have.length', 3)
+    })
   })
 
-  // eslint-disable-next-line jest/no-commented-out-tests
-  /* Describe('when creating a WiFi profile', () => {
+  describe('when creating a WiFi profile', () => {
     beforeEach(() => {
       cy.contains('button', 'Add WiFi profile').click()
       cy.findByText('Add WiFi profile', { selector: 'h1' }).should('be.visible')
@@ -136,9 +182,18 @@ describe('Managed Gateway WiFi profiles', () => {
     })
 
     it('succeeds to create WiFi profile with open access point and default network settings', () => {
+      const expectedRequest = {
+        profile: {
+          profile_name: 'Open WiFi profile',
+          profile_id: '',
+          shared: true,
+          ssid: 'AccessPoint1',
+        },
+      }
       cy.findByLabelText('Profile name').type('Open WiFi profile')
       cy.findByText('AccessPoint1').click()
       cy.findByRole('button', { name: 'Save changes' }).click()
+      cy.wait('@create-profile').its('request.body').should('deep.equal', expectedRequest)
       cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
@@ -147,18 +202,23 @@ describe('Managed Gateway WiFi profiles', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/wifi-profiles`,
       )
-      cy.findByLabelText('Show profiles of').should('be.visible').selectOption(userId)
-      cy.findByRole('rowgroup').within(() => {
-        cy.findAllByRole('row').should('have.length', 1)
-      })
-      cy.findByRole('cell', { name: 'Open WiFi profile' }).should('be.visible')
     })
 
     it('succeeds to create WiFi profile with secured access point', () => {
+      const expectedRequest = {
+        profile: {
+          profile_name: 'Secured WiFi profile',
+          profile_id: '',
+          shared: true,
+          ssid: 'AccessPoint2',
+          password: 'ABCDefg123!',
+        },
+      }
       cy.findByLabelText('Profile name').type('Secured WiFi profile')
       cy.findByText('AccessPoint2').click()
       cy.findByLabelText('WiFi password').type('ABCDefg123!')
       cy.findByRole('button', { name: 'Save changes' }).click()
+      cy.wait('@create-profile').its('request.body').should('deep.equal', expectedRequest)
       cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
@@ -167,18 +227,22 @@ describe('Managed Gateway WiFi profiles', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/wifi-profiles`,
       )
-      cy.findByLabelText('Show profiles of').should('be.visible').selectOption(userId)
-      cy.findByRole('rowgroup').within(() => {
-        cy.findAllByRole('row').should('have.length', 2)
-      })
-      cy.findByRole('cell', { name: 'Secured WiFi profile' }).should('be.visible')
     })
 
     it('succeeds to create WiFi profile with other access point', () => {
+      const expectedRequest = {
+        profile: {
+          profile_name: 'Other WiFi profile',
+          profile_id: '',
+          shared: true,
+          ssid: 'AccessPoint3',
+        },
+      }
       cy.findByLabelText('Profile name').type('Other WiFi profile')
       cy.findByText('Other...').click()
       cy.findByLabelText('SSID').type('AccessPoint3')
       cy.findByRole('button', { name: 'Save changes' }).click()
+      cy.wait('@create-profile').its('request.body').should('deep.equal', expectedRequest)
       cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
@@ -187,14 +251,23 @@ describe('Managed Gateway WiFi profiles', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/wifi-profiles`,
       )
-      cy.findByLabelText('Show profiles of').should('be.visible').selectOption(userId)
-      cy.findByRole('rowgroup').within(() => {
-        cy.findAllByRole('row').should('have.length', 3)
-      })
-      cy.findByRole('cell', { name: 'Other WiFi profile' }).should('be.visible')
     })
 
     it('succeeds to create WiFi profile with custom network settings', () => {
+      const expectedRequest = {
+        profile: {
+          profile_name: 'Custom WiFi profile',
+          profile_id: '',
+          shared: true,
+          ssid: 'AccessPoint1',
+          network_interface_addresses: {
+            ip_addresses: ['198.168.100.5'],
+            subnet_mask: '255.255.255.0',
+            gateway: '198.168.255.10',
+            dns_servers: ['198.168.100.5'],
+          },
+        },
+      }
       cy.findByLabelText('Profile name').type('Custom WiFi profile')
       cy.findByText('AccessPoint1').click()
       cy.findByLabelText(/Use default network interface settings/).uncheck()
@@ -205,7 +278,14 @@ describe('Managed Gateway WiFi profiles', () => {
         .type('198.168.100.5')
       cy.findByLabelText('Subnet mask').type('255.255.255.0')
       cy.findByLabelText('Gateway').type('198.168.255.10')
+      cy.get('button[name="network_interface_addresses.dns_servers.push"]').click()
+      cy.findByText('DNS servers')
+        .parents('div[data-test-id="form-field"]')
+        .find('input')
+        .first()
+        .type('198.168.100.5')
       cy.findByRole('button', { name: 'Save changes' }).click()
+      cy.wait('@create-profile').its('request.body').should('deep.equal', expectedRequest)
       cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
@@ -214,17 +294,48 @@ describe('Managed Gateway WiFi profiles', () => {
         'eq',
         `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/wifi-profiles`,
       )
-      cy.findByLabelText('Show profiles of').should('be.visible').selectOption(userId)
-      cy.findByRole('rowgroup').within(() => {
-        cy.findAllByRole('row').should('have.length', 4)
-      })
-      cy.findByRole('cell', { name: 'Custom WiFi profile' }).should('be.visible')
     })
   })
-
   describe('when updating a WiFi profile', () => {
+    it('succeeds to return to list view if the profile id is not UUID', () => {
+      cy.visit(
+        `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/wifi-profiles/edit/test-id`,
+      )
+      cy.location('pathname').should(
+        'eq',
+        `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/wifi-profiles`,
+      )
+    })
+
     it('succeeds to update WiFi profile', () => {
-      cy.findByRole('row', { name: /Open WiFi profile/ })
+      cy.intercept(
+        'GET',
+        `/api/v3/gcs/gateways/profiles/wifi/users/${userId}/${profiles[0].profile_id}`,
+        {
+          statusCode: 200,
+          body: {
+            profile: profiles[0],
+          },
+        },
+      )
+
+      cy.intercept(
+        'PUT',
+        `/api/v3/gcs/gateways/profiles/wifi/users/${userId}/${profiles[0].profile_id}`,
+        {
+          statusCode: 200,
+        },
+      ).as('update-profile')
+
+      const expectedRequest = {
+        profile_name: 'Updated WiFi profile',
+        profile_id: '',
+        shared: true,
+        ssid: 'AccessPoint2',
+        password: 'ABCDefg123!',
+      }
+
+      cy.findByRole('row', { name: /Test profile1/ })
         .should('be.visible')
         .within(() => {
           cy.get('button').first().click()
@@ -234,23 +345,28 @@ describe('Managed Gateway WiFi profiles', () => {
       cy.findByText('AccessPoint2').click()
       cy.findByLabelText('WiFi password').type('ABCDefg123!')
       cy.findByRole('button', { name: 'Save changes' }).click()
+      cy.wait('@update-profile')
+        .its('request.body')
+        .should(body => {
+          expect(body.profile).to.deep.equal(expectedRequest)
+        })
       cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
         .and('contain', 'WiFi profile updated')
-
-      cy.visit(
-        `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/managed-gateway/wifi-profiles`,
-      )
-      cy.findByLabelText('Show profiles of').should('be.visible').selectOption(userId)
-      cy.findByRole('cell', { name: 'Updated WiFi profile' }).should('be.visible')
-      cy.findByRole('cell', { name: 'Open WiFi profile' }).should('not.exist')
     })
   })
 
   describe('when deleting a WiFi profile', () => {
     it('succeeds to delete WiFi profile', () => {
-      cy.findByRole('row', { name: /Updated WiFi profile/ })
+      cy.intercept(
+        'DELETE',
+        `/api/v3/gcs/gateways/profiles/wifi/users/${userId}/${profiles[0].profile_id}`,
+        {
+          statusCode: 200,
+        },
+      ).as('update-profile')
+      cy.findByRole('row', { name: /Test profile1/ })
         .should('be.visible')
         .within(() => {
           cy.get('button').eq(1).click()
@@ -259,7 +375,7 @@ describe('Managed Gateway WiFi profiles', () => {
         .should('be.visible')
         .within(() => {
           cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
-          cy.findByRole('button', { name: /Delete profile/ }).click()
+          cy.findByRole('button', { name: /Delete/ }).click()
         })
 
       cy.findByTestId('error-notification').should('not.exist')
@@ -267,21 +383,9 @@ describe('Managed Gateway WiFi profiles', () => {
         .should('be.visible')
         .and('contain', 'WiFi profile deleted')
       cy.findByRole('rowgroup').within(() => {
-        cy.findAllByRole('row').should('have.length', 3)
+        cy.findAllByRole('row').should('have.length', 2)
       })
-      cy.findByRole('cell', { name: 'Updated WiFi profile' }).should('not.exist')
+      cy.findByRole('cell', { name: /Test profile1/ }).should('not.exist')
     })
   })
-
-  describe('when listing WiFi profiles for organization', () => {
-    it('succeeds to show correct WiFi profiles', () => {
-      cy.findByText('No items found').should('not.exist')
-      cy.findByRole('rowgroup').within(() => {
-        cy.findAllByRole('row').should('have.length', 3)
-      })
-      cy.findByLabelText('Show profiles of').selectOption(organizationId)
-      cy.findByText('No items found').should('be.visible')
-      cy.findByRole('rowgroup').should('not.exist')
-    })
-  })*/
 })

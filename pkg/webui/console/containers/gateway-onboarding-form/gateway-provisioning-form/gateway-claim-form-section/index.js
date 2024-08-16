@@ -55,7 +55,7 @@ const GatewayClaimFormSection = () => {
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
-    const hiddenFields = ['target_gateway_server_address', 'cups_redirection']
+    const hiddenFields = ['target_gateway_server_address']
     addToFieldRegistry(...hiddenFields)
     return () => removeFromFieldRegistry(...hiddenFields)
   }, [addToFieldRegistry, removeFromFieldRegistry])
