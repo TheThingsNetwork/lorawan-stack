@@ -16,28 +16,28 @@
 // Grid system which adheres to the TTUI grid.
 :global
   .grid
-    display: grid
-    row-gap: var(--grid-row-gap, $ls.s)
-    width: 100%
+    display: grid !important
+    row-gap: var(--grid-row-gap, $ls.s) !important
+    width: 100% !important
 
     // Prevent column-gaps that are wider than the page width when combined.
-    column-gap: calc(min(var(--grid-column-gap, $ls.s), 100% / 11))
+    column-gap: calc(min(var(--grid-column-gap, $ls.s), 100% / 11)) !important
 
     &:not(.auto-columns)
-      grid-template-columns: repeat(12, minmax(0, 1fr))
+      grid-template-columns: repeat(12, minmax(0, 1fr)) !important
 
     &.auto-columns
-      grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr))
+      grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr)) !important
 
     // Generate basic grid item classes.
     for $num in (1..12)
       .item-{$num}
-        grid-column-end: span $num
+        grid-column-end: span $num !important
 
     // Generate start-column (offset) classes.
     for $num in (1..12)
       .item-start-{$num}
-        grid-column-start: $num
+        grid-column-start: $num !important
 
     // Generate responsive grid item styles.
     for $name, $width in $bp
@@ -45,33 +45,33 @@
         for $num in (1..12)
           // Generate responsive grid item overrides.
           .{$name}\\:item-{$num}
-            grid-column-end: span $num
+            grid-column-end: span $num !important
 
           // Generate responsive start-colum (offset) item overrides.
           .{$name}\\:item-start-{$num}
-            grid-column-start: $num
+            grid-column-start: $num !important
 
     &--center
-      align-items: center
+      align-items: center !important
 
   // The container element is meant as a all-purpose container that
   // combines padding and max-width automatically for different breakpoints.
   // It spans the full width, which means it can also use full-width backgrounds
   // without extra markup.
   .container
-    width: 100%
-    max-width: var(--container-max-width)
-    padding: var(--container-vertical-padding, 0) $ls.xs
-    box-sizing: border-box
-    margin-left: auto
-    margin-right: auto
+    width: 100% !important
+    max-width: var(--container-max-width) !important
+    padding: var(--container-vertical-padding, 0) $ls.xs !important
+    box-sizing: border-box !important
+    margin-left: auto !important
+    margin-right: auto !important
 
     // Below the smallest breakpoint.
     +media-query($bp.xs3)
-      padding-left: $ls.xxs
-      padding-right: @padding-left
+      padding-left: $ls.xxs !important
+      padding-right: @padding-left !important
       // Prevent downsizing to extremely narrow widths.
-      min-width: calc(249px - $ls.xxs * 2)
+      min-width: calc(249px - $ls.xxs * 2) !important
 
     &--xs
       --container-max-width: $bp.xs
@@ -89,199 +89,199 @@
   // Content justification.
 
   .j-center
-    justify-content: center
+    justify-content: center !important
 
   .j-start
-    justify-content: start
+    justify-content: start !important
 
   .j-end
-    justify-content: end
+    justify-content: end !important
 
   .j-between
-    justify-content: space-between
+    justify-content: space-between !important
 
   .j-around
-    justify-content: space-around
+    justify-content: space-around !important
 
   .j-evenly
-    justify-content: space-evenly
+    justify-content: space-evenly !important
 
   .al-center
-    align-items: center
+    align-items: center !important
 
   .al-start
-    align-items: start
+    align-items: start !important
 
   .al-end
-    align-items: end
+    align-items: end !important
 
   // Responsive justification styles.
   for $name, $width in $bp
     +media-query($width)
       .{$name}\\:j-center
-        justify-content: center
+        justify-content: center !important
 
       .{$name}\\:j-start
-        justify-content: start
+        justify-content: start !important
 
       .{$name}\\:end
-        justify-content: end
+        justify-content: end !important
 
       .{$name}\\:j-between
-        justify-content: space-between
+        justify-content: space-between !important
 
       .{$name}\\:al-center
-        align-items: center
+        align-items: center !important
 
       .{$name}\\:al-start
-        align-items: start
+        align-items: start !important
 
       .{$name}\\:al-end
-        align-items: end
+        align-items: end !important
 
   // Block justification.
 
   .block-center
-    margin-left: auto
-    margin-right: auto
+    margin-left: auto !important
+    margin-right: auto !important
 
   // Width and height.
 
   .w-full
-    width: 100%
+    width: 100% !important
 
   .w-auto
-    width: auto
+    width: auto !important
 
   .w-content
-    width: fit-content
+    width: fit-content !important
 
   .h-full
-    height: 100%
+    height: 100% !important
 
   .h-auto
-    height: auto
+    height: auto !important
 
   .h-vh
-    height: 100vh
+    height: 100vh !important
 
   for $num in (1..9)
     $percentage = percentage($num / 10)
     .w-{$num}0
-      width: $percentage
+      width: $percentage !important
 
     .h-{$num}0
-      width: $percentage
+      width: $percentage !important
 
     for $name, $width in $bp
       +media-query($width)
         .{$name}:w-{$num}0
-          width: $percentage
+          width: $percentage !important
 
         .{$name}:h-{$num}0
-          height: $percentage
+          height: $percentage !important
 
   for $name, $width in $bp
     +media-query($width)
       .{$name}:w-full
-        width: 100%
+        width: 100% !important
 
       .{$name}:w-auto
-        width: auto
+        width: auto !important
 
       .{$name}:w-content
-        width: fit-content
+        width: fit-content !important
 
       .{$name}:h-full
-        height: 100%
+        height: 100% !important
 
       .{$name}:h-auto
-        height: auto
+        height: auto !important
 
   // Positioning.
   .pos-relative
-    position: relative
+    position: relative !important
   .pos-absolute
-    position: absolute
+    position: absolute !important
   .pos-fixed
-    position: fixed
+    position: fixed !important
   .pos-static
-    position: static
+    position: static !important
   // Flex layout.
   .direction-column
-    flex-direction: column
+    flex-direction: column !important
   .direction-row
-    flex-direction: row
+    flex-direction: row !important
   .flex-wrap
-    flex-wrap: wrap
+    flex-wrap: wrap !important
 
   for $name, $width in $bp
     +media-query($width)
       .{$name}:pos-relative
-        position: relative
+        position: relative !important
       .{$name}:pos-absolute
-        position: absolute
+        position: absolute !important
       .{$name}:pos-fixed
-        position: fixed
+        position: fixed !important
       .{$name}:pos-static
-        position: static
+        position: static !important
       .{$name}\\:direction-column
-        flex-direction: column
+        flex-direction: column !important
       .{$name}\\:direction-row
-        flex-direction: row
+        flex-direction: row !important
       .{$name}:flex-wrap
-        flex-wrap: wrap
+        flex-wrap: wrap !important
 
   // Layout shorthands.
   .pos-absolute-stretch
-    position: absolute
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
+    position: absolute !important
+    top: 0 !important
+    left: 0 !important
+    width: 100% !important
+    height: 100% !important
 
   .pos-absolute-container
-    position: absolute
-    top: 0
-    left: 0
+    position: absolute !important
+    top: 0 !important
+    left: 0 !important
 
   .flex-horizontal
-    display: flex
-    justify-content: space-between
-    align-items: center
+    display: flex !important
+    justify-content: space-between !important
+    align-items: center !important
 
   .flex-column
-    display: flex
-    justify-content: space-between
-    flex-direction: column
+    display: flex !important
+    justify-content: space-between !important
+    flex-direction: column !important
 
   .flex-grow
-    flex-grow: 1
+    flex-grow: 1 !important
 
   .flex-no-grow
-    flex-grow: 0
+    flex-grow: 0 !important
 
   .flex-shrink
-    flex-shrink: 1
+    flex-shrink: 1 !important
 
   .flex-no-shrink
-    flex-shrink: 0
+    flex-shrink: 0 !important
 
   for $name, $width in $bp
     +media-query($width)
       .{$name}\\:direction-column
-        flex-direction: column
+        flex-direction: column !important
 
       .{$name}\\:direction-row
-        flex-direction: row
+        flex-direction: row !important
 
   // Opacity.
   .opacity-0
-    opacity: 0
+    opacity: 0 !important
   for $num in (1..10)
     $percentage = percentage($num / 10)
     .opacity-{$num}0
-      opacity: $percentage
+      opacity: $percentage !important
 
   // Miscellaneous.
   .overflow-hidden
@@ -326,7 +326,7 @@
     white-space: nowrap !important
 
   .cursor-pointer
-    cursor: pointer
+    cursor: pointer !important
 
   .lh-1
     line-height: 1
@@ -335,81 +335,81 @@
 
   for $name in $fs
     .fs-{$name}
-      font-size: convert('$fs.' + $name)
+      font-size: convert('$fs.' + $name) !important
 
   // Line heights.
   for $name in $lh
     .lh-{$name}
-      line-height: convert('$lh.' + $name)
+      line-height: convert('$lh.' + $name) !important
 
   // Font weights.
   .fw-normal
-    font-weight: $fw.normal
+    font-weight: $fw.normal !important
 
   .fw-bold
-    font-weight: $fw.bold
+    font-weight: $fw.bold !important
 
   .fw-bolder
-    font-weight: $fw.bolder
+    font-weight: $fw.bolder !important
 
   // Text alignments.
 
   .text-center
-    text-align: center
+    text-align: center !important
 
   .text-left
-    text-align: left
+    text-align: left !important
 
   .text-right
-    text-align: right
+    text-align: right !important
 
   // Text decorations.
 
   .td-underline
-    text-decoration: underline
+    text-decoration: underline !important
 
   .td-line-through
-    text-decoration: line-through
+    text-decoration: line-through !important
 
   .td-none
-    text-decoration: none
+    text-decoration: none !important
 
   // Box sizing.
 
   .box-border
-    box-sizing: border-box
+    box-sizing: border-box !important
 
   .box-content
-    box-sizing: content-box
+    box-sizing: content-box !important
 
   // Cursor.
 
   .cursor-pointer
-    cursor: pointer
+    cursor: pointer !important
 
   .cursor-not-allowed
-    cursor: not-allowed
+    cursor: not-allowed !important
 
   .cursor-grab
-    cursor: grab
+    cursor: grab !important
 
   .cursor-zoom-in
-    cursor: zoom-in
+    cursor: zoom-in !important
 
   .cursor-zoom-out
-    cursor: zoom-out
+    cursor: zoom-out !important
 
   // Responsive typography styles.
   for $name, $width in $bp
     +media-query($width)
       .{$name}:text-center
-        text-align: center
+        text-align: center !important
 
       .{$name}:text-left
-        text-align: left
+        text-align: left !important
 
       .{$name}:text-right
-        text-align: right
+        text-align: right !important
 
   // DISPLAY UTILITIES.
   .d-flex

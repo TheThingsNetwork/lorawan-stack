@@ -35,26 +35,26 @@
     if $type == 'gap'
       if $direction == ''
         .{$prefix}gap{$scalesuffix}
-          gap: $property
+          gap: $property !important
     // Account for all-sides margins/paddings.
     else if $direction == ''
       .{$prefix}{$t}{$scalesuffix}
-        {$type}: $property
+        {$type}: $property !important
     // Account for special cases, vert (top/bottom) and sides (left/right).
     else if $direction == 'vert' || $direction == 'sides'
       .{$prefix}{$t}-{$direction}{$scalesuffix}
         if $direction == 'vert'
-          {$type}-top: $property
-          {$type}-bottom: $property
+          {$type}-top: $property !important
+          {$type}-bottom: $property !important
         else
-          {$type}-right: $property
-          {$type}-left: $property
+          {$type}-right: $property !important
+          {$type}-left: $property !important
     // Default assignment.
     else
       // Eg. `.xs:mb-cs-s`.
       .{$prefix}{$t}{$initial}{$scalesuffix}
         // Eg. `margin-bottom: $cs.s)`.
-        {$type}-{$direction}: $property
+        {$type}-{$direction}: $property !important
 
   // Iterate through types, scales, directions, sizes and generate classes.
   for $type in 'margin' 'padding' 'gap'
