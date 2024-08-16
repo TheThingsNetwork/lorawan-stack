@@ -66,7 +66,7 @@ const encodeSecret = value => {
 }
 
 const BasicSettingsForm = React.memo(props => {
-  const { gateway, gtwId, onSubmit, mayEditSecrets } = props
+  const { gateway, gtwId, onSubmit, mayEditSecrets, supportsClaiming } = props
 
   const userId = useSelector(selectUserId)
   const isConfig = useSelector(selectIsConfiguration)
@@ -260,7 +260,7 @@ const BasicSettingsForm = React.memo(props => {
         <Require condition={mayDeleteGtw}>
           <Button
             onClick={handleOpenDeleteGatewayModal}
-            message={sharedMessages.deleteGateway}
+            message={supportsClaiming ? m.unclaimAndDeleteGateway : sharedMessages.deleteGateway}
             type="button"
             icon={IconTrash}
             naked
@@ -284,6 +284,7 @@ BasicSettingsForm.propTypes = {
   gtwId: PropTypes.string.isRequired,
   mayEditSecrets: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  supportsClaiming: PropTypes.bool.isRequired,
 }
 
 export default BasicSettingsForm

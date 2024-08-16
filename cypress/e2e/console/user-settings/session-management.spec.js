@@ -25,9 +25,9 @@ describe('User settings / session management', () => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(Cypress.config('accountAppRootPath'))
+    cy.visit(Cypress.config('consoleRootPath'))
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-    cy.visit(Cypress.config('accountAppRootPath'))
+    cy.visit(Cypress.config('consoleRootPath'))
   })
 
   it('succeeds showing a list of sessions', () => {

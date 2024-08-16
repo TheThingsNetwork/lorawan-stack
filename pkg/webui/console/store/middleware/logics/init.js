@@ -20,14 +20,12 @@ import * as init from '@ttn-lw/lib/store/actions/init'
 import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 import { selectPageStatusBaseUrlConfig } from '@ttn-lw/lib/selectors/env'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { getNetworkStatusSummary } from '@ttn-lw/lib/store/actions/status'
 
 import { getActiveUserSessionIdSuccess } from '@console/store/actions/sessions'
 import * as user from '@console/store/actions/user'
-import {
-  getInboxNotifications,
-  getUnseenNotificationsPeriodically,
-} from '@console/store/actions/notifications'
+import { getInboxNotifications } from '@console/store/actions/notifications'
 import { getAllBookmarks } from '@console/store/actions/user-preferences'
 
 const consoleAppLogic = createRequestLogic({
@@ -79,12 +77,17 @@ const consoleAppLogic = createRequestLogic({
         ])
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))
-        dispatch(getInboxNotifications({ page: 1, limit: 3 }))
-        dispatch(getAllBookmarks(userId))
-        dispatch(getUnseenNotificationsPeriodically())
-        if (statusPageUrl) {
-          dispatch(getNetworkStatusSummary())
-        }
+
+        // Gather the initial actions to be dispatched, so they can be run in parallel.
+        const initActions = []
+
+        initActions.push(
+          await dispatch(attachPromise(getInboxNotifications({ page: 1, limit: 3 }))),
+          await dispatch(attachPromise(getAllBookmarks(userId))),
+          statusPageUrl ? await dispatch(attachPromise(getNetworkStatusSummary())) : undefined,
+        )
+
+        await Promise.all(initActions)
       } catch (error) {
         dispatch(user.getUserMeFailure(error))
       }

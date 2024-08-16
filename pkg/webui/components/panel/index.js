@@ -21,7 +21,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Icon from '../icon'
 import Link from '../link'
-import Button from '../button'
 
 import Toggle from './toggle'
 
@@ -59,10 +58,14 @@ const Panel = ({
   divider,
   shortCutLinkTarget,
   shortCutLinkDisabled,
+  compact,
 }) => (
   <div
+    className={classnames(styles.panel, className, {
+      [styles.divider]: divider,
+      [styles.compact]: compact,
+    })}
     data-test-id={`overview-panel-${title?.defaultMessage ?? ''}`}
-    className={classnames(styles.panel, className, { [styles.divider]: divider })}
     onMouseEnter={onMouseEnter}
     onMouseLeave={onMouseLeave}
   >
@@ -93,17 +96,6 @@ const Panel = ({
       </div>
     )}
     {children}
-    {shortCutLinkTitle && (
-      <Button.Link
-        naked
-        to={shortCutLinkPath}
-        className="d-none md-lg:d-flex c-bg-brand-extralight c-text-brand-normal mt-cs-l w-full fw-bold"
-        target={shortCutLinkTarget}
-        disabled={shortCutLinkDisabled}
-      >
-        <Message content={shortCutLinkTitle} /> →
-      </Button.Link>
-    )}
   </div>
 )
 
@@ -111,6 +103,7 @@ Panel.propTypes = {
   activeToggle: PropTypes.string,
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  compact: PropTypes.bool,
   divider: PropTypes.bool,
   icon: PropTypes.icon,
   iconClassName: PropTypes.string,
@@ -134,6 +127,7 @@ Panel.defaultProps = {
   onMouseEnter: () => null,
   onMouseLeave: () => null,
   className: undefined,
+  compact: false,
   messageDecorators: undefined,
   divider: false,
   shortCutLinkDisabled: undefined,

@@ -25,19 +25,12 @@ import Message from '@ttn-lw/lib/components/message'
 
 import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import filterDataProps from '@ttn-lw/lib/filter-data-props'
 
 import Dropdown from '../dropdown'
 import Tooltip from '../tooltip'
 
 import style from './button.styl'
-
-const filterDataProps = props =>
-  Object.keys(props)
-    .filter(key => key.startsWith('data-'))
-    .reduce((acc, key) => {
-      acc[key] = props[key]
-      return acc
-    }, {})
 
 const assembleClassnames = ({
   message,
@@ -201,7 +194,8 @@ Button.defaultProps = {
 }
 
 const LinkButton = props => {
-  const { disabled, titleMessage, onClick, value, tooltip, tooltipPlacement, ...rest } = props
+  const { disabled, titleMessage, onClick, value, tooltip, tooltipPlacement, dataTestId, ...rest } =
+    props
   const buttonClassNames = assembleClassnames(props)
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
   const { to } = props
@@ -224,6 +218,7 @@ const LinkButton = props => {
       title={titleMessage}
       children={buttonChildren(props)}
       onClick={handleClick}
+      dataTestId={dataTestId}
       {...dataProps}
     />
   )

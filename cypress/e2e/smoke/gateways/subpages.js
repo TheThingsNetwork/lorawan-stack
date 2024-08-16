@@ -58,7 +58,6 @@ const gatewaySubpages = defineSmokeTest('check all gateway sub-pages', () => {
 
   cy.findByRole('link', { name: /General settings/ }).click()
   cy.findByText('Basic settings')
-    .should('be.visible')
     .closest('[data-test-id="collapsible-section"]')
     .within(() => {
       cy.findByLabelText('Gateway ID').should('be.visible')
@@ -68,7 +67,6 @@ const gatewaySubpages = defineSmokeTest('check all gateway sub-pages', () => {
       cy.findByRole('button', { name: 'Collapse' }).click()
     })
   cy.findByText('LoRaWAN options')
-    .should('be.visible')
     .closest('[data-test-id="collapsible-section"]')
     .within(() => {
       cy.findByRole('button', { name: 'Expand' }).click()

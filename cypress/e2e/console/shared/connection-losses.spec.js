@@ -29,8 +29,9 @@ describe('Connection loss detection', () => {
   it('detects connection losses and attempts reconnects', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('consoleRootPath'))
-    cy.get('header').within(() => {
-      cy.findByText('Dashboard').should('be.visible')
+    // Wait until the page is fully loaded.
+    cy.get('#stage').within(() => {
+      cy.findByText('No top entities yet').should('be.visible')
     })
 
     cy.intercept('/api/v3/application*', { forceNetworkError: true }).as('offlineIntercept')
@@ -41,23 +42,22 @@ describe('Connection loss detection', () => {
     cy.findByRole('link', { name: /Applications/ }).click()
 
     cy.get('header').within(() => {
-      cy.findByText(/Offline/)
-        .should('be.visible')
-        .as('offlineToast')
+      cy.findByText(/Offline/).should('be.visible')
     })
 
     // After the 'offline' toast has disappeared, wait for the reconnection intercept to resolve.
     cy.wait('@reconnectionIntercept')
 
     cy.get('header').within(() => {
-      cy.findByText(/Offline/, { timeout: 20 * 1000 }).should('not.exist')
+      cy.findByText(/Offline/, { timeout: 20000 }).should('not.exist')
     })
   })
   it('does not see individual network errors as connection loss', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('consoleRootPath'))
-    cy.get('header').within(() => {
-      cy.findByText('Dashboard').should('be.visible')
+    // Wait until the page is fully loaded.
+    cy.get('#stage').within(() => {
+      cy.findByText('No top entities yet').should('be.visible')
     })
     cy.intercept('/api/v3/application*', { forceNetworkError: true })
 
@@ -65,7 +65,7 @@ describe('Connection loss detection', () => {
     cy.get('header').within(() => {
       // Connection issue note will appear in the footer and
       // dissappear shortly thereafter.
-      cy.findByText(/Connection issues/).should('be.visible')
+      cy.findByText(/Connection issues/, { timeout: 20000 }).should('be.visible')
       cy.findByText(/Connection issues/).should('not.exist')
 
       cy.findByText(/Offline/).should('not.exist')

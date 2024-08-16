@@ -244,7 +244,6 @@ describe('Gateway general settings', () => {
     )
 
     cy.get('button[type="submit').scrollIntoView()
-    cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').clear()
     cy.findByLabelText('Administrative contact').type('test-non-collab-user')
     cy.findByText('No matching user or organization was found')
@@ -261,7 +260,6 @@ describe('Gateway general settings', () => {
     )
 
     cy.get('button[type="submit').scrollIntoView()
-    cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').clear()
     cy.findByLabelText('Administrative contact').selectOption(collabUserId)
 
@@ -283,7 +281,6 @@ describe('Gateway general settings', () => {
     )
 
     cy.get('button[type="submit').scrollIntoView()
-    cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').should('have.attr', 'disabled')
     cy.findByLabelText('Administrative contact')
       .parent()

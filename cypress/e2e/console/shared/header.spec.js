@@ -37,6 +37,11 @@ describe('Header', () => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
       cy.visit(Cypress.config('consoleRootPath'))
 
+      // Wait until the page is fully loaded.
+      cy.get('#stage').within(() => {
+        cy.findByText('No top entities yet').should('be.visible')
+      })
+
       logout()
 
       cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/login`)
@@ -63,17 +68,24 @@ describe('Header', () => {
       cy.visit(Cypress.config('consoleRootPath'))
       cy.clearCookie('_console_csrf')
 
+      // Wait until the page is fully loaded.
+      cy.get('#stage').within(() => {
+        cy.findByText('No top entities yet').should('be.visible')
+      })
+
       logout()
 
       cy.location('pathname').should('eq', `${accountAppRootPath}/login`)
     })
+  })
 
-    it('displays UI elements in place', () => {
+  describe('Console navigation', () => {
+    it('it displays UI elements in place', () => {
       const user = {
-        ids: { user_id: 'test-header-user' },
-        primary_email_address: 'test-header-user@example.com',
-        password: 'ABCDefg123!',
-        password_confirm: 'ABCDefg123!',
+        ids: { user_id: 'test-header-nav-user' },
+        primary_email_address: 'test-header-nav-user@example.com',
+        password: 'ABCDefg123!!',
+        password_confirm: 'ABCDefg123!!',
         name: 'Test Header User',
       }
 
@@ -88,6 +100,28 @@ describe('Header', () => {
           .should('be.visible')
           .and('have.attr', 'src')
           .and('match', /missing-profile-picture/)
+
+        // Find and click on the user button to display dropdown
+        cy.findByTestId('profile-dropdown').click()
+
+        // Check that dropdown is displayed and contains the expected elements
+        cy.findByText('Profile settings').should('be.visible')
+        cy.findByText('Get support').should('be.visible')
+        cy.findByText('Documentation').should('be.visible')
+        cy.findByText('Logout').should('be.visible')
+
+        // Login again as admin.
+        cy.clearCookies()
+        cy.clearLocalStorage()
+        cy.loginConsole({ user_id: 'admin', password: 'admin' })
+        cy.reload()
+        // Find and click on the user button to display dropdown
+        cy.findByTestId('profile-dropdown').click()
+        cy.findByText('Profile settings').should('be.visible')
+        cy.findByText('Admin panel').should('be.visible')
+        cy.findByText('Get support').should('be.visible')
+        cy.findByText('Documentation').should('be.visible')
+        cy.findByText('Logout').should('be.visible')
       })
     })
   })

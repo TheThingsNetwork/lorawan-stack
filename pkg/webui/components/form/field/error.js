@@ -15,7 +15,7 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { IconAlertTriangle, IconExclamationCircle } from '@ttn-lw/components/icon'
+import { IconExclamationCircle, IconAlertTriangle } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 

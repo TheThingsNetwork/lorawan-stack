@@ -87,16 +87,18 @@ describe('Overview', () => {
       cy.findByText(`${gateway.name}`, { selector: 'h5' }).should('be.visible')
 
       // Check general information panel.
-      cy.get('[data-test-id="overview-panel-"]').within(() => {
-        cy.findByText(new RegExp(gatewayId)).should('be.visible')
+      cy.get('#stage').within(() => {
+        cy.findAllByText(gatewayId).should('be.visible').and('have.length', 2)
         cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
-      })
+        cy.findByText(/No uplinks yet/) // Check for no uplinks.
 
-      // Check panels.
-      cy.findByText('General information').should('be.visible')
-      cy.findByText('Gateway status').should('be.visible')
-      cy.get('[data-test-id="overview-panel-Network activity"]').scrollIntoView()
-      cy.findByText('Network activity').should('be.visible')
+        // Check panels.
+        cy.findByText('General information').should('be.visible')
+        cy.findByText('Gateway status').should('be.visible')
+        cy.findByText('Network activity').should('exist').scrollIntoView()
+        cy.findByText('Network activity').should('be.visible')
+        cy.findByText('Location').should('be.visible')
+      })
 
       cy.findByTestId('error-notification').should('not.exist')
     })

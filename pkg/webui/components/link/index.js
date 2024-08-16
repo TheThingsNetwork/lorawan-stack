@@ -63,6 +63,7 @@ const Link = React.forwardRef((props, ref) => {
     tabIndex,
     role,
     allowWrap,
+    dataTestId,
     ...rest
   } = props
 
@@ -98,6 +99,7 @@ const Link = React.forwardRef((props, ref) => {
       tabIndex={tabIndex}
       role={role}
       ref={ref}
+      data-test-id={dataTestId}
       {...dataProps}
     >
       {children}
@@ -109,6 +111,7 @@ Link.propTypes = {
   allowWrap: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
+  dataTestId: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   onClick: PropTypes.func,
@@ -150,6 +153,7 @@ Link.defaultProps = {
   target: undefined,
   title: undefined,
   titleValues: undefined,
+  dataTestId: '',
 }
 
 const DocLink = props => {

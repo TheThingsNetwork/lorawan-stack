@@ -286,17 +286,19 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
                   <Message content={errorMessages.technicalDetails} />
                 </summary>
                 <pre>{errorDetails}</pre>
-                <Button
-                  onClick={handleCopyClick}
-                  className={style.actionButton}
-                  data-clipboard-text={errorDetails}
-                  ref={copyButton}
-                  icon={copied ? IconClipboardCheck : IconClipboard}
-                  message={
-                    copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard
-                  }
-                  secondary
-                />
+                {!safe && (
+                  <Button
+                    onClick={handleCopyClick}
+                    className={style.actionButton}
+                    data-clipboard-text={errorDetails}
+                    ref={copyButton}
+                    icon={copied ? IconClipboardCheck : IconClipboard}
+                    message={
+                      copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard
+                    }
+                    secondary
+                  />
+                )}
               </details>
             </>
           )}
