@@ -54,9 +54,16 @@ import SidebarContext from '../sidebar/context'
 import NotificationsDropdown from './notifications-dropdown'
 import BookmarksDropdown from './bookmarks-dropdown'
 
-const Header = ({ onMenuClick, alwaysShowLogo, setIsSideBarHovered }) => {
+const Header = ({ alwaysShowLogo }) => {
   const dispatch = useDispatch()
-  const { isMinimized, onMinimizeToggle, onDrawerExpandClick } = useContext(SidebarContext)
+  const {
+    isMinimized,
+    onMinimizeToggle,
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer,
+    setIsHovered: setIsSideBarHovered,
+  } = useContext(SidebarContext)
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
   const user = useSelector(selectUser)
@@ -69,6 +76,14 @@ const Header = ({ onMenuClick, alwaysShowLogo, setIsSideBarHovered }) => {
   )
   const isAdmin = useSelector(selectUserIsAdmin)
   const hasUnseenNotifications = useSelector(selectTotalUnseenCount) > 0
+
+  const onDrawerExpandClick = useCallback(() => {
+    if (!isDrawerOpen) {
+      openDrawer()
+    } else {
+      closeDrawer()
+    }
+  }, [isDrawerOpen, openDrawer, closeDrawer])
 
   const handleRegisterEndDeviceClick = useCallback(() => {
     dispatch(setSearchScope(APPLICATION))
@@ -163,7 +178,7 @@ const Header = ({ onMenuClick, alwaysShowLogo, setIsSideBarHovered }) => {
       notificationsDropdownItems={<NotificationsDropdown />}
       brandLogo={brandLogo}
       Logo={Logo}
-      onMenuClick={onMenuClick}
+      onMenuClick={onDrawerExpandClick}
       showNotificationDot={hasUnseenNotifications}
       alwaysShowLogo={alwaysShowLogo}
       expandSidebar={handleExpandSidebar}
@@ -174,8 +189,6 @@ const Header = ({ onMenuClick, alwaysShowLogo, setIsSideBarHovered }) => {
 
 Header.propTypes = {
   alwaysShowLogo: PropTypes.bool,
-  onMenuClick: PropTypes.func.isRequired,
-  setIsSideBarHovered: PropTypes.func.isRequired,
 }
 
 Header.defaultProps = {

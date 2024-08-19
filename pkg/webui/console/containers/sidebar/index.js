@@ -22,8 +22,6 @@ import LAYOUT from '@ttn-lw/constants/layout'
 import SearchButton from '@ttn-lw/components/sidebar/search-button'
 import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
-
 import { setSearchOpen } from '@console/store/actions/search'
 
 import SearchPanelManager from '../search-panel'
@@ -35,10 +33,52 @@ import SwitcherContainer from './switcher'
 
 import style from './sidebar.styl'
 
-const Sidebar = ({ isDrawerOpen, isSideBarHovered, setIsHovered }) => {
+const Sidebar = () => {
   const { pathname } = useLocation()
-  const { setIsMinimized, isMinimized, closeDrawer } = useContext(SidebarContext)
+  const {
+    setIsMinimized,
+    isMinimized,
+    setIsDrawerOpen,
+    closeDrawer,
+    isDrawerOpen,
+    isHovered,
+    setIsHovered,
+  } = useContext(SidebarContext)
   const dispatch = useDispatch()
+  const node = React.useRef()
+
+  const handleMouseMove = useCallback(
+    e => {
+      if (e.clientX <= 20 && isMinimized) {
+        // If the mouse is within 20px of the left edge
+        setIsDrawerOpen(true)
+      } else if (e.clientX >= 550 && isMinimized) {
+        // If the mouse is within 300px of the sidebar
+        setIsDrawerOpen(false)
+      }
+    },
+    [isMinimized, setIsDrawerOpen],
+  )
+
+  useEffect(() => {
+    const onClickOutside = e => {
+      if (isDrawerOpen && node.current && !node.current.contains(e.target)) {
+        closeDrawer()
+      }
+    }
+
+    if (isMinimized) {
+      document.addEventListener('mousemove', handleMouseMove)
+      return () => document.removeEventListener('mousemove', handleMouseMove)
+    }
+
+    if (isDrawerOpen) {
+      document.addEventListener('mousedown', onClickOutside)
+      return () => document.removeEventListener('mousedown', onClickOutside)
+    }
+  }, [isDrawerOpen, isMinimized, handleMouseMove, closeDrawer])
+
+  // End of mobile side menu drawer functionality
 
   // Reset minimized state when screen size changes to mobile.
   useEffect(() => {
@@ -55,13 +95,13 @@ const Sidebar = ({ isDrawerOpen, isSideBarHovered, setIsHovered }) => {
 
   useEffect(() => {
     let timer
-    if (!isSideBarHovered && isMinimized && isDrawerOpen) {
+    if (!isHovered && isMinimized && isDrawerOpen) {
       timer = setTimeout(() => {
         closeDrawer()
       }, 800)
     }
     return () => clearTimeout(timer)
-  }, [isSideBarHovered, closeDrawer, isDrawerOpen, isMinimized])
+  }, [isHovered, isDrawerOpen, isMinimized, closeDrawer])
 
   // Close the drawer on navigation changes after a small delay.
   useEffect(() => {
@@ -70,7 +110,7 @@ const Sidebar = ({ isDrawerOpen, isSideBarHovered, setIsHovered }) => {
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [pathname, closeDrawer])
+  }, [closeDrawer, pathname])
 
   const handleSearchClick = useCallback(() => {
     dispatch(setSearchOpen(true))
@@ -100,6 +140,7 @@ const Sidebar = ({ isDrawerOpen, isSideBarHovered, setIsHovered }) => {
         id="sidebar"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        ref={node}
       >
         <SideHeader />
         <div className="d-flex direction-column gap-cs-m">
@@ -113,12 +154,6 @@ const Sidebar = ({ isDrawerOpen, isSideBarHovered, setIsHovered }) => {
       <SearchPanelManager />
     </>
   )
-}
-
-Sidebar.propTypes = {
-  isDrawerOpen: PropTypes.bool.isRequired,
-  isSideBarHovered: PropTypes.bool.isRequired,
-  setIsHovered: PropTypes.func.isRequired,
 }
 
 export default Sidebar
