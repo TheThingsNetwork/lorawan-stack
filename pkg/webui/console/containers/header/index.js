@@ -15,6 +15,8 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { APPLICATION } from '@console/constants/entities'
+
 import {
   IconLogout,
   IconUserCircle,
@@ -41,6 +43,7 @@ import {
 } from '@console/lib/feature-checks'
 
 import { logout } from '@console/store/actions/logout'
+import { setSearchOpen, setSearchScope } from '@console/store/actions/search'
 
 import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
@@ -65,6 +68,11 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const hasUnseenNotifications = useSelector(selectTotalUnseenCount) > 0
 
+  const handleRegisterEndDeviceClick = useCallback(() => {
+    dispatch(setSearchScope(APPLICATION))
+    dispatch(setSearchOpen(true))
+  }, [dispatch])
+
   const plusDropdownItems = (
     <>
       {mayViewApps && (
@@ -86,9 +94,9 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
       )}
 
       <Dropdown.Item
-        title="Register end device in application"
+        title={sharedMessages.registerDeviceInApplication}
         icon={IconDevice}
-        path="/devices/add"
+        action={handleRegisterEndDeviceClick}
       />
     </>
   )

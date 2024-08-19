@@ -24,18 +24,29 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './shortcut-item.styl'
 
-const ShortcutItem = ({ icon, title, link, className }) => (
-  <Link to={link} className={classnames(style.shortcut, className)}>
-    <div className="pos-relative w-full h-full">
-      <div className={style.shortcutTitleWrapper}>
-        <Icon icon={icon} className={style.icon} size={28} />
-        <Message content={title} className={style.title} component="span" />
+const ShortcutItem = ({ icon, title, link, action, className }) =>
+  action ? (
+    <button onClick={action} className={classnames(style.shortcut, className)}>
+      <div className="pos-relative w-full h-full">
+        <div className={style.shortcutTitleWrapper}>
+          <Icon icon={icon} className={style.icon} size={28} />
+          <Message content={title} className={style.title} component="span" />
+        </div>
       </div>
-    </div>
-  </Link>
-)
+    </button>
+  ) : (
+    <Link to={link} className={classnames(style.shortcut, className)}>
+      <div className="pos-relative w-full h-full">
+        <div className={style.shortcutTitleWrapper}>
+          <Icon icon={icon} className={style.icon} size={28} />
+          <Message content={title} className={style.title} component="span" />
+        </div>
+      </div>
+    </Link>
+  )
 
 ShortcutItem.propTypes = {
+  action: PropTypes.func,
   className: PropTypes.string,
   icon: PropTypes.icon.isRequired,
   link: PropTypes.string.isRequired,
@@ -44,6 +55,7 @@ ShortcutItem.propTypes = {
 
 ShortcutItem.defaultProps = {
   className: undefined,
+  action: undefined,
 }
 
 export default ShortcutItem

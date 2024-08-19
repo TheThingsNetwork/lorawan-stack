@@ -83,7 +83,11 @@ const TopEntitiesSection = ({ topEntities, type }) => {
   }
   return (
     <SideNavigation>
-      <SectionLabel label={topEntities.length === 0 ? noneLabel : label} icon={IconPlus} />
+      <SectionLabel
+        label={topEntities.length === 0 ? noneLabel : label}
+        icon={IconPlus}
+        type={type}
+      />
       <RequireRequest
         requestAction={getTopEntities()}
         spinnerProps={{ inline: true, micro: true, center: true, className: 'mt-ls-s' }}

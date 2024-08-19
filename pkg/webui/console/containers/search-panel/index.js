@@ -18,21 +18,31 @@ import FocusLock from 'react-focus-lock'
 import { RemoveScroll } from 'react-remove-scroll'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { APPLICATION } from '@console/constants/entities'
+
 import SearchPanel from '@ttn-lw/components/search-panel'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import useRequest from '@ttn-lw/lib/hooks/use-request'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getGlobalSearchResults, setSearchOpen } from '@console/store/actions/search'
+import {
+  getGlobalSearchResults,
+  setSearchOpen,
+  setSearchScope,
+} from '@console/store/actions/search'
 import { getTopEntities } from '@console/store/actions/top-entities'
 
 import {
   selectSearchResults,
   selectSearchQuery,
   selectIsSearchOpen,
+  selectSearchScope,
 } from '@console/store/selectors/search'
-import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
+import {
+  selectApplicationTopEntities,
+  selectTopEntitiesAll,
+} from '@console/store/selectors/top-entities'
 
 import style from './search-panel.styl'
 
@@ -54,6 +64,7 @@ const SearchPanelManager = () => {
   }, [dispatch])
 
   const handleClose = useCallback(() => {
+    dispatch(setSearchScope(undefined))
     dispatch(setSearchOpen(false))
   }, [dispatch])
 
@@ -70,14 +81,23 @@ const SearchPanelManager = () => {
 const SearchPanelInner = ({ onClose }) => {
   const dispatch = useDispatch()
   const searchResults = useSelector(selectSearchResults)
+  const scopedSearchResults = searchResults.filter(
+    result => result.category === APPLICATION || result.category === 'top-entities',
+  )
   const searchQuery = useSelector(selectSearchQuery)
+  const searchScope = useSelector(selectSearchScope)
+  const isApplicationScope = searchScope === APPLICATION
+  const selectPath = isApplicationScope ? '/devices/add' : undefined
+
   const [searchResultsFetching, setSearchResultsFetching] = useState(false)
   const [searchResultsError, setSearchResultsError] = useState()
-  const topEntitiesResult = useSelector(selectTopEntitiesAll)
+  const topEntitiesResult = useSelector(
+    isApplicationScope ? selectApplicationTopEntities : selectTopEntitiesAll,
+  )
   const topEntities = topEntitiesResult
     ? [
         {
-          category: 'top-entities',
+          category: isApplicationScope ? APPLICATION : 'top-entities',
           source: 'top-entities',
           items: topEntitiesResult,
         },
@@ -108,13 +128,15 @@ const SearchPanelInner = ({ onClose }) => {
         <div key="shadow" className={style.shadow} onClick={onClose} />
         <SearchPanel
           searchQuery={searchQuery}
-          searchResults={searchResults}
+          searchResults={isApplicationScope ? scopedSearchResults : searchResults}
           searchResultsFetching={searchResultsFetching}
           topEntities={topEntities}
           topEntitiesFetching={topItemsFetching}
           onClose={onClose}
           onQueryChange={handleQueryChange}
           error={topItemsError || searchResultsError}
+          selectPath={selectPath}
+          scope={searchScope}
         />
       </RemoveScroll>
     </FocusLock>

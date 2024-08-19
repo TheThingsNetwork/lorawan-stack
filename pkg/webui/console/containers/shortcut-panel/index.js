@@ -14,6 +14,9 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useDispatch } from 'react-redux'
+
+import { APPLICATION } from '@console/constants/entities'
 
 import {
   IconUsersGroup,
@@ -23,6 +26,10 @@ import {
   IconDevice,
   IconGateway,
 } from '@ttn-lw/components/icon'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { setSearchOpen, setSearchScope } from '@console/store/actions/search'
 
 import Panel from '../../../components/panel'
 
@@ -34,44 +41,51 @@ const m = defineMessages({
   addGateway: 'New gateway',
   addNewOrganization: 'New organization',
   addPersonalApiKey: 'New personal API key',
-  registerDevice: 'Register an end device',
 })
 
-const ShortcutPanel = () => (
-  <Panel title={m.shortcuts} icon={IconBolt} divider className="h-full">
-    <div className="grid gap-cs-xs">
-      <ShortcutItem
-        icon={IconApplication}
-        title={m.addApplication}
-        link="/applications/add"
-        className="item-6"
-      />
-      <ShortcutItem
-        icon={IconGateway}
-        title={m.addGateway}
-        link="/gateways/add"
-        className="item-6"
-      />
-      <ShortcutItem
-        icon={IconUsersGroup}
-        title={m.addNewOrganization}
-        link="/organizations/add"
-        className="item-4"
-      />
-      <ShortcutItem
-        icon={IconKey}
-        title={m.addPersonalApiKey}
-        link="/user/api-keys/add"
-        className="item-4"
-      />
-      <ShortcutItem
-        icon={IconDevice}
-        title={m.registerDevice}
-        link="/applications"
-        className="item-4"
-      />
-    </div>
-  </Panel>
-)
+const ShortcutPanel = () => {
+  const dispatch = useDispatch()
+  const handleRegisterDeviceClick = React.useCallback(() => {
+    dispatch(setSearchScope(APPLICATION))
+    dispatch(setSearchOpen(true))
+  }, [dispatch])
+
+  return (
+    <Panel title={m.shortcuts} icon={IconBolt} divider className="h-full">
+      <div className="grid gap-cs-xs">
+        <ShortcutItem
+          icon={IconApplication}
+          title={m.addApplication}
+          link="/applications/add"
+          className="item-6"
+        />
+        <ShortcutItem
+          icon={IconGateway}
+          title={m.addGateway}
+          link="/gateways/add"
+          className="item-6"
+        />
+        <ShortcutItem
+          icon={IconUsersGroup}
+          title={m.addNewOrganization}
+          link="/organizations/add"
+          className="item-4"
+        />
+        <ShortcutItem
+          icon={IconKey}
+          title={m.addPersonalApiKey}
+          link="/user/api-keys/add"
+          className="item-4"
+        />
+        <ShortcutItem
+          icon={IconDevice}
+          title={sharedMessages.registerDeviceInApplication}
+          action={handleRegisterDeviceClick}
+          className="item-4"
+        />
+      </div>
+    </Panel>
+  )
+}
 
 export default ShortcutPanel
