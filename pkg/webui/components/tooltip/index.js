@@ -33,7 +33,7 @@ const popperModifiers = [
     name: 'arrow',
     options: {
       element: '.tippy-arrow',
-      padding: 12,
+      padding: 10,
     },
   },
 ]
