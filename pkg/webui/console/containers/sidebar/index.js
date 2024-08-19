@@ -63,9 +63,13 @@ const Sidebar = ({ isDrawerOpen, isSideBarHovered, setIsHovered }) => {
     return () => clearTimeout(timer)
   }, [isSideBarHovered, closeDrawer, isDrawerOpen, isMinimized])
 
-  // Close the drawer on navigation changes.
+  // Close the drawer on navigation changes after a small delay.
   useEffect(() => {
-    closeDrawer()
+    const timer = setTimeout(() => {
+      closeDrawer()
+    }, 500)
+
+    return () => clearTimeout(timer)
   }, [pathname, closeDrawer])
 
   const handleSearchClick = useCallback(() => {

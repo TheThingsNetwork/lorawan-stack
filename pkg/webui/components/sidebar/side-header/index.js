@@ -33,12 +33,14 @@ const SideHeader = ({ Logo }) => {
       <Link to="/">
         <Logo className={classnames(style.logo)} />
       </Link>
-      <Button
-        className={classnames(style.minimizeButton, 'md-lg:d-none')}
-        icon={isMinimized ? IconX : IconLayoutSidebarLeftCollapse}
-        onClick={isMinimized ? closeDrawer : onMinimizeToggle}
-        naked
-      />
+      {!isMinimized && (
+        <Button
+          className={classnames(style.minimizeButton, 'md-lg:d-none')}
+          icon={IconLayoutSidebarLeftCollapse}
+          onClick={onMinimizeToggle}
+          naked
+        />
+      )}
       <Button
         className={classnames(style.minimizeButton, 'd-none', 'md-lg:d-flex')}
         icon={IconX}

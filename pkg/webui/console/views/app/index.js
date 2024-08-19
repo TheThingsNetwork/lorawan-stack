@@ -123,16 +123,13 @@ const Layout = () => {
 
   const handleMouseMove = useCallback(
     e => {
-      const timer = setTimeout(() => {
-        if (e.clientX <= 20 && isMinimized) {
-          // If the mouse is within 20px of the left edge
-          setIsDrawerOpen(true)
-        } else if (e.clientX >= 650 && isMinimized) {
-          // If the mouse is within 300px of the sidebar
-          setIsDrawerOpen(false)
-        }
-      }, 150)
-      return () => clearTimeout(timer)
+      if (e.clientX <= 20 && isMinimized) {
+        // If the mouse is within 20px of the left edge
+        setIsDrawerOpen(true)
+      } else if (e.clientX >= 550 && isMinimized) {
+        // If the mouse is within 300px of the sidebar
+        setIsDrawerOpen(false)
+      }
     },
     [isMinimized],
   )
