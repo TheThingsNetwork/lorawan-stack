@@ -1587,6 +1587,18 @@ func (x *ListGatewaysRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("deleted")
 		s.WriteBool(x.Deleted)
 	}
+	if len(x.Filters) > 0 || s.HasField("filters") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("filters")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Filters {
+			s.WriteMoreIf(&wroteElement)
+			// NOTE: ListGatewaysRequest_Filter does not seem to implement MarshalProtoJSON.
+			golang.MarshalMessage(s, element)
+		}
+		s.WriteArrayEnd()
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1637,6 +1649,18 @@ func (x *ListGatewaysRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "deleted":
 			s.AddField("deleted")
 			x.Deleted = s.ReadBool()
+		case "filters":
+			s.AddField("filters")
+			if s.ReadNil() {
+				x.Filters = nil
+				return
+			}
+			s.ReadArray(func() {
+				// NOTE: ListGatewaysRequest_Filter does not seem to implement UnmarshalProtoJSON.
+				var v ListGatewaysRequest_Filter
+				golang.UnmarshalMessage(s, &v)
+				x.Filters = append(x.Filters, &v)
+			})
 		}
 	})
 }

@@ -130,6 +130,29 @@ export const [
   },
 ] = createGetRightsListRequestActions(SHARED_NAME)
 
+export const CLAIM_GATEWAY_BASE = 'CLAIM_GATEWAY'
+export const [{ request: CLAIM_GATEWAY }, { request: claimGateway }] = createRequestActions(
+  CLAIM_GATEWAY_BASE,
+  details => ({ details }),
+)
+
+const UNCLAIM_GATEWAY_BASE = 'UNCLAIM_GATEWAY'
+export const [
+  { request: UNCLAIM_GATEWAY, success: UNCLAIM_GATEWAY_SUCCESS, failure: UNCLAIM_GATEWAY_FAILURE },
+  { request: unclaimGateway, success: unclaimGatewaySuccess, failure: unclaimGatewayFailure },
+] = createRequestActions(UNCLAIM_GATEWAY_BASE, gatewayId => ({
+  gatewayId,
+}))
+
+export const GET_GATEWAY_CLAIM_INFO_BY_EUI_BASE = 'GET_GATEWAY_CLAIM_INFO_BY_EUI'
+export const [
+  { request: GET_GATEWAY_CLAIM_INFO_BY_EUI, success: GET_GATEWAY_CLAIM_INFO_BY_EUI_SUCCESS },
+  { request: getGatewayClaimInfoByEui },
+] = createRequestActions(GET_GATEWAY_CLAIM_INFO_BY_EUI_BASE, (gatewayEui, isDetails = false) => ({
+  gatewayEui,
+  isDetails,
+}))
+
 export const UPDATE_GTW_STATS_BASE = 'UPDATE_GATEWAY_STATISTICS'
 export const [
   {

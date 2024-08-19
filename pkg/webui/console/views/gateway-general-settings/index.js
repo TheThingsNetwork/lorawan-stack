@@ -23,20 +23,34 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 import Collapse from '@ttn-lw/components/collapse'
 
+import RequireRequest from '@ttn-lw/lib/components/require-request'
+
 import Require from '@console/lib/components/require'
 
 import diff from '@ttn-lw/lib/diff'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 
 import {
   checkFromState,
   mayEditBasicGatewayInformation,
+  mayDeleteGateway,
   mayEditGatewaySecrets,
+  mayPurgeEntities,
+  mayViewOrEditGatewayApiKeys,
+  mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 
-import { updateGateway } from '@console/store/actions/gateways'
+import { updateGateway, getGatewayClaimInfoByEui } from '@console/store/actions/gateways'
+import { getApiKeysList } from '@console/store/actions/api-keys'
+import { getIsConfiguration } from '@console/store/actions/identity-server'
 
-import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
+import {
+  selectSelectedGateway,
+  selectSelectedGatewayClaimable,
+  selectSelectedGatewayId,
+} from '@console/store/selectors/gateways'
 
 import LorawanSettingsForm from './lorawan-settings-form'
 import BasicSettingsForm from './basic-settings-form'
@@ -46,7 +60,9 @@ const GatewayGeneralSettingsInner = () => {
   const dispatch = useDispatch()
   const { gtwId } = useParams()
   const gateway = useSelector(selectSelectedGateway)
+  const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
   const mayEditSecrets = useSelector(state => checkFromState(mayEditGatewaySecrets, state))
+  const supportsClaiming = useSelector(selectSelectedGatewayClaimable)
 
   const handleSubmit = useCallback(
     async values => {
@@ -85,7 +101,7 @@ const GatewayGeneralSettingsInner = () => {
   return (
     <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.generalSettings} hideHeading />
-      <div className="item-12 xl:item-8">
+      <div className="item-12 lg:item-8">
         <Collapse
           title={m.basicTitle}
           description={m.basicDescription}
@@ -96,7 +112,9 @@ const GatewayGeneralSettingsInner = () => {
             gtwId={gtwId}
             gateway={gateway}
             onSubmit={handleSubmit}
+            mayDeleteGateway={mayDeleteGtw}
             mayEditSecrets={mayEditSecrets}
+            supportsClaiming={supportsClaiming}
           />
         </Collapse>
         <Collapse
@@ -114,6 +132,30 @@ const GatewayGeneralSettingsInner = () => {
 
 const GatewaySettings = () => {
   const gtwId = useSelector(selectSelectedGatewayId)
+  const {
+    ids: { eui },
+  } = useSelector(selectSelectedGateway)
+  const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
+  const mayViewApiKeys = useSelector(state => checkFromState(mayViewOrEditGatewayApiKeys, state))
+  const mayViewCollaborators = useSelector(state =>
+    checkFromState(mayViewOrEditGatewayCollaborators, state),
+  )
+
+  const loadData = useCallback(
+    async dispatch => {
+      if (mayDeleteGtw) {
+        if (mayViewApiKeys) {
+          await dispatch(attachPromise(getApiKeysList('gateway', gtwId)))
+        }
+        if (mayViewCollaborators) {
+          await dispatch(attachPromise(getCollaboratorsList('gateway', gtwId)))
+        }
+      }
+      dispatch(attachPromise(getIsConfiguration()))
+      dispatch(attachPromise(getGatewayClaimInfoByEui(eui, true)))
+    },
+    [mayDeleteGtw, eui, mayViewApiKeys, mayViewCollaborators, gtwId],
+  )
 
   useBreadcrumbs(
     'gtws.single.general-settings',
@@ -128,7 +170,9 @@ const GatewaySettings = () => {
       featureCheck={mayEditBasicGatewayInformation}
       otherwise={{ redirect: `/gateways/${gtwId}` }}
     >
-      <GatewayGeneralSettingsInner />
+      <RequireRequest requestAction={loadData}>
+        <GatewayGeneralSettingsInner />
+      </RequireRequest>
     </Require>
   )
 }

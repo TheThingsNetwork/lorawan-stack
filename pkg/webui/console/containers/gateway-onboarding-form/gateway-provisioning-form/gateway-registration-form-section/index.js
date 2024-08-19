@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useFormikContext } from 'formik'
 import { defineMessages } from 'react-intl'
 
@@ -66,13 +66,21 @@ const initialValues = {
   frequency_plan_ids: [''],
   name: '',
   require_authenticated_connection: false,
+  schedule_anytime_delay: '0.530s',
   gateway_server_address: gsEnabled ? new URL(gsBaseURL).hostname : '',
   _create_api_key_cups: false,
   _create_api_key_lns: false,
 }
 
 const GatewayRegistrationFormSections = () => {
-  const { values } = useFormikContext()
+  const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
+
+  // Register hidden fields so they don't get cleaned.
+  useEffect(() => {
+    const hiddenField = ['gateway_server_address', 'enforce_duty_cycle', 'schedule_anytime_delay']
+    addToFieldRegistry(...hiddenField)
+    return () => removeFromFieldRegistry(...hiddenField)
+  }, [addToFieldRegistry, removeFromFieldRegistry])
 
   return (
     <>
@@ -82,6 +90,7 @@ const GatewayRegistrationFormSections = () => {
         placeholder={sharedMessages.gatewayIdPlaceholder}
         component={Input}
         tooltipId={tooltipIds.GATEWAY_ID}
+        autoFocus
         required
       />
       <Form.Field

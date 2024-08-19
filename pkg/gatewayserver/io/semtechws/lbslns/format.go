@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 )
 
@@ -30,7 +29,6 @@ var (
 
 type lbsLNS struct {
 	maxRoundTripDelay time.Duration
-	tokens            io.DownlinkTokens
 }
 
 // NewFormatter returns a new LoRa Basic Station LNS formatter.

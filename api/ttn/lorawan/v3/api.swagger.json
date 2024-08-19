@@ -25351,6 +25351,16 @@
         }
       }
     },
+    "v3ListEndDevicesRequestFilter": {
+      "type": "object",
+      "properties": {
+        "updated_since": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Filter end devices by fields."
+    },
     "v3ListFrequencyPlansResponse": {
       "type": "object",
       "properties": {
@@ -25362,6 +25372,16 @@
           }
         }
       }
+    },
+    "v3ListGatewaysRequestFilter": {
+      "type": "object",
+      "properties": {
+        "updated_since": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Filter gateways by fields."
     },
     "v3ListNotificationsResponse": {
       "type": "object",

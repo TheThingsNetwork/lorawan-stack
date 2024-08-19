@@ -21,6 +21,7 @@ import (
 	"net"
 	"net/url"
 	"strings"
+	"time"
 
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -301,6 +302,14 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, getPaths, nil)
+
+	if req.Filters != nil {
+		for _, filter := range req.Filters {
+			if _, ok := filter.GetField().(*ttnpb.ListEndDevicesRequest_Filter_UpdatedSince); ok {
+				ctx = store.WithFilter(ctx, "updated_at", filter.GetUpdatedSince().AsTime().Format(time.RFC3339Nano))
+			}
+		}
+	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)

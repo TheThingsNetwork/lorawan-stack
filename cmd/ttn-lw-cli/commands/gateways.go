@@ -146,6 +146,22 @@ var (
 			if req.FieldMask == nil {
 				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
+
+			updatedSince, err := getFilterUpdatedSince(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			if updatedSince != nil {
+				req.Filters = []*ttnpb.ListGatewaysRequest_Filter{
+					{
+						Field: &ttnpb.ListGatewaysRequest_Filter_UpdatedSince{
+							UpdatedSince: ttnpb.ProtoTime(updatedSince),
+						},
+					},
+				}
+			}
+
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
@@ -600,6 +616,7 @@ func init() {
 	AddCollaboratorFlagAlias(gatewaysListCommand.Flags(), "collaborator")
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysListCommand.Flags().AddFlagSet(selectAllGatewayFlags)
+	gatewaysListCommand.Flags().AddFlagSet(filterFlags())
 	gatewaysCommand.AddCommand(gatewaysListCommand)
 	ttnpb.AddSetFlagsForSearchGatewaysRequest(gatewaysSearchCommand.Flags(), "", false)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)

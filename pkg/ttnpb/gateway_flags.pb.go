@@ -941,6 +941,7 @@ func AddSetFlagsForListGatewaysRequest(flags *pflag.FlagSet, prefix string, hidd
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("limit", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("page", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("deleted", prefix), "", flagsplugin.WithHidden(hidden)))
+	// FIXME: Skipping Filters because repeated messages are currently not supported.
 }
 
 // SetFromFlags sets the ListGatewaysRequest message from flags.
@@ -985,6 +986,7 @@ func (m *ListGatewaysRequest) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 		m.Deleted = val
 		paths = append(paths, flagsplugin.Prefix("deleted", prefix))
 	}
+	// FIXME: Skipping Filters because it does not seem to implement AddSetFlags.
 	return paths, nil
 }
 

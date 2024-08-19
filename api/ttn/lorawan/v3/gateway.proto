@@ -569,6 +569,13 @@ message ListGatewaysRequest {
   uint32 page = 5;
   // Only return recently deleted gateways.
   bool deleted = 6;
+  // Filter gateways by fields.
+  message Filter {
+    oneof field {
+      google.protobuf.Timestamp updated_since = 1 [(validate.rules).timestamp.lt_now = true];
+    }
+  }
+  repeated Filter filters = 7;
 }
 
 message CreateGatewayRequest {

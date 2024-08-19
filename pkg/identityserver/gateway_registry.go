@@ -396,6 +396,14 @@ func (is *IdentityServer) listGateways( // nolint:gocyclo
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
 
+	if req.Filters != nil {
+		for _, filter := range req.Filters {
+			if _, ok := filter.GetField().(*ttnpb.ListGatewaysRequest_Filter_UpdatedSince); ok {
+				ctx = store.WithFilter(ctx, "updated_at", filter.GetUpdatedSince().AsTime().Format(time.RFC3339Nano))
+			}
+		}
+	}
+
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
