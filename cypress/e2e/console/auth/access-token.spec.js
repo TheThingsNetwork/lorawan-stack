@@ -31,7 +31,10 @@ describe('Log back in after the session has expired', () => {
 
   it('succeeds showing modal when session context is lost', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}`)
-    cy.get('header').should('be.visible')
+    // Wait until the page is fully loaded.
+    cy.get('#stage').within(() => {
+      cy.findByText('No top entities yet').should('be.visible')
+    })
     // When losing console auth cookie only.
     cy.clearCookie('_console_auth')
     cy.clearLocalStorage()
@@ -56,8 +59,9 @@ describe('Log back in after the session has expired', () => {
 
   it('handles token retrieval correctly when access token was lost', () => {
     cy.visit(Cypress.config('consoleRootPath'))
-    cy.get('header').within(() => {
-      cy.findByText('Dashboard').should('be.visible')
+    // Wait until the page is fully loaded.
+    cy.get('#stage').within(() => {
+      cy.findByText('No top entities yet').should('be.visible')
     })
     cy.intercept('/console/api/auth/token', { statusCode: 403 })
     cy.clearLocalStorage()
@@ -69,8 +73,8 @@ describe('Log back in after the session has expired', () => {
     cy.clearCookie('_console_auth')
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('consoleRootPath'))
-    cy.get('header').within(() => {
-      cy.findByText('Dashboard').should('be.visible')
+    cy.get('#stage').within(() => {
+      cy.findByText('No top entities yet').should('be.visible')
     })
     cy.intercept('/console/api/auth/token', { statusCode: 401 })
     cy.clearLocalStorage()
@@ -82,8 +86,9 @@ describe('Log back in after the session has expired', () => {
 
   it('retrieves new access tokens successfully', () => {
     cy.visit(Cypress.config('consoleRootPath'))
-    cy.get('header').within(() => {
-      cy.findByText('Dashboard').should('be.visible')
+    // Wait until the page is fully loaded.
+    cy.get('#stage').within(() => {
+      cy.findByText('No top entities yet').should('be.visible')
     })
     cy.clearLocalStorage()
     cy.findByRole('link', { name: /Applications/ }).click()
@@ -94,8 +99,9 @@ describe('Log back in after the session has expired', () => {
 
   it('forwards unexpected errors during token retrieval', () => {
     cy.visit(Cypress.config('consoleRootPath'))
-    cy.get('header').within(() => {
-      cy.findByText('Dashboard').should('be.visible')
+    // Wait until the page is fully loaded.
+    cy.get('#stage').within(() => {
+      cy.findByText('No top entities yet').should('be.visible')
     })
     cy.intercept('/console/api/auth/token', { statusCode: 500 })
     cy.clearLocalStorage()

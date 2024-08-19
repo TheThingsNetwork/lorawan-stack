@@ -27,8 +27,8 @@ export TTN_LW_IS_EMAIL_DIR=".dev/email"
 export TTN_LW_IS_EMAIL_PROVIDER="dir"
 export TTN_LW_LOG_LEVEL="debug"
 export TTN_LW_NOC_ACCESS_EXTENDED="true"
-export TTN_LW_PLUGINS_DIRECTORY="./.cache/plugins"
 export TTN_LW_PLUGINS_SOURCE="directory"
+export TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
 `
 
 // Local configuration environment variables
@@ -38,7 +38,6 @@ export TTN_LW_CONSOLE_OAUTH_LOGOUT_URL="http://localhost:8080/oauth/logout"
 export TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
 export TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 export TTN_LW_CONSOLE_UI_AS_BASE_URL="http://localhost:8080/api/v3"
-export TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
 export TTN_LW_CONSOLE_UI_EDTC_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_CONSOLE_UI_GCS_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_CONSOLE_UI_GS_BASE_URL="http://localhost:8080/api/v3"
@@ -47,12 +46,12 @@ export TTN_LW_CONSOLE_UI_JS_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js"
 export TTN_LW_CONSOLE_UI_NS_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_CONSOLE_UI_QRG_BASE_URL="http://localhost:8080/api/v3"
-export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
 export TTN_LW_IS_OAUTH_UI_IS_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js account.js"
 export WEBPACK_DEV_BACKEND_API_PROXY_URL="http://localhost:1885"
 export TTN_LW_CONSOLE_UI_ACCOUNT_URL="http://localhost:8080/oauth"
 export TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth"
+export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
 `
 
 // Branding configuration environment variables
@@ -65,7 +64,6 @@ export TTN_LW_CONSOLE_UI_SLA_INFORMATION_URL="http://example.com"
 export TTN_LW_CONSOLE_UI_SUPPORT_LINK="http://example.com"
 export TTN_LW_CONSOLE_UI_SUPPORT_PLAN_APPLIES="Premium"
 export TTN_LW_CONSOLE_UI_SUPPORT_PLAN_INFORMATION_URL="http://example.com"
-export TTN_LW_CONSOLE_UI_ACCOUNT_URL="${STAGING_URL}/oauth"
 `
 
 // Staging configuration environment variables
@@ -83,13 +81,20 @@ export TTN_LW_CONSOLE_UI_IS_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_CONSOLE_UI_JS_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_CONSOLE_UI_NS_BASE_URL="http://localhost:8080/api/v3"
 export TTN_LW_CONSOLE_UI_QRG_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_NOC_BASE_URL="http://localhost:8080/api/v3"
+export TTN_LW_CONSOLE_UI_NOC_URL="${STAGING_URL}/noc"
 export WEBPACK_DEV_BACKEND_API_PROXY_URL="${STAGING_URL}"
+export TTN_LW_CONSOLE_UI_ACCOUNT_URL="${STAGING_URL}/oauth"
+export TTN_LW_IS_OAUTH_UI_CANONICAL_URL="${STAGING_URL}/oauth"
 `
+
+let envConfig = ''
 
 // Show all environment variables that begin with TTN_LW and WEBPACK_DEV.
 const relevantSetEnvs = Object.entries(process.env).filter(
   ([key]) => key.startsWith('TTN_LW') || key.startsWith('WEBPACK_DEV'),
 )
+
 if (relevantSetEnvs.length > 0) {
   console.log('ℹ️  Current relevant environment variables:')
   console.log(relevantSetEnvs.map(([key, value]) => `${key}=${value}`).join('\n'))
@@ -104,30 +109,33 @@ if (relevantSetEnvs.length > 0) {
     choices: [
       { name: 'Staging', value: 'staging' },
       { name: 'Local', value: 'local' },
+      { name: 'Cypress', value: 'cypress' },
     ],
   })
 
-  const branding = await confirm({
-    message: 'Enable branding?',
-    default: true,
-  })
+  if (environment !== 'cypress') {
+    const branding = await confirm({
+      message: 'Enable branding?',
+      default: true,
+    })
 
-  let envConfig = baseConfig
+    envConfig = baseConfig
 
-  if (branding) {
-    envConfig += brandingConfig
-  }
-
-  if (environment === 'local') {
-    envConfig += localConfig
-  } else if (environment === 'staging') {
-    if (STAGING_URL === '') {
-      console.error(
-        '⛔️ The STAGING_URL environment variable is not set. It needs to be set in order for this config to work.',
-      )
-      process.exit(1)
+    if (branding) {
+      envConfig += brandingConfig
     }
-    envConfig += stagingConfig
+
+    if (environment === 'local') {
+      envConfig += localConfig
+    } else if (environment === 'staging') {
+      if (!STAGING_URL) {
+        console.error(
+          '⛔️ STAGING_URL environment variable is not set. Please set it to the base URL of the staging environment and try again.',
+        )
+        process.exit(1)
+      }
+      envConfig += stagingConfig
+    }
   }
 
   const envVars = envConfig

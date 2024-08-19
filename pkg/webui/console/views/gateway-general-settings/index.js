@@ -37,7 +37,6 @@ import {
   mayEditBasicGatewayInformation,
   mayDeleteGateway,
   mayEditGatewaySecrets,
-  mayPurgeEntities,
   mayViewOrEditGatewayApiKeys,
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'

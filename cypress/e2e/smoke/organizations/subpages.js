@@ -49,5 +49,4 @@ const organizationSubpages = defineSmokeTest('check all organization sub-pages',
   cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
   cy.findByTestId('error-notification').should('not.exist')
 })
-
 export default [organizationSubpages]

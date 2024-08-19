@@ -135,7 +135,7 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByText('Payload crypto override').should('be.visible')
-        cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
+        cy.findByRole('button', { name: /Save changes/ }).should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
         cy.findByRole('button', { name: 'Collapse' }).click()
       })
@@ -151,6 +151,8 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
         cy.findByRole('button', { name: 'Collapse' }).click()
       })
     cy.findByTestId('error-notification').should('not.exist')
+    cy.findByRole('button', { name: /Device overview/ }).click()
+    cy.findByText('General information').parent().should('be.visible')
   })
 })
 

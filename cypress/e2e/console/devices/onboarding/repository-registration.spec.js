@@ -535,6 +535,11 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('End device ID').type(devId3)
         cy.findByLabelText('View registered end device').check()
 
+        cy.intercept(
+          'GET',
+          `/api/v3/dr/applications/abp-test-application/brands/test-brand-abp?field_mask=name`,
+          { brand_id: 'test-brand-abp', name: 'Test Brand ABP' },
+        )
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(

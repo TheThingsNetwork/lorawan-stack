@@ -40,6 +40,7 @@ const {
   PUBLIC_DIR = 'public',
   NODE_ENV = 'production',
   MAGE = 'tools/bin/mage',
+  CI = false,
 } = process.env
 
 const WEBPACK_IS_DEV_SERVER_BUILD = process.env.WEBPACK_IS_DEV_SERVER_BUILD === 'true'
@@ -282,6 +283,7 @@ export default {
     all: [
       new webpack.EnvironmentPlugin({
         NODE_ENV,
+        CI,
         VERSION: version,
         REVISION: revision,
         ADDITIONAL_CONFIG: JSON.stringify(ADDITIONAL_CONFIG),

@@ -80,9 +80,9 @@ describe('Payload formatters', () => {
         join_eui: '0000000000000006',
         device_id: 'device-all-components',
       },
-      network_server_address: 'localhost',
-      application_server_address: 'localhost',
-      join_server_address: 'localhost',
+      network_server_address: window.location.hostname,
+      application_server_address: window.location.hostname,
+      join_server_address: window.location.hostname,
     },
     field_mask: {
       paths: ['network_server_address', 'application_server_address', 'join_server_address'],

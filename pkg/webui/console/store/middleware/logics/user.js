@@ -77,6 +77,7 @@ const updateUserLogic = createRequestLogic({
 
 const deleteUserLogic = createRequestLogic({
   type: user.DELETE_USER,
+  debounce: 250,
   process: async ({ action, getState }) => {
     const userId =
       'payload' in action && action.payload.id ? action.payload.id : selectUserId(getState())
