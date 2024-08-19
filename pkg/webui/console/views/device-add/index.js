@@ -47,7 +47,7 @@ const DeviceAdd = () => {
     'apps.single.devices.add',
     <Breadcrumb
       path={`/applications/${appId}/devices/add`}
-      content={sharedMessages.registerGateway}
+      content={sharedMessages.registerEndDevice}
     />,
   )
 

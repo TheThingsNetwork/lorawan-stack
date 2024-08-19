@@ -47,6 +47,8 @@ const m = defineMessages({
   noResultsSuggestion: 'Try searching for IDs names, attributes, EUIs or descriptions of:',
   devices: 'End devices of your{lineBreak}bookmarked applications',
   searchingEntities: 'Searching applications, gateways, organizations, bookmarks',
+  searchingApps: 'Searching applications',
+  chooseApplication: 'Choose an application for the new end device',
   instructions: 'Use {arrowKeys} to choose, {enter} to select',
   fetchingTopEntities: 'Fetching top entities…',
   noTopEntities: 'Seems like you haven’t interacted with any entities yet',
@@ -85,6 +87,8 @@ const SearchPanel = ({
   searchResultsFetching,
   topEntitiesFetching,
   searchQuery,
+  selectPath,
+  scope,
 }) => {
   const listRef = useRef()
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -93,6 +97,11 @@ const SearchPanel = ({
   const { formatMessage } = useIntl()
   const lastQuery = useRef('')
   const isTopEntitiesMode = debouncedQuery === ''
+  const isScoped = Boolean(scope)
+  const showApplications = !isScoped || scope === APPLICATION
+  const showGateways = !isScoped || scope === GATEWAY
+  const showOrganizations = !isScoped || scope === ORGANIZATION
+  const showDevices = !isScoped || scope === END_DEVICE
 
   let items
 
@@ -181,7 +190,12 @@ const SearchPanel = ({
 
   return (
     <div className={classNames(style.container, { 'pos-static': inline })}>
-      <div className="d-flex p-vert-cs-m p-sides-cs-xl gap-cs-s al-center">
+      <div
+        className={classNames('d-flex pt-cs-m p-sides-cs-xl gap-cs-s al-center', {
+          'pb-0': isScoped,
+          'pt-cs-m': !isScoped,
+        })}
+      >
         <Icon className="c-icon-neutral-normal" icon={IconSearch} />
         <input
           className={style.input}
@@ -225,18 +239,26 @@ const SearchPanel = ({
                   <Message content={m.noResultsSuggestion} />
                 </p>
                 <ul>
-                  <li>
-                    <Message content={sharedMessages.applications} />
-                  </li>
-                  <li>
-                    <Message content={sharedMessages.gateways} />
-                  </li>
-                  <li>
-                    <Message content={sharedMessages.organizations} />
-                  </li>
-                  <li>
-                    <Message content={m.devices} values={{ lineBreak: <br /> }} />
-                  </li>
+                  {showApplications && (
+                    <li>
+                      <Message content={sharedMessages.applications} />
+                    </li>
+                  )}
+                  {showGateways && (
+                    <li>
+                      <Message content={sharedMessages.gateways} />
+                    </li>
+                  )}
+                  {showOrganizations && (
+                    <li>
+                      <Message content={sharedMessages.organizations} />
+                    </li>
+                  )}
+                  {showDevices && (
+                    <li>
+                      <Message content={m.devices} values={{ lineBreak: <br /> }} />
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
@@ -244,9 +266,16 @@ const SearchPanel = ({
           {items.reduce((acc, item, index) => {
             if (item.items.length > 0) {
               acc.push(
-                <div className={style.resultHeader} key={`header-${index}`}>
-                  <Message content={categoryMap[item.category].title} />
-                </div>,
+                scope === APPLICATION ? (
+                  <Message
+                    content={m.chooseApplication}
+                    className="d-block w-full fs-s text-center c-text-neutral-light mb-cs-m"
+                  />
+                ) : (
+                  <div className={style.resultHeader} key={`header-${index}`}>
+                    <Message content={categoryMap[item.category].title} />
+                  </div>
+                ),
               )
               item.items.forEach(subitem => {
                 acc.push(
@@ -257,7 +286,7 @@ const SearchPanel = ({
                     key={subitem.id}
                     isFocused={i === selectedIndex}
                     index={i++}
-                    path={subitem.path}
+                    path={selectPath ? `${subitem.path}${selectPath}` : subitem.path}
                     onClick={onClose}
                     onMouseEnter={setSelectedIndex}
                   />,
@@ -284,7 +313,10 @@ const SearchPanel = ({
           />
         </div>
         <div>
-          <Message content={m.searchingEntities} component="span" />
+          <Message
+            content={scope === APPLICATION ? m.searchingApps : m.searchingEntities}
+            component="span"
+          />
         </div>
       </div>
     </div>
@@ -296,6 +328,7 @@ SearchPanel.propTypes = {
   onClose: PropTypes.func.isRequired,
   onQueryChange: PropTypes.func.isRequired,
   onSelect: PropTypes.func,
+  scope: PropTypes.entities,
   searchQuery: PropTypes.string.isRequired,
   searchResults: PropTypes.arrayOf(
     PropTypes.shape({
@@ -304,6 +337,7 @@ SearchPanel.propTypes = {
     }),
   ).isRequired,
   searchResultsFetching: PropTypes.bool.isRequired,
+  selectPath: PropTypes.string,
   topEntities: PropTypes.arrayOf(
     PropTypes.shape({
       category: PropTypes.string.isRequired,
@@ -317,6 +351,8 @@ SearchPanel.propTypes = {
 SearchPanel.defaultProps = {
   inline: false,
   onSelect: () => null,
+  scope: undefined,
+  selectPath: '',
 }
 
 export default SearchPanel

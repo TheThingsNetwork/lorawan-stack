@@ -479,6 +479,7 @@ export default defineMessages({
   redirecting: 'Redirecting…',
   refresh: 'Refresh',
   registerEndDevice: 'Register end device',
+  registerDeviceInApplication: 'Register end device in an application',
   registerGateway: 'Register gateway',
   remove: 'Remove',
   removeCollaborator: 'Remove collaborator',

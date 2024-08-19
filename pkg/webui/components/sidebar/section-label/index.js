@@ -14,7 +14,9 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { APPLICATION, END_DEVICE } from '@console/constants/entities'
 
 import { IconApplication, IconDevice, IconGateway, IconOrganization } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -32,10 +34,22 @@ import {
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
 
-import { selectUser } from '@console/store/selectors/user'
+import { setSearchOpen, setSearchScope } from '@console/store/actions/search'
 
-const SectionLabel = ({ label, icon, className, buttonDisabled, 'data-test-id': dataTestId }) => {
+import { selectUser } from '@console/store/selectors/user'
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+
+const SectionLabel = ({
+  label,
+  icon,
+  className,
+  buttonDisabled,
+  type,
+  'data-test-id': dataTestId,
+}) => {
+  const dispatch = useDispatch()
   const user = useSelector(selectUser)
+  const appId = useSelector(selectSelectedApplicationId)
   const mayViewApps = useSelector(state =>
     user ? checkFromState(mayViewApplications, state) : false,
   )
@@ -43,6 +57,11 @@ const SectionLabel = ({ label, icon, className, buttonDisabled, 'data-test-id': 
   const mayViewOrgs = useSelector(state =>
     user ? checkFromState(mayViewOrganizationsOfUser, state) : false,
   )
+
+  const handleRegisterDeviceClick = React.useCallback(() => {
+    dispatch(setSearchScope(APPLICATION))
+    dispatch(setSearchOpen(true))
+  }, [dispatch])
 
   const plusDropdownItems = (
     <>
@@ -65,9 +84,14 @@ const SectionLabel = ({ label, icon, className, buttonDisabled, 'data-test-id': 
       )}
 
       <Dropdown.Item
-        title="Register end device in application"
+        title={
+          type === END_DEVICE
+            ? sharedMessages.registerEndDevice
+            : sharedMessages.registerDeviceInApplication
+        }
         icon={IconDevice}
-        path="/devices/add"
+        path={type === END_DEVICE ? `/applications/${appId}/devices/add` : undefined}
+        action={type === END_DEVICE ? undefined : handleRegisterDeviceClick}
       />
     </>
   )
@@ -106,12 +130,14 @@ SectionLabel.propTypes = {
   'data-test-id': PropTypes.string,
   icon: PropTypes.icon.isRequired,
   label: PropTypes.oneOfType([PropTypes.node, PropTypes.message]).isRequired,
+  type: PropTypes.string,
 }
 
 SectionLabel.defaultProps = {
   buttonDisabled: false,
   className: undefined,
   'data-test-id': 'section-label',
+  type: undefined,
 }
 
 export default SectionLabel

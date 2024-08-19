@@ -19,6 +19,9 @@ import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actio
 export const SET_SEARCH_OPEN = 'SET_SEARCH_OPEN'
 export const setSearchOpen = createAction(SET_SEARCH_OPEN, searchOpen => ({ searchOpen }))
 
+export const SET_SEARCH_SCOPE = 'SET_SEARCH_SCOPE'
+export const setSearchScope = createAction(SET_SEARCH_SCOPE, scope => ({ scope }))
+
 export const GET_GLOBAL_SEARCH_RESULTS_BASE = 'GET_GLOBAL_SEARCH_RESULTS'
 export const [
   {
