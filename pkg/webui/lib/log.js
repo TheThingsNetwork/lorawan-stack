@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
 
 /* eslint-disable no-console */
 
-import dev from './dev'
+import dev, { ci } from './dev'
 
 export const warn = (...args) => {
-  if (dev) {
+  if (dev || ci) {
     console.warn(...args)
   }
 }
 
 export const error = (...args) => {
-  if (dev) {
+  if (dev || ci) {
     console.warn(...args)
   }
 }
 
 const log = (...args) => {
-  if (dev) {
+  if (dev || ci) {
     console.log(...args)
   }
 }
