@@ -196,3 +196,38 @@ func ComputeLegacyDownlinkMIC(key types.AES128Key, addr types.DevAddr, fCnt uint
 func ComputeDownlinkMIC(key types.AES128Key, addr types.DevAddr, confFCnt uint32, fCnt uint32, payload []byte) ([4]byte, error) {
 	return computeMIC(key, 1, uint16(confFCnt), addr, fCnt, payload)
 }
+
+// ComputeDownlinkMICA computes the Downlink Message Integrity Code A Scheme.
+// - The payload contains MHDR | FHDR | FPort | FRMPayload
+// - The SNwkSIntKey is used.
+func ComputeDownlinkMICA(
+	key types.AES128Key,
+	ivHeader uint8,
+	txDrUp uint8,
+	txChUp uint8,
+	cnt uint16,
+	addr types.DevAddr,
+	fCnt uint32,
+	payload []byte,
+) ([4]byte, error) {
+	hash, _ := cmac.New(key[:])
+	var aa [aes.BlockSize]byte
+	aa[0] = ivHeader
+	aa[3] = txDrUp
+	aa[4] = txChUp
+	binary.LittleEndian.PutUint16(aa[5:7], cnt)
+	copy(aa[7:11], reverse(addr[:]))
+	binary.LittleEndian.PutUint32(aa[11:15], fCnt)
+	aa[15] = uint8(len(payload))
+	_, err := hash.Write(aa[:])
+	if err != nil {
+		return [4]byte{}, err
+	}
+	_, err = hash.Write(payload)
+	if err != nil {
+		return [4]byte{}, err
+	}
+	var mic [4]byte
+	copy(mic[:], hash.Sum([]byte{}))
+	return mic, nil
+}

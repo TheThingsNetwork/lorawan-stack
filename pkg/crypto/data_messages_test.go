@@ -84,4 +84,8 @@ func TestUplinkDownlinkMIC(t *testing.T) {
 	mic, err = ComputeDownlinkMIC(key, addr, 0, 1, payloadWithoutMIC)
 	a.So(err, should.BeNil)
 	a.So(mic, should.Equal, [4]byte{0xA5, 0x60, 0x9F, 0xA9})
+
+	mic, err = ComputeDownlinkMICA(key, 0x4A, 0, 0, 0, addr, 1, payloadWithoutMIC)
+	a.So(err, should.BeNil)
+	a.So(mic, should.Equal, [4]byte{0x66, 0x5F, 0x21, 0x35})
 }
