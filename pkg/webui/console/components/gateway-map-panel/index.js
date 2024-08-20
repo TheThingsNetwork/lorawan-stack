@@ -23,8 +23,6 @@ import locationToMarkers from '@console/lib/location-to-markers'
 
 import MapPanel from '../map-panel'
 
-import style from './gateway-map-panel.styl'
-
 const GatewayMapPanel = ({ gateway }) => {
   const { gateway_id } = gateway.ids
 
@@ -43,7 +41,6 @@ const GatewayMapPanel = ({ gateway }) => {
       markers={markers}
       entity={GATEWAY}
       locationLink={locationLink}
-      className={style.gatewayMapPanel}
     />
   )
 }
