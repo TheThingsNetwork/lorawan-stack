@@ -50,14 +50,11 @@ const collaborators = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         entities: {
-          ...payload.entities.reduce(
-            (acc, col) => {
-              const id = getCollaboratorId(col)
-              acc[id] = collaborator(state.entities[id], col)
-              return acc
-            },
-            { ...state.entities },
-          ),
+          ...payload.entities.reduce((acc, col) => {
+            const id = getCollaboratorId(col)
+            acc[id] = collaborator(state.entities[id], col)
+            return acc
+          }, {}),
         },
         totalCount: payload.totalCount,
       }

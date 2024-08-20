@@ -121,7 +121,7 @@ const GatewayOnboardingForm = props => {
   )
 
   const handleClaimSubmit = useCallback(
-    async ({ _ownerId }, { ids, ...cleanValues }) => {
+    async ({ _ownerId }, { ids, ...cleanValues }, inputMethod) => {
       const collaboratorType = _ownerId ? (_ownerId === userId ? 'user' : 'organization') : 'user'
 
       try {
@@ -138,7 +138,7 @@ const GatewayOnboardingForm = props => {
           ),
         )
 
-        onSuccess(cleanValues.target_gateway_id)
+        onSuccess(cleanValues.target_gateway_id, inputMethod === 'managed')
       } catch (error) {
         setError(error)
       }
@@ -149,7 +149,7 @@ const GatewayOnboardingForm = props => {
   const handleSubmit = useCallback(
     ({ _inputMethod, ...values }, _, cleanValues) => {
       if (_inputMethod !== 'register') {
-        return handleClaimSubmit(values, cleanValues)
+        return handleClaimSubmit(values, cleanValues, _inputMethod)
       }
       return handleRegistrationSubmit(values, cleanValues)
     },

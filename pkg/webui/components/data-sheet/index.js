@@ -73,7 +73,8 @@ DataSheet.defaultProps = {
 }
 
 const DataSheetSection = ({ dataLength, group, index }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const hasHeader = Boolean(group.header)
+  const [isOpen, setIsOpen] = useState(!hasHeader)
 
   const toggleOpen = useCallback(() => {
     setIsOpen(prevOpen => !prevOpen)
@@ -81,10 +82,12 @@ const DataSheetSection = ({ dataLength, group, index }) => {
 
   return (
     <div>
-      <div className={style.dataSheetHeader} onClick={toggleOpen}>
-        <Message content={group.header} />
-        <Icon icon={isOpen ? IconChevronUp : IconChevronDown} className={style.icon} />
-      </div>
+      {Boolean(group.header) && (
+        <div className={style.dataSheetHeader} onClick={toggleOpen}>
+          <Message content={group.header} />
+          <Icon icon={isOpen ? IconChevronUp : IconChevronDown} className={style.icon} />
+        </div>
+      )}
       <div
         className={classnames({
           [style.dataSheetSectionCollapsed]: !isOpen,

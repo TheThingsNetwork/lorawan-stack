@@ -35,6 +35,7 @@ import GatewayData from '@console/views/gateway-data'
 import GatewayGeneralSettings from '@console/views/gateway-general-settings'
 import GatewayApiKeys from '@console/views/gateway-api-keys'
 import GatewayOverview from '@console/views/gateway-overview'
+import GatewayManagedGateway from '@console/views/gateway-managed-gateway'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
@@ -120,6 +121,7 @@ const GatewayInner = () => {
       <GatewayOverviewHeader gateway={gateway} />
       <Routes>
         <Route index Component={GatewayOverview} />
+        <Route path="managed-gateway/*" Component={GatewayManagedGateway} />
         <Route path="api-keys/*" Component={GatewayApiKeys} />
         <Route path="collaborators/*" Component={GatewayCollaborators} />
         <Route path="location" Component={GatewayLocation} />

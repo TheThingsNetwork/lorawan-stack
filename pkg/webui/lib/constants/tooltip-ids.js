@@ -26,6 +26,7 @@ export default Object.freeze({
   CLASS_B_TIMEOUT: 'class-b-timeout',
   CLASS_C_TIMEOUT: 'class-c-timeout',
   CLASSES: 'classes',
+  CLAIM_AUTH_CODE: 'claim-auth-code',
   DATA_RATE_OFFSET: 'data-rate-offset',
   DEV_EUI: 'deveui',
   DEVICE_ADDRESS: 'device-address',
@@ -54,6 +55,8 @@ export default Object.freeze({
   GATEWAY_STATUS_PUBLIC: 'gateway-status-public',
   GATEWAY_GENERATE_API_KEY_CUPS: 'gateway-generate-api-key-cups',
   GATEWAY_GENERATE_API_KEY_LNS: 'gateway-generate-api-key-lns',
+  GATEWAY_SHOW_PROFILES: 'gateway-show-profiles',
+  GATEWAY_SETTINGS_PROFILE: 'gateway-settings-profile',
   JOIN_EUI: 'joineui',
   JOIN_SERVER: 'join-server',
   LORA_CLOUD_MODEM_ENCODING: 'lora-cloud-modem-encoding',
@@ -85,4 +88,5 @@ export default Object.freeze({
   INPUT_METHOD: 'input-method',
   USE_DEFAULT_NB_TRANS: 'use-default-nb-trans',
   DATA_RATE_SPECIFIC_OVERRIDES: 'data-rate-specific-overrides',
+  DEFAULT_NETWORK_INTERFACE: 'default-network-interface',
 })

@@ -104,8 +104,13 @@ const GatewayProvisioningFormSection = () => {
 
     try {
       if (!hasEmptyEui) {
-        const { supports_claiming } = await dispatch(attachPromise(getGatewayClaimInfoByEui(eui)))
-        setFieldValue('_inputMethod', supports_claiming ? 'claim' : 'register')
+        const { supports_claiming, is_managed } = await dispatch(
+          attachPromise(getGatewayClaimInfoByEui(eui)),
+        )
+        setFieldValue(
+          '_inputMethod',
+          is_managed ? 'managed' : supports_claiming ? 'claim' : 'register',
+        )
       } else {
         // Gateways without Gateway EUI cannot be claimed.
         setFieldValue('_inputMethod', 'register')
@@ -191,7 +196,7 @@ const GatewayProvisioningFormSection = () => {
           />
         )}
       </Form.Field>
-      {inputMethod === 'claim' && <GatewayClaimFormSection />}
+      {(inputMethod === 'claim' || inputMethod === 'managed') && <GatewayClaimFormSection />}
       {inputMethod === 'register' && <GatewayRegistrationFormSection />}
       {statusElement}
     </>

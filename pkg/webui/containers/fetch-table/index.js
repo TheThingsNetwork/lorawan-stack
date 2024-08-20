@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { orderBy as lodashOrderBy } from 'lodash'
 import { useLocation } from 'react-router-dom'
 import Query from 'query-string'
+import classNames from 'classnames'
 
 import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
@@ -85,6 +86,7 @@ const FetchTable = props => {
     className,
     headerClassName,
     panelStyle,
+    filtersClassName,
   } = props
 
   const location = useLocation()
@@ -242,6 +244,10 @@ const FetchTable = props => {
     ? lodashOrderBy(items, i => getByPath(i, orderBy), [orderDirection])
     : items
 
+  const filtersCls = classNames(filtersClassName, style.filters, {
+    [style.topRule]: tabs.length > 0,
+  })
+
   // Go back to page 1 when no items are left on the current page.
   useEffect(() => {
     if (preparedItems.length === 0 && page > 1 && !initialFetch) {
@@ -252,7 +258,7 @@ const FetchTable = props => {
   return (
     <div data-test-id={`${entity}-table`}>
       {(tabs.length > 0 || tableTitle || actionItems || mayAdd || searchable) && (
-        <div className={style.filters}>
+        <div className={filtersCls}>
           <div className={style.filtersLeft}>
             {tabs.length > 0 ? (
               <Tabs
@@ -344,6 +350,7 @@ FetchTable.propTypes = {
   clickable: PropTypes.bool,
   defaultOrder: PropTypes.string,
   entity: PropTypes.string.isRequired,
+  filtersClassName: PropTypes.string,
   getItemPathPrefix: PropTypes.func,
   getItemsAction: PropTypes.func.isRequired,
   handlesPagination: PropTypes.bool,
@@ -402,6 +409,7 @@ FetchTable.defaultProps = {
   defaultOrder: undefined,
   headerClassName: undefined,
   panelStyle: false,
+  filtersClassName: undefined,
 }
 
 export default FetchTable

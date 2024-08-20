@@ -3934,16 +3934,16 @@
   },
   "error:pkg/deviceclaimingserver/gateways/ttgc:dial_gateway_server": {
     "translations": {
-      "en": "dial Gateway Gerver"
+      "en": "dial Gateway Gerver `{address}`"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/gateways/ttgc",
       "file": "root_ca.go"
     }
   },
-  "error:pkg/deviceclaimingserver/gateways/ttgc:gateway_server_tls": {
+  "error:pkg/deviceclaimingserver/gateways/ttgc:verify_gateway_server_tls": {
     "translations": {
-      "en": "establish TLS connection with Gateway Server"
+      "en": "verify TLS server certificate of Gateway Server `{address}`"
     },
     "description": {
       "package": "pkg/deviceclaimingserver/gateways/ttgc",
