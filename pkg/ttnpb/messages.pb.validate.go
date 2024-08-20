@@ -1536,7 +1536,14 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 		case "f_cnt":
 			// no validation rules for FCnt
 		case "frm_payload":
-			// no validation rules for FrmPayload
+
+			if len(m.GetFrmPayload()) > 255 {
+				return ApplicationDownlinkValidationError{
+					field:  "frm_payload",
+					reason: "value length must be at most 255 bytes",
+				}
+			}
+
 		case "decoded_payload":
 
 			if v, ok := interface{}(m.GetDecodedPayload()).(interface{ ValidateFields(...string) error }); ok {
