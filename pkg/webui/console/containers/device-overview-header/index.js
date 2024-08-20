@@ -340,13 +340,112 @@ const DeviceOverviewHeader = ({ device }) => {
   )
 
   return (
-    <div className={style.root} data-test-id="device-overview-header">
-      <div className="overflow-hidden d-flex flex-column gap-cs-xs">
-        <h5 className={style.name}>{name || device_id}</h5>
-        <span className={style.id}>
-          <Message className={style.idPrefix} content={sharedMessages.id} uppercase />
-          {device_id}
-        </span>
+    <>
+      <div className={style.root} data-test-id="device-overview-header">
+        <div className="overflow-hidden d-flex flex-column gap-cs-xs">
+          <h5 className={style.name}>{name || device_id}</h5>
+          <span className={style.id}>
+            <Message className={style.idPrefix} content={sharedMessages.id} uppercase />
+            {device_id}
+          </span>
+        </div>
+        <div className="d-inline-flex h-full al-center gap-cs-m flex-wrap">
+          <div className="d-flex al-center gap-cs-xxs md-lg:d-none">
+            {showLastSeen ? (
+              <DocTooltip
+                docPath="/reference/last-activity"
+                content={
+                  <Message
+                    content={m.lastSeenAvailableTooltip}
+                    values={{ lineBreak, lastActivityInfo }}
+                  />
+                }
+              >
+                <div className="d-inline-flex al-center gap-cs-xxs">
+                  <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
+                  <LastSeen lastSeen={lastSeen} className="c-text-neutral-semilight" />
+                </div>
+              </DocTooltip>
+            ) : (
+              <DocTooltip
+                docPath="/devices/troubleshooting/#my-device-wont-join-what-do-i-do"
+                docTitle={sharedMessages.troubleshooting}
+                content={<Message content={m.noActivityTooltip} />}
+              >
+                <div className="d-inline-flex al-center gap-cs-xxs">
+                  <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
+                  <Status status="mediocre" label={sharedMessages.noActivityYet} />
+                </div>
+              </DocTooltip>
+            )}
+          </div>
+          <div className="d-flex al-center gap-cs-xxs md-lg:d-none">
+            <Tooltip
+              content={
+                <Message
+                  content={m.uplinkDownlinkTooltip}
+                  values={{ break: <br /> }}
+                  convertBackticks
+                />
+              }
+            >
+              <div className="d-flex al-center gap-cs-xxs">
+                <Icon small className="c-text-neutral-semilight" icon={IconArrowsSort} />
+                <Message
+                  component="span"
+                  content={sharedMessages.upAndDown}
+                  className="c-text-neutral-semilight"
+                  values={{
+                    up: uplinkValue,
+                    down: downlinkValue,
+                  }}
+                />
+              </div>
+            </Tooltip>
+          </div>
+          <div className={classnames(style.divider, 'md-lg:d-none')} />
+          <div className="d-inline-flex al-center gap-cs-xxs">
+            <Button
+              secondary
+              icon={!isBookmarked ? IconStar : IconStarFilled}
+              onClick={handleAddToBookmark}
+              disabled={
+                (!isBookmarked && addBookmarkLoading) || (isBookmarked && deleteBookmarkLoading)
+              }
+            />
+            <Button
+              secondary
+              icon={IconMenu2}
+              noDropdownIcon
+              dropdownItems={menuDropdownItems}
+              dropdownPosition="below left"
+              data-test-id="device-header-menu"
+            />
+          </div>
+          <DeviceDeleteModal
+            visible={deleteDeviceVisible}
+            handleComplete={onDeviceDelete}
+            buttonMessage={
+              supportsClaiming ? sharedMessages.unclaimAndDeleteDevice : sharedMessages.deleteDevice
+            }
+            message={sharedMessages.deleteWarning}
+            deviceId={name ?? device_id}
+          />
+          <DeviceDownloadMacDataModal
+            visible={downloadMacDataVisible}
+            handleComplete={onExport}
+            message={
+              session
+                ? {
+                    values: { b: msg => <b>{msg}</b> },
+                    ...m.sensitiveDataWarning,
+                  }
+                : {
+                    ...m.noSessionWarning,
+                  }
+            }
+          />
+        </div>
       </div>
       <div className={classnames(style.mobileDetails, 'd-none md-lg:d-flex')}>
         <div className="d-flex al-center gap-cs-xxs">
@@ -403,7 +502,7 @@ const DeviceOverviewHeader = ({ device }) => {
           </Tooltip>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
