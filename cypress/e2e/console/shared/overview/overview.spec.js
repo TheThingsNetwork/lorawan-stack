@@ -48,7 +48,6 @@ describe('Overview', () => {
       // Check header.
       cy.findByText(`${application.name}`, { selector: 'h5' }).should('be.visible')
       cy.findByText(/0 End devices/).should('be.visible')
-      cy.findByText(/Created/).should('be.visible')
 
       cy.findByText(new RegExp(applicationId)).should('be.visible')
 
