@@ -14,16 +14,27 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { defineMessages } from 'react-intl'
 
-import { IconStar, IconPlus, IconInbox, IconMenu2 } from '@ttn-lw/components/icon'
-import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
+import {
+  IconStar,
+  IconPlus,
+  IconInbox,
+  IconMenu2,
+  IconLayoutSidebarLeftExpand,
+} from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
 
 import AppStatusBadge from '@console/containers/app-status-badge'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './header.styl'
+
+const m = defineMessages({
+  tooltipMinimize: 'Keep sidebar open',
+})
 
 const Header = ({
   brandLogo,
@@ -38,16 +49,43 @@ const Header = ({
   onMenuClick,
   showNotificationDot,
   alwaysShowLogo,
+  isSidebarMinimized,
+  toggleSidebarMinimized,
+  expandSidebar,
+  handleHideSidebar,
   ...rest
 }) => (
-  <header {...rest} className={classnames(className, style.container)} id="header">
+  <header
+    {...rest}
+    className={classnames(className, style.container, {
+      [style.containerMinimized]: isSidebarMinimized,
+    })}
+    id="header"
+  >
     {alwaysShowLogo ? (
       <div className="d-flex al-center gap-cs-xs">
         <Logo className={style.logo} />
       </div>
     ) : (
       <>
-        <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
+        <div className="d-flex j-start al-center gap-cs-s lg-xl:d-none">
+          {isSidebarMinimized && (
+            <>
+              <Button
+                className="md-lg:d-none"
+                icon={IconLayoutSidebarLeftExpand}
+                onClick={toggleSidebarMinimized}
+                naked
+                tooltip={m.tooltipMinimize}
+                tooltipPlacement="right"
+                onMouseEnter={expandSidebar}
+                onMouseLeave={handleHideSidebar}
+              />
+              <div className={style.divider} />
+            </>
+          )}
+          <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
+        </div>
         <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
           <Button secondary icon={IconMenu2} onClick={onMenuClick} />
           <Logo className={style.logo} />
@@ -111,6 +149,12 @@ Header.propTypes = {
   brandLogo: imgPropType,
   /** The classname applied to the component. */
   className: PropTypes.string,
+  /** A handler for when the sidebar is expanded. */
+  expandSidebar: PropTypes.func.isRequired,
+  /** A handler for when the sidebar is hidden. */
+  handleHideSidebar: PropTypes.func,
+  /** Whether the sidebar is minimized. */
+  isSidebarMinimized: PropTypes.bool.isRequired,
   /** The dropdown items when the notifications button is clicked. */
   notificationsDropdownItems: PropTypes.node,
   /** A handler for when the menu button is clicked. */
@@ -121,6 +165,9 @@ Header.propTypes = {
   safe: PropTypes.bool,
   /** Whether to show a notification dot. */
   showNotificationDot: PropTypes.bool,
+  toggleSidebarMinimized: PropTypes.func.isRequired,
+  /** The message to show in the un-minimize tooltip. */
+  tooltipMessage: PropTypes.message.isRequired,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
    * guest header is rendered.
@@ -140,6 +187,7 @@ Header.defaultProps = {
   notificationsDropdownItems: undefined,
   profileDropdownItems: undefined,
   onMenuClick: () => null,
+  handleHideSidebar: () => null,
 }
 
 export default Header

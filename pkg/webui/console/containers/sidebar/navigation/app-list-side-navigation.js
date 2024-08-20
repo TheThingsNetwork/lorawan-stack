@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 
 import { APPLICATION } from '@console/constants/entities'
 
 import { selectApplicationTopEntities } from '@console/store/selectors/top-entities'
 
-import SidebarContext from '../context'
-
 import TopEntitiesSection from './top-entities-section'
 
 const AppListSideNavigation = () => {
   const topEntities = useSelector(selectApplicationTopEntities)
-  const { isMinimized } = useContext(SidebarContext)
 
-  if (isMinimized || topEntities.length === 0) {
+  if (topEntities.length === 0) {
     // Rendering an empty div to prevent the shadow of the search bar
     // from being cut off. There will be a default element rendering
     // here in the future anyway.

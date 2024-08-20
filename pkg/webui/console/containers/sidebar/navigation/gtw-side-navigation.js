@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
@@ -49,8 +49,6 @@ import {
 } from '@console/store/selectors/gateways'
 import { selectGatewayTopEntities } from '@console/store/selectors/top-entities'
 
-import SidebarContext from '../context'
-
 import TopEntitiesSection from './top-entities-section'
 
 const m = defineMessages({
@@ -61,7 +59,6 @@ const GtwSideNavigation = () => {
   const gtw = useSelector(selectSelectedGateway)
   const gtwId = useSelector(selectSelectedGatewayId)
   const rights = useSelector(selectGatewayRights)
-  const { isMinimized } = useContext(SidebarContext)
   const gtwPageSize = getCookie('gateways-list-page-size')
   const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
   const topEntities = useSelector(selectGatewayTopEntities)
@@ -75,15 +72,13 @@ const GtwSideNavigation = () => {
   return (
     <>
       <SideNavigation>
-        {!isMinimized && (
-          <DedicatedEntity
-            label={entityId}
-            buttonMessage={m.buttonMessage}
-            className="mt-cs-xs mb-cs-l"
-            backPath={`/gateways${gtwParam}`}
-            path={`/gateways/${gtwId}`}
-          />
-        )}
+        <DedicatedEntity
+          label={entityId}
+          buttonMessage={m.buttonMessage}
+          className="mt-cs-xs mb-cs-l"
+          backPath={`/gateways${gtwParam}`}
+          path={`/gateways/${gtwId}`}
+        />
         {mayViewGatewayInfo.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.gatewayOverview}
@@ -128,7 +123,7 @@ const GtwSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && mayViewGatewayInfo.check(rights) && (
+      {mayViewGatewayInfo.check(rights) && (
         <TopEntitiesSection topEntities={topEntities} type={GATEWAY} />
       )}
     </>

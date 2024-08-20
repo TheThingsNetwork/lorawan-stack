@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef, useContext } from 'react'
+import React, { useRef } from 'react'
 import classnames from 'classnames'
-
-import SidebarContext from '@console/containers/sidebar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -26,11 +24,8 @@ import style from './side.styl'
 
 const SideNavigation = ({ className, children }) => {
   const node = useRef()
-  const { isMinimized } = useContext(SidebarContext)
 
-  const navigationClassNames = classnames(className, style.navigation, {
-    [style.isMinimized]: isMinimized,
-  })
+  const navigationClassNames = classnames(className, style.navigation)
 
   return (
     <nav className={navigationClassNames} ref={node} data-test-id="navigation-sidebar">

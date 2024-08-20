@@ -43,6 +43,7 @@
   "components.form.index.submitFailed": "Submit failed",
   "components.form.section.index.expand": "Expand section",
   "components.form.section.index.collapse": "Collapse section",
+  "components.header.index.tooltipMinimize": "Keep sidebar open",
   "components.input.generate.generate": "Generate",
   "components.input.index.showValue": "Show value",
   "components.input.index.hideValue": "Hide value",

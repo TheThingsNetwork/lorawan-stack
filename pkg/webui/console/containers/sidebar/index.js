@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import classnames from 'classnames'
 import { useDispatch } from 'react-redux'
@@ -21,8 +21,6 @@ import LAYOUT from '@ttn-lw/constants/layout'
 
 import SearchButton from '@ttn-lw/components/sidebar/search-button'
 import SideFooter from '@ttn-lw/components/sidebar/side-footer'
-
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { setSearchOpen } from '@console/store/actions/search'
 
@@ -35,10 +33,52 @@ import SwitcherContainer from './switcher'
 
 import style from './sidebar.styl'
 
-const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
+const Sidebar = () => {
   const { pathname } = useLocation()
-  const [isMinimized, setIsMinimized] = useState(false)
+  const {
+    setIsMinimized,
+    isMinimized,
+    setIsDrawerOpen,
+    closeDrawer,
+    isDrawerOpen,
+    isHovered,
+    setIsHovered,
+  } = useContext(SidebarContext)
   const dispatch = useDispatch()
+  const node = React.useRef()
+
+  const handleMouseMove = useCallback(
+    e => {
+      if (e.clientX <= 20 && isMinimized) {
+        // If the mouse is within 20px of the left edge
+        setIsDrawerOpen(true)
+      } else if (e.clientX >= 550 && isMinimized) {
+        // If the mouse is within 300px of the sidebar
+        setIsDrawerOpen(false)
+      }
+    },
+    [isMinimized, setIsDrawerOpen],
+  )
+
+  useEffect(() => {
+    const onClickOutside = e => {
+      if (isDrawerOpen && node.current && !node.current.contains(e.target)) {
+        closeDrawer()
+      }
+    }
+
+    if (isMinimized) {
+      document.addEventListener('mousemove', handleMouseMove)
+      return () => document.removeEventListener('mousemove', handleMouseMove)
+    }
+
+    if (isDrawerOpen) {
+      document.addEventListener('mousedown', onClickOutside)
+      return () => document.removeEventListener('mousedown', onClickOutside)
+    }
+  }, [isDrawerOpen, isMinimized, handleMouseMove, closeDrawer])
+
+  // End of mobile side menu drawer functionality
 
   // Reset minimized state when screen size changes to mobile.
   useEffect(() => {
@@ -53,52 +93,67 @@ const Sidebar = ({ isDrawerOpen, onDrawerCloseClick }) => {
     return () => window.removeEventListener('resize', handleResize)
   }, [setIsMinimized])
 
-  // Close the drawer on navigation changes.
   useEffect(() => {
-    onDrawerCloseClick()
-  }, [pathname, onDrawerCloseClick])
+    let timer
+    if (!isHovered && isMinimized && isDrawerOpen) {
+      timer = setTimeout(() => {
+        closeDrawer()
+      }, 800)
+    }
+    return () => clearTimeout(timer)
+  }, [isHovered, isDrawerOpen, isMinimized, closeDrawer])
 
-  const onMinimizeToggle = useCallback(async () => {
-    setIsMinimized(prev => !prev)
-  }, [setIsMinimized])
+  // Close the drawer on navigation changes after a small delay.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      closeDrawer()
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [closeDrawer, pathname])
 
   const handleSearchClick = useCallback(() => {
     dispatch(setSearchOpen(true))
   }, [dispatch])
 
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true)
+  }, [setIsHovered])
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false)
+  }, [setIsHovered])
+
   const sidebarClassnames = classnames(
     style.sidebar,
-    'd-flex direction-column j-between c-bg-brand-extralight gap-cs-l',
+    'd-flex direction-column j-between c-bg-brand-extralight gap-cs-l p-cs-m',
     {
       [style.sidebarMinimized]: isMinimized,
       [style.sidebarOpen]: isDrawerOpen,
-      'p-cs-m': !isMinimized,
-      'pt-cs-m pb-cs-xs p-sides-cs-xs': isMinimized,
     },
   )
 
   return (
     <>
-      <SidebarContext.Provider value={{ onMinimizeToggle, isMinimized, onDrawerCloseClick }}>
-        <div className={sidebarClassnames} id="sidebar">
-          <SideHeader />
-          <div className="d-flex direction-column gap-cs-m">
-            <SwitcherContainer />
-            <SearchButton onClick={handleSearchClick} />
-          </div>
-          <SidebarNavigation />
-          <SideFooter />
+      <div
+        className={sidebarClassnames}
+        id="sidebar"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        ref={node}
+      >
+        <SideHeader />
+        <div className="d-flex direction-column gap-cs-m">
+          <SwitcherContainer />
+          <SearchButton onClick={handleSearchClick} />
         </div>
-      </SidebarContext.Provider>
-      <div className={style.sidebarBackdrop} onClick={onDrawerCloseClick} />
+        <SidebarNavigation />
+        <SideFooter />
+      </div>
+      <div className={style.sidebarBackdrop} onClick={closeDrawer} />
       <SearchPanelManager />
     </>
   )
-}
-
-Sidebar.propTypes = {
-  isDrawerOpen: PropTypes.bool.isRequired,
-  onDrawerCloseClick: PropTypes.func.isRequired,
 }
 
 export default Sidebar

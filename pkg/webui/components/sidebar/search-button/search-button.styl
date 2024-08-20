@@ -34,16 +34,6 @@
     color: var(--c-text-neutral-min-hover)
     box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, .08)
 
-  &.is-minimized
-    justify-content: center
-    padding: $cs.xs $cs.xxs
-
-    & > div p
-      display: none
-
-    .keyboard-key
-      display: none
-
   p
     line-height: 1.4
 
@@ -64,8 +54,3 @@
     justify-content: center
     align-items: center
     padding: 0 $cs.xxs
-
-.fly-out-list
-  --dropdown-offset: calc(.75rem - 3px)
-  top: - $cs.xs
-  color: var(--c-text-neutral-heavy)

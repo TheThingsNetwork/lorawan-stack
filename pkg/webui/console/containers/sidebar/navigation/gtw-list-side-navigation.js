@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 
 import { GATEWAY } from '@console/constants/entities'
@@ -23,8 +23,6 @@ import useBookmark from '@ttn-lw/lib/hooks/use-bookmark'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { selectGatewayTopEntities } from '@console/store/selectors/top-entities'
-
-import SidebarContext from '../context'
 
 import TopEntitiesSection from './top-entities-section'
 
@@ -40,9 +38,8 @@ Bookmark.propTypes = {
 
 const GtwListSideNavigation = () => {
   const topEntities = useSelector(selectGatewayTopEntities)
-  const { isMinimized } = useContext(SidebarContext)
 
-  if (isMinimized || topEntities.length === 0) {
+  if (topEntities.length === 0) {
     return <div />
   }
 

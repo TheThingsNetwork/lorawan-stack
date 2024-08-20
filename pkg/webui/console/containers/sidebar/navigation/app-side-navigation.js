@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useContext } from 'react'
+import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
@@ -63,8 +63,6 @@ import {
 } from '@console/store/selectors/application-server'
 import { selectEndDeviceTopEntities } from '@console/store/selectors/top-entities'
 
-import SidebarContext from '../context'
-
 import TopEntitiesSection from './top-entities-section'
 
 const m = defineMessages({
@@ -77,7 +75,6 @@ const AppSideNavigation = () => {
   const rights = useSelector(selectApplicationRights)
   const natsDisabled = useSelector(selectNatsProviderDisabled)
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
-  const { isMinimized } = useContext(SidebarContext)
   const appPageSize = getCookie('applications-list-page-size')
   const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
   const topEntityFilter = useCallback(e => e.id.startsWith(appId), [appId])
@@ -92,15 +89,13 @@ const AppSideNavigation = () => {
   return (
     <>
       <SideNavigation>
-        {!isMinimized && (
-          <DedicatedEntity
-            label={entityId}
-            buttonMessage={m.buttonMessage}
-            className="mt-cs-xs mb-cs-l"
-            path={`/applications/${appId}`}
-            backPath={`/applications${appParam}`}
-          />
-        )}
+        <DedicatedEntity
+          label={entityId}
+          buttonMessage={m.buttonMessage}
+          className="mt-cs-xs mb-cs-l"
+          path={`/applications/${appId}`}
+          backPath={`/applications${appParam}`}
+        />
         {mayViewApplicationInfo.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.appOverview}
@@ -124,11 +119,7 @@ const AppSideNavigation = () => {
           />
         )}
         {maySetApplicationPayloadFormatters.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.payloadFormatters}
-            icon={IconPayloadFormat}
-            isMinimized={isMinimized}
-          >
+          <SideNavigation.Item title={sharedMessages.payloadFormatters} icon={IconPayloadFormat}>
             <SideNavigation.Item
               title={sharedMessages.uplink}
               path={`/applications/${appId}/payload-formatters/uplink`}
@@ -142,11 +133,7 @@ const AppSideNavigation = () => {
           </SideNavigation.Item>
         )}
         {mayCreateOrEditApplicationIntegrations.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.integrations}
-            icon={IconIntegration}
-            isMinimized={isMinimized}
-          >
+          <SideNavigation.Item title={sharedMessages.integrations} icon={IconIntegration}>
             <SideNavigation.Item
               title={sharedMessages.mqtt}
               path={`/applications/${appId}/integrations/mqtt`}
@@ -195,7 +182,7 @@ const AppSideNavigation = () => {
           />
         )}
       </SideNavigation>
-      {!isMinimized && mayViewApplicationInfo.check(rights) && (
+      {mayViewApplicationInfo.check(rights) && (
         <TopEntitiesSection topEntities={topEntities} type={END_DEVICE} />
       )}
     </>

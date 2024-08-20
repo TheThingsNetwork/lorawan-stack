@@ -113,6 +113,8 @@ const Button = forwardRef((props, ref) => {
     portalledDropdown,
     tooltip,
     tooltipPlacement,
+    onMouseEnter,
+    onMouseLeave,
     ...rest
   } = props
   const innerRef = useRef()
@@ -151,6 +153,8 @@ const Button = forwardRef((props, ref) => {
       children={buttonChildren({ ...props })}
       disabled={busy || disabled}
       ref={combinedRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       {...htmlProps}
     />
   )
@@ -190,6 +194,7 @@ const Button = forwardRef((props, ref) => {
 
 Button.defaultProps = {
   onClick: () => null,
+  onMouseEnter: () => null,
   onBlur: undefined,
 }
 
@@ -344,12 +349,14 @@ Button.propTypes = {
    * Not called if the button is in the `busy` or `disabled` state.
    */
   onClick: PropTypes.func,
+  onMouseEnter: PropTypes.func,
   portalledDropdown: PropTypes.bool,
   ...commonPropTypes,
 }
 
 Button.defaultProps = {
   onClick: () => null,
+  onMouseEnter: () => null,
   portalledDropdown: false,
 }
 

@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useContext, useRef } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
-import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
-
-import SidebarContext from '@console/containers/sidebar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -29,33 +26,20 @@ import style from './item.styl'
 
 const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
   const ref = useRef()
-  const { isMinimized } = useContext(SidebarContext)
 
   const className = useCallback(
     ({ isActive }) =>
       classnames(style.link, style.container, {
         [style.active]: isActive,
         [style.disabled]: disabled,
-        [style.isMinimized]: isMinimized,
       }),
-    [disabled, isMinimized],
+    [disabled],
   )
 
   return (
     <NavLink to={path} className={className} end={exact} onClick={onClick} ref={ref}>
       {icon && <Icon icon={icon} className={classnames(style.icon)} />}{' '}
       <Message className={style.title} content={title} />
-      {isMinimized && (
-        <Dropdown.Attached
-          attachedRef={ref}
-          className={style.flyOutList}
-          position="right"
-          hover
-          portalled
-        >
-          <Dropdown.HeaderItem title={title.defaultMessage} />
-        </Dropdown.Attached>
-      )}
     </NavLink>
   )
 }

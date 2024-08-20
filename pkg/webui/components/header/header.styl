@@ -16,13 +16,16 @@
   padding: 0 $cs.m
   background: var(--c-bg-brand-extralight)
   z-index: $zi.nav
-  border-bottom: 1px solid var(--c-border-neutral-extralight)
   display: flex
   justify-content: space-between
   align-items: center
   height: 4rem
+  border-normal('bottom')
   +media-query($bp.xs)
     padding: 0 $cs.xs
+
+  &-minimized
+    z-index: $zi.mobile-menu + 1
 
   .notifications-dropdown
     max-width: 31rem
@@ -38,3 +41,8 @@
   height: $cs.l
   +media-query($bp.xs)
     width: 3rem
+
+.divider
+  height: 2.5rem
+  width: 1px
+  background: var(--c-border-neutral-light)

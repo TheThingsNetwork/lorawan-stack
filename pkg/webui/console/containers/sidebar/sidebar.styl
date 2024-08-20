@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+$sidebar-width = 22rem
+
 .sidebar
   border-normal(right)
-  height: 100vh
   line-height: 1
   font-size: $fs.s
-  min-width: 22rem
-  max-width: 24rem
+  width: $sidebar-width
+  flex-shrink: 0
+  flex-grow: 0
   box-sizing: border-box
-  sidebar-transition(min-width)
+  left: 0
+  sidebar-transition(left)
   +media-query($bp.lg-xl)
-    transition: left .4s cubic-bezier(.22, .005, .295, 1)
     position: absolute
     top: 0
     left: -90vw
@@ -33,7 +35,6 @@
     z-index: $zi.mobile-menu
 
     &-open
-      transition: left .6s cubic-bezier(.165, .84, .44, 1)
       left: 0
 
       & + .sidebar-backdrop
@@ -41,7 +42,7 @@
         visibility: visible
 
   &-backdrop
-    transition: opacity .4s ease-in-out, visibility .4s ease-in-out
+    transition: opacity .3s ease-in-out, visibility .3s ease-in-out
     opacity: 0
     visibility: hidden
     position: fixed
@@ -50,11 +51,21 @@
     bottom: 0
     right: 0
     background: rgba(0, 0, 0, .7)
-    z-index: 1
+    z-index: $zi.mobile-menu - 1
     cursor: pointer
 
   &-minimized
-    +media-query-min($bp.lg-xl)
-      width: 4.5rem
-      min-width: initial
-      max-width: initial
+    position: absolute
+    top: 3.8rem
+    left: - $sidebar-width
+    bottom: 0
+    height: calc(100vh - 3.8rem)
+    z-index: $zi.mobile-menu
+
+  &-open&.sidebar-minimized
+    left: 0
+    box-shadow: 0 0 2rem 0 rgba(0,0,0,.05)
+
+    & + .sidebar-backdrop
+      opacity: .05
+      visibility: visible

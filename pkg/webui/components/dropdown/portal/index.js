@@ -12,21 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import DOM from 'react-dom'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import combineRefs from '@ttn-lw/lib/combine-refs'
 
 // This component create a portal to render children into a different part of the DOM.
-const Portal = ({ children, visible, positionReference }) => {
+const Portal = ({ children, visible, setOpen, positionReference }) => {
   const [buttonPosition, setButtonPosition] = React.useState()
+  const attachedRef = useRef()
+  const buttonRef = combineRefs([positionReference.current, attachedRef])
 
   useEffect(() => {
-    if (positionReference.current && visible) {
+    if (positionReference && visible) {
       const rect = positionReference.current.getBoundingClientRect()
       setButtonPosition(rect)
     }
   }, [positionReference, visible])
+
+  // Recreate the event listeners.
+  useEffect(() => {
+    if (!attachedRef.current) {
+      return
+    }
+    const node = attachedRef.current
+    const toggleDropdown = () => {
+      // Add escape key event listener to close the dropdown
+      setOpen(val => !val)
+    }
+    const closeDropdown = () => setOpen(false)
+
+    node.addEventListener('mouseenter', toggleDropdown)
+    node.addEventListener('mouseleave', closeDropdown)
+    return () => {
+      node.removeEventListener('mouseenter', toggleDropdown)
+      node.removeEventListener('mouseleave', closeDropdown)
+    }
+  }, [attachedRef, visible, setOpen])
 
   if (!buttonPosition) {
     return null
@@ -43,7 +66,7 @@ const Portal = ({ children, visible, positionReference }) => {
           minWidth: '100%',
           minHeight: '100%',
         }}
-        ref={positionReference.current}
+        ref={buttonRef}
       >
         {/* Simulate button to allow for the dropdown positioning logic to work correctly */}
         <div
@@ -70,6 +93,7 @@ Portal.propTypes = {
       getBoundingClientRect: PropTypes.func,
     }),
   }).isRequired,
+  setOpen: PropTypes.func.isRequired,
   visible: PropTypes.bool.isRequired,
 }
 

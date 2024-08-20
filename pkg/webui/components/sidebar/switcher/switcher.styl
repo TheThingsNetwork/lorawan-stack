@@ -43,25 +43,7 @@
       &:not(.active)
         background: var(--c-bg-neutral-light)
 
-  &.is-minimized
-    flex-direction: column
-
-    .link
-      padding: $cs.xs 0
-
-    .caption
-      display: none
-
-  &:not(.is-minimized)
-    .icon
-      display: none
-
   .icon
+    display: none
     font-size: $fs.xl
     font-weight: 300
-
-.fly-out-list
-  position: relative
-  --dropdown-offset: calc(.75rem - (-1px))
-  top: - $cs.xs
-  color: var(--c-text-neutral-heavy)

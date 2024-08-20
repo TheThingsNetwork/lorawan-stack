@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { APPLICATION } from '@console/constants/entities'
@@ -49,12 +49,21 @@ import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import Logo from '../logo'
+import SidebarContext from '../sidebar/context'
 
 import NotificationsDropdown from './notifications-dropdown'
 import BookmarksDropdown from './bookmarks-dropdown'
 
-const Header = ({ onMenuClick, alwaysShowLogo }) => {
+const Header = ({ alwaysShowLogo }) => {
   const dispatch = useDispatch()
+  const {
+    isMinimized,
+    onMinimizeToggle,
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer,
+    setIsHovered: setIsSideBarHovered,
+  } = useContext(SidebarContext)
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
   const user = useSelector(selectUser)
@@ -67,6 +76,14 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
   )
   const isAdmin = useSelector(selectUserIsAdmin)
   const hasUnseenNotifications = useSelector(selectTotalUnseenCount) > 0
+
+  const onDrawerExpandClick = useCallback(() => {
+    if (!isDrawerOpen) {
+      openDrawer()
+    } else {
+      closeDrawer()
+    }
+  }, [isDrawerOpen, openDrawer, closeDrawer])
 
   const handleRegisterEndDeviceClick = useCallback(() => {
     dispatch(setSearchScope(APPLICATION))
@@ -141,8 +158,19 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
       }
     : undefined
 
+  const handleExpandSidebar = useCallback(() => {
+    onDrawerExpandClick()
+    setIsSideBarHovered(true)
+  }, [onDrawerExpandClick, setIsSideBarHovered])
+
+  const handleHideSidebar = useCallback(() => {
+    setIsSideBarHovered(false)
+  }, [setIsSideBarHovered])
+
   return (
     <HeaderComponent
+      isSidebarMinimized={isMinimized}
+      toggleSidebarMinimized={onMinimizeToggle}
       user={user}
       profileDropdownItems={dropdownItems}
       addDropdownItems={plusDropdownItems}
@@ -150,16 +178,17 @@ const Header = ({ onMenuClick, alwaysShowLogo }) => {
       notificationsDropdownItems={<NotificationsDropdown />}
       brandLogo={brandLogo}
       Logo={Logo}
-      onMenuClick={onMenuClick}
+      onMenuClick={onDrawerExpandClick}
       showNotificationDot={hasUnseenNotifications}
       alwaysShowLogo={alwaysShowLogo}
+      expandSidebar={handleExpandSidebar}
+      handleHideSidebar={handleHideSidebar}
     />
   )
 }
 
 Header.propTypes = {
   alwaysShowLogo: PropTypes.bool,
-  onMenuClick: PropTypes.func.isRequired,
 }
 
 Header.defaultProps = {

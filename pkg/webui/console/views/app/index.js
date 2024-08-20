@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Route,
@@ -43,6 +43,7 @@ import LogBackInModal from '@console/containers/log-back-in-modal'
 import Sidebar from '@console/containers/sidebar'
 import EventSplitFrameContext from '@console/containers/event-split-frame/context'
 import Logo from '@console/containers/logo'
+import { SidebarContextProvider } from '@console/containers/sidebar/context'
 
 import OverviewRoutes from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -104,43 +105,6 @@ const Layout = () => {
     isActive,
   } = useContext(EventSplitFrameContext)
 
-  // For the mobile side menu drawer functionality.
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const node = useRef()
-
-  const openDrawer = useCallback(() => {
-    setIsDrawerOpen(true)
-    document.body.classList.add(style.scrollLock)
-  }, [])
-
-  const closeDrawer = useCallback(() => {
-    setIsDrawerOpen(false)
-    document.body.classList.remove(style.scrollLock)
-  }, [])
-
-  useEffect(() => {
-    const onClickOutside = e => {
-      if (isDrawerOpen && node.current && !node.current.contains(e.target)) {
-        closeDrawer()
-      }
-    }
-
-    if (isDrawerOpen) {
-      document.addEventListener('mousedown', onClickOutside)
-      return () => document.removeEventListener('mousedown', onClickOutside)
-    }
-  }, [isDrawerOpen, closeDrawer])
-
-  // Pass this function to the header prop `onMenuClick`.
-  const onDrawerExpandClick = useCallback(() => {
-    if (!isDrawerOpen) {
-      openDrawer()
-    } else {
-      closeDrawer()
-    }
-  }, [isDrawerOpen, openDrawer, closeDrawer])
-  // End of mobile side menu drawer functionality
-
   useEffect(() => {
     if (main.current) {
       main.current.scrollTop = 0
@@ -159,49 +123,47 @@ const Layout = () => {
           <div id="modal-container" />
           <div id="dropdown-container" className="pos-absolute-container" />
           <div className="d-flex">
-            <Sidebar
-              isDrawerOpen={isDrawerOpen}
-              onDrawerCloseClick={closeDrawer}
-              paddingBottom={splitFrameHeight}
-            />
-            <div className="w-full h-vh d-flex direction-column">
-              <Header onMenuClick={onDrawerExpandClick} />
-              <main
-                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
-                ref={main}
-              >
-                <WithAuth
-                  user={user}
-                  fetching={fetching}
-                  error={error}
-                  errorComponent={FullViewErrorInner}
-                  rights={rights}
-                  isAdmin={isAdmin}
+            <SidebarContextProvider>
+              <Sidebar />
+              <div className="w-full h-vh d-flex direction-column">
+                <Header />
+                <main
+                  className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+                  ref={main}
                 >
-                  <div className={style.content}>
-                    <div
-                      className={style.stage}
-                      id="stage"
-                      style={{ paddingBottom: splitFrameHeight }}
-                    >
-                      <Outlet />
-                    </div>
-                    {isMounted && isActive && !isOpen && (
-                      <div className={style.openButton}>
-                        <Button
-                          icon={IconLayoutBottombarExpand}
-                          tooltip={m.expandEventPanel}
-                          tooltipPlacement="left"
-                          onClick={() => setIsOpen(true)}
-                          secondary
-                          small
-                        />
+                  <WithAuth
+                    user={user}
+                    fetching={fetching}
+                    error={error}
+                    errorComponent={FullViewErrorInner}
+                    rights={rights}
+                    isAdmin={isAdmin}
+                  >
+                    <div className={style.content}>
+                      <div
+                        className={style.stage}
+                        id="stage"
+                        style={{ paddingBottom: splitFrameHeight }}
+                      >
+                        <Outlet />
                       </div>
-                    )}
-                  </div>
-                </WithAuth>
-              </main>
-            </div>
+                      {isMounted && isActive && !isOpen && (
+                        <div className={style.openButton}>
+                          <Button
+                            icon={IconLayoutBottombarExpand}
+                            tooltip={m.expandEventPanel}
+                            tooltipPlacement="left"
+                            onClick={() => setIsOpen(true)}
+                            secondary
+                            small
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </WithAuth>
+                </main>
+              </div>
+            </SidebarContextProvider>
           </div>
 
           <div id="split-frame" className={style.splitFrame} />
