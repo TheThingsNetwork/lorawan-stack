@@ -21,7 +21,6 @@ import { APPLICATION } from '@console/constants/entities'
 
 import Icon, {
   IconBroadcast,
-  IconCalendarMonth,
   IconMenu2,
   IconStar,
   IconStarFilled,
@@ -88,7 +87,7 @@ const ApplicationOverviewHeader = () => {
   const [deleteApplicationModalVisible, setDeleteApplicationModalVisible] = useState(false)
 
   const dispatch = useDispatch()
-  const { name, created_at, ids } = useSelector(selectSelectedApplication)
+  const { name, ids } = useSelector(selectSelectedApplication)
   const { application_id } = ids
   const user = useSelector(selectUser)
   const bookmarks = useSelector(selectBookmarksList)
@@ -166,7 +165,7 @@ const ApplicationOverviewHeader = () => {
       )
     }
     return (
-      <div className="d-inline-flex al-center gap-cs-xxs sm:d-none">
+      <div className="d-inline-flex al-center gap-cs-xxs md-lg:d-none">
         <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
         {node}
       </div>
@@ -203,7 +202,7 @@ const ApplicationOverviewHeader = () => {
         {recentActivity}
         {mayViewDevices && (
           <RequireRequest requestAction={getApplicationDeviceCount(application_id)}>
-            <div className="d-inline-flex al-center gap-cs-xxs sm:d-none">
+            <div className="d-inline-flex al-center gap-cs-xxs md-lg:d-none">
               <Icon icon={IconCpu} small className="c-text-neutral-semilight" />
               <Message
                 content={m.deviceCount}
@@ -213,16 +212,7 @@ const ApplicationOverviewHeader = () => {
             </div>
           </RequireRequest>
         )}
-        <div className="d-flex al-center gap-cs-xxs sm:d-none">
-          <Icon small className="c-text-neutral-semilight" icon={IconCalendarMonth} />
-          <LastSeen
-            statusClassName={style.createdAtStatus}
-            message={sharedMessages.created}
-            lastSeen={created_at}
-            className="c-text-neutral-semilight"
-          />
-        </div>
-        <div className={classnames(style.divider, 'sm:d-none')} />
+        <div className={classnames(style.divider, 'md-lg:d-none')} />
         <div className="d-inline-flex al-center gap-cs-xxs">
           <Button
             secondary
