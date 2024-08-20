@@ -20,19 +20,12 @@ import classnames from 'classnames'
 import { GATEWAY } from '@console/constants/entities'
 import tts from '@console/api/tts'
 
-import Icon, {
-  IconCalendarMonth,
-  IconMenu2,
-  IconStar,
-  IconStarFilled,
-} from '@ttn-lw/components/icon'
+import { IconMenu2, IconStar, IconStarFilled } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 import Dropdown from '@ttn-lw/components/dropdown'
 
 import Message from '@ttn-lw/lib/components/message'
-
-import LastSeen from '@console/components/last-seen'
 
 import GatewayConnection from '@console/containers/gateway-connection'
 import DeleteEntityHeaderModal from '@console/containers/delete-entity-header-modal'
@@ -67,7 +60,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
   const [deleteGatewayVisible, setDeleteGatewayVisible] = useState(false)
 
   const dispatch = useDispatch()
-  const { ids, name, created_at } = gateway
+  const { ids, name } = gateway
   const { gateway_id } = ids
   const user = useSelector(selectUser)
   const bookmarks = useSelector(selectBookmarksList)
@@ -144,15 +137,6 @@ const GatewayOverviewHeader = ({ gateway }) => {
       </div>
       <div className="d-inline-flex h-full al-center gap-cs-m flex-wrap">
         <GatewayConnection className="md-lg:d-none" gtwId={gateway_id} />
-        <div className="d-flex al-center gap-cs-xxs md-lg:d-none">
-          <Icon small className="c-text-neutral-semilight" icon={IconCalendarMonth} />
-          <LastSeen
-            statusClassName={style.createdAtStatus}
-            message={sharedMessages.created}
-            lastSeen={created_at}
-            className="c-text-neutral-semilight"
-          />
-        </div>
         <div className={classnames(style.divider, 'md-lg:d-none')} />
         <div className="d-inline-flex al-center gap-cs-xxs">
           <Button
