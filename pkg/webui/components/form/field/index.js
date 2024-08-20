@@ -85,6 +85,7 @@ const FormField = props => {
     required,
     title,
     titleChildren,
+    tooltip,
     tooltipId,
     warning,
     validate,
@@ -189,7 +190,7 @@ const FormField = props => {
 
   const value = decode(encodedValue)
   const disabled = inputDisabled || formDisabled
-  const hasTooltip = Boolean(tooltipId)
+  const hasTooltip = Boolean(tooltipId) || Boolean(tooltip)
   const hasTitle = Boolean(title)
   const showError =
     touched &&
@@ -198,7 +199,9 @@ const FormField = props => {
   const showWarning = !showError && Boolean(warning)
   const error = showError && errors[0]
   const showDescription = !showError && !showWarning && Boolean(description)
-  const tooltipIcon = hasTooltip ? <Tooltip id={tooltipId} glossaryTerm={title} small /> : null
+  const tooltipIcon = hasTooltip ? (
+    <Tooltip id={tooltipId} tooltip={tooltip} glossaryTerm={title} small />
+  ) : null
   const describedBy = showError
     ? `${name}-field-error`
     : showWarning
@@ -305,6 +308,7 @@ FormField.propTypes = {
   required: PropTypes.bool,
   title: PropTypes.message,
   titleChildren: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
+  tooltip: PropTypes.message,
   tooltipId: PropTypes.string,
   validate: PropTypes.func,
   valueSetter: PropTypes.func,
@@ -324,7 +328,8 @@ FormField.defaultProps = {
   required: false,
   title: undefined,
   titleChildren: null,
-  tooltipId: '',
+  tooltip: undefined,
+  tooltipId: undefined,
   validate: undefined,
   valueSetter: defaultValueSetter,
   warning: '',

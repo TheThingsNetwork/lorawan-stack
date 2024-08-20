@@ -1,0 +1,44 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.connection
+  display: inline-flex
+  align-items: center
+  gap: $cs.xxs
+  padding: $cs.xxs $cs.s $cs.xxs $cs.xs
+  font-weight: $fw.bold
+  background-color: var(--c-bg-neutral-light)
+  border-radius: $br.m
+  border-width: 1px
+  border-style: solid
+  border-color: var(--c-border-neutral-semibold)
+
+.connected
+  border-color: var(--c-border-success-normal)
+  background-color: var(--c-bg-success-light)
+
+  span
+    color: $c-success
+
+.notConnected
+  border-color: var(--c-border-error-normal)
+  background-color: var(--c-bg-error-light)
+
+  span
+    color: var(--c-text-error-normal)
+
+.fieldDescription
+  color: var(--c-text-neutral-light)
+  margin-bottom: $cs.m
+  margin-top: - $cs.m

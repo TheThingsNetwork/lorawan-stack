@@ -50,11 +50,21 @@ func NewClient(
 		return nil, err
 	}
 
-	// Add The Things Industries Root CA: the Gateway Controller is only available as hosted service.
-	if tlsConfig.RootCAs == nil {
-		tlsConfig.RootCAs = x509.NewCertPool()
+	// Add The Things Industries Root or Test CA if the Gateway Controller address is the production or staging address.
+	// Otherwise, the root CAs must be configured via global TLS client configuration or system roots.
+	var knownDeploymentPEM []byte
+	switch config.Address {
+	case "gc.thethings.industries:443":
+		knownDeploymentPEM = ttica.RootCA
+	case "gc.thethingslabs.com:443":
+		knownDeploymentPEM = ttica.TestCA
 	}
-	tlsConfig.RootCAs.AppendCertsFromPEM(ttica.RootCA)
+	if knownDeploymentPEM != nil {
+		if tlsConfig.RootCAs == nil {
+			tlsConfig.RootCAs = x509.NewCertPool()
+		}
+		tlsConfig.RootCAs.AppendCertsFromPEM(knownDeploymentPEM)
+	}
 
 	if err := config.TLS.ApplyTo(tlsConfig); err != nil {
 		return nil, err

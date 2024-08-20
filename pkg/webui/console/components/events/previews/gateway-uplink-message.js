@@ -66,7 +66,7 @@ const GatewayUplinkMessagePreview = React.memo(({ event }) => {
       <DescriptionList.Byte title={sharedMessages.devEUI} data={devEui} />
       <DescriptionList.Item title={messages.dataRate} data={dataRate} />
       <DescriptionList.Item title={messages.snr} data={snr} />
-      <DescriptionList.Item title={messages.rssi} data={rssi} />
+      <DescriptionList.Item title={sharedMessages.rssi} data={rssi} />
     </DescriptionList>
   )
 })

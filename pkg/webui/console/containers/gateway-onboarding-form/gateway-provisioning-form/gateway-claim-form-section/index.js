@@ -36,7 +36,7 @@ const { enabled: gsEnabled, base_url: gsBaseURL } = selectGsConfig()
 
 const m = defineMessages({
   claimWarning:
-    'We detected that your gateway is likely a The Things Indoor Gateway that uses gateway claiming. Use the WIFI password printed on the TTIG as claim authentication code below.',
+    'We detected that your gateway is a <strong>Managed Gateway</strong>. To claim this gateway, please use the claim authentication code printed on the inside of the mounting lid or scan the QR code to claim instantly.',
 })
 
 const initialValues = {
@@ -49,25 +49,30 @@ const initialValues = {
   target_gateway_server_address: gsEnabled ? getHostFromUrl(gsBaseURL) : '',
 }
 
-// This is the TrackNet prefix that all TTIGs use.
-const TRACKNET_PREFIX = '58A0CBFFFE'
-
 const GatewayClaimFormSection = () => {
   const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
-  const maybeTTIG = values.ids?.eui?.startsWith(TRACKNET_PREFIX)
+  const isManaged = values._inputMethod === 'managed'
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
-    const hiddenFields = ['target_gateway_server_address', 'cups_redirection']
+    const hiddenFields = ['target_gateway_server_address']
     addToFieldRegistry(...hiddenFields)
     return () => removeFromFieldRegistry(...hiddenFields)
   }, [addToFieldRegistry, removeFromFieldRegistry])
 
   return (
     <>
-      {maybeTTIG && (
+      {isManaged && (
         <Form.InfoField>
-          <Notification small info content={m.claimWarning} messageValues={{ br: <br /> }} />
+          <Notification
+            small
+            info
+            content={m.claimWarning}
+            messageValues={{
+              strong: txt => <strong>{txt}</strong>,
+            }}
+            className="mb-0"
+          />
         </Form.InfoField>
       )}
       <Form.Field

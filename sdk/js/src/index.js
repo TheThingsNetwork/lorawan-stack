@@ -36,6 +36,7 @@ import { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from './util/constants'
 import QRCodeGenerator from './service/qr-code-generator'
 import SearchAccounts from './service/search-accounts'
 import Notifications from './service/notifications'
+import ConnectionProfiles from './service/connection-profiles'
 
 class TTS {
   constructor({ authorization, stackConfig, connectionType, defaultUserId, axiosConfig }) {
@@ -77,6 +78,7 @@ class TTS {
     })
     this.SearchAccounts = new SearchAccounts(this.api)
     this.Notifications = new Notifications(this.api)
+    this.ConnectionProfiles = new ConnectionProfiles(this.api)
 
     this.subscribe = EventHandler.subscribe
     this.unsubscribe = EventHandler.unsubscribe

@@ -80,6 +80,7 @@ import search from './search'
 import sessions from './sessions'
 import authorizations from './authorizations'
 import clients from './clients'
+import connectionProfiles from './connection-profiles'
 
 export default combineReducers({
   user,
@@ -149,4 +150,5 @@ export default combineReducers({
   sessions,
   authorizations,
   clients,
+  connectionProfiles,
 })

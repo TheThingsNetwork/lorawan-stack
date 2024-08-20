@@ -41,7 +41,6 @@ export default (
 
   observableDiff(original, updated, d => {
     const { kind: diffKind, rhs: diffValue, path: diffPath } = d
-    const diffEntry = diffPath[diffPath.length - 1]
 
     // Do not add new entries that are of type `undefined`.
     if (diffKind === 'N' && typeof diffValue === 'undefined') {
@@ -68,9 +67,12 @@ export default (
       return
     }
 
-    if (!exclude.includes(diffEntry)) {
-      applyChange(result, undefined, d)
+    // Check if the entire path or any part of it is in the exclude list
+    if (diffPath.some(segment => exclude.includes(segment))) {
+      return
     }
+
+    applyChange(result, undefined, d)
   })
 
   return result

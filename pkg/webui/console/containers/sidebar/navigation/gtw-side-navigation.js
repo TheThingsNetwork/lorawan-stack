@@ -26,6 +26,9 @@ import {
   IconGeneralSettings,
   IconLiveData,
   IconOrganization,
+  IconRouter,
+  IconAdjustmentsHorizontal,
+  IconWorldCog,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
@@ -46,6 +49,7 @@ import {
   selectSelectedGateway,
   selectSelectedGatewayId,
   selectGatewayRights,
+  selectIsSelectedGatewayManaged,
 } from '@console/store/selectors/gateways'
 import { selectGatewayTopEntities } from '@console/store/selectors/top-entities'
 
@@ -62,6 +66,7 @@ const GtwSideNavigation = () => {
   const gtwPageSize = getCookie('gateways-list-page-size')
   const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
   const topEntities = useSelector(selectGatewayTopEntities)
+  const isGtwManaged = useSelector(selectIsSelectedGatewayManaged)
 
   if (!gtw) {
     return null
@@ -86,6 +91,20 @@ const GtwSideNavigation = () => {
             icon={IconGateway}
             exact
           />
+        )}
+        {isGtwManaged && (
+          <SideNavigation.Item title={sharedMessages.managedGateway} icon={IconRouter}>
+            <SideNavigation.Item
+              title={sharedMessages.connectionSettings}
+              path={`/gateways/${gtwId}/managed-gateway/connection-settings`}
+              icon={IconWorldCog}
+            />
+            <SideNavigation.Item
+              title={sharedMessages.wifiProfiles}
+              path={`/gateways/${gtwId}/managed-gateway/wifi-profiles`}
+              icon={IconAdjustmentsHorizontal}
+            />
+          </SideNavigation.Item>
         )}
         {mayViewGatewayEvents.check(rights) && (
           <SideNavigation.Item

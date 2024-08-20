@@ -44,6 +44,7 @@ import topEntities from './top-entities'
 import sessions from './sessions'
 import authorizations from './authorizations'
 import clients from './clients'
+import connectionProfiles from './connection-profiles'
 
 export default [
   ...status,
@@ -77,4 +78,5 @@ export default [
   ...sessions,
   ...authorizations,
   ...clients,
+  ...connectionProfiles,
 ]

@@ -25,7 +25,6 @@ import style from './details.styl'
 
 const m = defineMessages({
   showDetails: 'Show details',
-  details: 'Details',
   errorDetails: 'Error details',
 })
 
@@ -52,7 +51,7 @@ const Details = props => {
         type="button"
       />
       <PortalledModal
-        title={isError ? m.errorDetails : m.details}
+        title={isError ? m.errorDetails : sharedMessages.details}
         visible={showDetails}
         onComplete={handleModalComplete}
         approval={false}

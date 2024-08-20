@@ -1,0 +1,69 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.root
+  border: 1px solid var(--c-border-neutral-light)
+  border-radius: $br.l
+  box-sizing: border-box
+  padding: $cs.l
+  display: flex
+  flex-direction: column
+  gap: $cs.l
+  max-width: 35rem
+  box-shadow: var(--shadow-box-panel-normal)
+
+  .top
+    border: 1px solid var(--c-border-neutral-light)
+    box-sizing: border-box
+    border-radius: $br.l
+    display: flex
+
+  .img-div
+    background-color: var(--c-bg-neutral-min-hover)
+    border-radius: $br.l 0 0 $br.l
+    border-right: 1px solid var(--c-border-neutral-light)
+    .image
+      object-fit: contain
+      box-sizing: border-box
+      padding: $cs.s
+      height: 6rem
+      width: 10rem
+      opacity: .7
+      filter: grayscale(100%)
+
+  .horizontal-line
+    background-color: var(--c-border-neutral-light)
+
+  .connections
+    border: 1px solid var(--c-border-neutral-light)
+    box-sizing: border-box
+    border-radius: $br.l
+    display: flex
+    flex-direction: column
+    gap: $cs.xxs
+    padding: $cs.s
+
+  .connection
+    padding: 0 $cs.xs 0 $cs.xxs
+    background-color: var(--c-bg-neutral-light)
+    border-radius: $br.m
+
+  .details
+    padding-left: 1.7rem
+
+  .detail
+    & tr:not(:first-child)
+      height: 2rem
+    & th
+      width: 40%
