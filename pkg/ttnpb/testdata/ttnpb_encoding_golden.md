@@ -230,6 +230,7 @@ Binary | ttnpb.MType | UNCONFIRMED_DOWN | [3]
 Binary | ttnpb.MType | UNCONFIRMED_UP | [2]
 Binary | ttnpb.Major | LORAWAN_R1 | [0]
 Binary | ttnpb.Minor | MINOR_1 | [1]
+Binary | ttnpb.Minor | MINOR_2 | [2]
 Binary | ttnpb.Minor | MINOR_RFU_0 | [0]
 Binary | ttnpb.Minor | MINOR_RFU_10 | [10]
 Binary | ttnpb.Minor | MINOR_RFU_11 | [11]
@@ -237,7 +238,6 @@ Binary | ttnpb.Minor | MINOR_RFU_12 | [12]
 Binary | ttnpb.Minor | MINOR_RFU_13 | [13]
 Binary | ttnpb.Minor | MINOR_RFU_14 | [14]
 Binary | ttnpb.Minor | MINOR_RFU_15 | [15]
-Binary | ttnpb.Minor | MINOR_RFU_2 | [2]
 Binary | ttnpb.Minor | MINOR_RFU_3 | [3]
 Binary | ttnpb.Minor | MINOR_RFU_4 | [4]
 Binary | ttnpb.Minor | MINOR_RFU_5 | [5]
@@ -606,6 +606,7 @@ JSON | ttnpb.MType | UNCONFIRMED_DOWN | "UNCONFIRMED_DOWN"
 JSON | ttnpb.MType | UNCONFIRMED_UP | "UNCONFIRMED_UP"
 JSON | ttnpb.Major | LORAWAN_R1 | "LORAWAN_R1"
 JSON | ttnpb.Minor | MINOR_1 | "MINOR_1"
+JSON | ttnpb.Minor | MINOR_2 | "MINOR_2"
 JSON | ttnpb.Minor | MINOR_RFU_0 | "MINOR_RFU_0"
 JSON | ttnpb.Minor | MINOR_RFU_10 | "MINOR_RFU_10"
 JSON | ttnpb.Minor | MINOR_RFU_11 | "MINOR_RFU_11"
@@ -613,7 +614,6 @@ JSON | ttnpb.Minor | MINOR_RFU_12 | "MINOR_RFU_12"
 JSON | ttnpb.Minor | MINOR_RFU_13 | "MINOR_RFU_13"
 JSON | ttnpb.Minor | MINOR_RFU_14 | "MINOR_RFU_14"
 JSON | ttnpb.Minor | MINOR_RFU_15 | "MINOR_RFU_15"
-JSON | ttnpb.Minor | MINOR_RFU_2 | "MINOR_RFU_2"
 JSON | ttnpb.Minor | MINOR_RFU_3 | "MINOR_RFU_3"
 JSON | ttnpb.Minor | MINOR_RFU_4 | "MINOR_RFU_4"
 JSON | ttnpb.Minor | MINOR_RFU_5 | "MINOR_RFU_5"
@@ -1055,6 +1055,7 @@ ProtoJSON | ttnpb.MType | UNCONFIRMED_DOWN | "UNCONFIRMED_DOWN"
 ProtoJSON | ttnpb.MType | UNCONFIRMED_UP | "UNCONFIRMED_UP"
 ProtoJSON | ttnpb.Major | LORAWAN_R1 | "LORAWAN_R1"
 ProtoJSON | ttnpb.Minor | MINOR_1 | "MINOR_1"
+ProtoJSON | ttnpb.Minor | MINOR_2 | "MINOR_2"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_0 | "MINOR_RFU_0"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_10 | "MINOR_RFU_10"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_11 | "MINOR_RFU_11"
@@ -1062,7 +1063,6 @@ ProtoJSON | ttnpb.Minor | MINOR_RFU_12 | "MINOR_RFU_12"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_13 | "MINOR_RFU_13"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_14 | "MINOR_RFU_14"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_15 | "MINOR_RFU_15"
-ProtoJSON | ttnpb.Minor | MINOR_RFU_2 | "MINOR_RFU_2"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_3 | "MINOR_RFU_3"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_4 | "MINOR_RFU_4"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_5 | "MINOR_RFU_5"
@@ -1504,6 +1504,7 @@ Text | ttnpb.MType | UNCONFIRMED_DOWN | UNCONFIRMED_DOWN
 Text | ttnpb.MType | UNCONFIRMED_UP | UNCONFIRMED_UP
 Text | ttnpb.Major | LORAWAN_R1 | LORAWAN_R1
 Text | ttnpb.Minor | MINOR_1 | MINOR_1
+Text | ttnpb.Minor | MINOR_2 | MINOR_2
 Text | ttnpb.Minor | MINOR_RFU_0 | MINOR_RFU_0
 Text | ttnpb.Minor | MINOR_RFU_10 | MINOR_RFU_10
 Text | ttnpb.Minor | MINOR_RFU_11 | MINOR_RFU_11
@@ -1511,7 +1512,6 @@ Text | ttnpb.Minor | MINOR_RFU_12 | MINOR_RFU_12
 Text | ttnpb.Minor | MINOR_RFU_13 | MINOR_RFU_13
 Text | ttnpb.Minor | MINOR_RFU_14 | MINOR_RFU_14
 Text | ttnpb.Minor | MINOR_RFU_15 | MINOR_RFU_15
-Text | ttnpb.Minor | MINOR_RFU_2 | MINOR_RFU_2
 Text | ttnpb.Minor | MINOR_RFU_3 | MINOR_RFU_3
 Text | ttnpb.Minor | MINOR_RFU_4 | MINOR_RFU_4
 Text | ttnpb.Minor | MINOR_RFU_5 | MINOR_RFU_5

@@ -567,6 +567,7 @@
   - [Enum `ADRAckLimitExponent`](#ttn.lorawan.v3.ADRAckLimitExponent)
   - [Enum `AggregatedDutyCycle`](#ttn.lorawan.v3.AggregatedDutyCycle)
   - [Enum `CFListType`](#ttn.lorawan.v3.CFListType)
+  - [Enum `CipherEnum`](#ttn.lorawan.v3.CipherEnum)
   - [Enum `Class`](#ttn.lorawan.v3.Class)
   - [Enum `DataRateIndex`](#ttn.lorawan.v3.DataRateIndex)
   - [Enum `DataRateOffset`](#ttn.lorawan.v3.DataRateOffset)
@@ -7778,24 +7779,28 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `minor_version` | [`Minor`](#ttn.lorawan.v3.Minor) |  |  |
+| `cipher` | [`CipherEnum`](#ttn.lorawan.v3.CipherEnum) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `minor_version` | <p>`enum.defined_only`: `true`</p><p>`enum.in`: `[1]`</p> |
+| `minor_version` | <p>`enum.defined_only`: `true`</p><p>`enum.in`: `[1 2]`</p> |
+| `cipher` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.ResetInd">Message `MACCommand.ResetInd`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `minor_version` | [`Minor`](#ttn.lorawan.v3.Minor) |  |  |
+| `cipher` | [`CipherEnum`](#ttn.lorawan.v3.CipherEnum) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `minor_version` | <p>`enum.defined_only`: `true`</p><p>`enum.in`: `[1]`</p> |
+| `minor_version` | <p>`enum.defined_only`: `true`</p><p>`enum.in`: `[1 2]`</p> |
+| `cipher` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.RxParamSetupAns">Message `MACCommand.RxParamSetupAns`</a>
 
@@ -8208,6 +8213,27 @@ Transmission settings for downlink.
 | `FREQUENCIES` | 0 |  |
 | `CHANNEL_MASKS` | 1 |  |
 
+### <a name="ttn.lorawan.v3.CipherEnum">Enum `CipherEnum`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `CIPHER_0` | 0 |  |
+| `CIPHER_1` | 1 |  |
+| `CIPHER_2` | 2 |  |
+| `CIPHER_3` | 3 |  |
+| `CIPHER_4` | 4 |  |
+| `CIPHER_5` | 5 |  |
+| `CIPHER_6` | 6 |  |
+| `CIPHER_7` | 7 |  |
+| `CIPHER_8` | 8 |  |
+| `CIPHER_9` | 9 |  |
+| `CIPHER_10` | 10 |  |
+| `CIPHER_11` | 11 |  |
+| `CIPHER_12` | 12 |  |
+| `CIPHER_13` | 13 |  |
+| `CIPHER_14` | 14 |  |
+| `CIPHER_15` | 15 |  |
+
 ### <a name="ttn.lorawan.v3.Class">Enum `Class`</a>
 
 | Name | Number | Description |
@@ -8350,7 +8376,7 @@ Transmission settings for downlink.
 | ---- | ------ | ----------- |
 | `MINOR_RFU_0` | 0 |  |
 | `MINOR_1` | 1 |  |
-| `MINOR_RFU_2` | 2 |  |
+| `MINOR_2` | 2 |  |
 | `MINOR_RFU_3` | 3 |  |
 | `MINOR_RFU_4` | 4 |  |
 | `MINOR_RFU_5` | 5 |  |

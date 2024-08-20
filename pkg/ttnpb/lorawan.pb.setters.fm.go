@@ -3586,6 +3586,15 @@ func (dst *MACCommand_ResetInd) SetFields(src *MACCommand_ResetInd, paths ...str
 			} else {
 				dst.MinorVersion = 0
 			}
+		case "cipher":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cipher' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Cipher = src.Cipher
+			} else {
+				dst.Cipher = 0
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -3605,6 +3614,15 @@ func (dst *MACCommand_ResetConf) SetFields(src *MACCommand_ResetConf, paths ...s
 				dst.MinorVersion = src.MinorVersion
 			} else {
 				dst.MinorVersion = 0
+			}
+		case "cipher":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cipher' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Cipher = src.Cipher
+			} else {
+				dst.Cipher = 0
 			}
 
 		default:

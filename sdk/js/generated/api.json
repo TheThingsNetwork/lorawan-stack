@@ -31834,6 +31834,94 @@
           ]
         },
         {
+          "name": "CipherEnum",
+          "longName": "CipherEnum",
+          "fullName": "ttn.lorawan.v3.CipherEnum",
+          "description": "",
+          "values": [
+            {
+              "name": "CIPHER_0",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_1",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_2",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_3",
+              "number": "3",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_4",
+              "number": "4",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_5",
+              "number": "5",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_6",
+              "number": "6",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_7",
+              "number": "7",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_8",
+              "number": "8",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_9",
+              "number": "9",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_10",
+              "number": "10",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_11",
+              "number": "11",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_12",
+              "number": "12",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_13",
+              "number": "13",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_14",
+              "number": "14",
+              "description": ""
+            },
+            {
+              "name": "CIPHER_15",
+              "number": "15",
+              "description": ""
+            }
+          ]
+        },
+        {
           "name": "Class",
           "longName": "Class",
           "fullName": "ttn.lorawan.v3.Class",
@@ -32377,7 +32465,7 @@
               "description": ""
             },
             {
-              "name": "MINOR_RFU_2",
+              "name": "MINOR_2",
               "number": "2",
               "description": ""
             },
@@ -36655,8 +36743,29 @@
                   {
                     "name": "enum.in",
                     "value": [
-                      1
+                      1,
+                      2
                     ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cipher",
+              "description": "",
+              "label": "",
+              "type": "CipherEnum",
+              "longType": "CipherEnum",
+              "fullType": "ttn.lorawan.v3.CipherEnum",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
                   }
                 ]
               }
@@ -36693,8 +36802,29 @@
                   {
                     "name": "enum.in",
                     "value": [
-                      1
+                      1,
+                      2
                     ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cipher",
+              "description": "",
+              "label": "",
+              "type": "CipherEnum",
+              "longType": "CipherEnum",
+              "fullType": "ttn.lorawan.v3.CipherEnum",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
                   }
                 ]
               }

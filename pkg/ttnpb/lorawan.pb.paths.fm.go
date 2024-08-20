@@ -561,8 +561,10 @@ var MACCommandFieldPathsNested = []string{
 	"payload.relay_update_uplink_list_req.session_key_id",
 	"payload.relay_update_uplink_list_req.w_f_cnt",
 	"payload.reset_conf",
+	"payload.reset_conf.cipher",
 	"payload.reset_conf.minor_version",
 	"payload.reset_ind",
+	"payload.reset_ind.cipher",
 	"payload.reset_ind.minor_version",
 	"payload.rx_param_setup_ans",
 	"payload.rx_param_setup_ans.rx1_data_rate_offset_ack",
@@ -725,17 +727,21 @@ var TxSettings_DownlinkFieldPathsTopLevel = []string{
 	"tx_power",
 }
 var MACCommand_ResetIndFieldPathsNested = []string{
+	"cipher",
 	"minor_version",
 }
 
 var MACCommand_ResetIndFieldPathsTopLevel = []string{
+	"cipher",
 	"minor_version",
 }
 var MACCommand_ResetConfFieldPathsNested = []string{
+	"cipher",
 	"minor_version",
 }
 
 var MACCommand_ResetConfFieldPathsTopLevel = []string{
+	"cipher",
 	"minor_version",
 }
 var MACCommand_LinkCheckAnsFieldPathsNested = []string{

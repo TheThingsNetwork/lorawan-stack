@@ -1492,7 +1492,7 @@ func (x Minor) MarshalJSON() ([]byte, error) {
 var Minor_customvalue = map[string]int32{
 	"RFU_0":  0,
 	"1":      1,
-	"RFU_2":  2,
+	"2":      2,
 	"RFU_3":  3,
 	"RFU_4":  4,
 	"RFU_5":  5,
@@ -1530,6 +1530,66 @@ func (x *Minor) UnmarshalText(b []byte) error {
 
 // UnmarshalJSON unmarshals the Minor from JSON.
 func (x *Minor) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the CipherEnum to JSON.
+func (x CipherEnum) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), CipherEnum_name)
+}
+
+// MarshalText marshals the CipherEnum to text.
+func (x CipherEnum) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), CipherEnum_name)), nil
+}
+
+// MarshalJSON marshals the CipherEnum to JSON.
+func (x CipherEnum) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// CipherEnum_customvalue contains custom string values that extend CipherEnum_value.
+var CipherEnum_customvalue = map[string]int32{
+	"0":  0,
+	"1":  1,
+	"2":  2,
+	"3":  3,
+	"4":  4,
+	"5":  5,
+	"6":  6,
+	"7":  7,
+	"8":  8,
+	"9":  9,
+	"10": 10,
+	"11": 11,
+	"12": 12,
+	"13": 13,
+	"14": 14,
+	"15": 15,
+}
+
+// UnmarshalProtoJSON unmarshals the CipherEnum from JSON.
+func (x *CipherEnum) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(CipherEnum_value, CipherEnum_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read CipherEnum enum: %v", err)
+		return
+	}
+	*x = CipherEnum(v)
+}
+
+// UnmarshalText unmarshals the CipherEnum from text.
+func (x *CipherEnum) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), CipherEnum_customvalue, CipherEnum_value)
+	if err != nil {
+		return err
+	}
+	*x = CipherEnum(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the CipherEnum from JSON.
+func (x *CipherEnum) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -2885,6 +2945,11 @@ func (x *MACCommand_ResetInd) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("minor_version")
 		x.MinorVersion.MarshalProtoJSON(s)
 	}
+	if x.Cipher != 0 || s.HasField("cipher") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cipher")
+		x.Cipher.MarshalProtoJSON(s)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -2905,6 +2970,9 @@ func (x *MACCommand_ResetInd) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "minor_version", "minorVersion":
 			s.AddField("minor_version")
 			x.MinorVersion.UnmarshalProtoJSON(s)
+		case "cipher":
+			s.AddField("cipher")
+			x.Cipher.UnmarshalProtoJSON(s)
 		}
 	})
 }
@@ -2927,6 +2995,11 @@ func (x *MACCommand_ResetConf) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("minor_version")
 		x.MinorVersion.MarshalProtoJSON(s)
 	}
+	if x.Cipher != 0 || s.HasField("cipher") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cipher")
+		x.Cipher.MarshalProtoJSON(s)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -2947,6 +3020,9 @@ func (x *MACCommand_ResetConf) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 		case "minor_version", "minorVersion":
 			s.AddField("minor_version")
 			x.MinorVersion.UnmarshalProtoJSON(s)
+		case "cipher":
+			s.AddField("cipher")
+			x.Cipher.UnmarshalProtoJSON(s)
 		}
 	})
 }

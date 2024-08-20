@@ -5148,13 +5148,22 @@ func (m *MACCommand_ResetInd) ValidateFields(paths ...string) error {
 			if _, ok := _MACCommand_ResetInd_MinorVersion_InLookup[m.GetMinorVersion()]; !ok {
 				return MACCommand_ResetIndValidationError{
 					field:  "minor_version",
-					reason: "value must be in list [1]",
+					reason: "value must be in list [1 2]",
 				}
 			}
 
 			if _, ok := Minor_name[int32(m.GetMinorVersion())]; !ok {
 				return MACCommand_ResetIndValidationError{
 					field:  "minor_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "cipher":
+
+			if _, ok := CipherEnum_name[int32(m.GetCipher())]; !ok {
+				return MACCommand_ResetIndValidationError{
+					field:  "cipher",
 					reason: "value must be one of the defined enum values",
 				}
 			}
@@ -5227,6 +5236,7 @@ var _ interface {
 
 var _MACCommand_ResetInd_MinorVersion_InLookup = map[Minor]struct{}{
 	1: {},
+	2: {},
 }
 
 // ValidateFields checks the field values on MACCommand_ResetConf with the
@@ -5249,13 +5259,22 @@ func (m *MACCommand_ResetConf) ValidateFields(paths ...string) error {
 			if _, ok := _MACCommand_ResetConf_MinorVersion_InLookup[m.GetMinorVersion()]; !ok {
 				return MACCommand_ResetConfValidationError{
 					field:  "minor_version",
-					reason: "value must be in list [1]",
+					reason: "value must be in list [1 2]",
 				}
 			}
 
 			if _, ok := Minor_name[int32(m.GetMinorVersion())]; !ok {
 				return MACCommand_ResetConfValidationError{
 					field:  "minor_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "cipher":
+
+			if _, ok := CipherEnum_name[int32(m.GetCipher())]; !ok {
+				return MACCommand_ResetConfValidationError{
+					field:  "cipher",
 					reason: "value must be one of the defined enum values",
 				}
 			}
@@ -5328,6 +5347,7 @@ var _ interface {
 
 var _MACCommand_ResetConf_MinorVersion_InLookup = map[Minor]struct{}{
 	1: {},
+	2: {},
 }
 
 // ValidateFields checks the field values on MACCommand_LinkCheckAns with the

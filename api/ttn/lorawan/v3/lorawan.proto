@@ -937,14 +937,22 @@ message MACCommand {
   message ResetInd {
     Minor minor_version = 1 [(validate.rules).enum = {
       defined_only: true,
-      in: [1]
+      in: [
+        1,
+        2
+      ]
     }];
+    CipherEnum cipher = 2 [(validate.rules).enum.defined_only = true];
   }
   message ResetConf {
     Minor minor_version = 1 [(validate.rules).enum = {
       defined_only: true,
-      in: [1]
+      in: [
+        1,
+        2
+      ]
     }];
+    CipherEnum cipher = 2 [(validate.rules).enum.defined_only = true];
   }
   message LinkCheckAns {
     // Indicates the link margin in dB of the received LinkCheckReq, relative to the demodulation floor.
@@ -1438,7 +1446,7 @@ enum Minor {
 
   MINOR_RFU_0 = 0;
   MINOR_1 = 1;
-  MINOR_RFU_2 = 2;
+  MINOR_2 = 2;
   MINOR_RFU_3 = 3;
   MINOR_RFU_4 = 4;
   MINOR_RFU_5 = 5;
@@ -1452,6 +1460,30 @@ enum Minor {
   MINOR_RFU_13 = 13;
   MINOR_RFU_14 = 14;
   MINOR_RFU_15 = 15;
+}
+
+enum CipherEnum {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "CIPHER"
+  };
+
+  CIPHER_0 = 0;
+  CIPHER_1 = 1;
+  CIPHER_2 = 2;
+  CIPHER_3 = 3;
+  CIPHER_4 = 4;
+  CIPHER_5 = 5;
+  CIPHER_6 = 6;
+  CIPHER_7 = 7;
+  CIPHER_8 = 8;
+  CIPHER_9 = 9;
+  CIPHER_10 = 10;
+  CIPHER_11 = 11;
+  CIPHER_12 = 12;
+  CIPHER_13 = 13;
+  CIPHER_14 = 14;
+  CIPHER_15 = 15;
 }
 
 message FrequencyValue {

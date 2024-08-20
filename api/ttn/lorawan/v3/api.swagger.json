@@ -18232,6 +18232,9 @@
       "properties": {
         "minor_version": {
           "$ref": "#/definitions/v3Minor"
+        },
+        "cipher": {
+          "$ref": "#/definitions/v3CipherEnum"
         }
       }
     },
@@ -18240,6 +18243,9 @@
       "properties": {
         "minor_version": {
           "$ref": "#/definitions/v3Minor"
+        },
+        "cipher": {
+          "$ref": "#/definitions/v3CipherEnum"
         }
       }
     },
@@ -21723,6 +21729,28 @@
         }
       },
       "description": "DEPRECATED: This message is deprecated and will be removed in a future version of The Things Stack."
+    },
+    "v3CipherEnum": {
+      "type": "string",
+      "enum": [
+        "CIPHER_0",
+        "CIPHER_1",
+        "CIPHER_2",
+        "CIPHER_3",
+        "CIPHER_4",
+        "CIPHER_5",
+        "CIPHER_6",
+        "CIPHER_7",
+        "CIPHER_8",
+        "CIPHER_9",
+        "CIPHER_10",
+        "CIPHER_11",
+        "CIPHER_12",
+        "CIPHER_13",
+        "CIPHER_14",
+        "CIPHER_15"
+      ],
+      "default": "CIPHER_0"
     },
     "v3ClaimEndDeviceRequest": {
       "type": "object",
@@ -26774,7 +26802,7 @@
       "enum": [
         "MINOR_RFU_0",
         "MINOR_1",
-        "MINOR_RFU_2",
+        "MINOR_2",
         "MINOR_RFU_3",
         "MINOR_RFU_4",
         "MINOR_RFU_5",
