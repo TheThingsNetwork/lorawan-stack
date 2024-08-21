@@ -126,7 +126,7 @@ const Sidebar = () => {
 
   const sidebarClassnames = classnames(
     style.sidebar,
-    'd-flex direction-column j-between c-bg-brand-extralight gap-cs-l p-cs-m',
+    'd-flex direction-column j-between c-bg-neutral-extralight gap-cs-l p-cs-m',
     {
       [style.sidebarMinimized]: isMinimized,
       [style.sidebarOpen]: isDrawerOpen,
