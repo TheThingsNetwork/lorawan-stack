@@ -17,7 +17,6 @@ import React, { useEffect } from 'react'
 import {
   Routes,
   Route,
-  BrowserRouter,
   ScrollRestoration,
   createBrowserRouter,
   RouterProvider,
@@ -26,7 +25,6 @@ import {
 import { Helmet } from 'react-helmet'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
-import Footer from '@ttn-lw/components/footer'
 import HeaderComponent from '@ttn-lw/components/header'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -84,7 +82,6 @@ const Layout = () => (
             </div>
           </section>
           <section className={style.visual} />
-          <Footer className={style.footer} transparent />
         </div>
       </React.Fragment>
     </ErrorView>
@@ -111,12 +108,10 @@ const AccountRoot = () => {
 
   if (pageData && pageData.error) {
     return (
-      <BrowserRouter history={history} basename="/oauth">
-        <FullViewError
-          error={pageData.error}
-          header={<HeaderComponent safe alwaysShowLogo Logo={Logo} />}
-        />
-      </BrowserRouter>
+      <FullViewError
+        error={pageData.error}
+        header={<HeaderComponent safe alwaysShowLogo Logo={Logo} />}
+      />
     )
   }
 
