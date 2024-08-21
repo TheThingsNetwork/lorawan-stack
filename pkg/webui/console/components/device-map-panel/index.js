@@ -19,6 +19,7 @@ import { isEmpty, isPlainObject } from 'lodash'
 import { END_DEVICE } from '@console/constants/entities'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import locationToMarkers from '@console/lib/location-to-markers'
 
@@ -26,7 +27,7 @@ import { selectSelectedDevice } from '@console/store/selectors/devices'
 
 import MapPanel from '../map-panel'
 
-const DeviceMapPanel = () => {
+const DeviceMapPanel = ({ className }) => {
   const device = useSelector(selectSelectedDevice)
   const { device_id } = device.ids
   const { application_id } = device.ids.application_ids
@@ -44,8 +45,17 @@ const DeviceMapPanel = () => {
       markers={markers}
       entity={END_DEVICE}
       locationLink={locationLink}
+      className={className}
     />
   )
+}
+
+DeviceMapPanel.propTypes = {
+  className: PropTypes.string,
+}
+
+DeviceMapPanel.defaultProps = {
+  className: undefined,
 }
 
 export default DeviceMapPanel

@@ -88,7 +88,7 @@ const DeviceOverview = () => {
         </div>
         <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <BlurryNetworkActivityPanel className="mb-ls-s h-content" />
-          <DeviceMapPanel />
+          <DeviceMapPanel className="h-content" />
         </div>
       </div>
     </Require>
