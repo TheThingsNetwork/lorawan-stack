@@ -25,7 +25,7 @@ const ApplicationWebhooksList = () => {
   const { appId } = useParams()
 
   return (
-    <div className="container container--xxl grid">
+    <div className="container container--xxl p-0">
       <PageTitle title={sharedMessages.webhooks} hideHeading />
       <div className="item-12">
         <WebhooksTable appId={appId} />

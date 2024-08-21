@@ -49,7 +49,7 @@ const GatewayCollaboratorsList = () => {
   )
 
   return (
-    <div className="container container--xxl grid">
+    <div className="container container--xxl p-0">
       <IntlHelmet title={sharedMessages.collaborators} />
       <div className="item-12">
         <CollaboratorsTable

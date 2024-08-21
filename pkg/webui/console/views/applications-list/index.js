@@ -36,7 +36,7 @@ const ApplicationsList = () => {
   )
 
   return (
-    <div className="container container--xxl p-vert-cs-xs p-sides-0">
+    <div className="container container--xxl p-0">
       <IntlHelmet title={sharedMessages.applications} />
       <ApplicationsTable />
     </div>

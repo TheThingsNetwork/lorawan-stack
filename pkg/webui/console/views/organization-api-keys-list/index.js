@@ -46,7 +46,7 @@ const OrganizationApiKeysList = () => {
   )
 
   return (
-    <div className="container container--xxl grid">
+    <div className="container container--xxl p-0">
       <IntlHelmet title={sharedMessages.apiKeys} />
       <div className="item-12">
         <ApiKeysTable
