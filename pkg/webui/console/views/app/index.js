@@ -112,7 +112,7 @@ const Layout = () => {
   }, [page])
 
   return (
-    <>
+    <SidebarContextProvider>
       <ScrollRestoration getKey={getScrollRestorationKey} />
       <ErrorView errorRender={errorRender}>
         <div className={style.container}>
@@ -123,53 +123,51 @@ const Layout = () => {
           <div id="modal-container" />
           <div id="dropdown-container" className="pos-absolute-container" />
           <div className="d-flex">
-            <SidebarContextProvider>
-              <Sidebar />
-              <div className="w-full h-vh d-flex direction-column">
-                <Header />
-                <main
-                  className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
-                  ref={main}
+            <Sidebar />
+            <div className="w-full h-vh d-flex direction-column">
+              <Header />
+              <main
+                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+                ref={main}
+              >
+                <WithAuth
+                  user={user}
+                  fetching={fetching}
+                  error={error}
+                  errorComponent={FullViewErrorInner}
+                  rights={rights}
+                  isAdmin={isAdmin}
                 >
-                  <WithAuth
-                    user={user}
-                    fetching={fetching}
-                    error={error}
-                    errorComponent={FullViewErrorInner}
-                    rights={rights}
-                    isAdmin={isAdmin}
-                  >
-                    <div className={style.content}>
-                      <div
-                        className={style.stage}
-                        id="stage"
-                        style={{ paddingBottom: splitFrameHeight }}
-                      >
-                        <Outlet />
-                      </div>
-                      {isMounted && isActive && !isOpen && (
-                        <div className={style.openButton}>
-                          <Button
-                            icon={IconLayoutBottombarExpand}
-                            tooltip={m.expandEventPanel}
-                            tooltipPlacement="left"
-                            onClick={() => setIsOpen(true)}
-                            secondary
-                            small
-                          />
-                        </div>
-                      )}
+                  <div className={style.content}>
+                    <div
+                      className={style.stage}
+                      id="stage"
+                      style={{ paddingBottom: splitFrameHeight }}
+                    >
+                      <Outlet />
                     </div>
-                  </WithAuth>
-                </main>
-              </div>
-            </SidebarContextProvider>
+                    {isMounted && isActive && !isOpen && (
+                      <div className={style.openButton}>
+                        <Button
+                          icon={IconLayoutBottombarExpand}
+                          tooltip={m.expandEventPanel}
+                          tooltipPlacement="left"
+                          onClick={() => setIsOpen(true)}
+                          secondary
+                          small
+                        />
+                      </div>
+                    )}
+                  </div>
+                </WithAuth>
+              </main>
+            </div>
           </div>
 
           <div id="split-frame" className={style.splitFrame} />
         </div>
       </ErrorView>
-    </>
+    </SidebarContextProvider>
   )
 }
 const ConsoleRoot = () => {
@@ -197,7 +195,16 @@ const ConsoleRoot = () => {
     return (
       <FullViewError
         error={pageData.error}
-        header={<HeaderComponent safe alwaysShowLogo Logo={Logo} />}
+        header={
+          <HeaderComponent
+            safe
+            alwaysShowLogo
+            Logo={Logo}
+            isSidebarMinimized={false}
+            expandSidebar={false}
+            toggleSidebarMinimized={false}
+          />
+        }
         safe
       />
     )

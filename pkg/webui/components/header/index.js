@@ -166,8 +166,6 @@ Header.propTypes = {
   /** Whether to show a notification dot. */
   showNotificationDot: PropTypes.bool,
   toggleSidebarMinimized: PropTypes.func.isRequired,
-  /** The message to show in the un-minimize tooltip. */
-  tooltipMessage: PropTypes.message.isRequired,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
    * guest header is rendered.
