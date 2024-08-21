@@ -60,6 +60,11 @@ func TestCompareMACVersion(t *testing.T) {
 			Expected: -1,
 		},
 		{
+			A:        ttnpb.MACVersion_MAC_V1_0_4,
+			B:        ttnpb.MACVersion_MAC_V1_2_0,
+			Expected: -1,
+		},
+		{
 			A:      ttnpb.MACVersion_MAC_UNKNOWN,
 			B:      ttnpb.MACVersion_MAC_V1_1,
 			Panics: true,

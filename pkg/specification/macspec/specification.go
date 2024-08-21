@@ -37,6 +37,8 @@ func macVersion(v ttnpb.MACVersion) int {
 		return 104
 	case ttnpb.MACVersion_MAC_V1_1:
 		return 110
+	case ttnpb.MACVersion_MAC_V1_2_0:
+		return 120
 	default:
 		panic(fmt.Errorf("missed %q in macVersion", v))
 	}
