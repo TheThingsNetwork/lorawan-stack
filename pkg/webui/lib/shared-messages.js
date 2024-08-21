@@ -332,6 +332,7 @@ export default defineMessages({
   joinAccept: 'Join accept',
   joinEUI: 'JoinEUI',
   joinServerAddress: 'Join Server address',
+  keepSidebarOpen: 'Keep sidebar open',
   key: 'key',
   keyEdit: 'Edit API key',
   keyId: 'Key ID',

@@ -14,15 +14,8 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import { defineMessages } from 'react-intl'
 
-import {
-  IconStar,
-  IconPlus,
-  IconInbox,
-  IconMenu2,
-  IconLayoutSidebarLeftExpand,
-} from '@ttn-lw/components/icon'
+import { IconStar, IconPlus, IconInbox, IconLayoutSidebarLeftExpand } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
 
@@ -32,10 +25,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './header.styl'
-
-const m = defineMessages({
-  tooltipMinimize: 'Keep sidebar open',
-})
 
 const Header = ({
   brandLogo,
@@ -77,7 +66,7 @@ const Header = ({
                 icon={IconLayoutSidebarLeftExpand}
                 onClick={toggleSidebarMinimized}
                 naked
-                tooltip={m.tooltipMinimize}
+                tooltip={sharedMessages.keepSidebarOpen}
                 tooltipPlacement="right"
                 onMouseEnter={expandSidebar}
                 onMouseLeave={handleHideSidebar}
@@ -88,7 +77,7 @@ const Header = ({
           <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
         </div>
         <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
-          <Button secondary icon={IconMenu2} onClick={onMenuClick} />
+          <Button secondary icon={IconLayoutSidebarLeftExpand} onClick={onMenuClick} />
           <Logo className={style.logo} />
         </div>
       </>
