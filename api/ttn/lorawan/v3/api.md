@@ -8350,6 +8350,7 @@ Transmission settings for downlink.
 | `MAC_V1_1` | 4 |  |
 | `MAC_V1_0_3` | 5 |  |
 | `MAC_V1_0_4` | 6 |  |
+| `MAC_V1_2_0` | 7 |  |
 
 ### <a name="ttn.lorawan.v3.MType">Enum `MType`</a>
 

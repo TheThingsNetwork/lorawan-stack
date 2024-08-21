@@ -220,6 +220,7 @@ Binary | ttnpb.MACVersion | MAC_V1_0_2 | [3]
 Binary | ttnpb.MACVersion | MAC_V1_0_3 | [5]
 Binary | ttnpb.MACVersion | MAC_V1_0_4 | [6]
 Binary | ttnpb.MACVersion | MAC_V1_1 | [4]
+Binary | ttnpb.MACVersion | MAC_V1_2_0 | [7]
 Binary | ttnpb.MType | CONFIRMED_DOWN | [5]
 Binary | ttnpb.MType | CONFIRMED_UP | [4]
 Binary | ttnpb.MType | JOIN_ACCEPT | [1]
@@ -596,6 +597,7 @@ JSON | ttnpb.MACVersion | MAC_V1_0_2 | "MAC_V1_0_2"
 JSON | ttnpb.MACVersion | MAC_V1_0_3 | "MAC_V1_0_3"
 JSON | ttnpb.MACVersion | MAC_V1_0_4 | "MAC_V1_0_4"
 JSON | ttnpb.MACVersion | MAC_V1_1 | "MAC_V1_1"
+JSON | ttnpb.MACVersion | MAC_V1_2_0 | "MAC_V1_2_0"
 JSON | ttnpb.MType | CONFIRMED_DOWN | "CONFIRMED_DOWN"
 JSON | ttnpb.MType | CONFIRMED_UP | "CONFIRMED_UP"
 JSON | ttnpb.MType | JOIN_ACCEPT | "JOIN_ACCEPT"
@@ -1045,6 +1047,7 @@ ProtoJSON | ttnpb.MACVersion | MAC_V1_0_2 | "MAC_V1_0_2"
 ProtoJSON | ttnpb.MACVersion | MAC_V1_0_3 | "MAC_V1_0_3"
 ProtoJSON | ttnpb.MACVersion | MAC_V1_0_4 | "MAC_V1_0_4"
 ProtoJSON | ttnpb.MACVersion | MAC_V1_1 | "MAC_V1_1"
+ProtoJSON | ttnpb.MACVersion | MAC_V1_2_0 | "MAC_V1_2_0"
 ProtoJSON | ttnpb.MType | CONFIRMED_DOWN | "CONFIRMED_DOWN"
 ProtoJSON | ttnpb.MType | CONFIRMED_UP | "CONFIRMED_UP"
 ProtoJSON | ttnpb.MType | JOIN_ACCEPT | "JOIN_ACCEPT"
@@ -1494,6 +1497,7 @@ Text | ttnpb.MACVersion | MAC_V1_0_2 | MAC_V1_0_2
 Text | ttnpb.MACVersion | MAC_V1_0_3 | MAC_V1_0_3
 Text | ttnpb.MACVersion | MAC_V1_0_4 | MAC_V1_0_4
 Text | ttnpb.MACVersion | MAC_V1_1 | MAC_V1_1
+Text | ttnpb.MACVersion | MAC_V1_2_0 | MAC_V1_2_0
 Text | ttnpb.MType | CONFIRMED_DOWN | CONFIRMED_DOWN
 Text | ttnpb.MType | CONFIRMED_UP | CONFIRMED_UP
 Text | ttnpb.MType | JOIN_ACCEPT | JOIN_ACCEPT

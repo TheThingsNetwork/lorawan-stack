@@ -32384,6 +32384,11 @@
               "name": "MAC_V1_0_4",
               "number": "6",
               "description": ""
+            },
+            {
+              "name": "MAC_V1_2_0",
+              "number": "7",
+              "description": ""
             }
           ]
         },

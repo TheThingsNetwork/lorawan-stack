@@ -131,6 +131,9 @@ var MACVersion_customvalue = map[string]int32{
 	"1.0.3":   5,
 	"V1_0_4":  6,
 	"1.0.4":   6,
+	"V1_2_0":  7,
+	"1.2":     7,
+	"1.2.0":   7,
 }
 
 // UnmarshalProtoJSON unmarshals the MACVersion from JSON.

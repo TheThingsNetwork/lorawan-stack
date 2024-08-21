@@ -105,6 +105,12 @@ enum MACVersion {
   MAC_V1_0_4 = 6 [(thethings.json.enum_value) = {
     aliases: ["1.0.4"]
   }];
+  MAC_V1_2_0 = 7 [(thethings.json.enum_value) = {
+    aliases: [
+      "1.2",
+      "1.2.0"
+    ]
+  }];
 }
 
 enum PHYVersion {
