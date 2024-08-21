@@ -174,7 +174,7 @@ DropdownItem.propTypes = {
   active: PropTypes.bool,
   exact: PropTypes.bool,
   external: PropTypes.bool,
-  icon: PropTypes.shape({}),
+  icon: PropTypes.icon,
   messageClassName: PropTypes.string,
   path: PropTypes.string,
   showActive: PropTypes.bool,

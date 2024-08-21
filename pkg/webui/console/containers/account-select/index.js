@@ -38,7 +38,7 @@ const SingleValue = props => (
 
 SingleValue.propTypes = {
   data: PropTypes.shape({
-    icon: PropTypes.string.isRequired,
+    icon: PropTypes.icon.isRequired,
     description: PropTypes.string,
     label: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
