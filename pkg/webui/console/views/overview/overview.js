@@ -29,16 +29,16 @@ const Overview = () => {
 
   return (
     <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
-      <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
+      <div className="item-12 xl:item-6 md-lg:item-6">
         <TopEntitiesDashboardPanel />
       </div>
-      <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
+      <div className="item-12 xl:item-6 md-lg:item-6">
         <NotificationsDashboardPanel />
       </div>
-      <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
+      <div className="item-12 xl:item-6 md-lg:item-6">
         <DocumentationDashboardPanel />
       </div>
-      <div className="item-12 lg-xl:item-12 xl:item-6 md-lg:item-6">
+      <div className="item-12 xl:item-6 md-lg:item-6">
         <ShortcutPanel />
       </div>
     </div>

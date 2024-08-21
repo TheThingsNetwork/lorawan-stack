@@ -18,7 +18,7 @@ import Link from '@ttn-lw/components/link'
 import LocationMap from '@ttn-lw/components/map'
 import WidgetContainer from '@ttn-lw/components/widget-container'
 import Button from '@ttn-lw/components/button'
-import { IconPlus } from '@ttn-lw/components/icon'
+import { IconMapPinPlus } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -49,7 +49,7 @@ const Map = ({ id, markers, setupLocationLink }) => {
           widget
         />
       ) : (
-        <div className="d-flex direction-column flex-grow j-center al-center mb-ls-m">
+        <div className="d-flex direction-column flex-grow j-center al-center p-sides-ls-s pb-ls-s">
           <Message
             className="c-text-neutral-heavy fw-bold fs-l text-center"
             content={sharedMessages.noLocationYet}
@@ -62,7 +62,7 @@ const Map = ({ id, markers, setupLocationLink }) => {
             <Button.Link
               secondary
               message={sharedMessages.setUpALocation}
-              icon={IconPlus}
+              icon={IconMapPinPlus}
               to={setupLocationLink}
             />
           )}

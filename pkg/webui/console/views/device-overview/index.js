@@ -70,11 +70,11 @@ const DeviceOverview = () => {
   return (
     <Require condition={!shouldRedirect} otherwise={otherwise}>
       <IntlHelmet title={sharedMessages.overview} />
-      <div className="container container--xl grid p-ls-s gap-ls-s">
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+      <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
+        <div className="item-12 xl:item-6 lg:item-6">
           <DeviceInfoPanel events={events} />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6">
           <LatestDecodedPayloadPanel
             appId={appId}
             events={events}
@@ -83,13 +83,11 @@ const DeviceOverview = () => {
             isDevice
           />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6">
           <DeviceGeneralInformationPanel frequencyPlans={frequencyPlans} />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6 d-flex flex-column gap-ls-s md:gap-cs-xs">
           <BlurryNetworkActivityPanel />
-        </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
           <DeviceMapPanel />
         </div>
       </div>

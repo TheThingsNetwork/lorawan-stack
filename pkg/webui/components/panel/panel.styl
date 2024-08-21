@@ -50,9 +50,6 @@
     transition: text-decoration $ad.s ease-in-out
     align-self: center
 
-    +media-query($bp.md-lg)
-      display: none
-
     &:hover:not(:disabled)
       color: var(--c-text-brand-normal)
       text-decoration: underline
@@ -75,7 +72,7 @@
   color: var(--c-bg-brand-normal)
   font-variation-settings: 'FILL' 1
 
-@container panel (max-width: 485px)
+@container panel (max-width: 300px)
   .panel-header
     flex-direction: column
     align-items: flex-start

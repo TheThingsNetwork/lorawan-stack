@@ -68,21 +68,21 @@ const ApplicationOverview = () => {
   return (
     <Require condition={condition} otherwise={otherwise}>
       <IntlHelmet title={sharedMessages.overview} />
-      <div className="container container--xl grid p-ls-s gap-ls-s">
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+      <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
+        <div className="item-12 xl:item-6 lg:item-6">
           <DevicesPanel />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6 d-flex">
           <BlurryNetworkActivityPanel />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6">
           <LatestDecodedPayloadPanel
             appId={appId}
             events={events}
             shortCutLinkPath={`/applications/${appId}/data`}
           />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6 d-flex">
           <RequireRequest
             requestAction={getDevicesList(
               application.ids.application_id,

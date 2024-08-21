@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-$sidebar-width = 22rem
-
 .sidebar
+  --sidebar-width: 24rem
   border-normal(right)
   line-height: 1.2
   font-size: $fs.s
-  width: $sidebar-width
+  width: var(--sidebar-width)
   flex-shrink: 0
   flex-grow: 0
   box-sizing: border-box
   left: 0
   sidebar-transition(left)
+  sidebar-transition(width)
+  +media-query($bp.xxl)
+    --sidebar-width: 22rem
   +media-query($bp.lg-xl)
     position: absolute
     top: 0
@@ -31,6 +33,7 @@ $sidebar-width = 22rem
     bottom: 0
     width: 90vw
     min-width: 18rem
+    max-width: 24rem
     height: 100vh
     z-index: $zi.mobile-menu
 
@@ -57,7 +60,7 @@ $sidebar-width = 22rem
   &-minimized
     position: absolute
     top: 3.8rem
-    left: - $sidebar-width
+    left: calc(-1 * var(--sidebar-width))
     bottom: 0
     height: calc(100vh - 3.8rem)
     z-index: $zi.mobile-menu
