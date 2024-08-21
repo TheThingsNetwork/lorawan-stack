@@ -19,7 +19,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import combineRefs from '@ttn-lw/lib/combine-refs'
 
 // This component create a portal to render children into a different part of the DOM.
-const Portal = ({ children, visible, setOpen, positionReference }) => {
+const Portal = ({ children, visible, positionReference }) => {
   const [buttonPosition, setButtonPosition] = React.useState()
   const attachedRef = useRef()
   const buttonRef = combineRefs([positionReference.current, attachedRef])
@@ -30,26 +30,6 @@ const Portal = ({ children, visible, setOpen, positionReference }) => {
       setButtonPosition(rect)
     }
   }, [positionReference, visible])
-
-  // Recreate the event listeners.
-  useEffect(() => {
-    if (!attachedRef.current) {
-      return
-    }
-    const node = attachedRef.current
-    const toggleDropdown = () => {
-      // Add escape key event listener to close the dropdown
-      setOpen(val => !val)
-    }
-    const closeDropdown = () => setOpen(false)
-
-    node.addEventListener('mouseenter', toggleDropdown)
-    node.addEventListener('mouseleave', closeDropdown)
-    return () => {
-      node.removeEventListener('mouseenter', toggleDropdown)
-      node.removeEventListener('mouseleave', closeDropdown)
-    }
-  }, [attachedRef, visible, setOpen])
 
   if (!buttonPosition) {
     return null
@@ -93,7 +73,6 @@ Portal.propTypes = {
       getBoundingClientRect: PropTypes.func,
     }),
   }).isRequired,
-  setOpen: PropTypes.func.isRequired,
   visible: PropTypes.bool.isRequired,
 }
 
