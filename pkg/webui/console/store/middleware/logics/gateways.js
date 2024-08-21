@@ -21,6 +21,7 @@ import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import { getGatewayId } from '@ttn-lw/lib/selectors/id'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 
 import * as gateways from '@console/store/actions/gateways'
 
@@ -49,7 +50,23 @@ const getGatewayLogic = createRequestLogic({
     const gtw = await tts.Gateways.getById(id, selector)
     dispatch(gateways.startGatewayEventsStream(id))
 
-    return gtw
+    // Check if gateway is managed by TTI
+    let managed = undefined
+    try {
+      managed = await tts.Gateways.getManagedGateway(id, [
+        'wifi_profile_id',
+        'ethernet_profile_id',
+        'version_ids',
+        'wifi_mac_address',
+        'ethernet_mac_address',
+      ])
+    } catch (e) {
+      if (!isNotFoundError(e)) {
+        throw e
+      }
+    }
+
+    return { ...gtw, managed }
   },
 })
 
@@ -294,6 +311,17 @@ const getGatewayEventLocationLogic = createLogic({
   },
 })
 
+const updateManagedGatewayLogic = createRequestLogic({
+  type: gateways.UPDATE_MANAGED_GATEWAY,
+  process: async ({ action }) => {
+    const { gatewayId, patch } = action.payload
+
+    const data = await tts.Gateways.updateManagedGateway(gatewayId, patch)
+
+    return { id: gatewayId, data: { ...patch, ...data } }
+  },
+})
+
 export default [
   createGatewayLogic,
   getGatewayLogic,
@@ -308,5 +336,6 @@ export default [
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
   getGatewayEventLocationLogic,
+  updateManagedGatewayLogic,
   ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', tts.Gateways.openStream),
 ]

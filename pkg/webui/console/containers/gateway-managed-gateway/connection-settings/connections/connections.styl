@@ -1,0 +1,65 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.root
+  border-dark()
+  border-radius: $br.l
+  box-sizing: border-box
+  padding: $cs.l
+  display: flex
+  flex-direction: column
+  gap: $cs.l
+
+  .top
+    border-dark()
+    box-sizing: border-box
+    border-radius: $br.l
+    display: flex
+
+  .img-div
+    background-color: $c-backdrop-lighter
+    border-radius: $br.l 0 0 $br.l
+    border-dark('right')
+    .image
+      object-fit: contain
+      box-sizing: border-box
+      padding: $cs.s
+      height: 6rem
+      width: 10rem
+      opacity: 0.7
+      filter: grayscale(100%)
+
+  .horizontal-line
+    background-color: $c-divider-dark
+
+  .connections
+    border-dark()
+    box-sizing: border-box
+    border-radius: $br.l
+    display: flex
+    flex-direction: column
+    gap: $cs.xxs
+    padding: $cs.xs $cs.s
+
+  .connection
+    padding-inline: $cs.xxs
+    // TODO: Change color
+    background-color: #EEEFF9
+    border-radius: $br.m
+
+  .details
+    & tr:not(:first-child)
+      height: 2rem
+    & th
+      width: 40%

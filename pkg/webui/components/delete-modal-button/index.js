@@ -42,6 +42,7 @@ const DeleteModalButton = props => {
     shouldConfirm,
     title,
     onlyPurge,
+    onlyIcon,
   } = props
 
   const name = entityName ? entityName : entityId
@@ -71,7 +72,7 @@ const DeleteModalButton = props => {
       danger
       onApprove={handleDeleteApprove}
       onCancel={onCancel}
-      message={message}
+      message={onlyIcon ? undefined : message}
       modalData={{
         title: sharedMessages.deleteModalConfirmDeletion,
         approveButtonProps: {
@@ -149,6 +150,7 @@ DeleteModalButton.propTypes = {
   message: PropTypes.message.isRequired,
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,
+  onlyIcon: PropTypes.bool,
   onlyPurge: PropTypes.bool,
   purgeMessage: PropTypes.message,
   shouldConfirm: PropTypes.bool,
@@ -166,6 +168,7 @@ DeleteModalButton.defaultProps = {
   title: sharedMessages.deleteModalTitle,
   confirmMessage: sharedMessages.deleteModalConfirmMessage,
   onlyPurge: false,
+  onlyIcon: false,
 }
 
 export default DeleteModalButton

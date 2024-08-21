@@ -45,10 +45,9 @@ const ValidateRouteParam = ({ check, Component, element, otherwise }) => {
   const navigate = useNavigate()
 
   const shouldRender = checkParams(check, params)
-
   useEffect(() => {
     if (!shouldRender && otherwise.redirect) {
-      navigate(otherwise.redirect)
+      navigate(otherwise.redirect, { replace: true })
     }
   }, [shouldRender, navigate, otherwise.redirect])
 
@@ -59,6 +58,8 @@ const ValidateRouteParam = ({ check, Component, element, otherwise }) => {
   if (otherwise.render) {
     return otherwise.render()
   }
+
+  return null
 }
 
 ValidateRouteParam.propTypes = {

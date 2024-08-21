@@ -27,6 +27,7 @@ import {
   START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
   GET_GATEWAY_CLAIM_INFO_BY_EUI_SUCCESS,
+  UPDATE_MANAGED_GATEWAY_SUCCESS,
 } from '@console/store/actions/gateways'
 
 const defaultStatisticsState = {
@@ -96,6 +97,22 @@ const gateways = (state = defaultState, action) => {
         entities: {
           ...state.entities,
           [id]: gateway(state.entities[id], payload),
+        },
+      }
+    case UPDATE_MANAGED_GATEWAY_SUCCESS:
+      const managedGatewayId = payload.id
+
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [managedGatewayId]: {
+            ...state.entities[managedGatewayId],
+            managed: {
+              ...state.entities[managedGatewayId].managed,
+              ...action.payload.data,
+            },
+          },
         },
       }
     case UPDATE_GTW_LOCATION_SUCCESS: {

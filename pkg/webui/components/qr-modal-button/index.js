@@ -38,7 +38,6 @@ const m = defineMessages({
   invalidData:
     'Invalid QR code data. Please note that only TR005 LoRaWAN® Device Identification QR Code can be scanned. Some devices have unrelated QR codes printed on them that cannot be used.',
   apply: 'Apply',
-  scanAgain: 'Scan again',
 })
 
 const QRModalButton = props => {
@@ -86,7 +85,7 @@ const QRModalButton = props => {
         approveButtonProps: {
           disabled: !qrData.valid,
         },
-        cancelButtonMessage: qrData.data ? m.scanAgain : sharedMessages.cancel,
+        cancelButtonMessage: qrData.data ? sharedMessages.scanAgain : sharedMessages.cancel,
         cancelButtonProps: qrData.data ? { onClick: onCancel } : {},
         danger: false,
       }}

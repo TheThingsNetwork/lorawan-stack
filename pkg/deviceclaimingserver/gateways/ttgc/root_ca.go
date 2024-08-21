@@ -25,9 +25,9 @@ import (
 )
 
 var (
-	errDialGatewayServer = errors.DefineAborted("dial_gateway_server", "dial Gateway Gerver")
-	errGatewayServerTLS  = errors.DefineAborted(
-		"gateway_server_tls", "establish TLS connection with Gateway Server",
+	errDialGatewayServer      = errors.DefineAborted("dial_gateway_server", "dial Gateway Gerver `{address}`")
+	errVerifyGatewayServerTLS = errors.DefineAborted(
+		"verify_gateway_server_tls", "verify TLS server certificate of Gateway Server `{address}`",
 	)
 )
 
@@ -35,7 +35,7 @@ func (u *Upstream) getRootCA(ctx context.Context, address string) (*x509.Certifi
 	d := new(net.Dialer)
 	netConn, err := d.DialContext(ctx, "tcp", address)
 	if err != nil {
-		return nil, errDialGatewayServer.WithCause(err)
+		return nil, errDialGatewayServer.WithAttributes("address", address).WithCause(err)
 	}
 	defer netConn.Close()
 
@@ -43,9 +43,14 @@ func (u *Upstream) getRootCA(ctx context.Context, address string) (*x509.Certifi
 	if err != nil {
 		return nil, err
 	}
+	host, _, err := net.SplitHostPort(address)
+	if err != nil {
+		return nil, err
+	}
+	tlsConfig.ServerName = host
 	tlsConn := tls.Client(netConn, tlsConfig)
 	if err := tlsConn.HandshakeContext(ctx); err != nil {
-		return nil, errGatewayServerTLS.WithCause(err)
+		return nil, errVerifyGatewayServerTLS.WithAttributes("address", address).WithCause(err)
 	}
 
 	state := tlsConn.ConnectionState()

@@ -79,6 +79,7 @@ const FetchTable = props => {
     searchItemsAction,
     getItemsAction,
     baseDataSelector,
+    filtersClassName,
   } = props
 
   const isMounted = useRef(true)
@@ -233,7 +234,7 @@ const FetchTable = props => {
     ? lodashOrderBy(items, i => getByPath(i, orderBy), [orderDirection])
     : items
 
-  const filtersCls = classnames(style.filters, {
+  const filtersCls = classnames(filtersClassName, style.filters, {
     [style.topRule]: tabs.length > 0,
   })
 
@@ -327,6 +328,7 @@ FetchTable.propTypes = {
   clickable: PropTypes.bool,
   defaultOrder: PropTypes.string,
   entity: PropTypes.string.isRequired,
+  filtersClassName: PropTypes.string,
   getItemPathPrefix: PropTypes.func,
   getItemsAction: PropTypes.func.isRequired,
   handlesPagination: PropTypes.bool,
@@ -380,6 +382,7 @@ FetchTable.defaultProps = {
   actionItems: null,
   clickable: true,
   defaultOrder: undefined,
+  filtersClassName: undefined,
 }
 
 export default FetchTable

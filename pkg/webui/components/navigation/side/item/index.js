@@ -53,7 +53,7 @@ const SideNavigationItem = props => {
         [],
       )
       for (const path of paths) {
-        if (location.pathname.startsWith(path)) {
+        if (location.pathname.endsWith(path)) {
           setIsExpanded(true)
           return
         }

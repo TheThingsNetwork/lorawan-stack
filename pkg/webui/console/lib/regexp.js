@@ -33,3 +33,8 @@ export const delay = new RegExp('^[0-9]{1,}[.]?([0-9]{1,})?[a-zA-Z]{1,2}$')
 export const apiKeyPath = /([A-Z0-9]{39})/
 export const duration = /^[0-9]+([a-z])$/
 export const activationEvent = /.*\.join\..*/
+export const ipAddress = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/
+export const subnetMask =
+  /^(?:255|254|252|248|240|224|192|128|0)\.((?:255|254|252|248|240|224|192|128|0)\.){2}(?:255|254|252|248|240|224|192|128|0)$/
+export const profileIdPath =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i

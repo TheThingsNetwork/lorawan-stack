@@ -302,6 +302,33 @@ class Gateways {
 
     return Marshaler.payloadSingleResponse(result)
   }
+
+  // Managed Gateway Configuration Service.
+
+  async getManagedGateway(id, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const response = await this._api.ManagedGatewayConfigurationService.Get(
+      {
+        routeParams: { 'gateway_ids.gateway_id': id },
+      },
+      fieldMask,
+    )
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
+  async updateManagedGateway(gatewayId, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+    const response = await this._api.ManagedGatewayConfigurationService.Update(
+      {
+        routeParams: { 'gateway.ids.gateway_id': gatewayId },
+      },
+      {
+        gateway: patch,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
+    return Marshaler.payloadSingleResponse(response)
+  }
 }
 
 export default Gateways
