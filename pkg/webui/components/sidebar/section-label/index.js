@@ -120,7 +120,7 @@ const SectionLabel = ({
         noDropdownIcon
         portalledDropdown
         tooltip={sharedMessages.addEntity}
-        tooltipPlacement="top"
+        tooltipPlacement="bottom"
       />
     </div>
   )

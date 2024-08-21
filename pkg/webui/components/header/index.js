@@ -122,6 +122,8 @@ const Header = ({
           dropdownItems={notificationsDropdownItems}
           dropdownClassName={style.notificationsDropdown}
           dropdownPosition="below left"
+          tooltip={sharedMessages.notifications}
+          tooltipPlacement="bottom"
           withAlert={showNotificationDot}
           className="md-lg:d-none"
         />
