@@ -71,11 +71,15 @@ const BlurryNetworkActivityPanel = () => {
             content={sharedMessages.quicklyTroubleshoot}
           />
           <Button.AnchorLink
-            primary
+            naked
             message={sharedMessages.upgradeNow}
             icon={IconBolt}
             href={upgradeUrl}
             target="_blank"
+            className={classnames(
+              style.upgradeButton,
+              'c-bg-brand-extralight c-text-brand-normal fw-bold',
+            )}
           />
         </div>
       </div>

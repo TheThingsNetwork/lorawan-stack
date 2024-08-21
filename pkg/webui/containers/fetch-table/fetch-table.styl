@@ -18,10 +18,11 @@
   align-items: center
   margin: 0 $cs.s $cs.s $cs.s
   flex-wrap: wrap
-  height: 2.5rem
+  height: 4.5rem
 
-  +media-query($bp.md)
+  +media-query($bp.lg)
     gap: $cs.m
+    height: fit-content
 
   &.top-rule
     border-normal('bottom')
@@ -51,7 +52,7 @@
     align-items: center
     gap: $cs.xs
 
-    +media-query($bp.md)
+    +media-query($bp.lg)
       justify-content: flex-start
       max-width: none
       flex-basis: 100%

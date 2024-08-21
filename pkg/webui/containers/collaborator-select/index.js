@@ -181,7 +181,7 @@ Suggest.propTypes = {
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired,
-      icon: PropTypes.shape({}).isRequired,
+      icon: PropTypes.icon.isRequired,
     }),
   ),
   isResctrictedUser: PropTypes.bool,

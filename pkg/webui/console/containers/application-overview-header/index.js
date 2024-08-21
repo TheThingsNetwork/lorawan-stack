@@ -31,6 +31,7 @@ import toast from '@ttn-lw/components/toast'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Status from '@ttn-lw/components/status'
 import Dropdown from '@ttn-lw/components/dropdown'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -142,35 +143,42 @@ const ApplicationOverviewHeader = () => {
     let node
     if (showLastSeen) {
       node = (
-        <DocTooltip
-          interactive
-          docPath="/getting-started/console/troubleshooting"
-          content={<Message content={m.lastSeenAvailableTooltip} />}
-        >
-          <LastSeen lastSeen={lastSeen} className="c-text-neutral-semilight" />
-        </DocTooltip>
+        <Link to={`/applications/${application_id}/data`}>
+          <DocTooltip
+            interactive
+            docPath="/getting-started/console/troubleshooting"
+            content={<Message content={m.lastSeenAvailableTooltip} />}
+          >
+            <LastSeen lastSeen={lastSeen} className="c-text-neutral-semilight" />
+          </DocTooltip>
+        </Link>
       )
     } else {
       node = (
-        <DocTooltip
-          content={<Message content={m.noActivityTooltip} />}
-          docPath="/getting-started/console/troubleshooting"
-        >
-          <Status
-            status="mediocre"
-            label={sharedMessages.noRecentActivity}
-            className={style.status}
-          />
-        </DocTooltip>
+        <Link to={`/applications/${application_id}/data`}>
+          <DocTooltip
+            content={<Message content={m.noActivityTooltip} />}
+            docPath="/getting-started/console/troubleshooting"
+          >
+            <Status
+              status="mediocre"
+              label={sharedMessages.noRecentActivity}
+              className={style.status}
+            />
+          </DocTooltip>
+        </Link>
       )
     }
     return (
-      <div className="d-inline-flex al-center gap-cs-xxs md-lg:d-none">
+      <Link
+        to={`/applications/${application_id}/data`}
+        className="d-inline-flex al-center gap-cs-xxs md-lg:d-none"
+      >
         <Icon icon={IconBroadcast} small className="c-text-neutral-semilight" />
         {node}
-      </div>
+      </Link>
     )
-  }, [lastSeen, showLastSeen])
+  }, [lastSeen, showLastSeen, application_id])
 
   const handleOpenDeleteApplicationModal = useCallback(() => {
     setDeleteApplicationModalVisible(true)
@@ -202,14 +210,17 @@ const ApplicationOverviewHeader = () => {
         {recentActivity}
         {mayViewDevices && (
           <RequireRequest requestAction={getApplicationDeviceCount(application_id)}>
-            <div className="d-inline-flex al-center gap-cs-xxs md-lg:d-none">
+            <Link
+              to={`/applications/${application_id}/devices`}
+              className="d-inline-flex al-center gap-cs-xxs md-lg:d-none"
+            >
               <Icon icon={IconCpu} small className="c-text-neutral-semilight" />
               <Message
                 content={m.deviceCount}
                 className="c-text-neutral-semilight"
                 values={{ devices: devicesTotalCount }}
               />
-            </div>
+            </Link>
           </RequireRequest>
         )}
         <div className={classnames(style.divider, 'md-lg:d-none')} />
@@ -220,6 +231,9 @@ const ApplicationOverviewHeader = () => {
             onClick={handleAddToBookmark}
             disabled={
               (!isBookmarked && addBookmarkLoading) || (isBookmarked && deleteBookmarkLoading)
+            }
+            tooltip={
+              isBookmarked ? sharedMessages.removeFromBookmarks : sharedMessages.addToBookmarks
             }
           />
           <Button

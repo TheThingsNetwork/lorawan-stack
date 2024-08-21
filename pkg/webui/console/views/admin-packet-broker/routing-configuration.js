@@ -218,7 +218,7 @@ const RoutingConfigurationView = () => {
             </Routes>
           </>
         )}
-        <SubmitBar align="end">
+        <SubmitBar align="end" className="mt-cs-xl3">
           <Form.Submit component={SubmitButton} message={'Save routing configuration'} />
         </SubmitBar>
       </Form>

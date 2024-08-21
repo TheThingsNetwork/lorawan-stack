@@ -17,7 +17,7 @@ import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
 import { defineMessages } from 'react-intl'
 
-import { IconInbox } from '@ttn-lw/components/icon'
+import Icon, { IconInbox } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
 import Status from '@ttn-lw/components/status'
 import ScrollFader from '@ttn-lw/components/scroll-fader'
@@ -117,7 +117,8 @@ const NotificationsDashboardPanel = () => {
       className={style.notificationPanel}
     >
       {notifications && notifications.length === 0 ? (
-        <div className="d-flex direction-column flex-grow j-center">
+        <div className="d-flex direction-column flex-grow j-center al-center">
+          <Icon size={64} icon={IconInbox} className="c-icon-neutral-extralight" />
           <Message
             content={sharedMessages.noNotifications}
             className="d-block text-center fs-l fw-bold"

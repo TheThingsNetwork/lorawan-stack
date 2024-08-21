@@ -21,6 +21,7 @@ import Icon, { IconArrowsSort, IconBroadcast } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Tooltip from '@ttn-lw/components/tooltip'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -202,10 +203,13 @@ const GatewayConnection = props => {
   }, [statistics])
 
   return (
-    <div className={classnames(className, 'd-flex', 'al-center', 'gap-cs-m')}>
+    <Link
+      to={`/gateways/${gtwId}/data`}
+      className={classnames(className, 'd-flex', 'al-center', 'gap-cs-m')}
+    >
       {status}
       {messages}
-    </div>
+    </Link>
   )
 }
 

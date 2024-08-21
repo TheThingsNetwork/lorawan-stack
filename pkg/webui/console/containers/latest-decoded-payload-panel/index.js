@@ -76,7 +76,7 @@ const m = defineMessages({
   seeInLiveData: 'See in live data',
   up: '{up} up',
   rssi: `{rssi}dBm RSSI`,
-  snr: `{snr}dB SNR`,
+  snr: `{snr}dBm SNR`,
   noRecentActivityDescription: "There haven't been any uplinks recently in this application",
 })
 
@@ -289,6 +289,8 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
                   small
                   className={style.maximize}
                   onClick={handleOpenMaximizeCodeModal}
+                  tooltip={sharedMessages.expand}
+                  tooltipPlacement="top"
                 />
               )}
             </div>

@@ -68,7 +68,9 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
 
   cy.findByRole('link', { name: /Applications/ }).click()
   cy.findByRole('cell', { name: application.ids.application_id }).click()
-  cy.findByRole('link', { name: /End devices/ }).click()
+  cy.get('#sidebar').within(() => {
+    cy.findByRole('link', { name: /End devices/ }).click()
+  })
   cy.findByRole('cell', { name: `Test Device Name ${deviceId}` }).click()
 
   cy.get('#stage').within(() => {

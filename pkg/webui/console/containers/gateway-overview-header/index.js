@@ -146,6 +146,9 @@ const GatewayOverviewHeader = ({ gateway }) => {
             disabled={
               (!isBookmarked && addBookmarkLoading) || (isBookmarked && deleteBookmarkLoading)
             }
+            tooltip={
+              isBookmarked ? sharedMessages.removeFromBookmarks : sharedMessages.addToBookmarks
+            }
           />
           <Button
             secondary

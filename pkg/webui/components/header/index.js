@@ -29,6 +29,7 @@ import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
 import AppStatusBadge from '@console/containers/app-status-badge'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './header.styl'
 
@@ -101,6 +102,8 @@ const Header = ({
           icon={IconPlus}
           dropdownItems={addDropdownItems}
           dropdownPosition="below left"
+          tooltip={sharedMessages.addEntity}
+          tooltipPlacement="bottom"
           className="md-lg:d-none"
         />
         <Button
@@ -109,6 +112,8 @@ const Header = ({
           dropdownItems={bookmarkDropdownItems}
           dropdownClassName={style.bookmarksDropdown}
           dropdownPosition="below left"
+          tooltip={sharedMessages.bookmarks}
+          tooltipPlacement="bottom"
           className="md-lg:d-none"
         />
         <Button
@@ -117,6 +122,8 @@ const Header = ({
           dropdownItems={notificationsDropdownItems}
           dropdownClassName={style.notificationsDropdown}
           dropdownPosition="below left"
+          tooltip={sharedMessages.notifications}
+          tooltipPlacement="bottom"
           withAlert={showNotificationDot}
           className="md-lg:d-none"
         />

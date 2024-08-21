@@ -110,6 +110,8 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
             message={archiveMessage}
             icon={IconArchive}
             value={selectedNotification.id}
+            tooltip={isMediumScreen ? (isArchive ? m.unarchive : m.archive) : undefined}
+            tooltipPlacement="bottom"
             secondary
           />
         </div>
