@@ -672,7 +672,7 @@
   "console.containers.latest-decoded-payload-panel.index.seeInLiveData": "See in live data",
   "console.containers.latest-decoded-payload-panel.index.up": "{up} up",
   "console.containers.latest-decoded-payload-panel.index.rssi": "{rssi}dBm RSSI",
-  "console.containers.latest-decoded-payload-panel.index.snr": "{snr}dB SNR",
+  "console.containers.latest-decoded-payload-panel.index.snr": "{snr}dBm SNR",
   "console.containers.latest-decoded-payload-panel.index.noRecentActivityDescription": "There haven't been any uplinks recently in this application",
   "console.containers.log-back-in-modal.index.modalTitle": "Please sign in again",
   "console.containers.log-back-in-modal.index.modalMessage": "You were signed out of the Console. You can press 'Reload' to log back into the Console again.",
