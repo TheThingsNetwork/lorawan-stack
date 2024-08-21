@@ -219,6 +219,8 @@ const Input = React.forwardRef((props, ref) => {
           readOnly={readOnly}
           title={inputTitle}
           autoComplete={autoComplete}
+          data-1p-ignore={!sensitive}
+          data-lpignore={!sensitive}
           {...passedProps}
         />
         {v && <Valid show={v} />}
