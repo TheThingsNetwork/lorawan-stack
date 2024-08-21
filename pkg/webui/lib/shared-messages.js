@@ -421,6 +421,7 @@ export default defineMessages({
   noTopEndDevicesDescription: 'Your most visited and bookmarked end devices will be listed here',
   noTopEntities: 'No top entities yet',
   noc: 'Network Operations Center',
+  nocShortened: 'NOC',
   none: 'None',
   normalizedPayloadAir: 'Air',
   normalizedPayloadSoil: 'Soil',
