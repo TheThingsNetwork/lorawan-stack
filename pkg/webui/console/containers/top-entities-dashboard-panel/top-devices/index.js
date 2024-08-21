@@ -14,8 +14,12 @@
 
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
+import { IconPlus } from '@tabler/icons-react'
 
 import Status from '@ttn-lw/components/status'
+import Button from '@ttn-lw/components/button'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import LastSeen from '@console/components/last-seen'
 
@@ -70,10 +74,30 @@ const TopDevicesList = ({ appId }) => {
       entities={items}
       itemsCount={items.length}
       headers={headers}
-      emptyMessage={sharedMessages.noTopEndDevices}
-      emptyDescription={sharedMessages.noTopEndDevicesDescription}
-      emptyAction={appId ? sharedMessages.registerEndDevice : undefined}
-      emptyPath={appId ? `/applications/${appId}/devices/add` : undefined}
+      renderWhenEmpty={
+        <div className="d-flex direction-column flex-grow j-center gap-cs-l">
+          <div>
+            <Message
+              content={sharedMessages.noTopEndDevices}
+              className="d-block text-center fs-l fw-bold"
+            />
+            <Message
+              content={sharedMessages.noTopEndDevicesDescription}
+              className="d-block text-center c-text-neutral-light"
+            />
+          </div>
+          {appId && (
+            <div className="text-center">
+              <Button.Link
+                to={`/applications/${appId}/devices/add`}
+                primary
+                message={sharedMessages.registerEndDevice}
+                icon={IconPlus}
+              />
+            </div>
+          )}
+        </div>
+      }
     />
   )
 }

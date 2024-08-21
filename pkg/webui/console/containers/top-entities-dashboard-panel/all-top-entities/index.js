@@ -18,8 +18,12 @@ import { useSelector } from 'react-redux'
 
 import { APPLICATION, END_DEVICE, GATEWAY } from '@console/constants/entities'
 
-import Icon, { entityIcons } from '@ttn-lw/components/icon'
+import Icon, { entityIcons, IconApplication, IconGateway } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
+import Button from '@ttn-lw/components/button'
+import ButtonGroup from '@ttn-lw/components/button/group'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import LastSeen from '@console/components/last-seen'
 
@@ -112,8 +116,34 @@ const AllTopEntitiesList = () => {
     <EntitiesList
       entities={items}
       headers={headers}
-      emptyMessage={sharedMessages.noTopEntities}
-      emptyDescription={m.noTopEntitiesDescription}
+      renderWhenEmpty={
+        <div className="d-flex direction-column flex-grow j-center gap-cs-l">
+          <div>
+            <Message
+              content={sharedMessages.noTopEntities}
+              className="d-block text-center fs-l fw-bold"
+            />
+            <Message
+              content={m.noTopEntitiesDescription}
+              className="d-block text-center c-text-neutral-light"
+            />
+          </div>
+          <ButtonGroup align="center">
+            <Button.Link
+              to="/gateways/add"
+              message={sharedMessages.addGateway}
+              icon={IconGateway}
+              primary
+            />
+            <Button.Link
+              to="/applications/add"
+              message={sharedMessages.addApplication}
+              icon={IconApplication}
+              primary
+            />
+          </ButtonGroup>
+        </div>
+      }
     />
   )
 }
