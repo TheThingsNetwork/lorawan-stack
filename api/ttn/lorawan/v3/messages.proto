@@ -376,10 +376,13 @@ message ApplicationDownlink {
   // The frame payload of the downlink message.
   // The payload is encrypted if the skip_payload_crypto field of the EndDevice
   // is true.
-  bytes frm_payload = 4 [(thethings.flags.field) = {
-    set_flag_new_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.NewHexBytesFlag",
-    set_flag_getter_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.GetBytes"
-  }];
+  bytes frm_payload = 4 [
+    (validate.rules).bytes.max_len = 255,
+    (thethings.flags.field) = {
+      set_flag_new_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.NewHexBytesFlag",
+      set_flag_getter_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.GetBytes"
+    }
+  ];
 
   // The decoded frame payload of the downlink message.
   // When scheduling downlink with a message processor configured for the end device (see formatters) or application (see default_formatters),
