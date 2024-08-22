@@ -34,6 +34,7 @@ For details about compatibility between different releases, see the **Commitment
   - `ListGatewaysRequest` and `ListEndDevicesRequest` RPCs have a new `Filter` field that supports an `updated_since` timestamp.
 - Preparation for universal rights assigned to users.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`).
+- Option to pause application webhooks.
 
 ### Deprecated
 

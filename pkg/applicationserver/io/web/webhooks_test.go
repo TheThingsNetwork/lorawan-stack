@@ -149,6 +149,7 @@ func TestWebhooks(t *testing.T) {
 						ServiceData: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "service/data",
 						},
+						Paused: false,
 						FieldMask: ttnpb.FieldMask(
 							"correlation_ids",
 							"end_device_ids",
@@ -162,6 +163,7 @@ func TestWebhooks(t *testing.T) {
 							"up.downlink_sent",
 							"up.join_accept",
 							"up.location_solved",
+							"up.paused",
 							"up.service_data",
 							"up.uplink_message",
 							"up.uplink_normalized",
@@ -183,6 +185,7 @@ func TestWebhooks(t *testing.T) {
 						"join_accept",
 						"location_solved",
 						"service_data",
+						"paused",
 						"uplink_message",
 						"uplink_normalized",
 					}, nil
@@ -573,5 +576,119 @@ func TestWebhooks(t *testing.T) {
 				})
 			}
 		})
+	})
+
+	//nolint:paralleltest
+	t.Run("Paused", func(t *testing.T) {
+		_, ctx := test.New(t)
+
+		// Create an active webhook.
+		_, err := registry.Set(ctx, ids, nil,
+			func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+				return &ttnpb.ApplicationWebhook{
+						Ids:           ids,
+						BaseUrl:       "https://myapp.com/api/ttn/v3/{/appID,devID}",
+						Format:        "json",
+						Paused:        false,
+						UplinkMessage: &ttnpb.ApplicationWebhook_Message{Path: "/"},
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.webhook_id",
+						"base_url",
+						"format",
+						"paused",
+						"uplink_message",
+						"field_mask",
+					}, nil
+			})
+		if err != nil {
+			t.Fatalf("Failed to set webhook in registry: %s", err)
+		}
+
+		sinkCh := make(chan *http.Request, 1)
+		testSink := mocksink.New(sinkCh)
+
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		c := componenttest.NewComponent(t, &component.Config{})
+		componenttest.StartComponent(t, c)
+		defer c.Close()
+
+		as := mock.NewServer(c)
+		_, err = web.NewWebhooks(ctx, as, registry, testSink, downlinks)
+		if err != nil {
+			t.Fatalf("Unexpected error %v", err)
+		}
+
+		message := &ttnpb.ApplicationUp{
+			EndDeviceIds: registeredDeviceID,
+			Up: &ttnpb.ApplicationUp_UplinkMessage{
+				UplinkMessage: &ttnpb.ApplicationUplink{
+					SessionKeyId: []byte{0x11},
+					FPort:        42,
+					FCnt:         42,
+					FrmPayload:   []byte{0x1, 0x2, 0x3},
+				},
+			},
+		}
+
+		a := assertions.New(t)
+		err = as.Publish(ctx, message)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		var req *http.Request
+		select {
+		case req = <-sinkCh:
+		case <-time.After(timeout):
+			t.Fatal("Expected message but nothing received")
+		}
+
+		actualBody, err := stdio.ReadAll(req.Body)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		expectedBody, err := formatters.JSON.FromUp(message)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(actualBody, should.Resemble, expectedBody)
+
+		// Pause the webhook.
+		_, err = registry.Set(ctx, ids, nil,
+			func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+				return &ttnpb.ApplicationWebhook{
+						Ids:     ids,
+						BaseUrl: "https://myapp.com/api/ttn/v3/{/appID,devID}",
+						Format:  "json",
+						Paused:  true,
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.webhook_id",
+						"base_url",
+						"format",
+						"paused",
+						"field_mask",
+					}, nil
+			})
+		if err != nil {
+			t.Fatalf("Failed to set webhook in registry: %s", err)
+		}
+
+		err = as.Publish(ctx, message)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		select {
+		case req = <-sinkCh:
+			t.Fatalf("Did not expect message but received: %v", req)
+		case <-time.After(timeout):
+			// Webhook was not received.
+		}
 	})
 }

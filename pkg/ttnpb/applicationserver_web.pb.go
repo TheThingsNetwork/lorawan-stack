@@ -622,7 +622,7 @@ type ApplicationWebhook struct {
 	ServiceData              *ApplicationWebhook_Message `protobuf:"bytes,18,opt,name=service_data,json=serviceData,proto3" json:"service_data,omitempty"`
 	HealthStatus             *ApplicationWebhookHealth   `protobuf:"bytes,20,opt,name=health_status,json=healthStatus,proto3" json:"health_status,omitempty"`
 	FieldMask                *fieldmaskpb.FieldMask      `protobuf:"bytes,21,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	// Set to true to skip processing the messages for this webhook.
+	// Set to temporarily pause forwarding uplink data to this end point and receiving downlinks from this end point.
 	Paused bool `protobuf:"varint,24,opt,name=paused,proto3" json:"paused,omitempty"`
 }
 

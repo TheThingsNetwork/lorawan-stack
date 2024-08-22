@@ -52,9 +52,9 @@ var webhookFanOutFieldMask = []string{
 	"join_accept",
 	"location_solved",
 	"service_data",
+	"paused",
 	"uplink_message",
 	"uplink_normalized",
-	"paused",
 }
 
 // Webhooks is an interface for registering incoming webhooks for downlink and creating a subscription to outgoing
@@ -203,6 +203,7 @@ func (w *webhooks) handleDown(
 		}
 		if hook.Paused {
 			logger.Debug("Webhook is paused")
+			res.WriteHeader(http.StatusAccepted)
 			return
 		}
 		format, ok := formats[hook.Format]

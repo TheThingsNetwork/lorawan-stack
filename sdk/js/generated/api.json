@@ -6357,7 +6357,7 @@
             },
             {
               "name": "paused",
-              "description": "Set to true to skip processing the messages for this webhook.",
+              "description": "Set to temporarily pause forwarding uplink data to this end point and receiving downlinks from this end point.",
               "label": "",
               "type": "bool",
               "longType": "bool",

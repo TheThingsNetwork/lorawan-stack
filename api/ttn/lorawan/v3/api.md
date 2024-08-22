@@ -2073,7 +2073,7 @@ The NATS provider settings.
 | `service_data` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `health_status` | [`ApplicationWebhookHealth`](#ttn.lorawan.v3.ApplicationWebhookHealth) |  |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
-| `paused` | [`bool`](#bool) |  | Set to true to skip processing the messages for this webhook. |
+| `paused` | [`bool`](#bool) |  | Set to temporarily pause forwarding uplink data to this end point and receiving downlinks from this end point. |
 
 #### Field Rules
 
