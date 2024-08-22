@@ -69,7 +69,6 @@ const RecentEndDevices = () => {
     {
       name: 'name',
       displayName: sharedMessages.name,
-      width: 40,
       getValue: row => ({
         id: row.ids.device_id,
         name: row.name,
@@ -92,17 +91,9 @@ const RecentEndDevices = () => {
       ),
     },
     {
-      name: 'ids.dev_eui',
-      displayName: sharedMessages.devEUI,
-      width: '6rem',
-      render: devEui => (
-        <SafeInspector data={devEui} noTransform noCopyPopup small hideable={false} />
-      ),
-    },
-    {
       name: 'last_seen_at',
       displayName: sharedMessages.lastSeen,
-      width: '3rem',
+      width: '9rem',
       render: lastSeen => {
         const showLastSeen = Boolean(lastSeen)
         return showLastSeen ? (
