@@ -65,7 +65,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -579,13 +578,13 @@ func (gs *GatewayServer) Connect(
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	var (
-		isAuthenticated bool
-		fieldMask       *fieldmaskpb.FieldMask
-	)
+	var isAuthenticated bool
 	if _, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()); err == nil {
 		isAuthenticated = true
-		fieldMask = ttnpb.FieldMask(
+	}
+	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
+		GatewayIds: ids,
+		FieldMask: ttnpb.FieldMask(
 			"administrative_contact",
 			"antennas",
 			"attributes",
@@ -602,13 +601,7 @@ func (gs *GatewayServer) Connect(
 			"status_public",
 			"technical_contact",
 			"update_location_from_status",
-		)
-	} else {
-		fieldMask = ttnpb.FieldMask(ttnpb.PublicGatewayFields...)
-	}
-	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: ids,
-		FieldMask:  fieldMask,
+		),
 	})
 	if errors.IsNotFound(err) {
 		if gs.requireRegisteredGateways {
