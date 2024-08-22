@@ -54,10 +54,16 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			true,
 		},
 		{
-			"ResetConf",
-			&ttnpb.MACCommand_ResetConf{MinorVersion: 1},
-			[]byte{0x01, 1},
+			"ResetConf v1.2",
+			&ttnpb.MACCommand_ResetConf{MinorVersion: 2, Cipher: 3},
+			[]byte{0x01, 0x32},
 			false,
+		},
+		{
+			"ResetInd v1.2",
+			&ttnpb.MACCommand_ResetInd{MinorVersion: 2, Cipher: 3},
+			[]byte{0x01, 0x32},
+			true,
 		},
 		{
 			"LinkCheckReq",

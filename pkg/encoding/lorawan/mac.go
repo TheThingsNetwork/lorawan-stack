@@ -31,7 +31,7 @@ import (
 // fractStep defines (1/2)^8 second step used in DeviceTimeAns payload.
 const fractStep = 3906250 * time.Nanosecond
 
-// MACCommandDescriptor descibes a MAC command.
+// MACCommandDescriptor describes a MAC command.
 type MACCommandDescriptor struct {
 	InitiatedByDevice bool
 	// UplinkLength is length of uplink payload.
@@ -75,13 +75,17 @@ var DefaultMACCommands = MACCommandSpec{
 			if pld.MinorVersion > 15 {
 				return nil, errExpectedLowerOrEqual("MinorVersion", 15)(pld.MinorVersion)
 			}
-			b = append(b, byte(pld.MinorVersion))
+			if pld.Cipher > 15 {
+				return nil, errExpectedLowerOrEqual("Cipher", 15)(pld.Cipher)
+			}
+			b = append(b, byte((pld.Cipher&0xf)<<4)^byte(pld.MinorVersion&0xf))
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.MACCommandIdentifier_CID_RESET, "ResetInd", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_ResetInd_{
 				ResetInd: &ttnpb.MACCommand_ResetInd{
 					MinorVersion: ttnpb.Minor(b[0] & 0xf),
+					Cipher:       ttnpb.CipherEnum((b[0] >> 4) & 0xf),
 				},
 			}
 			return nil
@@ -93,13 +97,17 @@ var DefaultMACCommands = MACCommandSpec{
 			if pld.MinorVersion > 15 {
 				return nil, errExpectedLowerOrEqual("MinorVersion", 15)(pld.MinorVersion)
 			}
-			b = append(b, byte(pld.MinorVersion))
+			if pld.Cipher > 15 {
+				return nil, errExpectedLowerOrEqual("Cipher", 15)(pld.Cipher)
+			}
+			b = append(b, byte((pld.Cipher&0xf)<<4)^byte(pld.MinorVersion&0xf))
 			return b, nil
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.MACCommandIdentifier_CID_RESET, "ResetConf", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_ResetConf_{
 				ResetConf: &ttnpb.MACCommand_ResetConf{
 					MinorVersion: ttnpb.Minor(b[0] & 0xf),
+					Cipher:       ttnpb.CipherEnum((b[0] >> 4) & 0xf),
 				},
 			}
 			return nil

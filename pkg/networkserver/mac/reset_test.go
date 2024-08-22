@@ -147,6 +147,59 @@ func TestHandleResetInd(t *testing.T) {
 				})),
 			},
 		},
+		{
+			Name: "lorawan 1.2 cipher",
+			Device: &ttnpb.EndDevice{
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_2_0,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
+				SupportsJoin:      false,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
+				MacState: &ttnpb.MACState{
+					CurrentParameters: genMACParameters(),
+					DesiredParameters: genMACParameters(),
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
+				},
+			},
+			Expected: func() *ttnpb.EndDevice {
+				dev := &ttnpb.EndDevice{
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_2_0,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
+					SupportsJoin:      false,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
+				}
+				macState, err := NewState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), &ttnpb.MACSettings{})
+				if err != nil {
+					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
+				}
+				dev.MacState = macState
+				dev.MacState.LorawanVersion = ttnpb.MACVersion_MAC_V1_2_0
+				dev.MacState.QueuedResponses = []*ttnpb.MACCommand{
+					(&ttnpb.MACCommand_ResetConf{
+						MinorVersion: 2,
+						Cipher:       3,
+					}).MACCommand(),
+				}
+				return dev
+			}(),
+			Payload: &ttnpb.MACCommand_ResetInd{
+				MinorVersion: 2,
+				Cipher:       3,
+			},
+			Events: events.Builders{
+				EvtReceiveResetIndication.With(events.WithData(&ttnpb.MACCommand_ResetInd{
+					MinorVersion: 2,
+					Cipher:       3,
+				})),
+				EvtEnqueueResetConfirmation.With(events.WithData(&ttnpb.MACCommand_ResetConf{
+					MinorVersion: 2,
+					Cipher:       3,
+				})),
+			},
+		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
