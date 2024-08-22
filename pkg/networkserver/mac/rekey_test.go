@@ -254,6 +254,66 @@ func TestHandleRekeyInd(t *testing.T) {
 				})),
 			},
 		},
+		{
+			Name: "non-empty queue/lorawan 1.2",
+			Device: &ttnpb.EndDevice{
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_2_0,
+				SupportsJoin:   true,
+				Ids:            &ttnpb.EndDeviceIdentifiers{},
+				PendingSession: &ttnpb.Session{
+					DevAddr:       test.DefaultDevAddr.Bytes(),
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
+				PendingMacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					PendingJoinRequest: &ttnpb.MACState_JoinRequest{},
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_2_0,
+				SupportsJoin:   true,
+				Ids: &ttnpb.EndDeviceIdentifiers{
+					DevAddr: test.DefaultDevAddr.Bytes(),
+				},
+				Session: &ttnpb.Session{
+					DevAddr:       test.DefaultDevAddr.Bytes(),
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
+				MacState: &ttnpb.MACState{
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_2_0,
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+						(&ttnpb.MACCommand_RekeyConf{
+							MinorVersion: 2,
+							Cipher:       3,
+						}).MACCommand(),
+					},
+				},
+			},
+			Payload: &ttnpb.MACCommand_RekeyInd{
+				MinorVersion: 2,
+				Cipher:       3,
+			},
+			Events: events.Builders{
+				EvtReceiveRekeyIndication.With(events.WithData(&ttnpb.MACCommand_RekeyInd{
+					MinorVersion: 2,
+					Cipher:       3,
+				})),
+				EvtEnqueueRekeyConfirmation.With(events.WithData(&ttnpb.MACCommand_RekeyConf{
+					MinorVersion: 2,
+					Cipher:       3,
+				})),
+			},
+		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{

@@ -143,6 +143,9 @@ func UseRekeyInd(v ttnpb.MACVersion) bool {
 // after a device joins in order to decrypt the RekeyInd and
 // encrypt the RekeyIndConf MAC commands.
 func RekeyPeriodVersion(v ttnpb.MACVersion) ttnpb.MACVersion {
+	if compareMACVersion(v, ttnpb.MACVersion_MAC_V1_1) >= 0 {
+		return v
+	}
 	return ttnpb.MACVersion_MAC_V1_1
 }
 
@@ -152,9 +155,16 @@ func RekeyPeriodVersion(v ttnpb.MACVersion) ttnpb.MACVersion {
 // v is the Network Server requested MAC version, while upperBound
 // represents the maximum minor accepted by the end device.
 func NegotiatedVersion(v ttnpb.MACVersion, upperBound ttnpb.Minor) (ttnpb.MACVersion, ttnpb.Minor) {
-	// As there is a singular minor currently available for this mechanism,
-	// we return static values.
-	return ttnpb.MACVersion_MAC_V1_1, ttnpb.Minor_MINOR_1
+	var version ttnpb.MACVersion
+	switch upperBound {
+	case ttnpb.Minor_MINOR_1:
+		version = ttnpb.MACVersion_MAC_V1_1
+	case ttnpb.Minor_MINOR_2:
+		version = ttnpb.MACVersion_MAC_V1_2_0
+	default:
+		panic(fmt.Errorf("unhandled minor version %d", upperBound))
+	}
+	return version, upperBound
 }
 
 // AllowDuplicateLinkADRAns reports whether v is allowed to use

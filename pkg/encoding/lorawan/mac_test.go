@@ -243,6 +243,18 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			false,
 		},
 		{
+			"RekeyInd v1.2",
+			&ttnpb.MACCommand_RekeyInd{MinorVersion: 2, Cipher: 3},
+			[]byte{0x0B, 0x32},
+			true,
+		},
+		{
+			"RekeyConf v1.2",
+			&ttnpb.MACCommand_RekeyConf{MinorVersion: 2, Cipher: 3},
+			[]byte{0x0B, 0x32},
+			false,
+		},
+		{
 			"ADRParamSetupReq",
 			&ttnpb.MACCommand_ADRParamSetupReq{
 				AdrAckDelayExponent: ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_4,

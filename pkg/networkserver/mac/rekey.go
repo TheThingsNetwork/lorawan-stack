@@ -57,6 +57,7 @@ func HandleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	dev.MacState.PendingJoinRequest = nil
 	dev.PendingMacState = nil
 	dev.PendingSession = nil
+	conf.Cipher = pld.Cipher
 
 	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, conf.MACCommand())
 	return append(evs,

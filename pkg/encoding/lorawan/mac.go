@@ -530,13 +530,17 @@ var DefaultMACCommands = MACCommandSpec{
 			if pld.MinorVersion > 15 {
 				return nil, errExpectedLowerOrEqual("MinorVersion", 15)(pld.MinorVersion)
 			}
-			b = append(b, byte(pld.MinorVersion))
+			if pld.Cipher > 15 {
+				return nil, errExpectedLowerOrEqual("Cipher", 15)(pld.Cipher)
+			}
+			b = append(b, byte((pld.Cipher&0xf)<<4)^byte(pld.MinorVersion&0xf))
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.MACCommandIdentifier_CID_REKEY, "RekeyInd", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RekeyInd_{
 				RekeyInd: &ttnpb.MACCommand_RekeyInd{
 					MinorVersion: ttnpb.Minor(b[0] & 0xf),
+					Cipher:       ttnpb.CipherEnum((b[0] >> 4) & 0xf),
 				},
 			}
 			return nil
@@ -548,13 +552,17 @@ var DefaultMACCommands = MACCommandSpec{
 			if pld.MinorVersion > 15 {
 				return nil, errExpectedLowerOrEqual("MinorVersion", 15)(pld.MinorVersion)
 			}
-			b = append(b, byte(pld.MinorVersion))
+			if pld.Cipher > 15 {
+				return nil, errExpectedLowerOrEqual("Cipher", 15)(pld.Cipher)
+			}
+			b = append(b, byte((pld.Cipher&0xf)<<4)^byte(pld.MinorVersion&0xf))
 			return b, nil
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.MACCommandIdentifier_CID_REKEY, "RekeyConf", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RekeyConf_{
 				RekeyConf: &ttnpb.MACCommand_RekeyConf{
 					MinorVersion: ttnpb.Minor(b[0] & 0xf),
+					Cipher:       ttnpb.CipherEnum((b[0] >> 4) & 0xf),
 				},
 			}
 			return nil
