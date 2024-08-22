@@ -128,10 +128,7 @@ const NotificationsDropdown = () => {
             </Link>
           ))}
           <div className="p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight br-l">
-            <Message
-              content={m.description}
-              values={{ numNotifications: dropdownItems.length, totalNotifications }}
-            />
+            <Message content={m.description} values={{ numNotifications: 3, totalNotifications }} />
           </div>
         </>
       )}
