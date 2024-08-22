@@ -63,9 +63,11 @@ NotificationIcon.propTypes = {
   notificationType: PropTypes.string.isRequired,
 }
 
-Notification.Content = NotificationContent
-Notification.Title = NotificationTitle
-Notification.Preview = NotificationPreview
-Notification.Icon = NotificationIcon
+const ttiNotification = {
+  Content: NotificationContent,
+  Title: NotificationTitle,
+  Preview: NotificationPreview,
+  Icon: NotificationIcon,
+}
 
-export default Notification
+export default ttiNotification

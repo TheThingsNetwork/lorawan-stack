@@ -22,7 +22,7 @@ import Spinner from '@ttn-lw/components/spinner'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 
-import Notification from '@console/components/notifications'
+import ttiNotification from '@console/components/notifications'
 
 import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
 
@@ -58,7 +58,7 @@ export const NotificationListItem = ({
         {showUnseenStatus && <Status pulse={false} status="good" className={style.unseenMark} />}
         <div className={style.notificationPreviewTitle}>
           <div className={style.notificationPreviewTitleText}>
-            <Notification.Title
+            <ttiNotification.Title
               data={notification}
               notificationType={notification.notification_type}
             />
@@ -77,7 +77,7 @@ export const NotificationListItem = ({
           </div>
         </div>
         <div className={style.notificationPreviewContent}>
-          <Notification.Preview
+          <ttiNotification.Preview
             data={notification}
             notificationType={notification.notification_type}
           />
