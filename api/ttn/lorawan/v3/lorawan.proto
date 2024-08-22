@@ -1036,9 +1036,11 @@ message MACCommand {
   }
   message RekeyInd {
     Minor minor_version = 1 [(validate.rules).enum.defined_only = true];
+    CipherEnum cipher = 2 [(validate.rules).enum.defined_only = true];
   }
   message RekeyConf {
     Minor minor_version = 1 [(validate.rules).enum.defined_only = true];
+    CipherEnum cipher = 2 [(validate.rules).enum.defined_only = true];
   }
   message ADRParamSetupReq {
     // Exponent e that configures the ADR_ACK_LIMIT = 2^e messages.

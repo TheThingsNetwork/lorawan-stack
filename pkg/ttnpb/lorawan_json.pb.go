@@ -3392,6 +3392,11 @@ func (x *MACCommand_RekeyInd) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("minor_version")
 		x.MinorVersion.MarshalProtoJSON(s)
 	}
+	if x.Cipher != 0 || s.HasField("cipher") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cipher")
+		x.Cipher.MarshalProtoJSON(s)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -3412,6 +3417,9 @@ func (x *MACCommand_RekeyInd) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "minor_version", "minorVersion":
 			s.AddField("minor_version")
 			x.MinorVersion.UnmarshalProtoJSON(s)
+		case "cipher":
+			s.AddField("cipher")
+			x.Cipher.UnmarshalProtoJSON(s)
 		}
 	})
 }
@@ -3434,6 +3442,11 @@ func (x *MACCommand_RekeyConf) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("minor_version")
 		x.MinorVersion.MarshalProtoJSON(s)
 	}
+	if x.Cipher != 0 || s.HasField("cipher") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cipher")
+		x.Cipher.MarshalProtoJSON(s)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -3454,6 +3467,9 @@ func (x *MACCommand_RekeyConf) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 		case "minor_version", "minorVersion":
 			s.AddField("minor_version")
 			x.MinorVersion.UnmarshalProtoJSON(s)
+		case "cipher":
+			s.AddField("cipher")
+			x.Cipher.UnmarshalProtoJSON(s)
 		}
 	})
 }

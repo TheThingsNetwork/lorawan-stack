@@ -488,8 +488,10 @@ var MACCommandFieldPathsNested = []string{
 	"payload.rejoin_param_setup_req.max_count_exponent",
 	"payload.rejoin_param_setup_req.max_time_exponent",
 	"payload.rekey_conf",
+	"payload.rekey_conf.cipher",
 	"payload.rekey_conf.minor_version",
 	"payload.rekey_ind",
+	"payload.rekey_ind.cipher",
 	"payload.rekey_ind.minor_version",
 	"payload.relay_conf_ans",
 	"payload.relay_conf_ans.cad_periodicity_ack",
@@ -876,17 +878,21 @@ var MACCommand_TxParamSetupReqFieldPathsTopLevel = []string{
 	"uplink_dwell_time",
 }
 var MACCommand_RekeyIndFieldPathsNested = []string{
+	"cipher",
 	"minor_version",
 }
 
 var MACCommand_RekeyIndFieldPathsTopLevel = []string{
+	"cipher",
 	"minor_version",
 }
 var MACCommand_RekeyConfFieldPathsNested = []string{
+	"cipher",
 	"minor_version",
 }
 
 var MACCommand_RekeyConfFieldPathsTopLevel = []string{
+	"cipher",
 	"minor_version",
 }
 var MACCommand_ADRParamSetupReqFieldPathsNested = []string{

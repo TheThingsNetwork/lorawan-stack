@@ -35937,6 +35937,26 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "cipher",
+              "description": "",
+              "label": "",
+              "type": "CipherEnum",
+              "longType": "CipherEnum",
+              "fullType": "ttn.lorawan.v3.CipherEnum",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -35957,6 +35977,26 @@
               "type": "Minor",
               "longType": "Minor",
               "fullType": "ttn.lorawan.v3.Minor",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cipher",
+              "description": "",
+              "label": "",
+              "type": "CipherEnum",
+              "longType": "CipherEnum",
+              "fullType": "ttn.lorawan.v3.CipherEnum",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

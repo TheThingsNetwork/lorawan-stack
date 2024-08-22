@@ -18020,6 +18020,9 @@
       "properties": {
         "minor_version": {
           "$ref": "#/definitions/v3Minor"
+        },
+        "cipher": {
+          "$ref": "#/definitions/v3CipherEnum"
         }
       }
     },
@@ -18028,6 +18031,9 @@
       "properties": {
         "minor_version": {
           "$ref": "#/definitions/v3Minor"
+        },
+        "cipher": {
+          "$ref": "#/definitions/v3CipherEnum"
         }
       }
     },

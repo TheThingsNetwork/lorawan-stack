@@ -6646,6 +6646,15 @@ func (m *MACCommand_RekeyInd) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "cipher":
+
+			if _, ok := CipherEnum_name[int32(m.GetCipher())]; !ok {
+				return MACCommand_RekeyIndValidationError{
+					field:  "cipher",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_RekeyIndValidationError{
 				field:  name,
@@ -6732,6 +6741,15 @@ func (m *MACCommand_RekeyConf) ValidateFields(paths ...string) error {
 			if _, ok := Minor_name[int32(m.GetMinorVersion())]; !ok {
 				return MACCommand_RekeyConfValidationError{
 					field:  "minor_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "cipher":
+
+			if _, ok := CipherEnum_name[int32(m.GetCipher())]; !ok {
+				return MACCommand_RekeyConfValidationError{
+					field:  "cipher",
 					reason: "value must be one of the defined enum values",
 				}
 			}

@@ -7619,24 +7619,28 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `minor_version` | [`Minor`](#ttn.lorawan.v3.Minor) |  |  |
+| `cipher` | [`CipherEnum`](#ttn.lorawan.v3.CipherEnum) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `minor_version` | <p>`enum.defined_only`: `true`</p> |
+| `cipher` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.RekeyInd">Message `MACCommand.RekeyInd`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `minor_version` | [`Minor`](#ttn.lorawan.v3.Minor) |  |  |
+| `cipher` | [`CipherEnum`](#ttn.lorawan.v3.CipherEnum) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `minor_version` | <p>`enum.defined_only`: `true`</p> |
+| `cipher` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.RelayConfAns">Message `MACCommand.RelayConfAns`</a>
 
