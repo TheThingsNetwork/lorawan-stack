@@ -73,8 +73,8 @@ const options = {
 }
 
 const DutyCycleUtilization = ({ band }) => {
-  const maxFrequency = band.max_frequency / 1e6
-  const minFrequency = band.min_frequency / 1e6
+  const maxFrequency = isNaN(band.max_frequency / 1e6) ? 0 : band.max_frequency / 1e6
+  const minFrequency = isNaN(band.min_frequency / 1e6) ? 0 : band.min_frequency / 1e6
   const utilization = band.downlink_utilization
     ? (band.downlink_utilization * 100) / band.downlink_utilization_limit
     : 0
@@ -84,8 +84,8 @@ const DutyCycleUtilization = ({ band }) => {
       <Message
         content={m.frequencyRange}
         values={{
-          minFreq: minFrequency.toFixed(1),
-          maxFreq: maxFrequency.toFixed(1),
+          minFreq: <FormattedNumber minimumFractionDigits={1} value={minFrequency.toFixed(1)} />,
+          maxFreq: <FormattedNumber minimumFractionDigits={1} value={maxFrequency.toFixed(1)} />,
         }}
         className="fs-s"
       />
