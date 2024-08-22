@@ -24,12 +24,9 @@ import {
   useLocation,
 } from 'react-router-dom'
 import classnames from 'classnames'
-import { IconLayoutBottombarExpand } from '@tabler/icons-react'
-import { defineMessages } from 'react-intl'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
-import Button from '@ttn-lw/components/button'
 import HeaderComponent from '@ttn-lw/components/header'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
@@ -67,10 +64,6 @@ import {
 
 import style from './app.styl'
 
-const m = defineMessages({
-  expandEventPanel: 'Expand live data overlay',
-})
-
 const errorRender = error => (
   <FullViewError error={error} header={<Header alwaysShowLogo Logo={Logo} />} />
 )
@@ -97,13 +90,7 @@ const Layout = () => {
   const siteName = selectApplicationSiteName()
   const main = useRef()
 
-  const {
-    height: splitFrameHeight,
-    setIsOpen,
-    isOpen,
-    isMounted,
-    isActive,
-  } = useContext(EventSplitFrameContext)
+  const { height: splitFrameHeight } = useContext(EventSplitFrameContext)
 
   useEffect(() => {
     if (main.current) {
@@ -146,18 +133,6 @@ const Layout = () => {
                     >
                       <Outlet />
                     </div>
-                    {isMounted && isActive && !isOpen && (
-                      <div className={style.openButton}>
-                        <Button
-                          icon={IconLayoutBottombarExpand}
-                          tooltip={m.expandEventPanel}
-                          tooltipPlacement="left"
-                          onClick={() => setIsOpen(true)}
-                          secondary
-                          small
-                        />
-                      </div>
-                    )}
                   </div>
                 </WithAuth>
               </main>
