@@ -30,6 +30,12 @@ import {
   FETCH_APPS_LIST_SUCCESS,
 } from '@console/store/actions/applications'
 
+import {
+  FETCH_DEVICES_LIST_SUCCESS,
+  GET_DEVICES_LIST_SUCCESS,
+  GET_DEV_SUCCESS,
+} from '../actions/devices'
+
 const application = (state = {}, application) => ({
   ...state,
   ...application,
@@ -128,6 +134,40 @@ const applications = (state = defaultState, { type, payload, event, meta }) => {
           }
         }
       }
+      return state
+    // For device responses, we can also obtain the lastSeen info to determine
+    // if there is a newer lastSeen value for the application.
+    case GET_DEV_SUCCESS:
+    case FETCH_DEVICES_LIST_SUCCESS:
+    case GET_DEVICES_LIST_SUCCESS:
+      // Normalize the data to an array of devices.
+      const devices = type === GET_DEV_SUCCESS ? [payload] : payload?.entities || []
+      const appId = getApplicationId(devices[0])
+      // Get the most recent last seen value from the devices.
+      const lastSeen = devices.reduce((acc, device) => {
+        const deviceLastSeen = getByPath(device, 'last_seen_at') || ''
+        return deviceLastSeen > acc ? deviceLastSeen : acc
+      }, '')
+
+      if (!lastSeen) {
+        return state
+      }
+
+      // Update the application's derived last seen value, if the current
+      // device's last seen value is more recent than the currently stored one.
+      if (!(id in state.derived) || lastSeen > state.derived[appId].lastSeen) {
+        return {
+          ...state,
+          derived: {
+            ...state.derived,
+            [appId]: {
+              ...(state.derived[appId] || {}),
+              lastSeen,
+            },
+          },
+        }
+      }
+
       return state
     case GET_MQTT_INFO_SUCCESS:
       return {
