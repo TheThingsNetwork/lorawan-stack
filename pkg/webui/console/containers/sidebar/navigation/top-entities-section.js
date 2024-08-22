@@ -45,14 +45,19 @@ const SectionError = () => (
   />
 )
 
-const TopEntityItem = ({ id, entity = {}, path, type }) => (
-  <SideNavigation.Item title={entity?.name || id} icon={entityIcons[type]} path={path} />
+const TopEntityItem = ({ id, entity = {}, path, type, forType }) => (
+  <SideNavigation.Item
+    title={entity?.name || (forType === 'END_DEVICE' ? id.split('/')[1] : id)}
+    icon={entityIcons[type]}
+    path={path}
+  />
 )
 
 TopEntityItem.propTypes = {
   entity: PropTypes.shape({
     name: PropTypes.string,
   }),
+  forType: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   path: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
@@ -94,7 +99,7 @@ const TopEntitiesSection = ({ topEntities, type }) => {
         errorRenderFunction={SectionError}
       >
         {topEntities.slice(0, 6).map((topEntity, index) => (
-          <TopEntityItem key={index} {...topEntity} />
+          <TopEntityItem key={index} {...topEntity} forType={type} />
         ))}
         {showMore &&
           topEntities.length > 6 &&
