@@ -128,7 +128,10 @@ const Pagination = ({
   const navigationPrevClassNames = classnames(style.item)
 
   return (
-    <div className="d-flex al-center gap-cs-l w-full flex-wrap fw-normal m-vert-cs-xl">
+    <div
+      className="d-flex al-center gap-cs-l w-full flex-wrap fw-normal m-vert-cs-xl pos-relative"
+      style={{ zIndex: '999' }}
+    >
       <Paginate
         previousClassName={navigationPrevClassNames}
         previousLabel={
