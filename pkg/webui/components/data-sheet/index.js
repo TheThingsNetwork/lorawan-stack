@@ -175,6 +175,7 @@ const DataSheetRow = ({ item }) => {
             isBytes={item.type === 'byte'}
             data={item.value}
             enableUint32={item.enableUint32}
+            small
           />
         ) : (
           item.value || (
