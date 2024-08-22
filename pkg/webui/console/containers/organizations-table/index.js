@@ -167,11 +167,11 @@ const OrganizationsTable = () => {
           displayName: sharedMessages.collaborators,
           width: 10,
           align: 'center',
-          render: deviceCount =>
-            typeof deviceCount !== 'number' ? (
+          render: collaboratorCount =>
+            typeof collaboratorCount !== 'number' ? (
               <Spinner micro center inline after={100} className="c-text-neutral-light" />
             ) : (
-              deviceCount
+              collaboratorCount
             ),
         },
         {

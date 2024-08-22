@@ -41,7 +41,6 @@ Empty.defaultProps = {
 const Head = ({ className, panelStyle, children, ...props }) => (
   <>
     <div {...props} className={classnames(className, style.sectionHeader)}>
-      {!panelStyle && <div className={style.sectionDivider} />}
       {children}
     </div>
   </>

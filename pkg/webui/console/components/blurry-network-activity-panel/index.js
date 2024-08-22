@@ -44,7 +44,7 @@ const BlurryNetworkActivityPanel = () => {
     <Panel
       title={sharedMessages.networkActivity}
       icon={IconChartBar}
-      shortCutLinkTitle={sharedMessages.noc}
+      shortCutLinkTitle={sharedMessages.nocShortened}
       shortCutLinkPath="#"
       shortCutLinkTarget="_blank"
       shortCutLinkDisabled

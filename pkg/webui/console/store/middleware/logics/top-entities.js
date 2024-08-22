@@ -134,7 +134,11 @@ const fetchTopEntities = async (getState, dispatch) => {
     try {
       await Promise.all([
         dispatch(
-          attachPromise(fetchApplicationsList({ page: 1, limit: prefetchLimit, order }, ['name'])),
+          attachPromise(
+            fetchApplicationsList({ page: 1, limit: prefetchLimit, order }, ['name'], {
+              withDeviceCount: true,
+            }),
+          ),
         ),
         dispatch(
           attachPromise(

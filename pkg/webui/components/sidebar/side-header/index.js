@@ -22,6 +22,7 @@ import Button from '@ttn-lw/components/button'
 import SidebarContext from '@console/containers/sidebar/context'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './side-header.styl'
 
@@ -38,6 +39,8 @@ const SideHeader = ({ Logo }) => {
           className={classnames(style.minimizeButton, 'md-lg:d-none')}
           icon={IconLayoutSidebarLeftCollapse}
           onClick={onMinimizeToggle}
+          tooltip={sharedMessages.keepSidebarOpen}
+          tooltipPlacement="left"
           naked
         />
       )}

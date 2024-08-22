@@ -49,7 +49,7 @@ const ApplicationCollaboratorsList = () => {
   )
 
   return (
-    <div className="container container--xxl">
+    <div className="container container--xxl p-0">
       <IntlHelmet title={sharedMessages.collaborators} />
       <CollaboratorsTable baseDataSelector={baseDataSelector} getItemsAction={getItemsAction} />
     </div>

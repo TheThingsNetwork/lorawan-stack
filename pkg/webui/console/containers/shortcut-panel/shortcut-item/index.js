@@ -49,13 +49,14 @@ ShortcutItem.propTypes = {
   action: PropTypes.func,
   className: PropTypes.string,
   icon: PropTypes.icon.isRequired,
-  link: PropTypes.string.isRequired,
+  link: PropTypes.string,
   title: PropTypes.message.isRequired,
 }
 
 ShortcutItem.defaultProps = {
   className: undefined,
   action: undefined,
+  link: undefined,
 }
 
 export default ShortcutItem

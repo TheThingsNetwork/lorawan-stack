@@ -36,7 +36,7 @@ const List = () => {
   )
 
   return (
-    <div className="container container--xxl">
+    <div className="container container--xxl p-0">
       <IntlHelmet title={sharedMessages.organizations} />
       <OrganizationsTable />
     </div>

@@ -21,7 +21,6 @@
     height: auto
     color: var(--c-text-neutral-heavy)
     font-weight: $fw.bold
-    white-space: nowrap
     margin-bottom: $cs.xl
 
     +media-query($bp.md)
@@ -39,11 +38,12 @@
 
   &-row
     &-heading
-      display: flex
       align-items: center
+      line-height: 1.2
       text-align: left
       font-weight: 400
       color: var(--c-text-neutral-semilight)
+      width: 50%
 
       +media-query($bp.md)
         font-size: $fs.s
@@ -91,7 +91,7 @@
   .data-sheet-row-content-value
     max-width: 45%
 
-@container panel (max-width: 500px)
+@container panel (max-width: 350px)
   .data-sheet-header
     margin-bottom: $cs.l
 

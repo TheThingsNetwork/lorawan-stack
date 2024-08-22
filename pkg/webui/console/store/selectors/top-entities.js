@@ -125,7 +125,7 @@ export const selectTopEntities = createSelector(
         return bScore - aScore
       })
 
-      // Fill up the rest with frequency recency items.
+      // After the bookmarks, add frequency recency items.
       if (acc[entityType].length < MAX_TOP_ENTITIES) {
         const dedupedFrequencyRecencyItems = topRecencyFrequencyItems[entityType].filter(
           item => !acc[entityType].find(e => e.id === item.key.split(':')[1]),
@@ -137,6 +137,35 @@ export const selectTopEntities = createSelector(
               const { entityType, entityId } = getTypeAndId(item)
               return buildEntity(entityId, entityType, 'frequency-recency-item', entities)
             }),
+        )
+      }
+
+      // Fill up the rest with recently created entities.
+      if (acc[entityType].length < MAX_TOP_ENTITIES) {
+        // Concatenate entities from all entity types and add them to a new object sorted by created_at.
+        const relevantEntities =
+          entityType === ALL ? entities : { [entityType]: entities[entityType] }
+        const allEntities = Object.keys(relevantEntities).reduce(
+          (acc, entityType) =>
+            acc.concat(
+              Object.keys(entities[entityType]).map(id =>
+                buildEntity(id, entityType, 'recently-created-entity', entities),
+              ),
+            ),
+          [],
+        )
+
+        const sortedEntities = allEntities.sort((a, b) => {
+          const aCreatedAt = a.entity.created_at || 0
+          const bCreatedAt = b.entity.created_at || 0
+
+          return bCreatedAt - aCreatedAt
+        })
+
+        acc[entityType].push(
+          ...sortedEntities
+            .filter(e => !acc[entityType].find(i => i.id === e.id))
+            .slice(0, MAX_TOP_ENTITIES - acc[entityType].length),
         )
       }
 

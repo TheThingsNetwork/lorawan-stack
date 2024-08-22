@@ -13,7 +13,7 @@
 // limitations under the License.
 
 .container
-  +media-query-min($bp.sm)
+  +media-query-min($bp.lg)
     full-screen()
     horizontalize()
 
@@ -54,7 +54,7 @@
   .content
     width: 60%
 
-+media-query($bp.sm)
++media-query($bp.lg)
   .visual
     display: none
 
@@ -62,7 +62,7 @@
     width: 100%
 
 .form
-  +media-query($bp.sm)
+  +media-query($bp.lg)
     margin-top: $header-height-mobile
     padding-bottom: 0
   padding-bottom: $ls.s
@@ -70,7 +70,7 @@
   min-width: 28rem
   max-width: 30rem
 
-  +media-query($bp.sm)
+  +media-query($bp.lg)
     min-width: auto
     max-width: none
     width: 100%
@@ -85,7 +85,7 @@
   font-size: $fs.xl
   line-height: $lh.xxs
   font-weight: $fw.bold
-  +media-query($bp.sm)
+  +media-query($bp.lg)
     font-size: $fs.xl
     text-align: center
 
@@ -102,9 +102,9 @@
 .buttons
   display: flex
   flex-direction: column
-  +media-query-min($bp.sm)
+  +media-query-min($bp.lg)
     flex-direction: row
-  +media-query($bp.sm)
+  +media-query($bp.lg)
     button, a
       margin-bottom: $cs.s
       margin-right: 0
@@ -116,12 +116,12 @@
   right: 0
   z-index: $zi.nav
   font-size: $fs.s
-  +media-query-min($bp.sm)
+  +media-query-min($bp.lg)
     background-color: transparent
     border: 0
 
 .button-break
-  +media-query-min($bp.sm)
+  +media-query-min($bp.lg)
     display: static
 
 .error-description

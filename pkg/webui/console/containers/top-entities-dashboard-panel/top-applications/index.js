@@ -15,9 +15,13 @@
 import React from 'react'
 import { FormattedNumber, defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { IconPlus } from '@tabler/icons-react'
 
 import Spinner from '@ttn-lw/components/spinner'
 import Status from '@ttn-lw/components/status'
+import Button from '@ttn-lw/components/button'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import LastSeen from '@console/components/last-seen'
 
@@ -88,10 +92,25 @@ const TopApplicationsList = () => {
       itemsCount={items.length}
       entities={items}
       headers={headers}
-      emptyMessage={m.emptyMessage}
-      emptyDescription={m.emptyDescription}
-      emptyAction={sharedMessages.createApplication}
-      emptyPath={'/applications/add'}
+      renderWhenEmpty={
+        <div className="d-flex direction-column flex-grow j-center gap-cs-l">
+          <div>
+            <Message content={m.emptyMessage} className="d-block text-center fs-l fw-bold" />
+            <Message
+              content={m.emptyDescription}
+              className="d-block text-center c-text-neutral-light"
+            />
+          </div>
+          <div className="text-center">
+            <Button.Link
+              to="/application/add"
+              primary
+              message={sharedMessages.addApplication}
+              icon={IconPlus}
+            />
+          </div>
+        </div>
+      }
     />
   )
 }

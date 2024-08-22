@@ -48,16 +48,16 @@ const GatewayOverview = () => {
     <Require featureCheck={mayViewGatewayInfo} otherwise={{ redirect: '/' }}>
       <IntlHelmet title={sharedMessages.overview} />
       <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6">
           <GatewayGeneralInformationPanel />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6">
           <GatewayStatusPanel />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6 d-flex">
           <BlurryNetworkActivityPanel />
         </div>
-        <div className="item-12 lg-xl:item-12 xl:item-6 lg:item-6">
+        <div className="item-12 xl:item-6 lg:item-6 d-flex">
           <GatewayMapPanel gateway={gateway} />
         </div>
       </div>

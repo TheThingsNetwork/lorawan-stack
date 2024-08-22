@@ -16,11 +16,7 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 
 import { Table } from '@ttn-lw/components/table'
-import { IconPlus } from '@ttn-lw/components/icon'
-import Button from '@ttn-lw/components/button'
 import ScrollFader from '@ttn-lw/components/scroll-fader'
-
-import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -35,10 +31,7 @@ const m = defineMessages({
 const EntitiesList = ({
   entities,
   headers,
-  emptyMessage,
-  emptyDescription,
-  emptyAction,
-  emptyPath,
+  renderWhenEmpty,
   EntitiesItemComponent: EntitiesItemProp,
 }) => {
   const EntitiesItemComponent = EntitiesItemProp ?? EntitiesItem
@@ -64,17 +57,7 @@ const EntitiesList = ({
   )
 
   return entities.length === 0 ? (
-    <div className="d-flex direction-column flex-grow j-center gap-cs-l">
-      <div>
-        <Message content={emptyMessage} className="d-block text-center fs-l fw-bold" />
-        <Message content={emptyDescription} className="d-block text-center c-text-neutral-light" />
-      </div>
-      {emptyAction && (
-        <div className="text-center">
-          <Button.Link to={emptyPath} primary message={emptyAction} icon={IconPlus} />
-        </div>
-      )}
-    </div>
+    renderWhenEmpty
   ) : (
     <ScrollFader className={styles.scrollFader} faderHeight="4rem" topFaderOffset="3rem" light>
       <Table className={styles.table}>
@@ -89,10 +72,6 @@ const EntitiesList = ({
 
 EntitiesList.propTypes = {
   EntitiesItemComponent: PropTypes.func,
-  emptyAction: PropTypes.message,
-  emptyDescription: PropTypes.message,
-  emptyMessage: PropTypes.message,
-  emptyPath: PropTypes.string,
   entities: PropTypes.unifiedEntities.isRequired,
   headers: PropTypes.arrayOf(
     PropTypes.shape({
@@ -103,13 +82,11 @@ EntitiesList.propTypes = {
       className: PropTypes.string,
     }),
   ).isRequired,
+  renderWhenEmpty: PropTypes.node,
 }
 
 EntitiesList.defaultProps = {
-  emptyDescription: undefined,
-  emptyMessage: undefined,
-  emptyAction: undefined,
-  emptyPath: undefined,
+  renderWhenEmpty: null,
   EntitiesItemComponent: undefined,
 }
 

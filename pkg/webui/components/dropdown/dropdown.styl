@@ -28,6 +28,7 @@ ul.dropdown
   max-width: 24rem
   z-index: $zi.dropdown
   margin: 0
+  animation: dropdown-show-from-top .1s ease-out
 
   &:not(.submenu-dropdown)
     // Pseudo element to extend the clickable area
@@ -40,6 +41,7 @@ ul.dropdown
 
     &.above
       top: auto
+      animation: dropdown-show-from-bottom .1s ease-out
 
       &:not(.vertical)
         bottom: 0
@@ -171,4 +173,37 @@ ul.dropdown
 
     &-icon
       margin-right: - $cs.xs
+
+@keyframes dropdown-show-from-top
+  0%
+    opacity: 0
+    transform: translateY(-.5rem) scale(.98)
+    filter: blur(.2rem)
+
+  50%
+    opacity: 1
+    transform: translateY(.1rem) scale(1.01)
+    filter: blur(0)
+
+  100%
+    opacity: 1
+    transform: translateY(0) scale(1)
+
+
+
+@keyframes dropdown-show-from-bottom
+  0%
+    opacity: 0
+    transform: translateY(.5rem) scale(.98)
+    filter: blur(.2rem)
+
+  50%
+    opacity: 1
+    transform: translateY(-.1rem) scale(1.01)
+    filter: blur(0)
+
+  100%
+    opacity: 1
+    transform: translateY(0) scale(1)
+
 

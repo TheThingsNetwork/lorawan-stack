@@ -123,7 +123,7 @@ Tooltip.defaultProps = {
   interactive: false,
   noOffset: false,
   placement: 'bottom',
-  small: false,
+  small: true,
   delay: 300,
   onShow: () => null,
   trigger: 'mouseenter focus',
