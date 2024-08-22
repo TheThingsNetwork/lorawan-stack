@@ -63,7 +63,7 @@ const options = {
     radialBar: {
       track: {
         show: true,
-        margin: 0.8,
+        margin: 0.9,
       },
       dataLabels: {
         show: false,
@@ -95,8 +95,8 @@ const DutyCycleUtilization = ({ band }) => {
             options={options}
             series={[utilization.toFixed(2)]}
             type="radialBar"
-            height="auto"
-            width="20px"
+            height={20}
+            width={20}
           />
         </div>
         <span
