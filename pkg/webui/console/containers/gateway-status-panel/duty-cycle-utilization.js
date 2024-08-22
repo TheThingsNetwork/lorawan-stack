@@ -33,10 +33,10 @@ const options = {
   },
   grid: {
     padding: {
-      left: -4,
-      right: -4,
+      left: -5,
+      right: -5,
       bottom: -9,
-      top: -4,
+      top: -5,
     },
   },
   colors: [
@@ -63,7 +63,7 @@ const options = {
     radialBar: {
       track: {
         show: true,
-        margin: 0.5,
+        margin: 0.8,
       },
       dataLabels: {
         show: false,
