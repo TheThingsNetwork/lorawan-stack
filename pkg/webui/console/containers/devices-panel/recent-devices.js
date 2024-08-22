@@ -17,7 +17,6 @@ import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
 
 import Status from '@ttn-lw/components/status'
-import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Button from '@ttn-lw/components/button'
 import { IconPlus } from '@ttn-lw/components/icon'
 import ScrollFader from '@ttn-lw/components/scroll-fader'
