@@ -24,7 +24,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './item.styl'
 
-const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
+const MenuLink = ({ icon, title, path, onClick, exact, disabled, external }) => {
   const ref = useRef()
 
   const className = useCallback(
@@ -37,7 +37,14 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
   )
 
   return (
-    <NavLink to={path} className={className} end={exact} onClick={onClick} ref={ref}>
+    <NavLink
+      to={path}
+      className={className}
+      end={exact}
+      onClick={onClick}
+      ref={ref}
+      target={external ? '_blank' : undefined}
+    >
       {icon && <Icon icon={icon} className={classnames(style.icon)} />}{' '}
       <Message className={style.title} content={title} />
     </NavLink>
@@ -47,6 +54,7 @@ const MenuLink = ({ icon, title, path, onClick, exact, disabled }) => {
 MenuLink.propTypes = {
   disabled: PropTypes.bool,
   exact: PropTypes.bool.isRequired,
+  external: PropTypes.bool,
   icon: PropTypes.icon,
   onClick: PropTypes.func,
   path: PropTypes.string.isRequired,
@@ -57,6 +65,7 @@ MenuLink.defaultProps = {
   icon: undefined,
   onClick: () => null,
   disabled: false,
+  external: false,
 }
 
 export default MenuLink

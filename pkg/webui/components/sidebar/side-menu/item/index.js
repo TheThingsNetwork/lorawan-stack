@@ -29,7 +29,8 @@ const handleItemClick = event => {
 }
 
 const SideNavigationItem = props => {
-  const { className, children, title, depth, icon, path, exact, isActive, isMinimized } = props
+  const { className, children, title, depth, icon, path, exact, isActive, isMinimized, external } =
+    props
   const [isExpanded, setIsExpanded] = useState(false)
 
   const handleExpandCollapsableItem = useCallback(() => {
@@ -89,6 +90,7 @@ SideNavigationItem.propTypes = {
   depth: PropTypes.number,
   /** A flag specifying whether the path of the linkable item should be matched exactly or not. */
   exact: PropTypes.bool,
+  external: PropTypes.bool,
   /** The name of the icon for the side navigation item. */
   icon: PropTypes.icon,
   /** A flag specifying whether the side navigation item is active or not. */
@@ -109,9 +111,10 @@ SideNavigationItem.defaultProps = {
   depth: 0,
   path: undefined,
   isMinimized: false,
+  external: false,
 }
 
-const LinkItem = ({ onClick, title, icon, exact, path }) => {
+const LinkItem = ({ onClick, title, icon, exact, path, external }) => {
   const handleLinkItemClick = useCallback(
     event => {
       document.activeElement.blur()
@@ -121,12 +124,20 @@ const LinkItem = ({ onClick, title, icon, exact, path }) => {
   )
 
   return (
-    <MenuLink path={path} title={title} icon={icon} onClick={handleLinkItemClick} exact={exact} />
+    <MenuLink
+      path={path}
+      title={title}
+      icon={icon}
+      onClick={handleLinkItemClick}
+      exact={exact}
+      external={external}
+    />
   )
 }
 
 LinkItem.propTypes = {
   exact: PropTypes.bool.isRequired,
+  external: PropTypes.bool,
   icon: PropTypes.icon,
   onClick: PropTypes.func,
   path: PropTypes.string,
@@ -137,6 +148,7 @@ LinkItem.defaultProps = {
   icon: undefined,
   path: undefined,
   onClick: () => null,
+  external: false,
 }
 
 export default SideNavigationItem
