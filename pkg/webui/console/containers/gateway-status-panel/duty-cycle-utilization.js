@@ -33,10 +33,10 @@ const options = {
   },
   grid: {
     padding: {
-      left: -9,
-      right: -9,
-      bottom: -12,
-      top: -9,
+      left: -4,
+      right: -4,
+      bottom: -9,
+      top: -4,
     },
   },
   colors: [
@@ -63,7 +63,7 @@ const options = {
     radialBar: {
       track: {
         show: true,
-        margin: 1.5,
+        margin: 0.5,
       },
       dataLabels: {
         show: false,
@@ -95,8 +95,8 @@ const DutyCycleUtilization = ({ band }) => {
             options={options}
             series={[utilization.toFixed(2)]}
             type="radialBar"
-            height={20}
-            width={20}
+            height="auto"
+            width="20px"
           />
         </div>
         <span
