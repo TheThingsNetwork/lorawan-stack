@@ -30,7 +30,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import styles from './account-select.styl'
 
 const SingleValue = props => (
-  <components.SingleValue {...props}>
+  <components.SingleValue {...props} className="d-flex al-center">
     <Icon icon={props.data.icon} className="mr-cs-xs" />
     {props.data.label}
   </components.SingleValue>
