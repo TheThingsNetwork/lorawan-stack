@@ -153,21 +153,19 @@ const Tabular = ({
   })
 
   const pagination = paginated ? (
-    <Table.Row footer>
-      <Table.DataCell className={style.paginationCell} small={small}>
-        <Pagination
-          className={style.pagination}
-          pageCount={Math.ceil(totalCount / pageSize) || 1}
-          onPageChange={handlePageChange}
-          disableInitialCallback
-          pageRangeDisplayed={2}
-          forcePage={page}
-          pageSize={pageSize}
-          setPageSize={setPageSize}
-          totalCount={totalCount}
-        />
-      </Table.DataCell>
-    </Table.Row>
+    <div className="d-flex justify-center">
+      <Pagination
+        className={style.pagination}
+        pageCount={Math.ceil(totalCount / pageSize) || 1}
+        onPageChange={handlePageChange}
+        disableInitialCallback
+        pageRangeDisplayed={2}
+        forcePage={page}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+        totalCount={totalCount}
+      />
+    </div>
   ) : null
 
   return (
