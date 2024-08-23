@@ -119,7 +119,8 @@ func (gcls *gatewayClaimingServer) Claim(
 	}
 
 	// Claim the gateway on the upstream.
-	if err := claimer.Claim(ctx, gatewayEUI, string(authCode), req.TargetGatewayServerAddress); err != nil {
+	res, err := claimer.Claim(ctx, gatewayEUI, string(authCode), req.TargetGatewayServerAddress)
+	if err != nil {
 		observability.RegisterFailClaim(ctx, ids.GetEntityIdentifiers(), err)
 		return nil, errClaim.WithCause(err)
 	}
@@ -143,6 +144,7 @@ func (gcls *gatewayClaimingServer) Claim(
 		EnforceDutyCycle:               true,
 		RequireAuthenticatedConnection: true,
 		FrequencyPlanIds:               req.TargetFrequencyPlanIds,
+		Antennas:                       res.Antennas,
 	}
 
 	_, err = gcls.registry.Create(ctx, &ttnpb.CreateGatewayRequest{

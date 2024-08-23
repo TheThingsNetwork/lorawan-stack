@@ -713,8 +713,8 @@ go.packetbroker.org/api/routing v1.9.2 h1:J4+4vYZxa60UWC70Y9yy7sktU7DXaAp9Q13Bfq
 go.packetbroker.org/api/routing v1.9.2/go.mod h1:kd2K7gieDI35YfPA8/zDmLX3qiKPuXia/MA77BEAeUA=
 go.packetbroker.org/api/v3 v3.17.1 h1:LcyFPUGqVubGWMvQ16tZlQIKd+noGx7urzEYhSLiEQA=
 go.packetbroker.org/api/v3 v3.17.1/go.mod h1:6bVbdWAYLnvZ5kgXxA7GBQvZTN7vxI0DoF1Di1NoAT4=
-go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240729145607-ea516688afbd h1:FvD516hdD/iWqoS20SFdcoiUgwRJP3egNXNiN+Ux2d0=
-go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240729145607-ea516688afbd/go.mod h1:2+WsMwIunNLh22oauBzGL56JazE3UY34W1fstqEbacw=
+go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240823134410-68cd7baab6c5 h1:w4NvcBAq7JCwlfthvGw1PRWuI6pCf5TlIjKgFHKml8M=
+go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20240823134410-68cd7baab6c5/go.mod h1:2+WsMwIunNLh22oauBzGL56JazE3UY34W1fstqEbacw=
 go.thethings.industries/pkg/ca v0.0.0-20240809123127-21a24c0e47df h1:IMSctPllwEtJLyM/1AWgBiN1NPwBKqEVkCiK0I/MNY4=
 go.thethings.industries/pkg/ca v0.0.0-20240809123127-21a24c0e47df/go.mod h1:89OU623VYKW9i3W4CZgIGFmtgb/jsN8JV2PAuCsj+7w=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e h1:TWGQ3lh7gI2W5hnb6qPdpoAa0d7s/XPwvgf2VVCMJaY=

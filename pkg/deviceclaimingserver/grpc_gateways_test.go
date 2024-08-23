@@ -71,7 +71,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 		},
 	})
 
-	mockGatewayclaimer := &MockGatewayClaimer{
+	mockGatewayClaimer := &MockGatewayClaimer{
 		IsManagedGatewayFunc: func(_ context.Context, e types.EUI64) (bool, error) {
 			return e.Equal(supportedEUI), nil
 		},
@@ -88,7 +88,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 					Length: 48,
 				}),
 			},
-			mockGatewayclaimer,
+			mockGatewayClaimer,
 		),
 	)
 	if err != nil {
@@ -180,7 +180,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 		Name           string
 		Req            *ttnpb.ClaimGatewayRequest
 		CallOpt        grpc.CallOption
-		ClaimFunc      func(context.Context, types.EUI64, string, string) error
+		ClaimFunc      func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error)
 		CreateFunc     func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error)
 		UnclaimFunc    func(context.Context, types.EUI64) error
 		ErrorAssertion func(error) bool
@@ -271,8 +271,8 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 				TargetGatewayServerAddress: "things.example.com",
 			},
 			CallOpt: authorizedCallOpt,
-			ClaimFunc: func(_ context.Context, _ types.EUI64, _, _ string) error {
-				return errClaim.New()
+			ClaimFunc: func(_ context.Context, _ types.EUI64, _, _ string) (*dcstypes.GatewayMetadata, error) {
+				return nil, errClaim.New()
 			},
 			ErrorAssertion: errors.IsAborted,
 		},
@@ -290,8 +290,8 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 				TargetGatewayServerAddress: "things.example.com",
 			},
 			CallOpt: authorizedCallOpt,
-			ClaimFunc: func(context.Context, types.EUI64, string, string) error {
-				return nil
+			ClaimFunc: func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error) {
+				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errCreate.New()
@@ -318,8 +318,8 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 				TargetGatewayServerAddress: "things.example.com",
 			},
 			CallOpt: authorizedCallOpt,
-			ClaimFunc: func(context.Context, types.EUI64, string, string) error {
-				return nil
+			ClaimFunc: func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error) {
+				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errCreate.New()
@@ -342,8 +342,8 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 				TargetGatewayId:            "test-gateway",
 				TargetGatewayServerAddress: "things.example.com",
 			},
-			ClaimFunc: func(context.Context, types.EUI64, string, string) error {
-				return nil
+			ClaimFunc: func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error) {
+				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return in.Gateway, nil
@@ -354,10 +354,10 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			if tc.ClaimFunc != nil {
-				mockGatewayclaimer.ClaimFunc = tc.ClaimFunc
+				mockGatewayClaimer.ClaimFunc = tc.ClaimFunc
 			}
 			if tc.UnclaimFunc != nil {
-				mockGatewayclaimer.UnclaimFunc = tc.UnclaimFunc
+				mockGatewayClaimer.UnclaimFunc = tc.UnclaimFunc
 			}
 			if tc.CreateFunc != nil {
 				mockGatewayRegistry.createFunc = tc.CreateFunc
@@ -480,7 +480,7 @@ func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			if tc.UnclaimFunc != nil {
-				mockGatewayclaimer.UnclaimFunc = tc.UnclaimFunc
+				mockGatewayClaimer.UnclaimFunc = tc.UnclaimFunc
 			}
 			if tc.GetFunc != nil {
 				mockGatewayRegistry.getFunc = tc.GetFunc
