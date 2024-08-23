@@ -1,6 +1,7 @@
 module go.thethings.network/lorawan-stack/v3
 
-go 1.21
+go 1.21.0
+
 toolchain go1.22.5
 
 // See https://github.com/mitchellh/mapstructure/pull/278
