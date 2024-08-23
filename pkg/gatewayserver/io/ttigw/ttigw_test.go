@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/coder/websocket"
 	lorav1 "go.thethings.industries/pkg/api/gen/tti/gateway/data/lora/v1"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -34,7 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
-	"nhooyr.io/websocket"
 )
 
 //go:embed testdata/serverca.pem

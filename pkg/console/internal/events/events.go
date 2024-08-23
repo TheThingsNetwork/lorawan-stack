@@ -21,6 +21,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/coder/websocket"
 	"github.com/gorilla/mux"
 	"github.com/mileusna/useragent"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -38,7 +39,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
-	"nhooyr.io/websocket"
 )
 
 const (

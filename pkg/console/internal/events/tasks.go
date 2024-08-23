@@ -20,11 +20,11 @@ import (
 	"io"
 	"time"
 
+	"github.com/coder/websocket"
+	"github.com/coder/websocket/wsjson"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/eventsmux"
 	"go.thethings.network/lorawan-stack/v3/pkg/console/internal/events/protocol"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"nhooyr.io/websocket"
-	"nhooyr.io/websocket/wsjson"
 )
 
 func makeMuxTask(m eventsmux.Interface, cancel func(error)) func(context.Context) error {

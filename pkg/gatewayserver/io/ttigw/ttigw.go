@@ -25,6 +25,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/coder/websocket"
 	"github.com/gorilla/mux"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	lorav1 "go.thethings.industries/pkg/api/gen/tti/gateway/data/lora/v1"
@@ -44,7 +45,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"nhooyr.io/websocket"
 )
 
 const (
