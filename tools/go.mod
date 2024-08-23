@@ -80,6 +80,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cilium/ebpf v0.12.3 // indirect
+	github.com/coder/websocket v1.8.12 // indirect
 	github.com/containerd/cgroups/v3 v3.0.2 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/couchbase/vellum v1.0.2 // indirect
@@ -256,5 +257,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
 	mellium.im/sasl v0.3.1 // indirect
-	nhooyr.io/websocket v1.8.17 // indirect
 )

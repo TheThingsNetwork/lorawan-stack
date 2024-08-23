@@ -18,6 +18,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.14
 	github.com/bluele/gcache v0.0.2
+	github.com/coder/websocket v1.8.12
 	github.com/disintegration/imaging v1.6.2
 	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d
 	github.com/dustin/go-humanize v1.0.1
@@ -111,7 +112,6 @@ require (
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v2 v2.4.0
-	nhooyr.io/websocket v1.8.17
 )
 
 require (
