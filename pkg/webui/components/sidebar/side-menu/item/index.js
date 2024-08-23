@@ -78,6 +78,7 @@ const SideNavigationItem = props => {
           path={path}
           depth={depth}
           onDropdownItemsClick={handleItemClick}
+          external={external}
         />
       )}
     </li>
