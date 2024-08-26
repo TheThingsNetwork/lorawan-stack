@@ -29,7 +29,7 @@ import UserSettingsView from '../user-settings'
 import Overview from './overview'
 
 const OverviewRoutes = () => {
-  useBreadcrumbs('overview', <Breadcrumb path="/" content={sharedMessages.overview} />)
+  useBreadcrumbs('home', <Breadcrumb path="/" content={sharedMessages.home} />)
 
   return (
     <Routes>
