@@ -39,7 +39,7 @@ const SideHeader = ({ Logo }) => {
           className={classnames(style.minimizeButton, 'md-lg:d-none')}
           icon={IconLayoutSidebarLeftCollapse}
           onClick={onMinimizeToggle}
-          tooltip={sharedMessages.keepSidebarOpen}
+          tooltip={sharedMessages.hideSidebar}
           tooltipPlacement="left"
           naked
         />

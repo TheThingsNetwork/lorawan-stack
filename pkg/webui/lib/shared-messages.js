@@ -316,6 +316,7 @@ export default defineMessages({
   gsServerAddressDescription: 'The address of the Gateway Server to connect to',
   hardware: 'Hardware',
   hardwareVersion: 'Hardware version',
+  hideSidebar: 'Hide sidebar',
   home: 'Home',
   homeNetID: 'Home NetID',
   homeNetIDDescription: 'ID to identify the LoRaWAN network',
