@@ -134,11 +134,15 @@ const Transmissions = ({ gatewayStats, isDisconnected }) => {
       <div className={style.gtwStatusPanelTransmissions}>
         <div className="d-flex al-center gap-cs-xxs">
           <Icon icon={showConnectionEstablished ? IconClockCheck : IconClockCancel} />
-          <Message
-            content={showConnectionEstablished ? m.established : m.notEstablished}
-            className="fw-bold"
-            values={{ days: <DateTime.Relative value={gatewayStats?.connected_at} /> }}
-          />
+          {showConnectionEstablished ? (
+            <Message
+              content={m.established}
+              className="fw-bold"
+              values={{ days: <DateTime.Relative value={gatewayStats?.connected_at} /> }}
+            />
+          ) : (
+            <Message content={m.notEstablished} className="fw-bold" />
+          )}
         </div>
       </div>
       {showProtocol && (

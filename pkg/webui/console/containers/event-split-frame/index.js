@@ -14,6 +14,10 @@
 
 import React, { useContext, useCallback, useRef, useEffect } from 'react'
 import DOM from 'react-dom'
+import { IconLayoutBottombarExpand } from '@tabler/icons-react'
+import { defineMessages } from 'react-intl'
+
+import Button from '@ttn-lw/components/button'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -21,8 +25,13 @@ import EventSplitFrameContext from './context'
 
 import style from './event-split-frame.styl'
 
+const m = defineMessages({
+  expandEventPanel: 'Expand live data overlay',
+})
+
 const EventSplitFrameInner = ({ children }) => {
-  const { isOpen, height, isActive, setHeight, setIsMounted } = useContext(EventSplitFrameContext)
+  const { isOpen, height, isActive, setHeight, setIsMounted, setIsOpen } =
+    useContext(EventSplitFrameContext)
   const ref = useRef()
 
   useEffect(() => {
@@ -67,6 +76,18 @@ const EventSplitFrameInner = ({ children }) => {
           </div>
           <div className={style.content}>{children}</div>
         </>
+      )}
+      {isActive && !isOpen && (
+        <div className={style.openButton}>
+          <Button
+            icon={IconLayoutBottombarExpand}
+            tooltip={m.expandEventPanel}
+            tooltipPlacement="left"
+            onClick={() => setIsOpen(true)}
+            secondary
+            small
+          />
+        </div>
       )}
     </div>
   )

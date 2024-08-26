@@ -23,7 +23,7 @@ import Status from '@ttn-lw/components/status'
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
 
-import Notification from '@console/components/notifications'
+import ttiNotification from '@console/components/notifications'
 
 import notificationStyle from '@console/containers/notifications/notifications.styl'
 import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
@@ -78,14 +78,14 @@ const NotificationsDropdown = () => {
               className={classnames(style.notificationsDropdownLink, 'd-flex')}
             >
               <div className={style.notificationsDropdownLinkIcon}>
-                <Notification.Icon
+                <ttiNotification.Icon
                   data={notification}
                   notificationType={notification.notification_type}
                 />
               </div>
               <div className={style.notificationContainer}>
                 <div className={classnames(style.title, 'fw-bold')}>
-                  <Notification.Title
+                  <ttiNotification.Title
                     data={notification}
                     notificationType={notification.notification_type}
                   />
@@ -96,7 +96,7 @@ const NotificationsDropdown = () => {
                     style.previewContent,
                   )}
                 >
-                  <Notification.Preview
+                  <ttiNotification.Preview
                     data={notification}
                     notificationType={notification.notification_type}
                   />
@@ -128,10 +128,7 @@ const NotificationsDropdown = () => {
             </Link>
           ))}
           <div className="p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight br-l">
-            <Message
-              content={m.description}
-              values={{ numNotifications: dropdownItems.length, totalNotifications }}
-            />
+            <Message content={m.description} values={{ numNotifications: 3, totalNotifications }} />
           </div>
         </>
       )}

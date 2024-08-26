@@ -58,7 +58,7 @@ const ScrollFader = React.forwardRef(
       })
 
       // Run the calculation whenever the children change.
-      mutationObserver.observe(container, { attributes: false, childList: true, subtree: false })
+      mutationObserver.observe(container, { attributes: false, childList: true, subtree: true })
 
       handleScroll() // Call once on mount if needed
       container.addEventListener('scroll', handleScroll)

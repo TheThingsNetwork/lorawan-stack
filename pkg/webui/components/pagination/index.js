@@ -95,7 +95,7 @@ const Pagination = ({
   )
 
   const pageSizeSelect = (
-    <div className="d-flex al-center gap-cs-xs fw-normal m-vert-cs-xl">
+    <div className="d-flex al-center gap-cs-xs fw-normal">
       <Message content={m.itemsPerPage} className={style.sizeMessage} />
       <Select
         name="page-size-select"
@@ -128,7 +128,7 @@ const Pagination = ({
   const navigationPrevClassNames = classnames(style.item)
 
   return (
-    <div className="d-flex al-center gap-cs-l w-full flex-wrap fw-normal m-vert-cs-xl">
+    <div className="d-flex al-center gap-cs-l w-full flex-wrap fw-normal m-vert-cs-m">
       <Paginate
         previousClassName={navigationPrevClassNames}
         previousLabel={

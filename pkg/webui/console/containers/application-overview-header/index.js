@@ -143,30 +143,26 @@ const ApplicationOverviewHeader = () => {
     let node
     if (showLastSeen) {
       node = (
-        <Link to={`/applications/${application_id}/data`}>
-          <DocTooltip
-            interactive
-            docPath="/getting-started/console/troubleshooting"
-            content={<Message content={m.lastSeenAvailableTooltip} />}
-          >
-            <LastSeen lastSeen={lastSeen} className="c-text-neutral-semilight" />
-          </DocTooltip>
-        </Link>
+        <DocTooltip
+          interactive
+          docPath="/getting-started/console/troubleshooting"
+          content={<Message content={m.lastSeenAvailableTooltip} />}
+        >
+          <LastSeen lastSeen={lastSeen} className="c-text-neutral-semilight" />
+        </DocTooltip>
       )
     } else {
       node = (
-        <Link to={`/applications/${application_id}/data`}>
-          <DocTooltip
-            content={<Message content={m.noActivityTooltip} />}
-            docPath="/getting-started/console/troubleshooting"
-          >
-            <Status
-              status="mediocre"
-              label={sharedMessages.noRecentActivity}
-              className={style.status}
-            />
-          </DocTooltip>
-        </Link>
+        <DocTooltip
+          content={<Message content={m.noActivityTooltip} />}
+          docPath="/getting-started/console/troubleshooting"
+        >
+          <Status
+            status="mediocre"
+            label={sharedMessages.noRecentActivity}
+            className={style.status}
+          />
+        </DocTooltip>
       )
     }
     return (

@@ -56,7 +56,7 @@ const customMenu = props => {
 }
 
 const SingleValue = props => (
-  <components.SingleValue {...props}>
+  <components.SingleValue {...props} className="d-flex al-center">
     <Icon icon={props.data.icon} className="mr-cs-xs" />
     {props.data.label}
   </components.SingleValue>

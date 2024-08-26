@@ -186,7 +186,11 @@ const ApplicationsTable = props => {
                   }
                   placement="top-end"
                 >
-                  <Status status="unknown" label={sharedMessages.otherCluster}>
+                  <Status
+                    status="unknown"
+                    label={sharedMessages.otherCluster}
+                    className="d-flex al-center"
+                  >
                     <Icon
                       icon={IconHelp}
                       textPaddedLeft

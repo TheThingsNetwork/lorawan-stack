@@ -25,7 +25,7 @@ import Button from '@ttn-lw/components/button'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
 
-import Notification from '@console/components/notifications'
+import ttiNotification from '@console/components/notifications'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -73,7 +73,7 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
           />
           <div>
             <p className="m-0">
-              <Notification.Title
+              <ttiNotification.Title
                 data={selectedNotification}
                 notificationType={selectedNotification.notification_type}
               />
@@ -117,7 +117,7 @@ const NotificationContent = ({ onArchive, selectedNotification }) => {
         </div>
       </div>
       <div className="p-cs-xl md-lg:p-cs-l">
-        <Notification.Content
+        <ttiNotification.Content
           receiver={userId}
           data={selectedNotification}
           notificationType={selectedNotification.notification_type}

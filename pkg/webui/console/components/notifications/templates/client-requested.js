@@ -68,9 +68,9 @@ const ClientRequestedPreview = ({ notificationData }) => {
     <Message
       content={m.preview}
       values={{
-        senderType: capitalizeMessage(getType(sender_ids)),
-        senderTypeMiddle: getType(sender_ids),
-        id: getId(sender_ids),
+        senderType: sender_ids ? capitalizeMessage(getType(sender_ids)) : 'An unknown',
+        senderTypeMiddle: sender_ids ? getType(sender_ids) : 'the unknown',
+        id: sender_ids ? getId(sender_ids) : ' user',
         collaboratorType: getType(collaborator),
         collaboratorId: getId(collaborator),
         clientId: client.ids.client_id,
@@ -98,9 +98,9 @@ const ClientRequested = ({ notificationData }) => {
   }
   const values = {
     body: {
-      senderType: capitalizeMessage(getType(sender_ids)),
-      senderTypeMiddle: getType(sender_ids),
-      id: getId(sender_ids),
+      senderType: sender_ids ? capitalizeMessage(getType(sender_ids)) : 'An unknown',
+      senderTypeMiddle: sender_ids ? getType(sender_ids) : 'the unknown',
+      id: sender_ids ? getId(sender_ids) : ' user',
       collaboratorType: getType(collaborator),
       collaboratorId: getId(collaborator),
     },

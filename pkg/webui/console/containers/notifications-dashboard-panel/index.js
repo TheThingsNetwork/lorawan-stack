@@ -27,7 +27,7 @@ import FetchTable from '@ttn-lw/containers/fetch-table'
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
-import Notification from '@console/components/notifications'
+import ttiNotification from '@console/components/notifications'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import useRequest from '@ttn-lw/lib/hooks/use-request'
@@ -64,13 +64,13 @@ const NotificationsDashboardPanel = () => {
         <div className="pos-relative pl-cs-m">
           {!notification.status && <Status pulse={false} status="good" className={style.status} />}
           <div className={style.notificationPanelTitle}>
-            <Notification.Title
+            <ttiNotification.Title
               data={notification}
               notificationType={notification.notification_type}
             />
           </div>
           <div className={style.notificationPanelPreview}>
-            <Notification.Preview
+            <ttiNotification.Preview
               data={notification}
               notificationType={notification.notification_type}
             />
