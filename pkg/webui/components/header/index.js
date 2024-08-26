@@ -46,93 +46,96 @@ const Header = ({
   expandSidebar,
   handleHideSidebar,
   ...rest
-}) => (
-  <header
-    {...rest}
-    className={classnames(className, style.container, {
-      [style.containerMinimized]: isSidebarMinimized,
-    })}
-    id="header"
-  >
-    {alwaysShowLogo ? (
-      <div className="d-flex al-center gap-cs-xs">
-        <Link to="/">
-          <Logo className={style.logo} />
-        </Link>
-      </div>
-    ) : (
-      <>
-        <div className="d-flex j-start al-center gap-cs-s lg-xl:d-none">
-          {isSidebarMinimized && (
-            <>
-              <Button
-                className="md-lg:d-none"
-                icon={IconLayoutSidebarLeftExpand}
-                onClick={toggleSidebarMinimized}
-                naked
-                tooltip={sharedMessages.keepSidebarOpen}
-                tooltipPlacement="right"
-                onMouseEnter={expandSidebar}
-                onMouseLeave={handleHideSidebar}
-              />
-              <div className={style.divider} />
-            </>
-          )}
-          <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
-        </div>
-        <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
-          <Button secondary icon={IconLayoutSidebarLeftExpand} onClick={onMenuClick} />
-          <Link to="/">
+}) => {
+  const LinkComponent = safe ? 'a' : Link
+  return (
+    <header
+      {...rest}
+      className={classnames(className, style.container, {
+        [style.containerMinimized]: isSidebarMinimized,
+      })}
+      id="header"
+    >
+      {alwaysShowLogo ? (
+        <div className="d-flex al-center gap-cs-xs">
+          <LinkComponent to="/" href="/">
             <Logo className={style.logo} />
-          </Link>
+          </LinkComponent>
         </div>
-      </>
-    )}
+      ) : (
+        <>
+          <div className="d-flex j-start al-center gap-cs-s lg-xl:d-none">
+            {isSidebarMinimized && (
+              <>
+                <Button
+                  className="md-lg:d-none"
+                  icon={IconLayoutSidebarLeftExpand}
+                  onClick={toggleSidebarMinimized}
+                  naked
+                  tooltip={sharedMessages.keepSidebarOpen}
+                  tooltipPlacement="right"
+                  onMouseEnter={expandSidebar}
+                  onMouseLeave={handleHideSidebar}
+                />
+                <div className={style.divider} />
+              </>
+            )}
+            <div className={classnames('breadcrumbs', 'lg-xl:d-none')} />
+          </div>
+          <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
+            <Button secondary icon={IconLayoutSidebarLeftExpand} onClick={onMenuClick} />
+            <LinkComponent to="/" href="/">
+              <Logo className={style.logo} />
+            </LinkComponent>
+          </div>
+        </>
+      )}
 
-    {!safe && (
-      <div className="d-flex al-center gap-cs-xs">
-        <AppStatusBadge />
-        <Button
-          secondary
-          icon={IconPlus}
-          dropdownItems={addDropdownItems}
-          dropdownPosition="below left"
-          tooltip={sharedMessages.addEntity}
-          tooltipPlacement="bottom"
-          className="md-lg:d-none"
-        />
-        <Button
-          secondary
-          icon={IconStar}
-          dropdownItems={bookmarkDropdownItems}
-          dropdownClassName={style.bookmarksDropdown}
-          dropdownPosition="below left"
-          tooltip={sharedMessages.bookmarks}
-          tooltipPlacement="bottom"
-          className="md-lg:d-none"
-        />
-        <Button
-          secondary
-          icon={IconInbox}
-          dropdownItems={notificationsDropdownItems}
-          dropdownClassName={style.notificationsDropdown}
-          dropdownPosition="below left"
-          tooltip={sharedMessages.notifications}
-          tooltipPlacement="bottom"
-          withAlert={showNotificationDot}
-          className="md-lg:d-none"
-        />
-        <ProfileDropdown
-          brandLogo={brandLogo}
-          data-test-id="profile-dropdown"
-          profilePicture={user?.profile_picture}
-        >
-          {profileDropdownItems}
-        </ProfileDropdown>
-      </div>
-    )}
-  </header>
-)
+      {!safe && (
+        <div className="d-flex al-center gap-cs-xs">
+          <AppStatusBadge />
+          <Button
+            secondary
+            icon={IconPlus}
+            dropdownItems={addDropdownItems}
+            dropdownPosition="below left"
+            tooltip={sharedMessages.addEntity}
+            tooltipPlacement="bottom"
+            className="md-lg:d-none"
+          />
+          <Button
+            secondary
+            icon={IconStar}
+            dropdownItems={bookmarkDropdownItems}
+            dropdownClassName={style.bookmarksDropdown}
+            dropdownPosition="below left"
+            tooltip={sharedMessages.bookmarks}
+            tooltipPlacement="bottom"
+            className="md-lg:d-none"
+          />
+          <Button
+            secondary
+            icon={IconInbox}
+            dropdownItems={notificationsDropdownItems}
+            dropdownClassName={style.notificationsDropdown}
+            dropdownPosition="below left"
+            tooltip={sharedMessages.notifications}
+            tooltipPlacement="bottom"
+            withAlert={showNotificationDot}
+            className="md-lg:d-none"
+          />
+          <ProfileDropdown
+            brandLogo={brandLogo}
+            data-test-id="profile-dropdown"
+            profilePicture={user?.profile_picture}
+          >
+            {profileDropdownItems}
+          </ProfileDropdown>
+        </div>
+      )}
+    </header>
+  )
+}
 
 const imgPropType = PropTypes.shape({
   src: PropTypes.string.isRequired,
