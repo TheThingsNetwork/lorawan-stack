@@ -21,12 +21,12 @@ import Button from '@ttn-lw/components/button'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './collapse.styl'
 
 const m = defineMessages({
   collapse: 'Collapse',
-  expand: 'Expand',
 })
 
 const Collapse = props => {
@@ -50,9 +50,10 @@ const Collapse = props => {
         <div className={style.button}>
           <Button
             type="button"
+            secondary
             className={style.expandButton}
             disabled={disabled}
-            message={collapsed ? m.expand : m.collapse}
+            message={collapsed ? sharedMessages.expand : m.collapse}
             onClick={onCollapsedChange}
           />
         </div>

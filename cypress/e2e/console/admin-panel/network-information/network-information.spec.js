@@ -21,7 +21,7 @@ describe('Network information section', () => {
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
   })
 
-  it('succeeds showing registry totals', () => {
+  it('succeeds showing only registry totals when multi-tenant without tts-plugin', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel/network-information`)
     cy.findByText('Network information', { selector: 'h1' }).should('be.visible')
     // Shows registry totals.

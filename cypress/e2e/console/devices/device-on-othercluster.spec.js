@@ -96,7 +96,9 @@ describe('End device on other cluster', () => {
   })
 
   it('succeeds disabling click on devices that are on another cluster', () => {
-    cy.findByText(deviceId).click()
+    cy.get('#stage').within(() => {
+      cy.findByText(deviceId).click()
+    })
     cy.location('pathname').should(
       'eq',
       `${Cypress.config('consoleRootPath')}/applications/${applicationId}/devices`,
@@ -105,11 +107,13 @@ describe('End device on other cluster', () => {
   })
 
   it('succeeds showing "Other cluster" status on devices that are on another cluster', () => {
-    cy.findByText(deviceId)
-      .closest('[role="row"]')
-      .within(() => {
-        cy.findByText('Other cluster').should('be.visible')
-      })
+    cy.get('#stage').within(() => {
+      cy.findByText(deviceId)
+        .closest('[role="row"]')
+        .within(() => {
+          cy.findByText('Other cluster').should('be.visible')
+        })
+    })
   })
 
   it('succeeds redirecting when manually accessing devices that are on another cluster', () => {

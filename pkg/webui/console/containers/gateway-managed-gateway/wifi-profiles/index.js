@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Route, Routes, useParams } from 'react-router-dom'
-import { Col, Row } from 'react-grid-system'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -40,25 +39,23 @@ const GatewayWifiProfiles = () => {
   )
 
   return (
-    <Row>
-      <Col sm={12} lg={8}>
-        <Routes>
-          <Route index Component={GatewayWifiProfilesOverview} />
-          <Route path="add" Component={GatewayWifiProfilesForm} />
-          <Route
-            path="edit/:profileId"
-            element={
-              <ValidateRouteParam
-                check={{ profileId: profileIdPath }}
-                Component={GatewayWifiProfilesForm}
-                otherwise={{ redirect: `/gateways/${gtwId}/managed-gateway/wifi-profiles` }}
-              />
-            }
-          />
-          <Route path="*" element={<GenericNotFound />} />
-        </Routes>
-      </Col>
-    </Row>
+    <div className="item-12 xl:item-8">
+      <Routes>
+        <Route index Component={GatewayWifiProfilesOverview} />
+        <Route path="add" Component={GatewayWifiProfilesForm} />
+        <Route
+          path="edit/:profileId"
+          element={
+            <ValidateRouteParam
+              check={{ profileId: profileIdPath }}
+              Component={GatewayWifiProfilesForm}
+              otherwise={{ redirect: `/gateways/${gtwId}/managed-gateway/wifi-profiles` }}
+            />
+          }
+        />
+        <Route path="*" element={<GenericNotFound />} />
+      </Routes>
+    </div>
   )
 }
 

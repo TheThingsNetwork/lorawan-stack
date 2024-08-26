@@ -14,15 +14,12 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { defineMessages } from '@formatjs/intl'
+import { Navigate, Route, Routes } from 'react-router-dom'
 
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-
-import PanelView from '@console/components/panel-view'
 
 import Require from '@console/lib/components/require'
 
@@ -39,15 +36,9 @@ import {
   mayPerformAdminActions,
 } from '@console/lib/feature-checks'
 
-const m = defineMessages({
-  userManagement: 'User management',
-  globalNetworkSettings: 'Global network settings',
-  peeringSettings: 'Peering settings',
-})
-
 const AdminPanel = () => {
   useBreadcrumbs(
-    'admin-panel',
+    'overview.admin-panel',
     <Breadcrumb path="/admin-panel" content={sharedMessages.adminPanel} />,
   )
   const showUserManagement = useSelector(state => checkFromState(mayManageUsers, state))
@@ -55,35 +46,13 @@ const AdminPanel = () => {
 
   return (
     <Require featureCheck={mayPerformAdminActions} otherwise={{ redirect: '/' }}>
-      <Breadcrumbs />
       <IntlHelmet title={sharedMessages.adminPanel} />
-      <PanelView>
-        <PanelView.Item
-          title={sharedMessages.networkInformation}
-          icon="view_compact"
-          path="network-information"
-          Component={NetworkInformation}
-          exact
-        />
-        {showUserManagement && (
-          <PanelView.Item
-            title={m.userManagement}
-            icon="user_management"
-            path="user-management"
-            Component={UserManagement}
-            condition={showUserManagement}
-          />
-        )}
-        {showPacketBroker && (
-          <PanelView.Item
-            title={m.peeringSettings}
-            icon="packet_broker"
-            path="packet-broker"
-            Component={PacketBrokerRouter}
-            condition={showPacketBroker}
-          />
-        )}
-      </PanelView>
+      <Routes>
+        <Route index element={<Navigate to="network-information" />} />
+        <Route path="network-information" element={<NetworkInformation />} />
+        {showUserManagement && <Route path="user-management/*" element={<UserManagement />} />}
+        {showPacketBroker && <Route path="packet-broker/*" element={<PacketBrokerRouter />} />}
+      </Routes>
     </Require>
   )
 }

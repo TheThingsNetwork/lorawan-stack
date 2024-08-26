@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { useEffect } from 'react'
 import {
   MapContainer,
   Marker,
@@ -27,31 +26,25 @@ import classnames from 'classnames'
 import Leaflet, { latLngBounds } from 'leaflet'
 import shadowImg from 'leaflet/dist/images/marker-shadow.png'
 
-import MarkerIcon from '@assets/auxiliary-icons/location_pin.svg'
+import DefaultMarkerIcon from '@assets/auxiliary-icons/default-map-pin.svg'
+import GatewayMarkerIcon from '@assets/auxiliary-icons/gateway-map-pin.svg'
+import DeviceMarkerIcon from '@assets/auxiliary-icons/device-map-pin.svg'
 import COLORS from '@ttn-lw/constants/colors'
+import { END_DEVICE, GATEWAY } from '@console/constants/entities'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './map.styl'
-
-// Reset default marker icon.
-
-delete Leaflet.Icon.Default.prototype._getIconUrl
-Leaflet.Icon.Default.mergeOptions({
-  iconRetinaUrl: MarkerIcon,
-  iconUrl: MarkerIcon,
-  iconSize: [26, 36],
-  shadowSize: [26, 36],
-  iconAnchor: [13, 36],
-  shadowAnchor: [8, 37],
-  popupAnchor: [0, -40],
-  // eslint-disable-next-line import/no-commonjs
-  shadowUrl: shadowImg,
-})
 
 const defaultMinZoom = 7
 
 const MarkerRenderer = ({ marker }) => {
   if (!marker) {
     return null
+  }
+
+  if (!marker.mapPinType) {
+    marker.mapPinType = 'DEFAULT'
   }
 
   const hasAccuracy = typeof marker.accuracy === 'number'
@@ -68,6 +61,31 @@ const MarkerRenderer = ({ marker }) => {
       {marker.children}
     </>
   )
+  const markerImage =
+    marker.mapPinType === GATEWAY
+      ? GatewayMarkerIcon
+      : marker.mapPinType === END_DEVICE
+        ? DeviceMarkerIcon
+        : DefaultMarkerIcon
+
+  const customIcon = Leaflet.icon({
+    iconRetinaUrl: markerImage,
+    iconUrl: markerImage,
+    ...(marker.mapPinType === 'DEFAULT'
+      ? {
+          iconSize: [26, 36],
+          shadowSize: [26, 36],
+          iconAnchor: [13, 36],
+          shadowAnchor: [8, 37],
+          shadowUrl: shadowImg,
+        }
+      : {
+          iconSize: [36, 36],
+          iconAnchor: [18, 18],
+          shadowUrl: null,
+        }),
+  })
+
   return hasAccuracy ? (
     <CircleMarker
       key={`marker-${marker.position.latitude}-${marker.position.longitude}`}
@@ -83,12 +101,32 @@ const MarkerRenderer = ({ marker }) => {
       key={`marker-${marker.position.latitude}-${marker.position.longitude}`}
       position={[marker.position.latitude, marker.position.longitude]}
       children={children}
+      icon={customIcon}
     />
   )
 }
 
 const Controller = ({ onClick, centerOnMarkers, markers, bounds }) => {
   const map = useMap()
+
+  useEffect(() => {
+    const handleWheel = e => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+
+        const delta = e.deltaY > 0 ? 1 : -1 // Determine scroll direction
+        const zoomLevel = map.getZoom() - delta // Calculate the new zoom level
+
+        map.setZoom(zoomLevel)
+      }
+    }
+
+    map.getContainer().addEventListener('wheel', handleWheel)
+
+    return () => {
+      map.getContainer().removeEventListener('wheel', handleWheel)
+    }
+  }, [map])
 
   useMapEvent('click', onClick)
   // Fix incomplete tile loading in some rare cases.
@@ -143,6 +181,12 @@ const LocationMap = props => {
           })}
           minZoom={defaultMinZoom}
           center={center}
+          maxBounds={[
+            [-90, -180],
+            [90, 180],
+          ]}
+          scrollWheelZoom={false}
+          maxBoundsViscosity={1.0}
           {...leafletConfig}
         >
           <TileLayer
@@ -179,6 +223,7 @@ MarkerRenderer.propTypes = {
       longitude: PropTypes.number,
       latitude: PropTypes.number,
     }),
+    mapPinType: PropTypes.oneOf(['DEFAULT', GATEWAY, END_DEVICE]),
     accuracy: PropTypes.number,
     children: PropTypes.node,
   }).isRequired,

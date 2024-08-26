@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
@@ -141,6 +140,7 @@ const ApplicationMqtt = () => {
             message={m.generateApiKey}
             onClick={handleGeneratePasswordClick}
             className="mr-cs-s"
+            secondary
           />
           <Link to={`/applications/${appId}/api-keys`} naked secondary>
             <Message content={m.goToApiKeys} />
@@ -157,31 +157,29 @@ const ApplicationMqtt = () => {
         otherwise={{ redirect: `/applications/${appId}` }}
       >
         <ErrorView errorRender={SubViewError}>
-          <Container>
-            <PageTitle title={sharedMessages.mqtt} />
-            <Row>
-              <Col lg={8} md={12}>
-                <Message content={m.mqttInfoText} className="mt-0" />
-                <div>
-                  <Message
-                    component="h4"
-                    content={sharedMessages.furtherResources}
-                    className="mb-cs-xxs"
-                  />
-                  <Link.DocLink path="/integrations/mqtt" secondary>
-                    <Message content={m.mqttServer} />
-                  </Link.DocLink>
-                  {' | '}
-                  <Link.Anchor href="https://www.mqtt.org" external secondary>
-                    <Message content={m.officialMqttWebsite} />
-                  </Link.Anchor>
-                </div>
-                <hr className="mb-ls-s" />
-                <Message content={m.connectionInfo} component="h3" />
-                <DataSheet data={connectionData} />
-              </Col>
-            </Row>
-          </Container>
+          <div className="container container--xxl grid">
+            <div className="item-12 xl:item-8">
+              <PageTitle title={sharedMessages.mqtt} noGrid />
+              <Message content={m.mqttInfoText} className="mt-0" />
+              <div>
+                <Message
+                  component="h4"
+                  content={sharedMessages.furtherResources}
+                  className="mb-cs-xxs"
+                />
+                <Link.DocLink path="/integrations/mqtt" secondary>
+                  <Message content={m.mqttServer} />
+                </Link.DocLink>
+                {' | '}
+                <Link.Anchor href="https://www.mqtt.org" external secondary>
+                  <Message content={m.officialMqttWebsite} />
+                </Link.Anchor>
+              </div>
+              <hr className="mb-ls-s" />
+              <Message content={m.connectionInfo} component="h3" />
+              <DataSheet data={connectionData} />
+            </div>
+          </div>
         </ErrorView>
       </Require>
     </RequireRequest>

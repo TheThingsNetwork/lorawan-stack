@@ -15,3 +15,4 @@
 /* global process */
 
 export default process.env.NODE_ENV === 'development'
+export const ci = process.env.CI === 'true'

@@ -34,7 +34,7 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { id as organizationIdRegexp } from '@ttn-lw/lib/regexp'
 import contactSchema from '@ttn-lw/lib/shared-schemas'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
 
 const validationSchema = Yup.object().shape({
@@ -130,7 +130,7 @@ const OrganizationForm = props => {
           <Message
             content={m.adminContactDescription}
             component="p"
-            className="mt-cs-xs tc-subtle-gray"
+            className="mt-cs-xs c-text-neutral-light"
           />
           <CollaboratorSelect
             name="technical_contact"
@@ -147,7 +147,7 @@ const OrganizationForm = props => {
           <Message
             content={m.techContactDescription}
             component="p"
-            className="mt-cs-xs tc-subtle-gray"
+            className="mt-cs-xs c-text-neutral-light"
           />
           <Form.Field
             title={sharedMessages.gatewayFanoutNotificationsTitle}
@@ -160,7 +160,7 @@ const OrganizationForm = props => {
           <Message
             content={m.gatewayFanoutNotificationsDescription}
             component="p"
-            className="mt-cs-xs tc-subtle-gray"
+            className="mt-cs-xs c-text-neutral-light"
           />
         </>
       )}

@@ -15,6 +15,7 @@
 import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 
+import { IconCamera } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 
@@ -74,7 +75,7 @@ const QRModalButton = props => {
   return (
     <ModalButton
       type="button"
-      icon="camera_alt"
+      icon={IconCamera}
       onCancel={onCancel}
       onApprove={onApprove}
       message={message}

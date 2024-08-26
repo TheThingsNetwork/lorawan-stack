@@ -14,23 +14,29 @@
 
 import { createLogic } from 'redux-logic'
 import { defineMessage } from 'react-intl'
+import { get } from 'lodash'
 
 import tts from '@console/api/tts'
 
 import toast from '@ttn-lw/components/toast'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 
 import * as devices from '@console/store/actions/devices'
+import { getModel } from '@console/store/actions/device-repository'
 import * as deviceTemplateFormats from '@console/store/actions/device-template-formats'
 
 import { selectDeviceByIds } from '@console/store/selectors/devices'
+import { selectDeviceModelById } from '@console/store/selectors/device-repository'
 
 import createEventsConnectLogics from './events'
 
 const m = defineMessage({
   joinSuccess: 'The device has successfully joined the network',
 })
+
+const fullfillsSelector = (dev, selector) => selector.every(key => get(dev, key) !== undefined)
 
 const createDeviceLogic = createRequestLogic({
   type: devices.CREATE_DEVICE,
@@ -43,13 +49,43 @@ const createDeviceLogic = createRequestLogic({
 
 const getDeviceLogic = createRequestLogic({
   type: devices.GET_DEV,
-  process: async ({ action }, dispatch) => {
+  process: async ({ action, getState }, dispatch) => {
     const {
       payload: { appId, deviceId },
-      meta: { selector },
+      meta: {
+        selector,
+        options: { fetchModel, modelSelector, cache = false, startStream = true, components },
+      },
     } = action
-    const dev = await tts.Applications.Devices.getById(appId, deviceId, selector)
-    dispatch(devices.startDeviceEventsStream(dev.ids))
+    const composedSelector = fetchModel ? [...selector, 'version_ids'] : selector
+    const state = getState()
+    let dev
+    let model
+
+    if (cache) {
+      dev = selectDeviceByIds(state, appId, deviceId)
+      if (dev && fullfillsSelector(dev, composedSelector)) {
+        if (fetchModel && dev.version_ids?.brand_id && dev.version_ids?.model_id) {
+          model = selectDeviceModelById(state, dev.version_ids?.brand_id, dev.version_ids?.model_id)
+          if (!model) {
+            model = await dispatch(
+              getModel(appId, dev.version_ids?.brand_id, dev.version_ids?.model_id, modelSelector),
+            )
+          }
+        }
+        return dev
+      }
+    }
+
+    dev = await tts.Applications.Devices.getById(appId, deviceId, composedSelector, components)
+    if (fetchModel && dev.version_ids?.brand_id && dev.version_ids?.model_id) {
+      model = await dispatch(
+        getModel(appId, dev.version_ids?.brand_id, dev.version_ids?.model_id, modelSelector),
+      )
+    }
+    if (startStream) {
+      dispatch(devices.startDeviceEventsStream(dev.ids))
+    }
 
     return dev
   },
@@ -70,8 +106,20 @@ const updateDeviceLogic = createRequestLogic(
   devices.updateDeviceSuccess,
 )
 
+const deleteDeviceLogic = createRequestLogic({
+  type: devices.DELETE_DEV,
+  process: async ({ action }) => {
+    const {
+      payload: { appId, deviceId },
+    } = action
+    await tts.Applications.Devices.deleteById(appId, deviceId)
+
+    return { appId, deviceId, id: combineDeviceIds(appId, deviceId) }
+  },
+})
+
 const getDevicesListLogic = createRequestLogic({
-  type: devices.GET_DEVICES_LIST,
+  type: [devices.GET_DEVICES_LIST, devices.FETCH_DEVICES_LIST],
   process: async ({ action }) => {
     const {
       id: appId,
@@ -184,6 +232,7 @@ export default [
   getDeviceLogic,
   resetDeviceLogic,
   updateDeviceLogic,
+  deleteDeviceLogic,
   getDeviceSessionLogic,
   resetUsedDevNoncesLogic,
   ...createEventsConnectLogics(devices.SHARED_NAME, 'devices', tts.Applications.Devices.openStream),

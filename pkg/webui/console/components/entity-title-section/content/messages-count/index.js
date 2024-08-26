@@ -16,7 +16,7 @@ import React from 'react'
 import classnames from 'classnames'
 import { FormattedNumber } from 'react-intl'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconHelp } from '@ttn-lw/components/icon'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -30,7 +30,7 @@ const MessagesCount = React.forwardRef((props, ref) => {
       <Icon className={iconClassName} icon={icon} nudgeUp />
       {typeof value === 'number' ? <FormattedNumber value={value} /> : value}
       {helpTooltip && (
-        <Icon className="tc-subtle-gray ml-cs-xxs" icon="help_outline" nudgeUp small />
+        <Icon className="c-text-neutral-light ml-cs-xxs" icon={IconHelp} nudgeUp small />
       )}
     </div>
   )
@@ -39,7 +39,7 @@ const MessagesCount = React.forwardRef((props, ref) => {
 MessagesCount.propTypes = {
   className: PropTypes.string,
   helpTooltip: PropTypes.bool,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.icon.isRequired,
   iconClassName: PropTypes.string,
   value: PropTypes.node.isRequired,
 }

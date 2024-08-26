@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import Form from '@ttn-lw/components/form'
@@ -45,57 +44,55 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error }) => {
       error={error}
       validationSchema={validationSchema}
     >
-      <Row>
-        <Col md={6} xs={12}>
-          <Form.Field
-            name="visibility.location"
-            component={Checkbox}
-            label={sharedMessages.location}
-          />
-          <Form.Field
-            name="visibility.antenna_placement"
-            component={Checkbox}
-            label={gatewayVisibilityMessages.gatewayAntennaPlacementLabel}
-            description={gatewayVisibilityMessages.gatewayAntennaPlacementDescription}
-          />
-          <Form.Field
-            name="visibility.antenna_count"
-            component={Checkbox}
-            label={gatewayVisibilityMessages.gatewayAntennaCountLabel}
-          />
-          <Form.Field
-            name="visibility.fine_timestamps"
-            component={Checkbox}
-            label={gatewayVisibilityMessages.gatewayFineTimestampsLabel}
-            description={gatewayVisibilityMessages.gatewayFineTimestampsDescription}
-          />
-        </Col>
-        <Col sm={6} xs={12}>
-          <Form.Field
-            name="visibility.contact_info"
-            component={Checkbox}
-            label={sharedMessages.contactInformation}
-            description={gatewayVisibilityMessages.gatewayContactInfoDescription}
-          />
-          <Form.Field
-            name="visibility.status"
-            component={Checkbox}
-            label={sharedMessages.status}
-            description={gatewayVisibilityMessages.gatewayStatusDescription}
-          />
-          <Form.Field
-            name="visibility.frequency_plan"
-            component={Checkbox}
-            label={sharedMessages.frequencyPlan}
-          />
-          <Form.Field
-            name="visibility.packet_rates"
-            component={Checkbox}
-            label={gatewayVisibilityMessages.gatewayPacketRatesLabel}
-            description={gatewayVisibilityMessages.gatewayPacketRatesDescription}
-          />
-        </Col>
-      </Row>
+      <div className="item-12 lg-xl:item-6">
+        <Form.Field
+          name="visibility.location"
+          component={Checkbox}
+          label={sharedMessages.location}
+        />
+        <Form.Field
+          name="visibility.antenna_placement"
+          component={Checkbox}
+          label={gatewayVisibilityMessages.gatewayAntennaPlacementLabel}
+          description={gatewayVisibilityMessages.gatewayAntennaPlacementDescription}
+        />
+        <Form.Field
+          name="visibility.antenna_count"
+          component={Checkbox}
+          label={gatewayVisibilityMessages.gatewayAntennaCountLabel}
+        />
+        <Form.Field
+          name="visibility.fine_timestamps"
+          component={Checkbox}
+          label={gatewayVisibilityMessages.gatewayFineTimestampsLabel}
+          description={gatewayVisibilityMessages.gatewayFineTimestampsDescription}
+        />
+      </div>
+      <div className="item-12 md-lg:item-6">
+        <Form.Field
+          name="visibility.contact_info"
+          component={Checkbox}
+          label={sharedMessages.contactInformation}
+          description={gatewayVisibilityMessages.gatewayContactInfoDescription}
+        />
+        <Form.Field
+          name="visibility.status"
+          component={Checkbox}
+          label={sharedMessages.status}
+          description={gatewayVisibilityMessages.gatewayStatusDescription}
+        />
+        <Form.Field
+          name="visibility.frequency_plan"
+          component={Checkbox}
+          label={sharedMessages.frequencyPlan}
+        />
+        <Form.Field
+          name="visibility.packet_rates"
+          component={Checkbox}
+          label={gatewayVisibilityMessages.gatewayPacketRatesLabel}
+          description={gatewayVisibilityMessages.gatewayPacketRatesDescription}
+        />
+      </div>
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={m.saveDefaultGatewayVisibility} />
       </SubmitBar>

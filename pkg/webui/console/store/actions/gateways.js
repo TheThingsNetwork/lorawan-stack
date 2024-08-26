@@ -65,7 +65,7 @@ export const [
 ] = createRequestActions(
   GET_GTW_BASE,
   id => ({ id }),
-  (id, selector) => ({ selector }),
+  (id, selector, options = {}) => ({ selector, options }),
 )
 
 export const UPDATE_GTW_BASE = 'UPDATE_GATEWAY'
@@ -99,6 +99,22 @@ export const [
   { request: GET_GTWS_LIST, success: GET_GTWS_LIST_SUCCESS, failure: GET_GTWS_LIST_FAILURE },
   { request: getGatewaysList, success: getGatewaysListSuccess, failure: getGatewaysListFailure },
 ] = createPaginationRequestActions(SHARED_NAME)
+
+export const FETCH_GTWS_LIST_BASE = 'FETCH_GTWS_LIST'
+export const [
+  { request: FETCH_GTWS_LIST, success: FETCH_GTWS_LIST_SUCCESS, failure: FETCH_GTWS_LIST_FAILURE },
+  {
+    request: fetchGatewaysList,
+    success: fetchGatewaysListSuccess,
+    failure: fetchGatewaysListFailure,
+  },
+] = createRequestActions(
+  FETCH_GTWS_LIST_BASE,
+  ({ page, limit, query, order, deleted } = {}) => ({
+    params: { page, limit, query, order, deleted },
+  }),
+  (_, selectors = [], options = {}) => ({ selectors, options }),
+)
 
 export const GET_GTWS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [

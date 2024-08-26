@@ -45,7 +45,7 @@ import { selectPasswordRequirements } from '@account/store/selectors/identity-se
 const m = defineMessages({
   registrationApproved: 'You have successfully registered and can login now',
   createAccount: 'Create account',
-  createANewAccount: 'Create a new account',
+  createANewAccount: 'Create a new account for',
   registrationPending:
     'You have successfully sent the registration request. You will receive a confirmation once the account has been approved.',
 })
@@ -140,9 +140,9 @@ const CreateAccount = () => {
       <div className={style.form}>
         <IntlHelmet title={m.createANewAccount} />
         <h1 className={style.title}>
-          {siteName}
+          <Message content={m.createANewAccount} />
           <br />
-          <Message content={m.createANewAccount} component="strong" />
+          {siteName}
         </h1>
         <hr className={style.hRule} />
         <Form

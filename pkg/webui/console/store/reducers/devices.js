@@ -29,6 +29,8 @@ import {
   UPDATE_DEV_SUCCESS,
   RESET_DEV_SUCCESS,
   GET_DEVICE_EVENT_MESSAGE_SUCCESS,
+  DELETE_DEV_SUCCESS,
+  FETCH_DEVICES_LIST_SUCCESS,
 } from '@console/store/actions/devices'
 import { GET_APP_EVENT_MESSAGE_SUCCESS } from '@console/store/actions/applications'
 
@@ -62,7 +64,7 @@ const mergeDerived = (state, id, derived) =>
       }
     : state
 
-const devices = (state = defaultState, { type, payload, event }) => {
+const devices = (state = defaultState, { type, payload, event, meta }) => {
   switch (type) {
     case GET_INFO_BY_JOIN_EUI_SUCCESS:
       return {
@@ -70,13 +72,26 @@ const devices = (state = defaultState, { type, payload, event }) => {
         selectedDeviceClaimable: payload.supports_claiming ?? false,
       }
     case GET_DEV:
+      if (meta.options.noSelect) {
+        return state
+      }
       return {
         ...state,
         selectedDevice: combineDeviceIds(payload.appId, payload.deviceId),
       }
+    case DELETE_DEV_SUCCESS: {
+      const id = getCombinedDeviceId(payload)
+      const { [id]: deleted, ...entities } = state.entities
+      const { [id]: deleted2, ...derived } = state.derived
+
+      return {
+        ...defaultState,
+        entities,
+        derived,
+      }
+    }
     case UPDATE_DEV_SUCCESS:
     case GET_DEV_SUCCESS:
-      const updatedState = { ...state }
       const id = getCombinedDeviceId(payload)
       const lorawanVersion = payload.lorawan_version
 
@@ -91,7 +106,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
         }
       })
 
-      updatedState.entities = {
+      const updatedEntities = {
         ...state.entities,
         [id]: mergedDevice,
       }
@@ -110,7 +125,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
         }
       }
 
-      return mergeDerived(updatedState, id, derived)
+      return mergeDerived({ ...state, entities: updatedEntities }, id, derived)
     case RESET_DEV_SUCCESS:
       const combinedId = getCombinedDeviceId(payload)
       const device = state.entities[combinedId]
@@ -142,68 +157,21 @@ const devices = (state = defaultState, { type, payload, event }) => {
       }
 
       return mergeDerived(state, combinedId, defaultDerived)
+    case FETCH_DEVICES_LIST_SUCCESS:
     case GET_DEVICES_LIST_SUCCESS:
-      return payload.entities.reduce(
+      const newEntities = payload.entities.reduce(
         (acc, dev) => {
           const id = getCombinedDeviceId(dev)
-          acc.entities[id] = dev
-
+          acc[id] = { ...state.entities[id], ...dev }
           return acc
         },
-        { ...state },
+        { ...state.entities },
       )
+
+      return { ...state, entities: newEntities }
     case GET_DEVICE_EVENT_MESSAGE_SUCCESS:
-      // Detect uplink/downlink process events to update uplink/downlink frame count state.
-      if (event.name === uplinkFrameCountEvent) {
-        const uplinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
-        if (typeof uplinkFrameCount === 'number') {
-          return mergeDerived(state, getCombinedDeviceId(event.identifiers[0].device_ids), {
-            uplinkFrameCount,
-          })
-        }
-      } else if (event.name === downlinkFrameCountEvent) {
-        const combinedDeviceId = getCombinedDeviceId(event.identifiers[0].device_ids)
-        const lorawanVersion = getByPath(state.entities, `${combinedDeviceId}.lorawan_version`)
-
-        if (parseLorawanMacVersion(lorawanVersion) < 110) {
-          if (getByPath(event, 'data.payload.mac_payload.f_port') === undefined) {
-            const downlinkNwkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
-            if (typeof downlinkNwkFrameCount === 'number') {
-              return mergeDerived(state, combinedDeviceId, {
-                downlinkNwkFrameCount,
-              })
-            }
-          } else if (getByPath(event, 'data.payload.mac_payload.f_port') > 0) {
-            const downlinkAppFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
-            if (typeof downlinkAppFrameCount === 'number') {
-              return mergeDerived(state, combinedDeviceId, {
-                downlinkAppFrameCount,
-              })
-            }
-          }
-        }
-
-        // For 1.1+ end devices there are two frame counters. If `f_port` is equal to 0 - then it's the "network" frame counter,
-        // otherwise it's the "application" frame counter.
-        if (getByPath(event, 'data.payload.mac_payload.f_port') === 0) {
-          const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.f_cnt')
-          if (typeof downlinkFrameCount === 'number') {
-            return mergeDerived(state, combinedDeviceId, {
-              downlinkNwkFrameCount: downlinkFrameCount,
-            })
-          }
-        } else {
-          const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
-          if (typeof downlinkFrameCount === 'number') {
-            return mergeDerived(state, combinedDeviceId, {
-              downlinkAppFrameCount: downlinkFrameCount,
-            })
-          }
-        }
-      }
-
-      return state
     case GET_APP_EVENT_MESSAGE_SUCCESS:
+      let newState = state
       // Detect heartbeat events to update last seen state.
       if (heartbeatFilterRegExp.test(event.name)) {
         const id = getCombinedDeviceId(event.identifiers[0].device_ids)
@@ -216,21 +184,72 @@ const devices = (state = defaultState, { type, payload, event }) => {
               (currentEndDevice.last_seen_at && currentEndDevice.last_seen_at < receivedAt) ||
               !currentEndDevice.last_seen_at
             ) {
-              currentEndDevice.last_seen_at = receivedAt
-            }
+              const updatedEndDevice = {
+                ...currentEndDevice,
+                last_seen_at: receivedAt,
+              }
 
-            return {
-              ...state,
-              entities: {
-                ...state.entities,
-                [id]: currentEndDevice,
-              },
+              newState = {
+                ...state,
+                entities: {
+                  ...state.entities,
+                  [id]: updatedEndDevice,
+                },
+              }
             }
           }
         }
       }
+      // Detect uplink/downlink process events to update uplink/downlink frame count state.
+      if (event.name === uplinkFrameCountEvent) {
+        const uplinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+        if (typeof uplinkFrameCount === 'number') {
+          return mergeDerived(newState, getCombinedDeviceId(event.identifiers[0].device_ids), {
+            uplinkFrameCount,
+          })
+        }
+      } else if (event.name === downlinkFrameCountEvent) {
+        const combinedDeviceId = getCombinedDeviceId(event.identifiers[0].device_ids)
+        const lorawanVersion = getByPath(state.entities, `${combinedDeviceId}.lorawan_version`)
 
-      return state
+        if (parseLorawanMacVersion(lorawanVersion) < 110) {
+          if (getByPath(event, 'data.payload.mac_payload.f_port') === undefined) {
+            const downlinkNwkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+            if (typeof downlinkNwkFrameCount === 'number') {
+              return mergeDerived(newState, combinedDeviceId, {
+                downlinkNwkFrameCount,
+              })
+            }
+          } else if (getByPath(event, 'data.payload.mac_payload.f_port') > 0) {
+            const downlinkAppFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+            if (typeof downlinkAppFrameCount === 'number') {
+              return mergeDerived(newState, combinedDeviceId, {
+                downlinkAppFrameCount,
+              })
+            }
+          }
+        }
+
+        // For 1.1+ end devices there are two frame counters. If `f_port` is equal to 0 - then it's the "network" frame counter,
+        // otherwise it's the "application" frame counter.
+        if (getByPath(event, 'data.payload.mac_payload.f_port') === 0) {
+          const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.f_cnt')
+          if (typeof downlinkFrameCount === 'number') {
+            return mergeDerived(newState, combinedDeviceId, {
+              downlinkNwkFrameCount: downlinkFrameCount,
+            })
+          }
+        } else {
+          const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+          if (typeof downlinkFrameCount === 'number') {
+            return mergeDerived(newState, combinedDeviceId, {
+              downlinkAppFrameCount: downlinkFrameCount,
+            })
+          }
+        }
+      }
+
+      return newState
     default:
       return state
   }

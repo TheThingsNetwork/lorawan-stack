@@ -125,6 +125,7 @@ describe('Application general settings', () => {
     cy.intercept('GET', `/api/v3/is/configuration`, { fixture: 'restricted-user-config.json' })
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
 
+    cy.get('button[type="submit"]').scrollIntoView()
     cy.findByText('Contact information').should('be.visible')
     cy.findByLabelText('Administrative contact').should('have.attr', 'disabled')
     cy.findByLabelText('Administrative contact')

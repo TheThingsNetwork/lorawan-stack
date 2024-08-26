@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
@@ -55,27 +54,25 @@ const ApplicationWebhookEditInner = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle
         title={sharedMessages.editWebhook}
         className="mb-0"
         hideHeading={Boolean(webhookTemplate)}
       />
-      <Row>
-        <Col lg={8} md={12}>
-          <WebhookEdit
-            update
-            appId={appId}
-            selectedWebhook={webhook}
-            webhookId={webhookId}
-            webhookTemplate={webhookTemplate}
-            healthStatusEnabled={healthStatusEnabled}
-            webhookRetryInterval={webhookRetryInterval}
-            hasUnhealthyWebhookConfig={hasUnhealthyWebhookConfig}
-          />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <WebhookEdit
+          update
+          appId={appId}
+          selectedWebhook={webhook}
+          webhookId={webhookId}
+          webhookTemplate={webhookTemplate}
+          healthStatusEnabled={healthStatusEnabled}
+          webhookRetryInterval={webhookRetryInterval}
+          hasUnhealthyWebhookConfig={hasUnhealthyWebhookConfig}
+        />
+      </div>
+    </div>
   )
 }
 

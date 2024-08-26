@@ -15,8 +15,8 @@
 import React from 'react'
 import { Navigate, useSearchParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
-import { Container, Col, Row } from 'react-grid-system'
 
+import { IconChevronLeft } from '@ttn-lw/components/icon'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Button from '@ttn-lw/components/button'
 import PageTitle from '@ttn-lw/components/page-title'
@@ -25,8 +25,6 @@ import Message from '@ttn-lw/lib/components/message'
 
 import { selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import style from './code.styl'
 
 const m = defineMessages({
   codeDescription: 'Your authorization code is:',
@@ -43,30 +41,21 @@ const Code = () => {
   }
 
   return (
-    <Container>
-      <Row>
-        <Col lg={4} md={6} sm={12}>
+    <div className="container container--lg grid">
+      <div className="item-12 lg-xl:item-6 xl:item-4">
+        <div className="d-flex flex-column al-start gap-cs-m">
           <PageTitle title={sharedMessages.authorizationCode} />
-          <Message
-            content={m.codeDescription}
-            component="label"
-            className={style.codeDescription}
-          />
-          <SafeInspector
-            data={code}
-            initiallyVisible
-            hideable={false}
-            isBytes={false}
-            className={style.code}
-          />
+          <Message content={m.codeDescription} component="label" className="d-block" />
+          <SafeInspector data={code} initiallyVisible hideable={false} isBytes={false} />
           <Button.Link
             to="/"
-            icon="keyboard_arrow_left"
+            icon={IconChevronLeft}
             message={{ ...sharedMessages.backTo, values: { siteTitle } }}
+            secondary
           />
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+    </div>
   )
 }
 

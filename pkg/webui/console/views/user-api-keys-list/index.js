@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 import { createSelector } from 'reselect'
 
@@ -26,7 +25,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import { selectApiKeys, selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 
 const UserApiKeysList = () => {
   const userId = useSelector(selectUserId)
@@ -50,14 +49,10 @@ const UserApiKeysList = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.personalApiKeys} />
-        <Col>
-          <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
-        </Col>
-      </Row>
-    </Container>
+    <>
+      <IntlHelmet title={sharedMessages.personalApiKeys} />
+      <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
+    </>
   )
 }
 

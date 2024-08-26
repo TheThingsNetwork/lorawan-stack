@@ -60,7 +60,7 @@ const ModalButton = ({ modalData, message, onApprove, onCancel, ...rest }) => {
   return (
     <React.Fragment>
       <PortalledModal visible={modalVisible} {...modalComposedData} />
-      <Button onClick={handleClick} message={message} {...rest} />
+      <Button secondary onClick={handleClick} message={message} {...rest} />
     </React.Fragment>
   )
 }

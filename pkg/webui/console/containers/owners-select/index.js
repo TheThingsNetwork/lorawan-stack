@@ -22,7 +22,7 @@ import Field from '@ttn-lw/components/form/field'
 import { getOrganizationId, getUserId } from '@ttn-lw/lib/selectors/id'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectUser } from '@console/store/selectors/logout'
+import { selectUser } from '@console/store/selectors/user'
 import {
   selectOrganizations,
   selectOrganizationsError,

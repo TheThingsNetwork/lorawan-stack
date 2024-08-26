@@ -66,26 +66,14 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
   cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   cy.visit(Cypress.config('consoleRootPath'))
 
-  cy.get('header').within(() => {
-    cy.findByRole('link', { name: /Applications/ }).click()
-  })
+  cy.findByRole('link', { name: /Applications/ }).click()
   cy.findByRole('cell', { name: application.ids.application_id }).click()
-  cy.findByRole('cell', { name: deviceId }).click()
+  cy.get('#sidebar').within(() => {
+    cy.findByRole('link', { name: /End devices/ }).click()
+  })
+  cy.findByRole('cell', { name: `Test Device Name ${deviceId}` }).click()
 
   cy.get('#stage').within(() => {
-    cy.findAllByText(deviceId).should('be.visible')
-    cy.findByRole('columnheader', { name: 'General information' }).parent().should('be.visible')
-    cy.findByRole('columnheader', { name: 'Activation information' }).parent().should('be.visible')
-    cy.findByRole('columnheader', { name: 'Session information' }).parent().should('be.visible')
-    cy.findByRole('columnheader', { name: 'MAC data' }).parent().should('be.visible')
-    cy.findByRole('heading', { name: /Live data/ })
-      .parent()
-      .should('be.visible')
-    cy.findByRole('heading', { name: /Location/ })
-      .parent()
-      .should('be.visible')
-    cy.findByTestId('error-notification').should('not.exist')
-
     cy.findByRole('button', { name: 'Live data' }).click()
     cy.findByText(/Waiting for events from/).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
@@ -105,6 +93,7 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
 
     cy.findByRole('button', { name: 'Location' }).click()
     cy.findByRole('heading', { name: 'Set end device location manually' }).should('be.visible')
+    cy.get('button[type="submit"]').scrollIntoView()
     cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
 
@@ -117,12 +106,13 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
     cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
 
-    cy.findByRole('button', { name: /General settings/ }).click()
+    cy.findByRole('button', { name: /Settings/ }).click()
     cy.findByText('Basic')
       .should('be.visible')
       .closest('[data-test-id="collapsible-section"]')
       .within(() => {
         cy.findByLabelText('End device ID')
+        cy.get('button[type="submit"]').scrollIntoView()
         cy.findByRole('button', { name: /Save changes/ }).should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
         cy.findByRole('button', { name: 'Collapse' }).click()
@@ -133,8 +123,10 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByLabelText('Frequency plan').should('be.visible')
+        cy.get('button[type="submit"]').scrollIntoView()
         cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
         cy.findByText('Advanced MAC settings').click()
+        cy.get('#mac-settings').scrollIntoView()
         cy.findByText('Frame counter width').should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
         cy.findByRole('button', { name: 'Collapse' }).click()
@@ -145,7 +137,7 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByText('Payload crypto override').should('be.visible')
-        cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
+        cy.findByRole('button', { name: /Save changes/ }).should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
         cy.findByRole('button', { name: 'Collapse' }).click()
       })
@@ -155,11 +147,14 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByLabelText('Home NetID').should('be.visible')
+        cy.get('button[type="submit"]').scrollIntoView()
         cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
         cy.findByRole('button', { name: 'Collapse' }).click()
       })
     cy.findByTestId('error-notification').should('not.exist')
+    cy.findByRole('button', { name: /Device overview/ }).click()
+    cy.findByText('General information').parent().should('be.visible')
   })
 })
 

@@ -20,6 +20,8 @@ export const ORGANIZATION = 'ORGANIZATION'
 export const USER = 'USER'
 export const CLIENT = 'CLIENT'
 
+export const ALL = 'ALL'
+
 export const entitySdkServiceMap = Object.freeze({
   application: 'Applications',
   gateway: 'Gateways',

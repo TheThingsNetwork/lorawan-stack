@@ -16,7 +16,7 @@ import React from 'react'
 
 import Logo from '@assets/static/logo.svg'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconCheck } from '@ttn-lw/components/icon'
 
 import style from './story.styl'
 
@@ -35,6 +35,14 @@ const bottomLine = (
 
 export default {
   title: 'Modal',
+  component: Modal,
+  parameters: {
+    docs: {
+      description: {
+        component: `The modal can be displayed inline or portalled via \`<PortalledModal />\``,
+      },
+    },
+  },
 }
 
 export const BasicModal = () => (
@@ -58,27 +66,27 @@ export const OAuthAuthorizeExample = () => (
     <div className={style.left}>
       <ul>
         <li>
-          <Icon icon="check" className={style.icon} />
+          <Icon icon={IconCheck} className={style.icon} />
           View your profile
         </li>
         <li>
-          <Icon icon="check" className={style.icon} />
+          <Icon icon={IconCheck} className={style.icon} />
           Make changes to your profile
         </li>
         <li>
-          <Icon icon="check" className={style.icon} />
+          <Icon icon={IconCheck} className={style.icon} />
           Perform administrative action
         </li>
         <li>
-          <Icon icon="check" className={style.icon} />
+          <Icon icon={IconCheck} className={style.icon} />
           List your applications
         </li>
         <li>
-          <Icon icon="check" className={style.icon} />
+          <Icon icon={IconCheck} className={style.icon} />
           Degister new gateways in your account
         </li>
         <li>
-          <Icon icon="check" className={style.icon} />
+          <Icon icon={IconCheck} className={style.icon} />
           Create and edit end devices of your applications
         </li>
       </ul>

@@ -21,7 +21,12 @@ import classNames from 'classnames'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
-import Icon from '@ttn-lw/components/icon'
+import Icon, {
+  IconCircleCheck,
+  IconExclamationCircle,
+  IconInfoCircle,
+  IconProgressBolt,
+} from '@ttn-lw/components/icon'
 import Notification from '@ttn-lw/components/notification'
 import Button from '@ttn-lw/components/button'
 import Link from '@ttn-lw/components/link'
@@ -100,33 +105,41 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
   const connectionStatus = useMemo(() => {
     if (!values.wifi_profile.profile_id) return null
     if (hasChanged) {
-      return { message: m.saveToConnect, icon: 'info_outline' }
+      return { message: m.saveToConnect, icon: <Icon icon={IconInfoCircle} /> }
     }
     if (isWifiConnected) {
       if (values.wifi_profile._override) {
         return {
           message: m.connectedCollaborator,
-          icon: 'check_circle_outline',
           color: style.connected,
+          icon: <Icon icon={IconCircleCheck} className={style.connected} />,
         }
       }
-      return { message: m.connected, icon: 'check_circle_outline', color: style.connected }
+      return {
+        message: m.connected,
+        color: style.connected,
+        icon: <Icon icon={IconCircleCheck} className={style.connected} />,
+      }
     }
     if (!isWifiConnected) {
       if (saveFormClicked) {
         return {
           message: m.attemptingToConnect,
-          icon: 'rotate_right',
+          icon: <Icon icon={IconProgressBolt} />,
         }
       }
       if (values.wifi_profile._override) {
         return {
           message: m.unableToConnectCollaborator,
-          icon: 'highlight_remove',
           color: style.notConnected,
+          icon: <Icon icon={IconExclamationCircle} className={style.notConnected} />,
         }
       }
-      return { message: m.unableToConnect, icon: 'highlight_remove', color: style.notConnected }
+      return {
+        message: m.unableToConnect,
+        color: style.notConnected,
+        icon: <Icon icon={IconExclamationCircle} className={style.notConnected} />,
+      }
     }
 
     return null
@@ -219,6 +232,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
                   tooltip={m.settingsProfileTooltip}
                   placeholder={m.selectAProfile}
                   onChange={handleProfileIdChange}
+                  required
                 />
               </RequireRequest>
             )}
@@ -240,6 +254,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
             className="mb-cs-m"
             message={m.overrideProfile}
             onClick={handleOverrideProfile}
+            secondary
           />
         </div>
       )}
@@ -247,7 +262,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
       {connectionStatus !== null && (
         <div className="d-inline-flex al-center gap-cs-m">
           <div className={classNames(style.connection, connectionStatus.color)}>
-            <Icon icon={connectionStatus.icon} className={connectionStatus.color} />
+            {connectionStatus.icon}
             <Message content={connectionStatus.message} />
           </div>
           {Boolean(values.wifi_profile.profile_id) &&

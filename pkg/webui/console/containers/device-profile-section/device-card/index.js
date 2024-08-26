@@ -33,7 +33,6 @@ import style from './device-card.styl'
 
 const m = defineMessages({
   productWebsite: 'Product website',
-  dataSheet: 'Data sheet',
   classA: 'Class A',
   classB: 'Class B',
   classC: 'Class C',
@@ -98,11 +97,11 @@ const DeviceCard = props => {
               </Link.Anchor>
             )}
             {product_url && datasheet_url && (
-              <span className="tc-subtle-gray ml-cs-xxs mr-cs-xs">|</span>
+              <span className="c-text-neutral-light ml-cs-xxs mr-cs-xs">|</span>
             )}
             {datasheet_url && (
               <Link.Anchor secondary href={datasheet_url} external>
-                <Message content={m.dataSheet} />
+                <Message content={sharedMessages.dataSheet} />
               </Link.Anchor>
             )}
           </div>

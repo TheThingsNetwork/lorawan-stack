@@ -13,19 +13,21 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import Link from '@ttn-lw/components/link'
 import LocationMap from '@ttn-lw/components/map'
 import WidgetContainer from '@ttn-lw/components/widget-container'
+import Button from '@ttn-lw/components/button'
+import { IconMapPinPlus } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './widget.styl'
 
-const Map = ({ id, markers }) => {
+const Map = ({ id, markers, setupLocationLink }) => {
   const leafletConfig = {
     zoomControl: false,
     zoom: 10,
@@ -37,7 +39,7 @@ const Map = ({ id, markers }) => {
       : undefined
 
   return (
-    <div data-test-id="map-widget">
+    <div className={style.mapWidget} data-test-id="map-widget">
       {markers.length > 0 ? (
         <LocationMap
           id={id}
@@ -47,8 +49,23 @@ const Map = ({ id, markers }) => {
           widget
         />
       ) : (
-        <div className={style.mapDisabled}>
-          <Message component="span" content={sharedMessages.noLocation} />
+        <div className="d-flex direction-column flex-grow j-center al-center p-sides-ls-s pb-ls-s">
+          <Message
+            className="c-text-neutral-heavy fw-bold fs-l text-center"
+            content={sharedMessages.noLocationYet}
+          />
+          <Message
+            className="c-text-neutral-light fs-m text-center mb-cs-l"
+            content={sharedMessages.noLocationYetDescription}
+          />
+          {setupLocationLink && (
+            <Button.Link
+              secondary
+              message={sharedMessages.setUpALocation}
+              icon={IconMapPinPlus}
+              to={setupLocationLink}
+            />
+          )}
         </div>
       )}
     </div>
@@ -62,6 +79,11 @@ Map.propTypes = {
       position: PropTypes.objectOf(PropTypes.number),
     }),
   ).isRequired,
+  setupLocationLink: PropTypes.string,
+}
+
+Map.defaultProps = {
+  setupLocationLink: undefined,
 }
 
 const MapWidget = ({ id, markers, path }) => (
@@ -71,7 +93,7 @@ const MapWidget = ({ id, markers, path }) => (
     linkMessage={sharedMessages.changeLocation}
   >
     <Link to={path} disabled={markers && markers.length > 0}>
-      <Map id={id} markers={markers} />
+      <Map id={id} markers={markers} setupLocationLink="#" />
     </Link>
   </WidgetContainer>
 )
@@ -91,4 +113,4 @@ MapWidget.propTypes = {
   path: PropTypes.string.isRequired,
 }
 
-export default MapWidget
+export { MapWidget as default, Map }

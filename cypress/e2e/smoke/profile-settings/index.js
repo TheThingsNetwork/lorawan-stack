@@ -30,17 +30,17 @@ const profileSettingsNavigation = defineSmokeTest('succeeds navigating to Accoun
   cy.visit(Cypress.config('consoleRootPath'))
 
   cy.get('header').within(() => {
-    cy.findByTestId('profile-dropdown').should('contain', user.name).as('profileDropdown')
+    cy.findByTestId('profile-dropdown').as('profileDropdown')
 
     cy.get('@profileDropdown').click()
 
-    cy.get('@profileDropdown')
-      .findByText(/Profile settings/)
+    cy.findByText(/Profile settings/)
+      .parent()
       .should('have.attr', 'href', '/oauth/profile-settings')
       .should('have.attr', 'target', '_blank')
 
-    cy.get('@profileDropdown')
-      .findByText('Profile settings')
+    cy.findByText('Profile settings')
+      .parent()
       .then(link => {
         cy.visit(link.prop('href'))
         cy.location('pathname').should('eq', '/oauth/profile-settings')

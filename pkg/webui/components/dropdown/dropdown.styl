@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,97 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+$default-dropdown-offset = .25rem
+
 ul.dropdown
-  border-normal()
-  z-index: $zi.nav
-  right: 0
+  font-size: $fs.m
+  border-radius: $br.l
+  border: 1px solid var(--c-border-neutral-light)
+  list-style-type: none
+  background: var(--c-bg-neutral-min)
+  box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, .06)
   position: absolute
-  background: white
-  padding: 0
-  min-width: 14rem
+  padding: $cs.xs
+  width: max-content
+  min-width: 16rem
+  max-width: 24rem
   z-index: $zi.dropdown
   margin: 0
+  animation: dropdown-show-from-top .1s ease-out
+
+  &:not(.submenu-dropdown)
+    // Pseudo element to extend the clickable area
+    // to connect with the parent button when using hover.
+    // The offset can be set via --dropdown-offset in the
+    // consuming component.
+    &.hover:before
+      content: ""
+      position: absolute
+
+    &.above
+      top: auto
+      animation: dropdown-show-from-bottom .1s ease-out
+
+      &:not(.vertical)
+        bottom: 0
+
+      &.vertical
+        margin-bottom: var(--dropdown-offset, $default-dropdown-offset)
+        bottom: 100%
+
+        &.hover:before
+          bottom: calc(-1 * var(--dropdown-offset, $default-dropdown-offset))
+          left: 0
+          height: var(--dropdown-offset, $default-dropdown-offset)
+          width: 100%
+
+    &.left
+      left: auto
+
+      &.vertical
+        right: 0
+
+      &:not(.vertical)
+        margin-right: var(--dropdown-offset, $default-dropdown-offset)
+        right: 100%
+
+        &.hover:before
+          top: 0
+          right: calc(-1 * var(--dropdown-offset, $default-dropdown-offset))
+          width: var(--dropdown-offset, $default-dropdown-offset)
+          height: 100%
+
+    &.below
+      bottom: auto
+
+      &:not(.vertical)
+        top: 0
+
+      &.vertical
+        margin-top: var(--dropdown-offset, $default-dropdown-offset)
+        top: 100%
+
+        &.hover:before
+          top: calc(-1 * var(--dropdown-offset, $default-dropdown-offset))
+          left: 0
+          height: var(--dropdown-offset, $default-dropdown-offset)
+          width: 100%
+
+    &.right
+      right: auto
+
+      &.vertical
+        left: 0
+
+      &:not(.vertical)
+        margin-left: var(--dropdown-offset, $default-dropdown-offset)
+        left: 100%
+
+        &.hover:before
+          top: 0
+          left: calc(-1 * var(--dropdown-offset, $default-dropdown-offset))
+          width: var(--dropdown-offset, $default-dropdown-offset)
+          height: 100%
 
   &.larger
     li.dropdown-item
@@ -29,9 +110,9 @@ ul.dropdown
         padding: $cs.l
 
   hr
-    margin-top: 0
-    height: .1rem
-    background-color: $c-divider
+    height: 1px
+    background-color: var(--c-border-neutral-light)
+    margin: $cs.xs 0
 
   li.dropdown-header-item
     display: block
@@ -41,37 +122,88 @@ ul.dropdown
     span
       line-height: 1
       display: block
-      padding: $cs.m
+      padding: $cs.s
 
   li.dropdown-item
-    display: block
     margin-bottom: 0
+    text-align: left
+    position: relative
 
     button.button
       reset-button()
+      position: relative
 
     & > a.button, & > button.button
       box-sizing: border-box
       line-height: 1
-      display: block
+      display: flex
+      align-items: center
       text-decoration: none
-      padding: $cs.m
+      padding: $cs.xs
       width: 100%
-      &:not(.active)
-        color: $tc-deep-gray
-
-      &.active
-        border-left: $c-active-blue 5px solid
-        color: $c-active-blue
+      min-height: 2.5rem
+      color: var(--c-text-neutral)
+      border-radius: $br.m
 
       &:hover
-        color: white
-
-        .icon
-          color: white
+        background: var(--c-bg-neutral-light)
 
     .icon
       margin-right: $cs.xs
+      color: var(--c-icon-neutral-normal)
 
     &:hover
-      background-color: $c-active-blue
+      color: var(--c-text-neutral-heavy)
+      text-decoration: none
+
+  .submenu-dropdown
+    bottom: - $cs.xs
+    left: calc(100% + .5rem) // Width plus padding.
+    z-index: $zi.dropdown
+
+    // Pseudo element to extend the clickable area
+    // to connect with the parent button.
+    &:before
+      content: ""
+      position: absolute
+      top: 0
+      left: -1rem
+      width: 1rem
+      height: 100%
+
+    &-icon
+      margin-right: - $cs.xs
+
+@keyframes dropdown-show-from-top
+  0%
+    opacity: 0
+    transform: translateY(-.5rem) scale(.98)
+    filter: blur(.2rem)
+
+  50%
+    opacity: 1
+    transform: translateY(.1rem) scale(1.01)
+    filter: blur(0)
+
+  100%
+    opacity: 1
+    transform: translateY(0) scale(1)
+
+
+
+@keyframes dropdown-show-from-bottom
+  0%
+    opacity: 0
+    transform: translateY(.5rem) scale(.98)
+    filter: blur(.2rem)
+
+  50%
+    opacity: 1
+    transform: translateY(-.1rem) scale(1.01)
+    filter: blur(0)
+
+  100%
+    opacity: 1
+    transform: translateY(0) scale(1)
+
+

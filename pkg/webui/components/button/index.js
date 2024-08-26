@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,73 +12,84 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, forwardRef, useMemo } from 'react'
+import React, { useCallback, forwardRef, useMemo, useRef } from 'react'
 import classnames from 'classnames'
 import { useIntl } from 'react-intl'
+import { isPlainObject } from 'lodash'
 
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconChevronDown } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import filterDataProps from '@ttn-lw/lib/filter-data-props'
+
+import Dropdown from '../dropdown'
+import Tooltip from '../tooltip'
 
 import style from './button.styl'
-
-const filterDataProps = props =>
-  Object.keys(props)
-    .filter(key => key.startsWith('data-'))
-    .reduce((acc, key) => {
-      acc[key] = props[key]
-      return acc
-    }, {})
 
 const assembleClassnames = ({
   message,
   danger,
   warning,
   primary,
+  secondary,
   naked,
-  unstyled,
+  grey,
   icon,
+  small,
   busy,
+  dropdownItems,
   className,
   error,
-  disabled,
-}) => {
-  if (unstyled) {
-    return className
-  }
-  return classnames(style.button, className, {
+  withAlert,
+}) =>
+  classnames(style.button, {
+    [className]: !Boolean(dropdownItems), // If there are dropdown items, the button is wrapped in a div with the className.
     [style.danger]: danger,
     [style.warning]: warning,
     [style.primary]: primary,
+    [style.secondary]: secondary,
     [style.naked]: naked,
     [style.busy]: busy,
+    [style.grey]: grey,
+    [style.small]: small,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
+    [style.withDropdown]: Boolean(dropdownItems),
     [style.error]: error && !busy,
-    [style.disabled]: disabled || busy,
+    [style.withAlert]: withAlert,
   })
-}
 
 const buttonChildren = props => {
-  const { icon, busy, message, children } = props
+  const { dropdownItems, icon, busy, message, messageValues, noDropdownIcon, children, small } =
+    props
 
-  const content = Boolean(children) ? (
-    children
-  ) : (
+  const content = (
     <>
-      {icon ? <Icon className={style.icon} icon={icon} /> : null}
-      {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
+      {icon && <Icon className={style.icon} icon={icon} size={small ? 16 : 18} />}
+      {message && (
+        <Message content={message} values={messageValues} className={style.linkButtonMessage} />
+      )}
+      {children}
+      {dropdownItems && (
+        <>
+          {!noDropdownIcon && (
+            <Icon className={style.expandIcon} icon={IconChevronDown} size={small ? 12 : 18} />
+          )}
+        </>
+      )}
     </>
   )
 
   return (
     <>
       {content}
-      {busy ? <Spinner className={style.spinner} small after={200} /> : null}
+      {busy && <Spinner className={style.spinner} small after={200} />}
     </>
   )
 }
@@ -87,6 +98,9 @@ const Button = forwardRef((props, ref) => {
   const {
     autoFocus,
     disabled,
+    dropdownItems,
+    dropdownClassName,
+    dropdownPosition,
     name,
     type,
     value,
@@ -95,8 +109,16 @@ const Button = forwardRef((props, ref) => {
     onBlur,
     onClick,
     form,
+    className,
+    portalledDropdown,
+    tooltip,
+    tooltipPlacement,
+    onMouseEnter,
+    onMouseLeave,
     ...rest
   } = props
+  const innerRef = useRef()
+  const combinedRef = combineRefs([ref, innerRef])
 
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
 
@@ -123,36 +145,104 @@ const Button = forwardRef((props, ref) => {
 
   const htmlProps = { autoFocus, name, type, value, title, onBlur, form, ...dataProps }
   const buttonClassNames = assembleClassnames(props)
-  return (
+
+  const buttonElement = (
     <button
       className={buttonClassNames}
       onClick={handleClick}
-      children={buttonChildren(props)}
+      children={buttonChildren({ ...props })}
       disabled={busy || disabled}
-      ref={ref}
+      ref={combinedRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       {...htmlProps}
     />
   )
+
+  const wrappedButtonElement = tooltip ? (
+    <Tooltip
+      content={isPlainObject(tooltip) ? <Message content={tooltip} /> : tooltip}
+      placement={tooltipPlacement}
+      delay={0}
+      noOffset
+      small
+    >
+      {buttonElement}
+    </Tooltip>
+  ) : (
+    buttonElement
+  )
+
+  if (dropdownItems) {
+    return (
+      <div className={classnames(className, 'pos-relative')}>
+        {wrappedButtonElement}
+        <Dropdown.Attached
+          className={dropdownClassName}
+          attachedRef={innerRef}
+          position={dropdownPosition}
+          portalled={portalledDropdown}
+        >
+          {dropdownItems}
+        </Dropdown.Attached>
+      </div>
+    )
+  }
+
+  return wrappedButtonElement
 })
 
 Button.defaultProps = {
   onClick: () => null,
+  onMouseEnter: () => null,
   onBlur: undefined,
 }
 
 const LinkButton = props => {
-  const { disabled, titleMessage } = props
+  const { disabled, titleMessage, onClick, value, tooltip, tooltipPlacement, dataTestId, ...rest } =
+    props
   const buttonClassNames = assembleClassnames(props)
+  const dataProps = useMemo(() => filterDataProps(rest), [rest])
   const { to } = props
-  return (
+
+  const handleClick = useCallback(
+    evt => {
+      // Passing a value to the onClick handler is useful for components that
+      // are rendered multiple times, e.g. in a list. The value can be used to
+      // identify the component that was clicked.
+      onClick(evt, value)
+    },
+    [onClick, value],
+  )
+
+  const buttonElement = (
     <Link
       className={buttonClassNames}
       to={to}
       disabled={disabled}
       title={titleMessage}
       children={buttonChildren(props)}
+      onClick={handleClick}
+      dataTestId={dataTestId}
+      {...dataProps}
     />
   )
+
+  const wrappedButtonElement = tooltip ? (
+    <Tooltip
+      content={isPlainObject(tooltip) ? <Message content={tooltip} /> : tooltip}
+      placement={tooltipPlacement}
+      delay={0}
+      noOffset
+      small
+    >
+      {buttonElement}
+    </Tooltip>
+  ) : (
+    buttonElement
+  )
+
+  return wrappedButtonElement
 }
 
 const AnchorLinkButton = props => {
@@ -174,6 +264,8 @@ const AnchorLinkButton = props => {
 const commonPropTypes = {
   /** The message to be displayed within the button. */
   message: PropTypes.message,
+  /** The message values. */
+  messageValues: PropTypes.object,
   /**
    * A flag specifying whether the `danger` styling should applied to the
    * button.
@@ -199,7 +291,7 @@ const commonPropTypes = {
    */
   error: PropTypes.bool,
   /** The name of an icon to be displayed within the button. */
-  icon: PropTypes.string,
+  icon: PropTypes.icon,
   /**
    * A flag specifying whether the button in the `busy` state and the
    * appropriate styling should be applied.
@@ -215,16 +307,18 @@ const commonPropTypes = {
   name: PropTypes.string,
   /** The html `type` prop passed to the <button /> element. */
   type: PropTypes.string,
-  /** A flag specifying whether no additional styles should be
-   * attached to the button. This can helpful to achieve individual stylings.
-   */
-  unstyled: PropTypes.bool,
   /** The html `value` prop passed to the <button /> element. */
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** The html `autofocus` prop passed to the <button /> element. */
   autoFocus: PropTypes.bool,
   /** A message to be evaluated and passed to the <button /> element. */
   title: PropTypes.message,
+  /** The tooltip message to be displayed when hovering over the button. */
+  tooltip: PropTypes.oneOfType([PropTypes.message, PropTypes.node]),
+  /** Dropdown items of the button. */
+  dropdownItems: PropTypes.node,
+  /** A flag specifying whether the small styling should applied to the button. */
+  small: PropTypes.bool,
 }
 
 buttonChildren.propTypes = {
@@ -236,13 +330,16 @@ buttonChildren.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   icon: commonPropTypes.icon,
   message: commonPropTypes.message,
+  messageValues: commonPropTypes.messageValues,
 }
 
 buttonChildren.defaultProps = {
   busy: undefined,
   icon: undefined,
   message: undefined,
+  messageValues: undefined,
   children: null,
+  small: false,
 }
 
 Button.propTypes = {
@@ -252,12 +349,25 @@ Button.propTypes = {
    * Not called if the button is in the `busy` or `disabled` state.
    */
   onClick: PropTypes.func,
+  onMouseEnter: PropTypes.func,
+  portalledDropdown: PropTypes.bool,
   ...commonPropTypes,
 }
 
+Button.defaultProps = {
+  onClick: () => null,
+  onMouseEnter: () => null,
+  portalledDropdown: false,
+}
+
 LinkButton.propTypes = {
+  onClick: PropTypes.func,
   ...commonPropTypes,
   ...Link.propTypes,
+}
+
+LinkButton.defaultProps = {
+  onClick: () => null,
 }
 
 Button.Link = LinkButton

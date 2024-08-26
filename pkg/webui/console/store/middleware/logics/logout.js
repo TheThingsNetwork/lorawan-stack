@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
-import * as user from '@console/store/actions/logout'
+import * as logout from '@console/store/actions/logout'
 
 const logoutSequence = async () => {
   const response = await api.console.logout()
@@ -31,7 +31,7 @@ const logoutSequence = async () => {
 
 export default [
   createRequestLogic({
-    type: user.LOGOUT,
+    type: logout.LOGOUT,
     process: async () => {
       try {
         await logoutSequence()

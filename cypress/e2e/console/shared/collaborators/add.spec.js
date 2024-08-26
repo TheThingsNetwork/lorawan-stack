@@ -143,24 +143,24 @@ describe('Collaborators', () => {
 
     beforeEach(() => {
       cy.loginConsole({ user_id: userId, password: user.password })
-      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators/add`)
+      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/add`)
     })
 
     it('succeeds adding user as a collaborator', () => {
-      cy.findByLabelText('Collaborator').selectOption(collaboratorId)
+      cy.findByLabelText('Member').selectOption(collaboratorId)
       cy.findByLabelText('Grant all current and future rights').check()
-      cy.findByRole('button', { name: 'Add collaborator' }).click()
+      cy.findByRole('button', { name: 'Add member' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
       cy.location('pathname').should(
         'eq',
-        `${Cypress.config('consoleRootPath')}/organizations/${testOrgId}/collaborators`,
+        `${Cypress.config('consoleRootPath')}/organizations/${testOrgId}`,
       )
       cy.findByText(collaboratorId).should('be.visible')
     })
 
     it('fails adding organization as a collaborator', () => {
-      cy.findByLabelText('Collaborator').type(organizationId)
+      cy.findByLabelText('Member').type(organizationId)
       cy.findByText('No matching user or organization was found')
     })
   })

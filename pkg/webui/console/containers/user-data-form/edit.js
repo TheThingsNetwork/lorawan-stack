@@ -15,7 +15,6 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages, useIntl } from 'react-intl'
 
 import toast from '@ttn-lw/components/toast'
@@ -146,83 +145,81 @@ const UserDataFormEdit = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.userEdit} />
-      <Row>
-        <Col>
-          <Form
-            error={error}
-            onSubmit={handleSubmit}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-          >
-            <Form.Field
-              title={sharedMessages.userId}
-              name="ids.user_id"
-              component={Input}
-              disabled
-              required
+      <div className="item-12">
+        <Form
+          error={error}
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+        >
+          <Form.Field
+            title={sharedMessages.userId}
+            name="ids.user_id"
+            component={Input}
+            disabled
+            required
+          />
+          <Form.Field
+            title={sharedMessages.name}
+            name="name"
+            placeholder={sharedMessages.userNamePlaceholder}
+            component={Input}
+          />
+          <Form.Field
+            title={sharedMessages.description}
+            name="description"
+            type="textarea"
+            placeholder={sharedMessages.userDescription}
+            description={sharedMessages.userDescDescription}
+            component={Input}
+          />
+          <Form.Field
+            title={sharedMessages.emailAddress}
+            name="primary_email_address"
+            placeholder={sharedMessages.emailPlaceholder}
+            description={sharedMessages.emailAddressDescription}
+            component={Input}
+            required
+          />
+          <Form.Field
+            title={sharedMessages.state}
+            name="state"
+            component={Select}
+            options={approvalStateOptions}
+            required
+          />
+          <Form.Field
+            name="_validate_email"
+            component={Checkbox}
+            label={sharedMessages.emailAddressValidation}
+            description={sharedMessages.emailAddressValidationDescription}
+          />
+          <Form.Field
+            name="admin"
+            component={Checkbox}
+            label={sharedMessages.grantAdminStatus}
+            description={sharedMessages.adminDescription}
+          />
+          <SubmitBar>
+            <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
+            <DeleteModalButton
+              message={sharedMessages.userDelete}
+              entityId={initialValues?.ids?.user_id}
+              entityName={initialValues?.name}
+              title={sharedMessages.accountDeleteConfirmation}
+              confirmMessage={m.deleteConfirmMessage}
+              defaultMessage={m.deleteWarning}
+              purgeMessage={m.purgeWarning}
+              onApprove={handleDelete}
+              shouldConfirm
+              mayPurge
             />
-            <Form.Field
-              title={sharedMessages.name}
-              name="name"
-              placeholder={sharedMessages.userNamePlaceholder}
-              component={Input}
-            />
-            <Form.Field
-              title={sharedMessages.description}
-              name="description"
-              type="textarea"
-              placeholder={sharedMessages.userDescription}
-              description={sharedMessages.userDescDescription}
-              component={Input}
-            />
-            <Form.Field
-              title={sharedMessages.emailAddress}
-              name="primary_email_address"
-              placeholder={sharedMessages.emailPlaceholder}
-              description={sharedMessages.emailAddressDescription}
-              component={Input}
-              required
-            />
-            <Form.Field
-              title={sharedMessages.state}
-              name="state"
-              component={Select}
-              options={approvalStateOptions}
-              required
-            />
-            <Form.Field
-              name="_validate_email"
-              component={Checkbox}
-              label={sharedMessages.emailAddressValidation}
-              description={sharedMessages.emailAddressValidationDescription}
-            />
-            <Form.Field
-              name="admin"
-              component={Checkbox}
-              label={sharedMessages.grantAdminStatus}
-              description={sharedMessages.adminDescription}
-            />
-            <SubmitBar>
-              <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
-              <DeleteModalButton
-                message={sharedMessages.userDelete}
-                entityId={initialValues?.ids?.user_id}
-                entityName={initialValues?.name}
-                title={sharedMessages.accountDeleteConfirmation}
-                confirmMessage={m.deleteConfirmMessage}
-                defaultMessage={m.deleteWarning}
-                purgeMessage={m.purgeWarning}
-                onApprove={handleDelete}
-                shouldConfirm
-                mayPurge
-              />
-            </SubmitBar>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+          </SubmitBar>
+        </Form>
+      </div>
+    </div>
   )
 }
 

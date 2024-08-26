@@ -80,6 +80,7 @@ describe('Application Webhook', () => {
 
     cy.reload()
     cy.findByLabelText('Base URL').should('have.attr', 'value', webhook.url)
+    cy.get('input[name="uplink_message.enable"]').scrollIntoView()
     cy.findByLabelText('Uplink message')
       .should('be.checked')
       .parents('[data-test-id="form-field"]')

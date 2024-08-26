@@ -14,8 +14,7 @@
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Col, Row, Container } from 'react-grid-system'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { isEqual } from 'lodash'
 
 import toast from '@ttn-lw/components/toast'
@@ -32,28 +31,20 @@ import diff from '@ttn-lw/lib/diff'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
-import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/collaborators'
 
 import {
   checkFromState,
   mayEditBasicGatewayInformation,
   mayDeleteGateway,
   mayEditGatewaySecrets,
-  mayPurgeEntities,
   mayViewOrEditGatewayApiKeys,
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 
-import {
-  updateGateway,
-  deleteGateway,
-  getGatewayClaimInfoByEui,
-  unclaimGateway,
-} from '@console/store/actions/gateways'
+import { updateGateway, getGatewayClaimInfoByEui } from '@console/store/actions/gateways'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
 
-import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 import {
   selectSelectedGateway,
   selectSelectedGatewayClaimable,
@@ -66,23 +57,11 @@ import m from './messages'
 
 const GatewayGeneralSettingsInner = () => {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const { gtwId } = useParams()
   const gateway = useSelector(selectSelectedGateway)
-  const mayPurgeGtw = useSelector(state => checkFromState(mayPurgeEntities, state))
   const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
   const mayEditSecrets = useSelector(state => checkFromState(mayEditGatewaySecrets, state))
-  const apiKeysCount = useSelector(state => selectApiKeysTotalCount(state))
-  const collaboratorsCount = useSelector(selectCollaboratorsTotalCount)
-  const hasApiKeys = apiKeysCount > 0
-  const hasAddedCollaborators = collaboratorsCount > 1
-  const isPristine = !hasAddedCollaborators && !hasApiKeys
-  const mayViewCollaborators = useSelector(state =>
-    checkFromState(mayViewOrEditGatewayCollaborators, state),
-  )
-  const mayViewApiKeys = useSelector(state => checkFromState(mayViewOrEditGatewayApiKeys, state))
   const supportsClaiming = useSelector(selectSelectedGatewayClaimable)
-  const shouldConfirmDelete = !isPristine || !mayViewCollaborators || !mayViewApiKeys
 
   const handleSubmit = useCallback(
     async values => {
@@ -118,66 +97,35 @@ const GatewayGeneralSettingsInner = () => {
     [gateway, dispatch, gtwId],
   )
 
-  const handleDelete = useCallback(
-    async shouldPurge => {
-      try {
-        // Check if gateway is claimable and if so, try to unclaim.
-        if (supportsClaiming) {
-          await dispatch(attachPromise(unclaimGateway(gtwId)))
-        }
-        await dispatch(attachPromise(deleteGateway(gtwId, { purge: shouldPurge || false })))
-
-        navigate('/gateways')
-        toast({
-          title: gtwId,
-          message: m.deleteSuccess,
-          type: toast.types.SUCCESS,
-        })
-      } catch (error) {
-        toast({
-          title: gtwId,
-          message: m.deleteFailure,
-          type: toast.types.ERROR,
-        })
-      }
-    },
-    [dispatch, gtwId, navigate, supportsClaiming],
-  )
-
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.generalSettings} hideHeading />
-      <Row>
-        <Col lg={8} md={12}>
-          <Collapse
-            title={m.basicTitle}
-            description={m.basicDescription}
-            disabled={false}
-            initialCollapsed={false}
-          >
-            <BasicSettingsForm
-              gtwId={gtwId}
-              gateway={gateway}
-              onSubmit={handleSubmit}
-              onDelete={handleDelete}
-              mayDeleteGateway={mayDeleteGtw}
-              mayEditSecrets={mayEditSecrets}
-              shouldConfirmDelete={shouldConfirmDelete}
-              mayPurge={mayPurgeGtw}
-              supportsClaiming={supportsClaiming}
-            />
-          </Collapse>
-          <Collapse
-            title={sharedMessages.lorawanOptions}
-            description={m.lorawanDescription}
-            disabled={false}
-            initialCollapsed
-          >
-            <LorawanSettingsForm gateway={gateway} onSubmit={handleSubmit} />
-          </Collapse>
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 lg:item-8">
+        <Collapse
+          title={m.basicTitle}
+          description={m.basicDescription}
+          disabled={false}
+          initialCollapsed={false}
+        >
+          <BasicSettingsForm
+            gtwId={gtwId}
+            gateway={gateway}
+            onSubmit={handleSubmit}
+            mayDeleteGateway={mayDeleteGtw}
+            mayEditSecrets={mayEditSecrets}
+            supportsClaiming={supportsClaiming}
+          />
+        </Collapse>
+        <Collapse
+          title={sharedMessages.lorawanOptions}
+          description={m.lorawanDescription}
+          disabled={false}
+          initialCollapsed
+        >
+          <LorawanSettingsForm gateway={gateway} onSubmit={handleSubmit} />
+        </Collapse>
+      </div>
+    </div>
   )
 }
 

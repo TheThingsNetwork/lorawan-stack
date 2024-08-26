@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -84,26 +83,24 @@ const DeviceGeneralSettings = () => {
   const { user, ...nonUserLocations } = device.locations || {}
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <IntlHelmet title={sharedMessages.location} />
-      <Row>
-        <Col lg={8} md={12}>
-          <LocationForm
-            entityId={devId}
-            formTitle={m.setDeviceLocation}
-            initialValues={user}
-            additionalMarkers={locationToMarkers(nonUserLocations)}
-            onSubmit={handleSubmit}
-            onDelete={handleDelete}
-            centerOnMarkers
-          />
-        </Col>
-        <Col lg={4} md={12}>
-          <Message content={m.locationInfoTitle} component="h4" className="mb-0 mt-ls-xl" />
-          <Message content={m.locationInfo} component="p" />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <LocationForm
+          entityId={devId}
+          formTitle={m.setDeviceLocation}
+          initialValues={user}
+          additionalMarkers={locationToMarkers(nonUserLocations)}
+          onSubmit={handleSubmit}
+          onDelete={handleDelete}
+          centerOnMarkers
+        />
+      </div>
+      <div className="item-12 xl:item-4">
+        <Message content={m.locationInfoTitle} component="h4" className="mb-0 mt-ls-xl" />
+        <Message content={m.locationInfo} component="p" />
+      </div>
+    </div>
   )
 }
 

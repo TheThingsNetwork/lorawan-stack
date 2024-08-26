@@ -143,7 +143,7 @@ describe('API keys', () => {
   describe('User', () => {
     beforeEach(() => {
       cy.loginConsole({ user_id: userId, password: user.password })
-      cy.visit(`${Cypress.config('consoleRootPath')}/user/api-keys/add`)
+      cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/api-keys/add`)
     })
 
     it('succeeds adding new api key', () => {
@@ -163,7 +163,10 @@ describe('API keys', () => {
           cy.findByRole('button', { name: /I have copied the key/ }).click()
         })
 
-      cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/user/api-keys`)
+      cy.location('pathname').should(
+        'eq',
+        `${Cypress.config('consoleRootPath')}/user-settings/api-keys`,
+      )
     })
   })
 })

@@ -17,11 +17,11 @@ import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 
+import Icon, { IconHelp, IconImportDevices } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Status from '@ttn-lw/components/status'
 import DocTooltip from '@ttn-lw/components/tooltip/doc'
-import Icon from '@ttn-lw/components/icon'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -63,35 +63,59 @@ const m = defineMessages({
 const headers = [
   {
     name: 'ids.device_id',
-    displayName: sharedMessages.id,
+    displayName: sharedMessages.nameAndId,
     sortable: true,
     sortKey: 'device_id',
-  },
-  {
-    name: 'name',
-    displayName: sharedMessages.name,
-    sortable: true,
+    getValue: row => ({
+      id: row.ids.device_id,
+      name: row.name,
+    }),
+    render: ({ name, id }) =>
+      Boolean(name) ? (
+        <>
+          <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
+          <span className="c-text-neutral-light d-block">{id}</span>
+        </>
+      ) : (
+        <span className="mt-0 p-0 fw-bold d-block">{id}</span>
+      ),
   },
   {
     name: 'ids.dev_eui',
+    width: '14rem',
     displayName: sharedMessages.devEUI,
     sortable: false,
     render: devEUI =>
       !Boolean(devEUI) ? (
         <Message className={style.none} content={sharedMessages.none} firstToLower />
       ) : (
-        <SafeInspector data={devEUI} noTransform noCopyPopup small hideable={false} />
+        <SafeInspector
+          data={devEUI}
+          noTransform
+          noCopyPopup
+          small
+          hideable={false}
+          className="w-content"
+        />
       ),
   },
   {
     name: 'ids.join_eui',
+    width: '14rem',
     displayName: sharedMessages.joinEUI,
     sortable: false,
     render: joinEUI =>
       !Boolean(joinEUI) ? (
         <Message className={style.none} content={sharedMessages.none} lowercase />
       ) : (
-        <SafeInspector data={joinEUI} noTransform noCopyPopup small hideable={false} />
+        <SafeInspector
+          data={joinEUI}
+          noTransform
+          noCopyPopup
+          small
+          hideable={false}
+          className="w-content"
+        />
       ),
   },
   {
@@ -99,7 +123,7 @@ const headers = [
     displayName: sharedMessages.lastSeen,
     sortable: true,
     sortKey: 'last_seen_at',
-    width: 14,
+    width: '9rem',
     render: status => {
       if (status.otherCluster) {
         const host = status.host
@@ -109,8 +133,12 @@ const headers = [
             content={<Message content={m.otherClusterTooltip} values={{ host }} convertBackticks />}
             placement="top-end"
           >
-            <Status status="unknown" label={sharedMessages.otherCluster}>
-              <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+            <Status
+              status="unknown"
+              label={sharedMessages.otherCluster}
+              className="d-flex al-center"
+            >
+              <Icon icon={IconHelp} textPaddedLeft small nudgeUp className="c-text-neutral-light" />
             </Status>
           </DocTooltip>
         )
@@ -182,8 +210,9 @@ const DevicesTableInner = () => {
   const importButton = mayImportDevices && (
     <Button.Link
       message={sharedMessages.importDevices}
-      icon="import_devices"
+      icon={IconImportDevices}
       to={`/applications/${appId}/devices/import`}
+      secondary
     />
   )
 

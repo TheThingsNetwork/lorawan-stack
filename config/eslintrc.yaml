@@ -141,6 +141,8 @@ rules:
   react/forbid-foreign-prop-types: off
   # Prevent undefined components.
   react/jsx-no-undef: warn
+  # Allow arrow functions as props
+  react/jsx-no-bind: off
   # Prevent vague prop types.
   react/forbid-prop-types:
     - warn

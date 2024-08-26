@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 
@@ -49,14 +48,10 @@ const ApplicationApiKeysList = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.apiKeys} />
-        <Col>
-          <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--xxl p-0">
+      <IntlHelmet title={sharedMessages.apiKeys} />
+      <ApiKeysTable baseDataSelector={baseDataSelector} getItemsAction={getApiKeys} />
+    </div>
   )
 }
 

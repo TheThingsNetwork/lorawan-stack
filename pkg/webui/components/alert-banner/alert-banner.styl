@@ -1,0 +1,64 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.alert-banner
+  position: absolute
+  right: 0
+  left: 0
+  z-index: $zi.slight
+  padding: $cs.m
+  opacity: 0
+  pointer-events: none
+  transition: opacity $ad.m
+  &.visible
+    opacity: 1
+    pointer-events: auto
+
+  .link > span
+    text-decoration: underline
+
+  .title
+    line-height: normal
+
+.error
+  background-color: var(--c-bg-error-light)
+  color: var(--c-text-error-bold)
+  .link, .closeIcon
+    color: var(--c-text-error-bold)
+    &:hover
+      color: var(--c-text-error-normal-hover)
+
+.success
+  background-color: var(--c-bg-success-light)
+  color: var(--c-text-success-bold)
+  .link, .closeIcon
+    color: var(--c-text-success-bold)
+    &:hover
+      color: var(--c-text-success-normal-hover)
+
+.warning
+  background-color: var(--c-bg-warning-light)
+  color: var(--c-text-warning-bold)
+  .link, .closeIcon
+    color: var(--c-text-warning-bold)
+    &:hover
+      color: var(--c-text-warning-normal-hover)
+
+.info
+  background-color: var(--c-bg-info-light)
+  color: var(--c-text-info-bold)
+  .link, .closeIcon
+    color: var(--c-text-info-bold)
+    &:hover
+      color: var(--c-text-info-normal-hover)

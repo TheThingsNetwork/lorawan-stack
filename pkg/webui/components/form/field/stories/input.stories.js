@@ -23,6 +23,7 @@ import FieldsWrapperExample from './shared'
 
 export default {
   title: 'Fields/Input',
+  component: Form.Field,
 }
 
 export const Default = () => (

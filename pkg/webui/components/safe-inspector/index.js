@@ -17,9 +17,14 @@ import classnames from 'classnames'
 import clipboard from 'clipboard'
 import { defineMessages, useIntl } from 'react-intl'
 
-import Icon from '@ttn-lw/components/icon'
-
-import Message from '@ttn-lw/lib/components/message'
+import Icon, {
+  IconClipboard,
+  IconClipboardCheck,
+  IconCode,
+  IconEye,
+  IconEyeOff,
+  IconSwitchHorizontal,
+} from '@ttn-lw/components/icon'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -68,7 +73,6 @@ const SafeInspector = ({
   className,
   isBytes,
   small,
-  noCopyPopup,
   noCopy,
   noTransform,
   truncateAfter,
@@ -79,7 +83,7 @@ const SafeInspector = ({
   const [hidden, setHidden] = useState((hideable && !initiallyVisible) || false)
   const [byteStyle, setByteStyle] = useState(true)
   const [copied, setCopied] = useState(false)
-  const [copyIcon, setCopyIcon] = useState('file_copy')
+  const [copyIcon, setCopyIcon] = useState(IconClipboard)
   const [representation, setRepresentation] = useState(MSB)
   const [truncated, setTruncated] = useState(false)
 
@@ -107,11 +111,11 @@ const SafeInspector = ({
     const containerWidth = containerElem.current.offsetWidth
     const buttonsWidth = buttonsElem.current.offsetWidth
     const displayWidth = displayElem.current.offsetWidth
-    const netContainerWidth = containerWidth - buttonsWidth - 14
+    const netContainerWidth = containerWidth - buttonsWidth
 
     if (netContainerWidth < displayWidth && !truncated) {
       setTruncated(true)
-    } else if (netContainerWidth > displayWidth && truncated) {
+    } else if (netContainerWidth >= displayWidth && truncated) {
       setTruncated(false)
     }
   }, [truncated])
@@ -143,19 +147,12 @@ const SafeInspector = ({
     }
 
     setCopied(true)
-    setCopyIcon('done')
-    if (noCopyPopup) {
-      _timer.current = setTimeout(() => {
-        setCopied(false)
-        setCopyIcon('file_copy')
-      }, 2000)
-    }
-  }, [copied, noCopyPopup])
-
-  const handleCopyAnimationEnd = useCallback(() => {
-    setCopied(false)
-    setCopyIcon('file_copy')
-  }, [])
+    setCopyIcon(IconClipboardCheck)
+    _timer.current = setTimeout(() => {
+      setCopied(false)
+      setCopyIcon(IconClipboard)
+    }, 2000)
+  }, [copied])
 
   useEffect(() => {
     if (copyElem && copyElem.current) {
@@ -251,7 +248,7 @@ const SafeInspector = ({
                 className={style.buttonSwap}
                 onClick={handleSwapToggle}
               >
-                <Icon className={style.buttonIcon} small icon="swap_horiz" />
+                <Icon className={style.buttonIcon} small icon={IconSwitchHorizontal} />
               </button>
             </React.Fragment>
           )}
@@ -261,7 +258,7 @@ const SafeInspector = ({
               className={style.buttonTransform}
               onClick={handleTransformToggle}
             >
-              <Icon className={style.buttonIcon} small icon="code" />
+              <Icon className={style.buttonIcon} small icon={IconCode} />
             </button>
           )}
           {!noCopy && (
@@ -274,13 +271,6 @@ const SafeInspector = ({
               disabled={copied}
             >
               <Icon className={copyButtonStyle} onClick={handleCopyClick} small icon={copyIcon} />
-              {copied && !noCopyPopup && (
-                <Message
-                  content={sharedMessages.copiedToClipboard}
-                  onAnimationEnd={handleCopyAnimationEnd}
-                  className={style.copyConfirm}
-                />
-              )}
             </button>
           )}
           {hideable && (
@@ -289,11 +279,7 @@ const SafeInspector = ({
               className={style.buttonVisibility}
               onClick={handleVisibiltyToggle}
             >
-              <Icon
-                className={style.buttonIcon}
-                small
-                icon={hidden ? 'visibility' : 'visibility_off'}
-              />
+              <Icon className={style.buttonIcon} small icon={hidden ? IconEye : IconEyeOff} />
             </button>
           )}
         </div>
@@ -319,8 +305,6 @@ SafeInspector.propTypes = {
   isBytes: PropTypes.bool,
   /** Whether to hide the copy action. */
   noCopy: PropTypes.bool,
-  /** Whether to hide the copy popup click and just display checkmark. */
-  noCopyPopup: PropTypes.bool,
   /** Whether to hide the data transform action. */
   noTransform: PropTypes.bool,
   /**
@@ -336,7 +320,6 @@ SafeInspector.propTypes = {
 
 SafeInspector.defaultProps = {
   className: undefined,
-  noCopyPopup: false,
   disableResize: false,
   hideable: true,
   initiallyVisible: false,

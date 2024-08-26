@@ -17,7 +17,14 @@ import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, {
+  IconLock,
+  IconRefresh,
+  IconWifi,
+  IconWifi0,
+  IconWifi1,
+  IconWifi2,
+} from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Spinner from '@ttn-lw/components/spinner'
 
@@ -62,16 +69,15 @@ const computeDeltaInSeconds = (from, to) => {
   return Math.floor((from - to) / 1000)
 }
 
-const wifiIconBasedOnRSSI = rssi => {
-  if (rssi >= -60) {
-    // Strong
-    return 'wifi'
+const wifiStrengthIcon = rssi => {
+  if (rssi >= -50) {
+    return IconWifi // Excellent signal
+  } else if (rssi >= -60) {
+    return IconWifi2 // Good signal
   } else if (rssi >= -80) {
-    // Moderate
-    return 'signal_wifi_2'
+    return IconWifi1 // Fair signal
   }
-  // Weak
-  return 'signal_wifi_1'
+  return IconWifi0 // Weak signal
 }
 
 const AccessPointListItem = ({ accessPoint, onClick, isActive }) => {
@@ -88,11 +94,11 @@ const AccessPointListItem = ({ accessPoint, onClick, isActive }) => {
       onClick={handleClick}
     >
       <div className="d-flex al-center gap-cs-xs">
-        {!isOther && <Icon icon={wifiIconBasedOnRSSI(accessPoint.rssi)} />}
+        {!isOther && <Icon icon={wifiStrengthIcon(accessPoint.rssi)} className={style.wifiIcon} />}
         {isOther ? <Message content={sharedMessages.otherOption} /> : accessPoint.ssid}
       </div>
       {accessPoint.authentication_mode !== 'open' && !isOther && (
-        <Icon icon="lock" small className="tc-subtle-gray" />
+        <Icon icon={IconLock} className={style.lockIcon} small />
       )}
     </div>
   )
@@ -173,7 +179,7 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
                 <Message content={m.scanningWifi} />
               </Spinner>
             </div>
-            <Message content={m.description} className="tc-subtle-gray" />
+            <Message content={m.description} className="c-text-neutral-light" />
           </div>
         ) : (
           <div className="d-flex gap-cs-l">
@@ -192,7 +198,7 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
                 isActive={value.type === 'other'}
               />
             </div>
-            <Message content={m.description} className="tc-subtle-gray" />
+            <Message content={m.description} className="c-text-neutral-light" />
           </div>
         )}
 
@@ -201,11 +207,12 @@ const AccessPointList = ({ onChange, value, className, inputWidth, onBlur, ssid 
             type="button"
             message={sharedMessages.scanAgain}
             onClick={handleScanAccessPoints}
-            icon="autorenew"
+            icon={IconRefresh}
             disabled={isLoading}
+            secondary
           />
           {Boolean(lastRefresh) && (
-            <div className="tc-subtle-gray d-flex gap-cs-xxs">
+            <div className="c-text-neutral-light d-flex gap-cs-xxs">
               <Message content={m.lastRefresh} />
               <DateTime.Relative
                 value={lastRefresh}

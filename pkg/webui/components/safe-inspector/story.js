@@ -18,6 +18,7 @@ import SafeInspector from '.'
 
 export default {
   title: 'Safe Inspector',
+  component: SafeInspector,
 }
 
 export const Default = () => <SafeInspector data="ab01f46d2f" />

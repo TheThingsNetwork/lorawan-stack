@@ -14,11 +14,24 @@
 
 import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 
-import { SET_CONNECTION_STATUS, SET_LOGIN_STATUS } from '@ttn-lw/lib/store/actions/status'
+import {
+  SET_CONNECTION_STATUS,
+  SET_LOGIN_STATUS,
+  GET_NETWORK_STATUS_SUMMARY_SUCCESS,
+} from '@ttn-lw/lib/store/actions/status'
+
+export const initialSummaryState = {
+  scheduled_maintenances: [],
+  status: {
+    indicator: 'none',
+    description: '',
+  },
+}
 
 const defaultState = {
   onlineStatus: ONLINE_STATUS.ONLINE,
   isLoginRequired: false,
+  summary: initialSummaryState,
 }
 
 const status = (state = defaultState, { type, payload }) => {
@@ -32,6 +45,14 @@ const status = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         isLoginRequired: true,
+      }
+    case GET_NETWORK_STATUS_SUMMARY_SUCCESS:
+      return {
+        ...state,
+        summary: {
+          status: payload.summary.status,
+          scheduled_maintenances: payload.summary.scheduled_maintenances,
+        },
       }
     default:
       return state

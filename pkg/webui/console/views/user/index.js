@@ -15,8 +15,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
-
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
@@ -26,7 +24,6 @@ import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 
 const UserView = () => (
   <>
-    <Breadcrumbs />
     <IntlHelmet titleTemplate={`%s - User - ${selectApplicationSiteName()}`} />
     <Routes>
       <Route path="api-keys/*" Component={UserApiKeys} />

@@ -15,7 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconDownlink, IconUplink } from '@ttn-lw/components/icon'
 import Tooltip from '@ttn-lw/components/tooltip'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -52,10 +52,10 @@ const RoutingPolicyMatrix = ({ policy }) => {
   const { uplink = {}, downlink = {} } = policy
 
   return (
-    <div className={style.container}>
-      <div className={style.uplink}>
+    <div className="d-flex direction-column">
+      <div className="d-flex mb-cs-xxs al-center gap-cs-xxs">
         <Tooltip content={<Message content={m.uplinkPolicies} />} placement="top">
-          <Icon small icon="uplink" className={style.icon} />
+          <Icon small icon={IconUplink} className="c-text-neutral-light" />
         </Tooltip>
         <PolicyPoint
           symbol="J"
@@ -88,9 +88,9 @@ const RoutingPolicyMatrix = ({ policy }) => {
           negativeMessage={m.doesNotForwardLocalization}
         />
       </div>
-      <div className={style.downlink}>
+      <div className={classnames(style.downlink, 'd-flex', 'al-center', 'gap-cs-xxs')}>
         <Tooltip content={<Message content={m.downlinkPolicies} />} placement="bottom">
-          <Icon small icon="downlink" className={style.icon} />
+          <Icon small icon={IconDownlink} className="c-text-neutral-light" />
         </Tooltip>
         <PolicyPoint
           symbol="J"

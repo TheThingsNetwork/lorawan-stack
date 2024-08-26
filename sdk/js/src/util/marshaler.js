@@ -130,6 +130,14 @@ class Marshaler {
     return this.payloadSingleResponse(result)
   }
 
+  static unwrapBookmarks(result) {
+    return this.payloadListResponse('bookmarks', result)
+  }
+
+  static unwrapBookmark(result) {
+    return this.payloadSingleResponse(result)
+  }
+
   static fieldMaskFromPatch(patch, whitelist, remaps = []) {
     const paths = []
 

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import { isEqual } from 'lodash'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
@@ -36,12 +36,6 @@ import { parseLorawanMacVersion } from '@console/lib/device-utils'
 import { hasExternalJs, isDeviceOTAA } from '../utils'
 
 import validationSchema from './validation-schema'
-
-const messages = defineMessages({
-  unclaimAndDeleteDevice: 'Unclaim and delete end device',
-  deleteDevice: 'Delete end device',
-  deleteWarning: 'Are you sure you want to delete "{deviceId}"? This action cannot be undone.',
-})
 
 const IdentityServerForm = React.memo(props => {
   const {
@@ -292,10 +286,15 @@ const IdentityServerForm = React.memo(props => {
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <ModalButton
           type="button"
-          icon="delete"
-          message={supportsClaiming ? messages.unclaimAndDeleteDevice : messages.deleteDevice}
+          icon={IconTrash}
+          message={
+            supportsClaiming ? sharedMessages.unclaimAndDeleteDevice : sharedMessages.deleteDevice
+          }
           modalData={{
-            message: { values: { deviceId: name || ids.device_id }, ...messages.deleteWarning },
+            message: {
+              values: { deviceId: name || ids.device_id },
+              ...sharedMessages.deleteWarning,
+            },
           }}
           onApprove={onDeviceDelete}
           naked

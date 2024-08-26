@@ -37,8 +37,7 @@ import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { ACTIVATION_MODES } from '@console/lib/device-utils'
-import { checkFromState } from '@account/lib/feature-checks'
-import { mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
+import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
 import { getDefaultMacSettings } from '@console/store/actions/network-server'
 

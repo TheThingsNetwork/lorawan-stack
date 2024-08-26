@@ -216,6 +216,7 @@ class SortableExample extends React.Component {
 
 export default {
   title: 'Table/Tabular',
+  component: Tabular,
 }
 
 export const Default = () => (
