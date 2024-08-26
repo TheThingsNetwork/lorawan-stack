@@ -24,7 +24,9 @@
   left: 0
   height: 100vh
   sidebar-transition(left)
-  sidebar-transition(width)
+  // Stylus has trouble adding multiple properties to a function
+  // so we have to overwrite it like this.
+  transition-property: left, width
   +media-query($bp.xxl)
     --sidebar-width: 22rem
   +media-query($bp.lg-xl)
