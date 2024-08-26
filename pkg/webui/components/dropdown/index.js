@@ -150,7 +150,7 @@ const DropdownItem = ({
   const submenu = Boolean(submenuItems) && (
     <>
       <button className={classnames(style.button, 'd-flex', 'j-between')}>
-        <div>
+        <div className="d-flex al-center">
           {iconElement}
           <Message content={title} />
         </div>

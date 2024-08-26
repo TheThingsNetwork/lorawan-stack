@@ -56,11 +56,11 @@ const AllTopEntitiesList = () => {
       render: ({ entity, id }) =>
         Boolean(entity?.name) ? (
           <>
-            <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{entity.name}</span>
+            <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{entity.name}</span>
             <span className="c-text-neutral-light d-block">{id}</span>
           </>
         ) : (
-          <span className="mt-0 mb-cs-xs p-0 fw-bold d-block">{id}</span>
+          <span className="mt-0 p-0 fw-bold d-block">{id}</span>
         ),
     },
     {
