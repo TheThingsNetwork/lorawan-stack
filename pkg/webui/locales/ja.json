@@ -1442,6 +1442,7 @@
   "lib.shared-messages.gsServerAddressDescription": "接続先のゲートウェイサーバのアドレス",
   "lib.shared-messages.hardware": "ハードウェア",
   "lib.shared-messages.hardwareVersion": "ハードウェアバージョン",
+  "lib.shared-messages.hideSidebar": "",
   "lib.shared-messages.home": "",
   "lib.shared-messages.homeNetID": "ホーム NetID",
   "lib.shared-messages.homeNetIDDescription": "LoRaWANネットワークを識別するためのID",
