@@ -13,9 +13,9 @@
 // limitations under the License.
 
 export default Object.freeze({
-  C_ACTIVE_BLUE: '#3D73FF',
-  C_ACTIVE_BLUE_HOVER: '#1E5DFF',
-  C_ACTIVE_BLUE_ACTIVE: '#0047FF',
+  C_ACTIVE_BLUE: '#1E5DFF',
+  C_ACTIVE_BLUE_HOVER: '#1547DB',
+  C_ACTIVE_BLUE_ACTIVE: '#0F34B7',
   C_ICON_FILL: '#686868',
   C_SUBTLE_FILL: '#AAAAAA',
   C_BACKDROP: '#F3F3F3',

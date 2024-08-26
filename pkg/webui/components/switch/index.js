@@ -37,7 +37,9 @@ const Switch = props => (
       />
     }
     onColor={COLORS.C_ACTIVE_BLUE}
+    offColor="#B4B7CB"
     activeBoxShadow={`"0 0 3px 5px ${COLORS.C_ACTIVE_BLUE}66, inset 0 0 3px 1px #0002"`}
+    handleDiameter={18}
     height={24}
     width={44}
     data-test-id="switch"
