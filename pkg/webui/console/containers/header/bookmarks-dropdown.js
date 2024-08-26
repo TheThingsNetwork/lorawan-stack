@@ -15,6 +15,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import classnames from 'classnames'
 
 import Dropdown from '@ttn-lw/components/dropdown'
 
@@ -68,13 +69,22 @@ const BookmarksDropdown = () => {
     </div>
   ) : (
     <>
-      <div className={style.bookmarkContainer}>
+      <div
+        className={classnames(style.bookmarkContainer, {
+          [style.bookmarkContainerBorderBottom]: dropdownItems.length > 15,
+        })}
+      >
         {dropdownItems.slice(0, 15).map((bookmark, index) => (
           <Bookmark key={index} bookmark={bookmark} />
         ))}
       </div>
       {dropdownItems.length > 15 && (
-        <div className="p-cs-l c-text-neutral-light fs-s text-center c-bg-brand-extralight br-l">
+        <div
+          className={classnames(
+            style.bookmarkLimitMessage,
+            'p-cs-m c-text-neutral-light fs-s text-center c-bg-brand-extralight',
+          )}
+        >
           <Message content={m.threshold} />
         </div>
       )}

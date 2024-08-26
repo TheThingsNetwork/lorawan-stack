@@ -30,7 +30,7 @@ const ShortcutItem = ({ icon, title, link, action, className }) =>
       <div className="pos-relative w-full h-full">
         <div className={style.shortcutTitleWrapper}>
           <Icon icon={icon} className={style.icon} size={28} />
-          <Message content={title} className={style.title} component="span" />
+          <Message content={title} component="span" />
         </div>
       </div>
     </button>
@@ -39,7 +39,7 @@ const ShortcutItem = ({ icon, title, link, action, className }) =>
       <div className="pos-relative w-full h-full">
         <div className={style.shortcutTitleWrapper}>
           <Icon icon={icon} className={style.icon} size={28} />
-          <Message content={title} className={style.title} component="span" />
+          <Message content={title} component="span" />
         </div>
       </div>
     </Link>

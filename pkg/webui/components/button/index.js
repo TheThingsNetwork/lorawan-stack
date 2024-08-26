@@ -47,6 +47,7 @@ const assembleClassnames = ({
   className,
   error,
   withAlert,
+  noDropdownIcon,
 }) =>
   classnames(style.button, {
     [className]: !Boolean(dropdownItems), // If there are dropdown items, the button is wrapped in a div with the className.
@@ -59,6 +60,7 @@ const assembleClassnames = ({
     [style.grey]: grey,
     [style.small]: small,
     [style.withIcon]: icon !== undefined && message,
+    [style.noDropdownIcon]: noDropdownIcon,
     [style.onlyIcon]: icon !== undefined && !message,
     [style.withDropdown]: Boolean(dropdownItems),
     [style.error]: error && !busy,
