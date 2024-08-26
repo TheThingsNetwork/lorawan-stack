@@ -136,6 +136,9 @@ if (relevantSetEnvs.length > 0) {
       }
       envConfig += stagingConfig
     }
+  } else {
+    // Cypress setup
+    envConfig = baseConfig + localConfig
   }
 
   const envVars = envConfig
