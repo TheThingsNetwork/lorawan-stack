@@ -23,8 +23,11 @@ import (
 
 	northboundv1 "go.thethings.industries/pkg/api/gen/tti/gateway/controller/northbound/v1"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	dcstypes "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttgc"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -61,7 +64,9 @@ func New(ctx context.Context, c ttgc.Component, config ttgc.Config) (*Upstream, 
 //  2. Upsert a LoRa Packet Forwarder profile with the root CA presented by the given Gateway Server
 //  3. Upsert a Geolocation profile
 //  4. Update the gateway with the profiles
-func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clusterAddress string) error {
+func (u *Upstream) Claim(
+	ctx context.Context, eui types.EUI64, ownerToken, clusterAddress string,
+) (*dcstypes.GatewayMetadata, error) {
 	logger := log.FromContext(ctx)
 
 	// Claim the gateway.
@@ -72,7 +77,7 @@ func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clust
 		OwnerToken: ownerToken,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Get the root CA from the Gateway Server and upsert the LoRa Packet Forwarder profile.
@@ -83,7 +88,7 @@ func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clust
 	clusterAddress = net.JoinHostPort(host, "8889")
 	rootCA, err := u.getRootCA(ctx, clusterAddress)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var (
 		loraPFProfileID []byte
@@ -107,7 +112,7 @@ func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clust
 	if err != nil {
 		if status.Code(err) != codes.NotFound {
 			logger.WithError(err).Warn("Failed to get LoRa Packet Forwarder profile")
-			return err
+			return nil, err
 		}
 		res, err := loraPFProfileClient.Create(ctx, &northboundv1.LoraPacketForwarderProfileServiceCreateRequest{
 			Domain:                     u.client.Domain(ctx),
@@ -116,7 +121,7 @@ func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clust
 		})
 		if err != nil {
 			logger.WithError(err).Warn("Failed to create LoRa Packet Forwarder profile")
-			return err
+			return nil, err
 		}
 		loraPFProfileID = res.ProfileId
 	} else {
@@ -131,7 +136,7 @@ func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clust
 			})
 			if err != nil {
 				logger.WithError(err).Warn("Failed to update LoRa Packet Forwarder profile")
-				return err
+				return nil, err
 			}
 		}
 		loraPFProfileID = loraPFGetRes.ProfileId
@@ -158,7 +163,7 @@ func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clust
 	if err != nil {
 		if status.Code(err) != codes.NotFound {
 			logger.WithError(err).Warn("Failed to get geolocation profile")
-			return err
+			return nil, err
 		}
 		res, err := geolocationProfileClient.Create(ctx, &northboundv1.GeolocationProfileServiceCreateRequest{
 			Domain:             u.client.Domain(ctx),
@@ -167,7 +172,7 @@ func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clust
 		})
 		if err != nil {
 			logger.WithError(err).Warn("Failed to create geolocation profile")
-			return err
+			return nil, err
 		}
 		geolocationProfileID = res.ProfileId
 	} else {
@@ -187,10 +192,29 @@ func (u *Upstream) Claim(ctx context.Context, eui types.EUI64, ownerToken, clust
 	})
 	if err != nil {
 		logger.WithError(err).Warn("Failed to update gateway with profiles")
-		return err
+		return nil, err
 	}
 
-	return nil
+	gatewayMetadata := &dcstypes.GatewayMetadata{}
+	locationRes, err := gtwClient.GetLastLocation(ctx, &northboundv1.GatewayServiceGetLastLocationRequest{
+		GatewayId: eui.MarshalNumber(),
+		Domain:    u.client.Domain(ctx),
+	})
+	if err != nil && !errors.IsNotFound(err) {
+		logger.WithError(err).Warn("Failed to get gateway location")
+	} else if err == nil {
+		gatewayMetadata.Antennas = []*ttnpb.GatewayAntenna{
+			{
+				Location: &ttnpb.Location{
+					Latitude:  locationRes.Location.Latitude,
+					Longitude: locationRes.Location.Longitude,
+					Accuracy:  int32(locationRes.Location.Accuracy),
+				},
+			},
+		}
+	}
+
+	return gatewayMetadata, nil
 }
 
 // Unclaim implements gateways.GatewayClaimer.
@@ -201,6 +225,9 @@ func (u *Upstream) Unclaim(ctx context.Context, eui types.EUI64) error {
 		Domain:    u.client.Domain(ctx),
 	})
 	if err != nil {
+		if errors.IsNotFound(err) { // The gateway does not exist or is already unclaimed.
+			return nil
+		}
 		return err
 	}
 	return nil
