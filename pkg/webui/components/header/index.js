@@ -24,6 +24,8 @@ import AppStatusBadge from '@console/containers/app-status-badge'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import Link from '../link'
+
 import style from './header.styl'
 
 const Header = ({
@@ -54,7 +56,9 @@ const Header = ({
   >
     {alwaysShowLogo ? (
       <div className="d-flex al-center gap-cs-xs">
-        <Logo className={style.logo} />
+        <Link to="/">
+          <Logo className={style.logo} />
+        </Link>
       </div>
     ) : (
       <>
@@ -78,7 +82,9 @@ const Header = ({
         </div>
         <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
           <Button secondary icon={IconLayoutSidebarLeftExpand} onClick={onMenuClick} />
-          <Logo className={style.logo} />
+          <Link to="/">
+            <Logo className={style.logo} />
+          </Link>
         </div>
       </>
     )}
