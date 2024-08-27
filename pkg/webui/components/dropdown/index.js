@@ -130,7 +130,7 @@ const DropdownItem = ({
       onKeyPress={action}
       role="tab"
       tabIndex={tabIndex}
-      className={style.button}
+      className={classnames(style.button, { [style.buttonActive]: active })}
     >
       {iconElement}
       <Message content={title} />
