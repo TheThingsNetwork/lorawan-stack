@@ -186,6 +186,7 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MACVersion_MAC_V1_0_3,
 	ttnpb.MACVersion_MAC_V1_0_4,
 	ttnpb.MACVersion_MAC_V1_1,
+	ttnpb.MACVersion_MAC_V1_2_0,
 }
 
 // wrapKeyWithVault wraps the given key with the configured KEK label.
