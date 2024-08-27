@@ -116,6 +116,14 @@ const userPreferences = (state = initialState, { type, payload }) => {
           ...payload.console_preferences,
         },
       }
+    case 'SET_PAGE_SIZE':
+      return {
+        ...state,
+        consolePreferences: {
+          ...state.consolePreferences,
+          pageSize: payload,
+        },
+      }
     default:
       return state
   }

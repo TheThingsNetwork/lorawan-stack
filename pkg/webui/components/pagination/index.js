@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import classnames from 'classnames'
 import Paginate from 'react-paginate'
 import { defineMessages } from 'react-intl'
+import { useDispatch } from 'react-redux'
 
 import { allowedPageSizes } from '@ttn-lw/constants/page-sizes'
 
-import toast from '@ttn-lw/components/toast'
 import Icon, { IconChevronLeft, IconChevronRight } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
 
-import getCookie from '@console/lib/table-utils'
+import { setPageSize } from '@console/store/actions/user-preferences'
 
 import Select from '../select'
 import Input from '../input'
@@ -49,24 +48,12 @@ const Pagination = ({
   hideIfOnlyOnePage,
   pageCount,
   pageSize: propPageSize,
-  setPageSize,
+  setPageSize: setPageSizeProp,
   totalCount,
   ...rest
 }) => {
   const [selectedPage, setSelectedPage] = useState(forcePage)
-  const [pageSize, setQueryPageSize] = useQueryState('page-size', propPageSize)
-  const isAllowedPageSize = allowedPageSizes.includes(parseInt(pageSize))
-
-  useEffect(() => {
-    if (!isAllowedPageSize) {
-      const cookiePageSize = getCookie('applications-list-page-size')
-      setQueryPageSize(cookiePageSize)
-      toast({
-        title: 'Invalid page size',
-        type: toast.types.WARNING,
-      })
-    }
-  }, [pageSize, setQueryPageSize, isAllowedPageSize, propPageSize])
+  const dispatch = useDispatch()
 
   const handlePageChange = useCallback(
     page => {
@@ -88,10 +75,10 @@ const Pagination = ({
 
   const handlePageSizeChange = useCallback(
     val => {
-      setPageSize(val)
-      setQueryPageSize(val)
+      setPageSizeProp(val)
+      dispatch(setPageSize(val))
     },
-    [setPageSize, setQueryPageSize],
+    [setPageSizeProp, dispatch],
   )
 
   const pageSizeSelect = (
@@ -103,7 +90,7 @@ const Pagination = ({
           value,
           label: `${value}`,
         }))}
-        value={isAllowedPageSize ? parseInt(pageSize) : propPageSize}
+        value={propPageSize}
         onChange={handlePageSizeChange}
         inputWidth="xxs"
         className={style.selectSize}

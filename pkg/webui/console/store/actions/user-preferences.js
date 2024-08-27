@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createAction } from '@reduxjs/toolkit'
+
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 import {
   createPaginationBaseActionType,
@@ -49,3 +51,6 @@ export const [
   { request: DELETE_BOOKMARK, success: DELETE_BOOKMARK_SUCCESS, failure: DELETE_BOOKMARK_FAILURE },
   { request: deleteBookmark, success: deleteBookmarkSuccess, failure: deleteBookmarkFailure },
 ] = createRequestActions(DELETE_BOOKMARK_BASE, (userId, entity) => ({ userId, entity }))
+
+export const SET_PAGE_SIZE_BASE = 'SET_PAGE_SIZE'
+export const setPageSize = createAction(SET_PAGE_SIZE_BASE)

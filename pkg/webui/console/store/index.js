@@ -40,7 +40,10 @@ const middlewares = [
   // The state is persisted under the key `${userId}/console-state` and is automatically
   // loaded when the application is initialized and the user is authenticated via the
   // `applyPersistedState` action.
-  localStorageMiddleware(['recencyFrequencyItems'], selectUserId),
+  localStorageMiddleware(
+    ['recencyFrequencyItems', 'userPreferences.consolePreferences'],
+    selectUserId,
+  ),
 ]
 
 const sentryEnhancer = Sentry.createReduxEnhancer({
