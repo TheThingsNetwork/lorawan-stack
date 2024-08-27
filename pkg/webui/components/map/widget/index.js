@@ -27,7 +27,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './widget.styl'
 
-const Map = ({ id, markers, setupLocationLink }) => {
+const Map = ({ id, markers, setupLocationLink, panel }) => {
   const leafletConfig = {
     zoomControl: false,
     zoom: 10,
@@ -46,7 +46,7 @@ const Map = ({ id, markers, setupLocationLink }) => {
           mapCenter={mapCenter}
           markers={markers}
           leafletConfig={leafletConfig}
-          widget
+          panel={panel}
         />
       ) : (
         <div className="d-flex direction-column flex-grow j-center al-center p-sides-ls-s pb-ls-s">
@@ -79,11 +79,13 @@ Map.propTypes = {
       position: PropTypes.objectOf(PropTypes.number),
     }),
   ).isRequired,
+  panel: PropTypes.bool,
   setupLocationLink: PropTypes.string,
 }
 
 Map.defaultProps = {
   setupLocationLink: undefined,
+  panel: false,
 }
 
 const MapWidget = ({ id, markers, path }) => (

@@ -152,6 +152,7 @@ const LocationMap = props => {
     markers,
     leafletConfig,
     centerOnMarkers,
+    panel,
     ...rest
   } = props
 
@@ -171,7 +172,10 @@ const LocationMap = props => {
 
   return (
     <div
-      className={classnames(style.container, className, { [style.widget]: widget })}
+      className={classnames(style.container, className, {
+        [style.widget]: widget,
+        [style.panel]: panel,
+      })}
       data-test-id="location-map"
     >
       {hasValidCoordinates && (
@@ -215,6 +219,7 @@ LocationMap.defaultProps = {
   onClick: () => null,
   mapCenter: undefined,
   clickable: false,
+  panel: false,
 }
 
 MarkerRenderer.propTypes = {
@@ -244,6 +249,9 @@ LocationMap.propTypes = {
   // `markers` is an array of objects containing a specific properties.
   markers: PropTypes.arrayOf(MarkerRenderer.propTypes.marker),
   onClick: PropTypes.func,
+  // `panel` is a boolean used to add a class name to the
+  // map container div for styling.
+  panel: PropTypes.bool,
   // `widget` is a boolean used to add a class name to the map container div for styling.
   widget: PropTypes.bool,
 }
