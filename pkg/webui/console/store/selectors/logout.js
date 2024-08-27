@@ -15,11 +15,12 @@
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
-import { GET_USER_ME_BASE, LOGOUT_BASE } from '@console/store/actions/logout'
+import { LOGOUT_BASE } from '@console/store/actions/logout'
+import { GET_USER_ME_BASE } from '@console/store/actions/user'
 
-const selectUserStore = state => state.user
+const selectUserStore = state => state?.user
 
-export const selectUser = state => selectUserStore(state).user
+export const selectUser = state => selectUserStore(state)?.user
 export const selectUserError = createErrorSelector([GET_USER_ME_BASE, LOGOUT_BASE])
 export const selectUserFetching = createFetchingSelector(GET_USER_ME_BASE)
 

@@ -14,8 +14,8 @@
 
 .table
   border-collapse: collapse
-  width: 100%
   table-layout: fixed
+  width: 100%
   display: table
 
   .empty-message
@@ -23,12 +23,25 @@
     caption-side: bottom
     text-align: center
     margin-top: $ls.xs
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
     font-weight: normal
 
 .section
 
+  // Hacky way of extending the header row by adding a divider between the header and the body.
+  &-divider
+    position: absolute
+    bottom: 0
+    left: 0
+    right: 0
+    height: 1px
+    background: var(--c-border-neutral-light)
+
   &-header
+    position: sticky
+    background: var(--c-bg-neutral-min)
+    z-index: $zi.slight
+    top: 0
     display: table-header-group
 
   &-body

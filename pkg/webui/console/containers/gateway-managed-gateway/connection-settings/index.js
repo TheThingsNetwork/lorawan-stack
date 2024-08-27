@@ -15,7 +15,6 @@
 import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { Col, Row } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEmpty, isEqual } from 'lodash'
 
@@ -373,38 +372,37 @@ const GatewayConnectionSettings = () => {
 
   return (
     <RequireRequest requestAction={loadData}>
-      <PageTitle title={sharedMessages.connectionSettings} />
-      <Row>
-        <Col lg={7} md={6} sm={12}>
-          {isFirstClaim && <Notification info small content={m.firstNotification} />}
-          <Form
-            error={error}
-            onSubmit={handleSubmit}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-          >
-            <>
-              <WifiSettingsFormFields
-                initialValues={initialValues}
-                isWifiConnected={connectionsData.isWifiConnected}
-                saveFormClicked={saveFormClicked}
-              />
-              <EthernetSettingsFormFields />
+      <div className="item-12 lg:item-6 lg-xl:item-6 xl:item-7">
+        <PageTitle title={sharedMessages.connectionSettings} />
+        {isFirstClaim && <Notification info small content={m.firstNotification} />}
+        <Form
+          error={error}
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+        >
+          <>
+            <WifiSettingsFormFields
+              initialValues={initialValues}
+              isWifiConnected={connectionsData.isWifiConnected}
+              saveFormClicked={saveFormClicked}
+            />
+            <hr />
+            <EthernetSettingsFormFields />
 
-              <SubmitBar className="mb-cs-l">
-                <Form.Submit
-                  component={SubmitButton}
-                  message={sharedMessages.saveChanges}
-                  disabled={isLoading}
-                />
-              </SubmitBar>
-            </>
-          </Form>
-        </Col>
-        <Col lg={5} md={6} sm={12}>
-          <ManagedGatewayConnections connectionsData={connectionsData} />
-        </Col>
-      </Row>
+            <SubmitBar className="mb-cs-l">
+              <Form.Submit
+                component={SubmitButton}
+                message={sharedMessages.saveChanges}
+                disabled={isLoading}
+              />
+            </SubmitBar>
+          </>
+        </Form>
+      </div>
+      <div className="item-12 lg:item-6 lg-xl:item-6 xl:item-5">
+        <ManagedGatewayConnections connectionsData={connectionsData} />
+      </div>
     </RequireRequest>
   )
 }

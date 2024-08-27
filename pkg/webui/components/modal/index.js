@@ -17,6 +17,7 @@ import classnames from 'classnames'
 import FocusLock from 'react-focus-lock'
 import { RemoveScroll } from 'react-remove-scroll'
 
+import { IconCheck, IconX } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -35,9 +36,11 @@ const Modal = props => {
     buttonMessage,
     title,
     subtitle,
+    noControlBar,
     noTitleLine,
     children,
     message,
+    messageValues,
     logo,
     approval,
     formName,
@@ -97,7 +100,9 @@ const Modal = props => {
 
   const name = formName ? { name: formName } : {}
   const RootComponent = props.method ? 'form' : 'div'
-  const messageElement = message && <Message content={message} className={style.message} />
+  const messageElement = message && (
+    <Message content={message} className={style.message} values={messageValues} />
+  )
   const bottomLineElement =
     typeof bottomLine === 'object' && Boolean(bottomLine.id) ? (
       <Message content={bottomLine} />
@@ -117,7 +122,7 @@ const Modal = props => {
         primary
         message={approveButtonMessage}
         onClick={handleApprove}
-        icon="check"
+        icon={IconCheck}
         ref={approveButtonRef}
         {...approveButtonProps}
       />
@@ -131,20 +136,21 @@ const Modal = props => {
           message={cancelButtonMessage}
           onClick={handleCancel}
           name={formName}
-          icon="clear"
+          icon={IconX}
           value="false"
+          secondary
           {...name}
           {...cancelButtonProps}
         />
         <Button
-          primary
           message={approveButtonMessage}
           onClick={handleApprove}
           name={formName}
-          icon="check"
+          icon={IconCheck}
           value="true"
           danger={danger}
           ref={approveButtonRef}
+          primary
           {...name}
           {...approveButtonProps}
         />
@@ -177,10 +183,12 @@ const Modal = props => {
           )}
           {title && !noTitleLine && <div className={style.line} />}
           <div className={classnames(className, style.body)}>{children || messageElement}</div>
-          <div className={style.controlBar}>
-            <div>{bottomLineElement}</div>
-            {buttons}
-          </div>
+          {!noControlBar && (
+            <div className={style.controlBar}>
+              <div>{bottomLineElement}</div>
+              {buttons}
+            </div>
+          )}
         </RootComponent>
       </RemoveScroll>
     </FocusLock>
@@ -204,8 +212,10 @@ Modal.propTypes = {
   inline: PropTypes.bool,
   logo: PropTypes.node,
   message: PropTypes.message,
+  messageValues: PropTypes.shape({}),
   method: PropTypes.string,
   name: PropTypes.string,
+  noControlBar: PropTypes.bool,
   noTitleLine: PropTypes.bool,
   onComplete: PropTypes.func,
   subtitle: PropTypes.message,
@@ -222,7 +232,9 @@ Modal.defaultProps = {
   formName: undefined,
   logo: undefined,
   message: undefined,
+  messageValues: {},
   method: undefined,
+  noControlBar: false,
   noTitleLine: false,
   onComplete: () => null,
   inline: false,

@@ -13,11 +13,12 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import Tabs from '@ttn-lw/components/tabs'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -35,8 +36,6 @@ import {
   checkFromState,
 } from '@console/lib/feature-checks'
 
-import style from './device-messaging.styl'
-
 const DeviceMessaging = () => {
   const { appId, devId } = useParams()
   const mayScheduleDown = useSelector(state => checkFromState(mayScheduleDownlinks, state))
@@ -49,28 +48,34 @@ const DeviceMessaging = () => {
         ]
       : []
 
+  useBreadcrumbs(
+    'apps.single.devices.single.messaging',
+    <Breadcrumb
+      path={`/applications/${appId}/devices/${devId}`}
+      content={sharedMessages.messaging}
+    />,
+  )
+
   return (
     <Require
       featureCheck={mayWriteTraffic}
       otherwise={{ redirect: `/applications/${appId}/devices/${devId}` }}
     >
-      <Container>
+      <div className="container container--xxl grid">
         <IntlHelmet title={sharedMessages.messaging} />
-        <Row>
-          {tabs.length > 0 && (
-            <Col sm={12}>
-              <Tabs className={style.tabs} tabs={tabs} divider />
-            </Col>
-          )}
-          <Col lg={8} md={12}>
-            <Routes>
-              {mayScheduleDown && <Route path="downlink" Component={DownlinkForm} />}
-              {maySendUp && <Route path="uplink" Component={UplinkForm} />}
-              <Route index element={<Navigate to="downlink" replace />} />
-            </Routes>
-          </Col>
-        </Row>
-      </Container>
+        {tabs.length > 0 && (
+          <div className="item-12">
+            <Tabs className="mt-0 mb-ls-s md-lg:bg-none md-lg:mr-0" tabs={tabs} divider />
+          </div>
+        )}
+        <div className="item-12 xl:item-8">
+          <Routes>
+            {mayScheduleDown && <Route path="downlink" Component={DownlinkForm} />}
+            {maySendUp && <Route path="uplink" Component={UplinkForm} />}
+            <Route index element={<Navigate to="downlink" replace />} />
+          </Routes>
+        </div>
+      </div>
     </Require>
   )
 }

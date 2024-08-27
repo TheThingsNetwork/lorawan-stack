@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import { GATEWAY } from '@console/constants/entities'
@@ -35,14 +34,12 @@ const GatewayCollaboratorAdd = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.addCollaborator} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ConsoleCollaboratorsForm entity={GATEWAY} entityId={gtwId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <ConsoleCollaboratorsForm entity={GATEWAY} entityId={gtwId} />
+      </div>
+    </div>
   )
 }
 

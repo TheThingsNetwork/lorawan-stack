@@ -15,7 +15,6 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 import classnames from 'classnames'
-import { Container } from 'react-grid-system'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -52,9 +51,7 @@ const PortalledBreadcrumbs = ({ className, ...rest }) => {
       nodes.push(
         ReactDom.createPortal(
           <div className={classnames(className, style.breadcrumbsContainer)}>
-            <Container>
-              <Breadcrumbs {...rest} />
-            </Container>
+            <Breadcrumbs {...rest} />
           </div>,
           element,
         ),

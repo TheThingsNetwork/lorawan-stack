@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 
 import { USER } from '@console/constants/entities'
@@ -30,25 +29,23 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getUsersRightsList } from '@console/store/actions/users'
 
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 
 const UserApiKeyAddInner = () => {
   const userId = useSelector(selectUserId)
 
   useBreadcrumbs(
-    'usr.single.api-keys.add',
-    <Breadcrumb path={`/users/api-keys/add`} content={sharedMessages.add} />,
+    'user-settings.api-keys.add',
+    <Breadcrumb path={`/user-settings/api-keys/add`} content={sharedMessages.add} />,
   )
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.addApiKey} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ApiKeyCreateForm entity={USER} entityId={userId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <ApiKeyCreateForm entity={USER} entityId={userId} />
+      </div>
+    </div>
   )
 }
 

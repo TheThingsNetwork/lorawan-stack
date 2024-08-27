@@ -33,23 +33,28 @@ import { apiKeyPath as apiKeyPathRegexp } from '@console/lib/regexp'
 
 const UserApiKeys = () => {
   useBreadcrumbs(
-    'usr.single.api-keys',
-    <Breadcrumb path={`/user/api-keys`} content={sharedMessages.personalApiKeys} />,
+    'user-settings.api-keys',
+    <Breadcrumb path={`/user-settings/api-keys`} content={sharedMessages.personalApiKeys} />,
   )
 
   return (
     <ErrorView errorRender={SubViewError}>
-      <Routes>
-        <Route index Component={UserApiKeysList} />
-        <Route path="add" Component={UserApiKeyAdd} />
-        <Route
-          path=":apiKeyId/*"
-          element={
-            <ValidateRouteParam check={{ apiKeyId: apiKeyPathRegexp }} Component={UserApiKeyEdit} />
-          }
-        />
-        <Route path="*" Component={GenericNotFound} />
-      </Routes>
+      <div className="container container--xxl p-vert-cs-xs p-sides-0">
+        <Routes>
+          <Route index Component={UserApiKeysList} />
+          <Route path="add" Component={UserApiKeyAdd} />
+          <Route
+            path=":apiKeyId/*"
+            element={
+              <ValidateRouteParam
+                check={{ apiKeyId: apiKeyPathRegexp }}
+                Component={UserApiKeyEdit}
+              />
+            }
+          />
+          <Route path="*" Component={GenericNotFound} />
+        </Routes>
+      </div>
     </ErrorView>
   )
 }

@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { NavLink } from 'react-router-dom'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './tab.styl'
 
@@ -30,6 +31,8 @@ const Tab = props => {
     children,
     link,
     exact = true,
+    tabClassName,
+    toggleStyle,
     ...rest
   } = props
 
@@ -39,11 +42,15 @@ const Tab = props => {
     }
   }, [disabled, name, onClick])
 
+  const tabClassNames = classnames(tabClassName, style.tab)
+
   const tabItemClassNames = classnames(className, style.tabItem, {
     [style.tabItemNarrow]: narrow,
-    [style.tabItemActive]: !disabled && active,
-    [style.tabItemDefault]: !disabled && !active,
+    [style.tabItemActive]: !toggleStyle && !disabled && active,
+    [style.tabItemDefault]: !toggleStyle && !disabled && !active,
     [style.tabItemDisabled]: disabled,
+    [style.tabItemToggleStyle]: toggleStyle,
+    [style.tabItemToggleStyleActive]: toggleStyle && !disabled && active,
   })
 
   // There is no support for disabled on anchors in html and hence in
@@ -70,7 +77,7 @@ const Tab = props => {
   }
 
   return (
-    <li {...rest} className={style.tab}>
+    <li {...rest} className={tabClassNames}>
       <Component {...componentProps} children={children} />
     </li>
   )
@@ -93,17 +100,22 @@ Tab.propTypes = {
    * name of the new active tab as an argument.
    */
   onClick: PropTypes.func,
+  tabClassName: PropTypes.string,
+  /** A flag specifying whether the tab should render a toggle style. */
+  toggleStyle: PropTypes.bool,
 }
 
 Tab.defaultProps = {
   children: undefined,
   className: undefined,
+  tabClassName: undefined,
   link: undefined,
   onClick: () => null,
   active: false,
   disabled: false,
   narrow: false,
   exact: true,
+  toggleStyle: false,
 }
 
 export default Tab

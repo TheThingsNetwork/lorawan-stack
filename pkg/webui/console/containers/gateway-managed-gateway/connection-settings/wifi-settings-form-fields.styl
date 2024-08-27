@@ -18,28 +18,27 @@
   gap: $cs.xxs
   padding: $cs.xxs $cs.s $cs.xxs $cs.xs
   font-weight: $fw.bold
-  // TODO: Change color
-  background-color: #EEEFF9
+  background-color: var(--c-bg-neutral-light)
   border-radius: $br.m
   border-width: 1px
   border-style: solid
-  border-color: $c-input-border
+  border-color: var(--c-border-neutral-semibold)
 
 .connected
-  border-color: $c-success
-  background-color: #e6ffe4
+  border-color: var(--c-border-success-normal)
+  background-color: var(--c-bg-success-light)
 
   span
     color: $c-success
 
 .notConnected
-  border-color: $c-error
-  background-color: #ffe4e4
+  border-color: var(--c-border-error-normal)
+  background-color: var(--c-bg-error-light)
 
   span
-    color: $c-error
+    color: var(--c-text-error-normal)
 
 .fieldDescription
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   margin-bottom: $cs.m
   margin-top: - $cs.m

@@ -15,6 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import { IconRefresh } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -39,7 +40,7 @@ const GenerateInput = props => {
 
   const generateAction = React.useMemo(
     () => ({
-      icon: 'autorenew',
+      icon: IconRefresh,
       type: 'button',
       disabled: !mayGenerateValue,
       onClick: handleGenerateValue,

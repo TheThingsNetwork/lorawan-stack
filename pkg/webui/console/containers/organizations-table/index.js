@@ -39,7 +39,7 @@ import {
   restoreOrganization,
 } from '@console/store/actions/organizations'
 
-import { selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUserIsAdmin } from '@console/store/selectors/user'
 import {
   selectOrganizationsTotalCount,
   selectOrganizationsWithCollaboratorCount,
@@ -149,7 +149,7 @@ const OrganizationsTable = () => {
         }),
         render: details => (
           <ButtonGroup align="end">
-            <Button message={sharedMessages.restore} onClick={details.restore} />
+            <Button message={sharedMessages.restore} onClick={details.restore} secondary />
             <DeleteModalButton
               entityId={details.id}
               entityName={name}
@@ -167,11 +167,11 @@ const OrganizationsTable = () => {
           displayName: sharedMessages.collaborators,
           width: 10,
           align: 'center',
-          render: deviceCount =>
-            typeof deviceCount !== 'number' ? (
-              <Spinner micro center inline after={100} className="c-subtle-gray" />
+          render: collaboratorCount =>
+            typeof collaboratorCount !== 'number' ? (
+              <Spinner micro center inline after={100} className="c-text-neutral-light" />
             ) : (
-              deviceCount
+              collaboratorCount
             ),
         },
         {

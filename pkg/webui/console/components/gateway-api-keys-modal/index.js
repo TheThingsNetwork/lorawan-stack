@@ -15,6 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import { IconFileDownload } from '@ttn-lw/components/icon'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import Button from '@ttn-lw/components/button'
 import ButtonGroup from '@ttn-lw/components/button/group'
@@ -22,8 +23,6 @@ import ButtonGroup from '@ttn-lw/components/button/group'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-
-import style from './gateway-api-key-modal.styl'
 
 const m = defineMessages({
   modalTitle: 'Download gateway API keys',
@@ -43,7 +42,7 @@ const GatewayApiKeysModal = ({
   downloadCups,
 }) => (
   <PortalledModal
-    className={style.gatewayApiKeyModal}
+    className="d-flex direction-column"
     visible={modalVisible}
     title={m.modalTitle}
     approval={false}
@@ -52,14 +51,21 @@ const GatewayApiKeysModal = ({
   >
     <ButtonGroup>
       {lnsKey && (
-        <Button type="button" message={m.downloadLns} onClick={downloadLns} icon="file_download" />
+        <Button
+          type="button"
+          message={m.downloadLns}
+          onClick={downloadLns}
+          icon={IconFileDownload}
+          secondary
+        />
       )}
       {cupsKey && (
         <Button
           type="button"
           message={m.downloadCups}
           onClick={downloadCups}
-          icon="file_download"
+          icon={IconFileDownload}
+          secondary
         />
       )}
     </ButtonGroup>

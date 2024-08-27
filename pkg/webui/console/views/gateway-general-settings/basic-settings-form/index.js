@@ -12,21 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
-import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
+import { GATEWAY } from '@console/constants/entities'
+
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
+import Button from '@ttn-lw/components/button'
+import { IconTrash } from '@ttn-lw/components/icon'
 
 import CollaboratorSelect from '@ttn-lw/containers/collaborator-select'
 import { decodeContact, encodeContact } from '@ttn-lw/containers/collaborator-select/util'
 
 import Message from '@ttn-lw/lib/components/message'
+
+import DeleteEntityHeaderModal from '@console/containers/delete-entity-header-modal'
 
 import Require from '@console/lib/components/require'
 
@@ -35,9 +40,10 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
+import { checkFromState, mayDeleteGateway } from '@console/lib/feature-checks'
 
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 
 import m from '../messages'
 
@@ -60,36 +66,19 @@ const encodeSecret = value => {
 }
 
 const BasicSettingsForm = React.memo(props => {
-  const {
-    gateway,
-    gtwId,
-    onSubmit,
-    onDelete,
-    mayDeleteGateway,
-    mayEditSecrets,
-    shouldConfirmDelete,
-    mayPurge,
-    supportsClaiming,
-  } = props
+  const { gateway, gtwId, onSubmit, mayEditSecrets, supportsClaiming } = props
 
   const userId = useSelector(selectUserId)
   const isConfig = useSelector(selectIsConfiguration)
+  const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
   const isResctrictedUser =
     isConfig && isConfig.collaborator_rights?.set_others_as_contacts === false
   const [error, setError] = React.useState(undefined)
+  const [deleteGtwVisible, setDeleteGtwVisible] = React.useState(false)
 
-  const onGatewayDelete = React.useCallback(
-    async shouldPurge => {
-      try {
-        setError(undefined)
-
-        await onDelete(shouldPurge)
-      } catch (error) {
-        setError(error)
-      }
-    },
-    [onDelete],
-  )
+  const handleOpenDeleteGatewayModal = useCallback(() => {
+    setDeleteGtwVisible(true)
+  }, [])
 
   const initialValues = React.useMemo(() => validationSchema.cast(gateway), [gateway])
 
@@ -247,7 +236,7 @@ const BasicSettingsForm = React.memo(props => {
       <Message
         content={m.adminContactDescription}
         component="p"
-        className="mt-cs-xs tc-subtle-gray"
+        className="mt-cs-xs c-text-neutral-light"
       />
       <CollaboratorSelect
         name="technical_contact"
@@ -264,19 +253,25 @@ const BasicSettingsForm = React.memo(props => {
       <Message
         content={m.techContactDescription}
         component="p"
-        className="mt-cs-xs tc-subtle-gray"
+        className="mt-cs-xs c-text-neutral-light"
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-        <Require condition={mayDeleteGateway}>
-          <DeleteModalButton
+        <Require condition={mayDeleteGtw}>
+          <Button
+            onClick={handleOpenDeleteGatewayModal}
+            message={supportsClaiming ? m.unclaimAndDeleteGateway : sharedMessages.deleteGateway}
+            type="button"
+            icon={IconTrash}
+            naked
+            danger
+          />
+          <DeleteEntityHeaderModal
+            entity={GATEWAY}
             entityId={gtwId}
             entityName={gateway.name}
-            message={supportsClaiming ? m.unclaimAndDeleteGateway : m.deleteGateway}
-            defaultMessage={m.deleteGatewayDefaultMessage}
-            onApprove={onGatewayDelete}
-            shouldConfirm={shouldConfirmDelete}
-            mayPurge={mayPurge}
+            setVisible={setDeleteGtwVisible}
+            visible={deleteGtwVisible}
           />
         </Require>
       </SubmitBar>
@@ -287,12 +282,8 @@ const BasicSettingsForm = React.memo(props => {
 BasicSettingsForm.propTypes = {
   gateway: PropTypes.gateway.isRequired,
   gtwId: PropTypes.string.isRequired,
-  mayDeleteGateway: PropTypes.bool.isRequired,
   mayEditSecrets: PropTypes.bool.isRequired,
-  mayPurge: PropTypes.bool.isRequired,
-  onDelete: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  shouldConfirmDelete: PropTypes.bool.isRequired,
   supportsClaiming: PropTypes.bool.isRequired,
 }
 

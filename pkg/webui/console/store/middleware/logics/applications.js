@@ -20,6 +20,8 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import * as applications from '@console/store/actions/applications'
 import * as link from '@console/store/actions/link'
 
+import { selectApplicationDeviceCount } from '@console/store/selectors/applications'
+
 import createEventsConnectLogics from './events'
 
 const createApplicationLogic = createRequestLogic({
@@ -105,8 +107,7 @@ const restoreApplicationLogic = createRequestLogic({
 })
 
 const getApplicationsLogic = createRequestLogic({
-  type: applications.GET_APPS_LIST,
-  latest: true,
+  type: [applications.GET_APPS_LIST, applications.FETCH_APPS_LIST],
   process: async ({ action }, dispatch) => {
     const {
       params: { page, limit, query, order, deleted },
@@ -138,8 +139,15 @@ const getApplicationsLogic = createRequestLogic({
 
 const getApplicationDeviceCountLogic = createRequestLogic({
   type: applications.GET_APP_DEV_COUNT,
-  process: async ({ action }) => {
+  process: async ({ action, getState }) => {
     const { id: appId } = action.payload
+
+    // Fetch only if the count is not already in the store.
+    const storedDeviceCount = selectApplicationDeviceCount(getState(), appId)
+    if (storedDeviceCount !== undefined) {
+      return { id: appId, applicationDeviceCount: storedDeviceCount }
+    }
+
     const data = await tts.Applications.Devices.getAll(appId, { limit: 1 })
 
     return { id: appId, applicationDeviceCount: data.totalCount }

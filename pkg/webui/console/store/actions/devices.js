@@ -55,7 +55,7 @@ export const [
 ] = createRequestActions(
   GET_DEV_BASE,
   (appId, deviceId) => ({ appId, deviceId }),
-  (appId, deviceId, selector, options) => ({ selector, options }),
+  (appId, deviceId, selector, options = {}) => ({ selector, options }),
 )
 
 export const UPDATE_DEV_BASE = 'UPDATE_END_DEVICE'
@@ -65,8 +65,14 @@ export const [
 ] = createRequestActions(
   UPDATE_DEV_BASE,
   (appId, deviceId, patch) => ({ appId, deviceId, patch }),
-  (appId, deviceId, patch, selector) => ({ selector }),
+  (appId, deviceId, patch, selector, options) => ({ selector, ...options }),
 )
+
+export const DELETE_DEV_BASE = 'DELETE_DEV_BASE'
+export const [
+  { request: DELETE_DEV, success: DELETE_DEV_SUCCESS, failure: DELETE_DEV_FAILURE },
+  { request: deleteDevice, success: deleteDeviceSuccess, failure: deleteDeviceFailure },
+] = createRequestActions(DELETE_DEV_BASE, (appId, deviceId) => ({ appId, deviceId }))
 
 export const GET_DEVICES_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [
@@ -77,6 +83,23 @@ export const [
   },
   { request: getDevicesList, success: getDevicesListSuccess, failure: getDevicesListFailure },
 ] = createPaginationByIdRequestActions(SHARED_NAME)
+
+export const FETCH_DEVICES_LIST_BASE = 'FETCH_END_DEVICE_LIST'
+export const [
+  {
+    request: FETCH_DEVICES_LIST,
+    success: FETCH_DEVICES_LIST_SUCCESS,
+    failure: FETCH_DEVICES_LIST_FAILURE,
+  },
+  { request: fetchDevicesList, success: fetchDevicesListSuccess, failure: fetchDevicesListFailure },
+] = createRequestActions(
+  FETCH_DEVICES_LIST_BASE,
+  (id, { page, limit, query, order } = {}) => ({
+    id,
+    params: { page, limit, query, order },
+  }),
+  (id, params, selectors = [], options = {}) => ({ selectors, options }),
+)
 
 export const RESET_DEV_BASE = 'RESET_END_DEVICE'
 export const [

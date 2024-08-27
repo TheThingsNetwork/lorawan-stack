@@ -13,11 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
-import LORA_CLOUD_DAS from '@console/constants/lora-cloud-das'
+import LORA_CLOUD_MS from '@console/constants/lora-cloud-ms'
 import LORA_CLOUD_GLS from '@console/constants/lora-cloud-gls'
 import LoRaCloudImage from '@assets/misc/lora-cloud.png'
 
@@ -31,8 +30,8 @@ import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
-import LoRaCloudDASForm from '@console/containers/lora-cloud-das-form'
-import LoRaCloudGLSForm from '@console/containers/lora-cloud-gls-form'
+import LoRaCloudModemServicesForm from '@console/containers/lora-cloud-ms-form'
+import LoRaCloudGeolocationServicesForm from '@console/containers/lora-cloud-gls-form'
 
 import Require from '@console/lib/components/require'
 
@@ -77,46 +76,44 @@ const LoRaCloud = () => {
     >
       <RequireRequest
         requestAction={[
-          getAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, selector),
+          getAppPkgDefaultAssoc(appId, LORA_CLOUD_MS.DEFAULT_PORT, selector),
           getAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, selector),
         ]}
       >
         <ErrorView errorRender={SubViewError}>
-          <Container>
+          <div className="container container--xxl grid">
             <PageTitle title="LoRa Cloud Modem and Geolocation Services" />
-            <Row>
-              <Col lg={8} md={12}>
-                <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
-                <Message content={m.loraCloudInfoText} className={style.info} />
-                <div>
-                  <Message
-                    component="h4"
-                    content={sharedMessages.furtherResources}
-                    className={style.furtherResources}
-                  />
-                  <Link.DocLink
-                    path="/integrations/application-packages/lora-cloud-device-and-application-services/"
-                    secondary
-                  >
-                    Device & Application Services
-                  </Link.DocLink>
-                  {' | '}
-                  <Link.Anchor href="https://www.loracloud.com" external secondary>
-                    <Message content={m.officialLoRaCloudDocumentation} />
-                  </Link.Anchor>
-                </div>
-                <hr className={style.hRule} />
-                <Collapse title="Geolocation" description={m.glsDescription}>
-                  <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
-                  <LoRaCloudGLSForm />
-                </Collapse>
-                <Collapse title="Device & Application Services" description={m.dasDescription}>
-                  <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
-                  <LoRaCloudDASForm />
-                </Collapse>
-              </Col>
-            </Row>
-          </Container>
+            <div className="item-12 xl:item-8">
+              <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
+              <Message content={m.loraCloudInfoText} className="mt-0" />
+              <div>
+                <Message
+                  component="h4"
+                  content={sharedMessages.furtherResources}
+                  className="mb-cs-xs"
+                />
+                <Link.DocLink
+                  path="/integrations/application-packages/lora-cloud-device-and-application-services/"
+                  secondary
+                >
+                  Device & Application Services
+                </Link.DocLink>
+                {' | '}
+                <Link.Anchor href="https://www.loracloud.com" external secondary>
+                  <Message content={m.officialLoRaCloudDocumentation} />
+                </Link.Anchor>
+              </div>
+              <hr className="mb-0" />
+              <Collapse title="Geolocation" description={m.glsDescription}>
+                <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
+                <LoRaCloudGeolocationServicesForm />
+              </Collapse>
+              <Collapse title="Modem Services" description={m.dasDescription}>
+                <Message component="h3" content={sharedMessages.setLoRaCloudToken} />
+                <LoRaCloudModemServicesForm />
+              </Collapse>
+            </div>
+          </div>
         </ErrorView>
       </RequireRequest>
     </Require>

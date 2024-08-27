@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 
@@ -40,8 +40,25 @@ EmptyMessage.propTypes = {
   entityId: PropTypes.string.isRequired,
 }
 
-const EventsList = React.memo(({ events, scoped, entityId, onRowClick, activeId }) => {
-  if (!events.length) {
+const EventsList = React.memo(({ events, scoped, entityId, onRowClick, activeId, onScroll }) => {
+  const ref = React.useRef()
+  const hasEvents = Boolean(events.length)
+
+  const setRef = useCallback(
+    node => {
+      if (node && node._outerRef && onScroll && hasEvents) {
+        // Only attach if not yet attached.
+        node._outerRef.addEventListener('scroll', onScroll)
+      } else if (ref.current) {
+        ref.current._outerRef.removeEventListener('scroll', onScroll)
+      }
+
+      ref.current = node
+    },
+    [hasEvents, onScroll],
+  )
+
+  if (!hasEvents) {
     return <EmptyMessage entityId={entityId} />
   }
 
@@ -55,6 +72,7 @@ const EventsList = React.memo(({ events, scoped, entityId, onRowClick, activeId 
             itemCount={events.length}
             itemSize={40}
             overscanCount={25}
+            ref={setRef}
           >
             {({ index, style }) => {
               const eventId = getEventId(events[index])
@@ -83,12 +101,14 @@ EventsList.propTypes = {
   entityId: PropTypes.string.isRequired,
   events: PropTypes.events.isRequired,
   onRowClick: PropTypes.func.isRequired,
+  onScroll: PropTypes.func,
   scoped: PropTypes.bool,
 }
 
 EventsList.defaultProps = {
   activeId: undefined,
   scoped: false,
+  onScroll: () => null,
 }
 
 export { EventsList as default, EmptyMessage }

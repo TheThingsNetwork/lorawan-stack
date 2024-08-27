@@ -15,10 +15,10 @@
 import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch } from 'react-redux'
-import { useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 
+import Icon, { IconCheck } from '@ttn-lw/components/icon'
 import Modal from '@ttn-lw/components/modal'
-import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
@@ -42,7 +42,7 @@ import style from './authorize.styl'
 const m = defineMessages({
   modalTitle: 'Request for permission',
   modalSubtitle: '{clientName} is requesting to be granted the following rights:',
-  loginInfo: 'You are logged in as {userId}.',
+  loginInfo: 'You are logged in as <b>{userId}</b>.',
   redirectInfo: 'You will be redirected to {redirectUri}',
   authorize: 'Authorize {clientName}',
   noDescription: 'This client does not provide a description',
@@ -62,9 +62,12 @@ const Authorize = () => {
     window.location = `${selectApplicationRootPath()}/login`
   }, [dispatch])
 
-  const { client, user, error } = pageData
   const [searchParams] = useSearchParams()
 
+  if (!pageData) {
+    return <Navigate to="/" />
+  }
+  const { client, user, error } = pageData
   if (error) {
     return <ErrorMessage content={error} />
   }
@@ -78,14 +81,13 @@ const Authorize = () => {
         <Message
           className={style.loginInfo}
           content={m.loginInfo}
-          values={{ userId: user.name || user.ids.user_id }}
+          values={{ userId: user.name || user.ids.user_id, b: str => <b key="bold">{str}</b> }}
         />{' '}
-        <Button
+        <Button.Link
           message={sharedMessages.logout}
           type="button"
           onClick={handleLogout}
           className={style.logoutButton}
-          unstyled
         />
       </span>
       <Message content={m.redirectInfo} values={{ redirectUri }} />
@@ -111,7 +113,7 @@ const Authorize = () => {
             <ul>
               {client.rights.map(right => (
                 <li key={right}>
-                  <Icon icon="check" className={style.icon} />
+                  <Icon icon={IconCheck} className={style.icon} small />
                   <Message content={{ id: `enum:${right}` }} firstToUpper />
                 </li>
               ))}
@@ -125,7 +127,7 @@ const Authorize = () => {
             </ul>
           </div>
           <div className={style.right}>
-            <h3>{clientName}</h3>
+            <h3 className="mb-0">{clientName}</h3>
             <p>
               {Boolean(client.description) ? (
                 client.description

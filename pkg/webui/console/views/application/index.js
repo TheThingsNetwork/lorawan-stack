@@ -12,20 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
-import { Routes, Route, useParams } from 'react-router-dom'
+import React, { useEffect, useMemo } from 'react'
+import { Routes, Route, useParams, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import applicationIcon from '@assets/misc/application.svg'
+import { APPLICATION } from '@console/constants/entities'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import SideNavigation from '@ttn-lw/components/navigation/side'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
+
+import ApplicationOverviewHeader from '@console/containers/application-overview-header'
+import EventSplitFrame from '@console/containers/event-split-frame'
+import ApplicationEvents from '@console/containers/application-events'
 
 import Require from '@console/lib/components/require'
 
@@ -41,22 +43,9 @@ import ApplicationIntegrationsMqtt from '@console/views/application-integrations
 import ApplicationIntegrationsLoRaCloud from '@console/views/application-integrations-lora-cloud'
 import Devices from '@console/views/devices'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 
-import {
-  mayViewApplicationInfo,
-  mayViewApplicationEvents,
-  maySetApplicationPayloadFormatters,
-  mayViewApplicationDevices,
-  mayCreateOrEditApplicationIntegrations,
-  mayEditBasicApplicationInfo,
-  mayViewOrEditApplicationApiKeys,
-  mayViewOrEditApplicationCollaborators,
-  mayViewOrEditApplicationPackages,
-  mayAddPubSubIntegrations,
-  mayViewApplications,
-} from '@console/lib/feature-checks'
+import { mayAddPubSubIntegrations, mayViewApplications } from '@console/lib/feature-checks'
 
 import {
   getApplication,
@@ -64,11 +53,10 @@ import {
   stopApplicationEventsStream,
 } from '@console/store/actions/applications'
 import { getAsConfiguration } from '@console/store/actions/application-server'
+import { getDevicesList } from '@console/store/actions/devices'
+import { trackRecencyFrequencyItem } from '@console/store/actions/recency-frequency-items'
 
-import {
-  selectApplicationRights,
-  selectSelectedApplication,
-} from '@console/store/selectors/applications'
+import { selectSelectedApplication } from '@console/store/selectors/applications'
 import {
   selectMqttProviderDisabled,
   selectNatsProviderDisabled,
@@ -76,14 +64,24 @@ import {
 
 const Application = () => {
   const { appId } = useParams()
-  const actions = [
-    getApplication(
-      appId,
-      'name,description,attributes,dev_eui_counter,network_server_address,application_server_address,join_server_address,administrative_contact,technical_contact',
-    ),
-    getApplicationsRightsList(appId),
-    getAsConfiguration(),
-  ]
+  const dispatch = useDispatch()
+  const actions = useMemo(
+    () => [
+      getApplication(
+        appId,
+        'name,description,attributes,dev_eui_counter,network_server_address,application_server_address,join_server_address,administrative_contact,technical_contact',
+      ),
+      getApplicationsRightsList(appId),
+      getAsConfiguration(),
+      getDevicesList(appId, { page: 1, limit: 1000 }, ['name', 'last_seen_at']),
+    ],
+    [appId],
+  )
+
+  // Track application access.
+  useEffect(() => {
+    dispatch(trackRecencyFrequencyItem(APPLICATION, appId))
+  }, [appId, dispatch])
 
   // Check whether application still exists after it has been possibly deleted.
   const application = useSelector(selectSelectedApplication)
@@ -91,7 +89,7 @@ const Application = () => {
 
   return (
     <Require featureCheck={mayViewApplications} otherwise={{ redirect: '/' }}>
-      <RequireRequest requestAction={actions}>
+      <RequireRequest requestAction={actions} requestOnChange>
         {hasApplication && <ApplicationInner />}
       </RequireRequest>
     </Require>
@@ -100,100 +98,31 @@ const Application = () => {
 
 const ApplicationInner = () => {
   const { appId } = useParams()
+  const { pathname } = useLocation()
+  const isDevicePath = pathname.startsWith(`/applications/${appId}/devices/`)
+  const isEventsPath = pathname.endsWith('/data')
+  const showEventSplitFrame = !isDevicePath && !isEventsPath
+
   const application = useSelector(selectSelectedApplication)
   const name = application.name || appId
-  const rights = useSelector(selectApplicationRights)
   const siteName = selectApplicationSiteName()
   const natsDisabled = useSelector(selectNatsProviderDisabled)
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
+  const isDeviceRoute = pathname.startsWith(`/applications/${appId}/devices/`)
 
   const dispatch = useDispatch()
   const stopStream = React.useCallback(id => dispatch(stopApplicationEventsStream(id)), [dispatch])
 
   useEffect(() => () => stopStream(appId), [appId, stopStream])
-  useBreadcrumbs('apps.single', <Breadcrumb path={`/applications/${appId}`} content={name} />)
+  useBreadcrumbs(
+    `apps.single#${appId}`,
+    <Breadcrumb path={`/applications/${appId}`} content={name} />,
+  )
 
   return (
     <>
-      <Breadcrumbs />
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
-      <SideNavigation
-        header={{
-          icon: applicationIcon,
-          iconAlt: sharedMessages.application,
-          title: name,
-          to: '',
-        }}
-      >
-        {mayViewApplicationInfo.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
-        )}
-        {mayViewApplicationDevices.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.devices} path="devices" icon="devices" />
-        )}
-        {mayViewApplicationEvents.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="data" />
-        )}
-        {maySetApplicationPayloadFormatters.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="code">
-            <SideNavigation.Item
-              title={sharedMessages.uplink}
-              path="payload-formatters/uplink"
-              icon="uplink"
-            />
-            <SideNavigation.Item
-              title={sharedMessages.downlink}
-              path="payload-formatters/downlink"
-              icon="downlink"
-            />
-          </SideNavigation.Item>
-        )}
-        {mayCreateOrEditApplicationIntegrations.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.integrations} icon="integration">
-            <SideNavigation.Item
-              title={sharedMessages.mqtt}
-              path="integrations/mqtt"
-              icon="extension"
-            />
-            <SideNavigation.Item
-              title={sharedMessages.webhooks}
-              path="integrations/webhooks"
-              icon="extension"
-            />
-            {mayAddPubSubIntegrations.check(natsDisabled, mqttDisabled) && (
-              <SideNavigation.Item
-                title={sharedMessages.pubsubs}
-                path="integrations/pubsubs"
-                icon="extension"
-              />
-            )}
-            {mayViewOrEditApplicationPackages.check(rights) && (
-              <SideNavigation.Item
-                title={sharedMessages.loraCloud}
-                path="integrations/lora-cloud"
-                icon="extension"
-              />
-            )}
-          </SideNavigation.Item>
-        )}
-        {mayViewOrEditApplicationCollaborators.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.collaborators}
-            path="collaborators"
-            icon="organization"
-          />
-        )}
-        {mayViewOrEditApplicationApiKeys.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.apiKeys} path="api-keys" icon="api_keys" />
-        )}
-        {mayEditBasicApplicationInfo.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.generalSettings}
-            path="general-settings"
-            icon="general_settings"
-          />
-        )}
-      </SideNavigation>
+      {!isDeviceRoute && <ApplicationOverviewHeader />}
       <Routes>
         <Route index Component={ApplicationOverview} />
         <Route path="general-settings" Component={ApplicationGeneralSettings} />
@@ -210,6 +139,11 @@ const ApplicationInner = () => {
         <Route path="integrations/lora-cloud" Component={ApplicationIntegrationsLoRaCloud} />
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
+      {showEventSplitFrame && (
+        <EventSplitFrame>
+          <ApplicationEvents appId={appId} darkTheme framed />
+        </EventSplitFrame>
+      )}
     </>
   )
 }

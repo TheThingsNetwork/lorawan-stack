@@ -36,8 +36,6 @@ import {
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 
-import style from './dev-eui.styl'
-
 const m = defineMessages({
   unknownError: 'Unknown error while generating DevEUI',
 })
@@ -61,8 +59,8 @@ const DevEUIComponent = props => {
     },
   }
 
-  const indicatorCls = classnames(style.indicator, {
-    'tc-error':
+  const indicatorCls = classnames('ml-cs-s', 'al-center', 'c-text-neutral-light', {
+    'c-text-error-normal':
       applicationDevEUICounter === env.devEUIConfig.applicationLimit || Boolean(errorMessage),
   })
 

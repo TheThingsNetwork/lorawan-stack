@@ -43,7 +43,13 @@ const enhancers = env.sentryDsn ? [sentryEnhancer] : []
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middlewares),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActionPaths: ['meta._resolve', 'meta._reject', /error/],
+        ignoredPaths: [/error/],
+      },
+    }).concat(middlewares),
   enhancers: getDefaultEnhancers => getDefaultEnhancers().concat(enhancers),
   devTools: dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__,
 })

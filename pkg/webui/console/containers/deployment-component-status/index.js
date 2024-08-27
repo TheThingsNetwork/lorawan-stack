@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { Col, Row } from 'react-grid-system'
 
 import ServerIcon from '@assets/auxiliary-icons/server.svg'
 
@@ -56,11 +55,11 @@ const componentMap = {
 }
 
 const DeploymentComponentStatus = () => (
-  <Row className={style.componentSection}>
-    <Col sm={4} className={style.versionInfoSection}>
+  <div className="grid m-vert-ls-l lg-xl:mb-ls-xxs">
+    <div className="item-4 d-flex direction-column">
       <Message content={m.versionInfo} component="h3" className="panel-title" />
       <span className={style.versionValue}>TTS v{process.env.VERSION}</span>
-      <pre className={style.versionRevision}>{process.env.REVISION}</pre>
+      <pre className="mt-0 fs-s mb-cs-s">{process.env.REVISION}</pre>
       <Link.Anchor href={statusPageBaseUrl} external secondary>
         <Message content={m.statusPage} />
       </Link.Anchor>
@@ -71,10 +70,10 @@ const DeploymentComponentStatus = () => (
       >
         <Message content={m.seeChangelog} />
       </Link.Anchor>
-    </Col>
-    <Col sm={8} className={style.componentInfoSection}>
+    </div>
+    <div className="item-8 d-flex direction-column">
       <Message className="panel-title" content={m.availableComponents} component="h3" />
-      <div className={style.componentCards}>
+      <div className="d-flex flex-column mt-cs-m">
         {Object.keys(stackConfig).map(componentKey => {
           if (componentKey === 'language') {
             return null
@@ -87,8 +86,8 @@ const DeploymentComponentStatus = () => (
           )
         })}
       </div>
-    </Col>
-  </Row>
+    </div>
+  </div>
 )
 
 const ComponentCard = ({ name, enabled, host }) => (

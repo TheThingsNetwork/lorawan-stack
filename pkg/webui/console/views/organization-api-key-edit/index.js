@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -37,7 +36,7 @@ const OrganizationApiKeyEditInner = () => {
   const { orgId, apiKeyId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.api-keys.edit',
+    'overview.orgs.single.api-keys.edit',
     <Breadcrumb
       path={`/organizations/${orgId}/api-keys/${apiKeyId}`}
       content={sharedMessages.edit}
@@ -45,14 +44,12 @@ const OrganizationApiKeyEditInner = () => {
   )
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.keyEdit} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ApiKeyEditForm entity={ORGANIZATION} entityId={orgId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <ApiKeyEditForm entity={ORGANIZATION} entityId={orgId} />
+      </div>
+    </div>
   )
 }
 

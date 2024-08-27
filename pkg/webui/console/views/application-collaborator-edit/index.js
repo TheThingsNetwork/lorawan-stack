@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -34,20 +33,18 @@ const ApplicationCollaboratorEditInner = () => {
   const { appId, collaboratorId } = useParams()
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ConsoleCollaboratorsForm
-            entity={APPLICATION}
-            entityId={appId}
-            collaboratorId={collaboratorId}
-            collaboratorType="user"
-            update
-          />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <ConsoleCollaboratorsForm
+          entity={APPLICATION}
+          entityId={appId}
+          collaboratorId={collaboratorId}
+          collaboratorType="user"
+          update
+        />
+      </div>
+    </div>
   )
 }
 

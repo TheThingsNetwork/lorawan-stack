@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,70 +13,100 @@
 // limitations under the License.
 
 import React from 'react'
-import { action } from '@storybook/addon-actions'
 
-import TtsLogo from '@assets/static/logo.svg'
+import TtsLogo from '@assets/static/tts-logo.svg'
 
+import {
+  IconUser,
+  IconLogout,
+  IconAdminShield,
+  IconCreditCard,
+  IconChartBar,
+  IconBook,
+  IconRocket,
+  IconApplication,
+  IconDevice,
+  IconGateway,
+  IconSupport,
+} from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
-import NavigationBar from '@ttn-lw/components/navigation/bar'
-import Logo from '@ttn-lw/components/logo'
-import ExampleLogo from '@ttn-lw/components/logo/story-logo.svg'
+import ExampleLogo from '@ttn-lw/components/logo/story-logo-new.svg'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import Header from '.'
 
 const user = {
-  name: 'kschiffer',
+  name: 'johndoe',
   ids: {
-    user_id: 'ksc300',
+    user_id: 'jdoe300',
   },
 }
 
-const singleLogo = <Logo logo={{ src: TtsLogo, alt: 'Logo' }} />
-const doubleLogo = (
-  <Logo
-    logo={{ src: TtsLogo, alt: 'Logo' }}
-    brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
-  />
-)
-
-const navigationEntries = (
-  <React.Fragment>
-    <NavigationBar.Item title="Overview" icon="overview" path="/overview" />
-    <NavigationBar.Item title="Applications" icon="application" path="/application" />
-    <NavigationBar.Item title="Gateways" icon="gateway" path="/gateways" />
-    <NavigationBar.Item title="Organizations" icon="organization" path="/organization" />
-  </React.Fragment>
-)
-
-const items = (
-  <React.Fragment>
-    <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
-    <Dropdown.Item title="Logout" icon="power_settings_new" path="/logout" />
-  </React.Fragment>
-)
-
 export default {
-  title: 'Header',
+  title: 'Header V2',
 }
 
-export const SingleLogo = () => (
-  <Header
-    dropdownItems={items}
-    handleSearchRequest={action('Search')}
-    navigationEntries={navigationEntries}
-    style={{ margin: '-1rem' }}
-    user={user}
-    logo={singleLogo}
-  />
+const plusDropdownItems = (
+  <>
+    <Dropdown.Item title="Add new application" icon={IconApplication} path="/applications/add" />
+    <Dropdown.Item title="Add new gateway" icon={IconGateway} path="/gateways/add" />
+    <Dropdown.Item title="Add new organization" icon={IconSupport} path="/organizations/add" />
+    <Dropdown.Item
+      title="Register end device in application"
+      icon={IconDevice}
+      path="/devices/add"
+    />
+  </>
 )
 
-export const DoubleLogo = () => (
-  <Header
-    dropdownItems={items}
-    handleSearchRequest={action('Search')}
-    navigationEntries={navigationEntries}
-    style={{ margin: '-1rem' }}
-    user={user}
-    logo={doubleLogo}
-  />
+const starDropdownItems = (
+  <>
+    <Dropdown.Item title="Parking Lot Occupancy" icon={IconApplication} path="/parking1" />
+    <Dropdown.Item title="Parking Lot Occupancy" icon={IconApplication} path="/parking2" />
+    <Dropdown.Item title="Kerlink iZeptoCell-C 5.7.2" icon={IconGateway} path="/kerlink" />
+    <Dropdown.Item title="Dragino LPS8 lgw-5.4.1689641188" icon={IconGateway} path="/dragino" />
+    <Dropdown.Item title="Generic Node - AU915" icon={IconDevice} path="/au915" />
+    <Dropdown.Item title="Generic Node - US915" icon={IconDevice} path="/us915" />
+  </>
 )
+
+const profileDropdownItems = (
+  <>
+    <Dropdown.Item title="Profile settings" icon={IconUser} path="/profile-settings" />
+    <Dropdown.Item
+      title="Manage cloud subscription"
+      icon={IconCreditCard}
+      path="/manage-cloud-subs"
+    />
+    <Dropdown.Item title="Network Operations Center" icon={IconChartBar} path="/network_ops" />
+    <Dropdown.Item title="Admin panel" icon={IconAdminShield} path="/admin-panel" />
+    <hr />
+    <Dropdown.Item title="Upgrade" icon={IconRocket} path="/upgrade" />
+    <Dropdown.Item title="Get support" icon={IconSupport} path="/support" />
+    <Dropdown.Item title="Documentation" icon={IconBook} path="/documentation" />
+    <hr />
+    <Dropdown.Item title="Logout" icon={IconLogout} path="/logout" />
+  </>
+)
+
+export const Default = () => {
+  const breadcrumbs = [
+    <Breadcrumb key="1" path="/applications" content="Applications" />,
+    <Breadcrumb key="2" path="/applications/test-app" content="test-app" />,
+    <Breadcrumb key="3" path="/applications/test-app/devices" content="Devices" />,
+  ]
+
+  return (
+    <div style={{ height: '25rem' }}>
+      <Header
+        user={user}
+        breadcrumbs={breadcrumbs}
+        profileDropdownItems={profileDropdownItems}
+        addDropdownItems={plusDropdownItems}
+        starDropdownItems={starDropdownItems}
+        brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+        logo={{ src: TtsLogo, alt: 'Logo' }}
+      />
+    </div>
+  )
+}

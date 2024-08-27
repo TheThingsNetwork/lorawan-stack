@@ -82,10 +82,18 @@ describe('Applications list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 4)
     })
-    cy.findByRole('cell', { name: applications[0].ids.application_id }).should('be.visible')
-    cy.findByRole('cell', { name: applications[1].ids.application_id }).should('be.visible')
-    cy.findByRole('cell', { name: applications[2].ids.application_id }).should('be.visible')
-    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[0].name} ${applications[0].ids.application_id}`,
+    }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[1].name} ${applications[1].ids.application_id}`,
+    }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[2].name} ${applications[2].ids.application_id}`,
+    }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[3].name} ${applications[3].ids.application_id}`,
+    }).should('be.visible')
 
     cy.findByTestId('search-input').as('searchInput')
     cy.get('@searchInput').type('xyz')
@@ -93,10 +101,18 @@ describe('Applications list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 1)
     })
-    cy.findByRole('cell', { name: applications[0].ids.application_id }).should('be.visible')
-    cy.findByRole('cell', { name: applications[1].ids.application_id }).should('not.exist')
-    cy.findByRole('cell', { name: applications[2].ids.application_id }).should('not.exist')
-    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('not.exist')
+    cy.findByRole('cell', {
+      name: `${applications[0].name} ${applications[0].ids.application_id}`,
+    }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[1].name} ${applications[1].ids.application_id}`,
+    }).should('not.exist')
+    cy.findByRole('cell', {
+      name: `${applications[2].name} ${applications[2].ids.application_id}`,
+    }).should('not.exist')
+    cy.findByRole('cell', {
+      name: `${applications[3].name} ${applications[3].ids.application_id}`,
+    }).should('not.exist')
 
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('some')
@@ -104,10 +120,18 @@ describe('Applications list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findByRole('row').should('have.length', 1)
     })
-    cy.findByRole('cell', { name: applications[0].ids.application_id }).should('not.exist')
-    cy.findByRole('cell', { name: applications[1].ids.application_id }).should('be.visible')
-    cy.findByRole('cell', { name: applications[2].ids.application_id }).should('not.exist')
-    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('not.exist')
+    cy.findByRole('cell', {
+      name: `${applications[0].name} ${applications[0].ids.application_id}`,
+    }).should('not.exist')
+    cy.findByRole('cell', {
+      name: `${applications[1].name} ${applications[1].ids.application_id}`,
+    }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[2].name} ${applications[2].ids.application_id}`,
+    }).should('not.exist')
+    cy.findByRole('cell', {
+      name: `${applications[3].name} ${applications[3].ids.application_id}`,
+    }).should('not.exist')
 
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('test-app')
@@ -115,10 +139,18 @@ describe('Applications list', () => {
     cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 4)
     })
-    cy.findByRole('cell', { name: applications[0].ids.application_id }).should('be.visible')
-    cy.findByRole('cell', { name: applications[1].ids.application_id }).should('be.visible')
-    cy.findByRole('cell', { name: applications[2].ids.application_id }).should('be.visible')
-    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[0].name} ${applications[0].ids.application_id}`,
+    }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[1].name} ${applications[1].ids.application_id}`,
+    }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[2].name} ${applications[2].ids.application_id}`,
+    }).should('be.visible')
+    cy.findByRole('cell', {
+      name: `${applications[3].name} ${applications[3].ids.application_id}`,
+    }).should('be.visible')
   })
 
   it('succeeds disabling click on applications that are on another cluster', () => {

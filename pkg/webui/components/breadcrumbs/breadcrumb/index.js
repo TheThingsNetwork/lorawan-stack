@@ -15,13 +15,14 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import Icon, { IconChevronRight } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './breadcrumb.styl'
+import style from '../breadcrumbs.styl'
 
 const Breadcrumb = ({ className, path, content, isLast }) => {
   const isRawText = typeof content === 'string' || typeof content === 'number'
@@ -29,16 +30,27 @@ const Breadcrumb = ({ className, path, content, isLast }) => {
   let componentProps
   if (!isLast) {
     Component = Link
-    componentProps = { className: classnames(className, style.link), to: path, secondary: true }
+    componentProps = {
+      className: classnames(style.breadcrumb, style.link),
+      to: path,
+      secondary: true,
+    }
   } else {
     Component = 'span'
-    componentProps = { className: classnames(className, style.last) }
+    componentProps = { className: classnames(className, style.breadcrumb, style.last) }
   }
 
   return (
-    <Component {...componentProps}>
-      {isRawText ? <span>{content}</span> : <Message content={content} />}
-    </Component>
+    <span className={classnames(className, style.container)}>
+      <Component {...componentProps}>
+        {isRawText ? content : <Message content={content} />}
+      </Component>
+      {!isLast && (
+        <div className="d-flex al-center p-sides-cs-xxs">
+          <Icon icon={IconChevronRight} size={14} />
+        </div>
+      )}
+    </span>
   )
 }
 

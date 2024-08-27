@@ -36,6 +36,7 @@ const exampleError = {
 
 export default {
   title: 'Utility Components/ErrorMessage',
+  component: ErrorMessage,
 }
 
 export const Default = () => <ErrorMessage content={exampleError} />

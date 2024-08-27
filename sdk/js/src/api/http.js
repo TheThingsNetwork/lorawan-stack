@@ -106,6 +106,9 @@ class Http {
       const config = {
         method,
         url: endpoint,
+        paramsSerializer: {
+          indexes: null,
+        },
       }
 
       if (method === 'get' || method === 'delete') {

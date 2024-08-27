@@ -203,7 +203,7 @@ const FormField = props => {
   const error = showError && errors[0]
   const showDescription = !showError && !showWarning && Boolean(description)
   const tooltipIcon = hasTooltip ? (
-    <Tooltip id={tooltipId} tooltip={tooltip} glossaryTerm={title} />
+    <Tooltip id={tooltipId} tooltip={tooltip} glossaryTerm={title} small />
   ) : null
   const describedBy = showError
     ? `${name}-field-error`

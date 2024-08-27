@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { IconCellSignal5, IconPlugConnected, IconWifi } from '@tabler/icons-react'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -41,9 +42,9 @@ export const getConnectionType = type => {
 }
 
 export const connectionIconMap = {
-  [CONNECTION_TYPES.CELLULAR]: 'signal_cellular_alt',
-  [CONNECTION_TYPES.WIFI]: 'wifi',
-  [CONNECTION_TYPES.ETHERNET]: 'settings_input_hdmi',
+  [CONNECTION_TYPES.CELLULAR]: IconCellSignal5,
+  [CONNECTION_TYPES.WIFI]: IconWifi,
+  [CONNECTION_TYPES.ETHERNET]: IconPlugConnected,
 }
 
 export const connectionNameMap = {

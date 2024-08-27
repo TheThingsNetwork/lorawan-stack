@@ -21,15 +21,17 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './cell.styl'
 
-const Cell = ({ className, align, small, width, children, ...rest }) => {
+const Cell = ({ className, align, small, width, children, panelStyle, ...rest }) => {
   const cellClassNames = classnames(className, style.cell, {
+    [style.cellPanelStyle]: panelStyle,
     [style.cellCentered]: align === 'center',
     [style.cellLeft]: align === 'left',
     [style.cellRight]: align === 'right',
     [style.cellSmall]: small,
   })
 
-  const widthStyle = width ? { width: `${width}%` } : undefined
+  const widthStyle =
+    typeof width === 'number' ? { width: `${width}%` } : typeof width === 'string' ? { width } : {}
 
   return (
     <div {...rest} style={widthStyle} className={cellClassNames} role="cell">
@@ -45,10 +47,11 @@ Cell.propTypes = {
   className: PropTypes.string,
   /** The number of columns that the cell should occupy. */
   colSpan: PropTypes.number,
+  panelStyle: PropTypes.bool,
   /** A flag indicating whether the row take less height. */
   small: PropTypes.bool,
   /** The width of the cell in percentages. */
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 }
 
 Cell.defaultProps = {
@@ -58,10 +61,15 @@ Cell.defaultProps = {
   colSpan: 1,
   small: false,
   width: undefined,
+  panelStyle: false,
 }
 
-const HeadCell = ({ className, content, children, ...rest }) => (
-  <Cell className={classnames(className, style.cellHead)} {...rest}>
+const HeadCell = ({ className, content, children, panelStyle, ...rest }) => (
+  <Cell
+    className={classnames(className, style.cellHead, { [style.cellHeadPanelStyle]: panelStyle })}
+    panelStyle={panelStyle}
+    {...rest}
+  >
     {Boolean(content) && <Message content={content} />}
     {!Boolean(content) && children}
   </Cell>
@@ -72,12 +80,15 @@ HeadCell.propTypes = {
   className: PropTypes.string,
   /** The title of the head cell. */
   content: PropTypes.message,
+  /** A flag indicating whether the table is panel styled. */
+  panelStyle: PropTypes.bool,
 }
 
 HeadCell.defaultProps = {
   children: undefined,
   className: undefined,
   content: undefined,
+  panelStyle: false,
 }
 
 const DataCell = ({ className, children, ...rest }) => (

@@ -24,13 +24,18 @@ describe('Admin Panel', () => {
 
   it('succeeds displaying different views in the admin panel', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/admin-panel`)
+    cy.findByText('Total applications').should('be.visible')
+    cy.findByText('Identity Server').should('be.visible')
 
-    cy.findByText('User management').should('be.visible').click()
-    cy.findByText('User management', { selector: 'h1' }).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
 
-    cy.findByText('Peering settings').should('be.visible').click()
-    cy.findByText('Packet Broker', { selector: 'h1' }).should('be.visible')
+    cy.findByText('User management').should('be.visible').click()
+    cy.findByTestId('error-notification').should('not.exist')
+
+    cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info.json' })
+    cy.findByText('Packet Broker').should('be.visible').click()
+    cy.findByText('Setup', { selector: 'h3' }).should('be.visible')
+    cy.findByText('Why choose network peering?', { selector: 'h3' }).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
   })
 })

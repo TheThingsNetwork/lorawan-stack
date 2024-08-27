@@ -106,6 +106,7 @@ func generateConsoleCSPString(config *Config, nonce string, others ...webui.Cont
 		ConnectionSource: append([]string{
 			"'self'",
 			config.UI.SentryDSN,
+			config.UI.StatusPage,
 			"gravatar.com",
 			"www.gravatar.com",
 		}, baseURLs...),

@@ -12,35 +12,75 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useState } from 'react'
 
 import Pagination from '.'
 
 export default {
   title: 'Pagination',
+  component: Pagination,
 }
 
-export const Default = () => (
-  <div>
-    <Pagination pageCount={1} />
-    <Pagination pageCount={3} initialPage={2} marginPagesDisplayed={2} />
-    <Pagination pageCount={3} initialPage={3} marginPagesDisplayed={2} />
-  </div>
-)
+export const Default = () => {
+  const [pageSize, setPageSize] = useState(10)
 
-export const AllPagesWithoutGaps = () => <Pagination pageCount={10} pageRangeDisplayed={10} />
+  return (
+    <div>
+      <Pagination
+        pageCount={3}
+        marginPagesDisplayed={2}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+      />
+    </div>
+  )
+}
+
+export const AllPagesWithoutGaps = () => {
+  const [pageSize, setPageSize] = useState(10)
+
+  return (
+    <Pagination
+      pageCount={10}
+      pageRangeDisplayed={10}
+      pageSize={pageSize}
+      setPageSize={setPageSize}
+    />
+  )
+}
 
 AllPagesWithoutGaps.story = {
   name: 'All pages (without gaps)',
 }
 
-export const WithGaps = () => (
-  <div>
-    <Pagination pageCount={20} marginPagesDisplayed={2} />
-    <Pagination pageCount={9} initialPage={4} pageRangeDisplayed={1} marginPagesDisplayed={2} />
-    <Pagination pageCount={9} initialPage={4} pageRangeDisplayed={3} marginPagesDisplayed={2} />
-  </div>
-)
+export const WithGaps = () => {
+  const [pageSize, setPageSize] = useState(10)
+
+  return (
+    <div>
+      <Pagination
+        pageCount={20}
+        marginPagesDisplayed={2}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+      />
+      <Pagination
+        pageCount={9}
+        pageRangeDisplayed={1}
+        marginPagesDisplayed={2}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+      />
+      <Pagination
+        pageCount={9}
+        pageRangeDisplayed={3}
+        marginPagesDisplayed={2}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+      />
+    </div>
+  )
+}
 
 WithGaps.story = {
   name: 'With gaps',

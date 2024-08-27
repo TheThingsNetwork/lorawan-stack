@@ -32,6 +32,7 @@ const Row = ({
   head,
   footer,
   linkTo,
+  panelStyle,
 }) => {
   const handleClick = useCallback(
     evt => {
@@ -62,8 +63,8 @@ const Row = ({
 
   const rowClassNames = classnames(className, style.row, {
     [style.clickable]: body && clickable,
-    [style.rowHead]: head,
-    [style.rowBody]: body,
+    [style.rowHead]: head && !panelStyle,
+    [style.rowBody]: body && !panelStyle,
     [style.rowFooter]: footer,
   })
 
@@ -96,7 +97,7 @@ Row.propTypes = {
   /** A flag indicating whether the row is wrapping the head of a table. */
   head: PropTypes.bool,
   /** The identifier of the row. */
-  id: PropTypes.number,
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   /** The href to be passed as `to` prop to the `<Link />` component that wraps the row. */
   linkTo: PropTypes.string,
   /**
@@ -105,6 +106,7 @@ Row.propTypes = {
    */
   onClick: PropTypes.func,
   onMouseDown: PropTypes.func,
+  panelStyle: PropTypes.bool,
 }
 
 Row.defaultProps = {
@@ -118,6 +120,7 @@ Row.defaultProps = {
   onMouseDown: () => null,
   id: undefined,
   linkTo: undefined,
+  panelStyle: false,
 }
 
 export default Row

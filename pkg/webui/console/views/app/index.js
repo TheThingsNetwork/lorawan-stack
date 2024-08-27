@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useContext, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Route,
@@ -21,13 +21,13 @@ import {
   createBrowserRouter,
   RouterProvider,
   ScrollRestoration,
+  useLocation,
 } from 'react-router-dom'
 import classnames from 'classnames'
 
 import { ToastContainer } from '@ttn-lw/components/toast'
-import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
-
-import Footer from '@ttn-lw/containers/footer'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
+import HeaderComponent from '@ttn-lw/components/header'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -37,13 +37,14 @@ import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-v
 
 import Header from '@console/containers/header'
 import LogBackInModal from '@console/containers/log-back-in-modal'
+import Sidebar from '@console/containers/sidebar'
+import EventSplitFrameContext from '@console/containers/event-split-frame/context'
+import Logo from '@console/containers/logo'
+import { SidebarContextProvider } from '@console/containers/sidebar/context'
 
-import Overview from '@console/views/overview'
+import OverviewRoutes from '@console/views/overview'
 import Applications from '@console/views/applications'
 import Gateways from '@console/views/gateways'
-import Organizations from '@console/views/organizations'
-import AdminPanel from '@console/views/admin-panel'
-import User from '@console/views/user'
 
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
 import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
@@ -59,11 +60,13 @@ import {
   selectUserError,
   selectUserRights,
   selectUserIsAdmin,
-} from '@console/store/selectors/logout'
+} from '@console/store/selectors/user'
 
 import style from './app.styl'
 
-const errorRender = error => <FullViewError error={error} header={<Header />} />
+const errorRender = error => (
+  <FullViewError error={error} header={<Header alwaysShowLogo Logo={Logo} />} />
+)
 const getScrollRestorationKey = location => {
   // Preserve scroll position only when necessary.
   // E.g. we don't want to scroll to top when changing tabs of a table,
@@ -76,6 +79,8 @@ const getScrollRestorationKey = location => {
 }
 
 const Layout = () => {
+  const { search } = useLocation()
+  const page = new URLSearchParams(search).get('page')
   const user = useSelector(selectUser)
   const fetching = useSelector(selectUserFetching)
   const error = useSelector(selectUserError)
@@ -83,41 +88,61 @@ const Layout = () => {
   const isAdmin = useSelector(selectUserIsAdmin)
   const siteTitle = selectApplicationSiteTitle()
   const siteName = selectApplicationSiteName()
+  const main = useRef()
+
+  const { height: splitFrameHeight } = useContext(EventSplitFrameContext)
+
+  useEffect(() => {
+    if (main.current) {
+      main.current.scrollTop = 0
+    }
+  }, [page])
 
   return (
-    <>
+    <SidebarContextProvider>
       <ScrollRestoration getKey={getScrollRestorationKey} />
       <ErrorView errorRender={errorRender}>
-        <div className={style.app}>
+        <div className={style.container}>
           <IntlHelmet
             titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             defaultTitle={siteName}
           />
           <div id="modal-container" />
-          <Header />
-          <main className={style.main}>
-            <WithAuth
-              user={user}
-              fetching={fetching}
-              error={error}
-              errorComponent={FullViewErrorInner}
-              rights={rights}
-              isAdmin={isAdmin}
-            >
-              <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-              <div id="sidebar" className={sidebarStyle.container} />
-              <div className={style.content}>
-                <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
-                <div className={style.stage} id="stage">
-                  <Outlet />
-                </div>
-              </div>
-            </WithAuth>
-          </main>
-          <Footer className={style.footer} />
+          <div id="dropdown-container" className="pos-absolute-container" />
+          <div className="d-flex">
+            <Sidebar />
+            <div className="w-full h-vh d-flex direction-column">
+              <Header />
+              <main
+                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+                ref={main}
+              >
+                <WithAuth
+                  user={user}
+                  fetching={fetching}
+                  error={error}
+                  errorComponent={FullViewErrorInner}
+                  rights={rights}
+                  isAdmin={isAdmin}
+                >
+                  <div className={style.content}>
+                    <div
+                      className={style.stage}
+                      id="stage"
+                      style={{ paddingBottom: splitFrameHeight }}
+                    >
+                      <Outlet />
+                    </div>
+                  </div>
+                </WithAuth>
+              </main>
+            </div>
+          </div>
+
+          <div id="split-frame" className={style.splitFrame} />
         </div>
       </ErrorView>
-    </>
+    </SidebarContextProvider>
   )
 }
 const ConsoleRoot = () => {
@@ -142,21 +167,34 @@ const ConsoleRoot = () => {
   }, [handleConnectionStatusChange])
 
   if (pageData && pageData.error) {
-    return <FullViewError error={pageData.error} header={<Header />} />
+    return (
+      <FullViewError
+        error={pageData.error}
+        header={
+          <HeaderComponent
+            safe
+            alwaysShowLogo
+            Logo={Logo}
+            isSidebarMinimized={false}
+            expandSidebar={false}
+            toggleSidebarMinimized={false}
+          />
+        }
+        safe
+      />
+    )
   }
 
   return (
     <React.Fragment>
       {status.isLoginRequired && <LogBackInModal />}
       <ToastContainer />
+      <Breadcrumbs />
       <Routes>
         <Route element={<Layout />}>
-          <Route index Component={Overview} />
+          <Route path="/*" Component={OverviewRoutes} />
           <Route path="applications/*" Component={Applications} />
           <Route path="gateways/*" Component={Gateways} />
-          <Route path="organizations/*" Component={Organizations} />
-          <Route path="admin-panel/*" Component={AdminPanel} />
-          <Route path="user/*" Component={User} />
           <Route path="*" Component={GenericNotFound} />
         </Route>
       </Routes>

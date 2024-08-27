@@ -18,9 +18,9 @@ import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 import CONNECTION_STATUS from '@console/constants/connection-status'
 import EVENT_TAIL from '@console/constants/event-tail'
 
-import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
+import { buildObjectDeviceId, getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
-import { SET_CONNECTION_STATUS, setStatusChecking } from '@ttn-lw/lib/store/actions/status'
+import { SET_CONNECTION_STATUS } from '@ttn-lw/lib/store/actions/status'
 import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 import {
@@ -79,7 +79,23 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   const selectLatestClearedEvent = createLatestClearedEventSelector(entityName)
   const selectEventFilter = createEventsFilterSelector(entityName)
 
-  let channel = null
+  const ChannelManager = (() => {
+    const channels = {}
+
+    return {
+      addChannel: (id, channel) => {
+        channels[id] = channel
+      },
+      getChannel: id => channels[id],
+      removeChannel: id => {
+        if (channels[id]) {
+          channels[id].close()
+          delete channels[id]
+        }
+      },
+      hasChannel: id => id in channels,
+    }
+  })()
 
   return [
     createLogic({
@@ -109,9 +125,16 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         return allow(action)
       },
       process: async ({ getState, action }, dispatch) => {
-        const { id, silent } = action
+        const { id, silent, filter } = action
 
         const idString = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
+        // Marshal the id to a string or object, based on whether it's an application or device id.
+        const marshaledId =
+          typeof action.id === 'object'
+            ? action.id
+            : action.id.includes('/')
+              ? buildObjectDeviceId(action.id)
+              : action.id
 
         // Only get historical events emitted after the latest event or latest
         // cleared event in the store to avoid duplicate historical events.
@@ -123,8 +146,8 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         const after =
           (latestEventTime > latestClearedEventTime ? latestEventTime : latestClearedEventTime) ||
           undefined
-        const filter = selectEventFilter(state, idString)
-        const filterRegExp = Boolean(filter) ? filter.filterRegExp : undefined
+        const storeFilter = selectEventFilter(state, idString)
+        const filterRegExp = filter || (Boolean(storeFilter) ? storeFilter.filterRegExp : undefined)
 
         try {
           const listeners = {
@@ -132,7 +155,14 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
             error: error => dispatch(getEventFailure(id, error)),
             close: wasClientRequest => dispatch(closeEvents(id, { silent: wasClientRequest })),
           }
-          channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after, listeners)
+          const channel = await onEventsStart(
+            [marshaledId],
+            filterRegExp,
+            EVENT_TAIL,
+            after,
+            listeners,
+          )
+          ChannelManager.addChannel(idString, channel)
           dispatch(startEventsSuccess(id, { silent }))
           channel.open()
         } catch (error) {
@@ -166,19 +196,19 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         return allow(action)
       },
       process: async ({ action }, dispatch, done) => {
+        const idString = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
         if (action.type === START_EVENTS_FAILURE) {
-          // Set the connection status to `checking` to trigger connection checks
-          // and detect possible offline state.
-          dispatch(setStatusChecking())
-
           // In case of a network error, the connection could not be closed
           // since the network connection is disrupted. We can regard this
           // as equivalent to a closed connection.
+          ChannelManager.removeChannel(idString)
           return done()
         }
-        if (action.type === STOP_EVENTS && Boolean(channel)) {
+        if (action.type === STOP_EVENTS && ChannelManager.hasChannel(idString)) {
           // Close the connection if it wasn't closed already.
+          const channel = ChannelManager.getChannel(idString)
           await channel.close()
+          ChannelManager.removeChannel(idString)
         }
         return done()
       },
@@ -268,7 +298,9 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       type: SET_EVENT_FILTER,
       debounce: 250,
       process: async ({ action }, dispatch, done) => {
-        if (Boolean(channel)) {
+        const idString = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
+        if (ChannelManager.hasChannel(idString)) {
+          const channel = ChannelManager.getChannel(idString)
           await channel.close()
           dispatch(startEvents(action.id, { silent: true }))
         }

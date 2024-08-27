@@ -15,7 +15,7 @@
 import React, { useRef, useCallback } from 'react'
 import classnames from 'classnames'
 
-import missingProfilePicture from '@assets/img/placeholder/missing-profile-picture.png'
+import missingProfilePicture from '@assets/img/placeholder/missing-profile-picture.svg'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import {

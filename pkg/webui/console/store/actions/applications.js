@@ -64,7 +64,7 @@ export const [
 ] = createRequestActions(
   GET_APP_BASE,
   id => ({ id }),
-  (id, selector) => ({ selector }),
+  (id, selector, options = {}) => ({ selector, options }),
 )
 
 export const ISSUE_DEV_EUI_BASE = 'ISSUE_DEV_EUI'
@@ -140,6 +140,22 @@ export const [
     failure: getApplicationsFailure,
   },
 ] = createPaginationRequestActions(SHARED_NAME)
+
+export const FETCH_APPS_LIST_BASE = 'FETCH_APPS_LIST'
+export const [
+  { request: FETCH_APPS_LIST, success: FETCH_APPS_LIST_SUCCESS, failure: FETCH_APPS_LIST_FAILURE },
+  {
+    request: fetchApplicationsList,
+    success: fetchApplicationsListSuccess,
+    failure: fetchApplicationsListFailure,
+  },
+] = createRequestActions(
+  FETCH_APPS_LIST_BASE,
+  ({ page, limit, query, order, deleted } = {}) => ({
+    params: { page, limit, query, order, deleted },
+  }),
+  (_, selectors = [], options = {}) => ({ selectors, options }),
+)
 
 export const GET_APPS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [

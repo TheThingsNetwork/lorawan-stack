@@ -13,7 +13,11 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col, Container } from 'react-grid-system'
+
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
+
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -21,15 +25,22 @@ import ApplicationsTable from '@console/containers/applications-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const ApplicationsList = () => (
-  <Container>
-    <Row>
+import getCookie from '@console/lib/table-utils'
+
+const ApplicationsList = () => {
+  const appPageSize = getCookie('applications-list-page-size')
+  const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
+  useBreadcrumbs(
+    'apps.list',
+    <Breadcrumb path={`/applications${appParam}`} content={sharedMessages.list} />,
+  )
+
+  return (
+    <div className="container container--xxl p-0">
       <IntlHelmet title={sharedMessages.applications} />
-      <Col>
-        <ApplicationsTable />
-      </Col>
-    </Row>
-  </Container>
-)
+      <ApplicationsTable />
+    </div>
+  )
+}
 
 export default ApplicationsList

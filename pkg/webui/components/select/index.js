@@ -39,7 +39,7 @@ const customOption = props => {
 
 customOption.propTypes = {
   data: PropTypes.shape({
-    icon: PropTypes.string,
+    icon: PropTypes.icon,
   }).isRequired,
   label: PropTypes.string.isRequired,
 }
@@ -171,7 +171,12 @@ Select.propTypes = {
   ),
   placeholder: PropTypes.message,
   showOptionIcon: PropTypes.bool,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.shape({})]),
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.bool,
+    PropTypes.shape({}),
+    PropTypes.number,
+  ]),
   warning: PropTypes.bool,
 }
 

@@ -13,12 +13,13 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Link from '@ttn-lw/components/link'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -57,15 +58,16 @@ const GatewayAdd = () => {
     [navigate],
   )
 
+  useBreadcrumbs(
+    'gtws.add',
+    <Breadcrumb path={`/gateways/add`} content={sharedMessages.registerGateway} />,
+  )
+
   return (
     <Require featureCheck={mayCreateGateways} otherwise={{ redirect: '/gateways' }}>
       <RequireRequest requestAction={getOrganizationsList()}>
-        <Container>
-          <PageTitle
-            colProps={{ md: 10, lg: 9 }}
-            className="mb-cs-s"
-            title={sharedMessages.registerGateway}
-          >
+        <div className="container container--xxl grid">
+          <PageTitle className="mb-cs-s" title={sharedMessages.registerGateway}>
             <Message
               component="p"
               content={m.gtwOnboardingDescription}
@@ -73,12 +75,10 @@ const GatewayAdd = () => {
             />
             <hr className="mb-ls-s" />
           </PageTitle>
-          <Row>
-            <Col md={10} lg={9}>
-              <GatewayOnboardingForm onSuccess={handleSuccess} />
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-12 xl:item-9">
+            <GatewayOnboardingForm onSuccess={handleSuccess} />
+          </div>
+        </div>
       </RequireRequest>
     </Require>
   )

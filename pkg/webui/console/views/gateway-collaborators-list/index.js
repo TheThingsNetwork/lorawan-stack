@@ -13,11 +13,10 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -50,18 +49,16 @@ const GatewayCollaboratorsList = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <IntlHelmet title={sharedMessages.collaborators} />
-        <Col>
-          <CollaboratorsTable
-            pageSize={PAGE_SIZES.MAX}
-            baseDataSelector={baseDataSelector}
-            getItemsAction={getCollaborators}
-          />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--xxl p-0">
+      <IntlHelmet title={sharedMessages.collaborators} />
+      <div className="item-12">
+        <CollaboratorsTable
+          pageSize={PAGE_SIZES.MAX}
+          baseDataSelector={baseDataSelector}
+          getItemsAction={getCollaborators}
+        />
+      </div>
+    </div>
   )
 }
 
