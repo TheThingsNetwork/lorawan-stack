@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/gateways"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -35,9 +36,11 @@ type QRCodeGenerator struct {
 	ctx context.Context
 
 	endDevices *enddevices.Server
+	gateways   *gateways.Server
 
 	grpc struct {
 		endDeviceQRCodeGenerator *endDeviceQRCodeGeneratorServer
+		gatewayQRCodeGenerator   *gatewayQRCodeGeneratorServer
 	}
 }
 
@@ -52,6 +55,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*QRCodeGenerator
 	}
 	qrg.grpc.endDeviceQRCodeGenerator = &endDeviceQRCodeGeneratorServer{QRG: qrg}
 	qrg.endDevices = enddevices.New(ctx)
+
+	qrg.grpc.gatewayQRCodeGenerator = &gatewayQRCodeGeneratorServer{QRG: qrg}
+	qrg.gateways = gateways.New(ctx)
 
 	c.RegisterGRPC(qrg)
 
@@ -72,6 +78,13 @@ func WithEndDeviceFormat(id string, f enddevices.Format) Option {
 	}
 }
 
+// WithGatewayFormat configures QRCodeGenerator with a GatewayFormat.
+func WithGatewayFormat(id string, f gateways.Format) Option {
+	return func(qrg *QRCodeGenerator) {
+		qrg.gateways.RegisterGatewayFormat(id, f)
+	}
+}
+
 // Context returns the context of the QR Code Generator.
 func (qrg *QRCodeGenerator) Context() context.Context {
 	return qrg.ctx
@@ -85,6 +98,7 @@ func (qrg *QRCodeGenerator) Roles() []ttnpb.ClusterRole {
 // RegisterServices registers services provided by qrg at s.
 func (qrg *QRCodeGenerator) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterEndDeviceQRCodeGeneratorServer(s, qrg.grpc.endDeviceQRCodeGenerator)
+	ttnpb.RegisterGatewayQRCodeGeneratorServer(s, qrg.grpc.gatewayQRCodeGenerator)
 }
 
 // RegisterHandlers registers gRPC handlers.

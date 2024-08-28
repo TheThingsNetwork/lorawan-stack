@@ -1579,6 +1579,49 @@ var ParseEndDeviceQRCodeResponseFieldPathsTopLevel = []string{
 	"end_device_template",
 	"format_id",
 }
+var ParseGatewayQRCodeRequestFieldPathsNested = []string{
+	"format_id",
+	"qr_code",
+}
+
+var ParseGatewayQRCodeRequestFieldPathsTopLevel = []string{
+	"format_id",
+	"qr_code",
+}
+var ParseGatewayQRCodeResponseFieldPathsNested = []string{
+	"claim_gateway_request",
+	"claim_gateway_request.collaborator",
+	"claim_gateway_request.collaborator.ids",
+	"claim_gateway_request.collaborator.ids.organization_ids",
+	"claim_gateway_request.collaborator.ids.organization_ids.organization_id",
+	"claim_gateway_request.collaborator.ids.user_ids",
+	"claim_gateway_request.collaborator.ids.user_ids.email",
+	"claim_gateway_request.collaborator.ids.user_ids.user_id",
+	"claim_gateway_request.cups_redirection",
+	"claim_gateway_request.cups_redirection.current_gateway_key",
+	"claim_gateway_request.cups_redirection.gateway_credentials",
+	"claim_gateway_request.cups_redirection.gateway_credentials.auth_token",
+	"claim_gateway_request.cups_redirection.gateway_credentials.client_tls",
+	"claim_gateway_request.cups_redirection.gateway_credentials.client_tls.cert",
+	"claim_gateway_request.cups_redirection.gateway_credentials.client_tls.key",
+	"claim_gateway_request.cups_redirection.target_cups_trust",
+	"claim_gateway_request.cups_redirection.target_cups_uri",
+	"claim_gateway_request.source_gateway",
+	"claim_gateway_request.source_gateway.authenticated_identifiers",
+	"claim_gateway_request.source_gateway.authenticated_identifiers.authentication_code",
+	"claim_gateway_request.source_gateway.authenticated_identifiers.gateway_eui",
+	"claim_gateway_request.source_gateway.qr_code",
+	"claim_gateway_request.target_frequency_plan_id",
+	"claim_gateway_request.target_frequency_plan_ids",
+	"claim_gateway_request.target_gateway_id",
+	"claim_gateway_request.target_gateway_server_address",
+	"format_id",
+}
+
+var ParseGatewayQRCodeResponseFieldPathsTopLevel = []string{
+	"claim_gateway_request",
+	"format_id",
+}
 var GenerateEndDeviceQRCodeRequest_ImageFieldPathsNested = []string{
 	"image_size",
 }

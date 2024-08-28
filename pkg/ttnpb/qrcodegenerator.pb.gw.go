@@ -214,6 +214,92 @@ func local_request_EndDeviceQRCodeGenerator_Parse_1(ctx context.Context, marshal
 
 }
 
+func request_GatewayQRCodeGenerator_Parse_0(ctx context.Context, marshaler runtime.Marshaler, client GatewayQRCodeGeneratorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ParseGatewayQRCodeRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.Parse(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_GatewayQRCodeGenerator_Parse_0(ctx context.Context, marshaler runtime.Marshaler, server GatewayQRCodeGeneratorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ParseGatewayQRCodeRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.Parse(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_GatewayQRCodeGenerator_Parse_1(ctx context.Context, marshaler runtime.Marshaler, client GatewayQRCodeGeneratorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ParseGatewayQRCodeRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["format_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "format_id")
+	}
+
+	protoReq.FormatId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "format_id", err)
+	}
+
+	msg, err := client.Parse(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_GatewayQRCodeGenerator_Parse_1(ctx context.Context, marshaler runtime.Marshaler, server GatewayQRCodeGeneratorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ParseGatewayQRCodeRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["format_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "format_id")
+	}
+
+	protoReq.FormatId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "format_id", err)
+	}
+
+	msg, err := server.Parse(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterEndDeviceQRCodeGeneratorHandlerServer registers the http handlers for service EndDeviceQRCodeGenerator to "mux".
 // UnaryRPC     :call EndDeviceQRCodeGeneratorServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -342,6 +428,65 @@ func RegisterEndDeviceQRCodeGeneratorHandlerServer(ctx context.Context, mux *run
 		}
 
 		forward_EndDeviceQRCodeGenerator_Parse_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
+// RegisterGatewayQRCodeGeneratorHandlerServer registers the http handlers for service GatewayQRCodeGenerator to "mux".
+// UnaryRPC     :call GatewayQRCodeGeneratorServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterGatewayQRCodeGeneratorHandlerFromEndpoint instead.
+func RegisterGatewayQRCodeGeneratorHandlerServer(ctx context.Context, mux *runtime.ServeMux, server GatewayQRCodeGeneratorServer) error {
+
+	mux.Handle("POST", pattern_GatewayQRCodeGenerator_Parse_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-codes/gateways/parse"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_GatewayQRCodeGenerator_Parse_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_GatewayQRCodeGenerator_Parse_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_GatewayQRCodeGenerator_Parse_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-codes/gateways/{format_id}/parse"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_GatewayQRCodeGenerator_Parse_1(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_GatewayQRCodeGenerator_Parse_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -521,4 +666,101 @@ var (
 	forward_EndDeviceQRCodeGenerator_Parse_0 = runtime.ForwardResponseMessage
 
 	forward_EndDeviceQRCodeGenerator_Parse_1 = runtime.ForwardResponseMessage
+)
+
+// RegisterGatewayQRCodeGeneratorHandlerFromEndpoint is same as RegisterGatewayQRCodeGeneratorHandler but
+// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
+func RegisterGatewayQRCodeGeneratorHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+		}()
+	}()
+
+	return RegisterGatewayQRCodeGeneratorHandler(ctx, mux, conn)
+}
+
+// RegisterGatewayQRCodeGeneratorHandler registers the http handlers for service GatewayQRCodeGenerator to "mux".
+// The handlers forward requests to the grpc endpoint over "conn".
+func RegisterGatewayQRCodeGeneratorHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterGatewayQRCodeGeneratorHandlerClient(ctx, mux, NewGatewayQRCodeGeneratorClient(conn))
+}
+
+// RegisterGatewayQRCodeGeneratorHandlerClient registers the http handlers for service GatewayQRCodeGenerator
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "GatewayQRCodeGeneratorClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "GatewayQRCodeGeneratorClient"
+// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
+// "GatewayQRCodeGeneratorClient" to call the correct interceptors.
+func RegisterGatewayQRCodeGeneratorHandlerClient(ctx context.Context, mux *runtime.ServeMux, client GatewayQRCodeGeneratorClient) error {
+
+	mux.Handle("POST", pattern_GatewayQRCodeGenerator_Parse_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-codes/gateways/parse"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_GatewayQRCodeGenerator_Parse_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_GatewayQRCodeGenerator_Parse_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_GatewayQRCodeGenerator_Parse_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/ttn.lorawan.v3.GatewayQRCodeGenerator/Parse", runtime.WithHTTPPathPattern("/qr-codes/gateways/{format_id}/parse"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_GatewayQRCodeGenerator_Parse_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_GatewayQRCodeGenerator_Parse_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
+var (
+	pattern_GatewayQRCodeGenerator_Parse_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"qr-codes", "gateways", "parse"}, ""))
+
+	pattern_GatewayQRCodeGenerator_Parse_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"qr-codes", "gateways", "format_id", "parse"}, ""))
+)
+
+var (
+	forward_GatewayQRCodeGenerator_Parse_0 = runtime.ForwardResponseMessage
+
+	forward_GatewayQRCodeGenerator_Parse_1 = runtime.ForwardResponseMessage
 )

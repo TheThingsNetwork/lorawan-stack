@@ -278,6 +278,82 @@ func (dst *ParseEndDeviceQRCodeResponse) SetFields(src *ParseEndDeviceQRCodeResp
 	return nil
 }
 
+func (dst *ParseGatewayQRCodeRequest) SetFields(src *ParseGatewayQRCodeRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "format_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FormatId = src.FormatId
+			} else {
+				var zero string
+				dst.FormatId = zero
+			}
+		case "qr_code":
+			if len(subs) > 0 {
+				return fmt.Errorf("'qr_code' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.QrCode = src.QrCode
+			} else {
+				dst.QrCode = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ParseGatewayQRCodeResponse) SetFields(src *ParseGatewayQRCodeResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "format_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FormatId = src.FormatId
+			} else {
+				var zero string
+				dst.FormatId = zero
+			}
+		case "claim_gateway_request":
+			if len(subs) > 0 {
+				var newDst, newSrc *ClaimGatewayRequest
+				if (src == nil || src.ClaimGatewayRequest == nil) && dst.ClaimGatewayRequest == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ClaimGatewayRequest
+				}
+				if dst.ClaimGatewayRequest != nil {
+					newDst = dst.ClaimGatewayRequest
+				} else {
+					newDst = &ClaimGatewayRequest{}
+					dst.ClaimGatewayRequest = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClaimGatewayRequest = src.ClaimGatewayRequest
+				} else {
+					dst.ClaimGatewayRequest = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *GenerateEndDeviceQRCodeRequest_Image) SetFields(src *GenerateEndDeviceQRCodeRequest_Image, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
