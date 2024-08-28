@@ -54,10 +54,11 @@ func HandleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 
 	conf := &ttnpb.MACCommand_RekeyConf{}
 	dev.MacState.LorawanVersion, conf.MinorVersion = macspec.NegotiatedVersion(dev.LorawanVersion, pld.MinorVersion)
+	dev.MacState.CipherId = macspec.NegotiatedCipherSuite(pld.Cipher)
 	dev.MacState.PendingJoinRequest = nil
 	dev.PendingMacState = nil
 	dev.PendingSession = nil
-	conf.Cipher = pld.Cipher
+	conf.Cipher = ttnpb.CipherEnum(dev.MacState.CipherId)
 
 	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, conf.MACCommand())
 	return append(evs,

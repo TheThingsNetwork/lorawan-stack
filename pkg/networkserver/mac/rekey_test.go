@@ -294,23 +294,23 @@ func TestHandleRekeyInd(t *testing.T) {
 						{},
 						(&ttnpb.MACCommand_RekeyConf{
 							MinorVersion: 2,
-							Cipher:       3,
+							Cipher:       0,
 						}).MACCommand(),
 					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 2,
-				Cipher:       3,
+				Cipher:       0,
 			},
 			Events: events.Builders{
 				EvtReceiveRekeyIndication.With(events.WithData(&ttnpb.MACCommand_RekeyInd{
 					MinorVersion: 2,
-					Cipher:       3,
+					Cipher:       0,
 				})),
 				EvtEnqueueRekeyConfirmation.With(events.WithData(&ttnpb.MACCommand_RekeyConf{
 					MinorVersion: 2,
-					Cipher:       3,
+					Cipher:       0,
 				})),
 			},
 		},

@@ -167,6 +167,20 @@ func NegotiatedVersion(v ttnpb.MACVersion, upperBound ttnpb.Minor) (ttnpb.MACVer
 	return version, upperBound
 }
 
+// NegotiatedCipherSuite returns the cipher suite that should be
+// used by the end device and network server as part of the
+// RekeyInd{Conf} handshake.
+// The cipherEnum is the Device requested cipher suite.
+// The only supported cipher suite is the default (0).
+func NegotiatedCipherSuite(cipherEnum ttnpb.CipherEnum) uint32 {
+	switch cipherEnum {
+	case ttnpb.CipherEnum_CIPHER_0:
+		return 0
+	default:
+		panic(fmt.Errorf("unhandled cipher suite %d", cipherEnum))
+	}
+}
+
 // AllowDuplicateLinkADRAns reports whether v is allowed to use
 // duplicate LinkADRAns MAC responses within the same message.
 func AllowDuplicateLinkADRAns(v ttnpb.MACVersion) bool {
