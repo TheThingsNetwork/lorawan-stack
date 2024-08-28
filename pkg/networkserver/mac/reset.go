@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -51,10 +52,11 @@ func HandleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 	dev.MacState = macState
 	dev.MacState.LorawanVersion = dev.LorawanVersion
+	dev.MacState.CipherId = macspec.NegotiatedCipherSuite(pld.Cipher)
 
 	conf := &ttnpb.MACCommand_ResetConf{
 		MinorVersion: pld.MinorVersion,
-		Cipher:       pld.Cipher,
+		Cipher:       ttnpb.CipherEnum(dev.MacState.CipherId),
 	}
 	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, conf.MACCommand())
 	return append(evs,

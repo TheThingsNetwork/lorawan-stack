@@ -180,23 +180,23 @@ func TestHandleResetInd(t *testing.T) {
 				dev.MacState.QueuedResponses = []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_ResetConf{
 						MinorVersion: 2,
-						Cipher:       3,
+						Cipher:       0,
 					}).MACCommand(),
 				}
 				return dev
 			}(),
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 2,
-				Cipher:       3,
+				Cipher:       0,
 			},
 			Events: events.Builders{
 				EvtReceiveResetIndication.With(events.WithData(&ttnpb.MACCommand_ResetInd{
 					MinorVersion: 2,
-					Cipher:       3,
+					Cipher:       0,
 				})),
 				EvtEnqueueResetConfirmation.With(events.WithData(&ttnpb.MACCommand_ResetConf{
 					MinorVersion: 2,
-					Cipher:       3,
+					Cipher:       0,
 				})),
 			},
 		},
