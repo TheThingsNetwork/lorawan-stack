@@ -23,8 +23,6 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 
-import selectAccountUrl from '@console/lib/selectors/app-config'
-
 import ContentTemplate from './template'
 
 const m = defineMessages({
@@ -35,8 +33,6 @@ const m = defineMessages({
   preview:
     '{senderType} {id} just registered a new OAuth client under {collaboratorType} {collaboratorId} on your network. Since {senderTypeMiddle} {id} is not an admin, you need to approve this client before it can be used. Client ID: {clientId}',
 })
-
-const accountUrl = selectAccountUrl()
 
 const getType = entity => {
   if ('organization_ids' in entity) {
@@ -109,7 +105,7 @@ const ClientRequested = ({ notificationData }) => {
     },
     action: {
       Link: msg => (
-        <Link.Anchor href={`${accountUrl}/oauth-clients/${client.ids.client_id}`} external>
+        <Link.Anchor href={`/user-settings/oauth-clients/${client.ids.client_id}`}>
           {msg}
         </Link.Anchor>
       ),
