@@ -30,7 +30,7 @@ import Icon, {
   IconClipboardCheck,
 } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
-import Routes from '@ttn-lw/components/switch'
+import Switch from '@ttn-lw/components/switch'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -176,7 +176,7 @@ const Events = React.memo(
                   {!disableFiltering && (
                     <label className={style.toggleContainer}>
                       <Message content={m.verboseStream} className={style.toggleLabel} />
-                      <Routes onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
+                      <Switch onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
                     </label>
                   )}
                   <Button
@@ -220,6 +220,12 @@ const Events = React.memo(
                 />
               </div>
               <div className={style.buttonBar}>
+                {!disableFiltering && (
+                  <label className={style.toggleContainer}>
+                    <Message content={m.verboseStream} className={style.toggleLabel} />
+                    <Switch onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
+                  </label>
+                )}
                 <Button.Link
                   className={style.framedButton}
                   icon={IconExternalLink}

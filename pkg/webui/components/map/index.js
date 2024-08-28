@@ -93,7 +93,7 @@ const MarkerRenderer = ({ marker }) => {
       radius={8}
       children={children}
       color="#ffffff"
-      fillColor={COLORS.C_ACTIVE_BLUE}
+      fillColor={COLORS.C_TEXT_BRAND_NORMAL}
       fillOpacity={1}
     />
   ) : (
