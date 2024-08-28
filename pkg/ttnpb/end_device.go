@@ -2075,6 +2075,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.RejectedFrequencies == nil
 	case "rx_windows_available":
 		return !v.RxWindowsAvailable
+	case "cipher_id":
+		return v.CipherId == 0
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
