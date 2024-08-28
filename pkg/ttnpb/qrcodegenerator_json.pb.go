@@ -204,3 +204,57 @@ func (x *ParseEndDeviceQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.Unmarsha
 func (x *ParseEndDeviceQRCodeResponse) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the ParseGatewayQRCodeResponse message to JSON.
+func (x *ParseGatewayQRCodeResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.FormatId != "" || s.HasField("format_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("format_id")
+		s.WriteString(x.FormatId)
+	}
+	if x.ClaimGatewayRequest != nil || s.HasField("claim_gateway_request") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("claim_gateway_request")
+		x.ClaimGatewayRequest.MarshalProtoJSON(s.WithField("claim_gateway_request"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ParseGatewayQRCodeResponse to JSON.
+func (x *ParseGatewayQRCodeResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ParseGatewayQRCodeResponse message from JSON.
+func (x *ParseGatewayQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "format_id", "formatId":
+			s.AddField("format_id")
+			x.FormatId = s.ReadString()
+		case "claim_gateway_request", "claimGatewayRequest":
+			if s.ReadNil() {
+				x.ClaimGatewayRequest = nil
+				return
+			}
+			x.ClaimGatewayRequest = &ClaimGatewayRequest{}
+			x.ClaimGatewayRequest.UnmarshalProtoJSON(s.WithField("claim_gateway_request", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ParseGatewayQRCodeResponse from JSON.
+func (x *ParseGatewayQRCodeResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
