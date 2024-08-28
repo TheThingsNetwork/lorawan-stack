@@ -3199,6 +3199,11 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: RelayForwardDownlinkReq does not seem to implement MarshalProtoJSON.
 		golang.MarshalMessage(s, x.PendingRelayDownlink)
 	}
+	if x.CipherId != 0 || s.HasField("cipher_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cipher_id")
+		s.WriteUint32(x.CipherId)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -3437,6 +3442,9 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v RelayForwardDownlinkReq
 			golang.UnmarshalMessage(s, &v)
 			x.PendingRelayDownlink = &v
+		case "cipher_id", "cipherId":
+			s.AddField("cipher_id")
+			x.CipherId = s.ReadUint32()
 		}
 	})
 }

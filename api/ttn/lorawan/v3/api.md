@@ -4362,6 +4362,7 @@ This is used internally by the Network Server.
 | `last_adr_change_f_cnt_up` | [`uint32`](#uint32) |  | Frame counter of uplink, which confirmed the last ADR parameter change. |
 | `recent_mac_command_identifiers` | [`MACCommandIdentifier`](#ttn.lorawan.v3.MACCommandIdentifier) | repeated | MAC command identifiers sent by the end device in the last received uplink. The Network Server may choose to store only certain types of MAC command identifiers in the underlying implementation. |
 | `pending_relay_downlink` | [`RelayForwardDownlinkReq`](#ttn.lorawan.v3.RelayForwardDownlinkReq) |  | Pending relay downlink contents. The pending downlink will be scheduled to the relay in either Rx1 or Rx2. The pending downlink will be cleared after the scheduling attempt. |
+| `cipher_id` | [`uint32`](#uint32) |  | Used cipher suite for the device. |
 
 #### Field Rules
 
@@ -4374,6 +4375,7 @@ This is used internally by the Network Server.
 | `rejected_adr_data_rate_indexes` | <p>`repeated.max_items`: `15`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 | `rejected_adr_tx_power_indexes` | <p>`repeated.max_items`: `15`</p><p>`repeated.items.uint32.lte`: `15`</p> |
 | `rejected_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
+| `cipher_id` | <p>`uint32.lte`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.DataRateRange">Message `MACState.DataRateRange`</a>
 

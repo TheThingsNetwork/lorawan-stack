@@ -2845,6 +2845,16 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 					dst.PendingRelayDownlink = nil
 				}
 			}
+		case "cipher_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cipher_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CipherId = src.CipherId
+			} else {
+				var zero uint32
+				dst.CipherId = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

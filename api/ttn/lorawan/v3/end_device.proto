@@ -919,6 +919,9 @@ message MACState {
   // The pending downlink will be scheduled to the relay in either Rx1 or Rx2.
   // The pending downlink will be cleared after the scheduling attempt.
   RelayForwardDownlinkReq pending_relay_downlink = 24;
+
+  // Used cipher suite for the device.
+  uint32 cipher_id = 25 [(validate.rules).uint32.lte = 64];
 }
 
 // Power state of the device.

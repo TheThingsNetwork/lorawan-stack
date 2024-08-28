@@ -2873,6 +2873,15 @@ func (m *MACState) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "cipher_id":
+
+			if m.GetCipherId() > 64 {
+				return MACStateValidationError{
+					field:  "cipher_id",
+					reason: "value must be less than or equal to 64",
+				}
+			}
+
 		default:
 			return MACStateValidationError{
 				field:  name,

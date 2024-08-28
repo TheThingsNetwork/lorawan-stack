@@ -3547,6 +3547,7 @@ func AddSelectFlagsForMACState(flags *pflag.FlagSet, prefix string, hidden bool)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("recent-mac-command-identifiers", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("recent-mac-command-identifiers", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("pending-relay-downlink", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("pending-relay-downlink", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForRelayForwardDownlinkReq(flags, flagsplugin.Prefix("pending-relay-downlink", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cipher-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cipher-id", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forMACState message from select flags.
@@ -3706,6 +3707,11 @@ func PathsFromSelectFlagsForMACState(flags *pflag.FlagSet, prefix string) (paths
 	} else {
 		paths = append(paths, selectPaths...)
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("cipher_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("cipher_id", prefix))
+	}
 	return paths, nil
 }
 
@@ -3736,6 +3742,7 @@ func AddSetFlagsForMACState(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("last-adr-change-f-cnt-up", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("recent-mac-command-identifiers", prefix), flagsplugin.EnumValueDesc(MACCommandIdentifier_value), flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForRelayForwardDownlinkReq(flags, flagsplugin.Prefix("pending-relay-downlink", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("cipher-id", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the MACState message from flags.
@@ -3908,6 +3915,12 @@ func (m *MACState) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []st
 		} else {
 			paths = append(paths, setPaths...)
 		}
+	}
+	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("cipher_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.CipherId = val
+		paths = append(paths, flagsplugin.Prefix("cipher_id", prefix))
 	}
 	return paths, nil
 }

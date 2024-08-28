@@ -492,6 +492,15 @@ func (MACStateOptionNamespace) WithPendingRelayDownlink(v *ttnpb.RelayForwardDow
 	}
 }
 
+// WithCipherId returns a MACStateOption, which returns a copy of ttnpb.MACState with CipherId set to v.
+func (MACStateOptionNamespace) WithCipherId(v uint32) MACStateOption {
+	return func(x *ttnpb.MACState) *ttnpb.MACState {
+		copy := ttnpb.Clone(x)
+		copy.CipherId = v
+		return copy
+	}
+}
+
 // Compose returns a functional composition of opts as a singular MACStateOption.
 func (MACStateOptionNamespace) Compose(opts ...MACStateOption) MACStateOption {
 	return func(x *ttnpb.MACState) *ttnpb.MACState {

@@ -26088,6 +26088,11 @@
         "pending_relay_downlink": {
           "$ref": "#/definitions/v3RelayForwardDownlinkReq",
           "description": "Pending relay downlink contents.\nThe pending downlink will be scheduled to the relay in either Rx1 or Rx2.\nThe pending downlink will be cleared after the scheduling attempt."
+        },
+        "cipher_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Used cipher suite for the device."
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server."
