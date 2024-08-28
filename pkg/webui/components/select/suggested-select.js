@@ -30,8 +30,8 @@ const customOption = props => {
   const { showOptionIcon } = props.selectProps
 
   return (
-    <components.Option {...props}>
-      {showOptionIcon && <Icon icon={props.data.icon} className="mr-cs-xs" />}
+    <components.Option {...props} className="d-flex al-center gap-cs-xs">
+      {showOptionIcon && <Icon icon={props.data.icon} />}
       <b>{props.label}</b>
     </components.Option>
   )

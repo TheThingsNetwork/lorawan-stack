@@ -60,9 +60,9 @@ const ShortcutPanel = () => {
           className="item-6"
         />
         <ShortcutItem
-          icon={IconGateway}
-          title={m.addGateway}
-          link="/gateways/add"
+          icon={IconDevice}
+          title={sharedMessages.registerDeviceInApplication}
+          action={handleRegisterDeviceClick}
           className="item-6"
         />
         <ShortcutItem
@@ -78,9 +78,9 @@ const ShortcutPanel = () => {
           className="item-4"
         />
         <ShortcutItem
-          icon={IconDevice}
-          title={sharedMessages.registerDeviceInApplication}
-          action={handleRegisterDeviceClick}
+          icon={IconGateway}
+          title={m.addGateway}
+          link="/gateways/add"
           className="item-4"
         />
       </div>
