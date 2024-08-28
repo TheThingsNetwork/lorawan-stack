@@ -25,9 +25,10 @@
   left: 50%
   top: 10rem
   transform: translateX(-50%)
-  min-width: 35rem
+  width: 80%
+  min-width: 30rem
 
-  +media-query($bp.sm)
+  +media-query($bp['sm-md'])
     position: absolute
     top: 10vh
     left: $cs.xs
@@ -61,7 +62,7 @@
     padding: $cs.m
     cursor: pointer
     display: none
-    +media-query($bp.sm)
+    +media-query($bp['sm-md'])
       display: block
 
   .list
