@@ -16,7 +16,6 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 import { GATEWAY } from '@console/constants/entities'
 
 import {
@@ -43,7 +42,6 @@ import {
   mayViewOrEditGatewayApiKeys,
   mayEditBasicGatewayInformation,
 } from '@console/lib/feature-checks'
-import getCookie from '@console/lib/table-utils'
 
 import {
   selectSelectedGateway,
@@ -63,8 +61,6 @@ const GtwSideNavigation = () => {
   const gtw = useSelector(selectSelectedGateway)
   const gtwId = useSelector(selectSelectedGatewayId)
   const rights = useSelector(selectGatewayRights)
-  const gtwPageSize = getCookie('gateways-list-page-size')
-  const gtwParam = `?page-size=${gtwPageSize ? gtwPageSize : PAGE_SIZES.REGULAR}`
   const topEntities = useSelector(selectGatewayTopEntities)
   const isGtwManaged = useSelector(selectIsSelectedGatewayManaged)
 
@@ -81,7 +77,7 @@ const GtwSideNavigation = () => {
           label={entityId}
           buttonMessage={m.buttonMessage}
           className="mt-cs-xs mb-cs-l"
-          backPath={`/gateways${gtwParam}`}
+          backPath={`/gateways`}
           path={`/gateways/${gtwId}`}
         />
         {mayViewGatewayInfo.check(rights) && (

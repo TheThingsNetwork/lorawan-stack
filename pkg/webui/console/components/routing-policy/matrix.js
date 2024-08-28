@@ -53,7 +53,7 @@ const RoutingPolicyMatrix = ({ policy }) => {
 
   return (
     <div className="d-flex direction-column">
-      <div className="d-flex mb-cs-xxs al-center gap-cs-xxs">
+      <div className={classnames(style.downlink, 'd-flex mb-cs-xxs al-center gap-cs-xxs')}>
         <Tooltip content={<Message content={m.uplinkPolicies} />} placement="top">
           <Icon small icon={IconUplink} className="c-text-neutral-light" />
         </Tooltip>

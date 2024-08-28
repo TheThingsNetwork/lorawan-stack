@@ -145,7 +145,10 @@ ul.dropdown
       color: var(--c-text-neutral)
       border-radius: $br.m
 
-      &:hover
+      &-active
+        color: var(--c-text-neutral-extralight)
+
+      &:hover:not(.button-active)
         background: var(--c-bg-neutral-light)
 
     .icon

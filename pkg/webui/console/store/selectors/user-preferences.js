@@ -29,3 +29,5 @@ export const selectBookmarksTotalCount = state =>
 
 export const selectPerEntityTotalCount = (state, entity) =>
   selectUserPreferencesStore(state).bookmarks.totalCount.perEntityTotalCount[entity] || 0
+
+export const selectPageSize = state => selectConsolePreferences(state).pageSize

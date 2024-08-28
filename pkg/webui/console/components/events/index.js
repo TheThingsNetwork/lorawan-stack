@@ -30,6 +30,7 @@ import Icon, {
   IconClipboardCheck,
 } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import Switch from '@ttn-lw/components/switch'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -60,6 +61,9 @@ const Events = React.memo(
     framed,
     titleMessage,
     entityName,
+    disableFiltering,
+    filter,
+    onFilterChange,
   }) => {
     const [focus, setFocus] = useState({ eventId: undefined, visible: false })
     const [xOffset, setXOffset] = useState(0)
@@ -145,6 +149,10 @@ const Events = React.memo(
       }
     }, [selectedEvent])
 
+    const handleVerboseFilterChange = useCallback(() => {
+      onFilterChange(Boolean(filter) ? undefined : 'default')
+    }, [onFilterChange, filter])
+
     return (
       <div
         className={classnames(style.container, {
@@ -165,6 +173,12 @@ const Events = React.memo(
             <div className={style.stickyContainer}>
               <div className={style.actions}>
                 <>
+                  {!disableFiltering && (
+                    <label className={style.toggleContainer}>
+                      <Message content={m.verboseStream} className={style.toggleLabel} />
+                      <Switch onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
+                    </label>
+                  )}
                   <Button
                     onClick={onExport}
                     message={sharedMessages.exportJson}
@@ -206,6 +220,12 @@ const Events = React.memo(
                 />
               </div>
               <div className={style.buttonBar}>
+                {!disableFiltering && (
+                  <label className={style.toggleContainer}>
+                    <Message content={m.verboseStream} className={style.toggleLabel} />
+                    <Switch onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
+                  </label>
+                )}
                 <Button.Link
                   className={style.framedButton}
                   icon={IconExternalLink}
@@ -283,11 +303,14 @@ const Events = React.memo(
 
 Events.propTypes = {
   darkTheme: PropTypes.bool,
+  disableFiltering: PropTypes.bool,
   entityId: PropTypes.string.isRequired,
   entityName: PropTypes.string,
   events: PropTypes.events.isRequired,
+  filter: PropTypes.string,
   framed: PropTypes.bool,
   onClear: PropTypes.func,
+  onFilterChange: PropTypes.func,
   onPauseToggle: PropTypes.func,
   paused: PropTypes.bool.isRequired,
   scoped: PropTypes.bool,
@@ -303,6 +326,9 @@ Events.defaultProps = {
   titleMessage: undefined,
   onClear: () => null,
   onPauseToggle: () => null,
+  onFilterChange: () => null,
+  filter: undefined,
+  disableFiltering: false,
 }
 
 Events.Widget = Widget

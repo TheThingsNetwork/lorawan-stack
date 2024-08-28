@@ -38,6 +38,7 @@ const MapPanel = ({ panelTitle, markers, entity, locationLink, centerOnMarkers, 
         markers={markers}
         centerOnMarkers={centerOnMarkers}
         setupLocationLink={locationLink}
+        panel
       />
     </div>
   </Panel>

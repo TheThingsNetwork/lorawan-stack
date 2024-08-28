@@ -15,8 +15,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
-
 import {
   IconUsersGroup,
   IconLayoutDashboard,
@@ -45,7 +43,6 @@ import {
   mayViewOrEditUserSettings,
   mayViewOrganizationsOfUser,
 } from '@console/lib/feature-checks'
-import getCookie from '@console/lib/table-utils'
 
 import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectTopEntitiesAll } from '@console/store/selectors/top-entities'
@@ -68,9 +65,6 @@ const GeneralSideNavigation = () => {
   )
   const showClientManagement = useSelector(state => checkFromState(mayViewClientsOfUser, state))
 
-  const orgPageSize = getCookie('organizations-list-page-size')
-  const orgParam = `?page-size=${orgPageSize ? orgPageSize : PAGE_SIZES.REGULAR}`
-
   return (
     <>
       <SideNavigation>
@@ -83,7 +77,7 @@ const GeneralSideNavigation = () => {
         {mayViewOrgs && (
           <SideNavigation.Item
             title={sharedMessages.organizations}
-            path={`/organizations${orgParam}`}
+            path={`/organizations`}
             icon={IconUsersGroup}
           />
         )}

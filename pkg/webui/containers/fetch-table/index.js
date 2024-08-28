@@ -16,8 +16,6 @@ import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { orderBy as lodashOrderBy } from 'lodash'
-import { useLocation } from 'react-router-dom'
-import Query from 'query-string'
 import classNames from 'classnames'
 
 import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
@@ -36,7 +34,8 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import getByPath from '@ttn-lw/lib/get-by-path'
 import useDebounce from '@ttn-lw/lib/hooks/use-debounce'
 import useQueryState from '@ttn-lw/lib/hooks/use-query-state'
-import useCookieState from '@ttn-lw/lib/hooks/use-cookie-state'
+
+import { selectPageSize } from '@console/store/selectors/user-preferences'
 
 import style from './fetch-table.styl'
 
@@ -89,9 +88,8 @@ const FetchTable = props => {
     filtersClassName,
   } = props
 
-  const location = useLocation()
-  const queryPageSize = Query.parse(location.search)['page-size']
-  const [pageSize, setPageSize] = useCookieState(`${entity}-list-page-size`, initialPageSize)
+  const globalPageSize = useSelector(selectPageSize)
+  const [pageSize, setPageSize] = useState(initialPageSize)
   const isMounted = useRef(true)
   const dispatch = useDispatch()
   const defaultTab = tabs.length > 0 ? tabs[0].name : undefined
@@ -113,7 +111,7 @@ const FetchTable = props => {
   const mayAdd = 'mayAdd' in base ? base.mayAdd : true
   const mayLink = 'mayLink' in base ? base.mayLink : true
 
-  const filters = { query: debouncedQuery, tab, order, page, limit: queryPageSize ?? pageSize }
+  const filters = { query: debouncedQuery, tab, order, page, limit: globalPageSize ?? pageSize }
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState(undefined)
   let orderDirection, orderBy
@@ -123,7 +121,7 @@ const FetchTable = props => {
     orderBy = typeof order === 'string' && order[0] === '-' ? order.substr(1) : order
   }
   // Disable sorting when incoming data was long enough to be paginated.
-  const canHandleSorting = totalCount <= queryPageSize
+  const canHandleSorting = totalCount <= globalPageSize
   const disableSorting = handlesSorting && !canHandleSorting
   const handleSorting = handlesSorting && canHandleSorting && orderBy !== undefined
   if (!handleSorting) {
@@ -140,7 +138,7 @@ const FetchTable = props => {
   useEffect(() => {
     const fetchItems = async () => {
       setFetching(true)
-      const f = { query: debouncedQuery || '', page, limit: queryPageSize ?? pageSize }
+      const f = { query: debouncedQuery || '', page, limit: globalPageSize ?? pageSize }
       if (tabs.find(t => t.name === tab)) {
         f.tab = tab
       } else {
@@ -183,7 +181,7 @@ const FetchTable = props => {
     getItemsAction,
     order,
     page,
-    queryPageSize,
+    globalPageSize,
     pageSize,
     searchItemsAction,
     setOrder,
@@ -318,7 +316,7 @@ const FetchTable = props => {
           paginated={paginated}
           page={page}
           totalCount={totalCount}
-          pageSize={parseInt(queryPageSize ?? pageSize)}
+          pageSize={parseInt(globalPageSize ?? pageSize)}
           setPageSize={setPageSize}
           onPageChange={onPageChange}
           loading={fetching}

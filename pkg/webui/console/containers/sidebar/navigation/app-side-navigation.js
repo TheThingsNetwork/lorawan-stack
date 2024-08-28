@@ -16,7 +16,6 @@ import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import { PAGE_SIZES } from '@ttn-lw/constants/page-sizes'
 import { END_DEVICE } from '@console/constants/entities'
 
 import {
@@ -50,7 +49,6 @@ import {
   mayViewOrEditApplicationPackages,
   mayAddPubSubIntegrations,
 } from '@console/lib/feature-checks'
-import getCookie from '@console/lib/table-utils'
 
 import {
   selectSelectedApplication,
@@ -75,8 +73,6 @@ const AppSideNavigation = () => {
   const rights = useSelector(selectApplicationRights)
   const natsDisabled = useSelector(selectNatsProviderDisabled)
   const mqttDisabled = useSelector(selectMqttProviderDisabled)
-  const appPageSize = getCookie('applications-list-page-size')
-  const appParam = `?page-size=${appPageSize ? appPageSize : PAGE_SIZES.REGULAR}`
   const topEntityFilter = useCallback(e => e.id.startsWith(appId), [appId])
   const topEntities = useSelector(state => selectEndDeviceTopEntities(state, topEntityFilter))
 
@@ -94,7 +90,7 @@ const AppSideNavigation = () => {
           buttonMessage={m.buttonMessage}
           className="mt-cs-xs mb-cs-l"
           path={`/applications/${appId}`}
-          backPath={`/applications${appParam}`}
+          backPath={`/applications`}
         />
         {mayViewApplicationInfo.check(rights) && (
           <SideNavigation.Item
