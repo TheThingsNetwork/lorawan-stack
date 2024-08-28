@@ -70,7 +70,7 @@
     "stylus": "^0.63.0",
     "stylus-loader": "^8.1.0",
     "wait-on": "^7.2.0",
-    "webpack": "^5.91.0",
+    "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4",
     "webpack-shell-plugin": "https://github.com/cdeutsch/webpack-shell-plugin.git#bee537d",
