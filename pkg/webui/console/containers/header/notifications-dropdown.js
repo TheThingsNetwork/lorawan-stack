@@ -38,7 +38,8 @@ import {
 import style from './header.styl'
 
 const m = defineMessages({
-  description: 'Showing last {numNotifications} of {totalNotifications} notifications',
+  description:
+    'Showing last {numNotifications} of {totalNotifications} notifications • <Link>View all</Link>',
   noNotifications: 'All caught up!',
   noNotificationsDescription: 'You don’t have any notifications currently',
 })
@@ -133,7 +134,18 @@ const NotificationsDropdown = () => {
               style.totalMessage,
             )}
           >
-            <Message content={m.description} values={{ numNotifications: 3, totalNotifications }} />
+            <Message
+              content={m.description}
+              values={{
+                numNotifications: dropdownItems.slice(0, 3).length,
+                totalNotifications,
+                Link: txt => (
+                  <Link to={'/notifications/inbox'} primary className="td-none">
+                    {txt}
+                  </Link>
+                ),
+              }}
+            />
           </div>
         </>
       )}
