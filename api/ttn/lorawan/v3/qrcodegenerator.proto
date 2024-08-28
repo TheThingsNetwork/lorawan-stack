@@ -24,6 +24,7 @@ import "ttn/lorawan/v3/deviceclaimingserver.proto";
 import "ttn/lorawan/v3/end_device.proto";
 import "ttn/lorawan/v3/picture.proto";
 import "validate/validate.proto";
+import "ttn/lorawan/v3/deviceclaimingserver.proto";
 
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
