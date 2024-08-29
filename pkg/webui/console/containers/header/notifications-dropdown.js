@@ -127,7 +127,12 @@ const NotificationsDropdown = () => {
               </div>
             </Link>
           ))}
-          <div className="p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight br-l">
+          <div
+            className={classnames(
+              'p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight',
+              style.totalMessage,
+            )}
+          >
             <Message content={m.description} values={{ numNotifications: 3, totalNotifications }} />
           </div>
         </>

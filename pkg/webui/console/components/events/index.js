@@ -185,6 +185,7 @@ const Events = React.memo(
                     secondary
                     icon={IconFileDownload}
                     small
+                    className="sm-md:d-none"
                   />
                   <Button
                     onClick={onPause}

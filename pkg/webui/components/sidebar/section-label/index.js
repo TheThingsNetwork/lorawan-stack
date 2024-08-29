@@ -39,6 +39,8 @@ import { setSearchOpen, setSearchScope } from '@console/store/actions/search'
 import { selectUser } from '@console/store/selectors/user'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
+import style from './section-label.styl'
+
 const SectionLabel = ({
   label,
   icon,
@@ -116,8 +118,9 @@ const SectionLabel = ({
         icon={icon}
         disabled={buttonDisabled}
         dropdownItems={plusDropdownItems}
-        dropdownPosition="below right"
+        dropdownPosition="below"
         noDropdownIcon
+        dropdownClassName={style.portalledDropdown}
         portalledDropdown
         tooltip={sharedMessages.addEntity}
         tooltipPlacement="bottom"

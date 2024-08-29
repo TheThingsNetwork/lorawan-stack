@@ -20,7 +20,7 @@ import {
   GET_ALL_BOOKMARKS_SUCCESS,
   GET_BOOKMARKS_LIST_SUCCESS,
 } from '@console/store/actions/user-preferences'
-import { GET_USER_ME_SUCCESS } from '@console/store/actions/user'
+import { APPLY_PERSISTED_STATE_SUCCESS, GET_USER_ME_SUCCESS } from '@console/store/actions/user'
 
 const initialState = {
   bookmarks: {
@@ -122,6 +122,14 @@ const userPreferences = (state = initialState, { type, payload }) => {
         consolePreferences: {
           ...state.consolePreferences,
           pageSize: payload,
+        },
+      }
+    case APPLY_PERSISTED_STATE_SUCCESS:
+      return {
+        ...state,
+        consolePreferences: {
+          ...state.consolePreferences,
+          pageSize: payload.userPreferences?.consolePreferences?.pageSize,
         },
       }
     default:

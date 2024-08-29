@@ -146,7 +146,7 @@ const headers = [
         return <LastSeen lastSeen={status._lastSeen} short />
       }
 
-      return <Status status="mediocre" label={sharedMessages.never} />
+      return <Status status="mediocre" label={sharedMessages.never} className="d-flex al-center" />
     },
   },
 ]
