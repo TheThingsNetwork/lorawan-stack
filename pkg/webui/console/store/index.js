@@ -41,7 +41,7 @@ const middlewares = [
   // loaded when the application is initialized and the user is authenticated via the
   // `applyPersistedState` action.
   localStorageMiddleware(
-    ['recencyFrequencyItems', 'userPreferences.consolePreferences'],
+    ['recencyFrequencyItems', 'userPreferences.consolePreferences.pageSize'],
     selectUserId,
   ),
 ]
