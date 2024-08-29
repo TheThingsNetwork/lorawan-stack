@@ -14,9 +14,10 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { useLocation, useParams, Routes, Route } from 'react-router-dom'
+import { useLocation, useParams, Routes, Route, NavLink } from 'react-router-dom'
+import { components } from 'react-select'
 
-import {
+import Icon, {
   IconArrowsSort,
   IconLayoutDashboard,
   IconListDetails,
@@ -27,6 +28,7 @@ import {
 import Tabs from '@ttn-lw/components/tabs'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Select from '@ttn-lw/components/select'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -45,6 +47,7 @@ import DeviceOverview from '@console/views/device-overview'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectApplicationSiteName, selectAsConfig } from '@ttn-lw/lib/selectors/env'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
   mayScheduleDownlinks as mayScheduleDownlinksCheck,
@@ -57,12 +60,56 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 
 import style from './device.styl'
 
+const CustomOption = props => (
+  <NavLink to={props.data.link} end={props.data.exact} className={style.dropdownTabsOption}>
+    <components.Option {...props} className="d-flex al-center">
+      <Icon icon={props.data.icon} className="mr-cs-xs" />
+      <b>{props.label}</b>
+    </components.Option>
+  </NavLink>
+)
+
+CustomOption.propTypes = {
+  data: PropTypes.shape({
+    icon: PropTypes.icon.isRequired,
+    exact: PropTypes.bool,
+    link: PropTypes.string.isRequired,
+  }).isRequired,
+  label: PropTypes.string.isRequired,
+}
+
+const SingleValue = props => (
+  <components.SingleValue {...props} className="d-flex al-center">
+    <Icon icon={props.data.icon} className="mr-cs-xs" />
+    {props.data.label}
+  </components.SingleValue>
+)
+
+SingleValue.propTypes = {
+  data: PropTypes.shape({
+    icon: PropTypes.icon.isRequired,
+    label: PropTypes.string.isRequired,
+  }).isRequired,
+}
+
 const Device = () => {
   const { devId } = useParams()
   const { pathname } = useLocation()
   const appId = useSelector(selectSelectedApplicationId)
   const device = useSelector(state => selectSelectedDevice(state))
   const isEventsPath = pathname.endsWith('/data')
+  const selectValue = pathname.endsWith('/data')
+    ? 'data'
+    : pathname.endsWith('/location')
+      ? 'location'
+      : pathname.endsWith('/general-settings')
+        ? 'general-settings'
+        : pathname.endsWith('/payload-formatters/downlink') ||
+            pathname.endsWith('/payload-formatters/uplink')
+          ? 'develop'
+          : pathname.endsWith('messaging/downlink') || pathname.endsWith('messaging/uplink')
+            ? 'messaging'
+            : 'overview'
 
   const { name, application_server_address } = device
 
@@ -147,6 +194,18 @@ const Device = () => {
         divider
         individualTabClassName="al-center w-full"
         tabItemClassName="w-full box-border j-center"
+      />
+      <Select
+        options={tabs.map(value => ({
+          value: value.name,
+          label: value.title,
+          icon: value.icon,
+          link: value.link,
+          exact: value.exact === undefined ? true : value.exact,
+        }))}
+        value={selectValue}
+        customComponents={{ SingleValue, Option: CustomOption }}
+        className={style.dropdownTabs}
       />
       <Routes>
         <Route index Component={DeviceOverview} />

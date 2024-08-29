@@ -138,7 +138,7 @@ const Select = props => {
       onFocus={onFocus}
       isDisabled={disabled}
       name={name}
-      components={{ Input }}
+      components={{ Input, ...customComponents }}
       aria-describedby={rest['aria-describedby']}
       placeholder={Boolean(placeholder) ? formatMessage(placeholder) : undefined}
       {...rest}

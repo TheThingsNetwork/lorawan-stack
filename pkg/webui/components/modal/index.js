@@ -55,6 +55,8 @@ const Modal = props => {
   } = props
 
   const approveButtonRef = React.useRef(null)
+  const modalReference = React.useRef(null)
+
   const approvalAllowed = !Boolean(approveButtonProps.disabled)
 
   const modalClassNames = classnames(style.modal, style.modal, {
@@ -98,6 +100,10 @@ const Modal = props => {
     [approval, approvalAllowed, handleApprove, handleCancel],
   )
 
+  React.useEffect(() => {
+    modalReference.current.focus()
+  }, [])
+
   const name = formName ? { name: formName } : {}
   const RootComponent = props.method ? 'form' : 'div'
   const messageElement = message && (
@@ -116,6 +122,7 @@ const Modal = props => {
       : approval
         ? sharedMessages.approve
         : sharedMessages.ok
+
   let buttons = (
     <div>
       <Button
@@ -163,6 +170,7 @@ const Modal = props => {
       <RemoveScroll>
         {!inline && <div key="shadow" className={style.shadow} />}
         <RootComponent
+          ref={modalReference}
           data-test-id="modal-window"
           key="modal"
           className={modalClassNames}
