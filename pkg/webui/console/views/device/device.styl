@@ -36,6 +36,7 @@
     padding: $cs.xxs $cs.xs
   :global(.select__option--is-selected)
     background-color: var(--c-bg-brand-normal)
+    // stylelint-disable-next-line declaration-no-important
     color: var(--c-text-neutral-min) !important
   :global(.select__option--is-focused:not(.select__option--is-selected))
     background-color: var(--c-bg-neutral-semilight)
@@ -47,7 +48,7 @@
     background: var(--c-bg-brand-extralight)
     border-color: var(--c-border-neutral-light)
   :global(.select__menu)
-    width 96%
+    width: 96%
 
   &-option
     text-decoration: none
