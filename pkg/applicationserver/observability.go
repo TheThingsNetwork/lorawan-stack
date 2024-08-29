@@ -101,36 +101,6 @@ var (
 		events.WithDataType(&ttnpb.ApplicationUp{}),
 		events.WithPropagateToParent(),
 	)
-	evtForwardDownlinkQueueInvalidated = events.Define(
-		"as.up.downlink.queue.invalidated.forward", "forward downlink queue invalidated",
-		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
-		events.WithDataType(&ttnpb.ApplicationUp{}),
-		events.WithPropagateToParent(),
-	)
-	evtForwardDownlinkFailed = events.Define(
-		"as.up.downlink.failed.forward", "forward downlink failed",
-		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
-		events.WithDataType(&ttnpb.ApplicationUp{}),
-		events.WithPropagateToParent(),
-	)
-	evtForwardDownlinkSent = events.Define(
-		"as.up.downlink.sent.forward", "forward downlink sent",
-		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
-		events.WithDataType(&ttnpb.ApplicationUp{}),
-		events.WithPropagateToParent(),
-	)
-	evtForwardDownlinkAck = events.Define(
-		"as.up.downlink.ack.forward", "forward downlink acknowledged",
-		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
-		events.WithDataType(&ttnpb.ApplicationUp{}),
-		events.WithPropagateToParent(),
-	)
-	evtForwardDownlinkNack = events.Define(
-		"as.up.downlink.nack.forward", "forward downlink not acknowledged",
-		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
-		events.WithDataType(&ttnpb.ApplicationUp{}),
-		events.WithPropagateToParent(),
-	)
 	evtReceiveDataDown = events.Define(
 		"as.down.data.receive", "receive downlink data message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
@@ -174,6 +144,36 @@ var (
 		"as.down.data.decode.warning", "decode downlink data message warning",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkQueueInvalidated = events.Define(
+		"as.down.data.queue.invalidated.forward", "forward downlink queue invalidated",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkFailed = events.Define(
+		"as.down.data.failed.forward", "forward downlink failed",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkSent = events.Define(
+		"as.down.data.sent.forward", "forward downlink sent",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkAck = events.Define(
+		"as.down.data.ack.forward", "forward downlink acknowledged",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkNack = events.Define(
+		"as.down.data.nack.forward", "forward downlink not acknowledged",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
 		events.WithPropagateToParent(),
 	)
 )
