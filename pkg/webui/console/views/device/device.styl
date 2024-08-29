@@ -22,33 +22,7 @@
 .tabs
   width: 100%
 
-  +media-query($bp['sm-md'])
-    display: none
-
-.dropdown-tabs
-  display: none
-
-  +media-query($bp['sm-md'])
-    display: block
-    margin: $cs.m $cs.xs $cs.xs $cs.xs
-
-  :global(.select__value-container)
-    padding: $cs.xxs $cs.xs
-  :global(.select__option--is-selected)
-    background-color: var(--c-bg-brand-normal)
-    // stylelint-disable-next-line declaration-no-important
-    color: var(--c-text-neutral-min) !important
-  :global(.select__option--is-focused:not(.select__option--is-selected))
-    background-color: var(--c-bg-neutral-semilight)
-  :global(.select__option)
-    color: var(--c-text-neutral-semilight)
-  :global(.select__control)
-    width: 96%
-    border-radius: $br.l
-    background: var(--c-bg-brand-extralight)
-    border-color: var(--c-border-neutral-light)
-  :global(.select__menu)
-    width: 96%
-
-  &-option
-    text-decoration: none
+  +media-query($bp.lg)
+    margin-right: $ls.xxs * -1
+    overflow: auto
+    background: linear-gradient(right, rgba(0,0,0,.1), var(--c-bg-neutral-min) 5rem)
