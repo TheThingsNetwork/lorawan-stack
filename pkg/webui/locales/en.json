@@ -1709,6 +1709,7 @@
   "lib.shared-messages.topEntitiesError": "Top entities are currently unavailable",
   "lib.shared-messages.tokenSet": "Set token",
   "lib.shared-messages.tokenUpdated": "Token updated",
+  "lib.shared-messages.totalEndDevices": "Total end devices",
   "lib.shared-messages.traffic": "Traffic",
   "lib.shared-messages.troubleshooting": "Troubleshooting",
   "lib.shared-messages.type": "Type",

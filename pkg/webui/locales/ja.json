@@ -1709,6 +1709,7 @@
   "lib.shared-messages.topEntitiesError": "",
   "lib.shared-messages.tokenSet": "トークンの設定",
   "lib.shared-messages.tokenUpdated": "トークンの更新",
+  "lib.shared-messages.totalEndDevices": "",
   "lib.shared-messages.traffic": "トラフィック",
   "lib.shared-messages.troubleshooting": "トラブルシューティング",
   "lib.shared-messages.type": "タイプ",

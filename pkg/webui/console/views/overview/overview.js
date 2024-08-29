@@ -14,13 +14,14 @@
 
 import React from 'react'
 
-import { APPLICATION, END_DEVICE, GATEWAY } from '@console/constants/entities'
+import { APPLICATION, GATEWAY } from '@console/constants/entities'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { IconApplication, IconDevice, IconGateway } from '@ttn-lw/components/icon'
+import { IconApplication, IconGateway } from '@ttn-lw/components/icon'
 
 import BlurryNocMetricsPanel from '@console/components/blurry-noc-metrics-panel'
+import TotalEndDevicesUpsellerPanel from '@console/components/total-end-devices-upseller-panel'
 
 import ShortcutPanel from '@console/containers/shortcut-panel'
 import NotificationsDashboardPanel from '@console/containers/notifications-dashboard-panel'
@@ -51,11 +52,7 @@ const Overview = () => {
         />
       </div>
       <div className="item-12 md-lg:item-4">
-        <BlurryNocMetricsPanel
-          entity={END_DEVICE.split('_')[1]}
-          title={sharedMessages.activeDevices}
-          icon={IconDevice}
-        />
+        <TotalEndDevicesUpsellerPanel />
       </div>
       <div className="item-12 xl:item-6 md-lg:item-6">
         <TopEntitiesDashboardPanel />

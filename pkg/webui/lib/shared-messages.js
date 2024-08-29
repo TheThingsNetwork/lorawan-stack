@@ -595,6 +595,7 @@ export default defineMessages({
   topEntitiesError: 'Top entities are currently unavailable',
   tokenSet: 'Set token',
   tokenUpdated: 'Token updated',
+  totalEndDevices: 'Total end devices',
   traffic: 'Traffic',
   troubleshooting: 'Troubleshooting',
   type: 'Type',
