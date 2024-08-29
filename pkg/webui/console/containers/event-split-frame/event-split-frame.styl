@@ -21,7 +21,7 @@
   flex-direction: column
   z-index: $zi.nav
   position: relative
-  max-height: 90vh
+  max-height: "calc(100vh - %s)" % ($header-height)
 
 .header
   position: absolute
