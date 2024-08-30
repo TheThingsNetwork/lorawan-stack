@@ -27,6 +27,16 @@ func (dst *ListFrequencyPlansRequest) SetFields(src *ListFrequencyPlansRequest, 
 				var zero string
 				dst.BandId = zero
 			}
+		case "gateways_only":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateways_only' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewaysOnly = src.GatewaysOnly
+			} else {
+				var zero bool
+				dst.GatewaysOnly = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

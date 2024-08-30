@@ -15,6 +15,7 @@ import (
 func AddSetFlagsForListFrequencyPlansRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("base-frequency", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("band-id", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("gateways-only", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the ListFrequencyPlansRequest message from flags.
@@ -30,6 +31,12 @@ func (m *ListFrequencyPlansRequest) SetFromFlags(flags *pflag.FlagSet, prefix st
 	} else if changed {
 		m.BandId = val
 		paths = append(paths, flagsplugin.Prefix("band_id", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("gateways_only", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.GatewaysOnly = val
+		paths = append(paths, flagsplugin.Prefix("gateways_only", prefix))
 	}
 	return paths, nil
 }
