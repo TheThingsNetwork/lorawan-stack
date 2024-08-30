@@ -751,7 +751,7 @@ func (s *Store) GetGatewayFrequencyPlans() ([]*FrequencyPlan, error) {
 	for _, description := range descriptions {
 		frequencyPlan, err := s.getByID(description.ID)
 		if err != nil {
-			return nil, errRead.WithCause(err).WithAttributes("id", description.ID)
+			return nil, err
 		}
 		if frequencyPlan.Gateways != nil && *frequencyPlan.Gateways {
 			gatewayFrequencyPlans = append(gatewayFrequencyPlans, frequencyPlan)
