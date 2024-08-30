@@ -11,6 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Option to filter out non-gateway related frequency plans.
+  - `ListFrequencyPlans` RPC has a new `gateways-only` flag.
+
 ### Changed
 
 ### Deprecated
