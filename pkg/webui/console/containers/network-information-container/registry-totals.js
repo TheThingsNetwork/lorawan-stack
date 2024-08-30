@@ -32,7 +32,6 @@ const messages = defineMessages({
   applicationsUsed: 'Total applications',
   gatewaysUsed: 'Total gateways',
   registeredUsers: 'Registered users',
-  endDevicesAdded: 'Total end devices',
 })
 
 const RegistryTotals = () => {
