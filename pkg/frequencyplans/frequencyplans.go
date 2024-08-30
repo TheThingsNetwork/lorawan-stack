@@ -347,7 +347,7 @@ type FrequencyPlan struct {
 	// MaxEIRP is the maximum EIRP as ceiling for any (sub-)band value.
 	MaxEIRP *float32 `yaml:"max-eirp,omitempty"`
 	// Gateways is a boolean indicating whether the frequency plan is suitable for gateways.
-	Gateways bool `yaml:"gateways,omitempty"`
+	Gateways *bool `yaml:"gateways,omitempty"`
 }
 
 // Extend returns the same frequency plan, with values overridden by the passed frequency plan.
@@ -414,7 +414,10 @@ func (fp FrequencyPlan) Extend(extension FrequencyPlan) FrequencyPlan {
 		val := *extension.MaxEIRP
 		extended.MaxEIRP = &val
 	}
-	extended.Gateways = extension.Gateways
+	if extension.Gateways != nil {
+		val := *extension.Gateways
+		extended.Gateways = &val
+	}
 
 	return extended
 }
@@ -750,7 +753,7 @@ func (s *Store) GetGatewayFrequencyPlans() ([]*FrequencyPlan, error) {
 		if err != nil {
 			return nil, errRead.WithCause(err).WithAttributes("id", description.ID)
 		}
-		if frequencyPlan.Gateways {
+		if frequencyPlan.Gateways != nil && *frequencyPlan.Gateways {
 			gatewayFrequencyPlans = append(gatewayFrequencyPlans, frequencyPlan)
 		}
 	}

@@ -525,16 +525,21 @@ func TestGetGatewayFrequencyPlans(t *testing.T) {
   file: enable_dwell_time_400ms.yml
 `),
 		"EU_863_870.yml": []byte(`band-id: EU_863_870
+max-eirp: 1
 gateways: false
 `),
-		"EU_863_870_TTN.yml": []byte(`gateways: true
-`),
-		"US_902_928_FSB_1.yml": []byte(`band-id: US_902_928
-`),
-		"AS_923_2.yml": []byte(`band-id: AS_923_2
+		"EU_863_870_TTN.yml": []byte(`max-eirp: 2
 gateways: true
 `),
-		"enable_dwell_time_400ms.yml": []byte(`gateways: false
+		"US_902_928_FSB_1.yml": []byte(`band-id: US_902_928
+max-eirp: 3
+`),
+		"AS_923_2.yml": []byte(`band-id: AS_923_2
+max-eirp: 4
+gateways: true
+`),
+		"enable_dwell_time_400ms.yml": []byte(`max-eirp: 5
+gateways: false
 `),
 	}))
 
@@ -545,5 +550,7 @@ gateways: true
 		a.So(plans, should.HaveLength, 2)
 		a.So(plans[0].BandID, should.Equal, "EU_863_870")
 		a.So(plans[1].BandID, should.Equal, "AS_923_2")
+		a.So(*plans[0].MaxEIRP, should.Equal, 2)
+		a.So(*plans[1].MaxEIRP, should.Equal, 4)
 	}
 }
