@@ -700,7 +700,6 @@
   "console.containers.network-information-container.registry-totals.applicationsUsed": "Total applications",
   "console.containers.network-information-container.registry-totals.gatewaysUsed": "Total gateways",
   "console.containers.network-information-container.registry-totals.registeredUsers": "Registered users",
-  "console.containers.network-information-container.registry-totals.endDevicesAdded": "Total end devices",
   "console.containers.notifications-dashboard-panel.index.noNotificationsDescription": "Your latest notifications will appear here",
   "console.containers.notifications.index.seeArchived": "See archived messages",
   "console.containers.notifications.index.seeAll": "See all messages",
