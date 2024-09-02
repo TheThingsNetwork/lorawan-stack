@@ -44,8 +44,8 @@ const TopApplicationsList = () => {
       name: 'name',
       displayName: sharedMessages.name,
       getValue: entity => entity,
-      render: ({ entity: { name }, id }) =>
-        Boolean(name) ? (
+      render: ({ entity, id }) =>
+        Boolean(entity?.name) ? (
           <>
             <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
             <span className="c-text-neutral-light d-block">{id}</span>
@@ -59,12 +59,14 @@ const TopApplicationsList = () => {
       displayName: sharedMessages.devicesShort,
       width: '4rem',
       align: 'center',
-      getValue: entity => entity?.entity?.deviceCount,
-      render: deviceCount =>
-        typeof deviceCount !== 'number' ? (
+      getValue: entity => entity?.entity,
+      render: entity =>
+        !Boolean(entity) ? (
+          <span className="c-text-neutral-light">n/a</span>
+        ) : typeof entity?.deviceCount !== 'number' ? (
           <Spinner micro center after={0} faded inline />
         ) : (
-          <FormattedNumber value={deviceCount} />
+          <FormattedNumber value={entity?.deviceCount} />
         ),
     },
     {

@@ -156,8 +156,8 @@ export const selectTopEntities = createSelector(
         )
 
         const sortedEntities = allEntities.sort((a, b) => {
-          const aCreatedAt = a.entity.created_at || 0
-          const bCreatedAt = b.entity.created_at || 0
+          const aCreatedAt = a.entity?.created_at || 0
+          const bCreatedAt = b.entity?.created_at || 0
 
           return bCreatedAt - aCreatedAt
         })

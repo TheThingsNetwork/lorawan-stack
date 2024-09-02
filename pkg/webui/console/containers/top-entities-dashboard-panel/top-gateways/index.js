@@ -42,8 +42,8 @@ const TopGatewaysList = () => {
       name: 'name',
       displayName: sharedMessages.name,
       getValue: entity => entity,
-      render: ({ entity: { name }, id }) =>
-        Boolean(name) ? (
+      render: ({ entity, id }) =>
+        Boolean(entity?.name) ? (
           <>
             <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
             <span className="c-text-neutral-light d-block">{id}</span>

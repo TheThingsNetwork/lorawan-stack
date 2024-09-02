@@ -39,9 +39,9 @@ const TopDevicesList = ({ appId }) => {
       name: 'name',
       displayName: sharedMessages.name,
       getValue: entity => entity,
-      render: ({ entity: { name }, id }) => {
+      render: ({ entity, id }) => {
         const cleanedId = Boolean(appId) ? id.split('/')[1] : id
-        return Boolean(name) ? (
+        return Boolean(entity?.name) ? (
           <>
             <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
             <span className="c-text-neutral-light d-block">{cleanedId}</span>
