@@ -146,6 +146,36 @@ var (
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 		events.WithPropagateToParent(),
 	)
+	evtForwardDownlinkQueueInvalidated = events.Define(
+		"as.down.data.queue.invalidated.forward", "forward downlink queue invalidated",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkFailed = events.Define(
+		"as.down.data.failed.forward", "forward downlink failed",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkSent = events.Define(
+		"as.down.data.sent.forward", "forward downlink sent",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkAck = events.Define(
+		"as.down.data.ack.forward", "forward downlink acknowledged",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
+	evtForwardDownlinkNack = events.Define(
+		"as.down.data.nack.forward", "forward downlink not acknowledged",
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
+	)
 )
 
 const (
@@ -283,6 +313,16 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 		events.Publish(evtForwardLocationSolved.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	case *ttnpb.ApplicationUp_ServiceData:
 		events.Publish(evtForwardServiceData.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
+	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
+		events.Publish(evtForwardDownlinkQueueInvalidated.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
+	case *ttnpb.ApplicationUp_DownlinkFailed:
+		events.Publish(evtForwardDownlinkFailed.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
+	case *ttnpb.ApplicationUp_DownlinkSent:
+		events.Publish(evtForwardDownlinkSent.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
+	case *ttnpb.ApplicationUp_DownlinkAck:
+		events.Publish(evtForwardDownlinkAck.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
+	case *ttnpb.ApplicationUp_DownlinkNack:
+		events.Publish(evtForwardDownlinkNack.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	default:
 		return
 	}
