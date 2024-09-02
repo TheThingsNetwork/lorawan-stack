@@ -9035,6 +9035,33 @@
       "file": "enddevices.go"
     }
   },
+  "error:pkg/qrcodegenerator/qrcode/gateways:invalid_format": {
+    "translations": {
+      "en": "invalid format"
+    },
+    "description": {
+      "package": "pkg/qrcodegenerator/qrcode/gateways",
+      "file": "gateways.go"
+    }
+  },
+  "error:pkg/qrcodegenerator/qrcode/gateways:invalid_length": {
+    "translations": {
+      "en": "invalid length"
+    },
+    "description": {
+      "package": "pkg/qrcodegenerator/qrcode/gateways",
+      "file": "gateways.go"
+    }
+  },
+  "error:pkg/qrcodegenerator/qrcode/gateways:unknown_format": {
+    "translations": {
+      "en": "format unknown"
+    },
+    "description": {
+      "package": "pkg/qrcodegenerator/qrcode/gateways",
+      "file": "gateways.go"
+    }
+  },
   "error:pkg/qrcodegenerator:format_not_found": {
     "translations": {
       "en": "format `{id}` not found"
