@@ -42,8 +42,8 @@ var ttigpro1Regex = regexp.MustCompile(`^https://ttig\.pro/c/([a-f0-9]{16})/([a-
 func (m *ttigpro1) UnmarshalText(text []byte) error {
 	// Match the URL against the pattern
 	matches := ttigpro1Regex.FindStringSubmatch(string(text))
-	if matches == nil {
-		return errFormat
+	if matches == nil || len(matches) != 3 {
+		return errInvalidFormat
 	}
 
 	if err := m.gatewayEUI.UnmarshalText([]byte(matches[1])); err != nil {
@@ -51,6 +51,10 @@ func (m *ttigpro1) UnmarshalText(text []byte) error {
 	}
 
 	m.ownerToken = matches[2]
+
+	if len(m.ownerToken) != ownerTokenLength {
+		return errInvalidLength
+	}
 
 	return nil
 }

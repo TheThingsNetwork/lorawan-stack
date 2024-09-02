@@ -23,10 +23,9 @@ import (
 )
 
 var (
-	errCharacter     = errors.DefineInvalidArgument("character", "invalid character `{c}`")
 	errUnknownFormat = errors.DefineInvalidArgument("unknown_format", "format unknown")
-	errInvalidLength = errors.DefineInvalidArgument("length", "invalid length")
-	errFormat        = errors.DefineInvalidArgument("format", "invalid format")
+	errInvalidLength = errors.DefineInvalidArgument("invalid_length", "invalid length")
+	errInvalidFormat = errors.DefineInvalidArgument("invalid_format", "invalid format")
 )
 
 // Format is a gateway QR code format.

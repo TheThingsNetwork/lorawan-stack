@@ -743,10 +743,13 @@
   - [Message `GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest)
   - [Message `ParseEndDeviceQRCodeRequest`](#ttn.lorawan.v3.ParseEndDeviceQRCodeRequest)
   - [Message `ParseEndDeviceQRCodeResponse`](#ttn.lorawan.v3.ParseEndDeviceQRCodeResponse)
+  - [Message `ParseGatewayQRCodeRequest`](#ttn.lorawan.v3.ParseGatewayQRCodeRequest)
+  - [Message `ParseGatewayQRCodeResponse`](#ttn.lorawan.v3.ParseGatewayQRCodeResponse)
   - [Message `QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat)
   - [Message `QRCodeFormats`](#ttn.lorawan.v3.QRCodeFormats)
   - [Message `QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry)
   - [Service `EndDeviceQRCodeGenerator`](#ttn.lorawan.v3.EndDeviceQRCodeGenerator)
+  - [Service `GatewayQRCodeGenerator`](#ttn.lorawan.v3.GatewayQRCodeGenerator)
 - [File `ttn/lorawan/v3/regional.proto`](#ttn/lorawan/v3/regional.proto)
   - [Message `ConcentratorConfig`](#ttn.lorawan.v3.ConcentratorConfig)
   - [Message `ConcentratorConfig.Channel`](#ttn.lorawan.v3.ConcentratorConfig.Channel)
@@ -10542,6 +10545,27 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `format_id` | [`string`](#string) |  | Identifier of the format used to successfully parse the QR code data. |
 | `end_device_template` | [`EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate) |  |  |
 
+### <a name="ttn.lorawan.v3.ParseGatewayQRCodeRequest">Message `ParseGatewayQRCodeRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  | QR code format identifier. If this field is not specified, the server will default to ttigpro1. |
+| `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+| `qr_code` | <p>`bytes.min_len`: `10`</p><p>`bytes.max_len`: `1024`</p> |
+
+### <a name="ttn.lorawan.v3.ParseGatewayQRCodeResponse">Message `ParseGatewayQRCodeResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  | Identifier of the format used to successfully parse the QR code data. |
+| `claim_gateway_request` | [`ClaimGatewayRequest`](#ttn.lorawan.v3.ClaimGatewayRequest) |  |  |
+
 ### <a name="ttn.lorawan.v3.QRCodeFormat">Message `QRCodeFormat`</a>
 
 | Field | Type | Label | Description |
@@ -10596,6 +10620,21 @@ The EndDeviceQRCodeGenerator service provides functionality to generate and pars
 | `Generate` | `POST` | `/api/v3/qr-codes/end-devices` | `*` |
 | `Parse` | `POST` | `/api/v3/qr-codes/end-devices/parse` | `*` |
 | `Parse` | `POST` | `/api/v3/qr-codes/end-devices/{format_id}/parse` | `*` |
+
+### <a name="ttn.lorawan.v3.GatewayQRCodeGenerator">Service `GatewayQRCodeGenerator`</a>
+
+The GatewayQRCodeGenerator service provides functionality to generate and parse QR codes for gateways.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Parse` | [`ParseGatewayQRCodeRequest`](#ttn.lorawan.v3.ParseGatewayQRCodeRequest) | [`ParseGatewayQRCodeResponse`](#ttn.lorawan.v3.ParseGatewayQRCodeResponse) | Parse QR Codes of known formats and return the information contained within. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Parse` | `POST` | `/api/v3/qr-codes/gateways/parse` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-codes/gateways/{format_id}/parse` | `*` |
 
 ## <a name="ttn/lorawan/v3/regional.proto">File `ttn/lorawan/v3/regional.proto`</a>
 

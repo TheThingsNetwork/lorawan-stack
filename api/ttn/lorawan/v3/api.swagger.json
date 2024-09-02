@@ -246,6 +246,9 @@
       "description": "Generate and parse end device QR codes."
     },
     {
+      "name": "GatewayQRCodeGenerator"
+    },
+    {
       "name": "EntityRegistrySearch",
       "description": "Search for entities in the Entity Registry."
     },
@@ -13142,12 +13145,85 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/EndDeviceQRCodeGeneratorParseBody"
+              "$ref": "#/definitions/v3EndDeviceQRCodeGeneratorParseBody"
             }
           }
         ],
         "tags": [
           "EndDeviceQRCodeGenerator"
+        ]
+      }
+    },
+    "/qr-codes/gateways/parse": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "GatewayQRCodeGenerator_Parse",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseGatewayQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ParseGatewayQRCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GatewayQRCodeGenerator"
+        ]
+      }
+    },
+    "/qr-codes/gateways/{format_id}/parse": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "GatewayQRCodeGenerator_Parse2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseGatewayQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "format_id",
+            "description": "QR code format identifier.\nIf this field is not specified, the server will default to ttigpro1.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3GatewayQRCodeGeneratorParseBody"
+            }
+          }
+        ],
+        "tags": [
+          "GatewayQRCodeGenerator"
         ]
       }
     },
@@ -17410,16 +17486,6 @@
             "type": "string"
           },
           "description": "Links to other device videos."
-        }
-      }
-    },
-    "EndDeviceQRCodeGeneratorParseBody": {
-      "type": "object",
-      "properties": {
-        "qr_code": {
-          "type": "string",
-          "format": "byte",
-          "description": "Raw QR code contents."
         }
       }
     },
@@ -23054,6 +23120,16 @@
         }
       }
     },
+    "v3EndDeviceQRCodeGeneratorParseBody": {
+      "type": "object",
+      "properties": {
+        "qr_code": {
+          "type": "string",
+          "format": "byte",
+          "description": "Raw QR code contents."
+        }
+      }
+    },
     "v3EndDeviceRegistryCreateBody": {
       "type": "object",
       "properties": {
@@ -24280,6 +24356,16 @@
         }
       },
       "description": "GatewayDown contains downlink messages for the gateway."
+    },
+    "v3GatewayQRCodeGeneratorParseBody": {
+      "type": "object",
+      "properties": {
+        "qr_code": {
+          "type": "string",
+          "format": "byte",
+          "description": "Raw QR code contents."
+        }
+      }
     },
     "v3GatewayRadio": {
       "type": "object",
@@ -27950,6 +28036,32 @@
         },
         "end_device_template": {
           "$ref": "#/definitions/v3EndDeviceTemplate"
+        }
+      }
+    },
+    "v3ParseGatewayQRCodeRequest": {
+      "type": "object",
+      "properties": {
+        "format_id": {
+          "type": "string",
+          "description": "QR code format identifier.\nIf this field is not specified, the server will default to ttigpro1."
+        },
+        "qr_code": {
+          "type": "string",
+          "format": "byte",
+          "description": "Raw QR code contents."
+        }
+      }
+    },
+    "v3ParseGatewayQRCodeResponse": {
+      "type": "object",
+      "properties": {
+        "format_id": {
+          "type": "string",
+          "description": "Identifier of the format used to successfully parse the QR code data."
+        },
+        "claim_gateway_request": {
+          "$ref": "#/definitions/v3ClaimGatewayRequest"
         }
       }
     },
