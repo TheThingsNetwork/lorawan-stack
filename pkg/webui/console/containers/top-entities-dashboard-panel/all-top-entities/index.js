@@ -70,7 +70,7 @@ const AllTopEntitiesList = () => {
       className: 'overflow-visible',
       getValue: entity => {
         if (entity.type === GATEWAY) {
-          return entity.entity.status
+          return entity?.entity?.status
         } else if (entity.type === END_DEVICE) {
           return entity?.entity?.last_seen_at
         } else if (entity.type === APPLICATION) {

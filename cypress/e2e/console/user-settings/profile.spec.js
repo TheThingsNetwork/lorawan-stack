@@ -112,6 +112,7 @@ describe('User settings / profile', () => {
   })
 
   it('succeeds deleting the account', () => {
+    cy.intercept('DELETE', `/api/v3/users/${user.ids.user_id}`).as('delete-user')
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
@@ -125,6 +126,8 @@ describe('User settings / profile', () => {
         cy.findByTestId('confirm_deletion').type(user.ids.user_id)
         cy.findByRole('button', { name: /Delete account/ }).click()
       })
+
+    cy.wait('@delete-user')
 
     cy.findByTestId('error-notification').should('not.exist')
 
