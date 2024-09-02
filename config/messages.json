@@ -9989,6 +9989,15 @@
       "file": "observability.go"
     }
   },
+  "event:as.down.data.ack.forward": {
+    "translations": {
+      "en": "forward downlink acknowledged"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.down.data.decode.fail": {
     "translations": {
       "en": "decode downlink data message failure"
@@ -10034,6 +10043,15 @@
       "file": "observability.go"
     }
   },
+  "event:as.down.data.failed.forward": {
+    "translations": {
+      "en": "forward downlink failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.down.data.forward": {
     "translations": {
       "en": "forward downlink data message"
@@ -10043,9 +10061,36 @@
       "file": "observability.go"
     }
   },
+  "event:as.down.data.nack.forward": {
+    "translations": {
+      "en": "forward downlink not acknowledged"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.queue.invalidated.forward": {
+    "translations": {
+      "en": "forward downlink queue invalidated"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.down.data.receive": {
     "translations": {
       "en": "receive downlink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.down.data.sent.forward": {
+    "translations": {
+      "en": "forward downlink sent"
     },
     "description": {
       "package": "pkg/applicationserver",
