@@ -579,7 +579,7 @@ func TestWebhooks(t *testing.T) {
 	})
 
 	//nolint:paralleltest
-	t.Run("Paused", func(t *testing.T) {
+	t.Run("PausedUplink", func(t *testing.T) {
 		_, ctx := test.New(t)
 
 		// Create an active webhook.
@@ -690,5 +690,89 @@ func TestWebhooks(t *testing.T) {
 		case <-time.After(timeout):
 			// Webhook was not received.
 		}
+	})
+
+	//nolint:paralleltest
+	t.Run("PausedDownlink", func(t *testing.T) {
+		is, isAddr, closeIS := mockis.New(ctx)
+		defer closeIS()
+
+		is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey,
+			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+			ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE)
+		conf := &component.Config{
+			ServiceBase: config.ServiceBase{
+				GRPC: config.GRPC{
+					Listen:                      ":0",
+					AllowInsecureForCredentials: true,
+				},
+				Cluster: cluster.Config{
+					IdentityServer: isAddr,
+				},
+			},
+		}
+
+		_, err := registry.Set(ctx, ids, nil,
+			func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+				return &ttnpb.ApplicationWebhook{
+						Ids:           ids,
+						BaseUrl:       "https://myapp.com/api/ttn/v3/{/appID,devID}",
+						Format:        "json",
+						Paused:        true,
+						UplinkMessage: &ttnpb.ApplicationWebhook_Message{Path: "/"},
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.webhook_id",
+						"base_url",
+						"format",
+						"paused",
+						"uplink_message",
+						"field_mask",
+					}, nil
+			})
+		if err != nil {
+			t.Fatalf("Failed to set webhook in registry: %s", err)
+		}
+
+		sinkCh := make(chan *http.Request, 1)
+		testSink := mocksink.New(sinkCh)
+
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		c := componenttest.NewComponent(t, conf)
+		as := mock.NewServer(c)
+		w, err := web.NewWebhooks(ctx, as, registry, testSink, downlinks)
+		if err != nil {
+			t.Fatalf("Unexpected error %v", err)
+		}
+		c.RegisterWeb(w)
+		componenttest.StartComponent(t, c)
+		defer c.Close()
+
+		mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+		// Check the status error code when scheduling downlink to a paused webhook.
+		url := fmt.Sprintf("/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/replace",
+			ids.ApplicationIds.ApplicationId, ids.WebhookId, registeredDeviceID.DeviceId,
+		)
+		body := bytes.NewReader([]byte(`{"downlinks":[]}`))
+		req := httptest.NewRequest(http.MethodPost, url, body)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", registeredApplicationKey))
+
+		res := httptest.NewRecorder()
+		c.ServeHTTP(res, req)
+		a.So(res.Code, should.Equal, http.StatusNotAcceptable)
+		downlinks, err := as.DownlinkQueueList(ctx, registeredDeviceID)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		a.So(downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{})
 	})
 }

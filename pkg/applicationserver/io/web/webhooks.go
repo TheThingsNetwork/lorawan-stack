@@ -192,7 +192,7 @@ func (w *webhooks) handleDown(
 			"webhook_id", hookID.WebhookId,
 		))
 
-		hook, err := w.registry.Get(ctx, hookID, []string{"format"})
+		hook, err := w.registry.Get(ctx, hookID, []string{"format", "paused"})
 		if err != nil {
 			webhandlers.Error(res, req, err)
 			return
@@ -203,7 +203,7 @@ func (w *webhooks) handleDown(
 		}
 		if hook.Paused {
 			logger.Debug("Webhook is paused")
-			res.WriteHeader(http.StatusAccepted)
+			res.WriteHeader(http.StatusNotAcceptable)
 			return
 		}
 		format, ok := formats[hook.Format]
