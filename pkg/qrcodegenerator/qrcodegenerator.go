@@ -47,16 +47,16 @@ type QRCodeGenerator struct {
 var errFormatNotFound = errors.DefineNotFound("format_not_found", "format `{id}` not found")
 
 // New returns a new *QRCodeGenerator.
-func New(c *component.Component, conf *Config, opts ...Option) (*QRCodeGenerator, error) {
+func New(c *component.Component, _ *Config, opts ...Option) (*QRCodeGenerator, error) {
 	ctx := log.NewContextWithField(c.Context(), "namespace", "qrcodegenerator")
 	qrg := &QRCodeGenerator{
 		Component: c,
 		ctx:       ctx,
 	}
 	qrg.grpc.endDeviceQRCodeGenerator = &endDeviceQRCodeGeneratorServer{QRG: qrg}
-	qrg.endDevices = enddevices.New(ctx)
-
 	qrg.grpc.gatewayQRCodeGenerator = &gatewayQRCodeGeneratorServer{QRG: qrg}
+
+	qrg.endDevices = enddevices.New(ctx)
 	qrg.gateways = gateways.New(ctx)
 
 	c.RegisterGRPC(qrg)
@@ -91,7 +91,7 @@ func (qrg *QRCodeGenerator) Context() context.Context {
 }
 
 // Roles returns the roles that the QR Code Generator fulfills.
-func (qrg *QRCodeGenerator) Roles() []ttnpb.ClusterRole {
+func (*QRCodeGenerator) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_QR_CODE_GENERATOR}
 }
 
@@ -103,5 +103,6 @@ func (qrg *QRCodeGenerator) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers gRPC handlers.
 func (qrg *QRCodeGenerator) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterEndDeviceQRCodeGeneratorHandler(qrg.Context(), s, conn)
+	ttnpb.RegisterEndDeviceQRCodeGeneratorHandler(qrg.Context(), s, conn) //nolint:errcheck
+	ttnpb.RegisterGatewayQRCodeGeneratorHandler(qrg.Context(), s, conn)   //nolint:errcheck
 }

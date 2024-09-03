@@ -20,34 +20,42 @@ import (
 	"testing"
 
 	"github.com/smarty/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/gateways"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/gateways"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestParseGatewaysAuthenticationCodes(t *testing.T) {
+	t.Parallel()
+
 	for i, tc := range []struct {
-		FormatID string
-		Data     []byte
-		ExpectedEUI,
+		FormatID           string
+		Data               []byte
+		ExpectedEUI        types.EUI64
 		ExpectedOwnerToken string
 	}{
 		{
 			FormatID:           "ttigpro1",
 			Data:               []byte("https://ttig.pro/c/ec656efffe000128/abcdef123456"),
-			ExpectedEUI:        "ec656efffe000128",
+			ExpectedEUI:        types.EUI64{0xec, 0x65, 0x6e, 0xff, 0xfe, 0x00, 0x01, 0x28},
 			ExpectedOwnerToken: "abcdef123456",
 		},
 	} {
+		tc := tc
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 
-			qrCode := New(context.Background())
+			qrCode := gateways.New(context.Background())
 
 			d, err := qrCode.Parse(tc.FormatID, tc.Data)
 			data := test.Must(d, err)
 
-			a.So(data, should.NotBeNil)
+			a.So(data.FormatID(), should.Equal, tc.FormatID)
+			a.So(data.GatewayEUI(), should.Resemble, tc.ExpectedEUI)
+			a.So(data.OwnerToken(), should.Equal, tc.ExpectedOwnerToken)
 		})
 	}
 }

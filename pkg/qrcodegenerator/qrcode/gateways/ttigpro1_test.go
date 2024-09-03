@@ -24,7 +24,11 @@ import (
 )
 
 func TestTTIGPRO1(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Decode", func(t *testing.T) {
+		t.Parallel()
+
 		for _, tc := range []struct {
 			Name           string
 			Data           []byte
@@ -43,6 +47,7 @@ func TestTTIGPRO1(t *testing.T) {
 				Name: "InvalidURLPrefix",
 				Data: []byte("https://example.com/c/ec656efffe000128/abcdef12"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
+					t.Helper()
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
 			},
@@ -50,6 +55,7 @@ func TestTTIGPRO1(t *testing.T) {
 				Name: "Invalid/EUINotLowercase",
 				Data: []byte("https://ttig.pro/c/EC656effFe000128/abcdef12"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
+					t.Helper()
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
 			},
@@ -57,6 +63,7 @@ func TestTTIGPRO1(t *testing.T) {
 				Name: "Invalid/EUILength",
 				Data: []byte("https://ttig.pro/c/ec656efffe00012/abcdef12"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
+					t.Helper()
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
 			},
@@ -64,6 +71,7 @@ func TestTTIGPRO1(t *testing.T) {
 				Name: "Invalid/EUINotBase16",
 				Data: []byte("https://ttig.pro/c/ec656efffe00012g/abcdef12"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
+					t.Helper()
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
 			},
@@ -71,6 +79,7 @@ func TestTTIGPRO1(t *testing.T) {
 				Name: "Invalid/OwnerTokenLength",
 				Data: []byte("https://ttig.pro/c/ec656efffe000128/abcdef123"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
+					t.Helper()
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
 			},
@@ -78,11 +87,15 @@ func TestTTIGPRO1(t *testing.T) {
 				Name: "Invalid/OwnerTokenNotBase62",
 				Data: []byte("https://ttig.pro/c/ec656efffe000128/abcdef12!"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
+					t.Helper()
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
 			},
 		} {
+			tc := tc
 			t.Run(tc.Name, func(t *testing.T) {
+				t.Parallel()
+
 				a := assertions.New(t)
 
 				var data ttigpro1

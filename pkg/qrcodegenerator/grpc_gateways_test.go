@@ -22,7 +22,7 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/gateways"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -30,16 +30,21 @@ import (
 )
 
 func TestGatewayQRCodeParsing(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	c := componenttest.NewComponent(t, &component.Config{})
 	ttigpro1 := new(gateways.TTIGPRO1Format)
-	qrg, err := New(c, &Config{}, WithGatewayFormat(ttigpro1.ID(), ttigpro1))
+	qrg, err := qrcodegenerator.New(c,
+		&qrcodegenerator.Config{},
+		qrcodegenerator.WithGatewayFormat(ttigpro1.ID(), ttigpro1),
+	)
 	test.Must(qrg, err)
 
 	componenttest.StartComponent(t, c)
-	defer c.Close()
+	t.Cleanup(func() { c.Close() })
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_QR_CODE_GENERATOR)
 
@@ -117,7 +122,10 @@ func TestGatewayQRCodeParsing(t *testing.T) {
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
 			resp, err := client.Parse(ctx, &ttnpb.ParseGatewayQRCodeRequest{
 				FormatId: tc.FormatID,
 				QrCode:   tc.GetQRData(),

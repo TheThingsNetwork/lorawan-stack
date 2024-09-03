@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	formatIDttigpro1 = "ttigpro1"
+	formatIDTTIGPRO1 = "ttigpro1"
 
 	euiLength        = 16
 	ownerTokenLength = 12
@@ -35,7 +35,7 @@ type ttigpro1 struct {
 }
 
 // ttigpro1Regex is the regular expression to match the TTIGPRO1 format.
-// The format is as follows: https://ttig.pro/c/{16 lowercase base16 chars}/{12 base62 chars}
+// The format is as follows: https://ttig.pro/c/{16 lowercase base16 chars}/{12 base62 chars}.
 var ttigpro1Regex = regexp.MustCompile(`^https://ttig\.pro/c/([a-f0-9]{16})/([a-z0-9]{12})$`)
 
 // UnmarshalText implements the TextUnmarshaler interface.
@@ -60,16 +60,16 @@ func (m *ttigpro1) UnmarshalText(text []byte) error {
 }
 
 // FormatID implements the Data interface.
-func (m *ttigpro1) FormatID() string {
-	return formatIDttigpro1
+func (*ttigpro1) FormatID() string {
+	return formatIDTTIGPRO1
 }
 
-func (m *ttigpro1) GatewayEUI() string {
-	return m.gatewayEUI.String()
+func (m *ttigpro1) GatewayEUI() types.EUI64 {
+	return m.gatewayEUI
 }
 
 func (m *ttigpro1) OwnerToken() string {
-	return string(m.ownerToken)
+	return m.ownerToken
 }
 
 // TTIGPRO1Format implements the TTIGPRO1 Format.
@@ -79,7 +79,7 @@ type TTIGPRO1Format struct{}
 func (TTIGPRO1Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "TTIGPRO1",
-		Description: "TTI QR code format for gateway devices.",
+		Description: "QR code format for The Things Indoor Gateway Pro.",
 		FieldMask: ttnpb.FieldMask(
 			"ids.eui",
 			"claim_authentication_code.secret.value",
@@ -89,7 +89,7 @@ func (TTIGPRO1Format) Format() *ttnpb.QRCodeFormat {
 
 // ID is the identifier of the format as a string.
 func (TTIGPRO1Format) ID() string {
-	return formatIDttigpro1
+	return formatIDTTIGPRO1
 }
 
 // New implements the Format interface.
