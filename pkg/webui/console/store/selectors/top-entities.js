@@ -107,7 +107,8 @@ export const selectTopEntities = createSelector(
     const items = entityTypes.reduce((acc, entityType) => {
       const entityRelevantBookmarks =
         entityType === ALL
-          ? bookmarks
+          ? // If bookmarks were added through the CLI, there might be organizations, clients or users in the bookmarks, so we need to filter them out.
+            bookmarks.filter(bookmark => entityTypes.includes(getBookmarkType(bookmark)))
           : bookmarks.filter(bookmark => getBookmarkType(bookmark) === entityType)
 
       // Always put the bookmarks first.
