@@ -28,7 +28,10 @@ type gatewayQRCodeGeneratorServer struct {
 }
 
 // GetFormat implements EndDeviceQRCodeGenerator.
-func (s *gatewayQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttnpb.GetQRCodeFormatRequest) (*ttnpb.QRCodeFormat, error) {
+func (s *gatewayQRCodeGeneratorServer) GetFormat(
+	ctx context.Context,
+	req *ttnpb.GetQRCodeFormatRequest,
+) (*ttnpb.QRCodeFormat, error) {
 	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
 	if err != nil {
 		return nil, err
@@ -41,7 +44,10 @@ func (s *gatewayQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttnpb
 }
 
 // Parse implements EndDeviceQRCodeGenerator.
-func (s *gatewayQRCodeGeneratorServer) Parse(ctx context.Context, req *ttnpb.ParseGatewayQRCodeRequest) (*ttnpb.ParseGatewayQRCodeResponse, error) {
+func (s *gatewayQRCodeGeneratorServer) Parse(
+	ctx context.Context,
+	req *ttnpb.ParseGatewayQRCodeRequest,
+) (*ttnpb.ParseGatewayQRCodeResponse, error) {
 	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
 	if err != nil {
 		return nil, err
@@ -57,7 +63,7 @@ func (s *gatewayQRCodeGeneratorServer) Parse(ctx context.Context, req *ttnpb.Par
 		ClaimGatewayRequest: &ttnpb.ClaimGatewayRequest{
 			SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
 				AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
-					GatewayEui:         []byte(data.GatewayEUI()),
+					GatewayEui:         data.GatewayEUI().Bytes(),
 					AuthenticationCode: []byte(data.OwnerToken()),
 				},
 			},

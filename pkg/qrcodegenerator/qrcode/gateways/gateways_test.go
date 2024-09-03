@@ -20,12 +20,14 @@ import (
 	"testing"
 
 	"github.com/smarty/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/gateways"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/gateways"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestParseGatewaysAuthenticationCodes(t *testing.T) {
+	t.Parallel()
+
 	for i, tc := range []struct {
 		FormatID string
 		Data     []byte
@@ -39,10 +41,13 @@ func TestParseGatewaysAuthenticationCodes(t *testing.T) {
 			ExpectedOwnerToken: "abcdef123456",
 		},
 	} {
+		tc := tc
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 
-			qrCode := New(context.Background())
+			qrCode := gateways.New(context.Background())
 
 			d, err := qrCode.Parse(tc.FormatID, tc.Data)
 			data := test.Must(d, err)

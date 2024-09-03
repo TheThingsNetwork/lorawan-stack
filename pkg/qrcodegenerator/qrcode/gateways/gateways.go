@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package gateways provides a QR code parser for gateways.
 package gateways
 
 import (
@@ -20,6 +21,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -38,7 +40,7 @@ type Format interface {
 type Data interface {
 	// FormatID returns the ID of the format used to parse the QR Code data.
 	FormatID() string
-	GatewayEUI() string
+	GatewayEUI() types.EUI64
 	OwnerToken() string
 	encoding.TextUnmarshaler
 }
@@ -54,13 +56,13 @@ type Server struct {
 }
 
 // New returns a new Server.
-func New(ctx context.Context) *Server {
+func New(_ context.Context) *Server {
 	s := &Server{
 		// Newer formats should be added to this slice first to
 		// preferentially match with those first.
 		gatewayFormats: []gatewayFormat{
 			{
-				id:     formatIDttigpro1,
+				id:     formatIDTTIGPRO1,
 				format: new(TTIGPRO1Format),
 			},
 		},
