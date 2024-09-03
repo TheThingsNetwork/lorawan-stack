@@ -193,10 +193,10 @@ describe('Device general settings', () => {
   it('succeeds adding end device attributes', () => {
     cy.findByRole('button', { name: /Add attributes/ }).click()
 
-    cy.get('#attributes[0].key').click()
-    cy.get('#attributes[0].key').type('end-device-test-key')
-    cy.get('#attributes[0].value').click()
-    cy.get('#attributes[0].value').type('end-device-test-value')
+    cy.get(`[name="attributes[0].key"]`).click()
+    cy.get(`[name="attributes[0].key"]`).type('end-device-test-key')
+    cy.get(`[name="attributes[0].value"]`).click()
+    cy.get(`[name="attributes[0].value"]`).type('end-device-test-value')
 
     cy.findByRole('button', { name: 'Save changes' }).click()
 
