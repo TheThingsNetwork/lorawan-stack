@@ -50,7 +50,11 @@ const getBookmarksThroughPagination = async userId => {
   while ((page - 1) * limit < totalCount) {
     // Get the next page of bookmarks.
     // eslint-disable-next-line no-await-in-loop
-    const response = await tts.Users.getBookmarks(userId, { page, limit, order: '-created_at' })
+    const response = await tts.Users.getBookmarks(userId, {
+      page,
+      limit,
+      order: '-created_at',
+    })
     response.bookmarks.forEach(element => {
       const entityIds = element.entity_ids
       const entity = Object.keys(entityIds)[0].replace('_ids', '')
@@ -93,7 +97,12 @@ const getBookmarksPerEntityThroughPagination = async (
 
   while (result.perEntityBookmarks[requestedEntity].length < totalCount) {
     // eslint-disable-next-line no-await-in-loop
-    const response = await tts.Users.getBookmarks(userId, { page, limit, order: '-created_at' })
+    const response = await tts.Users.getBookmarks(userId, {
+      page,
+      limit,
+      order: '-created_at',
+      entity_types: requestedEntity,
+    })
     if (totalCount > response.totalCount) {
       totalCount = response.totalCount
     }
