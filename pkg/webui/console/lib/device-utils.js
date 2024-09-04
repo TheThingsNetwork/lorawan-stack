@@ -94,6 +94,7 @@ export const MAC_V1_0_2 = { value: 'MAC_V1_0_2', label: 'LoRaWAN Specification 1
 export const MAC_V1_0_3 = { value: 'MAC_V1_0_3', label: 'LoRaWAN Specification 1.0.3' }
 export const MAC_V1_0_4 = { value: 'MAC_V1_0_4', label: 'LoRaWAN Specification 1.0.4' }
 export const MAC_V1_1 = { value: 'MAC_V1_1', label: 'LoRaWAN Specification 1.1.0' }
+export const MAC_V1_2_0 = { value: 'MAC_V1_2_0', label: 'LoRaWAN Specification 1.2.0' }
 
 export const LORAWAN_VERSIONS = Object.freeze([
   MAC_V1_0,
@@ -102,6 +103,7 @@ export const LORAWAN_VERSIONS = Object.freeze([
   MAC_V1_0_3,
   MAC_V1_0_4,
   MAC_V1_1,
+  MAC_V1_2_0,
 ])
 
 export const FRAME_WIDTH_COUNT = Object.freeze({
