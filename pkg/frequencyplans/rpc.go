@@ -42,14 +42,8 @@ func (s *RPCServer) ListFrequencyPlans(ctx context.Context, req *ttnpb.ListFrequ
 		if req.BandId != "" && req.BandId != desc.BandID {
 			continue
 		}
-		if req.GatewaysOnly {
-			frequencyPlan, err := s.store.getByID(desc.ID)
-			if err != nil {
-				return nil, err
-			}
-			if frequencyPlan.Gateways == nil || !*frequencyPlan.Gateways {
-				continue
-			}
+		if req.GatewaysOnly && (desc.Gateways == nil || !*desc.Gateways) {
+			continue
 		}
 		res.FrequencyPlans = append(res.FrequencyPlans, &ttnpb.FrequencyPlanDescription{
 			Id:            desc.ID,

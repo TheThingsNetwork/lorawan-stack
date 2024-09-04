@@ -346,8 +346,6 @@ type FrequencyPlan struct {
 	DefaultRx2DataRate *uint8   `yaml:"rx2-default-data-rate,omitempty"`
 	// MaxEIRP is the maximum EIRP as ceiling for any (sub-)band value.
 	MaxEIRP *float32 `yaml:"max-eirp,omitempty"`
-	// Gateways is a boolean indicating whether the frequency plan is suitable for gateways.
-	Gateways *bool `yaml:"gateways,omitempty"`
 }
 
 // Extend returns the same frequency plan, with values overridden by the passed frequency plan.
@@ -413,10 +411,6 @@ func (fp FrequencyPlan) Extend(extension FrequencyPlan) FrequencyPlan {
 	if extension.MaxEIRP != nil {
 		val := *extension.MaxEIRP
 		extended.MaxEIRP = &val
-	}
-	if extension.Gateways != nil {
-		val := *extension.Gateways
-		extended.Gateways = &val
 	}
 
 	return extended
@@ -534,6 +528,8 @@ type FrequencyPlanDescription struct {
 	BaseFrequency uint16 `yaml:"base-frequency"`
 	// File is the file where the frequency plan is defined.
 	File string `yaml:"file"`
+	// Gateways is a boolean indicating whether the frequency plan is suitable for gateways.
+	Gateways *bool `yaml:"gateways,omitempty"`
 }
 
 var errFetchFailed = errors.Define("fetch", "fetching failed")
@@ -734,29 +730,4 @@ func (s *Store) GetAllIDs() ([]string, error) {
 	}
 
 	return ids, nil
-}
-
-// GetGatewayFrequencyPlans returns the list of frequency plans that are suitable for gateways.
-func (s *Store) GetGatewayFrequencyPlans() ([]*FrequencyPlan, error) {
-	if s == nil {
-		return nil, errNotConfigured.New()
-	}
-
-	descriptions, err := s.descriptions()
-	if err != nil {
-		return nil, errReadList.WithCause(err)
-	}
-
-	var gatewayFrequencyPlans []*FrequencyPlan
-	for _, description := range descriptions {
-		frequencyPlan, err := s.getByID(description.ID)
-		if err != nil {
-			return nil, err
-		}
-		if frequencyPlan.Gateways != nil && *frequencyPlan.Gateways {
-			gatewayFrequencyPlans = append(gatewayFrequencyPlans, frequencyPlan)
-		}
-	}
-
-	return gatewayFrequencyPlans, nil
 }

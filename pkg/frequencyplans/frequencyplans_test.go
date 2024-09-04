@@ -88,16 +88,19 @@ func TestStore(t *testing.T) {
   description: South East Asia
   base-frequency: 915
   file: AS_923.yml
+  gateways: true
 - id: JP
   base-id: AS_923
   description: Japan
   base-frequency: 915
   file: JP.yml
+  gateways: true
 - id: KR
   base-id: AS_923
   description: South Korea
   base-frequency: 915
   file: KR.yml
+  gateways: true
 - id: EU_863_870
   description: European Union
   file: EU.yml
@@ -106,16 +109,19 @@ func TestStore(t *testing.T) {
   description: United States
   file: US_915.yml
   base-frequency: 915
+  gateways: true
 - id: SA
   base-id: AFRICA
   description: South Africa
   file: AS_923.yml
   base-frequency: 868
+  gateways: false
 - id: CA
   base-id: US_915
   description: Canada
   file: EU.yml
   base-frequency: 915
+  gateways: false
 `),
 		"AS_923.yml": []byte(`band-id: AS_923
 uplink-channels:
@@ -484,73 +490,5 @@ dwell-time:
 			a := assertions.New(t)
 			a.So(fp.RespectsDwellTime(tc.IsDownlink, tc.Frequency, tc.Duration), should.Equal, tc.Expected)
 		})
-	}
-}
-
-func TestGetGatewayFrequencyPlans(t *testing.T) {
-	t.Parallel()
-	a := assertions.New(t)
-
-	store := frequencyplans.NewStore(fetch.NewMemFetcher(map[string][]byte{
-		"frequency-plans.yml": []byte(`- id: EU_863_870
-  band-id: EU_863_870
-  name: Europe 863-870 MHz (SF12 for RX2)
-  description: Default frequency plan for Europe
-  base-frequency: 868
-  file: EU_863_870.yml
-- id: EU_863_870_TTN
-  band-id: EU_863_870
-  name: Europe 863-870 MHz (SF9 for RX2 - recommended)
-  description: TTN Community Network frequency plan for Europe, using SF9 for RX2
-  base-frequency: 868
-  base-id: EU_863_870
-  file: EU_863_870_TTN.yml
-- id: US_902_928_FSB_1
-  band-id: US_902_928
-  name: United States 902-928 MHz, FSB 1
-  description: Default frequency plan for the United States and Canada, using sub-band 1
-  base-frequency: 915
-  file: US_902_928_FSB_1.yml
-- id: AS_923_2
-  band-id: AS_923_2
-  name: Asia 920-923 MHz (AS923 Group 2) with only default channels
-  description: Compatibility frequency plan for Asian countries with common channels in the 921.4-922.0 MHz sub-band
-  base-frequency: 915
-  file: AS_923_2.yml
-- id: AS_923_2_DT
-  band-id: AS_923_2
-  name: Asia 920-923 MHz (AS923 Group 2) with only default channels and dwell time enabled
-  base-frequency: 915
-  base-id: AS_923_2
-  file: enable_dwell_time_400ms.yml
-`),
-		"EU_863_870.yml": []byte(`band-id: EU_863_870
-max-eirp: 1
-gateways: false
-`),
-		"EU_863_870_TTN.yml": []byte(`max-eirp: 2
-gateways: true
-`),
-		"US_902_928_FSB_1.yml": []byte(`band-id: US_902_928
-max-eirp: 3
-`),
-		"AS_923_2.yml": []byte(`band-id: AS_923_2
-max-eirp: 4
-gateways: true
-`),
-		"enable_dwell_time_400ms.yml": []byte(`max-eirp: 5
-gateways: false
-`),
-	}))
-
-	// Frequency plan with gateways
-	{
-		plans, err := store.GetGatewayFrequencyPlans()
-		a.So(err, should.BeNil)
-		a.So(plans, should.HaveLength, 2)
-		a.So(plans[0].BandID, should.Equal, "EU_863_870")
-		a.So(plans[1].BandID, should.Equal, "AS_923_2")
-		a.So(*plans[0].MaxEIRP, should.Equal, 2)
-		a.So(*plans[1].MaxEIRP, should.Equal, 4)
 	}
 }
