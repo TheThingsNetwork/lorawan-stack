@@ -10180,7 +10180,7 @@
             },
             {
               "name": "gateways_only",
-              "description": "Optional field to filter out the non-gateway related results.",
+              "description": "Optional field to include only gateway related results.",
               "label": "",
               "type": "bool",
               "longType": "bool",

@@ -49,7 +49,7 @@ type ListFrequencyPlansRequest struct {
 	BaseFrequency uint32 `protobuf:"varint,1,opt,name=base_frequency,json=baseFrequency,proto3" json:"base_frequency,omitempty"`
 	// Optional Band ID to filter the results.
 	BandId string `protobuf:"bytes,2,opt,name=band_id,json=bandId,proto3" json:"band_id,omitempty"`
-	// Optional field to filter out the non-gateway related results.
+	// Optional field to include only gateway related results.
 	GatewaysOnly bool `protobuf:"varint,3,opt,name=gateways_only,json=gatewaysOnly,proto3" json:"gateways_only,omitempty"`
 }
 

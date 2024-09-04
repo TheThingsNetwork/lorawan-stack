@@ -35,7 +35,7 @@ message ListFrequencyPlansRequest {
   uint32 base_frequency = 1;
   // Optional Band ID to filter the results.
   string band_id = 2;
-  // Optional field to filter out the non-gateway related results.
+  // Optional field to include only gateway related results.
   bool gateways_only = 3;
 }
 
