@@ -71,7 +71,6 @@ const GatewayAdd = () => {
               content={m.gtwOnboardingDescription}
               values={{ Link: GatewayGuideLink, break: <br /> }}
             />
-            <hr className="mb-ls-s" />
           </PageTitle>
           <Row>
             <Col md={10} lg={9}>

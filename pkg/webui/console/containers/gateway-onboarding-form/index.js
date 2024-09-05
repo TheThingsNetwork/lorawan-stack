@@ -33,6 +33,7 @@ import GatewayProvisioningFormSection from './gateway-provisioning-form'
 import validationSchema from './gateway-provisioning-form/validation-schema'
 import { initialValues as registerInitialValues } from './gateway-provisioning-form/gateway-registration-form-section'
 import { initialValues as claimingInitialValues } from './gateway-provisioning-form/gateway-claim-form-section'
+import GatewayQRScanSection from './qr-scan-section'
 
 const GatewayOnboardingForm = props => {
   const { onSuccess } = props
@@ -190,6 +191,7 @@ const GatewayOnboardingForm = props => {
         validationSchema={validationSchema}
         validateAgainstCleanedValues
       >
+        <GatewayQRScanSection />
         <GatewayProvisioningFormSection userId={userId} />
       </Form>
     </>
