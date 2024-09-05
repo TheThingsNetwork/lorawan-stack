@@ -14,8 +14,30 @@
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
-const PARSE_QR_CODE_BASE = 'PARSE_QR_CODE'
+const PARSE_END_DEVICE_QR_CODE_BASE = 'PARSE_END_DEVICE_QR_CODE'
 export const [
-  { request: PARSE_QR_CODE, success: PARSE_QR_CODE_SUCCESS, failure: PARSE_QR_CODE_FAILURE },
-  { request: parseQRCode, success: parseQRCodeSuccess, failure: parseQRCodeFailure },
-] = createRequestActions(PARSE_QR_CODE_BASE, qrCode => ({ qrCode }))
+  {
+    request: PARSE_END_DEVICE_QR_CODE,
+    success: PARSE_END_DEVICE_QR_CODE_SUCCESS,
+    failure: PARSE_END_DEVICE_QR_CODE_FAILURE,
+  },
+  {
+    request: parseEndDeviceQRCode,
+    success: parseEndDeviceQRCodeSuccess,
+    failure: parseEndDeviceQRCodeFailure,
+  },
+] = createRequestActions(PARSE_END_DEVICE_QR_CODE_BASE, qrCode => ({ qrCode }))
+
+const PARSE_GATEWAY_QR_CODE_BASE = 'PARSE_GATEWAY_QR_CODE'
+export const [
+  {
+    request: PARSE_GATEWAY_QR_CODE,
+    success: PARSE_GATEWAY_QR_CODE_SUCCESS,
+    failure: PARSE_GATEWAY_QR_CODE_FAILURE,
+  },
+  {
+    request: parseGatewayQRCode,
+    success: parseGatewayQRCodeSuccess,
+    failure: parseGatewayQRCodeFailure,
+  },
+] = createRequestActions(PARSE_GATEWAY_QR_CODE_BASE, qrCode => ({ qrCode }))
