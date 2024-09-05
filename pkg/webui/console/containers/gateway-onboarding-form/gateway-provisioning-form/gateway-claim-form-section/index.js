@@ -52,6 +52,7 @@ const initialValues = {
 const GatewayClaimFormSection = () => {
   const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
   const isManaged = values._inputMethod === 'managed'
+  const withQRdata = values._withQRdata
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
@@ -83,6 +84,7 @@ const GatewayClaimFormSection = () => {
         component={Input}
         encode={btoa}
         decode={atob}
+        disabled={withQRdata}
         autoFocus
       />
       <Form.Field
