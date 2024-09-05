@@ -2793,6 +2793,7 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `base_frequency` | [`uint32`](#uint32) |  | Optional base frequency in MHz for hardware support (433, 470, 868 or 915) |
 | `band_id` | [`string`](#string) |  | Optional Band ID to filter the results. |
+| `gateways_only` | [`bool`](#bool) |  | Optional field to include only gateway related results. |
 
 ### <a name="ttn.lorawan.v3.ListFrequencyPlansResponse">Message `ListFrequencyPlansResponse`</a>
 

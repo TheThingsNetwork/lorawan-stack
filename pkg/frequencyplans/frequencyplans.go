@@ -412,6 +412,7 @@ func (fp FrequencyPlan) Extend(extension FrequencyPlan) FrequencyPlan {
 		val := *extension.MaxEIRP
 		extended.MaxEIRP = &val
 	}
+
 	return extended
 }
 
@@ -527,6 +528,8 @@ type FrequencyPlanDescription struct {
 	BaseFrequency uint16 `yaml:"base-frequency"`
 	// File is the file where the frequency plan is defined.
 	File string `yaml:"file"`
+	// Gateways is a boolean indicating whether the frequency plan is suitable for gateways.
+	Gateways *bool `yaml:"gateways,omitempty"`
 }
 
 var errFetchFailed = errors.Define("fetch", "fetching failed")

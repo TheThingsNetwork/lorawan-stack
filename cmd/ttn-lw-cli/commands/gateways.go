@@ -105,6 +105,14 @@ func getGatewayEUI(flagSet *pflag.FlagSet, args []string, requireEUI bool) (*ttn
 	return ids, nil
 }
 
+func listFrequencyPlansFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
+	flagSet.String("band-id", "", "Band ID to filter by")
+	flagSet.Bool("gateways-only", false, "List only frequency plans that support gateways")
+	return flagSet
+}
+
 var (
 	gatewaysCommand = &cobra.Command{
 		Use:     "gateways",
@@ -118,12 +126,16 @@ var (
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			baseFrequency, _ := cmd.Flags().GetUint32("base-frequency")
+			bandID, _ := cmd.Flags().GetString("band-id")
+			gatewaysOnly, _ := cmd.Flags().GetBool("gateways-only")
 			gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
 			if err != nil {
 				return err
 			}
 			res, err := ttnpb.NewConfigurationClient(gs).ListFrequencyPlans(ctx, &ttnpb.ListFrequencyPlansRequest{
 				BaseFrequency: baseFrequency,
+				BandId:        bandID,
+				GatewaysOnly:  gatewaysOnly,
 			})
 			if err != nil {
 				return err
@@ -610,7 +622,7 @@ If both the parameter and the flag are provided, the flag is ignored.`,
 
 func init() {
 	ttnpb.AddSelectFlagsForGateway(selectGatewayFlags, "", false)
-	gatewaysListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
+	gatewaysListFrequencyPlans.Flags().AddFlagSet(listFrequencyPlansFlags())
 	gatewaysCommand.AddCommand(gatewaysListFrequencyPlans)
 	ttnpb.AddSetFlagsForListGatewaysRequest(gatewaysListCommand.Flags(), "", false)
 	AddCollaboratorFlagAlias(gatewaysListCommand.Flags(), "collaborator")

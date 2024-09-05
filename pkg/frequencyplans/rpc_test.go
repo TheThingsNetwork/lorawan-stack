@@ -35,11 +35,13 @@ func TestRPCServer(t *testing.T) {
   description: Frequency Plan A
   base-frequency: 868
   file: A.yml
+  gateways: true
 - id: B
   band-id: AS_923
   base-id: A
   description: Frequency Plan B
   file: B.yml
+  gateways: false
 - id: C
   band-id: US_902_928
   description: Frequency Plan C
@@ -86,4 +88,11 @@ func TestRPCServer(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(bandAS.FrequencyPlans, should.HaveLength, 1)
 	a.So(bandAS.FrequencyPlans[0], should.Resemble, expectedAll[1])
+
+	gateways, err := server.ListFrequencyPlans(context.Background(), &ttnpb.ListFrequencyPlansRequest{
+		GatewaysOnly: true,
+	})
+	a.So(err, should.BeNil)
+	a.So(gateways.FrequencyPlans, should.HaveLength, 1)
+	a.So(gateways.FrequencyPlans[0], should.Resemble, expectedAll[0])
 }
