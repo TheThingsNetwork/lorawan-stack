@@ -73,7 +73,6 @@ const GatewayAdd = () => {
               content={m.gtwOnboardingDescription}
               values={{ Link: GatewayGuideLink, break: <br /> }}
             />
-            <hr className="mb-ls-s" />
           </PageTitle>
           <div className="item-12 xl:item-9">
             <GatewayOnboardingForm onSuccess={handleSuccess} />
