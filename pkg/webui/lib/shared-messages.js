@@ -425,6 +425,12 @@ export default defineMessages({
   pubsubId: 'Pub/Sub ID',
   pubsubs: 'Pub/Subs',
   purge: 'Purge',
+  qrCodeData: 'Found QR code data',
+  qrCodeDataReset: 'Reset QR code data',
+  resetConfirm:
+    'Are you sure you want to discard QR code data? The scanned device will not be registered and the form will be reset.',
+  scanSuccess: 'QR code scanned successfully',
+  scanGatewayQR: 'Scan gateway QR code',
   redirecting: 'Redirecting…',
   refresh: 'Refresh',
   registerEndDevice: 'Register end device',

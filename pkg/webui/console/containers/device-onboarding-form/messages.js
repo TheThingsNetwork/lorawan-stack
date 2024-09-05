@@ -49,9 +49,6 @@ export default defineMessages({
   hasEndDeviceQR:
     'Does your end device have a LoRaWAN® Device Identification QR Code? Scan it to speed up onboarding.',
   deviceGuide: 'Device registration help',
-  deviceInfo: 'Found QR code data',
-  resetQRCodeData: 'Reset QR code data',
-  resetConfirm:
-    'Are you sure you want to discard QR code data? The scanned device will not be registered and the form will be reset.',
-  scanSuccess: 'QR code scanned successfully',
+  invalidData:
+    'Invalid QR code data. Please note that only TR005 LoRaWAN® Device Identification QR Code can be scanned. Some devices have unrelated QR codes printed on them that cannot be used.',
 })
