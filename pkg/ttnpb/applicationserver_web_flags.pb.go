@@ -233,6 +233,7 @@ func AddSelectFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix string, hi
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("health-status", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("health-status", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForApplicationWebhookHealth(flags, flagsplugin.Prefix("health-status", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("field-mask", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("field-mask", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("paused", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("paused", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forApplicationWebhook message from select flags.
@@ -397,6 +398,11 @@ func PathsFromSelectFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix stri
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("field_mask", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("paused", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("paused", prefix))
+	}
 	return paths, nil
 }
 
@@ -422,6 +428,7 @@ func AddSetFlagsForApplicationWebhook(flags *pflag.FlagSet, prefix string, hidde
 	AddSetFlagsForApplicationWebhook_Message(flags, flagsplugin.Prefix("service-data", prefix), hidden)
 	// FIXME: Skipping HealthStatus because it does not seem to implement AddSetFlags.
 	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("field-mask", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("paused", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the ApplicationWebhook message from flags.
@@ -592,6 +599,12 @@ func (m *ApplicationWebhook) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 	} else if changed {
 		m.FieldMask = golang.SetFieldMask(val)
 		paths = append(paths, flagsplugin.Prefix("field_mask", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("paused", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Paused = val
+		paths = append(paths, flagsplugin.Prefix("paused", prefix))
 	}
 	return paths, nil
 }

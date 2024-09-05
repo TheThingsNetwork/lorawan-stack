@@ -1112,6 +1112,16 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			} else {
 				dst.FieldMask = nil
 			}
+		case "paused":
+			if len(subs) > 0 {
+				return fmt.Errorf("'paused' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Paused = src.Paused
+			} else {
+				var zero bool
+				dst.Paused = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

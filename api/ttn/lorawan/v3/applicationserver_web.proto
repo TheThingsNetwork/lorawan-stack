@@ -227,7 +227,10 @@ message ApplicationWebhook {
   reserved 23;
   reserved "queue";
 
-  // next: 24
+  // Set to temporarily pause forwarding uplink data to this end point and receiving downlinks from this end point.
+  bool paused = 24;
+
+  // next: 25
 }
 
 message ApplicationWebhooks {

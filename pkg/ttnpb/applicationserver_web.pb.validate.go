@@ -1290,6 +1290,8 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "paused":
+			// no validation rules for Paused
 		default:
 			return ApplicationWebhookValidationError{
 				field:  name,

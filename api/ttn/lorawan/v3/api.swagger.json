@@ -20844,6 +20844,10 @@
         },
         "field_mask": {
           "type": "string"
+        },
+        "paused": {
+          "type": "boolean",
+          "description": "Set to temporarily pause forwarding uplink data to this end point and receiving downlinks from this end point."
         }
       }
     },
@@ -20983,6 +20987,10 @@
             },
             "field_mask": {
               "type": "string"
+            },
+            "paused": {
+              "type": "boolean",
+              "description": "Set to temporarily pause forwarding uplink data to this end point and receiving downlinks from this end point."
             }
           }
         },

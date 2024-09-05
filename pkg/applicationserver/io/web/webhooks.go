@@ -52,6 +52,7 @@ var webhookFanOutFieldMask = []string{
 	"join_accept",
 	"location_solved",
 	"service_data",
+	"paused",
 	"uplink_message",
 	"uplink_normalized",
 }
@@ -135,6 +136,12 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			Health:       hook.HealthStatus,
 		})
 		ctx = log.NewContextWithField(ctx, "hook", hook.Ids.WebhookId)
+
+		if hook.Paused {
+			log.FromContext(ctx).Debug("Webhook is paused")
+			continue
+		}
+
 		f := func(ctx context.Context) error {
 			req, err := NewRequest(ctx, w.downlinks, msg, hook)
 			if err != nil {
@@ -185,13 +192,18 @@ func (w *webhooks) handleDown(
 			"webhook_id", hookID.WebhookId,
 		))
 
-		hook, err := w.registry.Get(ctx, hookID, []string{"format"})
+		hook, err := w.registry.Get(ctx, hookID, []string{"format", "paused"})
 		if err != nil {
 			webhandlers.Error(res, req, err)
 			return
 		}
 		if hook == nil {
 			webhandlers.Error(res, req, errWebhookNotFound.New())
+			return
+		}
+		if hook.Paused {
+			logger.Debug("Webhook is paused")
+			res.WriteHeader(http.StatusNotAcceptable)
 			return
 		}
 		format, ok := formats[hook.Format]
