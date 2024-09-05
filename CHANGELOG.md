@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Option to filter out non-gateway related frequency plans.
   - `ListFrequencyPlans` RPC has a new `gateways-only` flag.
+- Support for claiming a gateway via QR code in the Console.
 
 ### Changed
 
