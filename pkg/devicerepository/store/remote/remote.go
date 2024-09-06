@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package remote implements a remote store for the Device Repository.
 package remote
 
 import (
+	"fmt"
+	"strconv"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
@@ -36,12 +40,12 @@ func NewRemoteStore(fetcher fetch.Interface) store.Store {
 }
 
 // paginate returns page start and end indices, and false if the page is invalid.
-func paginate(size int, limit, page uint32) (uint32, uint32) {
+func paginate(size int, limit, page uint32) (start uint32, end uint32) {
 	if page == 0 {
 		page = 1
 	}
 	offset := (page - 1) * limit
-	start, end := offset, uint32(size)
+	start, end = offset, uint32(size) //nolint:gosec
 	if start >= end {
 		return 0, 0
 	}
@@ -79,7 +83,7 @@ func (s *remoteStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsRes
 	return &store.GetBrandsResponse{
 		Count:  end - start,
 		Offset: start,
-		Total:  uint32(len(brands)),
+		Total:  uint32(len(brands)), //nolint:gosec
 		Brands: brands[start:end],
 	}, nil
 }
@@ -121,7 +125,7 @@ func (s *remoteStore) listModelsByBrand(req store.GetModelsRequest) (*store.GetM
 	return &store.GetModelsResponse{
 		Count:  end - start,
 		Offset: start,
-		Total:  uint32(len(index.EndDevices)),
+		Total:  uint32(len(index.EndDevices)), //nolint:gosec
 		Models: models,
 	}, nil
 }
@@ -157,13 +161,15 @@ func (s *remoteStore) GetModels(req store.GetModelsRequest) (*store.GetModelsRes
 	return &store.GetModelsResponse{
 		Count:  end - start,
 		Offset: start,
-		Total:  uint32(len(all)),
+		Total:  uint32(len(all)), //nolint:gosec
 		Models: all[start:end],
 	}, nil
 }
 
 // getEndDeviceProfilesByBrand lists the available LoRaWAN end device profiles by a single brand.
-func (s *remoteStore) getEndDeviceProfilesByBrand(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
+func (s *remoteStore) getEndDeviceProfilesByBrand(
+	req store.GetEndDeviceProfilesRequest,
+) (*store.GetEndDeviceProfilesResponse, error) {
 	b, err := s.fetcher.File("vendor", req.BrandID, "index.yaml")
 	if err != nil {
 		return nil, errBrandNotFound.WithAttributes("brand_id", req.BrandID)
@@ -174,8 +180,7 @@ func (s *remoteStore) getEndDeviceProfilesByBrand(req store.GetEndDeviceProfiles
 	}
 	start, end := paginate(len(index.EndDevices), req.Limit, req.Page)
 
-	profiles := make([]*store.EndDeviceProfile, 0, end-start)
-
+	profilesMap := make(map[string]*store.EndDeviceProfile, end-start)
 	for idx := start; idx < end; idx++ {
 		modelID := index.EndDevices[idx]
 		if req.ModelID != "" && modelID != req.ModelID {
@@ -192,8 +197,8 @@ func (s *remoteStore) getEndDeviceProfilesByBrand(req store.GetEndDeviceProfiles
 
 		// For each profile ID, get the profile.
 		for _, fwVersion := range model.FirmwareVersions {
-			for _, profile := range fwVersion.Profiles {
-				p, err := s.fetcher.File("vendor", req.BrandID, profile.ID+".yaml")
+			for region, profileInfo := range fwVersion.Profiles {
+				p, err := s.fetcher.File("vendor", req.BrandID, profileInfo.ID+".yaml")
 				if err != nil {
 					return nil, err
 				}
@@ -201,22 +206,78 @@ func (s *remoteStore) getEndDeviceProfilesByBrand(req store.GetEndDeviceProfiles
 				if err := yaml.Unmarshal(p, &profile); err != nil {
 					return nil, err
 				}
-				profiles = append(profiles, &profile)
+				profileKey := s.buildProfileKey(modelID, fwVersion.Version, region)
+				profilesMap[profileKey] = &profile
 			}
 		}
 	}
+
+	// Append vendor profile IDs to the profiles.
+	if err := s.appendVendorProfileID(profilesMap, index); err != nil {
+		return nil, err
+	}
+
+	profilesList := make([]*store.EndDeviceProfile, 0, len(profilesMap))
+	for _, profile := range profilesMap {
+		profilesList = append(profilesList, profile)
+	}
+
 	return &store.GetEndDeviceProfilesResponse{
 		Count:    end - start,
 		Offset:   start,
-		Total:    uint32(len(index.EndDevices)),
-		Profiles: profiles,
+		Total:    uint32(len(index.EndDevices)), //nolint:gosec
+		Profiles: profilesList,
 	}, nil
+}
+
+// appendVendorProfileID checks the vendor index for profile identifiers. If any identifiers
+// are found, the vendor profile ID is set on the profile. The identifiers can be specified
+// as a combination of either device ID + hardware version + firmware version + region, or
+// profile ID + codec ID.
+func (s *remoteStore) appendVendorProfileID(
+	profilesMap map[string]*store.EndDeviceProfile,
+	index VendorEndDevicesIndex,
+) error {
+	for vendorProfileID, profileInfo := range index.ProfileIDs {
+		vendorProfileID, err := strconv.Atoi(vendorProfileID)
+		if err != nil {
+			return err
+		}
+
+		if profileInfo.ProfileID != "" {
+			if _, ok := profilesMap[profileInfo.ProfileID]; !ok {
+				continue
+			}
+
+			profilesMap[profileInfo.ProfileID].VendorProfileID = uint32(vendorProfileID) //nolint:gosec
+		}
+
+		if profileInfo.EndDeviceID != "" {
+			profileKey := s.buildProfileKey(
+				profileInfo.EndDeviceID,
+				profileInfo.FirmwareVersion,
+				profileInfo.Region,
+			)
+			if _, ok := profilesMap[profileKey]; !ok {
+				continue
+			}
+			profilesMap[profileKey].VendorProfileID = uint32(vendorProfileID) //nolint:gosec
+		}
+	}
+
+	return nil
+}
+
+func (*remoteStore) buildProfileKey(modelID, firmwareVersion, region string) string {
+	return fmt.Sprintf("%s-%s-%s", modelID, firmwareVersion, region)
 }
 
 // GetEndDeviceProfiles lists available LoRaWAN end device profiles per brand.
 // Note that this can be very slow, and does not support searching/sorting.
 // This function is primarily intended to be used for creating the bleve index.
-func (s *remoteStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
+func (s *remoteStore) GetEndDeviceProfiles(
+	req store.GetEndDeviceProfilesRequest,
+) (*store.GetEndDeviceProfilesResponse, error) {
 	if req.BrandID != "" {
 		return s.getEndDeviceProfilesByBrand(req)
 	}
@@ -244,21 +305,62 @@ func (s *remoteStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest
 	return &store.GetEndDeviceProfilesResponse{
 		Count:    end - start,
 		Offset:   start,
-		Total:    uint32(len(all)),
+		Total:    uint32(len(all)), //nolint:gosec
 		Profiles: all[start:end],
 	}, nil
 }
 
 var (
-	errModelNotFound           = errors.DefineNotFound("model_not_found", "model `{brand_id}/{model_id}` not found")
-	errBandNotFound            = errors.DefineNotFound("band_not_found", "band `{band_id}` not found")
-	errNoProfileForBand        = errors.DefineNotFound("no_profile_for_band", "device does not have a profile for band `{band_id}`")
-	errFirmwareVersionNotFound = errors.DefineNotFound("firmware_version_not_found", "firmware version `{firmware_version}` for model `{brand_id}/{model_id}` not found")
+	errModelNotFound = errors.DefineNotFound(
+		"model_not_found",
+		"model `{brand_id}/{model_id}` not found",
+	)
+	errBandNotFound = errors.DefineNotFound(
+		"band_not_found",
+		"band `{band_id}` not found",
+	)
+	errNoProfileForBand = errors.DefineNotFound(
+		"no_profile_for_band",
+		"device does not have a profile for band `{band_id}`",
+	)
+	errFirmwareVersionNotFound = errors.DefineNotFound(
+		"firmware_version_not_found",
+		"firmware version `{firmware_version}` for model `{brand_id}/{model_id}` not found",
+	)
+	errBrandWithVendorIDNotFound = errors.DefineNotFound(
+		"brand_with_vendor_id_not_found",
+		"brand with vendor ID `{vendor_id}` not found",
+	)
+	errVendorProfileIDNotFound = errors.DefineNotFound(
+		"vendor_profile_id_not_found",
+		"vendor profile ID `{vendor_profile_id}` not found for vendor ID `{vendor_id}`",
+	)
+	errNoTemplateIdentifiers = errors.DefineInvalidArgument(
+		"no_template_identifiers",
+		"one of version_ids or end_device_profile_ids must be set",
+	)
+	errBandNotFoundForRegion = errors.DefineNotFound(
+		"band_not_found_for_region",
+		"band not found for region `{region}`")
 )
 
 // GetTemplate retrieves an end device template for an end device definition.
-func (s *remoteStore) GetTemplate(req *ttnpb.GetTemplateRequest, profile *store.EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error) {
+func (s *remoteStore) GetTemplate(
+	req *ttnpb.GetTemplateRequest,
+	profile *store.EndDeviceProfile,
+) (*ttnpb.EndDeviceTemplate, error) {
 	ids := req.GetVersionIds()
+	if ids == nil {
+		if req.GetEndDeviceProfileIds() == nil {
+			return nil, errNoTemplateIdentifiers
+		}
+		versionIDs, err := s.getVersionIDsUsingProfileIDs(req.GetEndDeviceProfileIds())
+		if err != nil {
+			return nil, err
+		}
+		ids = versionIDs
+	}
+
 	if profile != nil {
 		return profile.ToTemplatePB(ids, nil)
 	}
@@ -288,9 +390,7 @@ func (s *remoteStore) GetTemplate(req *ttnpb.GetTemplateRequest, profile *store.
 		}
 		profileInfo, ok := ver.Profiles[ids.BandId]
 		if !ok {
-			return nil, errNoProfileForBand.WithAttributes(
-				"band_id", ids.BandId,
-			)
+			return nil, errNoProfileForBand.WithAttributes("band_id", ids.BandId)
 		}
 
 		profileVendorID := ids.BrandId
@@ -315,7 +415,58 @@ func (s *remoteStore) GetTemplate(req *ttnpb.GetTemplateRequest, profile *store.
 	)
 }
 
-var errNoCodec = errors.DefineNotFound("no_codec", "no codec defined for firmware version `{firmware_version}` and band `{band_id}`")
+func (s *remoteStore) getVersionIDsUsingProfileIDs(
+	ids *ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers,
+) (*ttnpb.EndDeviceVersionIdentifiers, error) {
+	if ids.VendorProfileId == 0 || ids.VendorId == 0 {
+		return nil, errors.New("vendor_profile_id and vendor_id must be set")
+	}
+
+	brandID, err := s.getBrandIDByVendorID(ids.VendorId)
+	if err != nil {
+		return nil, errBrandWithVendorIDNotFound.WithAttributes("vendor_id", ids.VendorId)
+	}
+	endDeviceProfilesIdentifiers, err := s.GetEndDeviceProfileIdentifiers(
+		store.GetEndDeviceProfileIdentifiersRequest{BrandID: brandID})
+	if err != nil {
+		return nil, err
+	}
+
+	var profileIDs *store.EndDeviceProfileIdentifiers
+	for _, profileIdentifiers := range endDeviceProfilesIdentifiers.EndDeviceProfileIdentifiers {
+		vendorProfileID := strconv.Itoa(int(ids.VendorProfileId))
+		if vendorProfileID == profileIdentifiers.VendorProfileID {
+			profileIDs = profileIdentifiers
+			break
+		}
+	}
+	if profileIDs == nil {
+		return nil, errVendorProfileIDNotFound.WithAttributes(
+			"vendor_id", ids.VendorId,
+			"vendor_profile_id", ids.VendorProfileId,
+		)
+	}
+
+	bandID, ok := regionToBandID[profileIDs.Region]
+	if !ok {
+		return nil, errBandNotFoundForRegion.WithAttributes("region", profileIDs.Region)
+	}
+
+	versionIDs := &ttnpb.EndDeviceVersionIdentifiers{
+		BrandId:         brandID,
+		ModelId:         profileIDs.EndDeviceID,
+		FirmwareVersion: profileIDs.FirmwareVersion,
+		HardwareVersion: profileIDs.HardwareVersion,
+		BandId:          bandID,
+	}
+
+	return versionIDs, nil
+}
+
+var errNoCodec = errors.DefineNotFound(
+	"no_codec",
+	"no codec defined for firmware version `{firmware_version}` and band `{band_id}`",
+)
 
 func (s *remoteStore) getCodecs(ids *ttnpb.EndDeviceVersionIdentifiers) (*EndDeviceCodecs, error) {
 	models, err := s.GetModels(store.GetModelsRequest{
@@ -332,7 +483,7 @@ func (s *remoteStore) getCodecs(ids *ttnpb.EndDeviceVersionIdentifiers) (*EndDev
 		return nil, errModelNotFound.WithAttributes("brand_id", ids.BrandId, "model_id", ids.ModelId)
 	}
 	model := models.Models[0]
-	var version *ttnpb.EndDeviceModel_FirmwareVersion = nil
+	var version *ttnpb.EndDeviceModel_FirmwareVersion
 	for _, ver := range model.FirmwareVersions {
 		if ver.Version == ids.FirmwareVersion {
 			version = ver
@@ -379,7 +530,10 @@ var (
 	errNoEncoder = errors.DefineNotFound("no_encoder", "no encoder defined for codec `{codec_id}`")
 )
 
-func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *EndDeviceCodecs) *EndDeviceDecoderCodec) (*ttnpb.MessagePayloadDecoder, error) {
+func (s *remoteStore) getDecoder(
+	req store.GetCodecRequest,
+	choose func(codecs *EndDeviceCodecs) *EndDeviceDecoderCodec,
+) (*ttnpb.MessagePayloadDecoder, error) {
 	codecs, err := s.getCodecs(req.GetVersionIds())
 	if err != nil {
 		return nil, err
@@ -448,7 +602,10 @@ func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Mess
 	codec := codecs.DownlinkEncoder
 
 	if codec.FileName == "" {
-		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIds().FirmwareVersion, "band_id", req.GetVersionIds().BandId)
+		return nil, errNoEncoder.WithAttributes(
+			"firmware_version", req.GetVersionIds().FirmwareVersion,
+			"band_id", req.GetVersionIds().BandId,
+		)
 	}
 
 	b, err := s.fetcher.File("vendor", req.GetVersionIds().BrandId, codec.FileName)
@@ -489,7 +646,58 @@ func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Mess
 	return pb, nil
 }
 
+func (s *remoteStore) GetEndDeviceProfileIdentifiers(
+	req store.GetEndDeviceProfileIdentifiersRequest,
+) (*store.GetEndDeviceProfileIdentifiersResponse, error) {
+	b, err := s.fetcher.File("vendor", req.BrandID, "index.yaml")
+	if err != nil {
+		return nil, errBrandNotFound.WithAttributes("brand_id", req.BrandID)
+	}
+
+	index := VendorEndDevicesIndex{}
+	if err := yaml.Unmarshal(b, &index); err != nil {
+		return nil, err
+	}
+
+	vendorProfiles := make([]*store.EndDeviceProfileIdentifiers, 0, len(index.ProfileIDs))
+	for profileID, profile := range index.ProfileIDs {
+		// Skip profiles that don't specify the end device ID.
+		if profile.EndDeviceID == "" {
+			continue
+		}
+
+		vendorProfiles = append(vendorProfiles, &store.EndDeviceProfileIdentifiers{
+			VendorProfileID: profileID,
+			EndDeviceID:     profile.EndDeviceID,
+			FirmwareVersion: profile.FirmwareVersion,
+			HardwareVersion: profile.HardwareVersion,
+			Region:          profile.Region,
+		})
+	}
+
+	return &store.GetEndDeviceProfileIdentifiersResponse{
+		EndDeviceProfileIdentifiers: vendorProfiles,
+	}, nil
+}
+
+func (s *remoteStore) getBrandIDByVendorID(vendorID uint32) (string, error) {
+	brands, err := s.GetBrands(store.GetBrandsRequest{
+		Paths: []string{"brand_id", "lora_alliance_vendor_id"},
+	})
+	if err != nil {
+		return "", err
+	}
+
+	for _, brand := range brands.Brands {
+		if brand.LoraAllianceVendorId == vendorID {
+			return brand.BrandId, nil
+		}
+	}
+
+	return "", errBrandNotFound.WithAttributes("vendor_id", vendorID)
+}
+
 // Close closes the store.
-func (s *remoteStore) Close() error {
+func (*remoteStore) Close() error {
 	return nil
 }

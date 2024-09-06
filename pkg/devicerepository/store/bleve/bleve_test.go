@@ -28,11 +28,15 @@ import (
 )
 
 func TestBleve(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 	if err := os.MkdirAll("testdata/data/lorawan-devices-index", 0o755); err != nil {
 		panic(err)
 	}
-	defer os.RemoveAll("testdata/data/lorawan-devices-index")
+	t.Cleanup(func() {
+		os.RemoveAll("testdata/data/lorawan-devices-index")
+	})
 	c := bleve.Config{
 		SearchPaths: []string{"testdata/data/lorawan-devices-index"},
 	}
@@ -46,6 +50,8 @@ func TestBleve(t *testing.T) {
 	}
 
 	t.Run("GetBrands", func(t *testing.T) {
+		t.Parallel()
+
 		for _, tc := range []struct {
 			name           string
 			request        store.GetBrandsRequest
@@ -113,7 +119,7 @@ func TestBleve(t *testing.T) {
 					OrderBy: "brand_id",
 					Paths:   []string{"brand_id"},
 				},
-				result: brandsResponse("foo-vendor", "full-vendor"),
+				result: brandsResponse("foo-vendor", "full-vendor", "windsensor-vendor"),
 			},
 			{
 				name: "OrderDesc",
@@ -121,7 +127,7 @@ func TestBleve(t *testing.T) {
 					OrderBy: "-brand_id",
 					Paths:   []string{"brand_id"},
 				},
-				result: brandsResponse("full-vendor", "foo-vendor"),
+				result: brandsResponse("windsensor-vendor", "full-vendor", "foo-vendor"),
 			},
 			{
 				name: "Limit",
@@ -130,7 +136,7 @@ func TestBleve(t *testing.T) {
 					Paths: []string{"brand_id"},
 				},
 				result: &store.GetBrandsResponse{
-					Total:  2,
+					Total:  3,
 					Count:  1,
 					Brands: []*ttnpb.EndDeviceBrand{{BrandId: "foo-vendor"}},
 				},
@@ -143,7 +149,7 @@ func TestBleve(t *testing.T) {
 					Paths: []string{"brand_id"},
 				},
 				result: &store.GetBrandsResponse{
-					Total:  2,
+					Total:  3,
 					Offset: 1,
 					Count:  1,
 					Brands: []*ttnpb.EndDeviceBrand{{BrandId: "full-vendor"}},
@@ -188,7 +194,7 @@ func TestBleve(t *testing.T) {
 					Search: "ETSI",
 					Paths:  []string{"brand_id"},
 				},
-				result: brandsResponse("full-vendor"),
+				result: brandsResponse("full-vendor", "windsensor-vendor"),
 			},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
@@ -205,6 +211,8 @@ func TestBleve(t *testing.T) {
 	})
 
 	t.Run("GetModels", func(t *testing.T) {
+		t.Parallel()
+
 		for _, tc := range []struct {
 			name           string
 			request        store.GetModelsRequest
@@ -240,7 +248,7 @@ func TestBleve(t *testing.T) {
 					OrderBy: "model_id",
 					Paths:   []string{"model_id"},
 				},
-				result: modelsResponse("dev1", "dev2", "full-device"),
+				result: modelsResponse("dev1", "dev2", "full-device", "windsensor"),
 			},
 			{
 				name: "OrderDesc",
@@ -248,7 +256,7 @@ func TestBleve(t *testing.T) {
 					OrderBy: "-model_id",
 					Paths:   []string{"model_id"},
 				},
-				result: modelsResponse("full-device", "dev2", "dev1"),
+				result: modelsResponse("windsensor", "full-device", "dev2", "dev1"),
 			},
 			{
 				name: "Offset",
@@ -261,9 +269,9 @@ func TestBleve(t *testing.T) {
 				result: &store.GetModelsResponse{
 					Count:  1,
 					Offset: 1,
-					Total:  3,
+					Total:  4,
 					Models: []*ttnpb.EndDeviceModel{{
-						ModelId: "dev2",
+						ModelId: "full-device",
 					}},
 				},
 			},
@@ -332,7 +340,7 @@ func TestBleve(t *testing.T) {
 					OrderBy: "model_id",
 					Paths:   []string{"model_id"},
 				},
-				result: modelsResponse("dev2", "full-device"),
+				result: modelsResponse("dev2", "full-device", "windsensor"),
 			},
 			{
 				name: "SearchByPartNumber",
@@ -348,7 +356,7 @@ func TestBleve(t *testing.T) {
 					Search: "ETSI",
 					Paths:  []string{"model_id"},
 				},
-				result: modelsResponse("full-device"),
+				result: modelsResponse("full-device", "windsensor"),
 			},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
@@ -365,7 +373,10 @@ func TestBleve(t *testing.T) {
 	})
 
 	t.Run("GetTemplate", func(t *testing.T) {
+		t.Parallel()
+
 		t.Run("Missing", func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 
 			for _, ids := range []*ttnpb.EndDeviceVersionIdentifiers{
@@ -397,6 +408,7 @@ func TestBleve(t *testing.T) {
 		})
 
 		t.Run("Success", func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 			tmpl, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
 				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
@@ -413,6 +425,8 @@ func TestBleve(t *testing.T) {
 	})
 
 	t.Run("GetTemplateByNumericIDs", func(t *testing.T) {
+		t.Parallel()
+
 		for _, tc := range []struct {
 			Name             string
 			Req              *ttnpb.GetTemplateRequest
@@ -424,7 +438,8 @@ func TestBleve(t *testing.T) {
 				Name: "UnknownVendorID",
 				Req: &ttnpb.GetTemplateRequest{
 					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
-						VendorId: 2,
+						VendorId:        125,
+						VendorProfileId: 1,
 					},
 				},
 				Assertion: func(t *ttnpb.EndDeviceTemplate, err error) bool {
@@ -447,45 +462,19 @@ func TestBleve(t *testing.T) {
 				Name: "ZeroProfileID",
 				Req: &ttnpb.GetTemplateRequest{
 					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
-						VendorId: 42,
+						VendorId: 42, // why is it allowed to have a vendor ID but no profile ID?
 					},
 				},
 				Assertion: func(t *ttnpb.EndDeviceTemplate, err error) bool {
-					if !(a.So(t, should.NotBeNil) && a.So(err, should.BeNil)) {
-						return false
-					}
-					return a.So(t, should.Resemble, &ttnpb.EndDeviceTemplate{
-						EndDevice: &ttnpb.EndDevice{
-							VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-								BrandId: "foo-vendor",
-							},
-							LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
-							LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_2_REV_B,
-							SupportsJoin:      true,
-							MacSettings: &ttnpb.MACSettings{
-								Supports_32BitFCnt: &ttnpb.BoolValue{
-									Value: true,
-								},
-							},
-						},
-						FieldMask: ttnpb.FieldMask(
-							"version_ids",
-							"supports_join",
-							"supports_class_b",
-							"supports_class_c",
-							"lorawan_version",
-							"lorawan_phy_version",
-							"mac_settings.supports_32_bit_f_cnt",
-						),
-					})
+					return a.So(errors.IsInvalidArgument(err), should.BeTrue) && a.So(t, should.BeNil)
 				},
 			},
 			{
 				Name: "SuccessfulFetch",
 				Req: &ttnpb.GetTemplateRequest{
 					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
-						VendorId:        42,
-						VendorProfileId: 3,
+						VendorId:        43,
+						VendorProfileId: 1,
 					},
 				},
 				Assertion: func(t *ttnpb.EndDeviceTemplate, err error) bool {
@@ -495,15 +484,24 @@ func TestBleve(t *testing.T) {
 					return a.So(t, should.Resemble, &ttnpb.EndDeviceTemplate{
 						EndDevice: &ttnpb.EndDevice{
 							VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-								BrandId: "foo-vendor",
+								BrandId:         "windsensor-vendor",
+								ModelId:         "windsensor",
+								FirmwareVersion: "1.0",
+								HardwareVersion: "1.0",
+								BandId:          "EU_863_870",
 							},
 							LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 							LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_3_REV_A,
 							SupportsJoin:      true,
+							SupportsClassB:    true,
 							MacSettings: &ttnpb.MACSettings{
 								Supports_32BitFCnt: &ttnpb.BoolValue{
 									Value: true,
 								},
+							},
+							Formatters: &ttnpb.MessagePayloadFormatters{
+								UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+								DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 							},
 						},
 						FieldMask: ttnpb.FieldMask(
@@ -513,6 +511,7 @@ func TestBleve(t *testing.T) {
 							"supports_class_c",
 							"lorawan_version",
 							"lorawan_phy_version",
+							"formatters",
 							"mac_settings.supports_32_bit_f_cnt",
 						),
 					})
@@ -529,7 +528,10 @@ func TestBleve(t *testing.T) {
 	})
 
 	t.Run("TestGetCodecs", func(t *testing.T) {
+		t.Parallel()
+
 		t.Run("Missing", func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 
 			for _, ids := range []*ttnpb.EndDeviceVersionIdentifiers{

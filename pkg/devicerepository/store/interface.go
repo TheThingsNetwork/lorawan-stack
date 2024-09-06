@@ -48,6 +48,16 @@ type GetModelsRequest struct {
 	Search  string
 }
 
+// GetEndDeviceProfileIdentifiersRequest is used to retrieve end device profile identifiers.
+type GetEndDeviceProfileIdentifiersRequest struct {
+	BrandID string
+}
+
+// GetEndDeviceProfileIdentifiersResponse contains the end device profile identifiers.
+type GetEndDeviceProfileIdentifiersResponse struct {
+	EndDeviceProfileIdentifiers []*EndDeviceProfileIdentifiers
+}
+
 // GetEndDeviceProfilesRequest is a request to list available LoRaWAN end device profile definitions.
 type GetEndDeviceProfilesRequest struct {
 	BrandID,
@@ -87,6 +97,8 @@ type Store interface {
 	GetBrands(GetBrandsRequest) (*GetBrandsResponse, error)
 	// GetModels lists available end device definitions.
 	GetModels(GetModelsRequest) (*GetModelsResponse, error)
+	// GetEndDeviceProfileIdentifiers retrieves end device profile identifiers from the vendor index file.
+	GetEndDeviceProfileIdentifiers(GetEndDeviceProfileIdentifiersRequest) (*GetEndDeviceProfileIdentifiersResponse, error)
 	// GetEndDeviceProfiles lists available LoRaWAN end device profile definitions.
 	GetEndDeviceProfiles(GetEndDeviceProfilesRequest) (*GetEndDeviceProfilesResponse, error)
 	// GetTemplate retrieves an end device template for an end device definition.

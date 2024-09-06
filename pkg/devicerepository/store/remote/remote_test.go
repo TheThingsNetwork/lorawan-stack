@@ -30,11 +30,15 @@ import (
 )
 
 func TestRemoteStore(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	s := remote.NewRemoteStore(fetch.FromFilesystem("testdata"))
 	t.Run("TestGetBrands", func(t *testing.T) {
+		t.Parallel()
+
 		t.Run("Limit", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetBrands(store.GetBrandsRequest{
 				Paths: []string{
 					"brand_id",
@@ -52,6 +56,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("SecondPage", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetBrands(store.GetBrandsRequest{
 				Paths: []string{
 					"brand_id",
@@ -70,6 +75,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Paths", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetBrands(store.GetBrandsRequest{
 				Paths: ttnpb.EndDeviceBrandFieldPathsNested,
 			})
@@ -100,7 +106,9 @@ func TestRemoteStore(t *testing.T) {
 	})
 
 	t.Run("TestGetModels", func(t *testing.T) {
+		t.Parallel()
 		t.Run("AllBrands", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetModels(store.GetModelsRequest{
 				Paths: []string{
 					"brand_id",
@@ -134,6 +142,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Limit", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetModels(store.GetModelsRequest{
 				BrandID: "foo-vendor",
 				Limit:   1,
@@ -154,6 +163,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Offset", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetModels(store.GetModelsRequest{
 				BrandID: "foo-vendor",
 				Limit:   1,
@@ -175,6 +185,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Paths", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetModels(store.GetModelsRequest{
 				BrandID: "foo-vendor",
 				Paths:   ttnpb.EndDeviceModelFieldPathsNested,
@@ -242,6 +253,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Full", func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 			list, err := s.GetModels(store.GetModelsRequest{
 				BrandID: "full-vendor",
@@ -363,7 +375,9 @@ func TestRemoteStore(t *testing.T) {
 	})
 
 	t.Run("TestGetTemplate", func(t *testing.T) {
+		t.Parallel()
 		t.Run("ByEndDeviceVersionIdentifiers", func(t *testing.T) {
+			t.Parallel()
 			template, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
 				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 					BrandId:         "foo-vendor",
@@ -402,6 +416,8 @@ func TestRemoteStore(t *testing.T) {
 			})
 		})
 		t.Run("ByProfile", func(t *testing.T) {
+			t.Parallel()
+
 			template, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
 				EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
 					VendorId:        43,
@@ -447,7 +463,9 @@ func TestRemoteStore(t *testing.T) {
 	})
 
 	t.Run("TestGetCodecs", func(t *testing.T) {
+		t.Parallel()
 		t.Run("Missing", func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 
 			for _, ids := range []*ttnpb.EndDeviceVersionIdentifiers{
@@ -506,6 +524,7 @@ func TestRemoteStore(t *testing.T) {
 			},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
+				t.Parallel()
 				a := assertions.New(t)
 
 				versionIDs := &ttnpb.EndDeviceVersionIdentifiers{
@@ -521,6 +540,7 @@ func TestRemoteStore(t *testing.T) {
 		}
 
 		t.Run("Examples", func(t *testing.T) {
+			t.Parallel()
 			for _, tc := range []struct {
 				name  string
 				f     func(store.GetCodecRequest) (any, error)

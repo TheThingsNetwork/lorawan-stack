@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package bleve implements a Device Repository store with indexing capabilities
+// using the bleve library.
 package bleve
 
 import (
@@ -29,12 +31,12 @@ import (
 )
 
 const (
-	// defaultTimeout is the timeout when trying to open the index. This is to avoid
-	// blocking on the index open call, which hangs indefinitely if the index is
-	// already in use by a different process.
+	// Timeout for opening the index. This is to avoid blocking on the index
+	// open call, which hangs indefinitely if the index is already in use by
+	// a different process.
 	defaultTimeout = 5 * time.Second
 
-	// cacheSize is the size of the cache for brands and models.
+	// Size of the cache for brands and models.
 	cacheSize = 1024
 )
 
@@ -78,11 +80,11 @@ func (c Config) NewStore(ctx context.Context) (store.Store, error) {
 
 var errCannotOpenIndex = errors.DefineNotFound("cannot_open_index", "cannot open index")
 
-func openIndex(ctx context.Context, path string) (bleve.Index, error) {
-	log.FromContext(ctx).WithField("path", path).Debug("Loading index")
-	index, err := bleve.OpenUsing(path, map[string]any{"read_only": true, "bolt_timeout": "60s"})
+func openIndex(ctx context.Context, indexPath string) (bleve.Index, error) {
+	log.FromContext(ctx).WithField("path", indexPath).Debug("Loading index")
+	index, err := bleve.OpenUsing(indexPath, map[string]any{"read_only": true, "bolt_timeout": "60s"})
 	if err != nil {
-		return nil, errCannotOpenIndex.WithAttributes("path", path).WithCause(err)
+		return nil, errCannotOpenIndex.WithAttributes("path", indexPath).WithCause(err)
 	}
 	return index, nil
 }

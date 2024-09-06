@@ -40,6 +40,20 @@ var regionalParametersToPB = map[string]ttnpb.PHYVersion{
 	"RP002-1.0.4":      ttnpb.PHYVersion_RP002_V1_0_4,
 }
 
+// EndDeviceProfileIdentifiers contains the profile identifiers of a LoRaWAN end device that
+// is mentioned in the vendor index file (not embedded in the device model).
+type EndDeviceProfileIdentifiers struct {
+	VendorProfileID string `yaml:"vendorProfileID"`
+	// First profile format.
+	EndDeviceID     string `yaml:"endDeviceID"`
+	FirmwareVersion string `yaml:"firmwareVersion"`
+	HardwareVersion string `yaml:"hardwareVersion"`
+	Region          string `yaml:"region"`
+	// Second profile format.
+	ProfileID string `yaml:"id"`
+	Codec     string `yaml:"codec"`
+}
+
 // EndDeviceProfile is the profile of a LoRaWAN end device as defined in the LoRaWAN backend interfaces.
 type EndDeviceProfile struct {
 	VendorProfileID uint32 `yaml:"vendorProfileID" json:"vendor_profile_id"`

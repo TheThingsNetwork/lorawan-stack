@@ -28,10 +28,22 @@ import (
 )
 
 var (
-	errCorruptedIndex           = errors.DefineCorruption("corrupted_index", "corrupted index file")
-	errInvalidNumberOfProfiles  = errors.DefineCorruption("invalid_number_of_profiles", "invalid number of profiles returned")
-	errMultipleIdentifiers      = errors.DefineCorruption("multiple_identifiers", "multiple identifiers found in the request. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers")
-	errEndDeviceProfileNotFound = errors.DefineNotFound("end_device_profile_not_found", "end device profile not found for vendor ID `{vendor_id}` and vendor profile ID `{vendor_profile_id}`")
+	errCorruptedIndex = errors.DefineCorruption(
+		"corrupted_index",
+		"corrupted index file",
+	)
+	errInvalidNumberOfProfiles = errors.DefineCorruption(
+		"invalid_number_of_profiles",
+		"invalid number of profiles returned",
+	)
+	errMultipleIdentifiers = errors.DefineCorruption(
+		"multiple_identifiers",
+		"multiple identifiers found in the request. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers",
+	)
+	errEndDeviceProfileNotFound = errors.DefineNotFound(
+		"end_device_profile_not_found",
+		"end device profile not found for vendor ID `{vendor_id}` and vendor profile ID `{vendor_profile_id}`",
+	)
 )
 
 // retrieve returns the resulting document from the cache, if available. Otherwise,
@@ -66,9 +78,9 @@ func (s *bleveStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsResp
 		queries = append(queries, bleve.NewQueryStringQuery(q))
 	}
 	if q := req.BrandID; q != "" {
-		query := bleve.NewTermQuery(q)
-		query.SetField("BrandID")
-		queries = append(queries, query)
+		termQuery := bleve.NewTermQuery(q)
+		termQuery.SetField("BrandID")
+		queries = append(queries, termQuery)
 	}
 
 	searchRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(queries...))
@@ -110,9 +122,9 @@ func (s *bleveStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsResp
 		brands = append(brands, pb)
 	}
 	return &store.GetBrandsResponse{
-		Count:  uint32(len(result.Hits)),
-		Total:  uint32(result.Total),
-		Offset: uint32(searchRequest.From),
+		Count:  uint32(len(result.Hits)),   //nolint:gosec
+		Total:  uint32(result.Total),       //nolint:gosec
+		Offset: uint32(searchRequest.From), //nolint:gosec
 		Brands: brands,
 	}, nil
 }
@@ -127,14 +139,14 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 		queries = append(queries, bleve.NewQueryStringQuery(q))
 	}
 	if q := req.BrandID; q != "" {
-		query := bleve.NewTermQuery(q)
-		query.SetField("BrandID")
-		queries = append(queries, query)
+		queryTerm := bleve.NewTermQuery(q)
+		queryTerm.SetField("BrandID")
+		queries = append(queries, queryTerm)
 	}
 	if q := req.ModelID; q != "" {
-		query := bleve.NewTermQuery(q)
-		query.SetField("ModelID")
-		queries = append(queries, query)
+		queryTerm := bleve.NewTermQuery(q)
+		queryTerm.SetField("ModelID")
+		queries = append(queries, queryTerm)
 	}
 
 	searchRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(queries...))
@@ -176,38 +188,55 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 		models = append(models, pb)
 	}
 	return &store.GetModelsResponse{
-		Count:  uint32(len(result.Hits)),
-		Total:  uint32(result.Total),
-		Offset: uint32(searchRequest.From),
+		Count:  uint32(len(result.Hits)),   //nolint:gosec
+		Total:  uint32(result.Total),       //nolint:gosec
+		Offset: uint32(searchRequest.From), //nolint:gosec
 		Models: models,
 	}, nil
 }
 
-// GetTemplate retrieves an end device template for an end device definition.
-func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error) {
-	var (
-		profile             *store.EndDeviceProfile
-		endDeviceProfileIds = req.GetEndDeviceProfileIds()
+var (
+	errNoIdentifiers = errors.DefineInvalidArgument(
+		"no_identifiers",
+		"no identifiers provided",
 	)
-	if endDeviceProfileIds != nil && req.VersionIds != nil {
+	errMissingProfileIdentifier = errors.DefineInvalidArgument(
+		"missing_profile_identifier",
+		"both vendor ID and vendor profile ID must be provided",
+	)
+)
+
+// GetTemplate retrieves an end device template for an end device definition.
+func (s *bleveStore) GetTemplate(
+	req *ttnpb.GetTemplateRequest,
+	_ *store.EndDeviceProfile,
+) (*ttnpb.EndDeviceTemplate, error) {
+	profileIDs, versionIDs := req.GetEndDeviceProfileIds(), req.GetVersionIds()
+	if profileIDs == nil && versionIDs == nil {
+		return nil, errNoIdentifiers.New()
+	}
+	if profileIDs != nil && versionIDs != nil {
 		return nil, errMultipleIdentifiers.New()
 	}
-	// Attempt to fetch the end device profile that matches the identifiers.
-	if endDeviceProfileIds != nil {
-		documentTypeQuery := bleve.NewTermQuery(profileDocumentType)
+
+	if profileIDs != nil {
+		if profileIDs.VendorId == 0 || profileIDs.VendorProfileId == 0 {
+			return nil, errMissingProfileIdentifier.New()
+		}
+		documentTypeQuery := bleve.NewTermQuery(templateDocumentType)
 		documentTypeQuery.SetField("Type")
 		queries := []query.Query{documentTypeQuery}
-		if q := endDeviceProfileIds.VendorId; q != 0 {
-			query := bleve.NewTermQuery(strconv.Itoa(int(q)))
-			query.SetField("VendorID")
-			queries = append(queries, query)
-		}
-		query := bleve.NewTermQuery(strconv.Itoa(int(endDeviceProfileIds.VendorProfileId)))
-		query.SetField("VendorProfileID")
-		queries = append(queries, query)
+
+		queryTerm := bleve.NewTermQuery(strconv.Itoa(int(profileIDs.VendorId)))
+		queryTerm.SetField("VendorID")
+		queries = append(queries, queryTerm)
+
+		queryTerm = bleve.NewTermQuery(strconv.Itoa(int(profileIDs.VendorProfileId)))
+		queryTerm.SetField("VendorProfileID")
+		queries = append(queries, queryTerm)
 
 		searchRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(queries...))
-		searchRequest.Fields = []string{"ProfileJSON", "BrandID"}
+		searchRequest.Fields = []string{"TemplateJSON"}
 		result, err := s.index.Search(searchRequest)
 		if err != nil {
 			return nil, err
@@ -215,8 +244,8 @@ func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDevi
 
 		if len(result.Hits) == 0 {
 			return nil, errEndDeviceProfileNotFound.WithAttributes(
-				"vendor_id", endDeviceProfileIds.VendorId,
-				"vendor_profile_id", endDeviceProfileIds.VendorProfileId)
+				"vendor_id", profileIDs.VendorId,
+				"vendor_profile_id", profileIDs.VendorProfileId)
 		}
 
 		if len(result.Hits) != 1 {
@@ -224,23 +253,20 @@ func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDevi
 			return nil, errInvalidNumberOfProfiles.New()
 		}
 
-		brandID, ok := result.Hits[0].Fields["BrandID"].(string)
-		if !ok {
-			return nil, errCorruptedIndex.New()
-		}
-		// Set the Brand ID.
-		req.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{
-			BrandId: brandID,
-		}
-
-		model, err := s.retrieve(result.Hits[0], "ProfileJSON", func() any { return &store.EndDeviceProfile{} })
+		hit, err := s.retrieve(result.Hits[0], "TemplateJSON", func() any { return &ttnpb.EndDeviceTemplate{} })
 		if err != nil {
 			return nil, err
 		}
-		profile = model.(*store.EndDeviceProfile)
+
+		template, ok := hit.(*ttnpb.EndDeviceTemplate)
+		if !ok {
+			return nil, errCorruptedIndex.New()
+		}
+
+		return template, nil
 	}
 
-	return s.store.GetTemplate(req, profile)
+	return s.store.GetTemplate(req, nil)
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
@@ -259,8 +285,17 @@ func (s *bleveStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Messa
 }
 
 // GetEndDeviceProfiles implements store.
-func (s *bleveStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
+func (s *bleveStore) GetEndDeviceProfiles(
+	req store.GetEndDeviceProfilesRequest,
+) (*store.GetEndDeviceProfilesResponse, error) {
 	return s.store.GetEndDeviceProfiles(req)
+}
+
+// GetEndDeviceProfileIdentifiers implements store.
+func (s *bleveStore) GetEndDeviceProfileIdentifiers(
+	req store.GetEndDeviceProfileIdentifiersRequest,
+) (*store.GetEndDeviceProfileIdentifiersResponse, error) {
+	return s.store.GetEndDeviceProfileIdentifiers(req)
 }
 
 // Close closes the store.

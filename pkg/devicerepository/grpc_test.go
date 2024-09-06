@@ -111,6 +111,12 @@ func (s *mockStore) GetTemplate(
 	return s.template, s.err
 }
 
+func (*mockStore) GetEndDeviceProfileIdentifiers(
+	_ store.GetEndDeviceProfileIdentifiersRequest,
+) (*store.GetEndDeviceProfileIdentifiersResponse, error) {
+	return nil, nil //nolint:nilnil
+}
+
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
 func (s *mockStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
 	s.lastVersionIDs = req.GetVersionIds()
