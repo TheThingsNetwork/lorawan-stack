@@ -1,4 +1,4 @@
-// Copyright © 2023 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,33 +13,35 @@
 // limitations under the License.
 
 import React from 'react'
-import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
-import DataSheet from '@ttn-lw/components/data-sheet'
-
-import DateTime from '@ttn-lw/lib/components/date-time'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
-import DevicesTable from '@console/containers/devices-table'
-import ApplicationEvents from '@console/containers/application-events'
-import ApplicationTitleSection from '@console/containers/application-title-section'
+import BlurryNetworkActivityPanel from '@console/components/blurry-network-activity-panel'
+import ApplicationMapPanel from '@console/components/application-map-panel'
+
+import LatestDecodedPayloadPanel from '@console/containers/latest-decoded-payload-panel'
+import DevicesPanel from '@console/containers/devices-panel'
 
 import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { isOtherClusterApp } from '@console/lib/application-utils'
-import { mayViewApplicationInfo } from '@console/lib/feature-checks'
-import { checkFromState } from '@account/lib/feature-checks'
+import { mayViewApplicationInfo, checkFromState } from '@console/lib/feature-checks'
 
-import { selectSelectedApplication } from '@console/store/selectors/applications'
+import { getDevicesList } from '@console/store/actions/devices'
 
-import style from './application-overview.styl'
+import {
+  selectApplicationEvents,
+  selectSelectedApplication,
+} from '@console/store/selectors/applications'
 
 const m = defineMessages({
   failedAccessOtherHostApplication:
@@ -48,22 +50,15 @@ const m = defineMessages({
 
 const ApplicationOverview = () => {
   const { appId } = useParams()
+  const events = useSelector(state => selectApplicationEvents(state, appId))
   const application = useSelector(selectSelectedApplication)
   const may = useSelector(state => checkFromState(mayViewApplicationInfo, state))
-  const { created_at, updated_at } = application
   const shouldRedirect = isOtherClusterApp(application)
   const condition = !shouldRedirect && may
-
-  const sheetData = [
-    {
-      header: sharedMessages.generalInformation,
-      items: [
-        { key: sharedMessages.appId, value: appId, type: 'code', sensitive: false },
-        { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
-        { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
-      ],
-    },
-  ]
+  useBreadcrumbs(
+    `apps.single#${appId}.overview`,
+    <Breadcrumb path={`/applications/${appId}`} content={sharedMessages.appOverview} />,
+  )
 
   const otherwise = {
     redirect: '/applications',
@@ -72,31 +67,33 @@ const ApplicationOverview = () => {
 
   return (
     <Require condition={condition} otherwise={otherwise}>
-      <div className={style.titleSection}>
-        <Container>
-          <IntlHelmet title={sharedMessages.overview} />
-          <Row>
-            <Col sm={12}>
-              <ApplicationTitleSection appId={appId} />
-            </Col>
-          </Row>
-        </Container>
+      <IntlHelmet title={sharedMessages.overview} />
+      <div className="container container--xl grid p-ls-s gap-ls-s md:p-cs-xs md:gap-cs-xs">
+        <div className="item-12 xl:item-6 lg:item-6">
+          <DevicesPanel />
+        </div>
+        <div className="item-12 xl:item-6 lg:item-6 d-flex">
+          <BlurryNetworkActivityPanel />
+        </div>
+        <div className="item-12 xl:item-6 lg:item-6">
+          <LatestDecodedPayloadPanel
+            appId={appId}
+            events={events}
+            shortCutLinkPath={`/applications/${appId}/data`}
+          />
+        </div>
+        <div className="item-12 xl:item-6 lg:item-6 d-flex">
+          <RequireRequest
+            requestAction={getDevicesList(
+              application.ids.application_id,
+              { page: 1, limit: 1000 },
+              'locations',
+            )}
+          >
+            <ApplicationMapPanel />
+          </RequireRequest>
+        </div>
       </div>
-      <Container>
-        <Row>
-          <Col sm={12} lg={6}>
-            <DataSheet data={sheetData} className={style.generalInformation} />
-          </Col>
-          <Col sm={12} lg={6}>
-            <ApplicationEvents appId={appId} widget />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} className={style.table}>
-            <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
-          </Col>
-        </Row>
-      </Container>
     </Require>
   )
 }

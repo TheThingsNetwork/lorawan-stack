@@ -85,7 +85,9 @@ func ParseGatewayEUIRanges(conf map[string][]string) (map[string][]dcstypes.EUI6
 // Claimer provides methods for claiming Gateways.
 type Claimer interface {
 	// Claim claims a gateway.
-	Claim(ctx context.Context, eui types.EUI64, ownerToken string, clusterAddress string) error
+	Claim(
+		ctx context.Context, eui types.EUI64, ownerToken string, clusterAddress string,
+	) (*dcstypes.GatewayMetadata, error)
 	// Unclaim unclaims a gateway.
 	Unclaim(ctx context.Context, eui types.EUI64) error
 	// IsManagedGateway returns true if the gateway is a managed gateway.

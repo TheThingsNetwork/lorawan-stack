@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,14 @@
 
 import { combineReducers } from 'redux'
 
-import { APPLICATION, END_DEVICE, GATEWAY, USER, ORGANIZATION } from '@console/constants/entities'
+import {
+  APPLICATION,
+  END_DEVICE,
+  GATEWAY,
+  USER,
+  ORGANIZATION,
+  CLIENT,
+} from '@console/constants/entities'
 
 import {
   getUserId,
@@ -25,6 +32,7 @@ import {
   getApiKeyId,
   getCollaboratorId,
   getPacketBrokerNetworkId,
+  getClientId,
 } from '@ttn-lw/lib/selectors/id'
 import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
@@ -38,7 +46,8 @@ import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '@ttn-lw/lib/store/acti
 import { SHARED_NAME as API_KEYS_SHARED_NAME } from '@console/store/actions/api-keys'
 import { SHARED_NAME as PACKET_BROKER_NETWORKS_SHARED_NAME } from '@console/store/actions/packet-broker'
 
-import user from './logout'
+import user from './user'
+import logout from './logout'
 import users from './users'
 import applications from './applications'
 import devices from './devices'
@@ -63,10 +72,19 @@ import as from './application-server'
 import deviceRepository from './device-repository'
 import packetBroker from './packet-broker'
 import ns from './network-server'
+import notifications from './notifications'
+import userPreferences from './user-preferences'
+import recencyFrequencyItems from './recency-frequency-items'
+import topEntities from './top-entities'
+import search from './search'
+import sessions from './sessions'
+import authorizations from './authorizations'
+import clients from './clients'
 import connectionProfiles from './connection-profiles'
 
 export default combineReducers({
   user,
+  logout,
   users,
   init,
   status,
@@ -90,6 +108,7 @@ export default combineReducers({
     gateways: createNamedRightsReducer(GATEWAY),
     organizations: createNamedRightsReducer(ORGANIZATION),
     users: createNamedRightsReducer(USER),
+    clients: createNamedRightsReducer(CLIENT),
   }),
   events: combineReducers({
     applications: createNamedEventsReducer(APPLICATION),
@@ -113,6 +132,7 @@ export default combineReducers({
       PACKET_BROKER_NETWORKS_SHARED_NAME,
       getPacketBrokerNetworkId,
     ),
+    clients: createNamedPaginationReducer('CLIENTS', getClientId),
   }),
   js,
   gatewayStatus,
@@ -122,5 +142,13 @@ export default combineReducers({
   packetBroker,
   ns,
   searchAccounts,
+  notifications,
+  userPreferences,
+  search,
+  recencyFrequencyItems,
+  topEntities,
+  sessions,
+  authorizations,
+  clients,
   connectionProfiles,
 })

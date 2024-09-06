@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Row, Col } from 'react-grid-system'
+
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -21,15 +23,15 @@ import GatewaysTable from '@console/containers/gateways-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const GatewaysList = () => (
-  <Container>
-    <Row>
+const GatewaysList = () => {
+  useBreadcrumbs('gtws.list', <Breadcrumb path={`/gateways`} content={sharedMessages.list} />)
+
+  return (
+    <div className="container container--xxl p-0">
       <IntlHelmet title={sharedMessages.gateways} />
-      <Col>
-        <GatewaysTable />
-      </Col>
-    </Row>
-  </Container>
-)
+      <GatewaysTable />
+    </div>
+  )
+}
 
 export default GatewaysList

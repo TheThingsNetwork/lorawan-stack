@@ -49,7 +49,8 @@ export const GATEWAY_EVENTS_VERBOSE_FILTERS = [
 // Regex for matching heartbeat events that trigger an update of the
 // last activity display.
 export const EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP = /^as.up\..*\.forward$/
-
+export const EVENT_END_DEVICE_HEARTBEAT_FILTERS_STRING =
+  EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP.toString()
 // Utility function to convert filter arrays to Regular Expressions strings
 // that the backend accepts for applying filters.
 const filterListToRegExpList = array =>

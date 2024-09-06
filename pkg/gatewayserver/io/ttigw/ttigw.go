@@ -64,6 +64,8 @@ var _ io.Frontend = (*Frontend)(nil)
 
 // New returns a new The Things Industries V1 gateway frontend.
 func New(ctx context.Context, server io.Server, cfg Config) (*Frontend, error) {
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/ttigw")
+
 	var proxyConfiguration webmiddleware.ProxyConfiguration
 	if err := proxyConfiguration.ParseAndAddTrusted(server.GetBaseConfig(ctx).HTTP.TrustedProxies...); err != nil {
 		return nil, err
@@ -130,7 +132,7 @@ func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, ids, err := f.authenticate(ctx, cert)
 	if err != nil {
-		logger.WithError(err).Debug("Client certificate verification failed")
+		logger.WithError(err).Warn("Client certificate verification failed")
 		writeError(w, err)
 		return
 	}
@@ -140,7 +142,7 @@ func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 		Ip: remoteIP(r),
 	})
 	if err != nil {
-		logger.WithError(err).Info("Failed to connect")
+		logger.WithError(err).Warn("Failed to connect")
 		writeError(w, err)
 		return
 	}

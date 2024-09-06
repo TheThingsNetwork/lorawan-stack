@@ -15,10 +15,10 @@
 import React, { useState, useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import { Navigate, useSearchParams } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
 
 import tts from '@account/api/tts'
 
+import { IconChevronLeft } from '@ttn-lw/components/icon'
 import Spinner from '@ttn-lw/components/spinner'
 import ErrorNotification from '@ttn-lw/components/error-notification'
 import Notification from '@ttn-lw/components/notification'
@@ -28,6 +28,8 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
+
+import Logo from '@account/containers/logo'
 
 import style from '@account/views/front/front.styl'
 
@@ -99,7 +101,7 @@ const Validate = ({ hideTitle }) => {
             <h1 className={style.title}>
               {siteName}
               <br />
-              <Message component="strong" content={m.contactInfoValidation} />
+              <Message content={m.contactInfoValidation} />
             </h1>
             <hr className={style.hRule} />
           </>
@@ -116,8 +118,9 @@ const Validate = ({ hideTitle }) => {
         )}
         <Button.Link
           to="/"
-          icon="keyboard_arrow_left"
+          icon={IconChevronLeft}
           message={{ ...m.backToAccount, values: { siteTitle } }}
+          secondary
         />
       </div>
     </RequireRequest>
@@ -125,14 +128,15 @@ const Validate = ({ hideTitle }) => {
 }
 
 const ValidateWithAuth = props => (
-  <Container>
-    <Row>
-      <Col lg={8} md={12}>
-        <PageTitle title={m.contactInfoValidation} />
-        <Validate hideTitle {...props} />
-      </Col>
-    </Row>
-  </Container>
+  <div className="container container--lg grid">
+    <div className="item-12">
+      <Logo className="al-start j-start" />
+    </div>
+    <div className="item-12 lg-xl:item-6 xl:item-4">
+      <PageTitle title={m.contactInfoValidation} />
+      <Validate hideTitle {...props} />
+    </div>
+  </div>
 )
 
 Validate.propTypes = {

@@ -13,12 +13,13 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Link from '@ttn-lw/components/link'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 import Message from '@ttn-lw/lib/components/message'
@@ -47,10 +48,15 @@ const ApplicationAdd = () => {
     [navigate],
   )
 
+  useBreadcrumbs(
+    'apps.add',
+    <Breadcrumb path={`/applications/add`} content={sharedMessages.createApplication} />,
+  )
+
   return (
     <Require featureCheck={mayCreateApplications} otherwise={{ redirect: '/applications' }}>
       <RequireRequest requestAction={getOrganizationsList()}>
-        <Container>
+        <div className="container container--xxl grid">
           <PageTitle
             colProps={{ md: 10, lg: 9 }}
             className="mb-cs-s"
@@ -70,12 +76,10 @@ const ApplicationAdd = () => {
             />
             <hr className="mb-ls-s" />
           </PageTitle>
-          <Row>
-            <Col md={10} lg={9}>
-              <ApplicationForm onSuccess={handleSuccess} />
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-10 xl:item-9">
+            <ApplicationForm onSuccess={handleSuccess} />
+          </div>
+        </div>
       </RequireRequest>
     </Require>
   )

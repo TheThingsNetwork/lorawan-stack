@@ -15,7 +15,7 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import Icon from '@ttn-lw/components/icon'
+import { IconExclamationCircle, IconAlertTriangle } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -24,7 +24,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './field.styl'
 
 const FieldError = ({ content, error, warning, title, className, id }) => {
-  const icon = error ? 'error' : 'warning'
+  const IconComponent = error ? IconExclamationCircle : IconAlertTriangle
   const contentValues = content.values || {}
   const classname = classNames(style.message, className, {
     [style.show]: content && content !== '',
@@ -39,7 +39,7 @@ const FieldError = ({ content, error, warning, title, className, id }) => {
 
   return (
     <div className={classname} id={id}>
-      <Icon icon={icon} className={style.icon} />
+      <IconComponent className={style.icon} size={16} />
       <Message content={content.message || content} values={contentValues} />
     </div>
   )

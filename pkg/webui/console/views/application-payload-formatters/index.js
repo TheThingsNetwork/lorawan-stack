@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
@@ -32,8 +31,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
   maySetApplicationPayloadFormatters,
   mayViewApplicationLink,
+  checkFromState,
 } from '@console/lib/feature-checks'
-import { checkFromState } from '@account/lib/feature-checks'
 
 import { getApplicationLink } from '@console/store/actions/link'
 
@@ -66,17 +65,11 @@ const ApplicationPayloadFormattersInner = () => {
   )
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          <Routes>
-            <Route index element={<Navigate to="uplink" replace />} />
-            <Route path="uplink" Component={ApplicationUplinkPayloadFormatters} />
-            <Route path="downlink" Component={ApplicationDownlinkPayloadFormatters} />
-          </Routes>
-        </Col>
-      </Row>
-    </Container>
+    <Routes>
+      <Route index element={<Navigate to="uplink" replace />} />
+      <Route path="uplink" Component={ApplicationUplinkPayloadFormatters} />
+      <Route path="downlink" Component={ApplicationDownlinkPayloadFormatters} />
+    </Routes>
   )
 }
 

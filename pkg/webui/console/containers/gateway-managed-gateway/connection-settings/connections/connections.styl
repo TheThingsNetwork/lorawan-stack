@@ -13,52 +13,56 @@
 // limitations under the License.
 
 .root
-  border-dark()
+  border: 1px solid var(--c-border-neutral-light)
   border-radius: $br.l
   box-sizing: border-box
   padding: $cs.l
   display: flex
   flex-direction: column
   gap: $cs.l
+  max-width: 35rem
+  box-shadow: var(--shadow-box-panel-normal)
 
   .top
-    border-dark()
+    border: 1px solid var(--c-border-neutral-light)
     box-sizing: border-box
     border-radius: $br.l
     display: flex
 
   .img-div
-    background-color: $c-backdrop-lighter
+    background-color: var(--c-bg-neutral-min-hover)
     border-radius: $br.l 0 0 $br.l
-    border-dark('right')
+    border-right: 1px solid var(--c-border-neutral-light)
     .image
       object-fit: contain
       box-sizing: border-box
       padding: $cs.s
       height: 6rem
       width: 10rem
-      opacity: 0.7
+      opacity: .7
       filter: grayscale(100%)
 
   .horizontal-line
-    background-color: $c-divider-dark
+    background-color: var(--c-border-neutral-light)
 
   .connections
-    border-dark()
+    border: 1px solid var(--c-border-neutral-light)
     box-sizing: border-box
     border-radius: $br.l
     display: flex
     flex-direction: column
     gap: $cs.xxs
-    padding: $cs.xs $cs.s
+    padding: $cs.s
 
   .connection
-    padding-inline: $cs.xxs
-    // TODO: Change color
-    background-color: #EEEFF9
+    padding: 0 $cs.xs 0 $cs.xxs
+    background-color: var(--c-bg-neutral-light)
     border-radius: $br.m
 
   .details
+    padding-left: 1.7rem
+
+  .detail
     & tr:not(:first-child)
       height: 2rem
     & th

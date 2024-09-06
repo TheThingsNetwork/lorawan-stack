@@ -94,7 +94,7 @@ describe('Gateway create', () => {
       `${Cypress.config('consoleRootPath')}/gateways/eui-${gateway.eui}`,
     )
     cy.findByRole('heading', { name: 'Test Gateway' })
-    cy.findByText(gateway.frequency_plan).should('be.visible')
+    cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
   })
 
@@ -339,7 +339,7 @@ describe('Gateway create', () => {
     )
 
     cy.findByRole('heading', { name: 'Test Gateway' })
-    cy.findByText(gateway.frequency_plan).should('be.visible')
+    cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
   })
 
@@ -377,7 +377,9 @@ describe('Gateway create', () => {
     )
     cy.findByRole('heading', { name: `eui-${gateway.eui}` })
     cy.findByText('Frequency plan')
-    cy.findByText('EU_863_870 , EU_863_870_TTN').should('be.visible')
+    cy.findByText(
+      'Europe 863-870 MHz (SF12 for RX2) , Europe 863-870 MHz (SF9 for RX2 - recommended)',
+    ).should('be.visible')
     cy.findByTestId('error-notification').should('not.exist')
   })
 

@@ -295,11 +295,7 @@ describe('Collaborators', () => {
 
     it('succeeds editing user collaborator', () => {
       cy.loginConsole({ user_id: userId, password: user.password })
-      cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/organizations/${orgId}/collaborators/user/${collaboratorId}`,
-      )
+      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${orgId}/user/${collaboratorId}`)
 
       cy.findByLabelText('Grant individual rights').check()
       cy.findByLabelText('Select all').check()
@@ -309,32 +305,28 @@ describe('Collaborators', () => {
       cy.findByTestId('error-notification').should('not.exist')
       cy.findByTestId('toast-notification')
         .should('be.visible')
-        .findByText(`Collaborator rights updated`)
+        .findByText(`Member rights updated`)
         .should('be.visible')
     })
 
     it('succeeds deleting user collaborator', () => {
       cy.loginConsole({ user_id: userId, password: user.password })
-      cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/organizations/${orgId}/collaborators/user/${collaboratorId}`,
-      )
+      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${orgId}/user/${collaboratorId}`)
 
-      cy.findByRole('button', { name: /Remove collaborator/ }).click()
+      cy.findByRole('button', { name: /Remove member/ }).click()
 
       cy.findByTestId('modal-window')
         .should('be.visible')
         .within(() => {
-          cy.findByText('Remove collaborator', { selector: 'h1' }).should('be.visible')
-          cy.findByRole('button', { name: /Remove collaborator/ }).click()
+          cy.findByText('Remove member', { selector: 'h1' }).should('be.visible')
+          cy.findByRole('button', { name: /Remove member/ }).click()
         })
 
       cy.findByTestId('error-notification').should('not.exist')
 
-      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${orgId}/collaborators`)
+      cy.visit(`${Cypress.config('consoleRootPath')}/organizations/${orgId}`)
 
-      cy.findByText(/Collaborators \(\d+\)/).should('be.visible')
+      cy.findByText(/Members \(\d+\)/).should('be.visible')
       cy.findByRole('cell', { name: collaboratorId }).should('not.exist')
     })
   })

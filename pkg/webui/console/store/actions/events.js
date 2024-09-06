@@ -36,18 +36,20 @@ export const createSetEventsFilterActionType = name => `SET_${name}_EVENTS_FILTE
 
 export const startEventsStream =
   name =>
-  (id, { silent } = {}) => ({
+  (id, { silent, filter } = {}) => ({
     type: createStartEventsStreamActionType(name),
     id,
     silent: silent !== undefined ? silent : false,
+    filter,
   })
 
 export const startEventsStreamSuccess =
   name =>
-  (id, { silent } = {}) => ({
+  (id, { silent, filter } = {}) => ({
     type: createStartEventsStreamSuccessActionType(name),
     id,
     silent: silent !== undefined ? silent : false,
+    filter,
   })
 
 export const startEventsStreamFailure = name => (id, error) => ({

@@ -21,6 +21,9 @@ import {
   createPaginationTotalCountSelectorByEntity,
 } from '@ttn-lw/lib/store/selectors/pagination'
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+
+import { GET_DEV_BASE } from '../actions/devices'
 
 import {
   createEventsSelector,
@@ -40,6 +43,7 @@ export const selectDeviceEntitiesStore = state => selectDeviceStore(state).entit
 export const selectDeviceDerivedStore = state => selectDeviceStore(state).derived
 export const selectDeviceByIds = (state, appId, devId) =>
   selectDeviceById(state, combineDeviceIds(appId, devId))
+export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectDeviceById = (state, id) => selectDeviceEntitiesStore(state)[id]
 export const selectDeviceDerivedById = (state, id) => selectDeviceDerivedStore(state)[id]
 export const selectSelectedDeviceId = state =>
@@ -86,15 +90,6 @@ export const selectDeviceDerivedNwkDownlinkFrameCount = (state, appId, devId) =>
 export const selectSelectedDeviceClaimable = state =>
   selectDeviceStore(state).selectedDeviceClaimable
 
-export const selectDevicesWithLastSeen = state => {
-  const devices = selectDevices(state)
-  const devicesWithLastSeen = devices.map(device => ({
-    ...device,
-    _lastSeen: selectDeviceLastSeen(state, device.application_ids, device.ids.device_id),
-  }))
-  return devicesWithLastSeen
-}
-
 // Devices.
 const selectDevsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectDevsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
@@ -104,6 +99,15 @@ export const selectDevices = createSelector(
   (ids, entities) => ids.map(id => entities[id]),
 )
 export const selectDevicesTotalCount = state => selectDevsTotalCount(state)
+
+export const selectDevicesWithLastSeen = createSelector(
+  [selectDevices, state => state],
+  (devices, state) =>
+    devices.map(device => ({
+      ...device,
+      _lastSeen: selectDeviceLastSeen(state, device.application_ids, device.ids.device_id),
+    })),
+)
 
 // Events.
 export const selectDeviceEvents = createEventsSelector(ENTITY)

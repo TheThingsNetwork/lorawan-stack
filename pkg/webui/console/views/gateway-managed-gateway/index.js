@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
-import { Container } from 'react-grid-system'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -41,14 +40,14 @@ const GatewayManagedGateway = () => {
 
   return (
     <Require featureCheck={mayViewManagedGateway} otherwise={{ redirect: `/gateways/${gtwId}` }}>
-      <Container>
+      <div className="container container--xl p-vert-ls-s grid ml-0">
         <Routes>
           <Route index element={<Navigate to="connection-settings" replace />} />
           <Route path="connection-settings" Component={GatewayConnectionSettings} />
           <Route path="wifi-profiles/*" Component={GatewayWifiProfiles} />
           <Route path="*" element={<Navigate to="connection-settings" replace />} />
         </Routes>
-      </Container>
+      </div>
     </Require>
   )
 }

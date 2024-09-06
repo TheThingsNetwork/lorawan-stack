@@ -68,8 +68,11 @@ export default actionOrActionCreator => {
  * Helper function to retrieve the result action types based
  * on the request action type.
  *
- * @param {string} typeString - The request action type.
+ * @param {string|Array<string>} type - The request action type.
  * @param {string} status - The result type, either `SUCCESS`, `FAILURE` or `ABORT`.
  * @returns {string} - The result action type.
  */
-export const getResultActionFromType = (typeString, status) => typeString.replace('REQUEST', status)
+export const getResultActionFromType = (type, status) =>
+  type instanceof Array
+    ? type.map(t => t.replace('REQUEST', status))
+    : type.replace('REQUEST', status)

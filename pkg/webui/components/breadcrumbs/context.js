@@ -60,7 +60,7 @@ const useBreadcrumbs = (id, element) => {
       context.remove(id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [id])
 }
 
 export { Consumer as BreadcrumbsConsumer, BreadcrumbsProvider, BreadcrumbsContext, useBreadcrumbs }

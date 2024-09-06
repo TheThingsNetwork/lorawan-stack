@@ -22,7 +22,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const UserManagementAdd = () => (
   <>
-    <PageTitle title={sharedMessages.userManagement} className="panel-title mb-0" />
+    <PageTitle title={sharedMessages.userManagement} hideHeading />
     <UsersTable />
   </>
 )

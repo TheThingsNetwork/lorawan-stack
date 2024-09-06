@@ -34,7 +34,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { createApp } from '@console/store/actions/applications'
 
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 
 const m = defineMessages({
   applicationName: 'Application name',

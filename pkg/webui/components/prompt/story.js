@@ -27,6 +27,7 @@ const linkContainerStyle = {
 
 export default {
   title: 'Prompt',
+  component: Prompt,
 }
 
 export const Default = () => (

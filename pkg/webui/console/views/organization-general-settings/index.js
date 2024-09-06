@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { Col, Row, Container } from 'react-grid-system'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -39,8 +38,8 @@ import {
   mayDeleteOrganization,
   mayViewOrEditOrganizationApiKeys,
   mayViewOrEditOrganizationCollaborators,
+  checkFromState,
 } from '@console/lib/feature-checks'
-import { checkFromState } from '@account/lib/feature-checks'
 
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
@@ -62,7 +61,7 @@ const GeneralSettings = () => {
   const orgId = useSelector(selectSelectedOrganizationId)
 
   useBreadcrumbs(
-    'orgs.single.general-settings',
+    'overview.orgs.single.general-settings',
     <Breadcrumb
       path={`/organizations/${orgId}/general-settings`}
       content={sharedMessages.generalSettings}
@@ -108,14 +107,12 @@ const GeneralSettings = () => {
       otherwise={{ redirect: `/organizations/${orgId}` }}
     >
       <RequireRequest requestAction={getIsConfiguration()}>
-        <Container>
+        <div className="container container--xxl grid">
           <PageTitle title={sharedMessages.generalSettings} />
-          <Row>
-            <Col lg={8} md={12}>
-              <OrganizationUpdateForm onDeleteSuccess={handleDeleteSuccess} />
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-12 xl:item-8">
+            <OrganizationUpdateForm onDeleteSuccess={handleDeleteSuccess} />
+          </div>
+        </div>
       </RequireRequest>
     </Require>
   )

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import deleteTests from './delete'
-import createTests from './create'
 import subpageTests from './subpages'
 
-export default [...deleteTests, ...createTests, ...subpageTests]
+export default [...subpageTests]

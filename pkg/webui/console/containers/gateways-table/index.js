@@ -36,11 +36,10 @@ import { checkFromState, mayCreateGateways } from '@console/lib/feature-checks'
 
 import { getGatewaysList, restoreGateway, deleteGateway } from '@console/store/actions/gateways'
 
-import { selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUserIsAdmin } from '@console/store/selectors/user'
 import { selectGateways, selectGatewaysTotalCount } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
-  ownedTabTitle: 'Owned gateways',
   restoreSuccess: 'Gateway restored',
   restoreFail: 'There was an error and the gateway could not be restored',
   purgeSuccess: 'Gateway purged',
@@ -52,7 +51,7 @@ const ALL_TAB = 'all'
 const DELETED_TAB = 'deleted'
 const tabs = [
   {
-    title: m.ownedTabTitle,
+    title: sharedMessages.ownedByMe,
     name: OWNED_TAB,
   },
   {
@@ -113,33 +112,41 @@ const GatewaysTable = () => {
     const baseHeaders = [
       {
         name: 'ids.gateway_id',
-        displayName: sharedMessages.id,
-        width: 25,
+        displayName: sharedMessages.nameAndId,
+        getValue: row => ({
+          id: row.ids.gateway_id,
+          name: row.name,
+        }),
+        render: ({ name, id }) =>
+          Boolean(name) ? (
+            <>
+              <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
+              <span className="c-text-neutral-light d-block">{id}</span>
+            </>
+          ) : (
+            <span className="mt-0 p-0 fw-bold d-block">{id}</span>
+          ),
         sortable: true,
         sortKey: 'gateway_id',
       },
       {
-        name: 'name',
-        displayName: sharedMessages.name,
-        width: 33,
-        sortable: true,
-      },
-      {
         name: 'ids.eui',
         displayName: sharedMessages.gatewayEUI,
-        width: 22,
+        width: '14rem',
         sortable: true,
         sortKey: 'gateway_eui',
         render: gatewayEui =>
           !Boolean(gatewayEui) ? (
-            <Message
-              className="tc-subtle-gray"
-              component="i"
-              content={sharedMessages.none}
-              firstToLower
-            />
+            <Message className="c-text-neutral-light" component="i" content={sharedMessages.none} />
           ) : (
-            <SafeInspector data={gatewayEui} noTransform noCopyPopup small hideable={false} />
+            <SafeInspector
+              data={gatewayEui}
+              noTransform
+              noCopyPopup
+              small
+              hideable={false}
+              className="w-content"
+            />
           ),
       },
     ]
@@ -147,8 +154,8 @@ const GatewaysTable = () => {
     if (tab === DELETED_TAB) {
       baseHeaders.push({
         name: 'actions',
+        width: '13rem',
         displayName: sharedMessages.actions,
-        width: 25,
         getValue: row => ({
           id: row.ids.gateway_id,
           name: row.name,
@@ -157,7 +164,7 @@ const GatewaysTable = () => {
         }),
         render: details => (
           <ButtonGroup align="end">
-            <Button message={sharedMessages.restore} onClick={details.restore} />
+            <Button message={sharedMessages.restore} onClick={details.restore} secondary />
             <DeleteModalButton
               entityId={details.id}
               entityName={name}
@@ -172,8 +179,8 @@ const GatewaysTable = () => {
       baseHeaders.push(
         {
           name: 'status',
-          width: 10,
           displayName: sharedMessages.status,
+          width: '8rem',
           render: status => {
             let indicator = 'unknown'
             let label = sharedMessages.unknown
@@ -192,14 +199,13 @@ const GatewaysTable = () => {
               label = sharedMessages.unknown
             }
 
-            return <Status status={indicator} label={label} flipped />
+            return <Status status={indicator} label={label} className="d-flex al-center" />
           },
         },
         {
           name: 'created_at',
-          width: 10,
           displayName: sharedMessages.createdAt,
-          align: 'right',
+          width: '8rem',
           sortable: true,
           render: date => <DateTime.Relative value={date} />,
         },
@@ -246,8 +252,9 @@ const GatewaysTable = () => {
       baseDataSelector={baseDataSelector}
       tableTitle={<Message content={sharedMessages.gateways} />}
       searchable
+      searchPlaceholderMessage={sharedMessages.searchGateways}
       clickable={!isDeletedTab}
-      tabs={isAdmin ? tabs : []}
+      tabs={isAdmin ? tabs : undefined}
     />
   )
 }

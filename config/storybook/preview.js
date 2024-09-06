@@ -15,9 +15,7 @@
 /* eslint-disable import/prefer-default-export */
 
 import React from 'react'
-import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
-import { createMemoryHistory } from 'history'
 import { MemoryRouter } from 'react-router-dom'
 
 import messages from '@ttn-lw/locales/en.json'
@@ -26,21 +24,16 @@ import backendMessages from '@ttn-lw/locales/.backend/en.json'
 import '../../pkg/webui/styles/main.styl'
 import '../../pkg/webui/styles/utilities/general.styl'
 import '../../pkg/webui/styles/utilities/spacing.styl'
+import '../../pkg/webui/styles/utilities/tokens.styl'
 import 'focus-visible/dist/focus-visible'
-import createStore from './store'
 import Center from './center'
-
-const history = createMemoryHistory()
-const store = createStore(history)
 
 export const decorators = [
   Story => (
-    <Provider store={store}>
-      <IntlProvider key="key" messages={{ ...messages, ...backendMessages }} locale="en-US">
-        <MemoryRouter>
-          <Center>{Story()}</Center>
-        </MemoryRouter>
-      </IntlProvider>
-    </Provider>
+    <IntlProvider key="key" messages={{ ...messages, ...backendMessages }} locale="en-US">
+      <MemoryRouter>
+        <Center>{Story()}</Center>
+      </MemoryRouter>
+    </IntlProvider>
   ),
 ]

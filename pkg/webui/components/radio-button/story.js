@@ -20,6 +20,7 @@ import Radio from '.'
 
 export default {
   title: 'Radio',
+  component: Radio,
 }
 
 export const Default = () => <Radio label="Radio" name="radio" value="1" />

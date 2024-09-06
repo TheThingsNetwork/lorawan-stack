@@ -13,7 +13,7 @@
 // limitations under the License.
 
 .modal
-  background: white
+  background: var(--c-bg-neutral-min)
   border-radius: $br.m
   display: flex
   flex-direction: column
@@ -27,11 +27,11 @@
     width: 60%
     max-height: 80vh
 
-    +media-query-min($bp.s)
+    +media-query-min($bp.sm)
       min-width: 500px
       max-width: 780px
 
-    +media-query($bp.s)
+    +media-query($bp.sm)
       full-screen($ls.xxs)
       border: 0
       border-radius: 0
@@ -47,7 +47,7 @@
   align-items: center
   flex-shrink: 0
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     flex-wrap: wrap-reverse
     padding: $ls.s $ls.s
 
@@ -60,14 +60,14 @@
       display: block
 
   .title
-    line-height: $lh.xxl
+    margin-bottom: 0
     text-margin-top()
 
     &:last-child
       text-margin-bottom()
 
     &:not(:last-child)
-      text-margin-bottom($cs.l)
+      text-margin-bottom($cs.m)
 
   .logo
     max-width: 12rem
@@ -77,19 +77,19 @@
     flex-shrink: 0
     margin-bottom: 0
 
-    +media-query($bp.s)
+    +media-query($bp.sm)
       margin-bottom: $ls.s
       align-items: flex-start
 
 .line
   height: 1px
   width: 18%
-  background-color: $c-divider-dark
-  margin-left: $cs.xxl
+  background-color: var(--c-border-neutral-normal)
+  margin-left: $cs.xl3
   flex-shrink: 0
   margin-bottom: -4px // Compensate for own visual height.
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     margin-left: $cs.xl
 
 .body
@@ -97,10 +97,10 @@
   overflow-x: auto
   flex-grow: 1
 
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     horizontalize()
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     padding: $ls.s $ls.s
 
 .message
@@ -117,9 +117,9 @@
   & > div:first-child
     align-items: center
     display: flex
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
-    +media-query($bp.s)
+    +media-query($bp.sm)
       text-align: center
 
     div > span
@@ -132,7 +132,7 @@
   & > div:last-child
     display: flex
     align-items: center
-    +media-query($bp.s)
+    +media-query($bp.sm)
       margin-bottom: $cs.s
       flex-direction: row
       align-items: stretch
@@ -142,7 +142,7 @@
         margin-right: 0
         margin-right: $cs.s
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     flex-direction: column-reverse
 
 .shadow

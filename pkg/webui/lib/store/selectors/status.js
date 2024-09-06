@@ -26,3 +26,8 @@ export const selectIsOfflineStatus = state =>
 
 export const selectIsCheckingStatus = state =>
   selectStatusStore(state).onlineStatus === ONLINE_STATUS.CHECKING
+
+export const selectSummaryStore = state => selectStatusStore(state).summary
+export const selectUpcomingMaintenancesStore = state =>
+  selectSummaryStore(state).scheduled_maintenances ?? []
+export const selectNetworkStatusIndicatorStore = state => selectSummaryStore(state).status.indicator

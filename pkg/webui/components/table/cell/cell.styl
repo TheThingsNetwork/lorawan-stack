@@ -14,25 +14,29 @@
 
 .cell
   display: table-cell
-  padding: $cs.m
   vertical-align: middle
-
-  +media-query($bp.s)
-    padding: $cs.m $cs.xs
-
-  &:first-child, &:last-child
-    padding-right: $cs.s
+  line-height: 1.15
+  padding: 0 'calc(%s / 2)' % $cs.s
 
   &:first-child
-    font-weight: $fw.bold
+    padding-left: $cs.m
+
+  &:last-child
+    padding-right: $cs.m
+
+  &-panel-style
+    &:first-child
+      padding: 0 'calc(%s / 2)' % $cs.s 0 $cs.s
+
+    &:last-child
+      padding: 0 $cs.s 0 'calc(%s / 2)' % $cs.s
 
   &:not(&-centered):not(&-left)
     &:last-child
       text-align: right
-
-  &-small
-    padding-top: $cs.xs
-    padding-bottom: $cs.xs
+      justify-content: flex-end
+      & > *
+        justify-content: flex-end
 
   &-centered
     text-align: center
@@ -42,17 +46,31 @@
 
   &-right
     text-align: right
+    justify-content: flex-end
+    & > *
+      justify-content: flex-end
 
   &-head
-    font-weight: normal
-    font-size: $fs.s
-    color: $tc-subtle-gray
+    height: 3rem
+    text-transform: uppercase
+    font-weight: 600
+    font-size: $fs.xs
+    color: var(--c-text-neutral-light)
+    white-space: nowrap
 
   &-data
+    height: 4rem
     white-space: nowrap
-    overflow: hidden
-    text-overflow: ellipsis
 
+    &:not(:last-child)
+      overflow: hidden
+
+    & > *
+      overflow: inherit
+      text-overflow: ellipsis
+
+    .cell-left
+      padding: $cs.l
 
   &-head:not(&-centered):not(&-right)
     text-align: left

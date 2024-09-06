@@ -13,20 +13,28 @@
 // limitations under the License.
 
 import React from 'react'
+
+import {
+  IconApplication,
+  IconGateway,
+  IconOrganization,
+  IconOverview,
+} from '@ttn-lw/components/icon'
 import 'focus-visible/dist/focus-visible'
 
 import NavigationBar from '.'
 
 export default {
   title: 'Navigation',
+  component: NavigationBar,
 }
 
 export const _NavigationBar = () => (
   <NavigationBar>
-    <NavigationBar.Item title="Overview" icon="overview" path="/overview" />
-    <NavigationBar.Item title="Applications" icon="application" path="/application" />
-    <NavigationBar.Item title="Gateways" icon="gateway" path="/gateways" />
-    <NavigationBar.Item title="Organizations" icon="organization" path="/organization" />
+    <NavigationBar.Item title="Overview" icon={IconOverview} path="/overview" />
+    <NavigationBar.Item title="Applications" icon={IconApplication} path="/application" />
+    <NavigationBar.Item title="Gateways" icon={IconGateway} path="/gateways" />
+    <NavigationBar.Item title="Organizations" icon={IconOrganization} path="/organization" />
   </NavigationBar>
 )
 

@@ -37,12 +37,13 @@
   margin-top: $ls.m
 
 .switch-info
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     border-dark('left')
+    padding-left: $cs.l
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     margin-top: $cs.xs
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
 .description
   font-weight: $fw.normal
@@ -87,7 +88,7 @@
       margin-right: $cs.l
 
     & > span:first-child
-      color: $tc-subtle-gray
+      color: var(--c-text-neutral-light)
       margin-right: $cs.xs
 
 .back-link

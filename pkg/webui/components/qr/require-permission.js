@@ -113,7 +113,7 @@ const RequirePermission = props => {
       <div className={style.captureWrapper}>
         <ErrorMessage style={{ color: '#fff' }} content={m.permissionDeniedError} />
         <br />
-        <Button className="mt-cs-m" onClick={handleUseCapture} message={m.uploadImage} />
+        <Button className="mt-cs-m" onClick={handleUseCapture} message={m.uploadImage} secondary />
       </div>
     )
   }

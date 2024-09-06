@@ -62,4 +62,7 @@ const skipIfNecessary = function () {
 }
 
 before(skipIfNecessary)
-beforeEach(skipIfNecessary)
+
+beforeEach(() => {
+  skipIfNecessary()
+})

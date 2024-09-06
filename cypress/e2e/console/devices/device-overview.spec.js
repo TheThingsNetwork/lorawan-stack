@@ -67,7 +67,8 @@ describe('Device overview', () => {
   })
 
   it('succeeds downloading device MAC state', () => {
-    cy.findByRole('button', { name: /Download MAC data/ }).click()
+    cy.findByTestId('device-header-menu').click()
+    cy.findByText(/Download MAC data/).click()
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
@@ -98,7 +99,8 @@ describe('Device overview', () => {
       response,
     )
 
-    cy.findByRole('button', { name: /Download MAC data/ }).click()
+    cy.findByTestId('device-header-menu').click()
+    cy.findByText(/Download MAC data/).click()
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
@@ -106,7 +108,7 @@ describe('Device overview', () => {
         cy.findByRole('button', { name: /Download MAC data/ }).click()
       })
     cy.findByTestId('toast-notification')
-      .findByText(`There was an error and MAC state could not be included in the MAC data.`)
+      .findByText(`There was an error and MAC state could not be included in the MAC data`)
       .should('be.visible')
   })
 })

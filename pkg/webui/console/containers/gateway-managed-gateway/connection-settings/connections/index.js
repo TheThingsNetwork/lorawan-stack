@@ -18,7 +18,11 @@ import classnames from 'classnames'
 
 import managedGatewayImage from '@assets/misc/gateway.svg'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, {
+  IconCircleCheck,
+  IconExclamationCircle,
+  IconThermometer,
+} from '@ttn-lw/components/icon'
 import DataSheet from '@ttn-lw/components/data-sheet'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -47,14 +51,14 @@ import style from './connections.styl'
 const ConnectionByType = ({ type, isConnected, details, connectedVia, macAddress }) => (
   <div className="d-flex flex-column gap-cs-xxs">
     <div className="d-flex al-center gap-cs-xxs">
-      <Icon icon={connectionIconMap[type]} />
+      <Icon className={style.icon} icon={connectionIconMap[type]} />
       <Message content={connectionNameMap[type]} component="p" className="m-0 fw-bold" />
       <div className={classnames(style.connection, 'd-flex al-center gap-cs-xxs ml-cs-xs')}>
-        <Icon
-          small
-          icon={isConnected ? 'check_circle_outline' : 'highlight_remove'}
-          className={isConnected ? 'c-success' : 'c-error'}
-        />
+        {isConnected ? (
+          <Icon icon={IconCircleCheck} className="c-text-success-normal" small />
+        ) : (
+          <Icon icon={IconExclamationCircle} className="c-text-error-normal" small />
+        )}
         <Message
           content={
             isConnected
@@ -69,16 +73,20 @@ const ConnectionByType = ({ type, isConnected, details, connectedVia, macAddress
         />
       </div>
     </div>
-    <div className="ml-cs-l">
+    <div className={style.details}>
       {Boolean(macAddress) && (
-        <Message content={m.macAddress} values={{ address: formatMACAddress(macAddress) }} />
+        <Message
+          content={m.macAddress}
+          values={{ address: formatMACAddress(macAddress) }}
+          className="m-vert-cs-xs d-block"
+        />
       )}
       {Boolean(details?.[0]?.items?.length) && (
         <details>
           <summary>
             <Message content={sharedMessages.details} />
           </summary>
-          <DataSheet data={details} className={style.details} />
+          <DataSheet data={details} className={style.detail} />
         </details>
       )}
     </div>
@@ -139,10 +147,11 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
   const getConnectionData = useCallback(
     ({ isConnected, connectedMessage, disconnectedMessage, type }) => (
       <div className="d-flex al-center gap-cs-xxs">
-        <Icon
-          icon={isConnected ? 'check_circle_outline' : 'highlight_remove'}
-          className={isConnected ? 'c-success' : 'c-error'}
-        />
+        {isConnected ? (
+          <Icon icon={IconCircleCheck} className="c-text-success-normal" />
+        ) : (
+          <Icon icon={IconExclamationCircle} className="c-text-error-normal" />
+        )}
         <Message
           content={isConnected ? connectedMessage : disconnectedMessage}
           component="div"
@@ -154,7 +163,7 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
                 <span className="fw-bold">
                   {
                     <div className="d-flex al-center gap-cs-xxs fw-bold">
-                      <Icon small icon={connectionIconMap[getConnectionType(type)]} />
+                      <Icon icon={connectionIconMap[getConnectionType(type)]} />
                       <Message
                         content={connectionNameMap[getConnectionType(type)]}
                         component="p"
@@ -175,7 +184,7 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
   return (
     <div className={style.root}>
       <Message
-        className="fw-bold m-0"
+        className="fw-bold m-0 lh-1"
         component="h3"
         content={managedGateway.version_ids?.model_id ?? sharedMessages.managedGateway}
       />
@@ -188,26 +197,26 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
           <div className="d-flex direction-column j-center p-cs-l gap-cs-xs">
             <Message
               component="p"
-              className="m-0 tc-subtle-gray"
+              className="m-0 c-text-neutral-light"
               content={m.hardwareVersion}
               values={{
-                span: text => <span className="tc-deep-gray">{text}</span>,
+                span: text => <span className="c-text-neutral-heavy">{text}</span>,
                 version: managedGateway.version_ids.hardware_version,
               }}
             />
             <Message
               component="p"
-              className="m-0 tc-subtle-gray"
+              className="m-0 c-text-neutral-light"
               content={m.firmwareVersion}
               values={{
-                span: text => <span className="tc-deep-gray">{text}</span>,
+                span: text => <span className="c-text-neutral-heavy">{text}</span>,
                 version: managedGateway.version_ids.firmware_version,
               }}
             />
 
             {systemStatus?.cpu_temperature && (
               <div className="d-flex al-center gap-cs-xxs">
-                <Icon icon="device_thermostat" />
+                <IconThermometer />
                 <Message
                   content={m.cpuTemperature}
                   values={{ temperature: `${systemStatus.cpu_temperature}°C` }}

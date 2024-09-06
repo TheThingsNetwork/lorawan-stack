@@ -61,7 +61,9 @@ const TagGroup = ({ className, tagMaxWidth, tags }) => {
   }, [handleWindowResize, tags])
 
   const ts = useMemo(() => tags.slice(0, tags.length - left), [left, tags])
-  const leftGroup = <div className={style.leftGroup}>{tags.slice(tags.length - left)}</div>
+  const leftGroup = tags
+    .slice(tags.length - left)
+    .map(tag => <div key={tag.key}>{tag.props.content}</div>)
 
   return (
     <div ref={element} className={classnames(className, style.group)}>

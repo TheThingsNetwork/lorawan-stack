@@ -19,10 +19,9 @@ describe('Account App user registration', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.findByText(Cypress.config('accountAppSiteName'), {
+    cy.findByText(new RegExp(Cypress.config('accountAppSiteName')), {
       selector: 'h1',
     }).should('be.visible')
-    cy.findByText('Create a new account').should('be.visible')
     cy.findByLabelText('User ID').should('be.visible')
     cy.findByLabelText('Name').should('be.visible')
     cy.findByLabelText('Email').should('be.visible')

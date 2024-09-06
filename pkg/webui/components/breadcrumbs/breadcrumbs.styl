@@ -13,13 +13,18 @@
 // limitations under the License.
 
 .breadcrumbs
-  color: $tc-subtle-gray
-  height: $breadcrumbs-bar-height
+  color: var(--c-text-neutral-light)
   display: flex
   align-items: center
   overflow: hidden
 
-  +media-query($bp.s)
+  +media-query($bp.md + 150)
+    // If the breadcrumb <= 5 elements
+    &:has(.container:nth-child(5))
+      .container .breadcrumb
+        max-width: 6rem
+
+  +media-query($bp.sm)
     overflow: auto
     margin-right: $ls.xxs * -1
     scrollbar-width: none
@@ -28,6 +33,36 @@
       display: none
 
   &-container
-    border-normal('bottom')
     box-sizing: border-box
     height: $breadcrumbs-bar-height
+    display: flex
+    align-items: center
+
+.container
+  display: flex
+
+  +media-query($bp.lg)
+    font-size: $fs.s
+
+.link, .last
+  max-width: 15rem
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  display: block
+
+.link
+  text-decoration: none
+  color: var(--c-text-neutral-light)
+  align-items: center
+  +focus-visible()
+    text-decoration: underline
+    color: var(--c-text-neutral-heavy)
+
+.last
+  align-items: center
+  color: var(--c-text-neutral-heavy)
+  font-weight: $fw.bold
+  +media-query($bp.sm)
+    &:last-child
+      padding-right: $ls.xxs

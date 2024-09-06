@@ -17,9 +17,9 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { components } from 'react-select'
 
+import Icon, { IconOrganization, IconUser } from '@ttn-lw/components/icon'
 import Field from '@ttn-lw/components/form/field'
 import Select from '@ttn-lw/components/select'
-import Icon from '@ttn-lw/components/icon'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -30,7 +30,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import styles from './account-select.styl'
 
 const SingleValue = props => (
-  <components.SingleValue {...props}>
+  <components.SingleValue {...props} className="d-flex al-center">
     <Icon icon={props.data.icon} className="mr-cs-xs" />
     {props.data.label}
   </components.SingleValue>
@@ -38,7 +38,7 @@ const SingleValue = props => (
 
 SingleValue.propTypes = {
   data: PropTypes.shape({
-    icon: PropTypes.string.isRequired,
+    icon: PropTypes.icon.isRequired,
     description: PropTypes.string,
     label: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
@@ -68,13 +68,13 @@ const Suggest = ({ entity, entityId, ...rest }) => {
         const newOptions = searchResultsRef.current.map(account => ({
           value:
             'user_ids' in account
-              ? account.user_ids?.user_id
-              : account.organization_ids?.organization_id,
+              ? `user#${account.user_ids?.user_id}`
+              : `organization#${account.organization_ids?.organization_id}`,
           label:
             'user_ids' in account
               ? account.user_ids?.user_id
               : account.organization_ids?.organization_id,
-          icon: 'user_ids' in account ? 'user' : 'organization',
+          icon: 'user_ids' in account ? IconUser : IconOrganization,
         }))
 
         const translatedOptions = newOptions?.map(option => {

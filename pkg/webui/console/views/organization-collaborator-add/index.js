@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import { ORGANIZATION } from '@console/constants/entities'
@@ -30,19 +29,17 @@ const OrganizationCollaboratorAdd = () => {
   const { orgId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.collaborators.add',
+    'overview.orgs.single.collaborators.add',
     <Breadcrumb path={`/organizations/${orgId}/collaborators/add`} content={sharedMessages.add} />,
   )
 
   return (
-    <Container>
-      <PageTitle title={sharedMessages.addCollaborator} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ConsoleCollaboratorsForm entity={ORGANIZATION} entityId={orgId} />
-        </Col>
-      </Row>
-    </Container>
+    <div className="container container--xxl grid">
+      <PageTitle title={sharedMessages.addMember} />
+      <div className="item-12 xl:item-8">
+        <ConsoleCollaboratorsForm entity={ORGANIZATION} entityId={orgId} isMember />
+      </div>
+    </div>
   )
 }
 

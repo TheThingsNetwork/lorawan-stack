@@ -34,7 +34,6 @@ const EthernetSettingsFormFields = () => {
   return (
     <>
       <Message component="h3" content={m.ethernetConnection} />
-
       <Form.Field
         name={`ethernet_profile._use_static_ip`}
         component={Checkbox}

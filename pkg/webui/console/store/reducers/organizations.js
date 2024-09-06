@@ -35,9 +35,12 @@ const defaultState = {
   collaboratorCounts: {},
 }
 
-const organizations = (state = defaultState, { type, payload }) => {
+const organizations = (state = defaultState, { type, payload, meta }) => {
   switch (type) {
     case GET_ORG:
+      if (meta.options.noSelect) {
+        return state
+      }
       return {
         ...state,
         selectedOrganization: payload.id,

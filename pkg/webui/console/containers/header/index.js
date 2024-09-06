@@ -12,39 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { APPLICATION } from '@console/constants/entities'
+
+import {
+  IconLogout,
+  IconUserCircle,
+  IconBook,
+  IconAdminPanel,
+  IconApplication,
+  IconDevice,
+  IconGateway,
+  IconOrganization,
+  IconSupport,
+} from '@ttn-lw/components/icon'
 import HeaderComponent from '@ttn-lw/components/header'
-import NavigationBar from '@ttn-lw/components/navigation/bar'
 import Dropdown from '@ttn-lw/components/dropdown'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectAssetsRootPath, selectBrandingRootPath } from '@ttn-lw/lib/selectors/env'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
-import selectAccountUrl from '@console/lib/selectors/app-config'
 import {
   checkFromState,
   mayViewApplications,
   mayViewGateways,
   mayViewOrganizationsOfUser,
-  mayViewOrEditApiKeys,
 } from '@console/lib/feature-checks'
 
 import { logout } from '@console/store/actions/logout'
+import { setSearchOpen, setSearchScope } from '@console/store/actions/search'
 
-import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUser, selectUserIsAdmin } from '@console/store/selectors/user'
+import { selectTotalUnseenCount } from '@console/store/selectors/notifications'
 
 import Logo from '../logo'
+import SidebarContext from '../sidebar/context'
 
-const accountUrl = selectAccountUrl()
+import NotificationsDropdown from './notifications-dropdown'
+import BookmarksDropdown from './bookmarks-dropdown'
 
-const Header = ({ searchable, handleSearchRequest }) => {
+const Header = ({ alwaysShowLogo }) => {
   const dispatch = useDispatch()
+  const {
+    isMinimized,
+    onMinimizeToggle,
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer,
+    setIsHovered: setIsSideBarHovered,
+  } = useContext(SidebarContext)
 
   const handleLogout = useCallback(() => dispatch(logout()), [dispatch])
   const user = useSelector(selectUser)
-  const isUserAdmin = useSelector(selectUserIsAdmin)
   const mayViewApps = useSelector(state =>
     user ? checkFromState(mayViewApplications, state) : false,
   )
@@ -52,148 +74,125 @@ const Header = ({ searchable, handleSearchRequest }) => {
   const mayViewOrgs = useSelector(state =>
     user ? checkFromState(mayViewOrganizationsOfUser, state) : false,
   )
-  const mayHandleApiKeys = useSelector(state =>
-    user ? checkFromState(mayViewOrEditApiKeys, state) : false,
-  )
+  const isAdmin = useSelector(selectUserIsAdmin)
+  const hasUnseenNotifications = useSelector(selectTotalUnseenCount) > 0
 
-  const navigation = [
-    {
-      title: sharedMessages.overview,
-      icon: 'overview',
-      path: '',
-      exact: true,
-      hidden: !mayViewApps && !mayViewGateways,
-    },
-    {
-      title: sharedMessages.applications,
-      icon: 'application',
-      path: '/applications',
-      hidden: !mayViewApps,
-    },
-    {
-      title: sharedMessages.gateways,
-      icon: 'gateway',
-      path: '/gateways',
-      hidden: !mayViewGtws,
-    },
-    {
-      title: sharedMessages.organizations,
-      icon: 'organization',
-      path: '/organizations',
-      hidden: !mayViewOrgs,
-    },
-  ]
+  const onDrawerExpandClick = useCallback(() => {
+    if (!isDrawerOpen) {
+      openDrawer()
+    } else {
+      closeDrawer()
+    }
+  }, [isDrawerOpen, openDrawer, closeDrawer])
 
-  const navigationEntries = (
-    <React.Fragment>
-      {navigation.map(
-        ({ hidden, ...rest }) => !hidden && <NavigationBar.Item {...rest} key={rest.title.id} />,
+  const handleRegisterEndDeviceClick = useCallback(() => {
+    dispatch(setSearchScope(APPLICATION))
+    dispatch(setSearchOpen(true))
+  }, [dispatch])
+
+  const plusDropdownItems = (
+    <>
+      {mayViewApps && (
+        <Dropdown.Item
+          title={sharedMessages.addApplication}
+          icon={IconApplication}
+          path="/applications/add"
+        />
       )}
-    </React.Fragment>
+      {mayViewGtws && (
+        <Dropdown.Item title={sharedMessages.addGateway} icon={IconGateway} path="/gateways/add" />
+      )}
+      {mayViewOrgs && (
+        <Dropdown.Item
+          title={sharedMessages.addOrganization}
+          icon={IconOrganization}
+          path="/organizations/add"
+        />
+      )}
+
+      <Dropdown.Item
+        title={sharedMessages.registerDeviceInApplication}
+        icon={IconDevice}
+        action={handleRegisterEndDeviceClick}
+      />
+    </>
   )
 
   const dropdownItems = (
     <React.Fragment>
       <Dropdown.Item
         title={sharedMessages.profileSettings}
-        icon="user"
-        path={`${accountUrl}/profile-settings`}
-        external
+        icon={IconUserCircle}
+        path="/user-settings/profile"
       />
-      {mayHandleApiKeys && (
-        <Dropdown.Item title={sharedMessages.apiKeys} icon="api_keys" path="/user/api-keys" />
-      )}
-      <Dropdown.Item
-        title={sharedMessages.adminPanel}
-        icon="lock"
-        path="/admin-panel/network-information"
-      />
-      <hr />
-      <Dropdown.Item
-        title={sharedMessages.getSupport}
-        icon="help"
-        path="https://thethingsindustries.com/support"
-        external
-      />
-      <Dropdown.Item
-        title={sharedMessages.documentation}
-        icon="description"
-        path="https://thethingsindustries.com/docs"
-        external
-      />
-      <hr />
-      <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
-    </React.Fragment>
-  )
-
-  const mobileDropdownItems = (
-    <React.Fragment>
-      {navigation.map(
-        ({ hidden, ...rest }) => !hidden && <Dropdown.Item {...rest} key={rest.title.id} />,
-      )}
-      <React.Fragment>
-        <hr />
-        <Dropdown.Item
-          title={sharedMessages.profileSettings}
-          icon="user"
-          path={`${accountUrl}/profile-settings`}
-          external
-        />
-      </React.Fragment>
-      {mayHandleApiKeys && (
-        <Dropdown.Item
-          title={sharedMessages.personalApiKeys}
-          icon="api_keys"
-          path="/user/api-keys"
-        />
-      )}
-      {isUserAdmin && (
+      {isAdmin && (
         <Dropdown.Item
           title={sharedMessages.adminPanel}
-          icon="lock"
+          icon={IconAdminPanel}
           path="/admin-panel/network-information"
         />
       )}
       <hr />
       <Dropdown.Item
         title={sharedMessages.getSupport}
-        icon="help"
+        icon={IconSupport}
         path="https://thethingsindustries.com/support"
         external
       />
       <Dropdown.Item
         title={sharedMessages.documentation}
-        icon="description"
+        icon={IconBook}
         path="https://thethingsindustries.com/docs"
         external
       />
+      <hr />
+      <Dropdown.Item title={sharedMessages.logout} icon={IconLogout} action={handleLogout} />
     </React.Fragment>
   )
 
+  const hasCustomBranding = selectBrandingRootPath() !== selectAssetsRootPath()
+  const brandLogo = hasCustomBranding
+    ? {
+        src: `${selectBrandingRootPath()}/logo.svg`,
+        alt: 'Logo',
+      }
+    : undefined
+
+  const handleExpandSidebar = useCallback(() => {
+    onDrawerExpandClick()
+    setIsSideBarHovered(true)
+  }, [onDrawerExpandClick, setIsSideBarHovered])
+
+  const handleHideSidebar = useCallback(() => {
+    setIsSideBarHovered(false)
+  }, [setIsSideBarHovered])
+
   return (
     <HeaderComponent
+      isSidebarMinimized={isMinimized}
+      toggleSidebarMinimized={onMinimizeToggle}
       user={user}
-      dropdownItems={dropdownItems}
-      mobileDropdownItems={mobileDropdownItems}
-      navigationEntries={navigationEntries}
-      searchable={searchable}
-      onSearchRequest={handleSearchRequest}
-      onLogout={handleLogout}
-      logo={<Logo />}
+      profileDropdownItems={dropdownItems}
+      addDropdownItems={plusDropdownItems}
+      bookmarkDropdownItems={<BookmarksDropdown />}
+      notificationsDropdownItems={<NotificationsDropdown />}
+      brandLogo={brandLogo}
+      Logo={Logo}
+      onMenuClick={onDrawerExpandClick}
+      showNotificationDot={hasUnseenNotifications}
+      alwaysShowLogo={alwaysShowLogo}
+      expandSidebar={handleExpandSidebar}
+      handleHideSidebar={handleHideSidebar}
     />
   )
 }
 
 Header.propTypes = {
-  /** A handler for when the user used the search input. */
-  handleSearchRequest: PropTypes.func,
-  /** A flag identifying whether the header should display the search input. */
-  searchable: PropTypes.bool,
+  alwaysShowLogo: PropTypes.bool,
 }
 
 Header.defaultProps = {
-  handleSearchRequest: () => null,
-  searchable: false,
+  alwaysShowLogo: false,
 }
 
 export default Header

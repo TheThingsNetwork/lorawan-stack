@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default Object.freeze({
+export const PAGE_SIZES = Object.freeze({
   SMALL: 5,
   REGULAR: 20,
 })
+
+export const allowedPageSizes = [20, 30, 50, 100]

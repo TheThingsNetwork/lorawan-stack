@@ -17,6 +17,7 @@ package deviceclaimingserver_test
 import (
 	"context"
 
+	dcstypes "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -80,7 +81,7 @@ func (m MockEndDeviceClaimer) BatchUnclaim(
 type MockGatewayClaimer struct {
 	EUIs []types.EUI64
 
-	ClaimFunc            func(context.Context, types.EUI64, string, string) error
+	ClaimFunc            func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error)
 	UnclaimFunc          func(context.Context, types.EUI64) error
 	IsManagedGatewayFunc func(context.Context, types.EUI64) (bool, error)
 }
@@ -91,7 +92,7 @@ func (claimer MockGatewayClaimer) Claim(
 	eui types.EUI64,
 	ownerToken string,
 	clusterAddress string,
-) error {
+) (*dcstypes.GatewayMetadata, error) {
 	return claimer.ClaimFunc(ctx, eui, ownerToken, clusterAddress)
 }
 

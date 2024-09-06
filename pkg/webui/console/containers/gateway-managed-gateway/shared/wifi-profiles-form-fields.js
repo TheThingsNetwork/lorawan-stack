@@ -101,8 +101,8 @@ const GatewayWifiProfilesFormFields = ({ namePrefix }) => {
               className="ml-cs-xs"
               type="button"
               message={sharedMessages.reset}
-              icon="delete"
               onClick={handleResetPassword}
+              secondary
             />
           )}
         </Form.Field>

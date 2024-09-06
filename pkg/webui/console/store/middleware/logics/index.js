@@ -14,7 +14,8 @@
 
 import status from '@ttn-lw/lib/store/logics/status'
 
-import user from './logout'
+import user from './user'
+import logout from './logout'
 import users from './users'
 import init from './init'
 import applications from './applications'
@@ -36,11 +37,19 @@ import packetBroker from './packet-broker'
 import networkServer from './network-server'
 import qrCodeGenerator from './qr-code-generator'
 import searchAccounts from './search-accounts'
+import notifications from './notifications'
+import userPreferences from './user-preferences'
+import search from './search'
+import topEntities from './top-entities'
+import sessions from './sessions'
+import authorizations from './authorizations'
+import clients from './clients'
 import connectionProfiles from './connection-profiles'
 
 export default [
   ...status,
   ...user,
+  ...logout,
   ...users,
   ...init,
   ...applications,
@@ -62,5 +71,12 @@ export default [
   ...networkServer,
   ...qrCodeGenerator,
   ...searchAccounts,
+  ...notifications,
+  ...userPreferences,
+  ...search,
+  ...topEntities,
+  ...sessions,
+  ...authorizations,
+  ...clients,
   ...connectionProfiles,
 ]

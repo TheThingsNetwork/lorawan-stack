@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ const accountAppInitLogic = createLogic({
       await promisifyDispatch(dispatch)(
         attachPromise(
           user.getUser(meResult.data.user.ids.user_id, [
-            'profile_picture',
             'name',
             'description',
             'primary_email_address',

@@ -14,6 +14,7 @@
 
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import Events from '@console/components/events'
 
@@ -32,14 +33,20 @@ import {
   selectDeviceEventsPaused,
   selectDeviceEventsTruncated,
   selectDeviceEventsFilter,
+  selectDeviceById,
 } from '@console/store/selectors/devices'
 
+const m = defineMessages({
+  deviceEventsOf: 'End device events of <strong>{entityName}</strong>',
+})
+
 const DeviceEvents = props => {
-  const { devIds, widget } = props
+  const { devIds, widget, darkTheme, framed } = props
 
   const appId = getApplicationId(devIds)
   const devId = getDeviceId(devIds)
   const combinedId = combineDeviceIds(appId, devId)
+  const deviceName = useSelector(state => selectDeviceById(state, combinedId).name) || devId
 
   const events = useSelector(state => selectDeviceEvents(state, combinedId))
   const paused = useSelector(state => selectDeviceEventsPaused(state, combinedId))
@@ -91,6 +98,10 @@ const DeviceEvents = props => {
       onPauseToggle={onPauseToggle}
       onFilterChange={onFilterChange}
       truncated={truncated}
+      darkTheme={darkTheme}
+      framed={framed}
+      titleMessage={m.deviceEventsOf}
+      entityName={deviceName}
       scoped
       widget
     />
@@ -98,16 +109,20 @@ const DeviceEvents = props => {
 }
 
 DeviceEvents.propTypes = {
+  darkTheme: PropTypes.bool,
   devIds: PropTypes.shape({
     device_id: PropTypes.string,
     application_ids: PropTypes.shape({
       application_id: PropTypes.string,
     }),
   }).isRequired,
+  framed: PropTypes.bool,
   widget: PropTypes.bool,
 }
 
 DeviceEvents.defaultProps = {
+  darkTheme: false,
+  framed: false,
   widget: false,
 }
 

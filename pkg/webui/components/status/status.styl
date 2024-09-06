@@ -15,16 +15,20 @@
 .status
   position: relative
   display: inline-block
-  top: -2px
   width: 5px
   height: 5px
   border-radius: 50%
   transition: background-color $ad.m
 
-  &:not(.flipped)
-    margin-left: $cs.xs
-  &.flipped
-    margin-right: $cs.xs
+  &-big
+    width: 8px
+    height: 8px
+
+  &:not(.dot-only)
+    &:not(.flipped)
+      margin-left: $cs.xs
+    &.flipped
+      margin-right: $cs.xs
 
   &:after
     content: ''
@@ -37,26 +41,23 @@
     opacity: .7
     animation: pulse 2s infinite
 
+  &-green
+    background-color: var(--c-bg-success-normal)
+
   &-good
-    background-color: $c-active-blue
+    background-color: var(--c-text-brand-normal)
 
   &-bad
-    background-color: $c-error
+    background-color: var(--c-bg-error-normal)
 
   &-mediocre
-    background-color: $c-warning
+    background-color: var(--c-bg-warning-normal)
 
   &-unknown
-    background-color: $c-icon-fill
+    background-color: var(--c-icon-neutral-normal)
 
 .good-pulse:after
   animation: goodPulse 4s infinite
-
-.bad-pulse:after
-  animation: badPulse 4s infinite
-
-.mediocre-pulse:after
-  animation: mediocrePulse 4s infinite
 
 .triggered-good-pulse:after
   animation: triggeredGoodPulse 1.5s ease-out
@@ -86,10 +87,6 @@ triggered-pulse-animation($color, $name)
     100%
       box-shadow: 0 0 0 0 alpha($color, 0)
 
-pulse-animation($c-active-blue, 'goodPulse')
-pulse-animation($c-error, 'badPulse')
-pulse-animation($c-error, 'mediocrePulse')
+pulse-animation($tokens.theme-light.color.icon-info-normal, 'goodPulse')
 
-triggered-pulse-animation($c-active-blue, 'triggeredGoodPulse')
-triggered-pulse-animation($c-error, 'triggeredBadPulse')
-triggered-pulse-animation($c-error, 'triggeredMediocrePulse')
+triggered-pulse-animation($tokens.theme-light.color.icon-info-normal, 'triggeredGoodPulse')

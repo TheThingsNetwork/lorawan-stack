@@ -14,6 +14,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import FileInput from '@ttn-lw/components/file-input'
@@ -312,7 +313,11 @@ const PubsubForm = props => {
   const messageTypesSection = useMemo(
     () => (
       <>
-        <Form.SubTitle title={sharedMessages.eventEnabledTypes} className="mb-0" />
+        <Form.SubTitle
+          title={sharedMessages.eventEnabledTypes}
+          className="mb-0"
+          data-test-id="enbaled-event-types"
+        />
         <Message component="p" content={m.messageInfo} className="mt-0 mb-ls-xxs" />
         <PubsubFormatSelector name="format" required />
         <Form.Field
@@ -492,7 +497,7 @@ const PubsubForm = props => {
           {update && (
             <ModalButton
               type="button"
-              icon="delete"
+              icon={IconTrash}
               danger
               naked
               message={m.deletePubsub}

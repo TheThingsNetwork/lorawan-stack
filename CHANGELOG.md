@@ -24,10 +24,18 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.32.0] - unreleased
+## [3.32.0] - 2024-09-05
 
 ### Added
 
+- Newly redesigned The Things Stack Console. The most notable changes are as follows:
+  - New look and feel
+  - New sidebar-based navigation and structure
+  - Top entities are automatically stored and displayed for faster access
+  - More useful panels in the overviews of gateways, applications and end devices
+  - Quick search feature to search globally for any entity
+  - New event overlay for better in-context event examination
+  - Notifications can now be viewed from within the Console
 - Support for managed gateways and claiming through The Things Gateway Controller.
 - Support for The Things Industries gateway protocol. This is adds a new pair of ports to Gateway Server: `1889` for Envoy or Traefik terminated TLS mutual authentication, and `8889` for The Things Stack terminated TLS mutual authentication.
 - Option to filter the output of the `List` RPCs for end devices and gateways based on when they were updated.

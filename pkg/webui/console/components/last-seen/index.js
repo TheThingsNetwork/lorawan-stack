@@ -23,8 +23,6 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import style from './last-seen.styl'
-
 const computeDeltaInSeconds = (from, to) => {
   // Avoid situations when server clock is ahead of the browser clock.
   if (from > to) {
@@ -37,6 +35,7 @@ const computeDeltaInSeconds = (from, to) => {
 const LastSeen = React.forwardRef((props, ref) => {
   const {
     className,
+    statusClassName,
     lastSeen,
     short,
     updateIntervalInSeconds,
@@ -45,12 +44,19 @@ const LastSeen = React.forwardRef((props, ref) => {
     message,
     status,
     noTitle,
+    displayMessage,
   } = props
 
   return (
-    <Status status={status} pulseTrigger={lastSeen} flipped={flipped} ref={ref}>
-      <div className={classnames(className, style.container)}>
-        {!short && <Message className={style.message} content={message} />}
+    <Status
+      status={status}
+      pulseTrigger={lastSeen}
+      flipped={flipped}
+      ref={ref}
+      className={classnames(statusClassName, 'd-flex al-center')}
+    >
+      <div className={classnames(className, 'd-inline-block')}>
+        {(!short || displayMessage) && <Message className="mr-cs-xxs" content={message} />}
         <DateTime.Relative
           value={lastSeen}
           computeDelta={computeDeltaInSeconds}
@@ -68,6 +74,7 @@ const LastSeen = React.forwardRef((props, ref) => {
 LastSeen.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
+  displayMessage: PropTypes.bool,
   flipped: PropTypes.bool,
   lastSeen: PropTypes.oneOfType([
     PropTypes.string,
@@ -78,6 +85,7 @@ LastSeen.propTypes = {
   noTitle: PropTypes.bool,
   short: PropTypes.bool,
   status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
+  statusClassName: PropTypes.string,
   updateIntervalInSeconds: PropTypes.number,
 }
 
@@ -90,6 +98,8 @@ LastSeen.defaultProps = {
   status: 'good',
   message: sharedMessages.lastSeen,
   noTitle: false,
+  statusClassName: undefined,
+  displayMessage: false,
 }
 
 export default LastSeen

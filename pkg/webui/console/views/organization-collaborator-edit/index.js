@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -35,28 +34,27 @@ const OrganizationCollaboratorEditInner = () => {
   const { orgId, collaboratorId } = useParams()
 
   useBreadcrumbs(
-    'orgs.single.collaborators.edit',
+    'overview.orgs.single.collaborators.single.edit',
     <Breadcrumb
-      path={`/organizations/${orgId}/collaborators/user/${collaboratorId}`}
+      path={`/organizations/${orgId}/collaborators/user/${collaboratorId}/edit`}
       content={sharedMessages.edit}
     />,
   )
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ConsoleCollaboratorsForm
-            entity={ORGANIZATION}
-            entityId={orgId}
-            collaboratorId={collaboratorId}
-            collaboratorType="user"
-            update
-          />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <ConsoleCollaboratorsForm
+          entity={ORGANIZATION}
+          entityId={orgId}
+          collaboratorId={collaboratorId}
+          collaboratorType="user"
+          update
+          isMember
+        />
+      </div>
+    </div>
   )
 }
 
@@ -66,6 +64,11 @@ const OrganizationCollaboratorEdit = () => {
   // Check if collaborator still exists after being possibly deleted.
   const collaborator = useSelector(state => selectCollaboratorById(state, collaboratorId))
   const hasCollaborator = Boolean(collaborator)
+
+  useBreadcrumbs(
+    'overview.orgs.single.collaborators.single',
+    <Breadcrumb path={`/organizations/${orgId}`} content={collaboratorId} />,
+  )
 
   return (
     <RequireRequest requestAction={getCollaborator('organization', orgId, collaboratorId, true)}>

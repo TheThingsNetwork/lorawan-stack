@@ -13,7 +13,7 @@
 // limitations under the License.
 
 .container
-  +media-query-min($bp.s)
+  +media-query-min($bp.lg)
     full-screen()
     horizontalize()
 
@@ -35,6 +35,7 @@
   flex: 1 0
   overflow: auto
   align-items: center
+  justify-content: center
   padding: $ls.s
 
 .visual
@@ -44,16 +45,16 @@
   background-image: url('../../../assets/img/layout/bg/login-visual.jpg')
   background-size: cover
   background-position: left
-  box-shadow: inset 60px 0 60px rgba(0,0,0,0.08)
+  box-shadow: inset 60px 0 60px rgba(0,0,0,.08)
 
-+media-query($bp.l)
++media-query($bp.lg)
   .visual
     width: 40%
 
   .content
     width: 60%
 
-+media-query($bp.s)
++media-query($bp.lg)
   .visual
     display: none
 
@@ -61,16 +62,15 @@
     width: 100%
 
 .form
-  +media-query($bp.s)
+  +media-query($bp.lg)
     margin-top: $header-height-mobile
     padding-bottom: 0
   padding-bottom: $ls.s
   box-sizing: border-box
   min-width: 28rem
   max-width: 30rem
-  margin: auto 0
 
-  +media-query($bp.s)
+  +media-query($bp.lg)
     min-width: auto
     max-width: none
     width: 100%
@@ -80,22 +80,18 @@
   margin: $ls.s 0
 
 .title
-  color: $c-active-blue
+  text-align: center
   margin-top: 0
-  background: linear-gradient(right, 0% $c-active-blue, $c-active-blue-active);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 200
-  font-size: $fs.xl3
-  +media-query($bp.s)
+  font-size: $fs.xl
+  line-height: $lh.xxs
+  font-weight: $fw.bold
+  +media-query($bp.lg)
     font-size: $fs.xl
     text-align: center
 
 .sub-title
   font-size: 3rem
-  font-weight: 800
-  +media-query($bp.s)
-    font-size: $fs.xl3
+  font-weight: $fw.bolder
 
 .submit-button
   min-width: 8rem
@@ -106,12 +102,12 @@
 .buttons
   display: flex
   flex-direction: column
-  +media-query-min($bp.s)
+  +media-query-min($bp.lg)
     flex-direction: row
-  +media-query($bp.s)
+  +media-query($bp.lg)
     button, a
-      margin-bottom: $cs.s !important
-      margin-right: 0 !important
+      margin-bottom: $cs.s
+      margin-right: 0
 
 .footer
   position: fixed
@@ -119,14 +115,21 @@
   left: 0
   right: 0
   z-index: $zi.nav
-  +media-query-min($bp.s)
+  font-size: $fs.s
+  +media-query-min($bp.lg)
     background-color: transparent
     border: 0
 
 .button-break
-  +media-query-min($bp.s)
+  +media-query-min($bp.lg)
     display: static
 
 .error-description
   text-margin-bottom($cs.xl)
   display: block
+
+.login-logo
+  width: 11rem
+  margin-left: auto
+  margin-right: auto
+  margin-bottom: $ls.s

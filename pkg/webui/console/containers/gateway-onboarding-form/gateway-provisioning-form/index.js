@@ -175,6 +175,7 @@ const GatewayProvisioningFormSection = () => {
             type="button"
             message={sharedMessages.convertMacToEui}
             onClick={handleConvertMacToEui}
+            secondary
           />
         ) : hasInputMethod ? (
           <Button
@@ -182,6 +183,7 @@ const GatewayProvisioningFormSection = () => {
             type="button"
             message={sharedMessages.reset}
             onClick={handleEuiReset}
+            secondary
           />
         ) : (
           <Button
@@ -190,6 +192,7 @@ const GatewayProvisioningFormSection = () => {
             message={hasEmptyEui ? m.emtyEui : sharedMessages.confirm}
             onClick={handleGatewayEUI}
             disabled={!hasCompletedEui && !hasEmptyEui}
+            secondary
           />
         )}
       </Form.Field>
