@@ -90,6 +90,11 @@ func TestRemoteStore(t *testing.T) {
 					OrganizationUniqueIdentifiers: []string{"010203", "030405"},
 					Logo:                          "logo.svg",
 				},
+				{
+					BrandId:              "windsensor-vendor",
+					Name:                 "Wind Sensor Vendor",
+					LoraAllianceVendorId: 43,
+				},
 			})
 		})
 	})
@@ -119,6 +124,11 @@ func TestRemoteStore(t *testing.T) {
 					BrandId: "full-vendor",
 					ModelId: "full-device",
 					Name:    "Full Device",
+				},
+				{
+					BrandId: "windsensor-vendor",
+					ModelId: "windsensor",
+					Name:    "Wind Sensor",
 				},
 			})
 		})
@@ -391,18 +401,14 @@ func TestRemoteStore(t *testing.T) {
 				),
 			})
 		})
-
 		t.Run("ByProfile", func(t *testing.T) {
 			template, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
-				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-					BrandId: "foo-vendor",
-				},
 				EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
-					VendorId:        42,
-					VendorProfileId: 0,
+					VendorId:        43,
+					VendorProfileId: 1,
 				},
 			}, &store.EndDeviceProfile{
-				VendorProfileID:           0,
+				VendorProfileID:           1,
 				RegionalParametersVersion: "RP001-1.0.3-RevA",
 				MACVersion:                ttnpb.MACVersion_MAC_V1_0_3,
 				SupportsJoin:              true,
@@ -412,7 +418,11 @@ func TestRemoteStore(t *testing.T) {
 			a.So(template, should.Resemble, &ttnpb.EndDeviceTemplate{
 				EndDevice: &ttnpb.EndDevice{
 					VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-						BrandId: "foo-vendor",
+						BrandId:         "windsensor-vendor",
+						ModelId:         "windsensor",
+						FirmwareVersion: "1.0",
+						HardwareVersion: "1.0",
+						BandId:          "EU_863_870",
 					},
 					LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_3_REV_A,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
