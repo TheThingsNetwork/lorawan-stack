@@ -50,7 +50,7 @@ func (a *Application) PublicSafe() *Application {
 		return nil
 	}
 	var safe Application
-	safe.SetFields(a, PublicApplicationFields...)
+	safe.SetFields(a, PublicApplicationFields...) // nolint:errcheck
 	safe.ContactInfo = onlyPublicContactInfo(safe.ContactInfo)
 	return &safe
 }
@@ -77,7 +77,7 @@ func (c *Client) PublicSafe() *Client {
 		return nil
 	}
 	var safe Client
-	safe.SetFields(c, PublicClientFields...)
+	safe.SetFields(c, PublicClientFields...) // nolint:errcheck
 	safe.ContactInfo = onlyPublicContactInfo(safe.ContactInfo)
 	return &safe
 }
@@ -104,7 +104,7 @@ func (g *Gateway) PublicSafe() *Gateway {
 		return nil
 	}
 	var safe Gateway
-	safe.SetFields(g, PublicGatewayFields...)
+	safe.SetFields(g, PublicGatewayFields...) // nolint:errcheck
 	safe.ContactInfo = onlyPublicContactInfo(safe.ContactInfo)
 	if !safe.StatusPublic {
 		safe.GatewayServerAddress = ""

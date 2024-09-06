@@ -88,7 +88,7 @@ func StreamServerInterceptor(limiter Interface) grpc.StreamServerInterceptor {
 
 		acceptResource := grpcStreamAcceptResource(ctx, info.FullMethod)
 		limit, result := limiter.RateLimit(acceptResource)
-		stream.SetHeader(result.GRPCHeaders())
+		stream.SetHeader(result.GRPCHeaders()) // nolint:errcheck
 		if limit {
 			return errRateLimitExceeded.WithAttributes("key", acceptResource.Key(), "rate", result.Limit)
 		}

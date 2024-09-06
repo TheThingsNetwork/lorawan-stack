@@ -52,7 +52,7 @@ func DeprecateFlagWithoutForwarding(flagSet *pflag.FlagSet, flag string, reason 
 func ForwardFlag(flagSet *pflag.FlagSet, old string, new string) {
 	if oldFlag := flagSet.Lookup(old); oldFlag != nil && oldFlag.Changed {
 		if newFlag := flagSet.Lookup(new); newFlag != nil && !newFlag.Changed {
-			flagSet.Set(new, oldFlag.Value.String())
+			flagSet.Set(new, oldFlag.Value.String()) // nolint:errcheck
 		}
 	}
 }

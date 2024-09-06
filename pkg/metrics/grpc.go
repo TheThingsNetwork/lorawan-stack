@@ -138,7 +138,8 @@ func (hdl statsHandler) HandleConn(ctx context.Context, s stats.ConnStats) {
 	case *stats.ConnBegin:
 		if s.IsClient() {
 			hdl.openedClientConns.WithLabelValues(peer).Inc()
-			hdl.closedClientConns.GetMetricWithLabelValues(peer) // Initialize the "closed" counter.
+			// Initialize the "closed" counter.
+			hdl.closedClientConns.GetMetricWithLabelValues(peer) // nolint:errcheck
 		} else {
 			hdl.openedServerConns.Inc()
 		}

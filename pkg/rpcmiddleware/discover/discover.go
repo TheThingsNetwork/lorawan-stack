@@ -231,7 +231,7 @@ func (r *clusterResolver) watch() {
 		if err != nil {
 			r.cc.ReportError(err)
 		} else {
-			r.cc.UpdateState(*state)
+			r.cc.UpdateState(*state) // nolint:errcheck
 		}
 
 		debounceTimer := time.NewTimer(30 * time.Second)

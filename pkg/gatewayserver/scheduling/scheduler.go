@@ -181,7 +181,7 @@ func NewScheduler(
 		sb := NewSubBand(noDutyCycleParams, s.clock, nil, dutyCycleStyle)
 		s.subBands = append(s.subBands, sb)
 	}
-	go s.gc(ctx)
+	go s.gc(ctx) // nolint:errcheck
 	return s, nil
 }
 
