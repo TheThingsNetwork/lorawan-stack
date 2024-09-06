@@ -193,9 +193,7 @@ const GatewayConnectionSettings = () => {
     (values, profile, entityId, isNonSharedProfile) => ({
       ...values.wifi_profile,
       ...(isNonSharedProfile && { ...profile.data }),
-      profile_id: isNonSharedProfile
-        ? 'non-shared'
-        : (selectedManagedGateway.wifi_profile_id ?? ''),
+      profile_id: isNonSharedProfile ? 'non-shared' : (selectedManagedGateway.wifi_profile_id ?? ''),
       _override: !Boolean(profile) && hasWifiProfileSet,
       _profile_of: entityId ?? '',
     }),
