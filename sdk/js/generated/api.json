@@ -48326,7 +48326,7 @@
           "fields": [
             {
               "name": "format_id",
-              "description": "Identifier of the format used to successfully parse the QR code data.",
+              "description": "Identifier of the format used to parse the QR code data.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -48337,12 +48337,32 @@
               "defaultValue": ""
             },
             {
-              "name": "claim_gateway_request",
+              "name": "gateway_eui",
               "description": "",
               "label": "",
-              "type": "ClaimGatewayRequest",
-              "longType": "ClaimGatewayRequest",
-              "fullType": "ttn.lorawan.v3.ClaimGatewayRequest",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
+            },
+            {
+              "name": "owner_token",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

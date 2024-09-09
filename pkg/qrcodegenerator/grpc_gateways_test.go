@@ -117,6 +117,8 @@ func TestGatewayQRCodeParsing(t *testing.T) {
 					return false
 				}
 				a.So(resp.FormatId, should.Equal, ttigpro1.ID())
+				a.So(resp.GatewayEui, should.Resemble, []uint8{0xec, 0x65, 0x6e, 0xff, 0xfe, 0x00, 0x01, 0x28})
+				a.So(resp.OwnerToken, should.Equal, "abcdef123456")
 
 				return true
 			},

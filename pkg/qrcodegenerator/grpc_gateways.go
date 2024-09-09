@@ -59,14 +59,8 @@ func (s *gatewayQRCodeGeneratorServer) Parse(
 	}
 
 	return &ttnpb.ParseGatewayQRCodeResponse{
-		FormatId: data.FormatID(),
-		ClaimGatewayRequest: &ttnpb.ClaimGatewayRequest{
-			SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
-				AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
-					GatewayEui:         data.GatewayEUI().Bytes(),
-					AuthenticationCode: []byte(data.OwnerToken()),
-				},
-			},
-		},
+		FormatId:   data.FormatID(),
+		GatewayEui: data.GatewayEUI().Bytes(),
+		OwnerToken: data.OwnerToken(),
 	}, nil
 }

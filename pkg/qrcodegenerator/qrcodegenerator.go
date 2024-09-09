@@ -57,7 +57,7 @@ func New(c *component.Component, _ *Config, opts ...Option) (*QRCodeGenerator, e
 	qrg.grpc.gatewayQRCodeGenerator = &gatewayQRCodeGeneratorServer{QRG: qrg}
 
 	qrg.endDevices = enddevices.New(ctx)
-	qrg.gateways = gateways.New(ctx)
+	qrg.gateways = gateways.New()
 
 	c.RegisterGRPC(qrg)
 

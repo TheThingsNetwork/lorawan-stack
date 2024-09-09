@@ -16,7 +16,6 @@
 package gateways
 
 import (
-	"context"
 	"encoding"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -56,13 +55,13 @@ type Server struct {
 }
 
 // New returns a new Server.
-func New(_ context.Context) *Server {
+func New() *Server {
 	s := &Server{
 		// Newer formats should be added to this slice first to
 		// preferentially match with those first.
 		gatewayFormats: []gatewayFormat{
 			{
-				id:     formatIDTTIGPRO1,
+				id:     ttigpro1FormatID,
 				format: new(TTIGPRO1Format),
 			},
 		},

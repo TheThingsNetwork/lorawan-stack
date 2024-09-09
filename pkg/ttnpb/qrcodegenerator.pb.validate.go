@@ -909,18 +909,21 @@ func (m *ParseGatewayQRCodeResponse) ValidateFields(paths ...string) error {
 		switch name {
 		case "format_id":
 			// no validation rules for FormatId
-		case "claim_gateway_request":
+		case "gateway_eui":
 
-			if v, ok := interface{}(m.GetClaimGatewayRequest()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
+			if len(m.GetGatewayEui()) > 0 {
+
+				if len(m.GetGatewayEui()) != 8 {
 					return ParseGatewayQRCodeResponseValidationError{
-						field:  "claim_gateway_request",
-						reason: "embedded message failed validation",
-						cause:  err,
+						field:  "gateway_eui",
+						reason: "value length must be 8 bytes",
 					}
 				}
+
 			}
 
+		case "owner_token":
+			// no validation rules for OwnerToken
 		default:
 			return ParseGatewayQRCodeResponseValidationError{
 				field:  name,

@@ -10563,8 +10563,15 @@ The Pba service allows clients to manage peering through Packet Broker.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `format_id` | [`string`](#string) |  | Identifier of the format used to successfully parse the QR code data. |
-| `claim_gateway_request` | [`ClaimGatewayRequest`](#ttn.lorawan.v3.ClaimGatewayRequest) |  |  |
+| `format_id` | [`string`](#string) |  | Identifier of the format used to parse the QR code data. |
+| `gateway_eui` | [`bytes`](#bytes) |  |  |
+| `owner_token` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.QRCodeFormat">Message `QRCodeFormat`</a>
 

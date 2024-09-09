@@ -22,21 +22,18 @@ import (
 )
 
 const (
-	formatIDTTIGPRO1 = "ttigpro1"
-
-	euiLength        = 16
-	ownerTokenLength = 12
+	ttigpro1FormatID = "ttigpro1"
 )
+
+// ttigpro1Regex is the regular expression to match the TTIGPRO1 format.
+// The format is as follows: https://ttig.pro/c/{16 lowercase base16 chars}/{12 base62 chars}.
+var ttigpro1Regex = regexp.MustCompile(`^https://ttig\.pro/c/([a-f0-9]{16})/([a-z0-9]{12})$`)
 
 // TTIGPRO1 is a format for gateway identification QR codes.
 type ttigpro1 struct {
 	gatewayEUI types.EUI64
 	ownerToken string
 }
-
-// ttigpro1Regex is the regular expression to match the TTIGPRO1 format.
-// The format is as follows: https://ttig.pro/c/{16 lowercase base16 chars}/{12 base62 chars}.
-var ttigpro1Regex = regexp.MustCompile(`^https://ttig\.pro/c/([a-f0-9]{16})/([a-z0-9]{12})$`)
 
 // UnmarshalText implements the TextUnmarshaler interface.
 func (m *ttigpro1) UnmarshalText(text []byte) error {
@@ -52,7 +49,7 @@ func (m *ttigpro1) UnmarshalText(text []byte) error {
 
 	m.ownerToken = matches[2]
 
-	if len(m.ownerToken) != ownerTokenLength {
+	if len(m.ownerToken) != 12 /* owner token length */ {
 		return errInvalidLength
 	}
 
@@ -61,7 +58,7 @@ func (m *ttigpro1) UnmarshalText(text []byte) error {
 
 // FormatID implements the Data interface.
 func (*ttigpro1) FormatID() string {
-	return formatIDTTIGPRO1
+	return ttigpro1FormatID
 }
 
 func (m *ttigpro1) GatewayEUI() types.EUI64 {
@@ -89,7 +86,7 @@ func (TTIGPRO1Format) Format() *ttnpb.QRCodeFormat {
 
 // ID is the identifier of the format as a string.
 func (TTIGPRO1Format) ID() string {
-	return formatIDTTIGPRO1
+	return ttigpro1FormatID
 }
 
 // New implements the Format interface.

@@ -321,30 +321,24 @@ func (dst *ParseGatewayQRCodeResponse) SetFields(src *ParseGatewayQRCodeResponse
 				var zero string
 				dst.FormatId = zero
 			}
-		case "claim_gateway_request":
+		case "gateway_eui":
 			if len(subs) > 0 {
-				var newDst, newSrc *ClaimGatewayRequest
-				if (src == nil || src.ClaimGatewayRequest == nil) && dst.ClaimGatewayRequest == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.ClaimGatewayRequest
-				}
-				if dst.ClaimGatewayRequest != nil {
-					newDst = dst.ClaimGatewayRequest
-				} else {
-					newDst = &ClaimGatewayRequest{}
-					dst.ClaimGatewayRequest = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
+				return fmt.Errorf("'gateway_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayEui = src.GatewayEui
 			} else {
-				if src != nil {
-					dst.ClaimGatewayRequest = src.ClaimGatewayRequest
-				} else {
-					dst.ClaimGatewayRequest = nil
-				}
+				dst.GatewayEui = nil
+			}
+		case "owner_token":
+			if len(subs) > 0 {
+				return fmt.Errorf("'owner_token' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.OwnerToken = src.OwnerToken
+			} else {
+				var zero string
+				dst.OwnerToken = zero
 			}
 
 		default:

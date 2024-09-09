@@ -15,7 +15,6 @@
 package gateways_test
 
 import (
-	"context"
 	"strconv"
 	"testing"
 
@@ -48,7 +47,7 @@ func TestParseGatewaysAuthenticationCodes(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
 
-			qrCode := gateways.New(context.Background())
+			qrCode := gateways.New()
 
 			d, err := qrCode.Parse(tc.FormatID, tc.Data)
 			data := test.Must(d, err)

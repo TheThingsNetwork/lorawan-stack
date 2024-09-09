@@ -28058,10 +28058,15 @@
       "properties": {
         "format_id": {
           "type": "string",
-          "description": "Identifier of the format used to successfully parse the QR code data."
+          "description": "Identifier of the format used to parse the QR code data."
         },
-        "claim_gateway_request": {
-          "$ref": "#/definitions/v3ClaimGatewayRequest"
+        "gateway_eui": {
+          "type": "string",
+          "format": "string",
+          "example": "70B3D57ED000ABCD"
+        },
+        "owner_token": {
+          "type": "string"
         }
       }
     },

@@ -9,6 +9,7 @@ package ttnpb
 import (
 	golang "github.com/TheThingsIndustries/protoc-gen-go-json/golang"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MarshalProtoJSON marshals the QRCodeFormat message to JSON.
@@ -218,10 +219,15 @@ func (x *ParseGatewayQRCodeResponse) MarshalProtoJSON(s *jsonplugin.MarshalState
 		s.WriteObjectField("format_id")
 		s.WriteString(x.FormatId)
 	}
-	if x.ClaimGatewayRequest != nil || s.HasField("claim_gateway_request") {
+	if len(x.GatewayEui) > 0 || s.HasField("gateway_eui") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("claim_gateway_request")
-		x.ClaimGatewayRequest.MarshalProtoJSON(s.WithField("claim_gateway_request"))
+		s.WriteObjectField("gateway_eui")
+		types.MarshalHEXBytes(s.WithField("gateway_eui"), x.GatewayEui)
+	}
+	if x.OwnerToken != "" || s.HasField("owner_token") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("owner_token")
+		s.WriteString(x.OwnerToken)
 	}
 	s.WriteObjectEnd()
 }
@@ -243,13 +249,12 @@ func (x *ParseGatewayQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 		case "format_id", "formatId":
 			s.AddField("format_id")
 			x.FormatId = s.ReadString()
-		case "claim_gateway_request", "claimGatewayRequest":
-			if s.ReadNil() {
-				x.ClaimGatewayRequest = nil
-				return
-			}
-			x.ClaimGatewayRequest = &ClaimGatewayRequest{}
-			x.ClaimGatewayRequest.UnmarshalProtoJSON(s.WithField("claim_gateway_request", true))
+		case "gateway_eui", "gatewayEui":
+			s.AddField("gateway_eui")
+			x.GatewayEui = types.Unmarshal8Bytes(s.WithField("gateway_eui", false))
+		case "owner_token", "ownerToken":
+			s.AddField("owner_token")
+			x.OwnerToken = s.ReadString()
 		}
 	})
 }
