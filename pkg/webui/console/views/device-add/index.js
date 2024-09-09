@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -42,16 +43,20 @@ const DeviceAdd = () => {
     [appId, jsEnabled],
   )
 
+  useBreadcrumbs(
+    'apps.single.devices.add',
+    <Breadcrumb
+      path={`/applications/${appId}/devices/add`}
+      content={sharedMessages.registerEndDevice}
+    />,
+  )
+
   return (
     <RequireRequest requestAction={requestAction}>
-      <Container>
-        <Row>
-          <Col>
-            <PageTitle tall title={sharedMessages.registerEndDevice} className="mb-cs-m" />
-            <DeviceOnboardingForm />
-          </Col>
-        </Row>
-      </Container>
+      <div className="container container--xxl">
+        <PageTitle title={sharedMessages.registerEndDevice} className="mb-cs-m" />
+        <DeviceOnboardingForm />
+      </div>
     </RequireRequest>
   )
 }

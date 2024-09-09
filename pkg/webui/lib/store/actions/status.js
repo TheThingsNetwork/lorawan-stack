@@ -39,3 +39,16 @@ export const [
   { success: ATTEMPT_RECONNECT_SUCCESS, failure: ATTEMPT_RECONNECT_FAILURE },
   { success: attemptReconnectSuccess, failure: attemptReconnectFailure },
 ] = createRequestActions(ATTEMPT_RECONNECT)
+
+export const [
+  {
+    request: GET_NETWORK_STATUS_SUMMARY,
+    success: GET_NETWORK_STATUS_SUMMARY_SUCCESS,
+    failure: GET_NETWORK_STATUS_SUMMARY_FAILURE,
+  },
+  {
+    request: getNetworkStatusSummary,
+    success: getNetworkStatusSummarySuccess,
+    failure: getNetworkStatusSummaryFailure,
+  },
+] = createRequestActions('GET_NETWORK_STATUS_SUMMARY')

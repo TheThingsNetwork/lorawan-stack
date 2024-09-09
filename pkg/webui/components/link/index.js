@@ -17,7 +17,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import classnames from 'classnames'
 import { defineMessages, useIntl } from 'react-intl'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconBook } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -44,7 +44,7 @@ const formatTitle = (content, values, formatter) => {
   return content
 }
 
-const Link = props => {
+const Link = React.forwardRef((props, ref) => {
   const {
     className,
     disabled,
@@ -57,11 +57,17 @@ const Link = props => {
     target,
     showVisited,
     onClick,
+    onMouseEnter,
     secondary,
     primary,
     tabIndex,
     role,
+    allowWrap,
+    dataTestId,
+    ...rest
   } = props
+
+  const dataProps = useMemo(() => filterDataProps(rest), [rest])
 
   const { formatMessage } = useIntl()
   const formattedTitle = formatTitle(title, titleValues, formatMessage)
@@ -69,6 +75,7 @@ const Link = props => {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
     [style.secondary]: secondary,
+    [style.allowWrap]: allowWrap,
   })
 
   if (disabled) {
@@ -88,20 +95,27 @@ const Link = props => {
       to={to}
       target={target}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
       tabIndex={tabIndex}
       role={role}
+      ref={ref}
+      data-test-id={dataTestId}
+      {...dataProps}
     >
       {children}
     </RouterLink>
   )
-}
+})
 
 Link.propTypes = {
+  allowWrap: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
+  dataTestId: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   onClick: PropTypes.func,
+  onMouseEnter: PropTypes.func,
   primary: PropTypes.bool,
   replace: PropTypes.bool,
   role: PropTypes.string,
@@ -123,11 +137,13 @@ Link.propTypes = {
 }
 
 Link.defaultProps = {
+  allowWrap: false,
   children: undefined,
   className: undefined,
   disabled: false,
   id: undefined,
   onClick: () => null,
+  onMouseEnter: undefined,
   primary: false,
   showVisited: false,
   replace: false,
@@ -137,6 +153,7 @@ Link.defaultProps = {
   target: undefined,
   title: undefined,
   titleValues: undefined,
+  dataTestId: '',
 }
 
 const DocLink = props => {
@@ -155,6 +172,7 @@ const DocLink = props => {
     tabIndex,
     raw,
     onClick,
+    allowWrap,
   } = props
 
   const { formatMessage } = useIntl()
@@ -162,6 +180,7 @@ const DocLink = props => {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
     [style.secondary]: secondary,
+    [style.allowWrap]: allowWrap,
   })
   if (disabled) {
     return <span className={classnames(classNames, style.disabled)}>{children}</span>
@@ -180,14 +199,14 @@ const DocLink = props => {
       onClick={onClick}
       tabIndex={tabIndex}
     >
-      {!raw && <Icon className={style.docIcon} icon="book" />}
+      {!raw && <Icon className={style.docIcon} icon={IconBook} size={16} />}
       {children}
-      {!raw && <Icon className={style.icon} icon="launch" />}
     </a>
   )
 }
 
 DocLink.propTypes = {
+  allowWrap: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
   disabled: PropTypes.bool,
@@ -205,6 +224,7 @@ DocLink.propTypes = {
 }
 
 DocLink.defaultProps = {
+  allowWrap: false,
   children: undefined,
   className: undefined,
   disabled: false,
@@ -276,6 +296,7 @@ const AnchorLink = props => {
     disabled,
     external,
     tabIndex,
+    allowWrap,
     ...rest
   } = props
 
@@ -285,6 +306,7 @@ const AnchorLink = props => {
     [style.linkVisited]: showVisited,
     [style.primary]: primary,
     [style.secondary]: secondary,
+    [style.allowWrap]: allowWrap,
   })
   const dataProps = useMemo(() => filterDataProps(rest), [rest])
 
@@ -304,12 +326,12 @@ const AnchorLink = props => {
       {...dataProps}
     >
       {children}
-      {external ? <Icon className={style.icon} icon="launch" /> : null}
     </a>
   )
 }
 
 AnchorLink.propTypes = {
+  allowWrap: PropTypes.bool,
   href: PropTypes.string.isRequired,
   id: PropTypes.string,
   name: PropTypes.string,
@@ -320,6 +342,7 @@ AnchorLink.propTypes = {
 }
 
 AnchorLink.defaultProps = {
+  allowWrap: false,
   showVisited: false,
 }
 

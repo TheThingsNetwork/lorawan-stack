@@ -14,9 +14,10 @@
 
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Col, Row, Container } from 'react-grid-system'
 
 import PageTitle from '@ttn-lw/components/page-title'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -40,7 +41,7 @@ import { getPubsubsList } from '@console/store/actions/pubsubs'
 import { getWebhooksList } from '@console/store/actions/webhooks'
 import { getApplicationLink } from '@console/store/actions/link'
 import { getApiKeysList } from '@console/store/actions/api-keys'
-import { getIsConfiguration } from '@account/store/actions/identity-server'
+import { getIsConfiguration } from '@console/store/actions/identity-server'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
@@ -71,6 +72,11 @@ const ApplicationGeneralSettings = () => {
     getIsConfiguration(),
   ]
 
+  useBreadcrumbs(
+    `apps.single#${appId}.general-settings`,
+    <Breadcrumb path={`/applications/${appId}`} content={sharedMessages.generalSettings} />,
+  )
+
   return (
     <Require
       featureCheck={mayEditBasicApplicationInfo}
@@ -79,14 +85,12 @@ const ApplicationGeneralSettings = () => {
       {/* The request getApplicationLink returns 404 when there is no `skip_payload_crypto`. */}
       {/* This is expected behavior and should not be treated as an error. */}
       <RequireRequest requestAction={requestsList} handleErrors={false}>
-        <Container>
+        <div className="container container--xxl grid">
           <PageTitle title={sharedMessages.generalSettings} />
-          <Row>
-            <Col lg={8} md={12}>
-              <ApplicationGeneralSettingsContainer appId={appId} />
-            </Col>
-          </Row>
-        </Container>
+          <div className="item-12 xl:item-8">
+            <ApplicationGeneralSettingsContainer appId={appId} />
+          </div>
+        </div>
       </RequireRequest>
     </Require>
   )

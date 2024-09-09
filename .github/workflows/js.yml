@@ -39,6 +39,8 @@ jobs:
         run: tools/bin/mage -v jsSDK:lint
       - name: Lint frontend code
         run: tools/bin/mage -v js:lint
+      - name: Lint stylus files
+        run: tools/bin/mage -v styl:lint
       - name: Check for diff
         run: tools/bin/mage git:diff
 

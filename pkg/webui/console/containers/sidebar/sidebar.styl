@@ -1,0 +1,77 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.sidebar
+  --sidebar-width: 24rem
+  border-normal(right)
+  line-height: 1.2
+  font-size: $fs.s
+  width: var(--sidebar-width)
+  flex-shrink: 0
+  flex-grow: 0
+  box-sizing: border-box
+  left: 0
+  height: 100vh
+  sidebar-transition(left)
+  // Stylus has trouble adding multiple properties to a function
+  // so we have to overwrite it like this.
+  transition-property: left, width
+  +media-query($bp.xxl)
+    --sidebar-width: 22rem
+  +media-query($bp.lg-xl)
+    position: absolute
+    top: 0
+    left: -90vw
+    bottom: 0
+    width: 90vw
+    min-width: 18rem
+    max-width: 24rem
+    height: 100vh
+    z-index: $zi.mobile-menu
+
+    &-open
+      left: 0
+
+      & + .sidebar-backdrop
+        opacity: 1
+        visibility: visible
+
+  &-backdrop
+    transition: opacity .3s ease-in-out, visibility .3s ease-in-out
+    opacity: 0
+    visibility: hidden
+    position: fixed
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+    background: rgba(0, 0, 0, .7)
+    z-index: $zi.mobile-menu - 1
+    cursor: pointer
+
+  &-minimized
+    position: absolute
+    top: 3.8rem
+    left: calc(-1 * var(--sidebar-width))
+    bottom: 0
+    height: calc(100vh - 3.8rem)
+    z-index: $zi.mobile-menu
+
+  &-open&.sidebar-minimized
+    left: 0
+    box-shadow: 0 0 2rem 0 rgba(0,0,0,.05)
+
+    & + .sidebar-backdrop
+      opacity: .05
+      visibility: visible

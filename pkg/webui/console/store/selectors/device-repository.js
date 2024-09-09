@@ -15,7 +15,11 @@
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
-import { LIST_BRANDS_BASE, LIST_MODELS_BASE } from '@console/store/actions/device-repository'
+import {
+  GET_MODEL_BASE,
+  LIST_BRANDS_BASE,
+  LIST_MODELS_BASE,
+} from '@console/store/actions/device-repository'
 
 const EMPTY_MODEL = { list: [] }
 const EMPTY_ARRAY = []
@@ -37,6 +41,7 @@ export const selectDeviceModelsByBrandId = (state, brandId) => {
 }
 export const selectDeviceModelsFetching = createFetchingSelector(LIST_MODELS_BASE)
 export const selectDeviceModelsError = createErrorSelector(LIST_MODELS_BASE)
+export const selectDeviceModelFetching = createFetchingSelector(GET_MODEL_BASE)
 export const selectDeviceModelById = (state, brandId, modelId) => {
   const models = selectDeviceModelsByBrandId(state, brandId)
 

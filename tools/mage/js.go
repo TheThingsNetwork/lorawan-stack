@@ -341,7 +341,7 @@ func (js Js) Storybook() error {
 	return js.runYarnCommandV(
 		"sb", "dev",
 		"--config-dir", "./config/storybook",
-		"--port", "9001",
+		"-p", "9001",
 	)
 }
 

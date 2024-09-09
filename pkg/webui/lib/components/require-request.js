@@ -27,28 +27,31 @@ import { FullViewErrorInner } from './full-view-error'
 // `<RequireRequest />` is a utility component that can wrap a component tree
 // and dispatch a request action, rendering a loading spinner until the request
 // has been resolved. It also takes care of rendering possible errors if wished.
-const RequireRequest = ({
-  requestAction,
-  children,
-  handleErrors,
-  spinnerProps,
-  errorRenderFunction: ErrorRenderFunction,
-}) => {
-  const [fetching, error] = useRequest(requestAction)
-  if (fetching) {
-    return (
-      <Spinner {...spinnerProps}>
-        <Message content={sharedMessages.fetching} />
-      </Spinner>
-    )
-  }
+const RequireRequest = React.memo(
+  ({
+    requestAction,
+    children,
+    handleErrors,
+    spinnerProps,
+    errorRenderFunction: ErrorRenderFunction,
+    requestOnChange,
+  }) => {
+    const [fetching, error] = useRequest(requestAction, requestOnChange)
+    if (fetching) {
+      return (
+        <Spinner {...spinnerProps}>
+          <Message content={sharedMessages.fetching} />
+        </Spinner>
+      )
+    }
 
-  if (error && handleErrors) {
-    return <ErrorRenderFunction error={error} />
-  }
+    if (error && handleErrors) {
+      return <ErrorRenderFunction error={error} />
+    }
 
-  return children
-}
+    return children
+  },
+)
 
 RequireRequest.propTypes = {
   children: PropTypes.node.isRequired,
@@ -59,6 +62,7 @@ RequireRequest.propTypes = {
     PropTypes.arrayOf(PropTypes.shape({})),
     PropTypes.func,
   ]).isRequired,
+  requestOnChange: PropTypes.bool,
   spinnerProps: PropTypes.shape(Spinner.propTypes),
 }
 
@@ -66,6 +70,7 @@ RequireRequest.defaultProps = {
   errorRenderFunction: FullViewErrorInner,
   handleErrors: true,
   spinnerProps: { center: true },
+  requestOnChange: false,
 }
 
 export default RequireRequest

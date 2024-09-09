@@ -12,39 +12,100 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.table
-  width: 100%
-  table-layout: fixed
-
-  tr
-    height: 3rem
-
-  th
-    text-align: left
-    font-weight: $fw.normal
-    color: $tc-subtle-gray
-    min-width: 6rem
-    padding-right: $cs.xs
-
-  +media-query($bp.m)
-    margin-bottom: $ls.xs
-
-tr.group-heading
-  height: auto
-  vertical-align: bottom
-
-  &:not(:first-child)
-    height: 3.5rem
-  th
-    color: $tc-deep-gray
+.data-sheet
+  &-header
+    display: flex
+    align-items: center
+    justify-content: space-between
+    line-height: 1
+    height: auto
+    color: var(--c-text-neutral-heavy)
     font-weight: $fw.bold
-    width: 33%
-    white-space: nowrap
-    +media-query($bp.s)
+    margin-bottom: $cs.xl
+
+    +media-query($bp.md)
+      margin-top: $cs.l
+
+  &-section-collapsed
+    height: auto
+    opacity: 1
+    overflow: hidden
+    transition: max-height $ad.m ease-in-out, opacity $ad.xs ease-in-out
+    +media-query($bp.md)
+      height: 0px
+      margin-bottom: 0
+      opacity: 0
+
+  &-row
+    &-heading
+      align-items: center
+      line-height: 1.2
+      text-align: left
+      font-weight: 400
+      color: var(--c-text-neutral-semilight)
       width: 50%
 
-.sub th
-  padding-left: $cs.l
+      +media-query($bp.md)
+        font-size: $fs.s
+
+    &-content
+      height: 2.5rem
+      display: flex
+      align-items: center
+      justify-content: space-between
+      margin-bottom: $cs.xs
+
+      +media-query($bp.md)
+        margin-left: $cs.s
+
+      &:last-child
+        &:not(.last-group-last-item)
+          margin-bottom: $cs.xl
+
+      &-value
+        flex-grow: 1
+        text-align: left
+        max-width: 55%
+
+  &-divider
+    +media-query($bp.md)
+      height: 1px
+      width: 100%
+      margin: 0 auto $cs.l
+      background: var(--c-border-neutral-light)
 
 .not-available
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
+
+.tooltip-icon
+  color: var(--c-icon-neutral-light)
+  margin-bottom: -4px
+  margin-left: 2px
+
+.icon
+  display: none
+  +media-query($bp.md)
+    display: inline-block
+
+@container panel (max-width: 530px)
+  .data-sheet-row-content-value
+    max-width: 45%
+
+@container panel (max-width: 350px)
+  .data-sheet-header
+    margin-bottom: $cs.l
+
+  .data-sheet-row-heading
+    height: auto
+    line-height: 1
+    margin-bottom: $cs.xs
+
+  .data-sheet-row-content
+    flex-direction: column
+    justify-content: flex-start
+    align-items: flex-start
+    height: fit-content
+    margin-bottom: $cs.xl
+
+  .data-sheet-row-content-value
+    max-width: 100%

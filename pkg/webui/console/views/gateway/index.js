@@ -13,19 +13,21 @@
 // limitations under the License.
 
 import React, { useCallback, useEffect } from 'react'
-import { Routes, Route, useParams } from 'react-router-dom'
+import { Routes, Route, useParams, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import gatewayIcon from '@assets/misc/gateway.svg'
+import { GATEWAY } from '@console/constants/entities'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
-import SideNavigation from '@ttn-lw/components/navigation/side'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
+
+import GatewayOverviewHeader from '@console/containers/gateway-overview-header'
+import EventSplitFrame from '@console/containers/event-split-frame'
+import GatewayEvents from '@console/containers/gateway-events'
 
 import GatewayCollaborators from '@console/views/gateway-collaborators'
 import GatewayLocation from '@console/views/gateway-location'
@@ -36,29 +38,17 @@ import GatewayOverview from '@console/views/gateway-overview'
 import GatewayManagedGateway from '@console/views/gateway-managed-gateway'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
-
-import {
-  mayViewGatewayInfo,
-  mayViewGatewayEvents,
-  mayViewOrEditGatewayLocation,
-  mayViewOrEditGatewayCollaborators,
-  mayViewOrEditGatewayApiKeys,
-  mayEditBasicGatewayInformation,
-} from '@console/lib/feature-checks'
 
 import {
   getGateway,
   stopGatewayEventsStream,
   getGatewaysRightsList,
 } from '@console/store/actions/gateways'
+import { getGsFrequencyPlans } from '@console/store/actions/configuration'
+import { trackRecencyFrequencyItem } from '@console/store/actions/recency-frequency-items'
 
-import {
-  selectSelectedGateway,
-  selectGatewayRights,
-  selectIsSelectedGatewayManaged,
-} from '@console/store/selectors/gateways'
+import { selectSelectedGateway } from '@console/store/selectors/gateways'
 
 const Gateway = () => {
   const { gtwId } = useParams()
@@ -92,25 +82,34 @@ const Gateway = () => {
         selector.push('lbs_lns_secret')
       }
 
+      dispatch(getGsFrequencyPlans())
+
       return dispatch(attachPromise(getGateway(gtwId, selector)))
     },
     [gtwId],
   )
   useEffect(() => () => dispatch(stopGatewayEventsStream(gtwId)), [gtwId, dispatch])
 
+  // Track gateway access.
+  useEffect(() => {
+    dispatch(trackRecencyFrequencyItem(GATEWAY, gtwId))
+  }, [dispatch, gtwId])
+
   const gateway = useSelector(selectSelectedGateway)
   const hasGateway = Boolean(gateway)
 
   return (
-    <RequireRequest requestAction={initialFetch}>{hasGateway && <GatewayInner />}</RequireRequest>
+    <RequireRequest requestAction={initialFetch} requestOnChange>
+      {hasGateway && <GatewayInner />}
+    </RequireRequest>
   )
 }
 
 const GatewayInner = () => {
   const { gtwId } = useParams()
+  const { pathname } = useLocation()
   const gateway = useSelector(selectSelectedGateway)
-  const rights = useSelector(selectGatewayRights)
-  const isGtwManaged = useSelector(selectIsSelectedGatewayManaged)
+  const isEventsPath = pathname.endsWith('/data')
 
   const gatewayName = gateway?.name || gtwId
 
@@ -118,57 +117,8 @@ const GatewayInner = () => {
 
   return (
     <>
-      <Breadcrumbs />
       <IntlHelmet titleTemplate={`%s - ${gatewayName} - ${selectApplicationSiteName()}`} />
-      <SideNavigation
-        header={{
-          icon: gatewayIcon,
-          iconAlt: sharedMessages.gateway,
-          title: gatewayName,
-          to: '',
-        }}
-      >
-        {mayViewGatewayInfo.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.overview} path="" icon="overview" exact />
-        )}
-        {isGtwManaged && (
-          <SideNavigation.Item title={sharedMessages.managedGateway} icon="router">
-            <SideNavigation.Item
-              title={sharedMessages.connectionSettings}
-              path="managed-gateway/connection-settings"
-              icon="language"
-            />
-            <SideNavigation.Item
-              title={sharedMessages.wifiProfiles}
-              path="managed-gateway/wifi-profiles"
-              icon="tune"
-            />
-          </SideNavigation.Item>
-        )}
-        {mayViewGatewayEvents.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.liveData} path="data" icon="data" />
-        )}
-        {mayViewOrEditGatewayLocation.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.location} path="location" icon="location" />
-        )}
-        {mayViewOrEditGatewayCollaborators.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.collaborators}
-            path="collaborators"
-            icon="organization"
-          />
-        )}
-        {mayViewOrEditGatewayApiKeys.check(rights) && (
-          <SideNavigation.Item title={sharedMessages.apiKeys} path="api-keys" icon="api_keys" />
-        )}
-        {mayEditBasicGatewayInformation.check(rights) && (
-          <SideNavigation.Item
-            title={sharedMessages.generalSettings}
-            path="general-settings"
-            icon="general_settings"
-          />
-        )}
-      </SideNavigation>
+      <GatewayOverviewHeader gateway={gateway} />
       <Routes>
         <Route index Component={GatewayOverview} />
         <Route path="managed-gateway/*" Component={GatewayManagedGateway} />
@@ -179,6 +129,11 @@ const GatewayInner = () => {
         <Route path="general-settings" Component={GatewayGeneralSettings} />
         <Route path="*" element={GenericNotFound} />
       </Routes>
+      {!isEventsPath && (
+        <EventSplitFrame>
+          <GatewayEvents gtwId={gtwId} darkTheme framed />
+        </EventSplitFrame>
+      )}
     </>
   )
 }

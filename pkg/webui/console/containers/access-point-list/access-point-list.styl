@@ -21,15 +21,22 @@
   height: 15rem
   min-width: 15rem
   overflow-x: auto
+  .wifi-icon
+    color: var(--c-icon-neutral-normal)
+
   .item
     padding: $cs.xxs $cs.xs
-    &.active
-      background-color: $c-active-blue-active
-      color: white
 
-      span
-        color: white
+    .lock-icon
+      color: var(--c-icon-neutral-light)
+
+    &.active
+      background-color: var(--c-bg-info-normal)
+      color: var(--c-text-neutral-min)
+
+      .lock-icon, .wifi-icon
+        color: var(--c-text-neutral-min)
     &:not(.active):hover
       cursor: pointer
-      background-color: $c-backdrop
+      background-color: var(--c-bg-neutral-light)
 

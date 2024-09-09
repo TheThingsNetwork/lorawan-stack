@@ -21,13 +21,13 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import WithRootClass from '@ttn-lw/lib/components/with-root-class'
 
 import DeviceEvents from '@console/containers/device-events'
 
 import appStyle from '@console/views/app/app.styl'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import useRootClass from '@ttn-lw/lib/hooks/use-root-class'
 
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
@@ -47,6 +47,8 @@ const Data = () => {
     />,
   )
 
+  useRootClass(appStyle.stage, 'stage')
+
   if (!device) {
     return <GenericNotFound />
   }
@@ -54,12 +56,10 @@ const Data = () => {
   const { ids } = device
 
   return (
-    <WithRootClass className={appStyle.stageFlex} id="stage">
-      <div className={style.overflowContainer}>
-        <IntlHelmet hideHeading title={sharedMessages.liveData} />
-        <DeviceEvents devIds={ids} />
-      </div>
-    </WithRootClass>
+    <div className={style.overflowContainer}>
+      <IntlHelmet hideHeading title={sharedMessages.liveData} />
+      <DeviceEvents devIds={ids} />
+    </div>
   )
 }
 

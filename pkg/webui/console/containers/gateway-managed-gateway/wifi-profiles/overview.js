@@ -17,6 +17,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { createSelector } from 'reselect'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { IconPencil, IconPlus } from '@tabler/icons-react'
 
 import Form from '@ttn-lw/components/form'
 import Button from '@ttn-lw/components/button'
@@ -54,6 +55,8 @@ const m = defineMessages({
   deleteProfile: 'Delete profile',
   deleteSuccess: 'WiFi profile deleted',
   deleteFail: 'There was an error and the WiFi profile could not be deleted',
+  deleteModalMessage:
+    'The profile will not be applicable to gateways anymore and gateways using this profile might lose connectivity. Please make sure to update the gateway settings before deleting this profile.',
 })
 
 const GatewayWifiProfilesOverview = () => {
@@ -123,13 +126,21 @@ const GatewayWifiProfilesOverview = () => {
           ),
         }),
         render: details => (
-          <ButtonGroup align="end">
-            <Button message={sharedMessages.edit} icon="edit" onClick={details.edit} />
+          <ButtonGroup align="end" className="gap-0">
+            <Button
+              message={sharedMessages.edit}
+              icon={IconPencil}
+              onClick={details.edit}
+              secondary
+              small
+            />
             <DeleteModalButton
               message={sharedMessages.delete}
               entityId={details.id}
               entityName={details.name}
               onApprove={details.delete}
+              defaultMessage={m.deleteModalMessage}
+              small
             />
           </ButtonGroup>
         ),
@@ -201,7 +212,7 @@ const GatewayWifiProfilesOverview = () => {
                 primary
                 onClick={onAddProfile}
                 message={sharedMessages.addWifiProfile}
-                icon="add"
+                icon={IconPlus}
               />
             </div>
             {Boolean(values._profile_of) && (

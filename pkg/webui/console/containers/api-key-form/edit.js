@@ -16,6 +16,7 @@ import React, { useState, useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import toast from '@ttn-lw/components/toast'
@@ -125,7 +126,7 @@ const ApiKeyEditForm = ({ entity, entityId }) => {
         <FormSubmit component={SubmitButton} message={sharedMessages.saveChanges} />
         <ModalButton
           type="button"
-          icon="delete"
+          icon={IconTrash}
           danger
           naked
           message={m.deleteKey}

@@ -138,7 +138,7 @@ const GatewayRegistrationFormSections = () => {
         component="p"
         content={m.requireAuthenticatedConnectionDescription}
         values={{ packetBrokerURL: PacketBrokerURL }}
-        className="m-0 mb-cs-xs tc-subtle-gray"
+        className="m-0 mb-cs-xs c-text-neutral-light"
       />
       <Form.Field
         name="status_public"

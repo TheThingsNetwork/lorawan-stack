@@ -65,8 +65,9 @@ module.exports = defineConfig({
 
       return configWithPermissions
     },
+    scrollBehavior: 'center',
     experimentalRunAllSpecs: true,
-    excludeSpecPattern: '!*.spec.js',
+    excludeSpecPattern: ['!*.spec.js'],
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
   },
   asBaseUrl: 'http://localhost:1885/api/v3',

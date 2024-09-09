@@ -15,16 +15,25 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation, useParams, Routes, Route } from 'react-router-dom'
-import { Col, Row, Container } from 'react-grid-system'
 
+import {
+  IconArrowsSort,
+  IconLayoutDashboard,
+  IconListDetails,
+  IconMapPin,
+  IconSettings,
+  IconSourceCode,
+} from '@ttn-lw/components/icon'
+import Tabs from '@ttn-lw/components/tabs'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Tabs from '@ttn-lw/components/tabs'
 
 import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import DeviceTitleSection from '@console/containers/device-title-section'
+import DeviceOverviewHeader from '@console/containers/device-overview-header'
+import EventSplitFrame from '@console/containers/event-split-frame'
+import DeviceEvents from '@console/containers/device-events'
 
 import DeviceData from '@console/views/device-data'
 import DeviceGeneralSettings from '@console/views/device-general-settings'
@@ -50,8 +59,10 @@ import style from './device.styl'
 
 const Device = () => {
   const { devId } = useParams()
+  const { pathname } = useLocation()
   const appId = useSelector(selectSelectedApplicationId)
   const device = useSelector(state => selectSelectedDevice(state))
+  const isEventsPath = pathname.endsWith('/data')
 
   const { name, application_server_address } = device
 
@@ -84,44 +95,59 @@ const Device = () => {
   )
 
   const tabs = [
-    { title: sharedMessages.overview, name: 'overview', link: basePath },
-    { title: sharedMessages.liveData, name: 'data', link: `${basePath}/data` },
+    {
+      title: sharedMessages.endDeviceOverview,
+      name: 'overview',
+      link: basePath,
+      icon: IconLayoutDashboard,
+    },
+    {
+      title: sharedMessages.liveData,
+      name: 'data',
+      link: `${basePath}/data`,
+      icon: IconListDetails,
+    },
     {
       title: sharedMessages.messaging,
       name: 'messaging',
       exact: false,
       link: messagingLink,
       hidden: hideMessaging,
+      icon: IconArrowsSort,
     },
-    { title: sharedMessages.location, name: 'location', link: `${basePath}/location` },
+    {
+      title: sharedMessages.location,
+      name: 'location',
+      link: `${basePath}/location`,
+      icon: IconMapPin,
+    },
     {
       title: sharedMessages.payloadFormatters,
       name: 'develop',
       link: payloadFormattersLink,
       exact: false,
       hidden: hidePayloadFormatters,
+      icon: IconSourceCode,
     },
     {
-      title: sharedMessages.generalSettings,
+      title: sharedMessages.settings,
       name: 'general-settings',
       link: `${basePath}/general-settings`,
+      icon: IconSettings,
     },
   ]
 
   return (
     <>
       <IntlHelmet titleTemplate={`%s - ${name || devId} - ${siteName}`} />
-      <div className={style.titleSection}>
-        <Container>
-          <Row>
-            <Col sm={12}>
-              <DeviceTitleSection appId={appId} devId={devId}>
-                <Tabs className={style.tabs} narrow tabs={tabs} />
-              </DeviceTitleSection>
-            </Col>
-          </Row>
-        </Container>
-      </div>
+      <DeviceOverviewHeader device={device} />
+      <Tabs
+        className={style.tabs}
+        tabs={tabs}
+        divider
+        individualTabClassName="al-center w-full"
+        tabItemClassName="w-full box-border j-center"
+      />
       <Routes>
         <Route index Component={DeviceOverview} />
         <Route path="data" Component={DeviceData} />
@@ -133,6 +159,11 @@ const Device = () => {
         )}
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
+      {!isEventsPath && (
+        <EventSplitFrame>
+          <DeviceEvents devIds={device.ids} darkTheme framed />
+        </EventSplitFrame>
+      )}
     </>
   )
 }

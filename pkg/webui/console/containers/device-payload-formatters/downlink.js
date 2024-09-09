@@ -33,8 +33,7 @@ import PayloadFormattersForm from '@console/components/payload-formatters-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { checkFromState } from '@account/lib/feature-checks'
-import { mayViewApplicationLink } from '@console/lib/feature-checks'
+import { checkFromState, mayViewApplicationLink } from '@console/lib/feature-checks'
 
 import { updateDevice } from '@console/store/actions/devices'
 import { getRepositoryPayloadFormatters } from '@console/store/actions/device-repository'

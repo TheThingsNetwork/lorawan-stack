@@ -15,7 +15,10 @@
 // Package types provides types for the Device Claiming Server.
 package types
 
-import "go.thethings.network/lorawan-stack/v3/pkg/types"
+import (
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+)
 
 // EUI64Range is a range of EUI64s.
 type EUI64Range interface {
@@ -55,4 +58,9 @@ func RangeFromEUI64Range(start, end types.EUI64) EUI64Range {
 		start: start.MarshalNumber(),
 		end:   end.MarshalNumber(),
 	}
+}
+
+// GatewayMetadata contains metadata of a gateway, typically returned on claiming.
+type GatewayMetadata struct {
+	Antennas []*ttnpb.GatewayAntenna
 }

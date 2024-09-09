@@ -13,73 +13,93 @@
 // limitations under the License.
 
 .pagination
+  height: 2.5rem
   white-space: nowrap
   padding: 0
+  border: 1px solid var(--c-border-neutral-light)
+  background: var(--c-bg-neutral-min)
+  border-radius: $br.m
+  width: fit-content
+  display: flex
+  align-items: center
+  gap: $cs.xxs
+  margin: 0
 
   .item
     margin: 0
 
 .item
+  width: $cs.xl
+  height: $cs.xl
   display: inline-block
-  color: $c-active-blue
-  font-weight: $fw.bold
+  color: var(--c-text-neutral-heavy)
   user-select: none
 
+  a
+    display: inline-block
+    cursor: pointer
+    height: 100%
+    width: 100%
+
   .link:hover
-    background-color: hoverize(white)
+    background-color: hoverize(var(--c-bg-neutral-min-hover))
 
   .link
     +focus-visible()
-      background-color: hoverize(white)
+      background-color: hoverize(var(--c-bg-neutral-min))
 
   .link:active
-    background-color: activize(white)
+    background-color: activize(var(--c-bg-neutral-min))
 
-  &-navigation-next
-    .link
-      border-radius: 0 $br.s $br.s 0
-      border-dark()
-
-  &-navigation-prev
-    .link
-      border-radius: $br.s 0 0 $br.s
 
   &-disabled
-    .link
+    a
       opacity: .4
       cursor: not-allowed
 
   &-active
     .link
-      background-color: $c-active-blue
-      border: 1px solid $c-active-blue
-      color: white
-
-      +focus-visible()
-        background-color: hoverize($c-active-blue)
-
-    & + .item
-      a
-        border-left: 0
-
-    & + .item-break
-      border-left: 0
+      background-color: var(--c-text-brand-normal)
+      color: var(--c-bg-neutral-min)
+      border-radius: $br.m
 
     .link:hover
-      background-color: $c-active-blue
+      background-color: var(--c-text-brand-normal)
 
   &-break
-    color: $c-active-blue
-    padding: $cs.xs $cs.m
-    border-dark()
-    border-right: 0
+    padding: 0 $cs.xxs
+
+  &-icon
+    color: var(--c-text-neutral-semilight)
+    position: relative
+    top: 4px
 
 .link
-  padding: $cs.xs $cs.m
   outline: 0
   text-align: center
   text-decoration: none
-  cursor: pointer
-  display: inline-block
-  border-dark()
-  border-right: 0
+  line-height: 1.9
+
+.size-message
+  color: var(--c-text-neutral-semilight)
+  white-space: nowrap
+
+.select-size
+  :global(.select__value-container)
+    padding: 0 0 0 8px
+  :global(.select__indicator-separator)
+    display: none
+  :global(.select__menu)
+    color: var(--c-text-neutral-heavy)
+  :global(.select__control)
+    min-height: 2.5rem
+    cursor: pointer
+    border-radius: $br.m
+    box-shadow: 0px 2px 2px 0px rgba(0,0,0,.045), inset 0px 0px 0px 1px var(--c-bg-neutral-min)
+    border: 1px solid transparent
+    background: linear-gradient(to bottom, var(--c-bg-neutral-min), var(--c-bg-neutral-min)) padding-box, linear-gradient(to bottom, var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02)) border-box
+  :global(.select__control)
+    &:hover
+      box-shadow: 0px 2px 2px 0px rgba(0,0,0,.045), inset 0px 0px 0px 1px var(--c-bg-neutral-min)
+      border-color: transparent
+      background: linear-gradient(to bottom, var(--c-bg-neutral-min-hover), var(--c-bg-neutral-min-hover)) padding-box, linear-gradient(to bottom, var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02)) border-box

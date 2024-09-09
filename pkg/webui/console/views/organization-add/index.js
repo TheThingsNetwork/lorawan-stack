@@ -13,12 +13,13 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Link from '@ttn-lw/components/link'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -45,9 +46,14 @@ const OrganizationAdd = () => {
     [navigate],
   )
 
+  useBreadcrumbs(
+    'overview.orgs.add',
+    <Breadcrumb path="/organizations/add" content={sharedMessages.createOrganization} />,
+  )
+
   return (
     <Require featureCheck={mayCreateOrganizations} otherwise={{ redirect: '/organizations' }}>
-      <Container>
+      <div className="container container--xxl grid">
         <PageTitle
           colProps={{ md: 10, lg: 9 }}
           className="mb-cs-s"
@@ -67,12 +73,10 @@ const OrganizationAdd = () => {
           />
           <hr className="mb-ls-s" />
         </PageTitle>
-        <Row>
-          <Col md={10} lg={9}>
-            <OrganizationAddForm onSuccess={handleSuccess} />
-          </Col>
-        </Row>
-      </Container>
+        <div className="item-10 xl:item-9">
+          <OrganizationAddForm onSuccess={handleSuccess} />
+        </div>
+      </div>
     </Require>
   )
 }

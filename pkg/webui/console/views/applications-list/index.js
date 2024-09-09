@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
-import { Row, Col, Container } from 'react-grid-system'
+
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -21,15 +23,15 @@ import ApplicationsTable from '@console/containers/applications-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const ApplicationsList = () => (
-  <Container>
-    <Row>
+const ApplicationsList = () => {
+  useBreadcrumbs('apps.list', <Breadcrumb path={`/applications`} content={sharedMessages.list} />)
+
+  return (
+    <div className="container container--xxl p-0">
       <IntlHelmet title={sharedMessages.applications} />
-      <Col>
-        <ApplicationsTable />
-      </Col>
-    </Row>
-  </Container>
-)
+      <ApplicationsTable />
+    </div>
+  )
+}
 
 export default ApplicationsList

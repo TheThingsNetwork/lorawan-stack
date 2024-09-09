@@ -19,3 +19,4 @@ export const id = /^[a-z0-9](?:[-]?[a-z0-9]){2,}$/
 export const userId = /^[a-z0-9](?:[-]?[a-z0-9]){1,}$/
 export const pathId = /([a-z0-9-]{3,})/
 export const userPathId = /([a-z0-9-]{2,})/
+export const uuid = /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/

@@ -26,7 +26,6 @@ import style from './details.styl'
 const m = defineMessages({
   showDetails: 'Show details',
   errorDetails: 'Error details',
-  close: 'Close',
 })
 
 const Details = props => {
@@ -56,8 +55,8 @@ const Details = props => {
         visible={showDetails}
         onComplete={handleModalComplete}
         approval={false}
-        buttonMessage={m.close}
-        approveButtonProps={{ primary: false, icon: undefined }}
+        buttonMessage={sharedMessages.close}
+        approveButtonProps={{ secondary: true, icon: undefined }}
         noTitleLine
       >
         <pre className={style.detailsCode}>{content}</pre>

@@ -26,13 +26,14 @@ import {
   UPDATE_GTW_STATS_FAILURE,
   START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
+  FETCH_GTWS_LIST_SUCCESS,
   GET_GATEWAY_CLAIM_INFO_BY_EUI_SUCCESS,
   UPDATE_MANAGED_GATEWAY_SUCCESS,
 } from '@console/store/actions/gateways'
 
 const defaultStatisticsState = {
   error: undefined,
-  stats: {},
+  stats: undefined,
 }
 
 const defaultState = {
@@ -74,7 +75,7 @@ const statistics = (state = defaultStatisticsState, { type, payload }) => {
 }
 
 const gateways = (state = defaultState, action) => {
-  const { type, payload } = action
+  const { type, payload, meta } = action
 
   switch (type) {
     case GET_GATEWAY_CLAIM_INFO_BY_EUI_SUCCESS:
@@ -86,7 +87,7 @@ const gateways = (state = defaultState, action) => {
       return {
         ...state,
         statistics: defaultStatisticsState,
-        selectedGateway: payload.id,
+        selectedGateway: meta.options.noSelect ? state.selectedGateway : payload.id,
       }
     case GET_GTW_SUCCESS:
     case UPDATE_GTW_SUCCESS:
@@ -147,6 +148,7 @@ const gateways = (state = defaultState, action) => {
         selectedGateway: null,
         entities: rest,
       }
+    case FETCH_GTWS_LIST_SUCCESS:
     case GET_GTWS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
         (acc, gtw) => {

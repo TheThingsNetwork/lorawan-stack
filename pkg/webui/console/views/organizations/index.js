@@ -34,8 +34,8 @@ import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
 const Organizations = () => {
   useBreadcrumbs(
-    'orgs',
-    <Breadcrumb path="/organizations" content={sharedMessages.organizations} />,
+    'overview.orgs',
+    <Breadcrumb path={`/organizations`} content={sharedMessages.organizations} />,
   )
 
   return (

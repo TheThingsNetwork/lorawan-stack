@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import { useParams } from 'react-router-dom'
 
 import PageTitle from '@ttn-lw/components/page-title'
@@ -26,14 +25,12 @@ const ApplicationWebhooksList = () => {
   const { appId } = useParams()
 
   return (
-    <Container>
+    <div className="container container--xxl p-0">
       <PageTitle title={sharedMessages.webhooks} hideHeading />
-      <Row>
-        <Col>
-          <WebhooksTable appId={appId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12">
+        <WebhooksTable appId={appId} />
+      </div>
+    </div>
   )
 }
 

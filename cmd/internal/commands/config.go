@@ -137,7 +137,7 @@ func Config(mgr *config.Manager) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				cmd.OutOrStdout().Write(yaml)
+				cmd.OutOrStdout().Write(yaml) // nolint:errcheck
 			}
 			return nil
 		},

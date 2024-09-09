@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
@@ -47,7 +46,7 @@ const m = defineMessages({
 const DeviceAddBulk = () => {
   const appId = useSelector(selectSelectedApplicationId)
   useBreadcrumbs(
-    'devices.import',
+    'device.import',
     <Breadcrumb path={`/applications/${appId}/devices/import`} content={sharedMessages.import} />,
   )
 
@@ -62,17 +61,15 @@ const DeviceAddBulk = () => {
       errorRenderFunction={SubViewError}
       spinnerProps={{ center: false, inline: true }}
     >
-      <Container>
+      <div className="container container--xxl grid">
         <PageTitle title={sharedMessages.importDevices} />
-        <Row>
-          <Col md={12}>
-            {showEmptyWarning && (
-              <Notification warning title={m.noTemplatesTitle} content={m.noTemplates} />
-            )}
-            <DeviceImporter />
-          </Col>
-        </Row>
-      </Container>
+        <div className="item-12">
+          {showEmptyWarning && (
+            <Notification warning title={m.noTemplatesTitle} content={m.noTemplates} />
+          )}
+          <DeviceImporter />
+        </div>
+      </div>
     </RequireRequest>
   )
 }

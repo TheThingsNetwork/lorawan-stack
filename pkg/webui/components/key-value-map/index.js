@@ -16,14 +16,13 @@ import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import { IconPlus } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Input from '@ttn-lw/components/input'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import Entry from './entry'
-
-import style from './key-value-map.styl'
 
 const m = defineMessages({
   addEntry: 'Add entry',
@@ -39,6 +38,7 @@ const KeyValueMap = ({
   inputElement,
   isReadOnly,
   keyPlaceholder,
+  maxItems,
   name,
   onBlur,
   onChange,
@@ -76,8 +76,10 @@ const KeyValueMap = ({
     onChange([...value, entry])
   }, [indexAsKey, onChange, value])
 
+  const disableAddButton = distinctOptions && maxItems !== undefined && maxItems <= value.length
+
   return (
-    <div data-test-id={'key-value-map'} className={classnames(className, style.container)}>
+    <div data-test-id={'key-value-map'} className={classnames(className, 'direction-column')}>
       <div>
         {value &&
           value.map((individualValue, index) => (
@@ -109,8 +111,9 @@ const KeyValueMap = ({
           type="button"
           message={addMessage}
           onClick={addEmptyEntry}
-          disabled={disabled}
-          icon="add"
+          disabled={disabled || disableAddButton}
+          icon={IconPlus}
+          secondary
         />
       </div>
     </div>
@@ -129,6 +132,7 @@ KeyValueMap.propTypes = {
   inputElement: PropTypes.elementType,
   isReadOnly: PropTypes.func,
   keyPlaceholder: PropTypes.message,
+  maxItems: PropTypes.number,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
@@ -154,6 +158,7 @@ KeyValueMap.defaultProps = {
   addMessage: m.addEntry,
   indexAsKey: false,
   keyPlaceholder: '',
+  maxItems: undefined,
   disabled: false,
   isReadOnly: () => null,
   inputElement: Input,

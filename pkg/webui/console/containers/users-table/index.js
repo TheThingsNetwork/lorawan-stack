@@ -17,8 +17,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 
+import Icon, { IconTrash, IconCheck } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
-import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 import ButtonGroup from '@ttn-lw/components/button/group'
@@ -44,15 +44,13 @@ import {
   restoreUser,
 } from '@console/store/actions/users'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 import {
   selectUsers,
   selectUsersTotalCount,
   selectUserInvitations,
   selectUserInvitationsTotalCount,
 } from '@console/store/selectors/users'
-
-import style from './users-table.styl'
 
 const m = defineMessages({
   invite: 'Invite user',
@@ -211,8 +209,9 @@ const UsersTable = props => {
               type="button"
               onClick={details.delete}
               message={m.revokeInvitation}
-              icon="delete"
+              icon={IconTrash}
               danger
+              naked
             />
           ),
         },
@@ -231,7 +230,10 @@ const UsersTable = props => {
               return (
                 <span>
                   {userId}{' '}
-                  <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
+                  <Message
+                    className="c-text-neutral-light"
+                    content={sharedMessages.currentUserIndicator}
+                  />
                 </span>
               )
             }
@@ -264,7 +266,7 @@ const UsersTable = props => {
           }),
           render: details => (
             <ButtonGroup align="end">
-              <Button message={sharedMessages.restore} onClick={details.restore} />
+              <Button message={sharedMessages.restore} onClick={details.restore} secondary />
               <DeleteModalButton
                 entityId={details.id}
                 entityName={details.name}
@@ -282,7 +284,7 @@ const UsersTable = props => {
           width: 7,
           render: isAdmin => {
             if (isAdmin) {
-              return <Icon className={style.icon} icon="check" />
+              return <Icon className="c-text-brand-normal" icon={IconCheck} />
             }
 
             return null

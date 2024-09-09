@@ -31,7 +31,7 @@ import {
 describe('Gateways reducer', () => {
   const defaultStatisticsState = {
     error: undefined,
-    stats: {},
+    stats: undefined,
   }
   const defaultState = {
     entities: {},

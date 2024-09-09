@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -105,22 +104,20 @@ const EditPubsubInner = () => {
   }, [appId, dispatch, navigate, pubsubId])
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={m.editPubsub} className="mb-0" />
-      <Row>
-        <Col lg={8} md={12}>
-          <PubsubForm
-            update
-            appId={appId}
-            initialPubsubValue={pubsub}
-            onSubmit={handleSubmit}
-            onDelete={handleDelete}
-            mqttDisabled={mqttDisabled}
-            natsDisabled={natsDisabled}
-          />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <PubsubForm
+          update
+          appId={appId}
+          initialPubsubValue={pubsub}
+          onSubmit={handleSubmit}
+          onDelete={handleDelete}
+          mqttDisabled={mqttDisabled}
+          natsDisabled={natsDisabled}
+        />
+      </div>
+    </div>
   )
 }
 

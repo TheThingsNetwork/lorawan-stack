@@ -19,7 +19,7 @@ import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
 import * as organizations from '@console/store/actions/organizations'
 
-import { selectUserId } from '@console/store/selectors/logout'
+import { selectUserId } from '@console/store/selectors/user'
 
 import createEventsConnectLogics from './events'
 
@@ -38,7 +38,6 @@ const getOrganizationLogic = createRequestLogic({
 
 const getOrganizationsLogic = createRequestLogic({
   type: organizations.GET_ORGS_LIST,
-  latest: true,
   process: async ({ action }, dispatch) => {
     const {
       params: { page, limit, order, query, deleted },

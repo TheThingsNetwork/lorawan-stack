@@ -32,12 +32,12 @@
       font-size: $fs.l
       display: inline-block
       line-height: 1
-      color: $c-error
+      color: var(--c-bg-error-normal)
 
   &:not(.has-tooltip)
     &.required
       .label::after
-        margin-left: 0.1rem
+        margin-left: .1rem
 
   &.grow
     flex-grow: 1
@@ -115,7 +115,7 @@
   display: inline-block
 
   &-icon
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
     padding: .1rem
     height: 1rem
     width: 1rem
@@ -125,21 +125,24 @@
 
   &-content
     .tooltip-title
+      font-size: $fs.s
       margin: 0
 
     .tooltip-description
+      font-size: $fs.s
       margin: 0
 
       &:not(:last-child)
         margin: 0 0 $cs.s 0
-  
+
     .tooltip-links
+      font-size: $fs.s
       display: flex
       justify-content: space-between
 
 .description
   font-weight: $fw.normal
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
 
 .component-area
   flex-shrink: 0
@@ -154,7 +157,7 @@
 
 .message
   display: block
-  font-size: .9rem
+  font-size: $fs.s
 
   height: 0
   box-sizing: border-box
@@ -181,10 +184,10 @@
     flex-shrink: 0
 
 .err
-  color: $c-error
+  color: var(--c-bg-error-normal)
 
 .warn
-  color: $tc-warning
+  color: var(--c-text-warning-normal)
 
 .disabled .info-area
-    color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)

@@ -14,7 +14,6 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import classnames from 'classnames'
-import { defineMessages, useIntl } from 'react-intl'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -22,19 +21,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './status.styl'
 
-const m = defineMessages({
-  good: 'good',
-  bad: 'bad',
-  mediocre: 'mediocre',
-  unknown: 'unknown',
-})
-
 const Status = React.forwardRef(
-  (
-    { className, status, label, pulse, pulseTrigger, labelValues, children, title, flipped },
-    ref,
-  ) => {
-    const intl = useIntl()
+  ({ className, status, label, pulse, pulseTrigger, labelValues, children, flipped, big }, ref) => {
     const [animate, setAnimate] = useState(false)
     const pulseArmed = useRef(false)
     useEffect(() => {
@@ -50,6 +38,7 @@ const Status = React.forwardRef(
     }, [setAnimate])
 
     const cls = classnames(style.status, {
+      [style.statusGreen]: status === 'green',
       [style.statusGood]: status === 'good',
       [style.statusBad]: status === 'bad',
       [style.statusMediocre]: status === 'mediocre',
@@ -57,6 +46,8 @@ const Status = React.forwardRef(
       [style[`${status}-pulse`]]: typeof pulse === 'boolean' ? pulse : status === 'good',
       [style.flipped]: flipped,
       [style[`triggered-${status}-pulse`]]: animate,
+      [style.dotOnly]: !label && !children,
+      [style.statusBig]: big,
     })
 
     let statusLabel = null
@@ -73,32 +64,23 @@ const Status = React.forwardRef(
       )
     }
 
-    let translatedTitle
-
-    if (title) {
-      translatedTitle = typeof title === 'string' ? title : intl.formatMessage(title)
-    } else if (label) {
-      translatedTitle = typeof label === 'string' ? label : intl.formatMessage(label)
-    } else {
-      translatedTitle = intl.formatMessage(m[status])
-    }
-
     return (
       <span
         className={classnames(className, style.container)}
         onAnimationEnd={handleAnimationEnd}
         ref={ref}
       >
-        {flipped && <span className={classnames(cls)} title={translatedTitle} />}
+        {flipped && <span className={classnames(cls)} />}
         {statusLabel}
         {children}
-        {!flipped && <span className={classnames(cls)} title={translatedTitle} />}
+        {!flipped && <span className={classnames(cls)} />}
       </span>
     )
   },
 )
 
 Status.propTypes = {
+  big: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
   flipped: PropTypes.bool,
@@ -110,8 +92,7 @@ Status.propTypes = {
     PropTypes.number,
     PropTypes.instanceOf(Date),
   ]),
-  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
-  title: PropTypes.message,
+  status: PropTypes.oneOf(['green', 'good', 'bad', 'mediocre', 'unknown']),
 }
 
 Status.defaultProps = {
@@ -123,7 +104,7 @@ Status.defaultProps = {
   pulse: undefined,
   pulseTrigger: undefined,
   status: 'unknown',
-  title: undefined,
+  big: false,
 }
 
 export default Status

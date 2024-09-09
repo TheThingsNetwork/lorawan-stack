@@ -13,32 +13,35 @@
 // limitations under the License.
 
 .link
-  white-space: nowrap
+  box-sizing: border-box
+
+  &:not(.allow-wrap)
+    white-space: nowrap
 
   &:not(.primary):not(.secondary)
     text-decoration: none
 
   &.primary
-    color: $c-active-blue
+    color: var(--c-text-brand-normal)
 
-    &:active,
-    &:hover
-      color: $c-active-blue-hover
+    &:active:not(.disabled),
+    &:hover:not(.disabled)
+      color: var(--c-text-brand-normal-hover)
       text-decoration: underline
 
     &.link-visited
       &:visited
-        color: $c-active-blue-active
+        color: var(--c-text-brand-normal-active)
 
   &.secondary
-    color: $tc-subtle-gray
-    &:active,
-    &:hover
-      color: $tc-deep-gray
+    color: var(--c-text-neutral-light)
+    &:active:not(.disabled),
+    &:hover:not(.disabled)
+      color: var(--c-text-neutral-heavy)
 
     &.link-visited
       &:visited
-        color: $tc-deep-gray
+        color: var(--c-text-neutral-heavy)
 
   &.primary, &.secondary
     &.disabled
@@ -46,13 +49,17 @@
       cursor: not-allowed
 
 .doc-link
-  white-space: nowrap
+  align-items: center
+
+  &:not(.allow-wrap)
+    white-space: nowrap
 
 .icon
   nudge('up', 2px)
   margin-left: .11rem
   margin-right: .1rem
-  font-size: 0.9rem
+  font-size: .9rem
 
 .doc-icon
-  nudge('up')
+  nudge('down', 4px)
+  margin-right: $cs.xxs

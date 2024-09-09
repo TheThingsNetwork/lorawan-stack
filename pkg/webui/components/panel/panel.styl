@@ -1,0 +1,81 @@
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.panel
+  box-sizing: border-box
+  border-radius: $br.xl
+  border: 1px solid var(--c-border-neutral-light)
+  background-color: var(--c-bg-neutral-min)
+  box-shadow: var(--shadow-box-panel-normal)
+  padding: $cs.xl
+  container: panel / inline-size
+  display: flex
+  flex-direction: column
+
+  +media-query($bp.md)
+    padding: $cs.m
+
+  &-header
+    display: flex
+    flex-wrap: wrap
+    justify-content: space-between
+    align-items: flex-start
+    gap: $cs.m
+    min-height: 2.5rem // Fix the header height to have a uniform look between panels.
+    margin-bottom: $cs.m
+    flex-shrink: 0
+
+    &-title
+      font-weight: $fw.bolder
+      font-size: $fs.l
+      line-height: 1.3
+      white-space: nowrap
+      text-overflow: ellipsis
+      overflow: hidden
+
+  &-button
+    font-weight: $fw.bold
+    text-decoration: none transparent
+    transition: text-decoration $ad.s ease-in-out
+    align-self: center
+
+    &:hover:not(:disabled)
+      color: var(--c-text-brand-normal)
+      text-decoration: underline
+      text-decoration-thickness: 2px
+      text-underline-offset: .4rem
+      text-decoration-color: var(--c-text-brand-normal)
+
+  &.divider
+    .panel-header
+      padding-bottom: $cs.m
+      border-bottom: 1px solid var(--c-border-neutral-light)
+      margin-bottom: $cs.l
+
+.panel-header-icon
+  font-size: $fs.xl
+  min-width: $cs.l
+  background-color: var(--c-bg-brand-extralight)
+  padding: $cs.xs
+  border-radius: $br.l
+  color: var(--c-bg-brand-normal)
+  font-variation-settings: 'FILL' 1
+
+@container panel (max-width: 300px)
+  .panel-header
+    flex-direction: column
+    align-items: flex-start
+
+  .panel-button
+    align-self: flex-start

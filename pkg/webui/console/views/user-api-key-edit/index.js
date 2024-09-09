@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
@@ -32,7 +31,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getUsersRightsList } from '@console/store/actions/users'
 import { getApiKey } from '@console/store/actions/api-keys'
 
-import { selectUserId } from '@account/store/selectors/user'
+import { selectUserId } from '@console/store/selectors/user'
 import { selectApiKeyById } from '@console/store/selectors/api-keys'
 
 const UserApiKeyEditInner = () => {
@@ -40,19 +39,17 @@ const UserApiKeyEditInner = () => {
   const { apiKeyId } = useParams()
 
   useBreadcrumbs(
-    'usr.single.api-keys.edit',
-    <Breadcrumb path={`/users/api-keys/edit/${apiKeyId}`} content={sharedMessages.edit} />,
+    'user-settings.api-keys.edit',
+    <Breadcrumb path={`/user-settings/api-keys/edit/${apiKeyId}`} content={sharedMessages.edit} />,
   )
 
   return (
-    <Container>
+    <div className="container container--xxl grid">
       <PageTitle title={sharedMessages.keyEdit} />
-      <Row>
-        <Col lg={8} md={12}>
-          <ApiKeyEditForm entity={USER} entityId={userId} />
-        </Col>
-      </Row>
-    </Container>
+      <div className="item-12 xl:item-8">
+        <ApiKeyEditForm entity={USER} entityId={userId} />
+      </div>
+    </div>
   )
 }
 

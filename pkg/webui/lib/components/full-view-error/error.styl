@@ -30,31 +30,32 @@
   padding-bottom: $ls.s
   padding-left: 4rem
   padding-right: 4rem
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     padding-top: 20vh
-  +media-query($bp.s)
+  +media-query($bp.sm)
     padding-top: $header-height-mobile + $ls.m
 
   &-header
-    +media-query($bp.s)
+    +media-query($bp.sm)
       font-size: $fs.l
 
   &-sub
     display: block
+    margin-bottom: $ls.s
 
   summary
-    color: $tc-subtle-gray
+    color: var(--c-text-neutral-light)
 
   pre
     width: 100%
     box-sizing: border-box
-    background-color: $c-backdrop
-    color: $tc-black
+    background-color: var(--c-bg-neutral-semilight)
+    color: var(--c-text-neutral-heavy)
     font-size: $fs.s
     overflow-y: auto
     padding: $cs.s
     max-height: 26rem
-    color: $tc-deep-gray
+    color: var(--c-text-neutral-heavy)
 
 .error-actions
   display: flex
@@ -64,21 +65,13 @@
   margin-top: $cs.m
 
   & > span
-    color: $tc-subtle-gray
-
-.icon
-  nudge('up', .1rem)
-  color: $c-error
-  +media-query-min($bp.s)
-    font-size: 2rem
-  +media-query($bp.s)
-    font-size: 1.4rem
+    color: var(--c-text-neutral-light)
 
 .action-button
   margin-right: $cs.m
   padding-left: $cs.xs
 
 .detail-colophon
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   span
     display: block

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
-import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { Routes, Route, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import classNames from 'classnames'
 
 import BlankWebhookImg from '@assets/misc/blank-webhook.svg'
 
@@ -42,7 +42,7 @@ const m = defineMessages({
 })
 
 const WebhookTile = ({ ids, name, description, logo_url }) => (
-  <Col xl={3} lg={4} sm={6} xs={6} key={`tile-${ids.template_id}`} className={style.tileColumn}>
+  <div className="item-6 md-lg:item-6 xl:item-4 xxl:item-3" key={`tile-${ids.template_id}`}>
     <Link to={ids.template_id} className={style.webhookTile}>
       <img className={style.logo} alt={name} src={logo_url} />
       <span className={style.name}>{name}</span>
@@ -50,7 +50,7 @@ const WebhookTile = ({ ids, name, description, logo_url }) => (
         {typeof description === 'string' ? description : <Message content={description} />}
       </span>
     </Link>
-  </Col>
+  </div>
 )
 
 WebhookTile.propTypes = {
@@ -66,13 +66,11 @@ const WebhookChooser = () => {
   const webhookTemplates = useSelector(selectWebhookTemplates)
 
   return (
-    <Container>
-      <Row>
-        <Col lg={8} md={12}>
-          <PageTitle title={m.chooseTemplate} />
-        </Col>
-      </Row>
-      <Row gutterWidth={15} className={style.tileRow}>
+    <div className="container container--xxl grid">
+      <div className="item-12 xl:item-8">
+        <PageTitle title={m.chooseTemplate} />
+      </div>
+      <div className={classNames(style.tileRow, 'item-12 grid gap-ls-xxs')}>
         <WebhookTile
           ids={{ template_id: 'custom' }}
           name="Custom webhook"
@@ -80,8 +78,8 @@ const WebhookChooser = () => {
           logo_url={BlankWebhookImg}
         />
         {webhookTemplates.map(WebhookTile)}
-      </Row>
-    </Container>
+      </div>
+    </div>
   )
 }
 const ApplicationWebhookAddChooser = () => {

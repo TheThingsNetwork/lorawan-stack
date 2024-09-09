@@ -33,6 +33,10 @@ $xs = $cs.m
     justify-content: flex-start
     align-items: center
 
+  &.right
+    &:not(.inline)
+      text-align: right
+
 .spinner
   width: $l
   height: $l
@@ -54,10 +58,10 @@ $xs = $cs.m
   animation: rotate .6s infinite linear
 
 .stop
-  stop-color: $c-active-blue
+  stop-color: var(--c-icon-brand-normal)
 
   .faded &
-    stop-color: darken($c-subtle-fill, 20)
+    stop-color: var(--c-icon-neutral-normal)
 
 @keyframes rotate
   from
@@ -66,7 +70,7 @@ $xs = $cs.m
     transform: rotate(360deg)
 
 .message
-  color: $tc-subtle-gray
+  color: var(--c-text-neutral-light)
   margin-left: $cs.xs
 
 .center

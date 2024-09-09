@@ -1,0 +1,39 @@
+extends:
+  - 'stylelint-stylus/standard'
+rules:
+  color-no-hex: true
+  color-named: 'never'
+  declaration-no-important: true
+  stylus/at-rule-no-unknown: true
+  stylus/property-no-unknown: true
+  stylus/selector-type-no-unknown: true
+  stylus/at-extend-style: null
+  stylus/at-rule-empty-line-before: null
+  stylus/at-rule-name-space-after: null
+  stylus/block-closing-brace-empty-line-before: null
+  stylus/block-closing-brace-newline-after: null
+  stylus/block-closing-brace-newline-before: 'always-multi-line'
+  stylus/block-opening-brace-newline-after: 'always-multi-line'
+  stylus/block-opening-brace-space-after: 'always-single-line'
+  stylus/block-opening-brace-space-before: 'always'
+  stylus/color-hex-case: 'upper'
+  stylus/declaration-colon: 'always'
+  stylus/hash-object-property-comma: 'always'
+  stylus/indentation: 2
+  stylus/media-feature-colon: 'always'
+  stylus/no-at-require: null
+  stylus/no-eol-whitespace: true
+  stylus/number-leading-zero: 'never'
+  stylus/number-no-trailing-zeros: true
+  stylus/pythonic: 'always'
+  stylus/selector-list-comma: 'always'
+  stylus/selector-list-comma-newline-after: 'always-multi-line'
+  stylus/selector-list-comma-space-after: 'always-single-line'
+  stylus/selector-list-comma-space-before: 'never'
+  stylus/selector-pseudo-class-case: 'lower'
+  stylus/semicolon: 'never'
+  stylus/single-line-comment-double-slash-space-after: 'always'
+  stylus/single-line-comment-no-empty: null
+  stylus/single-line-comment:
+    - 'always'
+    - style: 'double-slash'

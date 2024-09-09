@@ -16,11 +16,13 @@
   border-normal('bottom')
   margin-bottom: $ls.s
 
-  +media-query($bp.s)
+  +media-query($bp.sm)
     margin-bottom: $ls.xs
 
 .tabs
-  +media-query(550px)
+  width: 100%
+
+  +media-query($bp.lg)
     margin-right: $ls.xxs * -1
     overflow: auto
-    background: linear-gradient(right, rgba(0,0,0,.1), white 5rem)
+    background: linear-gradient(right, rgba(0,0,0,.1), var(--c-bg-neutral-min) 5rem)

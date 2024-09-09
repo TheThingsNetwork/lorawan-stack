@@ -49,7 +49,7 @@ func logWarnings(ctx context.Context, md metadata.MD) {
 
 // Add a warning to the response headers.
 func Add(ctx context.Context, message string) {
-	grpc.SetHeader(ctx, metadata.Pairs(warning, message)) // nolint:gas
+	grpc.SetHeader(ctx, metadata.Pairs(warning, message)) // nolint:gas,errcheck
 }
 
 // UnaryClientInterceptor is a unary client interceptor that logs warnings sent by the server.

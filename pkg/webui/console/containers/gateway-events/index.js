@@ -14,6 +14,7 @@
 
 import React, { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import Events from '@console/components/events'
 
@@ -35,10 +36,17 @@ import {
   selectGatewayEventsPaused,
   selectGatewayEventsTruncated,
   selectGatewayEventsFilter,
+  selectGatewayById,
 } from '@console/store/selectors/gateways'
 
+const m = defineMessages({
+  gatewayEventsOf: 'Gateway events of <strong>{entityName}</strong>',
+})
+
 const GatewayEvents = props => {
-  const { gtwId, widget } = props
+  const { gtwId, widget, darkTheme, framed } = props
+
+  const gatewayName = useSelector(state => selectGatewayById(state, gtwId).name) || gtwId
 
   const events = useSelector(state => selectGatewayEvents(state, gtwId))
   const paused = useSelector(state => selectGatewayEventsPaused(state, gtwId))
@@ -93,11 +101,18 @@ const GatewayEvents = props => {
         onFilterChange={onFilterChange}
         truncated={truncated}
         filter={filter}
+        darkTheme={darkTheme}
+        framed={framed}
+        titleMessage={m.gatewayEventsOf}
+        entityName={gatewayName}
         scoped
       />
     )
   }, [
+    darkTheme,
     filter,
+    framed,
+    gatewayName,
     filteredEvents,
     gtwId,
     onClear,
@@ -112,11 +127,15 @@ const GatewayEvents = props => {
 }
 
 GatewayEvents.propTypes = {
+  darkTheme: PropTypes.bool,
+  framed: PropTypes.bool,
   gtwId: PropTypes.string.isRequired,
   widget: PropTypes.bool,
 }
 
 GatewayEvents.defaultProps = {
+  darkTheme: false,
+  framed: false,
   widget: false,
 }
 

@@ -27,7 +27,14 @@ import {
   DELETE_APP_SUCCESS,
   GET_APP_EVENT_MESSAGE_SUCCESS,
   GET_MQTT_INFO_SUCCESS,
+  FETCH_APPS_LIST_SUCCESS,
 } from '@console/store/actions/applications'
+
+import {
+  FETCH_DEVICES_LIST_SUCCESS,
+  GET_DEVICES_LIST_SUCCESS,
+  GET_DEV_SUCCESS,
+} from '../actions/devices'
 
 const application = (state = {}, application) => ({
   ...state,
@@ -38,18 +45,21 @@ const defaultState = {
   entities: {},
   derived: {},
   selectedApplication: null,
-  applicationDeviceCounts: {},
   mqtt: {},
 }
 
-const applications = (state = defaultState, { type, payload, event }) => {
+const applications = (state = defaultState, { type, payload, event, meta }) => {
   switch (type) {
     case GET_APP:
+      if (meta.options.noSelect) {
+        return state
+      }
       return {
         ...state,
         selectedApplication: payload.id,
       }
     case GET_APPS_LIST_SUCCESS:
+    case FETCH_APPS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
         (acc, app) => {
           const id = getApplicationId(app)
@@ -67,9 +77,12 @@ const applications = (state = defaultState, { type, payload, event }) => {
     case GET_APP_DEV_COUNT_SUCCESS:
       return {
         ...state,
-        applicationDeviceCounts: {
-          ...state.applicationDeviceCounts,
-          [payload.id]: payload.applicationDeviceCount,
+        derived: {
+          ...state.derived,
+          [payload.id]: {
+            ...state.derived[payload.id],
+            deviceCount: payload.applicationDeviceCount,
+          },
         },
       }
     case GET_APP_SUCCESS:
@@ -121,6 +134,40 @@ const applications = (state = defaultState, { type, payload, event }) => {
           }
         }
       }
+      return state
+    // For device responses, we can also obtain the lastSeen info to determine
+    // if there is a newer lastSeen value for the application.
+    case GET_DEV_SUCCESS:
+    case FETCH_DEVICES_LIST_SUCCESS:
+    case GET_DEVICES_LIST_SUCCESS:
+      // Normalize the data to an array of devices.
+      const devices = type === GET_DEV_SUCCESS ? [payload] : payload?.entities || []
+      const appId = getApplicationId(devices[0])
+      // Get the most recent last seen value from the devices.
+      const lastSeen = devices.reduce((acc, device) => {
+        const deviceLastSeen = getByPath(device, 'last_seen_at') || ''
+        return deviceLastSeen > acc ? deviceLastSeen : acc
+      }, '')
+
+      if (!lastSeen) {
+        return state
+      }
+
+      // Update the application's derived last seen value, if the current
+      // device's last seen value is more recent than the currently stored one.
+      if (!(id in state.derived) || lastSeen > state.derived[appId].lastSeen) {
+        return {
+          ...state,
+          derived: {
+            ...state.derived,
+            [appId]: {
+              ...(state.derived[appId] || {}),
+              lastSeen,
+            },
+          },
+        }
+      }
+
       return state
     case GET_MQTT_INFO_SUCCESS:
       return {

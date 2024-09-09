@@ -16,6 +16,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
+import { IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -112,11 +113,11 @@ const Entry = ({
   const showRemoveButton = atLeastOneEntry ? index !== 0 : true
 
   return (
-    <div className={style.entriesRow}>
+    <div className="d-flex j-start mb-cs-s">
       {!indexAsKey && (
         <InputElement
           data-test-id={_getKeyInputName}
-          className={style.input}
+          className="flex-grow mr-cs-s"
           name={_getKeyInputName}
           placeholder={keyPlaceholder}
           type="text"
@@ -140,18 +141,19 @@ const Entry = ({
         value={indexAsKey ? value : value.value}
         readOnly={readOnly}
         code
-        options={options ? (newOptions ?? options) : undefined}
+        options={options ? newOptions ?? options : undefined}
         {...additionalInputPropsRest}
       />
       {showRemoveButton && (
         <Button
           type="button"
           onClick={handleRemoveButtonClick}
-          icon="delete"
+          icon={IconTrash}
           title={m.deleteEntry}
           message={removeMessage}
           disabled={readOnly}
-          danger={!Boolean(removeMessage)}
+          secondary
+          danger
         />
       )}
     </div>

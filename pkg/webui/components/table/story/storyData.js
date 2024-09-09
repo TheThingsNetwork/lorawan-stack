@@ -14,16 +14,18 @@
 
 import React from 'react'
 
+import { IconSettings, IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 const headers = [
   {
     name: 'appId',
-    displayName: 'Application ID',
+    displayName: 'Name and ID',
   },
   {
     name: 'desc',
     displayName: 'Description',
+    align: 'center',
   },
   {
     name: 'devices',
@@ -33,6 +35,7 @@ const headers = [
   {
     name: 'lastActivity',
     displayName: 'Last Activity',
+    align: 'center',
   },
 ]
 
@@ -121,8 +124,8 @@ export default {
       Object.assign({}, r, {
         options: (
           <div>
-            <Button icon="settings" />
-            <Button danger icon="delete" />
+            <Button icon={IconSettings} primary />
+            <Button danger icon={IconTrash} primary />
           </div>
         ),
       }),

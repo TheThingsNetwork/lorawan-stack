@@ -18,7 +18,7 @@
 .left
   flex-basis: 65%
   padding-right: $cs.m
-  +media-query($bp.s)
+  +media-query($bp.sm)
     flex-basis: 100%
     flex-grow: 0
     margin-bottom: $ls.m
@@ -33,15 +33,15 @@
 
   li > span
     nudge('down', 3px)
-    color: $c-info
+    color: var(--c-bg-info-normal)
     margin-right: $cs.xxs
 
 .right
-  +media-query($bp.s)
+  +media-query($bp.sm)
     flex-grow: 0
     padding-top: 3rem
     background: url('../../assets/misc/oauth-arrow-hor.svg') no-repeat
-  +media-query-min($bp.s)
+  +media-query-min($bp.sm)
     flex-basis: 35%
     padding-left: 3rem
     background: url('../../assets/misc/oauth-arrow.svg') no-repeat
@@ -56,15 +56,15 @@
       font-size: $fs.s
       font-weight: $fw.bold
       text-transform: uppercase
-      color: $c-active-blue
-      border: 1px solid $c-active-blue
-      border-radius: $br.s
+      color: var(--c-text-brand-normal)
+      border: 1px solid var(--c-text-brand-normal)
+      border-radius: $br.xs
       padding: $cs.xxs
       margin-left: $cs.xxs
 
 .login-info
-  color: $tc-deep-gray
+  color: var(--c-text-neutral-heavy)
 
 .redirect-info
   span
-    color: $c-active-blue
+    color: var(--c-text-brand-normal)

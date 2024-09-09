@@ -13,14 +13,19 @@
 // limitations under the License.
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Container, Row, Col } from 'react-grid-system'
 import clipboard from 'clipboard'
 import { Helmet } from 'react-helmet'
-import classnames from 'classnames'
 
+import Icon, {
+  IconChevronLeft,
+  IconExclamationCircle,
+  IconClipboard,
+  IconClipboardCheck,
+  IconLifebuoy,
+  IconError404,
+} from '@ttn-lw/components/icon'
 import Footer from '@ttn-lw/components/footer'
-import buttonStyle from '@ttn-lw/components/button/button.styl'
-import Icon from '@ttn-lw/components/icon'
+import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -151,7 +156,6 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
   const errorDetails = JSON.stringify(error, undefined, 2)
   const hasErrorDetails =
     (!isNotFound && Boolean(error) && errorDetails.length > 2) || (isFrontend && error.errorCode)
-  const buttonClasses = classnames(buttonStyle.button, style.actionButton)
 
   // Do not render anything when performing a redirect.
   if (doBlankRender) {
@@ -160,141 +164,146 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">
-      <Container>
-        <Row>
-          <Col xl={7} lg={8} md={10} sm={12}>
-            {safe ? (
-              <Helmet titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}>
-                <title>Error</title>
-              </Helmet>
-            ) : (
-              <IntlHelmet title={errorMessages.error} />
-            )}
-            <h1>
-              <Icon className={style.icon} textPaddedRight icon="error_outline" />
-              <Message content={errorTitle} />
-            </h1>
-            <div className={style.fullViewErrorSub}>
-              <Message component="span" content={errorMessage} />
-              {!isNotFound && unexpected && (
-                <>
-                  {' '}
-                  <Message
-                    component="span"
-                    content={
-                      hasSupportLink
-                        ? errorMessages.contactSupport
-                        : errorMessages.contactAdministrator
-                    }
-                  />
-                  <br />
-                  <Message component="span" content={errorMessages.inconvenience} />
-                </>
-              )}
-            </div>
-            <div className={style.errorActions}>
-              {isNotFound && (
-                <a href={appRoot} className={buttonClasses}>
-                  <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
-                  <Message content={sharedMessages.backToOverview} />
-                </a>
-              )}
-              {isOAuthCallback && (
-                <a href={appRoot} className={buttonClasses}>
-                  <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
-                  <Message content={sharedMessages.backToLogin} />
-                </a>
-              )}
-              {hasAction && (
-                <button
-                  type="button"
-                  className={classnames(buttonClasses, buttonStyle.primary)}
-                  onClick={action.action}
-                >
-                  <Icon icon={action.icon} textPaddedRight nudgeDown />
-                  <Message content={action.message} />
-                </button>
-              )}
-              {hasSupportLink && !isNotFound && (
-                <>
-                  <a
-                    href={supportLink}
-                    target="_blank"
-                    className={classnames(
-                      buttonStyle.button,
-                      buttonStyle.primary,
-                      style.actionButton,
-                    )}
-                  >
-                    <Icon icon="contact_support" textPaddedRight nudgeDown />
-                    <Message content={sharedMessages.getSupport} />
-                  </a>
-                  {hasErrorDetails && (
-                    <Message component="span" content={errorMessages.attachToSupportInquiries} />
-                  )}
-                </>
-              )}
-            </div>
-            {hasErrorDetails && (
+      <div className="container container--xl grid">
+        <div className="item-12 lg-xl:item-10 xl:item-8 xxl:item-7">
+          {safe ? (
+            <Helmet titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}>
+              <title>Error</title>
+            </Helmet>
+          ) : (
+            <IntlHelmet title={errorMessages.error} />
+          )}
+          <h1 className="d-flex al-center gap-cs-xxs mb-cs-xxs">
+            <Icon
+              icon={isNotFound ? IconError404 : IconExclamationCircle}
+              size={isNotFound ? 38 : 28}
+              className="c-icon-error-normal"
+            />
+            <Message content={errorTitle} />
+          </h1>
+          <div className={style.fullViewErrorSub}>
+            <Message component="span" content={errorMessage} />
+            {!isNotFound && unexpected && (
               <>
-                {isErrorObject && (
-                  <>
-                    <hr />
-                    <div className={style.detailColophon}>
-                      <span>
-                        Error Type: <code>{error.name}</code>
-                      </span>
-                    </div>
-                  </>
-                )}
-                {isFrontend && (
-                  <>
-                    <hr />
-                    <div className={style.detailColophon}>
-                      <span>
-                        Frontend Error ID: <code>{error.errorCode}</code>
-                      </span>
-                    </div>
-                  </>
-                )}
-                {isBackend && (
-                  <>
-                    <hr />
-                    <div className={style.detailColophon}>
-                      <span>
-                        Error ID: <code>{errorId}</code>
-                      </span>
-                      <span>
-                        Correlation ID: <code>{correlationId}</code>
-                      </span>
-                    </div>
-                  </>
-                )}
-                <hr />
-                <details>
-                  <summary>
-                    <Message content={errorMessages.technicalDetails} />
-                  </summary>
-                  <pre>{errorDetails}</pre>
-                  <button
-                    onClick={handleCopyClick}
-                    className={classnames(buttonClasses)}
-                    data-clipboard-text={errorDetails}
-                    ref={copyButton}
-                  >
-                    <Icon icon={copied ? 'done' : 'file_copy'} textPaddedRight />
-                    <Message
-                      content={
-                        copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard
-                      }
-                    />
-                  </button>
-                </details>
+                {' '}
+                <Message
+                  component="span"
+                  content={
+                    hasSupportLink
+                      ? errorMessages.contactSupport
+                      : errorMessages.contactAdministrator
+                  }
+                />
+                <br />
+                <Message component="span" content={errorMessages.inconvenience} />
               </>
             )}
-          </Col>
-        </Row>
-      </Container>
+          </div>
+          <div className={style.errorActions}>
+            {isNotFound && (
+              <Button.AnchorLink
+                href={appRoot}
+                className={style.actionButton}
+                icon={IconChevronLeft}
+                message={sharedMessages.backToOverview}
+                secondary
+              />
+            )}
+            {isOAuthCallback && (
+              <Button.AnchorLink
+                href={appRoot}
+                className={style.actionButton}
+                icon={IconChevronLeft}
+                message={sharedMessages.backToLogin}
+                secondary
+              />
+            )}
+            {hasAction && (
+              <Button
+                type="button"
+                primary
+                className={style.actionButton}
+                onClick={action.action}
+                icon={action.icon}
+                message={action.message}
+                secondary
+              />
+            )}
+            {hasSupportLink && !isNotFound && (
+              <>
+                <Button.AnchorLink
+                  href={supportLink}
+                  target="_blank"
+                  className={style.actionButton}
+                  icon={IconLifebuoy}
+                  message={sharedMessages.getSupport}
+                  secondary
+                />
+                {hasErrorDetails && (
+                  <Message component="span" content={errorMessages.attachToSupportInquiries} />
+                )}
+              </>
+            )}
+          </div>
+          {hasErrorDetails && (
+            <>
+              {isErrorObject && (
+                <>
+                  <hr />
+                  <div className={style.detailColophon}>
+                    <span>
+                      Error Type: <code>{error.name}</code>
+                    </span>
+                  </div>
+                </>
+              )}
+              {isFrontend && (
+                <>
+                  <hr />
+                  <div className={style.detailColophon}>
+                    <span>
+                      Frontend Error ID: <code>{error.errorCode}</code>
+                    </span>
+                  </div>
+                </>
+              )}
+              {isBackend && (
+                <>
+                  <hr />
+                  <div className={style.detailColophon}>
+                    <span>
+                      Error ID: <code>{errorId}</code>
+                    </span>
+                    <span>
+                      Correlation ID: <code>{correlationId}</code>
+                    </span>
+                  </div>
+                </>
+              )}
+              <hr />
+              <details>
+                <summary>
+                  <Message content={errorMessages.technicalDetails} />
+                </summary>
+                <pre>{errorDetails}</pre>
+                {!safe && (
+                  <Button
+                    onClick={handleCopyClick}
+                    className={style.actionButton}
+                    data-clipboard-text={errorDetails}
+                    ref={copyButton}
+                    icon={copied ? IconClipboardCheck : IconClipboard}
+                    message={
+                      copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard
+                    }
+                    secondary
+                  />
+                )}
+              </details>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -302,7 +311,7 @@ const FullViewErrorInner = ({ error, safe, action, unexpected }) => {
 FullViewErrorInner.propTypes = {
   action: PropTypes.shape({
     action: PropTypes.func.isRequired,
-    icon: PropTypes.string.isRequired,
+    icon: PropTypes.icon.isRequired,
     message: PropTypes.message.isRequired,
   }),
   error: PropTypes.error.isRequired,
@@ -319,7 +328,7 @@ FullViewErrorInner.defaultProps = {
 FullViewError.propTypes = {
   action: PropTypes.shape({
     action: PropTypes.func.isRequired,
-    icon: PropTypes.string.isRequired,
+    icon: PropTypes.icon.isRequired,
     message: PropTypes.message.isRequired,
   }),
   error: PropTypes.error.isRequired,
