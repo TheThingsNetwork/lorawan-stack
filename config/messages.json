@@ -5129,15 +5129,6 @@
       "file": "mapping.go"
     }
   },
-  "error:pkg/gatewayserver/io/ttigw:invalid_frequency": {
-    "translations": {
-      "en": "invalid frequency `{frequency}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ttigw",
-      "file": "mapping.go"
-    }
-  },
   "error:pkg/gatewayserver/io/ttigw:invalid_gateway_eui": {
     "translations": {
       "en": "invalid gateway EUI"

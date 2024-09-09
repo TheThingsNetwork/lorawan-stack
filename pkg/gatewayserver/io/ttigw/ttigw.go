@@ -240,7 +240,7 @@ func (f *Frontend) handleConnection(wsConn *websocket.Conn, srvConn *io.Connecti
 	ctx := srvConn.Context()
 	logger := log.FromContext(ctx)
 
-	gwConfig, err := buildLoRaGatewayConfig(srvConn.PrimaryFrequencyPlan())
+	gtwConfig, err := buildLoRaGatewayConfig(srvConn.PrimaryFrequencyPlan())
 	if err != nil {
 		logger.WithError(err).Warn("Failed to build LoRa gateway configuration")
 		wsConn.Close(websocket.StatusInternalError, "failed to build LoRa gateway configuration")
@@ -263,7 +263,7 @@ func (f *Frontend) handleConnection(wsConn *websocket.Conn, srvConn *io.Connecti
 	msgCh <- &lorav1.NetworkServerMessage{
 		Message: &lorav1.NetworkServerMessage_ConfigureLoraGatewayRequest{
 			ConfigureLoraGatewayRequest: &lorav1.ConfigureLoraGatewayRequest{
-				Config: gwConfig,
+				Config: gtwConfig,
 			},
 		},
 	}
@@ -274,10 +274,10 @@ func (f *Frontend) handleConnection(wsConn *websocket.Conn, srvConn *io.Connecti
 		return sendMessages(ctx, wsConn, msgCh)
 	})
 	wg.Go(func() error {
-		return enqueueNetworkServerMessages(ctx, srvConn, msgCh, dlTokens)
+		return enqueueNetworkServerMessages(ctx, srvConn, gtwConfig, msgCh, dlTokens)
 	})
 	wg.Go(func() error {
-		return readGatewayMessages(ctx, wsConn, srvConn, dlTokens)
+		return readGatewayMessages(ctx, wsConn, srvConn, gtwConfig, dlTokens)
 	})
 	return wg.Wait()
 }
@@ -307,6 +307,7 @@ func sendMessages(
 func enqueueNetworkServerMessages(
 	ctx context.Context,
 	srvConn *io.Connection,
+	gtwConfig *lorav1.GatewayConfig,
 	msgCh chan<- *lorav1.NetworkServerMessage,
 	dlTokens *io.DownlinkTokens,
 ) error {
@@ -318,7 +319,7 @@ func enqueueNetworkServerMessages(
 		case down := <-srvConn.Down():
 			logger.Debug("Send downlink message")
 			dlToken := dlTokens.Next(down, time.Now())
-			msg, err := fromDownlinkMessage(srvConn.PrimaryFrequencyPlan(), down)
+			msg, err := fromDownlinkMessage(gtwConfig, down)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to convert downlink message")
 				continue
@@ -348,6 +349,7 @@ func readGatewayMessages(
 	ctx context.Context,
 	wsConn *websocket.Conn,
 	srvConn *io.Connection,
+	gtwConfig *lorav1.GatewayConfig,
 	dlTokens *io.DownlinkTokens,
 ) error {
 	var (
@@ -400,7 +402,7 @@ func readGatewayMessages(
 			continue
 		}
 
-		if err := processGatewayMessage(ctx, srvConn, dlTokens, &envelope, receivedAt); err != nil {
+		if err := processGatewayMessage(ctx, srvConn, gtwConfig, dlTokens, &envelope, receivedAt); err != nil {
 			logger.WithError(err).Warn("Failed to handle message")
 		}
 	}
@@ -411,6 +413,7 @@ var errUnknownMessageType = errors.DefineInvalidArgument("unknown_message_type",
 func processGatewayMessage(
 	ctx context.Context,
 	srvConn *io.Connection,
+	gtwConfig *lorav1.GatewayConfig,
 	dlTokens *io.DownlinkTokens,
 	envelope *lorav1.GatewayMessage,
 	receivedAt time.Time,
@@ -452,7 +455,7 @@ func processGatewayMessage(
 		logger.WithField("count", len(msg.UplinkMessagesNotification.Messages)).Debug("Received uplink messages")
 		uplinkMessages := make([]*ttnpb.UplinkMessage, 0, len(msg.UplinkMessagesNotification.Messages))
 		for _, uplinkMsg := range msg.UplinkMessagesNotification.Messages {
-			up, err := toUplinkMessage(srvConn.Gateway().Ids, srvConn.PrimaryFrequencyPlan(), uplinkMsg)
+			up, err := toUplinkMessage(srvConn.Gateway().Ids, gtwConfig, uplinkMsg)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to convert uplink message")
 				continue
