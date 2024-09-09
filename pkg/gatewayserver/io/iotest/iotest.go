@@ -1508,7 +1508,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 								},
 								Priority: ttnpb.TxSchedulePriority_NORMAL,
 								Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
-								Rx1DataRate: &ttnpb.DataRate{
+								Rx2DataRate: &ttnpb.DataRate{
 									Modulation: &ttnpb.DataRate_Lora{
 										Lora: &ttnpb.LoRaDataRate{
 											SpreadingFactor: 7,
@@ -1517,7 +1517,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 										},
 									},
 								},
-								Rx1Frequency:    868100000,
+								Rx2Frequency:    869525000,
 								FrequencyPlanId: test.EUFrequencyPlanID,
 							},
 						},
@@ -1543,7 +1543,7 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 								},
 								Priority: ttnpb.TxSchedulePriority_NORMAL,
 								Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
-								Rx1DataRate: &ttnpb.DataRate{
+								Rx2DataRate: &ttnpb.DataRate{
 									Modulation: &ttnpb.DataRate_Lora{
 										Lora: &ttnpb.LoRaDataRate{
 											SpreadingFactor: 7,
@@ -1552,7 +1552,41 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 										},
 									},
 								},
-								Rx1Frequency: 868100000,
+								Rx2Frequency: 869525000,
+							},
+						},
+					},
+				},
+				{
+					Name: "ValidClassCWithCustomFrequency",
+					Message: &ttnpb.DownlinkMessage{
+						RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 42, 2),
+						Settings: &ttnpb.DownlinkMessage_Request{
+							Request: &ttnpb.TxRequest{
+								Class: ttnpb.Class_CLASS_C,
+								DownlinkPaths: []*ttnpb.DownlinkPath{
+									{
+										Path: &ttnpb.DownlinkPath_Fixed{
+											Fixed: &ttnpb.GatewayAntennaIdentifiers{
+												GatewayIds: &ttnpb.GatewayIdentifiers{
+													GatewayId: registeredGatewayID,
+												},
+											},
+										},
+									},
+								},
+								Priority: ttnpb.TxSchedulePriority_NORMAL,
+								Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
+								Rx2DataRate: &ttnpb.DataRate{
+									Modulation: &ttnpb.DataRate_Lora{
+										Lora: &ttnpb.LoRaDataRate{
+											SpreadingFactor: 7,
+											Bandwidth:       250000,
+											CodingRate:      band.Cr4_5,
+										},
+									},
+								},
+								Rx2Frequency: 868123000,
 							},
 						},
 					},

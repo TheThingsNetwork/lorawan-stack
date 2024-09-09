@@ -2166,7 +2166,6 @@
   "error:pkg/gatewayserver/io/semtechws:no_auth_provided": "認証されていな `{uid}`",
   "error:pkg/gatewayserver/io/ttigw:downlink_channel_mixed_bandwidths": "",
   "error:pkg/gatewayserver/io/ttigw:invalid_board": "",
-  "error:pkg/gatewayserver/io/ttigw:invalid_frequency": "",
   "error:pkg/gatewayserver/io/ttigw:invalid_gateway_eui": "",
   "error:pkg/gatewayserver/io/ttigw:invalid_if_chain": "",
   "error:pkg/gatewayserver/io/ttigw:invalid_modulation": "",

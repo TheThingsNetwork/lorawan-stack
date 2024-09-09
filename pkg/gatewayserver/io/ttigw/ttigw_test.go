@@ -162,7 +162,7 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 			}
 			var (
 				multiSFIFChains = map[uint64]uint32{}
-				txChannels      []uint64
+				txFrequencies   []uint64
 				txBandwidths    []uint32
 			)
 			for _, b := range gwConfig.Boards {
@@ -185,7 +185,7 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 				}
 			}
 			for _, ch := range gwConfig.Tx {
-				txChannels = append(txChannels, ch.Frequency)
+				txFrequencies = append(txFrequencies, ch.Frequency)
 				txBandwidths = append(txBandwidths, map[lorav1.Bandwidth]uint32{
 					lorav1.Bandwidth_BANDWIDTH_125_KHZ: 125000,
 					lorav1.Bandwidth_BANDWIDTH_250_KHZ: 250000,
@@ -314,8 +314,24 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 						}:
 						}
 					case *lorav1.NetworkServerMessage_TransmitDownlinkRequest:
+						var (
+							frequency uint64
+							bandwidth uint32
+						)
+						switch txCh := msg.TransmitDownlinkRequest.Message.TxChannel.(type) {
+						case *lorav1.DownlinkMessage_TxChannelIndex:
+							frequency = txFrequencies[txCh.TxChannelIndex]
+							bandwidth = txBandwidths[txCh.TxChannelIndex]
+						case *lorav1.DownlinkMessage_TxChannelConfig:
+							frequency = txCh.TxChannelConfig.Frequency
+							bandwidth = map[lorav1.Bandwidth]uint32{
+								lorav1.Bandwidth_BANDWIDTH_125_KHZ: 125000,
+								lorav1.Bandwidth_BANDWIDTH_250_KHZ: 250000,
+								lorav1.Bandwidth_BANDWIDTH_500_KHZ: 500000,
+							}[txCh.TxChannelConfig.Bandwidth]
+						}
 						scheduled := &ttnpb.TxSettings{
-							Frequency: txChannels[msg.TransmitDownlinkRequest.Message.TxChannel],
+							Frequency: frequency,
 							Timestamp: msg.TransmitDownlinkRequest.Message.Timestamp,
 							Downlink: &ttnpb.TxSettings_Downlink{
 								TxPower: float32(msg.TransmitDownlinkRequest.Message.TxPower) + 2.15,
@@ -326,7 +342,7 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 							scheduled.DataRate = &ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{
 									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       txBandwidths[msg.TransmitDownlinkRequest.Message.TxChannel],
+										Bandwidth:       bandwidth,
 										SpreadingFactor: dataRate.Lora.SpreadingFactor,
 										CodingRate: map[lorav1.CodeRate]string{
 											lorav1.CodeRate_CODE_RATE_4_5: "4/5",
