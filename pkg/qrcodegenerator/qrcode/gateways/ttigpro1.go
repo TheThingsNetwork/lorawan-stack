@@ -26,8 +26,8 @@ const (
 )
 
 // ttigpro1Regex is the regular expression to match the TTIGPRO1 format.
-// The format is as follows: https://ttig.pro/c/{16 lowercase base16 chars}/{12 base62 chars}.
-var ttigpro1Regex = regexp.MustCompile(`^https://ttig\.pro/c/([a-f0-9]{16})/([a-z0-9]{12})$`)
+// The format is as follows: https://ttig.pro/c/{16 lowercase base16 chars}/{8+ base32 chars}.
+var ttigpro1Regex = regexp.MustCompile(`^https://ttig\.pro/c/([a-f0-9]{16})/([a-z0-9]{8,})$`)
 
 // TTIGPRO1 is a format for gateway identification QR codes.
 type ttigpro1 struct {
@@ -40,7 +40,7 @@ func (m *ttigpro1) UnmarshalText(text []byte) error {
 	// Match the URL against the pattern
 	matches := ttigpro1Regex.FindStringSubmatch(string(text))
 	if matches == nil || len(matches) != 3 {
-		return errInvalidFormat
+		return errInvalidFormat.New()
 	}
 
 	if err := m.gatewayEUI.UnmarshalText([]byte(matches[1])); err != nil {
@@ -49,8 +49,8 @@ func (m *ttigpro1) UnmarshalText(text []byte) error {
 
 	m.ownerToken = matches[2]
 
-	if len(m.ownerToken) != 12 /* owner token length */ {
-		return errInvalidLength
+	if len(m.ownerToken) < 8 {
+		return errInvalidLength.New()
 	}
 
 	return nil

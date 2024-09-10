@@ -123,5 +123,5 @@ func (s *Server) Parse(formatID string, data []byte) (ret Data, err error) {
 		return f, nil
 	}
 
-	return nil, errUnknownFormat
+	return nil, errUnknownFormat.New()
 }
