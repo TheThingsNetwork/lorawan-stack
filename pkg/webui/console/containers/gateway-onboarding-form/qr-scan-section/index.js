@@ -56,22 +56,18 @@ const GatewayQRScanSection = () => {
   }, [resetForm])
 
   const handleQRCodeApprove = useCallback(() => {
-    const {
-      gateway: { claim_gateway_request },
-    } = qrData
+    const { gateway } = qrData
 
     setValues(values => ({
       ...values,
       _withQRdata: true,
       ids: {
         ...values.ids,
-        eui: claim_gateway_request.authenticated_identifiers.gateway_eui,
+        eui: gateway.gateway_eui,
       },
       authenticated_identifiers: {
-        gateway_eui: claim_gateway_request.authenticated_identifiers.gateway_eui,
-        authentication_code: claim_gateway_request.authenticated_identifiers.authentication_code
-          ? claim_gateway_request.authenticated_identifiers.authentication_code
-          : '',
+        gateway_eui: gateway.gateway_eui,
+        authentication_code: gateway.owner_token ? gateway.owner_token : '',
       },
     }))
 
@@ -87,9 +83,6 @@ const GatewayQRScanSection = () => {
       try {
         // Get gateway from QR code
         const gateway = await dispatch(attachPromise(parseGatewayQRCode(qrCode)))
-        const {
-          claim_gateway_request: { authenticated_identifiers },
-        } = gateway
 
         const sheetData = [
           {
@@ -97,13 +90,13 @@ const GatewayQRScanSection = () => {
             items: [
               {
                 key: sharedMessages.claimAuthCode,
-                value: authenticated_identifiers.authentication_code,
+                value: gateway.owner_token,
                 type: 'code',
                 sensitive: true,
               },
               {
                 key: sharedMessages.gatewayEUI,
-                value: authenticated_identifiers.gateway_eui,
+                value: gateway.gateway_eui,
                 type: 'byte',
                 sensitive: false,
               },
