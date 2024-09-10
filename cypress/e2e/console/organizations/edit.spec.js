@@ -86,7 +86,9 @@ describe('Organization general settings', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification-success').findByText(`Organization updated`).should('be.visible')
+    cy.findByTestId('toast-notification-success')
+      .findByText(`Organization updated`)
+      .should('be.visible')
   })
 
   it('succeeds setting current user as contact', () => {
