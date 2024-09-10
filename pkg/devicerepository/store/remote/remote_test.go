@@ -385,7 +385,7 @@ func TestRemoteStore(t *testing.T) {
 					FirmwareVersion: "1.0",
 					BandId:          "EU_863_870",
 				},
-			}, nil)
+			})
 			a.So(err, should.BeNil)
 			a.So(template, should.Resemble, &ttnpb.EndDeviceTemplate{
 				EndDevice: &ttnpb.EndDevice{
@@ -423,12 +423,6 @@ func TestRemoteStore(t *testing.T) {
 					VendorId:        43,
 					VendorProfileId: 1,
 				},
-			}, &store.EndDeviceProfile{
-				VendorProfileID:           1,
-				RegionalParametersVersion: "RP001-1.0.3-RevA",
-				MACVersion:                ttnpb.MACVersion_MAC_V1_0_3,
-				SupportsJoin:              true,
-				Supports32BitFCnt:         true,
 			})
 			a.So(err, should.BeNil)
 			a.So(template, should.Resemble, &ttnpb.EndDeviceTemplate{
@@ -440,9 +434,14 @@ func TestRemoteStore(t *testing.T) {
 						HardwareVersion: "1.0",
 						BandId:          "EU_863_870",
 					},
+					Formatters: &ttnpb.MessagePayloadFormatters{
+						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+					},
 					LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_3_REV_A,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 					SupportsJoin:      true,
+					SupportsClassB:    true,
 					MacSettings: &ttnpb.MACSettings{
 						Supports_32BitFCnt: &ttnpb.BoolValue{
 							Value: true,
@@ -456,6 +455,7 @@ func TestRemoteStore(t *testing.T) {
 					"supports_class_c",
 					"lorawan_version",
 					"lorawan_phy_version",
+					"formatters",
 					"mac_settings.supports_32_bit_f_cnt",
 				),
 			})

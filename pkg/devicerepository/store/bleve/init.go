@@ -194,7 +194,7 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 						VendorId:        brand.LoraAllianceVendorId,
 						VendorProfileId: profile.VendorProfileID,
 					},
-				}, nil)
+				})
 				if errors.IsNotFound(err) {
 					continue
 				}

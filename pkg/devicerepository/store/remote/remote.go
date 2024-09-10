@@ -347,7 +347,6 @@ var (
 // GetTemplate retrieves an end device template for an end device definition.
 func (s *remoteStore) GetTemplate(
 	req *ttnpb.GetTemplateRequest,
-	profile *store.EndDeviceProfile,
 ) (*ttnpb.EndDeviceTemplate, error) {
 	ids := req.GetVersionIds()
 	if ids == nil {
@@ -359,10 +358,6 @@ func (s *remoteStore) GetTemplate(
 			return nil, err
 		}
 		ids = versionIDs
-	}
-
-	if profile != nil {
-		return profile.ToTemplatePB(ids, nil)
 	}
 
 	// Parse the models and return the End Device Profile that corresponds to the Band ID.

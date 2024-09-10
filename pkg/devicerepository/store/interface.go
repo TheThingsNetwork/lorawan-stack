@@ -102,7 +102,7 @@ type Store interface {
 	// GetEndDeviceProfiles lists available LoRaWAN end device profile definitions.
 	GetEndDeviceProfiles(GetEndDeviceProfilesRequest) (*GetEndDeviceProfilesResponse, error)
 	// GetTemplate retrieves an end device template for an end device definition.
-	GetTemplate(*ttnpb.GetTemplateRequest, *EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error)
+	GetTemplate(*ttnpb.GetTemplateRequest) (*ttnpb.EndDeviceTemplate, error)
 	// GetUplinkDecoder retrieves the codec for decoding uplink messages.
 	GetUplinkDecoder(GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error)
 	// GetDownlinkDecoder retrieves the codec for decoding downlink messages.

@@ -99,7 +99,6 @@ func (*mockStore) GetEndDeviceProfiles(
 // GetTemplate retrieves an end device template for an end device definition.
 func (s *mockStore) GetTemplate(
 	req *ttnpb.GetTemplateRequest,
-	_ *store.EndDeviceProfile,
 ) (*ttnpb.EndDeviceTemplate, error) {
 	s.lastVersionIDs = req.GetVersionIds()
 	profileIDs := req.GetEndDeviceProfileIds()

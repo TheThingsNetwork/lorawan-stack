@@ -207,10 +207,7 @@ var (
 )
 
 // GetTemplate retrieves an end device template for an end device definition.
-func (s *bleveStore) GetTemplate(
-	req *ttnpb.GetTemplateRequest,
-	_ *store.EndDeviceProfile,
-) (*ttnpb.EndDeviceTemplate, error) {
+func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest) (*ttnpb.EndDeviceTemplate, error) {
 	profileIDs, versionIDs := req.GetEndDeviceProfileIds(), req.GetVersionIds()
 	if profileIDs == nil && versionIDs == nil {
 		return nil, errNoIdentifiers.New()
@@ -266,7 +263,7 @@ func (s *bleveStore) GetTemplate(
 		return template, nil
 	}
 
-	return s.store.GetTemplate(req, nil)
+	return s.store.GetTemplate(req)
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
