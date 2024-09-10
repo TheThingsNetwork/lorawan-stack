@@ -341,7 +341,12 @@ var (
 	)
 	errBandNotFoundForRegion = errors.DefineNotFound(
 		"band_not_found_for_region",
-		"band not found for region `{region}`")
+		"band not found for region `{region}`",
+	)
+	errMissingProfileIdentifiers = errors.DefineInvalidArgument(
+		"missing_profile_identifiers",
+		"both vendor ID and vendor profile ID must be provided",
+	)
 )
 
 // GetTemplate retrieves an end device template for an end device definition.
@@ -414,7 +419,7 @@ func (s *remoteStore) getVersionIDsUsingProfileIDs(
 	ids *ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers,
 ) (*ttnpb.EndDeviceVersionIdentifiers, error) {
 	if ids.VendorProfileId == 0 || ids.VendorId == 0 {
-		return nil, errors.New("vendor_profile_id and vendor_id must be set")
+		return nil, errMissingProfileIdentifiers.New()
 	}
 
 	brandID, err := s.getBrandIDByVendorID(ids.VendorId)
@@ -422,7 +427,8 @@ func (s *remoteStore) getVersionIDsUsingProfileIDs(
 		return nil, errBrandWithVendorIDNotFound.WithAttributes("vendor_id", ids.VendorId)
 	}
 	endDeviceProfilesIdentifiers, err := s.GetEndDeviceProfileIdentifiers(
-		store.GetEndDeviceProfileIdentifiersRequest{BrandID: brandID})
+		store.GetEndDeviceProfileIdentifiersRequest{BrandID: brandID},
+	)
 	if err != nil {
 		return nil, err
 	}

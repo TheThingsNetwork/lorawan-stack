@@ -31,12 +31,12 @@ import (
 )
 
 const (
-	// Timeout for opening the index. This is to avoid blocking on the index
+	// DefaultTimeout for opening the index. This is to avoid blocking on the index
 	// open call, which hangs indefinitely if the index is already in use by
 	// a different process.
 	defaultTimeout = 5 * time.Second
 
-	// Size of the cache for brands and models.
+	// CacheSize for brands and models.
 	cacheSize = 1024
 )
 

@@ -462,7 +462,7 @@ func TestBleve(t *testing.T) {
 				Name: "ZeroProfileID",
 				Req: &ttnpb.GetTemplateRequest{
 					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
-						VendorId: 42, // why is it allowed to have a vendor ID but no profile ID?
+						VendorId: 42,
 					},
 				},
 				Assertion: func(t *ttnpb.EndDeviceTemplate, err error) bool {

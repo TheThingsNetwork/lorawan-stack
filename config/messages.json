@@ -4121,27 +4121,9 @@
       "file": "store.go"
     }
   },
-  "error:pkg/devicerepository/store/bleve:missing_profile_identifier": {
+  "error:pkg/devicerepository/store/bleve:missing_profile_identifiers": {
     "translations": {
       "en": "both vendor ID and vendor profile ID must be provided"
-    },
-    "description": {
-      "package": "pkg/devicerepository/store/bleve",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/devicerepository/store/bleve:multiple_identifiers": {
-    "translations": {
-      "en": "multiple identifiers found in the request. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers"
-    },
-    "description": {
-      "package": "pkg/devicerepository/store/bleve",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/devicerepository/store/bleve:no_identifiers": {
-    "translations": {
-      "en": "no identifiers provided"
     },
     "description": {
       "package": "pkg/devicerepository/store/bleve",
@@ -4187,6 +4169,15 @@
   "error:pkg/devicerepository/store/remote:firmware_version_not_found": {
     "translations": {
       "en": "firmware version `{firmware_version}` for model `{brand_id}/{model_id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:missing_profile_identifiers": {
+    "translations": {
+      "en": "both vendor ID and vendor profile ID must be provided"
     },
     "description": {
       "package": "pkg/devicerepository/store/remote",

@@ -36,13 +36,13 @@ var (
 		"invalid_number_of_profiles",
 		"invalid number of profiles returned",
 	)
-	errMultipleIdentifiers = errors.DefineCorruption(
-		"multiple_identifiers",
-		"multiple identifiers found in the request. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers",
-	)
 	errEndDeviceProfileNotFound = errors.DefineNotFound(
 		"end_device_profile_not_found",
 		"end device profile not found for vendor ID `{vendor_id}` and vendor profile ID `{vendor_profile_id}`",
+	)
+	errMissingProfileIdentifiers = errors.DefineInvalidArgument(
+		"missing_profile_identifiers",
+		"both vendor ID and vendor profile ID must be provided",
 	)
 )
 
@@ -195,75 +195,56 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 	}, nil
 }
 
-var (
-	errNoIdentifiers = errors.DefineInvalidArgument(
-		"no_identifiers",
-		"no identifiers provided",
-	)
-	errMissingProfileIdentifier = errors.DefineInvalidArgument(
-		"missing_profile_identifier",
-		"both vendor ID and vendor profile ID must be provided",
-	)
-)
-
 // GetTemplate retrieves an end device template for an end device definition.
 func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest) (*ttnpb.EndDeviceTemplate, error) {
-	profileIDs, versionIDs := req.GetEndDeviceProfileIds(), req.GetVersionIds()
-	if profileIDs == nil && versionIDs == nil {
-		return nil, errNoIdentifiers.New()
+	profileIDs := req.GetEndDeviceProfileIds()
+	if profileIDs == nil {
+		return s.store.GetTemplate(req)
 	}
-	if profileIDs != nil && versionIDs != nil {
-		return nil, errMultipleIdentifiers.New()
+	if profileIDs.VendorId == 0 || profileIDs.VendorProfileId == 0 {
+		return nil, errMissingProfileIdentifiers.New()
 	}
+	documentTypeQuery := bleve.NewTermQuery(templateDocumentType)
+	documentTypeQuery.SetField("Type")
+	queries := []query.Query{documentTypeQuery}
 
-	if profileIDs != nil {
-		if profileIDs.VendorId == 0 || profileIDs.VendorProfileId == 0 {
-			return nil, errMissingProfileIdentifier.New()
-		}
-		documentTypeQuery := bleve.NewTermQuery(templateDocumentType)
-		documentTypeQuery.SetField("Type")
-		queries := []query.Query{documentTypeQuery}
+	queryTerm := bleve.NewTermQuery(strconv.Itoa(int(profileIDs.VendorId)))
+	queryTerm.SetField("VendorID")
+	queries = append(queries, queryTerm)
 
-		queryTerm := bleve.NewTermQuery(strconv.Itoa(int(profileIDs.VendorId)))
-		queryTerm.SetField("VendorID")
-		queries = append(queries, queryTerm)
+	queryTerm = bleve.NewTermQuery(strconv.Itoa(int(profileIDs.VendorProfileId)))
+	queryTerm.SetField("VendorProfileID")
+	queries = append(queries, queryTerm)
 
-		queryTerm = bleve.NewTermQuery(strconv.Itoa(int(profileIDs.VendorProfileId)))
-		queryTerm.SetField("VendorProfileID")
-		queries = append(queries, queryTerm)
-
-		searchRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(queries...))
-		searchRequest.Fields = []string{"TemplateJSON"}
-		result, err := s.index.Search(searchRequest)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(result.Hits) == 0 {
-			return nil, errEndDeviceProfileNotFound.WithAttributes(
-				"vendor_id", profileIDs.VendorId,
-				"vendor_profile_id", profileIDs.VendorProfileId)
-		}
-
-		if len(result.Hits) != 1 {
-			// There can only be one profile for a given tuple.
-			return nil, errInvalidNumberOfProfiles.New()
-		}
-
-		hit, err := s.retrieve(result.Hits[0], "TemplateJSON", func() any { return &ttnpb.EndDeviceTemplate{} })
-		if err != nil {
-			return nil, err
-		}
-
-		template, ok := hit.(*ttnpb.EndDeviceTemplate)
-		if !ok {
-			return nil, errCorruptedIndex.New()
-		}
-
-		return template, nil
+	searchRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(queries...))
+	searchRequest.Fields = []string{"TemplateJSON"}
+	result, err := s.index.Search(searchRequest)
+	if err != nil {
+		return nil, err
 	}
 
-	return s.store.GetTemplate(req)
+	if len(result.Hits) == 0 {
+		return nil, errEndDeviceProfileNotFound.WithAttributes(
+			"vendor_id", profileIDs.VendorId,
+			"vendor_profile_id", profileIDs.VendorProfileId)
+	}
+
+	if len(result.Hits) != 1 {
+		// There can only be one profile for a given tuple.
+		return nil, errInvalidNumberOfProfiles.New()
+	}
+
+	hit, err := s.retrieve(result.Hits[0], "TemplateJSON", func() any { return &ttnpb.EndDeviceTemplate{} })
+	if err != nil {
+		return nil, err
+	}
+
+	template, ok := hit.(*ttnpb.EndDeviceTemplate)
+	if !ok {
+		return nil, errCorruptedIndex.New()
+	}
+
+	return template, nil
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
