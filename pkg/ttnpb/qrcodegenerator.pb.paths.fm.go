@@ -1579,6 +1579,26 @@ var ParseEndDeviceQRCodeResponseFieldPathsTopLevel = []string{
 	"end_device_template",
 	"format_id",
 }
+var ParseGatewayQRCodeRequestFieldPathsNested = []string{
+	"format_id",
+	"qr_code",
+}
+
+var ParseGatewayQRCodeRequestFieldPathsTopLevel = []string{
+	"format_id",
+	"qr_code",
+}
+var ParseGatewayQRCodeResponseFieldPathsNested = []string{
+	"format_id",
+	"gateway_eui",
+	"owner_token",
+}
+
+var ParseGatewayQRCodeResponseFieldPathsTopLevel = []string{
+	"format_id",
+	"gateway_eui",
+	"owner_token",
+}
 var GenerateEndDeviceQRCodeRequest_ImageFieldPathsNested = []string{
 	"image_size",
 }

@@ -7147,6 +7147,27 @@
       ]
     }
   },
+  "GatewayQRCodeGenerator": {
+    "Parse": {
+      "file": "ttn/lorawan/v3/qrcodegenerator.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/qr-codes/gateways/parse",
+          "body": "*",
+          "parameters": []
+        },
+        {
+          "method": "post",
+          "pattern": "/qr-codes/gateways/{format_id}/parse",
+          "body": "*",
+          "parameters": [
+            "format_id"
+          ]
+        }
+      ]
+    }
+  },
   "EndDeviceRegistrySearch": {
     "SearchEndDevices": {
       "file": "ttn/lorawan/v3/search_services.proto",

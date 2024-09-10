@@ -48,7 +48,7 @@ var (
 	authorizedCallOpt = grpc.PerRPCCredentials(authorizedMD)
 )
 
-func TestGatewayClaimingServer(t *testing.T) { // nolint:paralleltest
+func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)

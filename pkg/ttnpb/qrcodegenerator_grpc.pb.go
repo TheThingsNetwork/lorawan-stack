@@ -242,3 +242,96 @@ var EndDeviceQRCodeGenerator_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "ttn/lorawan/v3/qrcodegenerator.proto",
 }
+
+const (
+	GatewayQRCodeGenerator_Parse_FullMethodName = "/ttn.lorawan.v3.GatewayQRCodeGenerator/Parse"
+)
+
+// GatewayQRCodeGeneratorClient is the client API for GatewayQRCodeGenerator service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type GatewayQRCodeGeneratorClient interface {
+	// Parse QR Codes of known formats and return the information contained within.
+	Parse(ctx context.Context, in *ParseGatewayQRCodeRequest, opts ...grpc.CallOption) (*ParseGatewayQRCodeResponse, error)
+}
+
+type gatewayQRCodeGeneratorClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewGatewayQRCodeGeneratorClient(cc grpc.ClientConnInterface) GatewayQRCodeGeneratorClient {
+	return &gatewayQRCodeGeneratorClient{cc}
+}
+
+func (c *gatewayQRCodeGeneratorClient) Parse(ctx context.Context, in *ParseGatewayQRCodeRequest, opts ...grpc.CallOption) (*ParseGatewayQRCodeResponse, error) {
+	out := new(ParseGatewayQRCodeResponse)
+	err := c.cc.Invoke(ctx, GatewayQRCodeGenerator_Parse_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GatewayQRCodeGeneratorServer is the server API for GatewayQRCodeGenerator service.
+// All implementations must embed UnimplementedGatewayQRCodeGeneratorServer
+// for forward compatibility
+type GatewayQRCodeGeneratorServer interface {
+	// Parse QR Codes of known formats and return the information contained within.
+	Parse(context.Context, *ParseGatewayQRCodeRequest) (*ParseGatewayQRCodeResponse, error)
+	mustEmbedUnimplementedGatewayQRCodeGeneratorServer()
+}
+
+// UnimplementedGatewayQRCodeGeneratorServer must be embedded to have forward compatible implementations.
+type UnimplementedGatewayQRCodeGeneratorServer struct {
+}
+
+func (UnimplementedGatewayQRCodeGeneratorServer) Parse(context.Context, *ParseGatewayQRCodeRequest) (*ParseGatewayQRCodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Parse not implemented")
+}
+func (UnimplementedGatewayQRCodeGeneratorServer) mustEmbedUnimplementedGatewayQRCodeGeneratorServer() {
+}
+
+// UnsafeGatewayQRCodeGeneratorServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GatewayQRCodeGeneratorServer will
+// result in compilation errors.
+type UnsafeGatewayQRCodeGeneratorServer interface {
+	mustEmbedUnimplementedGatewayQRCodeGeneratorServer()
+}
+
+func RegisterGatewayQRCodeGeneratorServer(s grpc.ServiceRegistrar, srv GatewayQRCodeGeneratorServer) {
+	s.RegisterService(&GatewayQRCodeGenerator_ServiceDesc, srv)
+}
+
+func _GatewayQRCodeGenerator_Parse_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ParseGatewayQRCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayQRCodeGeneratorServer).Parse(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayQRCodeGenerator_Parse_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayQRCodeGeneratorServer).Parse(ctx, req.(*ParseGatewayQRCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GatewayQRCodeGenerator_ServiceDesc is the grpc.ServiceDesc for GatewayQRCodeGenerator service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var GatewayQRCodeGenerator_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.GatewayQRCodeGenerator",
+	HandlerType: (*GatewayQRCodeGeneratorServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Parse",
+			Handler:    _GatewayQRCodeGenerator_Parse_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "ttn/lorawan/v3/qrcodegenerator.proto",
+}

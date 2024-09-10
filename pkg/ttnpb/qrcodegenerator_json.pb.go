@@ -9,6 +9,7 @@ package ttnpb
 import (
 	golang "github.com/TheThingsIndustries/protoc-gen-go-json/golang"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MarshalProtoJSON marshals the QRCodeFormat message to JSON.
@@ -202,5 +203,63 @@ func (x *ParseEndDeviceQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.Unmarsha
 
 // UnmarshalJSON unmarshals the ParseEndDeviceQRCodeResponse from JSON.
 func (x *ParseEndDeviceQRCodeResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ParseGatewayQRCodeResponse message to JSON.
+func (x *ParseGatewayQRCodeResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.FormatId != "" || s.HasField("format_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("format_id")
+		s.WriteString(x.FormatId)
+	}
+	if len(x.GatewayEui) > 0 || s.HasField("gateway_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("gateway_eui")
+		types.MarshalHEXBytes(s.WithField("gateway_eui"), x.GatewayEui)
+	}
+	if x.OwnerToken != "" || s.HasField("owner_token") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("owner_token")
+		s.WriteString(x.OwnerToken)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ParseGatewayQRCodeResponse to JSON.
+func (x *ParseGatewayQRCodeResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ParseGatewayQRCodeResponse message from JSON.
+func (x *ParseGatewayQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "format_id", "formatId":
+			s.AddField("format_id")
+			x.FormatId = s.ReadString()
+		case "gateway_eui", "gatewayEui":
+			s.AddField("gateway_eui")
+			x.GatewayEui = types.Unmarshal8Bytes(s.WithField("gateway_eui", false))
+		case "owner_token", "ownerToken":
+			s.AddField("owner_token")
+			x.OwnerToken = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ParseGatewayQRCodeResponse from JSON.
+func (x *ParseGatewayQRCodeResponse) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

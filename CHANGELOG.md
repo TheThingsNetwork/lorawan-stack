@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 - Option to filter out non-gateway related frequency plans.
   - `ListFrequencyPlans` RPC has a new `gateways-only` flag.
 - Option to pause application webhooks.
+- Endpoint for claiming gateways using a qr code
 
 ### Changed
 

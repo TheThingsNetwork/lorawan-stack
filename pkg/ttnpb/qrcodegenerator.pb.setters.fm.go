@@ -278,6 +278,76 @@ func (dst *ParseEndDeviceQRCodeResponse) SetFields(src *ParseEndDeviceQRCodeResp
 	return nil
 }
 
+func (dst *ParseGatewayQRCodeRequest) SetFields(src *ParseGatewayQRCodeRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "format_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FormatId = src.FormatId
+			} else {
+				var zero string
+				dst.FormatId = zero
+			}
+		case "qr_code":
+			if len(subs) > 0 {
+				return fmt.Errorf("'qr_code' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.QrCode = src.QrCode
+			} else {
+				dst.QrCode = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ParseGatewayQRCodeResponse) SetFields(src *ParseGatewayQRCodeResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "format_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FormatId = src.FormatId
+			} else {
+				var zero string
+				dst.FormatId = zero
+			}
+		case "gateway_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayEui = src.GatewayEui
+			} else {
+				dst.GatewayEui = nil
+			}
+		case "owner_token":
+			if len(subs) > 0 {
+				return fmt.Errorf("'owner_token' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.OwnerToken = src.OwnerToken
+			} else {
+				var zero string
+				dst.OwnerToken = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *GenerateEndDeviceQRCodeRequest_Image) SetFields(src *GenerateEndDeviceQRCodeRequest_Image, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
