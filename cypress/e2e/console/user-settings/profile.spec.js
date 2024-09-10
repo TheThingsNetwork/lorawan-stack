@@ -72,7 +72,7 @@ describe('User settings / profile', () => {
 
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Profile updated')
       .should('be.visible')
@@ -99,7 +99,7 @@ describe('User settings / profile', () => {
 
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Profile updated')
       .should('be.visible')

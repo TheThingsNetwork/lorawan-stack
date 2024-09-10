@@ -101,7 +101,7 @@ describe('Collaborators', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .findByText(`Collaborator rights updated`)
         .should('be.visible')
@@ -146,7 +146,7 @@ describe('Collaborators', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .findByText(`Collaborator rights updated`)
         .should('be.visible')
@@ -205,7 +205,7 @@ describe('Collaborators', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .findByText(`Collaborator rights updated`)
         .should('be.visible')
@@ -250,7 +250,7 @@ describe('Collaborators', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .findByText(`Collaborator rights updated`)
         .should('be.visible')
@@ -303,7 +303,7 @@ describe('Collaborators', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .findByText(`Member rights updated`)
         .should('be.visible')

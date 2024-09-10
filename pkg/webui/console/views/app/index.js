@@ -25,7 +25,7 @@ import {
 } from 'react-router-dom'
 import classnames from 'classnames'
 
-import { ToastContainer } from '@ttn-lw/components/toast'
+import toast, { ToastContainer } from '@ttn-lw/components/toast'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import HeaderComponent from '@ttn-lw/components/header'
 
@@ -97,6 +97,16 @@ const Layout = () => {
       main.current.scrollTop = 0
     }
   }, [page])
+
+  useEffect(() => {
+    toast({
+      title: 'Warning',
+      type: toast.types.WARNING,
+      message: 'License expires in 5m',
+      preventConsecutive: true,
+      messageGroup: 'header-warning',
+    })
+  }, [])
 
   return (
     <SidebarContextProvider>

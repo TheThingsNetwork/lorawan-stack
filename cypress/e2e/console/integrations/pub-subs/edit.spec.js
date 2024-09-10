@@ -111,7 +111,7 @@ describe('Application Pub/Sub', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText(`Pub/Sub updated`)
       .should('be.visible')
