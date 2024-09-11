@@ -180,7 +180,7 @@ func (dr *DeviceRepository) GetTemplate(
 	if err := rights.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	return dr.store.GetTemplate(req, nil)
+	return dr.store.GetTemplate(req)
 }
 
 func getDecoder(

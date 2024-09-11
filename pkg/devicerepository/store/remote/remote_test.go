@@ -30,11 +30,15 @@ import (
 )
 
 func TestRemoteStore(t *testing.T) {
+	t.Parallel()
 	a := assertions.New(t)
 
 	s := remote.NewRemoteStore(fetch.FromFilesystem("testdata"))
 	t.Run("TestGetBrands", func(t *testing.T) {
+		t.Parallel()
+
 		t.Run("Limit", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetBrands(store.GetBrandsRequest{
 				Paths: []string{
 					"brand_id",
@@ -52,6 +56,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("SecondPage", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetBrands(store.GetBrandsRequest{
 				Paths: []string{
 					"brand_id",
@@ -70,6 +75,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Paths", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetBrands(store.GetBrandsRequest{
 				Paths: ttnpb.EndDeviceBrandFieldPathsNested,
 			})
@@ -90,12 +96,19 @@ func TestRemoteStore(t *testing.T) {
 					OrganizationUniqueIdentifiers: []string{"010203", "030405"},
 					Logo:                          "logo.svg",
 				},
+				{
+					BrandId:              "windsensor-vendor",
+					Name:                 "Wind Sensor Vendor",
+					LoraAllianceVendorId: 43,
+				},
 			})
 		})
 	})
 
 	t.Run("TestGetModels", func(t *testing.T) {
+		t.Parallel()
 		t.Run("AllBrands", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetModels(store.GetModelsRequest{
 				Paths: []string{
 					"brand_id",
@@ -120,10 +133,16 @@ func TestRemoteStore(t *testing.T) {
 					ModelId: "full-device",
 					Name:    "Full Device",
 				},
+				{
+					BrandId: "windsensor-vendor",
+					ModelId: "windsensor",
+					Name:    "Wind Sensor",
+				},
 			})
 		})
 
 		t.Run("Limit", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetModels(store.GetModelsRequest{
 				BrandID: "foo-vendor",
 				Limit:   1,
@@ -144,6 +163,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Offset", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetModels(store.GetModelsRequest{
 				BrandID: "foo-vendor",
 				Limit:   1,
@@ -165,6 +185,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Paths", func(t *testing.T) {
+			t.Parallel()
 			list, err := s.GetModels(store.GetModelsRequest{
 				BrandID: "foo-vendor",
 				Paths:   ttnpb.EndDeviceModelFieldPathsNested,
@@ -232,6 +253,7 @@ func TestRemoteStore(t *testing.T) {
 		})
 
 		t.Run("Full", func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 			list, err := s.GetModels(store.GetModelsRequest{
 				BrandID: "full-vendor",
@@ -353,7 +375,9 @@ func TestRemoteStore(t *testing.T) {
 	})
 
 	t.Run("TestGetTemplate", func(t *testing.T) {
+		t.Parallel()
 		t.Run("ByEndDeviceVersionIdentifiers", func(t *testing.T) {
+			t.Parallel()
 			template, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
 				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 					BrandId:         "foo-vendor",
@@ -361,7 +385,7 @@ func TestRemoteStore(t *testing.T) {
 					FirmwareVersion: "1.0",
 					BandId:          "EU_863_870",
 				},
-			}, nil)
+			})
 			a.So(err, should.BeNil)
 			a.So(template, should.Resemble, &ttnpb.EndDeviceTemplate{
 				EndDevice: &ttnpb.EndDevice{
@@ -391,32 +415,33 @@ func TestRemoteStore(t *testing.T) {
 				),
 			})
 		})
-
 		t.Run("ByProfile", func(t *testing.T) {
+			t.Parallel()
+
 			template, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
-				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-					BrandId: "foo-vendor",
-				},
 				EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
-					VendorId:        42,
-					VendorProfileId: 0,
+					VendorId:        43,
+					VendorProfileId: 1,
 				},
-			}, &store.EndDeviceProfile{
-				VendorProfileID:           0,
-				RegionalParametersVersion: "RP001-1.0.3-RevA",
-				MACVersion:                ttnpb.MACVersion_MAC_V1_0_3,
-				SupportsJoin:              true,
-				Supports32BitFCnt:         true,
 			})
 			a.So(err, should.BeNil)
 			a.So(template, should.Resemble, &ttnpb.EndDeviceTemplate{
 				EndDevice: &ttnpb.EndDevice{
 					VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-						BrandId: "foo-vendor",
+						BrandId:         "windsensor-vendor",
+						ModelId:         "windsensor",
+						FirmwareVersion: "1.0",
+						HardwareVersion: "1.0",
+						BandId:          "EU_863_870",
+					},
+					Formatters: &ttnpb.MessagePayloadFormatters{
+						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 					},
 					LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_3_REV_A,
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 					SupportsJoin:      true,
+					SupportsClassB:    true,
 					MacSettings: &ttnpb.MACSettings{
 						Supports_32BitFCnt: &ttnpb.BoolValue{
 							Value: true,
@@ -430,6 +455,7 @@ func TestRemoteStore(t *testing.T) {
 					"supports_class_c",
 					"lorawan_version",
 					"lorawan_phy_version",
+					"formatters",
 					"mac_settings.supports_32_bit_f_cnt",
 				),
 			})
@@ -437,7 +463,9 @@ func TestRemoteStore(t *testing.T) {
 	})
 
 	t.Run("TestGetCodecs", func(t *testing.T) {
+		t.Parallel()
 		t.Run("Missing", func(t *testing.T) {
+			t.Parallel()
 			a := assertions.New(t)
 
 			for _, ids := range []*ttnpb.EndDeviceVersionIdentifiers{
@@ -496,6 +524,7 @@ func TestRemoteStore(t *testing.T) {
 			},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
+				t.Parallel()
 				a := assertions.New(t)
 
 				versionIDs := &ttnpb.EndDeviceVersionIdentifiers{
@@ -511,6 +540,7 @@ func TestRemoteStore(t *testing.T) {
 		}
 
 		t.Run("Examples", func(t *testing.T) {
+			t.Parallel()
 			for _, tc := range []struct {
 				name  string
 				f     func(store.GetCodecRequest) (any, error)

@@ -17,6 +17,7 @@ package remote
 import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -60,7 +61,8 @@ type VendorsIndex struct {
 
 // VendorEndDevicesIndex is the format of the `vendor/<vendor-id>/index.yaml` file.
 type VendorEndDevicesIndex struct {
-	EndDevices []string `yaml:"endDevices"`
+	EndDevices []string                                      `yaml:"endDevices"`
+	ProfileIDs map[string]*store.EndDeviceProfileIdentifiers `yaml:"profileIDs,omitempty"`
 }
 
 // EndDeviceModel is the format of the `vendor/<vendor-id>/<model-id>.yaml` file.

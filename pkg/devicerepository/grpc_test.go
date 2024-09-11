@@ -99,7 +99,6 @@ func (*mockStore) GetEndDeviceProfiles(
 // GetTemplate retrieves an end device template for an end device definition.
 func (s *mockStore) GetTemplate(
 	req *ttnpb.GetTemplateRequest,
-	_ *store.EndDeviceProfile,
 ) (*ttnpb.EndDeviceTemplate, error) {
 	s.lastVersionIDs = req.GetVersionIds()
 	profileIDs := req.GetEndDeviceProfileIds()
@@ -109,6 +108,12 @@ func (s *mockStore) GetTemplate(
 		}
 	}
 	return s.template, s.err
+}
+
+func (*mockStore) GetEndDeviceProfileIdentifiers(
+	_ store.GetEndDeviceProfileIdentifiersRequest,
+) (*store.GetEndDeviceProfileIdentifiersResponse, error) {
+	return nil, nil //nolint:nilnil
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.

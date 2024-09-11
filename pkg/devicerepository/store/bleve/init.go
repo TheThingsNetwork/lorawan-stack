@@ -35,10 +35,10 @@ import (
 )
 
 const (
-	indexPath           = "index.bleve"
-	brandDocumentType   = "brand"
-	modelDocumentType   = "model"
-	profileDocumentType = "profile"
+	indexPath            = "index.bleve"
+	brandDocumentType    = "brand"
+	modelDocumentType    = "model"
+	templateDocumentType = "template"
 )
 
 type indexableBrand struct {
@@ -61,35 +61,34 @@ type indexableModel struct {
 	Type string // Index document type, always modelDocumentType
 }
 
-type indexableProfile struct {
-	Brand   *ttnpb.EndDeviceBrand
-	Profile *store.EndDeviceProfile
+type indexableTemplate struct {
+	Template *ttnpb.EndDeviceTemplate
 
-	ProfileJSON                        string // *store.EndDeviceProfile marshaled into string.
-	BrandID, VendorID, VendorProfileID string // stored separately to support queries.
+	TemplateJSON              string // *ttnpb.EndDeviceTemplate marshaled into string.
+	VendorID, VendorProfileID string // stored separately to support queries.
 
-	Type string // Index document type, always profileDocumentType
+	Type string // Index document type, always templateDocumentType
 }
 
-func newIndex(path string, overwrite bool, keywords ...string) (bleve.Index, error) {
+func newIndex(indexPath string, overwrite bool, keywords ...string) (bleve.Index, error) {
 	mapping := bleve.NewIndexMapping()
-	if st, err := os.Stat(path); err == nil && st.IsDir() && overwrite {
-		if err := os.RemoveAll(path); err != nil {
+	if st, err := os.Stat(indexPath); err == nil && st.IsDir() && overwrite {
+		if err := os.RemoveAll(indexPath); err != nil {
 			return nil, err
 		}
 	}
 	keywordFieldMapping := bleve.NewTextFieldMapping()
 	keywordFieldMapping.Analyzer = keyword.Name
-	for _, keyword := range keywords {
-		mapping.DefaultMapping.AddFieldMappingsAt(keyword, keywordFieldMapping)
+	for _, k := range keywords {
+		mapping.DefaultMapping.AddFieldMappingsAt(k, keywordFieldMapping)
 	}
-	return bleve.New(path, mapping)
+	return bleve.New(indexPath, mapping)
 }
 
 func getWorkingDirectory(paths []string) (string, error) {
-	for _, path := range paths {
-		if s, err := os.Stat(path); err == nil && s.IsDir() {
-			return path, nil
+	for _, p := range paths {
+		if s, err := os.Stat(p); err == nil && s.IsDir() {
+			return p, nil
 		}
 	}
 
@@ -102,7 +101,7 @@ func getWorkingDirectory(paths []string) (string, error) {
 }
 
 // Initialize fetches the Device Repository package file and generates index files.
-func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overwrite bool) error {
+func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overwrite bool) error { //nolint:gocyclo
 	wd, err := getWorkingDirectory(c.SearchPaths)
 	if err != nil {
 		return err
@@ -133,20 +132,14 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 			Paths:   ttnpb.EndDeviceModelFieldPathsNested,
 			BrandID: brand.BrandId,
 		})
-		if err != nil {
-			if errors.IsNotFound(err) {
-				// Skip vendors without any models
-				continue
-			} else {
-				return err
-			}
+		if errors.IsNotFound(err) {
+			// Skip vendors without any models.
+			continue
 		}
-		profiles, err := s.GetEndDeviceProfiles(store.GetEndDeviceProfilesRequest{
-			BrandID: brand.BrandId,
-		})
-		if err != nil && !errors.IsNotFound(err) {
+		if err != nil {
 			return err
 		}
+
 		brandJSON, err := jsonpb.TTN().Marshal(brand)
 		if err != nil {
 			return err
@@ -179,25 +172,49 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 				return err
 			}
 		}
-		// Add the end device profiles to the index.
+		profiles, err := s.GetEndDeviceProfiles(store.GetEndDeviceProfilesRequest{
+			BrandID: brand.BrandId,
+		})
+		if err != nil && !errors.IsNotFound(err) {
+			return err
+		}
+		// Add the end device templates to the index.
 		if profiles != nil {
 			for _, profile := range profiles.Profiles {
-				profileJSON, err := jsonpb.TTN().Marshal(profile)
+				// Skip profiles without complete information.
+				if brand.LoraAllianceVendorId == 0 || profile.VendorProfileID == 0 {
+					continue
+				}
+
+				vendorID := strconv.Itoa(int(brand.LoraAllianceVendorId))
+				vendorProfileID := strconv.Itoa(int(profile.VendorProfileID))
+
+				template, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
+					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
+						VendorId:        brand.LoraAllianceVendorId,
+						VendorProfileId: profile.VendorProfileID,
+					},
+				})
+				if errors.IsNotFound(err) {
+					continue
+				}
 				if err != nil {
 					return err
 				}
-				vendorProfileID := strconv.Itoa(int(profile.VendorProfileID))
-				vendorID := strconv.Itoa(int(brand.LoraAllianceVendorId))
-				p := indexableProfile{
-					Type:            profileDocumentType,
-					ProfileJSON:     string(profileJSON),
-					Brand:           brand,
-					Profile:         profile,
-					BrandID:         brand.BrandId,
+
+				templateJSON, err := jsonpb.TTN().Marshal(template)
+				if err != nil {
+					return err
+				}
+
+				t := indexableTemplate{
+					Type:            templateDocumentType,
+					TemplateJSON:    string(templateJSON),
+					Template:        template,
 					VendorID:        vendorID,
 					VendorProfileID: vendorProfileID,
 				}
-				if err := batch.Index(fmt.Sprintf("%s:%s", vendorID, vendorProfileID), p); err != nil {
+				if err := batch.Index(fmt.Sprintf("%s:%s", vendorID, vendorProfileID), t); err != nil {
 					return err
 				}
 			}

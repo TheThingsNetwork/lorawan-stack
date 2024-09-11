@@ -1,0 +1,16 @@
+endDevices:
+- windsensor
+
+profileIDs:
+  '1':
+    endDeviceID: 'windsensor'
+    firmwareVersion: '1.0'
+    hardwareVersion: '1.0'
+    region: 'EU863-870'
+  '2':
+    endDeviceID: 'windsensor'
+    firmwareVersion: '1.0'
+    hardwareVersion: '1.0'
+    region: 'US902-928'
+  '3':
+    id: 'windsor-profile'
