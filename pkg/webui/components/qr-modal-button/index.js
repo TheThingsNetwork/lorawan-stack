@@ -60,7 +60,12 @@ const QRModalButton = props => {
       ) : (
         <>
           <QR onChange={handleRead} />
-          <Message content={m.scanContinue} values={{ qrScanDoc: QrScanDoc }} component="span" />
+          <Message
+            content={m.scanContinue}
+            values={{ qrScanDoc: QrScanDoc }}
+            component="span"
+            className="c-text-neutral-light"
+          />
         </>
       )}
     </div>

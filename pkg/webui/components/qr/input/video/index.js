@@ -234,7 +234,7 @@ const Video = props => {
           data-test-id="webcam-feed"
         />
       ) : (
-        <Spinner center>
+        <Spinner center inline className="mb-cs-xl">
           <Message className={style.msg} content={m.fetchingCamera} />
         </Spinner>
       )}

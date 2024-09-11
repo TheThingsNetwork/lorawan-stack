@@ -112,7 +112,7 @@ const RequirePermission = props => {
   if (!allow || videoError) {
     return (
       <div className={style.captureWrapper}>
-        <ErrorMessage style={{ color: '#fff' }} content={m.permissionDeniedError} />
+        <ErrorMessage content={m.permissionDeniedError} />
         <br />
         <Button
           className="mt-cs-m"
