@@ -120,7 +120,7 @@ const Layout = () => {
                 <WithAuth
                   user={user}
                   fetching={fetching}
-                  error={error}
+                  userError={error}
                   errorComponent={FullViewErrorInner}
                   rights={rights}
                   isAdmin={isAdmin}
