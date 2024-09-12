@@ -362,6 +362,7 @@ var TxRequestFieldPathsNested = []string{
 	"rx2_data_rate.modulation.lrfhss.modulation_type",
 	"rx2_data_rate.modulation.lrfhss.operating_channel_width",
 	"rx2_frequency",
+	"rx2_mic",
 }
 
 var TxRequestFieldPathsTopLevel = []string{
@@ -376,6 +377,7 @@ var TxRequestFieldPathsTopLevel = []string{
 	"rx1_frequency",
 	"rx2_data_rate",
 	"rx2_frequency",
+	"rx2_mic",
 }
 var RelaySecondChannelFieldPathsNested = []string{
 	"ack_offset",

@@ -597,6 +597,11 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			rxErrs = append(rxErrs, errDataRateRxWindow.WithAttributes("window", i+1))
 			continue
 		}
+		if i == 1 && len(request.Rx2Mic) != 0 {
+			l := len(msg.RawPayload) - len(request.Rx2Mic)
+			msg.RawPayload = append(msg.RawPayload[:l], request.Rx2Mic...)
+			msg.Payload.Mic = request.Rx2Mic
+		}
 
 		logger := logger.WithFields(log.Fields(
 			"rx_window", i+1,

@@ -2622,6 +2622,11 @@ func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("frequency_plan_id")
 		s.WriteString(x.FrequencyPlanId)
 	}
+	if len(x.Rx2Mic) > 0 || s.HasField("rx2_mic") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rx2_mic")
+		s.WriteBytes(x.Rx2Mic)
+	}
 	if x.Advanced != nil || s.HasField("advanced") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("advanced")
@@ -2715,6 +2720,9 @@ func (x *TxRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "frequency_plan_id", "frequencyPlanId":
 			s.AddField("frequency_plan_id")
 			x.FrequencyPlanId = s.ReadString()
+		case "rx2_mic", "rx2Mic":
+			s.AddField("rx2_mic")
+			x.Rx2Mic = s.ReadBytes()
 		case "advanced":
 			s.AddField("advanced")
 			if s.ReadNil() {

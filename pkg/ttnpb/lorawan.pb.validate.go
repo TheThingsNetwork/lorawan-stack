@@ -2345,6 +2345,15 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "rx2_mic":
+
+			if l := len(m.GetRx2Mic()); l < 0 || l > 4 {
+				return TxRequestValidationError{
+					field:  "rx2_mic",
+					reason: "value length must be between 0 and 4 bytes, inclusive",
+				}
+			}
+
 		case "advanced":
 
 			if v, ok := interface{}(m.GetAdvanced()).(interface{ ValidateFields(...string) error }); ok {

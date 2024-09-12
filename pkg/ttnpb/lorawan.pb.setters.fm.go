@@ -1465,6 +1465,15 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 				var zero string
 				dst.FrequencyPlanId = zero
 			}
+		case "rx2_mic":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_mic' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2Mic = src.Rx2Mic
+			} else {
+				dst.Rx2Mic = nil
+			}
 		case "advanced":
 			if len(subs) > 0 {
 				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)

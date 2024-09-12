@@ -97,6 +97,11 @@ func UseLegacyMIC(v ttnpb.MACVersion) bool {
 	return compareMACVersion(v, ttnpb.MACVersion_MAC_V1_1) < 0
 }
 
+// UseDownlinkMICA reports whether v uses a separate MIC computation.
+func UseDownlinkMICA(v ttnpb.MACVersion) bool {
+	return compareMACVersion(v, ttnpb.MACVersion_MAC_V1_2_0) >= 0
+}
+
 // UseSharedFCntDown reports whether v uses the same frame counter
 // for both network and application downlinks.
 func UseSharedFCntDown(v ttnpb.MACVersion) bool {

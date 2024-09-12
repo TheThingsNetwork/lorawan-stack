@@ -693,6 +693,12 @@ message TxRequest {
   string frequency_plan_id = 10 [(validate.rules).string.max_len = 64];
   reserved 11; // lorawan_phy_version
 
+  // MIC for Rx2.
+  bytes rx2_mic = 14 [(validate.rules).bytes = {
+    min_len: 0,
+    max_len: 4
+  }];
+
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case

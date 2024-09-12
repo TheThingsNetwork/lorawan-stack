@@ -38137,6 +38137,30 @@
               }
             },
             {
+              "name": "rx2_mic",
+              "description": "MIC for Rx2.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.min_len",
+                    "value": 0
+                  },
+                  {
+                    "name": "bytes.max_len",
+                    "value": 4
+                  }
+                ]
+              }
+            },
+            {
               "name": "advanced",
               "description": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case",
               "label": "",

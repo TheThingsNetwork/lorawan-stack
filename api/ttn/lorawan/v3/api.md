@@ -8078,6 +8078,7 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | `priority` | [`TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling. Requests with a higher priority are allocated more channel time than messages with a lower priority, in duty-cycle limited regions. A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object. |
 | `absolute_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the downlink message should be transmitted. This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots. This requires the gateway to have GPS time sychronization. If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations. |
 | `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID from which the frequencies in this message are retrieved. |
+| `rx2_mic` | [`bytes`](#bytes) |  | MIC for Rx2. |
 | `advanced` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 #### Field Rules
@@ -8087,6 +8088,7 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | `rx1_delay` | <p>`enum.defined_only`: `true`</p> |
 | `priority` | <p>`enum.defined_only`: `true`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
+| `rx2_mic` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `4`</p> |
 
 ### <a name="ttn.lorawan.v3.TxSettings">Message `TxSettings`</a>
 

@@ -89,11 +89,13 @@ func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.Appli
 var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 
 type generatedDownlink struct {
-	Payload        *ttnpb.Message
-	RawPayload     []byte
+	Payload    *ttnpb.Message
+	RawPayload []byte
+
 	Priority       ttnpb.TxSchedulePriority
 	NeedsMACAnswer bool
 	SessionKeyID   []byte
+	Rx2Mic         []byte
 }
 
 type generateDownlinkState struct {
@@ -209,6 +211,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		genState     generateDownlinkState
 		cmdBuf       []byte
 		relayPayload []byte
+		isRekeyConf  bool
 	)
 	if class == ttnpb.Class_CLASS_A {
 		spec := lorawan.DefaultMACCommands
@@ -308,6 +311,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		cmds = append(cmds, dev.MacState.PendingRequests...)
 		for _, cmd := range cmds {
 			logger := logger.WithField("cid", cmd.Cid)
+			if cmd.Cid == ttnpb.MACCommandIdentifier_CID_REKEY {
+				isRekeyConf = true
+			}
 			logger.Debug("Add MAC command to buffer")
 			var err error
 			b, err = spec.AppendDownlink(*phy, b, cmd)
@@ -635,6 +641,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 
 	var mic [4]byte
+	var mic2 [4]byte
+
 	if macspec.UseLegacyMIC(dev.MacState.LorawanVersion) {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
@@ -647,13 +655,46 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		if pld.FHdr.FCtrl.Ack {
 			confFCnt = up.GetPayload().GetMacPayload().GetFullFCnt()
 		}
-		mic, err = crypto.ComputeDownlinkMIC(
-			key,
-			types.MustDevAddr(dev.Session.DevAddr).OrZero(),
-			confFCnt,
-			pld.FullFCnt,
-			b,
-		)
+
+		if macspec.UseDownlinkMICA(dev.MacState.LorawanVersion) && !isRekeyConf {
+			uplinkDRIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
+			if !ok {
+				return nil, genState, errDataRateNotFound.WithAttributes("data_rate", up.Settings.DataRate)
+			}
+
+			mic, err = crypto.ComputeDownlinkMICA(
+				key,
+				crypto.IvHeaderRx1,
+				uint8(uplinkDRIdx),
+				uint8(up.DeviceChannelIndex),
+				uint16(confFCnt),
+				types.MustDevAddr(dev.Session.DevAddr).OrZero(),
+				pld.FullFCnt,
+				b,
+			)
+			if err != nil {
+				return nil, genState, errComputeMIC.New()
+			}
+
+			mic2, err = crypto.ComputeDownlinkMICA(
+				key,
+				crypto.IvHeaderRx2,
+				uint8(uplinkDRIdx),
+				uint8(up.DeviceChannelIndex),
+				uint16(confFCnt),
+				types.MustDevAddr(dev.Session.DevAddr).OrZero(),
+				pld.FullFCnt,
+				b,
+			)
+		} else {
+			mic, err = crypto.ComputeDownlinkMIC(
+				key,
+				types.MustDevAddr(dev.Session.DevAddr).OrZero(),
+				confFCnt,
+				pld.FullFCnt,
+				b,
+			)
+		}
 	}
 	if err != nil {
 		return nil, genState, errComputeMIC.New()
@@ -682,6 +723,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		Priority:       priority,
 		NeedsMACAnswer: len(dev.MacState.PendingRequests) > 0 && class == ttnpb.Class_CLASS_A,
 		SessionKeyID:   dev.Session.Keys.SessionKeyId,
+		Rx2Mic:         mic2[:],
 	}, genState, nil
 }
 
@@ -1583,6 +1625,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		Priority:        genDown.Priority,
 		FrequencyPlanId: dev.FrequencyPlanId,
 		Rx1Delay:        ttnpb.RxDelay(slot.RxDelay / time.Second),
+		Rx2Mic:          genDown.Rx2Mic,
 	}
 	if attemptRX1 {
 		req.Rx1Frequency = rxParameters.rx1Frequency
@@ -1788,6 +1831,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		Rx2DataRate:     dr.Rate,
 		Rx2Frequency:    freq,
 		AbsoluteTime:    absTime,
+		Rx2Mic:          genDown.Rx2Mic,
 	}
 	down, scheduleEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),

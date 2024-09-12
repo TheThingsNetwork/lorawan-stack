@@ -767,3 +767,205 @@ func TestUniqueUplinkMessagesByRSSI(t *testing.T) {
 		})
 	}
 }
+
+func TestPayloadMICOverride(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	is, _, closeIS := mockis.New(ctx)
+	t.Cleanup(closeIS)
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
+		},
+	})
+	gs := mock.NewServer(c, is)
+
+	ids := &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}
+	antennaGain := float32(3)
+	gtw := &ttnpb.Gateway{
+		Ids:             ids,
+		FrequencyPlanId: "EU_863_870",
+		Antennas: []*ttnpb.GatewayAntenna{
+			{
+				Gain: antennaGain,
+			},
+		},
+	}
+	gs.RegisterGateway(ctx, ids, gtw)
+
+	gtwCtx := rights.NewContext(ctx, &rights.Rights{
+		GatewayRights: *rights.NewMap(map[string]*ttnpb.Rights{
+			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_LINK),
+		}),
+	})
+	frontend, err := mock.ConnectFrontend(gtwCtx, ids, gs)
+	if err != nil {
+		panic(err)
+	}
+	conn := gs.GetConnection(ctx, ids)
+
+	a.So(conn.Context(), should.HaveParentContextOrEqual, gtwCtx)
+	a.So(time.Since(conn.ConnectTime()), should.BeLessThan, timeout)
+	a.So(conn.Gateway(), should.Resemble, gtw)
+	a.So(conn.Frontend().Protocol(), should.Equal, "mock")
+	a.So(conn.PrimaryFrequencyPlan(), should.NotBeNil)
+	a.So(conn.PrimaryFrequencyPlan().BandID, should.Equal, "EU_863_870")
+
+	_, paths := conn.Stats()
+	a.So(paths, should.Resemble, []string{"connected_at", "disconnected_at", "protocol", "gateway_remote_address"})
+
+	{
+		frontend.Up <- &ttnpb.UplinkMessage{
+			RxMetadata: []*ttnpb.RxMetadata{
+				{
+					GatewayIds: &ttnpb.GatewayIdentifiers{
+						GatewayId: "test-gateway",
+					},
+					AntennaIndex: 0,
+					Timestamp:    100,
+				},
+			},
+			Settings: &ttnpb.TxSettings{
+				DataRate:  &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}},
+				Frequency: 868000000,
+			},
+		}
+		select {
+		case up := <-conn.Up():
+			token, err := io.ParseUplinkToken(up.Message.RxMetadata[0].UplinkToken)
+			a.So(err, should.BeNil)
+			a.So(token.Ids.GatewayIds, should.Resemble, ids)
+			a.So(token.Ids.AntennaIndex, should.Equal, 0)
+			a.So(token.Timestamp, should.Equal, 100)
+		case <-time.After(timeout):
+			t.Fatalf("Expected uplink message time-out")
+		}
+		time.Sleep(timeout / 2)
+		total, t, ok := conn.UpStats()
+		a.So(ok, should.BeTrue)
+		a.So(total, should.Equal, 1)
+		a.So(time.Since(t), should.BeLessThan, timeout)
+		assertStatsIncludePaths(a, conn, []string{"last_uplink_received_at", "uplink_count"})
+	}
+
+	received := 0
+	for _, tc := range []struct {
+		Name               string
+		Path               *ttnpb.DownlinkPath
+		Message            *ttnpb.DownlinkMessage
+		ExpectedRawPayload []byte
+		ExpectedPayloadMic []byte
+	}{
+		{
+			Name: "ValidClassA Rx1",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						100,
+						100000,
+						time.Unix(0, 100*1000),
+						nil,
+					),
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14},
+				Payload: &ttnpb.Message{
+					Mic: []byte{0x11, 0x12, 0x13, 0x14},
+				},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:    ttnpb.Class_CLASS_A,
+						Priority: ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
+						Rx1DataRate: &ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
+									SpreadingFactor: 7,
+									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
+								},
+							},
+						},
+						Rx1Frequency: 868100000,
+						Rx2Mic:       []byte{0x21, 0x22, 0x23, 0x24},
+					},
+				},
+			},
+			ExpectedRawPayload: []byte{0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14},
+			ExpectedPayloadMic: []byte{0x11, 0x12, 0x13, 0x14},
+		},
+		{
+			Name: "ValidClassA Rx2",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						100,
+						100000,
+						time.Unix(0, 100*1000),
+						nil,
+					),
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14},
+				Payload: &ttnpb.Message{
+					Mic: []byte{0x11, 0x12, 0x13, 0x14},
+				},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:    ttnpb.Class_CLASS_A,
+						Priority: ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
+						Rx2DataRate: &ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
+									SpreadingFactor: 7,
+									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
+								},
+							},
+						},
+						Rx2Frequency:    868100000,
+						FrequencyPlanId: "EU_863_870",
+						Rx2Mic:          []byte{0x21, 0x22, 0x23, 0x24},
+					},
+				},
+			},
+			ExpectedRawPayload: []byte{0x01, 0x02, 0x03, 0x04, 0x21, 0x22, 0x23, 0x24},
+			ExpectedPayloadMic: []byte{0x21, 0x22, 0x23, 0x24},
+		},
+	} {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			a := assertions.New(t)
+			_, _, _, err := conn.ScheduleDown(tc.Path, tc.Message)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+			received++
+			select {
+			case msg := <-frontend.Down:
+				scheduled := msg.GetScheduled()
+				a.So(scheduled, should.NotBeNil)
+				a.So(msg.RawPayload, should.Resemble, tc.ExpectedRawPayload)
+				a.So(msg.Payload.Mic, should.Resemble, tc.ExpectedPayloadMic)
+			case <-time.After(timeout):
+				t.Fatalf("Expected downlink message timeout")
+			}
+			total, last, ok := conn.DownStats()
+			a.So(ok, should.BeTrue)
+			a.So(total, should.Equal, received)
+			a.So(time.Since(last), should.BeLessThan, timeout)
+		})
+	}
+}

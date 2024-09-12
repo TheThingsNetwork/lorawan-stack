@@ -24,6 +24,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+// IV Header values for downlink MIC A computation.
+const (
+	IvHeaderRx1  = 0x4A
+	IvHeaderRx2  = 0x4B
+	IvHeaderRxj1 = 0x50
+	IvHeaderRxj2 = 0x51
+)
+
 type encryptionOptions struct {
 	frameTypeConstant [4]byte
 }
