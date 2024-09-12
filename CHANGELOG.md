@@ -11,13 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Option to filter out non-gateway related frequency plans.
-  - `ListFrequencyPlans` RPC has a new `gateways-only` flag.
-- Option to pause application webhooks.
-- Endpoint for claiming gateways using a qr code
-- Update the GetTemplate endpoint in device repository to check for profile identifiers in the vendor index.
-- Support for claiming a gateway via QR code in the Console.
-
 ### Changed
 
 ### Deprecated
@@ -26,9 +19,22 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- RX2 and Class C with The Things Industries gateway protocol in dynamic channel plan regions (including `EU868`).
-
 ### Security
+
+## [3.32.1] - unreleased
+
+### Added
+
+- Option to filter out non-gateway related frequency plans.
+  - `ListFrequencyPlans` RPC has a new `gateways-only` flag.
+- Option to pause application webhooks.
+- Endpoint for claiming gateways using a qr code
+- Update the GetTemplate endpoint in device repository to check for profile identifiers in the vendor index.
+- Support for claiming a gateway via QR code in the Console.
+
+### Fixed
+
+- RX2 and Class C with The Things Industries gateway protocol in dynamic channel plan regions (including `EU868`).
 
 ## [3.32.0] - 2024-09-05
 
@@ -2879,7 +2885,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.0...v3.32
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.1...v3.32
+[3.32.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.0...v3.32.1
 [3.32.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.1...v3.32.0
 [3.31.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.0...v3.31.1
 [3.31.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.30.2...v3.31.0
