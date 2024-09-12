@@ -18,12 +18,20 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as QRCodeGenerator from '@console/store/actions/qr-code-generator'
 
-const parseQRCodeLogic = createRequestLogic({
-  type: QRCodeGenerator.PARSE_QR_CODE,
+const parseEndDeviceQRCodeLogic = createRequestLogic({
+  type: QRCodeGenerator.PARSE_END_DEVICE_QR_CODE,
   process: async ({ action }) => {
     const { qrCode } = action.payload
-    return await tts.QRCodeGenerator.parse(qrCode)
+    return await tts.QRCodeGenerator.parseEndDeviceQrCode(qrCode)
   },
 })
 
-export default [parseQRCodeLogic]
+const parseGatewayQRCodeLogic = createRequestLogic({
+  type: QRCodeGenerator.PARSE_GATEWAY_QR_CODE,
+  process: async ({ action }) => {
+    const { qrCode } = action.payload
+    return await tts.QRCodeGenerator.parseGatewayQrCode(qrCode)
+  },
+})
+
+export default [parseEndDeviceQRCodeLogic, parseGatewayQRCodeLogic]

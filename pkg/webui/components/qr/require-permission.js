@@ -18,6 +18,7 @@ import { defineMessages } from 'react-intl'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import Button from '../button'
 
@@ -111,9 +112,14 @@ const RequirePermission = props => {
   if (!allow || videoError) {
     return (
       <div className={style.captureWrapper}>
-        <ErrorMessage style={{ color: '#fff' }} content={m.permissionDeniedError} />
+        <ErrorMessage content={m.permissionDeniedError} />
         <br />
-        <Button className="mt-cs-m" onClick={handleUseCapture} message={m.uploadImage} secondary />
+        <Button
+          className="mt-cs-m"
+          onClick={handleUseCapture}
+          message={sharedMessages.uploadAnImage}
+          secondary
+        />
       </div>
     )
   }

@@ -37,10 +37,10 @@ func TestTTIGPRO1(t *testing.T) {
 		}{
 			{
 				Name: "CorrectQRCode",
-				Data: []byte("https://ttig.pro/c/ec656efffe000128/abcdef123456"),
+				Data: []byte("https://ttig.pro/c/ec656efffe000128/abcdef12"),
 				Expected: ttigpro1{
 					gatewayEUI: types.EUI64{0xec, 0x65, 0x6e, 0xff, 0xfe, 0x00, 0x01, 0x28},
-					ownerToken: "abcdef123456",
+					ownerToken: "abcdef12",
 				},
 			},
 			{
@@ -77,7 +77,7 @@ func TestTTIGPRO1(t *testing.T) {
 			},
 			{
 				Name: "Invalid/OwnerTokenLength",
-				Data: []byte("https://ttig.pro/c/ec656efffe000128/abcdef123"),
+				Data: []byte("https://ttig.pro/c/ec656efffe000128/abcdef"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
 					t.Helper()
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)

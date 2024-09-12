@@ -23,8 +23,16 @@ class QRCodeGenerator {
     autoBind(this)
   }
 
-  async parse(qrCode) {
+  async parseEndDeviceQrCode(qrCode) {
     const response = await this._api.EndDeviceQRCodeGenerator.Parse(undefined, {
+      qr_code: btoa(qrCode),
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
+  async parseGatewayQrCode(qrCode) {
+    const response = await this._api.GatewayQRCodeGenerator.Parse(undefined, {
       qr_code: btoa(qrCode),
     })
 

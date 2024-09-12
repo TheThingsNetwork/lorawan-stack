@@ -71,6 +71,7 @@ const GatewayProvisioningFormSection = () => {
     values: {
       _ownerId: ownerId,
       _inputMethod: inputMethod,
+      _withQRdata: withQRdata,
       ids: { eui = '' },
     },
     initialValues,
@@ -120,6 +121,13 @@ const GatewayProvisioningFormSection = () => {
     }
   }, [dispatch, eui, hasEmptyEui, setFieldValue])
 
+  useEffect(() => {
+    // Auto-confirm the join EUI when using QR code data.
+    if (withQRdata) {
+      handleGatewayEUI()
+    }
+  }, [withQRdata, handleGatewayEUI])
+
   const handleEuiReset = useCallback(async () => {
     setEuiError(undefined)
     resetForm({ values: { ...initialValues, _ownerId: ownerId } })
@@ -162,7 +170,7 @@ const GatewayProvisioningFormSection = () => {
         component={Input}
         tooltipId={tooltipIds.GATEWAY_EUI}
         required={inputMethod !== 'register'}
-        disabled={hasInputMethod}
+        disabled={hasInputMethod || withQRdata}
         onKeyDown={handleGatewayEUIKeydown}
         encode={gatewayEuiEncoder}
         decode={gatewayEuiDecoder}
@@ -184,6 +192,7 @@ const GatewayProvisioningFormSection = () => {
             message={sharedMessages.reset}
             onClick={handleEuiReset}
             secondary
+            disabled={withQRdata}
           />
         ) : (
           <Button

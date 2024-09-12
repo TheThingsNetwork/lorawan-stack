@@ -35,14 +35,12 @@ const QrScanDoc = (
 )
 
 const m = defineMessages({
-  scanEndDeviceContinue: 'Please scan the QR code to continue. {qrScanDoc}',
-  invalidData:
-    'Invalid QR code data. Please note that only TR005 LoRaWAN® Device Identification QR Code can be scanned. Some devices have unrelated QR codes printed on them that cannot be used.',
+  scanContinue: 'Please scan the QR code to continue. {qrScanDoc}',
   apply: 'Apply',
 })
 
 const QRModalButton = props => {
-  const { message, onApprove, onCancel, onRead, qrData } = props
+  const { message, onApprove, onCancel, onRead, qrData, invalidMessage } = props
 
   const handleRead = useCallback(
     val => {
@@ -57,15 +55,16 @@ const QRModalButton = props => {
         qrData.valid ? (
           <DataSheet data={qrData.data} />
         ) : (
-          <ErrorMessage content={m.invalidData} />
+          <ErrorMessage content={invalidMessage} />
         )
       ) : (
         <>
           <QR onChange={handleRead} />
           <Message
-            content={m.scanEndDeviceContinue}
+            content={m.scanContinue}
             values={{ qrScanDoc: QrScanDoc }}
             component="span"
+            className="c-text-neutral-light"
           />
         </>
       )}
@@ -80,7 +79,7 @@ const QRModalButton = props => {
       onApprove={onApprove}
       message={message}
       modalData={{
-        title: sharedMessages.scanEndDevice,
+        title: message,
         children: modalData,
         buttonMessage: m.apply,
         approveButtonProps: {
@@ -95,6 +94,7 @@ const QRModalButton = props => {
 }
 
 QRModalButton.propTypes = {
+  invalidMessage: PropTypes.message.isRequired,
   message: PropTypes.message.isRequired,
   onApprove: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,

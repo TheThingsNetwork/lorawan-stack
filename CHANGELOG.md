@@ -16,6 +16,7 @@ For details about compatibility between different releases, see the **Commitment
 - Option to pause application webhooks.
 - Endpoint for claiming gateways using a qr code
 - Update the GetTemplate endpoint in device repository to check for profile identifiers in the vendor index.
+- Support for claiming a gateway via QR code in the Console.
 
 ### Changed
 
