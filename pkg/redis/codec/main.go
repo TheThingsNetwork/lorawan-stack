@@ -17,6 +17,8 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"flag"
 	"io"
 	"log"
@@ -74,14 +76,20 @@ func main() {
 		}
 		return
 	}
-	b, err := io.ReadAll(os.Stdin)
-	if err != nil {
-		log.Fatalf("Failed to read from stdin: %v", err)
-	}
-	if err := redis.UnmarshalProto(string(b), pb); err != nil {
-		log.Fatalf("Failed to unmarshal proto: %v", err)
-	}
-	if err := json.NewEncoder(os.Stdout).Encode(pb); err != nil {
-		log.Fatalf("Failed to write proto as JSON to stdout: %v", err)
+	rd := bufio.NewReader(os.Stdin)
+	for {
+		b, err := rd.ReadString('\n')
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			log.Fatalf("Failed to read from stdin: %v", err)
+		}
+		if err := redis.UnmarshalProto(b, pb); err != nil {
+			log.Fatalf("Failed to unmarshal proto: %v", err)
+		}
+		if err := json.NewEncoder(os.Stdout).Encode(pb); err != nil {
+			log.Fatalf("Failed to write proto as JSON to stdout: %v", err)
+		}
 	}
 }
