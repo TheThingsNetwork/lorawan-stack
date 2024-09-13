@@ -50,7 +50,7 @@
     "eslint-plugin-cypress": "^3.5.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^28.8.2",
-    "eslint-plugin-jsdoc": "^48.2.5",
+    "eslint-plugin-jsdoc": "^50.2.2",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "5.1.3",
     "eslint-plugin-react": "^7.35.0",
