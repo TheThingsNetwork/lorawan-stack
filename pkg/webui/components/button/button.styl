@@ -70,7 +70,7 @@
       width: 2.5rem
       height: 2.5rem
 
-    &.primary
+    &.primary:not(.naked)
       color: var(--c-bg-neutral-min)
       background-color: var(--c-text-brand-normal)
 
@@ -159,7 +159,7 @@
           gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
           box-shadow: none
 
-    &.naked
+    &.naked:not(.primary)
       color: var(--c-text-neutral-light)
 
       &:disabled
@@ -176,6 +176,25 @@
 
         &:active
           background-color: var(--c-bg-neutral-semilight)
+
+    &.primary.naked
+      color: var(--c-bg-brand-normal)
+
+      &:disabled
+        color: var(--c-bg-brand-normal-disabled)
+
+      &:not(:disabled)
+        &:hover
+          background-color: var(--c-bg-brand-semilight)
+          color: var(--c-bg-brand-normal-hover)
+
+        +focus-visible()
+          background-color: var(--c-bg-brand-semilight)
+          color: var(--c-bg-brand-normal-hover)
+
+        &:active
+          background-color: var(--c-bg-brand-semilight)
+          color: var(--c-bg-brand-normal-hover)
 
       &.small
         border-radius: $br.s
