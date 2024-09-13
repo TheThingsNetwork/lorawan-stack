@@ -118,10 +118,13 @@ const applications = (state = defaultState, { type, payload, event, meta }) => {
       if (EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP.test(event.name)) {
         const lastSeen = getByPath(event, 'data.received_at') || event.time
         const id = getApplicationId(event.identifiers[0].device_ids)
-
         // Update the application's derived last seen value, if the current
         // heartbeat event is more recent than the currently stored one.
-        if (!(id in state.derived) || lastSeen > state.derived[id].lastSeen) {
+        if (
+          !(id in state.derived) ||
+          !state.derived[id].lastSeen ||
+          lastSeen > state.derived[id].lastSeen
+        ) {
           return {
             ...state,
             derived: {
