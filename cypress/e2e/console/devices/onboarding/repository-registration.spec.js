@@ -361,7 +361,7 @@ describe('End device repository manual registration', () => {
 
         cy.findByRole('button', { name: 'Register end device' }).click()
         cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
-        cy.findByTestId('toast-notification')
+        cy.findByTestId('toast-notification-success')
           .findByText('End device registered')
           .should('be.visible')
 
@@ -506,7 +506,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Register end device' }).click()
-        cy.findByTestId('toast-notification')
+        cy.findByTestId('toast-notification-success')
           .findByText('End device registered')
           .should('be.visible')
         cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
@@ -521,7 +521,7 @@ describe('End device repository manual registration', () => {
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Register end device' }).click()
-        cy.findByTestId('toast-notification')
+        cy.findByTestId('toast-notification-success')
           .findByText('End device registered')
           .should('be.visible')
         cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')

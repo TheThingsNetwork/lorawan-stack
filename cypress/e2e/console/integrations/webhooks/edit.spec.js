@@ -76,7 +76,7 @@ describe('Application Webhook', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification').findByText('Webhook updated').should('be.visible')
+    cy.findByTestId('toast-notification-success').findByText('Webhook updated').should('be.visible')
 
     cy.reload()
     cy.findByLabelText('Base URL').should('have.attr', 'value', webhook.url)
@@ -90,7 +90,7 @@ describe('Application Webhook', () => {
     cy.findByLabelText('Join accept').should('not.be.checked')
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification').findByText(`Webhook updated`).should('be.visible')
+    cy.findByTestId('toast-notification-success').findByText(`Webhook updated`).should('be.visible')
 
     cy.reload()
     cy.findByLabelText('Base URL').should('have.attr', 'value', webhook.url)
@@ -103,7 +103,7 @@ describe('Application Webhook', () => {
     cy.findByLabelText('Uplink message').uncheck()
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification').findByText(`Webhook updated`).should('be.visible')
+    cy.findByTestId('toast-notification-success').findByText(`Webhook updated`).should('be.visible')
 
     cy.reload()
     cy.findByLabelText('Uplink message').should('not.be.checked')
@@ -125,7 +125,7 @@ describe('Application Webhook', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText(`Webhook updated`)
       .should('be.visible')
@@ -162,7 +162,7 @@ describe('Application Webhook', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText(`Webhook updated`)
       .should('be.visible')

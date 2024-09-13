@@ -55,7 +55,9 @@ describe('End device messaging', () => {
 
       cy.findAllByRole('button', { name: 'Simulate uplink' }).filter('[type="submit"]').click()
 
-      cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Uplink sent')
+      cy.findByTestId('toast-notification-success')
+        .should('be.visible')
+        .and('contain', 'Uplink sent')
 
       cy.findByTestId('error-notification').should('not.exist')
     })

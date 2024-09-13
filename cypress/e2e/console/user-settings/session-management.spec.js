@@ -51,7 +51,7 @@ describe('User settings / session management', () => {
     })
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .findByText('Session removed successfully')
       .should('be.visible')
 

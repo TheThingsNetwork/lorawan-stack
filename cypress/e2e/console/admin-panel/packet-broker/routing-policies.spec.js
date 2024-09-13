@@ -47,7 +47,7 @@ describe('Packet Broker routing policies', () => {
     cy.findByRole('button', { name: 'Save routing configuration' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Default routing configuration set')
       .should('be.visible')
@@ -71,7 +71,7 @@ describe('Packet Broker routing policies', () => {
     cy.findByRole('button', { name: 'Save routing configuration' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Default routing configuration set')
       .should('be.visible')
@@ -110,7 +110,7 @@ describe('Packet Broker routing policies', () => {
     cy.findByRole('button', { name: 'Save routing configuration' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Default routing configuration set')
       .should('be.visible')
@@ -133,7 +133,7 @@ describe('Packet Broker routing policies', () => {
     cy.findByRole('button', { name: 'Save routing configuration' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Default routing configuration set')
       .should('be.visible')
@@ -180,7 +180,7 @@ describe('Packet Broker routing policies', () => {
       })
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Routing policy set')
       .should('be.visible')
@@ -208,7 +208,7 @@ describe('Packet Broker routing policies', () => {
     cy.findByRole('button', { name: 'Save routing policy' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Routing policy set')
       .should('be.visible')
@@ -235,7 +235,7 @@ describe('Packet Broker routing policies', () => {
     cy.findByRole('button', { name: 'Save routing policy' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText('Routing policy set')
       .should('be.visible')

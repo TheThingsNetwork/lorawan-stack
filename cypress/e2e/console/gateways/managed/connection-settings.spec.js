@@ -171,7 +171,7 @@ describe('Managed Gateway connection settings', () => {
       'be.visible',
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
@@ -211,7 +211,7 @@ describe('Managed Gateway connection settings', () => {
       'be.visible',
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
@@ -233,7 +233,7 @@ describe('Managed Gateway connection settings', () => {
       'be.visible',
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
@@ -246,7 +246,7 @@ describe('Managed Gateway connection settings', () => {
         expect(body).to.have.nested.property('gateway.ethernet_profile_id', ethernetProfileId)
       })
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
@@ -281,7 +281,7 @@ describe('Managed Gateway connection settings', () => {
         expect(body).to.have.nested.property('gateway.ethernet_profile_id', ethernetProfileId)
       })
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
@@ -316,7 +316,7 @@ describe('Managed Gateway connection settings', () => {
       'be.visible',
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })

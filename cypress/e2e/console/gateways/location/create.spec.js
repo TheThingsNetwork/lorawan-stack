@@ -113,7 +113,7 @@ describe('Gateway location create', () => {
 
     cy.findByRole('button', { name: 'Save changes' }).click()
 
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText(`Location updated`)
       .should('be.visible')

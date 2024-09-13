@@ -760,7 +760,7 @@ describe('End device manual create', () => {
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
-        cy.findByTestId('toast-notification')
+        cy.findByTestId('toast-notification-success')
           .findByText('End device registered')
           .should('be.visible')
         cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
@@ -772,7 +772,7 @@ describe('End device manual create', () => {
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
-        cy.findByTestId('toast-notification')
+        cy.findByTestId('toast-notification-success')
           .findByText('End device registered')
           .should('be.visible')
         cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')

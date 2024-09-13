@@ -59,7 +59,9 @@ describe('User settings / change password', () => {
     cy.findByLabelText('Revoke all access').check()
     cy.findByLabelText('Confirm new password').type(`${newPassword}{enter}`)
 
-    cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Password changed')
+    cy.findByTestId('toast-notification-success')
+      .should('be.visible')
+      .and('contain', 'Password changed')
   })
 
   it('succeeds changing password without revoking access', () => {
@@ -68,6 +70,8 @@ describe('User settings / change password', () => {
     cy.findByLabelText('Confirm new password').type(newPassword)
     cy.findByRole('button', { name: 'Change password' }).click()
 
-    cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Password changed')
+    cy.findByTestId('toast-notification-success')
+      .should('be.visible')
+      .and('contain', 'Password changed')
   })
 })

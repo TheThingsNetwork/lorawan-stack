@@ -78,7 +78,7 @@ describe('Gateway location', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText(`Location updated`)
       .should('be.visible')
@@ -94,7 +94,7 @@ describe('Gateway location', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText(`Location updated`)
       .should('be.visible')
@@ -113,7 +113,7 @@ describe('Gateway location', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText(`Location updated`)
       .should('be.visible')
@@ -132,7 +132,7 @@ describe('Gateway location', () => {
       })
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .findByText(`Location deleted`)
       .should('be.visible')

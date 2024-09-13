@@ -86,7 +86,7 @@ const createToast = () => {
         info={type === INFO}
         error={type === ERROR}
         warning={type === WARNING}
-        data-test-id="toast-notification"
+        data-test-id={`toast-notification-${type}`}
       />
     )
 
