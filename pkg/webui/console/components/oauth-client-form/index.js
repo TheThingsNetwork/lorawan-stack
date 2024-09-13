@@ -238,9 +238,9 @@ const OAuthClientForm = props => {
             component={Checkbox.Group}
             description={m.grantsDesc}
           >
-            <Checkbox name="GRANT_AUTHORIZATION_CODE" label={m.grantAuthorizationLabel} />
+            <Checkbox name="GRANT_AUTHORIZATION_CODE" label={sharedMessages.authorizationCode} />
             <Checkbox name="GRANT_REFRESH_TOKEN" label={m.grantRefreshTokenLabel} />
-            {isAdmin && <Checkbox name="GRANT_PASSWORD" label={m.grantPasswordLabel} />}
+            {isAdmin && <Checkbox name="GRANT_PASSWORD" label={sharedMessages.password} />}
           </Form.Field>
         </>
       )}
