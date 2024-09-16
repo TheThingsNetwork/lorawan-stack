@@ -36,7 +36,7 @@ const { enabled: gsEnabled, base_url: gsBaseURL } = selectGsConfig()
 
 const m = defineMessages({
   claimWarning:
-    'We detected that your gateway is a <strong>Managed Gateway</strong>. To claim this gateway, please use the claim authentication code printed on the inside of the mounting lid or scan the QR code to claim instantly.',
+    'We detected that your gateway is a <strong>Managed Gateway</strong>. To claim this gateway, please use the owner token printed on the inside of the mounting lid or scan the QR code to claim instantly.',
 })
 
 const initialValues = {
