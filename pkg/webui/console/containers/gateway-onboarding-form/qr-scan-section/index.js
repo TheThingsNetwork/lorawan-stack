@@ -67,7 +67,7 @@ const GatewayQRScanSection = () => {
       },
       authenticated_identifiers: {
         gateway_eui: gateway.gateway_eui,
-        authentication_code: gateway.owner_token ? gateway.owner_token : '',
+        authentication_code: gateway.owner_token ? btoa(gateway.owner_token) : '',
       },
     }))
 
