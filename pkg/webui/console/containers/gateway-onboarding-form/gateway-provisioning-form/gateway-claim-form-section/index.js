@@ -78,7 +78,7 @@ const GatewayClaimFormSection = () => {
       )}
       <Form.Field
         required
-        title={sharedMessages.claimAuthCode}
+        title={sharedMessages.ownerToken}
         name="authenticated_identifiers.authentication_code"
         tooltipId={tooltipIds.CLAIM_AUTH_CODE}
         component={Input}

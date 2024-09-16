@@ -1574,6 +1574,7 @@
   "lib.shared-messages.otherOption": "Other...",
   "lib.shared-messages.overview": "Overview",
   "lib.shared-messages.ownedByMe": "Owned by me",
+  "lib.shared-messages.ownerToken": "Owner token",
   "lib.shared-messages.packetBroker": "Packet Broker",
   "lib.shared-messages.packetsPerDataRate": "Packets per data rate",
   "lib.shared-messages.packetsPerChannel": "Packets per channel (24 days)",

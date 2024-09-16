@@ -1574,6 +1574,7 @@
   "lib.shared-messages.otherOption": "その他…",
   "lib.shared-messages.overview": "概要",
   "lib.shared-messages.ownedByMe": "",
+  "lib.shared-messages.ownerToken": "",
   "lib.shared-messages.packetBroker": "Packet Broker",
   "lib.shared-messages.packetsPerDataRate": "",
   "lib.shared-messages.packetsPerChannel": "",

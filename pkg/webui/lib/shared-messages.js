@@ -457,6 +457,7 @@ export default defineMessages({
   otherOption: 'Other...',
   overview: 'Overview',
   ownedByMe: 'Owned by me',
+  ownerToken: 'Owner token',
   packetBroker: 'Packet Broker',
   packetsPerDataRate: 'Packets per data rate',
   packetsPerChannel: 'Packets per channel (24 days)',

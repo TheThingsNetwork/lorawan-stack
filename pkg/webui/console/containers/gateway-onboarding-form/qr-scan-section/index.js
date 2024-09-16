@@ -89,7 +89,7 @@ const GatewayQRScanSection = () => {
             header: sharedMessages.qrCodeData,
             items: [
               {
-                key: sharedMessages.claimAuthCode,
+                key: sharedMessages.ownerToken,
                 value: gateway.owner_token,
                 type: 'code',
                 sensitive: true,
