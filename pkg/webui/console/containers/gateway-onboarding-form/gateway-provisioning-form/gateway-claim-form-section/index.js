@@ -85,6 +85,7 @@ const GatewayClaimFormSection = () => {
         encode={btoa}
         decode={atob}
         disabled={withQRdata}
+        sensitive
         autoFocus
       />
       <Form.Field
