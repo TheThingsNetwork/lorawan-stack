@@ -64,6 +64,10 @@ service GatewayRegistry {
       get: "/gateways"
       additional_bindings {get: "/users/{collaborator.user_ids.user_id}/gateways"}
       additional_bindings {get: "/organizations/{collaborator.organization_ids.organization_id}/gateways"}
+      additional_bindings {
+        post: "/gateways/filter"
+        body: "*"
+      }
     };
   }
 

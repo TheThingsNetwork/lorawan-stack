@@ -1181,6 +1181,45 @@
         ]
       }
     },
+    "/applications/{application_ids.application_id}/devices/filter": {
+      "post": {
+        "summary": "List end devices in the given application.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
+        "operationId": "EndDeviceRegistry_List2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EndDevices"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3EndDeviceRegistryListBody"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceRegistry"
+        ]
+      }
+    },
     "/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
         "summary": "Delete the end device with the given IDs.",
@@ -6810,6 +6849,39 @@
         },
         "tags": [
           "GatewayBatchRegistry"
+        ]
+      }
+    },
+    "/gateways/filter": {
+      "post": {
+        "summary": "List gateways where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the gateways the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
+        "operationId": "GatewayRegistry_List4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3Gateways"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ListGatewaysRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GatewayRegistry"
         ]
       }
     },
@@ -23403,6 +23475,39 @@
         }
       }
     },
+    "v3EndDeviceRegistryListBody": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "type": "object"
+        },
+        "field_mask": {
+          "type": "string",
+          "description": "The names of the end device fields that should be returned.\nSee the API reference for which fields can be returned by the different services."
+        },
+        "order": {
+          "type": "string",
+          "description": "Order the results by this field path (must be present in the field mask).\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order."
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Limit the number of results per page."
+        },
+        "page": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Page number for pagination. 0 is interpreted as 1."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3ListEndDevicesRequestFilter"
+          }
+        }
+      }
+    },
     "v3EndDeviceRegistryUpdateBody": {
       "type": "object",
       "properties": {
@@ -25470,6 +25575,44 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v3FrequencyPlanDescription"
+          }
+        }
+      }
+    },
+    "v3ListGatewaysRequest": {
+      "type": "object",
+      "properties": {
+        "collaborator": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers",
+          "description": "By default we list all gateways the caller has rights on.\nSet the user or the organization (not both) to instead list the gateways\nwhere the user or organization is collaborator on."
+        },
+        "field_mask": {
+          "type": "string",
+          "description": "The names of the gateway fields that should be returned."
+        },
+        "order": {
+          "type": "string",
+          "description": "Order the results by this field path (must be present in the field mask).\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order."
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Limit the number of results per page."
+        },
+        "page": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Page number for pagination. 0 is interpreted as 1."
+        },
+        "deleted": {
+          "type": "boolean",
+          "description": "Only return recently deleted gateways."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v3ListGatewaysRequestFilter"
           }
         }
       }
