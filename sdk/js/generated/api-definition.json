@@ -2826,6 +2826,14 @@
           "parameters": [
             "application_ids.application_id"
           ]
+        },
+        {
+          "method": "post",
+          "pattern": "/applications/{application_ids.application_id}/devices/filter",
+          "body": "*",
+          "parameters": [
+            "application_ids.application_id"
+          ]
         }
       ],
       "allowedFieldMaskPaths": [
@@ -3717,6 +3725,12 @@
           "parameters": [
             "collaborator.organization_ids.organization_id"
           ]
+        },
+        {
+          "method": "post",
+          "pattern": "/gateways/filter",
+          "body": "*",
+          "parameters": []
         }
       ],
       "allowedFieldMaskPaths": [

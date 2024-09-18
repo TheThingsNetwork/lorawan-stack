@@ -20755,6 +20755,11 @@
                     {
                       "method": "GET",
                       "pattern": "/applications/{application_ids.application_id}/devices"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/applications/{application_ids.application_id}/devices/filter",
+                      "body": "*"
                     }
                   ]
                 }
@@ -27171,6 +27176,11 @@
                     {
                       "method": "GET",
                       "pattern": "/organizations/{collaborator.organization_ids.organization_id}/gateways"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/gateways/filter",
+                      "body": "*"
                     }
                   ]
                 }

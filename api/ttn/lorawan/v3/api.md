@@ -4796,6 +4796,7 @@ NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 | `Create` | `POST` | `/api/v3/applications/{end_device.ids.application_ids.application_id}/devices` | `*` |
 | `Get` | `GET` | `/api/v3/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}` |  |
 | `List` | `GET` | `/api/v3/applications/{application_ids.application_id}/devices` |  |
+| `List` | `POST` | `/api/v3/applications/{application_ids.application_id}/devices/filter` | `*` |
 | `Update` | `PUT` | `/api/v3/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/applications/{application_ids.application_id}/devices/{device_id}` |  |
 
@@ -6092,6 +6093,7 @@ gateway registrations.
 | `List` | `GET` | `/api/v3/gateways` |  |
 | `List` | `GET` | `/api/v3/users/{collaborator.user_ids.user_id}/gateways` |  |
 | `List` | `GET` | `/api/v3/organizations/{collaborator.organization_ids.organization_id}/gateways` |  |
+| `List` | `POST` | `/api/v3/gateways/filter` | `*` |
 | `Update` | `PUT` | `/api/v3/gateways/{gateway.ids.gateway_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/gateways/{gateway_id}` |  |
 | `Restore` | `POST` | `/api/v3/gateways/{gateway_id}/restore` |  |
