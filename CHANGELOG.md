@@ -35,6 +35,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - RX2 and Class C with The Things Industries gateway protocol in dynamic channel plan regions (including `EU868`).
+- Filtering the list end points for end devices and gateways using the HTTP API.
 
 ## [3.32.0] - 2024-09-05
 
