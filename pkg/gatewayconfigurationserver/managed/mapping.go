@@ -256,7 +256,7 @@ func fromProfileID(profileID string) []byte {
 
 func fromProfileIDOrNil(profileID string) *northboundv1.ProfileIDValue {
 	if profileID == "" {
-		return nil
+		return new(northboundv1.ProfileIDValue)
 	}
 	id := uuid.Must(uuid.Parse(profileID))
 	return &northboundv1.ProfileIDValue{
