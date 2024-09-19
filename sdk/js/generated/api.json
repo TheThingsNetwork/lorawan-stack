@@ -42759,6 +42759,74 @@
               "description": ""
             }
           ]
+        },
+        {
+          "name": "NotificationType",
+          "longName": "NotificationType",
+          "fullName": "ttn.lorawan.v3.NotificationType",
+          "description": "",
+          "values": [
+            {
+              "name": "UNKNOWN",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "API_KEY_CREATED",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "API_KEY_CHANGED",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "CLIENT_REQUESTED",
+              "number": "3",
+              "description": ""
+            },
+            {
+              "name": "COLLABORATOR_CHANGED",
+              "number": "4",
+              "description": ""
+            },
+            {
+              "name": "ENTITY_STATE_CHANGED",
+              "number": "5",
+              "description": ""
+            },
+            {
+              "name": "INVITATION",
+              "number": "6",
+              "description": ""
+            },
+            {
+              "name": "LOGIN_TOKEN",
+              "number": "7",
+              "description": ""
+            },
+            {
+              "name": "PASSWORD_CHANGED",
+              "number": "8",
+              "description": ""
+            },
+            {
+              "name": "TEMPORARY_PASSWORD",
+              "number": "9",
+              "description": ""
+            },
+            {
+              "name": "USER_REQUESTED",
+              "number": "10",
+              "description": ""
+            },
+            {
+              "name": "VALIDATE",
+              "number": "11",
+              "description": ""
+            }
+          ]
         }
       ],
       "extensions": [],
@@ -42797,9 +42865,9 @@
               "name": "notification_type",
               "description": "The type of this notification.",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "NotificationType",
+              "longType": "NotificationType",
+              "fullType": "ttn.lorawan.v3.NotificationType",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -42807,12 +42875,8 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "string.min_len",
-                    "value": 1
-                  },
-                  {
-                    "name": "string.max_len",
-                    "value": 100
+                    "name": "enum.defined_only",
+                    "value": true
                   }
                 ]
               }
@@ -43121,9 +43185,9 @@
               "name": "notification_type",
               "description": "The type of this notification.",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "NotificationType",
+              "longType": "NotificationType",
+              "fullType": "ttn.lorawan.v3.NotificationType",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

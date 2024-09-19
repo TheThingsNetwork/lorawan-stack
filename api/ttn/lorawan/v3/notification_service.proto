@@ -40,7 +40,7 @@ message Notification {
   EntityIdentifiers entity_ids = 3;
 
   // The type of this notification.
-  string notification_type = 4;
+  NotificationType notification_type = 4;
 
   // The data related to the notification.
   google.protobuf.Any data = 5;
@@ -64,6 +64,37 @@ message Notification {
 
   // The time when the notification status was updated.
   google.protobuf.Timestamp status_updated_at = 11;
+}
+
+enum NotificationType {
+  option (thethings.json.enum) = {
+    marshal_as_string: true,
+    prefix: "NOTIFICATION_TYPE"
+  };
+
+  UNKNOWN = 0;
+
+  API_KEY_CREATED = 1;
+
+  API_KEY_CHANGED = 2;
+
+  CLIENT_REQUESTED = 3;
+
+  COLLABORATOR_CHANGED = 4;
+
+  ENTITY_STATE_CHANGED = 5;
+
+  INVITATION = 6;
+
+  LOGIN_TOKEN = 7;
+
+  PASSWORD_CHANGED = 8;
+
+  TEMPORARY_PASSWORD = 9;
+
+  USER_REQUESTED = 10;
+
+  VALIDATE = 11;
 }
 
 enum NotificationReceiver {
@@ -103,10 +134,7 @@ message CreateNotificationRequest {
   EntityIdentifiers entity_ids = 1 [(validate.rules).message.required = true];
 
   // The type of this notification.
-  string notification_type = 2 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 100,
-  }];
+  NotificationType notification_type = 2 [(validate.rules).enum.defined_only = true];
 
   // The data related to the notification.
   google.protobuf.Any data = 3;

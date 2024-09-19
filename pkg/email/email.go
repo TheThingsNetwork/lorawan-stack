@@ -15,9 +15,11 @@
 // Package email provides an interface to send messages over email.
 package email
 
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+
 // Message for sending over email.
 type Message struct {
-	TemplateName string
+	TemplateName ttnpb.NotificationType
 
 	RecipientName    string
 	RecipientAddress string

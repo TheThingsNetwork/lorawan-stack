@@ -217,10 +217,10 @@ func (m *CreateNotificationRequest) ValidateFields(paths ...string) error {
 
 		case "notification_type":
 
-			if l := utf8.RuneCountInString(m.GetNotificationType()); l < 1 || l > 100 {
+			if _, ok := NotificationType_name[int32(m.GetNotificationType())]; !ok {
 				return CreateNotificationRequestValidationError{
 					field:  "notification_type",
-					reason: "value length must be between 1 and 100 runes, inclusive",
+					reason: "value must be one of the defined enum values",
 				}
 			}
 
