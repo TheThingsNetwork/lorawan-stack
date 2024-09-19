@@ -140,7 +140,7 @@ func (is *IdentityServer) requestEmailValidation(
 	)).Info("Sending validation email")
 	go is.SendTemplateEmailToUsers( // nolint:errcheck
 		is.Component.FromRequestContext(ctx),
-		"validate",
+		ttnpb.NotificationType_VALIDATE,
 		func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
 			validateData.TemplateData = data
 			return validateData, nil

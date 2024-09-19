@@ -11,6 +11,49 @@ import (
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 )
 
+// MarshalProtoJSON marshals the NotificationType to JSON.
+func (x NotificationType) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), NotificationType_name)
+}
+
+// MarshalText marshals the NotificationType to text.
+func (x NotificationType) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), NotificationType_name)), nil
+}
+
+// MarshalJSON marshals the NotificationType to JSON.
+func (x NotificationType) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// NotificationType_customvalue contains custom string values that extend NotificationType_value.
+var NotificationType_customvalue = map[string]int32{}
+
+// UnmarshalProtoJSON unmarshals the NotificationType from JSON.
+func (x *NotificationType) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(NotificationType_value, NotificationType_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read NotificationType enum: %v", err)
+		return
+	}
+	*x = NotificationType(v)
+}
+
+// UnmarshalText unmarshals the NotificationType from text.
+func (x *NotificationType) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), NotificationType_customvalue, NotificationType_value)
+	if err != nil {
+		return err
+	}
+	*x = NotificationType(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the NotificationType from JSON.
+func (x *NotificationType) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the NotificationReceiver to JSON.
 func (x NotificationReceiver) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), NotificationReceiver_name)
@@ -133,10 +176,10 @@ func (x *Notification) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("entity_ids")
 		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
 	}
-	if x.NotificationType != "" || s.HasField("notification_type") {
+	if x.NotificationType != 0 || s.HasField("notification_type") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("notification_type")
-		s.WriteString(x.NotificationType)
+		x.NotificationType.MarshalProtoJSON(s)
 	}
 	if x.Data != nil || s.HasField("data") {
 		s.WriteMoreIf(&wroteField)
@@ -223,7 +266,7 @@ func (x *Notification) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
 		case "notification_type", "notificationType":
 			s.AddField("notification_type")
-			x.NotificationType = s.ReadString()
+			x.NotificationType.UnmarshalProtoJSON(s)
 		case "data":
 			s.AddField("data")
 			if s.ReadNil() {
@@ -295,10 +338,10 @@ func (x *CreateNotificationRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 		s.WriteObjectField("entity_ids")
 		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
 	}
-	if x.NotificationType != "" || s.HasField("notification_type") {
+	if x.NotificationType != 0 || s.HasField("notification_type") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("notification_type")
-		s.WriteString(x.NotificationType)
+		x.NotificationType.MarshalProtoJSON(s)
 	}
 	if x.Data != nil || s.HasField("data") {
 		s.WriteMoreIf(&wroteField)
@@ -357,7 +400,7 @@ func (x *CreateNotificationRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
 		case "notification_type", "notificationType":
 			s.AddField("notification_type")
-			x.NotificationType = s.ReadString()
+			x.NotificationType.UnmarshalProtoJSON(s)
 		case "data":
 			s.AddField("data")
 			if s.ReadNil() {

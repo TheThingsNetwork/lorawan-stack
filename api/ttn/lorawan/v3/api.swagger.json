@@ -26943,7 +26943,7 @@
           "description": "The entity this notification is about."
         },
         "notification_type": {
-          "type": "string",
+          "$ref": "#/definitions/v3NotificationType",
           "description": "The type of this notification."
         },
         "data": {
@@ -26995,6 +26995,24 @@
         "NOTIFICATION_STATUS_ARCHIVED"
       ],
       "default": "NOTIFICATION_STATUS_UNSEEN"
+    },
+    "v3NotificationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "API_KEY_CREATED",
+        "API_KEY_CHANGED",
+        "CLIENT_REQUESTED",
+        "COLLABORATOR_CHANGED",
+        "ENTITY_STATE_CHANGED",
+        "INVITATION",
+        "LOGIN_TOKEN",
+        "PASSWORD_CHANGED",
+        "TEMPORARY_PASSWORD",
+        "USER_REQUESTED",
+        "VALIDATE"
+      ],
+      "default": "UNKNOWN"
     },
     "v3NsEndDeviceRegistrySetBody": {
       "type": "object",

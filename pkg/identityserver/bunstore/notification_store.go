@@ -45,7 +45,7 @@ type Notification struct {
 	// EntityUID is a copy of the human-readable entity ID, so that we can keep notifications for deleted entities.
 	EntityUID string `bun:"entity_uid,notnull"`
 
-	NotificationType string `bun:"notification_type,notnull"`
+	NotificationType ttnpb.NotificationType `bun:"notification_type,notnull"`
 
 	Data json.RawMessage `bun:"data,nullzero"`
 
@@ -126,7 +126,7 @@ func (s *notificationStore) CreateNotification(
 	ctx, span := tracer.StartFromContext(ctx, "CreateNotification", trace.WithAttributes(
 		attribute.String("entity_type", pb.EntityIds.EntityType()),
 		attribute.String("entity_id", pb.EntityIds.IDString()),
-		attribute.String("notification_type", pb.NotificationType),
+		attribute.String("notification_type", pb.NotificationType.String()),
 	))
 	if pb.SenderIds != nil {
 		span.SetAttributes(attribute.String("sender_id", pb.SenderIds.GetUserId()))

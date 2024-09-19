@@ -23,7 +23,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, "user_requested",
+		fsys, ttnpb.NotificationType_USER_REQUESTED,
 		email.FSTemplate{
 			SubjectTemplate:      "A new user has requested to join {{ .Network.Name }}",
 			HTMLTemplateBaseFile: "base.html.tmpl",
@@ -35,8 +35,8 @@ func init() {
 		panic(err)
 	}
 	email.RegisterTemplate(tmpl)
-	email.RegisterNotification("user_requested", &email.NotificationBuilder{
-		EmailTemplateName: "user_requested",
+	email.RegisterNotification(ttnpb.NotificationType_USER_REQUESTED, &email.NotificationBuilder{
+		EmailTemplateName: ttnpb.NotificationType_USER_REQUESTED,
 		DataBuilder:       newUserRequestedData,
 	})
 }
