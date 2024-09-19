@@ -23,6 +23,7 @@ export const validationSchema = Yup.object().shape({
   wifi_profile: Yup.object()
     .shape({
       _override: Yup.boolean().default(false),
+      _enable_wifi_connection: Yup.boolean().default(false),
       profile_id: Yup.string(),
     })
     .when('.profile_id', {

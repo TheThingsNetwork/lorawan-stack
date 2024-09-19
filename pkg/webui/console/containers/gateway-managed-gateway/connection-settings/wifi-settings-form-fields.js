@@ -31,6 +31,7 @@ import Notification from '@ttn-lw/components/notification'
 import Button from '@ttn-lw/components/button'
 import Link from '@ttn-lw/components/link'
 import toast from '@ttn-lw/components/toast'
+import Checkbox from '@ttn-lw/components/checkbox'
 
 import Message from '@ttn-lw/lib/components/message'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
@@ -73,6 +74,7 @@ const m = defineMessages({
   settingsProfileTooltip:
     'To set up the gateway connection, you can either use a shared profile, to share the connection settings with other gateways, or set a config for this gateway only.',
   fetchProfilesFailure: 'There was an error and the WiFi profiles cannot be fetched.',
+  enableWifiConnection: 'Enable WiFi connection',
 })
 
 const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicked }) => {
@@ -214,36 +216,48 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
       <Message component="h3" content={m.wifiConnection} className="mt-0" />
       {!values.wifi_profile._override ? (
         <>
-          <div className="d-flex al-center gap-cs-m">
-            <ShowProfilesSelect name={`wifi_profile._profile_of`} onChange={handleChangeProfile} />
-            {Boolean(values.wifi_profile._profile_of) && (
-              <RequireRequest
-                requestAction={getConnectionProfilesList({
-                  entityId: values.wifi_profile._profile_of,
-                  type: CONNECTION_TYPES.WIFI,
-                })}
-                handleErrors={false}
-              >
-                <Form.Field
-                  name={`wifi_profile.profile_id`}
-                  title={m.settingsProfile}
-                  component={Select}
-                  options={profileOptions}
-                  tooltip={m.settingsProfileTooltip}
-                  placeholder={m.selectAProfile}
-                  onChange={handleProfileIdChange}
-                  required
-                />
-              </RequireRequest>
-            )}
-          </div>
-          <Message
-            component="div"
-            content={m.profileDescription}
-            className={style.fieldDescription}
+          <Form.Field
+            name={`wifi_profile._enable_wifi_connection`}
+            component={Checkbox}
+            label={m.enableWifiConnection}
           />
-          {values.wifi_profile.profile_id.includes('shared') && (
-            <GatewayWifiProfilesFormFields namePrefix={`wifi_profile.`} />
+          {values.wifi_profile._enable_wifi_connection && (
+            <>
+              <div className="d-flex al-center gap-cs-m">
+                <ShowProfilesSelect
+                  name={`wifi_profile._profile_of`}
+                  onChange={handleChangeProfile}
+                />
+                {Boolean(values.wifi_profile._profile_of) && (
+                  <RequireRequest
+                    requestAction={getConnectionProfilesList({
+                      entityId: values.wifi_profile._profile_of,
+                      type: CONNECTION_TYPES.WIFI,
+                    })}
+                    handleErrors={false}
+                  >
+                    <Form.Field
+                      name={`wifi_profile.profile_id`}
+                      title={m.settingsProfile}
+                      component={Select}
+                      options={profileOptions}
+                      tooltip={m.settingsProfileTooltip}
+                      placeholder={m.selectAProfile}
+                      onChange={handleProfileIdChange}
+                      required
+                    />
+                  </RequireRequest>
+                )}
+              </div>
+              <Message
+                component="div"
+                content={m.profileDescription}
+                className={style.fieldDescription}
+              />
+              {values.wifi_profile.profile_id.includes('shared') && (
+                <GatewayWifiProfilesFormFields namePrefix={`wifi_profile.`} />
+              )}
+            </>
           )}
         </>
       ) : (
@@ -284,6 +298,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
 WifiSettingsFormFields.propTypes = {
   initialValues: PropTypes.shape({
     wifi_profile: PropTypes.shape({
+      _enable_wifi_connection: PropTypes.bool,
       _override: PropTypes.bool,
       profile_id: PropTypes.string,
       _profile_of: PropTypes.string,
