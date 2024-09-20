@@ -212,6 +212,17 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
     [setValues],
   )
 
+  const handleEnableWifiChange = useCallback(() => {
+    const { _profile_of, ...initialProfile } = initialWifiProfile
+    setValues(oldValues => ({
+      ...oldValues,
+      wifi_profile: {
+        ...oldValues.wifi_profile,
+        ...initialProfile,
+      },
+    }))
+  }, [setValues])
+
   return (
     <>
       <Message component="h3" content={m.wifiConnection} className="mt-0" />
@@ -221,6 +232,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
             name={`wifi_profile._enable_wifi_connection`}
             component={Checkbox}
             label={m.enableWifiConnection}
+            onChange={handleEnableWifiChange}
           />
           {values.wifi_profile._enable_wifi_connection && (
             <>
