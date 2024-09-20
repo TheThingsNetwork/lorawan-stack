@@ -315,10 +315,7 @@ const updateManagedGatewayLogic = createRequestLogic({
   process: async ({ action }) => {
     const { gatewayId, patch } = action.payload
 
-    const data = await tts.Gateways.updateManagedGateway(gatewayId, patch, [
-      'wifi_profile_id',
-      'ethernet_profile_id',
-    ])
+    const data = await tts.Gateways.updateManagedGateway(gatewayId, patch)
 
     return { id: gatewayId, data: { ...patch, ...data } }
   },

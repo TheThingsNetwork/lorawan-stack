@@ -321,9 +321,7 @@ const GatewayConnectionSettings = () => {
         )
         const body = {
           wifi_profile_id:
-            wifi_profile._enable_wifi_connection && Boolean(wifiProfileId)
-              ? wifiProfileId
-              : undefined,
+            !wifi_profile._enable_wifi_connection && !wifi_profile._override ? null : wifiProfileId,
           ethernet_profile_id: ethernetProfileId,
         }
 
@@ -335,6 +333,7 @@ const GatewayConnectionSettings = () => {
           resetValues = {
             ...values,
             wifi_profile: {
+              ...values.wifi_profile,
               ...initialWifiProfile,
               profile_id: wifiProfileId,
               _profile_of: wifi_profile._profile_of,
@@ -346,7 +345,10 @@ const GatewayConnectionSettings = () => {
         resetForm({
           values: resetValues,
         })
-        setSaveFormClicked(true)
+
+        if (resetValues.wifi_profile._enable_wifi_connection) {
+          setSaveFormClicked(true)
+        }
 
         toast({
           title: selectedGateway.name,
