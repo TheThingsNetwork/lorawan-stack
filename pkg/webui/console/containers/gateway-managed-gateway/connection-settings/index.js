@@ -248,7 +248,8 @@ const GatewayConnectionSettings = () => {
   const handleSubmit = useCallback(
     async (values, { resetForm, setSubmitting }, cleanValues) => {
       const getWifiProfileId = async (profile, shouldUpdateNonSharedWifiProfile) => {
-        const { profile_id, _profile_of, _override, ...wifiProfile } = profile
+        const { profile_id, _profile_of, _override, _enable_wifi_connection, ...wifiProfile } =
+          profile
         let wifiProfileId = profile_id
         // If the WiFi profile id contains 'shared', create/update that profile.
         // The id could be either shared or non-shared.
