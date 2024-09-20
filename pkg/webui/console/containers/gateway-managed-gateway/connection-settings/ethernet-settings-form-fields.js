@@ -24,7 +24,6 @@ import NetworkInterfaceAddressesFormFields from '@console/containers/gateway-man
 
 const m = defineMessages({
   ethernetConnection: 'Ethernet connection',
-  enableEthernetConnection: 'Enable ethernet connection',
   useStaticIp: 'Use a static IP address',
 })
 
