@@ -105,7 +105,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
   ]
 
   const connectionStatus = useMemo(() => {
-    if (!values.wifi_profile.profile_id) return null
+    if (!values.wifi_profile.profile_id || !values.wifi_profile._enable_wifi_connection) return null
     if (hasChanged) {
       return { message: m.saveToConnect, icon: <Icon icon={IconInfoCircle} /> }
     }
@@ -149,6 +149,7 @@ const WifiSettingsFormFields = ({ initialValues, isWifiConnected, saveFormClicke
     hasChanged,
     isWifiConnected,
     saveFormClicked,
+    values.wifi_profile._enable_wifi_connection,
     values.wifi_profile._override,
     values.wifi_profile.profile_id,
   ])
