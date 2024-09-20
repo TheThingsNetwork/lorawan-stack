@@ -313,7 +313,9 @@ const GatewayConnectionSettings = () => {
         const { wifi_profile, ethernet_profile } = values
 
         const shouldUpdateNonSharedWifiProfile =
-          wifi_profile.profile_id === 'non-shared' && Boolean(nonSharedWifiProfileId)
+          wifi_profile.profile_id === 'non-shared' &&
+          Boolean(nonSharedWifiProfileId) &&
+          wifi_profile._enable_wifi_connection
 
         const wifiProfileId = await getWifiProfileId(wifi_profile, shouldUpdateNonSharedWifiProfile)
         const ethernetProfileId = await getEthernetProfileId(
