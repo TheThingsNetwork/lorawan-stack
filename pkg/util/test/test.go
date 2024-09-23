@@ -104,6 +104,8 @@ var (
 	DefaultMACVersion      = ttnpb.MACVersion_MAC_V1_1
 	DefaultPHYVersion      = ttnpb.PHYVersion_RP001_V1_1_REV_B
 	DefaultFrequencyPlanID = EUFrequencyPlanID
+
+	DefaultRx2Mic = []byte{0x00, 0x00, 0x00, 0x00}
 )
 
 func NewWithContext(ctx context.Context, tb testing.TB) (*assertions.Assertion, context.Context) {

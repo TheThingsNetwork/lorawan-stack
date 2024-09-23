@@ -861,6 +861,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1012,6 +1013,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1167,6 +1169,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1326,6 +1329,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1DataRate:     lastUp.Settings.DataRate,
 							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1479,6 +1483,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Rx2Frequency:    DefaultEU868RX2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							AbsoluteTime:    timestamppb.New(pingAt),
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
@@ -1635,6 +1640,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1778,6 +1784,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1918,6 +1925,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Rx2Frequency:    DefaultEU868RX2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							AbsoluteTime:    timestamppb.New(now.Add(InfrastructureDelay)),
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
@@ -2049,6 +2057,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							AbsoluteTime:    timestamppb.New(now.Add(AbsoluteTimeSchedulingDelay)),
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -2208,6 +2217,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							Rx2Mic:          test.DefaultRx2Mic,
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
