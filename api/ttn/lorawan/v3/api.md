@@ -799,6 +799,7 @@
   - [Message `DeleteInvitationRequest`](#ttn.lorawan.v3.DeleteInvitationRequest)
   - [Message `DeleteUserAPIKeyRequest`](#ttn.lorawan.v3.DeleteUserAPIKeyRequest)
   - [Message `DeleteUserBookmarkRequest`](#ttn.lorawan.v3.DeleteUserBookmarkRequest)
+  - [Message `EmailNotificationPreferences`](#ttn.lorawan.v3.EmailNotificationPreferences)
   - [Message `GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest)
   - [Message `GetUserRequest`](#ttn.lorawan.v3.GetUserRequest)
   - [Message `Invitation`](#ttn.lorawan.v3.Invitation)
@@ -11362,6 +11363,20 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `entity_ids` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.EmailNotificationPreferences">Message `EmailNotificationPreferences`</a>
+
+EmailNotificationPreferences is the message that defines the types of notifications the user wants to receive.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `email_notification_types` | [`NotificationType`](#ttn.lorawan.v3.NotificationType) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `email_notification_types` | <p>`repeated.max_items`: `10`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetUserAPIKeyRequest">Message `GetUserAPIKeyRequest`</a>
 
 | Field | Type | Label | Description |
@@ -11597,6 +11612,7 @@ User is the message that defines a user on the network.
 | `temporary_password_expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `profile_picture` | [`Picture`](#ttn.lorawan.v3.Picture) |  | A profile picture for the user. This information is public and can be seen by any authenticated user in the network. |
 | `console_preferences` | [`UserConsolePreferences`](#ttn.lorawan.v3.UserConsolePreferences) |  | Console preferences contains the user's preferences regarding the behavior of the Console. |
+| `email_notification_preferences` | [`EmailNotificationPreferences`](#ttn.lorawan.v3.EmailNotificationPreferences) |  | next: 27 |
 
 #### Field Rules
 

@@ -52710,6 +52710,46 @@
           ]
         },
         {
+          "name": "EmailNotificationPreferences",
+          "longName": "EmailNotificationPreferences",
+          "fullName": "ttn.lorawan.v3.EmailNotificationPreferences",
+          "description": "EmailNotificationPreferences is the message that defines the types of notifications the user wants to receive.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "email_notification_types",
+              "description": "",
+              "label": "repeated",
+              "type": "NotificationType",
+              "longType": "NotificationType",
+              "fullType": "ttn.lorawan.v3.NotificationType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetUserAPIKeyRequest",
           "longName": "GetUserAPIKeyRequest",
           "fullName": "ttn.lorawan.v3.GetUserAPIKeyRequest",
@@ -54056,6 +54096,18 @@
               "type": "UserConsolePreferences",
               "longType": "UserConsolePreferences",
               "fullType": "ttn.lorawan.v3.UserConsolePreferences",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "email_notification_preferences",
+              "description": "next: 27",
+              "label": "",
+              "type": "EmailNotificationPreferences",
+              "longType": "EmailNotificationPreferences",
+              "fullType": "ttn.lorawan.v3.EmailNotificationPreferences",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

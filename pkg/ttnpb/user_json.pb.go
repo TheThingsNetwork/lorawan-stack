@@ -105,6 +105,62 @@ func (x *DashboardLayout) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the EmailNotificationPreferences message to JSON.
+func (x *EmailNotificationPreferences) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.EmailNotificationTypes) > 0 || s.HasField("email_notification_types") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("email_notification_types")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.EmailNotificationTypes {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s)
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the EmailNotificationPreferences to JSON.
+func (x *EmailNotificationPreferences) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the EmailNotificationPreferences message from JSON.
+func (x *EmailNotificationPreferences) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "email_notification_types", "emailNotificationTypes":
+			s.AddField("email_notification_types")
+			if s.ReadNil() {
+				x.EmailNotificationTypes = nil
+				return
+			}
+			s.ReadArray(func() {
+				var v NotificationType
+				v.UnmarshalProtoJSON(s)
+				x.EmailNotificationTypes = append(x.EmailNotificationTypes, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the EmailNotificationPreferences from JSON.
+func (x *EmailNotificationPreferences) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the UserConsolePreferences_DashboardLayouts message to JSON.
 func (x *UserConsolePreferences_DashboardLayouts) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -429,6 +485,11 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("console_preferences")
 		x.ConsolePreferences.MarshalProtoJSON(s.WithField("console_preferences"))
 	}
+	if x.EmailNotificationPreferences != nil || s.HasField("email_notification_preferences") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("email_notification_preferences")
+		x.EmailNotificationPreferences.MarshalProtoJSON(s.WithField("email_notification_preferences"))
+	}
 	s.WriteObjectEnd()
 }
 
@@ -605,6 +666,13 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.ConsolePreferences = &UserConsolePreferences{}
 			x.ConsolePreferences.UnmarshalProtoJSON(s.WithField("console_preferences", true))
+		case "email_notification_preferences", "emailNotificationPreferences":
+			if s.ReadNil() {
+				x.EmailNotificationPreferences = nil
+				return
+			}
+			x.EmailNotificationPreferences = &EmailNotificationPreferences{}
+			x.EmailNotificationPreferences.UnmarshalProtoJSON(s.WithField("email_notification_preferences", true))
 		}
 	})
 }
