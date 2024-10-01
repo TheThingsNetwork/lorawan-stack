@@ -89,6 +89,8 @@ func AddSelectFlagsForUser(flags *pflag.FlagSet, prefix string, hidden bool) {
 	// NOTE: profile_picture (Picture) does not seem to have select flags.
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("console-preferences", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("console-preferences", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForUserConsolePreferences(flags, flagsplugin.Prefix("console-preferences", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("email-notification-preferences", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("email-notification-preferences", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: email_notification_preferences (EmailNotificationPreferences) does not seem to have select flags.
 }
 
 // SelectFromFlags outputs the fieldmask paths forUser message from select flags.
@@ -189,6 +191,12 @@ func PathsFromSelectFlagsForUser(flags *pflag.FlagSet, prefix string) (paths []s
 	} else {
 		paths = append(paths, selectPaths...)
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("email_notification_preferences", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("email_notification_preferences", prefix))
+	}
+	// NOTE: email_notification_preferences (EmailNotificationPreferences) does not seem to have select flags.
 	return paths, nil
 }
 
@@ -209,6 +217,7 @@ func AddSetFlagsForUser(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("temporary-password", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping ProfilePicture because it does not seem to implement AddSetFlags.
 	AddSetFlagsForUserConsolePreferences(flags, flagsplugin.Prefix("console-preferences", prefix), hidden)
+	// FIXME: Skipping EmailNotificationPreferences because it does not seem to implement AddSetFlags.
 }
 
 // SetFromFlags sets the User message from flags.
@@ -305,6 +314,7 @@ func (m *User) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string
 			paths = append(paths, setPaths...)
 		}
 	}
+	// FIXME: Skipping EmailNotificationPreferences because it does not seem to implement AddSetFlags.
 	return paths, nil
 }
 

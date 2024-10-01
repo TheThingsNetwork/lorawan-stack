@@ -65,8 +65,9 @@ type User struct {
 	ProfilePictureID *string  `bun:"profile_picture_id"`
 	ProfilePicture   *Picture `bun:"rel:belongs-to,join:profile_picture_id=id"`
 
-	ConsolePreferences json.RawMessage `bun:"console_preferences"`
-	UniversalRights    []int           `bun:"universal_rights,array,nullzero"`
+	ConsolePreferences           json.RawMessage `bun:"console_preferences"`
+	UniversalRights              []int           `bun:"universal_rights,array,nullzero"`
+	EmailNotificationPreferences json.RawMessage `bun:"email_notification_preferences"`
 }
 
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
@@ -107,6 +108,8 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 		TemporaryPasswordExpiresAt: ttnpb.ProtoTime(m.TemporaryPasswordExpiresAt),
 
 		ConsolePreferences: &ttnpb.UserConsolePreferences{},
+
+		EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{},
 	}
 
 	if len(m.Attributes) > 0 {
@@ -208,6 +211,14 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		userModel.ConsolePreferences = b
 	}
 
+	if pb.EmailNotificationPreferences != nil {
+		b, err := jsonpb.TTN().Marshal(pb.EmailNotificationPreferences)
+		if err != nil {
+			return nil, err
+		}
+		userModel.EmailNotificationPreferences = b
+	}
+
 	// Run user+account creation in a transaction if we're not already in one.
 	err := s.transact(ctx, func(ctx context.Context, tx bun.IDB) error {
 		_, err := tx.NewInsert().
@@ -275,7 +286,8 @@ func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask
 				"password", "password_updated_at", "require_password_update",
 				"state", "state_description",
 				"admin",
-				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
+				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
+				"email_notification_preferences":
 				// Proto name equals model name.
 				columns = append(columns, f)
 			case "console_preferences",
@@ -599,6 +611,8 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 			consolePreferences.SortBy = pb.ConsolePreferences.GetSortBy()
 		case "universal_rights":
 			columns = append(columns, "universal_rights")
+		case "email_notification_preferences":
+			columns = append(columns, "email_notification_preferences")
 		}
 	}
 
