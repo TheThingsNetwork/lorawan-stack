@@ -113,7 +113,6 @@ func (is *IdentityServer) createOrganizationAPIKey(
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	key.Key = token
@@ -235,7 +234,6 @@ func (is *IdentityServer) updateOrganizationAPIKey(
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	return key, nil
@@ -379,7 +377,6 @@ func (is *IdentityServer) setOrganizationCollaborator( //nolint:gocyclo
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: false,
 		})
 	} else {
 		events.Publish(evtDeleteOrganizationCollaborator.New(

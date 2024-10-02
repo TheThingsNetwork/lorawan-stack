@@ -80,7 +80,6 @@ func (st *StoreTest) TestNotificationStore(t *T) {
 				Data:             notificationData,
 				SenderIds:        usr1.GetIds(),
 				Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
-				Email:            true,
 			}, []*ttnpb.UserIdentifiers{usr1.GetIds(), usr2.GetIds()})
 
 			if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -90,7 +89,6 @@ func (st *StoreTest) TestNotificationStore(t *T) {
 				a.So(created.Data, should.Resemble, notificationData)
 				a.So(created.SenderIds, should.Resemble, usr1.GetIds())
 				a.So(created.Receivers, should.Resemble, []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR})
-				a.So(created.Email, should.BeTrue)
 				a.So(created.Status, should.Resemble, ttnpb.NotificationStatus_NOTIFICATION_STATUS_UNSEEN)
 				a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 				a.So(*ttnpb.StdTime(created.StatusUpdatedAt), should.HappenWithin, 5*time.Second, start)

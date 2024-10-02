@@ -57,7 +57,9 @@ message Notification {
   repeated NotificationReceiver receivers = 8;
 
   // Whether an email was sent for the notification.
-  bool email = 9;
+  bool email = 9 [
+    deprecated = true
+  ];
 
   // The status of the notification.
   NotificationStatus status = 10;
@@ -152,7 +154,9 @@ message CreateNotificationRequest {
   }];
 
   // Whether an email should be sent for the notification.
-  bool email = 6;
+  bool email = 6 [
+    deprecated = true
+  ];
 }
 
 message CreateNotificationResponse {

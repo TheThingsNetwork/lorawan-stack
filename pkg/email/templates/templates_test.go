@@ -349,7 +349,6 @@ func TestNotificationEmailTemplates(t *testing.T) {
 	} {
 		notification := ttnpb.Clone(notification)
 		notification.CreatedAt = now
-		notification.Email = true
 		t.Run(notification.NotificationType.String(), func(t *testing.T) {
 			t.Parallel()
 			a, ctx := test.New(t)
