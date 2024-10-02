@@ -1,5 +1,5 @@
 ALTER TABLE users
-ADD COLUMN IF NOT EXISTS email_notification_preferences INTEGER [];
+ADD COLUMN IF NOT EXISTS email_notification_preferences bytea;
 
 --bun:split
 CREATE OR REPLACE VIEW user_accounts AS

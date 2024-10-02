@@ -133,6 +133,12 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 		}
 	}
 
+	if len(m.EmailNotificationPreferences) > 0 {
+		if err := jsonpb.TTN().Unmarshal(m.EmailNotificationPreferences, pb.EmailNotificationPreferences); err != nil {
+			return nil, err
+		}
+	}
+
 	if len(fieldMask) == 0 {
 		return pb, nil
 	}
@@ -286,8 +292,7 @@ func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask
 				"password", "password_updated_at", "require_password_update",
 				"state", "state_description",
 				"admin",
-				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
-				"email_notification_preferences":
+				"temporary_password", "temporary_password_created_at", "temporary_password_expires_at":
 				// Proto name equals model name.
 				columns = append(columns, f)
 			case "console_preferences",
@@ -295,6 +300,8 @@ func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask
 				"console_preferences.dashboard_layouts",
 				"console_preferences.sort_by":
 				columns = append(columns, "console_preferences")
+			case "email_notification_preferences", "email_notification_preferences.email_notification_types":
+				columns = append(columns, "email_notification_preferences")
 			case "attributes":
 				q = q.Relation("Attributes")
 			case "administrative_contact":
@@ -497,9 +504,16 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 
 	consolePreferences := &ttnpb.UserConsolePreferences{}
 	updateConsolePreferences := false
+	emailNotificationPreferences := &ttnpb.EmailNotificationPreferences{}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(fieldMask), "console_preferences") && len(model.ConsolePreferences) > 0 {
 		if err := jsonpb.TTN().Unmarshal(model.ConsolePreferences, consolePreferences); err != nil {
+			return err
+		}
+	}
+
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(fieldMask), "email_notification_preferences") && len(model.EmailNotificationPreferences) > 0 {
+		if err := jsonpb.TTN().Unmarshal(model.EmailNotificationPreferences, emailNotificationPreferences); err != nil {
 			return err
 		}
 	}
@@ -612,6 +626,12 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 		case "universal_rights":
 			columns = append(columns, "universal_rights")
 		case "email_notification_preferences":
+			emailNotificationPreferences = pb.EmailNotificationPreferences
+			e, err := jsonpb.TTN().Marshal(emailNotificationPreferences)
+			if err != nil {
+				return err
+			}
+			model.EmailNotificationPreferences = e
 			columns = append(columns, "email_notification_preferences")
 		}
 	}
