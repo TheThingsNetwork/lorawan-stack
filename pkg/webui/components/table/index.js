@@ -126,7 +126,7 @@ const Tabular = ({
   const paginatedData = handlePagination(data)
   const rows = paginatedData.map((row, rowIndex) => {
     // If the whole table is disabled each row should be as well.
-    const rowClickable = !clickable ? false : row._meta?.clickable ?? clickable
+    const rowClickable = !clickable ? false : (row._meta?.clickable ?? clickable)
 
     return (
       <Table.Row
