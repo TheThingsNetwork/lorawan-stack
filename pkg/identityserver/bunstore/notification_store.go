@@ -90,7 +90,6 @@ func notificationToPB(m *Notification, r *NotificationReceiver) (*ttnpb.Notifica
 		EntityIds:        getEntityIdentifiers(m.EntityType, m.EntityUID),
 		NotificationType: m.NotificationType,
 		Receivers:        convertIntSlice[int, ttnpb.NotificationReceiver](m.Receivers),
-		Email:            m.Email,
 	}
 	if len(m.Data) > 0 {
 		anyPB := &anypb.Any{}
@@ -144,7 +143,6 @@ func (s *notificationStore) CreateNotification(
 		EntityUID:        pb.GetEntityIds().IDString(),
 		NotificationType: pb.NotificationType,
 		Receivers:        convertIntSlice[ttnpb.NotificationReceiver, int](pb.Receivers),
-		Email:            pb.Email,
 	}
 
 	if pb.Data != nil {

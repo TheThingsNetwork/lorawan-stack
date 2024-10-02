@@ -106,7 +106,6 @@ func (is *IdentityServer) createGatewayAPIKey(
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	key.Key = token
@@ -224,7 +223,6 @@ func (is *IdentityServer) updateGatewayAPIKey(
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	return key, nil
@@ -365,7 +363,6 @@ func (is *IdentityServer) setGatewayCollaborator(
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: false,
 		})
 	} else {
 		events.Publish(evtDeleteGatewayCollaborator.New(

@@ -91,7 +91,6 @@ func (is *IdentityServer) createUserAPIKey(
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	key.Key = token
@@ -208,7 +207,6 @@ func (is *IdentityServer) updateUserAPIKey(
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	return key, nil

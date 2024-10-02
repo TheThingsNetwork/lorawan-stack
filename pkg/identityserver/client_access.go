@@ -178,7 +178,6 @@ func (is *IdentityServer) setClientCollaborator(
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: false,
 		})
 	} else {
 		events.Publish(evtDeleteClientCollaborator.New(

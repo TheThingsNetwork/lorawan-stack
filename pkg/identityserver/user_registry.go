@@ -264,7 +264,6 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: true,
 		})
 	}
 
@@ -517,7 +516,6 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				StateDescription: usr.StateDescription,
 			}),
 			Receivers: []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
-			Email:     true,
 		})
 	}
 
@@ -641,7 +639,6 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
 		NotificationType: ttnpb.NotificationType_PASSWORD_CHANGED,
-		Email:            true,
 		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
 	})
 	return ttnpb.Empty, nil

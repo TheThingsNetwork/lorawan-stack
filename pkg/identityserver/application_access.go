@@ -109,7 +109,6 @@ func (is *IdentityServer) createApplicationAPIKey(
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	key.Key = token
@@ -231,7 +230,6 @@ func (is *IdentityServer) updateApplicationAPIKey(
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	return key, nil
@@ -375,7 +373,6 @@ func (is *IdentityServer) setApplicationCollaborator(
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: false,
 		})
 	} else {
 		events.Publish(evtDeleteApplicationCollaborator.New(

@@ -163,7 +163,6 @@ func (is *IdentityServer) createClient( //nolint:gocyclo
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: true,
 		})
 	}
 
@@ -376,7 +375,6 @@ func (is *IdentityServer) updateClient(
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: true,
 		})
 	}
 	return cli, nil
