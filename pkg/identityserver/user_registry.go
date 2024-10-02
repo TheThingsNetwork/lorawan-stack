@@ -422,7 +422,6 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		"require_password_update",
 		"state", "state_description", "admin",
 		"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
-		"email_notification_preferences",
 	}); err != nil {
 		return nil, err
 	}
