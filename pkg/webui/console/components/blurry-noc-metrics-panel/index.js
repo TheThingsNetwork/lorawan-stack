@@ -44,7 +44,7 @@ const BlurryNocMetricsPanel = ({ title, icon }) => {
     <Panel
       title={title}
       icon={icon}
-      shortCutLinkTitle={sharedMessages.nocShortened}
+      shortCutLinkButton
       shortCutLinkPath="#"
       className={style.panel}
       compact

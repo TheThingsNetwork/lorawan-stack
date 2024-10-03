@@ -24,8 +24,8 @@
   &.primary
     color: var(--c-text-brand-normal)
 
-    &:active:not(.disabled),
-    &:hover:not(.disabled)
+    &:active:not(:disabled),
+    &:hover:not(:disabled)
       color: var(--c-text-brand-normal-hover)
       text-decoration: underline
 
@@ -35,18 +35,22 @@
 
   &.secondary
     color: var(--c-text-neutral-light)
-    &:active:not(.disabled),
-    &:hover:not(.disabled)
+    &:active:not(:disabled),
+    &:hover:not(:disabled)
       color: var(--c-text-neutral-heavy)
 
     &.link-visited
       &:visited
         color: var(--c-text-neutral-heavy)
 
+  &:disabled
+    cursor: not-allowed !important
+    background: transparent
+    border: none
+
   &.primary, &.secondary
-    &.disabled
+    &:disabled
       opacity: .5
-      cursor: not-allowed
 
 .doc-link
   align-items: center

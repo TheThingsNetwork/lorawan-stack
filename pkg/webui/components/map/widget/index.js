@@ -29,7 +29,6 @@ import style from './widget.styl'
 
 const Map = ({ id, markers, setupLocationLink, panel }) => {
   const leafletConfig = {
-    zoomControl: false,
     zoom: 10,
     minZoom: 1,
   }
