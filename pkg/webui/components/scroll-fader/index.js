@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useLayoutEffect, useRef } from 'react'
 import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -38,23 +38,25 @@ const ScrollFader = React.forwardRef(
       const scrollGradientBottom = container.querySelector(`.${style.scrollGradientBottom}`)
 
       if (scrollGradientTop) {
-        scrollGradientTop.style.display = 'block' // Ensure gradient is visible
         const opacity = scrollTop < fadeHeight ? scrollTop / fadeHeight : 1
         scrollGradientTop.style.opacity = opacity
       }
 
       if (scrollGradientBottom) {
-        scrollGradientBottom.style.display = 'block' // Ensure gradient is visible
         const scrollEnd = scrollable - fadeHeight
         const opacity = scrollTop < scrollEnd ? 1 : (scrollable - scrollTop) / fadeHeight
         scrollGradientBottom.style.opacity = opacity
       }
     }, [fadeHeight])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       const container = internalRef.current
       if (!container) return
 
+      // Perform initial fader calculation
+      handleScroll()
+
+      // Observe mutations in the DOM to recalculate faders if content changes
       const mutationObserver = new MutationObserver(() => {
         handleScroll()
       })
@@ -62,7 +64,6 @@ const ScrollFader = React.forwardRef(
       // Run the calculation whenever the children change.
       mutationObserver.observe(container, { attributes: false, childList: true, subtree: true })
 
-      handleScroll() // Call once on mount if needed
       container.addEventListener('scroll', handleScroll)
       window.addEventListener('resize', handleScroll)
 
