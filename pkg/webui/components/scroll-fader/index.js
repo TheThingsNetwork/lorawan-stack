@@ -38,11 +38,13 @@ const ScrollFader = React.forwardRef(
       const scrollGradientBottom = container.querySelector(`.${style.scrollGradientBottom}`)
 
       if (scrollGradientTop) {
+        scrollGradientTop.style.display = 'block' // Ensure gradient is visible
         const opacity = scrollTop < fadeHeight ? scrollTop / fadeHeight : 1
         scrollGradientTop.style.opacity = opacity
       }
 
       if (scrollGradientBottom) {
+        scrollGradientBottom.style.display = 'block' // Ensure gradient is visible
         const scrollEnd = scrollable - fadeHeight
         const opacity = scrollTop < scrollEnd ? 1 : (scrollable - scrollTop) / fadeHeight
         scrollGradientBottom.style.opacity = opacity
