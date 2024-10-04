@@ -57,7 +57,7 @@ func receiversContains(receivers []ttnpb.NotificationReceiver, search ttnpb.Noti
 
 func notificationTypeAllowed(notificationType ttnpb.NotificationType, allowedNotifications []ttnpb.NotificationType) bool {
 	for _, allowedType := range allowedNotifications {
-		if notificationType == allowedType || notificationType == ttnpb.NotificationType_CLIENT_REQUESTED || notificationType == ttnpb.NotificationType_USER_REQUESTED {
+		if notificationType == allowedType {
 			return true
 		}
 	}
@@ -289,7 +289,7 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 	}
 
 	if emailReceiverIDs != nil || len(emailReceiverIDs) > 0 {
-		if err := is.SendNotificationEmailToUserIDs(ctx, notification, receiverUserIDs...); err != nil {
+		if err := is.SendNotificationEmailToUserIDs(ctx, notification, emailReceiverIDs...); err != nil {
 			return nil, err
 		}
 	}
