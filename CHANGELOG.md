@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Potential leak of end devices of other (owned) applications in the top end devices panel in the application overview of the Console.
+
 ### Security
 
 ## [3.32.1] - unreleased
