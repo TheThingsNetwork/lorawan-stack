@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { APPLICATION } from '@console/constants/entities'
 
@@ -28,6 +28,14 @@ import {
 } from '@ttn-lw/components/icon'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import {
+  checkFromState,
+  mayCreateApplications,
+  mayCreateGateways,
+  mayCreateOrganizations,
+  mayViewOrEditUserApiKeys,
+} from '@console/lib/feature-checks'
 
 import { setSearchOpen, setSearchScope } from '@console/store/actions/search'
 
@@ -50,39 +58,55 @@ const ShortcutPanel = () => {
     dispatch(setSearchOpen(true))
   }, [dispatch])
 
+  const showApplicationButton = useSelector(state => checkFromState(mayCreateApplications, state))
+  const showEndDeviceButton = useSelector(state => checkFromState(mayProvisionDevice, state))
+  const showOrganizationButton = useSelector(state => checkFromState(mayCreateOrganizations, state))
+  const showUserApiKeys = useSelector(state => checkFromState(mayViewOrEditUserApiKeys, state))
+  const showGatewaysButton = useSelector(state => checkFromState(mayCreateGateways, state))
+
   return (
     <Panel title={m.shortcuts} icon={IconBolt} divider className="h-full">
       <div className="grid gap-cs-xs">
-        <ShortcutItem
-          icon={IconApplication}
-          title={m.addApplication}
-          link="/applications/add"
-          className="item-6"
-        />
-        <ShortcutItem
-          icon={IconDevice}
-          title={sharedMessages.registerDeviceInApplication}
-          action={handleRegisterDeviceClick}
-          className="item-6"
-        />
-        <ShortcutItem
-          icon={IconUsersGroup}
-          title={m.addNewOrganization}
-          link="/organizations/add"
-          className="item-4"
-        />
-        <ShortcutItem
-          icon={IconKey}
-          title={m.addPersonalApiKey}
-          link="/user/api-keys/add"
-          className="item-4"
-        />
-        <ShortcutItem
-          icon={IconGateway}
-          title={m.addGateway}
-          link="/gateways/add"
-          className="item-4"
-        />
+        {showApplicationButton && (
+          <ShortcutItem
+            icon={IconApplication}
+            title={m.addApplication}
+            link="/applications/add"
+            className="item-6"
+          />
+        )}
+        {showEndDeviceButton && (
+          <ShortcutItem
+            icon={IconDevice}
+            title={sharedMessages.registerDeviceInApplication}
+            action={handleRegisterDeviceClick}
+            className="item-6"
+          />
+        )}
+        {showGatewaysButton && (
+          <ShortcutItem
+            icon={IconUsersGroup}
+            title={m.addNewOrganization}
+            link="/organizations/add"
+            className="item-4"
+          />
+        )}
+        {showUserApiKeys && (
+          <ShortcutItem
+            icon={IconKey}
+            title={m.addPersonalApiKey}
+            link="/user/api-keys/add"
+            className="item-4"
+          />
+        )}
+        {showOrganizationButton && (
+          <ShortcutItem
+            icon={IconGateway}
+            title={m.addGateway}
+            link="/gateways/add"
+            className="item-4"
+          />
+        )}
       </div>
     </Panel>
   )
