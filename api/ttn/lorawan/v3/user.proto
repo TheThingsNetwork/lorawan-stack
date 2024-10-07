@@ -57,8 +57,7 @@ enum DashboardLayout {
 
 // EmailNotificationPreferences is the message that defines the types of notifications the user wants to receive.
 message EmailNotificationPreferences {
-  repeated NotificationType email_notification_types = 1 [(validate.rules).repeated = {
-    max_items: 10,
+  repeated NotificationType types = 1 [(validate.rules).repeated = {
     unique: true,
     items: {
       enum: {defined_only: true}

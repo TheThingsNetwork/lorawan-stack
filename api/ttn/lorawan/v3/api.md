@@ -11369,13 +11369,13 @@ EmailNotificationPreferences is the message that defines the types of notificati
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `email_notification_types` | [`NotificationType`](#ttn.lorawan.v3.NotificationType) | repeated |  |
+| `types` | [`NotificationType`](#ttn.lorawan.v3.NotificationType) | repeated |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `email_notification_types` | <p>`repeated.max_items`: `10`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `types` | <p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GetUserAPIKeyRequest">Message `GetUserAPIKeyRequest`</a>
 

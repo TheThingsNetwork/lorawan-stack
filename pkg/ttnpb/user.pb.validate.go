@@ -47,32 +47,25 @@ func (m *EmailNotificationPreferences) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "email_notification_types":
+		case "types":
 
-			if len(m.GetEmailNotificationTypes()) > 10 {
-				return EmailNotificationPreferencesValidationError{
-					field:  "email_notification_types",
-					reason: "value must contain no more than 10 item(s)",
-				}
-			}
+			_EmailNotificationPreferences_Types_Unique := make(map[NotificationType]struct{}, len(m.GetTypes()))
 
-			_EmailNotificationPreferences_EmailNotificationTypes_Unique := make(map[NotificationType]struct{}, len(m.GetEmailNotificationTypes()))
-
-			for idx, item := range m.GetEmailNotificationTypes() {
+			for idx, item := range m.GetTypes() {
 				_, _ = idx, item
 
-				if _, exists := _EmailNotificationPreferences_EmailNotificationTypes_Unique[item]; exists {
+				if _, exists := _EmailNotificationPreferences_Types_Unique[item]; exists {
 					return EmailNotificationPreferencesValidationError{
-						field:  fmt.Sprintf("email_notification_types[%v]", idx),
+						field:  fmt.Sprintf("types[%v]", idx),
 						reason: "repeated value must contain unique items",
 					}
 				} else {
-					_EmailNotificationPreferences_EmailNotificationTypes_Unique[item] = struct{}{}
+					_EmailNotificationPreferences_Types_Unique[item] = struct{}{}
 				}
 
 				if _, ok := NotificationType_name[int32(item)]; !ok {
 					return EmailNotificationPreferencesValidationError{
-						field:  fmt.Sprintf("email_notification_types[%v]", idx),
+						field:  fmt.Sprintf("types[%v]", idx),
 						reason: "value must be one of the defined enum values",
 					}
 				}
