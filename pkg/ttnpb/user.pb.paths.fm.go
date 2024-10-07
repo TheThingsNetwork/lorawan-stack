@@ -3,11 +3,11 @@
 package ttnpb
 
 var EmailNotificationPreferencesFieldPathsNested = []string{
-	"email_notification_types",
+	"types",
 }
 
 var EmailNotificationPreferencesFieldPathsTopLevel = []string{
-	"email_notification_types",
+	"types",
 }
 var UserConsolePreferencesFieldPathsNested = []string{
 	"console_theme",
@@ -62,7 +62,7 @@ var UserFieldPathsNested = []string{
 	"deleted_at",
 	"description",
 	"email_notification_preferences",
-	"email_notification_preferences.email_notification_types",
+	"email_notification_preferences.types",
 	"ids",
 	"ids.email",
 	"ids.user_id",
@@ -171,7 +171,7 @@ var CreateUserRequestFieldPathsNested = []string{
 	"user.deleted_at",
 	"user.description",
 	"user.email_notification_preferences",
-	"user.email_notification_preferences.email_notification_types",
+	"user.email_notification_preferences.types",
 	"user.ids",
 	"user.ids.email",
 	"user.ids.user_id",
@@ -227,7 +227,7 @@ var UpdateUserRequestFieldPathsNested = []string{
 	"user.deleted_at",
 	"user.description",
 	"user.email_notification_preferences",
-	"user.email_notification_preferences.email_notification_types",
+	"user.email_notification_preferences.types",
 	"user.ids",
 	"user.ids.email",
 	"user.ids.user_id",

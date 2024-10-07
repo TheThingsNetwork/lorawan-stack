@@ -67,7 +67,7 @@ type User struct {
 
 	ConsolePreferences           json.RawMessage `bun:"console_preferences"`
 	UniversalRights              []int           `bun:"universal_rights,array,nullzero"`
-	EmailNotificationPreferences json.RawMessage `bun:"email_notification_preferences"`
+	EmailNotificationPreferences []int           `bun:"email_notification_preferences,array,nullzero"`
 }
 
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
@@ -109,7 +109,9 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 
 		ConsolePreferences: &ttnpb.UserConsolePreferences{},
 
-		EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{},
+		EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{
+			Types: convertIntSlice[int, ttnpb.NotificationType](m.EmailNotificationPreferences),
+		},
 	}
 
 	if len(m.Attributes) > 0 {
@@ -129,12 +131,6 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 
 	if len(m.ConsolePreferences) > 0 {
 		if err := jsonpb.TTN().Unmarshal(m.ConsolePreferences, pb.ConsolePreferences); err != nil {
-			return nil, err
-		}
-	}
-
-	if len(m.EmailNotificationPreferences) > 0 {
-		if err := jsonpb.TTN().Unmarshal(m.EmailNotificationPreferences, pb.EmailNotificationPreferences); err != nil {
 			return nil, err
 		}
 	}
@@ -190,6 +186,7 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		TemporaryPassword:              pb.TemporaryPassword,
 		TemporaryPasswordCreatedAt:     cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordCreatedAt)),
 		TemporaryPasswordExpiresAt:     cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordExpiresAt)),
+		EmailNotificationPreferences:   convertIntSlice[ttnpb.NotificationType, int](pb.EmailNotificationPreferences.GetTypes()),
 	}
 
 	if pb.ProfilePicture != nil {
@@ -217,14 +214,6 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		userModel.ConsolePreferences = b
 	}
 
-	if pb.EmailNotificationPreferences != nil {
-		b, err := jsonpb.TTN().Marshal(pb.EmailNotificationPreferences)
-		if err != nil {
-			return nil, err
-		}
-		userModel.EmailNotificationPreferences = b
-	}
-
 	// Run user+account creation in a transaction if we're not already in one.
 	err := s.transact(ctx, func(ctx context.Context, tx bun.IDB) error {
 		_, err := tx.NewInsert().
@@ -248,10 +237,10 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 
 		return nil
 	})
+
 	if err != nil {
 		return nil, storeutil.WrapDriverError(err)
 	}
-
 	if len(pb.Attributes) > 0 {
 		userModel.Attributes, err = s.replaceAttributes(
 			ctx, nil, pb.Attributes, "user", userModel.ID,
@@ -300,7 +289,7 @@ func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask
 				"console_preferences.dashboard_layouts",
 				"console_preferences.sort_by":
 				columns = append(columns, "console_preferences")
-			case "email_notification_preferences", "email_notification_preferences.email_notification_types":
+			case "email_notification_preferences", "email_notification_preferences.types":
 				columns = append(columns, "email_notification_preferences")
 			case "attributes":
 				q = q.Relation("Attributes")
@@ -504,16 +493,9 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 
 	consolePreferences := &ttnpb.UserConsolePreferences{}
 	updateConsolePreferences := false
-	emailNotificationPreferences := &ttnpb.EmailNotificationPreferences{}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(fieldMask), "console_preferences") && len(model.ConsolePreferences) > 0 {
 		if err := jsonpb.TTN().Unmarshal(model.ConsolePreferences, consolePreferences); err != nil {
-			return err
-		}
-	}
-
-	if ttnpb.HasAnyField(ttnpb.TopLevelFields(fieldMask), "email_notification_preferences") && len(model.EmailNotificationPreferences) > 0 {
-		if err := jsonpb.TTN().Unmarshal(model.EmailNotificationPreferences, emailNotificationPreferences); err != nil {
 			return err
 		}
 	}
@@ -626,12 +608,7 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 		case "universal_rights":
 			columns = append(columns, "universal_rights")
 		case "email_notification_preferences":
-			emailNotificationPreferences = pb.EmailNotificationPreferences
-			e, err := jsonpb.TTN().Marshal(emailNotificationPreferences)
-			if err != nil {
-				return err
-			}
-			model.EmailNotificationPreferences = e
+			model.EmailNotificationPreferences = convertIntSlice[ttnpb.NotificationType, int](pb.EmailNotificationPreferences.Types)
 			columns = append(columns, "email_notification_preferences")
 		}
 	}

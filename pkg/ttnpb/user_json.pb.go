@@ -113,12 +113,12 @@ func (x *EmailNotificationPreferences) MarshalProtoJSON(s *jsonplugin.MarshalSta
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if len(x.EmailNotificationTypes) > 0 || s.HasField("email_notification_types") {
+	if len(x.Types) > 0 || s.HasField("types") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("email_notification_types")
+		s.WriteObjectField("types")
 		s.WriteArrayStart()
 		var wroteElement bool
-		for _, element := range x.EmailNotificationTypes {
+		for _, element := range x.Types {
 			s.WriteMoreIf(&wroteElement)
 			element.MarshalProtoJSON(s)
 		}
@@ -141,16 +141,16 @@ func (x *EmailNotificationPreferences) UnmarshalProtoJSON(s *jsonplugin.Unmarsha
 		switch key {
 		default:
 			s.ReadAny() // ignore unknown field
-		case "email_notification_types", "emailNotificationTypes":
-			s.AddField("email_notification_types")
+		case "types":
+			s.AddField("types")
 			if s.ReadNil() {
-				x.EmailNotificationTypes = nil
+				x.Types = nil
 				return
 			}
 			s.ReadArray(func() {
 				var v NotificationType
 				v.UnmarshalProtoJSON(s)
-				x.EmailNotificationTypes = append(x.EmailNotificationTypes, v)
+				x.Types = append(x.Types, v)
 			})
 		}
 	})

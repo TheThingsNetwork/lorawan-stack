@@ -52736,7 +52736,7 @@
           "extensions": [],
           "fields": [
             {
-              "name": "email_notification_types",
+              "name": "types",
               "description": "",
               "label": "repeated",
               "type": "NotificationType",
@@ -52748,10 +52748,6 @@
               "defaultValue": "",
               "options": {
                 "validate.rules": [
-                  {
-                    "name": "repeated.max_items",
-                    "value": 10
-                  },
                   {
                     "name": "repeated.unique",
                     "value": true

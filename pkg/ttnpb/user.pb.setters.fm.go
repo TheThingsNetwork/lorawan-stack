@@ -7,14 +7,14 @@ import fmt "fmt"
 func (dst *EmailNotificationPreferences) SetFields(src *EmailNotificationPreferences, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "email_notification_types":
+		case "types":
 			if len(subs) > 0 {
-				return fmt.Errorf("'email_notification_types' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'types' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.EmailNotificationTypes = src.EmailNotificationTypes
+				dst.Types = src.Types
 			} else {
-				dst.EmailNotificationTypes = nil
+				dst.Types = nil
 			}
 
 		default:

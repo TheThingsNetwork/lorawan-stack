@@ -22695,7 +22695,7 @@
     "v3EmailNotificationPreferences": {
       "type": "object",
       "properties": {
-        "email_notification_types": {
+        "types": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3NotificationType"
