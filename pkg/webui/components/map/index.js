@@ -108,7 +108,7 @@ const MarkerRenderer = ({ marker }) => {
 
 const Controller = ({ onClick, centerOnMarkers, markers, bounds }) => {
   const map = useMap()
-  const [userInteracted, setUserInteracted] = useState(false)
+  const [useManualZoom, setUseManualZoom] = useState(false)
 
   useEffect(() => {
     const handleWheel = e => {
@@ -119,12 +119,12 @@ const Controller = ({ onClick, centerOnMarkers, markers, bounds }) => {
         const zoomLevel = map.getZoom() - delta // Calculate the new zoom level
 
         map.setZoom(zoomLevel)
-        setUserInteracted(true) // Mark user interaction
+        setUseManualZoom(true) // Mark user interaction
       }
     }
 
     const handleUserInteracted = () => {
-      setUserInteracted(true) // Mark user interaction on zoom
+      setUseManualZoom(true) // Mark user interaction on zoom
     }
 
     // Ensure the map resizes correctly when the container changes size
@@ -142,10 +142,10 @@ const Controller = ({ onClick, centerOnMarkers, markers, bounds }) => {
   }, [map])
 
   useEffect(() => {
-    if (centerOnMarkers && markers.length > 1 && !userInteracted) {
+    if (centerOnMarkers && markers.length > 1 && !useManualZoom) {
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
     }
-  }, [map, centerOnMarkers, markers, bounds, userInteracted])
+  }, [map, centerOnMarkers, markers, bounds, useManualZoom])
 
   useMapEvent('click', onClick)
 
