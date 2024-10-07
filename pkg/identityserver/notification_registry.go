@@ -229,11 +229,12 @@ func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *
 
 		// Filter only user identifiers and remove duplicates.
 		receiverUserIDs = filterUserIdentifiers(uniqueOrganizationOrUserIdentifiers(ctx, receiverIDs))
-		for _, id := range receiverUserIDs {
-			user, _ := st.GetUser(ctx, id, []string{"email_notification_preferences"})
-			userNotificationPreferences := user.GetEmailNotificationPreferences().GetEmailNotificationTypes()
+
+		receiverUsers, _ := st.FindUsers(ctx, receiverUserIDs, []string{"email_notification_preferences"})
+		for _, user := range receiverUsers {
+			userNotificationPreferences := user.GetEmailNotificationPreferences().GetTypes()
 			if notificationTypeAllowed(req.NotificationType, userNotificationPreferences) {
-				emailReceiverIDs = append(emailReceiverIDs, id)
+				emailReceiverIDs = append(emailReceiverIDs, user.Ids)
 			}
 		}
 
