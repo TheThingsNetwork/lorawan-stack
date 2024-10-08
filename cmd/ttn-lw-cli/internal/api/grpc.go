@@ -17,7 +17,6 @@ package api
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"sync"
 	"time"
 
@@ -75,22 +74,6 @@ func SetRetryEnableMetadata(b bool) {
 // SetRetryJitter configures the fraction to be used in the deviation procedure of the rpcretry timeout.
 func SetRetryJitter(f float64) {
 	retryJitter = f
-}
-
-// AddCA adds the CA certificate file.
-func AddCA(pemBytes []byte) (err error) {
-	if tlsConfig == nil {
-		tlsConfig = &tls.Config{}
-	}
-	rootCAs := tlsConfig.RootCAs
-	if rootCAs == nil {
-		if rootCAs, err = x509.SystemCertPool(); err != nil {
-			rootCAs = x509.NewCertPool()
-		}
-	}
-	rootCAs.AppendCertsFromPEM(pemBytes)
-	tlsConfig.RootCAs = rootCAs
-	return nil
 }
 
 // SetAuth sets the authentication information.
