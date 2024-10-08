@@ -300,11 +300,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	}
 
 	if a.forwarderConfig.Enable || a.homeNetworkConfig.Enable {
-		iamConn, err := a.dialContext(ctx, conf.IAMAddress)
+		iamConn, err := a.newClient(ctx, conf.IAMAddress)
 		if err != nil {
 			return nil, err
 		}
-		cpConn, err := a.dialContext(ctx, conf.ControlPlaneAddress)
+		cpConn, err := a.newClient(ctx, conf.ControlPlaneAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -322,7 +322,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	}
 
 	if a.forwarderConfig.Enable {
-		mapperConn, err := a.dialContext(ctx, conf.MapperAddress)
+		mapperConn, err := a.newClient(ctx, conf.MapperAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -414,17 +414,16 @@ func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterPbaHandler(a.Context(), s, conn)
 }
 
-func (a *Agent) dialContext(ctx context.Context, target string, dialOpts ...grpc.DialOption) (*grpc.ClientConn, error) {
+func (a *Agent) newClient(ctx context.Context, target string) (*grpc.ClientConn, error) {
 	baseDialOpts, err := a.authenticator.DialOptions(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defaultOpts := rpcclient.DefaultDialOptions(ctx)
-	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(baseDialOpts)+len(dialOpts))
+	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(baseDialOpts))
 	opts = append(opts, defaultOpts...)
 	opts = append(opts, baseDialOpts...)
-	opts = append(opts, dialOpts...)
-	return grpc.DialContext(ctx, target, opts...)
+	return grpc.NewClient(target, opts...)
 }
 
 func (a *Agent) publishUplink(ctx context.Context) error {
@@ -433,10 +432,7 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 		"forwarder_cluster_id", a.clusterID,
 	))
 
-	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
-		grpc.WithBlock(),
-		grpc.FailOnNonTempDialError(true),
-	)
+	conn, err := a.newClient(ctx, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
@@ -504,10 +500,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 		"group", a.clusterID,
 	))
 
-	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
-		grpc.WithBlock(),
-		grpc.FailOnNonTempDialError(true),
-	)
+	conn, err := a.newClient(ctx, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
@@ -791,10 +784,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	))
 	logger := log.FromContext(ctx)
 
-	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
-		grpc.WithBlock(),
-		grpc.FailOnNonTempDialError(true),
-	)
+	conn, err := a.newClient(ctx, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
@@ -1067,10 +1057,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 		"home_network_cluster_id", a.homeNetworkClusterID,
 	))
 
-	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
-		grpc.WithBlock(),
-		grpc.FailOnNonTempDialError(true),
-	)
+	conn, err := a.newClient(ctx, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
