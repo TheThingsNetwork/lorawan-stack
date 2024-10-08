@@ -57,10 +57,7 @@ func initOTLPExporter(ctx context.Context, config *CollectorConfig) (sdktrace.Sp
 		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
 	}
 
-	conn, err := grpc.DialContext(ctx, config.EndpointURL, append(opts,
-		grpc.FailOnNonTempDialError(true),
-		grpc.WithBlock(),
-	)...)
+	conn, err := grpc.NewClient(config.EndpointURL, opts...)
 	if err != nil {
 		return nil, err
 	}
