@@ -349,6 +349,13 @@ func (Dev) StartDevStack() error {
 	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start", "--log.format=json")
 }
 
+func (Dev) ServeDevWebui() error {
+	if mg.Verbose() {
+		fmt.Println("Starting the webui with interactive configs")
+	}
+	return sh.RunV("node", "tools/js/serve-dev-webui.js")
+}
+
 func init() {
 	initDeps = append(initDeps, Dev.Certificates, Dev.InitDeviceRepo)
 }
