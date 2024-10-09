@@ -33,6 +33,7 @@ import {
   checkFromState,
   mayCreateApplications,
   mayCreateGateways,
+  mayCreateOrEditApplicationDevices,
   mayCreateOrganizations,
   mayViewOrEditUserApiKeys,
 } from '@console/lib/feature-checks'
@@ -59,7 +60,9 @@ const ShortcutPanel = () => {
   }, [dispatch])
 
   const showApplicationButton = useSelector(state => checkFromState(mayCreateApplications, state))
-  const showEndDeviceButton = useSelector(state => checkFromState(mayProvisionDevice, state))
+  const showEndDeviceButton = useSelector(state =>
+    checkFromState(mayCreateOrEditApplicationDevices, state),
+  )
   const showOrganizationButton = useSelector(state => checkFromState(mayCreateOrganizations, state))
   const showUserApiKeys = useSelector(state => checkFromState(mayViewOrEditUserApiKeys, state))
   const showGatewaysButton = useSelector(state => checkFromState(mayCreateGateways, state))
