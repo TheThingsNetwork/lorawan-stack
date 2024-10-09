@@ -17,7 +17,6 @@ package api
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"sync"
 	"time"
 
@@ -29,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpcretry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -77,22 +77,6 @@ func SetRetryJitter(f float64) {
 	retryJitter = f
 }
 
-// AddCA adds the CA certificate file.
-func AddCA(pemBytes []byte) (err error) {
-	if tlsConfig == nil {
-		tlsConfig = &tls.Config{}
-	}
-	rootCAs := tlsConfig.RootCAs
-	if rootCAs == nil {
-		if rootCAs, err = x509.SystemCertPool(); err != nil {
-			rootCAs = x509.NewCertPool()
-		}
-	}
-	rootCAs.AppendCertsFromPEM(pemBytes)
-	tlsConfig.RootCAs = rootCAs
-	return nil
-}
-
 // SetAuth sets the authentication information.
 func SetAuth(authType, authValue string) {
 	auth = &rpcmetadata.MD{
@@ -112,10 +96,10 @@ func requestInterceptor(ctx context.Context, method string, req, reply any, cc *
 }
 
 // GetDialOptions gets the dial options for a gRPC connection.
-func GetDialOptions() (opts []grpc.DialOption) {
-	opts = append(opts, grpc.FailOnNonTempDialError(true), grpc.WithBlock())
+func GetDialOptions() []grpc.DialOption {
+	var opts []grpc.DialOption
 	if withInsecure {
-		opts = append(opts, grpc.WithInsecure())
+		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if auth != nil {
 			md := *auth
 			md.AllowInsecure = true
@@ -132,13 +116,12 @@ func GetDialOptions() (opts []grpc.DialOption) {
 		opts = append(opts, grpc.WithChainUnaryInterceptor(requestInterceptor))
 	}
 
-	opts = append(opts, grpc.WithChainUnaryInterceptor(rpcretry.UnaryClientInterceptor(
+	return append(opts, grpc.WithChainUnaryInterceptor(rpcretry.UnaryClientInterceptor(
 		rpcretry.WithMax(retryMax),
 		rpcretry.WithDefaultTimeout(retryDefaultTimeout),
 		rpcretry.UseMetadata(retryEnableMetadata),
 		rpcretry.WithJitter(retryJitter),
 	)))
-	return
 }
 
 // GetCallOptions returns the gRPC call options.
@@ -151,6 +134,7 @@ var (
 	conns  = make(map[string]*grpc.ClientConn)
 )
 
+// Dial dials a gRPC connection to the target.
 func Dial(ctx context.Context, target string) (*grpc.ClientConn, error) {
 	connMu.Lock()
 	defer connMu.Unlock()
@@ -160,21 +144,17 @@ func Dial(ctx context.Context, target string) (*grpc.ClientConn, error) {
 		return conn, nil
 	}
 	logger.Debug("Connecting to gRPC server...")
-	startTime := time.Now()
-	conn, err := dialContext(ctx, target, grpc.WithBlock())
+	conn, err := newClient(ctx, target)
 	if err != nil {
 		return nil, err
 	}
-	logger.WithField(
-		"duration", time.Since(startTime).Round(time.Microsecond*100),
-	).Debug("Connected to gRPC server")
 	conns[target] = conn
 	return conn, nil
 }
 
-func dialContext(ctx context.Context, target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+func newClient(ctx context.Context, target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 	opts = append(append(rpcclient.DefaultDialOptions(ctx), GetDialOptions()...), opts...)
-	return grpc.DialContext(ctx, target, opts...)
+	return grpc.NewClient(target, opts...)
 }
 
 // CloseAll closes all remaining gRPC connections.
