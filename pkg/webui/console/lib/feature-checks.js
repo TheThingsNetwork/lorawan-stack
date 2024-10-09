@@ -92,6 +92,11 @@ export const mayViewOrEditUserApiKeys = {
   check: rights => rights.includes('RIGHT_USER_SETTINGS_API_KEYS'),
 }
 
+export const mayCreateDevices = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_APPLICATION_DEVICES_WRITE'),
+}
+
 // Application related feature checks.
 export const mayViewApplicationInfo = {
   rightsSelector: selectApplicationRights,
