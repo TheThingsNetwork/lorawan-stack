@@ -1166,7 +1166,9 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		lastUpdate = time.Now()
 
 		stats, paths := conn.Stats()
-		registerGatewayConnectionStats(decoupledCtx, ids, stats)
+		// The stats must be cloned, they are passed to the event publisher and must not be modified
+		// by another goroutine during proto marshalling, otherwise it will trigger a panic.
+		registerGatewayConnectionStats(decoupledCtx, ids, ttnpb.Clone(stats))
 		if gs.statsRegistry == nil {
 			continue
 		}
