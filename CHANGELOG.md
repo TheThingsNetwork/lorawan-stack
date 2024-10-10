@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Potential leak of end devices of other (owned) applications in the top end devices panel in the application overview of the Console.
+- Fix reversed Join Server dev nonce metrics.
 
 ### Security
 
