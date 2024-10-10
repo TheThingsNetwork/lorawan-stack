@@ -24,9 +24,10 @@
   left: 0
   height: 100vh
   sidebar-transition(left)
-  // Stylus has trouble adding multiple properties to a function
-  // so we have to overwrite it like this.
-  transition-property: left, width
+  +media-query-min($bp.xl)
+    // Stylus has trouble adding multiple properties to a function
+    // so we have to overwrite it like this.
+    transition-property: left, width
   +media-query($bp.xxl)
     --sidebar-width: 22rem
   +media-query($bp.lg-xl)
@@ -60,18 +61,19 @@
     z-index: $zi.mobile-menu - 1
     cursor: pointer
 
-  &-minimized
-    position: absolute
-    top: 3.8rem
-    left: calc(-1 * var(--sidebar-width))
-    bottom: 0
-    height: calc(100vh - 3.8rem)
-    z-index: $zi.mobile-menu
+  +media-query-min($bp.lg-xl)
+    &-minimized
+      position: absolute
+      top: 3.8rem
+      left: calc(-1 * var(--sidebar-width))
+      bottom: 0
+      height: calc(100vh - 3.8rem)
+      z-index: $zi.mobile-menu
 
-  &-open&.sidebar-minimized
-    left: 0
-    box-shadow: 0 0 2rem 0 rgba(0,0,0,.05)
+    &-open&.sidebar-minimized
+      left: 0
+      box-shadow: 0 0 2rem 0 rgba(0,0,0,.05)
 
-    & + .sidebar-backdrop
-      opacity: .05
-      visibility: visible
+      & + .sidebar-backdrop
+        opacity: .05
+        visibility: visible

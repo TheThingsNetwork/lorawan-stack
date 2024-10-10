@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useLayoutEffect, useRef } from 'react'
 import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -49,10 +49,14 @@ const ScrollFader = React.forwardRef(
       }
     }, [fadeHeight])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       const container = internalRef.current
       if (!container) return
 
+      // Perform initial fader calculation
+      handleScroll()
+
+      // Observe mutations in the DOM to recalculate faders if content changes
       const mutationObserver = new MutationObserver(() => {
         handleScroll()
       })
@@ -60,7 +64,6 @@ const ScrollFader = React.forwardRef(
       // Run the calculation whenever the children change.
       mutationObserver.observe(container, { attributes: false, childList: true, subtree: true })
 
-      handleScroll() // Call once on mount if needed
       container.addEventListener('scroll', handleScroll)
       window.addEventListener('resize', handleScroll)
 
