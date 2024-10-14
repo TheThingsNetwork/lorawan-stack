@@ -55,7 +55,7 @@ jobs:
           printf '%s' '${{ secrets.SIGNATURE_PASSPHRASE }}' >/tmp/gpg_passphrase
           cat /tmp/gpg_passphrase | gpg --passphrase-fd 0 --no-tty --batch --import gpg_signing_key
       - name: Run Goreleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           version: "v1.18.2"
           args: release --config .goreleaser.snapshot.yml --snapshot --timeout 60m

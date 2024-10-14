@@ -64,7 +64,7 @@ jobs:
           export RC_VERSION=${RC_VERSION#release/v}
           echo "rc_version=$RC_VERSION" >> $GITHUB_OUTPUT
       - name: Run Goreleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           version: "v1.18.2"
           args: release --config .goreleaser.snapshot.yml --snapshot --timeout 60m
