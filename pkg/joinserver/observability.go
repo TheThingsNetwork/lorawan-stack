@@ -130,9 +130,9 @@ func registerRejectJoin(ctx context.Context, req *ttnpb.JoinRequest, err error) 
 }
 
 func registerDevNonceReuse(ctx context.Context, msg *ttnpb.JoinRequest) {
-	jsMetrics.devNonce.tooSmall.WithLabelValues(ctx, ttnpb.MACVersion_name[int32(msg.SelectedMacVersion)]).Inc()
+	jsMetrics.devNonce.reuse.WithLabelValues(ctx, ttnpb.MACVersion_name[int32(msg.SelectedMacVersion)]).Inc()
 }
 
 func registerDevNonceTooSmall(ctx context.Context, msg *ttnpb.JoinRequest) {
-	jsMetrics.devNonce.reuse.WithLabelValues(ctx, ttnpb.MACVersion_name[int32(msg.SelectedMacVersion)]).Inc()
+	jsMetrics.devNonce.tooSmall.WithLabelValues(ctx, ttnpb.MACVersion_name[int32(msg.SelectedMacVersion)]).Inc()
 }
