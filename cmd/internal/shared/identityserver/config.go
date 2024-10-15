@@ -49,6 +49,9 @@ var DefaultIdentityServerConfig = identityserver.Config{
 			},
 		},
 	},
+	Pagination: identityserver.Pagination{
+		DefaultLimit: 10,
+	},
 }
 
 func init() {
