@@ -34,10 +34,6 @@ import (
 )
 
 // Config for the Identity Server.
-
-type Pagination struct {
-	DefaultLimit uint32 `name:"default-limit" description:"The default limit applied to paginated requests if not specified"`
-}
 type Config struct {
 	DatabaseURI      string `name:"database-uri" description:"Database connection URI"`
 	UserRegistration struct {
@@ -126,6 +122,10 @@ type Config struct {
 	} `name:"network"`
 	TelemetryQueue telemetry.TaskQueue `name:"-"`
 	Pagination     Pagination          `name:"pagination" description:"Pagination settings"`
+}
+
+type Pagination struct {
+	DefaultLimit uint32 `name:"default-limit" description:"The default limit applied to paginated requests if not specified"`
 }
 
 type emailTemplatesConfig struct {

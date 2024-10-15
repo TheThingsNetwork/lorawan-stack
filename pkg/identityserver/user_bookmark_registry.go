@@ -54,8 +54,14 @@ func (is *IdentityServer) listUserBookmarks(
 	}
 
 	var total uint64
+	var limit uint32
+	if req.Limit == 0 {
+		limit = is.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
 	ctx = store.WithOrder(ctx, req.Order)
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)

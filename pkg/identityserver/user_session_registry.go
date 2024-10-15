@@ -29,7 +29,13 @@ func (is *IdentityServer) listUserSessions(ctx context.Context, req *ttnpb.ListU
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = is.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	paginateCtx := store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
