@@ -73,7 +73,13 @@ func (rs *registrySearch) SearchApplications(
 
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = rs.IdentityServer.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -101,7 +107,7 @@ func (rs *registrySearch) SearchApplications(
 				return err
 			}
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindApplications).
+		ctx = store.WithPagination(ctx, rs.IdentityServer.config.Pagination.DefaultLimit, 0, nil) // Reset pagination (already done in EntitySearch.FindApplications).
 		res.Applications, err = st.FindApplications(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
@@ -176,7 +182,13 @@ func (rs *registrySearch) SearchClients(
 
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = rs.IdentityServer.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -204,7 +216,7 @@ func (rs *registrySearch) SearchClients(
 				return err
 			}
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindClients).
+		ctx = store.WithPagination(ctx, 0, rs.IdentityServer.config.Pagination.DefaultLimit, nil) // Reset pagination (already done in EntitySearch.FindClients).
 		res.Clients, err = st.FindClients(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
@@ -282,7 +294,13 @@ func (rs *registrySearch) SearchGateways(
 
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = rs.IdentityServer.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -310,7 +328,7 @@ func (rs *registrySearch) SearchGateways(
 				return err
 			}
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindGateways).
+		ctx = store.WithPagination(ctx, 0, rs.IdentityServer.config.Pagination.DefaultLimit, nil) // Reset pagination (already done in EntitySearch.FindGateways).
 		res.Gateways, err = st.FindGateways(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
@@ -391,7 +409,13 @@ func (rs *registrySearch) SearchOrganizations(
 
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = rs.IdentityServer.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -419,7 +443,7 @@ func (rs *registrySearch) SearchOrganizations(
 				return err
 			}
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindOrganizations).
+		ctx = store.WithPagination(ctx, rs.IdentityServer.config.Pagination.DefaultLimit, 0, nil) // Reset pagination (already done in EntitySearch.FindOrganizations).
 		res.Organizations, err = st.FindOrganizations(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
@@ -492,7 +516,13 @@ func (rs *registrySearch) SearchUsers(
 
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = rs.IdentityServer.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -516,7 +546,7 @@ func (rs *registrySearch) SearchUsers(
 		if len(ids) == 0 {
 			return nil
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindUsers).
+		ctx = store.WithPagination(ctx, rs.IdentityServer.config.Pagination.DefaultLimit, 0, nil) // Reset pagination (already done in EntitySearch.FindUsers).
 		res.Users, err = st.FindUsers(ctx, ids, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
@@ -606,7 +636,13 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = rs.IdentityServer.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -622,7 +658,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 		if len(ids) == 0 {
 			return nil
 		}
-		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindEndDevices).
+		ctx = store.WithPagination(ctx, rs.IdentityServer.config.Pagination.DefaultLimit, 0, nil) // Reset pagination (already done in EntitySearch.FindEndDevices).
 		res.EndDevices, err = st.FindEndDevices(ctx, ids, req.FieldMask.GetPaths())
 		if err != nil {
 			return err

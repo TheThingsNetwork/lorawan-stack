@@ -340,7 +340,13 @@ func (is *IdentityServer) listNotifications(ctx context.Context, req *ttnpb.List
 	res := &ttnpb.ListNotificationsResponse{}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		var total uint64
-		paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
+		var limit uint32
+		if req.Limit == 0 {
+			limit = is.config.Pagination.DefaultLimit
+		} else {
+			limit = req.Limit
+		}
+		paginateCtx := store.WithPagination(ctx, limit, req.Page, &total)
 		defer func() {
 			if err == nil {
 				setTotalHeader(ctx, total)

@@ -129,7 +129,13 @@ func (is *IdentityServer) listOrganizationAPIKeys(
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = is.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -402,7 +408,13 @@ func (is *IdentityServer) listOrganizationCollaborators(
 
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = is.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)

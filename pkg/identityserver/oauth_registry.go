@@ -30,7 +30,13 @@ func (is *IdentityServer) listOAuthClientAuthorizations(ctx context.Context, req
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = is.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -60,7 +66,13 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	var limit uint32
+	if req.Limit == 0 {
+		limit = is.config.Pagination.DefaultLimit
+	} else {
+		limit = req.Limit
+	}
+	ctx = store.WithPagination(ctx, limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
