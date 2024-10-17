@@ -124,6 +124,7 @@ type Config struct {
 	Pagination     Pagination          `name:"pagination" description:"Pagination settings"`
 }
 
+// Pagination default limit.
 type Pagination struct {
 	DefaultLimit uint32 `name:"default-limit" description:"The default limit applied to paginated requests if not specified"`
 }
