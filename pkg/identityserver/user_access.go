@@ -106,13 +106,7 @@ func (is *IdentityServer) listUserAPIKeys(
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	var limit uint32
-	if req.Limit == 0 {
-		limit = is.config.Pagination.DefaultLimit
-	} else {
-		limit = req.Limit
-	}
-	ctx = store.WithPagination(ctx, limit, req.Page, &total)
+	ctx = store.WithPagination(ctx, store.WithLimit(req.Limit, is.config.Pagination.DefaultLimit), req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
