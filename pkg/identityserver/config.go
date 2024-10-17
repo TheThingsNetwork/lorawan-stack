@@ -121,6 +121,12 @@ type Config struct {
 		TenantID string          `name:"tenant-id" description:"Tenant ID"`
 	} `name:"network"`
 	TelemetryQueue telemetry.TaskQueue `name:"-"`
+	Pagination     Pagination          `name:"pagination" description:"Pagination settings"`
+}
+
+// Pagination default limit.
+type Pagination struct {
+	DefaultLimit uint32 `name:"default-limit" description:"The default limit applied to paginated requests if not specified"`
 }
 
 type emailTemplatesConfig struct {

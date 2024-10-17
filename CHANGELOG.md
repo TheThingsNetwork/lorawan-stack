@@ -21,6 +21,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Potential leak of end devices of other (owned) applications in the top end devices panel in the application overview of the Console.
 - Fix reversed Join Server dev nonce metrics.
+- Default limit on IS List RPCs if not provided in the request.
 
 ### Security
 

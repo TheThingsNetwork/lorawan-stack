@@ -31,6 +31,14 @@ type PaginationOptions struct {
 	total  *uint64
 }
 
+// WithLimit checks if the limit is set, and returns the set limit or the default.
+func WithLimit(setLimit uint32, defaultLimit uint32) uint32 {
+	if setLimit == 0 {
+		return defaultLimit
+	}
+	return setLimit
+}
+
 // WithPagination instructs the store to paginate the results, and set the total
 // number of results into total.
 func WithPagination(ctx context.Context, limit, page uint32, total *uint64) context.Context {
