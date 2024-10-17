@@ -237,7 +237,6 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 
 		return nil
 	})
-
 	if err != nil {
 		return nil, storeutil.WrapDriverError(err)
 	}

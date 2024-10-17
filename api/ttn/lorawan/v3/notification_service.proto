@@ -57,9 +57,7 @@ message Notification {
   repeated NotificationReceiver receivers = 8;
 
   // Whether an email was sent for the notification.
-  bool email = 9 [
-    deprecated = true
-  ];
+  bool email = 9 [deprecated = true];
 
   // The status of the notification.
   NotificationStatus status = 10;
@@ -69,33 +67,19 @@ message Notification {
 }
 
 enum NotificationType {
-  option (thethings.json.enum) = {
-    marshal_as_string: true,
-    prefix: "NOTIFICATION_TYPE"
-  };
+  option (thethings.json.enum) = {marshal_as_string: true};
 
   UNKNOWN = 0;
-
   API_KEY_CREATED = 1;
-
   API_KEY_CHANGED = 2;
-
   CLIENT_REQUESTED = 3;
-
   COLLABORATOR_CHANGED = 4;
-
   ENTITY_STATE_CHANGED = 5;
-
   INVITATION = 6;
-
   LOGIN_TOKEN = 7;
-
   PASSWORD_CHANGED = 8;
-
   TEMPORARY_PASSWORD = 9;
-
   USER_REQUESTED = 10;
-
   VALIDATE = 11;
 }
 
@@ -154,9 +138,7 @@ message CreateNotificationRequest {
   }];
 
   // Whether an email should be sent for the notification.
-  bool email = 6 [
-    deprecated = true
-  ];
+  bool email = 6 [deprecated = true];
 }
 
 message CreateNotificationResponse {

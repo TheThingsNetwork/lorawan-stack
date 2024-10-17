@@ -68,14 +68,17 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 		return nil, err
 	}
 	events.Publish(evtCreateInvitation.NewWithIdentifiersAndData(ctx, nil, invitation))
-	go is.SendTemplateEmailToUsers(is.FromRequestContext(ctx), ttnpb.NotificationType_INVITATION, func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
-		return &templates.InvitationData{
-			TemplateData:    data,
-			SenderIds:       authInfo.GetEntityIdentifiers().GetUserIds(),
-			InvitationToken: invitation.Token,
-			TTL:             ttl,
-		}, nil
-	}, &ttnpb.User{PrimaryEmailAddress: in.Email})
+	go is.SendTemplateEmailToUsers( // nolint:errcheck
+		is.FromRequestContext(ctx),
+		ttnpb.NotificationType_INVITATION,
+		func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
+			return &templates.InvitationData{
+				TemplateData:    data,
+				SenderIds:       authInfo.GetEntityIdentifiers().GetUserIds(),
+				InvitationToken: invitation.Token,
+				TTL:             ttl,
+			}, nil
+		}, &ttnpb.User{PrimaryEmailAddress: in.Email})
 	return invitation, nil
 }
 

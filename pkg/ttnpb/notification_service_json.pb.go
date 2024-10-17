@@ -26,12 +26,9 @@ func (x NotificationType) MarshalJSON() ([]byte, error) {
 	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
 }
 
-// NotificationType_customvalue contains custom string values that extend NotificationType_value.
-var NotificationType_customvalue = map[string]int32{}
-
 // UnmarshalProtoJSON unmarshals the NotificationType from JSON.
 func (x *NotificationType) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
-	v := s.ReadEnum(NotificationType_value, NotificationType_customvalue)
+	v := s.ReadEnum(NotificationType_value)
 	if err := s.Err(); err != nil {
 		s.SetErrorf("could not read NotificationType enum: %v", err)
 		return
@@ -41,7 +38,7 @@ func (x *NotificationType) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalText unmarshals the NotificationType from text.
 func (x *NotificationType) UnmarshalText(b []byte) error {
-	i, err := jsonplugin.ParseEnumString(string(b), NotificationType_customvalue, NotificationType_value)
+	i, err := jsonplugin.ParseEnumString(string(b), NotificationType_value)
 	if err != nil {
 		return err
 	}

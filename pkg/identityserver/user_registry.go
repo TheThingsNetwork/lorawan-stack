@@ -679,13 +679,15 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
 	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateTemporaryPasswordFieldMask))
-	go is.SendTemplateEmailToUserIDs(is.FromRequestContext(ctx), ttnpb.NotificationType_TEMPORARY_PASSWORD, func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
-		return &templates.TemporaryPasswordData{
-			TemplateData:      data,
-			TemporaryPassword: temporaryPassword,
-			TTL:               ttl,
-		}, nil
-	}, req.GetUserIds())
+	go is.SendTemplateEmailToUserIDs( // nolint:errcheck
+		is.FromRequestContext(ctx), ttnpb.NotificationType_TEMPORARY_PASSWORD,
+		func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
+			return &templates.TemporaryPasswordData{
+				TemplateData:      data,
+				TemporaryPassword: temporaryPassword,
+				TTL:               ttl,
+			}, nil
+		}, req.GetUserIds())
 
 	return ttnpb.Empty, nil
 }
