@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -40,7 +41,7 @@ func TestMailDir(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	err = mailer.Send(&email.Message{
-		TemplateName:     "irrelevant",
+		TemplateName:     ttnpb.NotificationType_UNKNOWN,
 		RecipientName:    "John Doe",
 		RecipientAddress: "john.doe@example.com",
 		Subject:          "Email Subject",

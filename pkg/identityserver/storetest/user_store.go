@@ -75,6 +75,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			ConsolePreferences: &ttnpb.UserConsolePreferences{
 				ConsoleTheme: ttnpb.ConsoleTheme_CONSOLE_THEME_LIGHT,
 			},
+			EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			},
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -101,6 +106,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			)
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
+			a.So(created.EmailNotificationPreferences, should.Resemble, &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			})
 		}
 	})
 

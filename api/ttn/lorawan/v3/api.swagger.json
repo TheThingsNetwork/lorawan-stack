@@ -22620,6 +22620,18 @@
       "default": "DOWNLINK_PATH_CONSTRAINT_NONE",
       "description": " - DOWNLINK_PATH_CONSTRAINT_NONE: Indicates that the gateway can be selected for downlink without constraints by the Network Server.\n - DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER: Indicates that the gateway can be selected for downlink only if no other or better gateway can be selected.\n - DOWNLINK_PATH_CONSTRAINT_NEVER: Indicates that this gateway will never be selected for downlink, even if that results in no available downlink path."
     },
+    "v3EmailNotificationPreferences": {
+      "type": "object",
+      "properties": {
+        "types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3NotificationType"
+          }
+        }
+      },
+      "description": "EmailNotificationPreferences is the message that defines the types of notifications the user wants to receive."
+    },
     "v3EmailValidation": {
       "type": "object",
       "properties": {
@@ -26943,7 +26955,7 @@
           "description": "The entity this notification is about."
         },
         "notification_type": {
-          "type": "string",
+          "$ref": "#/definitions/v3NotificationType",
           "description": "The type of this notification."
         },
         "data": {
@@ -26995,6 +27007,24 @@
         "NOTIFICATION_STATUS_ARCHIVED"
       ],
       "default": "NOTIFICATION_STATUS_UNSEEN"
+    },
+    "v3NotificationType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "API_KEY_CREATED",
+        "API_KEY_CHANGED",
+        "CLIENT_REQUESTED",
+        "COLLABORATOR_CHANGED",
+        "ENTITY_STATE_CHANGED",
+        "INVITATION",
+        "LOGIN_TOKEN",
+        "PASSWORD_CHANGED",
+        "TEMPORARY_PASSWORD",
+        "USER_REQUESTED",
+        "VALIDATE"
+      ],
+      "default": "UNKNOWN"
     },
     "v3NsEndDeviceRegistrySetBody": {
       "type": "object",
@@ -29104,6 +29134,10 @@
         "console_preferences": {
           "$ref": "#/definitions/v3UserConsolePreferences",
           "description": "Console preferences contains the user's preferences regarding the behavior of the Console."
+        },
+        "email_notification_preferences": {
+          "$ref": "#/definitions/v3EmailNotificationPreferences",
+          "title": "next: 27"
         }
       },
       "description": "User is the message that defines a user on the network."
@@ -29363,6 +29397,10 @@
             "console_preferences": {
               "$ref": "#/definitions/v3UserConsolePreferences",
               "description": "Console preferences contains the user's preferences regarding the behavior of the Console."
+            },
+            "email_notification_preferences": {
+              "$ref": "#/definitions/v3EmailNotificationPreferences",
+              "title": "next: 27"
             }
           },
           "description": "User is the message that defines a user on the network."

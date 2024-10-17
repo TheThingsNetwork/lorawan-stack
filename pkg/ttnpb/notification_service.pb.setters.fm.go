@@ -58,8 +58,7 @@ func (dst *Notification) SetFields(src *Notification, paths ...string) error {
 			if src != nil {
 				dst.NotificationType = src.NotificationType
 			} else {
-				var zero string
-				dst.NotificationType = zero
+				dst.NotificationType = 0
 			}
 		case "data":
 			if len(subs) > 0 {
@@ -175,8 +174,7 @@ func (dst *CreateNotificationRequest) SetFields(src *CreateNotificationRequest, 
 			if src != nil {
 				dst.NotificationType = src.NotificationType
 			} else {
-				var zero string
-				dst.NotificationType = zero
+				dst.NotificationType = 0
 			}
 		case "data":
 			if len(subs) > 0 {

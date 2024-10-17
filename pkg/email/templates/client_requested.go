@@ -23,7 +23,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, "client_requested",
+		fsys, ttnpb.NotificationType_CLIENT_REQUESTED,
 		email.FSTemplate{
 			SubjectTemplate:      "A new OAuth client has been requested",
 			HTMLTemplateBaseFile: "base.html.tmpl",
@@ -35,8 +35,8 @@ func init() {
 		panic(err)
 	}
 	email.RegisterTemplate(tmpl)
-	email.RegisterNotification("client_requested", &email.NotificationBuilder{
-		EmailTemplateName: "client_requested",
+	email.RegisterNotification(ttnpb.NotificationType_CLIENT_REQUESTED, &email.NotificationBuilder{
+		EmailTemplateName: ttnpb.NotificationType_CLIENT_REQUESTED,
 		DataBuilder:       newClientRequestedData,
 	})
 }

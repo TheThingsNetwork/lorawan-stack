@@ -45,7 +45,7 @@ type Notification struct {
 	// EntityUID is a copy of the human-readable entity ID, so that we can keep notifications for deleted entities.
 	EntityUID string `bun:"entity_uid,notnull"`
 
-	NotificationType string `bun:"notification_type,notnull"`
+	NotificationType ttnpb.NotificationType `bun:"notification_type,notnull"`
 
 	Data json.RawMessage `bun:"data,nullzero"`
 
@@ -90,7 +90,6 @@ func notificationToPB(m *Notification, r *NotificationReceiver) (*ttnpb.Notifica
 		EntityIds:        getEntityIdentifiers(m.EntityType, m.EntityUID),
 		NotificationType: m.NotificationType,
 		Receivers:        convertIntSlice[int, ttnpb.NotificationReceiver](m.Receivers),
-		Email:            m.Email,
 	}
 	if len(m.Data) > 0 {
 		anyPB := &anypb.Any{}
@@ -126,7 +125,7 @@ func (s *notificationStore) CreateNotification(
 	ctx, span := tracer.StartFromContext(ctx, "CreateNotification", trace.WithAttributes(
 		attribute.String("entity_type", pb.EntityIds.EntityType()),
 		attribute.String("entity_id", pb.EntityIds.IDString()),
-		attribute.String("notification_type", pb.NotificationType),
+		attribute.String("notification_type", pb.NotificationType.String()),
 	))
 	if pb.SenderIds != nil {
 		span.SetAttributes(attribute.String("sender_id", pb.SenderIds.GetUserId()))
@@ -144,7 +143,6 @@ func (s *notificationStore) CreateNotification(
 		EntityUID:        pb.GetEntityIds().IDString(),
 		NotificationType: pb.NotificationType,
 		Receivers:        convertIntSlice[ttnpb.NotificationReceiver, int](pb.Receivers),
-		Email:            pb.Email,
 	}
 
 	if pb.Data != nil {

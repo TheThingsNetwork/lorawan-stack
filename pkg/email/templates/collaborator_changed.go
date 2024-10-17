@@ -24,7 +24,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, "collaborator_changed",
+		fsys, ttnpb.NotificationType_COLLABORATOR_CHANGED,
 		email.FSTemplate{
 			SubjectTemplate:      "A collaborator of your {{ .Notification.EntityIds.EntityType }} has been changed",
 			HTMLTemplateBaseFile: "base.html.tmpl",
@@ -36,8 +36,8 @@ func init() {
 		panic(err)
 	}
 	email.RegisterTemplate(tmpl)
-	email.RegisterNotification("collaborator_changed", &email.NotificationBuilder{
-		EmailTemplateName: "collaborator_changed",
+	email.RegisterNotification(ttnpb.NotificationType_COLLABORATOR_CHANGED, &email.NotificationBuilder{
+		EmailTemplateName: ttnpb.NotificationType_COLLABORATOR_CHANGED,
 		DataBuilder:       newCollaboratorChangedData,
 	})
 }

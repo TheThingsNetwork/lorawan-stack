@@ -21,13 +21,13 @@ import PasswordChanged from './templates/password-changed'
 import UserRequested from './templates/user-requested'
 
 const notificationMap = {
-  api_key_created: ApiKeyCreated,
-  api_key_changed: ApiKeyChanged,
-  client_requested: ClientRequested,
-  collaborator_changed: CollaboratorChanged,
-  entity_state_changed: EntityStateChanged,
-  password_changed: PasswordChanged,
-  user_requested: UserRequested,
+  API_KEY_CREATED: ApiKeyCreated,
+  API_KEY_CHANGED: ApiKeyChanged,
+  CLIENT_REQUESTED: ClientRequested,
+  COLLABORATOR_CHANGED: CollaboratorChanged,
+  ENTITY_STATE_CHANGED: EntityStateChanged,
+  PASSWORD_CHANGED: PasswordChanged,
+  USER_REQUESTED: UserRequested,
 }
 
 export default notificationMap
