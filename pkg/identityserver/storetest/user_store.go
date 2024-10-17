@@ -232,6 +232,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 					ApiKey: ttnpb.DashboardLayout_DASHBOARD_LAYOUT_LIST,
 				},
 			},
+			EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			},
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetUserId(), should.Equal, "foo")
