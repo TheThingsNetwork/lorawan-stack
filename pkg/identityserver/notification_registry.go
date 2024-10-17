@@ -318,8 +318,7 @@ func (is *IdentityServer) notifyAdminsInternal(ctx context.Context, req *ttnpb.C
 		}
 	}
 
-	isAdminActionNotificationType := req.NotificationType == ttnpb.NotificationType_CLIENT_REQUESTED || req.NotificationType == ttnpb.NotificationType_USER_REQUESTED
-	if isAdminActionNotificationType && email.GetNotification(ctx, req.GetNotificationType()) == nil {
+	if email.GetNotification(ctx, req.GetNotificationType()) == nil {
 		log.FromContext(ctx).WithField("notification_type", req.GetNotificationType()).Warn("email template for notification not registered")
 	}
 
@@ -342,10 +341,8 @@ func (is *IdentityServer) notifyAdminsInternal(ctx context.Context, req *ttnpb.C
 		return err
 	}
 
-	if isAdminActionNotificationType {
-		if err := is.SendNotificationEmailToUsers(ctx, notification, receivers...); err != nil {
-			return err
-		}
+	if err := is.SendNotificationEmailToUsers(ctx, notification, receivers...); err != nil {
+		return err
 	}
 
 	return nil
