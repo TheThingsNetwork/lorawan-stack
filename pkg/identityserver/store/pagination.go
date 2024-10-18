@@ -32,11 +32,11 @@ type PaginationOptions struct {
 }
 
 // WithLimit checks if the limit is set, and returns the set limit or the default.
-func WithLimit(setLimit uint32, defaultLimit uint32) uint32 {
-	if setLimit == 0 {
-		return defaultLimit
+func WithLimit(set, def uint32) uint32 {
+	if set == 0 {
+		return def
 	}
-	return setLimit
+	return set
 }
 
 // WithPagination instructs the store to paginate the results, and set the total
