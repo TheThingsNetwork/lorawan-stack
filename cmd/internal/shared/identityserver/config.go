@@ -79,4 +79,5 @@ func init() {
 	DefaultIdentityServerConfig.LoginTokens.TokenTTL = time.Hour
 	DefaultIdentityServerConfig.Delete.Restore = 24 * time.Hour
 	DefaultIdentityServerConfig.Gateways.TokenValidity = 5 * time.Second
+	DefaultIdentityServerConfig.Pagination.DefaultLimit = 100
 }
