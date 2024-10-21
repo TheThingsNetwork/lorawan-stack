@@ -216,7 +216,7 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 	defer s.Close()
 
 	var all []*ttnpb.Invitation
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 102; i++ {
 		created, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     fmt.Sprintf("user%d@example.com", i+1),
 			Token:     fmt.Sprintf("TOKEN%d", i+1),
@@ -237,17 +237,24 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 
 			got, err := s.FindInvitations(paginateCtx)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, all[i+2*int(page-1)])
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 102)
+		}
+	})
+
+	t.Run("FindInvitations_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(store.WithOrder(ctx, "email"), 0, 1, &total)
+		got, err := s.FindInvitations(paginateCtx)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 100)
 		}
 	})
 }

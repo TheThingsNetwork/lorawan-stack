@@ -311,7 +311,7 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 	usr1 := st.population.NewUser()
 
 	var all []*ttnpb.Organization
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 102; i++ {
 		all = append(all, st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 
@@ -336,17 +336,25 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 
 			got, err := s.FindOrganizations(paginateCtx, nil, mask)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, all[i+2*int(page-1)])
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 102)
+		}
+	})
+
+	t.Run("FindOrganizations_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 1, &total)
+
+		got, err := s.FindOrganizations(paginateCtx, nil, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 100)
 		}
 	})
 }

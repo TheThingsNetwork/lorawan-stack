@@ -362,7 +362,7 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 	usr1 := st.population.NewUser()
 
 	var clients []*ttnpb.Client
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 102; i++ {
 		clients = append(clients, st.population.NewClient(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 
@@ -377,7 +377,7 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 	defer s.Close()
 
 	var authorizations []*ttnpb.OAuthClientAuthorization
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 102; i++ {
 		created, err := s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   usr1.GetIds(),
 			ClientIds: clients[i].GetIds(),
@@ -391,7 +391,7 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 	}
 
 	var accessTokens []*ttnpb.OAuthAccessToken
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 102; i++ {
 		created, err := s.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:   usr1.GetIds(),
 			ClientIds: clients[0].GetIds(),
@@ -424,7 +424,7 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 102)
 		}
 	})
 
@@ -437,17 +437,37 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 
 			got, err := s.ListAccessTokens(paginateCtx, usr1.GetIds(), clients[0].GetIds())
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, accessTokens[i+2*int(page-1)])
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 102)
+		}
+	})
+
+	t.Run("ListAuthorizations_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 1, &total)
+
+		got, err := s.ListAuthorizations(paginateCtx, usr1.GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 100)
+		}
+	})
+
+	t.Run("ListAccessTokens_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 1, &total)
+
+		got, err := s.ListAccessTokens(paginateCtx, usr1.GetIds(), clients[0].GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 100)
 		}
 	})
 }

@@ -262,18 +262,18 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 
 func (st *StoreTest) TestMembershipStorePagination(t *T) {
 	var apps []*ttnpb.Application
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 102; i++ {
 		apps = append(apps, st.population.NewApplication(nil))
 	}
 
 	var memberIDs []*ttnpb.OrganizationOrUserIdentifiers
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 102; i++ {
 		ids := st.population.NewUser().GetOrganizationOrUserIdentifiers()
 		memberIDs = append(memberIDs, ids)
 		st.population.NewMembership(ids, apps[0].GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
 	}
 
-	for i := 1; i < 7; i++ {
+	for i := 1; i < 102; i++ {
 		st.population.NewMembership(memberIDs[0], apps[i].GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
 	}
 
@@ -312,7 +312,19 @@ func (st *StoreTest) TestMembershipStorePagination(t *T) {
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 102)
+		}
+	})
+
+	t.Run("FindMembers_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 1, &total)
+
+		got, err := s.FindMembers(paginateCtx, apps[0].GetEntityIdentifiers())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 100)
 		}
 	})
 
@@ -385,7 +397,19 @@ func (st *StoreTest) TestMembershipStorePagination(t *T) {
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 102)
+		}
+	})
+
+	t.Run("FindMemberships_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 1, &total)
+
+		got, err := s.FindMemberships(paginateCtx, memberIDs[0], "application", false)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 100)
 		}
 	})
 }
