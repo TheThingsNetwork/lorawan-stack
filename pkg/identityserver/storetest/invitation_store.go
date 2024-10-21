@@ -252,6 +252,7 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 	})
 }
 
+// TestInvitationStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestInvitationStorePaginationDefaults(t *T) {
 	a, ctx := test.New(t)
 	start := time.Now().Truncate(time.Second)

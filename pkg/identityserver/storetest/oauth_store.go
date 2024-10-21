@@ -452,6 +452,7 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 	})
 }
 
+// TestOAuthStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 	a, ctx := test.New(t)
 

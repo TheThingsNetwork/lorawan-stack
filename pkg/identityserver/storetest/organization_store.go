@@ -351,12 +351,12 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 	})
 }
 
+// TestOrganizationStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestOrganizationStorePaginationDefaults(t *T) {
 	usr1 := st.population.NewUser()
 
-	var all []*ttnpb.Organization
 	for i := 0; i < 102; i++ {
-		all = append(all, st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers()))
+		st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
 	}
 
 	s, ok := st.PrepareDB(t).(interface {

@@ -27,6 +27,8 @@ type PaginationDefaults struct {
 
 var paginationDefaults = PaginationDefaults{}
 
+// SetPaginationDefaults should only be called at the initialization of the server, never on regitries or
+// auxiliary functions.
 func SetPaginationDefaults(d PaginationDefaults) { paginationDefaults = d }
 
 type paginationOptionsKeyType struct{}

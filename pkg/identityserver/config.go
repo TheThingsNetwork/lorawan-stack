@@ -122,7 +122,7 @@ type Config struct {
 	} `name:"network"`
 	TelemetryQueue telemetry.TaskQueue `name:"-"`
 	Pagination     struct {
-		DefaultLimit uint32 `name:"default-limit" description:"The default limit applied to paginated requests if not specified"`
+		DefaultLimit uint32 `name:"default-limit" description:"The default limit applied to paginated requests if not specified"` // nolint:lll
 	} `name:"pagination" description:"Pagination settings"`
 }
 

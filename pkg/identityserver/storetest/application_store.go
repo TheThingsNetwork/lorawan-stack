@@ -361,6 +361,7 @@ func (st *StoreTest) TestApplicationStorePagination(t *T) {
 	})
 }
 
+// TestApplicationStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestApplicationStorePaginationDefaults(t *T) {
 	usr1 := st.population.NewUser()
 

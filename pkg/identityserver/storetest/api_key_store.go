@@ -268,6 +268,7 @@ func (st *StoreTest) TestAPIKeyStorePagination(t *T) {
 	})
 }
 
+// TestAPIKeyStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestAPIKeyStorePaginationDefaults(t *T) {
 	app1 := st.population.NewApplication(nil)
 

@@ -390,6 +390,7 @@ func (st *StoreTest) TestMembershipStorePagination(t *T) {
 	})
 }
 
+// TestMembershipStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestMembershipStorePaginationDefaults(t *T) {
 	var apps []*ttnpb.Application
 	for i := 0; i < 102; i++ {

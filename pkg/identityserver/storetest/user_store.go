@@ -473,6 +473,7 @@ func (st *StoreTest) TestUserStorePagination(t *T) {
 	})
 }
 
+// TestUserStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestUserStorePaginationDefaults(t *T) {
 	for i := 0; i < 102; i++ {
 		st.population.NewUser()

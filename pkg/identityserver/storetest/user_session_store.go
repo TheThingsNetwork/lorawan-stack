@@ -230,6 +230,7 @@ func (st *StoreTest) TestUserSessionStorePagination(t *T) {
 	})
 }
 
+// TestUserSessionStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestUserSessionStorePaginationDefaults(t *T) {
 	a, ctx := test.New(t)
 
@@ -254,7 +255,7 @@ func (st *StoreTest) TestUserSessionStorePaginationDefaults(t *T) {
 			t.FailNow()
 		}
 
-		time.Sleep(test.Delay) // The tests depend on sorting by created_at, so we don't want multiple sessions with the same time.
+		time.Sleep(test.Delay)
 	}
 
 	t.Run("FindSessions_PageLimit", func(t *T) {
