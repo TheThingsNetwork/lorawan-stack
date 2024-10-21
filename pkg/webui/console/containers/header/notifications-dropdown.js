@@ -130,7 +130,7 @@ const NotificationsDropdown = () => {
           ))}
           <div
             className={classnames(
-              'p-cs-m c-text-neutral-semilight fs-s text-center c-bg-brand-extralight',
+              'p-cs-m c-text-neutral-semilight fs-s text-center c-bg-neutral-light',
               style.totalMessage,
             )}
           >

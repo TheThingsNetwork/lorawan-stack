@@ -71,7 +71,8 @@
       height: 2.5rem
 
     &.primary:not(.naked)
-      color: var(--c-bg-neutral-min)
+      color: var(--c-text-neutral-min)
+
       background-color: var(--c-text-brand-normal)
 
       &:disabled
@@ -126,13 +127,46 @@
       gradient-border(var(--c-bg-neutral-min), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
       border: 1px solid transparent
 
+      &:not(:disabled)
+        &:hover
+          gradient-border(var(--c-bg-neutral-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+
+        +focus-visible()
+          gradient-border(var(--c-bg-neutral-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+
+        &:active
+          gradient-border(var(--c-bg-neutral-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+          box-shadow: none
+
       &.warning
         color: var(--c-text-warning-normal)
         border-color: var(--c-border-warning-normal)
 
+        &:not(:disabled)
+          &:hover
+            gradient-border(var(--c-bg-warning-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+
+          +focus-visible()
+            gradient-border(var(--c-bg-warning-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+
+          &:active
+            gradient-border(var(--c-bg-warning-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+            box-shadow: none
+
       &.danger
         color: var(--c-text-error-normal)
         border-color: var(--c-border-error-normal)
+
+        &:not(:disabled)
+          &:hover
+            gradient-border(var(--c-bg-error-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+
+          +focus-visible()
+            gradient-border(var(--c-bg-error-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+
+          &:active
+            gradient-border(var(--c-bg-error-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+            box-shadow: none
 
       &:disabled
         color: var(--c-text-neutral-extralight)
@@ -147,17 +181,6 @@
         .icon
           width: 1.2rem
           height: 1.2rem
-
-      &:not(:disabled)
-        &:hover
-          gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
-
-        +focus-visible()
-          gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
-
-        &:active
-          gradient-border(var(--c-bg-neutral-min-hover), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
-          box-shadow: none
 
     &.naked:not(.primary)
       color: var(--c-text-neutral-light)

@@ -110,7 +110,7 @@ const TopEntitiesSection = ({ topEntities, type }) => {
           <Button
             message={showMore ? sharedMessages.showLess : sharedMessages.showMore}
             onClick={handleShowMore}
-            className="c-text-neutral-light ml-cs-xs mt-cs-xs fs-s"
+            className="c-text-neutral-light ml-cs-xs fs-s mt-cs-xs"
           />
         )}
       </RequireRequest>
