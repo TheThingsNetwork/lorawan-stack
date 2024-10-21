@@ -321,7 +321,7 @@ func (st *StoreTest) TestApplicationStorePagination(t *T) {
 	usr1 := st.population.NewUser()
 
 	var all []*ttnpb.Application
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 7; i++ {
 		all = append(all, st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 
@@ -346,15 +346,39 @@ func (st *StoreTest) TestApplicationStorePagination(t *T) {
 
 			got, err := s.FindApplications(paginateCtx, nil, mask)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				a.So(got, should.HaveLength, 2)
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
 				for i, e := range got {
 					a.So(e, should.Resemble, all[i+2*int(page-1)])
 				}
 			}
 
-			a.So(total, should.Equal, 102)
+			a.So(total, should.Equal, 7)
 		}
 	})
+}
+
+func (st *StoreTest) TestApplicationStorePaginationDefaults(t *T) {
+	usr1 := st.population.NewUser()
+
+	for i := 0; i < 102; i++ {
+		st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.ApplicationStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement ApplicationStore")
+	}
+	defer s.Close()
+
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.ApplicationFieldPathsTopLevel...), "contact_info")
 
 	t.Run("FindApplications_PageLimit", func(t *T) {
 		a, ctx := test.New(t)

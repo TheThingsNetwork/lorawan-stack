@@ -55,7 +55,7 @@ func (is *IdentityServer) listUserBookmarks(
 
 	var total uint64
 	ctx = store.WithOrder(ctx, req.Order)
-	ctx = store.WithPagination(ctx, store.WithLimit(req.Limit, is.config.Pagination.DefaultLimit), req.Page, &total)
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)

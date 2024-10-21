@@ -20,6 +20,15 @@ import (
 	"strings"
 )
 
+// PaginationDefaults sets default values for paginations options within the IS store.
+type PaginationDefaults struct {
+	DefaultLimit uint32
+}
+
+var paginationDefaults = PaginationDefaults{}
+
+func SetPaginationDefaults(d PaginationDefaults) { paginationDefaults = d }
+
 type paginationOptionsKeyType struct{}
 
 var paginationOptionsKey paginationOptionsKeyType
@@ -31,19 +40,14 @@ type PaginationOptions struct {
 	total  *uint64
 }
 
-// WithLimit checks if the limit is set, and returns the set limit or the default.
-func WithLimit(set, def uint32) uint32 {
-	if set == 0 {
-		return def
-	}
-	return set
-}
-
 // WithPagination instructs the store to paginate the results, and set the total
 // number of results into total.
 func WithPagination(ctx context.Context, limit, page uint32, total *uint64) context.Context {
 	if page == 0 {
 		page = 1
+	}
+	if limit == 0 {
+		limit = paginationDefaults.DefaultLimit
 	}
 	return context.WithValue(ctx, paginationOptionsKey, PaginationOptions{
 		limit:  limit,

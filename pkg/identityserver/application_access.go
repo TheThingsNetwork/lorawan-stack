@@ -125,7 +125,7 @@ func (is *IdentityServer) listApplicationAPIKeys(
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, store.WithLimit(req.Limit, is.config.Pagination.DefaultLimit), req.Page, &total)
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -398,7 +398,7 @@ func (is *IdentityServer) listApplicationCollaborators(
 
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
-	ctx = store.WithPagination(ctx, store.WithLimit(req.Limit, is.config.Pagination.DefaultLimit), req.Page, &total)
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)

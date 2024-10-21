@@ -193,7 +193,7 @@ func (st *StoreTest) TestUserSessionStorePagination(t *T) {
 	defer s.Close()
 
 	var sessions []*ttnpb.UserSession
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 7; i++ {
 		created, err := s.CreateSession(ctx, &ttnpb.UserSession{
 			UserIds:   usr1.GetIds(),
 			SessionId: fmt.Sprintf("SESS%d", i+1),
@@ -215,15 +215,47 @@ func (st *StoreTest) TestUserSessionStorePagination(t *T) {
 
 			got, err := s.FindSessions(paginateCtx, usr1.GetIds())
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				a.So(got, should.HaveLength, 2)
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
 				for i, e := range got {
 					a.So(e, should.Resemble, sessions[i+2*int(page-1)])
 				}
 			}
 
-			a.So(total, should.Equal, 102)
+			a.So(total, should.Equal, 7)
 		}
 	})
+}
+
+func (st *StoreTest) TestUserSessionStorePaginationDefaults(t *T) {
+	a, ctx := test.New(t)
+
+	usr1 := st.population.NewUser()
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.UserSessionStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement UserSessionStore")
+	}
+	defer s.Close()
+
+	for i := 0; i < 102; i++ {
+		_, err := s.CreateSession(ctx, &ttnpb.UserSession{
+			UserIds:   usr1.GetIds(),
+			SessionId: fmt.Sprintf("SESS%d", i+1),
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		time.Sleep(test.Delay) // The tests depend on sorting by created_at, so we don't want multiple sessions with the same time.
+	}
 
 	t.Run("FindSessions_PageLimit", func(t *T) {
 		a, ctx := test.New(t)

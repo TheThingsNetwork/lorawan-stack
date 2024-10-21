@@ -311,7 +311,7 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 	usr1 := st.population.NewUser()
 
 	var all []*ttnpb.Organization
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 7; i++ {
 		all = append(all, st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 
@@ -336,15 +336,40 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 
 			got, err := s.FindOrganizations(paginateCtx, nil, mask)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				a.So(got, should.HaveLength, 2)
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
 				for i, e := range got {
 					a.So(e, should.Resemble, all[i+2*int(page-1)])
 				}
 			}
 
-			a.So(total, should.Equal, 102)
+			a.So(total, should.Equal, 7)
 		}
 	})
+}
+
+func (st *StoreTest) TestOrganizationStorePaginationDefaults(t *T) {
+	usr1 := st.population.NewUser()
+
+	var all []*ttnpb.Organization
+	for i := 0; i < 102; i++ {
+		all = append(all, st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers()))
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.OrganizationStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement OrganizationStore")
+	}
+	defer s.Close()
+
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.OrganizationFieldPathsTopLevel...), "contact_info")
 
 	t.Run("FindOrganizations_PageLimit", func(t *T) {
 		a, ctx := test.New(t)

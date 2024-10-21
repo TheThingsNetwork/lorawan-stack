@@ -433,7 +433,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 
 func (st *StoreTest) TestUserStorePagination(t *T) {
 	var all []*ttnpb.User
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 7; i++ {
 		all = append(all, st.population.NewUser())
 	}
 
@@ -458,15 +458,37 @@ func (st *StoreTest) TestUserStorePagination(t *T) {
 
 			got, err := s.FindUsers(paginateCtx, nil, mask)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				a.So(got, should.HaveLength, 2)
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
 				for i, e := range got {
 					a.So(e, should.Resemble, all[i+2*int(page-1)])
 				}
 			}
 
-			a.So(total, should.Equal, 102)
+			a.So(total, should.Equal, 7)
 		}
 	})
+}
+
+func (st *StoreTest) TestUserStorePaginationDefaults(t *T) {
+	for i := 0; i < 102; i++ {
+		st.population.NewUser()
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.UserStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement UserStore")
+	}
+	defer s.Close()
+
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.UserFieldPathsTopLevel...), "contact_info")
 
 	t.Run("FindUsers_PageLimit", func(t *T) {
 		a, ctx := test.New(t)

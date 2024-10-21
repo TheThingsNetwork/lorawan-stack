@@ -216,7 +216,7 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 	defer s.Close()
 
 	var all []*ttnpb.Invitation
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 7; i++ {
 		created, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     fmt.Sprintf("user%d@example.com", i+1),
 			Token:     fmt.Sprintf("TOKEN%d", i+1),
@@ -237,15 +237,45 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 
 			got, err := s.FindInvitations(paginateCtx)
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				a.So(got, should.HaveLength, 2)
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
 				for i, e := range got {
 					a.So(e, should.Resemble, all[i+2*int(page-1)])
 				}
 			}
 
-			a.So(total, should.Equal, 102)
+			a.So(total, should.Equal, 7)
 		}
 	})
+}
+
+func (st *StoreTest) TestInvitationStorePaginationDefaults(t *T) {
+	a, ctx := test.New(t)
+	start := time.Now().Truncate(time.Second)
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.InvitationStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement InvitationStore")
+	}
+	defer s.Close()
+
+	for i := 0; i < 102; i++ {
+		_, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
+			Email:     fmt.Sprintf("user%d@example.com", i+1),
+			Token:     fmt.Sprintf("TOKEN%d", i+1),
+			ExpiresAt: timestamppb.New(start.Add(time.Minute)),
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+	}
 
 	t.Run("FindInvitations_PageLimit", func(t *T) {
 		a, ctx := test.New(t)
