@@ -68,10 +68,10 @@ var (
 				return err
 			}
 			if migrations := status.Applied(); len(migrations) > 0 {
-				logger.Infof("Applied: %s", status)
+				logger.Infof("Applied: %s", migrations)
 			}
 			if migrations := status.Unapplied(); len(migrations) > 0 {
-				logger.Infof("Unapplied: %s", status)
+				logger.Infof("Unapplied: %s", migrations)
 			}
 
 			var group *migrate.MigrationGroup
