@@ -270,10 +270,14 @@ func (st *StoreTest) TestAPIKeyStorePagination(t *T) {
 
 // TestAPIKeyStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestAPIKeyStorePaginationDefaults(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
 	app1 := st.population.NewApplication(nil)
 
 	var all []*ttnpb.APIKey
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 10; i++ {
 		_, key := st.population.NewAPIKey(app1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
 		key.Name = fmt.Sprintf("Key %d", i)
 		all = append(all, key)
@@ -296,10 +300,10 @@ func (st *StoreTest) TestAPIKeyStorePaginationDefaults(t *T) {
 		a, ctx := test.New(t)
 
 		var total uint64
-		paginateCtx := store.WithPagination(ctx, 0, 1, &total)
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
 		got, err := s.FindAPIKeys(paginateCtx, app1.GetEntityIdentifiers())
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-			a.So(got, should.HaveLength, 100)
+			a.So(got, should.HaveLength, 7)
 		}
 	})
 }

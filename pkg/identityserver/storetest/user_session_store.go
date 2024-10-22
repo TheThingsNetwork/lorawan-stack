@@ -232,6 +232,10 @@ func (st *StoreTest) TestUserSessionStorePagination(t *T) {
 
 // TestUserSessionStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestUserSessionStorePaginationDefaults(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
 	a, ctx := test.New(t)
 
 	usr1 := st.population.NewUser()
@@ -246,7 +250,7 @@ func (st *StoreTest) TestUserSessionStorePaginationDefaults(t *T) {
 	}
 	defer s.Close()
 
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 10; i++ {
 		_, err := s.CreateSession(ctx, &ttnpb.UserSession{
 			UserIds:   usr1.GetIds(),
 			SessionId: fmt.Sprintf("SESS%d", i+1),
@@ -262,11 +266,11 @@ func (st *StoreTest) TestUserSessionStorePaginationDefaults(t *T) {
 		a, ctx := test.New(t)
 
 		var total uint64
-		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 1, &total)
+		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 0, &total)
 
 		got, err := s.FindSessions(paginateCtx, usr1.GetIds())
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-			a.So(got, should.HaveLength, 100)
+			a.So(got, should.HaveLength, 7)
 		}
 	})
 }

@@ -254,6 +254,10 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 
 // TestInvitationStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestInvitationStorePaginationDefaults(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
 	a, ctx := test.New(t)
 	start := time.Now().Truncate(time.Second)
 
@@ -267,7 +271,7 @@ func (st *StoreTest) TestInvitationStorePaginationDefaults(t *T) {
 	}
 	defer s.Close()
 
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 10; i++ {
 		_, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     fmt.Sprintf("user%d@example.com", i+1),
 			Token:     fmt.Sprintf("TOKEN%d", i+1),
@@ -282,10 +286,10 @@ func (st *StoreTest) TestInvitationStorePaginationDefaults(t *T) {
 		a, ctx := test.New(t)
 
 		var total uint64
-		paginateCtx := store.WithPagination(store.WithOrder(ctx, "email"), 0, 1, &total)
+		paginateCtx := store.WithPagination(store.WithOrder(ctx, "email"), 0, 0, &total)
 		got, err := s.FindInvitations(paginateCtx)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-			a.So(got, should.HaveLength, 100)
+			a.So(got, should.HaveLength, 7)
 		}
 	})
 }

@@ -475,7 +475,11 @@ func (st *StoreTest) TestUserStorePagination(t *T) {
 
 // TestUserStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestUserStorePaginationDefaults(t *T) {
-	for i := 0; i < 102; i++ {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
+	for i := 0; i < 10; i++ {
 		st.population.NewUser()
 	}
 
@@ -495,11 +499,11 @@ func (st *StoreTest) TestUserStorePaginationDefaults(t *T) {
 		a, ctx := test.New(t)
 
 		var total uint64
-		paginateCtx := store.WithPagination(ctx, 0, 1, &total)
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
 
 		got, err := s.FindUsers(paginateCtx, nil, mask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-			a.So(got, should.HaveLength, 100)
+			a.So(got, should.HaveLength, 7)
 		}
 	})
 }

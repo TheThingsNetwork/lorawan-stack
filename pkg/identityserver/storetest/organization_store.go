@@ -353,9 +353,13 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 
 // TestOrganizationStorePaginationDefaults tests the default pagination values.
 func (st *StoreTest) TestOrganizationStorePaginationDefaults(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
 	usr1 := st.population.NewUser()
 
-	for i := 0; i < 102; i++ {
+	for i := 0; i < 10; i++ {
 		st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
 	}
 
@@ -375,11 +379,11 @@ func (st *StoreTest) TestOrganizationStorePaginationDefaults(t *T) {
 		a, ctx := test.New(t)
 
 		var total uint64
-		paginateCtx := store.WithPagination(ctx, 0, 1, &total)
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
 
 		got, err := s.FindOrganizations(paginateCtx, nil, mask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-			a.So(got, should.HaveLength, 100)
+			a.So(got, should.HaveLength, 7)
 		}
 	})
 }
