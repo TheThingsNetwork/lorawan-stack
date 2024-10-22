@@ -56,7 +56,7 @@ var (
 
 			bunDB := bun.NewDB(sqlDB, pgdialect.New())
 
-			migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations)
+			migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations, migrate.WithMarkAppliedOnSuccess(true))
 
 			err = migrator.Init(cmd.Context())
 			if err != nil {
