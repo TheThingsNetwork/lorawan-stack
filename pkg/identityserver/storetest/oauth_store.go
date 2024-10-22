@@ -463,7 +463,7 @@ func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 	usr1 := st.population.NewUser()
 
 	var clients []*ttnpb.Client
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 15; i++ {
 		clients = append(clients, st.population.NewClient(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 
@@ -477,7 +477,7 @@ func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 	}
 	defer s.Close()
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 15; i++ {
 		_, err := s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   usr1.GetIds(),
 			ClientIds: clients[i].GetIds(),
@@ -489,7 +489,7 @@ func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 		time.Sleep(test.Delay)
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 15; i++ {
 		_, err := s.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:   usr1.GetIds(),
 			ClientIds: clients[0].GetIds(),
@@ -507,8 +507,13 @@ func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 
 		var total uint64
 		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 0, &total)
-
 		got, err := s.ListAuthorizations(paginateCtx, usr1.GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 2, &total)
+		got, err = s.ListAuthorizations(paginateCtx, usr1.GetIds())
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.HaveLength, 7)
 		}
@@ -519,8 +524,13 @@ func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 
 		var total uint64
 		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 0, &total)
-
 		got, err := s.ListAccessTokens(paginateCtx, usr1.GetIds(), clients[0].GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 2, &total)
+		got, err = s.ListAccessTokens(paginateCtx, usr1.GetIds(), clients[0].GetIds())
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.HaveLength, 7)
 		}

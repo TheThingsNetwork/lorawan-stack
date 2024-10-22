@@ -119,7 +119,7 @@ func TestUserStore(t *testing.T) {
 	st := storetest.New(t, newTestStore)
 	st.TestUserStoreCRUD(t)
 	st.TestUserStorePagination(t)
-	st.TestUserSessionStorePaginationDefaults(t)
+	st.TestUserStorePaginationDefaults(t)
 }
 
 func TestUserSessionStore(t *testing.T) {
