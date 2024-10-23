@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - Potential leak of end devices of other (owned) applications in the top end devices panel in the application overview of the Console.
 - Fix reversed Join Server dev nonce metrics.
+- Identity Server's store runs each migration within a transaction, so a migration's changes are only applied if all of its queries are successful.
+  - Identity Server's store now marks a migration as successful after all its operations are finished. Previously it was possible to have a successful migration which not all of its queries were processed.
 
 ### Security
 
