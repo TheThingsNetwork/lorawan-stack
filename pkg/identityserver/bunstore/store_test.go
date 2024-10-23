@@ -72,7 +72,7 @@ func TestApplicationStore(t *testing.T) {
 	st := storetest.New(t, newTestStore)
 	st.TestApplicationStoreCRUD(t)
 	st.TestApplicationStorePagination(t)
-	st.TestAPIKeyStorePaginationDefaults(t)
+	st.TestApplicationStorePaginationDefaults(t)
 }
 
 func TestClientStore(t *testing.T) {
